@@ -71,7 +71,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.5 2002/05/17 12:22:35 geirm Exp $
+ *  @version $Id: JexlTest.java,v 1.6 2002/05/20 10:49:27 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -514,6 +514,25 @@ public class JexlTest extends TestCase
         o = e.evaluate(jc);
 
         assertEquals("o incorrect", Boolean.FALSE, o );
+    }
+
+    /**
+      *  test some simple double array lookups
+      */
+    public void testDoubleArrays()
+         throws Exception
+    {
+        Expression e = ExpressionFactory.createExpression("foo[0][1]");
+        JexlContext jc = JexlHelper.createContext();
+
+        Object[][] foo = new Object[2][2];
+        foo[0][0] = "one";
+        foo[0][1] = "two";
+        
+        jc.getVars().put("foo", foo );
+        Object o = e.evaluate(jc);
+
+        assertEquals("o incorrect", "two", o);
     }
 
     public class Foo
