@@ -53,7 +53,6 @@
  */
 package org.apache.commons.jexl.util;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.jexl.util.introspection.Introspector;

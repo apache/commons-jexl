@@ -53,18 +53,17 @@
  */
 package org.apache.commons.jexl;
 
+import java.io.StringReader;
+
+import org.apache.commons.jexl.parser.ASTExpressionExpression;
+import org.apache.commons.jexl.parser.ASTReferenceExpression;
 import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
-import org.apache.commons.jexl.parser.ASTReference;
-import org.apache.commons.jexl.parser.ASTReferenceExpression;
-import org.apache.commons.jexl.parser.ASTExpressionExpression;
-
-import java.io.StringReader;
 
 /**
  *  Used to create Expression objects
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ExpressionFactory.java,v 1.1 2002/04/26 04:23:14 geirm Exp $
+ *  @version $Id: ExpressionFactory.java,v 1.2 2002/12/16 10:41:59 jstrachan Exp $
  */
 public class ExpressionFactory
 {
