@@ -35,7 +35,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.47 2004/08/20 07:44:07 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.48 2004/08/20 07:51:48 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -110,9 +110,6 @@ public class JexlTest extends TestCase
         l.add(new Integer(3));
 
         jc.getVars().put("list", l);
-
-        Expression e = ExpressionFactory.createExpression("list[1]");
-        Object o = e.evaluate(jc);
 
         assertExpression(jc, "list[1]", new Integer(2));
         assertExpression(jc, "list[1+1]", new Integer(3));
@@ -393,34 +390,14 @@ public class JexlTest extends TestCase
     public void testConditions()
          throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("foo == 2");
         JexlContext jc = JexlHelper.createContext();
-
         jc.getVars().put("foo", new Integer(2) );
-        Object o = e.evaluate(jc);
-
-        assertTrue("o not instanceof Boolean", o instanceof Boolean);
-        assertEquals("o incorrect", Boolean.TRUE, o);
-
-        e = ExpressionFactory.createExpression("2 == 3");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.FALSE, o );
-
-        e = ExpressionFactory.createExpression("3 == foo");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.FALSE, o );
-
-        e = ExpressionFactory.createExpression("3 != foo");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.TRUE, o );
-
-        e = ExpressionFactory.createExpression("foo != 2");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.FALSE, o );
+        
+        assertExpression(jc, "foo == 2", Boolean.TRUE);
+        assertExpression(jc, "2 == 3", Boolean.FALSE);
+        assertExpression(jc, "3 == foo", Boolean.FALSE);
+        assertExpression(jc, "3 != foo", Boolean.TRUE);
+        assertExpression(jc, "foo != 2", Boolean.FALSE);
     }
 
     /**
