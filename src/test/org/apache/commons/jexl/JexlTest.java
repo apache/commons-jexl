@@ -15,6 +15,7 @@
  */
 package org.apache.commons.jexl;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -30,13 +31,15 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.commons.jexl.parser.ParseException;
+import org.apache.commons.jexl.parser.Parser;
+import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.resolver.FlatResolver;
 
 /**
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.56 2004/08/22 08:32:14 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.57 2004/08/22 14:52:15 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -867,6 +870,18 @@ public class JexlTest extends TestCase
     public void testComment() throws Exception
     {
         assertExpression(JexlHelper.createContext(), "## double or nothing\n 1 + 1", Long.valueOf("2"));
+    }
+    
+    /**
+     * Assignment isn't implemented for an expression language
+     * @throws Exception
+     */
+    public void testAssignment() throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("aString", "Hello");
+        Parser parser = new Parser(new StringReader(";"));
+        SimpleNode tree = parser.parse(new StringReader("aString = 'World';"));
     }
     
     /**
