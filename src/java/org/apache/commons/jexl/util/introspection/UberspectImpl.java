@@ -63,6 +63,7 @@ import org.apache.commons.jexl.util.PropertyExecutor;
 import org.apache.commons.logging.Log;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Collection;
 import java.util.Map;
@@ -74,7 +75,7 @@ import java.util.ArrayList;
  *  functionality of Velocity
  *
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @version $Id: UberspectImpl.java,v 1.2 2002/08/09 13:57:04 jstrachan Exp $
+ * @version $Id: UberspectImpl.java,v 1.3 2003/06/22 19:40:40 proyal Exp $
  */
 public class UberspectImpl implements Uberspect, UberspectLoggable
 {
@@ -301,7 +302,27 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
         public Object invoke(Object o, Object[] params)
             throws Exception
         {
-            return method.invoke(o, params);
+            try
+            {
+                return method.invoke(o, params);
+            }
+            catch( InvocationTargetException e )
+            {
+                final Throwable t = e.getTargetException();
+
+                if( t instanceof Exception )
+                {
+                    throw (Exception)t;
+                }
+                else if (t instanceof Error)
+                {
+                    throw (Error)t;
+                }
+                else
+                {
+                    throw e;
+                }
+            }
         }
 
         public boolean isCacheable()
