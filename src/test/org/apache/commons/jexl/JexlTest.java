@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.22 2002/10/26 09:14:46 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.23 2002/10/26 09:26:38 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -457,6 +457,8 @@ public class JexlTest extends TestCase
         jc.getVars().put("foo", "abcdef");
         
         assertExpression(jc, "foo.substring(3)", "def");
+        assertExpression(jc, "foo.substring(0,(size(foo)-3))", "abc");
+        assertExpression(jc, "foo.substring(0,size(foo)-3)", "abc");
         assertExpression(jc, "foo.substring(0,foo.length()-3)", "abc");
     }
 
