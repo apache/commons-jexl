@@ -8,6 +8,7 @@ Developers:
 	(pgpk -ll <your name> && pgpk -xa <your name>) >> this file.
         (gpg --list-sigs <your name>
              && gpg --armor --export <your name>) >> this file.
+    Use gpg --armour --detach-sign --default-key=YOURNAME FILE
 
 pub  1024D/6883C846 2004-08-03 Dion Gillard <dion@apache.org>
 sig 3       6883C846 2004-08-03   Dion Gillard <dion@apache.org>
