@@ -61,7 +61,7 @@ import org.apache.commons.jexl.ExpressionFactory;
  *  simple example to show how to access method and properties
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: MethodPropertyExample.java,v 1.1 2002/04/26 04:47:03 geirm Exp $
+ *  @version $Id: MethodPropertyExample.java,v 1.2 2002/04/26 21:25:07 geirm Exp $
  */
 public class MethodPropertyExample
 {
@@ -73,8 +73,8 @@ public class MethodPropertyExample
          */
         JexlContext jc = JexlHelper.createContext();
 
-        jc.put("foo", new Foo());
-        jc.put("number", new Integer(10));
+        jc.getVars().put("foo", new Foo());
+        jc.getVars().put("number", new Integer(10));
 
         /*
          *  access a method w/o args
