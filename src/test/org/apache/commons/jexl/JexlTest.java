@@ -28,13 +28,14 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.resolver.FlatResolver;
 
 /**
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.41 2004/08/18 07:03:34 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.42 2004/08/19 17:35:47 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -1096,6 +1097,23 @@ public class JexlTest extends TestCase
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("aBool", Boolean.FALSE);
     	assertExpression(jc, "aBool.valueOf('true')", Boolean.TRUE);
+    }
+    
+    /**
+     * Make sure bad syntax throws ParseException
+     * @throws Exception on errors
+     */
+    public void testBadParse() throws Exception
+    {
+    	try
+		{
+    		JexlContext jc = JexlHelper.createContext();
+    		Expression e = ExpressionFactory.createExpression("empty()");
+		}
+    	catch (ParseException pe)
+		{
+    		System.err.println("Expecting a parse exception: " + pe.getMessage());
+		}
     }
     
     /**
