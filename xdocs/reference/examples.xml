@@ -27,7 +27,7 @@
           <li><a href="#Evaluating Expressions">Evaluating Expressions</a></li>
           <li><a href="#Custom Contexts">Custom Contexts</a></li>
           <li><a href="#Custom Resolvers">Custom Resolvers</a></li>
-          <li><a href="#Example Expressions">Example Expression</a></li>
+          <li><a href="#Example Expressions">Example Expressions</a></li>
         </ul>
       </p>
     </section>
@@ -104,6 +104,9 @@
 -12 + 77.2
         </source>
       </subsection>
+      <subsection name="Calling methods"></subsection>
+      <subsection name="Accessing properties"></subsection>
+      <subsection name="Arrays, Collections and Maps"></subsection>
     </section>
   </body>
 </document>
