@@ -18,20 +18,28 @@ package org.apache.commons.jexl;
 
 
 /**
- *  Inferface for expression object.
+ * Represents a single JEXL expression.  This simple interface
+ * provides access to the underlying expression through getExpression(), 
+ * and it provides hooks to add a pre- and post- expression resolver.   
  *
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: Expression.java,v 1.4 2004/02/28 13:45:20 yoavs Exp $
+ * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
+ * @version $Id: Expression.java,v 1.5 2004/06/12 23:53:17 tobrien Exp $
  */
 public interface Expression
 {
     /**
-     *  Evaluates the expression, returning the return value;
+     * Evaluates the expression with the variables contained in the
+     * supplied {@link JexlContext}. 
+     * 
+     * @param context A JexlContext containing variables.
+     * @return The result of this evaluation
      */
     public Object evaluate(JexlContext context) throws Exception;
 
     /**
-     *  returns the expression used
+     * Returns the JEXL expression this Expression was created with.
+     * 
+     * @return The JEXL expression to be evaluated
      */
     public String getExpression();
 

@@ -28,7 +28,7 @@ import org.apache.commons.jexl.parser.SimpleNode;
  *  a reference or expression that we can get the value of.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ExpressionImpl.java,v 1.6 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id: ExpressionImpl.java,v 1.7 2004/06/12 23:53:17 tobrien Exp $
  */
 class ExpressionImpl implements Expression
 {
@@ -57,6 +57,8 @@ class ExpressionImpl implements Expression
 
     /**
      *  evaluate the expression and return the value
+     *
+     * @todo Under what conditions will pre and post resolvers be called
      *
      *  @param context Context containing objects/data used for evaluation
      *  @return value of expression
