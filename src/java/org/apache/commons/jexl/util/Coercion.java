@@ -175,10 +175,26 @@ public class Coercion
         }
         else if (val instanceof Number)
         {
+            //The below construct is used rather than ((Number)val).doubleValue() to ensure
+            //equality between comparint new Double( 6.4 / 3 ) and the jexl expression of 6.4 / 3
             return new Double(Double.parseDouble(String.valueOf(val)));
         }
 
         throw new Exception("Double coercion exception");
+    }
+
+    public static boolean isFloatingPoint( final Object o )
+    {
+        return o instanceof Float || o instanceof Double;
+    }
+
+    public static boolean isNumberable( final Object o )
+    {
+        return o instanceof Integer
+            || o instanceof Long
+            || o instanceof Byte
+            || o instanceof Short
+            || o instanceof Character;
     }
 
 }

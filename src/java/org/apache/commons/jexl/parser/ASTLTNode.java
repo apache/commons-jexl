@@ -55,12 +55,16 @@
 package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl.util.Coercion;
 
 /**
  *  LT : a < b
  *
+ *  Follows A.3.6.1 of the JSTL 1.0 specification
+ *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTLTNode.java,v 1.2 2003/03/06 21:34:32 werken Exp $
+ *  @author <a href="mailto:proyal@apache.org">Peter Royal</a>
+ *  @version $Id: ASTLTNode.java,v 1.3 2003/06/22 19:43:01 proyal Exp $
  */
 public class ASTLTNode extends SimpleNode
 {
@@ -90,20 +94,48 @@ public class ASTLTNode extends SimpleNode
         Object left = ( (SimpleNode) jjtGetChild(0)).value(jc);
         Object right = ( (SimpleNode) jjtGetChild(1)).value(jc);
 
-        if ((left==null) || (right==null))
+        if( ( left == right ) || ( left == null ) || ( right == null ) )
         {
-            throw new Exception("Null comparison : LT ");
+            return Boolean.FALSE;
         }
-
-        if ( (left instanceof Integer || left instanceof Long) 
-             && ( right instanceof Integer || right instanceof Long) )
+        else if( Coercion.isFloatingPoint( left ) || Coercion.isFloatingPoint( right ) )
         {
-            long leftLong = ((Number)left).longValue();
-            long rightLong = ((Number)right).longValue();
+            double leftDouble = Coercion.coerceDouble( left ).doubleValue();
+            double rightDouble = Coercion.coerceDouble( right ).doubleValue();
 
-            return ( ( leftLong < rightLong )
-                     ? Boolean.TRUE
-                     : Boolean.FALSE );
+            return leftDouble < rightDouble
+                ? Boolean.TRUE
+                : Boolean.FALSE;
+        }
+        else if( Coercion.isNumberable( left ) || Coercion.isNumberable( right ) )
+        {
+            long leftLong = Coercion.coerceLong( left ).longValue();
+            long rightLong = Coercion.coerceLong( right ).longValue();
+
+            return leftLong < rightLong
+                ? Boolean.TRUE
+                : Boolean.FALSE;
+        }
+        else if( left instanceof String || right instanceof String )
+        {
+            String leftString = left.toString();
+            String rightString = right.toString();
+
+            return leftString.compareTo( rightString ) < 0
+                ? Boolean.TRUE
+                : Boolean.FALSE;
+        }
+        else if( left instanceof Comparable )
+        {
+            return ( (Comparable)left ).compareTo( right ) < 0
+                ? Boolean.TRUE
+                : Boolean.FALSE;
+        }
+        else if( right instanceof Comparable )
+        {
+            return ( (Comparable)right ).compareTo( left ) > 0
+                ? Boolean.TRUE
+                : Boolean.FALSE;
         }
 
         throw new Exception("Invalid comparison : LT ");
