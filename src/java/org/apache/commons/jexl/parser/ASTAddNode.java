@@ -55,12 +55,13 @@
 package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl.util.Coercion;
 
 /**
  *  Addition : either integer addition or string concatenation
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTAddNode.java,v 1.1 2002/04/26 04:23:14 geirm Exp $
+ *  @version $Id: ASTAddNode.java,v 1.2 2002/05/17 12:13:22 geirm Exp $
  */
 public class ASTAddNode extends SimpleNode
 {
@@ -87,17 +88,43 @@ public class ASTAddNode extends SimpleNode
         Object left = ((SimpleNode) jjtGetChild(0)).value(context);
         Object right = ((SimpleNode) jjtGetChild(1)).value(context);
 
-        if (left instanceof String || right instanceof String)
-        {
-            return left.toString() + right.toString();
-        }
-        else if (left instanceof Integer && right instanceof Integer)
-        {
-            int res = ((Integer) left).intValue() + ((Integer) right).intValue();
+        /*
+         *  the spec says 'and', I think 'or'
+         */
+        if (left == null && right == null)
+            return new Integer(0);
 
-            return new Integer(res);
+        /*
+         *  if anything is float, double or string with ( "." | "E" | "e")
+         *  coerce all to doubles and do it
+         */
+        if ( left instanceof Float || left instanceof Double
+            || right instanceof Float || right instanceof Double
+            || (  left instanceof String
+                  && (  ((String) left).indexOf(".") != -1 ||
+                        ((String) left).indexOf("e") != -1 ||
+                        ((String) left).indexOf("E") != -1 )
+               )
+            || (  right instanceof String
+                  && (  ((String) right).indexOf(".") != -1 ||
+                        ((String) right).indexOf("e") != -1 ||
+                        ((String) right).indexOf("E") != -1 )
+               )
+            )
+        {
+            Double l = Coercion.coerceDouble(left);
+            Double r = Coercion.coerceDouble(right);
+
+            return new Double( l.doubleValue() + r.doubleValue() );
         }
 
-        return null;
+        /*
+         * otherwise to longs with thee!
+         */
+
+        Long l = Coercion.coerceLong(left);
+        Long r = Coercion.coerceLong(right);
+
+        return new Long(l.longValue() + r.longValue());
     }
 }
