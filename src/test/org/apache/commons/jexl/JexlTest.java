@@ -34,7 +34,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.39 2004/08/17 13:20:48 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.40 2004/08/18 06:40:01 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -1088,6 +1088,18 @@ public class JexlTest extends TestCase
         assertTrue("Short circuit failure: rhs evaluated when lhs TRUE", !tester.getModified());
     }
 
+    /**
+     * Ensures static methods on objects can be called.
+     */
+    public void testStaticMethodInvocation() throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("aBool", Boolean.FALSE);
+        Expression expr = ExpressionFactory.createExpression("aBool.valueOf('true')");
+        Boolean result = (Boolean)expr.evaluate(jc);
+        assertEquals("Static method evaluation failed: " + result, Boolean.TRUE, result);
+    }
+    
     /**
      * Asserts that the given expression returns the given value when applied to the
      * given context
