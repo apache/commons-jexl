@@ -53,26 +53,22 @@
  */
 package org.apache.commons.jexl;
 
-import junit.framework.TestCase;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import org.apache.commons.jexl.parser.Parser;
-import org.apache.commons.jexl.parser.SimpleNode;
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.ExpressionFactory;
-import org.apache.commons.jexl.resolver.FlatResolver;
-
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import org.apache.commons.jexl.resolver.FlatResolver;
 
 /**
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.24 2002/11/20 12:58:39 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.25 2002/12/16 10:42:26 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -825,15 +821,30 @@ public class JexlTest extends TestCase
         // lets check the square function first..
         assertEquals(4, foo.square(2));
         assertEquals(4, foo.square(-2));
-                        
+
         jc.getVars().put("foo", foo );
         Object o = e.evaluate(jc);
 
         assertEquals("o incorrect", new Integer(5), o);
-        
+
         assertExpression(jc, "foo.square(2)", new Integer(4));
         assertExpression(jc, "foo.square(-2)", new Integer(4));
-   }
+    }
+
+    /**
+      *  test the -1 comparison bug
+      */
+    public void testNegativeIntComparison()
+         throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+        Foo foo = new Foo();
+        jc.getVars().put("foo", foo );
+        
+        assertExpression(jc, "foo.count != -1", Boolean.TRUE);
+        assertExpression(jc, "foo.count == 5", Boolean.TRUE);
+        assertExpression(jc, "foo.count == -1", Boolean.FALSE);
+    }
 
     public void testArrayProperty()
         throws Exception
