@@ -61,7 +61,7 @@ import org.apache.commons.jexl.util.Coercion;
  *  Addition : either integer addition or string concatenation
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTAddNode.java,v 1.4 2003/12/17 12:49:35 geirm Exp $
+ *  @version $Id: ASTAddNode.java,v 1.5 2003/12/18 16:10:26 geirm Exp $
  */
 public class ASTAddNode extends SimpleNode
 {
@@ -89,10 +89,10 @@ public class ASTAddNode extends SimpleNode
         Object right = ((SimpleNode) jjtGetChild(1)).value(context);
 
         /*
-         *  the spec says 'and', I think 'or'
+         *  the spec says 'and'
          */
         if (left == null && right == null)
-            return new Integer(0);
+            return new Long(0);
 
         /*
          *  if anything is float, double or string with ( "." | "E" | "e")
