@@ -34,7 +34,7 @@
     </section>
     <section name="Language Elements">
       <table>
-        <tr><th>Item</th><th>Description</th></tr>
+        <tr><th width="15%">Item</th><th>Description</th></tr>
         <tr>
           <td>Comments</td>
           <td>
@@ -83,7 +83,7 @@
     </section>
     <section name="Literals">
       <table>
-        <tr><th>Item</th><th>Description</th></tr>
+        <tr><th width="15%">Item</th><th>Description</th></tr>
         <tr>
           <td>Integer Literals</td>
           <td>1 or more digits from <code>0</code> to <code>9</code></td>
@@ -122,7 +122,7 @@
     </section>
     <section name="Functions">
       <table>
-        <tr><th>Function</th><th>Description</th></tr>
+        <tr><th width="15%">Function</th><th>Description</th></tr>
         <tr>
           <td>empty</td>
           <td>
@@ -155,7 +155,7 @@
     </section>
     <section name="Operators">
       <table>
-        <tr><th>Operator</th><th>Description</th></tr>
+        <tr><th width="15%">Operator</th><th>Description</th></tr>
         <tr>
           <td>Assignment</td>
           <td><source>var1 = var2</source></td>
