@@ -79,16 +79,22 @@
   <branches/>
   <developers>
     <developer>
+      <name>dIon Gillard</name>
+      <id>dion</id>
+      <email>dion@apache.org</email>
+      <organization>Apache Software Foundation</organization>
+    </developer>
+    <developer>
       <name>Geir Magnusson Jr.</name>
       <id>geirm</id>
       <email>geirm@apache.org</email>
       <organization>independent</organization>
     </developer>
     <developer>
-      <name>James Strachan</name>
-      <id>jstrachan</id>
-      <email>jstrachan@apache.org</email>
-      <organization>SpiritSoft, Inc.</organization>
+      <name>Tim O'Brien</name>
+      <id>tobrien</id>
+      <email>tobrien@apache.org</email>
+      <organization>independent</organization>
     </developer>
     <developer>
       <name>Peter Royal</name>
@@ -97,10 +103,10 @@
       <organization>Pace Systems Group, Inc.</organization>
     </developer>
     <developer>
-      <name>Tim O'Brien</name>
-      <id>tobrien</id>
-      <email>tobrien@apache.org</email>
-      <organization>independent</organization>
+      <name>James Strachan</name>
+      <id>jstrachan</id>
+      <email>jstrachan@apache.org</email>
+      <organization>SpiritSoft, Inc.</organization>
     </developer>
   </developers>
   <dependencies>
