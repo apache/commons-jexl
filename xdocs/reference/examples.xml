@@ -99,6 +99,18 @@
       </p>
     </section>
     <section name="Custom Resolvers">
+      <p>
+        JEXL allows you to add custom expression resolvers that will get called with before or after expression
+        evaluation.
+      </p>
+      <p>
+        If <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlExprResolver.html">pre-resolvers</a>
+        is added to an expression, any value it returns will be used instead of that normally provided by JEXL. If JEXL evaluates
+        an expression to <code>null</code> post-resolvers of an expression are called in turn in an attempt to get a value.
+      </p>
+      <p>
+        Expression resolvers are called in the order that they are added.
+      </p>
     </section>
     <section name="Example Expressions">
       <!--  invoking methods, property access, array access, empty, size etc... -->
