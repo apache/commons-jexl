@@ -93,6 +93,12 @@
     </section>
     <section name="Example Expressions">
       <!--  invoking methods, property access, array access, empty, size etc... -->
+      <subsection name="Arithmetic">
+        <source>
+1 + 2
+12.0 - 5.2
+        </source>
+      </subsection>
     </section>
   </body>
 </document>
