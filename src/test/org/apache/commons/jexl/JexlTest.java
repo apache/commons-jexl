@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.23 2002/10/26 09:26:38 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.24 2002/11/20 12:58:39 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -717,6 +717,28 @@ public class JexlTest extends TestCase
         assertExpression(jc, "empty bar", Boolean.TRUE);
         assertExpression(jc, "bar.length() == 0", Boolean.TRUE);
     }
+
+    /**
+      *  test some blank strings
+      */
+    public void testLogicExpressions()
+         throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("foo", "abc" );
+        jc.getVars().put("bar", "def" );
+        
+        assertExpression(jc, "foo == 'abc' || bar == 'abc'", Boolean.TRUE);
+        assertExpression(jc, "foo == 'abc' or bar == 'abc'", Boolean.TRUE);
+        assertExpression(jc, "foo == 'abc' && bar == 'abc'", Boolean.FALSE);
+        assertExpression(jc, "foo == 'abc' and bar == 'abc'", Boolean.FALSE);
+        
+        assertExpression(jc, "foo == 'def' || bar == 'abc'", Boolean.FALSE);
+        assertExpression(jc, "foo == 'def' or bar == 'abc'", Boolean.FALSE);
+        assertExpression(jc, "foo == 'abc' && bar == 'def'", Boolean.TRUE);
+        assertExpression(jc, "foo == 'abc' and bar == 'def'", Boolean.TRUE);
+    }
+        
 
     /**
       *  test some simple double array lookups
