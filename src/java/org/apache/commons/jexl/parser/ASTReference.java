@@ -21,7 +21,7 @@ import org.apache.commons.jexl.JexlContext;
  *  reference - any variable expression
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTReference.java,v 1.3 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id: ASTReference.java,v 1.4 2004/09/01 00:35:38 dion Exp $
  */
 public class ASTReference extends SimpleNode
 {
@@ -67,12 +67,37 @@ public class ASTReference extends SimpleNode
          {
              o = ( (SimpleNode) jjtGetChild(i)).execute(o,jc);
 
-             if(o==null)
-                 return null;
+             // check for a variable in the context named
+             // child0.child1.child2 etc
+             if(o == null) {
+                 String varName = getIdentifierToDepth(i);
+                 o = jc.getVars().get(varName);
+             }
          }
 
          return o;
      }
+
+    /**
+     * This method returns a variable from this identifier and
+     * it's children. For an expression like 'a.b.c', a is child
+     * zero, b is child 1 and c is child 2.
+     *  
+     * @param i the depth of the child nodes to go to
+     * @return the a dotted variable from this identifier and it's
+     *    child nodes.
+     */
+    private String getIdentifierToDepth(int i) {
+        StringBuffer varName = new StringBuffer();
+         for (int j = 0; j <=i; j++) {
+             SimpleNode node = (SimpleNode) jjtGetChild(j);
+             if (node instanceof ASTIdentifier) {
+               varName.append(((ASTIdentifier)node).getIdentifierString());
+               if (j != i) varName.append('.');
+             }
+         }
+        return varName.toString();
+    }
 
     public String getRootString()
         throws Exception

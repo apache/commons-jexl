@@ -39,7 +39,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.59 2004/08/24 05:03:13 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.60 2004/09/01 00:35:38 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -209,14 +209,7 @@ public class JexlTest extends TestCase
         assertExpression(jc, "num <= 5", Boolean.TRUE);
         assertExpression(jc, "num >= 5", Boolean.TRUE);
         assertExpression(jc, "num > 4", Boolean.TRUE);
-
-//
-//   $$$ GMJ - trying to be spec conformant re addition means no string concat.
-//         so get rid of it for the moment.  Will certainly revisit
-//
-//        e = ExpressionFactory.createExpression("\"foo\" + \"bar\" == \"foobar\"");
-//        o = e.evaluate(jc);
-//        assertTrue("9 : o incorrect", o.equals(Boolean.TRUE));
+        assertExpression(jc, "\"foo\" + \"bar\" == \"foobar\"", Boolean.TRUE);
 
     }
 
@@ -470,29 +463,14 @@ public class JexlTest extends TestCase
          throws Exception
     {
         Expression e = ExpressionFactory.createExpression("x.a");
-        e.addPostResolver(new FlatResolver());
         JexlContext jc = JexlHelper.createContext();
 
         jc.getVars().put("x.a", Boolean.TRUE );
         jc.getVars().put("x.b", Boolean.FALSE );
-        Object o = e.evaluate(jc);
 
-        assertTrue("o not instanceof Boolean", o instanceof Boolean);
-        assertEquals("o incorrect", Boolean.TRUE, o );
-
-// unfortunately the FlatResolver doesn't resolve variables, that is the job of the context,
-// so the following tests would never have worked.
-//        e = ExpressionFactory.createExpression("!x.a");
-//        e.addPreResolver(new FlatResolver());
-//        o = e.evaluate(jc);
-//
-//        assertEquals("o incorrect", Boolean.FALSE, o);
-//
-//        e = ExpressionFactory.createExpression("!x.b");
-//        e.addPreResolver(new FlatResolver());
-//        o = e.evaluate(jc);
-//
-//        assertEquals("o incorrect", Boolean.TRUE, o );
+        assertExpression(jc, "x.a", Boolean.TRUE);
+        assertExpression(jc, "!x.a", Boolean.FALSE);
+        assertExpression(jc, "!x.b", Boolean.TRUE);
     }
 
     /**
@@ -675,11 +653,7 @@ public class JexlTest extends TestCase
         assertExpression(jc, "foo.array[1]", GET_METHOD_ARRAY[1]);
         assertExpression(jc, "foo.array.1", GET_METHOD_ARRAY[1]);
         assertExpression(jc, "foo.array2[1][1]", GET_METHOD_ARRAY2[1][1]);
-
-//        dotForm =
-//            ExpressionFactory.createExpression("foo.array2.1.1");
-//        o2 = dotForm.evaluate(jc);
-//        assertEquals("dot form failed", GET_METHOD_ARRAY2[1][1], o2);
+        //assertExpression(jc, "foo.array2.1.1", GET_METHOD_ARRAY2[1][1]);
     }
 
     /**
@@ -900,6 +874,22 @@ public class JexlTest extends TestCase
         SimpleNode tree = parser.parse(new StringReader("aString = 'World';"));
     }
     
+    public void testAntPropertiesWithMethods() throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+        String value = "Stinky Cheese";
+        jc.getVars().put("maven.bob.food", value);
+        assertExpression(jc, "maven.bob.food.length()", new Integer(value.length()));
+        assertExpression(jc, "empty(maven.bob.food)", Boolean.FALSE);
+        assertExpression(jc, "size(maven.bob.food)", new Integer(value.length()));
+        assertExpression(jc, "maven.bob.food + ' is good'", value + " is good");
+
+        // DG: Note the following ant properties don't work
+//        String version = "1.0.3";
+//        jc.getVars().put("commons-logging", version);
+//        assertExpression(jc, "commons-logging", version);
+    }
+
     /**
      * Asserts that the given expression returns the given value when applied to the
      * given context
