@@ -26,7 +26,7 @@ import org.apache.commons.jexl.parser.SimpleNode;
  * and this is the default implementation of the {@link Expression} interface.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ExpressionImpl.java,v 1.11 2004/08/23 14:00:11 dion Exp $
+ *  @version $Id$
  */
 class ExpressionImpl implements Expression
 {

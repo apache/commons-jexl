@@ -32,7 +32,7 @@ import org.apache.commons.jexl.JexlHelper;
  * Jexl navigation expressions.
  *
  * @author <a href="mailto:jstrachan@apache.org">James Strachan</a>
- * @version $Revision: 1.4 $
+ * @version $Revision$
  */
 public class Asserter extends Assert {
 

@@ -21,7 +21,7 @@ import org.apache.commons.jexl.JexlContext;
  *  reference - any variable expression
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTReference.java,v 1.4 2004/09/01 00:35:38 dion Exp $
+ *  @version $Id$
  */
 public class ASTReference extends SimpleNode
 {

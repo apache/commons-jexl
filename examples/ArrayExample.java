@@ -26,7 +26,7 @@ import java.util.ArrayList;
  *  simple example to show how to access arrays
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ArrayExample.java,v 1.4 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id$
  */
 public class ArrayExample
 {

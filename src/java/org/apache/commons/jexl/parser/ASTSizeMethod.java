@@ -21,7 +21,7 @@ import org.apache.commons.jexl.JexlContext;
  *  Simple testcases
  *
  *  @author <a href="mailto:mhw@kremvax.net">Mark H. Wilkinson</a>
- *  @version $Id: ASTSizeMethod.java,v 1.3 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id$
  */
 public class ASTSizeMethod extends SimpleNode
 {

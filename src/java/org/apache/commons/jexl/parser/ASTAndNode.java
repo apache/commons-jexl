@@ -22,7 +22,7 @@ import org.apache.commons.jexl.util.Coercion;
  *  && and 'and'
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTAndNode.java,v 1.4 2004/08/17 13:20:47 dion Exp $
+ *  @version $Id$
  */
 public class ASTAndNode extends SimpleNode
 {

@@ -26,7 +26,7 @@ import java.util.Map;
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @author <a href="mailto:tobrien@apache.org">Tim O'Brien</a>
- *  @version $Id: ASTEmptyFunction.java,v 1.6 2004/08/23 13:30:36 dion Exp $
+ *  @version $Id$
  */
 public class ASTEmptyFunction extends SimpleNode
 {

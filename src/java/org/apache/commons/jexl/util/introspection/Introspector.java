@@ -47,7 +47,7 @@ import org.apache.commons.logging.Log;
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
  * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
  * @author <a href="mailto:paulo.gaspar@krankikom.de">Paulo Gaspar</a>
- * @version $Id: Introspector.java,v 1.6 2004/08/23 13:50:00 dion Exp $
+ * @version $Id$
  */
 public class Introspector extends IntrospectorBase
 {

@@ -29,7 +29,7 @@ import org.apache.commons.logging.Log;
  * the case.
  *
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @version $Id: GetExecutor.java,v 1.4 2004/02/28 13:45:21 yoavs Exp $
+ * @version $Id$
  */
 public class GetExecutor extends AbstractExecutor
 {

@@ -24,7 +24,7 @@ import org.apache.commons.jexl.JexlContext;
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @author <a href="mailto:mhw@kremvax.net">Mark H. Wilkinson</a>
- *  @version $Id: ASTSubtractNode.java,v 1.5 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id$
  */
 public class ASTSubtractNode extends SimpleNode
 {

@@ -22,7 +22,7 @@ import org.apache.commons.jexl.JexlContext;
  *  || and 'or'
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTOrNode.java,v 1.4 2004/08/17 13:20:47 dion Exp $
+ *  @version $Id$
  */
 public class ASTOrNode extends SimpleNode
 {

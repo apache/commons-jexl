@@ -25,7 +25,7 @@ import org.apache.commons.jexl.context.HashMapContext;
  *  own application.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlHelper.java,v 1.4 2004/06/12 23:53:17 tobrien Exp $
+ *  @version $Id$
  */
 public class JexlHelper
 {

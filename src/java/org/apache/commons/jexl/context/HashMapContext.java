@@ -25,7 +25,7 @@ import java.util.Map;
  *  Implementation of JexlContext based on a HashMap
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: HashMapContext.java,v 1.4 2004/08/23 13:51:59 dion Exp $
+ *  @version $Id$
  */
 public class HashMapContext extends HashMap implements JexlContext
 {

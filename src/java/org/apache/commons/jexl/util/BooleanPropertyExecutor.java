@@ -28,7 +28,7 @@ import org.apache.commons.logging.Log;
  *  by is<Property>
  *
  *  @author <a href="geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: BooleanPropertyExecutor.java,v 1.4 2004/02/28 13:45:21 yoavs Exp $
+ *  @version $Id$
  */
 public class BooleanPropertyExecutor extends PropertyExecutor
 {

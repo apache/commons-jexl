@@ -22,7 +22,7 @@ package org.apache.commons.jexl.util.introspection;
  *  Taken from velocity for self-sufficiency.
  *
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @version $Id: Info.java,v 1.3 2004/02/28 13:45:21 yoavs Exp $
+ * @version $Id$
  */
 public class Info
 {

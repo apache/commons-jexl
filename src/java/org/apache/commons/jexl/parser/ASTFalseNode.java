@@ -21,7 +21,7 @@ import org.apache.commons.jexl.JexlContext;
  *  represents Boolean false
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTFalseNode.java,v 1.3 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id$
  */
 public class ASTFalseNode extends SimpleNode
 {

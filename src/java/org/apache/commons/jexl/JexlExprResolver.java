@@ -6,7 +6,7 @@ package org.apache.commons.jexl;
  *
  *  @todo This needs to be explained in detail.  Why do this?
  *  @author <a href="mailto:geirm@adeptra.com">Geir Magnusson Jr.</a>
- *  @version $Id: JexlExprResolver.java,v 1.3 2004/08/23 13:53:34 dion Exp $
+ *  @version $Id$
  */
 public interface JexlExprResolver
 {

@@ -37,7 +37,7 @@ import java.util.ArrayList;
  *  functionality of Velocity
  *
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @version $Id: UberspectImpl.java,v 1.6 2004/08/19 17:15:59 dion Exp $
+ * @version $Id$
  */
 public class UberspectImpl implements Uberspect, UberspectLoggable
 {

@@ -25,7 +25,7 @@ import org.apache.commons.jexl.util.Coercion;
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @author <a href="mailto:proyal@apache.org">Peter Royal</a>
- *  @version $Id: ASTGTNode.java,v 1.5 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id$
  */
 public class ASTGTNode extends SimpleNode
 {

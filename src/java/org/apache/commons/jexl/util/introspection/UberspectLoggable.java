@@ -26,7 +26,7 @@ import org.apache.commons.logging.Log;
  *  Thanks to Paulo for the suggestion
  *
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Id: UberspectLoggable.java,v 1.3 2004/02/28 13:45:22 yoavs Exp $
+ * @version $Id$
  *
  */
 public interface UberspectLoggable

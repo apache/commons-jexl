@@ -12,7 +12,7 @@ import org.apache.commons.jexl.JexlContext;
  *  hint, hint...
  *
  *  @author <a href="mailto:geirm@adeptra.com">Geir Magnusson Jr.</a>
- *  @version $Id: FlatResolver.java,v 1.1 2002/06/13 16:10:44 geirm Exp $
+ *  @version $Id$
  */
 public class FlatResolver implements JexlExprResolver
 {
