@@ -94,9 +94,14 @@
     <section name="Example Expressions">
       <!--  invoking methods, property access, array access, empty, size etc... -->
       <subsection name="Arithmetic">
+        <p>Most valid arithmetic expressions in Java are also valid in Jexl.</p>
         <source>
 1 + 2
 12.0 - 5.2
+6 * 12 + 5 / 2.6
+12 % 2
+6 div 4
+-12 + 77.2
         </source>
       </subsection>
     </section>
