@@ -74,7 +74,7 @@ import java.util.ArrayList;
  *  functionality of Velocity
  *
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @version $Id: UberspectImpl.java,v 1.1 2002/08/05 05:04:53 geirm Exp $
+ * @version $Id: UberspectImpl.java,v 1.2 2002/08/09 13:57:04 jstrachan Exp $
  */
 public class UberspectImpl implements Uberspect, UberspectLoggable
 {
@@ -193,21 +193,21 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
         executor = new PropertyExecutor(rlog,introspector, claz, identifier);
 
         /*
+         *  look for boolean isFoo()
+         */
+
+        if( executor.isAlive() == false)
+        {
+            executor = new BooleanPropertyExecutor(rlog, introspector, claz, identifier);
+        }
+
+        /*
          *  if that didn't work, look for get("foo")
          */
 
         if (executor.isAlive() == false)
         {
             executor = new GetExecutor(rlog, introspector, claz, identifier);
-        }
-
-        /*
-         *  finally, look for boolean isFoo()
-         */
-
-        if( executor.isAlive() == false)
-        {
-            executor = new BooleanPropertyExecutor(rlog, introspector, claz, identifier);
         }
 
         return (executor != null) ? new VelGetterImpl(executor) : null;
