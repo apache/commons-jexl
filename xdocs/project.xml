@@ -51,7 +51,7 @@
     <menu name="Sandbox Components">
         <item name="Betwixt"                href="/betwixt.html"/>
         <item name="Jelly"                  href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/jelly/"/>
-        <item name="Jelly"                  href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/jexl/"/>
+        <item name="Jexl"                  href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/jexl/"/>
         <item name="JJar"                   href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/jjar/"/>
         <item name="Messenger"              href="/messenger.html"/>
         <item name="Workflow"               href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/workflow/"/>
