@@ -21,94 +21,131 @@ import org.apache.commons.jexl.parser.ASTExpressionExpression;
 import org.apache.commons.jexl.parser.ASTReferenceExpression;
 import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- *  Used to create Expression objects
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ExpressionFactory.java,v 1.4 2004/02/28 13:45:20 yoavs Exp $
+ * <p> 
+ * Creates Expression objects.  To create a JEXL Expression object, pass
+ * valid JEXL syntax to the static createExpression() method:
+ * </p>
+ * 
+ * <pre>
+ * String jexl = "array[1]";
+ * Expression expression = ExpressionFactory.createExpression( jexl );
+ * </pre>
+ * 
+ * <p>
+ * When an {@link Expression} object is created, the JEXL syntax is
+ * parsed and verified.  If the supplied expression is neither an
+ * expression not a reference, an exception is thrown from createException().
+ * </p>
+ * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
+ * @version $Id: ExpressionFactory.java,v 1.5 2004/06/13 01:41:49 tobrien Exp $
  */
 public class ExpressionFactory
 {
     /**
-     *  our parser - we share it
+     * The Log to which all ExpressionFactory messages will be logged.
      */
-    protected static Parser parser = new Parser(new StringReader(";"));
+    protected static Log log =
+        LogFactory.getLog("org.apache.commons.jexl.ExpressionFactory");
 
     /**
-     *  We Be Singleton
+     * The singleton ExpressionFactory also holds a single instance of {@link Parser}.
+     * When parsing expressions, ExpressionFactory synchronizes on Parser.
+     */
+    protected static Parser parser = new Parser(new StringReader(";")); //$NON-NLS-1$
+
+    /**
+     * ExpressionFactory is a single and this is the private
+     * status instance fufilling that pattern.
      */
     protected static ExpressionFactory ef = new ExpressionFactory();
 
-    private ExpressionFactory()
-    {
-    }
+    /**
+     * Private constructor, the single instance is always obtained
+     * with a call to getInstance().
+     */
+    private ExpressionFactory(){}
 
-    public static Expression createExpression(String expression)
-        throws Exception
-    {
-        return getInstance().createNewExpression(expression);
-    }
-
+    /**
+     * Returns the single instance of ExpressionFactory.
+     * @return the instance of ExpressionFactory.
+     */
     protected static  ExpressionFactory getInstance()
     {
         return ef;
     }
 
     /**
+     * Creates an Expression from a String containing valid
+     * JEXL syntax.  This method parses the expression which
+     * must contain either a reference or an expression.
+     * @param expression A String containing valid JEXL syntax
+     * @return An Expression object which can be evaluated with a JexlContext
+     * @throws Exception An exception can be thrown if there is a problem parsing
+     *                   his expression, or if the expression is neither an
+     *                   expression or a reference.
+     */
+    public static Expression createExpression(String expression)
+        throws Exception
+    {
+        return getInstance().createNewExpression(expression);
+    }
+
+
+    /**
      *  Creates a new Expression based on the expression string.
      *
-     *  @param expresison valid Jexl expression
+     *  @param expression valid Jexl expression
      *  @return Expression
      *  @throws Exception for a variety of reasons - mostly malformed
      *          Jexl expression
      */
     protected Expression createNewExpression(String expression)
-        throws Exception
-    {
-        String expr = expression.trim();
+        throws Exception {
+    
+    	String expr = cleanExpression(expression);
 
-        /*
-         * make sure a valid statement
-         */
+        // Parse the Expression
+        SimpleNode tree;
+        synchronized(parser)
+        {
+        	log.debug( "Parsing expression: " + expr );
+            tree = parser.parse(new StringReader(expr));
+        }
+
+        // Must be a simple reference or expression, otherwise
+        // throw an exception.
+        SimpleNode node = (SimpleNode) tree.jjtGetChild(0);
+
+        if( (node instanceof ASTReferenceExpression) ||
+            (node instanceof ASTExpressionExpression) ) 
+        {
+            node = (SimpleNode) node.jjtGetChild(0);
+        	Expression e = new ExpressionImpl(expression, node);
+        
+        	return e;
+        }
+        else 
+        {
+        	log.error( "Invalid Expression, node of type: " + node.getClass().getName() );
+        	throw new Exception("Invalid Expression: neither Reference nor Expression");
+        }
+    }
+
+	/**
+	 * Trims the expression and adds a semi-colon if missing.
+	 * @param expression to clean
+	 * @return trimmed expression ending in a semi-colon
+	 */
+	private String cleanExpression(String expression) {
+        String expr = expression.trim();
         if (!expr.endsWith(";"))
         {
             expr = expr + ";";
         }
-
-        /*
-         *  now parse - we want to protect the parser for now
-         */
-        SimpleNode tree;
-
-        synchronized(parser)
-        {
-            tree = parser.parse(new StringReader(expr));
-        }
-
-        /*
-         *  we expect that this is a simple Reference Expression, or
-         *  one can be dug out...
-         *
-         *  if not, chuck an exception
-         */
-
-        SimpleNode node = (SimpleNode) tree.jjtGetChild(0);
-
-        if (node instanceof ASTReferenceExpression)
-        {
-            Expression e = new ExpressionImpl(expression,
-                    (SimpleNode) node.jjtGetChild(0));
-
-            return e;
-        }
-        else if (node instanceof ASTExpressionExpression)
-        {
-            Expression e = new ExpressionImpl(expression,
-                        (SimpleNode) node.jjtGetChild(0));
-
-            return e;
-        }
-
-        throw new Exception("Invalid expression");
-    }
+		return expr;
+	}
 }
