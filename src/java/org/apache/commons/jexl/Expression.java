@@ -59,7 +59,7 @@ package org.apache.commons.jexl;
  *  Inferface for expression object.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: Expression.java,v 1.1 2002/04/26 04:23:14 geirm Exp $
+ *  @version $Id: Expression.java,v 1.2 2002/06/13 16:09:53 geirm Exp $
  */
 public interface Expression
 {
@@ -72,4 +72,20 @@ public interface Expression
      *  returns the expression used
      */
     public String getExpression();
+
+    /**
+     *  allows addition of a resolver to allow custom interdiction of
+     *  expression evaluation
+     *
+     *  @param resolver resolver to be called before Jexl expression evaluated
+     */
+    public void addPreResolver(JexlExprResolver resolver);
+
+    /**
+     *  allows addition of a resolver to allow custom interdiction of
+     *  expression evaluation
+     *
+     *  @param resolver resolver to be called if Jexl expression evaluated to null
+     */
+    public void addPostResolver(JexlExprResolver resolver);
 }
