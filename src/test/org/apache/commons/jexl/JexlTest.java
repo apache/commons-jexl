@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -68,7 +69,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.33 2003/12/18 16:10:57 geirm Exp $
+ *  @version $Id: JexlTest.java,v 1.34 2003/12/30 20:47:53 proyal Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -977,6 +978,16 @@ public class JexlTest extends TestCase
         jc.getVars().put( "this.is.a.test", "");
 
         assertExpression(jc, "empty(this.is.a.test)", Boolean.TRUE);
+    }
+
+    public void testEmptySubListOfMap() throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+        Map m = Collections.singletonMap("aList", Collections.EMPTY_LIST);
+
+        jc.getVars().put( "aMap", m );
+
+        assertExpression( jc, "empty( aMap.aList )", Boolean.TRUE );
     }
 
     public void testCoercionWithComparisionOperators()
