@@ -51,7 +51,7 @@ public class Coercion
         }
         else if (val instanceof String)
         {
-            if(((String)val).equals(""))
+            if("".equals((String) val))
                 return new Integer(0);
 
             return Integer.valueOf((String)val);
@@ -81,7 +81,7 @@ public class Coercion
         }
         else if (val instanceof String)
         {
-            if(((String)val).equals(""))
+            if("".equals((String) val))
                 return new Long(0);
 
             return Long.valueOf((String)val);
@@ -111,7 +111,7 @@ public class Coercion
         }
         else if (val instanceof String)
         {
-            if(((String)val).equals(""))
+            if("".equals((String) val))
                 return new Double(0);
 
             /*

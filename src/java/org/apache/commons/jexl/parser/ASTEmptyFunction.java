@@ -26,7 +26,7 @@ import java.util.Map;
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @author <a href="mailto:tobrien@apache.org">Tim O'Brien</a>
- *  @version $Id: ASTEmptyFunction.java,v 1.5 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id: ASTEmptyFunction.java,v 1.6 2004/08/23 13:30:36 dion Exp $
  */
 public class ASTEmptyFunction extends SimpleNode
 {
@@ -60,7 +60,7 @@ public class ASTEmptyFunction extends SimpleNode
         if (o == null)
             return Boolean.TRUE;
 
-        if (o instanceof String && ((String)o).equals(""))
+        if (o instanceof String && "".equals((String) o))
             return Boolean.TRUE;
 
         if (o.getClass().isArray() && ((Object[])o).length == 0)
