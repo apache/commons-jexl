@@ -71,7 +71,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.4 2002/05/17 12:14:35 geirm Exp $
+ *  @version $Id: JexlTest.java,v 1.5 2002/05/17 12:22:35 geirm Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -442,26 +442,42 @@ public class JexlTest extends TestCase
 
         assertTrue("o not instanceof Long", o instanceof Long);
         assertEquals("o incorrect", new Long(4), o);
-        
+
         e = ExpressionFactory.createExpression("3 + 3");
         o = e.evaluate(jc);
-        
+
         assertEquals("o incorrect", new Long(6), o );
-        
+
         e = ExpressionFactory.createExpression("3 + 3 + foo");
         o = e.evaluate(jc);
-        
+
         assertEquals("o incorrect", new Long(8), o );
-        
+
         e = ExpressionFactory.createExpression("3 * 3");
         o = e.evaluate(jc);
-        
+
         assertEquals("o incorrect", new Long(9), o );
-        
+
         e = ExpressionFactory.createExpression("3 * 3 + foo");
         o = e.evaluate(jc);
-        
+
         assertEquals("o incorrect", new Long(11), o );
+
+        e = ExpressionFactory.createExpression("3 * 3 - foo");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", new Long(7), o );
+
+        /*
+         * test some floaty stuff
+         */
+        e = ExpressionFactory.createExpression("3 * \"3.0\"");
+        o = e.evaluate(jc);
+        assertEquals("o incorrect", new Double(9), o );
+
+        e = ExpressionFactory.createExpression("3 * 3.0");
+        o = e.evaluate(jc);
+        assertEquals("o incorrect", new Double(9), o );
     }
 
     /**
@@ -478,25 +494,25 @@ public class JexlTest extends TestCase
 
         assertTrue("o not instanceof Boolean", o instanceof Boolean);
         assertEquals("o incorrect", Boolean.TRUE, o);
-        
+
         e = ExpressionFactory.createExpression("2 == 3");
         o = e.evaluate(jc);
-        
+
         assertEquals("o incorrect", Boolean.FALSE, o );
-        
+
         e = ExpressionFactory.createExpression("3 == foo");
         o = e.evaluate(jc);
-        
+
         assertEquals("o incorrect", Boolean.FALSE, o );
-        
+
         e = ExpressionFactory.createExpression("3 != foo");
         o = e.evaluate(jc);
-        
+
         assertEquals("o incorrect", Boolean.TRUE, o );
-        
+
         e = ExpressionFactory.createExpression("foo != 2");
         o = e.evaluate(jc);
-        
+
         assertEquals("o incorrect", Boolean.FALSE, o );
     }
 
