@@ -22,7 +22,7 @@ import java.util.List;
  * A simple bean used for testing purposes
  * 
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class Foo {
     
@@ -95,5 +95,11 @@ public class Foo {
     public boolean getModified()
     {
         return beenModified;
+    }
+
+
+    public int getSize()
+    {
+        return 22;
     }
 }
