@@ -35,7 +35,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.43 2004/08/19 18:05:26 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.44 2004/08/19 18:11:59 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -367,9 +367,9 @@ public class JexlTest extends TestCase
         o = e.evaluate(jc);
         assertTrue("7 : o incorrect", o.equals(Boolean.TRUE));
 
-		e = ExpressionFactory.createExpression("empty set");
-		o = e.evaluate(jc);
-		assertTrue("8 : o incorrect", o.equals(Boolean.TRUE));
+        e = ExpressionFactory.createExpression("empty set");
+        o = e.evaluate(jc);
+        assertTrue("8 : o incorrect", o.equals(Boolean.TRUE));
 
     }
 
@@ -1096,7 +1096,7 @@ public class JexlTest extends TestCase
     {
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("aBool", Boolean.FALSE);
-    	assertExpression(jc, "aBool.valueOf('true')", Boolean.TRUE);
+        assertExpression(jc, "aBool.valueOf('true')", Boolean.TRUE);
     }
     
     /**
@@ -1105,14 +1105,14 @@ public class JexlTest extends TestCase
      */
     public void testBadParse() throws Exception
     {
-    	try
-		{
-    		assertExpression(JexlHelper.createContext(), "empty()", null);
-		}
-    	catch (ParseException pe)
-		{
-    		System.err.println("Expecting a parse exception: " + pe.getMessage());
-		}
+        try
+        {
+            assertExpression(JexlHelper.createContext(), "empty()", null);
+        }
+        catch (ParseException pe)
+        {
+            System.err.println("Expecting a parse exception: " + pe.getMessage());
+        }
     }
 
     /**
@@ -1120,9 +1120,9 @@ public class JexlTest extends TestCase
      * @throws Exception
      */
     public void testComment() throws Exception
-	{
+    {
         assertExpression(JexlHelper.createContext(), "## double or nothing\n 1 + 1", Long.valueOf("2"));
-	}
+    }
     
     /**
      * Asserts that the given expression returns the given value when applied to the

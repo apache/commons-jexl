@@ -21,18 +21,18 @@ import java.util.Map;
  * Holds a Map of variables which are referenced in a JEXL expression.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlContext.java,v 1.4 2004/06/12 23:53:17 tobrien Exp $
+ *  @version $Id: JexlContext.java,v 1.5 2004/08/19 18:16:17 dion Exp $
  */
 public interface JexlContext
 {
-	/**
-	 * Replaces variables in a JexlContext with the variables contained
-	 * in the supplied Map.  When setVars() is called on a JexlContext,
-	 * it clears the current Map and puts each entry of the
-	 * supplied Map into the current variable Map. 
-	 * 
-	 * @param vars Contents of vars will be replaced with the content of this Map
-	 */
+    /**
+     * Replaces variables in a JexlContext with the variables contained
+     * in the supplied Map.  When setVars() is called on a JexlContext,
+     * it clears the current Map and puts each entry of the
+     * supplied Map into the current variable Map. 
+     * 
+     * @param vars Contents of vars will be replaced with the content of this Map
+     */
     public void setVars(Map vars);
     
     /**

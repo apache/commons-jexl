@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  * expression not a reference, an exception is thrown from createException().
  * </p>
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Id: ExpressionFactory.java,v 1.5 2004/06/13 01:41:49 tobrien Exp $
+ * @version $Id: ExpressionFactory.java,v 1.6 2004/08/19 18:16:17 dion Exp $
  */
 public class ExpressionFactory
 {
@@ -106,13 +106,13 @@ public class ExpressionFactory
     protected Expression createNewExpression(String expression)
         throws Exception {
     
-    	String expr = cleanExpression(expression);
+        String expr = cleanExpression(expression);
 
         // Parse the Expression
         SimpleNode tree;
         synchronized(parser)
         {
-        	log.debug( "Parsing expression: " + expr );
+            log.debug( "Parsing expression: " + expr );
             tree = parser.parse(new StringReader(expr));
         }
 
@@ -124,28 +124,28 @@ public class ExpressionFactory
             (node instanceof ASTExpressionExpression) ) 
         {
             node = (SimpleNode) node.jjtGetChild(0);
-        	Expression e = new ExpressionImpl(expression, node);
+            Expression e = new ExpressionImpl(expression, node);
         
-        	return e;
+            return e;
         }
         else 
         {
-        	log.error( "Invalid Expression, node of type: " + node.getClass().getName() );
-        	throw new Exception("Invalid Expression: neither Reference nor Expression");
+            log.error( "Invalid Expression, node of type: " + node.getClass().getName() );
+            throw new Exception("Invalid Expression: neither Reference nor Expression");
         }
     }
 
-	/**
-	 * Trims the expression and adds a semi-colon if missing.
-	 * @param expression to clean
-	 * @return trimmed expression ending in a semi-colon
-	 */
-	private String cleanExpression(String expression) {
+    /**
+     * Trims the expression and adds a semi-colon if missing.
+     * @param expression to clean
+     * @return trimmed expression ending in a semi-colon
+     */
+    private String cleanExpression(String expression) {
         String expr = expression.trim();
         if (!expr.endsWith(";"))
         {
             expr = expr + ";";
         }
-		return expr;
-	}
+        return expr;
+    }
 }
