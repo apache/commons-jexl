@@ -147,9 +147,17 @@ public class Coercion
         {
             return new Double(0);
         }
-        else if (val instanceof String && ((String)val).equals(""))
+        else if (val instanceof String)
         {
-            return new Double(0);
+            if(((String)val).equals(""))
+                return new Double(0);
+
+            /*
+             * the spec seems to be iffy about this.  Going to give it a wack
+             *  anyway
+             */
+
+            return new Double((String) val);
         }
         else if(val instanceof Character)
         {
