@@ -59,7 +59,7 @@ import org.apache.commons.jexl.JexlContext;
  *  GT : a > b
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTGTNode.java,v 1.1 2002/04/26 04:23:14 geirm Exp $
+ *  @version $Id: ASTGTNode.java,v 1.2 2003/03/06 21:34:32 werken Exp $
  */
 public class ASTGTNode extends SimpleNode
 {
@@ -94,11 +94,15 @@ public class ASTGTNode extends SimpleNode
             throw new Exception("Null comparison : GT ");
         }
 
-        if (left instanceof Integer && right instanceof Integer)
+        if ( (left instanceof Integer || left instanceof Long)
+             && (right instanceof Integer || right instanceof Long) )
         {
-            int val = ((Integer) left).compareTo((Integer)right);
+            long leftLong = ((Number)left).longValue();
+            long rightLong = ((Number)right).longValue();
 
-            return new Boolean(val > 0);
+            return ( ( leftLong > rightLong  )
+                     ? Boolean.TRUE
+                     : Boolean.FALSE );
         }
 
         throw new Exception("Invalid comparison : GT ");
