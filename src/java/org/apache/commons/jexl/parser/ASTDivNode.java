@@ -1,7 +1,7 @@
 /*
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
+ * Copyright (c) 2003 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,18 +53,56 @@
  */
 package org.apache.commons.jexl.parser;
 
-public class ASTDivNode extends SimpleNode {
-  public ASTDivNode(int id) {
-    super(id);
-  }
+import org.apache.commons.jexl.util.Coercion;
+import org.apache.commons.jexl.JexlContext;
 
-  public ASTDivNode(Parser p, int id) {
-    super(p, id);
-  }
+/**
+ *  /
+ *
+ *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
+ *  @version $Id: ASTDivNode.java,v 1.2 2003/02/09 20:17:55 geirm Exp $
+ */
+public class ASTDivNode extends SimpleNode
+{
+    public ASTDivNode(int id)
+    {
+        super(id);
+    }
+
+    public ASTDivNode(Parser p, int id)
+    {
+        super(p, id);
+    }
 
 
-  /** Accept the visitor. **/
-  public Object jjtAccept(ParserVisitor visitor, Object data) {
-    return visitor.visit(this, data);
-  }
+    /** Accept the visitor. **/
+    public Object jjtAccept(ParserVisitor visitor, Object data)
+    {
+        return visitor.visit(this, data);
+    }
+
+       public Object value(JexlContext jc)
+        throws Exception
+    {
+        Object left = ((SimpleNode) jjtGetChild(0)).value(jc);
+        Object right = ((SimpleNode) jjtGetChild(1)).value(jc);
+
+        /*
+         *  the spec says 'and', I think 'or'
+         */
+        if (left == null && right == null)
+            return new Integer(0);
+
+        Double l = Coercion.coerceDouble(left);
+        Double r = Coercion.coerceDouble(right);
+
+        /*
+         * catch div/0
+         */
+        if (r.doubleValue() == 0.0)
+            return new Double(0.0);
+
+        return new Double(l.doubleValue() / r.doubleValue());
+
+    }
 }
