@@ -19,7 +19,7 @@
 
   <id>commons-jexl</id>
   <inceptionYear>2003</inceptionYear>
-  <currentVersion>1.0-beta-2</currentVersion>
+  <currentVersion>1.0-beta-3-SNAPSHOT</currentVersion>
   <name>Commons JEXL</name>
   <shortDescription>Commons JEXL Expression Language Engine</shortDescription>
   <description>
