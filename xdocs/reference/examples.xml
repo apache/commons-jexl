@@ -133,7 +133,26 @@ aString.substring(6)
           <source>aString.substring(i)</source>
         </p>
       </subsection>
-      <subsection name="Accessing properties"></subsection>
+      <subsection name="Accessing properties">
+        <p>
+          JEXL provides a shorthand syntax to access methods that
+          follow the JavaBean naming convention for properties, i.e.
+          setters and getters.
+        </p>
+        <p>
+          If you have some object foo in the context and it has a
+          method <code>getBar()</code>, you can call that method using
+          the following syntax:
+          <source>foo.bar</source>
+        </p>
+        <p>
+          Since <code>java.lang.Object</code> has a <code>getClass()</code> method
+          that returns a <code>java.lang.Class</code> object, and the
+          class has a <code>getName()</code> method, the following is a shorthand
+          for obtaining the class name of an object <code>foo</code> in the context: 
+          <source>foo.class.name</source>
+        </p>
+      </subsection>
       <subsection name="Arrays, Collections and Maps"></subsection>
     </section>
   </body>
