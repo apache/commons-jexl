@@ -18,14 +18,29 @@ package org.apache.commons.jexl;
 import java.util.Map;
 
 /**
- *  Right now, just steal the j.u.Map interface as the JexlContext interface
- *  this might be a pain going forward - we might want to do something simpler
+ * Holds a Map of variables which are referenced in a JEXL expression.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlContext.java,v 1.3 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id: JexlContext.java,v 1.4 2004/06/12 23:53:17 tobrien Exp $
  */
 public interface JexlContext
 {
+	/**
+	 * Replaces variables in a JexlContext with the variables contained
+	 * in the supplied Map.  When setVars() is called on a JexlContext,
+	 * it clears the current Map and puts each entry of the
+	 * supplied Map into the current variable Map. 
+	 * 
+	 * @param vars Contents of vars will be replaced with the content of this Map
+	 */
     public void setVars(Map vars);
+    
+    /**
+     * Retrives the Map of variables associated with this JexlContext.  The
+     * keys of this map correspond to variable names referenced in a
+     * JEXL expression.
+     * 
+     * @return A reference to the variable Map associated with this JexlContext.
+     */
     public Map getVars();
 }
