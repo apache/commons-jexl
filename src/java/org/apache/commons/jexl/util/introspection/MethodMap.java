@@ -31,7 +31,7 @@ import java.util.Map;
  * @author <a href="mailto:Christoph.Reck@dlr.de">Christoph Reck</a>
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
- * @version $Id: MethodMap.java,v 1.4 2004/02/28 13:45:21 yoavs Exp $
+ * @version $Id: MethodMap.java,v 1.5 2004/08/19 17:15:59 dion Exp $
  */
 public class MethodMap
 {
@@ -62,8 +62,6 @@ public class MethodMap
         }
 
         l.add(method);
-
-        return;
     }
 
     /**
