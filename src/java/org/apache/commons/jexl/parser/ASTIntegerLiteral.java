@@ -59,7 +59,7 @@ import org.apache.commons.jexl.JexlContext;
  *  represents an integer
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTIntegerLiteral.java,v 1.1 2002/04/26 04:23:14 geirm Exp $
+ *  @version $Id: ASTIntegerLiteral.java,v 1.2 2002/05/25 18:39:51 geirm Exp $
  */
 public class ASTIntegerLiteral extends SimpleNode
 {
@@ -80,6 +80,20 @@ public class ASTIntegerLiteral extends SimpleNode
     public Object jjtAccept(ParserVisitor visitor, Object data)
     {
         return visitor.visit(this, data);
+    }
+
+    /**
+     *  Part of reference resolution - wierd...  in JSTL EL you can
+     *  have
+     *          foo.2
+     *  which is equiv to
+     *          foo[2]
+     *  it appears...
+     */
+    public Object execute(Object o, JexlContext ctx)
+            throws Exception
+    {
+        return ASTArrayAccess.evaluateExpr(o, val);
     }
 
     public Object value(JexlContext jc)
