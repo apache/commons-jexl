@@ -71,7 +71,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.2 2002/05/17 07:53:47 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.3 2002/05/17 07:56:30 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -437,7 +437,7 @@ public class JexlTest extends TestCase
         Object o = e.evaluate(jc);
 
         assertTrue("o not instanceof Integer", o instanceof Integer);
-        assertEquals("o incorrect", o, new Integer(4));
+        assertEquals("o incorrect", new Integer(4), o);
         
         e = ExpressionFactory.createExpression("3 + 3");
         o = e.evaluate(jc);
@@ -458,6 +458,42 @@ public class JexlTest extends TestCase
         o = e.evaluate(jc);
         
         assertEquals("o incorrect", new Integer(11), o );
+    }
+
+    /**
+      *  test some simple conditions
+      */
+    public void testConditions()
+         throws Exception
+    {
+        Expression e = ExpressionFactory.createExpression("foo == 2");
+        JexlContext jc = JexlHelper.createContext();
+
+        jc.getVars().put("foo", new Integer(2) );
+        Object o = e.evaluate(jc);
+
+        assertTrue("o not instanceof Boolean", o instanceof Boolean);
+        assertEquals("o incorrect", Boolean.TRUE, o);
+        
+        e = ExpressionFactory.createExpression("2 == 3");
+        o = e.evaluate(jc);
+        
+        assertEquals("o incorrect", Boolean.FALSE, o );
+        
+        e = ExpressionFactory.createExpression("3 == foo");
+        o = e.evaluate(jc);
+        
+        assertEquals("o incorrect", Boolean.FALSE, o );
+        
+        e = ExpressionFactory.createExpression("3 != foo");
+        o = e.evaluate(jc);
+        
+        assertEquals("o incorrect", Boolean.TRUE, o );
+        
+        e = ExpressionFactory.createExpression("foo != 2");
+        o = e.evaluate(jc);
+        
+        assertEquals("o incorrect", Boolean.FALSE, o );
     }
 
     public class Foo
