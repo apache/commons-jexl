@@ -28,24 +28,25 @@ public interface ParserTreeConstants
   public int JJTMULNODE = 21;
   public int JJTDIVNODE = 22;
   public int JJTMODNODE = 23;
-  public int JJTBITWISECOMPLNODE = 24;
-  public int JJTNOTNODE = 25;
-  public int JJTNULLLITERAL = 26;
-  public int JJTTRUENODE = 27;
-  public int JJTFALSENODE = 28;
-  public int JJTINTEGERLITERAL = 29;
-  public int JJTFLOATLITERAL = 30;
-  public int JJTSTRINGLITERAL = 31;
-  public int JJTEXPRESSIONEXPRESSION = 32;
-  public int JJTSTATEMENTEXPRESSION = 33;
-  public int JJTREFERENCEEXPRESSION = 34;
-  public int JJTIFSTATEMENT = 35;
-  public int JJTWHILESTATEMENT = 36;
-  public int JJTFOREACHSTATEMENT = 37;
-  public int JJTMETHOD = 38;
-  public int JJTARRAYACCESS = 39;
-  public int JJTSIZEMETHOD = 40;
-  public int JJTREFERENCE = 41;
+  public int JJTUNARYMINUSNODE = 24;
+  public int JJTBITWISECOMPLNODE = 25;
+  public int JJTNOTNODE = 26;
+  public int JJTNULLLITERAL = 27;
+  public int JJTTRUENODE = 28;
+  public int JJTFALSENODE = 29;
+  public int JJTINTEGERLITERAL = 30;
+  public int JJTFLOATLITERAL = 31;
+  public int JJTSTRINGLITERAL = 32;
+  public int JJTEXPRESSIONEXPRESSION = 33;
+  public int JJTSTATEMENTEXPRESSION = 34;
+  public int JJTREFERENCEEXPRESSION = 35;
+  public int JJTIFSTATEMENT = 36;
+  public int JJTWHILESTATEMENT = 37;
+  public int JJTFOREACHSTATEMENT = 38;
+  public int JJTMETHOD = 39;
+  public int JJTARRAYACCESS = 40;
+  public int JJTSIZEMETHOD = 41;
+  public int JJTREFERENCE = 42;
 
 
   public String[] jjtNodeName = {
@@ -73,6 +74,7 @@ public interface ParserTreeConstants
     "MulNode",
     "DivNode",
     "ModNode",
+    "UnaryMinusNode",
     "BitwiseComplNode",
     "NotNode",
     "NullLiteral",

@@ -1,5 +1,7 @@
 package org.apache.commons.jexl.parser;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Introspector;
 import org.apache.commons.jexl.util.introspection.VelMethod;
@@ -28,7 +30,8 @@ public class ASTMethod extends SimpleNode
      *  returns the value of itself applied to the object.
      *   We assume that an identifier can be gotten via a get(String)
      */
-    public Object execute(Object obj, JexlContext jc) throws Exception
+    public Object execute(Object obj, JexlContext jc) 
+        throws Exception
     {
         String methodName = ((ASTIdentifier)jjtGetChild(0)).val;
 
@@ -40,17 +43,37 @@ public class ASTMethod extends SimpleNode
 
         Object params[] = new Object[paramCount];
 
-        for (int i=0; i<paramCount; i++)
+        try
         {
-            params[i] = ( (SimpleNode) jjtGetChild(i+1)).value(jc);
+            for (int i=0; i<paramCount; i++)
+            {
+                params[i] = ( (SimpleNode) jjtGetChild(i+1)).value(jc);
+            }
+    
+            VelMethod vm = Introspector.getUberspect().getMethod(obj, methodName,
+                params, new Info("",1,1));
+    
+            if (vm == null)
+                return null;
+    
+            return vm.invoke(obj, params);
         }
+        catch(InvocationTargetException e)
+        {
+            Throwable t = e.getTargetException();
 
-        VelMethod vm = Introspector.getUberspect().getMethod(obj, methodName,
-            params, new Info("",1,1));
+            if (t instanceof Exception)
+            {
+                throw (Exception) t;
+            }
 
-        if (vm == null)
-            return null;
-
-        return vm.invoke(obj, params);
+            throw e;
+        }
+        catch(Exception e)
+        {
+            System.out.println("ASTMethod : "+ e);
+            e.printStackTrace();;
+            throw e;
+         }
     }
 }

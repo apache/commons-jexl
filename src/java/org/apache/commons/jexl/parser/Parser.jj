@@ -59,7 +59,7 @@
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @author <a href="mailto:mhw@kremvax.net">Mark H. Wilkinson</a>
  *
- *  @version $Id: Parser.jj,v 1.6 2003/06/25 10:52:02 geirm Exp $
+ *  @version $Id: Parser.jj,v 1.7 2003/06/25 11:17:01 geirm Exp $
  */
 
 options
@@ -1171,9 +1171,9 @@ void MultiplicativeExpression()       :
 void UnaryExpression()       :
 {}
 {
-  "~"/*@bgen(jjtree) #BitwiseComplNode( 1) */
+  "-"/*@bgen(jjtree) #UnaryMinusNode( 1) */
       {
-        ASTBitwiseComplNode jjtn001 = new ASTBitwiseComplNode(this, JJTBITWISECOMPLNODE);
+        ASTUnaryMinusNode jjtn001 = new ASTUnaryMinusNode(this, JJTUNARYMINUSNODE);
         boolean jjtc001 = true;
         jjtree.openNodeScope(jjtn001);
       }
@@ -1200,9 +1200,9 @@ void UnaryExpression()       :
       }
 /*@egen*/
 |
-  "!"/*@bgen(jjtree) #NotNode( 1) */
+  "~"/*@bgen(jjtree) #BitwiseComplNode( 1) */
       {
-        ASTNotNode jjtn002 = new ASTNotNode(this, JJTNOTNODE);
+        ASTBitwiseComplNode jjtn002 = new ASTBitwiseComplNode(this, JJTBITWISECOMPLNODE);
         boolean jjtc002 = true;
         jjtree.openNodeScope(jjtn002);
       }
@@ -1229,31 +1229,60 @@ void UnaryExpression()       :
       }
 /*@egen*/
 |
+  "!"/*@bgen(jjtree) #NotNode( 1) */
+      {
+        ASTNotNode jjtn003 = new ASTNotNode(this, JJTNOTNODE);
+        boolean jjtc003 = true;
+        jjtree.openNodeScope(jjtn003);
+      }
+      try {
+/*@egen*/ UnaryExpression()/*@bgen(jjtree)*/
+      } catch (Throwable jjte003) {
+        if (jjtc003) {
+          jjtree.clearNodeScope(jjtn003);
+          jjtc003 = false;
+        } else {
+          jjtree.popNode();
+        }
+        if (jjte003 instanceof RuntimeException) {
+          throw (RuntimeException)jjte003;
+        }
+        if (jjte003 instanceof ParseException) {
+          throw (ParseException)jjte003;
+        }
+        throw (Error)jjte003;
+      } finally {
+        if (jjtc003) {
+          jjtree.closeNodeScope(jjtn003,  1);
+        }
+      }
+/*@egen*/
+|
   "not"/*@bgen(jjtree) #NotNode( 1) */
         {
-          ASTNotNode jjtn003 = new ASTNotNode(this, JJTNOTNODE);
-          boolean jjtc003 = true;
-          jjtree.openNodeScope(jjtn003);
+          ASTNotNode jjtn004 = new ASTNotNode(this, JJTNOTNODE);
+          boolean jjtc004 = true;
+          jjtree.openNodeScope(jjtn004);
         }
         try {
 /*@egen*/ UnaryExpression()/*@bgen(jjtree)*/
-        } catch (Throwable jjte003) {
-          if (jjtc003) {
-            jjtree.clearNodeScope(jjtn003);
-            jjtc003 = false;
+        } catch (Throwable jjte004) {
+          if (jjtc004) {
+            jjtree.clearNodeScope(jjtn004);
+            jjtc004 = false;
           } else {
             jjtree.popNode();
           }
-          if (jjte003 instanceof RuntimeException) {
-            throw (RuntimeException)jjte003;
+          if (jjte004 instanceof RuntimeException) {
+            throw (RuntimeException)jjte004;
           }
-          if (jjte003 instanceof ParseException) {
-            throw (ParseException)jjte003;
+          if (jjte004 instanceof ParseException) {
+            throw (ParseException)jjte004;
           }
-          throw (Error)jjte003;
+          throw (Error)jjte004;
         } finally {
-          if (jjtc003) {
-            jjtree.closeNodeScope(jjtn003,  1);
+          if (jjtc004) {
+            jjtree.closeNodeScope(jjtn004,  1);
           }
         }
 /*@egen*/
