@@ -35,7 +35,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.42 2004/08/19 17:35:47 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.43 2004/08/19 18:05:26 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -1107,14 +1107,22 @@ public class JexlTest extends TestCase
     {
     	try
 		{
-    		JexlContext jc = JexlHelper.createContext();
-    		Expression e = ExpressionFactory.createExpression("empty()");
+    		assertExpression(JexlHelper.createContext(), "empty()", null);
 		}
     	catch (ParseException pe)
 		{
     		System.err.println("Expecting a parse exception: " + pe.getMessage());
 		}
     }
+
+    /**
+     * Test the ## comment in a string
+     * @throws Exception
+     */
+    public void testComment() throws Exception
+	{
+        assertExpression(JexlHelper.createContext(), "## double or nothing\n 1 + 1", Long.valueOf("2"));
+	}
     
     /**
      * Asserts that the given expression returns the given value when applied to the
