@@ -71,7 +71,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.6 2002/05/20 10:49:27 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.7 2002/05/20 12:32:23 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -533,6 +533,40 @@ public class JexlTest extends TestCase
         Object o = e.evaluate(jc);
 
         assertEquals("o incorrect", "two", o);
+    }
+
+    /**
+      *  test variables with underscore names
+      */
+    public void testVariableNames()
+         throws Exception
+    {
+        Expression e = ExpressionFactory.createExpression("foo_bar");
+        JexlContext jc = JexlHelper.createContext();
+
+        
+        jc.getVars().put("foo_bar", "123" );
+        Object o = e.evaluate(jc);
+
+        assertEquals("o incorrect", "123", o);
+    }
+
+    /**
+      *  test the use of dot notation to lookup map entries
+      */
+    public void testMapDot()
+         throws Exception
+    {
+        Expression e = ExpressionFactory.createExpression("foo.bar");
+        JexlContext jc = JexlHelper.createContext();
+
+        Map foo = new HashMap();
+        foo.put( "bar", "123" );
+                
+        jc.getVars().put("foo", foo );
+        Object o = e.evaluate(jc);
+
+        assertEquals("o incorrect", "123", o);
     }
 
     public class Foo
