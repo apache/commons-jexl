@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.20 2002/10/10 14:19:16 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.21 2002/10/10 15:44:23 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -671,38 +671,13 @@ public class JexlTest extends TestCase
         assertTrue("o not instanceof Boolean", o instanceof Boolean);
         assertEquals("o incorrect", Boolean.TRUE, o);
 
-        /*
-         * also support the functional syntax extension
-         */
-        e = ExpressionFactory.createExpression("empty(foo)");
-        o = e.evaluate(jc);
-
-        assertTrue("o not instanceof Boolean", o instanceof Boolean);
-        assertEquals("o incorrect", Boolean.TRUE, o);
-
-        e = ExpressionFactory.createExpression("bar == null");
-        o = e.evaluate(jc);
-
-        assertTrue("o not instanceof Boolean", o instanceof Boolean);
-        assertEquals("o incorrect", Boolean.FALSE, o );
-
-        e = ExpressionFactory.createExpression("bar != null");
-        o = e.evaluate(jc);
-
-        assertTrue("o not instanceof Boolean", o instanceof Boolean);
-        assertEquals("o incorrect", Boolean.TRUE, o );
-
-        e = ExpressionFactory.createExpression("foo != null");
-        o = e.evaluate(jc);
-
-        assertTrue("o not instanceof Boolean", o instanceof Boolean);
-        assertEquals("o incorrect", Boolean.FALSE, o);
-
-        e = ExpressionFactory.createExpression("foo == null");
-        o = e.evaluate(jc);
-
-        assertTrue("o not instanceof Boolean", o instanceof Boolean);
-        assertEquals("o incorrect", Boolean.TRUE, o);
+        assertExpression(jc, "empty foo", Boolean.TRUE);
+        assertExpression(jc, "bar == null", Boolean.FALSE);
+        assertExpression(jc, "foo == null", Boolean.TRUE);
+        assertExpression(jc, "bar != null", Boolean.TRUE);
+        assertExpression(jc, "foo != null", Boolean.FALSE);
+        assertExpression(jc, "empty(bar)", Boolean.FALSE);
+        assertExpression(jc, "empty(foo)", Boolean.TRUE);
     }
 
     /**
@@ -818,9 +793,9 @@ public class JexlTest extends TestCase
 
         assertEquals("o incorrect", new Integer(5), o);
         
-        assertExpression(jc, "foo.square(-2)", new Integer(4));
         assertExpression(jc, "foo.square(2)", new Integer(4));
-    }
+        assertExpression(jc, "foo.square(-2)", new Integer(4));
+   }
 
     public void testArrayProperty()
         throws Exception
@@ -873,8 +848,8 @@ public class JexlTest extends TestCase
 
         jc.getVars().put("foo", "abcdef");
 
-        assertExpression(jc, "foo.substring(2,3)", "cd");
-        assertExpression(jc, "foo.charAt(2)", new Character('b'));
+        assertExpression(jc, "foo.substring(2,4)", "cd");
+        assertExpression(jc, "foo.charAt(2)", new Character('c'));
      
         try {
             assertExpression(jc, "foo.charAt(-2)", null);
@@ -1008,7 +983,7 @@ public class JexlTest extends TestCase
      */
     protected void assertExpression(JexlContext jc, String expression, Object expected) throws Exception 
     {
-        Expression e = ExpressionFactory.createExpression("array.length");
+        Expression e = ExpressionFactory.createExpression(expression);
         Object actual = e.evaluate(jc);
         assertEquals(expression, expected, actual);
     }
