@@ -153,7 +153,23 @@ aString.substring(6)
           <source>foo.class.name</source>
         </p>
       </subsection>
-      <subsection name="Arrays, Collections and Maps"></subsection>
+      <subsection name="Arrays, Lists and Maps">
+        <p>
+          Array elements can be accessed using either square brackets or a dotted
+          index notation, e.g. the following are equivalent
+          <source>arr[0]
+arr.0</source>
+          The same holds true for lists.
+        </p>
+        <p>
+          For a map, the syntax is very similar, except the 'index' is an object, e.g.
+          the following are equivalent.
+          <source>aMap['key']
+aMap.get('key')</source>
+          Please note that the index does not have to be a string, and
+          that the string usage above is just one possible option.
+        </p>
+      </subsection>
     </section>
   </body>
 </document>
