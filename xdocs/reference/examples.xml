@@ -106,10 +106,25 @@ x * 1.1 + y
         </source>
         <p>Arithmetic expressions can use variables. <code>null</code> is treated as a zero for arithmetic.</p>
       </subsection>
-      <subsection name="Calling methods"></subsection>
+      <subsection name="Calling methods">
+        <p>
+          JEXL allows you to call any method on a Java object using the same syntax.
+          If you have a string in the context under the name <code>aString</code>,
+          you could call it's <code>length</code> 
+          method like this:
+          <source>
+aString.length()
+aString.substring(6)
+          </source>
+        </p>
+        <p>
+          Often the values you want to pass to a method are other variables or expressions.
+          If you have a number in the context named <code>i</code>, you could use it
+          in a method call:
+        </p>
+      </subsection>
       <subsection name="Accessing properties"></subsection>
       <subsection name="Arrays, Collections and Maps"></subsection>
     </section>
   </body>
 </document>
-    
