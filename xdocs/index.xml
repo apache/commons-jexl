@@ -16,8 +16,8 @@
 -->
 
 <document>
-	<properties>
-		<title>Commons JEXL Overview</title>
+    <properties>
+        <title>Commons JEXL Overview</title>
     </properties>
 
     <body>
@@ -69,9 +69,9 @@
     // Now evaluate the expression, getting the result
     Object o = e.evaluate(jc);]]></source>
 
-	</section>
-	
-	<section name="Extensions to JSTL Expression Language">
+    </section>
+    
+    <section name="Extensions to JSTL Expression Language">
 
     <p>
     While JEXL is similar to the expression language defined in JSTL, it has improved
@@ -85,9 +85,9 @@
         <li>
         Added a general <span class="literal">size()</span> method, which works on:
           <ul>
-        	<li><span class="literal">String</span> - returns length</li>
-        	<li><span class="literal">Map</span> - returns number of keys</li>
-        	<li><span class="literal">List</span> - returns number of elements.</li>
+            <li><span class="literal">String</span> - returns length</li>
+            <li><span class="literal">Map</span> - returns number of keys</li>
+            <li><span class="literal">List</span> - returns number of elements.</li>
           </ul>
         </li>
         <li>
@@ -110,27 +110,36 @@
 
     <section name="Related Resources">
         <p>
-		  JEXL is not a product of the Java Community Process (JCP), but it provides a
-		  similar expression syntax.  For more information about JSP 2.0 EL and JSTL 1.1
-		  EL:
-		</p>
-		<ul>
+          JEXL is not a product of the Java Community Process (JCP), but it provides a
+          similar expression syntax.  For more information about JSP 2.0 EL and JSTL 1.1
+          EL:
+        </p>
+        <ul>
           <li>
             <a href="http://java.sun.com/products/jsp/index.jsp">JSP 2.0</a> is covered 
             by Java Specification Requests (JSR) 
-		    <a href="http://www.jcp.org/en/jsr/detail?id=152">JSR-152: JavaServer 
-		    Pages 2.0 Specification</a>.
-		  </li>
+            <a href="http://www.jcp.org/en/jsr/detail?id=152">JSR-152: JavaServer 
+            Pages 2.0 Specification</a>.
+          </li>
           <li>
-          	<a href="http://java.sun.com/products/jsp/jstl/">JSTL 1.1</a> is covered 
-          	by <a href="http://jcp.org/en/jsr/detail?id=52">JSR 52: A Standard 
-		    Tag Library for JavaServer Pages</a>.
-		  </li>
-		</ul>
-		<p>
-		  <a href="http://jakarta.apache.org/velocity">Jakarta Velocity</a> implements 
-		  a similar expression language.
-		</p>
+            <a href="http://java.sun.com/products/jsp/jstl/">JSTL 1.1</a> is covered 
+            by <a href="http://jcp.org/en/jsr/detail?id=52">JSR 52: A Standard 
+            Tag Library for JavaServer Pages</a>. See the 
+            <a href="http://java.sun.com/products/jsp/jstl/1.1/docs/api/index.html">JSTL API</a>.
+          </li>
+          <li>Apache has a <a href="http://jakarta.apache.org/taglibs/doc/standard-doc/intro.html">JSTL Implementation</a>.</li>
+        </ul>
+        <subsection name="Velocity">
+          <p>
+            <a href="http://jakarta.apache.org/velocity">Jakarta Velocity</a> implements 
+            a similar expression language. 
+          </p>
+          <p>
+            In particular the <a href="http://jakarta.apache.org/velocity/user-guide.html#References">References</a>
+            section of the User Guide has some good information on properties and method which correlate
+            directly to JEXL.
+          </p>
+        </subsection>
     </section>
 
     <section name="Anyone Using It Yet?">
