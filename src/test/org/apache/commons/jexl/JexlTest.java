@@ -71,7 +71,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.1 2002/04/26 04:45:28 geirm Exp $
+ *  @version $Id: JexlTest.java,v 1.2 2002/05/17 07:53:47 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -423,6 +423,42 @@ public class JexlTest extends TestCase
     }
 
 
+
+    /**
+      *  test some simple mathematical calculations
+      */
+    public void testCalculations()
+         throws Exception
+    {
+        Expression e = ExpressionFactory.createExpression("foo + 2");
+        JexlContext jc = JexlHelper.createContext();
+
+        jc.getVars().put("foo", new Integer(2) );
+        Object o = e.evaluate(jc);
+
+        assertTrue("o not instanceof Integer", o instanceof Integer);
+        assertEquals("o incorrect", o, new Integer(4));
+        
+        e = ExpressionFactory.createExpression("3 + 3");
+        o = e.evaluate(jc);
+        
+        assertEquals("o incorrect", new Integer(6), o );
+        
+        e = ExpressionFactory.createExpression("3 + 3 + foo");
+        o = e.evaluate(jc);
+        
+        assertEquals("o incorrect", new Integer(8), o );
+        
+        e = ExpressionFactory.createExpression("3 * 3");
+        o = e.evaluate(jc);
+        
+        assertEquals("o incorrect", new Integer(9), o );
+        
+        e = ExpressionFactory.createExpression("3 * 3 + foo");
+        o = e.evaluate(jc);
+        
+        assertEquals("o incorrect", new Integer(11), o );
+    }
 
     public class Foo
     {
