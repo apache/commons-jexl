@@ -44,6 +44,8 @@
       <arg value="1+2"/>
       <arg value="1+a"/>
       <arg value="1.0 * 5.2 / 2.5"/>
+      <arg value="7 % 3"/>
+      <arg value="77 div 17"/>
     </java>
   </goal>
 
