@@ -64,7 +64,7 @@ import java.util.ArrayList;
  *  simple example to show how to access arrays
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ArrayExample.java,v 1.1 2002/04/26 04:47:03 geirm Exp $
+ *  @version $Id: ArrayExample.java,v 1.2 2002/04/26 21:25:07 geirm Exp $
  */
 public class ArrayExample
 {
@@ -79,7 +79,7 @@ public class ArrayExample
         List l = new ArrayList();
         l.add("Hello from location 0");
         l.add(new Integer(2));
-        jc.put("array", l);
+        jc.getVars().put("array", l);
 
         Expression e = ExpressionFactory.createExpression("array[1]");
         Object o = e.evaluate(jc);
