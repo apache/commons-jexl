@@ -56,7 +56,7 @@
  *  Jexl : Java Expression Language
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: Parser.jjt,v 1.4 2002/06/07 03:03:51 geirm Exp $
+ *  @version $Id: Parser.jjt,v 1.5 2002/06/07 03:34:42 geirm Exp $
  */
 
 options
@@ -451,7 +451,13 @@ void ArrayAccess() : {}
 void Reference() : {}
 {
   (LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() | Identifier())
-  (LOOKAHEAD(2) "." (LOOKAHEAD(3) Method() | Identifier() | IntegerLiteral() ))*
+  (LOOKAHEAD(2) "."
+    (
+      LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() |
+      (LOOKAHEAD(3) Method() | Identifier() |  IntegerLiteral() )
+
+    )
+  )*
 }
 
 
