@@ -68,7 +68,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.29 2003/06/22 19:43:01 proyal Exp $
+ *  @version $Id: JexlTest.java,v 1.30 2003/09/04 01:06:29 proyal Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -652,7 +652,6 @@ public class JexlTest extends TestCase
         e.addPostResolver(new FlatResolver());
         JexlContext jc = JexlHelper.createContext();
 
-        Foo foo = new Foo();
         jc.getVars().put("x.a", Boolean.TRUE );
         jc.getVars().put("x.b", Boolean.FALSE );
         Object o = e.evaluate(jc);
@@ -682,7 +681,6 @@ public class JexlTest extends TestCase
         Expression e = ExpressionFactory.createExpression("foo.indexOf('quick') > 0");
         JexlContext jc = JexlHelper.createContext();
 
-        Foo foo = new Foo();
         jc.getVars().put("foo", "the quick and lazy fox" );
         Object o = e.evaluate(jc);
 
@@ -927,8 +925,6 @@ public class JexlTest extends TestCase
     {
         JexlContext jc = JexlHelper.createContext();
 
-        Foo foo = new Foo();
-
         jc.getVars().put("foo", "abcdef");
 
         assertExpression(jc, "foo.substring(2,4)", "cd");
@@ -944,6 +940,15 @@ public class JexlTest extends TestCase
         catch (Exception e) {
             throw e;
         }
+    }
+
+    public void testEmptyDottedVariableName() throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+
+        jc.getVars().put( "this.is.a.test", "");
+
+        assertExpression(jc, "empty(this.is.a.test)", Boolean.TRUE);
     }
 
     public void testCoercionWithComparisionOperators()
