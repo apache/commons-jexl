@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+
+<document>
+
+    <properties>
+        <title>Jexl</title>
+        <author email="geirm@apache.org">Geir Magnusson Jr.</author>
+    </properties>
+
+    <body>
+
+    <section name="Jexl : Java Expression Language">
+
+    <p>
+    Jexl is an expression language engine designed for easy embedding in
+    applications and frameworks.  It implements an extended version of the
+    Expression Language of the JSTL.
+    </p>
+
+    <p>
+    The motivation was to bring some of the lessons learned by the Velocity
+    community about expersssion languages in templating to a wider audience.
+    And I just had to get Velocity-ish method access in Jelly.  Just had to.
+    </p>
+
+    <p>
+    Here is an example of using Jexl :
+    </p>
+
+    <source>
+    <![CDATA[
+        /*
+         *  create an expression object
+         */
+        Expression e = ExpressionFactory.createExpression("foo.innerFoo.bar()");
+
+        /*
+         *  create a context and add data
+         */
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("foo", new Foo() );
+
+        /*
+         *  now evaluate the expression, getting the result
+        Object o = e.evaluate(jc);
+    ]]>
+    </source>
+
+    <p>
+    Jexl has extended the JSTL in a few ways :
+    </p>
+
+    <ul>
+        <li>
+        Support for invocation of any accessible method (see example above).
+        </li>
+        <li>
+        Added a general size() method, which works on String, returning length,
+        Map, returning # of keys, and List and arrays, returning the
+        number of elements.
+        </li>
+        <li>
+        Optional syntax for the 'empty' function :   empty(obj)
+        </li>
+     </ul>
+
+    </section>
+
+    <section name="Current Status">
+
+        <p>
+        The current status is best described as 'development, active'.
+        </p>
+
+    </section>
+
+    <section name="Anyone Using It Yet?">
+
+        <p>
+        James Strachan's
+        <a href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/jelly/">
+        Jelly</a>, currently in commons-sandbox.
+        </p>
+
+        <p>
+        Jexl and Jelly are two components of the Jakarta Je*l* Pack
+        </p>
+
+    </section>
+
+    <section name="Nightly Snapshots">
+
+        <p>
+        Soon.
+        </p>
+
+    </section>
+
+ </body>
+</document>
+

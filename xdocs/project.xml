@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Commons"
+        href="http://jakarta.apache.org/commons/">
+
+    <title>Commons</title>
+    <logo href="/images/logo.jpg">Commons</logo>
+
+    <body>
+
+    <menu name="Home">
+        <item name="Jakarta Commons"       href="/index.html" />
+    </menu>
+
+    <menu name="About Us">
+        <item name="Contributors"           href="/contributors.html"/>
+        <item name="License"                href="/license.html"/>
+    </menu>
+
+    <menu name="Download">
+        <item name="Release"                href="http://jakarta.apache.org/builds/jakarta-commons/release"/>
+        <item name="Nightly"                href="http://jakarta.apache.org/builds/jakarta-commons/nightly"/>
+    </menu>
+
+    <menu name="Information">
+        <item name="Overview"               href="/index.html"/>
+        <item name="Components"             href="/components.html"/>
+        <!-- Yet to come?
+        <item name="Guidelines"             href="/guidelines.html"/>
+        <item name="News"                   href="/news.html"/>
+        -->
+        <!-- deprecated?
+        <item name="Commons Proper"         href="/commons.html"/>
+        <item name="Sandbox"                href="/sandbox.html"/>
+        -->
+    </menu>
+
+    <menu name="Components Repository">
+        <item name="BeanUtils"              href="/beanutils.html"/>
+        <item name="Cactus"                 href="/cactus/index.html"/>
+        <item name="Collections"            href="/collections.html"/>
+        <item name="Digester"               href="/digester.html"/>
+        <item name="DBCP"                   href="http://cvs.apache.org/viewcvs/jakarta-commons/dbcp/"/>
+        <item name="HTTP Client"            href="/httpclient"/>
+        <item name="JXPath"                 href="http://cvs.apache.org/viewcvs/jakarta-commons/jxpath/"/>
+        <item name="Latka"                  href="/latka/index.html"/>
+        <item name="Pool"                   href="http://cvs.apache.org/viewcvs/jakarta-commons/pool/"/>
+        <item name="Logging"                href="http://cvs.apache.org/viewcvs/jakarta-commons/logging/"/>
+        <item name="Validator"              href="http://cvs.apache.org/viewcvs/jakarta-commons/validator/"/>
+    </menu>
+
+    <menu name="Sandbox Components">
+        <item name="Betwixt"                href="/betwixt.html"/>
+        <item name="Jelly"                  href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/jelly/"/>
+        <item name="Jelly"                  href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/jexl/"/>
+        <item name="JJar"                   href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/jjar/"/>
+        <item name="Messenger"              href="/messenger.html"/>
+        <item name="Workflow"               href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/workflow/"/>
+    </menu>
+
+    <menu name="Jakarta Community">
+        <item name="Get Involved"           href="/site/getinvolved.html"/>
+        <item name="Mailing Lists"          href="/site/mail.html"/>
+        <item name="CVS Repositories"       href="/site/cvsindex.html"/>
+    </menu>
+
+    <menu name="Project Docs">
+        <item name="Charter"                href="/charter.html"/>
+        <item name="Releases"               href="/releases.html"/>
+        <item name="Versioning"             href="/versioning.html"/>
+    </menu>
+    </body>
+</project>
