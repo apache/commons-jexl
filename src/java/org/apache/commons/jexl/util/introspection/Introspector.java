@@ -47,7 +47,7 @@ import org.apache.commons.logging.Log;
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
  * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
  * @author <a href="mailto:paulo.gaspar@krankikom.de">Paulo Gaspar</a>
- * @version $Id: Introspector.java,v 1.4 2004/02/28 13:45:21 yoavs Exp $
+ * @version $Id: Introspector.java,v 1.5 2004/08/23 13:25:29 dion Exp $
  */
 public class Introspector extends IntrospectorBase
 {
@@ -55,8 +55,8 @@ public class Introspector extends IntrospectorBase
      *  define a public string so that it can be looked for
      *  if interested
      */
-     
-    public final static String CACHEDUMP_MSG = 
+
+    public static final String CACHEDUMP_MSG = 
         "Introspector : detected classloader change. Dumping cache.";
 
     /**
