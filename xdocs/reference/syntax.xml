@@ -50,8 +50,33 @@
             e.g.
             <ul>
               <li>Valid: <code>var1</code>,<code>_a99</code>,<code>$1</code></li>
-              <li>Inalid: <code>9v</code>,<code>!a99</code>,<code>1$</code></li>
+              <li>Invalid: <code>9v</code>,<code>!a99</code>,<code>1$</code></li>
             </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>Scripts</td>
+          <td>
+            A script in Jexl is made up of zero or more statements.
+          </td>
+        </tr>
+        <tr>
+          <td>Statements</td>
+          <td>
+            A statement can be the empty statement, the semicolon (<code>;</code>) ,  block, assignment or an expression.
+            Statements are optionally terminated with a semicolon.
+          </td>
+        </tr>
+        <tr>
+          <td>Block</td>
+          <td>
+            A block is simply multiple statements inside curly braces (<code>{, }</code>).
+          </td>
+        </tr>
+        <tr>
+          <td>Assigment</td>
+          <td>
+            Assignment sets a variable to a given value using the <code>=</code> operator.
           </td>
         </tr>
       </table>
@@ -77,6 +102,20 @@
             Can start and end with either <code>'</code> or <code>"</code>, e.g.
             <source>"Hello world"</source> and
             <source>'Hello world'</source> are equivalent.
+          </td>
+        </tr>
+        <tr>
+          <td>Boolean literals</td>
+          <td>
+            The literals <code>true</code> and <code>false</code> can be used, e.g.
+            <source>val1 == true</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Null literal</td>
+          <td>
+            The null value is represented as in java using the literal <code>null</code>, e.g.
+            <source>val1 == null</source>
           </td>
         </tr>
       </table>
@@ -143,6 +182,124 @@
             The usual <code>!</code> operator can be used as well as the word <code>not</code>, e.g.
             <source>!cond1</source> and
             <source>not cond1</source> are equivalent
+          </td>
+        </tr>
+        <tr>
+          <td>Equality</td>
+          <td>
+            The usual <code>==</code> operator can be used as well as the abbreviation <code>eq</code>.
+            For example
+            <source>val1 == val2</source> and
+            <source>val1 eq val2</source> are equivalent.
+            <ol>
+              <li>
+                <code>null</code> is only ever equal to null, that is if you compare null
+                to any non-null value, the result is false.
+              </li>
+              <li>Equality uses the java <code>equals</code> method</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Inequality</td>
+          <td>
+            The usual <code>!=</code> operator can be used as well as the abbreviation <code>ne</code>.
+            For example
+            <source>val1 != val2</source> and
+            <source>val1 ne val2</source> are equivalent.
+          </td>
+        </tr>
+        <tr>
+          <td>Less Than</td>
+          <td>
+            The usual <code>&lt;</code> operator can be used as well as the abbreviation <code>lt</code>.
+            For example
+            <source>val1 &lt; val2</source> and
+            <source>val1 lt val2</source> are equivalent.
+          </td>
+        </tr>
+        <tr>
+          <td>Less Than Or Equal To</td>
+          <td>
+            The usual <code>&lt;=</code> operator can be used as well as the abbreviation <code>le</code>.
+            For example
+            <source>val1 &lt;= val2</source> and
+            <source>val1 le val2</source> are equivalent.
+          </td>
+        </tr>
+        <tr>
+          <td>Greater Than</td>
+          <td>
+            The usual <code>&gt;</code> operator can be used as well as the abbreviation <code>gt</code>.
+            For example
+            <source>val1 &gt; val2</source> and
+            <source>val1 gt val2</source> are equivalent.
+          </td>
+        </tr>
+        <tr>
+          <td>Greater Than Or Equal To</td>
+          <td>
+            The usual <code>&gt;=</code> operator can be used as well as the abbreviation <code>ge</code>.
+            For example
+            <source>val1 &gt;= val2</source> and
+            <source>val1 ge val2</source> are equivalent.
+          </td>
+        </tr>
+        <tr>
+          <td>Addition</td>
+          <td>
+            The usual <code>+</code> operator is used.
+            For example
+            <source>val1 + val2</source>.
+          </td>
+        </tr>
+        <tr>
+          <td>Subtraction</td>
+          <td>
+            The usual <code>-</code> operator is used.
+            For example
+            <source>val1 - val2</source>.
+          </td>
+        </tr>
+        <tr>
+          <td>Multiplication</td>
+          <td>
+            The usual <code>*</code> operator is used.
+            For example
+            <source>val1 * val2</source>.
+          </td>
+        </tr>
+        <tr>
+          <td>Division</td>
+          <td>
+            The usual <code>/</code> operator is used.
+            For example
+            <source>val1 / val2</source>.
+          </td>
+        </tr>
+        <tr>
+          <td>Integer Division</td>
+          <td>
+            The <code>div</code> operator is used.
+            For example
+            <source>4 div 3</source> gives 1.
+          </td>
+        </tr>
+        <tr>
+          <td>Modulus (or remainder)</td>
+          <td>
+            The <code>%</code> operator is used. An alternative is the <code>mod</code>
+            operator.
+            For example
+            <source>5 mod 2</source> gives 1 and is equivalent to <source>5 % 2</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Negation</td>
+          <td>
+            The unary <code>-</code> operator is used.
+            For example
+            <source>-12</source>.
           </td>
         </tr>
       </table>
