@@ -1,13 +1,12 @@
 package org.apache.commons.jexl.util;
 
 import org.apache.commons.logging.Log;
-import org.apache.velocity.runtime.RuntimeLogger;
 
 /**
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  */
-public class LogAdapter implements RuntimeLogger
+public class LogAdapter
 {
     Log logger;
 

@@ -1,7 +1,7 @@
 /*
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
+ * Copyright (c) 2000-2001 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,7 +23,7 @@
  *    Alternately, this acknowlegement may appear in the software itself,
  *    if and wherever such third-party acknowlegements normally appear.
  *
- * 4. The names "The Jakarta Project", "Commons", "Jexl" and "Apache Software
+ * 4. The names "The Jakarta Project", "Velocity", and "Apache Software
  *    Foundation" must not be used to endorse or promote products derived
  *    from this software without prior written permission. For written
  *    permission, please contact apache@apache.org.
@@ -51,43 +51,50 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
+
 package org.apache.commons.jexl.util;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.jexl.util.introspection.Uberspect;
-import org.apache.commons.jexl.util.introspection.UberspectImpl;
-import org.apache.commons.jexl.util.introspection.UberspectLoggable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.apache.commons.logging.Log;
+
 /**
- *  Little class to manage a Velocity uberspector (Vel 1.4+) for instrospective
- *  services
+ * Abstract class that is used to execute an arbitrary
+ * method that is in introspected. This is the superclass
+ * for the GetExecutor and PropertyExecutor.
  *
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: Introspector.java,v 1.3 2002/08/05 05:06:21 geirm Exp $
+ * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
+ * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
+ * @version $Id: AbstractExecutor.java,v 1.1 2002/08/05 05:06:21 geirm Exp $
  */
-public class Introspector
+public abstract class AbstractExecutor
 {
+    protected Log rlog = null;
+    
     /**
-     *  the uberspector from Velocity - handles all instrospection patterns
+     * Method to be executed.
      */
-    private static Uberspect uberSpect;
+    protected Method method = null;
+    
+    /**
+     * Execute method against context.
+     */
+     public abstract Object execute(Object o)
+         throws IllegalAccessException, InvocationTargetException;
 
-    static {
-
-        Log logger = LogFactory.getLog(Introspector.class);
-
-        uberSpect = new UberspectImpl();
-        ((UberspectLoggable) uberSpect).setRuntimeLogger(logger);
+    /**
+     * Tell whether the executor is alive by looking
+     * at the value of the method.
+     */
+    public boolean isAlive()
+    {
+        return (method != null);
     }
 
-    /**
-     *  For now, expose the raw uberspector to the AST
-     */
-    public static Uberspect getUberspect()
+    public Method getMethod()
     {
-        return uberSpect;
+        return method;
     }
 }
