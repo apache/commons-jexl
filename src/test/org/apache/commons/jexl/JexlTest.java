@@ -60,6 +60,7 @@ import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.Expression;
 import org.apache.commons.jexl.ExpressionFactory;
+import org.apache.commons.jexl.resolver.FlatResolver;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.10 2002/06/07 03:37:07 geirm Exp $
+ *  @version $Id: JexlTest.java,v 1.11 2002/06/13 16:11:28 geirm Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -668,6 +669,56 @@ public class JexlTest extends TestCase
 //        assertEquals("dot form failed", GET_METHOD_ARRAY2[1][1], o2);
     }
 
+    public void testResolver()
+        throws Exception
+    {
+        /*
+         * first, a simple override
+         */
+
+        Expression expr =
+            ExpressionFactory.createExpression("foo.bar");
+
+        expr.addPreResolver(new FlatResolver());
+
+        JexlContext jc = JexlHelper.createContext();
+
+        Foo foo = new Foo();
+
+        jc.getVars().put("foo.bar", "flat value");
+        jc.getVars().put("foo", foo );
+
+        Object o = expr.evaluate(jc);
+
+        assertEquals("flat override", o,"flat value");
+
+        /*
+         * now, let the resolver not find it and have it drop to jexl
+         */
+
+        expr =
+            ExpressionFactory.createExpression("foo.bar.length()");
+
+        expr.addPreResolver(new FlatResolver());
+
+        o = expr.evaluate(jc);
+
+        assertEquals("flat override 1", o,new Integer(GET_METHOD_STRING.length()));
+
+        /*
+         * now, let the resolver not find it and NOT drop to jexl
+         */
+
+        expr =
+            ExpressionFactory.createExpression("foo.bar.length()");
+
+        expr.addPreResolver(new FlatResolver(false));
+
+        o = expr.evaluate(jc);
+
+        assertEquals("flat override 2", o, null);
+
+    }
 
     public class Foo
     {
@@ -695,7 +746,7 @@ public class JexlTest extends TestCase
         {
             return "Boolean : " + b;
         }
-        
+
         public int getCount() {
             return 5;
         }
