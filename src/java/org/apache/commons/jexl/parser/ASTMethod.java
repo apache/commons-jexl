@@ -2,8 +2,8 @@ package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Introspector;
-import org.apache.velocity.util.introspection.VelMethod;
-import org.apache.velocity.util.introspection.Info;
+import org.apache.commons.jexl.util.introspection.VelMethod;
+import org.apache.commons.jexl.util.introspection.Info;
 
 public class ASTMethod extends SimpleNode
 {
