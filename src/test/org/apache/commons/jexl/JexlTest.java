@@ -68,7 +68,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.25 2002/12/16 10:42:26 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.26 2003/02/09 20:20:08 geirm Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -510,6 +510,35 @@ public class JexlTest extends TestCase
         e = ExpressionFactory.createExpression("3 * 3.0");
         o = e.evaluate(jc);
         assertEquals("o incorrect", new Double(9), o );
+
+        /*
+         *  test / and %
+         */
+
+        e = ExpressionFactory.createExpression("6 / 3");
+        o = e.evaluate(jc);
+        assertEquals("o incorrect", new Double(6/3), o);
+
+        e = ExpressionFactory.createExpression("6.4 / 3");
+        o = e.evaluate(jc);
+        assertEquals("o incorrect", new Double(6.4 / 3), o);
+
+        e = ExpressionFactory.createExpression("0 / 3");
+        o = e.evaluate(jc);
+        assertEquals("o incorrect", new Double(0 / 3), o);
+
+        e = ExpressionFactory.createExpression("3 / 0");
+        o = e.evaluate(jc);
+        assertEquals("o incorrect", new Double(0), o);
+
+        e = ExpressionFactory.createExpression("4 % 3");
+        o = e.evaluate(jc);
+        assertEquals("o incorrect", new Long(1), o);
+
+        e = ExpressionFactory.createExpression("4.8 % 3");
+        o = e.evaluate(jc);
+        assertEquals("o incorrect", new Double(4.8 % 3), o);
+
     }
 
     /**
@@ -1036,4 +1065,17 @@ public class JexlTest extends TestCase
         Object actual = e.evaluate(jc);
         assertEquals(expression, expected, actual);
     }
+
+
+    /**
+     *  Helps in debugging the testcases when working with it
+     *
+     */
+    public static void main(String[] args)
+        throws Exception
+    {
+        JexlTest jt = new JexlTest("foo");
+        jt.testCalculations();
+    }
+
 }
