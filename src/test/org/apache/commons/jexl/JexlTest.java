@@ -71,7 +71,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.8 2002/05/20 14:11:25 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.9 2002/05/25 18:40:44 geirm Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -182,6 +182,16 @@ public class JexlTest extends TestCase
 
         assertTrue("array[0]", o.equals("hello"));
 
+        jc.getVars().put("zero", new Integer(0));
+
+        /*
+         * to think that this was an intentional syntax...
+         */
+        e = ExpressionFactory.createExpression("array.0");
+        o = e.evaluate(jc);
+
+        assertTrue("array[0]", o.equals("hello"));
+
         /*
          * test map access
          */
@@ -210,6 +220,12 @@ public class JexlTest extends TestCase
         o = e.evaluate(jc);
 
         assertTrue("foo['bar']", o.equals(GET_METHOD_STRING));
+
+        e = ExpressionFactory.createExpression("foo[\"bar\"] == foo.bar");
+        o = e.evaluate(jc);
+
+        assertTrue("foo['bar'] == foo.bar", o.equals(Boolean.TRUE));
+
     }
 
     public void testMulti()
