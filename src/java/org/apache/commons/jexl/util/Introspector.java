@@ -61,7 +61,6 @@ import org.apache.velocity.util.introspection.VelMethod;
 import org.apache.velocity.runtime.RuntimeLogger;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
-import org.apache.log.Logger;
 
 import java.lang.reflect.Method;
 
@@ -70,7 +69,7 @@ import java.lang.reflect.Method;
  *  services
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: Introspector.java,v 1.1 2002/04/26 04:23:17 geirm Exp $
+ *  @version $Id: Introspector.java,v 1.2 2002/05/20 12:07:59 jstrachan Exp $
  */
 public class Introspector
 {
