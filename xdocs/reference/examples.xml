@@ -102,7 +102,9 @@
 12 % 2
 6 div 4
 -12 + 77.2
+x * 1.1 + y
         </source>
+        <p>Arithmetic expressions can use variables. <code>null</code> is treated as a zero for arithmetic.</p>
       </subsection>
       <subsection name="Calling methods"></subsection>
       <subsection name="Accessing properties"></subsection>
