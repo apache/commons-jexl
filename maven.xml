@@ -32,5 +32,19 @@
   <!-- ================================================================== -->
   <!-- END: C O M M O N S - B U I L D                                     -->
   <!-- ================================================================== -->
-  
+
+
+  <goal name="tester" prereqs="test:compile" description="Run">
+    <java classname="org.apache.commons.jexl.Jexl">
+      <classpath>
+        <pathelement path="${maven.build.dest}"/>
+        <pathelement path="${maven.test.dest}"/>
+        <path refid="maven.dependency.classpath"/>
+      </classpath>
+      <arg value="1+2"/>
+      <arg value="1+a"/>
+      <arg value="1.0 * 5.2 / 2.5"/>
+    </java>
+  </goal>
+
 </project>
