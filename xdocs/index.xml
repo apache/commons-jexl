@@ -18,7 +18,6 @@
 
     <properties>
         <title>Overview</title>
-        <author email="geirm@apache.org">Geir Magnusson Jr.</author>
     </properties>
 
     <body>
@@ -33,8 +32,8 @@
 
     <p>
     The motivation was to bring some of the lessons learned by the Velocity
-    community about expersssion languages in templating to a wider audience.
-    And I just had to get Velocity-ish method access in Jelly.  Just had to.
+    community about expression languages in templating to a wider audience.
+    Jelly needed Velocity-ish method access; it Just had to have it.
     </p>
 
     <p>
@@ -92,6 +91,7 @@
 
     <section name="Releases">
         <p>
+        Jelly is not yet release, but a nightly build can be downloaded.
         See the <a href="downloads.html">downloads</a> page for information on obtaining releases.
         </p>
     </section>
