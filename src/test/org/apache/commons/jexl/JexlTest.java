@@ -35,7 +35,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.48 2004/08/20 07:51:48 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.49 2004/08/20 07:56:33 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -239,18 +239,6 @@ public class JexlTest extends TestCase
         assertExpression(jc, "empty longstring", Boolean.FALSE);
         assertExpression(jc, "not empty longstring", Boolean.TRUE);
     }
-    
-    public void testNot() throws Exception
-    {
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("string", "");
-        assertExpression(jc, "not empty string", Boolean.FALSE);
-        assertExpression(jc, "not(empty string)", Boolean.FALSE);
-        assertExpression(jc, "not empty(string)", Boolean.FALSE);
-        assertExpression(jc, "! empty string", Boolean.FALSE);
-        assertExpression(jc, "!(empty string)", Boolean.FALSE);
-        assertExpression(jc, "!empty(string)", Boolean.FALSE);
-    }
 
     public void testSize()
          throws Exception
@@ -406,57 +394,31 @@ public class JexlTest extends TestCase
     public void testNotConditions()
          throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("!x");
         JexlContext jc = JexlHelper.createContext();
 
         Foo foo = new Foo();
         jc.getVars().put("x", Boolean.TRUE );
         jc.getVars().put("foo", foo );
         jc.getVars().put("bar", "true" );
-        Object o = e.evaluate(jc);
 
-        assertTrue("o not instanceof Boolean", o instanceof Boolean);
-        assertEquals("o incorrect", Boolean.FALSE, o);
+        assertExpression(jc, "!x", Boolean.FALSE);
+        assertExpression(jc, "x", Boolean.TRUE);
+        assertExpression(jc, "!bar", Boolean.FALSE);
+        assertExpression(jc, "!foo.isSimple()", Boolean.FALSE);
+        assertExpression(jc, "foo.isSimple()", Boolean.TRUE);
+        assertExpression(jc, "!foo.simple", Boolean.FALSE);
+        assertExpression(jc, "foo.simple", Boolean.TRUE);
+        assertExpression(jc, "foo.getCheeseList().size() == 3", Boolean.TRUE);
+        assertExpression(jc, "foo.cheeseList.size() == 3", Boolean.TRUE);
 
-        e = ExpressionFactory.createExpression("x");
-        o = e.evaluate(jc);
+        jc.getVars().put("string", "");
+        assertExpression(jc, "not empty string", Boolean.FALSE);
+        assertExpression(jc, "not(empty string)", Boolean.FALSE);
+        assertExpression(jc, "not empty(string)", Boolean.FALSE);
+        assertExpression(jc, "! empty string", Boolean.FALSE);
+        assertExpression(jc, "!(empty string)", Boolean.FALSE);
+        assertExpression(jc, "!empty(string)", Boolean.FALSE);
 
-        assertEquals("o incorrect", Boolean.TRUE, o );
-
-        e = ExpressionFactory.createExpression("!bar");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.FALSE, o );
-
-        e = ExpressionFactory.createExpression("!foo.isSimple()");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.FALSE, o );
-
-        e = ExpressionFactory.createExpression("foo.isSimple()");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.TRUE, o );
-
-        e = ExpressionFactory.createExpression("!foo.simple");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.FALSE, o );
-
-        e = ExpressionFactory.createExpression("foo.simple");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.TRUE, o );
-
-        e = ExpressionFactory.createExpression("foo.getCheeseList().size() == 3");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.TRUE, o );
-
-        e = ExpressionFactory.createExpression("foo.cheeseList.size() == 3");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.TRUE, o );
     }
 
 
