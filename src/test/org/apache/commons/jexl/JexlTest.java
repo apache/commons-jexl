@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Collections;
@@ -35,7 +36,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.54 2004/08/20 08:22:20 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.55 2004/08/20 12:05:03 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -380,12 +381,43 @@ public class JexlTest extends TestCase
     {
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("foo", new Integer(2) );
+        jc.getVars().put("aFloat", new Float(1));
+        jc.getVars().put("aDouble", new Double(2));
+        jc.getVars().put("aChar", new Character('A'));
+        jc.getVars().put("aBool", Boolean.TRUE);
+        StringBuffer buffer = new StringBuffer("abc");
+        List list = new ArrayList();
+        List list2 = new LinkedList();
+        jc.getVars().put("aBuffer", buffer);
+        jc.getVars().put("aList", list);
+        jc.getVars().put("bList", list2);
         
         assertExpression(jc, "foo == 2", Boolean.TRUE);
         assertExpression(jc, "2 == 3", Boolean.FALSE);
         assertExpression(jc, "3 == foo", Boolean.FALSE);
         assertExpression(jc, "3 != foo", Boolean.TRUE);
         assertExpression(jc, "foo != 2", Boolean.FALSE);
+        // test float and double equality
+        assertExpression(jc, "aFloat eq aDouble", Boolean.FALSE);
+        assertExpression(jc, "aFloat ne aDouble", Boolean.TRUE);
+        assertExpression(jc, "aFloat == aDouble", Boolean.FALSE);
+        assertExpression(jc, "aFloat != aDouble", Boolean.TRUE);
+        // test number and character equality
+        assertExpression(jc, "foo == aChar", Boolean.FALSE);
+        assertExpression(jc, "foo != aChar", Boolean.TRUE);
+        // test string and boolean
+        assertExpression(jc, "aBool == 'true'", Boolean.TRUE);
+        assertExpression(jc, "aBool == 'false'", Boolean.FALSE);
+        assertExpression(jc, "aBool != 'false'", Boolean.TRUE);
+        // test null and boolean
+        assertExpression(jc, "aBool == notThere", Boolean.FALSE);
+        assertExpression(jc, "aBool != notThere", Boolean.TRUE);
+        // anything and string as a string comparison
+        assertExpression(jc, "aBuffer == 'abc'", Boolean.TRUE);
+        assertExpression(jc, "aBuffer != 'abc'", Boolean.FALSE);
+        // arbitrary equals
+        assertExpression(jc, "aList == bList", Boolean.TRUE);
+        assertExpression(jc, "aList != bList", Boolean.FALSE);
     }
 
     /**
