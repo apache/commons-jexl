@@ -8,3 +8,6 @@ target
 tmp
 lib
 bin
+*.ipr
+*.iws
+*.iml
