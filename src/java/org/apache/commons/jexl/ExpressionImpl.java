@@ -22,17 +22,16 @@ import java.util.List;
 import org.apache.commons.jexl.parser.SimpleNode;
 
 /**
- *  Implelmentation of an Expression.  Created by the ExpressionFactory.
- *	
- *  The expression is different than a script - it's really just either
- *  a reference or expression that we can get the value of.
+ * Instances of ExpressionImpl are created by the {@link ExpressionFactory},
+ * and this is the default implementation of the {@link Expression} interface.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ExpressionImpl.java,v 1.7 2004/06/12 23:53:17 tobrien Exp $
+ *  @version $Id: ExpressionImpl.java,v 1.8 2004/06/13 01:42:21 tobrien Exp $
  */
 class ExpressionImpl implements Expression
 {
-    List preResolvers;
+
+	List preResolvers;
     List postResolvers;
 
     /**
