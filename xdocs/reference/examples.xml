@@ -76,6 +76,18 @@
       </source>
     </section>
     <section name="Custom Contexts">
+      <p>
+        Often you have the objects and values that are needed in the context available
+        elsewhere, and instead of creating the default context and populating it
+        manually in the code, it may be simpler to create a context implementation of your
+        own.
+      </p>
+      <p>
+        The <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">JexlContext</a>
+        interface is very simple with only two methods, one to get the variables of the
+        context as a <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Map.html">Map</a> and
+        another to set the variables of the context from a Map.
+      </p>
     </section>
     <section name="Custom Resolvers">
     </section>
