@@ -60,7 +60,7 @@ import org.apache.commons.jexl.util.Coercion;
  *  represents equality between integers - use .equals() for strings
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTEQNode.java,v 1.1 2002/04/26 04:23:14 geirm Exp $
+ *  @version $Id: ASTEQNode.java,v 1.2 2002/07/08 00:21:54 geirm Exp $
  */
 public class ASTEQNode extends SimpleNode
 {
@@ -86,8 +86,18 @@ public class ASTEQNode extends SimpleNode
         Object left = ( (SimpleNode) jjtGetChild(0)).value(pc);
         Object right = ( (SimpleNode) jjtGetChild(1)).value(pc);
 
-        if (left==null || right==null)
+        if (left == null && right == null)
         {
+            /*
+             * if both are null L == R
+             */
+            return Boolean.TRUE;
+        }
+        else if (left==null || right==null)
+        {
+            /*
+             * we know both aren't null, therefore L != R
+             */
             return Boolean.FALSE;
         }
         else if (left.getClass().equals(right.getClass()))
