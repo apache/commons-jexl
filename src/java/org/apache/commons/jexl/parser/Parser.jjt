@@ -1,0 +1,475 @@
+/*
+ * The Apache Software License, Version 1.1
+ *
+ * Copyright (c) 2002 The Apache Software Foundation.  All rights
+ * reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ *
+ * 3. The end-user documentation included with the redistribution, if
+ *    any, must include the following acknowlegement:
+ *       "This product includes software developed by the
+ *        Apache Software Foundation (http://www.apache.org/)."
+ *    Alternately, this acknowlegement may appear in the software itself,
+ *    if and wherever such third-party acknowlegements normally appear.
+ *
+ * 4. The names "The Jakarta Project", "Commons", "Jexl" and "Apache Software
+ *    Foundation" must not be used to endorse or promote products derived
+ *    from this software without prior written permission. For written
+ *    permission, please contact apache@apache.org.
+ *
+ * 5. Products derived from this software may not be called "Apache"
+ *    nor may "Apache" appear in their names without prior written
+ *    permission of the Apache Group.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ * ====================================================================
+ *
+ * This software consists of voluntary contributions made by many
+ * individuals on behalf of the Apache Software Foundation.  For more
+ * information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
+ */
+
+/**
+ *  Jexl : Java Expression Language
+ *
+ *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
+ *  @version $Id: Parser.jjt,v 1.1 2002/04/26 04:23:14 geirm Exp $
+ */
+
+options
+{
+   MULTI=true;
+   STATIC=false;
+   VISITOR=true;
+   NODE_USES_PARSER=true;
+}
+
+PARSER_BEGIN(Parser)
+
+package org.apache.commons.jexl.parser;
+
+import java.io.Reader;
+import java.io.ByteArrayInputStream;
+
+public class Parser
+{
+    public SimpleNode parse(Reader reader)
+        throws Exception
+    {
+        ReInit(reader);
+
+        /*
+         *  lets do the 'Unique Init' in here to be
+         *  safe - it's a pain to remember
+         */
+
+        SimpleNode tree = JexlScript();
+        return tree;
+    }
+}
+
+PARSER_END(Parser)
+
+
+SKIP : /* WHITE SPACE */
+{
+    <COMMENT: ( "##" ( ~["\"","\n","\r"] )* ("\n" | "\r") ) >
+|
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL: (<DIGIT>)+ >
+|
+  < FLOAT_LITERAL: (<DIGIT>)+ "."(<DIGIT>)+ >
+}
+
+/*
+ * Program structuring syntax follows.
+ */
+
+SimpleNode JexlScript() :
+{
+   String name;
+}
+{
+    (
+       Statement()
+    )*
+    <EOF>
+   { return jjtThis;}
+}
+
+
+void Block() :
+{}
+{
+  "{" ( Statement() )* "}"
+}
+
+void EmptyFunction() : {}
+{
+    "empty"
+    ( Reference() | "(" Reference() ")" )
+}
+
+void SizeFunction() : {}
+{
+    "size" "(" Reference() ")"
+}
+
+void Identifier() :
+{
+   Token t;
+}
+{
+    t=<IDENTIFIER>
+    {
+       jjtThis.val = t.image;
+    }
+}
+
+
+/*
+ * Expression syntax follows.
+ */
+
+void Expression() : {}
+{
+  LOOKAHEAD( PrimaryExpression() "=" )
+  Assignment()
+|
+  ConditionalOrExpression()
+}
+
+void Assignment() #Assignment(2) :
+{}
+{
+  PrimaryExpression() "=" Expression()
+}
+
+void ConditionalOrExpression() #void :
+{}
+{
+  ConditionalAndExpression()
+  (
+    "||" ConditionalAndExpression() #OrNode(2)
+  |
+    "or" ConditionalAndExpression() #OrNode(2)
+  )*
+}
+
+void ConditionalAndExpression() #void :
+{}
+{
+  InclusiveOrExpression()
+  (
+    "&&" InclusiveOrExpression() #AndNode(2)
+  |
+    "and" InclusiveOrExpression() #AndNode(2)
+  )*
+}
+
+void InclusiveOrExpression() #void :
+{}
+{
+  ExclusiveOrExpression()
+  ( "|" ExclusiveOrExpression() #BitwiseOrNode(2) )*
+}
+
+void ExclusiveOrExpression() #void :
+{}
+{
+  AndExpression()
+  ( "^" AndExpression() #BitwiseXorNode(2) )*
+}
+
+void AndExpression() #void :
+{}
+{
+  EqualityExpression()
+  ( "&" EqualityExpression() #BitwiseAndNode(2) )*
+}
+
+void EqualityExpression() #void :
+{}
+{
+  RelationalExpression()
+  (
+     "==" RelationalExpression() #EQNode(2)
+   |
+     "eq" RelationalExpression() #EQNode(2)
+   |
+     "!=" RelationalExpression() #NENode(2)
+   |
+     "ne" RelationalExpression() #NENode(2)
+  )*
+}
+
+void RelationalExpression() #void :
+{}
+{
+  AdditiveExpression()
+  (
+    "<" AdditiveExpression() #LTNode(2)
+   |
+    "lt" AdditiveExpression() #LTNode(2)
+   |
+    ">" AdditiveExpression() #GTNode(2)
+   |
+    "gt" AdditiveExpression() #GTNode(2)
+   |
+    "<=" AdditiveExpression() #LENode(2)
+   |
+    "le" AdditiveExpression() #LENode(2)
+   |
+    ">=" AdditiveExpression() #GENode(2)
+   |
+    "ge" AdditiveExpression() #GENode(2)
+  )*
+}
+
+void AdditiveExpression() #void :
+{}
+{
+  MultiplicativeExpression()
+  (
+    "+" MultiplicativeExpression() #AddNode(2)
+   |
+    "-" MultiplicativeExpression() #SubtractNode(2)
+  )*
+}
+
+void MultiplicativeExpression() #void :
+{}
+{
+  UnaryExpression()
+  (
+    "*" UnaryExpression() #MulNode(2)
+   |
+    "/" UnaryExpression() #DivNode(2)
+   |
+    "div" UnaryExpression() #DivNode(2)
+   |
+    "%" UnaryExpression() #ModNode(2)
+   |
+    "mod" UnaryExpression() #ModNode(2)
+  )*
+}
+
+void UnaryExpression() #void :
+{}
+{
+  "~" UnaryExpression() #BitwiseComplNode(1)
+|
+  "!" UnaryExpression() #NotNode(1)
+|
+  "not" UnaryExpression() #NotNode(1)
+|
+  PrimaryExpression()
+}
+
+void PrimaryExpression() #void :
+{}
+{
+  Literal()
+|
+  Reference()
+|
+  "(" Expression() ")"
+|
+  EmptyFunction()
+|
+  SizeFunction()
+}
+
+
+void Literal() #void :
+{
+   Token t;
+}
+{
+  IntegerLiteral()
+|
+  FloatLiteral()
+|
+  BooleanLiteral()
+|
+  StringLiteral()
+|
+  NullLiteral()
+}
+
+void NullLiteral() : {}
+{
+    "null"
+}
+
+void BooleanLiteral() #void :
+{}
+{
+  "true" #TrueNode
+|
+  "false" #FalseNode
+}
+
+void IntegerLiteral() :
+{
+  Token t;
+}
+{
+ (
+  t=<INTEGER_LITERAL>
+    {
+       jjtThis.val = Integer.valueOf(t.image);
+    }
+ )
+}
+
+void FloatLiteral() :
+{
+  Token t;
+}
+{
+ (
+  t=<FLOAT_LITERAL>
+    {
+       jjtThis.val = Float.valueOf(t.image);
+    }
+ )
+}
+
+void StringLiteral() :
+{
+   Token t;
+}
+{
+ (
+  t=<STRING_LITERAL>
+    {
+       jjtThis.literal = t.image.substring(1,t.image.length()-1);
+    }
+ )
+}
+
+/*
+ * Statement syntax follows.
+ */
+
+void Statement() #void :
+{}
+{
+  ";"
+|
+  Block()
+|
+  LOOKAHEAD( Reference() ";" ) ReferenceExpression()
+|
+  LOOKAHEAD( PrimaryExpression() "=" ) StatementExpression()
+|
+  ExpressionExpression()
+|
+  IfStatement()
+|
+  ForeachStatement()
+|
+  WhileStatement()
+}
+
+
+void ExpressionExpression() : {}
+{
+    Expression() ";"
+}
+
+void StatementExpression() : {}
+{
+  Assignment() ";"
+}
+
+void ReferenceExpression() : {}
+{
+  Reference() ";"
+}
+
+void IfStatement() :{}
+{
+  "if" "(" Expression() ")" Statement() [ LOOKAHEAD(1) "else" Statement() ]
+}
+
+
+void WhileStatement() :
+{}
+{
+  "while" "(" Expression() ")" Statement()
+}
+
+void ForeachStatement() :
+{}
+{
+  "foreach" "(" Reference() "in"  Reference() ")" Statement()
+}
+
+void Method() : {}
+{
+   Identifier() "("[ Parameter() ( "," Parameter() )* ] ")"
+}
+
+void ArrayAccess() : {}
+{
+    Identifier() "[" ( LOOKAHEAD(3) Expression() | IntegerLiteral() | Reference() ) "]"
+}
+
+void Reference() : {}
+{
+  (LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() | Identifier())
+ (LOOKAHEAD(2) "." (LOOKAHEAD(3) Method() | Identifier() ))*
+}
+
+
+void Parameter() #void: {}
+{
+   LOOKAHEAD(3) Expression() |  Literal() | Reference()
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+|
+  < #LETTER: [ "a"-"z", "A"-"Z" ] >
+|
+  < #DIGIT: [ "0"-"9"] >
+}
+
+TOKEN :
+{
+    <STRING_LITERAL: ( "\"" ( ~["\"","\n","\r"] )* "\"" ) >
+}
