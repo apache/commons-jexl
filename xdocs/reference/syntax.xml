@@ -21,6 +21,15 @@
   </properties>
 
   <body>
+    <section name="Overview">
+      <p>
+        This reference is split up into the following sections:
+        <ol>
+          <li><a href="#Syntax">Syntax</a></li>
+          <li><a href="#Functions">Functions</a></li>
+        </ol>
+      </p>
+    </section>
     <section name="Syntax">
       <table>
         <tr><th>Item</th><th>Description</th></tr>
@@ -44,10 +53,18 @@
           </td>
         </tr>
         <tr>
-          <td>Identifier / variable</td>
+          <td>String literals</td>
+          <td>
+            Can start and end with either <code>'</code> or <code>"</code>, e.g.
+            <source>"Hello world"</source> and
+            <source>'Hello world'</source> are equivalent.
+          </td>
+        </tr>
+        <tr>
+          <td>Identifiers / variables</td>
           <td>
             Must start with <code>a-z</code>, <code>A-Z</code>, <code>_</code> or <code>$</code>.
-            Can then be followed by <code>0-9</code>,<code>a-z</code>, <code>A-Z</code>, <code>_</code> or <code>$</code>.
+            Can then be followed by <code>0-9</code>, <code>a-z</code>, <code>A-Z</code>, <code>_</code> or <code>$</code>.
             e.g.
             <ul>
               <li>Valid: <code>var1</code>,<code>_a99</code>,<code>$1</code></li>
@@ -58,6 +75,24 @@
         <tr>
           <td>Assignment</td>
           <td><source>var1 = var2</source></td>
+        </tr>
+      </table>
+    </section>
+    <section name="Functions">
+      <table>
+        <tr><th>Function</th><th>Description</th></tr>
+        <tr>
+          <td>empty</td>
+          <td>
+            Returns true if the expression following is either:
+            <ol>
+              <li><code>null</code></li>
+              <li>An empty string</li>
+              <li>An array of length zero</li>
+              <li>A collection of size zero</li>
+              <li>An empty map</li>
+            </ol>
+          </td>
         </tr>
       </table>
     </section>
