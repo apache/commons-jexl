@@ -35,7 +35,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.45 2004/08/20 06:08:54 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.46 2004/08/20 07:31:52 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -87,16 +87,9 @@ public class JexlTest extends TestCase
         /*
          *  tests a simple method expression
          */
-
-        Expression e = ExpressionFactory.createExpression("foo.bar()");
         JexlContext jc = JexlHelper.createContext();
-
         jc.getVars().put("foo", new Foo() );
-
-        Object o = e.evaluate(jc);
-
-        assertTrue("o not instanceof String", o instanceof String);
-        assertTrue("o incorrect", o.equals(METHOD_STRING));
+        assertExpression(jc, "foo.bar()", METHOD_STRING);
     }
 
     /**
@@ -105,7 +98,6 @@ public class JexlTest extends TestCase
     public void testArrayAccess()
          throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("list[1]");
         JexlContext jc = JexlHelper.createContext();
 
         /*
@@ -119,82 +111,45 @@ public class JexlTest extends TestCase
 
         jc.getVars().put("list", l);
 
+        Expression e = ExpressionFactory.createExpression("list[1]");
         Object o = e.evaluate(jc);
 
-        assertTrue("o not instanceof Integer", o instanceof Integer);
-        assertTrue("o incorrect", o.equals(new Integer(2)));
-
-        e = ExpressionFactory.createExpression("list[1+1]");
-
-        o = e.evaluate(jc);
-
-        assertTrue("o not instanceof Integer", o instanceof Integer);
-        assertTrue("o incorrect", o.equals(new Integer(3)));
-
-        e = ExpressionFactory.createExpression("list[loc+1]");
-
+        assertExpression(jc, "list[1]", new Integer(2));
+        assertExpression(jc, "list[1+1]", new Integer(3));
         jc.getVars().put("loc", new Integer(1));
-        o = e.evaluate(jc);
-
-        assertTrue("o not instanceof Integer", o instanceof Integer);
-        assertTrue("o incorrect", o.equals(new Integer(3)));
+        assertExpression(jc, "list[loc+1]", new Integer(3));
 
         /*
          * test array access
          */
 
         String[] args = {"hello", "there"};
-
         jc.getVars().put("array", args);
-
-        e = ExpressionFactory.createExpression("array[0]");
-        o = e.evaluate(jc);
-
-        assertTrue("array[0]", o.equals("hello"));
-
-        jc.getVars().put("zero", new Integer(0));
+        assertExpression(jc, "array[0]", "hello");
 
         /*
          * to think that this was an intentional syntax...
          */
-        e = ExpressionFactory.createExpression("array.0");
-        o = e.evaluate(jc);
-
-        assertTrue("array[0]", o.equals("hello"));
+        assertExpression(jc, "array.0", "hello");
 
         /*
          * test map access
          */
-
         Map m = new HashMap();
         m.put("foo", "bar");
 
         jc.getVars().put("map", m);
         jc.getVars().put("key", "foo");
 
-        e = ExpressionFactory.createExpression("map[\"foo\"]");
-        o = e.evaluate(jc);
-        assertTrue("map[foo]", o.equals("bar"));
-
-        e = ExpressionFactory.createExpression("map[key]");
-        o = e.evaluate(jc);
-        assertTrue("map[key]", o.equals("bar"));
+        assertExpression(jc, "map[\"foo\"]", "bar");
+        assertExpression(jc, "map[key]", "bar");
 
         /*
          *  test bean access
          */
-
         jc.getVars().put("foo", new Foo());
-
-        e = ExpressionFactory.createExpression("foo[\"bar\"]");
-        o = e.evaluate(jc);
-
-        assertTrue("foo['bar']", o.equals(GET_METHOD_STRING));
-
-        e = ExpressionFactory.createExpression("foo[\"bar\"] == foo.bar");
-        o = e.evaluate(jc);
-
-        assertTrue("foo['bar'] == foo.bar", o.equals(Boolean.TRUE));
+        assertExpression(jc, "foo[\"bar\"]", GET_METHOD_STRING);
+        assertExpression(jc, "foo[\"bar\"] == foo.bar", Boolean.TRUE);
 
     }
 
@@ -204,54 +159,29 @@ public class JexlTest extends TestCase
         /*
          *  tests a simple property expression
          */
-
-        Expression e = ExpressionFactory.createExpression("foo.innerFoo.bar()");
         JexlContext jc = JexlHelper.createContext();
-
         jc.getVars().put("foo", new Foo() );
-        Object o = e.evaluate(jc);
-
-        assertTrue("o not instanceof String", o instanceof String);
-        assertTrue("o incorrect", o.equals(METHOD_STRING));
+        assertExpression(jc, "foo.innerFoo.bar()", METHOD_STRING);
     }
 
     public void testBoolean()
          throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("foo.convertBoolean(a==b)");
         JexlContext jc = JexlHelper.createContext();
 
         jc.getVars().put("foo", new Foo() );
         jc.getVars().put("a", Boolean.TRUE);
         jc.getVars().put("b", Boolean.FALSE);
 
+        Expression e = ExpressionFactory.createExpression("foo.convertBoolean(a==b)");
         Object o = e.evaluate(jc);
-
-        assertTrue("o not instanceof String", o instanceof String);
-        assertTrue("1 : o incorrect", o.equals("Boolean : false"));
-
-        e = ExpressionFactory.createExpression("foo.convertBoolean(a==true)");
-        o = e.evaluate(jc);
-        assertTrue("o not instanceof String", o instanceof String);
-        assertTrue("2 : o incorrect", o.equals("Boolean : true"));
-
-        e = ExpressionFactory.createExpression("foo.convertBoolean(a==false)");
-        o = e.evaluate(jc);
-        assertTrue("o not instanceof String", o instanceof String);
-        assertTrue("3 : o incorrect", o.equals("Boolean : false"));
-
-        e = ExpressionFactory.createExpression("foo.convertBoolean(true==false)");
-        o = e.evaluate(jc);
-        assertTrue("o not instanceof String", o instanceof String);
-        assertTrue("4 : o incorrect", o.equals("Boolean : false"));
-
-        e = ExpressionFactory.createExpression("true eq false");
-        o = e.evaluate(jc);
-        assertTrue("true eq false", o.equals(Boolean.FALSE));
-
-        e = ExpressionFactory.createExpression("true ne false");
-        o = e.evaluate(jc);
-        assertTrue("true ne false", o.equals(Boolean.TRUE));
+        
+        assertExpression(jc, "foo.convertBoolean(a==b)", "Boolean : false");
+        assertExpression(jc, "foo.convertBoolean(a==true)", "Boolean : true");
+        assertExpression(jc, "foo.convertBoolean(a==false)", "Boolean : false");
+        assertExpression(jc, "foo.convertBoolean(true==false)", "Boolean : false");
+        assertExpression(jc, "true eq false", Boolean.FALSE);
+        assertExpression(jc, "true ne false", Boolean.TRUE);
     }
 
     public void testStringLit()
@@ -449,90 +379,40 @@ public class JexlTest extends TestCase
     public void testCalculations()
          throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("foo + 2");
+        Expression e = null;
         JexlContext jc = JexlHelper.createContext();
 
         jc.getVars().put("foo", new Integer(2) );
-        Object o = e.evaluate(jc);
+        Object o = null;
 
-        assertTrue("o not instanceof Long", o instanceof Long);
-        assertEquals("o incorrect", new Long(4), o);
-
-        e = ExpressionFactory.createExpression("3 + 3");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", new Long(6), o );
-
-        e = ExpressionFactory.createExpression("3 + 3 + foo");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", new Long(8), o );
-
-        e = ExpressionFactory.createExpression("3 * 3");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", new Long(9), o );
-
-        e = ExpressionFactory.createExpression("3 * 3 + foo");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", new Long(11), o );
-
-        e = ExpressionFactory.createExpression("3 * 3 - foo");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", new Long(7), o );
+        assertExpression(jc, "foo + 2", new Long(4));
+        assertExpression(jc, "3 + 3", new Long(6));
+        assertExpression(jc, "3 + 3 + foo", new Long(8));
+        assertExpression(jc, "3 * 3", new Long(9));
+        assertExpression(jc, "3 * 3 + foo", new Long(11));
+        assertExpression(jc, "3 * 3 - foo", new Long(7));
 
         /*
          * test some floaty stuff
          */
-        e = ExpressionFactory.createExpression("3 * \"3.0\"");
-        o = e.evaluate(jc);
-        assertEquals("o incorrect", new Double(9), o );
-
-        e = ExpressionFactory.createExpression("3 * 3.0");
-        o = e.evaluate(jc);
-        assertEquals("o incorrect", new Double(9), o );
+        assertExpression(jc, "3 * \"3.0\"", new Double(9));
+        assertExpression(jc, "3 * 3.0", new Double(9));
 
         /*
          *  test / and %
          */
-
-        e = ExpressionFactory.createExpression("6 / 3");
-        o = e.evaluate(jc);
-        assertEquals("o incorrect", new Double(6/3), o);
-
-        e = ExpressionFactory.createExpression("6.4 / 3");
-        o = e.evaluate(jc);
-        assertEquals("o incorrect", new Double(6.4 / 3), o);
-
-        e = ExpressionFactory.createExpression("0 / 3");
-        o = e.evaluate(jc);
-        assertEquals("o incorrect", new Double(0 / 3), o);
-
-        e = ExpressionFactory.createExpression("3 / 0");
-        o = e.evaluate(jc);
-        assertEquals("o incorrect", new Double(0), o);
-
-        e = ExpressionFactory.createExpression("4 % 3");
-        o = e.evaluate(jc);
-        assertEquals("o incorrect", new Long(1), o);
-
-        e = ExpressionFactory.createExpression("4.8 % 3");
-        o = e.evaluate(jc);
-        assertEquals("o incorrect", new Double(4.8 % 3), o);
+        assertExpression(jc, "6 / 3", new Double(6/3));
+        assertExpression(jc, "6.4 / 3", new Double(6.4 / 3));
+        assertExpression(jc, "0 / 3", new Double(0 / 3));
+        assertExpression(jc, "3 / 0", new Double(0));
+        assertExpression(jc, "4 % 3", new Long(1));
+        assertExpression(jc, "4.8 % 3", new Double(4.8 % 3));
 
         /*
          * test to ensure new string cat works
          */
-
-        e = ExpressionFactory.createExpression("stringy + 2");
-
         jc.getVars().put("stringy", "thingy" );
-
-        o = e.evaluate(jc);
-        assertTrue("o not instanceof String", o instanceof String);
-        assertEquals("o incorrect", "thingy2", o);
+        assertExpression(jc, "stringy + 2", "thingy2");
 
         /*
          * test new null coersion
