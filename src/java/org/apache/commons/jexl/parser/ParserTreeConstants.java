@@ -44,7 +44,8 @@ public interface ParserTreeConstants
   public int JJTFOREACHSTATEMENT = 37;
   public int JJTMETHOD = 38;
   public int JJTARRAYACCESS = 39;
-  public int JJTREFERENCE = 40;
+  public int JJTSIZEMETHOD = 40;
+  public int JJTREFERENCE = 41;
 
 
   public String[] jjtNodeName = {
@@ -88,6 +89,7 @@ public interface ParserTreeConstants
     "ForeachStatement",
     "Method",
     "ArrayAccess",
+    "SizeMethod",
     "Reference",
   };
 }
