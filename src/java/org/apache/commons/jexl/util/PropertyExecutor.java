@@ -1,7 +1,7 @@
 /*
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
+ * Copyright (c) 2000-2002 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,7 +23,7 @@
  *    Alternately, this acknowlegement may appear in the software itself,
  *    if and wherever such third-party acknowlegements normally appear.
  *
- * 4. The names "The Jakarta Project", "Commons", "Jexl" and "Apache Software
+ * 4. The names "The Jakarta Project", "Velocity", and "Apache Software
  *    Foundation" must not be used to endorse or promote products derived
  *    from this software without prior written permission. For written
  *    permission, please contact apache@apache.org.
@@ -53,41 +53,101 @@
  */
 package org.apache.commons.jexl.util;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.jexl.util.introspection.Uberspect;
-import org.apache.commons.jexl.util.introspection.UberspectImpl;
-import org.apache.commons.jexl.util.introspection.UberspectLoggable;
-
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+
+import org.apache.commons.jexl.util.introspection.Introspector;
+import org.apache.commons.logging.Log;
 
 /**
- *  Little class to manage a Velocity uberspector (Vel 1.4+) for instrospective
- *  services
- *
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: Introspector.java,v 1.3 2002/08/05 05:06:21 geirm Exp $
+ * Returned the value of object property when executed.
  */
-public class Introspector
+public class PropertyExecutor extends AbstractExecutor
 {
-    /**
-     *  the uberspector from Velocity - handles all instrospection patterns
-     */
-    private static Uberspect uberSpect;
+    protected Introspector introspector = null;
 
-    static {
+    protected String methodUsed = null;
 
-        Log logger = LogFactory.getLog(Introspector.class);
+    public PropertyExecutor(Log r, Introspector ispctr,
+                            Class clazz, String property)
+    {
+        rlog = r;
+        introspector = ispctr;
 
-        uberSpect = new UberspectImpl();
-        ((UberspectLoggable) uberSpect).setRuntimeLogger(logger);
+        discover(clazz, property);
     }
 
-    /**
-     *  For now, expose the raw uberspector to the AST
-     */
-    public static Uberspect getUberspect()
+    protected void discover(Class clazz, String property)
     {
-        return uberSpect;
+        /*
+         *  this is gross and linear, but it keeps it straightforward.
+         */
+
+        try
+        {
+            char c;
+            StringBuffer sb;
+
+            Object[] params = {  };
+
+            /*
+             *  start with get<property>
+             *  this leaves the property name 
+             *  as is...
+             */
+            sb = new StringBuffer("get");
+            sb.append(property);
+
+            methodUsed = sb.toString();
+
+            method = introspector.getMethod(clazz, methodUsed, params);
+             
+            if (method != null)
+                return;
+        
+            /*
+             *  now the convenience, flip the 1st character
+             */
+         
+            sb = new StringBuffer("get");
+            sb.append(property);
+
+            c = sb.charAt(3);
+
+            if (Character.isLowerCase(c))
+            {
+                sb.setCharAt(3, Character.toUpperCase(c));
+            }
+            else
+            {
+                sb.setCharAt(3, Character.toLowerCase(c));
+            }
+
+            methodUsed = sb.toString();
+            method = introspector.getMethod(clazz, methodUsed, params);
+
+            if (method != null)
+                return; 
+            
+        }
+        catch(Exception e)
+        {
+            rlog.error("PROGRAMMER ERROR : PropertyExector() : " + e );
+        }
+    }
+
+
+    /**
+     * Execute method against context.
+     */
+    public Object execute(Object o)
+        throws IllegalAccessException,  InvocationTargetException
+    {
+        if (method == null)
+            return null;
+
+        return method.invoke(o, null);
     }
 }
+
+

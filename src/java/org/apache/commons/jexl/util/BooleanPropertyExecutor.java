@@ -1,7 +1,7 @@
 /*
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
+ * Copyright (c) 2000-2001 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,7 +23,7 @@
  *    Alternately, this acknowlegement may appear in the software itself,
  *    if and wherever such third-party acknowlegements normally appear.
  *
- * 4. The names "The Jakarta Project", "Commons", "Jexl" and "Apache Software
+ * 4. The names "The Jakarta Project", "Velocity", and "Apache Software
  *    Foundation" must not be used to endorse or promote products derived
  *    from this software without prior written permission. For written
  *    permission, please contact apache@apache.org.
@@ -51,43 +51,74 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
+
 package org.apache.commons.jexl.util;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.jexl.util.introspection.Uberspect;
-import org.apache.commons.jexl.util.introspection.UberspectImpl;
-import org.apache.commons.jexl.util.introspection.UberspectLoggable;
-
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
+import org.apache.commons.logging.Log;
 /**
- *  Little class to manage a Velocity uberspector (Vel 1.4+) for instrospective
- *  services
+ *  Handles discovery and valuation of a
+ *  boolean object property, of the
+ *  form public boolean is<property> when executed.
  *
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: Introspector.java,v 1.3 2002/08/05 05:06:21 geirm Exp $
+ *  We do this separately as to preserve the current
+ *  quasi-broken semantics of get<as is property>
+ *  get< flip 1st char> get("property") and now followed
+ *  by is<Property>
+ *
+ *  @author <a href="geirm@apache.org">Geir Magnusson Jr.</a>
+ *  @version $Id: BooleanPropertyExecutor.java,v 1.1 2002/08/05 05:06:21 geirm Exp $
  */
-public class Introspector
+public class BooleanPropertyExecutor extends PropertyExecutor
 {
-    /**
-     *  the uberspector from Velocity - handles all instrospection patterns
-     */
-    private static Uberspect uberSpect;
-
-    static {
-
-        Log logger = LogFactory.getLog(Introspector.class);
-
-        uberSpect = new UberspectImpl();
-        ((UberspectLoggable) uberSpect).setRuntimeLogger(logger);
+    public BooleanPropertyExecutor(Log rlog, org.apache.commons.jexl.util.introspection.Introspector is, Class clazz, String property)
+    {
+        super(rlog, is, clazz, property);
     }
 
-    /**
-     *  For now, expose the raw uberspector to the AST
-     */
-    public static Uberspect getUberspect()
+    protected void discover(Class clazz, String property)
     {
-        return uberSpect;
+        try
+        {
+            char c;
+            StringBuffer sb;
+
+            Object[] params = {  };
+
+            /*
+             *  now look for a boolean isFoo
+             */
+
+            sb = new StringBuffer("is");
+            sb.append(property);
+
+            c = sb.charAt(2);
+
+            if (Character.isLowerCase(c))
+            {
+                sb.setCharAt(2, Character.toUpperCase(c));
+            }
+
+            methodUsed = sb.toString();
+            method = introspector.getMethod(clazz, methodUsed, params);
+
+            if (method != null)
+            {
+                /*
+                 *  now, this has to return a boolean
+                 */
+
+                if (method.getReturnType() == Boolean.TYPE)
+                    return;
+
+                method = null;
+            }
+        }
+        catch(Exception e)
+        {
+            rlog.error("PROGRAMMER ERROR : BooleanPropertyExector() : " + e);
+        }
     }
 }

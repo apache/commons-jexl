@@ -1,7 +1,9 @@
 /*
+ * ====================================================================
+ *
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
+ * Copyright (c) 1999-2001 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,7 +25,7 @@
  *    Alternately, this acknowlegement may appear in the software itself,
  *    if and wherever such third-party acknowlegements normally appear.
  *
- * 4. The names "The Jakarta Project", "Commons", "Jexl" and "Apache Software
+ * 4. The names "The Jakarta Project", "Velocity", and "Apache Software
  *    Foundation" must not be used to endorse or promote products derived
  *    from this software without prior written permission. For written
  *    permission, please contact apache@apache.org.
@@ -51,43 +53,63 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
+
 package org.apache.commons.jexl.util;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import org.apache.commons.jexl.util.introspection.Uberspect;
-import org.apache.commons.jexl.util.introspection.UberspectImpl;
-import org.apache.commons.jexl.util.introspection.UberspectLoggable;
 
-import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.Enumeration;
 
 /**
- *  Little class to manage a Velocity uberspector (Vel 1.4+) for instrospective
- *  services
+ * An Iterator wrapper for an Enumeration.
  *
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: Introspector.java,v 1.3 2002/08/05 05:06:21 geirm Exp $
+ * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
+ * @version $Id: EnumerationIterator.java,v 1.1 2002/08/05 05:06:21 geirm Exp $
  */
-public class Introspector
+public class EnumerationIterator implements Iterator
 {
     /**
-     *  the uberspector from Velocity - handles all instrospection patterns
+     * The enumeration to iterate.
      */
-    private static Uberspect uberSpect;
+    private Enumeration enum = null;
 
-    static {
-
-        Log logger = LogFactory.getLog(Introspector.class);
-
-        uberSpect = new UberspectImpl();
-        ((UberspectLoggable) uberSpect).setRuntimeLogger(logger);
+    /**
+     * Creates a new iteratorwrapper instance for the specified 
+     * Enumeration.
+     *
+     * @param enum  The Enumeration to wrap.
+     */
+    public EnumerationIterator( Enumeration enum)
+    {
+        this.enum = enum;
     }
 
     /**
-     *  For now, expose the raw uberspector to the AST
+     * Move to next element in the array.
+     *
+     * @return The next object in the array.
      */
-    public static Uberspect getUberspect()
+    public Object next()
     {
-        return uberSpect;
+        return enum.nextElement();
     }
+    
+    /**
+     * Check to see if there is another element in the array.
+     *
+     * @return Whether there is another element.
+     */
+    public boolean hasNext()
+    {
+        return enum.hasMoreElements();
+    }
+
+    /**
+     *  Unimplemented.  No analogy in Enumeration
+     */
+    public void remove()
+    {
+        // not implemented
+    }
+   
 }
