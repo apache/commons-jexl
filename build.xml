@@ -1,0 +1,293 @@
+<project name="Jexl" default="compile" basedir=".">
+
+
+<!--
+        "Jexl" component of the Jakarta Commons Subproject
+        $Id: build.xml,v 1.1 2002/04/26 04:23:13 geirm Exp $
+-->
+
+
+<!-- ========== Initialize Properties ===================================== -->
+
+
+  <property file="build.properties"/>                <!-- Component local   -->
+  <property file="../build.properties"/>             <!-- Commons local     -->
+  <property file="${user.home}/build.properties"/>   <!-- User local        -->
+
+
+<!-- ========== Component Declarations ==================================== -->
+
+
+  <!-- The name of this component -->
+  <property name="component.name"          value="jexl"/>
+
+  <!-- The primary package name of this component -->
+  <property name="component.package"       value="org.apache.commons.jexl"/>
+
+  <!-- The title of this component -->
+  <property name="component.title"         value="Jexl - Java EXpression Language engine"/>
+
+  <!-- The current version number of this component -->
+  <property name="component.version"       value="1.0-dev"/>
+
+  <!-- The base directory for compilation targets -->
+  <property name="build.home"              value="target"/>
+
+  <!-- The base directory for component configuration files -->
+  <property name="conf.home"               value="src/conf"/>
+
+  <!-- The base directory for distribution targets -->
+  <property name="dist.home"               value="dist"/>
+
+  <!-- The base directory for component sources -->
+  <property name="source.home"             value="src/java"/>
+
+  <!-- The base directory for documentation sources -->
+  <property name="docs.src"             value="xdocs"/>
+
+  <!-- The base directory for documentation sources -->
+  <property name="docs.dest"             value="docs"/>
+
+  <!-- The base directory for unit test sources -->
+  <property name="test.home"               value="src/test"/>
+
+  <!-- The base directory for example sources -->
+  <property name="examples.home"            value="examples"/>
+
+
+<!-- ========== Compiler Defaults ========================================= -->
+
+
+  <!-- Should Java compilations set the 'debug' compiler option? -->
+  <property name="compile.debug"           value="true"/>
+
+  <!-- Should Java compilations set the 'deprecation' compiler option? -->
+  <property name="compile.deprecation"     value="false"/>
+
+  <!-- Should Java compilations set the 'optimize' compiler option? -->
+  <property name="compile.optimize"        value="true"/>
+
+  <!-- Construct compile classpath -->
+  <path id="compile.classpath">
+    <pathelement location="${build.home}/classes"/>
+    <pathelement location="${junit.jar}"/>
+    <pathelement location="${logging.jar}"/>
+    <pathelement location="${velocity.jar}"/>
+    <pathelement location="${dvsl.jar}"/>
+    <pathelement location="${dom4j.jar}"/>
+
+  </path>
+
+
+<!-- ========== Test Execution Defaults =================================== -->
+
+
+  <!-- Construct unit test classpath -->
+  <path id="test.classpath">
+    <pathelement location="${build.home}/classes"/>
+    <pathelement location="${build.home}/tests"/>
+    <pathelement location="${junit.jar}"/>
+    <pathelement location="${logging.jar}"/>
+    <pathelement location="${velocity.jar}"/>
+  </path>
+
+  <!-- Should all tests fail if one does? -->
+  <property name="test.failonerror"        value="true"/>
+
+  <!-- The test runner to execute -->
+  <property name="test.runner"             value="junit.textui.TestRunner"/>
+
+
+<!-- ========== Executable Targets ======================================== -->
+
+
+  <target name="init"
+   description="Initialize and evaluate conditionals">
+    <echo message="-------- ${component.name} ${component.version} --------"/>
+    <filter  token="name"                  value="${component.package}"/>
+    <filter  token="version"               value="${component.version}"/>
+  </target>
+
+
+  <target name="prepare" depends="init"
+   description="Prepare build directory">
+    <mkdir dir="${build.home}"/>
+    <mkdir dir="${build.home}/classes"/>
+    <mkdir dir="${build.home}/conf"/>
+    <mkdir dir="${build.home}/tests"/>
+  </target>
+
+
+  <target name="static" depends="prepare"
+   description="Copy static files to build directory">
+    <tstamp/>
+    <copy  todir="${build.home}/conf" filtering="on">
+      <fileset dir="${conf.home}" includes="*.MF"/>
+    </copy>
+  </target>
+
+
+  <target name="compile" depends="static"
+   description="Compile shareable components">
+    <javac  srcdir="${source.home}"
+           destdir="${build.home}/classes"
+             debug="${compile.debug}"
+       deprecation="${compile.deprecation}"
+          optimize="${compile.optimize}">
+      <classpath refid="compile.classpath"/>
+    </javac>
+    <copy    todir="${build.home}/classes" filtering="on">
+      <fileset dir="${source.home}" excludes="**/*.java"/>
+    </copy>
+  </target>
+
+
+  <target name="compile.tests" depends="compile"
+   description="Compile unit test cases">
+    <javac  srcdir="${test.home}"
+           destdir="${build.home}/tests"
+             debug="${compile.debug}"
+       deprecation="${compile.deprecation}"
+          optimize="${compile.optimize}">
+      <classpath refid="test.classpath"/>
+    </javac>
+    <copy    todir="${build.home}/tests" filtering="on">
+      <fileset dir="${test.home}" excludes="**/*.java"/>
+    </copy>
+  </target>
+
+  <target name="compile.examples" depends="compile"
+   description="Compile exammple">
+    <javac  srcdir="${examples.home}"
+           destdir="${examples.home}"
+             debug="${compile.debug}"
+       deprecation="${compile.deprecation}"
+          optimize="${compile.optimize}">
+      <classpath refid="compile.classpath"/>
+    </javac>
+  </target>
+
+
+  <target name="clean"
+   description="Clean build and distribution directories">
+    <delete    dir="${build.home}"/>
+    <delete    dir="${dist.home}"/>
+  </target>
+
+
+  <target name="all" depends="clean,compile"
+   description="Clean and compile all components"/>
+
+
+  <target name="javadoc" depends="compile"
+   description="Create component Javadoc documentation">
+    <mkdir      dir="${dist.home}"/>
+    <mkdir      dir="${dist.home}/docs"/>
+    <mkdir      dir="${dist.home}/docs/api"/>
+    <javadoc sourcepath="${source.home}"
+                destdir="${dist.home}/docs/api"
+           packagenames="org.apache.commons.*"
+                 author="true"
+                private="true"
+                version="true"
+               doctitle="&lt;h1&gt;${component.title}&lt;/h1&gt;"
+            windowtitle="${component.title} (Version ${component.version})"
+                 bottom="Copyright (c) 2002 - Apache Software Foundation">
+      <classpath  refid="compile.classpath"/>
+    </javadoc>
+  </target>
+
+
+  <target name="dist" depends="compile,javadoc"
+   description="Create binary distribution">
+    <mkdir      dir="${dist.home}"/>
+    <copy      file="../LICENSE"
+              todir="${dist.home}"/>
+    <mkdir      dir="${build.home}/classes/META-INF"/>
+    <copy      file="../LICENSE"
+             tofile="${build.home}/classes/META-INF/LICENSE.txt"/>
+    <jar    jarfile="${dist.home}/commons-${component.name}.jar"
+            basedir="${build.home}/classes"
+           manifest="${build.home}/conf/MANIFEST.MF"/>
+  </target>
+
+
+  <!-- ================================================================== -->
+  <!--  D O C S                                                           -->
+  <!-- ================================================================== -->
+  <target name="docs" depends="docs-init"
+   description="Generate documentation">
+      <dvsl
+           basedir="${docs.src}"
+           destdir="${docs.dest}/"
+           toolboxfile="${docs.src}/toolbox.props"
+           extension=".html"
+           style="${docs.src}/site.dvsl"
+           excludes="**/project.xml"
+           includes="**/*.xml"
+      />
+  </target>
+
+  <target name="docs-init">
+      <taskdef name="dvsl" classname="org.apache.tools.dvsl.DVSLTask">
+          <classpath>
+             <pathelement location="${dvsl.jar}"/>
+             <path refid="compile.classpath"/>
+          </classpath>
+      </taskdef>
+  </target>
+
+<!-- ========== Unit Test Targets ========================================= -->
+
+
+  <target name="test" depends="compile.tests,
+                                test.parser,
+                                test.jexl"
+   description="Run all unit test cases">
+  </target>
+
+  <target name="test.parser" depends="compile.tests" >
+    <echo message="Basic parser test"/>
+    <java classname="${test.runner}" fork="yes" failonerror="${test.failonerror}">
+        <arg value="org.apache.commons.jexl.parser.ParserTest"/>
+        <classpath refid="test.classpath"/>
+    </java>
+  </target>
+
+  <target name="test.jexl" depends="compile.tests" >
+    <echo message="Basic expression test"/>
+    <java classname="${test.runner}" fork="yes" failonerror="${test.failonerror}">
+        <arg value="org.apache.commons.jexl.JexlTest"/>
+        <classpath refid="test.classpath"/>
+    </java>
+  </target>
+
+
+<!-- ============ Example Targets ========================================== -->
+
+  <target name="examples" depends="compile.examples">
+
+    <echo message="Basic array example"/>
+    <java classname="ArrayExample" fork="yes" failonerror="${test.failonerror}">
+
+       <classpath>
+          <path refid="test.classpath"/>
+          <pathelement location="${examples.home}"/>
+      </classpath>
+
+    </java>
+
+    <echo message="Method and Property Example"/>
+    <java classname="MethodPropertyExample" fork="yes" failonerror="${test.failonerror}">
+
+       <classpath>
+          <path refid="test.classpath"/>
+          <pathelement location="${examples.home}"/>
+      </classpath>
+
+    </java>
+
+
+  </target>
+
+</project>
