@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.13 2002/07/08 00:25:50 geirm Exp $
+ *  @version $Id: JexlTest.java,v 1.14 2002/07/08 13:47:51 geirm Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -607,7 +607,12 @@ public class JexlTest extends TestCase
         o = e.evaluate(jc);
 
         assertEquals("o incorrect", Boolean.TRUE, o );
-        
+
+        e = ExpressionFactory.createExpression("barnotexist == ''");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.FALSE, o );
+
         e = ExpressionFactory.createExpression("empty bar");
         o = e.evaluate(jc);
 
