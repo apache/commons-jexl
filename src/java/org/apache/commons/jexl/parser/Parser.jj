@@ -57,7 +57,9 @@
  *  Jexl : Java Expression Language
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: Parser.jj,v 1.5 2002/06/07 03:35:30 geirm Exp $
+ *  @author <a href="mailto:mhw@kremvax.net">Mark H. Wilkinson</a>
+ *
+ *  @version $Id: Parser.jj,v 1.6 2003/06/25 10:52:02 geirm Exp $
  */
 
 options
@@ -1707,6 +1709,23 @@ void ArrayAccess() : {/*@bgen(jjtree) ArrayAccess */
 /*@egen*/
 }
 
+void SizeMethod() : {/*@bgen(jjtree) SizeMethod */
+  ASTSizeMethod jjtn000 = new ASTSizeMethod(this, JJTSIZEMETHOD);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) SizeMethod */
+        try {
+/*@egen*/
+	"size" "(" ")"/*@bgen(jjtree)*/
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
 void Reference() : {/*@bgen(jjtree) Reference */
   ASTReference jjtn000 = new ASTReference(this, JJTREFERENCE);
   boolean jjtc000 = true;
@@ -1719,7 +1738,8 @@ void Reference() : {/*@bgen(jjtree) Reference */
   (LOOKAHEAD(2) "."
     (
       LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() |
-      (LOOKAHEAD(3) Method() | Identifier() |  IntegerLiteral() )
+//      (LOOKAHEAD(3) Method() | Identifier() |  IntegerLiteral() )
+      (LOOKAHEAD(3) Method() | SizeMethod() | Identifier() |  IntegerLiteral() )
 
     )
   )*/*@bgen(jjtree)*/

@@ -44,5 +44,6 @@ public interface ParserVisitor
   public Object visit(ASTForeachStatement node, Object data);
   public Object visit(ASTMethod node, Object data);
   public Object visit(ASTArrayAccess node, Object data);
+  public Object visit(ASTSizeMethod node, Object data);
   public Object visit(ASTReference node, Object data);
 }
