@@ -16,6 +16,9 @@
 package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl.util.Introspector;
+import org.apache.commons.jexl.util.introspection.Info;
+import org.apache.commons.jexl.util.introspection.VelMethod;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +30,7 @@ import java.lang.reflect.Array;
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @author <a href="hw@kremvax.net">Mark H. Wilkinson</a>
- *  @version $Id: ASTSizeFunction.java,v 1.5 2004/08/15 15:32:52 dion Exp $
+ *  @version $Id: ASTSizeFunction.java,v 1.6 2004/08/15 16:01:12 dion Exp $
  */
 public class ASTSizeFunction extends SimpleNode
 {
@@ -87,8 +90,22 @@ public class ASTSizeFunction extends SimpleNode
         {
             return ((Set)val).size();
         }
-
-        throw new Exception("size() : unknown type : " + val.getClass());
+        else {
+        	// check if there is a size method on the object that returns an integer
+        	// and if so, just use it
+        	Object[] params = new Object[0];
+        	Info velInfo = new Info("",1,1);
+            VelMethod vm = Introspector.getUberspect().getMethod(val, "size", params, velInfo);
+            if (vm != null && vm.getReturnType() == Integer.TYPE)
+            {
+            	Integer result = (Integer)vm.invoke(val, params);
+            	return result.intValue();
+            }
+            else
+            {
+                throw new Exception("size() : unknown type : " + val.getClass());
+            }
+        }
     }
 
 }
