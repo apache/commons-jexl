@@ -122,6 +122,10 @@
             Pages 2.0 Specification</a>.
           </li>
           <li>
+            Apache has an implementation of the expression language for JSP 2.0,
+            called <a href="http://jakarta.apache.org/commons/el/index.html">EL</a>
+          </li>
+          <li>
             <a href="http://java.sun.com/products/jsp/jstl/">JSTL 1.1</a> is covered 
             by <a href="http://jcp.org/en/jsr/detail?id=52">JSR 52: A Standard 
             Tag Library for JavaServer Pages</a>. See the 
