@@ -250,7 +250,7 @@
           <td>
             The usual <code>+</code> operator is used.
             For example
-            <source>val1 + val2</source>.
+            <source>val1 + val2</source>
           </td>
         </tr>
         <tr>
@@ -258,7 +258,7 @@
           <td>
             The usual <code>-</code> operator is used.
             For example
-            <source>val1 - val2</source>.
+            <source>val1 - val2</source>
           </td>
         </tr>
         <tr>
@@ -266,7 +266,7 @@
           <td>
             The usual <code>*</code> operator is used.
             For example
-            <source>val1 * val2</source>.
+            <source>val1 * val2</source>
           </td>
         </tr>
         <tr>
@@ -274,7 +274,7 @@
           <td>
             The usual <code>/</code> operator is used.
             For example
-            <source>val1 / val2</source>.
+            <source>val1 / val2</source>
           </td>
         </tr>
         <tr>
@@ -299,7 +299,14 @@
           <td>
             The unary <code>-</code> operator is used.
             For example
-            <source>-12</source>.
+            <source>-12</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Array access</td>
+          <td>
+            Array elements may be accessed using either square brackets or a dotted numeral, e.g.
+            <source>arr1[0]</source> and <source>arr1.0</source> are equivalent
           </td>
         </tr>
       </table>
