@@ -58,7 +58,7 @@
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @author <a href="mailto:mhw@kremvax.net">Mark H. Wilkinson</a>
  *
- *  @version $Id: Parser.jjt,v 1.6 2003/06/25 10:48:46 geirm Exp $
+ *  @version $Id: Parser.jjt,v 1.7 2003/06/25 11:09:21 geirm Exp $
  */
 
 options
@@ -290,6 +290,8 @@ void MultiplicativeExpression() #void :
 void UnaryExpression() #void :
 {}
 {
+  "-" UnaryExpression() #UnaryMinusNode(1)
+|
   "~" UnaryExpression() #BitwiseComplNode(1)
 |
   "!" UnaryExpression() #NotNode(1)
