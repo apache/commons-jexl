@@ -34,7 +34,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.38 2004/08/15 16:01:12 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.39 2004/08/17 13:20:48 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -1042,6 +1042,50 @@ public class JexlTest extends TestCase
 
         assertEquals("flat override 2", o, null);
 
+    }
+
+    /**
+     * Test that 'and' only evaluates the second item if needed
+     * @throws Exception if there are errors
+     */
+    public void testBooleanShortCircuitAnd() throws Exception
+    {
+        // handle false for the left arg of 'and'
+        Foo tester = new Foo();
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("first", Boolean.FALSE);
+        jc.getVars().put("foo", tester);
+        Expression expr = ExpressionFactory.createExpression("first and foo.trueAndModify");
+        expr.evaluate(jc);
+        assertTrue("Short circuit failure: rhs evaluated when lhs FALSE", !tester.getModified());
+        // handle true for the left arg of 'and' 
+        tester = new Foo();
+        jc.getVars().put("first", Boolean.TRUE);
+        jc.getVars().put("foo", tester);
+        expr.evaluate(jc);
+        assertTrue("Short circuit failure: rhs not evaluated when lhs TRUE", tester.getModified());
+    }
+    
+    /**
+     * Test that 'or' only evaluates the second item if needed
+     * @throws Exception if there are errors
+     */
+    public void testBooleanShortCircuitOr() throws Exception
+    {
+        // handle false for the left arg of 'or'
+        Foo tester = new Foo();
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("first", Boolean.FALSE);
+        jc.getVars().put("foo", tester);
+        Expression expr = ExpressionFactory.createExpression("first or foo.trueAndModify");
+        expr.evaluate(jc);
+        assertTrue("Short circuit failure: rhs not evaluated when lhs FALSE", tester.getModified());
+        // handle true for the left arg of 'or' 
+        tester = new Foo();
+        jc.getVars().put("first", Boolean.TRUE);
+        jc.getVars().put("foo", tester);
+        expr.evaluate(jc);
+        assertTrue("Short circuit failure: rhs evaluated when lhs TRUE", !tester.getModified());
     }
 
     /**

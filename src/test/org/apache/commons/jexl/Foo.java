@@ -22,10 +22,12 @@ import java.util.List;
  * A simple bean used for testing purposes
  * 
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class Foo {
     
+	private boolean beenModified = false;
+	
     public String bar()
     {
         return JexlTest.METHOD_STRING;
@@ -84,4 +86,14 @@ public class Foo {
         return value * value;
     }
 
+    public boolean getTrueAndModify()
+    {
+    	beenModified = true;
+    	return true;
+    }
+
+    public boolean getModified()
+    {
+    	return beenModified;
+    }
 }
