@@ -71,7 +71,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.3 2002/05/17 07:56:30 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.4 2002/05/17 12:14:35 geirm Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -328,9 +328,13 @@ public class JexlTest extends TestCase
         o = e.evaluate(jc);
         assertTrue("8 : o incorrect", o.equals(Boolean.TRUE));
 
-        e = ExpressionFactory.createExpression("\"foo\" + \"bar\" == \"foobar\"");
-        o = e.evaluate(jc);
-        assertTrue("9 : o incorrect", o.equals(Boolean.TRUE));
+//
+//   $$$ GMJ - trying to be spec conformant re addition means no string concat.
+//         so get rid of it for the moment.  Will certainly revisit
+//
+//        e = ExpressionFactory.createExpression("\"foo\" + \"bar\" == \"foobar\"");
+//        o = e.evaluate(jc);
+//        assertTrue("9 : o incorrect", o.equals(Boolean.TRUE));
 
     }
 
@@ -436,28 +440,28 @@ public class JexlTest extends TestCase
         jc.getVars().put("foo", new Integer(2) );
         Object o = e.evaluate(jc);
 
-        assertTrue("o not instanceof Integer", o instanceof Integer);
-        assertEquals("o incorrect", new Integer(4), o);
+        assertTrue("o not instanceof Long", o instanceof Long);
+        assertEquals("o incorrect", new Long(4), o);
         
         e = ExpressionFactory.createExpression("3 + 3");
         o = e.evaluate(jc);
         
-        assertEquals("o incorrect", new Integer(6), o );
+        assertEquals("o incorrect", new Long(6), o );
         
         e = ExpressionFactory.createExpression("3 + 3 + foo");
         o = e.evaluate(jc);
         
-        assertEquals("o incorrect", new Integer(8), o );
+        assertEquals("o incorrect", new Long(8), o );
         
         e = ExpressionFactory.createExpression("3 * 3");
         o = e.evaluate(jc);
         
-        assertEquals("o incorrect", new Integer(9), o );
+        assertEquals("o incorrect", new Long(9), o );
         
         e = ExpressionFactory.createExpression("3 * 3 + foo");
         o = e.evaluate(jc);
         
-        assertEquals("o incorrect", new Integer(11), o );
+        assertEquals("o incorrect", new Long(11), o );
     }
 
     /**
