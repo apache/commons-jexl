@@ -56,14 +56,15 @@ package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 /**
  *  function to see if reference doesn't exist in context
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTEmptyFunction.java,v 1.1 2002/04/26 04:23:14 geirm Exp $
+ *  @author <a href="mailto:tobrien@apache.org">Tim O'Brien</a>
+ *  @version $Id: ASTEmptyFunction.java,v 1.2 2003/02/18 20:22:00 geirm Exp $
  */
 public class ASTEmptyFunction extends SimpleNode
 {
@@ -107,11 +108,14 @@ public class ASTEmptyFunction extends SimpleNode
             if (o.getClass().isArray() && ((Object[])o).length == 0)
                 return Boolean.TRUE;
 
-            if (o instanceof Map && ((Map)o).isEmpty())
+            if (o instanceof Collection && ((Collection)o).isEmpty())
                 return Boolean.TRUE;
 
-            if (o instanceof List && ((List)o).isEmpty())
-                return Boolean.TRUE;
+			/*
+			 *  Map isn't a collection
+			 */
+			if (o instanceof Map && ((Map)o).isEmpty())
+				return Boolean.TRUE;
 
             return Boolean.FALSE;
         }
