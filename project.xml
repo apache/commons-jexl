@@ -20,7 +20,7 @@
   <pomVersion>3</pomVersion>
   <id>commons-jexl</id>
   <inceptionYear>2003</inceptionYear>
-  <currentVersion>1.0-SNAPSHOT</currentVersion>
+  <currentVersion>1.0</currentVersion>
   <name>Commons JEXL</name>
   <shortDescription>Commons JEXL Expression Language Engine</shortDescription>
   <description>Jexl is an implementation of the JSTL Expression Language with extensions.</description>
@@ -74,6 +74,11 @@
       <id>1.0-RC1</id>
       <name>1.0-RC1</name>
       <tag>COMMONS_JEXL-1_0-RC1</tag>
+    </version>
+    <version>
+      <id>1.0</id>
+      <name>1.0</name>
+      <tag>COMMONS_JEXL-1_0</tag>
     </version>
   </versions>
   <branches/>
