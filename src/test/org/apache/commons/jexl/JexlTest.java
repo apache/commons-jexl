@@ -68,7 +68,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.26 2003/02/09 20:20:08 geirm Exp $
+ *  @version $Id: JexlTest.java,v 1.27 2003/02/18 20:22:41 geirm Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -365,6 +365,7 @@ public class JexlTest extends TestCase
         jc.getVars().put("array", new Object[0]);
         jc.getVars().put("map", new HashMap());
         jc.getVars().put("list", new ArrayList());
+        jc.getVars().put("set", (new HashMap()).keySet());
         jc.getVars().put("longstring", "thingthing");
 
         /*
@@ -398,6 +399,10 @@ public class JexlTest extends TestCase
         e = ExpressionFactory.createExpression("not empty longstring");
         o = e.evaluate(jc);
         assertTrue("7 : o incorrect", o.equals(Boolean.TRUE));
+
+		e = ExpressionFactory.createExpression("empty set");
+		o = e.evaluate(jc);
+		assertTrue("8 : o incorrect", o.equals(Boolean.TRUE));
 
     }
 
@@ -451,7 +456,7 @@ public class JexlTest extends TestCase
         JexlContext jc = JexlHelper.createContext();
 
         jc.getVars().put("foo", "abcdef");
-        
+
         assertExpression(jc, "foo.substring(3)", "def");
         assertExpression(jc, "foo.substring(0,(size(foo)-3))", "abc");
         assertExpression(jc, "foo.substring(0,size(foo)-3)", "abc");
@@ -609,27 +614,27 @@ public class JexlTest extends TestCase
         o = e.evaluate(jc);
 
         assertEquals("o incorrect", Boolean.FALSE, o );
-        
+
         e = ExpressionFactory.createExpression("foo.isSimple()");
         o = e.evaluate(jc);
 
         assertEquals("o incorrect", Boolean.TRUE, o );
-        
+
         e = ExpressionFactory.createExpression("!foo.simple");
         o = e.evaluate(jc);
 
         assertEquals("o incorrect", Boolean.FALSE, o );
-        
+
         e = ExpressionFactory.createExpression("foo.simple");
         o = e.evaluate(jc);
 
         assertEquals("o incorrect", Boolean.TRUE, o );
-        
+
         e = ExpressionFactory.createExpression("foo.getCheeseList().size() == 3");
         o = e.evaluate(jc);
 
         assertEquals("o incorrect", Boolean.TRUE, o );
-        
+
         e = ExpressionFactory.createExpression("foo.cheeseList.size() == 3");
         o = e.evaluate(jc);
 
@@ -654,11 +659,11 @@ public class JexlTest extends TestCase
 
         assertTrue("o not instanceof Boolean", o instanceof Boolean);
         assertEquals("o incorrect", Boolean.TRUE, o );
-        
+
         e = ExpressionFactory.createExpression("!x.a");
         e.addPreResolver(new FlatResolver());
         o = e.evaluate(jc);
-        
+
         assertEquals("o incorrect", Boolean.FALSE, o);
 
         e = ExpressionFactory.createExpression("!x.b");
@@ -705,7 +710,7 @@ public class JexlTest extends TestCase
     {
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("bar", new Integer(2) );
-        
+
         Expression e = ExpressionFactory.createExpression("empty foo");
         Object o = e.evaluate(jc);
 
@@ -729,7 +734,7 @@ public class JexlTest extends TestCase
     {
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("bar", "" );
-        
+
         Expression e = ExpressionFactory.createExpression("foo == ''");
         Object o = e.evaluate(jc);
 
@@ -752,18 +757,18 @@ public class JexlTest extends TestCase
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("foo", "abc" );
         jc.getVars().put("bar", "def" );
-        
+
         assertExpression(jc, "foo == 'abc' || bar == 'abc'", Boolean.TRUE);
         assertExpression(jc, "foo == 'abc' or bar == 'abc'", Boolean.TRUE);
         assertExpression(jc, "foo == 'abc' && bar == 'abc'", Boolean.FALSE);
         assertExpression(jc, "foo == 'abc' and bar == 'abc'", Boolean.FALSE);
-        
+
         assertExpression(jc, "foo == 'def' || bar == 'abc'", Boolean.FALSE);
         assertExpression(jc, "foo == 'def' or bar == 'abc'", Boolean.FALSE);
         assertExpression(jc, "foo == 'abc' && bar == 'def'", Boolean.TRUE);
         assertExpression(jc, "foo == 'abc' and bar == 'def'", Boolean.TRUE);
     }
-        
+
 
     /**
       *  test some simple double array lookups
@@ -777,7 +782,7 @@ public class JexlTest extends TestCase
         Object[][] foo = new Object[2][2];
         foo[0][0] = "one";
         foo[0][1] = "two";
-        
+
         jc.getVars().put("foo", foo );
         Object o = e.evaluate(jc);
 
@@ -793,7 +798,7 @@ public class JexlTest extends TestCase
         Expression e = ExpressionFactory.createExpression("foo_bar");
         JexlContext jc = JexlHelper.createContext();
 
-        
+
         jc.getVars().put("foo_bar", "123" );
         Object o = e.evaluate(jc);
 
@@ -811,7 +816,7 @@ public class JexlTest extends TestCase
 
         Map foo = new HashMap();
         foo.put( "bar", "123" );
-                
+
         jc.getVars().put("foo", foo );
         Object o = e.evaluate(jc);
 
@@ -869,7 +874,7 @@ public class JexlTest extends TestCase
         JexlContext jc = JexlHelper.createContext();
         Foo foo = new Foo();
         jc.getVars().put("foo", foo );
-        
+
         assertExpression(jc, "foo.count != -1", Boolean.TRUE);
         assertExpression(jc, "foo.count == 5", Boolean.TRUE);
         assertExpression(jc, "foo.count == -1", Boolean.FALSE);
@@ -928,14 +933,14 @@ public class JexlTest extends TestCase
 
         assertExpression(jc, "foo.substring(2,4)", "cd");
         assertExpression(jc, "foo.charAt(2)", new Character('c'));
-     
+
         try {
             assertExpression(jc, "foo.charAt(-2)", null);
-            fail("this test should have thrown an exception" );            
+            fail("this test should have thrown an exception" );
         }
         catch (IndexOutOfBoundsException e) {
             // expected behaviour
-        }   
+        }
         catch (Exception e) {
             throw e;
         }
@@ -1024,7 +1029,7 @@ public class JexlTest extends TestCase
             return 5;
         }
 
-        public List getCheeseList() 
+        public List getCheeseList()
         {
             ArrayList answer = new ArrayList();
             answer.add("cheddar");
@@ -1032,7 +1037,7 @@ public class JexlTest extends TestCase
             answer.add("brie");
             return answer;
         }
-            
+
         public String[] getArray()
         {
             return GET_METHOD_ARRAY;
@@ -1042,13 +1047,13 @@ public class JexlTest extends TestCase
         {
             return GET_METHOD_ARRAY2;
         }
-        
-        public boolean isSimple() 
+
+        public boolean isSimple()
         {
             return true;
         }
-        
-        public int square(int value) 
+
+        public int square(int value)
         {
             return value * value;
         }
@@ -1056,10 +1061,10 @@ public class JexlTest extends TestCase
 
 
     /**
-     * Asserts that the given expression returns the given value when applied to the 
+     * Asserts that the given expression returns the given value when applied to the
      * given context
      */
-    protected void assertExpression(JexlContext jc, String expression, Object expected) throws Exception 
+    protected void assertExpression(JexlContext jc, String expression, Object expected) throws Exception
     {
         Expression e = ExpressionFactory.createExpression(expression);
         Object actual = e.evaluate(jc);
@@ -1075,7 +1080,7 @@ public class JexlTest extends TestCase
         throws Exception
     {
         JexlTest jt = new JexlTest("foo");
-        jt.testCalculations();
+        jt.testEmpty();
     }
 
 }
