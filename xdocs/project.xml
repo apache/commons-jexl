@@ -43,6 +43,7 @@
         <item name="Digester"               href="http://jakarta.apache.org/commons/digester.html"/>
         <item name="DBCP"                   href="http://cvs.apache.org/viewcvs/jakarta-commons/dbcp/"/>
         <item name="HTTP Client"            href="http://jakarta.apache.org/commons/httpclient"/>
+        <item name="Jexl"                   href="http://jakarta.apache.org/commons/jexl/"/>
         <item name="JXPath"                 href="http://cvs.apache.org/viewcvs/jakarta-commons/jxpath/"/>
         <item name="Latka"                  href="http://jakarta.apache.org/commons/latka/index.html"/>
         <item name="Pool"                   href="http://cvs.apache.org/viewcvs/jakarta-commons/pool/"/>
@@ -52,7 +53,7 @@
 
     <menu name="Sandbox Components">
         <item name="Jelly"                  href="http://jakarta.apache.org/commons/sandbox/jelly/"/>
-        <item name="Jexl"                   href="http://jakarta.apache.org/commons/sandbox/jexl/"/>
+       
         <item name="JJar"                   href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/jjar/"/>
         <item name="Messenger"              href="http://jakarta.apache.org/commons/sandbox/messenger/"/>
         <item name="Workflow"               href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/workflow/"/>
