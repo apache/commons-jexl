@@ -25,8 +25,8 @@
       <item name="Overview"                      href="/index.html" />
       <item name="API&#xA0;Documentation"        href="/apidocs/index.html"/>
       <item name="Examples"                      href="http://cvs.apache.org/viewcvs/jakarta-commons/jexl/examples/"/>
-      <item name="Release Builds"                href="/downloads.html"/>
-      <item name="Nightly Builds"                href="/nightly.html"/>
+      <item name="Releases and Builds"           href="/releases.html"/>
+      <item name="Jar Downloads"                 href="/downloads.html"/>
       <item name="Reference"                     href="/reference/index.html">
       </item>  
       <item name="JEXL Wiki"                     href="http://wiki.apache.org/jakarta-commons/JEXL"/>
