@@ -39,7 +39,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.58 2004/08/24 02:22:12 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.59 2004/08/24 05:03:13 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -303,10 +303,14 @@ public class JexlTest extends TestCase
         JexlContext jc = JexlHelper.createContext();
 
         jc.getVars().put("map", Collections.singletonMap( "size", "cheese"));
+        jc.getVars().put("foo", new Foo());
 
         assertExpression(jc, "map['size']", "cheese");
 // PR - unsure whether or not we should support map.size or force usage of the above 'escaped' version        
 //        assertExpression(jc, "map.size", "cheese");
+        assertExpression(jc, "foo.getSize()", new Integer(22));
+        // failing assertion for size property
+        //assertExpression(jc, "foo.size", new Integer(22));
     }
 
     /**
