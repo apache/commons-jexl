@@ -76,10 +76,6 @@
       <id>commons-logging</id>
       <version>1.0</version>
     </dependency>
-    <dependency>
-      <id>velocity</id>
-      <version>1.4-dev</version>
-    </dependency>
   </dependencies>
 
   <build>
