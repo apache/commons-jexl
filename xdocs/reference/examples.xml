@@ -88,6 +88,15 @@
         context as a <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Map.html">Map</a> and
         another to set the variables of the context from a Map.
       </p>
+      <p>
+        Here's a simple context that wraps the JVM's system properties:
+        <source>
+        JexlContext context = new JexlContext() {
+            public Map getVars() { return System.getProperties(); }
+            public void setVars(Map map) { }
+        };
+        </source>
+      </p>
     </section>
     <section name="Custom Resolvers">
     </section>
@@ -121,6 +130,7 @@ aString.substring(6)
           Often the values you want to pass to a method are other variables or expressions.
           If you have a number in the context named <code>i</code>, you could use it
           in a method call:
+          <source>aString.substring(i)</source>
         </p>
       </subsection>
       <subsection name="Accessing properties"></subsection>
