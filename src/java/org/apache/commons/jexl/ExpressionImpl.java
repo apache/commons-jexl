@@ -26,7 +26,7 @@ import org.apache.commons.jexl.parser.SimpleNode;
  * and this is the default implementation of the {@link Expression} interface.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ExpressionImpl.java,v 1.10 2004/08/23 13:37:19 dion Exp $
+ *  @version $Id: ExpressionImpl.java,v 1.11 2004/08/23 14:00:11 dion Exp $
  */
 class ExpressionImpl implements Expression
 {
@@ -55,9 +55,12 @@ class ExpressionImpl implements Expression
     }
 
     /**
-     *  evaluate the expression and return the value
+     *  Evaluate the expression and return the value.
      *
-     * @todo Under what conditions will pre and post resolvers be called
+     * Before JEXL evaluates the expression, any pre-resolvers will be called.
+     * If the pre-resolver provides a value, it is returned.
+     * If JEXL evaluates the expression as null, post-resolvers are called
+     * and any resulting value returned.
      *
      *  @param context Context containing objects/data used for evaluation
      *  @return value of expression
