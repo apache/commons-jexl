@@ -14,36 +14,53 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<document>
 
-    <properties>
-        <title>Commons JEXL Overview</title>
+<document>
+	<properties>
+		<title>Commons JEXL Overview</title>
     </properties>
 
     <body>
-
     <section name="Java Expression Language (JEXL)">
 
     <p>
       Java Expression Language (JEXL) is an expression language engine which can be 
-      embedded in applications and frameworks.  <!--It implements an extended version of 
-      the Expression Language of the JavaServer Pages Standard Tag Library version 1.1 
-      (JSTL) and JavaServer Pages version 2.0 (JSP).-->
+      embedded in applications and frameworks.  JEXL is inspired by Jakarta Velocity 
+      and the Expression Language defined in the JavaServer Pages Standard Tag Library 
+      version 1.1 (JSTL) and JavaServer Pages version 2.0 (JSP).  
     </p>
 
     <p>
-      The motivation was to bring some of the lessons learned by the Velocity
+      JEXL attempts to bring some of the lessons learned by the Velocity
       community about expression languages in templating to a wider audience.
-      Jelly needed Velocity-ish method access; it Just had to have it.
+      <a href="http://jakarta.apache.org/commons/jelly">Commons Jelly needed</a> 
+      Velocity-ish method access, it just had to have it.
+    </p>
+    
+    <p>
+      It must be noted that JEXL is not a compatibile implementation of EL as defined
+      in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152). For a compatible implementation of
+      these specifications, see the <a href="http://jakarta.apache.org/commons/el">
+      Commons EL</a> project.
     </p>
 
+    </section>
+
+    <section name="A Brief Example">
+
     <p>
-      Here is an example of using Jexl :
+      When evaluating expressions, JEXL merges an <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/Expression.html">Expression</a> with a <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">JexlContext</a>.
+      An Expression is created using <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/ExpressionFactory.html#createExpression(java.lang.String)">ExpressionFactory.createExpression()</a>, passing a
+      String containing valid JEXL syntax.  A JexlContext is created using 
+      <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlHelper.html#createContext()">JexlHelper.createContext()</a>, and variables are put into a map exposed through
+      the <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlContext.html#getVars()">getVars()</a> method on JexlContext.  The following example, takes a variable
+      named foo, and invokes the bar() method on the property innerFoo:
     </p>
 
     <source><![CDATA[
     // Create an expression object
-    Expression e = ExpressionFactory.createExpression("foo.innerFoo.bar()");
+    String jexlExp = "foo.innerFoo.bar()";
+    Expression e = ExpressionFactory.createExpression( jexlExp );
 
     // Create a context and add data
     JexlContext jc = JexlHelper.createContext();
@@ -52,8 +69,13 @@
     // Now evaluate the expression, getting the result
     Object o = e.evaluate(jc);]]></source>
 
+	</section>
+	
+	<section name="Extensions to JSTL Expression Language">
+
     <p>
-    Jexl has extended the JSTL in a few ways :
+    While JEXL is similar to the expression language defined in JSTL, it has improved
+    upon the syntax in a few areas:
     </p>
 
     <ul>
@@ -61,32 +83,21 @@
         Support for invocation of any accessible method (see example above).
         </li>
         <li>
-        Added a general size() method, which works on String, returning length,
-        Map, returning # of keys, and List and arrays, returning the
-        number of elements.
+        Added a general <span class="literal">size()</span> method, which works on:
+          <ul>
+        	<li><span class="literal">String</span> - returns length</li>
+        	<li><span class="literal">Map</span> - returns number of keys</li>
+        	<li><span class="literal">List</span> - returns number of elements.</li>
+          </ul>
         </li>
         <li>
-        Optional syntax for the 'empty' function :   empty(obj)
+        Optional syntax for the 'empty' function : empty(obj)
         </li>
         <li>
         Misc : '+' has been overloaded to be use as a String concatenation operator
         </li>
 
      </ul>
-
-    </section>
-
-    <section name="Anyone Using It Yet?">
-
-        <p>
-        James Strachan's
-        <a href="http://jakarta.apache.org/commons/jelly.html">
-        Jelly</a>.
-        </p>
-
-        <p>
-        Jexl and Jelly are two components of the Jakarta Je*l* Pack
-        </p>
 
     </section>
 
@@ -98,19 +109,35 @@
     </section>
 
     <section name="Related Resources">
-        <!--<p>
-		  JEXL is not a product of the Java Community Process (JCP).
-		  JSP 2.0 is covered by Java Specification Requests (JSR) 
-		  <a href="http://www.jcp.org/en/jsr/detail?id=152">JSR-152: JavaServer 
-		  Pages 2.0 Specification</a>.  JSTL 1.1 is covered by 
-		  <a href="http://jcp.org/en/jsr/detail?id=52">JSR 52: A Standard 
-		  Tag Library for JavaServer Pages</a>.
-		</p>-->
+        <p>
+		  JEXL is not a product of the Java Community Process (JCP), but it provides a
+		  similar expression syntax.  For more information about JSP 2.0 EL and JSTL 1.1
+		  EL:
+		</p>
+		<ul>
+          <li>
+            <a href="http://java.sun.com/products/jsp/index.jsp">JSP 2.0</a> is covered 
+            by Java Specification Requests (JSR) 
+		    <a href="http://www.jcp.org/en/jsr/detail?id=152">JSR-152: JavaServer 
+		    Pages 2.0 Specification</a>.
+		  </li>
+          <li>
+          	<a href="http://java.sun.com/products/jsp/jstl/">JSTL 1.1</a> is covered 
+          	by <a href="http://jcp.org/en/jsr/detail?id=52">JSR 52: A Standard 
+		    Tag Library for JavaServer Pages</a>.
+		  </li>
+		</ul>
 		<p>
 		  <a href="http://jakarta.apache.org/velocity">Jakarta Velocity</a> implements 
 		  a similar expression language.
 		</p>
     </section>
+
+    <section name="Anyone Using It Yet?">
+        <p>
+          <a href="http://jakarta.apache.org/commons/jelly.html">Jelly</a>
+        </p>
+     </section>
 
  </body>
 </document>
