@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.17 2002/10/10 10:40:58 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.18 2002/10/10 11:09:32 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -424,42 +424,26 @@ public class JexlTest extends TestCase
 
         List list = new ArrayList();
 
-        list.add("");
-        list.add("");
-        list.add("");
-        list.add("");
-        list.add("");
+        list.add("1");
+        list.add("2");
+        list.add("3");
+        list.add("4");
+        list.add("5");
 
         jc.getVars().put("list", list);
 
-        Expression e = ExpressionFactory.createExpression("size(string)");
-        Object o = e.evaluate(jc);
-        assertTrue("1 : o incorrect", o.equals(new Integer(5)));
+        assertExpression(jc, "size(string)", new Integer(5));
+        assertExpression(jc, "size(array)", new Integer(5));
+        assertExpression(jc, "size(list)", new Integer(5));
+        assertExpression(jc, "size(map)", new Integer(5));
+        assertExpression(jc, "size(list)", new Integer(5));
+        assertExpression(jc, "list.size()", new Integer(5));
+        assertExpression(jc, "map.size()", new Integer(5));
+        assertExpression(jc, "array.length", new Integer(5));
 
-        e = ExpressionFactory.createExpression("size(array)");
-        o = e.evaluate(jc);
-        assertTrue("2 : o incorrect", o.equals(new Integer(5)));
-
-        e = ExpressionFactory.createExpression("size(map)");
-        o = e.evaluate(jc);
-        assertTrue("3 : o incorrect", o.equals(new Integer(5)));
-
-        e = ExpressionFactory.createExpression("size(list)");
-        o = e.evaluate(jc);
-        assertTrue("4 : o incorrect", o.equals(new Integer(5)));
-        
-        
-        e = ExpressionFactory.createExpression("list.size()");
-        o = e.evaluate(jc);
-        assertTrue("4 : o incorrect", o.equals(new Integer(5)));
-
-        e = ExpressionFactory.createExpression("map.size()");
-        o = e.evaluate(jc);
-        assertTrue("4 : o incorrect", o.equals(new Integer(5)));
-        
-        e = ExpressionFactory.createExpression("array.length");
-        o = e.evaluate(jc);
-        assertTrue("4 : o incorrect", o.equals(new Integer(5)));
+        assertExpression(jc, "list.get(size(list) - 1)", "5");
+        assertExpression(jc, "list[size(list) - 1]", "5");
+        assertExpression(jc, "list.get(list.size() - 1)", "5");
     }
 
 
@@ -736,25 +720,11 @@ public class JexlTest extends TestCase
         assertTrue("o not instanceof Boolean", o instanceof Boolean);
         assertEquals("o incorrect", Boolean.FALSE, o);
 
-        e = ExpressionFactory.createExpression("bar == ''");
-        o = e.evaluate(jc);
 
-        assertEquals("o incorrect", Boolean.TRUE, o );
-
-        e = ExpressionFactory.createExpression("barnotexist == ''");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.FALSE, o );
-
-        e = ExpressionFactory.createExpression("empty bar");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.TRUE, o );
-        
-        e = ExpressionFactory.createExpression("bar.length() == 0");
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.TRUE, o );
+        assertExpression(jc, "bar == ''", Boolean.TRUE);
+        assertExpression(jc, "barnotexist == ''", Boolean.FALSE);
+        assertExpression(jc, "empty bar", Boolean.TRUE);
+        assertExpression(jc, "bar.length() == 0", Boolean.TRUE);
     }
 
     /**
@@ -994,4 +964,15 @@ public class JexlTest extends TestCase
         }
     }
 
+
+    /**
+     * Asserts that the given expression returns the given value when applied to the 
+     * given context
+     */
+    protected void assertExpression(JexlContext jc, String expression, Object expected) throws Exception 
+    {
+        Expression e = ExpressionFactory.createExpression("array.length");
+        Object actual = e.evaluate(jc);
+        assertEquals(expression, expected, actual);
+    }
 }
