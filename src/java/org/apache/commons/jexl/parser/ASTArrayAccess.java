@@ -57,8 +57,8 @@ package org.apache.commons.jexl.parser;
 import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Coercion;
 import org.apache.commons.jexl.util.Introspector;
-import org.apache.velocity.util.introspection.VelPropertyGet;
-import org.apache.velocity.util.introspection.Info;
+import org.apache.commons.jexl.util.introspection.Info;
+import org.apache.commons.jexl.util.introspection.VelPropertyGet;
 
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ import java.lang.reflect.Array;
  *    $foo[2]
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTArrayAccess.java,v 1.3 2002/06/07 03:35:30 geirm Exp $
+ *  @version $Id: ASTArrayAccess.java,v 1.4 2002/08/05 12:41:08 geirm Exp $
  */
 public class ASTArrayAccess extends SimpleNode
 {

@@ -57,8 +57,6 @@ package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Introspector;
-import org.apache.velocity.util.introspection.VelPropertyGet;
-import org.apache.velocity.util.introspection.Info;
 
 import java.lang.reflect.Method;
 
@@ -67,7 +65,7 @@ import java.lang.reflect.Method;
  *     $foo  or $foo.bar (both parts are identifiers...)
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTIdentifier.java,v 1.2 2002/05/25 18:40:11 geirm Exp $
+ *  @version $Id: ASTIdentifier.java,v 1.3 2002/08/05 12:41:08 geirm Exp $
  */
 public class ASTIdentifier extends SimpleNode
 {
