@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.11 2002/06/13 16:11:28 geirm Exp $
+ *  @version $Id: JexlTest.java,v 1.12 2002/07/04 18:05:05 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -537,6 +537,77 @@ public class JexlTest extends TestCase
         o = e.evaluate(jc);
 
         assertEquals("o incorrect", Boolean.FALSE, o );
+    }
+
+    /**
+      *  test some null conditions
+      */
+    public void testNull()
+         throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("bar", new Integer(2) );
+        
+        Expression e = ExpressionFactory.createExpression("empty foo");
+        Object o = e.evaluate(jc);
+
+        assertTrue("o not instanceof Boolean", o instanceof Boolean);
+        assertEquals("o incorrect", Boolean.TRUE, o);
+
+        e = ExpressionFactory.createExpression("bar == null");
+        o = e.evaluate(jc);
+
+        assertTrue("o not instanceof Boolean", o instanceof Boolean);
+        assertEquals("o incorrect", Boolean.FALSE, o );
+
+        e = ExpressionFactory.createExpression("bar != null");
+        o = e.evaluate(jc);
+
+        assertTrue("o not instanceof Boolean", o instanceof Boolean);
+        assertEquals("o incorrect", Boolean.TRUE, o );
+
+        e = ExpressionFactory.createExpression("foo != null");
+        o = e.evaluate(jc);
+
+        assertTrue("o not instanceof Boolean", o instanceof Boolean);
+        assertEquals("o incorrect", Boolean.FALSE, o);
+
+        e = ExpressionFactory.createExpression("foo == null");
+        o = e.evaluate(jc);
+
+        assertTrue("o not instanceof Boolean", o instanceof Boolean);
+        assertEquals("o incorrect", Boolean.TRUE, o);
+    }
+
+    /**
+      *  test some blank strings
+      */
+    public void testBlankStrings()
+         throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("bar", "" );
+        
+        Expression e = ExpressionFactory.createExpression("foo == ''");
+        Object o = e.evaluate(jc);
+
+        assertTrue("o not instanceof Boolean", o instanceof Boolean);
+        assertEquals("o incorrect", Boolean.FALSE, o);
+
+        e = ExpressionFactory.createExpression("bar == ''");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.TRUE, o );
+        
+        e = ExpressionFactory.createExpression("empty bar");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.TRUE, o );
+        
+        e = ExpressionFactory.createExpression("bar.length() == 0");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.TRUE, o );
     }
 
     /**
