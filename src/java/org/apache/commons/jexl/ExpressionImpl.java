@@ -69,12 +69,12 @@ import java.util.List;
  *  a reference or expression that we can get the value of.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ExpressionImpl.java,v 1.2 2002/06/13 16:09:53 geirm Exp $
+ *  @version $Id: ExpressionImpl.java,v 1.3 2002/08/09 13:36:10 jstrachan Exp $
  */
 class ExpressionImpl implements Expression
 {
-    List preResolvers = new ArrayList();
-    List postResolvers = new ArrayList();
+    List preResolvers;
+    List postResolvers;
 
     /**
      *  Original expression - this is just a 'snippet', not a valid
@@ -110,7 +110,7 @@ class ExpressionImpl implements Expression
         /*
          * if we have pre resolvers, give them a wack
          */
-        if (preResolvers.size() != 0)
+        if (preResolvers != null)
         {
             val = tryResolver(preResolvers, context);
 
@@ -125,7 +125,7 @@ class ExpressionImpl implements Expression
         /*
          * if null, call post resolvers
          */
-        if (val == null && postResolvers.size() != 0)
+        if (val == null && postResolvers != null)
         {
             val = tryResolver(postResolvers, context);
 
@@ -178,6 +178,10 @@ class ExpressionImpl implements Expression
 
     public void addPreResolver(JexlExprResolver resolver)
     {
+        if (preResolvers == null) 
+        {
+            preResolvers = new ArrayList();
+        }
         preResolvers.add(resolver);
     }
 
@@ -189,7 +193,11 @@ class ExpressionImpl implements Expression
      */
     public void addPostResolver(JexlExprResolver resolver)
     {
-        preResolvers.add(resolver);
+        if (postResolvers == null) 
+        {
+            postResolvers = new ArrayList();
+        }
+        postResolvers.add(resolver);
     }
 
 }
