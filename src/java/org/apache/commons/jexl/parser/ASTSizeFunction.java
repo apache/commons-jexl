@@ -19,6 +19,7 @@ import org.apache.commons.jexl.JexlContext;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.lang.reflect.Array;
 
 /**
@@ -26,7 +27,7 @@ import java.lang.reflect.Array;
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @author <a href="hw@kremvax.net">Mark H. Wilkinson</a>
- *  @version $Id: ASTSizeFunction.java,v 1.4 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id: ASTSizeFunction.java,v 1.5 2004/08/15 15:32:52 dion Exp $
  */
 public class ASTSizeFunction extends SimpleNode
 {
@@ -81,6 +82,10 @@ public class ASTSizeFunction extends SimpleNode
         else if (val instanceof String)
         {
             return ((String)val).length();
+        }
+        else if (val instanceof Set)
+        {
+            return ((Set)val).size();
         }
 
         throw new Exception("size() : unknown type : " + val.getClass());
