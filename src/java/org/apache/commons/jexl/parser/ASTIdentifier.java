@@ -67,7 +67,7 @@ import java.lang.reflect.Method;
  *     $foo  or $foo.bar (both parts are identifiers...)
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTIdentifier.java,v 1.1 2002/04/26 04:23:14 geirm Exp $
+ *  @version $Id: ASTIdentifier.java,v 1.2 2002/05/25 18:40:11 geirm Exp $
  */
 public class ASTIdentifier extends SimpleNode
 {
@@ -101,24 +101,9 @@ public class ASTIdentifier extends SimpleNode
      *   We assume that an identifier can be gotten via a get(String)
      */
     public Object execute(Object obj, JexlContext jc)
+        throws Exception
     {
-        try
-        {
-            VelPropertyGet vg = Introspector.getUberspect().getPropertyGet(obj,
-                    val, new Info("",1,1));
-
-            if (vg == null)
-                return null;
-
-            return vg.invoke(obj);
-        }
-        catch(Exception e)
-        {
-            System.out.println("ASTIdentifier : "+ e);
-            e.printStackTrace();;
-        }
-
-        return null;
+        return ASTArrayAccess.evaluateExpr(obj, val);
     }
 
     public String getIdentifierString()
