@@ -21,7 +21,39 @@
   </properties>
 
   <body>
-    <section name="Examples">
+    <section name="Overview">
+      <p>
+        <ul>
+          <li><a href="#Evaluating Expressions">Evaluating Expressions</a></li>
+          <li><a href="#Custom Contexts">Custom Contexts</a></li>
+          <li><a href="#Custom Resolvers">Custom Resolvers</a></li>
+        </ul>
+      </p>
+    </section>
+    <section name="Evaluating Expressions">
+      <p>
+        To evaluate expressions using JEXL, you need two things:
+        <ul>
+          <li>A <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">context</a> containing any variables, and</li>
+          <li>An <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/Expression.html">expression</a></li>
+        </ul>
+      </p>
+      <p>
+        The easiest way of obtaining a a context is to use the
+        <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlHelper.html#createContext()">JexlHelper.createContext()</a>
+        method. This creates a context which is simply an extension of a
+        <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/HashMap.html">HashMap</a>
+      </p>
+      <p>
+        <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/Expression.html">Expressions</a> are
+        created using the <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/ExpressionFactory.html#createExpression(java.lang.String)">ExpressionFactory.createExpression(String)</a>
+        method. 
+      </p>
+      <p>
+        Once you have your expression, you can then use use the
+        <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/Expression.html#evaluate(org.apache.commons.jexl.JexlContext)">evaluate</a>
+        to execute it and obtain a result.
+      </p>
     </section>
   </body>
 </document>
