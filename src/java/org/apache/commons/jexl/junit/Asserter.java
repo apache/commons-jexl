@@ -32,18 +32,17 @@ import org.apache.commons.jexl.JexlHelper;
  * Jexl navigation expressions.
  *
  * @author <a href="mailto:jstrachan@apache.org">James Strachan</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class Asserter extends Assert {
 
     private Map variables = new HashMap();
     private JexlContext context = JexlHelper.createContext();
 
-    public Asserter() {
-    }
+    public Asserter() {}
 
     /**
-     * This consstructor will register the given variableValue as the
+     * This constructor will register the given variableValue as the
      * "this" variable.
      * 
      * @param variableValue
