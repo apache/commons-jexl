@@ -47,6 +47,8 @@
       <arg value="1.0 * 5.2 / 2.5"/>
       <arg value="7 % 3"/>
       <arg value="77 div 17"/>
+      <arg value="aString.length()"/>
+      <arg value='aString.substring(6)'/>
     </java>
   </goal>
 
