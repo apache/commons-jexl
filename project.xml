@@ -129,12 +129,6 @@
         <include>**/*Test.java</include>
       </includes>
     </unitTest>
-    <integrationUnitTestPatterns></integrationUnitTestPatterns>
-    <resources>
-      <includes>
-        <include>**/*.properties</include>
-      </includes>
-    </resources>
   </build>
   
   <reports>
