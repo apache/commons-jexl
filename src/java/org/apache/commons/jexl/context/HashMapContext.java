@@ -25,14 +25,14 @@ import java.util.Map;
  *  Implementation of JexlContext based on a HashMap
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: HashMapContext.java,v 1.3 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id: HashMapContext.java,v 1.4 2004/08/23 13:51:59 dion Exp $
  */
 public class HashMapContext extends HashMap implements JexlContext
 {
     public void setVars(Map vars)
     {
-        this.clear();
-        this.putAll(vars);
+        clear();
+        putAll(vars);
     }
 
     public Map getVars()

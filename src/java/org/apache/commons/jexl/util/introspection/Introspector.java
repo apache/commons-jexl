@@ -47,7 +47,7 @@ import org.apache.commons.logging.Log;
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
  * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
  * @author <a href="mailto:paulo.gaspar@krankikom.de">Paulo Gaspar</a>
- * @version $Id: Introspector.java,v 1.5 2004/08/23 13:25:29 dion Exp $
+ * @version $Id: Introspector.java,v 1.6 2004/08/23 13:50:00 dion Exp $
  */
 public class Introspector extends IntrospectorBase
 {
@@ -106,9 +106,9 @@ public class Introspector extends IntrospectorBase
             for (int i = 0; i < params.length; i++)
             {
                 if ( i > 0)
-                    msg = msg + ", ";
+                    msg += ", ";
                 
-                msg = msg + params[i].getClass().getName();
+                msg += params[i].getClass().getName();
             }
             
             msg = msg + ") for class " + c;

@@ -30,7 +30,7 @@ package org.apache.commons.jexl;
  * </p>
  * 
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Id: Expression.java,v 1.6 2004/06/13 01:42:21 tobrien Exp $
+ * @version $Id: Expression.java,v 1.7 2004/08/23 13:53:34 dion Exp $
  */
 public interface Expression
 {
@@ -41,14 +41,14 @@ public interface Expression
      * @param context A JexlContext containing variables.
      * @return The result of this evaluation
      */
-    public Object evaluate(JexlContext context) throws Exception;
+    Object evaluate(JexlContext context) throws Exception;
 
     /**
      * Returns the JEXL expression this Expression was created with.
      * 
      * @return The JEXL expression to be evaluated
      */
-    public String getExpression();
+    String getExpression();
 
     /**
      *  allows addition of a resolver to allow custom interdiction of
@@ -56,7 +56,7 @@ public interface Expression
      *
      *  @param resolver resolver to be called before Jexl expression evaluated
      */
-    public void addPreResolver(JexlExprResolver resolver);
+    void addPreResolver(JexlExprResolver resolver);
 
     /**
      *  allows addition of a resolver to allow custom interdiction of
@@ -64,5 +64,5 @@ public interface Expression
      *
      *  @param resolver resolver to be called if Jexl expression evaluated to null
      */
-    public void addPostResolver(JexlExprResolver resolver);
+    void addPostResolver(JexlExprResolver resolver);
 }
