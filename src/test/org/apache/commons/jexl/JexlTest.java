@@ -35,7 +35,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.53 2004/08/20 08:05:28 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.54 2004/08/20 08:22:20 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -549,7 +549,6 @@ public class JexlTest extends TestCase
          throws Exception
     {
         JexlContext jc = JexlHelper.createContext();
-
         jc.getVars().put("foo_bar", "123" );
         
         assertExpression(jc, "foo_bar", "123");
@@ -561,16 +560,13 @@ public class JexlTest extends TestCase
     public void testMapDot()
          throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("foo.bar");
-        JexlContext jc = JexlHelper.createContext();
-
         Map foo = new HashMap();
         foo.put( "bar", "123" );
 
+        JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("foo", foo );
-        Object o = e.evaluate(jc);
-
-        assertEquals("o incorrect", "123", o);
+        
+        assertExpression(jc, "foo.bar", "123");
     }
 
     /**
@@ -579,15 +575,10 @@ public class JexlTest extends TestCase
     public void testStringLiterals()
         throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("foo == \"bar\"");
         JexlContext jc = JexlHelper.createContext();
-
         jc.getVars().put("foo", "bar" );
 
-        Object o = e.evaluate(jc);
-
-        assertTrue("o incorrect", Boolean.TRUE.equals(o));
-
+        assertExpression(jc, "foo == \"bar\"", Boolean.TRUE);
         assertExpression(jc, "foo == 'bar'", Boolean.TRUE);
     }
 
@@ -597,20 +588,16 @@ public class JexlTest extends TestCase
     public void testIntProperty()
          throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("foo.count");
-        JexlContext jc = JexlHelper.createContext();
-
         Foo foo = new Foo();
 
         // lets check the square function first..
         assertEquals(4, foo.square(2));
         assertEquals(4, foo.square(-2));
 
+        JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("foo", foo );
-        Object o = e.evaluate(jc);
 
-        assertEquals("o incorrect", new Integer(5), o);
-
+        assertExpression(jc, "foo.count", new Integer(5));
         assertExpression(jc, "foo.square(2)", new Integer(4));
         assertExpression(jc, "foo.square(-2)", new Integer(4));
     }
@@ -633,38 +620,23 @@ public class JexlTest extends TestCase
     public void testArrayProperty()
         throws Exception
     {
+        Foo foo = new Foo();
+
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("foo", foo );
+
         Expression bracketForm =
             ExpressionFactory.createExpression("foo.array[1]");
 
         Expression dotForm =
             ExpressionFactory.createExpression("foo.array.1");
 
-        JexlContext jc = JexlHelper.createContext();
-
-        Foo foo = new Foo();
-
-        jc.getVars().put("foo", foo );
-
-        Object o1 = bracketForm.evaluate(jc);
-        assertEquals("bracket form failed", GET_METHOD_ARRAY[1], o1);
-
-        Object o2 = dotForm.evaluate(jc);
-        assertEquals("dot form failed", GET_METHOD_ARRAY[1], o2);
-
-
-        bracketForm =
-            ExpressionFactory.createExpression("foo.array2[1][1]");
+        assertExpression(jc, "foo.array[1]", GET_METHOD_ARRAY[1]);
+        assertExpression(jc, "foo.array.1", GET_METHOD_ARRAY[1]);
+        assertExpression(jc, "foo.array2[1][1]", GET_METHOD_ARRAY2[1][1]);
 
 //        dotForm =
 //            ExpressionFactory.createExpression("foo.array2.1.1");
-
-        jc = JexlHelper.createContext();
-
-        jc.getVars().put("foo", foo );
-
-        o1 = bracketForm.evaluate(jc);
-        assertEquals("bracket form failed", GET_METHOD_ARRAY2[1][1], o1);
-
 //        o2 = dotForm.evaluate(jc);
 //        assertEquals("dot form failed", GET_METHOD_ARRAY2[1][1], o2);
     }
@@ -724,7 +696,14 @@ public class JexlTest extends TestCase
         assertExpression(jc, "'2' < 1", Boolean.FALSE);
         assertExpression(jc, "'2' <= 1", Boolean.FALSE);
         assertExpression(jc, "'2' <= 2", Boolean.TRUE);
-    }
+
+        assertExpression(jc, "2 > '1'", Boolean.TRUE);
+        assertExpression(jc, "2 >= '1'", Boolean.TRUE);
+        assertExpression(jc, "2 >= '2'", Boolean.TRUE);
+        assertExpression(jc, "2 < '1'", Boolean.FALSE);
+        assertExpression(jc, "2 <= '1'", Boolean.FALSE);
+        assertExpression(jc, "2 <= '2'", Boolean.TRUE);
+}
 
     public void testResolver()
         throws Exception
