@@ -54,12 +54,10 @@
 
 package org.apache.commons.jexl.util.introspection;
 
-import java.util.Map;
-import java.util.List;
-import java.util.Hashtable;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  *  Taken from the Velocity tree so we can be self-sufficient
@@ -72,7 +70,7 @@ import java.lang.reflect.Modifier;
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
  * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @version $Id: ClassMap.java,v 1.1 2002/08/05 05:04:53 geirm Exp $
+ * @version $Id: ClassMap.java,v 1.2 2002/12/16 10:41:59 jstrachan Exp $
  */
 public class ClassMap
 {

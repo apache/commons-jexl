@@ -54,11 +54,9 @@
 
 package org.apache.commons.jexl.util;
 
-import org.apache.commons.logging.Log;
-
-import java.lang.reflect.Method;
-
 import java.lang.reflect.InvocationTargetException;
+
+import org.apache.commons.logging.Log;
 
 
 /**
@@ -69,7 +67,7 @@ import java.lang.reflect.InvocationTargetException;
  * the case.
  *
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @version $Id: GetExecutor.java,v 1.1 2002/08/05 05:06:21 geirm Exp $
+ * @version $Id: GetExecutor.java,v 1.2 2002/12/16 10:41:59 jstrachan Exp $
  */
 public class GetExecutor extends AbstractExecutor
 {

@@ -54,22 +54,19 @@
 
 package org.apache.commons.jexl;
 
-import org.apache.commons.jexl.parser.SimpleNode;
-import org.apache.commons.jexl.parser.Parser;
-import org.apache.commons.jexl.parser.ASTReference;
-
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.jexl.parser.SimpleNode;
+
 /**
  *  Implelmentation of an Expression.  Created by the ExpressionFactory.
- *
+ *	
  *  The expression is different than a script - it's really just either
  *  a reference or expression that we can get the value of.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ExpressionImpl.java,v 1.3 2002/08/09 13:36:10 jstrachan Exp $
+ *  @version $Id: ExpressionImpl.java,v 1.4 2002/12/16 10:41:59 jstrachan Exp $
  */
 class ExpressionImpl implements Expression
 {

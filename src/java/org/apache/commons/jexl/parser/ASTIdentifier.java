@@ -56,16 +56,13 @@
 package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
-import org.apache.commons.jexl.util.Introspector;
-
-import java.lang.reflect.Method;
 
 /**
  *  Simple identifier -
  *     $foo  or $foo.bar (both parts are identifiers...)
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTIdentifier.java,v 1.3 2002/08/05 12:41:08 geirm Exp $
+ *  @version $Id: ASTIdentifier.java,v 1.4 2002/12/16 10:41:59 jstrachan Exp $
  */
 public class ASTIdentifier extends SimpleNode
 {

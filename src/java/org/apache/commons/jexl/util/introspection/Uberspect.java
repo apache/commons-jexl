@@ -56,14 +56,13 @@ package org.apache.commons.jexl.util.introspection;
 
 
 import java.util.Iterator;
-import java.lang.reflect.Method;
 
 /**
  * 'Federated' introspection/reflection interface to allow the introspection
  *  behavior in Velocity to be customized.
  *
  * @author <a href="mailto:geirm@apache.org">Geir Magusson Jr.</a>
- * @version $Id: Uberspect.java,v 1.1 2002/08/05 05:04:53 geirm Exp $
+ * @version $Id: Uberspect.java,v 1.2 2002/12/16 10:41:59 jstrachan Exp $
  */
 public interface Uberspect
 {

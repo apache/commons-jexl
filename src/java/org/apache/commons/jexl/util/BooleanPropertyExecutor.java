@@ -54,9 +54,6 @@
 
 package org.apache.commons.jexl.util;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.commons.logging.Log;
 /**
  *  Handles discovery and valuation of a
@@ -69,7 +66,7 @@ import org.apache.commons.logging.Log;
  *  by is<Property>
  *
  *  @author <a href="geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: BooleanPropertyExecutor.java,v 1.1 2002/08/05 05:06:21 geirm Exp $
+ *  @version $Id: BooleanPropertyExecutor.java,v 1.2 2002/12/16 10:41:59 jstrachan Exp $
  */
 public class BooleanPropertyExecutor extends PropertyExecutor
 {

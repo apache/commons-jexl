@@ -54,16 +54,13 @@
 
 package org.apache.commons.jexl.util.introspection;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Hashtable;
-
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -72,7 +69,7 @@ import java.lang.reflect.Method;
  * @author <a href="mailto:Christoph.Reck@dlr.de">Christoph Reck</a>
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
- * @version $Id: MethodMap.java,v 1.1 2002/08/05 05:04:53 geirm Exp $
+ * @version $Id: MethodMap.java,v 1.2 2002/12/16 10:41:59 jstrachan Exp $
  */
 public class MethodMap
 {

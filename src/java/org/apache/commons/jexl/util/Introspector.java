@@ -53,20 +53,18 @@
  */
 package org.apache.commons.jexl.util;
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 import org.apache.commons.jexl.util.introspection.Uberspect;
 import org.apache.commons.jexl.util.introspection.UberspectImpl;
 import org.apache.commons.jexl.util.introspection.UberspectLoggable;
-
-import java.lang.reflect.Method;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *  Little class to manage a Velocity uberspector (Vel 1.4+) for instrospective
  *  services
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: Introspector.java,v 1.3 2002/08/05 05:06:21 geirm Exp $
+ *  @version $Id: Introspector.java,v 1.4 2002/12/16 10:41:59 jstrachan Exp $
  */
 public class Introspector
 {

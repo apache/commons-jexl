@@ -54,14 +54,9 @@
 
 package org.apache.commons.jexl.util.introspection;
 
-import org.apache.commons.logging.Log;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import java.lang.reflect.Method;
+
+import org.apache.commons.logging.Log;
 
 
 /**
@@ -90,7 +85,7 @@ import java.lang.reflect.Method;
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
  * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
  * @author <a href="mailto:paulo.gaspar@krankikom.de">Paulo Gaspar</a>
- * @version $Id: Introspector.java,v 1.1 2002/08/05 05:04:53 geirm Exp $
+ * @version $Id: Introspector.java,v 1.2 2002/12/16 10:41:59 jstrachan Exp $
  */
 public class Introspector extends IntrospectorBase
 {
