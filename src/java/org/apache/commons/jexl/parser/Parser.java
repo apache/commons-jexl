@@ -2,7 +2,6 @@
 package org.apache.commons.jexl.parser;
 
 import java.io.Reader;
-import java.io.ByteArrayInputStream;
 
 public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConstants {/*@bgen(jjtree)*/
   protected JJTParserState jjtree = new JJTParserState();public SimpleNode parse(Reader reader)
