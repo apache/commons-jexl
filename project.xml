@@ -36,8 +36,8 @@
 
   <versions>
     <version>
-      <id>b1</id>
-      <name>1.0-b1</name>
+      <id>1.0-beta-1</id>
+      <name>1.0-beta-1</name>
       <tag>HEAD</tag>
     </version>
   </versions>
