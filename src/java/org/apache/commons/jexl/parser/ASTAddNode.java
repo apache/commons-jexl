@@ -61,7 +61,7 @@ import org.apache.commons.jexl.util.Coercion;
  *  Addition : either integer addition or string concatenation
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTAddNode.java,v 1.3 2003/10/09 21:28:55 rdonkin Exp $
+ *  @version $Id: ASTAddNode.java,v 1.4 2003/12/17 12:49:35 geirm Exp $
  */
 public class ASTAddNode extends SimpleNode
 {
@@ -98,7 +98,7 @@ public class ASTAddNode extends SimpleNode
          *  if anything is float, double or string with ( "." | "E" | "e")
          *  coerce all to doubles and do it
          */
-        if ( left instanceof Float || left instanceof Double
+        if (left instanceof Float || left instanceof Double
             || right instanceof Float || right instanceof Double
             || (  left instanceof String
                   && (  ((String) left).indexOf(".") != -1 ||
@@ -108,23 +108,38 @@ public class ASTAddNode extends SimpleNode
             || (  right instanceof String
                   && (  ((String) right).indexOf(".") != -1 ||
                         ((String) right).indexOf("e") != -1 ||
-                        ((String) right).indexOf("E") != -1 )
+                        ((String) right).indexOf("E") != -1)
                )
             )
         {
-            Double l = Coercion.coerceDouble(left);
-            Double r = Coercion.coerceDouble(right);
 
-            return new Double( l.doubleValue() + r.doubleValue() );
+            /*
+             * in the event that either is null and not both, then just make the
+             * null a 0
+             */
+
+            Double l = left == null ? new Double(0) : Coercion.coerceDouble(left);
+            Double r = right == null? new Double(0) : Coercion.coerceDouble(right);
+
+            return new Double(l.doubleValue() + r.doubleValue());
         }
 
         /*
-         * otherwise to longs with thee!
+         * attempt to use Longs
          */
+        try
+        {
+            Long l = left == null ? new Long(0) : Coercion.coerceLong(left);
+            Long r = right == null ? new Long(0) : Coercion.coerceLong(right);
 
-        Long l = Coercion.coerceLong(left);
-        Long r = Coercion.coerceLong(right);
-
-        return new Long(l.longValue() + r.longValue());
+            return new Long(l.longValue() + r.longValue());
+        }
+        catch( java.lang.NumberFormatException nfe )
+        {
+            /*
+             * Well, use strings!
+             */
+            return left.toString().concat(right.toString());
+        }
     }
 }
