@@ -26,7 +26,9 @@
         This reference is split up into the following sections:
         <ol>
           <li><a href="#Syntax">Syntax</a></li>
+          <li><a href="#Literals">Literals</a></li>
           <li><a href="#Functions">Functions</a></li>
+          <li><a href="#Operators">Operators</a></li>
         </ol>
       </p>
     </section>
@@ -40,6 +42,23 @@
             <source>## This is a comment</source>
           </td>
         </tr>
+        <tr>
+          <td>Identifiers / variables</td>
+          <td>
+            Must start with <code>a-z</code>, <code>A-Z</code>, <code>_</code> or <code>$</code>.
+            Can then be followed by <code>0-9</code>, <code>a-z</code>, <code>A-Z</code>, <code>_</code> or <code>$</code>.
+            e.g.
+            <ul>
+              <li>Valid: <code>var1</code>,<code>_a99</code>,<code>$1</code></li>
+              <li>Inalid: <code>9v</code>,<code>!a99</code>,<code>1$</code></li>
+            </ul>
+          </td>
+        </tr>
+      </table>
+    </section>
+    <section name="Literals">
+      <table>
+        <tr><th>Item</th><th>Description</th></tr>
         <tr>
           <td>Integer Literals</td>
           <td>1 or more digits from <code>0</code> to <code>9</code></td>
@@ -60,22 +79,6 @@
             <source>'Hello world'</source> are equivalent.
           </td>
         </tr>
-        <tr>
-          <td>Identifiers / variables</td>
-          <td>
-            Must start with <code>a-z</code>, <code>A-Z</code>, <code>_</code> or <code>$</code>.
-            Can then be followed by <code>0-9</code>, <code>a-z</code>, <code>A-Z</code>, <code>_</code> or <code>$</code>.
-            e.g.
-            <ul>
-              <li>Valid: <code>var1</code>,<code>_a99</code>,<code>$1</code></li>
-              <li>Inalid: <code>9v</code>,<code>!a99</code>,<code>1$</code></li>
-            </ul>
-          </td>
-        </tr>
-        <tr>
-          <td>Assignment</td>
-          <td><source>var1 = var2</source></td>
-        </tr>
       </table>
     </section>
     <section name="Functions">
@@ -92,6 +95,54 @@
               <li>A collection of size zero</li>
               <li>An empty map</li>
             </ol>
+            <source>empty(var1)</source>
+          </td>
+        </tr>
+        <tr>
+          <td>size</td>
+          <td>
+            Returns the information about the expression:
+            <ol>
+              <li>Length of an array</li>
+              <li>Size of a List</li>
+              <li>Size of a Map</li>
+              <li>Size of a Set</li>
+              <li>Length of a string</li>
+            </ol>
+            <source>size("Hello")</source> returns 5.
+          </td>
+        </tr>
+      </table>
+    </section>
+    <section name="Operators">
+      <table>
+        <tr><th>Operator</th><th>Description</th></tr>
+        <tr>
+          <td>Assignment</td>
+          <td><source>var1 = var2</source></td>
+        </tr>
+        <tr>
+          <td>Boolean <code>and</code></td>
+          <td>
+            The usual <code>&amp;&amp;</code> operator can be used as well as the word <code>and</code>, e.g.
+            <source>cond1 and cond2</source> and
+            <source>cond1 &amp;&amp; cond2</source> are equivalent
+          </td>
+        </tr>
+        <tr>
+          <td>Boolean <code>or</code></td>
+          <td>
+            The usual <code>||</code> operator can be used as well as the word <code>or</code>, e.g.
+            <source>cond1 or cond2</source> and
+            <source>cond1 || cond2</source> are equivalent
+          </td>
+        </tr>
+        <tr>
+          <td>Boolean <code>not</code></td>
+          <td>
+            The usual <code>!</code> operator can be used as well as the word <code>not</code>, e.g.
+            <source>!cond1</source> and
+            <source>not cond1</source> are equivalent
           </td>
         </tr>
       </table>
