@@ -54,6 +54,25 @@
         <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/Expression.html#evaluate(org.apache.commons.jexl.JexlContext)">evaluate</a>
         to execute it and obtain a result.
       </p>
+      <p>
+        Here's a typical scenario:
+      </p>
+      <source>
+    // Create an expression object for our calculation
+    String calculateTax = taxManager.getTaxCalc(); //e.g. "((G1 + G2 + G3) * 0.1) + G4";
+    Expression e = ExpressionFactory.createExpression( calculateTax );
+
+    // populate the context
+    JexlContext context = JexlHelper.createContext();
+    context.getVars().put("G1", businessObject.getTotalSales());
+    context.getVars().put("G2", taxManager.getTaxCredit(businessObject.getYear()));
+    context.getVars().put("G3", businessObject.getIntercompanyPayments());
+    context.getVars().put("G4", -taxManager.getAllowances());
+    // ...
+    
+    // work it out
+    Float result = (Float)e.evaluate(context);
+      </source>
     </section>
     <section name="Custom Contexts">
     </section>
