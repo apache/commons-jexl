@@ -15,10 +15,16 @@
   limitations under the License.
 -->
 <!DOCTYPE org.apache.commons.menus SYSTEM '../../commons-build/menus/menus.dtd'>
-<project name="Jexl">
-  <title>Jexl</title>
-  <organizationLogo href="http://jakarta.apache.org/images/jakarta-logo.gif">Jakarta</organizationLogo>
-  <body>
-    &common-menus;
-  </body>
+<project name="Commons&#xA0;Jexl">
+    <title>Commons&#xA0;Jexl</title>
+    <body>
+        <menu name="Commons&#xA0;Jexl">
+            <item name="Overview"                      href="/index.html" />
+            <item name="API&#xA0;Documentation"        href="/apidocs/index.html"/>
+            <item name="Examples"                      href="http://cvs.apache.org/viewcvs/jakarta-commons/jexl/examples/"/>
+            <item name="Downloads"                     href="/downloads.html"/>
+            <item name="Wiki"                          href="http://wiki.apache.org/jakarta-commons/Jexl"/>
+        </menu>
+        &common-menus;
+    </body>
 </project>
