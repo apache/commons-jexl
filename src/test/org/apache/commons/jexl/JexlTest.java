@@ -39,7 +39,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.57 2004/08/22 14:52:15 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.58 2004/08/24 02:22:12 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -835,6 +835,18 @@ public class JexlTest extends TestCase
         jc.getVars().put("foo", tester);
         expr.evaluate(jc);
         assertTrue("Short circuit failure: rhs evaluated when lhs TRUE", !tester.getModified());
+    }
+
+    /**
+     * Simple test of '+' as a string concatenation operator
+     * @throws Exception
+     */
+    public void testStringConcatenation() throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("first", "Hello");
+        jc.getVars().put("second", "World");
+        assertExpression(jc, "first + ' ' + second", "Hello World");
     }
 
     /**

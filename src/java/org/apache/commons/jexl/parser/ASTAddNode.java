@@ -23,7 +23,7 @@ import org.apache.commons.jexl.util.Coercion;
  *  Addition : either integer addition or string concatenation
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTAddNode.java,v 1.6 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id: ASTAddNode.java,v 1.7 2004/08/24 02:22:12 dion Exp $
  */
 public class ASTAddNode extends SimpleNode
 {
@@ -80,10 +80,20 @@ public class ASTAddNode extends SimpleNode
              * null a 0
              */
 
-            Double l = left == null ? new Double(0) : Coercion.coerceDouble(left);
-            Double r = right == null? new Double(0) : Coercion.coerceDouble(right);
+            try
+            {
+                Double l = left == null ? new Double(0) : Coercion.coerceDouble(left);
+                Double r = right == null? new Double(0) : Coercion.coerceDouble(right);
 
-            return new Double(l.doubleValue() + r.doubleValue());
+                return new Double(l.doubleValue() + r.doubleValue());
+            }
+            catch( java.lang.NumberFormatException nfe )
+            {
+                /*
+                 * Well, use strings!
+                 */
+                return left.toString().concat(right.toString());
+            }
         }
 
         /*
