@@ -40,7 +40,7 @@
     <p>
       It must be noted that JEXL is not a compatibile implementation of EL as defined
       in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152). For a compatible implementation of
-      these specifications, see the <a href="http://jakarta.apache.org/commons/el">
+      these specifications, see the <a href="http://jakarta.apache.org/commons/el/">
       Commons EL</a> project.
     </p>
 
