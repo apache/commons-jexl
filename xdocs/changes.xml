@@ -24,7 +24,7 @@
     <author email="dion@apache.org">dIon Gillard</author>
   </properties>
   <body>
-    <release version="1.0" date="in CVS">
+    <release version="1.0" date="2004-09-07">
       <action dev="dion" type="fix">Support ant-style properties</action>
     </release>
     <release version="1.0-RC1" date="2004-08-26">
