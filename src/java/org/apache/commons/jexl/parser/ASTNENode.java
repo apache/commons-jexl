@@ -22,7 +22,7 @@ import org.apache.commons.jexl.util.Coercion;
  *  != or ne
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTNENode.java,v 1.6 2004/08/21 10:01:18 dion Exp $
+ *  @version $Id: ASTNENode.java,v 1.7 2004/08/22 01:53:27 dion Exp $
  */
 public class ASTNENode extends SimpleNode
 {
@@ -66,30 +66,30 @@ public class ASTNENode extends SimpleNode
         }
         else if (left.getClass().equals(right.getClass()))
         {
-            return new Boolean(!left.equals(right));
+            return (!left.equals(right)) ? Boolean.TRUE : Boolean.FALSE;
         }
         else if(left instanceof Float || left instanceof Double ||
                 right instanceof Float || right instanceof Double)
         {
-            return new Boolean(
-                !Coercion.coerceDouble(left).equals(Coercion.coerceDouble(right)));
+            return (!Coercion.coerceDouble(left).equals(Coercion.coerceDouble(right)))
+                ? Boolean.TRUE : Boolean.FALSE;
         }
         else if ( left instanceof Number || right instanceof Number ||
                    left instanceof Character || right instanceof Character)
         {
-            return new Boolean(
-                    !Coercion.coerceLong(left).equals(Coercion.coerceLong(right)));
+            return (!Coercion.coerceLong(left).equals(Coercion.coerceLong(right)))
+                ? Boolean.TRUE : Boolean.FALSE;
         }
         else if (left instanceof Boolean || right instanceof Boolean)
         {
-            return new Boolean(
-                    !Coercion.coerceBoolean(left).equals(Coercion.coerceBoolean(right)));
+            return (!Coercion.coerceBoolean(left).equals(Coercion.coerceBoolean(right)))
+                ? Boolean.TRUE : Boolean.FALSE;
         }
         else if (left instanceof java.lang.String || right instanceof String)
         {
-            return new Boolean(!left.toString().equals(right.toString()));
+            return (!left.toString().equals(right.toString())) ? Boolean.TRUE : Boolean.FALSE;
         }
 
-        return new Boolean(!left.equals(right));
+        return (!left.equals(right)) ? Boolean.TRUE : Boolean.FALSE;
     }
 }
