@@ -53,6 +53,7 @@
   
   <repository>
     <connection>scm:cvs:pserver:anoncvs@cvs.apache.org:/home/cvspublic:jakarta-commons/${pom.artifactId.substring(8)}</connection>
+    <developerConnection>scm:cvs:pserver:${maven.username}@cvs.apache.org:/home/cvs:jakarta-commons/${pom.artifactId.substring(8)}</developerConnection>
     <url>http://cvs.apache.org/viewcvs/jakarta-commons/${pom.artifactId.substring(8)}/</url>
   </repository>
 
