@@ -64,7 +64,7 @@ import java.util.Map;
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @author <a href="mailto:tobrien@apache.org">Tim O'Brien</a>
- *  @version $Id: ASTEmptyFunction.java,v 1.3 2003/10/09 21:28:55 rdonkin Exp $
+ *  @version $Id: ASTEmptyFunction.java,v 1.4 2003/12/30 20:47:53 proyal Exp $
  */
 public class ASTEmptyFunction extends SimpleNode
 {
@@ -89,38 +89,30 @@ public class ASTEmptyFunction extends SimpleNode
     {
         SimpleNode sn = (SimpleNode) jjtGetChild(0);
 
-        if (sn instanceof ASTReference)
-        {
-            String s = ((ASTReference)sn).getRootString();
+        /*
+         * I can't believe this
+         */
 
-            /*
-             * I can't believe this
-             */
+        Object o = sn.value(jc);
 
-            Object o = jc.getVars().get(s);
+        if (o == null)
+            return Boolean.TRUE;
 
-            if (o == null)
-                return Boolean.TRUE;
+        if (o instanceof String && ((String)o).equals(""))
+            return Boolean.TRUE;
 
-            if (o instanceof String && ((String)o).equals(""))
-                return Boolean.TRUE;
+        if (o.getClass().isArray() && ((Object[])o).length == 0)
+            return Boolean.TRUE;
 
-            if (o.getClass().isArray() && ((Object[])o).length == 0)
-                return Boolean.TRUE;
+        if (o instanceof Collection && ((Collection)o).isEmpty())
+            return Boolean.TRUE;
 
-            if (o instanceof Collection && ((Collection)o).isEmpty())
-                return Boolean.TRUE;
+        /*
+         *  Map isn't a collection
+         */
+        if (o instanceof Map && ((Map)o).isEmpty())
+            return Boolean.TRUE;
 
-			/*
-			 *  Map isn't a collection
-			 */
-			if (o instanceof Map && ((Map)o).isEmpty())
-				return Boolean.TRUE;
-
-            return Boolean.FALSE;
-        }
-
-        throw new Exception("programmer error : ASTEmptyFunction : invalid root"
-                    + sn);
+        return Boolean.FALSE;
     }
 }
