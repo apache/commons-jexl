@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.15 2002/08/09 11:46:49 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.16 2002/08/19 22:41:10 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -586,7 +586,78 @@ public class JexlTest extends TestCase
         o = e.evaluate(jc);
 
         assertEquals("o incorrect", Boolean.TRUE, o );
+        
+        e = ExpressionFactory.createExpression("foo.getCheeseList().size() == 3");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.TRUE, o );
+        
+        e = ExpressionFactory.createExpression("foo.cheeseList.size() == 3");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.TRUE, o );
     }
+
+
+    /**
+      *  test some simple conditions
+      */
+    public void testNotConditionsWithDots()
+         throws Exception
+    {
+        Expression e = ExpressionFactory.createExpression("x.a == true");
+        e.addPostResolver(new FlatResolver());
+        JexlContext jc = JexlHelper.createContext();
+
+        Foo foo = new Foo();
+        jc.getVars().put("x.a", Boolean.TRUE );
+        jc.getVars().put("x.b", Boolean.FALSE );
+        Object o = e.evaluate(jc);
+
+        assertTrue("o not instanceof Boolean", o instanceof Boolean);
+        assertEquals("o incorrect", Boolean.TRUE, o );
+        
+        e = ExpressionFactory.createExpression("!x.a");
+        e.addPreResolver(new FlatResolver());
+        o = e.evaluate(jc);
+        
+        assertEquals("o incorrect", Boolean.FALSE, o);
+
+        e = ExpressionFactory.createExpression("!x.b");
+        e.addPreResolver(new FlatResolver());
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.TRUE, o );
+    }
+
+    /**
+      *  test some simple conditions
+      */
+    public void testComparisons()
+         throws Exception
+    {
+        Expression e = ExpressionFactory.createExpression("foo.indexOf('quick') > 0");
+        JexlContext jc = JexlHelper.createContext();
+
+        Foo foo = new Foo();
+        jc.getVars().put("foo", "the quick and lazy fox" );
+        Object o = e.evaluate(jc);
+
+        assertTrue("o not instanceof Boolean", o instanceof Boolean);
+        assertEquals("o incorrect", Boolean.TRUE, o);
+
+        e = ExpressionFactory.createExpression("foo.indexOf('bar') >= 0");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.FALSE, o );
+
+        e = ExpressionFactory.createExpression("foo.indexOf('bar') < 0");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.TRUE, o );
+    }
+
+
 
     /**
       *  test some null conditions
@@ -885,6 +956,15 @@ public class JexlTest extends TestCase
             return 5;
         }
 
+        public List getCheeseList() 
+        {
+            ArrayList answer = new ArrayList();
+            answer.add("cheddar");
+            answer.add("edam");
+            answer.add("brie");
+            return answer;
+        }
+            
         public String[] getArray()
         {
             return GET_METHOD_ARRAY;
