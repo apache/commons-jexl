@@ -57,7 +57,7 @@
  *  Jexl : Java Expression Language
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: Parser.jj,v 1.4 2002/06/07 03:03:51 geirm Exp $
+ *  @version $Id: Parser.jj,v 1.5 2002/06/07 03:35:30 geirm Exp $
  */
 
 options
@@ -1716,7 +1716,13 @@ void Reference() : {/*@bgen(jjtree) Reference */
   try {
 /*@egen*/
   (LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() | Identifier())
-  (LOOKAHEAD(2) "." (LOOKAHEAD(3) Method() | Identifier() | IntegerLiteral() ))*/*@bgen(jjtree)*/
+  (LOOKAHEAD(2) "."
+    (
+      LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() |
+      (LOOKAHEAD(3) Method() | Identifier() |  IntegerLiteral() )
+
+    )
+  )*/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
