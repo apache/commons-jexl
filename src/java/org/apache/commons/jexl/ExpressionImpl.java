@@ -26,13 +26,13 @@ import org.apache.commons.jexl.parser.SimpleNode;
  * and this is the default implementation of the {@link Expression} interface.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ExpressionImpl.java,v 1.9 2004/08/19 18:16:17 dion Exp $
+ *  @version $Id: ExpressionImpl.java,v 1.10 2004/08/23 13:37:19 dion Exp $
  */
 class ExpressionImpl implements Expression
 {
 
-    List preResolvers;
-    List postResolvers;
+    protected List preResolvers;
+    protected List postResolvers;
 
     /**
      *  Original expression - this is just a 'snippet', not a valid
