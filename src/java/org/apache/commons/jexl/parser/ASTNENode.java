@@ -22,7 +22,7 @@ import org.apache.commons.jexl.util.Coercion;
  *  != or ne
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTNENode.java,v 1.5 2004/08/20 12:04:39 dion Exp $
+ *  @version $Id: ASTNENode.java,v 1.6 2004/08/21 10:01:18 dion Exp $
  */
 public class ASTNENode extends SimpleNode
 {
@@ -66,30 +66,30 @@ public class ASTNENode extends SimpleNode
         }
         else if (left.getClass().equals(right.getClass()))
         {
-            return Boolean.valueOf(!left.equals(right));
+            return new Boolean(!left.equals(right));
         }
         else if(left instanceof Float || left instanceof Double ||
                 right instanceof Float || right instanceof Double)
         {
-            return Boolean.valueOf(
+            return new Boolean(
                 !Coercion.coerceDouble(left).equals(Coercion.coerceDouble(right)));
         }
         else if ( left instanceof Number || right instanceof Number ||
                    left instanceof Character || right instanceof Character)
         {
-            return Boolean.valueOf(
+            return new Boolean(
                     !Coercion.coerceLong(left).equals(Coercion.coerceLong(right)));
         }
         else if (left instanceof Boolean || right instanceof Boolean)
         {
-            return Boolean.valueOf(
+            return new Boolean(
                     !Coercion.coerceBoolean(left).equals(Coercion.coerceBoolean(right)));
         }
         else if (left instanceof java.lang.String || right instanceof String)
         {
-            return Boolean.valueOf(!left.toString().equals(right.toString()));
+            return new Boolean(!left.toString().equals(right.toString()));
         }
 
-        return Boolean.valueOf(!left.equals(right));
+        return new Boolean(!left.equals(right));
     }
 }
