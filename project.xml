@@ -65,6 +65,12 @@
       <email>jstrachan@apache.org</email>
       <organization>SpiritSoft, Inc.</organization>
     </developer>
+    <developer>
+      <name>Peter Royal</name>
+      <id>proyal</id>
+      <email>proyal@apache.org</email>
+      <organization>Pace Systems Group, Inc.</organization>
+    </developer>
   </developers>
 
   <dependencies>
