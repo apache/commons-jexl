@@ -23,9 +23,7 @@ package org.apache.commons.jexl.util;
 public class Coercion
 {
 
-    public static Boolean coerceBoolean(Object val)
-        throws Exception
-    {
+    public static Boolean coerceBoolean(Object val) {
         if (val == null)
         {
             return Boolean.FALSE;
