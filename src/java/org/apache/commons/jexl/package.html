@@ -1,0 +1,64 @@
+<html>
+ <head>
+  <title>Package Documentation for org.apache.commons.jexl Package</title>
+ </head>
+ <body bgcolor="white">
+  Provides a framework for evaluating JEXL expressions.
+  <br><br>
+  <p>
+   <ul>
+    <li><a href="#intro">Introduction</a></li>
+    <li><a href="#example">Brief Example</a></li>
+   </ul>
+  </p>
+  <h2><a name="intro">Introduction</a></h2>
+  <p>
+   Java Expression Language (JEXL) is an expression language engine which can be 
+   embedded in applications and frameworks.  JEXL is inspired by Jakarta Velocity 
+   and the Expression Language defined in the JavaServer Pages Standard Tag Library 
+   version 1.1 (JSTL) and JavaServer Pages version 2.0 (JSP).  
+  </p>
+  <p>
+   JEXL attempts to bring some of the lessons learned by the Velocity
+   community about expression languages in templating to a wider audience.
+   <a href="http://jakarta.apache.org/commons/jelly">Commons Jelly needed</a>
+   Velocity-ish method access, it just had to have it.
+  </p>
+  <p>
+   It must be noted that JEXL is not a compatibile implementation of EL as defined
+   in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152). For a compatible implementation of
+   these specifications, see the <a href="http://jakarta.apache.org/commons/el">
+   Commons EL</a> project.
+  </p>
+
+  <h2><a name="example">A Brief Example</a></h2>
+  
+  <p>
+   When evaluating expressions, JEXL merges an 
+   <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/Expression.html">Expression</a>
+   with a 
+   <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">JexlContext</a>.
+   An Expression is created using 
+   <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/ExpressionFactory.html#createExpression(java.lang.String)">ExpressionFactory.createExpression()</a>, 
+   passing a String containing valid JEXL syntax.  A JexlContext is created using 
+   <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlHelper.html#createContext()">JexlHelper.createContext()</a>,
+   and variables are put into a map exposed through the 
+   <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlContext.html#getVars()">getVars()</a>
+   method on JexlContext.  The following example, takes a variable named foo, and 
+   invokes the bar() method on the property innerFoo:
+  </p>
+  <pre>
+    // Create an expression object
+    String jexlExp = "foo.innerFoo.bar()";
+    Expression e = ExpressionFactory.createExpression( jexlExp );
+
+    // Create a context and add data
+    JexlContext jc = JexlHelper.createContext();
+    jc.getVars().put("foo", new Foo() );
+
+    // Now evaluate the expression, getting the result
+    Object o = e.evaluate(jc);</pre>
+  </pre>
+  
+</body>
+</html>
