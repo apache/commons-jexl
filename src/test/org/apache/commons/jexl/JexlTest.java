@@ -35,7 +35,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.50 2004/08/20 07:59:47 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.51 2004/08/20 08:01:16 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -468,8 +468,6 @@ public class JexlTest extends TestCase
         assertExpression(jc, "foo.indexOf('bar') < 0", Boolean.TRUE);
     }
 
-
-
     /**
       *  test some null conditions
       */
@@ -478,12 +476,6 @@ public class JexlTest extends TestCase
     {
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("bar", new Integer(2) );
-
-        Expression e = ExpressionFactory.createExpression("empty foo");
-        Object o = e.evaluate(jc);
-
-        assertTrue("o not instanceof Boolean", o instanceof Boolean);
-        assertEquals("o incorrect", Boolean.TRUE, o);
 
         assertExpression(jc, "empty foo", Boolean.TRUE);
         assertExpression(jc, "bar == null", Boolean.FALSE);
