@@ -57,6 +57,15 @@
               <li>Valid: <code>var1</code>,<code>_a99</code>,<code>$1</code></li>
               <li>Invalid: <code>9v</code>,<code>!a99</code>,<code>1$</code></li>
             </ul>
+            <p>
+              JEXL also supports <code>ant-style</code> variables, e.g. <source>my.dotted.var</source>
+              is a valid variable name.
+            </p>
+            <p>
+              <strong>NOTE:</strong> JEXL does not support variables with hyphens in them, e.g.
+              <source>commons-logging</source> is not a valid variable, but instead is treated as a
+              subtraction of the variable <code>logging</code> from the variable <code>commons</code>
+            </p>
           </td>
         </tr>
         <tr>
