@@ -30,7 +30,7 @@ public class ASTMethod extends SimpleNode
      *  returns the value of itself applied to the object.
      *   We assume that an identifier can be gotten via a get(String)
      */
-    public Object execute(Object obj, JexlContext jc) 
+    public Object execute(Object obj, JexlContext jc)
         throws Exception
     {
         String methodName = ((ASTIdentifier)jjtGetChild(0)).val;
@@ -49,13 +49,13 @@ public class ASTMethod extends SimpleNode
             {
                 params[i] = ( (SimpleNode) jjtGetChild(i+1)).value(jc);
             }
-    
+
             VelMethod vm = Introspector.getUberspect().getMethod(obj, methodName,
                 params, new Info("",1,1));
-    
+
             if (vm == null)
                 return null;
-    
+
             return vm.invoke(obj, params);
         }
         catch(InvocationTargetException e)
@@ -69,11 +69,5 @@ public class ASTMethod extends SimpleNode
 
             throw e;
         }
-        catch(Exception e)
-        {
-            System.out.println("ASTMethod : "+ e);
-            e.printStackTrace();;
-            throw e;
-         }
     }
 }
