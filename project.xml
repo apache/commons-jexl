@@ -64,6 +64,12 @@
   </developers>
 
   <dependencies>
+   <dependency>
+      <name>commons-logging</name>
+      <type>required</type>
+      <version>1.0</version>
+      <jar>commons-logging-1.0.jar</jar>
+    </dependency>
     <dependency>
       <name>velocity</name>
       <type>required</type>
