@@ -1,38 +1,20 @@
-# junit.jar - JUnit 3.2+ Classpath
-junit.jar=/java/junit/junit.jar
-
-# jakarta-commons-collections.jar
-collections.jar=../../jakarta-commons/collections/dist/commons-collections.jar
+# junit.jar 
+#   http://www.junit.org/
+junit.jar=lib/junit-3.7.jar
 
 # jakarta-commons-logging.jar
-logging.jar=../../jakarta-commons/logging/dist/commons-logging.jar
+#  http://jakarta.apache.org/commons/
+logging.jar=lib/commons-logging.jar
 
-# jakarta-commons-httpclient.jar
-httpclient.jar=../../jakarta-commons/httpclient/dist/commons-httpclient.jar
+# Jakarta Velocity
+#   http://jakarta.apache.org/velocity/
+#   must be >= 1.4-dev
+velocity.jar=lib/velocity-dep-1.4-dev.jar
 
-# you can change this property to point at a local copy of the java 2 platform api
-jdk-doc-url=http://java.sun.com/products/jdk/1.3/docs/api
+# Jakarta Velocity DVSL
+#  http://jakarta.apache.org/velocity/dvsl/
+dvsl.jar=lib/velocity-dvsl-0.43.jar
 
-# for the XML tags the following is required
-#
-# dom4j.jar - go to http://dom4j.org to download
-dom4j.jar=/java/dom4j/dom4j.jar
-
-# BSF: the Bean Scripting Framework from
-# http://oss.software.ibm.com/developerworks/projects/bsf
-bsf.jar=/java/bsf/bsf.jar
-
-# Rhino is the default language for BSF
-# http://www.mozilla.org/rhino
-rhino.jar=/java/rhino/js.jar
-
-# for the beanshell expression language the following is required
-#
-# beanshell.jar - go to http://www.beanshell.org
-beanshell.jar=/java/beanshell/beanshell.jar
-
-
-# for pnuts scripts the following jar is required
-# http://javacenter.sun.co.jp/pnuts/index.html
-pnuts.jar=/java/pnuts/pnuts.jar
-
+# dom4j
+#  http://www.dom4j.org/
+dom4j.jar = lib/dom4j.jar
