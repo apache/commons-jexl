@@ -35,7 +35,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.51 2004/08/20 08:01:16 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.52 2004/08/20 08:04:37 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -495,17 +495,12 @@ public class JexlTest extends TestCase
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("bar", "" );
 
-        Expression e = ExpressionFactory.createExpression("foo == ''");
-        Object o = e.evaluate(jc);
-
-        assertTrue("o not instanceof Boolean", o instanceof Boolean);
-        assertEquals("o incorrect", Boolean.FALSE, o);
-
-
+        assertExpression(jc, "foo == ''", Boolean.FALSE);
         assertExpression(jc, "bar == ''", Boolean.TRUE);
         assertExpression(jc, "barnotexist == ''", Boolean.FALSE);
         assertExpression(jc, "empty bar", Boolean.TRUE);
         assertExpression(jc, "bar.length() == 0", Boolean.TRUE);
+        assertExpression(jc, "size(bar) == 0", Boolean.TRUE);
     }
 
     /**
@@ -536,7 +531,6 @@ public class JexlTest extends TestCase
     public void testDoubleArrays()
          throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("foo[0][1]");
         JexlContext jc = JexlHelper.createContext();
 
         Object[][] foo = new Object[2][2];
@@ -544,9 +538,8 @@ public class JexlTest extends TestCase
         foo[0][1] = "two";
 
         jc.getVars().put("foo", foo );
-        Object o = e.evaluate(jc);
 
-        assertEquals("o incorrect", "two", o);
+        assertExpression(jc, "foo[0][1]", "two");
     }
 
     /**
