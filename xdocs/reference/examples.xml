@@ -128,7 +128,7 @@ aString.substring(6)
         </p>
         <p>
           Often the values you want to pass to a method are other variables or expressions.
-          If you have a number in the context named <code>i</code>, you could use it
+          If you have a number in the context, named <code>i</code>, you could use it
           in a method call:
           <source>aString.substring(i)</source>
         </p>
