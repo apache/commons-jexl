@@ -1,7 +1,7 @@
 /*
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
+ * Copyright (c) 2002-2003 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -63,7 +63,8 @@ import java.lang.reflect.Array;
  *  generalized size() function for all classes we can think of
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTSizeFunction.java,v 1.1 2002/04/26 04:23:14 geirm Exp $
+ *  @author <a href="hw@kremvax.net">Mark H. Wilkinson</a>
+ *  @version $Id: ASTSizeFunction.java,v 1.2 2003/06/25 10:51:44 geirm Exp $
  */
 public class ASTSizeFunction extends SimpleNode
 {
@@ -96,21 +97,28 @@ public class ASTSizeFunction extends SimpleNode
         {
             throw new Exception("size() : null arg");
         }
-        else if (val instanceof List)
+        
+        return new Integer(ASTSizeFunction.sizeOf(val));
+    }
+    
+    public static int sizeOf(Object val)
+        throws Exception
+    {
+        if (val instanceof List)
         {
-            return new Integer(((List)val).size());
+            return ((List)val).size();
         }
         else if (val.getClass().isArray())
         {
-            return new Integer(Array.getLength(val));
+            return Array.getLength(val);
         }
         else if (val instanceof Map)
         {
-            return new Integer(((Map)val).size());
+            return ((Map)val).size();
         }
         else if (val instanceof String)
         {
-            return new Integer(((String)val).length());
+            return ((String)val).length();
         }
 
         throw new Exception("size() : unknown type : " + val.getClass());
