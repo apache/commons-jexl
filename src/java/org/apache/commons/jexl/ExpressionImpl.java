@@ -59,6 +59,8 @@ import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.ASTReference;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  Implelmentation of an Expression.  Created by the ExpressionFactory.
@@ -67,10 +69,13 @@ import java.io.StringReader;
  *  a reference or expression that we can get the value of.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ExpressionImpl.java,v 1.1 2002/04/26 04:23:14 geirm Exp $
+ *  @version $Id: ExpressionImpl.java,v 1.2 2002/06/13 16:09:53 geirm Exp $
  */
 class ExpressionImpl implements Expression
 {
+    List preResolvers = new ArrayList();
+    List postResolvers = new ArrayList();
+
     /**
      *  Original expression - this is just a 'snippet', not a valid
      *  statement (i.e.  foo.bar() vs foo.bar();
@@ -100,7 +105,67 @@ class ExpressionImpl implements Expression
     public Object evaluate(JexlContext context)
         throws Exception
     {
-        return node.value(context);
+        Object val = null;
+
+        /*
+         * if we have pre resolvers, give them a wack
+         */
+        if (preResolvers.size() != 0)
+        {
+            val = tryResolver(preResolvers, context);
+
+            if (val != JexlExprResolver.NO_VALUE)
+            {
+                return val;
+            }
+        }
+
+        val = node.value(context);
+
+        /*
+         * if null, call post resolvers
+         */
+        if (val == null && postResolvers.size() != 0)
+        {
+            val = tryResolver(postResolvers, context);
+
+            if (val != JexlExprResolver.NO_VALUE)
+            {
+                return val;
+            }
+        }
+
+        return val;
+    }
+
+    /**
+     *  Tries the resolvers in the given resolverlist against the context
+     *
+     *  @param resolverList list of JexlExprResolvers
+     *  @param context JexlContext to use for evauluation
+     *  @return value (including null) or JexlExprResolver.NO_VALUE
+     */
+    protected Object tryResolver(List resolverList, JexlContext context)
+    {
+        Object val = JexlExprResolver.NO_VALUE;
+        String expr = getExpression();
+
+        for (int i = 0; i < resolverList.size(); i++)
+        {
+            JexlExprResolver jer = (JexlExprResolver) resolverList.get(i);
+
+            val = jer.evaluate(context, expr);
+
+            /*
+            * as long as it's not NO_VALUE, return it
+            */
+            if (val != JexlExprResolver.NO_VALUE)
+            {
+               return val;
+            }
+        }
+
+        return val;
     }
 
     /**
@@ -110,4 +175,21 @@ class ExpressionImpl implements Expression
     {
         return expression;
     }
+
+    public void addPreResolver(JexlExprResolver resolver)
+    {
+        preResolvers.add(resolver);
+    }
+
+    /**
+     *  allows addition of a resolver to allow custom interdiction of
+     *  expression evaluation
+     *
+     *  @param resolver resolver to be called if Jexl expression evaluated to null
+     */
+    public void addPostResolver(JexlExprResolver resolver)
+    {
+        preResolvers.add(resolver);
+    }
+
 }
