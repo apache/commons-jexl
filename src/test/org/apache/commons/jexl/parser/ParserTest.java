@@ -39,6 +39,19 @@ public class ParserTest extends TestCase
          sn.interpret(jc);
      }
 
+    public void testParse2()
+        throws Exception
+    {
+        Parser parser = new Parser(new StringReader(";"));
+
+        JexlContext jc = JexlHelper.createContext();
+
+        SimpleNode sn = parser.parse(new StringReader("foo = \"bar\";"));
+        sn.interpret(jc);
+        sn = parser.parse(new StringReader("foo = 'bar';"));
+        sn.interpret(jc);
+    }
+
     public static void main(String[] args)
         throws Exception
     {

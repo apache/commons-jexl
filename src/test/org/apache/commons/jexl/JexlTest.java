@@ -71,12 +71,18 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.9 2002/05/25 18:40:44 geirm Exp $
+ *  @version $Id: JexlTest.java,v 1.10 2002/06/07 03:37:07 geirm Exp $
  */
 public class JexlTest extends TestCase
 {
     protected static final String METHOD_STRING = "Method string";
     protected static final String GET_METHOD_STRING = "GetMethod string";
+
+    protected static final String[] GET_METHOD_ARRAY =
+        new String[] { "One", "Two", "Three" };
+
+    protected static final String[][] GET_METHOD_ARRAY2 =
+        new String[][] { {"One", "Two", "Three"},{"Four", "Five", "Six"} };
 
     public static Test suite()
     {
@@ -586,6 +592,27 @@ public class JexlTest extends TestCase
     }
 
     /**
+     *  Tests string literals
+     */
+    public void testStringLiterals()
+        throws Exception
+    {
+        Expression e = ExpressionFactory.createExpression("foo == \"bar\"");
+        JexlContext jc = JexlHelper.createContext();
+
+        jc.getVars().put("foo", "bar" );
+
+        Object o = e.evaluate(jc);
+
+        assertTrue("o incorrect", Boolean.TRUE.equals(o));
+
+        e = ExpressionFactory.createExpression("foo == 'bar'");
+        o = e.evaluate(jc);
+
+        assertTrue("o incorrect", Boolean.TRUE.equals(o));
+    }
+
+    /**
       *  test the use of an int based property
       */
     public void testIntProperty()
@@ -601,6 +628,46 @@ public class JexlTest extends TestCase
 
         assertEquals("o incorrect", new Integer(5), o);
     }
+
+    public void testArrayProperty()
+        throws Exception
+    {
+        Expression bracketForm =
+            ExpressionFactory.createExpression("foo.array[1]");
+
+        Expression dotForm =
+            ExpressionFactory.createExpression("foo.array.1");
+
+        JexlContext jc = JexlHelper.createContext();
+
+        Foo foo = new Foo();
+
+        jc.getVars().put("foo", foo );
+
+        Object o1 = bracketForm.evaluate(jc);
+        assertEquals("bracket form failed", GET_METHOD_ARRAY[1], o1);
+
+        Object o2 = dotForm.evaluate(jc);
+        assertEquals("dot form failed", GET_METHOD_ARRAY[1], o2);
+
+
+        bracketForm =
+            ExpressionFactory.createExpression("foo.array2[1][1]");
+
+//        dotForm =
+//            ExpressionFactory.createExpression("foo.array2.1.1");
+
+        jc = JexlHelper.createContext();
+
+        jc.getVars().put("foo", foo );
+
+        o1 = bracketForm.evaluate(jc);
+        assertEquals("bracket form failed", GET_METHOD_ARRAY2[1][1], o1);
+
+//        o2 = dotForm.evaluate(jc);
+//        assertEquals("dot form failed", GET_METHOD_ARRAY2[1][1], o2);
+    }
+
 
     public class Foo
     {
@@ -631,6 +698,16 @@ public class JexlTest extends TestCase
         
         public int getCount() {
             return 5;
+        }
+
+        public String[] getArray()
+        {
+            return GET_METHOD_ARRAY;
+        }
+
+        public String[][] getArray2()
+        {
+            return GET_METHOD_ARRAY2;
         }
     }
 
