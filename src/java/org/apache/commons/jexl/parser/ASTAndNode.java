@@ -22,7 +22,7 @@ import org.apache.commons.jexl.util.Coercion;
  *  && and 'and'
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTAndNode.java,v 1.3 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id: ASTAndNode.java,v 1.4 2004/08/17 13:20:47 dion Exp $
  */
 public class ASTAndNode extends SimpleNode
 {
@@ -47,14 +47,15 @@ public class ASTAndNode extends SimpleNode
         throws Exception
     {
         Object left = ((SimpleNode) jjtGetChild(0)).value(jc);
-        Object right = ((SimpleNode) jjtGetChild(1)).value(jc);
+        boolean leftValue = Coercion.coerceBoolean(left).booleanValue(); 
 
         /*
          * coercion rules
          */
-
-        return (Coercion.coerceBoolean(left).booleanValue()
-                && Coercion.coerceBoolean(right).booleanValue()) ?
+        return (leftValue
+        		&& 
+				Coercion.coerceBoolean(
+						((SimpleNode) jjtGetChild(1)).value(jc)).booleanValue()) ?
             Boolean.TRUE : Boolean.FALSE;
     }
 }
