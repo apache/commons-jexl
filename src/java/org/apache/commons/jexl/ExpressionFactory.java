@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  * expression not a reference, an exception is thrown from createException().
  * </p>
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Id: ExpressionFactory.java,v 1.6 2004/08/19 18:16:17 dion Exp $
+ * @version $Id: ExpressionFactory.java,v 1.7 2004/08/23 13:50:00 dion Exp $
  */
 public class ExpressionFactory
 {
@@ -144,7 +144,7 @@ public class ExpressionFactory
         String expr = expression.trim();
         if (!expr.endsWith(";"))
         {
-            expr = expr + ";";
+            expr += ";";
         }
         return expr;
     }

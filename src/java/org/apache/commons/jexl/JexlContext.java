@@ -21,7 +21,7 @@ import java.util.Map;
  * Holds a Map of variables which are referenced in a JEXL expression.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlContext.java,v 1.5 2004/08/19 18:16:17 dion Exp $
+ *  @version $Id: JexlContext.java,v 1.6 2004/08/23 13:53:34 dion Exp $
  */
 public interface JexlContext
 {
@@ -33,7 +33,7 @@ public interface JexlContext
      * 
      * @param vars Contents of vars will be replaced with the content of this Map
      */
-    public void setVars(Map vars);
+    void setVars(Map vars);
     
     /**
      * Retrives the Map of variables associated with this JexlContext.  The
@@ -42,5 +42,5 @@ public interface JexlContext
      * 
      * @return A reference to the variable Map associated with this JexlContext.
      */
-    public Map getVars();
+    Map getVars();
 }

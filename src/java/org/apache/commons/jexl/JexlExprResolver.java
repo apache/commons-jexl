@@ -6,11 +6,11 @@ package org.apache.commons.jexl;
  *
  *  @todo This needs to be explained in detail.  Why do this?
  *  @author <a href="mailto:geirm@adeptra.com">Geir Magnusson Jr.</a>
- *  @version $Id: JexlExprResolver.java,v 1.2 2004/06/12 23:53:17 tobrien Exp $
+ *  @version $Id: JexlExprResolver.java,v 1.3 2004/08/23 13:53:34 dion Exp $
  */
 public interface JexlExprResolver
 {
-    public static final Object NO_VALUE = new Object();
+    Object NO_VALUE = new Object();
 
     /**
      *  evaluates an expression against the context
