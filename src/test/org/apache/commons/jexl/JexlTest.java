@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.16 2002/08/19 22:41:10 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.17 2002/10/10 10:40:58 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -445,6 +445,19 @@ public class JexlTest extends TestCase
         assertTrue("3 : o incorrect", o.equals(new Integer(5)));
 
         e = ExpressionFactory.createExpression("size(list)");
+        o = e.evaluate(jc);
+        assertTrue("4 : o incorrect", o.equals(new Integer(5)));
+        
+        
+        e = ExpressionFactory.createExpression("list.size()");
+        o = e.evaluate(jc);
+        assertTrue("4 : o incorrect", o.equals(new Integer(5)));
+
+        e = ExpressionFactory.createExpression("map.size()");
+        o = e.evaluate(jc);
+        assertTrue("4 : o incorrect", o.equals(new Integer(5)));
+        
+        e = ExpressionFactory.createExpression("array.length");
         o = e.evaluate(jc);
         assertTrue("4 : o incorrect", o.equals(new Integer(5)));
     }
