@@ -25,14 +25,14 @@
       <p>
         This reference is split up into the following sections:
         <ol>
-          <li><a href="#Syntax">Syntax</a></li>
+          <li><a href="#Language Elements">Language Elements</a></li>
           <li><a href="#Literals">Literals</a></li>
           <li><a href="#Functions">Functions</a></li>
           <li><a href="#Operators">Operators</a></li>
         </ol>
       </p>
     </section>
-    <section name="Syntax">
+    <section name="Language Elements">
       <table>
         <tr><th>Item</th><th>Description</th></tr>
         <tr>
