@@ -23,12 +23,26 @@
   <body>
     <section name="Overview">
       <p>
+        In this reference you will find the following topics to help with your use of JEXL.
         <ul>
           <li><a href="#Evaluating Expressions">Evaluating Expressions</a></li>
           <li><a href="#Custom Contexts">Custom Contexts</a></li>
           <li><a href="#Custom Resolvers">Custom Resolvers</a></li>
           <li><a href="#Example Expressions">Example Expressions</a></li>
         </ul>
+      </p>
+      <p>
+        You can find two sample programs in JEXL's CVS repository:
+        <ul>
+          <li><a href="http://cvs.apache.org/viewcvs.cgi/jakarta-commons/jexl/examples/ArrayExample.java?view=markup">Using arrays</a></li>
+          <li><a href="http://cvs.apache.org/viewcvs.cgi/jakarta-commons/jexl/examples/MethodPropertyExample.java?view=markup">Accessing Properties and invoking methods</a></li>
+        </ul>
+      </p>
+      <p>
+        As well, <a href="http://cvs.apache.org/viewcvs.cgi/jakarta-commons/jexl/src/test/org/apache/commons/jexl/JexlTest.java?view=markup">JEXL's Unit Tests</a>
+        provide handy examples of expressions. The test code also contains a
+        <a href="http://cvs.apache.org/viewcvs.cgi/jakarta-commons/jexl/src/test/org/apache/commons/jexl/Jexl.java?view=markup">simple class</a>
+        that evaluates its command line arguments as JEXL expressions when run.
       </p>
     </section>
     <section name="Evaluating Expressions">
