@@ -28,6 +28,7 @@ public interface ParserVisitor
   public Object visit(ASTMulNode node, Object data);
   public Object visit(ASTDivNode node, Object data);
   public Object visit(ASTModNode node, Object data);
+  public Object visit(ASTUnaryMinusNode node, Object data);
   public Object visit(ASTBitwiseComplNode node, Object data);
   public Object visit(ASTNotNode node, Object data);
   public Object visit(ASTNullLiteral node, Object data);
