@@ -33,7 +33,7 @@ import java.lang.reflect.Array;
  *    $foo[2]
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTArrayAccess.java,v 1.7 2004/08/22 07:42:35 dion Exp $
+ *  @version $Id$
  */
 public class ASTArrayAccess extends SimpleNode
 {

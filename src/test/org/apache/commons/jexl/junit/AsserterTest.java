@@ -27,7 +27,7 @@ import org.apache.commons.jexl.Foo;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: AsserterTest.java,v 1.3 2004/02/28 13:45:22 yoavs Exp $
+ *  @version $Id$
  */
 public class AsserterTest extends TestCase {
     

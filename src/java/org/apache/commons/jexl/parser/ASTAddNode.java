@@ -23,7 +23,7 @@ import org.apache.commons.jexl.util.Coercion;
  *  Addition : either integer addition or string concatenation
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTAddNode.java,v 1.7 2004/08/24 02:22:12 dion Exp $
+ *  @version $Id$
  */
 public class ASTAddNode extends SimpleNode
 {

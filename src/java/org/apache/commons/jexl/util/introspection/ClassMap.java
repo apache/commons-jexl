@@ -32,7 +32,7 @@ import java.util.Map;
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
  * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @version $Id: ClassMap.java,v 1.5 2004/08/19 17:15:59 dion Exp $
+ * @version $Id$
  */
 public class ClassMap
 {

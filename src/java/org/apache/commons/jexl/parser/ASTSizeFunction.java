@@ -30,7 +30,7 @@ import java.lang.reflect.Array;
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @author <a href="hw@kremvax.net">Mark H. Wilkinson</a>
- *  @version $Id: ASTSizeFunction.java,v 1.6 2004/08/15 16:01:12 dion Exp $
+ *  @version $Id$
  */
 public class ASTSizeFunction extends SimpleNode
 {

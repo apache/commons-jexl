@@ -20,7 +20,7 @@ import org.apache.commons.jexl.JexlContext;
 /**
  *  AST node for expression
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTExpression.java,v 1.3 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id$
  */
 public class ASTExpression extends SimpleNode
 {

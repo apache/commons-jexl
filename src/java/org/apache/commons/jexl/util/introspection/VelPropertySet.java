@@ -24,7 +24,7 @@ package org.apache.commons.jexl.util.introspection;
  *      #set($foo.bar = "hello")
  *
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @version $Id: VelPropertySet.java,v 1.3 2004/02/28 13:45:22 yoavs Exp $
+ * @version $Id$
  */
 public interface VelPropertySet
 {

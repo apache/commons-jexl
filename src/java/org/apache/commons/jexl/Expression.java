@@ -30,7 +30,7 @@ package org.apache.commons.jexl;
  * </p>
  * 
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Id: Expression.java,v 1.7 2004/08/23 13:53:34 dion Exp $
+ * @version $Id$
  */
 public interface Expression
 {

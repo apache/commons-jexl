@@ -24,7 +24,7 @@ import org.apache.commons.jexl.JexlContext;
  *     $foo  or $foo.bar (both parts are identifiers...)
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTIdentifier.java,v 1.6 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id$
  */
 public class ASTIdentifier extends SimpleNode
 {

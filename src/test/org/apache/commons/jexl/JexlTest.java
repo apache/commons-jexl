@@ -39,7 +39,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.60 2004/09/01 00:35:38 dion Exp $
+ *  @version $Id$
  */
 public class JexlTest extends TestCase
 {

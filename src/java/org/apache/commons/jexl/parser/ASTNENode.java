@@ -22,7 +22,7 @@ import org.apache.commons.jexl.util.Coercion;
  *  != or ne
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTNENode.java,v 1.7 2004/08/22 01:53:27 dion Exp $
+ *  @version $Id$
  */
 public class ASTNENode extends SimpleNode
 {

@@ -24,7 +24,7 @@ import java.util.Iterator;
  *  behavior in Velocity to be customized.
  *
  * @author <a href="mailto:geirm@apache.org">Geir Magusson Jr.</a>
- * @version $Id: Uberspect.java,v 1.4 2004/02/28 13:45:21 yoavs Exp $
+ * @version $Id$
  */
 public interface Uberspect
 {

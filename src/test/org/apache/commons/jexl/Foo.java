@@ -22,7 +22,7 @@ import java.util.List;
  * A simple bean used for testing purposes
  * 
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Revision: 1.6 $
+ * @version $Revision$
  */
 public class Foo {
     

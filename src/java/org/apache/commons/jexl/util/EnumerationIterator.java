@@ -24,7 +24,7 @@ import java.util.Enumeration;
  * An Iterator wrapper for an Enumeration.
  *
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @version $Id: EnumerationIterator.java,v 1.3 2004/02/28 13:45:21 yoavs Exp $
+ * @version $Id$
  */
 public class EnumerationIterator implements Iterator
 {
