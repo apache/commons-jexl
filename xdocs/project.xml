@@ -8,12 +8,12 @@
     <body>
 
     <menu name="Home">
-        <item name="Jakarta Commons"       href="/index.html" />
+        <item name="Jakarta Commons"       href="http://jakarta.apache.org/commons/index.html" />
     </menu>
 
     <menu name="About Us">
-        <item name="Contributors"           href="/contributors.html"/>
-        <item name="License"                href="/license.html"/>
+        <item name="Contributors"           href="http://jakarta.apache.org/commons/contributors.html"/>
+        <item name="License"                href="http://jakarta.apache.org/commons/license.html"/>
     </menu>
 
     <menu name="Download">
@@ -22,8 +22,8 @@
     </menu>
 
     <menu name="Information">
-        <item name="Overview"               href="/index.html"/>
-        <item name="Components"             href="/components.html"/>
+        <item name="Overview"               href="http://jakarta.apache.org/commons/index.html"/>
+        <item name="Components"             href="http://jakarta.apache.org/commons/components.html"/>
         <!-- Yet to come?
         <item name="Guidelines"             href="/guidelines.html"/>
         <item name="News"                   href="/news.html"/>
@@ -60,15 +60,15 @@
     </menu>
 
     <menu name="Jakarta Community">
-        <item name="Get Involved"           href="/site/getinvolved.html"/>
-        <item name="Mailing Lists"          href="/site/mail.html"/>
-        <item name="CVS Repositories"       href="/site/cvsindex.html"/>
+        <item name="Get Involved"           href="http://jakarta.apache.org/site/getinvolved.html"/>
+        <item name="Mailing Lists"          href="http://jakarta.apache.org/site/mail.html"/>
+        <item name="CVS Repositories"       href="http://jakarta.apache.org/site/cvsindex.html"/>
     </menu>
 
     <menu name="Project Docs">
-        <item name="Charter"                href="/charter.html"/>
-        <item name="Releases"               href="/releases.html"/>
-        <item name="Versioning"             href="/versioning.html"/>
+        <item name="Charter"                href="http://jakarta.apache.org/commons/charter.html"/>
+        <item name="Releases"               href="http://jakarta.apache.org/commons/releases.html"/>
+        <item name="Versioning"             href="http://jakarta.apache.org/commons/versioning.html"/>
     </menu>
     </body>
 </project>
