@@ -27,6 +27,7 @@
           <li><a href="#Evaluating Expressions">Evaluating Expressions</a></li>
           <li><a href="#Custom Contexts">Custom Contexts</a></li>
           <li><a href="#Custom Resolvers">Custom Resolvers</a></li>
+          <li><a href="#Example Expressions">Example Expression</a></li>
         </ul>
       </p>
     </section>
@@ -77,6 +78,8 @@
     <section name="Custom Contexts">
     </section>
     <section name="Custom Resolvers">
+    </section>
+    <section name="Example Expressions">
     </section>
   </body>
 </document>
