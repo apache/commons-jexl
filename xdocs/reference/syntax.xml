@@ -22,6 +22,20 @@
 
   <body>
     <section name="Syntax">
+      <table>
+        <tr><th>Item</th><th>Description</th></tr>
+        <tr>
+          <td>Comments</td>
+          <td>
+            Specified using <code>##</code> and extend to the end of line, e.g.
+            <source>## This is a comment</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Integer Literals</td>
+          <td>1 or more digits from <code>0</code> to <code>9</code></td>
+        </tr>
+      </table>
     </section>
   </body>
 </document>
