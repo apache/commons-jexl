@@ -34,7 +34,7 @@
   <!-- ================================================================== -->
 
 
-  <goal name="tester" prereqs="test:compile" description="Run">
+  <goal name="tester" prereqs="test:compile" description="Run jexl from the command line evaluating all args">
     <java classname="org.apache.commons.jexl.Jexl">
       <classpath>
         <pathelement path="${maven.build.dest}"/>
