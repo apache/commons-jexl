@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.19 2002/10/10 13:51:36 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.20 2002/10/10 14:19:16 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -871,12 +871,13 @@ public class JexlTest extends TestCase
 
         Foo foo = new Foo();
 
-        jc.getVars().put("s", "abc");
+        jc.getVars().put("foo", "abcdef");
 
-        assertExpression(jc, "s.charAt(2)", new Character('b'));
+        assertExpression(jc, "foo.substring(2,3)", "cd");
+        assertExpression(jc, "foo.charAt(2)", new Character('b'));
      
         try {
-            assertExpression(jc, "s.charAt(-2)", null);
+            assertExpression(jc, "foo.charAt(-2)", null);
             fail("this test should have thrown an exception" );            
         }
         catch (IndexOutOfBoundsException e) {
