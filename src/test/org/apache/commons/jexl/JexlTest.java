@@ -71,7 +71,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.7 2002/05/20 12:32:23 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.8 2002/05/20 14:11:25 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -569,6 +569,23 @@ public class JexlTest extends TestCase
         assertEquals("o incorrect", "123", o);
     }
 
+    /**
+      *  test the use of an int based property
+      */
+    public void testIntProperty()
+         throws Exception
+    {
+        Expression e = ExpressionFactory.createExpression("foo.count");
+        JexlContext jc = JexlHelper.createContext();
+
+        Foo foo = new Foo();
+                
+        jc.getVars().put("foo", foo );
+        Object o = e.evaluate(jc);
+
+        assertEquals("o incorrect", new Integer(5), o);
+    }
+
     public class Foo
     {
         public String bar()
@@ -594,6 +611,10 @@ public class JexlTest extends TestCase
         public String convertBoolean(boolean b)
         {
             return "Boolean : " + b;
+        }
+        
+        public int getCount() {
+            return 5;
         }
     }
 
