@@ -35,7 +35,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.46 2004/08/20 07:31:52 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.47 2004/08/20 07:44:07 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -168,14 +168,10 @@ public class JexlTest extends TestCase
          throws Exception
     {
         JexlContext jc = JexlHelper.createContext();
-
         jc.getVars().put("foo", new Foo() );
         jc.getVars().put("a", Boolean.TRUE);
         jc.getVars().put("b", Boolean.FALSE);
 
-        Expression e = ExpressionFactory.createExpression("foo.convertBoolean(a==b)");
-        Object o = e.evaluate(jc);
-        
         assertExpression(jc, "foo.convertBoolean(a==b)", "Boolean : false");
         assertExpression(jc, "foo.convertBoolean(a==true)", "Boolean : true");
         assertExpression(jc, "foo.convertBoolean(a==false)", "Boolean : false");
@@ -190,59 +186,28 @@ public class JexlTest extends TestCase
         /*
          *  tests a simple property expression
          */
-
-        Expression e = ExpressionFactory.createExpression("foo.get(\"woogie\")");
         JexlContext jc = JexlHelper.createContext();
-
         jc.getVars().put("foo", new Foo() );
-        Object o = e.evaluate(jc);
-
-        assertTrue("o not instanceof String", o instanceof String);
-        assertTrue("o incorrect", o.equals("Repeat : woogie"));
+        assertExpression(jc, "foo.get(\"woogie\")", "Repeat : woogie");
     }
 
     public void testExpression()
          throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("a == b");
         JexlContext jc = JexlHelper.createContext();
-
         jc.getVars().put("foo", new Foo() );
         jc.getVars().put("a", Boolean.TRUE);
         jc.getVars().put("b", Boolean.FALSE);
         jc.getVars().put("num", new Integer(5));
 
-        Object o = e.evaluate(jc);
-
-        assertTrue("1 : o incorrect", o.equals(Boolean.FALSE));
-
-        e = ExpressionFactory.createExpression("a==true");
-        o = e.evaluate(jc);
-        assertTrue("2 : o incorrect", o.equals(Boolean.TRUE));
-
-        e = ExpressionFactory.createExpression("a==false");
-        o = e.evaluate(jc);
-        assertTrue("3 : o incorrect", o.equals(Boolean.FALSE));
-
-        e = ExpressionFactory.createExpression("true==false");
-        o = e.evaluate(jc);
-        assertTrue("4 : o incorrect", o.equals(Boolean.FALSE));
-
-        e = ExpressionFactory.createExpression("num < 3");
-        o = e.evaluate(jc);
-        assertTrue("5 : o incorrect", o.equals(Boolean.FALSE));
-
-        e = ExpressionFactory.createExpression("num <= 5");
-        o = e.evaluate(jc);
-        assertTrue("6 : o incorrect", o.equals(Boolean.TRUE));
-
-        e = ExpressionFactory.createExpression("num >= 5");
-        o = e.evaluate(jc);
-        assertTrue("7 : o incorrect", o.equals(Boolean.TRUE));
-
-        e = ExpressionFactory.createExpression("num > 4");
-        o = e.evaluate(jc);
-        assertTrue("8 : o incorrect", o.equals(Boolean.TRUE));
+        assertExpression(jc, "a == b", Boolean.FALSE);
+        assertExpression(jc, "a==true", Boolean.TRUE);
+        assertExpression(jc, "a==false", Boolean.FALSE);
+        assertExpression(jc, "true==false", Boolean.FALSE);
+        assertExpression(jc, "num < 3", Boolean.FALSE);
+        assertExpression(jc, "num <= 5", Boolean.TRUE);
+        assertExpression(jc, "num >= 5", Boolean.TRUE);
+        assertExpression(jc, "num > 4", Boolean.TRUE);
 
 //
 //   $$$ GMJ - trying to be spec conformant re addition means no string concat.
@@ -417,18 +382,9 @@ public class JexlTest extends TestCase
         /*
          * test new null coersion
          */
-
-        e = ExpressionFactory.createExpression("imanull + 2");
-
         jc.getVars().put("imanull", null );
-
-        o = e.evaluate(jc);
-        assertEquals("o incorrect", new Long(2), o);
-
-        e = ExpressionFactory.createExpression("imanull + imanull");
-        o = e.evaluate(jc);
-        assertEquals("o incorrect", new Long(0), o);
-
+        assertExpression(jc, "imanull + 2", new Long(2));
+        assertExpression(jc, "imanull + imanull", new Long(0));
     }
 
     /**
