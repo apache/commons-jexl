@@ -68,7 +68,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.28 2003/05/09 12:22:29 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.29 2003/06/22 19:43:01 proyal Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -946,6 +946,18 @@ public class JexlTest extends TestCase
         }
     }
 
+    public void testCoercionWithComparisionOperators()
+        throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+
+        assertExpression(jc, "'2' > 1", Boolean.TRUE);
+        assertExpression(jc, "'2' >= 1", Boolean.TRUE);
+        assertExpression(jc, "'2' >= 2", Boolean.TRUE);
+        assertExpression(jc, "'2' < 1", Boolean.FALSE);
+        assertExpression(jc, "'2' <= 1", Boolean.FALSE);
+        assertExpression(jc, "'2' <= 2", Boolean.TRUE);
+    }
 
     public void testResolver()
         throws Exception
