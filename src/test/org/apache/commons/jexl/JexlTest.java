@@ -68,7 +68,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.27 2003/02/18 20:22:41 geirm Exp $
+ *  @version $Id: JexlTest.java,v 1.28 2003/05/09 12:22:29 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -997,68 +997,6 @@ public class JexlTest extends TestCase
         assertEquals("flat override 2", o, null);
 
     }
-
-    public class Foo
-    {
-        public String bar()
-        {
-            return METHOD_STRING;
-        }
-
-        public String getBar()
-        {
-            return GET_METHOD_STRING;
-        }
-
-        public Foo getInnerFoo()
-        {
-            return new Foo();
-        }
-
-        public String get(String arg)
-        {
-            return "Repeat : " + arg;
-        }
-
-        public String convertBoolean(boolean b)
-        {
-            return "Boolean : " + b;
-        }
-
-        public int getCount() {
-            return 5;
-        }
-
-        public List getCheeseList()
-        {
-            ArrayList answer = new ArrayList();
-            answer.add("cheddar");
-            answer.add("edam");
-            answer.add("brie");
-            return answer;
-        }
-
-        public String[] getArray()
-        {
-            return GET_METHOD_ARRAY;
-        }
-
-        public String[][] getArray2()
-        {
-            return GET_METHOD_ARRAY2;
-        }
-
-        public boolean isSimple()
-        {
-            return true;
-        }
-
-        public int square(int value)
-        {
-            return value * value;
-        }
-    }
-
 
     /**
      * Asserts that the given expression returns the given value when applied to the
