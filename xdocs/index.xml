@@ -62,6 +62,10 @@
         <li>
         Optional syntax for the 'empty' function :   empty(obj)
         </li>
+        <li>
+        Misc : '+' has been overloaded to be use as a String concatenation operator
+        </li>
+
      </ul>
 
     </section>
