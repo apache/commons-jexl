@@ -16,6 +16,7 @@
 package org.apache.commons.jexl;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,7 +34,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.37 2004/08/15 15:32:52 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.38 2004/08/15 16:01:12 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -397,21 +398,28 @@ public class JexlTest extends TestCase
         list.add("5");
 
         jc.getVars().put("list", list);
-        
+
+        // 30652 - support for set
         Set set = new HashSet();
         set.addAll(list);
         set.add("1");
         
         jc.getVars().put("set", set);
+        
+        // support generic int size() method
+        BitSet bitset = new BitSet(5);
+        jc.getVars().put("bitset", bitset);
 
         assertExpression(jc, "size(s)", new Integer(5));
         assertExpression(jc, "size(array)", new Integer(5));
         assertExpression(jc, "size(list)", new Integer(5));
         assertExpression(jc, "size(map)", new Integer(5));
         assertExpression(jc, "size(set)", new Integer(5));
+        assertExpression(jc, "size(bitset)", new Integer(64));
         assertExpression(jc, "list.size()", new Integer(5));
         assertExpression(jc, "map.size()", new Integer(5));
         assertExpression(jc, "set.size()", new Integer(5));
+        assertExpression(jc, "bitset.size()", new Integer(64));
 
         assertExpression(jc, "list.get(size(list) - 1)", "5");
         assertExpression(jc, "list[size(list) - 1]", "5");

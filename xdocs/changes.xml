@@ -25,6 +25,7 @@
   </properties>
   <body>
     <release version="1.0-beta-3-SNAPSHOT" date="in CVS">
+      <action dev="dion" type="add">Handle any size() method that returns an int</action>
       <action dev="dion" type="fix" issue="30562">Can't issue .size() on java.util.Set</action>
     </release>
   </body>
