@@ -73,12 +73,6 @@
             A block is simply multiple statements inside curly braces (<code>{, }</code>).
           </td>
         </tr>
-        <tr>
-          <td>Assigment</td>
-          <td>
-            Assignment sets a variable to a given value using the <code>=</code> operator.
-          </td>
-        </tr>
       </table>
     </section>
     <section name="Literals">
@@ -156,10 +150,6 @@
     <section name="Operators">
       <table>
         <tr><th width="15%">Operator</th><th>Description</th></tr>
-        <tr>
-          <td>Assignment</td>
-          <td><source>var1 = var2</source></td>
-        </tr>
         <tr>
           <td>Boolean <code>and</code></td>
           <td>
