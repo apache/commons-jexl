@@ -17,27 +17,28 @@
 <document>
 
     <properties>
-        <title>Overview</title>
+        <title>Commons JEXL Overview</title>
     </properties>
 
     <body>
 
-    <section name="Jexl : Java Expression Language">
+    <section name="Java Expression Language (JEXL)">
 
     <p>
-    Jexl is an expression language engine designed for easy embedding in
-    applications and frameworks.  It implements an extended version of the
-    Expression Language of the JSTL.
+      Java Expression Language (JEXL) is an expression language engine which can be 
+      embedded in applications and frameworks.  <!--It implements an extended version of 
+      the Expression Language of the JavaServer Pages Standard Tag Library version 1.1 
+      (JSTL) and JavaServer Pages version 2.0 (JSP).-->
     </p>
 
     <p>
-    The motivation was to bring some of the lessons learned by the Velocity
-    community about expression languages in templating to a wider audience.
-    Jelly needed Velocity-ish method access; it Just had to have it.
+      The motivation was to bring some of the lessons learned by the Velocity
+      community about expression languages in templating to a wider audience.
+      Jelly needed Velocity-ish method access; it Just had to have it.
     </p>
 
     <p>
-    Here is an example of using Jexl :
+      Here is an example of using Jexl :
     </p>
 
     <source><![CDATA[
@@ -91,9 +92,24 @@
 
     <section name="Releases">
         <p>
-        Jelly is not yet release, but a nightly build can be downloaded.
+        Jelly is not yet released, but a nightly build can be downloaded.
         See the <a href="downloads.html">downloads</a> page for information on obtaining releases.
         </p>
+    </section>
+
+    <section name="Related Resources">
+        <!--<p>
+		  JEXL is not a product of the Java Community Process (JCP).
+		  JSP 2.0 is covered by Java Specification Requests (JSR) 
+		  <a href="http://www.jcp.org/en/jsr/detail?id=152">JSR-152: JavaServer 
+		  Pages 2.0 Specification</a>.  JSTL 1.1 is covered by 
+		  <a href="http://jcp.org/en/jsr/detail?id=52">JSR 52: A Standard 
+		  Tag Library for JavaServer Pages</a>.
+		</p>-->
+		<p>
+		  <a href="http://jakarta.apache.org/velocity">Jakarta Velocity</a> implements 
+		  a similar expression language.
+		</p>
     </section>
 
  </body>
