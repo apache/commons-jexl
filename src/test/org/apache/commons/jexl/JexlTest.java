@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.14 2002/07/08 13:47:51 geirm Exp $
+ *  @version $Id: JexlTest.java,v 1.15 2002/08/09 11:46:49 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -540,6 +540,55 @@ public class JexlTest extends TestCase
     }
 
     /**
+      *  test some simple conditions
+      */
+    public void testNotConditions()
+         throws Exception
+    {
+        Expression e = ExpressionFactory.createExpression("!x");
+        JexlContext jc = JexlHelper.createContext();
+
+        Foo foo = new Foo();
+        jc.getVars().put("x", Boolean.TRUE );
+        jc.getVars().put("foo", foo );
+        jc.getVars().put("bar", "true" );
+        Object o = e.evaluate(jc);
+
+        assertTrue("o not instanceof Boolean", o instanceof Boolean);
+        assertEquals("o incorrect", Boolean.FALSE, o);
+
+        e = ExpressionFactory.createExpression("x");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.TRUE, o );
+
+        e = ExpressionFactory.createExpression("!bar");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.FALSE, o );
+
+        e = ExpressionFactory.createExpression("!foo.isSimple()");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.FALSE, o );
+        
+        e = ExpressionFactory.createExpression("foo.isSimple()");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.TRUE, o );
+        
+        e = ExpressionFactory.createExpression("!foo.simple");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.FALSE, o );
+        
+        e = ExpressionFactory.createExpression("foo.simple");
+        o = e.evaluate(jc);
+
+        assertEquals("o incorrect", Boolean.TRUE, o );
+    }
+
+    /**
       *  test some null conditions
       */
     public void testNull()
@@ -844,6 +893,11 @@ public class JexlTest extends TestCase
         public String[][] getArray2()
         {
             return GET_METHOD_ARRAY2;
+        }
+        
+        public boolean isSimple() 
+        {
+            return true;
         }
     }
 
