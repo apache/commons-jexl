@@ -33,7 +33,7 @@
     <p>
       JEXL attempts to bring some of the lessons learned by the Velocity
       community about expression languages in templating to a wider audience.
-      <a href="http://jakarta.apache.org/commons/jelly">Commons Jelly needed</a> 
+      <a href="http://jakarta.apache.org/commons/jelly">Commons Jelly</a> needed
       Velocity-ish method access, it just had to have it.
     </p>
     
