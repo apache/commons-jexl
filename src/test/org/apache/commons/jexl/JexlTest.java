@@ -68,7 +68,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.30 2003/09/04 01:06:29 proyal Exp $
+ *  @version $Id: JexlTest.java,v 1.31 2003/09/09 17:48:27 tobrien Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -440,7 +440,6 @@ public class JexlTest extends TestCase
         assertExpression(jc, "size(list)", new Integer(5));
         assertExpression(jc, "list.size()", new Integer(5));
         assertExpression(jc, "map.size()", new Integer(5));
-        assertExpression(jc, "array.length", new Integer(5));
 
         assertExpression(jc, "list.get(size(list) - 1)", "5");
         assertExpression(jc, "list[size(list) - 1]", "5");
