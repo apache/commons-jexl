@@ -71,7 +71,7 @@ import java.lang.reflect.Array;
  *    $foo[2]
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTArrayAccess.java,v 1.2 2002/05/25 18:39:02 geirm Exp $
+ *  @version $Id: ASTArrayAccess.java,v 1.3 2002/06/07 03:35:30 geirm Exp $
  */
 public class ASTArrayAccess extends SimpleNode
 {
@@ -91,6 +91,36 @@ public class ASTArrayAccess extends SimpleNode
     {
         return visitor.visit(this, data);
     }
+
+    /*
+     * evaluate array access upon a base object
+     *
+     *   foo.bar[2]
+     *
+     *  makes me rethink the array operator :)
+     */
+    public Object execute(Object obj, JexlContext jc)
+             throws Exception
+     {
+         ASTIdentifier base = (ASTIdentifier) jjtGetChild(0);
+
+         obj = base.execute(obj,jc);
+
+         /*
+          * ignore the first child - it's our identifier
+          */
+         for(int i=1; i<jjtGetNumChildren(); i++)
+         {
+             Object loc = ((SimpleNode) jjtGetChild(i)).value(jc);
+
+             if(loc==null)
+                 return null;
+
+             obj = evaluateExpr(obj, loc);
+         }
+
+         return obj;
+     }
 
     /**
      *  return the value of this node
