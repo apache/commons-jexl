@@ -36,7 +36,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.55 2004/08/20 12:05:03 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.56 2004/08/22 08:32:14 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -459,10 +459,10 @@ public class JexlTest extends TestCase
       *
       *  test some simple conditions
       */
-    public void dontDoTestNotConditionsWithDots()
+    public void testNotConditionsWithDots()
          throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("x.a == true");
+        Expression e = ExpressionFactory.createExpression("x.a");
         e.addPostResolver(new FlatResolver());
         JexlContext jc = JexlHelper.createContext();
 
@@ -473,17 +473,19 @@ public class JexlTest extends TestCase
         assertTrue("o not instanceof Boolean", o instanceof Boolean);
         assertEquals("o incorrect", Boolean.TRUE, o );
 
-        e = ExpressionFactory.createExpression("!x.a");
-        e.addPreResolver(new FlatResolver());
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.FALSE, o);
-
-        e = ExpressionFactory.createExpression("!x.b");
-        e.addPreResolver(new FlatResolver());
-        o = e.evaluate(jc);
-
-        assertEquals("o incorrect", Boolean.TRUE, o );
+// unfortunately the FlatResolver doesn't resolve variables, that is the job of the context,
+// so the following tests would never have worked.
+//        e = ExpressionFactory.createExpression("!x.a");
+//        e.addPreResolver(new FlatResolver());
+//        o = e.evaluate(jc);
+//
+//        assertEquals("o incorrect", Boolean.FALSE, o);
+//
+//        e = ExpressionFactory.createExpression("!x.b");
+//        e.addPreResolver(new FlatResolver());
+//        o = e.evaluate(jc);
+//
+//        assertEquals("o incorrect", Boolean.TRUE, o );
     }
 
     /**
