@@ -18,12 +18,19 @@ package org.apache.commons.jexl;
 
 
 /**
+ * <p>
  * Represents a single JEXL expression.  This simple interface
  * provides access to the underlying expression through getExpression(), 
- * and it provides hooks to add a pre- and post- expression resolver.   
+ * and it provides hooks to add a pre- and post- expression resolver.
+ * </p>   
  *
+ * <p>
+ * An expression is different than a script - it is simply a reference of
+ * an expression.
+ * </p>
+ * 
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Id: Expression.java,v 1.5 2004/06/12 23:53:17 tobrien Exp $
+ * @version $Id: Expression.java,v 1.6 2004/06/13 01:42:21 tobrien Exp $
  */
 public interface Expression
 {
