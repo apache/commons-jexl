@@ -35,25 +35,26 @@
     </menu>
 
     <menu name="Components Repository">
-        <item name="BeanUtils"              href="/beanutils.html"/>
-        <item name="Cactus"                 href="/cactus/index.html"/>
-        <item name="Collections"            href="/collections.html"/>
-        <item name="Digester"               href="/digester.html"/>
+        <item name="BeanUtils"              href="http://jakarta.apache.org/commons/beanutils.html"/>
+        <item name="Betwixt"                href="http://jakarta.apache.org/commons/betwixt/"/>
+        <item name="Cactus"                 href="http://jakarta.apache.org/commons/cactus/index.html"/>
+        <item name="Collections"            href="http://jakarta.apache.org/commons/collections.html"/>
+        <item name="CLI"            		href="http://jakarta.apache.org/commons/cli/"/>
+        <item name="Digester"               href="http://jakarta.apache.org/commons/digester.html"/>
         <item name="DBCP"                   href="http://cvs.apache.org/viewcvs/jakarta-commons/dbcp/"/>
-        <item name="HTTP Client"            href="/httpclient"/>
+        <item name="HTTP Client"            href="http://jakarta.apache.org/commons/httpclient"/>
         <item name="JXPath"                 href="http://cvs.apache.org/viewcvs/jakarta-commons/jxpath/"/>
-        <item name="Latka"                  href="/latka/index.html"/>
+        <item name="Latka"                  href="http://jakarta.apache.org/commons/latka/index.html"/>
         <item name="Pool"                   href="http://cvs.apache.org/viewcvs/jakarta-commons/pool/"/>
         <item name="Logging"                href="http://cvs.apache.org/viewcvs/jakarta-commons/logging/"/>
         <item name="Validator"              href="http://cvs.apache.org/viewcvs/jakarta-commons/validator/"/>
     </menu>
 
     <menu name="Sandbox Components">
-        <item name="Betwixt"                href="/betwixt.html"/>
-        <item name="Jelly"                  href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/jelly/"/>
-        <item name="Jexl"                  href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/jexl/"/>
+        <item name="Jelly"                  href="http://jakarta.apache.org/commons/sandbox/jelly/"/>
+        <item name="Jexl"                   href="http://jakarta.apache.org/commons/sandbox/jexl/"/>
         <item name="JJar"                   href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/jjar/"/>
-        <item name="Messenger"              href="/messenger.html"/>
+        <item name="Messenger"              href="http://jakarta.apache.org/commons/sandbox/messenger/"/>
         <item name="Workflow"               href="http://cvs.apache.org/viewcvs/jakarta-commons-sandbox/workflow/"/>
     </menu>
 
