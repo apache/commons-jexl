@@ -35,7 +35,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.52 2004/08/20 08:04:37 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.53 2004/08/20 08:05:28 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -548,14 +548,11 @@ public class JexlTest extends TestCase
     public void testVariableNames()
          throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("foo_bar");
         JexlContext jc = JexlHelper.createContext();
 
-
         jc.getVars().put("foo_bar", "123" );
-        Object o = e.evaluate(jc);
-
-        assertEquals("o incorrect", "123", o);
+        
+        assertExpression(jc, "foo_bar", "123");
     }
 
     /**
