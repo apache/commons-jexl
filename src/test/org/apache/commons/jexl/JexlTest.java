@@ -35,7 +35,7 @@ import org.apache.commons.jexl.resolver.FlatResolver;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.44 2004/08/19 18:11:59 dion Exp $
+ *  @version $Id: JexlTest.java,v 1.45 2004/08/20 06:08:54 dion Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -338,39 +338,26 @@ public class JexlTest extends TestCase
         /*
          *  I can't believe anyone thinks this is a syntax.. :)
          */
-
-        Expression e = ExpressionFactory.createExpression("empty nullthing");
-        Object o = e.evaluate(jc);
-        assertTrue("1 : o incorrect", o.equals(Boolean.TRUE));
-
-        e = ExpressionFactory.createExpression("empty string");
-        o = e.evaluate(jc);
-        assertTrue("2 : o incorrect", o.equals(Boolean.TRUE));
-
-        e = ExpressionFactory.createExpression("empty array");
-        o = e.evaluate(jc);
-        assertTrue("3 : o incorrect", o.equals(Boolean.TRUE));
-
-        e = ExpressionFactory.createExpression("empty map");
-        o = e.evaluate(jc);
-        assertTrue("4 : o incorrect", o.equals(Boolean.TRUE));
-
-        e = ExpressionFactory.createExpression("empty list");
-        o = e.evaluate(jc);
-        assertTrue("5 : o incorrect", o.equals(Boolean.TRUE));
-
-        e = ExpressionFactory.createExpression("empty longstring");
-        o = e.evaluate(jc);
-        assertTrue("6 : o incorrect", o.equals(Boolean.FALSE));
-
-        e = ExpressionFactory.createExpression("not empty longstring");
-        o = e.evaluate(jc);
-        assertTrue("7 : o incorrect", o.equals(Boolean.TRUE));
-
-        e = ExpressionFactory.createExpression("empty set");
-        o = e.evaluate(jc);
-        assertTrue("8 : o incorrect", o.equals(Boolean.TRUE));
-
+        assertExpression(jc, "empty nullthing", Boolean.TRUE);
+        assertExpression(jc, "empty string", Boolean.TRUE);
+        assertExpression(jc, "empty array", Boolean.TRUE);
+        assertExpression(jc, "empty map", Boolean.TRUE);
+        assertExpression(jc, "empty set", Boolean.TRUE);
+        assertExpression(jc, "empty list", Boolean.TRUE);
+        assertExpression(jc, "empty longstring", Boolean.FALSE);
+        assertExpression(jc, "not empty longstring", Boolean.TRUE);
+    }
+    
+    public void testNot() throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("string", "");
+        assertExpression(jc, "not empty string", Boolean.FALSE);
+        assertExpression(jc, "not(empty string)", Boolean.FALSE);
+        assertExpression(jc, "not empty(string)", Boolean.FALSE);
+        assertExpression(jc, "! empty string", Boolean.FALSE);
+        assertExpression(jc, "!(empty string)", Boolean.FALSE);
+        assertExpression(jc, "!empty(string)", Boolean.FALSE);
     }
 
     public void testSize()
