@@ -71,7 +71,7 @@ import java.lang.reflect.Array;
  *    $foo[2]
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTArrayAccess.java,v 1.1 2002/04/26 04:23:14 geirm Exp $
+ *  @version $Id: ASTArrayAccess.java,v 1.2 2002/05/25 18:39:02 geirm Exp $
  */
 public class ASTArrayAccess extends SimpleNode
 {
@@ -106,9 +106,25 @@ public class ASTArrayAccess extends SimpleNode
 
         Object o = base.value(jc);
 
-        SimpleNode arg = (SimpleNode) jjtGetChild(1);
-        Object loc = arg.value(jc);
+        /*
+         * ignore the first child - it's our identifier
+         */
+        for(int i=1; i<jjtGetNumChildren(); i++)
+        {
+            Object loc = ((SimpleNode) jjtGetChild(i)).value(jc);
 
+            if(loc==null)
+                return null;
+
+            o = evaluateExpr(o, loc);
+        }
+
+        return o;
+    }
+
+    public static Object evaluateExpr(Object o, Object loc)
+        throws Exception
+    {
         /*
          * following the JSTL EL rules
          */
