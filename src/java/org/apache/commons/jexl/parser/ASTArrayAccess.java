@@ -33,10 +33,13 @@ import java.lang.reflect.Array;
  *    $foo[2]
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTArrayAccess.java,v 1.6 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id: ASTArrayAccess.java,v 1.7 2004/08/22 07:42:35 dion Exp $
  */
 public class ASTArrayAccess extends SimpleNode
 {
+    /** dummy velocity info */
+    private static Info DUMMY = new Info("", 1, 1);
+    
     public ASTArrayAccess(int id)
     {
         super(id);
@@ -168,7 +171,7 @@ public class ASTArrayAccess extends SimpleNode
 
             String s = loc.toString();
 
-            VelPropertyGet vg = Introspector.getUberspect().getPropertyGet(o,s,new Info("",1,1));
+            VelPropertyGet vg = Introspector.getUberspect().getPropertyGet(o, s, DUMMY);
 
             if (vg != null)
             {

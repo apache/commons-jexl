@@ -9,6 +9,9 @@ import org.apache.commons.jexl.util.introspection.Info;
 
 public class ASTMethod extends SimpleNode
 {
+    /** dummy velocity info */
+    private static Info DUMMY = new Info("", 1, 1);
+
     public ASTMethod(int id)
     {
         super(id);
@@ -50,8 +53,7 @@ public class ASTMethod extends SimpleNode
                 params[i] = ( (SimpleNode) jjtGetChild(i+1)).value(jc);
             }
 
-            VelMethod vm = Introspector.getUberspect().getMethod(obj, methodName,
-                params, new Info("",1,1));
+            VelMethod vm = Introspector.getUberspect().getMethod(obj, methodName, params, DUMMY);
 
             if (vm == null)
                 return null;
