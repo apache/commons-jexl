@@ -22,7 +22,7 @@ import org.apache.commons.jexl.util.Coercion;
  *  represents equality between integers - use .equals() for strings
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTEQNode.java,v 1.4 2004/02/28 13:45:20 yoavs Exp $
+ *  @version $Id: ASTEQNode.java,v 1.5 2004/08/20 12:04:39 dion Exp $
  */
 public class ASTEQNode extends SimpleNode
 {
@@ -64,7 +64,7 @@ public class ASTEQNode extends SimpleNode
         }
         else if (left.getClass().equals(right.getClass()))
         {
-            return new Boolean(left.equals(right));
+            return Boolean.valueOf(left.equals(right));
         }
         else if(left instanceof Float || left instanceof Double ||
                 right instanceof Float || right instanceof Double)
@@ -72,24 +72,24 @@ public class ASTEQNode extends SimpleNode
             Double l = Coercion.coerceDouble(left);
             Double r = Coercion.coerceDouble(right);
 
-            return new Boolean(l.equals(r));
+            return Boolean.valueOf(l.equals(r));
         }
         else if ( left instanceof Number || right instanceof Number ||
                    left instanceof Character || right instanceof Character)
         {
-            return new Boolean(
+            return Boolean.valueOf(
                     Coercion.coerceLong(left).equals(Coercion.coerceLong(right)));
         }
         else if (left instanceof Boolean || right instanceof Boolean)
         {
-            return new Boolean(
+            return Boolean.valueOf(
                     Coercion.coerceBoolean(left).equals(Coercion.coerceBoolean(right)));
         }
         else if (left instanceof java.lang.String || right instanceof String)
         {
-            return new Boolean(left.toString().equals(right.toString()));
+            return Boolean.valueOf(left.toString().equals(right.toString()));
         }
 
-        return new Boolean(left.equals(right));
+        return Boolean.valueOf(left.equals(right));
     }
 }
