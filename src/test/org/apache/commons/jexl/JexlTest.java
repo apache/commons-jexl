@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.18 2002/10/10 11:09:32 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.19 2002/10/10 13:51:36 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -409,7 +409,7 @@ public class JexlTest extends TestCase
          throws Exception
     {
         JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("string", "five!");
+        jc.getVars().put("s", "five!");
         jc.getVars().put("array", new Object[5]);
 
         Map map = new HashMap();
@@ -432,7 +432,7 @@ public class JexlTest extends TestCase
 
         jc.getVars().put("list", list);
 
-        assertExpression(jc, "size(string)", new Integer(5));
+        assertExpression(jc, "size(s)", new Integer(5));
         assertExpression(jc, "size(array)", new Integer(5));
         assertExpression(jc, "size(list)", new Integer(5));
         assertExpression(jc, "size(map)", new Integer(5));
@@ -795,10 +795,7 @@ public class JexlTest extends TestCase
 
         assertTrue("o incorrect", Boolean.TRUE.equals(o));
 
-        e = ExpressionFactory.createExpression("foo == 'bar'");
-        o = e.evaluate(jc);
-
-        assertTrue("o incorrect", Boolean.TRUE.equals(o));
+        assertExpression(jc, "foo == 'bar'", Boolean.TRUE);
     }
 
     /**
@@ -811,11 +808,18 @@ public class JexlTest extends TestCase
         JexlContext jc = JexlHelper.createContext();
 
         Foo foo = new Foo();
-                
+
+        // lets check the square function first..
+        assertEquals(4, foo.square(2));
+        assertEquals(4, foo.square(-2));
+                        
         jc.getVars().put("foo", foo );
         Object o = e.evaluate(jc);
 
         assertEquals("o incorrect", new Integer(5), o);
+        
+        assertExpression(jc, "foo.square(-2)", new Integer(4));
+        assertExpression(jc, "foo.square(2)", new Integer(4));
     }
 
     public void testArrayProperty()
@@ -856,6 +860,33 @@ public class JexlTest extends TestCase
 //        o2 = dotForm.evaluate(jc);
 //        assertEquals("dot form failed", GET_METHOD_ARRAY2[1][1], o2);
     }
+
+    /**
+     * Attempts to recreate bug http://jira.werken.com/ViewIssue.jspa?key=JELLY-8
+     */
+    public void testCharAtBug()
+        throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+
+        Foo foo = new Foo();
+
+        jc.getVars().put("s", "abc");
+
+        assertExpression(jc, "s.charAt(2)", new Character('b'));
+     
+        try {
+            assertExpression(jc, "s.charAt(-2)", null);
+            fail("this test should have thrown an exception" );            
+        }
+        catch (IndexOutOfBoundsException e) {
+            // expected behaviour
+        }   
+        catch (Exception e) {
+            throw e;
+        }
+    }
+
 
     public void testResolver()
         throws Exception
@@ -961,6 +992,11 @@ public class JexlTest extends TestCase
         public boolean isSimple() 
         {
             return true;
+        }
+        
+        public int square(int value) 
+        {
+            return value * value;
         }
     }
 
