@@ -61,7 +61,8 @@ import org.apache.commons.jexl.JexlContext;
  *  Subtraction
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: ASTSubtractNode.java,v 1.2 2002/05/17 12:13:22 geirm Exp $
+ *  @author <a href="mailto:mhw@kremvax.net">Mark H. Wilkinson</a>
+ *  @version $Id: ASTSubtractNode.java,v 1.3 2003/06/25 10:49:48 geirm Exp $
  */
 public class ASTSubtractNode extends SimpleNode
 {
@@ -118,9 +119,26 @@ public class ASTSubtractNode extends SimpleNode
         Long l = Coercion.coerceLong(left);
         Long r = Coercion.coerceLong(right);
 
-        return new Long(l.longValue() - r.longValue());
+        /*
+         *  TODO - this is actually wrong - JSTL says to return a Long
+         *  but we have problems where you have something like 
+         * 
+         *     foo.bar( a - b )
+         * 
+         *  where bar wants an int... 
+         * 
+         */
+        long v = l.longValue() - r.longValue();
 
-    }
+        if ( left instanceof Integer && right instanceof Integer )
+        {
+            return new Integer((int) v);
+        }
+        else
+        {
+            return new Long(v);
+        }
+     }
     /** Accept the visitor. **/
     public Object jjtAccept(ParserVisitor visitor, Object data)
     {
