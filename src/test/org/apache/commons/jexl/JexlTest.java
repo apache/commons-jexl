@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.12 2002/07/04 18:05:05 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.13 2002/07/08 00:25:50 geirm Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -550,6 +550,15 @@ public class JexlTest extends TestCase
         
         Expression e = ExpressionFactory.createExpression("empty foo");
         Object o = e.evaluate(jc);
+
+        assertTrue("o not instanceof Boolean", o instanceof Boolean);
+        assertEquals("o incorrect", Boolean.TRUE, o);
+
+        /*
+         * also support the functional syntax extension
+         */
+        e = ExpressionFactory.createExpression("empty(foo)");
+        o = e.evaluate(jc);
 
         assertTrue("o not instanceof Boolean", o instanceof Boolean);
         assertEquals("o incorrect", Boolean.TRUE, o);
