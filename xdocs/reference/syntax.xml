@@ -35,6 +35,30 @@
           <td>Integer Literals</td>
           <td>1 or more digits from <code>0</code> to <code>9</code></td>
         </tr>
+        <tr>
+          <td>Floating point Literals</td>
+          <td>
+            1 or more digits from <code>0</code> to <code>9</code>, followed
+            by a decimal point and then one or more digits from
+            <code>0</code> to <code>9</code>. 
+          </td>
+        </tr>
+        <tr>
+          <td>Identifier / variable</td>
+          <td>
+            Must start with <code>a-z</code>, <code>A-Z</code>, <code>_</code> or <code>$</code>.
+            Can then be followed by <code>0-9</code>,<code>a-z</code>, <code>A-Z</code>, <code>_</code> or <code>$</code>.
+            e.g.
+            <ul>
+              <li>Valid: <code>var1</code>,<code>_a99</code>,<code>$1</code></li>
+              <li>Inalid: <code>9v</code>,<code>!a99</code>,<code>1$</code></li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>Assignment</td>
+          <td><source>var1 = var2</source></td>
+        </tr>
       </table>
     </section>
   </body>
