@@ -57,7 +57,7 @@
  *  Jexl : Java Expression Language
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: Parser.jj,v 1.3 2002/06/07 03:02:55 geirm Exp $
+ *  @version $Id: Parser.jj,v 1.4 2002/06/07 03:03:51 geirm Exp $
  */
 
 options
@@ -1756,8 +1756,6 @@ TOKEN : /* IDENTIFIERS */
 
 TOKEN :
 {
-//    <STRING_LITERAL: ( "\"" ( ~["\"","\n","\r"] )* "\"" ) >
-
     <STRING_LITERAL :
         ("\"" ( ~["\"","\n","\r"] )* "\"" )
      |
