@@ -72,7 +72,7 @@ import java.util.Map;
  *  Simple testcases
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlTest.java,v 1.21 2002/10/10 15:44:23 jstrachan Exp $
+ *  @version $Id: JexlTest.java,v 1.22 2002/10/26 09:14:46 jstrachan Exp $
  */
 public class JexlTest extends TestCase
 {
@@ -444,6 +444,20 @@ public class JexlTest extends TestCase
         assertExpression(jc, "list.get(size(list) - 1)", "5");
         assertExpression(jc, "list[size(list) - 1]", "5");
         assertExpression(jc, "list.get(list.size() - 1)", "5");
+    }
+
+    /**
+      *  test some String method calls
+      */
+    public void testStringMethods()
+         throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+
+        jc.getVars().put("foo", "abcdef");
+        
+        assertExpression(jc, "foo.substring(3)", "def");
+        assertExpression(jc, "foo.substring(0,foo.length()-3)", "abc");
     }
 
 
