@@ -28,6 +28,11 @@
       embedded in applications and frameworks.  JEXL is inspired by Jakarta Velocity 
       and the Expression Language defined in the JavaServer Pages Standard Tag Library 
       version 1.1 (JSTL) and JavaServer Pages version 2.0 (JSP).  
+      While inspired by JSTL EL, it must be noted that JEXL is not a compatibile 
+      implementation of EL as defined in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152). For a 
+      compatible implementation of these specifications, see the 
+      <a href="http://jakarta.apache.org/commons/el/">Commons EL</a> project.
+
     </p>
 
     <p>
@@ -37,13 +42,6 @@
       Velocity-ish method access, it just had to have it.
     </p>
     
-    <p>
-      It must be noted that JEXL is not a compatibile implementation of EL as defined
-      in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152). For a compatible implementation of
-      these specifications, see the <a href="http://jakarta.apache.org/commons/el/">
-      Commons EL</a> project.
-    </p>
-
     </section>
 
     <section name="A Brief Example">
