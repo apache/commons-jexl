@@ -51,10 +51,7 @@ public class ASTUnaryMinusNode extends SimpleNode
         {
             return new Integer(- ( ((Integer) val).intValue() ) );
         }
-        else
-        {
-            throw new Exception("expression not integer valued");
-        }
+        throw new Exception("expression not integer valued");
     }
 }
 
