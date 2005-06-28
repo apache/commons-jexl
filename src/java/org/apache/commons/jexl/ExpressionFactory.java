@@ -19,6 +19,7 @@ import java.io.StringReader;
 
 import org.apache.commons.jexl.parser.ASTExpressionExpression;
 import org.apache.commons.jexl.parser.ASTReferenceExpression;
+import org.apache.commons.jexl.parser.ASTStatementExpression;
 import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.logging.Log;
@@ -120,8 +121,9 @@ public class ExpressionFactory
         // throw an exception.
         SimpleNode node = (SimpleNode) tree.jjtGetChild(0);
 
-        if( (node instanceof ASTReferenceExpression) ||
-            (node instanceof ASTExpressionExpression) ) 
+        if( (node instanceof ASTReferenceExpression) 
+            || (node instanceof ASTExpressionExpression)
+            || (node instanceof ASTStatementExpression)) 
         {
             node = (SimpleNode) node.jjtGetChild(0);
             Expression e = new ExpressionImpl(expression, node);

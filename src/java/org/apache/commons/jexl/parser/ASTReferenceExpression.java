@@ -2,6 +2,8 @@
 
 package org.apache.commons.jexl.parser;
 
+import org.apache.commons.jexl.JexlContext;
+
 public class ASTReferenceExpression extends SimpleNode {
   public ASTReferenceExpression(int id) {
     super(id);
@@ -15,5 +17,13 @@ public class ASTReferenceExpression extends SimpleNode {
   /** Accept the visitor. **/
   public Object jjtAccept(ParserVisitor visitor, Object data) {
     return visitor.visit(this, data);
+  }
+  
+  /**
+   * @return the value of the expression 
+   */
+  public Object value(JexlContext context) throws Exception
+  {
+      return ((SimpleNode) jjtGetChild(0)).value(context);
   }
 }
