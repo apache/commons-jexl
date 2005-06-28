@@ -60,7 +60,7 @@ public class ASTEmptyFunction extends SimpleNode
         if (o == null)
             return Boolean.TRUE;
 
-        if (o instanceof String && "".equals((String) o))
+        if (o instanceof String && "".equals(o))
             return Boolean.TRUE;
 
         if (o.getClass().isArray() && ((Object[])o).length == 0)
