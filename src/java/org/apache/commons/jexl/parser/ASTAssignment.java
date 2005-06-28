@@ -2,6 +2,8 @@
 
 package org.apache.commons.jexl.parser;
 
+import org.apache.commons.jexl.JexlContext;
+
 public class ASTAssignment extends SimpleNode {
   public ASTAssignment(int id) {
     super(id);
@@ -15,5 +17,25 @@ public class ASTAssignment extends SimpleNode {
   /** Accept the visitor. **/
   public Object jjtAccept(ParserVisitor visitor, Object data) {
     return visitor.visit(this, data);
+  }
+
+  /**
+   * Handle assignment ( left = right ) 
+   */
+  public Object value(JexlContext context) throws Exception
+  {
+      // left should be the variable (reference) to assign to
+      SimpleNode left = (SimpleNode)jjtGetChild(0);
+      // right should be the expression to evaluate
+      Object right = ((SimpleNode) jjtGetChild(1)).value(context);
+      if (left instanceof ASTReference) {
+          ASTReference reference = (ASTReference)left;
+          left = (SimpleNode)reference.jjtGetChild(0);
+          if (left instanceof ASTIdentifier) {
+              String identifier = ((ASTIdentifier)left).getIdentifierString();
+              context.getVars().put(identifier,right);
+          }
+      }
+      return right;
   }
 }

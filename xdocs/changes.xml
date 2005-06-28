@@ -25,6 +25,7 @@
   </properties>
   <body>
     <release version="1.0.1-SNAPSHOT" date="in SVN">
+      <action dev="dion" type="add" issue="32110" due-to="Barry Lagerweij">Support assignment to variables</action>
       <action dev="dion" type="fix" issue="32829">'abc'.substring(0,1+1) is empty (method matching problem)</action>
     </release>
     <release version="1.0" date="2004-09-07">
