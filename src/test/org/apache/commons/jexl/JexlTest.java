@@ -18,12 +18,12 @@ package org.apache.commons.jexl;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 import java.util.Set;
 
 import junit.framework.Test;
@@ -32,7 +32,6 @@ import junit.framework.TestSuite;
 
 import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
-import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.resolver.FlatResolver;
 
 /**
@@ -330,11 +329,9 @@ public class JexlTest extends TestCase
     public void testCalculations()
          throws Exception
     {
-        Expression e = null;
         JexlContext jc = JexlHelper.createContext();
 
         jc.getVars().put("foo", new Integer(2) );
-        Object o = null;
 
         assertExpression(jc, "foo + 2", new Long(4));
         assertExpression(jc, "3 + 3", new Long(6));
@@ -462,7 +459,6 @@ public class JexlTest extends TestCase
     public void testNotConditionsWithDots()
          throws Exception
     {
-        Expression e = ExpressionFactory.createExpression("x.a");
         JexlContext jc = JexlHelper.createContext();
 
         jc.getVars().put("x.a", Boolean.TRUE );
@@ -643,12 +639,6 @@ public class JexlTest extends TestCase
 
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("foo", foo );
-
-        Expression bracketForm =
-            ExpressionFactory.createExpression("foo.array[1]");
-
-        Expression dotForm =
-            ExpressionFactory.createExpression("foo.array.1");
 
         assertExpression(jc, "foo.array[1]", GET_METHOD_ARRAY[1]);
         assertExpression(jc, "foo.array.1", GET_METHOD_ARRAY[1]);
@@ -871,7 +861,7 @@ public class JexlTest extends TestCase
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("aString", "Hello");
         Parser parser = new Parser(new StringReader(";"));
-        SimpleNode tree = parser.parse(new StringReader("aString = 'World';"));
+        parser.parse(new StringReader("aString = 'World';"));
     }
     
     public void testAntPropertiesWithMethods() throws Exception
