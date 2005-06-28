@@ -53,7 +53,7 @@ public class ASTDivNode extends SimpleNode
          *  the spec says 'and', I think 'or'
          */
         if (left == null && right == null)
-            return new Integer(0);
+            return new Byte((byte)0);
 
         Double l = Coercion.coerceDouble(left);
         Double r = Coercion.coerceDouble(right);

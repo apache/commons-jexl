@@ -54,7 +54,7 @@ public class ASTModNode extends SimpleNode
          *  the spec says 'and', I think 'or'
          */
         if (left == null && right == null)
-            return new Integer(0);
+            return new Byte((byte)0);
 
         /*
          *  if anything is float, double or string with ( "." | "E" | "e")
@@ -99,7 +99,7 @@ public class ASTModNode extends SimpleNode
         if (r.longValue() == 0)
             return new Long(0);
 
-        return new Long(l.longValue() % r.longValue());
+        return ASTAddNode.unwiden(new Long(l.longValue() % r.longValue()));
     }
 
 }
