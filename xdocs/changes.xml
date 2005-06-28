@@ -24,6 +24,9 @@
     <author email="dion@apache.org">dIon Gillard</author>
   </properties>
   <body>
+    <release version="1.0.1-SNAPSHOT" date="in SVN">
+      <action dev="dion" type="fix" issue="32829">'abc'.substring(0,1+1) is empty (method matching problem)</action>
+    </release>
     <release version="1.0" date="2004-09-07">
       <action dev="dion" type="fix">Support ant-style properties</action>
     </release>
