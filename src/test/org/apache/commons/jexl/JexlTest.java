@@ -845,7 +845,7 @@ public class JexlTest extends TestCase
         }
         catch (ParseException pe)
         {
-            System.err.println("Expecting a parse exception: " + pe.getMessage());
+            // expected behaviour
         }
     }
 
