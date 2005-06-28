@@ -101,10 +101,7 @@ public class ASTSizeFunction extends SimpleNode
             	Integer result = (Integer)vm.invoke(val, params);
             	return result.intValue();
             }
-            else
-            {
-                throw new Exception("size() : unknown type : " + val.getClass());
-            }
+            throw new Exception("size() : unknown type : " + val.getClass());
         }
     }
 
