@@ -96,10 +96,7 @@ public class ASTSubtractNode extends SimpleNode
         {
             return new Integer((int) v);
         }
-        else
-        {
-            return new Long(v);
-        }
+        return new Long(v);
      }
     /** Accept the visitor. **/
     public Object jjtAccept(ParserVisitor visitor, Object data)
