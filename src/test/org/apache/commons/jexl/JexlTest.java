@@ -368,6 +368,10 @@ public class JexlTest extends TestCase
         jc.getVars().put("imanull", null );
         assertExpression(jc, "imanull + 2", new Long(2));
         assertExpression(jc, "imanull + imanull", new Long(0));
+        
+        /* test for bugzilla 31577 */
+        jc.getVars().put("n", new Integer(0));
+        assertExpression(jc, "n != null && n != 0", Boolean.FALSE);
     }
 
     /**
