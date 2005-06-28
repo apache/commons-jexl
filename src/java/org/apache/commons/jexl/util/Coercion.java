@@ -49,14 +49,14 @@ public class Coercion
         }
         else if (val instanceof String)
         {
-            if("".equals((String) val))
+            if("".equals(val))
                 return new Integer(0);
 
             return Integer.valueOf((String)val);
         }
         else if(val instanceof Character)
         {
-            return new Integer((int)((Character)val).charValue());
+            return new Integer(((Character)val).charValue());
         }
         else if(val instanceof Boolean)
         {
@@ -79,14 +79,14 @@ public class Coercion
         }
         else if (val instanceof String)
         {
-            if("".equals((String) val))
+            if("".equals(val))
                 return new Long(0);
 
             return Long.valueOf((String)val);
         }
         else if(val instanceof Character)
         {
-            return new Long((long)((Character)val).charValue());
+            return new Long(((Character)val).charValue());
         }
         else if(val instanceof Boolean)
         {
@@ -109,7 +109,7 @@ public class Coercion
         }
         else if (val instanceof String)
         {
-            if("".equals((String) val))
+            if("".equals(val))
                 return new Double(0);
 
             /*
