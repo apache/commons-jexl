@@ -836,6 +836,7 @@ public class JexlTest extends TestCase
         try
         {
             assertExpression(JexlHelper.createContext(), "empty()", null);
+            fail("Bad expression didn't throw ParseException");
         }
         catch (ParseException pe)
         {
