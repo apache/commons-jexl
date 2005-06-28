@@ -48,7 +48,7 @@ public class ASTSubtractNode extends SimpleNode
          *  the spec says 'and', I think 'or'
          */
         if (left == null && right == null)
-            return new Integer(0);
+            return new Byte((byte)0);
 
         /*
          *  if anything is float, double or string with ( "." | "E" | "e")
@@ -91,12 +91,8 @@ public class ASTSubtractNode extends SimpleNode
          * 
          */
         long v = l.longValue() - r.longValue();
+        return ASTAddNode.unwiden(new Long(v));
 
-        if ( left instanceof Integer && right instanceof Integer )
-        {
-            return new Integer((int) v);
-        }
-        return new Long(v);
      }
     /** Accept the visitor. **/
     public Object jjtAccept(ParserVisitor visitor, Object data)
