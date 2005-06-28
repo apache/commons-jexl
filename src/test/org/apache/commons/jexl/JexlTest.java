@@ -859,7 +859,7 @@ public class JexlTest extends TestCase
     }
     
     /**
-     * Assignment isn't implemented for an expression language
+     * Test assignment.
      * @throws Exception
      */
     public void testAssignment() throws Exception
@@ -868,6 +868,11 @@ public class JexlTest extends TestCase
         jc.getVars().put("aString", "Hello");
         Parser parser = new Parser(new StringReader(";"));
         parser.parse(new StringReader("aString = 'World';"));
+        
+        assertExpression(jc, "hello = 'world'", "world");
+        assertEquals("hello variable not changed", "world", jc.getVars().get("hello"));
+        assertExpression(jc, "result = 1 + 1", new Byte((byte)2));
+        assertEquals("result variable not changed", new Byte((byte)2), jc.getVars().get("result"));
     }
     
     public void testAntPropertiesWithMethods() throws Exception
