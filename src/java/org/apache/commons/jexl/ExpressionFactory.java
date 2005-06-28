@@ -128,11 +128,8 @@ public class ExpressionFactory
         
             return e;
         }
-        else 
-        {
-            log.error( "Invalid Expression, node of type: " + node.getClass().getName() );
-            throw new Exception("Invalid Expression: neither Reference nor Expression");
-        }
+        log.error( "Invalid Expression, node of type: " + node.getClass().getName() );
+        throw new Exception("Invalid Expression: neither Reference nor Expression");
     }
 
     /**
