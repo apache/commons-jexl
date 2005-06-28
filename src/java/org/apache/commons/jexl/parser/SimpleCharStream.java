@@ -322,9 +322,8 @@ public final class SimpleCharStream
   {
      if (bufpos >= tokenBegin)
         return new String(buffer, tokenBegin, bufpos - tokenBegin + 1);
-     else
-        return new String(buffer, tokenBegin, bufsize - tokenBegin) +
-                              new String(buffer, 0, bufpos + 1);
+     return new String(buffer, tokenBegin, bufsize - tokenBegin) +
+                       new String(buffer, 0, bufpos + 1);
   }
 
   public final char[] GetSuffix(int len)
