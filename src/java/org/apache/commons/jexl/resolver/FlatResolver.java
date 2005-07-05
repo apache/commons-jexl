@@ -11,6 +11,7 @@ import org.apache.commons.jexl.JexlContext;
  *
  *  hint, hint...
  *
+ *  @since 1.0
  *  @author <a href="mailto:geirm@adeptra.com">Geir Magnusson Jr.</a>
  *  @version $Id$
  */

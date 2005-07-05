@@ -24,6 +24,7 @@ import java.util.Map;
 /**
  *  Implementation of JexlContext based on a HashMap
  *
+ *  @since 1.0
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */

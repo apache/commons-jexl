@@ -28,6 +28,7 @@ import java.util.Map;
  * Keys {@link java.lang.Method} objects by a concatenation of the
  * method name and the names of classes that make up the parameters.
  *
+ * @since 1.0
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
  * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>

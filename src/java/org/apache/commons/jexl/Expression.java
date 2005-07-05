@@ -28,7 +28,8 @@ package org.apache.commons.jexl;
  * An expression is different than a script - it is simply a reference of
  * an expression.
  * </p>
- * 
+ *
+ * @since 1.0
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  */

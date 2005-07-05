@@ -25,6 +25,7 @@ import org.apache.commons.jexl.parser.SimpleNode;
  * Instances of ExpressionImpl are created by the {@link ExpressionFactory},
  * and this is the default implementation of the {@link Expression} interface.
  *
+ *  @since 1.0
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */

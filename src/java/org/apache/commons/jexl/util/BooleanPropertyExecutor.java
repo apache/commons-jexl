@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
  *  get< flip 1st char> get("property") and now followed
  *  by is<Property>
  *
+ *  @since 1.0
  *  @author <a href="geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */

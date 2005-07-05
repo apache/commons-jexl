@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 
 /**
  * Returned the value of object property when executed.
+ * @since 1.0
  */
 public class PropertyExecutor extends AbstractExecutor
 {

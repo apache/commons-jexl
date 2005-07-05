@@ -36,6 +36,7 @@ import java.util.ArrayList;
  *  Implementation of Uberspect to provide the default introspective
  *  functionality of Velocity
  *
+ * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */

@@ -21,6 +21,7 @@ package org.apache.commons.jexl.util.introspection;
  *
  *  Taken from velocity for self-sufficiency.
  *
+ * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */

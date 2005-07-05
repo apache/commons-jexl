@@ -46,6 +46,7 @@ import java.lang.reflect.Method;
  *
  * This mapping is performed for all the methods in a class
  * and stored for 
+ * @since 1.0
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
  * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>

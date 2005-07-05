@@ -23,6 +23,7 @@ package org.apache.commons.jexl.util.introspection;
  *
  *      #set($foo.bar = "hello")
  *
+ * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */

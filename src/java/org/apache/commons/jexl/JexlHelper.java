@@ -24,6 +24,7 @@ import org.apache.commons.jexl.context.HashMapContext;
  *  is no reason not to directly instantiate {@link HashMapContext} in your
  *  own application.
  *
+ *  @since 1.0
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */

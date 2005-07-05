@@ -23,6 +23,7 @@ import java.util.Iterator;
  * 'Federated' introspection/reflection interface to allow the introspection
  *  behavior in Velocity to be customized.
  *
+ * @since 1.0
  * @author <a href="mailto:geirm@apache.org">Geir Magusson Jr.</a>
  * @version $Id$
  */

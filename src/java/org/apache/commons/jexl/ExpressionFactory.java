@@ -41,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
  * parsed and verified.  If the supplied expression is neither an
  * expression not a reference, an exception is thrown from createException().
  * </p>
+ * @since 1.0
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  */
