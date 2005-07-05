@@ -22,6 +22,7 @@ import org.apache.commons.jexl.ExpressionFactory;
 /**
  *  simple example to show how to access method and properties
  *
+ *  @since 1.0
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
