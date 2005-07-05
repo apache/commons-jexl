@@ -25,6 +25,7 @@ import java.util.ArrayList;
 /**
  *  simple example to show how to access arrays
  *
+ *  @since 1.0
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
