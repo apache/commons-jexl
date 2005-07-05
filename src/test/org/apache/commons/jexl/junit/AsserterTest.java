@@ -26,6 +26,7 @@ import org.apache.commons.jexl.Foo;
 /**
  *  Simple testcases
  *
+ *  @since 1.0
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */

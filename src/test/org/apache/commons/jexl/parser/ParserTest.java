@@ -10,6 +10,7 @@ import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.JexlHelper;
 
 /**
+ * @since 1.0
  *
  */
 public class ParserTest extends TestCase
