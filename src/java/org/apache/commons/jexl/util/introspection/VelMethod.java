@@ -24,6 +24,7 @@ package org.apache.commons.jexl.util.introspection;
  *    $foo.bar()
  *
  *
+ * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */

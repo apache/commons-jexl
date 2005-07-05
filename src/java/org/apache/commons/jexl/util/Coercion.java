@@ -18,6 +18,7 @@ package org.apache.commons.jexl.util;
 /**
  *  Coercion utilities for the JSTL EL-like coercion.
  *
+ *  @since 1.0
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  */
 public class Coercion

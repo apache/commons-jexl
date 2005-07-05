@@ -31,6 +31,7 @@ import org.apache.commons.jexl.JexlHelper;
  * expressions. This class can make it easier to do unit tests using
  * Jexl navigation expressions.
  *
+ * @since 1.0
  * @author <a href="mailto:jstrachan@apache.org">James Strachan</a>
  * @version $Revision$
  */

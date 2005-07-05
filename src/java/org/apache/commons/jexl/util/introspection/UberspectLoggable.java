@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
  *
  *  Thanks to Paulo for the suggestion
  *
+ * @since 1.0
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  *

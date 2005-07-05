@@ -20,6 +20,7 @@ import java.util.Map;
 /**
  * Holds a Map of variables which are referenced in a JEXL expression.
  *
+ *  @since 1.0
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */

@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
  * implement the Map interface as was previously
  * the case.
  *
+ * @since 1.0
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @version $Id$
  */

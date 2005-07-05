@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
  * method that is in introspected. This is the superclass
  * for the GetExecutor and PropertyExecutor.
  *
+ * @since 1.0
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$

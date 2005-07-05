@@ -29,7 +29,7 @@ import org.apache.commons.logging.Log;
  * The first time the Introspector sees a 
  * class it creates a class method map for the
  * class in question. Basically the class method map
- * is a Hastable where Method objects are keyed by a
+ * is a Hashtable where Method objects are keyed by a
  * concatenation of the method name and the names of
  * classes that make up the parameters.
  *
@@ -43,6 +43,7 @@ import org.apache.commons.logging.Log;
  *
  * This mapping is performed for all the methods in a class
  * and stored for 
+ * @since 1.0
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
  * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>

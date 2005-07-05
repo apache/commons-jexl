@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
  *  Little class to manage a Velocity uberspector (Vel 1.4+) for instrospective
  *  services
  *
+ *  @since 1.0
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
