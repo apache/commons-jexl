@@ -120,6 +120,7 @@ public class ASTAddNode extends SimpleNode
      * This works hand in hand with parameter 'widening' in java method calls,
      * e.g. a call to substring(int,int) with an int and a long will fail, but
      * a call to substring(int,int) with an int and a short will succeed.
+     * @since 1.0.1
      */
     public static Number unwiden(Long result)
     {
