@@ -20,6 +20,7 @@ import java.util.Map;
 
 /**
  * @author Dion Gillard
+ * @since 1.0
  * Command line interface for Jexl for use in testing
  */
 public class Jexl {
