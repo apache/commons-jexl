@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <classpath>
-  <classpathentry excluding="" kind="src" path="src\java">
+  <classpathentry excluding="" kind="src" path="src/java">
   </classpathentry>
-  <classpathentry output="target\test-classes" kind="src" path="src\test">
+  <classpathentry output="target\test-classes" kind="src" path="src/test">
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/junit/jars/junit-3.8.1.jar">
   </classpathentry>
@@ -11,6 +11,6 @@
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/commons-logging/jars/commons-logging-1.0.3.jar">
   </classpathentry>
-  <classpathentry kind="output" path="target\classes">
+  <classpathentry kind="output" path="target/classes">
   </classpathentry>
 </classpath>
