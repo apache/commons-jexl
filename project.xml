@@ -18,7 +18,8 @@
 
 <project>
   <pomVersion>3</pomVersion>
-  <id>commons-jexl</id>
+  <groupId>commons-jexl</groupId>
+  <artifactId>commons-jexl</artifactId>
   <inceptionYear>2003</inceptionYear>
   <currentVersion>1.0.1-SNAPSHOT</currentVersion>
   <name>Commons JEXL</name>
@@ -116,11 +117,13 @@
   </developers>
   <dependencies>
     <dependency>
-      <id>junit</id>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
       <version>3.8.1</version>
     </dependency>
     <dependency>
-      <id>commons-logging</id>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
       <version>1.0.3</version>
     </dependency>
   </dependencies>
