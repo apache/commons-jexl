@@ -114,6 +114,12 @@
       <email>jstrachan@apache.org</email>
       <organization>SpiritSoft, Inc.</organization>
     </developer>
+    <developer>
+      <name>Rahul Akolkar</name>
+      <id>rahul</id>
+      <email>rahul AT apache.org</email>
+      <organization>Apache Software Foundation</organization>
+    </developer>
   </developers>
   <dependencies>
     <dependency>
