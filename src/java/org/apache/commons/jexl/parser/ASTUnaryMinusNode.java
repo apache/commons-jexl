@@ -47,11 +47,37 @@ public class ASTUnaryMinusNode extends SimpleNode
     {
         Object val = ((SimpleNode) jjtGetChild(0)).value(jc);
 
-        if (val instanceof Integer)
+        if (val instanceof Byte)
         {
-            return new Integer(- ( ((Integer) val).intValue() ) );
+        	byte valueAsByte = ((Byte) val).byteValue();
+            return new Byte((byte) -valueAsByte);
+        } 
+        else if (val instanceof Short)
+        {
+        	short valueAsShort = ((Short) val).shortValue(); 
+            return new Short((short) -valueAsShort);
         }
-        throw new Exception("expression not integer valued");
+        else if (val instanceof Integer)
+        {
+        	int valueAsInt = ((Integer) val).intValue();
+            return new Integer(-valueAsInt);
+        }
+        else if (val instanceof Long)
+        {
+        	long valueAsLong = ((Long) val).longValue();
+            return new Long(-valueAsLong);
+        }
+        else if (val instanceof Float)
+        {
+        	float valueAsFloat = ((Float) val).floatValue(); 
+        	return new Float( -valueAsFloat  );
+        }
+        else if (val instanceof Double)
+        {
+        	double valueAsDouble = ((Double) val).doubleValue();  
+        	return new Double( -valueAsDouble );
+        }
+        throw new Exception("expression not a number");
     }
 }
 
