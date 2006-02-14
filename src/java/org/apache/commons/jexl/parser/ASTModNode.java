@@ -99,7 +99,7 @@ public class ASTModNode extends SimpleNode
         if (r.longValue() == 0)
             return new Long(0);
 
-        return ASTAddNode.unwiden(new Long(l.longValue() % r.longValue()));
+        return new Long(l.longValue() % r.longValue());
     }
 
 }

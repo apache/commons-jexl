@@ -54,7 +54,7 @@ public class ASTAddNode extends SimpleNode
          *  the spec says 'and'
          */
         if (left == null && right == null)
-            return new Byte((byte)0);
+            return new Long(0);
 
         /*
          *  if anything is float, double or string with ( "." | "E" | "e")
@@ -103,8 +103,7 @@ public class ASTAddNode extends SimpleNode
         {
             Long l = left == null ? new Long(0) : Coercion.coerceLong(left);
             Long r = right == null ? new Long(0) : Coercion.coerceLong(right);
-            Long result = new Long(l.longValue() + r.longValue());
-            return unwiden(result);
+            return new Long(l.longValue() + r.longValue());
         }
         catch( java.lang.NumberFormatException nfe )
         {
@@ -113,30 +112,5 @@ public class ASTAddNode extends SimpleNode
              */
             return left.toString().concat(right.toString());
         }
-    }
-    
-    /**
-     * Given a long, return back the smallest type the result will fit into.
-     * This works hand in hand with parameter 'widening' in java method calls,
-     * e.g. a call to substring(int,int) with an int and a long will fail, but
-     * a call to substring(int,int) with an int and a short will succeed.
-     * @since 1.0.1
-     */
-    public static Number unwiden(Long result)
-    {
-        if (result.longValue() <= Byte.MAX_VALUE && result.longValue() >= Byte.MIN_VALUE)
-        {
-            // it will fit in a byte
-            return new Byte((byte)result.longValue());
-        }
-        else if (result.longValue() <= Short.MAX_VALUE && result.longValue() >= Short.MIN_VALUE)
-        {
-            return new Short((short)result.longValue());
-        }
-        else if (result.longValue() <= Integer.MAX_VALUE && result.longValue() >= Integer.MIN_VALUE)
-        {
-            return new Integer((int)result.longValue());
-        }
-        return result;
     }
 }

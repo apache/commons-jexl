@@ -90,8 +90,7 @@ public class ASTSubtractNode extends SimpleNode
          *  where bar wants an int... 
          * 
          */
-        long v = l.longValue() - r.longValue();
-        return ASTAddNode.unwiden(new Long(v));
+        return new Long(l.longValue() - r.longValue());
 
      }
     /** Accept the visitor. **/
