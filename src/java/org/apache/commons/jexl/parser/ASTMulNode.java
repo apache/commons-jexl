@@ -87,7 +87,7 @@ public class ASTMulNode extends SimpleNode
         Long l = Coercion.coerceLong(left);
         Long r = Coercion.coerceLong(right);
 
-        return ASTAddNode.unwiden(new Long(l.longValue() * r.longValue()));
+        return new Long(l.longValue() * r.longValue());
     }
 
 }
