@@ -347,12 +347,12 @@ public class JexlTest extends TestCase
 
         jc.getVars().put("foo", new Integer(2) );
 
-        assertExpression(jc, "foo + 2", new Byte((byte)4));
-        assertExpression(jc, "3 + 3", new Byte((byte)6));
-        assertExpression(jc, "3 + 3 + foo", new Byte((byte)8));
-        assertExpression(jc, "3 * 3", new Byte((byte)9));
-        assertExpression(jc, "3 * 3 + foo", new Byte((byte)11));
-        assertExpression(jc, "3 * 3 - foo", new Byte((byte)7));
+        assertExpression(jc, "foo + 2", new Long(4));
+        assertExpression(jc, "3 + 3", new Long(6));
+        assertExpression(jc, "3 + 3 + foo", new Long(8));
+        assertExpression(jc, "3 * 3", new Long(9));
+        assertExpression(jc, "3 * 3 + foo", new Long(11));
+        assertExpression(jc, "3 * 3 - foo", new Long(7));
 
         /*
          * test some floaty stuff
@@ -367,7 +367,7 @@ public class JexlTest extends TestCase
         assertExpression(jc, "6.4 / 3", new Double(6.4 / 3));
         assertExpression(jc, "0 / 3", new Double(0 / 3));
         assertExpression(jc, "3 / 0", new Double(0));
-        assertExpression(jc, "4 % 3", new Byte((byte)1));
+        assertExpression(jc, "4 % 3", new Long(1));
         assertExpression(jc, "4.8 % 3", new Double(4.8 % 3));
 
         /*
@@ -380,8 +380,8 @@ public class JexlTest extends TestCase
          * test new null coersion
          */
         jc.getVars().put("imanull", null );
-        assertExpression(jc, "imanull + 2", new Byte((byte)2));
-        assertExpression(jc, "imanull + imanull", new Byte((byte)0));
+        assertExpression(jc, "imanull + 2", new Long(2));
+        assertExpression(jc, "imanull + imanull", new Long(0));
         
         /* test for bugzilla 31577 */
         jc.getVars().put("n", new Integer(0));
@@ -868,7 +868,7 @@ public class JexlTest extends TestCase
      */
     public void testComment() throws Exception
     {
-        assertExpression(JexlHelper.createContext(), "## double or nothing\n 1 + 1", Byte.valueOf("2"));
+        assertExpression(JexlHelper.createContext(), "## double or nothing\n 1 + 1", Long.valueOf("2"));
     }
     
     /**
@@ -884,8 +884,8 @@ public class JexlTest extends TestCase
         
         assertExpression(jc, "hello = 'world'", "world");
         assertEquals("hello variable not changed", "world", jc.getVars().get("hello"));
-        assertExpression(jc, "result = 1 + 1", new Byte((byte)2));
-        assertEquals("result variable not changed", new Byte((byte)2), jc.getVars().get("result"));
+        assertExpression(jc, "result = 1 + 1", new Long(2));
+        assertEquals("result variable not changed", new Long(2), jc.getVars().get("result"));
     }
     
     public void testAntPropertiesWithMethods() throws Exception
