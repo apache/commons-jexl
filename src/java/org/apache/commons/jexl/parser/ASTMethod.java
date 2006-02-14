@@ -54,9 +54,24 @@ public class ASTMethod extends SimpleNode
             }
 
             VelMethod vm = Introspector.getUberspect().getMethod(obj, methodName, params, DUMMY);
-
+            /*
+             * DG: If we can't find an exact match, narrow the parameters and try again! 
+             */
             if (vm == null)
-                return null;
+            {
+            	
+            	// replace all numbers with the smallest type that will fit
+            	for (int i = 0; i < params.length; i++)
+            	{
+            		Object param = params[i];
+            		if (param instanceof Number)
+            		{
+            			params[i] = narrow((Number)param);
+            		}
+            	}
+            	vm = Introspector.getUberspect().getMethod(obj, methodName, params, DUMMY);
+                if (vm == null) return null;
+            }
 
             return vm.invoke(obj, params);
         }
@@ -72,4 +87,53 @@ public class ASTMethod extends SimpleNode
             throw e;
         }
     }
+
+    /**
+     * Given a Number, return back the value using the smallest type the result will fit into.
+     * This works hand in hand with parameter 'widening' in java method calls,
+     * e.g. a call to substring(int,int) with an int and a long will fail, but
+     * a call to substring(int,int) with an int and a short will succeed.
+     * @since 1.0.1
+     */
+    private Number narrow(Number original)
+    {
+    	if (original == null) return null;
+    	Number result = null;
+    	if (original instanceof Double || original instanceof Float)
+    	{
+    		double value = result.doubleValue();
+    		if (value <= Float.MAX_VALUE && value >= Float.MIN_VALUE)
+    		{
+    			result = new Float(result.floatValue());
+    		}
+    		else
+    		{
+    			// it was a double
+    			result = original;
+    		}
+    	}
+    	else
+    	{
+    		long value = original.longValue();
+	        if (value <= Byte.MAX_VALUE && value >= Byte.MIN_VALUE)
+	        {
+	            // it will fit in a byte
+	            result = new Byte((byte)value);
+	        }
+	        else if (value <= Short.MAX_VALUE && value >= Short.MIN_VALUE)
+	        {
+	        	result = new Short((short)value);
+	        }
+	        else if (value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE)
+	        {
+	        	result = new Integer((int)value);
+	        }
+	        else
+	        {
+	        	result = original;
+	        }
+    	}
+        return result;
+    }
+
 }
