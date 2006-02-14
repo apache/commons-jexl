@@ -325,6 +325,18 @@ public class JexlTest extends TestCase
 
 
 
+   /**
+    *  test some simple mathematical calculations
+    */
+   public void testUnaryMinus()
+        throws Exception
+   {
+       JexlContext jc = JexlHelper.createContext();
+       assertExpression(jc, "-3", new Integer(-3));
+       assertExpression(jc, "-3.0", new Float("-3.0"));
+   }
+
+    
     /**
       *  test some simple mathematical calculations
       */
