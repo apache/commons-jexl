@@ -15,6 +15,9 @@
  */
 package org.apache.commons.jexl.parser;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import org.apache.commons.jexl.JexlContext;
 
 
@@ -76,6 +79,16 @@ public class ASTUnaryMinusNode extends SimpleNode
         {
         	double valueAsDouble = ((Double) val).doubleValue();  
         	return new Double( -valueAsDouble );
+        }
+        else if (val instanceof BigDecimal)
+        {
+        	BigDecimal valueAsBigD = (BigDecimal)val;
+        	return valueAsBigD.negate();
+        }
+        else if (val instanceof BigInteger)
+        {
+        	BigInteger valueAsBigI = (BigInteger)val;
+        	return valueAsBigI.negate();
         }
         throw new Exception("expression not a number");
     }
