@@ -98,19 +98,15 @@ public class ASTMethod extends SimpleNode
     private Number narrow(Number original)
     {
     	if (original == null) return null;
-    	Number result = null;
+    	Number result = original;
     	if (original instanceof Double || original instanceof Float)
     	{
-    		double value = result.doubleValue();
+    		double value = original.doubleValue();
     		if (value <= Float.MAX_VALUE && value >= Float.MIN_VALUE)
     		{
     			result = new Float(result.floatValue());
     		}
-    		else
-    		{
-    			// it was a double
-    			result = original;
-    		}
+   			// else it was already a double
     	}
     	else
     	{
@@ -128,10 +124,7 @@ public class ASTMethod extends SimpleNode
 	        {
 	        	result = new Integer((int)value);
 	        }
-	        else
-	        {
-	        	result = original;
-	        }
+   			// else it was already a long
     	}
         return result;
     }
