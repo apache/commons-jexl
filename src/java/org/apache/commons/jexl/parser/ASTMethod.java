@@ -1,6 +1,8 @@
 package org.apache.commons.jexl.parser;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Introspector;
@@ -97,7 +99,7 @@ public class ASTMethod extends SimpleNode
      */
     private Number narrow(Number original)
     {
-    	if (original == null) return null;
+    	if (original == null || original instanceof BigDecimal || original instanceof BigInteger) return original; 
     	Number result = original;
     	if (original instanceof Double || original instanceof Float)
     	{
