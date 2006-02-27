@@ -119,7 +119,7 @@ public class ExpressionFactory
             tree = parser.parse(new StringReader(expr));
         }
 
-        // Must be a simple reference or expression, otherwise
+        // Must be a simple reference, expression, statement or if, otherwise
         // throw an exception.
         SimpleNode node = (SimpleNode) tree.jjtGetChild(0);
 
@@ -137,7 +137,7 @@ public class ExpressionFactory
             return new ExpressionImpl(expression, node);
         }
         log.error( "Invalid Expression, node of type: " + node.getClass().getName() );
-        throw new Exception("Invalid Expression: neither Reference nor Expression");
+        throw new Exception("Invalid Expression: not a Reference, Expression, Statement or If");
     }
 
     /**
