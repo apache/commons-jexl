@@ -84,7 +84,9 @@ public class IfTest extends TestCase {
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
-        assertNull("Return value is not empty", o);
+        assertNotNull("Return value is empty", o);
+        assertTrue("Result is not a String", o instanceof String);
+        assertEquals("Result is wrong", "hello", o);
     }
 
     /**
@@ -98,7 +100,9 @@ public class IfTest extends TestCase {
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
-        assertNull("Return value is not empty", o);
+        assertNotNull("Return value is empty", o);
+        assertTrue("Result is not an Integer", o instanceof Integer);
+        assertEquals("Result is wrong", Integer.valueOf(2), o);
     }
 
     /**
@@ -134,4 +138,38 @@ public class IfTest extends TestCase {
         assertTrue("Result is not a boolean", o instanceof Boolean);
         assertEquals("Result is not true", Boolean.TRUE, o);
     }
+
+    /**
+     * Test the if statement evaluates decimal arithmetic expressions correctly
+     * 
+     * @throws Exception on any error
+     */
+    public void testIfWithDecimalArithmeticExpression() throws Exception {
+        Expression e = ExpressionFactory
+                .createExpression("if ((x * 2) == 5) true;");
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("x", Float.valueOf(2.5f));
+
+        Object o = e.evaluate(jc);
+        assertNotNull("Return value is empty", o);
+        assertTrue("Result is not a boolean", o instanceof Boolean);
+        assertEquals("Result is not true", Boolean.TRUE, o);
+    }
+
+    /**
+     * Test the if statement works with assignment
+     * 
+     * @throws Exception on any error
+     */
+    public void testIfWithAssignment() throws Exception {
+        Expression e = ExpressionFactory
+                .createExpression("if ((x * 2) == 5) {y = 1;} else {y = 2;}");
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("x", Float.valueOf(2.5f));
+
+        e.evaluate(jc);
+        Object result = jc.getVars().get("y");
+        assertNotNull(result);
+    }
+
 }
