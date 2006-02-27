@@ -21,9 +21,10 @@
   <title>Commons JEXL</title>
   <body>
     &top-menus;
-    <menu name="Commons Jexl">
+    <menu name="Commons&#xA0;Jexl">
       <item name="Overview"                      href="/index.html" />
-      <item name="API Documentation"             href="/apidocs/index.html"/>
+      <item name="1.0&#xA0;Javadoc"              href="/apidocs-1.0/index.html"/>
+      <item name="Latest&#xA0;Javadoc"           href="/apidocs/index.html"/>
       <item name="Examples"                      href="http://svn.apache.org/repos/asf/jakarta/commons/proper/jexl/trunk/examples/"/>
       <item name="Releases and Builds"           href="/releases.html"/>
       <item name="Jar Downloads"                 href="/downloads.html"/>
