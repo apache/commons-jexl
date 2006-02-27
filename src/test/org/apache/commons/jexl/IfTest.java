@@ -39,7 +39,7 @@ public class IfTest extends TestCase {
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
-        assertEquals("Result is not 1", Integer.valueOf(1), o);
+        assertEquals("Result is not 1", new Integer(1), o);
     }
 
     /**
@@ -66,7 +66,7 @@ public class IfTest extends TestCase {
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
-        assertEquals("Result is not 2", Integer.valueOf(2), o);
+        assertEquals("Result is not 2", new Integer(2), o);
     }
 
     /**
@@ -94,7 +94,7 @@ public class IfTest extends TestCase {
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", Integer.valueOf(2), o);
+        assertEquals("Result is wrong", new Integer(2), o);
     }
 
     /**
@@ -106,7 +106,7 @@ public class IfTest extends TestCase {
         Expression e = ExpressionFactory
                 .createExpression("if (x == 1) true;");
         JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", Integer.valueOf(1));
+        jc.getVars().put("x", new Integer(1));
 
         Object o = e.evaluate(jc);
         assertEquals("Result is not true", Boolean.TRUE, o);
@@ -121,7 +121,7 @@ public class IfTest extends TestCase {
         Expression e = ExpressionFactory
                 .createExpression("if ((x * 2) + 1 == 5) true;");
         JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", Integer.valueOf(2));
+        jc.getVars().put("x", new Integer(2));
 
         Object o = e.evaluate(jc);
         assertEquals("Result is not true", Boolean.TRUE, o);
@@ -136,7 +136,7 @@ public class IfTest extends TestCase {
         Expression e = ExpressionFactory
                 .createExpression("if ((x * 2) == 5) true;");
         JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", Float.valueOf(2.5f));
+        jc.getVars().put("x", new Float(2.5f));
 
         Object o = e.evaluate(jc);
         assertEquals("Result is not true", Boolean.TRUE, o);
@@ -151,10 +151,10 @@ public class IfTest extends TestCase {
         Expression e = ExpressionFactory
                 .createExpression("if ((x * 2) == 5) {y = 1;} else {y = 2;}");
         JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", Float.valueOf(2.5f));
+        jc.getVars().put("x", new Float(2.5f));
 
         e.evaluate(jc);
         Object result = jc.getVars().get("y");
-        assertEquals("y has the wrong value", Integer.valueOf(1), result);
+        assertEquals("y has the wrong value", new Integer(1), result);
     }
 }
