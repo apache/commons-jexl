@@ -31,10 +31,10 @@ public class IfTest extends TestCase {
 
     /**
      * Make sure if true executes the true statement
+     * 
      * @throws Exception on any error
      */
-    public void testSimpleIfTrue() throws Exception
-    {
+    public void testSimpleIfTrue() throws Exception {
         Expression e = ExpressionFactory.createExpression("if (true) 1");
         JexlContext jc = JexlHelper.createContext();
 
@@ -46,10 +46,10 @@ public class IfTest extends TestCase {
 
     /**
      * Make sure if false doesn't execute the true statement
+     * 
      * @throws Exception on any error
      */
-    public void testSimpleIfFalse() throws Exception
-    {
+    public void testSimpleIfFalse() throws Exception {
         Expression e = ExpressionFactory.createExpression("if (false) 1");
         JexlContext jc = JexlHelper.createContext();
 
@@ -59,11 +59,12 @@ public class IfTest extends TestCase {
 
     /**
      * Make sure if false executes the false statement
+     * 
      * @throws Exception on any error
      */
-    public void testSimpleElse() throws Exception
-    {
-        Expression e = ExpressionFactory.createExpression("if (false) 1; else 2;");
+    public void testSimpleElse() throws Exception {
+        Expression e = ExpressionFactory
+                .createExpression("if (false) 1; else 2;");
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
@@ -74,11 +75,12 @@ public class IfTest extends TestCase {
 
     /**
      * Test the if statement handles blocks correctly
+     * 
      * @throws Exception on any error
      */
-    public void testBlockIfTrue() throws Exception
-    {
-        Expression e = ExpressionFactory.createExpression("if (true) { 'hello'; }");
+    public void testBlockIfTrue() throws Exception {
+        Expression e = ExpressionFactory
+                .createExpression("if (true) { 'hello'; }");
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
@@ -87,14 +89,49 @@ public class IfTest extends TestCase {
 
     /**
      * Test the if statement handles blocks in the else statement correctly
+     * 
      * @throws Exception on any error
      */
-    public void testBlockElse() throws Exception
-    {
-        Expression e = ExpressionFactory.createExpression("if (false) {1;} else {2;}");
+    public void testBlockElse() throws Exception {
+        Expression e = ExpressionFactory
+                .createExpression("if (false) {1;} else {2;}");
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
         assertNull("Return value is not empty", o);
+    }
+
+    /**
+     * Test the if statement evaluates expressions correctly
+     * 
+     * @throws Exception on any error
+     */
+    public void testIfWithSimpleExpression() throws Exception {
+        Expression e = ExpressionFactory
+                .createExpression("if (x == 1) true;");
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("x", Integer.valueOf(1));
+
+        Object o = e.evaluate(jc);
+        assertNotNull("Return value is empty", o);
+        assertTrue("Result is not a boolean", o instanceof Boolean);
+        assertEquals("Result is not true", Boolean.TRUE, o);
+    }
+
+    /**
+     * Test the if statement evaluates arithmetic expressions correctly
+     * 
+     * @throws Exception on any error
+     */
+    public void testIfWithArithmeticExpression() throws Exception {
+        Expression e = ExpressionFactory
+                .createExpression("if ((x * 2) + 1 == 5) true;");
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("x", Integer.valueOf(2));
+
+        Object o = e.evaluate(jc);
+        assertNotNull("Return value is empty", o);
+        assertTrue("Result is not a boolean", o instanceof Boolean);
+        assertEquals("Result is not true", Boolean.TRUE, o);
     }
 }
