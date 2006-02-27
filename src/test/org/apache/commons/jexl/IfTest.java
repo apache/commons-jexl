@@ -28,7 +28,11 @@ public class IfTest extends TestCase {
     public IfTest(String testName) {
         super(testName);
     }
-    
+
+    /**
+     * Make sure if true executes the true statement
+     * @throws Exception on any error
+     */
     public void testSimpleIfTrue() throws Exception
     {
         Expression e = ExpressionFactory.createExpression("if (true) 1");
@@ -40,6 +44,10 @@ public class IfTest extends TestCase {
         assertEquals("Result is not 1", Integer.valueOf(1), o);
     }
 
+    /**
+     * Make sure if false doesn't execute the true statement
+     * @throws Exception on any error
+     */
     public void testSimpleIfFalse() throws Exception
     {
         Expression e = ExpressionFactory.createExpression("if (false) 1");
@@ -49,6 +57,10 @@ public class IfTest extends TestCase {
         assertNull("Return value is not empty", o);
     }
 
+    /**
+     * Make sure if false executes the false statement
+     * @throws Exception on any error
+     */
     public void testSimpleElse() throws Exception
     {
         Expression e = ExpressionFactory.createExpression("if (false) 1; else 2;");
@@ -58,5 +70,31 @@ public class IfTest extends TestCase {
         assertNotNull("Return value is empty", o);
         assertTrue("Result is not an integer", o instanceof Integer);
         assertEquals("Result is not 2", Integer.valueOf(2), o);
+    }
+
+    /**
+     * Test the if statement handles blocks correctly
+     * @throws Exception on any error
+     */
+    public void testBlockIfTrue() throws Exception
+    {
+        Expression e = ExpressionFactory.createExpression("if (true) { 'hello'; }");
+        JexlContext jc = JexlHelper.createContext();
+
+        Object o = e.evaluate(jc);
+        assertNull("Return value is not empty", o);
+    }
+
+    /**
+     * Test the if statement handles blocks in the else statement correctly
+     * @throws Exception on any error
+     */
+    public void testBlockElse() throws Exception
+    {
+        Expression e = ExpressionFactory.createExpression("if (false) {1;} else {2;}");
+        JexlContext jc = JexlHelper.createContext();
+
+        Object o = e.evaluate(jc);
+        assertNull("Return value is not empty", o);
     }
 }
