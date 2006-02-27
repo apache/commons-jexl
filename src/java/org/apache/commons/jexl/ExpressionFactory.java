@@ -18,6 +18,7 @@ package org.apache.commons.jexl;
 import java.io.StringReader;
 
 import org.apache.commons.jexl.parser.ASTExpressionExpression;
+import org.apache.commons.jexl.parser.ASTIfStatement;
 import org.apache.commons.jexl.parser.ASTReferenceExpression;
 import org.apache.commons.jexl.parser.ASTStatementExpression;
 import org.apache.commons.jexl.parser.Parser;
@@ -130,6 +131,10 @@ public class ExpressionFactory
             Expression e = new ExpressionImpl(expression, node);
         
             return e;
+        }
+        else if (node instanceof ASTIfStatement)
+        {
+            return new ExpressionImpl(expression, node);
         }
         log.error( "Invalid Expression, node of type: " + node.getClass().getName() );
         throw new Exception("Invalid Expression: neither Reference nor Expression");
