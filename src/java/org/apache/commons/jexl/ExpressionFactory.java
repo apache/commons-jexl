@@ -21,6 +21,7 @@ import org.apache.commons.jexl.parser.ASTExpressionExpression;
 import org.apache.commons.jexl.parser.ASTIfStatement;
 import org.apache.commons.jexl.parser.ASTReferenceExpression;
 import org.apache.commons.jexl.parser.ASTStatementExpression;
+import org.apache.commons.jexl.parser.ASTWhileStatement;
 import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.logging.Log;
@@ -132,7 +133,8 @@ public class ExpressionFactory
         
             return e;
         }
-        else if (node instanceof ASTIfStatement)
+        else if (node instanceof ASTIfStatement 
+                || node instanceof ASTWhileStatement)
         {
             return new ExpressionImpl(expression, node);
         }
