@@ -25,6 +25,7 @@
   </properties>
   <body>
     <release version="1.0.1-SNAPSHOT" date="in SVN">
+      <action dev="dion" type="add">Added implementation for block statements, e.g. curly braces containing multiple statements.</action>
       <action dev="dion" type="add">Added implementation for the if statement.</action>
       <action dev="dion" type="fix" issue="36857">Unary minus was only working for integer values.</action>
       <action dev="dion" type="update">Add @since tags to code so we can track API additions via javadoc</action>
