@@ -39,8 +39,6 @@ public class IfTest extends TestCase {
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
-        assertNotNull("Return value is empty", o);
-        assertTrue("Result is not an integer", o instanceof Integer);
         assertEquals("Result is not 1", Integer.valueOf(1), o);
     }
 
@@ -68,8 +66,6 @@ public class IfTest extends TestCase {
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
-        assertNotNull("Return value is empty", o);
-        assertTrue("Result is not an integer", o instanceof Integer);
         assertEquals("Result is not 2", Integer.valueOf(2), o);
     }
 
@@ -84,8 +80,6 @@ public class IfTest extends TestCase {
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
-        assertNotNull("Return value is empty", o);
-        assertTrue("Result is not a String", o instanceof String);
         assertEquals("Result is wrong", "hello", o);
     }
 
@@ -100,8 +94,6 @@ public class IfTest extends TestCase {
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
-        assertNotNull("Return value is empty", o);
-        assertTrue("Result is not an Integer", o instanceof Integer);
         assertEquals("Result is wrong", Integer.valueOf(2), o);
     }
 
@@ -117,8 +109,6 @@ public class IfTest extends TestCase {
         jc.getVars().put("x", Integer.valueOf(1));
 
         Object o = e.evaluate(jc);
-        assertNotNull("Return value is empty", o);
-        assertTrue("Result is not a boolean", o instanceof Boolean);
         assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
@@ -134,8 +124,6 @@ public class IfTest extends TestCase {
         jc.getVars().put("x", Integer.valueOf(2));
 
         Object o = e.evaluate(jc);
-        assertNotNull("Return value is empty", o);
-        assertTrue("Result is not a boolean", o instanceof Boolean);
         assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
@@ -151,8 +139,6 @@ public class IfTest extends TestCase {
         jc.getVars().put("x", Float.valueOf(2.5f));
 
         Object o = e.evaluate(jc);
-        assertNotNull("Return value is empty", o);
-        assertTrue("Result is not a boolean", o instanceof Boolean);
         assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
@@ -171,5 +157,4 @@ public class IfTest extends TestCase {
         Object result = jc.getVars().get("y");
         assertEquals("y has the wrong value", Integer.valueOf(1), result);
     }
-
 }
