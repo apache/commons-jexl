@@ -20,10 +20,10 @@
 <project name="Commons JEXL">
   <title>Commons JEXL</title>
   <body>
-  	&top-menus;
-    <menu name="Commons&#xA0;Jexl">
+    &top-menus;
+    <menu name="Commons Jexl">
       <item name="Overview"                      href="/index.html" />
-      <item name="API&#xA0;Documentation"        href="/apidocs/index.html"/>
+      <item name="API Documentation"             href="/apidocs/index.html"/>
       <item name="Examples"                      href="http://svn.apache.org/repos/asf/jakarta/commons/proper/jexl/trunk/examples/"/>
       <item name="Releases and Builds"           href="/releases.html"/>
       <item name="Jar Downloads"                 href="/downloads.html"/>
@@ -36,4 +36,3 @@
 </project>
 
 
-	
