@@ -169,7 +169,7 @@ public class IfTest extends TestCase {
 
         e.evaluate(jc);
         Object result = jc.getVars().get("y");
-        assertNotNull(result);
+        assertEquals("y has the wrong value", Integer.valueOf(1), result);
     }
 
 }
