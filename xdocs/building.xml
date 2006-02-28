@@ -44,6 +44,9 @@ limitations under the License.
     directory to build the full website, and place it as a sibling directory of the
     JEXL root directory. The result will be in "target/docs".
   </p>
+  <p>
+    To build the site, you need Maven 1.0.2 and version 1.9.2 of the maven-xdoc-plugin installed.
+  </p>
 </section>
 <!-- ================================================== -->
 <section name="Ant Goals">
