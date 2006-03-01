@@ -120,6 +120,14 @@ public class ExpressionFactory
             tree = parser.parse(new StringReader(expr));
         }
 
+        if (tree.jjtGetNumChildren() > 1) {
+            if (log.isWarnEnabled()) {
+                log.warn( "The JEXL Expression created will be a reference"
+                    + " to the first expression from the supplied script: \""
+                    + expression + "\" " );
+            }
+        }
+
         // Must be a simple reference, expression, statement or if, otherwise
         // throw an exception.
         SimpleNode node = (SimpleNode) tree.jjtGetChild(0);
