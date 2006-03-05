@@ -81,15 +81,6 @@ public class ASTSubtractNode extends SimpleNode
         Long l = Coercion.coerceLong(left);
         Long r = Coercion.coerceLong(right);
 
-        /*
-         *  TODO - this is actually wrong - JSTL says to return a Long
-         *  but we have problems where you have something like 
-         * 
-         *     foo.bar( a - b )
-         * 
-         *  where bar wants an int... 
-         * 
-         */
         return new Long(l.longValue() - r.longValue());
 
      }
