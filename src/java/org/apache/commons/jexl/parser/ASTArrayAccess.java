@@ -69,7 +69,7 @@ public class ASTArrayAccess extends SimpleNode
      {
          ASTIdentifier base = (ASTIdentifier) jjtGetChild(0);
 
-         obj = base.execute(obj,jc);
+         Object result = base.execute(obj,jc);
 
          /*
           * ignore the first child - it's our identifier
@@ -81,10 +81,10 @@ public class ASTArrayAccess extends SimpleNode
              if(loc==null)
                  return null;
 
-             obj = evaluateExpr(obj, loc);
+             result = evaluateExpr(result, loc);
          }
 
-         return obj;
+         return result;
      }
 
     /**
