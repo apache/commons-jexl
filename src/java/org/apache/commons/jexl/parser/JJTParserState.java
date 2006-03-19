@@ -2,17 +2,19 @@
 
 package org.apache.commons.jexl.parser;
 
+import java.util.Stack;
+
 class JJTParserState {
-  private java.util.Stack nodes;
-  private java.util.Stack marks;
+  private final Stack nodes;
+  private final Stack marks;
 
   private int sp;		// number of nodes on stack
   private int mk;		// current mark
   private boolean node_created;
 
   JJTParserState() {
-    nodes = new java.util.Stack();
-    marks = new java.util.Stack();
+    nodes = new Stack();
+    marks = new Stack();
     sp = 0;
     mk = 0;
   }
