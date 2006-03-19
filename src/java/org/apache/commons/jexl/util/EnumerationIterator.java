@@ -32,7 +32,7 @@ public class EnumerationIterator implements Iterator
     /**
      * The enumeration to iterate.
      */
-    private Enumeration enumeration = null;
+    private final Enumeration enumeration;
 
     /**
      * Creates a new iteratorwrapper instance for the specified 
