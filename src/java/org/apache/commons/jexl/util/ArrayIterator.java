@@ -47,13 +47,13 @@ public class ArrayIterator implements Iterator
     /**
      * The objects to iterate.
      */
-    private Object array;
+    private final Object array;
 
     /**
      * The current position and size in the array.
      */
     private int pos;
-    private int size;
+    private final int size;
 
     /**
      * Creates a new iterator instance for the specified array.
