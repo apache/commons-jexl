@@ -38,7 +38,7 @@ public class GetExecutor extends AbstractExecutor
      * Container to hold the 'key' part of 
      * get(key).
      */
-    private Object[] args = new Object[1];
+    private final Object[] args = new Object[1];
     
     /**
      * Default constructor.
