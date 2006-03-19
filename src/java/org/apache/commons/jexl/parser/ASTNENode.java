@@ -19,7 +19,7 @@ import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Coercion;
 
 /**
- *  != or ne
+ *  Not equal to. Use '!=' or 'ne', do not use <>. 
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$

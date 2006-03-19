@@ -35,8 +35,8 @@ public class ASTBlock extends SimpleNode {
   }
 
   /**
-   * return the value of the block, i.e. execute 
-   * all statements inside and return the value of the last
+   * @return the value of the block.
+   * Execute all statements inside and return the value of the last.
    */
   public Object value(JexlContext context) throws Exception
   {
