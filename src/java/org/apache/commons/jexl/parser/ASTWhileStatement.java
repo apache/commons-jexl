@@ -21,7 +21,9 @@ import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Coercion;
 
 /**
- * while ( expression ) statement
+ * A while loop.
+ * Syntax:
+ *      while ( expression ) statement
  * 
  * @author Dion Gillard
  * @since 1.0.1
