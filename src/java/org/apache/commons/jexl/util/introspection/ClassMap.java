@@ -52,9 +52,9 @@ public class ClassMap
      * Cache of Methods, or CACHE_MISS, keyed by method
      * name and actual arguments used to find it.
      */
-    private Map methodCache = new Hashtable();
+    private final Map methodCache = new Hashtable();
 
-    private MethodMap methodMap = new MethodMap();
+    private final MethodMap methodMap = new MethodMap();
 
     /**
      * Standard constructor
