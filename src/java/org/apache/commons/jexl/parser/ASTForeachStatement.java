@@ -2,18 +2,59 @@
 
 package org.apache.commons.jexl.parser;
 
+import java.util.Iterator;
+
+import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl.util.Introspector;
+import org.apache.commons.jexl.util.introspection.Info;
+
+/**
+ * ForEach statement.
+ * Syntax:
+ *      foreach (var in iterable) Statement()
+ * @author Dion Gillard
+ *
+ */
 public class ASTForeachStatement extends SimpleNode {
-  public ASTForeachStatement(int id) {
-    super(id);
-  }
+    /** dummy velocity info */
+    private static Info DUMMY = new Info("", 1, 1);
 
-  public ASTForeachStatement(Parser p, int id) {
-    super(p, id);
-  }
+    public ASTForeachStatement(int id) {
+        super(id);
+    }
+
+    public ASTForeachStatement(Parser p, int id) {
+        super(p, id);
+    }
 
 
-  /** Accept the visitor. **/
-  public Object jjtAccept(ParserVisitor visitor, Object data) {
-    return visitor.visit(this, data);
-  }
+    /** Accept the visitor. **/
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
+        return visitor.visit(this, data);
+    }
+  
+    public Object value(JexlContext jc) throws Exception {
+        Object result = null;
+        /* first child is the loop variable */
+        ASTReference loopVariable = (ASTReference) jjtGetChild(0); 
+        /* second child is the variable to iterate */
+        SimpleNode iterable = (SimpleNode) jjtGetChild(1);
+        Object iterableValue = iterable.value(jc);
+        // make sure there is a value to iterate on and a statement to execute
+        if (iterableValue != null && jjtGetNumChildren() >= 3) {
+            /* third child is the statement to execute */
+            SimpleNode statement = (SimpleNode) jjtGetChild(2);
+            // get an iterator for the collection/array etc via the introspector.
+            Iterator itemsIterator = Introspector.getUberspect().getIterator(iterableValue, DUMMY);
+            while (itemsIterator.hasNext())
+            {
+                // set loopVariable to value of iterator
+                Object value = itemsIterator.next();
+                jc.getVars().put(loopVariable.getRootString(), value);
+                // execute statement
+                result = statement.value(jc);
+            }
+        }
+        return result;
+    }
 }
