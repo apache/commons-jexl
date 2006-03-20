@@ -18,6 +18,7 @@ package org.apache.commons.jexl;
 import java.io.StringReader;
 
 import org.apache.commons.jexl.parser.ASTExpressionExpression;
+import org.apache.commons.jexl.parser.ASTForeachStatement;
 import org.apache.commons.jexl.parser.ASTIfStatement;
 import org.apache.commons.jexl.parser.ASTReferenceExpression;
 import org.apache.commons.jexl.parser.ASTStatementExpression;
@@ -140,7 +141,8 @@ public class ExpressionFactory
             return e;
         }
         else if (node instanceof ASTIfStatement 
-                || node instanceof ASTWhileStatement)
+                || node instanceof ASTWhileStatement
+                || node instanceof ASTForeachStatement)
         {
             return new ExpressionImpl(expression, node);
         }
