@@ -136,7 +136,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
 
         Method m = introspector.getMethod(obj.getClass(), methodName, args);
 
-        return (m != null) ? new VelMethodImpl(m) : null;
+        return (m == null) ? null : new VelMethodImpl(m);
     }
 
     /**
@@ -160,7 +160,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
          *  look for boolean isFoo()
          */
 
-        if( executor.isAlive() == false)
+        if( !executor.isAlive())
         {
             executor = new BooleanPropertyExecutor(rlog, introspector, claz, identifier);
         }
@@ -169,12 +169,12 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
          *  if that didn't work, look for get("foo")
          */
 
-        if (executor.isAlive() == false)
+        if (!executor.isAlive())
         {
             executor = new GetExecutor(rlog, introspector, claz, identifier);
         }
 
-        return (executor != null) ? new VelGetterImpl(executor) : null;
+        return (executor == null) ? null : new VelGetterImpl(executor);
     }
 
     /**
@@ -242,7 +242,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
             }
        }
 
-       return (vm!=null) ?  new VelSetterImpl(vm) : null;
+       return (vm ==null) ?  null : new VelSetterImpl(vm);
     }
 
     /**
@@ -359,13 +359,13 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
         {
             ArrayList al = new ArrayList();
 
-            if (putKey != null)
+            if (putKey == null)
             {
-                al.add(putKey);
                 al.add(value);
             }
             else
             {
+                al.add(putKey);
                 al.add(value);
             }
 
