@@ -63,7 +63,7 @@ public class Introspector extends IntrospectorBase
     /**
      *  our engine runtime services
      */
-    private  Log rlog = null;
+    private final Log rlog;
 
     /**
      *  Recieves our RuntimeServices object
