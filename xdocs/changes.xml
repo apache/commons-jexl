@@ -25,7 +25,7 @@
   </properties>
   <body>
     <release version="1.0.1-SNAPSHOT" date="in SVN">
-      <action dev="dion" type="add">Added implementation for bitwise and operator.</action>
+      <action dev="dion" type="add">Added implementation for bitwise and operator, plus bitiwse complement.</action>
       <action dev="dion" type="add">Added implementation for the foreach statement.</action>
       <action dev="dion" type="add">Added implementation for the while statement.</action>
       <action dev="dion" type="add">Added implementation for block statements, e.g. curly braces containing multiple statements.</action>

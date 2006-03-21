@@ -2,6 +2,16 @@
 
 package org.apache.commons.jexl.parser;
 
+import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl.util.Coercion;
+
+/**
+ * Bitwise Complement. Syntax:
+ *      ~a
+ * Result is a Long
+ * @author Dion Gillard
+ * @since 1.0.1
+ */
 public class ASTBitwiseComplNode extends SimpleNode {
   public ASTBitwiseComplNode(int id) {
     super(id);
@@ -16,4 +26,16 @@ public class ASTBitwiseComplNode extends SimpleNode {
   public Object jjtAccept(ParserVisitor visitor, Object data) {
     return visitor.visit(this, data);
   }
+  
+  /**
+   * @return a {@link Long} which is the bitwise complement of the operand.
+   */
+  public Object value(JexlContext context) throws Exception
+  {
+      Object left = ((SimpleNode) jjtGetChild(0)).value(context);
+    
+      Long l = left == null ? new Long(0) : Coercion.coerceLong(left);
+      return new Long(~l.longValue());
+  }
+
 }
