@@ -108,4 +108,51 @@ public class BitwiseOperatorTest extends TestCase {
         Object o = e.evaluate(jc);
         assertEquals("Result is wrong", new Long(-16), o);
     }
+
+    public void testOrWithTwoNulls() throws Exception {
+        Expression e = ExpressionFactory.createExpression("null | null");
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(0), o);
+    }
+
+    public void testOrWithLeftNull() throws Exception {
+        Expression e = ExpressionFactory.createExpression("null | 1");
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(1), o);
+    }
+
+    public void testOrWithRightNull() throws Exception {
+        Expression e = ExpressionFactory.createExpression("1 | null");
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(1), o);
+    }
+
+    public void testOrSimple() throws Exception {
+        Expression e = ExpressionFactory.createExpression("12 | 3");
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(15), o);
+    }
+
+    public void testOrVariableNumberCoercion() throws Exception {
+        Expression e = ExpressionFactory.createExpression("x | y");
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("x", new Integer(12));
+        jc.getVars().put("y", new Short((short)3));
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(15), o);
+    }
+
+    public void testOrVariableStringCoercion() throws Exception {
+        Expression e = ExpressionFactory.createExpression("x | y");
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("x", new Integer(12));
+        jc.getVars().put("y", "3");
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(15), o);
+    }
+
 }
