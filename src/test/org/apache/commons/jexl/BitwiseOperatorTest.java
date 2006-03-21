@@ -155,4 +155,49 @@ public class BitwiseOperatorTest extends TestCase {
         assertEquals("Result is wrong", new Long(15), o);
     }
 
+    public void testXorWithTwoNulls() throws Exception {
+        Expression e = ExpressionFactory.createExpression("null ^ null");
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(0), o);
+    }
+
+    public void testXorWithLeftNull() throws Exception {
+        Expression e = ExpressionFactory.createExpression("null ^ 1");
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(1), o);
+    }
+
+    public void testXorWithRightNull() throws Exception {
+        Expression e = ExpressionFactory.createExpression("1 ^ null");
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(1), o);
+    }
+
+    public void testXorSimple() throws Exception {
+        Expression e = ExpressionFactory.createExpression("1 ^ 3");
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(2), o);
+    }
+
+    public void testXorVariableNumberCoercion() throws Exception {
+        Expression e = ExpressionFactory.createExpression("x ^ y");
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("x", new Integer(1));
+        jc.getVars().put("y", new Short((short)3));
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(2), o);
+    }
+
+    public void testXorVariableStringCoercion() throws Exception {
+        Expression e = ExpressionFactory.createExpression("x ^ y");
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("x", new Integer(1));
+        jc.getVars().put("y", "3");
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(2), o);
+    }
 }
