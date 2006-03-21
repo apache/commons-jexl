@@ -78,4 +78,34 @@ public class BitwiseOperatorTest extends TestCase {
         Object o = e.evaluate(jc);
         assertEquals("Result is wrong", new Long(7), o);
     }
+
+    public void testComplementWithNull() throws Exception {
+        Expression e = ExpressionFactory.createExpression("~null");
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(-1), o);
+    }
+    
+    public void testComplementSimple() throws Exception {
+        Expression e = ExpressionFactory.createExpression("~128");
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(-129), o);
+    }
+
+    public void testComplementVariableNumberCoercion() throws Exception {
+        Expression e = ExpressionFactory.createExpression("~x");
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("x", new Integer(15));
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(-16), o);
+    }
+
+    public void testComplementVariableStringCoercion() throws Exception {
+        Expression e = ExpressionFactory.createExpression("~x");
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("x", "15");
+        Object o = e.evaluate(jc);
+        assertEquals("Result is wrong", new Long(-16), o);
+    }
 }
