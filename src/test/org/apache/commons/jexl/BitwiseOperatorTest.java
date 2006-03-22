@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 /**
  * Tests for the bitwise operators.
  * @author Dion Gillard
- * @since 1.0.1
+ * @since 1.1
  */
 public class BitwiseOperatorTest extends TestCase {
 

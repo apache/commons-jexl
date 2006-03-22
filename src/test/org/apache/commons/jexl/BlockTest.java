@@ -16,7 +16,10 @@
 package org.apache.commons.jexl;
 
 import junit.framework.TestCase;
-
+/**
+ * Tests for blocks
+ * @since 1.1
+ */
 public class BlockTest extends TestCase {
 
     /**

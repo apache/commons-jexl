@@ -10,7 +10,7 @@ import org.apache.commons.jexl.util.Coercion;
  *      a ^ b
  * Result is a Long
  * @author Dion Gillard
- * @since 1.0.1
+ * @since 1.1
  */
 public class ASTBitwiseXorNode extends SimpleNode {
   public ASTBitwiseXorNode(int id) {

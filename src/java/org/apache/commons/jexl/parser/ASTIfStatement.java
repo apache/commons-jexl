@@ -24,7 +24,7 @@ import org.apache.commons.jexl.util.Coercion;
  * if ( expression ) statement [else statement]
  * 
  * @author Dion Gillard
- * @since 1.0.1
+ * @since 1.1
  */
 public class ASTIfStatement extends SimpleNode {
     public ASTIfStatement(int id) {
