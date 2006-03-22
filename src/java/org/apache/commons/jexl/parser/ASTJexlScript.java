@@ -2,6 +2,9 @@
 
 package org.apache.commons.jexl.parser;
 
+/**
+ * Top of the syntax tree - parsed Jexl code.
+ */
 public class ASTJexlScript extends SimpleNode {
   public ASTJexlScript(int id) {
     super(id);
