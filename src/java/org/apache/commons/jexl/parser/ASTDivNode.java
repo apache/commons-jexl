@@ -19,7 +19,7 @@ import org.apache.commons.jexl.util.Coercion;
 import org.apache.commons.jexl.JexlContext;
 
 /**
- *  /
+ *  a / b, mathematical divide.
  *
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
