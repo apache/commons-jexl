@@ -9,6 +9,9 @@ import org.apache.commons.jexl.util.Introspector;
 import org.apache.commons.jexl.util.introspection.VelMethod;
 import org.apache.commons.jexl.util.introspection.Info;
 
+/**
+ * Method execution.
+ */
 public class ASTMethod extends SimpleNode
 {
     /** dummy velocity info */
