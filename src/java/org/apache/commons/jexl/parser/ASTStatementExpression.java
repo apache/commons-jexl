@@ -4,6 +4,9 @@ package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
 
+/**
+ * Assignment as an expression.
+ */
 public class ASTStatementExpression extends SimpleNode {
   public ASTStatementExpression(int id) {
     super(id);
