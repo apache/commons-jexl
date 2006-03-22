@@ -4,6 +4,11 @@ package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
 
+/**
+ * x = y, assigns a value to a variable in the context.
+ * @author Dion Gillard
+ *
+ */
 public class ASTAssignment extends SimpleNode {
   public ASTAssignment(int id) {
     super(id);

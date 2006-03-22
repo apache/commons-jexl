@@ -19,6 +19,11 @@ package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
 
+/**
+ * { code }, a block of statements enclosed in curly braces.
+ * @author Dion Gillard
+ *
+ */
 public class ASTBlock extends SimpleNode {
   public ASTBlock(int id) {
     super(id);
