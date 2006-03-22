@@ -4,6 +4,9 @@ package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
 
+/**
+ * variable; A reference by itself.
+ */
 public class ASTReferenceExpression extends SimpleNode {
   public ASTReferenceExpression(int id) {
     super(id);
