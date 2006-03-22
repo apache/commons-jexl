@@ -18,7 +18,9 @@ package org.apache.commons.jexl;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -200,6 +202,9 @@ public class JexlTest extends TestCase
         jc.getVars().put("a", Boolean.TRUE);
         jc.getVars().put("b", Boolean.FALSE);
         jc.getVars().put("num", new Integer(5));
+        jc.getVars().put("now", Calendar.getInstance().getTime());
+        GregorianCalendar gc = new GregorianCalendar(5000, 11, 20);
+        jc.getVars().put("now2", gc.getTime());
 
         assertExpression(jc, "a == b", Boolean.FALSE);
         assertExpression(jc, "a==true", Boolean.TRUE);
@@ -208,7 +213,12 @@ public class JexlTest extends TestCase
         assertExpression(jc, "num < 3", Boolean.FALSE);
         assertExpression(jc, "num <= 5", Boolean.TRUE);
         assertExpression(jc, "num >= 5", Boolean.TRUE);
+        assertExpression(jc, "'6' >= '5'", Boolean.TRUE);
+        assertExpression(jc, "num >= num", Boolean.TRUE);
+        assertExpression(jc, "num >= null", Boolean.FALSE);
+        assertExpression(jc, "num >= 2.5", Boolean.TRUE);
         assertExpression(jc, "num > 4", Boolean.TRUE);
+        assertExpression(jc, "now2 >= now", Boolean.TRUE); // test comparable
         assertExpression(jc, "\"foo\" + \"bar\" == \"foobar\"", Boolean.TRUE);
 
     }
