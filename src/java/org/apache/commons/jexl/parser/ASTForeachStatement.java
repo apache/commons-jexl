@@ -13,7 +13,7 @@ import org.apache.commons.jexl.util.introspection.Info;
  * Syntax:
  *      foreach (var in iterable) Statement()
  * @author Dion Gillard
- * @since 1.0.1
+ * @since 1.1
  */
 public class ASTForeachStatement extends SimpleNode {
     /** dummy velocity info */

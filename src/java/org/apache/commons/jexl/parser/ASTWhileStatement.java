@@ -26,7 +26,7 @@ import org.apache.commons.jexl.util.Coercion;
  *      while ( expression ) statement
  * 
  * @author Dion Gillard
- * @since 1.0.1
+ * @since 1.1
  */
 public class ASTWhileStatement extends SimpleNode {
     public ASTWhileStatement(int id) {

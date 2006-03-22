@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 /**
  * Tests for the foreach statement
  * @author Dion Gillard
- * @since 1.0.1
+ * @since 1.1
  */
 public class ForEachTest extends TestCase {
 

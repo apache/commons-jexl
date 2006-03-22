@@ -22,6 +22,7 @@ import junit.framework.TestCase;
  * Test cases for the if statement.
  * 
  * @author Dion Gillard
+ * @since 1.1
  */
 public class IfTest extends TestCase {
 

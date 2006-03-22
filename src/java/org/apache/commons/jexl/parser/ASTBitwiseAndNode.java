@@ -10,7 +10,7 @@ import org.apache.commons.jexl.util.Coercion;
  *      a & b
  * Result is a Long
  * @author Dion Gillard
- * @since 1.0.1
+ * @since 1.1
  */
 public class ASTBitwiseAndNode extends SimpleNode {
   public ASTBitwiseAndNode(int id) {
