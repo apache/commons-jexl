@@ -82,22 +82,4 @@ public class BlockTest extends TestCase {
         assertEquals("Block result is wrong", "world", o);
     }
 
-    /* Need to flesh out block <-> expression relationship?
-    public void testBlockPlusStatements() throws Exception {
-        Expression e = ExpressionFactory
-                .createExpression("if (true) { x = 1; } y = 2; ");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Block result is wrong", new Integer(2), o);
-    }
-
-    public void testMultipleBlocks() throws Exception {
-        Expression e = ExpressionFactory
-                .createExpression("if (true) { x = 1; } if (true) { y = 2;}");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Block result is wrong", new Integer(2), o);
-    }
-    */
-
 }
