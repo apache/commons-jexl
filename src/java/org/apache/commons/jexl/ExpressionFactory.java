@@ -63,8 +63,8 @@ public class ExpressionFactory
     protected static Parser parser = new Parser(new StringReader(";")); //$NON-NLS-1$
 
     /**
-     * ExpressionFactory is a single and this is the private
-     * status instance fufilling that pattern.
+     * ExpressionFactory is a singleton and this is the private
+     * instance fufilling that pattern.
      */
     protected static ExpressionFactory ef = new ExpressionFactory();
 
