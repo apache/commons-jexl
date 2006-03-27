@@ -163,5 +163,11 @@ class ExpressionImpl implements Expression
         }
         postResolvers.add(resolver);
     }
+    
+    public String toString()
+    {
+        String expr = getExpression();
+        return expr == null ? "" : expr;
+    }
 
 }
