@@ -164,6 +164,10 @@ class ExpressionImpl implements Expression
         postResolvers.add(resolver);
     }
     
+    /**
+     * Provide a string representation of the expression.
+     * @return the expression or blank if it's null.
+     */
     public String toString()
     {
         String expr = getExpression();
