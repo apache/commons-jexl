@@ -25,7 +25,12 @@ public class ASTJexlScript extends SimpleNode {
   
   public Object value(JexlContext jc) throws Exception
   {
-      SimpleNode child = (SimpleNode)jjtGetChild(0);
-      return child.value(jc);
+      int numChildren = jjtGetNumChildren();
+      Object result = null;
+      for (int i = 0; i < numChildren; i++) {
+          SimpleNode child = (SimpleNode)jjtGetChild(i);
+          result = child.value(jc);
+      }
+      return result;
   }
 }
