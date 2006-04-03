@@ -3,6 +3,9 @@ package org.apache.commons.jexl.parser;
 
 public class TokenMgrError extends Error
 {
+   /** serialization version id jdk13 generated */
+   static final long serialVersionUID = 2843513002462329650L;
+   
    /*
     * Ordinals for various reasons why an Error of this type can be thrown.
     */

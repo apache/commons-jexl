@@ -11,6 +11,9 @@ package org.apache.commons.jexl.parser;
  * mechanisms so long as you retain the public fields.
  */
 public class ParseException extends Exception {
+  
+  /** serialization version id jdk13 generated */
+  static final long serialVersionUID = 654626477565941968L;
 
   /**
    * This constructor is used by the method "generateParseException"

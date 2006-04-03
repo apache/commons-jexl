@@ -138,6 +138,8 @@ public class MethodMap
      */
     public static class AmbiguousException extends Exception
     {
+        /** serialization version id jdk13 generated */
+        static final long serialVersionUID = 8758118091728717367L;
     }
 
 
