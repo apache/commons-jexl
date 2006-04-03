@@ -1,0 +1,10 @@
+##
+## This is a test script
+##
+if (out != null) out.println('Starting test script');
+x = 1;
+y = 2;
+result = x * y + 5;
+if (out != null) out.println("The result is " + result);
+## return the result.
+result;
