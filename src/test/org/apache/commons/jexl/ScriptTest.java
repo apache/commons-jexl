@@ -32,11 +32,13 @@ public class ScriptTest extends TestCase {
     }
 
     public void testSimpleScript() throws Exception {
-        Script s = ScriptFactory.createScript("while (x < 10) x = x + 1;");
+        String code = "while (x < 10) x = x + 1;";
+        Script s = ScriptFactory.createScript(code);
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Integer(1));
     
         Object o = s.execute(jc);
         assertEquals("Result is wrong", new Long(10), o);
+        assertEquals("getText is wrong", code, s.getText());
     }
 }
