@@ -16,6 +16,7 @@
 package org.apache.commons.jexl;
 
 import java.io.File;
+import java.net.URL;
 
 import junit.framework.TestCase;
 
@@ -50,6 +51,16 @@ public class ScriptTest extends TestCase {
     public void testScriptFromFile() throws Exception {
         File testScript = new File("src/test-scripts/test1.jexl");
         Script s = ScriptFactory.createScript(testScript);
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("out", System.out);
+        Object result = s.execute(jc);
+        assertNotNull("No result", result);
+        assertEquals("Wrong result", new Long(7), result);
+    }
+
+    public void testScriptFromURL() throws Exception {
+        URL testUrl = new File("src/test-scripts/test1.jexl").toURL();
+        Script s = ScriptFactory.createScript(testUrl);
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("out", System.out);
         Object result = s.execute(jc);

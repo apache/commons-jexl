@@ -19,7 +19,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.net.URL;
+import java.net.URLConnection;
 
 import org.apache.commons.jexl.parser.ASTJexlScript;
 import org.apache.commons.jexl.parser.Parser;
@@ -113,7 +116,32 @@ public class ScriptFactory {
             buffer.append(line).append('\n');
         }
         reader.close();
-        return getInstance().newScript(buffer.toString());
+        return createScript(buffer.toString());
+    }
+
+    /**
+     * Creates a Script from a {@link URL} containing valid JEXL syntax. 
+     * This method parses the script and validates the syntax.
+     * 
+     * @param scriptUrl A {@link URL} containing valid JEXL syntax. Must not be null. Must be a readable file.
+     * @return A {@link Script} which can be executed with a {@link JexlContext}.
+     * @throws Exception An exception can be thrown if there is a problem parsing the script.
+     */
+    public static Script createScript(URL scriptUrl) throws Exception
+    {
+        if (scriptUrl == null) {
+            throw new NullPointerException("scriptUrl passed to ScriptFactory.createScript is null");
+        }
+        URLConnection connection = scriptUrl.openConnection();
+        
+        StringBuffer buffer = new StringBuffer();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line).append('\n');
+        }
+        reader.close();
+        return createScript(buffer.toString());
     }
 
     /**
