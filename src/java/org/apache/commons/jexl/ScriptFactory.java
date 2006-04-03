@@ -15,6 +15,10 @@
  */
 package org.apache.commons.jexl;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.StringReader;
 
 import org.apache.commons.jexl.parser.ASTJexlScript;
@@ -86,6 +90,31 @@ public class ScriptFactory {
         return getInstance().newScript(scriptText);
     }
 
+    /**
+     * Creates a Script from a String containing valid JEXL syntax. 
+     * This method parses the script which validates the syntax.
+     * 
+     * @param scriptText A String containing valid JEXL syntax
+     * @return A {@link Script} which can be executed with a {@link JexlContext}.
+     * @throws Exception An exception can be thrown if there is a problem parsing the script.
+     */
+    public static Script createScript(File scriptFile) throws Exception
+    {
+        if (scriptFile == null) {
+            throw new NullPointerException("scriptFile passed to ScriptFactory.createScript is null");
+        }
+        if (!scriptFile.canRead()) {
+            throw new IOException("Can't read scriptFile (" + scriptFile.getCanonicalPath() +")");
+        }
+        StringBuffer buffer = new StringBuffer();
+        BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line).append('\n');
+        }
+        reader.close();
+        return getInstance().newScript(buffer.toString());
+    }
 
     /**
      *  Creates a new Script based on the string.
