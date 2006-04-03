@@ -18,6 +18,10 @@ package org.apache.commons.jexl;
 
 import org.apache.commons.jexl.parser.ASTJexlScript;
 
+/**
+ * Simple script implementation.
+ * @since 1.1
+ */
 public class ScriptImpl implements Script {
 
     /** text of the script */
