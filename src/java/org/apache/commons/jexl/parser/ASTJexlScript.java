@@ -2,8 +2,11 @@
 
 package org.apache.commons.jexl.parser;
 
+import org.apache.commons.jexl.JexlContext;
+
 /**
  * Top of the syntax tree - parsed Jexl code.
+ * @since 1.1
  */
 public class ASTJexlScript extends SimpleNode {
   public ASTJexlScript(int id) {
@@ -18,5 +21,11 @@ public class ASTJexlScript extends SimpleNode {
   /** Accept the visitor. **/
   public Object jjtAccept(ParserVisitor visitor, Object data) {
     return visitor.visit(this, data);
+  }
+  
+  public Object value(JexlContext jc) throws Exception
+  {
+      SimpleNode child = (SimpleNode)jjtGetChild(0);
+      return child.value(jc);
   }
 }
