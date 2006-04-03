@@ -91,10 +91,10 @@ public class ScriptFactory {
     }
 
     /**
-     * Creates a Script from a String containing valid JEXL syntax. 
-     * This method parses the script which validates the syntax.
+     * Creates a Script from a {@link File} containing valid JEXL syntax. 
+     * This method parses the script and validates the syntax.
      * 
-     * @param scriptText A String containing valid JEXL syntax
+     * @param scriptFile A {@link File} containing valid JEXL syntax. Must not be null. Must be a readable file.
      * @return A {@link Script} which can be executed with a {@link JexlContext}.
      * @throws Exception An exception can be thrown if there is a problem parsing the script.
      */
