@@ -15,6 +15,8 @@
  */
 package org.apache.commons.jexl;
 
+import java.io.File;
+
 import junit.framework.TestCase;
 
 /**
@@ -38,5 +40,14 @@ public class ScriptFactoryTest extends TestCase {
     public void testCreateFromString() throws Exception {
         String code = ";";
         assertNotNull("No script created", ScriptFactory.createScript(code));
+    }
+
+    /**
+     * Ensure the factory can create a script from a file.
+     * @throws Exception on a parse error.
+     */
+    public void testCreateFromFile() throws Exception {
+        File testScript = new File("src/test-scripts/test1.jexl");
+        assertNotNull("No script created", ScriptFactory.createScript(testScript));
     }
 }

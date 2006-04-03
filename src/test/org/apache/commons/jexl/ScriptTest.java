@@ -15,6 +15,8 @@
  */
 package org.apache.commons.jexl;
 
+import java.io.File;
+
 import junit.framework.TestCase;
 
 /**
@@ -31,6 +33,9 @@ public class ScriptTest extends TestCase {
         super(name);
     }
 
+    /**
+     * Test creating a script from a string.
+     */
     public void testSimpleScript() throws Exception {
         String code = "while (x < 10) x = x + 1;";
         Script s = ScriptFactory.createScript(code);
@@ -40,5 +45,15 @@ public class ScriptTest extends TestCase {
         Object o = s.execute(jc);
         assertEquals("Result is wrong", new Long(10), o);
         assertEquals("getText is wrong", code, s.getText());
+    }
+    
+    public void testScriptFromFile() throws Exception {
+        File testScript = new File("src/test-scripts/test1.jexl");
+        Script s = ScriptFactory.createScript(testScript);
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("out", System.out);
+        Object result = s.execute(jc);
+        assertNotNull("No result", result);
+        assertEquals("Wrong result", new Long(7), result);
     }
 }
