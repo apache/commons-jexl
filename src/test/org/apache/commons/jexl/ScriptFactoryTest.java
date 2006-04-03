@@ -17,6 +17,10 @@ package org.apache.commons.jexl;
 
 import junit.framework.TestCase;
 
+/**
+ * Tests for ScriptFactory
+ * @since 1.1
+ */
 public class ScriptFactoryTest extends TestCase {
 
     /**

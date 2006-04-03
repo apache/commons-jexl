@@ -17,6 +17,10 @@ package org.apache.commons.jexl;
 
 import junit.framework.TestCase;
 
+/**
+ * Tests for Script
+ * @since 1.1
+ */
 public class ScriptTest extends TestCase {
 
     /**
