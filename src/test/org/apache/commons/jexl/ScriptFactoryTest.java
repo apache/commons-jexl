@@ -16,6 +16,7 @@
 package org.apache.commons.jexl;
 
 import java.io.File;
+import java.net.URL;
 
 import junit.framework.TestCase;
 
@@ -49,5 +50,14 @@ public class ScriptFactoryTest extends TestCase {
     public void testCreateFromFile() throws Exception {
         File testScript = new File("src/test-scripts/test1.jexl");
         assertNotNull("No script created", ScriptFactory.createScript(testScript));
+    }
+
+    /**
+     * Ensure the factory can create a script from a URL.
+     * @throws Exception on a parse error.
+     */
+    public void testCreateFromURL() throws Exception {
+        URL testUrl = new File("src/test-scripts/test1.jexl").toURL();
+        assertNotNull("No script created", ScriptFactory.createScript(testUrl));
     }
 }
