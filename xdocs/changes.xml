@@ -25,6 +25,7 @@
   </properties>
   <body>
     <release version="1.1-SNAPSHOT" date="in SVN">
+      <action dev="dion" type="fix" issue="39193" due-to="Guido Anzuoni">Allow for static methods to be called on classes and not just objects.</action>
       <action dev="dion" type="add">Added Script and ScriptFactory to allow scripts to be executed from text, files or a URL.</action>
       <action dev="dion" type="add">Added implementation for bitwise operators: and, complement, or, xor.</action>
       <action dev="dion" type="add">Added implementation for the foreach statement.</action>
