@@ -135,6 +135,9 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
             return null;
 
         Method m = introspector.getMethod(obj.getClass(), methodName, args);
+        if (m == null && obj instanceof Class) {
+            m = introspector.getMethod((Class) obj, methodName, args);
+        }
 
         return (m == null) ? null : new VelMethodImpl(m);
     }
