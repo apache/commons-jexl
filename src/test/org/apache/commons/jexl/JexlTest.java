@@ -855,6 +855,14 @@ public class JexlTest extends TestCase
         assertExpression(jc, "aBool.valueOf('true')", Boolean.TRUE);
     }
     
+    public void testStaticMethodInvocationOnClasses() throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("Boolean", Boolean.class);
+        assertExpression(jc, "Boolean.valueOf('true')", Boolean.TRUE);
+        
+    }
+    
     /**
      * Make sure bad syntax throws ParseException
      * @throws Exception on errors
