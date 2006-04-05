@@ -68,7 +68,7 @@ public class MethodMap
     /**
      * Return a list of methods with the same name.
      *
-     * @param key a key to the {@link #methodByNameMap}
+     * @param key The method name.
      * @return List list of methods
      */
     public List get(String key)
