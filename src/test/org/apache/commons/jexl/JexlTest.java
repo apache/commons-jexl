@@ -81,7 +81,7 @@ public class JexlTest extends TestCase
         Object o = e.evaluate(jc);
 
         assertTrue("o not instanceof String", o instanceof String);
-        assertTrue("o incorrect", o.equals(GET_METHOD_STRING));
+        assertEquals("o incorrect", GET_METHOD_STRING, o);
     }
 
     /**
@@ -745,47 +745,40 @@ public class JexlTest extends TestCase
          * first, a simple override
          */
 
-        Expression expr =
-            ExpressionFactory.createExpression("foo.bar");
-
+        Expression expr = ExpressionFactory.createExpression("foo.bar");
         expr.addPreResolver(new FlatResolver());
 
         JexlContext jc = JexlHelper.createContext();
-
         Foo foo = new Foo();
-
         jc.getVars().put("foo.bar", "flat value");
         jc.getVars().put("foo", foo );
 
         Object o = expr.evaluate(jc);
-
-        assertEquals("flat override", o,"flat value");
+        assertEquals("flat override", "flat value", o);
 
         /*
          * now, let the resolver not find it and have it drop to jexl
          */
-
-        expr =
-            ExpressionFactory.createExpression("foo.bar.length()");
-
+        expr = ExpressionFactory.createExpression("foo.bar.length()");
         expr.addPreResolver(new FlatResolver());
-
         o = expr.evaluate(jc);
-
-        assertEquals("flat override 1", o,new Integer(GET_METHOD_STRING.length()));
+        assertEquals("flat override 1", new Integer(GET_METHOD_STRING.length()), o);
 
         /*
          * now, let the resolver not find it and NOT drop to jexl
          */
 
-        expr =
-            ExpressionFactory.createExpression("foo.bar.length()");
-
+        expr = ExpressionFactory.createExpression("foo.bar.length()");
         expr.addPreResolver(new FlatResolver(false));
-
         o = expr.evaluate(jc);
-
         assertEquals("flat override 2", o, null);
+        
+        // now for a post resolver
+        expr = ExpressionFactory.createExpression("foo.bar.baz");
+        Long result = new Long(1);
+        jc.getVars().put("foo.bar.baz", result);
+        expr.addPostResolver(new FlatResolver());
+        assertEquals("flat override", result, expr.evaluate(jc));
 
     }
 
