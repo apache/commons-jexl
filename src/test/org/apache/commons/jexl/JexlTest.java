@@ -852,8 +852,13 @@ public class JexlTest extends TestCase
     {
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("Boolean", Boolean.class);
-        assertExpression(jc, "Boolean.valueOf('true')", Boolean.TRUE);
-        
+        assertExpression(jc, "Boolean.valueOf('true')", Boolean.TRUE);        
+    }
+    
+    public void testToString() throws Exception {
+        String code = "abcd";
+        Expression expr = ExpressionFactory.createExpression(code);
+        assertEquals("Bad expression value", code, expr.toString());
     }
     
     /**
