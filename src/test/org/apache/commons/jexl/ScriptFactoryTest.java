@@ -44,12 +44,52 @@ public class ScriptFactoryTest extends TestCase {
     }
 
     /**
+     * Ensure the factory can create a script from a String
+     * @throws Exception on a parse error
+     */
+    public void testCreateFromSimpleString() throws Exception {
+        String code = "(1 + 2) * 4";
+        assertNotNull("No script created", ScriptFactory.createScript(code));
+    }
+
+    /**
+     * Ensure the factory throws an NPE on an null String
+     * @throws Exception on a parse error
+     */
+    public void testCreateFromNullString() throws Exception {
+        String code = null;
+        try {
+            assertNotNull("No script created", ScriptFactory.createScript(code));
+            fail("Null script created");
+        } catch (NullPointerException e) {
+            // expected
+        }
+    }
+
+    /**
      * Ensure the factory can create a script from a file.
      * @throws Exception on a parse error.
      */
     public void testCreateFromFile() throws Exception {
         File testScript = new File("src/test-scripts/test1.jexl");
         assertNotNull("No script created", ScriptFactory.createScript(testScript));
+    }
+
+    /**
+     * Ensure the factory throws npe on a null file.
+     * @throws Exception on a parse error.
+     */
+    public void testCreateFromNullFile() throws Exception {
+        File testScript = null;
+        try
+        {
+            assertNotNull("No script created", ScriptFactory.createScript(testScript));
+            fail("Null script created");
+        }
+        catch (NullPointerException e)
+        {
+            // expected
+        }
     }
 
     /**
@@ -60,4 +100,19 @@ public class ScriptFactoryTest extends TestCase {
         URL testUrl = new File("src/test-scripts/test1.jexl").toURL();
         assertNotNull("No script created", ScriptFactory.createScript(testUrl));
     }
+
+    /**
+     * Ensure the factory throws an NPE on an null URL
+     * @throws Exception on a parse error
+     */
+    public void testCreateFromNullURL() throws Exception {
+        URL code = null;
+        try {
+            assertNotNull("No script created", ScriptFactory.createScript(code));
+            fail("Null script created");
+        } catch (NullPointerException e) {
+            // expected
+        }
+    }
+
 }
