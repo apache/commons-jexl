@@ -16,6 +16,8 @@
 package org.apache.commons.jexl;
 
 import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -363,8 +365,25 @@ public class JexlTest extends TestCase
         throws Exception
    {
        JexlContext jc = JexlHelper.createContext();
-       assertExpression(jc, "-3", new Integer(-3));
+
+       jc.getVars().put("aByte", new Byte((byte)1));
+       jc.getVars().put("aShort", new Short((short)2));
+       jc.getVars().put("anInteger", new Integer(3));
+       jc.getVars().put("aLong", new Long(4));
+       jc.getVars().put("aFloat", new Float(5.5));
+       jc.getVars().put("aDouble", new Double(6.6));
+       jc.getVars().put("aBigInteger", new BigInteger("7"));
+       jc.getVars().put("aBigDecimal", new BigDecimal("8.8"));
+       assertExpression(jc, "-3", new Integer("-3"));
        assertExpression(jc, "-3.0", new Float("-3.0"));
+       assertExpression(jc, "-aByte", new Byte((byte)-1));
+       assertExpression(jc, "-aShort", new Short((short)-2));
+       assertExpression(jc, "-anInteger", new Integer(-3));
+       assertExpression(jc, "-aLong", new Long(-4));
+       assertExpression(jc, "-aFloat", new Float(-5.5));
+       assertExpression(jc, "-aDouble", new Double(-6.6));
+       assertExpression(jc, "-aBigInteger", new BigInteger("-7"));
+       assertExpression(jc, "-aBigDecimal", new BigDecimal("-8.8"));
    }
 
     
