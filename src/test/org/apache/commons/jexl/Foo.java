@@ -28,6 +28,7 @@ import java.util.List;
 public class Foo {
     
     private boolean beenModified = false;
+    private String property1 = "some value";
     
     public String bar()
     {
@@ -102,5 +103,13 @@ public class Foo {
     public int getSize()
     {
         return 22;
+    }
+    
+    public String getProperty1() {
+        return property1;
+    }
+
+    public void setProperty1(String newValue) {
+        property1 = newValue;
     }
 }
