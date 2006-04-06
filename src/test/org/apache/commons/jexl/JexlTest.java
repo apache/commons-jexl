@@ -210,15 +210,36 @@ public class JexlTest extends TestCase
         assertExpression(jc, "a==true", Boolean.TRUE);
         assertExpression(jc, "a==false", Boolean.FALSE);
         assertExpression(jc, "true==false", Boolean.FALSE);
-        assertExpression(jc, "num < 3", Boolean.FALSE);
+        
+        assertExpression(jc, "2 < 3", Boolean.TRUE);
+        assertExpression(jc, "num < 5", Boolean.FALSE);
+        assertExpression(jc, "num < num", Boolean.FALSE);
+        assertExpression(jc, "num < null", Boolean.FALSE);
+        assertExpression(jc, "num < 2.5", Boolean.FALSE);
+        assertExpression(jc, "now2 < now", Boolean.FALSE); // test comparable
+//
+        assertExpression(jc, "'6' <= '5'", Boolean.FALSE);
         assertExpression(jc, "num <= 5", Boolean.TRUE);
-        assertExpression(jc, "num >= 5", Boolean.TRUE);
+        assertExpression(jc, "num <= num", Boolean.TRUE);
+        assertExpression(jc, "num <= null", Boolean.FALSE);
+        assertExpression(jc, "num <= 2.5", Boolean.FALSE);
+        assertExpression(jc, "now2 <= now", Boolean.FALSE); // test comparable
+
+//        
         assertExpression(jc, "'6' >= '5'", Boolean.TRUE);
+        assertExpression(jc, "num >= 5", Boolean.TRUE);
         assertExpression(jc, "num >= num", Boolean.TRUE);
         assertExpression(jc, "num >= null", Boolean.FALSE);
         assertExpression(jc, "num >= 2.5", Boolean.TRUE);
-        assertExpression(jc, "num > 4", Boolean.TRUE);
         assertExpression(jc, "now2 >= now", Boolean.TRUE); // test comparable
+
+        assertExpression(jc, "'6' > '5'", Boolean.TRUE);
+        assertExpression(jc, "num > 4", Boolean.TRUE);
+        assertExpression(jc, "num > num", Boolean.FALSE);
+        assertExpression(jc, "num > null", Boolean.FALSE);
+        assertExpression(jc, "num > 2.5", Boolean.TRUE);
+        assertExpression(jc, "now2 > now", Boolean.TRUE); // test comparable
+
         assertExpression(jc, "\"foo\" + \"bar\" == \"foobar\"", Boolean.TRUE);
 
     }
@@ -895,6 +916,8 @@ public class JexlTest extends TestCase
     {
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("aString", "Hello");
+        Foo foo = new Foo();
+        jc.getVars().put("foo", foo);
         Parser parser = new Parser(new StringReader(";"));
         parser.parse(new StringReader("aString = 'World';"));
         
@@ -902,6 +925,9 @@ public class JexlTest extends TestCase
         assertEquals("hello variable not changed", "world", jc.getVars().get("hello"));
         assertExpression(jc, "result = 1 + 1", new Long(2));
         assertEquals("result variable not changed", new Long(2), jc.getVars().get("result"));
+        // todo: make sure properties can be assigned to, fall back to flat var if no property
+        // assertExpression(jc, "foo.property1 = '99'", "99");
+        // assertEquals("property not set", "99", foo.getProperty1());
     }
     
     public void testAntPropertiesWithMethods() throws Exception
