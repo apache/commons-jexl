@@ -56,11 +56,11 @@ public class ExpressionFactory {
         LogFactory.getLog("org.apache.commons.jexl.ExpressionFactory");
 
     /**
-     * The singleton ExpressionFactory also holds a single instance of 
+     * The singleton ExpressionFactory also holds a single instance of
      * {@link Parser}.
      * When parsing expressions, ExpressionFactory synchronizes on Parser.
      */
-    protected static Parser parser = 
+    protected static Parser parser =
             new Parser(new StringReader(";")); //$NON-NLS-1$
 
     /**
@@ -90,7 +90,7 @@ public class ExpressionFactory {
      * must contain either a reference or an expression.
      * @param expression A String containing valid JEXL syntax
      * @return An Expression object which can be evaluated with a JexlContext
-     * @throws Exception An exception can be thrown if there is a problem 
+     * @throws Exception An exception can be thrown if there is a problem
      *      parsing this expression, or if the expression is neither an
      *      expression or a reference.
      */
@@ -131,18 +131,18 @@ public class ExpressionFactory {
         SimpleNode node = (SimpleNode) tree.jjtGetChild(0);
 
         // TODO: Can we get rid of these checks?
-        if( node instanceof ASTReferenceExpression
+        if (node instanceof ASTReferenceExpression
             || node instanceof ASTExpressionExpression
             || node instanceof ASTStatementExpression
-            || node instanceof ASTIfStatement 
+            || node instanceof ASTIfStatement
             || node instanceof ASTWhileStatement
             || node instanceof ASTForeachStatement
-            ) 
-        {
+            ) {
             return new ExpressionImpl(expression, node);
         }
         log.error( "Invalid Expression, node of type: " + node.getClass().getName() );
-        throw new Exception("Invalid Expression: not a Reference, Expression, Statement or If");
+        throw new Exception("Invalid Expression: not a Reference, Expression, "
+            + "Statement or If");
     }
 
     /**
@@ -152,8 +152,7 @@ public class ExpressionFactory {
      */
     private String cleanExpression(String expression) {
         String expr = expression.trim();
-        if (!expr.endsWith(";"))
-        {
+        if (!expr.endsWith(";")) {
             expr += ";";
         }
         return expr;
