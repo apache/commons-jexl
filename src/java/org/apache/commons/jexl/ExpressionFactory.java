@@ -1,12 +1,12 @@
 /*
  * Copyright 2002,2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,16 +29,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <p> 
+ * <p>
  * Creates Expression objects.  To create a JEXL Expression object, pass
  * valid JEXL syntax to the static createExpression() method:
  * </p>
- * 
+ *
  * <pre>
  * String jexl = "array[1]";
  * Expression expression = ExpressionFactory.createExpression( jexl );
  * </pre>
- * 
+ *
  * <p>
  * When an {@link Expression} object is created, the JEXL syntax is
  * parsed and verified.  If the supplied expression is neither an
@@ -48,8 +48,7 @@ import org.apache.commons.logging.LogFactory;
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public class ExpressionFactory
-{
+public class ExpressionFactory {
     /**
      * The Log to which all ExpressionFactory messages will be logged.
      */
@@ -57,10 +56,12 @@ public class ExpressionFactory
         LogFactory.getLog("org.apache.commons.jexl.ExpressionFactory");
 
     /**
-     * The singleton ExpressionFactory also holds a single instance of {@link Parser}.
+     * The singleton ExpressionFactory also holds a single instance of 
+     * {@link Parser}.
      * When parsing expressions, ExpressionFactory synchronizes on Parser.
      */
-    protected static Parser parser = new Parser(new StringReader(";")); //$NON-NLS-1$
+    protected static Parser parser = 
+            new Parser(new StringReader(";")); //$NON-NLS-1$
 
     /**
      * ExpressionFactory is a singleton and this is the private
@@ -72,14 +73,14 @@ public class ExpressionFactory
      * Private constructor, the single instance is always obtained
      * with a call to getInstance().
      */
-    private ExpressionFactory(){}
+    private ExpressionFactory() {
+    }
 
     /**
      * Returns the single instance of ExpressionFactory.
      * @return the instance of ExpressionFactory.
      */
-    protected static  ExpressionFactory getInstance()
-    {
+    protected static  ExpressionFactory getInstance() {
         return ef;
     }
 
@@ -89,13 +90,12 @@ public class ExpressionFactory
      * must contain either a reference or an expression.
      * @param expression A String containing valid JEXL syntax
      * @return An Expression object which can be evaluated with a JexlContext
-     * @throws Exception An exception can be thrown if there is a problem parsing
-     *                   his expression, or if the expression is neither an
-     *                   expression or a reference.
+     * @throws Exception An exception can be thrown if there is a problem 
+     *      parsing this expression, or if the expression is neither an
+     *      expression or a reference.
      */
     public static Expression createExpression(String expression)
-        throws Exception
-    {
+        throws Exception {
         return getInstance().createNewExpression(expression);
     }
 
@@ -108,23 +108,22 @@ public class ExpressionFactory
      *  @throws Exception for a variety of reasons - mostly malformed
      *          Jexl expression
      */
-    protected Expression createNewExpression(String expression)
+    protected Expression createNewExpression(final String expression)
         throws Exception {
-    
+
         String expr = cleanExpression(expression);
 
         // Parse the Expression
         SimpleNode tree;
-        synchronized(parser)
-        {
-            log.debug( "Parsing expression: " + expr );
+        synchronized (parser) {
+            log.debug("Parsing expression: " + expr);
             tree = parser.parse(new StringReader(expr));
         }
 
         if (tree.jjtGetNumChildren() > 1 && log.isWarnEnabled()) {
-            log.warn( "The JEXL Expression created will be a reference"
+            log.warn("The JEXL Expression created will be a reference"
                 + " to the first expression from the supplied script: \""
-                + expression + "\" " );
+                + expression + "\" ");
         }
 
         // Must be a simple reference, expression, statement or if, otherwise
