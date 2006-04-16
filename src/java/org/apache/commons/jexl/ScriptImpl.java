@@ -25,9 +25,9 @@ import org.apache.commons.jexl.parser.ASTJexlScript;
 public class ScriptImpl implements Script {
 
     /** text of the script */
-    private String text;
+    private final String text;
     /** syntax tree */
-    private ASTJexlScript parsedScript;
+    private final ASTJexlScript parsedScript;
     
     public ScriptImpl(String scriptText, ASTJexlScript scriptTree) {
         text = scriptText;
