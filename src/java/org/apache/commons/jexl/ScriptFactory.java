@@ -26,6 +26,7 @@ import java.net.URLConnection;
 
 import org.apache.commons.jexl.parser.ASTJexlScript;
 import org.apache.commons.jexl.parser.Parser;
+import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -109,14 +110,9 @@ public class ScriptFactory {
         if (!scriptFile.canRead()) {
             throw new IOException("Can't read scriptFile (" + scriptFile.getCanonicalPath() +")");
         }
-        StringBuffer buffer = new StringBuffer();
         BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line).append('\n');
-        }
-        reader.close();
-        return createScript(buffer.toString());
+        return createScript(readerToString(reader));
+            
     }
 
     /**
@@ -134,14 +130,8 @@ public class ScriptFactory {
         }
         URLConnection connection = scriptUrl.openConnection();
         
-        StringBuffer buffer = new StringBuffer();
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            buffer.append(line).append('\n');
-        }
-        reader.close();
-        return createScript(buffer.toString());
+        return createScript(readerToString(reader));
     }
 
     /**
@@ -154,15 +144,16 @@ public class ScriptFactory {
     protected Script newScript(String scriptText) throws Exception {
         String cleanText = cleanScript(scriptText);
         // Parse the Expression
-        ASTJexlScript tree;
         synchronized(parser)
         {
-            log.debug( "Parsing script: " + cleanText);
-            tree = (ASTJexlScript) parser.parse(new StringReader(cleanText));
+            log.debug("Parsing script: " + cleanText);
+            SimpleNode script = parser.parse(new StringReader(cleanText));
+            if (script instanceof ASTJexlScript) {
+                return new ScriptImpl(cleanText, (ASTJexlScript) script);
+            } else {
+                throw new IllegalStateException("Parsed script is not an ASTJexlScript");
+            }
         }
-
-        return new ScriptImpl(cleanText, tree);
-
     }
 
     /**
@@ -178,6 +169,25 @@ public class ScriptFactory {
             expr += ";";
         }
         return expr;
+    }
+    
+    /**
+     * Read a buffered reader into a StringBuffer and return a String with the contents of the reader.
+     * @return the contents of the reader as a String.
+     * @throws IOException on any error reading the reader.
+     */
+    private static String readerToString(BufferedReader reader) throws IOException {
+        StringBuffer buffer = new StringBuffer();
+        try {
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line).append('\n');
+            }
+            return buffer.toString();
+        } finally {
+            reader.close();
+        }
+
     }
 
 }
