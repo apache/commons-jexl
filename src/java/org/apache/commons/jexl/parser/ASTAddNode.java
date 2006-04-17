@@ -82,9 +82,8 @@ public class ASTAddNode extends SimpleNode
 
             try
             {
-                Double l = left == null ? new Double(0) : Coercion.coerceDouble(left);
-                Double r = right == null? new Double(0) : Coercion.coerceDouble(right);
-
+                Double l = Coercion.coerceDouble(left);
+                Double r = Coercion.coerceDouble(right);
                 return new Double(l.doubleValue() + r.doubleValue());
             }
             catch( java.lang.NumberFormatException nfe )
@@ -101,8 +100,8 @@ public class ASTAddNode extends SimpleNode
          */
         try
         {
-            Long l = left == null ? new Long(0) : Coercion.coerceLong(left);
-            Long r = right == null ? new Long(0) : Coercion.coerceLong(right);
+            Long l = Coercion.coerceLong(left);
+            Long r = Coercion.coerceLong(right);
             return new Long(l.longValue() + r.longValue());
         }
         catch( java.lang.NumberFormatException nfe )
