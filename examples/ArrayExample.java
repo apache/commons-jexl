@@ -1,12 +1,12 @@
 /*
- * Copyright 2002,2004 The Apache Software Foundation.
- * 
+ * Copyright 2002-2006 The Apache Software Foundation.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,17 +23,19 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- *  simple example to show how to access arrays
+ *  Simple example to show how to access arrays.
  *
  *  @since 1.0
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public class ArrayExample
-{
-    public static void main(String args[])
-        throws Exception
-    {
+public class ArrayExample {
+    /** 
+     * Command line entry point.
+     * @param args command line arguments
+     * @throws Exception cos jexl does. 
+     */
+    public static void main(String[] args) throws Exception {
         /*
          *  First make a jexlContext and put stuff in it
          */
