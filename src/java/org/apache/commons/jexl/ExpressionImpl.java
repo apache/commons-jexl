@@ -24,7 +24,7 @@ import org.apache.commons.jexl.parser.SimpleNode;
 /**
  * Instances of ExpressionImpl are created by the {@link ExpressionFactory},
  * and this is the default implementation of the {@link Expression} interface.
- * 
+ *
  * @since 1.0
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
@@ -50,7 +50,7 @@ class ExpressionImpl implements Expression {
 
     /**
      * do not let this be generally instantiated with a 'new'.
-     * 
+     *
      * @param expr the expression.
      * @param ref the parsed expression.
      */
@@ -61,12 +61,12 @@ class ExpressionImpl implements Expression {
 
     /**
      * Evaluate the expression and return the value.
-     * 
+     *
      * Before JEXL evaluates the expression, any pre-resolvers will be called.
      * If the pre-resolver provides a value, it is returned. If JEXL evaluates
      * the expression as null, post-resolvers are called and any resulting value
      * returned.
-     * 
+     *
      * @param context Context containing objects/data used for evaluation
      * @return value of expression
      * @throws Exception on any error, but typically errors evaluating the
@@ -104,7 +104,7 @@ class ExpressionImpl implements Expression {
 
     /**
      * Tries the resolvers in the given resolverlist against the context.
-     * 
+     *
      * @param resolverList list of JexlExprResolvers
      * @param context JexlContext to use for evauluation
      * @return value (including null) or JexlExprResolver.NO_VALUE
@@ -131,7 +131,7 @@ class ExpressionImpl implements Expression {
 
     /**
      * Gets the original expression string.
-     * 
+     *
      * @return the expression.
      */
     public String getExpression() {
@@ -148,7 +148,7 @@ class ExpressionImpl implements Expression {
     /**
      * allows addition of a resolver to allow custom interdiction of expression
      * evaluation.
-     * 
+     *
      * @param resolver resolver to be called if Jexl expression evaluated to
      *            null
      */
@@ -161,7 +161,7 @@ class ExpressionImpl implements Expression {
 
     /**
      * Provide a string representation of the expression.
-     * 
+     *
      * @return the expression or blank if it's null.
      */
     public String toString() {
