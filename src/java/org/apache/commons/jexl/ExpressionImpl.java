@@ -1,5 +1,5 @@
 /*
- * Copyright 2002,2004 The Apache Software Foundation.
+ * Copyright 2002-2006 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,7 +142,8 @@ class ExpressionImpl implements Expression {
      * allows addition of a resolver to allow custom interdiction of expression
      * evaluation.
      *
-     * @param resolver resolver to be called before a Jexl expression is evaluated.
+     * @param resolver resolver to be called before a Jexl expression 
+     *      is evaluated.
      */
     public void addPreResolver(JexlExprResolver resolver) {
         if (preResolvers == null) {

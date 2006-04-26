@@ -1,12 +1,12 @@
 /*
- * Copyright 2002,2004 The Apache Software Foundation.
- * 
+ * Copyright 2002-2006 The Apache Software Foundation.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,12 +28,12 @@ import org.apache.commons.jexl.context.HashMapContext;
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public class JexlHelper
-{
+public class JexlHelper {
+    /** singleton instance. */
     protected static JexlHelper helper = new JexlHelper();
 
-    protected static JexlHelper getInstance()
-    {
+    /** @return the single instance. */
+    protected static JexlHelper getInstance() {
         return helper;
     }
 
@@ -41,18 +41,17 @@ public class JexlHelper
      * Returns a new {@link JexlContext}.
      * @return a new JexlContext
      */
-    public static JexlContext createContext()
-    {
+    public static JexlContext createContext() {
         return getInstance().newContext();
     }
 
     /**
-     * Creates and returns a new {@link JexlContext}.  The current implementation
-     * creates a new instance of {@link HashMapContext}.
+     * Creates and returns a new {@link JexlContext}.  
+     * The current implementation creates a new instance of 
+     * {@link HashMapContext}.
      * @return a new JexlContext
      */
-    protected JexlContext newContext()
-    {
+    protected JexlContext newContext() {
         return new HashMapContext();
     }
 }
