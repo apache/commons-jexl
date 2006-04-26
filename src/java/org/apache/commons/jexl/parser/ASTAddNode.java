@@ -26,20 +26,41 @@ import org.apache.commons.jexl.util.Coercion;
  *  @version $Id$
  */
 public class ASTAddNode extends SimpleNode {
+    /**
+     * Create an add node with the given id.
+     * @param id node id.
+     */
     public ASTAddNode(int id) {
         super(id);
     }
 
+    /**
+     * Create an add node with the given parser and id.
+     * @param p a parser.
+     * @param id node ide.
+     */
     public ASTAddNode(Parser p, int id) {
         super(p, id);
     }
 
 
-    /** Accept the visitor. **/
+    /** 
+     * Accept the visitor.
+     * @param visitor a {@link ParserVisitor}.
+     * @param data data to be passed along to the visitor.
+     * @return the value from visiting.
+     * @see ParserVisitor#visit(ASTAddNode, Object) 
+     */
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
+    /**
+     * Gets the value of this node.
+     * @param context the context to retrieve values from.
+     * @return the result of addition.
+     * @throws Exception when evaluating the operands fails.
+     */
     public Object value(JexlContext context) throws Exception {
         Object left = ((SimpleNode) jjtGetChild(0)).value(context);
         Object right = ((SimpleNode) jjtGetChild(1)).value(context);
