@@ -42,7 +42,8 @@ class ScriptImpl implements Script {
     /**
      * @see Script#execute(JexlContext)
      * @return the value of the script. Usually the value of the last 
-     *      executed statement. 
+     *      executed statement.
+     * @param context (variables etc) to execute the script with. 
      * @throws Exception on any error.
      */
     public Object execute(JexlContext context) throws Exception {
