@@ -40,11 +40,7 @@ class ScriptImpl implements Script {
     }
 
     /**
-     * @see Script#execute(JexlContext)
-     * @return the value of the script. Usually the value of the last 
-     *      executed statement.
-     * @param context (variables etc) to execute the script with. 
-     * @throws Exception on any error.
+     * {@inheritDoc}
      */
     public Object execute(JexlContext context) throws Exception {
         // TODO Auto-generated method stub
@@ -52,7 +48,7 @@ class ScriptImpl implements Script {
     }
 
     /**
-     * @see Script#getText()
+     * {@inheritDoc}
      */
     public String getText() {
         return text;
