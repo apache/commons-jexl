@@ -168,9 +168,9 @@
 
         <!-- Checks for class design                         -->
         <!-- See http://checkstyle.sf.net/config_design.html -->
-        <module name="DesignForExtension"/>
+        <!-- JEXL: module name="DesignForExtension"/-->
         <!-- JEXL: module name="FinalClass"/-->
-        <module name="HideUtilityClassConstructor"/>
+        <!-- JEXL: module name="HideUtilityClassConstructor"/-->
         <module name="InterfaceIsType"/>
         <module name="VisibilityModifier"/>
 
