@@ -31,14 +31,14 @@ import org.apache.commons.jexl.parser.SimpleNode;
  */
 class ExpressionImpl implements Expression {
 
-    /** resolvers called before expression evaluation */
+    /** resolvers called before expression evaluation. */
     protected List preResolvers;
 
-    /** resolvers called after expression evaluation */
+    /** resolvers called after expression evaluation. */
     protected List postResolvers;
 
     /**
-     * Original expression - this is just a 'snippet', not a valid statement
+     * Original expression. This is just a 'snippet', not a valid statement
      * (i.e. foo.bar() vs foo.bar();
      */
     protected String expression;
