@@ -1,6 +1,6 @@
 /*
  * Copyright 2002,2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,15 +24,15 @@ import java.util.Map;
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public interface JexlContext
-{
+public interface JexlContext {
     /**
      * Replaces variables in a JexlContext with the variables contained
      * in the supplied Map.  When setVars() is called on a JexlContext,
      * it clears the current Map and puts each entry of the
      * supplied Map into the current variable Map. 
      * 
-     * @param vars Contents of vars will be replaced with the content of this Map
+     * @param vars Contents of vars will be replaced with the content 
+     *      of this Map
      */
     void setVars(Map vars);
     
