@@ -1,5 +1,5 @@
 /*
- * Copyright 2003,2004 The Apache Software Foundation.
+ * Copyright 2003-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,16 +37,24 @@ import org.apache.commons.jexl.JexlHelper;
  */
 public class Asserter extends Assert {
 
+    /** variables used during asserts. */
     private final Map variables = new HashMap();
+    /** context to use during asserts. */
     private final JexlContext context = JexlHelper.createContext();
 
-    public Asserter() {}
+    /**
+     * 
+     * Create an asserter.
+     */
+    public Asserter() {
+
+    }
 
     /**
      * This constructor will register the given variableValue as the
      * "this" variable.
      * 
-     * @param variableValue
+     * @param variableValue 'this'.
      */
     public Asserter(Object variableValue) {
         setVariable("this", variableValue);
@@ -54,7 +62,7 @@ public class Asserter extends Assert {
 
     /**
      * Performs an assertion that the value of the given Jexl expression 
-     * evaluates to the given expected value
+     * evaluates to the given expected value.
      * 
      * @param expression is the Jexl expression to evaluate
      * @param expected is the expected value of the expression
@@ -74,8 +82,8 @@ public class Asserter extends Assert {
      * Puts a variable of a certain name in the context so that it can be used from
      * assertion expressions.
      * 
-     * @param name
-     * @param value
+     * @param name variable name
+     * @param value variable value
      */
     public void setVariable(String name, Object value) {
         variables.put(name, value);
