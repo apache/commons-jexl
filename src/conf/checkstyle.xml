@@ -118,7 +118,12 @@
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
         <module name="FileLength"/>
-        <module name="LineLength"/>
+        <module name="LineLength">
+            <!--  JEXL: added max, ignore @version and @see -->
+        	<property name="max" value="120"/>
+        	<property name="ignorePattern" value="@version"/>
+        	<property name="ignorePattern" value="@see"/>
+        </module>
         <module name="MethodLength"/>
         <module name="ParameterNumber"/>
 
@@ -172,7 +177,9 @@
         <!-- JEXL: module name="FinalClass"/-->
         <!-- JEXL: module name="HideUtilityClassConstructor"/-->
         <module name="InterfaceIsType"/>
-        <module name="VisibilityModifier"/>
+        <module name="VisibilityModifier">
+            <property name="protectedAllowed" value="true"/>
+        </module>
 
 
         <!-- Miscellaneous other checks.                   -->
