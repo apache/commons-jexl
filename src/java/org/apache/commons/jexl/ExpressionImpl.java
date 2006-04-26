@@ -60,17 +60,7 @@ class ExpressionImpl implements Expression {
     }
 
     /**
-     * Evaluate the expression and return the value.
-     *
-     * Before JEXL evaluates the expression, any pre-resolvers will be called.
-     * If the pre-resolver provides a value, it is returned. If JEXL evaluates
-     * the expression as null, post-resolvers are called and any resulting value
-     * returned.
-     *
-     * @param context Context containing objects/data used for evaluation
-     * @return value of expression
-     * @throws Exception on any error, but typically errors evaluating the
-     *             expression.
+     * {@inheritDoc}
      */
     public Object evaluate(JexlContext context) throws Exception {
         Object val = null;
@@ -130,20 +120,14 @@ class ExpressionImpl implements Expression {
     }
 
     /**
-     * Gets the original expression string.
-     *
-     * @return the expression.
+     * {@inheritDoc}
      */
     public String getExpression() {
         return expression;
     }
 
     /**
-     * allows addition of a resolver to allow custom interdiction of expression
-     * evaluation.
-     *
-     * @param resolver resolver to be called before a Jexl expression 
-     *      is evaluated.
+     * {@inheritDoc}     
      */
     public void addPreResolver(JexlExprResolver resolver) {
         if (preResolvers == null) {
@@ -153,11 +137,7 @@ class ExpressionImpl implements Expression {
     }
 
     /**
-     * allows addition of a resolver to allow custom interdiction of expression
-     * evaluation.
-     *
-     * @param resolver resolver to be called if Jexl expression evaluated to
-     *            null
+     * {@inheritDoc}
      */
     public void addPostResolver(JexlExprResolver resolver) {
         if (postResolvers == null) {
