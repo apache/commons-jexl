@@ -37,7 +37,7 @@ public class ASTAddNode extends SimpleNode {
     /**
      * Create an add node with the given parser and id.
      * @param p a parser.
-     * @param id node ide.
+     * @param id node id.
      */
     public ASTAddNode(Parser p, int id) {
         super(p, id);
