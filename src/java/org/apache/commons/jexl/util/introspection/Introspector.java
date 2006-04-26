@@ -1,5 +1,5 @@
 /*
- * Copyright 2001,2004 The Apache Software Foundation.
+ * Copyright 2001-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,26 +50,25 @@ import org.apache.commons.logging.Log;
  * @author <a href="mailto:paulo.gaspar@krankikom.de">Paulo Gaspar</a>
  * @version $Id$
  */
-public class Introspector extends IntrospectorBase
-{
+public class Introspector extends IntrospectorBase {
     /**
      *  define a public string so that it can be looked for
-     *  if interested
+     *  if interested.
      */
 
     public static final String CACHEDUMP_MSG = 
         "Introspector : detected classloader change. Dumping cache.";
 
     /**
-     *  our engine runtime services
+     *  our engine runtime services.
      */
     private final Log rlog;
 
     /**
-     *  Recieves our RuntimeServices object
+     *  Recieves our RuntimeServices object.
+     *  @param logger a {@link Log}.
      */
-    public Introspector(Log logger)
-    {
+    public Introspector(Log logger) {
         this.rlog = logger;
     }
    
@@ -83,20 +82,16 @@ public class Introspector extends IntrospectorBase
      *               the parameters
      *
      * @return The desired Method object.
+     * @throws Exception if the superclass does.
      */
-    public Method getMethod(Class c, String name, Object[] params)
-        throws Exception
-    {
+    public Method getMethod(Class c, String name, Object[] params) throws Exception {
         /*
          *  just delegate to the base class
          */
 
-        try
-        {
-            return super.getMethod( c, name, params );
-        }
-        catch( MethodMap.AmbiguousException ae )
-        {
+        try {
+            return super.getMethod(c, name, params);
+        } catch (MethodMap.AmbiguousException ae) {
             /*
              *  whoops.  Ambiguous.  Make a nice log message and return null...
              */
@@ -104,17 +99,17 @@ public class Introspector extends IntrospectorBase
             StringBuffer msg = new StringBuffer("Introspection Error : Ambiguous method invocation ")
                 .append(name).append("( ");
 
-            for (int i = 0; i < params.length; i++)
-            {
-                if ( i > 0)
+            for (int i = 0; i < params.length; i++) {
+                if (i > 0) {
                     msg.append(", ");
+                }
                 
                 msg.append(params[i].getClass().getName());
             }
             
             msg.append(") for class ").append(c.getName());
             
-            rlog.error( msg.toString() );
+            rlog.error(msg.toString());
         }
 
         return null;
@@ -122,11 +117,10 @@ public class Introspector extends IntrospectorBase
 
     /**
      * Clears the classmap and classname
-     * caches, and logs that we did so
+     * caches, and logs that we did so.
      */
-    protected void clearCache()
-    {
+    protected void clearCache() {
         super.clearCache();
-        rlog.info( CACHEDUMP_MSG );
+        rlog.info(CACHEDUMP_MSG);
     }
 }
