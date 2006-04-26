@@ -138,6 +138,12 @@ class ExpressionImpl implements Expression {
         return expression;
     }
 
+    /**
+     * allows addition of a resolver to allow custom interdiction of expression
+     * evaluation.
+     *
+     * @param resolver resolver to be called before a Jexl expression is evaluated.
+     */
     public void addPreResolver(JexlExprResolver resolver) {
         if (preResolvers == null) {
             preResolvers = new ArrayList();
