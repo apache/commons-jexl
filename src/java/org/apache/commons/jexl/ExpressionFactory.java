@@ -140,7 +140,7 @@ public class ExpressionFactory {
             ) {
             return new ExpressionImpl(expression, node);
         }
-        log.error("Invalid Expression, node of type: " 
+        log.error("Invalid Expression, node of type: "
             + node.getClass().getName());
         throw new Exception("Invalid Expression: not a Reference, Expression, "
             + "Statement or If");
