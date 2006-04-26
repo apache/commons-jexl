@@ -1,12 +1,12 @@
 /*
- * Copyright 2002,2004 The Apache Software Foundation.
- * 
+ * Copyright 2002-2006 The Apache Software Foundation.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,17 +20,19 @@ import org.apache.commons.jexl.Expression;
 import org.apache.commons.jexl.ExpressionFactory;
 
 /**
- *  simple example to show how to access method and properties
+ *  Simple example to show how to access method and properties.
  *
  *  @since 1.0
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public class MethodPropertyExample
-{
-    public static void main(String args[])
-        throws Exception
-    {
+public class MethodPropertyExample {
+    /**
+     * Command line entry point.
+     * @param args Command line arguments
+     * @throws Exception on any error.
+     */
+    public static void main(String[] args) throws Exception {
         /*
          *  First make a jexlContext and put stuff in it
          */
@@ -51,15 +53,15 @@ public class MethodPropertyExample
          */
         e = ExpressionFactory.createExpression("foo.convert(1)");
         o = e.evaluate(jc);
-        System.out.println("value returned by the method convert() w/ arg = 1 is : " + o);
+        System.out.println("value of " + e.getExpression() + " is : " + o);
 
         e = ExpressionFactory.createExpression("foo.convert(1+7)");
         o = e.evaluate(jc);
-        System.out.println("value returned by the method convert() w/ arg = 1+7 is : " + o);
+        System.out.println("value of " + e.getExpression() + " is : " + o);
 
         e = ExpressionFactory.createExpression("foo.convert(1+number)");
         o = e.evaluate(jc);
-        System.out.println("value returned by the method convert() w/ arg = 1+number is : " + o);
+        System.out.println("value of " + e.getExpression() + " is : " + o);
 
         /*
          * access a property
@@ -70,20 +72,33 @@ public class MethodPropertyExample
 
     }
 
-    public static class Foo
-    {
-        public String getFoo()
-        {
+    /**
+     * Helper example class.
+     */
+    public static class Foo {
+        /**
+         * Gets foo.
+         * @return a string.
+         */
+        public String getFoo() {
             return "This is from getFoo()";
         }
 
-        public String get(String arg)
-        {
+        /**
+         * Gets an arbitrary property.
+         * @param arg property name.
+         * @return arg prefixed with 'This is the property '.
+         */
+        public String get(String arg) {
             return "This is the property " + arg;
         }
 
-        public String convert(long i)
-        {
+        /**
+         * Gets a string from the argument.
+         * @param i a long.
+         * @return The argument prefixed with 'The value is : '
+         */
+        public String convert(long i) {
             return "The value is : " + i;
         }
     }
