@@ -23,16 +23,15 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  *  Little class to manage a Velocity uberspector (Vel 1.4+) for instrospective
- *  services
+ *  services.
  *
  *  @since 1.0
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public class Introspector
-{
+public class Introspector {
     /**
-     *  the uberspector from Velocity - handles all instrospection patterns
+     *  The uberspector from Velocity that handles all instrospection patterns.
      */
     private static Uberspect uberSpect;
 
@@ -45,10 +44,11 @@ public class Introspector
     }
 
     /**
-     *  For now, expose the raw uberspector to the AST
+     *  For now, expose the raw uberspector to the AST.
+     *
+     *  @return Uberspect The Velocity uberspector.
      */
-    public static Uberspect getUberspect()
-    {
+    public static Uberspect getUberspect() {
         return uberSpect;
     }
 }
