@@ -1,5 +1,5 @@
 /*
- * Copyright 2003,2004 The Apache Software Foundation.
+ * Copyright 2003-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,41 +19,35 @@ import org.apache.commons.jexl.util.Coercion;
 import org.apache.commons.jexl.JexlContext;
 
 /**
- *  a / b, mathematical divide.
- *
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id$
+ * a / b, mathematical divide.
+ * 
+ * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
+ * @version $Id$
  */
-public class ASTDivNode extends SimpleNode
-{
-    public ASTDivNode(int id)
-    {
+public class ASTDivNode extends SimpleNode {
+    public ASTDivNode(int id) {
         super(id);
     }
 
-    public ASTDivNode(Parser p, int id)
-    {
+    public ASTDivNode(Parser p, int id) {
         super(p, id);
     }
 
-
-    /** Accept the visitor. **/
-    public Object jjtAccept(ParserVisitor visitor, Object data)
-    {
+    /** Accept the visitor. * */
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
-       public Object value(JexlContext jc)
-        throws Exception
-    {
+    public Object value(JexlContext jc) throws Exception {
         Object left = ((SimpleNode) jjtGetChild(0)).value(jc);
         Object right = ((SimpleNode) jjtGetChild(1)).value(jc);
 
         /*
-         *  the spec says 'and', I think 'or'
+         * the spec says 'and', I think 'or'
          */
-        if (left == null && right == null)
-            return new Byte((byte)0);
+        if (left == null && right == null) {
+            return new Byte((byte) 0);
+        }
 
         Double l = Coercion.coerceDouble(left);
         Double r = Coercion.coerceDouble(right);
@@ -61,8 +55,9 @@ public class ASTDivNode extends SimpleNode
         /*
          * catch div/0
          */
-        if (r.doubleValue() == 0.0)
+        if (r.doubleValue() == 0.0) {
             return new Double(0.0);
+        }
 
         return new Double(l.doubleValue() / r.doubleValue());
 
