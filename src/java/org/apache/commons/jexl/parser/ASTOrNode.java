@@ -1,12 +1,12 @@
 /*
- * Copyright 2002,2004 The Apache Software Foundation.
- * 
+ * Copyright 2002-2006 The Apache Software Foundation.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,42 +19,34 @@ import org.apache.commons.jexl.util.Coercion;
 import org.apache.commons.jexl.JexlContext;
 
 /**
- *  || and 'or'
- *
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id$
+ * || and 'or'.
+ * 
+ * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
+ * @version $Id$
  */
-public class ASTOrNode extends SimpleNode
-{
-    public ASTOrNode(int id)
-    {
+public class ASTOrNode extends SimpleNode {
+    public ASTOrNode(int id) {
         super(id);
     }
 
-    public ASTOrNode(Parser p, int id)
-    {
+    public ASTOrNode(Parser p, int id) {
         super(p, id);
     }
 
-
-    /** Accept the visitor. **/
-    public Object jjtAccept(ParserVisitor visitor, Object data)
-    {
+    /** Accept the visitor. * */
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
-    public Object value(JexlContext jc)
-        throws Exception
-    {
+    public Object value(JexlContext jc) throws Exception {
         Object left = ((SimpleNode) jjtGetChild(0)).value(jc);
-        boolean leftValue = Coercion.coerceBoolean(left).booleanValue(); 
+        boolean leftValue = Coercion.coerceBoolean(left).booleanValue();
 
         /*
          * coercion rules
          */
-        return (leftValue
-                || Coercion.coerceBoolean(((SimpleNode) jjtGetChild(1)).value(jc))
-					.booleanValue()) ?
-            Boolean.TRUE : Boolean.FALSE;
+        return (leftValue || Coercion.coerceBoolean(((SimpleNode) jjtGetChild(1)).value(jc)).booleanValue()) 
+            ? Boolean.TRUE
+            : Boolean.FALSE;
     }
 }
