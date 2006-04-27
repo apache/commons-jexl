@@ -57,12 +57,22 @@ public class SimpleNode implements Node {
         parser = p;
     }
 
+    /**
+     * Start of the node.
+     */
     public void jjtOpen() {
     }
 
+    /**
+     * End of the node.
+     */
     public void jjtClose() {
     }
 
+    /**
+     * Sets the parent node.
+     * @param n parent node.
+     */
     public void jjtSetParent(Node n) {
         parent = n;
     }
