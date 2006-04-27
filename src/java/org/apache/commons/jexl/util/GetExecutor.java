@@ -32,8 +32,7 @@ import org.apache.commons.logging.Log;
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @version $Id$
  */
-public class GetExecutor extends AbstractExecutor
-{
+public class GetExecutor extends AbstractExecutor {
     /**
      * Container to hold the 'key' part of 
      * get(key).
@@ -42,34 +41,32 @@ public class GetExecutor extends AbstractExecutor
     
     /**
      * Default constructor.
+     *
+     * @param r The instance log.
+     * @param ispect The JEXL introspector.
+     * @param c The class being examined.
+     * @param key The key for the get(key) operation.
+     * @throws Exception Failure while trying to obtain the pertinent method.
      */
-    public GetExecutor(Log r, org.apache.commons.jexl.util.introspection.Introspector ispect, Class c, String key)
-        throws Exception
-    {
+    public GetExecutor(Log r,
+            org.apache.commons.jexl.util.introspection.Introspector ispect,
+            Class c, String key) throws Exception {
         rlog = r;
         args[0] = key;
         method = ispect.getMethod(c, "get", args);
     }
 
     /**
-     * Execute method against context.
+     * {@inheritDoc}
      */
     public Object execute(Object o)
-        throws IllegalAccessException, InvocationTargetException
-    {
-        if (method == null)
+    throws IllegalAccessException, InvocationTargetException {
+        if (method == null) {
             return null;
+        }
 
         return method.invoke(o, args);
     }
 
 }
-
-
-
-
-
-
-
-
 
