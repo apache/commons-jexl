@@ -1,5 +1,5 @@
 /*
- * Copyright 2003,2004 The Apache Software Foundation.
+ * Copyright 2003-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,68 +20,61 @@ import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Coercion;
 
 /**
- *  %
- *
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id$
+ * % (mod).
+ * 
+ * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
+ * @version $Id$
  */
-public class ASTModNode extends SimpleNode
-{
-    public ASTModNode(int id)
-    {
+public class ASTModNode extends SimpleNode {
+    public ASTModNode(int id) {
         super(id);
     }
 
-    public ASTModNode(Parser p, int id)
-    {
+    public ASTModNode(Parser p, int id) {
         super(p, id);
     }
 
-
-    /** Accept the visitor. **/
-    public Object jjtAccept(ParserVisitor visitor, Object data)
-    {
+    /** Accept the visitor. * */
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
-    public Object value(JexlContext jc)
-        throws Exception
-    {
+    public Object value(JexlContext jc) throws Exception {
         Object left = ((SimpleNode) jjtGetChild(0)).value(jc);
         Object right = ((SimpleNode) jjtGetChild(1)).value(jc);
 
         /*
-         *  the spec says 'and', I think 'or'
+         * the spec says 'and', I think 'or'
          */
-        if (left == null && right == null)
-            return new Byte((byte)0);
+        if (left == null && right == null) {
+            return new Byte((byte) 0);
+        }
 
         /*
-         *  if anything is float, double or string with ( "." | "E" | "e")
-         *  coerce all to doubles and do it
+         * if anything is float, double or string with ( "." | "E" | "e") coerce
+         * all to doubles and do it
          */
-        if ( left instanceof Float || left instanceof Double
-            || right instanceof Float || right instanceof Double
-            || (  left instanceof String
-                  && (  ((String) left).indexOf(".") != -1 ||
-                        ((String) left).indexOf("e") != -1 ||
-                        ((String) left).indexOf("E") != -1 )
-               )
-            || (  right instanceof String
-                  && (  ((String) right).indexOf(".") != -1 ||
-                        ((String) right).indexOf("e") != -1 ||
-                        ((String) right).indexOf("E") != -1 )
-               )
-            )
-        {
+        if (left instanceof Float
+            || left instanceof Double
+            || right instanceof Float
+            || right instanceof Double
+            || (left instanceof String 
+                && (((String) left).indexOf(".") != -1 
+                    || ((String) left).indexOf("e") != -1 
+                    || ((String) left).indexOf("E") != -1))
+            || (right instanceof String 
+                && (((String) right).indexOf(".") != -1 
+                    || ((String) right).indexOf("e") != -1 
+                    || ((String) right).indexOf("E") != -1))) {
             Double l = Coercion.coerceDouble(left);
             Double r = Coercion.coerceDouble(right);
 
             /*
              * catch div/0
              */
-            if (r.doubleValue() == 0.0)
+            if (r.doubleValue() == 0.0) {
                 return new Double(0.0);
+            }
 
             return new Double(l.doubleValue() % r.doubleValue());
         }
@@ -96,8 +89,9 @@ public class ASTModNode extends SimpleNode
         /*
          * catch the div/0
          */
-        if (r.longValue() == 0)
+        if (r.longValue() == 0) {
             return new Long(0);
+        }
 
         return new Long(l.longValue() % r.longValue());
     }
