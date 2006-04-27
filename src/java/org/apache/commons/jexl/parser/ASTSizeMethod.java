@@ -18,36 +18,30 @@ package org.apache.commons.jexl.parser;
 import org.apache.commons.jexl.JexlContext;
 
 /**
- *  Simple testcases
- *
- *  @author <a href="mailto:mhw@kremvax.net">Mark H. Wilkinson</a>
- *  @version $Id$
+ * Size Method, e.g. size().
+ * 
+ * @author <a href="mailto:mhw@kremvax.net">Mark H. Wilkinson</a>
+ * @version $Id$
  */
-public class ASTSizeMethod extends SimpleNode
-{
-    public ASTSizeMethod(int id)
-    {
+public class ASTSizeMethod extends SimpleNode {
+    public ASTSizeMethod(int id) {
         super(id);
     }
 
-    public ASTSizeMethod(Parser p, int id)
-    {
+    public ASTSizeMethod(Parser p, int id) {
         super(p, id);
     }
 
-    /** Accept the visitor. **/
-    public Object jjtAccept(ParserVisitor visitor, Object data)
-    {
+    /** Accept the visitor. * */
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
     /**
-     *  returns the value of itself applied to the object.
-     *   We assume that an identifier can be gotten via a get(String)
+     * returns the value of itself applied to the object. We assume that an
+     * identifier can be gotten via a get(String)
      */
-    public Object execute(Object obj, JexlContext jc)
-        throws Exception
-    {
+    public Object execute(Object obj, JexlContext jc) throws Exception {
         return new Integer(ASTSizeFunction.sizeOf(obj));
     }
 
