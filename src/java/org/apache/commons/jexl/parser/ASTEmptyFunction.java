@@ -29,12 +29,10 @@ import java.util.Map;
  * @version $Id$
  */
 public class ASTEmptyFunction extends SimpleNode {
-    /** {@inheritDoc} */
     public ASTEmptyFunction(int id) {
         super(id);
     }
 
-    /** {@inheritDoc} */
     public ASTEmptyFunction(Parser p, int id) {
         super(p, id);
     }
