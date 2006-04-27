@@ -42,10 +42,9 @@ import java.lang.reflect.Array;
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public class ArrayIterator implements Iterator
-{
+public class ArrayIterator implements Iterator {
     /**
-     * The objects to iterate.
+     * The objects to iterate over.
      */
     private final Object array;
 
@@ -53,6 +52,10 @@ public class ArrayIterator implements Iterator
      * The current position and size in the array.
      */
     private int pos;
+
+    /**
+     * The size of the array.
+     */
     private final int size;
 
     /**
@@ -60,23 +63,21 @@ public class ArrayIterator implements Iterator
      *
      * @param array The array for which an iterator is desired.
      */
-    public ArrayIterator(Object array)
-    {
+    public ArrayIterator(Object array) {
         /*
          * if this isn't an array, then throw.  Note that this is 
          * for internal use - so this should never happen - if it does
          *  we screwed up.
          */
          
-        if ( !array.getClass().isArray() )
-        {   
-            throw new IllegalArgumentException( 
-                "Programmer error : internal ArrayIterator invoked w/o array");
+        if (!array.getClass().isArray()) {
+            throw new IllegalArgumentException("Programmer error :"
+                      + " internal ArrayIterator invoked w/o array");
         }
             
         this.array = array;
         pos = 0;
-        size = Array.getLength( this.array );
+        size = Array.getLength(this.array);
     }
 
     /**
@@ -84,17 +85,17 @@ public class ArrayIterator implements Iterator
      *
      * @return The next object in the array.
      */
-    public Object next()
-    {
-        if (pos < size )
-            return Array.get( array, pos++);
+    public Object next() {
+        if (pos < size) {
+            return Array.get(array, pos++);
+        }
                 
         /*
          *  we screwed up...
          */
          
-        throw new NoSuchElementException("No more elements: " + pos +
-                                         " / " + size);
+        throw new NoSuchElementException("No more elements: " + pos
+                                         + " / " + size);
     }
     
     /**
@@ -102,16 +103,14 @@ public class ArrayIterator implements Iterator
      *
      * @return Whether there is another element.
      */
-    public boolean hasNext()
-    {
-        return (pos < size );
+    public boolean hasNext() {
+        return (pos < size);
     }
 
     /**
      * No op--merely added to satify the <code>Iterator</code> interface.
      */
-    public void remove()
-    {
+    public void remove() {
         throw new UnsupportedOperationException();
     }
 }
