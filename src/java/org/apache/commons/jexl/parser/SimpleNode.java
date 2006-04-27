@@ -1,12 +1,12 @@
 /*
- * Copyright 2002,2004 The Apache Software Foundation.
- * 
+ * Copyright 2002-2006 The Apache Software Foundation.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,20 +25,30 @@ import org.apache.commons.jexl.JexlContext;
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public class SimpleNode implements Node
-{
+public class SimpleNode implements Node {
+    /** parent node. */
     protected Node parent;
+    /** children of this node. */
     protected Node[] children;
+    /** id of the node. */
     protected int id;
+    /** parser that created the node. */
     protected Parser parser;
 
-    public SimpleNode(int i)
-    {
+    /**
+     * Create the node given an id.
+     * @param i node id.
+     */
+    public SimpleNode(int i) {
         id = i;
     }
 
-    public SimpleNode(Parser p, int i)
-    {
+    /**
+     * Create a node with the given parser and id.
+     * @param p a parser.
+     * @param i node id.
+     */
+    public SimpleNode(Parser p, int i) {
         this(i);
         parser = p;
     }
@@ -87,7 +97,13 @@ public class SimpleNode implements Node
         return (children == null) ? 0 : children.length;
     }
 
-    /** Accept the visitor. **/
+    /** 
+     * Accept the visitor.
+     * @param visitor a {@link ParserVisitor}.
+     * @param data data to be passed along to the visitor.
+     * @return the value from visiting.
+     * @see ParserVisitor#visit 
+     */
     public Object jjtAccept(ParserVisitor visitor, Object data)
     {
         return visitor.visit(this, data);
@@ -153,11 +169,12 @@ public class SimpleNode implements Node
 
 
     /**
-     *  Returns the value of the node.
+     * Gets the value of this node.
+     * @param context the context to retrieve values from.
+     * @return the result of addition.
+     * @throws Exception when evaluating the operands fails.
      */
-    public Object value(JexlContext context)
-            throws Exception
-    {
+    public Object value(JexlContext context) throws Exception {
         return null;
     }
 
