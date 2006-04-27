@@ -1,12 +1,12 @@
 /*
- * Copyright 2002,2004 The Apache Software Foundation.
- * 
+ * Copyright 2002-2006 The Apache Software Foundation.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,35 +19,28 @@ package org.apache.commons.jexl.parser;
 import org.apache.commons.jexl.JexlContext;
 
 /**
- *  represents an float
- *
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id$
+ * represents a float point number.
+ * 
+ * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
+ * @version $Id$
  */
-public class ASTFloatLiteral extends SimpleNode
-{
+public class ASTFloatLiteral extends SimpleNode {
     protected Float val;
 
-    public ASTFloatLiteral(int id)
-    {
+    public ASTFloatLiteral(int id) {
         super(id);
     }
 
-    public ASTFloatLiteral(Parser p, int id)
-    {
+    public ASTFloatLiteral(Parser p, int id) {
         super(p, id);
     }
 
-
-    /** Accept the visitor. **/
-    public Object jjtAccept(ParserVisitor visitor, Object data)
-    {
+    /** Accept the visitor. * */
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
-    public Object value(JexlContext jc)
-        throws Exception
-    {
+    public Object value(JexlContext jc) throws Exception {
         return val;
     }
 }
