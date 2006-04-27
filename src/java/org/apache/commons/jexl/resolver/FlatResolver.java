@@ -15,36 +15,40 @@ import org.apache.commons.jexl.JexlContext;
  *  @author <a href="mailto:geirm@adeptra.com">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public class FlatResolver implements JexlExprResolver
-{
+public class FlatResolver implements JexlExprResolver {
     /**
-     *  flag to return NO_VALUE on null from context
+     *  Flag to return NO_VALUE on null from context.
      *  this allows jexl to try to evaluate
      */
     protected boolean noValOnNull = true;
 
     /**
-     * default CTOR
+     * Default CTOR.
      */
-    public FlatResolver()
-    {
+    public FlatResolver() {
     }
 
     /**
      *  CTOR that lets you override the default behavior of
-     *  noValOnNull, which is true (jexl gets a shot after if null)
+     *  noValOnNull, which is true. (jexl gets a shot after if null)
+     *
+     *  @param noValOnNull Whether NO_VALUE will be returned instead of null.
      */
-    public FlatResolver(boolean noValOnNull)
-    {
+    public FlatResolver(boolean noValOnNull) {
         this.noValOnNull = noValOnNull;
     }
 
-    public Object evaluate(JexlContext context, String expression)
-    {
+    /**
+     *  Try to resolve expression as-is.
+     *
+     *  @param context The context for resolution.
+     *  @param expression The flat expression.
+     *  @return The resolved value.
+     */
+    public Object evaluate(JexlContext context, String expression) {
         Object val = context.getVars().get(expression);
 
-        if (val == null && noValOnNull)
-        {
+        if (val == null && noValOnNull) {
             return JexlExprResolver.NO_VALUE;
         }
 
