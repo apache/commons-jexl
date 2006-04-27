@@ -24,33 +24,46 @@ import org.apache.commons.logging.Log;
  * Returned the value of object property when executed.
  * @since 1.0
  */
-public class PropertyExecutor extends AbstractExecutor
-{
+public class PropertyExecutor extends AbstractExecutor {
+
+    /** The JEXL introspector used. */
     protected Introspector introspector = null;
 
+    /** The method used. */
     protected String methodUsed = null;
 
+    /**
+     * Constructor.
+     *
+     * @param r The log for this property executor instance.
+     * @param ispctr The JEXL introspector.
+     * @param clazz The class being examined.
+     * @param property The property being addressed.
+     */
     public PropertyExecutor(Log r, Introspector ispctr,
-                            Class clazz, String property)
-    {
+            Class clazz, String property) {
         rlog = r;
         introspector = ispctr;
 
         discover(clazz, property);
     }
 
-    protected void discover(Class clazz, String property)
-    {
+    /**
+     * Locate the getter method for this property.
+     *
+     * @param clazz The class being analyzed.
+     * @param property Name of the property.
+     */
+    protected void discover(Class clazz, String property) {
         /*
          *  this is gross and linear, but it keeps it straightforward.
          */
 
-        try
-        {
+        try {
             char c;
             StringBuffer sb;
 
-            Object[] params = {  };
+            Object[] params = {};
 
             /*
              *  start with get<property>
@@ -64,8 +77,9 @@ public class PropertyExecutor extends AbstractExecutor
 
             method = introspector.getMethod(clazz, methodUsed, params);
              
-            if (method != null)
+            if (method != null) {
                 return;
+            }
         
             /*
              *  now the convenience, flip the 1st character
@@ -76,40 +90,35 @@ public class PropertyExecutor extends AbstractExecutor
 
             c = sb.charAt(3);
 
-            if (Character.isLowerCase(c))
-            {
+            if (Character.isLowerCase(c)) {
                 sb.setCharAt(3, Character.toUpperCase(c));
-            }
-            else
-            {
+            } else {
                 sb.setCharAt(3, Character.toLowerCase(c));
             }
 
             methodUsed = sb.toString();
             method = introspector.getMethod(clazz, methodUsed, params);
 
-            if (method != null)
-                return; 
+            if (method != null) {
+                return;
+            }
             
-        }
-        catch(Exception e)
-        {
-            rlog.error("PROGRAMMER ERROR : PropertyExector() : " + e );
+        } catch (Exception e) {
+            rlog.error("PROGRAMMER ERROR : PropertyExector() : " + e);
         }
     }
 
 
     /**
-     * Execute method against context.
+     * {@inheritDoc}
      */
     public Object execute(Object o)
-        throws IllegalAccessException,  InvocationTargetException
-    {
-        if (method == null)
+    throws IllegalAccessException,  InvocationTargetException {
+        if (method == null) {
             return null;
+        }
 
         return method.invoke(o, null);
     }
 }
-
 
