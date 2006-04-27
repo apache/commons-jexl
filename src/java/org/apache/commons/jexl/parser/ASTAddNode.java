@@ -27,14 +27,12 @@ import org.apache.commons.jexl.util.Coercion;
  */
 public class ASTAddNode extends SimpleNode {
     /**
-     * {@inheritDoc}
      */
     public ASTAddNode(int id) {
         super(id);
     }
 
     /**
-     * {@inheritDoc}
      */
     public ASTAddNode(Parser p, int id) {
         super(p, id);
