@@ -86,7 +86,7 @@ public class Coercion {
         } else if (val instanceof Character) {
             return new Long(((Character) val).charValue());
         } else if (val instanceof Boolean) {
-            throw new Exception("Boolean->Integer coercion exception");
+            throw new Exception("Boolean->Long coercion exception");
         } else if (val instanceof Number) {
             return new Long(((Number) val).longValue());
         }
@@ -121,7 +121,7 @@ public class Coercion {
 
             return new Double(Double.parseDouble(String.valueOf(i)));
         } else if (val instanceof Boolean) {
-            throw new Exception("Boolean->Integer coercion exception");
+            throw new Exception("Boolean->Double coercion exception");
         } else if (val instanceof Double) {
             return (Double) val;
         } else if (val instanceof Number) {
