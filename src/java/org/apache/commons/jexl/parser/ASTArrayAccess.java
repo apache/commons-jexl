@@ -1,12 +1,12 @@
 /*
- * Copyright 2002,2004 The Apache Software Foundation.
- * 
+ * Copyright 2002-2006 The Apache Software Foundation.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,73 +26,63 @@ import java.util.List;
 import java.util.Map;
 import java.lang.reflect.Array;
 
-
 /**
- *  Like an ASTIdentifier, but with array access allowed
- *
- *    $foo[2]
- *
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id$
+ * Like an ASTIdentifier, but with array access allowed
+ * 
+ * $foo[2]
+ * 
+ * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
+ * @version $Id$
  */
-public class ASTArrayAccess extends SimpleNode
-{
+public class ASTArrayAccess extends SimpleNode {
     /** dummy velocity info */
     private static Info DUMMY = new Info("", 1, 1);
-    
-    public ASTArrayAccess(int id)
-    {
+
+    public ASTArrayAccess(int id) {
         super(id);
     }
 
-    public ASTArrayAccess(Parser p, int id)
-    {
+    public ASTArrayAccess(Parser p, int id) {
         super(p, id);
     }
 
-
-    /** Accept the visitor. **/
-    public Object jjtAccept(ParserVisitor visitor, Object data)
-    {
+    /** Accept the visitor. * */
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
     /*
      * evaluate array access upon a base object
-     *
-     *   foo.bar[2]
-     *
-     *  makes me rethink the array operator :)
+     * 
+     * foo.bar[2]
+     * 
+     * makes me rethink the array operator :)
      */
-    public Object execute(Object obj, JexlContext jc)
-             throws Exception
-     {
-         ASTIdentifier base = (ASTIdentifier) jjtGetChild(0);
+    public Object execute(Object obj, JexlContext jc) throws Exception {
+        ASTIdentifier base = (ASTIdentifier) jjtGetChild(0);
 
-         Object result = base.execute(obj,jc);
+        Object result = base.execute(obj, jc);
 
-         /*
-          * ignore the first child - it's our identifier
-          */
-         for(int i=1; i<jjtGetNumChildren(); i++)
-         {
-             Object loc = ((SimpleNode) jjtGetChild(i)).value(jc);
+        /*
+         * ignore the first child - it's our identifier
+         */
+        for (int i = 1; i < jjtGetNumChildren(); i++) {
+            Object loc = ((SimpleNode) jjtGetChild(i)).value(jc);
 
-             if(loc==null)
-                 return null;
+            if (loc == null) {
+                return null;
+            }
 
-             result = evaluateExpr(result, loc);
-         }
+            result = evaluateExpr(result, loc);
+        }
 
-         return result;
-     }
+        return result;
+    }
 
     /**
-     *  return the value of this node
+     * return the value of this node
      */
-    public Object value(JexlContext jc)
-        throws Exception
-    {
+    public Object value(JexlContext jc) throws Exception {
         /*
          * get the base ASTIdentifier
          */
@@ -104,12 +94,12 @@ public class ASTArrayAccess extends SimpleNode
         /*
          * ignore the first child - it's our identifier
          */
-        for(int i=1; i<jjtGetNumChildren(); i++)
-        {
+        for (int i = 1; i < jjtGetNumChildren(); i++) {
             Object loc = ((SimpleNode) jjtGetChild(i)).value(jc);
 
-            if(loc==null)
+            if (loc == null) {
                 return null;
+            }
 
             o = evaluateExpr(o, loc);
         }
@@ -117,64 +107,52 @@ public class ASTArrayAccess extends SimpleNode
         return o;
     }
 
-    public static Object evaluateExpr(Object o, Object loc)
-        throws Exception
-    {
+    public static Object evaluateExpr(Object o, Object loc) throws Exception {
         /*
          * following the JSTL EL rules
          */
 
-        if (o == null)
+        if (o == null) {
             return null;
-
-        if (loc == null)
-            return null;
-
-        if (o instanceof Map)
-        {
-            if (!((Map)o).containsKey(loc))
-                return null;
-
-            return ((Map)o).get(loc);
         }
-        else if (o instanceof List)
-        {
-            int idx = Coercion.coerceInteger(loc).intValue();
 
-            try
-            {
-                return ((List)o).get(idx);
-            }
-            catch(IndexOutOfBoundsException iobe)
-            {
+        if (loc == null) {
+            return null;
+        }
+
+        if (o instanceof Map) {
+            if (!((Map) o).containsKey(loc)) {
                 return null;
             }
-        }
-        else if (o.getClass().isArray())
-        {
+
+            return ((Map) o).get(loc);
+        } else if (o instanceof List) {
             int idx = Coercion.coerceInteger(loc).intValue();
 
-            try
-            {
+            try {
+                return ((List) o).get(idx);
+            } catch (IndexOutOfBoundsException iobe) {
+                return null;
+            }
+        } else if (o.getClass().isArray()) {
+            int idx = Coercion.coerceInteger(loc).intValue();
+
+            try {
                 return Array.get(o, idx);
-            }
-            catch(ArrayIndexOutOfBoundsException aiobe)
-            {
+            } catch (ArrayIndexOutOfBoundsException aiobe) {
                 return null;
             }
-        }
-        else
-        {
+        } else {
             /*
-             *  "Otherwise (a JavaBean object)..."  huh? :)
+             * "Otherwise (a JavaBean object)..." huh? :)
              */
 
             String s = loc.toString();
 
-            VelPropertyGet vg = Introspector.getUberspect().getPropertyGet(o, s, DUMMY);
+            VelPropertyGet vg = Introspector.getUberspect().getPropertyGet(o,
+                    s, DUMMY);
 
-            if (vg != null)
-            {
+            if (vg != null) {
                 return vg.invoke(o);
             }
         }
@@ -182,8 +160,7 @@ public class ASTArrayAccess extends SimpleNode
         throw new Exception("Unsupported object type for array [] accessor");
     }
 
-    public String getIdentifierString()
-    {
+    public String getIdentifierString() {
         return ((ASTIdentifier) jjtGetChild(0)).getIdentifierString();
     }
 }
