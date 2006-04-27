@@ -20,32 +20,45 @@ import org.apache.commons.logging.Log;
 /**
  *  Handles discovery and valuation of a
  *  boolean object property, of the
- *  form public boolean is<property> when executed.
+ *  form public boolean is&lt;Property&gt; when executed.
  *
  *  We do this separately as to preserve the current
- *  quasi-broken semantics of get<as is property>
- *  get< flip 1st char> get("property") and now followed
- *  by is<Property>
+ *  quasi-broken semantics of get &lt;as is property&gt;
+ *  get&lt;flip 1st char&gt; get("property") and now followed
+ *  by is&lt;Property&gt;.
  *
  *  @since 1.0
  *  @author <a href="geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public class BooleanPropertyExecutor extends PropertyExecutor
-{
-    public BooleanPropertyExecutor(Log rlog, org.apache.commons.jexl.util.introspection.Introspector is, Class clazz, String property)
-    {
-        super(rlog, is, clazz, property);
+public class BooleanPropertyExecutor extends PropertyExecutor {
+
+    /**
+     * Constructor.
+     *
+     * @param rlog The instance log.
+     * @param is The JEXL introspector.
+     * @param clazz The class being analyzed.
+     * @param property The boolean property.
+     */
+    public BooleanPropertyExecutor(Log rlog,
+        org.apache.commons.jexl.util.introspection.Introspector is,
+        Class clazz, String property) {
+            super(rlog, is, clazz, property);
     }
 
-    protected void discover(Class clazz, String property)
-    {
-        try
-        {
+    /**
+     * Locate the getter method for this boolean property.
+     *
+     * @param clazz The class being analyzed.
+     * @param property Name of boolean property.
+     */
+    protected void discover(Class clazz, String property) {
+        try {
             char c;
             StringBuffer sb;
 
-            Object[] params = {  };
+            Object[] params = {};
 
             /*
              *  now look for a boolean isFoo
@@ -56,28 +69,25 @@ public class BooleanPropertyExecutor extends PropertyExecutor
 
             c = sb.charAt(2);
 
-            if (Character.isLowerCase(c))
-            {
+            if (Character.isLowerCase(c)) {
                 sb.setCharAt(2, Character.toUpperCase(c));
             }
 
             methodUsed = sb.toString();
             method = introspector.getMethod(clazz, methodUsed, params);
 
-            if (method != null)
-            {
+            if (method != null) {
                 /*
                  *  now, this has to return a boolean
                  */
 
-                if (method.getReturnType() == Boolean.TYPE)
+                if (method.getReturnType() == Boolean.TYPE) {
                     return;
+                }
 
                 method = null;
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             rlog.error("PROGRAMMER ERROR : BooleanPropertyExector() : " + e);
         }
     }
