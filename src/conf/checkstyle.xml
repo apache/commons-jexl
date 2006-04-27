@@ -101,6 +101,7 @@
             <!--     name="headerFile"                                  -->
             <!--     value="${basedir}/java.header"/>                   -->
             <property name="headerFile" value="${checkstyle.header.file}"/>
+            <property name="ignoreLines" value="2"/>
         </module>
 
         <!-- Following interprets the header file as regular expressions. -->
