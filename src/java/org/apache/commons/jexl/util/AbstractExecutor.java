@@ -32,8 +32,8 @@ import org.apache.commons.logging.Log;
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public abstract class AbstractExecutor
-{
+public abstract class AbstractExecutor {
+    /** The executor instance log. */
     protected Log rlog = null;
     
     /**
@@ -43,6 +43,11 @@ public abstract class AbstractExecutor
     
     /**
      * Execute method against context.
+     *
+     * @param o The owner.
+     * @return The return value.
+     * @throws IllegalAccessException Method is inaccessible.
+     * @throws InvocationTargetException Method body throws an exception.
      */
      public abstract Object execute(Object o)
          throws IllegalAccessException, InvocationTargetException;
@@ -50,14 +55,19 @@ public abstract class AbstractExecutor
     /**
      * Tell whether the executor is alive by looking
      * at the value of the method.
+     *
+     * @return boolean Whether the executor is alive.
      */
-    public boolean isAlive()
-    {
+    public boolean isAlive() {
         return (method != null);
     }
 
-    public Method getMethod()
-    {
+    /**
+     * Get the method to be executed.
+     *
+     * @return Method The method to be executed.
+     */
+    public Method getMethod() {
         return method;
     }
 }
