@@ -27,10 +27,9 @@ import java.util.Enumeration;
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public class EnumerationIterator implements Iterator
-{
+public class EnumerationIterator implements Iterator {
     /**
-     * The enumeration to iterate.
+     * The enumeration to iterate over.
      */
     private final Enumeration enumeration;
 
@@ -40,8 +39,7 @@ public class EnumerationIterator implements Iterator
      *
      * @param enumeration  The Enumeration to wrap.
      */
-    public EnumerationIterator( Enumeration enumeration)
-    {
+    public EnumerationIterator(Enumeration enumeration) {
         this.enumeration = enumeration;
     }
 
@@ -50,8 +48,7 @@ public class EnumerationIterator implements Iterator
      *
      * @return The next object in the array.
      */
-    public Object next()
-    {
+    public Object next() {
         return enumeration.nextElement();
     }
     
@@ -60,16 +57,14 @@ public class EnumerationIterator implements Iterator
      *
      * @return Whether there is another element.
      */
-    public boolean hasNext()
-    {
+    public boolean hasNext() {
         return enumeration.hasMoreElements();
     }
 
     /**
      *  Unimplemented.  No analogy in Enumeration
      */
-    public void remove()
-    {
+    public void remove() {
         // not implemented
     }
    
