@@ -24,17 +24,29 @@ import org.apache.commons.jexl.JexlContext;
  * @version $Id$
  */
 public class ASTIntegerLiteral extends SimpleNode {
+    /** literal value. */
     Integer val;
 
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
     public ASTIntegerLiteral(int id) {
         super(id);
     }
 
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
     public ASTIntegerLiteral(Parser p, int id) {
         super(p, id);
     }
 
-    /** Accept the visitor. * */
+    /** {@inheritDoc} */
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
@@ -42,11 +54,18 @@ public class ASTIntegerLiteral extends SimpleNode {
     /**
      * Part of reference resolution - wierd... in JSTL EL you can have foo.2
      * which is equiv to foo[2] it appears...
+     *
+     * @param obj the object to evaluate against.
+     * @param ctx the {@link JexlContext}.
+     * @throws Exception on any error.
+     * @return the resulting value.
+     * @see ASTArrayAccess#evaluateExpr(Object, Object)
      */
-    public Object execute(Object o, JexlContext ctx) throws Exception {
-        return ASTArrayAccess.evaluateExpr(o, val);
+    public Object execute(Object obj, JexlContext ctx) throws Exception {
+        return ASTArrayAccess.evaluateExpr(obj, val);
     }
 
+    /** {@inheritDoc} */
     public Object value(JexlContext jc) throws Exception {
         return val;
     }

@@ -26,19 +26,33 @@ import org.apache.commons.jexl.util.Coercion;
  * @since 1.1
  */
 public class ASTIfStatement extends SimpleNode {
+    /** child index of the else statement to execute. */
+    private static final int ELSE_STATEMENT_INDEX = 2;
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
     public ASTIfStatement(int id) {
         super(id);
     }
 
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
     public ASTIfStatement(Parser p, int id) {
         super(p, id);
     }
 
-    /** Accept the visitor. */
+    /** {@inheritDoc} */
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
+    /** {@inheritDoc} */
     public Object value(JexlContext jc) throws Exception {
         Object result = null;
         /* first child is the expression */
@@ -48,7 +62,7 @@ public class ASTIfStatement extends SimpleNode {
             result = ((SimpleNode) jjtGetChild(1)).value(jc);
         } else {
             // if there is a false, execute it
-            if (jjtGetNumChildren() == 3) {
+            if (jjtGetNumChildren() == ELSE_STATEMENT_INDEX + 1) {
                 result = ((SimpleNode) jjtGetChild(2)).value(jc);
             }
         }
