@@ -27,7 +27,7 @@ import java.util.Map;
 import java.lang.reflect.Array;
 
 /**
- * Like an ASTIdentifier, but with array access allowed
+ * Like an ASTIdentifier, but with array access allowed.
  * 
  * $foo[2]
  * 
@@ -35,8 +35,8 @@ import java.lang.reflect.Array;
  * @version $Id$
  */
 public class ASTArrayAccess extends SimpleNode {
-    /** dummy velocity info */
-    private static Info DUMMY = new Info("", 1, 1);
+    /** dummy velocity info. */
+    private static final Info DUMMY = new Info("", 1, 1);
 
     public ASTArrayAccess(int id) {
         super(id);

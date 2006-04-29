@@ -18,7 +18,7 @@ package org.apache.commons.jexl.parser;
 import org.apache.commons.jexl.JexlContext;
 
 /**
- * AST node for expression
+ * AST node for expression.
  * 
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$

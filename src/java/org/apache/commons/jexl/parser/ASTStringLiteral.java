@@ -18,7 +18,7 @@ package org.apache.commons.jexl.parser;
 import org.apache.commons.jexl.JexlContext;
 
 /**
- * represents an string
+ * represents a quoted string.
  * 
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
