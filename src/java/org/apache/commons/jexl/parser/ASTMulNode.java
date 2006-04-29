@@ -20,7 +20,7 @@ import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Coercion;
 
 /**
- * Multiplication
+ * Multiplication.
  * 
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
