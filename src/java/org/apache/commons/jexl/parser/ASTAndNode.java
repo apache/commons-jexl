@@ -25,19 +25,31 @@ import org.apache.commons.jexl.util.Coercion;
  * @version $Id$
  */
 public class ASTAndNode extends SimpleNode {
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
     public ASTAndNode(int id) {
         super(id);
     }
 
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
     public ASTAndNode(Parser p, int id) {
         super(p, id);
     }
 
-    /** Accept the visitor. * */
+    /** {@inheritDoc} */
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
+    /** {@inheritDoc} */
     public Object value(JexlContext jc) throws Exception {
         Object left = ((SimpleNode) jjtGetChild(0)).value(jc);
         boolean leftValue = Coercion.coerceBoolean(left).booleanValue();
