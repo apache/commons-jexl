@@ -31,22 +31,39 @@ public class ASTMethod extends SimpleNode {
     /** dummy velocity info. */
     private static final Info DUMMY = new Info("", 1, 1);
 
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
     public ASTMethod(int id) {
         super(id);
     }
 
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
     public ASTMethod(Parser p, int id) {
         super(p, id);
     }
 
-    /** Accept the visitor. * */
+    /** {@inheritDoc} */
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
     /**
-     * returns the value of itself applied to the object. We assume that an
-     * identifier can be gotten via a get(String)
+     * evaluate a method invocation upon a base object.
+     * 
+     * foo.bar(2)
+     * 
+     * @param jc the {@link JexlContext} to evaluate against.
+     * @param obj The object to have the method invoked.
+     * @return the value of the method invocation.
+     * @throws Exception on any error
      */
     public Object execute(Object obj, JexlContext jc) throws Exception {
         String methodName = ((ASTIdentifier) jjtGetChild(0)).val;
@@ -103,6 +120,8 @@ public class ASTMethod extends SimpleNode {
      * will fail, but a call to substring(int,int) with an int and a short will
      * succeed.
      * 
+     * @param original the original number.
+     * @return a value of the smallest type the original number will fit into.
      * @since 1.1
      */
     private Number narrow(Number original) {
