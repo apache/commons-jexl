@@ -1,12 +1,12 @@
 /*
  * Copyright 2002,2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,41 +16,41 @@
 
 package org.apache.commons.jexl.util.introspection;
 
-
 import java.util.Iterator;
 
 /**
  * 'Federated' introspection/reflection interface to allow the introspection
- *  behavior in Velocity to be customized.
- *
+ * behavior in Velocity to be customized.
+ * 
  * @since 1.0
  * @author <a href="mailto:geirm@apache.org">Geir Magusson Jr.</a>
  * @version $Id$
  */
-public interface Uberspect
-{
+public interface Uberspect {
     /**
-     *  Initializer - will be called before use
+     * Initializer - will be called before use.
      */
-    public void init() throws Exception;
+    void init() throws Exception;
 
     /**
-     *  To support iteratives - #foreach()
+     * To support iteratives - #foreach().
      */
-    public Iterator getIterator(Object obj, Info info) throws Exception;
+    Iterator getIterator(Object obj, Info info) throws Exception;
 
     /**
-     *  Returns a general method, corresponding to $foo.bar( $woogie )
+     * Returns a general method, corresponding to $foo.bar( $woogie ).
      */
-    public VelMethod getMethod(Object obj, String method, Object[] args, Info info) throws Exception;
+    VelMethod getMethod(Object obj, String method, Object[] args, Info info) throws Exception;
 
     /**
-     * Property getter - returns VelPropertyGet appropos for #set($foo = $bar.woogie)
+     * Property getter - returns VelPropertyGet appropos for #set($foo =
+     * $bar.woogie).
      */
-    public VelPropertyGet getPropertyGet(Object obj, String identifier, Info info) throws Exception;
+    VelPropertyGet getPropertyGet(Object obj, String identifier, Info info) throws Exception;
 
     /**
-     * Property setter - returns VelPropertySet appropos for #set($foo.bar = "geir")
+     * Property setter - returns VelPropertySet appropos for #set($foo.bar =
+     * "geir").
      */
-    public VelPropertySet getPropertySet(Object obj, String identifier, Object arg, Info info) throws Exception;
+    VelPropertySet getPropertySet(Object obj, String identifier, Object arg, Info info) throws Exception;
 }
