@@ -19,7 +19,23 @@ import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Coercion;
 
 /**
- * represents equality between integers - use .equals() for strings
+ * Represents equality between values.
+ * 
+ * If the values are of the same class, .equals() is used.
+ * 
+ * If either value is a {@link Float} or {@link Double} (but both are not the same class),
+ * the values are coerced to {@link Double}s before comparing.
+ * 
+ * If either value is a {@link Number} or {@link Character} (but both are not the same class),
+ * the values are coerced to {@link Long}s before comparing.
+ *
+ * If either value is a {@link Boolean} (but both are not the same class),
+ * the values are coerced to {@link Boolean}s before comparing.
+ * 
+ * If either value is a {@link String} (but both are not the same class),
+ * toString() is called on both before comparing.
+ * 
+ * Otherwise left.equals(right) is returned.
  * 
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$

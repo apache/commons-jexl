@@ -146,7 +146,7 @@ public class SimpleNode implements Node {
     }
 
     /**
-     * basic interpret - just invoke interpret on all children
+     * basic interpret - just invoke interpret on all children.
      */
     public boolean interpret(JexlContext pc) throws Exception {
         for (int i = 0; i < jjtGetNumChildren(); i++) {

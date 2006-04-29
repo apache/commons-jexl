@@ -39,7 +39,7 @@ public class ASTAssignment extends SimpleNode {
     }
 
     /**
-     * Handle assignment ( left = right )
+     * Handle assignment ( left = right ).
      */
     public Object value(JexlContext context) throws Exception {
         // left should be the variable (reference) to assign to

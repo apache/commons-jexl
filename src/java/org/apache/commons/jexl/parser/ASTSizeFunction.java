@@ -26,7 +26,7 @@ import java.util.Set;
 import java.lang.reflect.Array;
 
 /**
- * generalized size() function for all classes we can think of
+ * generalized size() function for all classes we can think of.
  * 
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @author <a href="hw@kremvax.net">Mark H. Wilkinson</a>

@@ -29,7 +29,7 @@ import org.apache.commons.jexl.util.introspection.Info;
  */
 public class ASTMethod extends SimpleNode {
     /** dummy velocity info. */
-    private static Info DUMMY = new Info("", 1, 1);
+    private static final Info DUMMY = new Info("", 1, 1);
 
     public ASTMethod(int id) {
         super(id);

@@ -29,8 +29,8 @@ import org.apache.commons.jexl.util.introspection.Info;
  * @since 1.1
  */
 public class ASTForeachStatement extends SimpleNode {
-    /** dummy velocity info */
-    private static Info DUMMY = new Info("", 1, 1);
+    /** dummy velocity info. */
+    private static final Info DUMMY = new Info("", 1, 1);
 
     public ASTForeachStatement(int id) {
         super(id);
