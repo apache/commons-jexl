@@ -26,22 +26,31 @@ import org.apache.commons.jexl.util.Coercion;
  * @since 1.1
  */
 public class ASTBitwiseComplNode extends SimpleNode {
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
     public ASTBitwiseComplNode(int id) {
         super(id);
     }
 
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
     public ASTBitwiseComplNode(Parser p, int id) {
         super(p, id);
     }
 
-    /** Accept the visitor. * */
+    /** {@inheritDoc} */
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
-    /**
-     * @return a {@link Long} which is the bitwise complement of the operand.
-     */
+    /** {@inheritDoc} */
     public Object value(JexlContext context) throws Exception {
         Object left = ((SimpleNode) jjtGetChild(0)).value(context);
 
