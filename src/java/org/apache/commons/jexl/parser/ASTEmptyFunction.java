@@ -29,10 +29,21 @@ import java.util.Map;
  * @version $Id$
  */
 public class ASTEmptyFunction extends SimpleNode {
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
     public ASTEmptyFunction(int id) {
         super(id);
     }
 
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
     public ASTEmptyFunction(Parser p, int id) {
         super(p, id);
     }
