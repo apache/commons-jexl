@@ -25,10 +25,21 @@ import org.apache.commons.jexl.JexlContext;
  * 
  */
 public class ASTBlock extends SimpleNode {
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
     public ASTBlock(int id) {
         super(id);
     }
 
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
     public ASTBlock(Parser p, int id) {
         super(p, id);
     }
@@ -41,6 +52,8 @@ public class ASTBlock extends SimpleNode {
     /**
      * @return the value of the block. Execute all statements inside and return
      *         the value of the last.
+     * @param context the {@link JexlContext} to execute against.
+     * @throws Exception on any error.
      */
     public Object value(JexlContext context) throws Exception {
         int numChildren = jjtGetNumChildren();
