@@ -1,12 +1,12 @@
 /*
  * Copyright 2002,2004 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,104 +33,76 @@ import java.util.Enumeration;
 import java.util.ArrayList;
 
 /**
- *  Implementation of Uberspect to provide the default introspective
- *  functionality of Velocity
- *
+ * Implementation of Uberspect to provide the default introspective
+ * functionality of Velocity.
+ * 
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public class UberspectImpl implements Uberspect, UberspectLoggable
-{
+public class UberspectImpl implements Uberspect, UberspectLoggable {
     /**
-     *  Our runtime logger.
+     * Our runtime logger.
      */
     private Log rlog;
 
     /**
-     *  the default Velocity introspector
+     * the default Velocity introspector.
      */
     private static Introspector introspector;
 
     /**
-     *  init - does nothing - we need to have setRuntimeLogger
-     *  called before getting our introspector, as the default
-     *  vel introspector depends upon it.
+     * init - does nothing - we need to have setRuntimeLogger called before
+     * getting our introspector, as the default vel introspector depends upon
+     * it.
      */
-    public void init()
-        throws Exception
-    {
+    public void init() throws Exception {
     }
 
     /**
-     *  Sets the runtime logger - this must be called before anything
-     *  else besides init() as to get the logger.  Makes the pull
-     *  model appealing...
+     * Sets the runtime logger - this must be called before anything else
+     * besides init() as to get the logger. Makes the pull model appealing...
      */
-    public void setRuntimeLogger(Log runtimeLogger)
-    {
+    public void setRuntimeLogger(Log runtimeLogger) {
         rlog = runtimeLogger;
         introspector = new Introspector(rlog);
     }
 
     /**
-     *  To support iteratives - #foreach()
+     * To support iteratives - #foreach().
      */
-    public Iterator getIterator(Object obj, Info i)
-            throws Exception
-    {
-        if (obj.getClass().isArray())
-        {
+    public Iterator getIterator(Object obj, Info i) throws Exception {
+        if (obj.getClass().isArray()) {
             return new ArrayIterator(obj);
-        }
-        else if (obj instanceof Collection)
-        {
+        } else if (obj instanceof Collection) {
             return ((Collection) obj).iterator();
-        }
-        else if (obj instanceof Map)
-        {
+        } else if (obj instanceof Map) {
             return ((Map) obj).values().iterator();
-        }
-        else if (obj instanceof Iterator)
-        {
-            rlog.warn ("Warning! The iterative "
-                          + " is an Iterator in the #foreach() loop at ["
-                          + i.getLine() + "," + i.getColumn() + "]"
-                          + " in template " + i.getTemplateName()
-                          + ". Because it's not resetable,"
-                          + " if used in more than once, this may lead to"
-                          + " unexpected results.");
+        } else if (obj instanceof Iterator) {
+            rlog.warn("Warning! The iterative " + " is an Iterator in the #foreach() loop at [" + i.getLine() + ","
+                + i.getColumn() + "]" + " in template " + i.getTemplateName() + ". Because it's not resetable,"
+                + " if used in more than once, this may lead to" + " unexpected results.");
 
             return ((Iterator) obj);
-        }
-        else if (obj instanceof Enumeration)
-        {
-            rlog.warn ("Warning! The iterative "
-                          + " is an Enumeration in the #foreach() loop at ["
-                          + i.getLine() + "," + i.getColumn() + "]"
-                          + " in template " + i.getTemplateName()
-                          + ". Because it's not resetable,"
-                          + " if used in more than once, this may lead to"
-                          + " unexpected results.");
+        } else if (obj instanceof Enumeration) {
+            rlog.warn("Warning! The iterative " + " is an Enumeration in the #foreach() loop at [" + i.getLine() + ","
+                + i.getColumn() + "]" + " in template " + i.getTemplateName() + ". Because it's not resetable,"
+                + " if used in more than once, this may lead to" + " unexpected results.");
 
             return new EnumerationIterator((Enumeration) obj);
         }
 
-        /*  we have no clue what this is  */
-        rlog.warn ("Could not determine type of iterator in "
-                      +  "#foreach loop "
-                      + " at [" + i.getLine() + "," + i.getColumn() + "]"
-                      + " in template " + i.getTemplateName() );
+        /* we have no clue what this is */
+        rlog.warn("Could not determine type of iterator in " + "#foreach loop " + " at [" + i.getLine() + ","
+            + i.getColumn() + "]" + " in template " + i.getTemplateName());
 
         return null;
     }
 
     /**
-     *  Method
+     * Method.
      */
-    public VelMethod getMethod(Object obj, String methodName, Object[] args, Info i)
-            throws Exception
-    {
+    public VelMethod getMethod(Object obj, String methodName, Object[] args, Info i) throws Exception {
         if (obj == null)
             return null;
 
@@ -143,37 +115,32 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
     }
 
     /**
-     * Property  getter
+     * Property getter.
      */
-    public VelPropertyGet getPropertyGet(Object obj, String identifier, Info i)
-            throws Exception
-    {
+    public VelPropertyGet getPropertyGet(Object obj, String identifier, Info i) throws Exception {
         AbstractExecutor executor;
 
         Class claz = obj.getClass();
 
         /*
-         *  first try for a getFoo() type of property
-         *  (also getfoo() )
+         * first try for a getFoo() type of property (also getfoo() )
          */
 
-        executor = new PropertyExecutor(rlog,introspector, claz, identifier);
+        executor = new PropertyExecutor(rlog, introspector, claz, identifier);
 
         /*
-         *  look for boolean isFoo()
+         * look for boolean isFoo()
          */
 
-        if( !executor.isAlive())
-        {
+        if (!executor.isAlive()) {
             executor = new BooleanPropertyExecutor(rlog, introspector, claz, identifier);
         }
 
         /*
-         *  if that didn't work, look for get("foo")
+         * if that didn't work, look for get("foo")
          */
 
-        if (!executor.isAlive())
-        {
+        if (!executor.isAlive()) {
             executor = new GetExecutor(rlog, introspector, claz, identifier);
         }
 
@@ -183,205 +150,158 @@ public class UberspectImpl implements Uberspect, UberspectLoggable
     /**
      * Property setter
      */
-    public VelPropertySet getPropertySet(Object obj, String identifier, Object arg, Info i)
-            throws Exception
-    {
+    public VelPropertySet getPropertySet(Object obj, String identifier, Object arg, Info i) throws Exception {
         Class claz = obj.getClass();
 
         VelMethod vm = null;
-        try
-        {
+        try {
             /*
-             *  first, we introspect for the set<identifier> setter method
+             * first, we introspect for the set<identifier> setter method
              */
 
             Object[] params = {arg};
 
-            try
-            {
+            try {
                 vm = getMethod(obj, "set" + identifier, params, i);
 
-                if (vm == null)
-                {
-                   throw new NoSuchMethodException();
+                if (vm == null) {
+                    throw new NoSuchMethodException();
                 }
-            }
-            catch(NoSuchMethodException nsme2)
-            {
+            } catch (NoSuchMethodException nsme2) {
                 StringBuffer sb = new StringBuffer("set");
                 sb.append(identifier);
 
-                if (Character.isLowerCase( sb.charAt(3)))
-                {
+                if (Character.isLowerCase(sb.charAt(3))) {
                     sb.setCharAt(3, Character.toUpperCase(sb.charAt(3)));
-                }
-                else
-                {
+                } else {
                     sb.setCharAt(3, Character.toLowerCase(sb.charAt(3)));
                 }
 
                 vm = getMethod(obj, sb.toString(), params, i);
 
-                if (vm == null)
-                {
-                   throw new NoSuchMethodException();
+                if (vm == null) {
+                    throw new NoSuchMethodException();
                 }
             }
-        }
-        catch (NoSuchMethodException nsme)
-        {
+        } catch (NoSuchMethodException nsme) {
             /*
-             *  right now, we only support the Map interface
+             * right now, we only support the Map interface
              */
 
-            if (Map.class.isAssignableFrom(claz))
-            {
+            if (Map.class.isAssignableFrom(claz)) {
                 Object[] params = {new Object(), new Object()};
 
                 vm = getMethod(obj, "put", params, i);
 
-                if (vm!=null)
+                if (vm != null)
                     return new VelSetterImpl(vm, identifier);
             }
-       }
+        }
 
-       return (vm ==null) ?  null : new VelSetterImpl(vm);
+        return (vm == null) ? null : new VelSetterImpl(vm);
     }
 
     /**
-     *  Implementation of VelMethod
+     * Implementation of VelMethod
      */
-    public class VelMethodImpl implements VelMethod
-    {
+    public class VelMethodImpl implements VelMethod {
         Method method = null;
 
-        public VelMethodImpl(Method m)
-        {
+        public VelMethodImpl(Method m) {
             method = m;
         }
 
-        private VelMethodImpl()
-        {
+        private VelMethodImpl() {
         }
 
-        public Object invoke(Object o, Object[] params)
-            throws Exception
-        {
-            try
-            {
+        public Object invoke(Object o, Object[] params) throws Exception {
+            try {
                 return method.invoke(o, params);
-            }
-            catch( InvocationTargetException e )
-            {
+            } catch (InvocationTargetException e) {
                 final Throwable t = e.getTargetException();
 
-                if( t instanceof Exception )
-                {
-                    throw (Exception)t;
-                }
-                else if (t instanceof Error)
-                {
-                    throw (Error)t;
-                }
-                else
-                {
+                if (t instanceof Exception) {
+                    throw (Exception) t;
+                } else if (t instanceof Error) {
+                    throw (Error) t;
+                } else {
                     throw e;
                 }
             }
         }
 
-        public boolean isCacheable()
-        {
+        public boolean isCacheable() {
             return true;
         }
 
-        public String getMethodName()
-        {
+        public String getMethodName() {
             return method.getName();
         }
 
-        public Class getReturnType()
-        {
+        public Class getReturnType() {
             return method.getReturnType();
         }
     }
 
-    public class VelGetterImpl implements VelPropertyGet
-    {
+    public class VelGetterImpl implements VelPropertyGet {
         AbstractExecutor ae = null;
 
-        public VelGetterImpl(AbstractExecutor exec)
-        {
+        public VelGetterImpl(AbstractExecutor exec) {
             ae = exec;
         }
 
-        private VelGetterImpl()
-        {
+        private VelGetterImpl() {
         }
 
-        public Object invoke(Object o)
-            throws Exception
-        {
+        public Object invoke(Object o) throws Exception {
             return ae.execute(o);
         }
 
-        public boolean isCacheable()
-        {
+        public boolean isCacheable() {
             return true;
         }
 
-        public String getMethodName()
-        {
+        public String getMethodName() {
             return ae.getMethod().getName();
         }
 
     }
 
-    public class VelSetterImpl implements VelPropertySet
-    {
+    public class VelSetterImpl implements VelPropertySet {
         VelMethod vm = null;
+
         String putKey = null;
 
-        public VelSetterImpl(VelMethod velmethod)
-        {
+        public VelSetterImpl(VelMethod velmethod) {
             this.vm = velmethod;
         }
 
-        public VelSetterImpl(VelMethod velmethod, String key)
-        {
+        public VelSetterImpl(VelMethod velmethod, String key) {
             this.vm = velmethod;
             putKey = key;
         }
 
-        private VelSetterImpl()
-        {
+        private VelSetterImpl() {
         }
 
-        public Object invoke(Object o, Object value)
-            throws Exception
-        {
+        public Object invoke(Object o, Object value) throws Exception {
             ArrayList al = new ArrayList();
 
-            if (putKey == null)
-            {
+            if (putKey == null) {
                 al.add(value);
-            }
-            else
-            {
+            } else {
                 al.add(putKey);
                 al.add(value);
             }
 
-            return vm.invoke(o,al.toArray());
+            return vm.invoke(o, al.toArray());
         }
 
-        public boolean isCacheable()
-        {
+        public boolean isCacheable() {
             return true;
         }
 
-        public String getMethodName()
-        {
+        public String getMethodName() {
             return vm.getMethodName();
         }
 
