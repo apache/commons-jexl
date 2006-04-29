@@ -25,7 +25,7 @@ import org.apache.commons.jexl.JexlContext;
  */
 public class ASTIntegerLiteral extends SimpleNode {
     /** literal value. */
-    Integer val;
+    protected Integer val;
 
     /**
      * Create the node given an id.
