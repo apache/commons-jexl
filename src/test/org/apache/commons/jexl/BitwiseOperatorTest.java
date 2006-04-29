@@ -1,12 +1,12 @@
 /*
  * Copyright 2002-2006 The Apache Software Foundation.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 public class BitwiseOperatorTest extends TestCase {
 
     /**
-     * Create the named test
+     * Create the named test.
      * @param name test name
      */
     public BitwiseOperatorTest(String name) {
@@ -141,7 +141,7 @@ public class BitwiseOperatorTest extends TestCase {
         Expression e = ExpressionFactory.createExpression("x | y");
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Integer(12));
-        jc.getVars().put("y", new Short((short)3));
+        jc.getVars().put("y", new Short((short) 3));
         Object o = e.evaluate(jc);
         assertEquals("Result is wrong", new Long(15), o);
     }
@@ -187,7 +187,7 @@ public class BitwiseOperatorTest extends TestCase {
         Expression e = ExpressionFactory.createExpression("x ^ y");
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Integer(1));
-        jc.getVars().put("y", new Short((short)3));
+        jc.getVars().put("y", new Short((short) 3));
         Object o = e.evaluate(jc);
         assertEquals("Result is wrong", new Long(2), o);
     }
