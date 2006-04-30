@@ -69,18 +69,17 @@ public class SimpleNode implements Node {
     public void jjtClose() {
     }
 
-    /**
-     * Sets the parent node.
-     * @param n parent node.
-     */
+    /** {@inheritDoc} */
     public void jjtSetParent(Node n) {
         parent = n;
     }
 
+    /** {@inheritDoc} */
     public Node jjtGetParent() {
         return parent;
     }
 
+    /** {@inheritDoc} */
     public void jjtAddChild(Node n, int i) {
         if (children == null) {
             children = new Node[i + 1];
@@ -93,10 +92,12 @@ public class SimpleNode implements Node {
         children[i] = n;
     }
 
+    /** {@inheritDoc} */
     public Node jjtGetChild(int i) {
         return children[i];
     }
 
+    /** {@inheritDoc} */
     public int jjtGetNumChildren() {
         return (children == null) ? 0 : children.length;
     }
@@ -113,7 +114,14 @@ public class SimpleNode implements Node {
         return visitor.visit(this, data);
     }
 
-    /** Accept the visitor. * */
+    /**
+     * Visit all children.
+     * 
+     * @param visitor a {@link ParserVisitor}.
+     * @param data data to be passed along to the visitor.
+     * @return the value from visiting.
+     * @see ParserVisitor#visit
+     */
     public Object childrenAccept(ParserVisitor visitor, Object data) {
         if (children != null) {
             for (int i = 0; i < children.length; ++i) {
@@ -123,14 +131,27 @@ public class SimpleNode implements Node {
         return data;
     }
 
+    /**
+     * Gets a string representation of the node.
+     * @return the node name.
+     */
     public String toString() {
         return ParserTreeConstants.jjtNodeName[id];
     }
 
+    /**
+     * Used during dumping to output the node with a prefix.
+     * @param prefix text to prefix {@link #toString()}
+     * @return text.
+     */
     public String toString(String prefix) {
         return prefix + toString();
     }
 
+    /**
+     * Dump the node and all children.
+     * @param prefix text to prefix the node output.
+     */
     public void dump(String prefix) {
         System.out.println(toString(prefix));
 
@@ -147,6 +168,9 @@ public class SimpleNode implements Node {
 
     /**
      * basic interpret - just invoke interpret on all children.
+     * @param pc the {@link JexlContext context} to interpret against.
+     * @return true if interpretation worked.
+     * @throws Exception on any error.
      */
     public boolean interpret(JexlContext pc) throws Exception {
         for (int i = 0; i < jjtGetNumChildren(); i++) {
@@ -173,6 +197,11 @@ public class SimpleNode implements Node {
     /**
      * Sets the value for the node - again, only makes sense for some nodes but
      * lazyness tempts me to put it here. Keeps things simple.
+     * 
+     * @param context the context to retrieve values from.
+     * @param value the value.
+     * @return the result.
+     * @throws Exception when evaluating the operands fails.
      */
     public Object setValue(JexlContext context, Object value) throws Exception {
         return null;
@@ -180,6 +209,10 @@ public class SimpleNode implements Node {
 
     /**
      * Used to let a node calcuate it's value..
+     * @param o the object to calculate with.
+     * @param ctx the context to retrieve values from.
+     * @throws Exception when calculating the value fails.
+     * @return the result of the calculation.
      */
     public Object execute(Object o, JexlContext ctx) throws Exception {
         return null;
