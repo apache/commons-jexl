@@ -24,29 +24,54 @@ import org.apache.commons.jexl.JexlContext;
  * @version $Id$
  */
 public class ASTReference extends SimpleNode {
-    SimpleNode root;
+    /** first variable in the expression. */
+    protected SimpleNode root;
 
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
     public ASTReference(int id) {
         super(id);
     }
 
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
     public ASTReference(Parser p, int id) {
         super(p, id);
     }
 
-    /** Accept the visitor. * */
+    /** {@inheritDoc} */
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
+    /** {@inheritDoc} */
     public Object value(JexlContext jc) throws Exception {
         return execute(null, jc);
     }
 
+    /** Store the first child as {@link ASTReference#root root}. */
     public void jjtClose() {
         root = (SimpleNode) jjtGetChild(0);
     }
 
+    /**
+     * evaluate each piece of the reference.
+     * 
+     * e.g. foo.bar.woogie[2].name, foo is our 'root', and we need to
+     * evaluate 'bar.woogie[2].name' relative to foo.
+     * 
+     * @param jc the {@link JexlContext} to evaluate against.
+     * @param obj not used. root.value(jc) is used instead.
+     * @return the value of the array expression.
+     * @throws Exception on any error
+     */
     public Object execute(Object obj, JexlContext jc) throws Exception {
         Object o = root.value(jc);
 
@@ -89,6 +114,13 @@ public class ASTReference extends SimpleNode {
         return varName.toString();
     }
 
+    /**
+     * Gets the variable name of {@link ASTReference#root root}.
+     * @return the identifier.
+     * @throws Exception on any error
+     * @see ASTIdentifier#getIdentifierString()
+     * @see ASTArrayAccess#getIdentifierString()
+     */
     public String getRootString() throws Exception {
         if (root instanceof ASTIdentifier) {
             return ((ASTIdentifier) root).getIdentifierString();
