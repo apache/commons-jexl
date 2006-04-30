@@ -21,22 +21,31 @@ import org.apache.commons.jexl.JexlContext;
  * variable; A reference by itself.
  */
 public class ASTReferenceExpression extends SimpleNode {
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
     public ASTReferenceExpression(int id) {
         super(id);
     }
 
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
     public ASTReferenceExpression(Parser p, int id) {
         super(p, id);
     }
 
-    /** Accept the visitor. * */
+    /** {@inheritDoc} */
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
-    /**
-     * @return the value of the expression
-     */
+    /** {@inheritDoc} */
     public Object value(JexlContext context) throws Exception {
         return ((SimpleNode) jjtGetChild(0)).value(context);
     }
