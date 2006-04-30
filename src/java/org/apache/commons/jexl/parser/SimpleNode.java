@@ -163,7 +163,7 @@ public class SimpleNode implements Node {
      * Gets the value of this node.
      * 
      * @param context the context to retrieve values from.
-     * @return the result of addition.
+     * @return the value of the node.
      * @throws Exception when evaluating the operands fails.
      */
     public Object value(JexlContext context) throws Exception {
