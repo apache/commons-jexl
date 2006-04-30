@@ -15,15 +15,14 @@
  */
 package org.apache.commons.jexl.parser;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Map;
+
 import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Introspector;
 import org.apache.commons.jexl.util.introspection.Info;
 import org.apache.commons.jexl.util.introspection.VelMethod;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.lang.reflect.Array;
 
 /**
  * generalized size() function for all classes we can think of.
@@ -33,19 +32,31 @@ import java.lang.reflect.Array;
  * @version $Id$
  */
 public class ASTSizeFunction extends SimpleNode {
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
     public ASTSizeFunction(int id) {
         super(id);
     }
 
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
     public ASTSizeFunction(Parser p, int id) {
         super(p, id);
     }
 
-    /** Accept the visitor. * */
+    /** {@inheritDoc} */
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
+    /** {@inheritDoc} */
     public Object value(JexlContext jc) throws Exception {
         SimpleNode arg = (SimpleNode) jjtGetChild(0);
 
@@ -58,17 +69,23 @@ public class ASTSizeFunction extends SimpleNode {
         return new Integer(ASTSizeFunction.sizeOf(val));
     }
 
+    /**
+     * Calculate the <code>size</code> of various types: Collection, Array, Map, String,
+     * and anything that has a int size() method.
+     * 
+     * @param val the object to get the size of.
+     * @return the size of val
+     * @throws Exception if the size cannot be determined.
+     */
     public static int sizeOf(Object val) throws Exception {
-        if (val instanceof List) {
-            return ((List) val).size();
+        if (val instanceof Collection) {
+            return ((Collection) val).size();
         } else if (val.getClass().isArray()) {
             return Array.getLength(val);
         } else if (val instanceof Map) {
             return ((Map) val).size();
         } else if (val instanceof String) {
             return ((String) val).length();
-        } else if (val instanceof Set) {
-            return ((Set) val).size();
         } else {
             // check if there is a size method on the object that returns an
             // integer

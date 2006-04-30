@@ -21,21 +21,32 @@ import org.apache.commons.jexl.JexlContext;
  * Assignment as an expression.
  */
 public class ASTStatementExpression extends SimpleNode {
-  public ASTStatementExpression(int id) {
-    super(id);
-  }
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
+    public ASTStatementExpression(int id) {
+        super(id);
+    }
 
-  public ASTStatementExpression(Parser p, int id) {
-    super(p, id);
-  }
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
+    public ASTStatementExpression(Parser p, int id) {
+        super(p, id);
+    }
 
+    /** {@inheritDoc} */
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
+        return visitor.visit(this, data);
+    }
 
-  /** Accept the visitor. **/
-  public Object jjtAccept(ParserVisitor visitor, Object data) {
-    return visitor.visit(this, data);
-  }
-
-  public Object value(JexlContext context) throws Exception {
-    return ((SimpleNode) jjtGetChild(0)).value(context);
-  }
+    /** {@inheritDoc} */
+    public Object value(JexlContext context) throws Exception {
+        return ((SimpleNode) jjtGetChild(0)).value(context);
+    }
 }
