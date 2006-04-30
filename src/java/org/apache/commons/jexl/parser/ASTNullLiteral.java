@@ -24,19 +24,31 @@ import org.apache.commons.jexl.JexlContext;
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  */
 public class ASTNullLiteral extends SimpleNode {
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
     public ASTNullLiteral(int id) {
         super(id);
     }
 
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
     public ASTNullLiteral(Parser p, int id) {
         super(p, id);
     }
 
-    /** Accept the visitor. * */
+    /** {@inheritDoc} */
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
+    /** {@inheritDoc} */
     public Object value(JexlContext context) {
         return null;
     }
