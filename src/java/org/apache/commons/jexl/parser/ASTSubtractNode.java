@@ -27,14 +27,26 @@ import org.apache.commons.jexl.JexlContext;
  * @version $Id$
  */
 public class ASTSubtractNode extends SimpleNode {
+    /**
+     * Create the node given an id.
+     * 
+     * @param id node id.
+     */
     public ASTSubtractNode(int id) {
         super(id);
     }
 
+    /**
+     * Create a node with the given parser and id.
+     * 
+     * @param p a parser.
+     * @param id node id.
+     */
     public ASTSubtractNode(Parser p, int id) {
         super(p, id);
     }
 
+    /** {@inheritDoc} */
     public Object value(JexlContext context) throws Exception {
         Object left = ((SimpleNode) jjtGetChild(0)).value(context);
         Object right = ((SimpleNode) jjtGetChild(1)).value(context);
@@ -79,7 +91,7 @@ public class ASTSubtractNode extends SimpleNode {
 
     }
 
-    /** Accept the visitor. * */
+    /** {@inheritDoc} */
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
