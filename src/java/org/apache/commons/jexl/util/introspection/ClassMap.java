@@ -36,11 +36,14 @@ import java.util.Map;
  * @version $Id$
  */
 public class ClassMap {
+    /** represents a miss on the cached data. */
     private static final class CacheMiss {
     }
 
+    /** constant for a miss on the cached data. */
     private static final CacheMiss CACHE_MISS = new CacheMiss();
 
+    /** represents null or missing arguments. */
     private static final Object OBJECT = new Object();
 
     /**
@@ -56,17 +59,16 @@ public class ClassMap {
      */
     private final Map methodCache = new Hashtable();
 
+    /** map from method name and args to a {@link Method}. */
     private final MethodMap methodMap = new MethodMap();
 
     /**
      * Standard constructor.
+     * @param aClass the class to deconstruct. 
      */
-    public ClassMap(Class clazz) {
-        this.clazz = clazz;
+    public ClassMap(Class aClass) {
+        clazz = aClass;
         populateMethodCache();
-    }
-
-    private ClassMap() {
     }
 
     /**
@@ -85,6 +87,11 @@ public class ClassMap {
      * 
      * If nothing is found, then we must actually go and introspect the method
      * from the MethodMap.
+     * 
+     * @param name method name
+     * @param params method parameters
+     * @return CACHE_MISS or a {@link Method}
+     * @throws MethodMap.AmbiguousException if the method and parameters are ambiguous.
      */
     public Method findMethod(String name, Object[] params) throws MethodMap.AmbiguousException {
         String methodKey = makeMethodKey(name, params);
