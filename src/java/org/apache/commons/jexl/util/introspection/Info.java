@@ -26,29 +26,44 @@ package org.apache.commons.jexl.util.introspection;
  * @version $Id$
  */
 public class Info {
+    /** line number. */
     private int line;
-
+    /** column number. */
     private int column;
-
+    /** name. */
     private String templateName;
-
+    /** 
+     * Create info.
+     * @param tn template name
+     * @param l line number
+     * @param c column
+     */
     public Info(String tn, int l, int c) {
         templateName = tn;
         line = l;
         column = c;
     }
 
-    private Info() {
-    }
-
+    /**
+     * Gets the template name.
+     * @return template name
+     */
     public String getTemplateName() {
         return templateName;
     }
 
+    /**
+     * Gets the line number.
+     * @return line number.
+     */
     public int getLine() {
         return line;
     }
 
+    /**
+     * Gets the column number.
+     * @return the column.
+     */
     public int getColumn() {
         return column;
     }
