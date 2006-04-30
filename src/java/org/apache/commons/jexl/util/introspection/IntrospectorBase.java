@@ -73,6 +73,7 @@ public class IntrospectorBase {
      *            parameters
      * 
      * @return The desired Method object.
+     * @throws Exception on any logical error.
      */
     public Method getMethod(Class c, String name, Object[] params) throws Exception {
         if (c == null) {
@@ -110,6 +111,8 @@ public class IntrospectorBase {
      * Creates a class map for specific class and registers it in the cache.
      * Also adds the qualified name to the name->class map for later Classloader
      * change detection.
+     * @param c class.
+     * @return a {@link ClassMap}
      */
     protected ClassMap createClassMap(Class c) {
         ClassMap classMap = new ClassMap(c);
@@ -120,7 +123,7 @@ public class IntrospectorBase {
     }
 
     /**
-     * Clears the classmap and classname caches
+     * Clears the classmap and classname caches.
      */
     protected void clearCache() {
         /*
