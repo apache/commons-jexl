@@ -61,23 +61,23 @@ public class ArrayIterator implements Iterator {
     /**
      * Creates a new iterator instance for the specified array.
      *
-     * @param array The array for which an iterator is desired.
+     * @param arr The array for which an iterator is desired.
      */
-    public ArrayIterator(Object array) {
+    public ArrayIterator(Object arr) {
         /*
          * if this isn't an array, then throw.  Note that this is 
          * for internal use - so this should never happen - if it does
          *  we screwed up.
          */
          
-        if (!array.getClass().isArray()) {
+        if (!arr.getClass().isArray()) {
             throw new IllegalArgumentException("Programmer error :"
                       + " internal ArrayIterator invoked w/o array");
         }
             
-        this.array = array;
+        array = arr;
         pos = 0;
-        size = Array.getLength(this.array);
+        size = Array.getLength(array);
     }
 
     /**
