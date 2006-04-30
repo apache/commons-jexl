@@ -26,6 +26,8 @@ import org.apache.commons.logging.Log;
  */
 public class PropertyExecutor extends AbstractExecutor {
 
+    /** index of the first character of the property. */
+    private static final int PROPERTY_START_INDEX = 3;
     /** The JEXL introspector used. */
     protected Introspector introspector = null;
 
@@ -88,12 +90,12 @@ public class PropertyExecutor extends AbstractExecutor {
             sb = new StringBuffer("get");
             sb.append(property);
 
-            c = sb.charAt(3);
+            c = sb.charAt(PROPERTY_START_INDEX);
 
             if (Character.isLowerCase(c)) {
-                sb.setCharAt(3, Character.toUpperCase(c));
+                sb.setCharAt(PROPERTY_START_INDEX, Character.toUpperCase(c));
             } else {
-                sb.setCharAt(3, Character.toLowerCase(c));
+                sb.setCharAt(PROPERTY_START_INDEX, Character.toLowerCase(c));
             }
 
             methodUsed = sb.toString();
