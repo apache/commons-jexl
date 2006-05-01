@@ -29,28 +29,50 @@ import java.util.Iterator;
 public interface Uberspect {
     /**
      * Initializer - will be called before use.
+     * @throws Exception on any error.
      */
     void init() throws Exception;
 
     /**
      * To support iteratives - #foreach().
+     * @param info template info.
+     * @param obj to get the iterator for.
+     * @throws Exception on any error.
+     * @return an iterator over obj.
      */
     Iterator getIterator(Object obj, Info info) throws Exception;
 
     /**
      * Returns a general method, corresponding to $foo.bar( $woogie ).
+     * @param obj the object
+     * @param method the method name
+     * @param args method arguments
+     * @param info template info
+     * @throws Exception on any error.
+     * @return a {@link VelMethod}.
      */
     VelMethod getMethod(Object obj, String method, Object[] args, Info info) throws Exception;
 
     /**
      * Property getter - returns VelPropertyGet appropos for #set($foo =
      * $bar.woogie).
+     * @param obj the object to get the property from.
+     * @param identifier property name
+     * @param info template info
+     * @throws Exception on any error.
+     * @return a {@link VelPropertyGet}.
      */
     VelPropertyGet getPropertyGet(Object obj, String identifier, Info info) throws Exception;
 
     /**
      * Property setter - returns VelPropertySet appropos for #set($foo.bar =
      * "geir").
+     * @param obj the object to get the property from.
+     * @param identifier property name
+     * @param arg value to set.
+     * @param info template info
+     * @throws Exception on any error.
+     * @return a {@link VelPropertySet}.
      */
     VelPropertySet getPropertySet(Object obj, String identifier, Object arg, Info info) throws Exception;
 }
