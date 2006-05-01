@@ -28,8 +28,13 @@ package org.apache.commons.jexl.util.introspection;
  */
 public interface VelMethod {
     /**
-     * invocation method - called when the method invocationshould be preformed
+     * invocation method - called when the method invocation should be performed
      * and a value returned.
+
+     * @param o the object
+     * @param params method parameters.
+     * @return the result
+     * @throws Exception on any error.
      */
     Object invoke(Object o, Object[] params) throws Exception;
 
@@ -42,12 +47,14 @@ public interface VelMethod {
     boolean isCacheable();
 
     /**
-     * returns the method name used.
+     * Gets the method name used.
+     * @return method name
      */
     String getMethodName();
 
     /**
      * returns the return type of the method invoked.
+     * @return return type
      */
     Class getReturnType();
 }
