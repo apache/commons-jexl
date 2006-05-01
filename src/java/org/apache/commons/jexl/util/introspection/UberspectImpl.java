@@ -224,11 +224,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
         }
 
         /**
-         * Invoke the method on the object.
-         * @param o the object
-         * @param params method parameters.
-         * @return the result
-         * @throws Exception on any error.
+         * {@inheritDoc}
          */
         public Object invoke(Object o, Object[] params) throws Exception {
             try {
@@ -246,60 +242,95 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean isCacheable() {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public String getMethodName() {
             return method.getName();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public Class getReturnType() {
             return method.getReturnType();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public class VelGetterImpl implements VelPropertyGet {
-        AbstractExecutor ae = null;
+        /** executor for performing the get. */
+        protected AbstractExecutor ae = null;
 
+        /**
+         * Create the getter using an {@link AbstractExecutor} to
+         * do the work.
+         * @param exec the executor.
+         */
         public VelGetterImpl(AbstractExecutor exec) {
             ae = exec;
         }
 
-        private VelGetterImpl() {
-        }
-
+        /**
+         * {@inheritDoc}
+         */
         public Object invoke(Object o) throws Exception {
             return ae.execute(o);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean isCacheable() {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public String getMethodName() {
             return ae.getMethod().getName();
         }
-
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public class VelSetterImpl implements VelPropertySet {
-        VelMethod vm = null;
+        /** the method to call. */
+        protected VelMethod vm = null;
+        /** the key for indexed and other properties. */
+        protected String putKey = null;
 
-        String putKey = null;
-
+        /**
+         * Create an instance.
+         * @param velmethod the method to call on set.
+         */
         public VelSetterImpl(VelMethod velmethod) {
             this.vm = velmethod;
         }
 
+        /**
+         * Create an instance.
+         * @param velmethod the method to call on set.
+         * @param key the index or other value passed to a
+         *      setProperty(xxx, value) method.
+         */
         public VelSetterImpl(VelMethod velmethod, String key) {
             this.vm = velmethod;
             putKey = key;
         }
 
-        private VelSetterImpl() {
-        }
-
+        /** {@inheritDoc} */
         public Object invoke(Object o, Object value) throws Exception {
             ArrayList al = new ArrayList();
 
@@ -313,10 +344,12 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
             return vm.invoke(o, al.toArray());
         }
 
+        /** {@inheritDoc} */
         public boolean isCacheable() {
             return true;
         }
 
+        /** {@inheritDoc} */
         public String getMethodName() {
             return vm.getMethodName();
         }
