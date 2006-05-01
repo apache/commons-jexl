@@ -165,27 +165,23 @@ public class MethodMap {
                 Method max = (Method) maximal.next();
 
                 switch (moreSpecific(appArgs, max.getParameterTypes())) {
-                    case MORE_SPECIFIC: {
+                    case MORE_SPECIFIC:
                         /*
                          * This method is more specific than the previously
                          * known maximally specific, so remove the old maximum.
                          */
-
                         maximal.remove();
                         break;
-                    }
 
-                    case LESS_SPECIFIC: {
+                    case LESS_SPECIFIC:
                         /*
                          * This method is less specific than some of the
                          * currently known maximally specific methods, so we
                          * won't add it into the set of maximally specific
                          * methods
                          */
-
                         lessSpecific = true;
                         break;
-                    }
                 }
             }
 
@@ -273,6 +269,9 @@ public class MethodMap {
     /**
      * Returns true if the supplied method is applicable to actual argument
      * types.
+     * @param method the method to check
+     * @param classes possible argument types
+     * @return true if the arguments are applicable to the method.
      */
     private static boolean isApplicable(Method method, Class[] classes) {
         Class[] methodArgs = method.getParameterTypes();
