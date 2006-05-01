@@ -41,6 +41,9 @@ import java.util.ArrayList;
  * @version $Id$
  */
 public class UberspectImpl implements Uberspect, UberspectLoggable {
+    /** index of the first character of the property. */
+    private static final int PROPERTY_START_INDEX = 3;
+
     /**
      * Our runtime logger.
      */
@@ -55,6 +58,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
      * init - does nothing - we need to have setRuntimeLogger called before
      * getting our introspector, as the default vel introspector depends upon
      * it.
+     * @throws Exception on any error.
      */
     public void init() throws Exception {
     }
@@ -62,6 +66,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     /**
      * Sets the runtime logger - this must be called before anything else
      * besides init() as to get the logger. Makes the pull model appealing...
+     * @param runtimeLogger service to use for logging.
      */
     public void setRuntimeLogger(Log runtimeLogger) {
         rlog = runtimeLogger;
@@ -69,7 +74,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     }
 
     /**
-     * To support iteratives - #foreach().
+     * {@inheritDoc}
      */
     public Iterator getIterator(Object obj, Info i) throws Exception {
         if (obj.getClass().isArray()) {
@@ -100,11 +105,12 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     }
 
     /**
-     * Method.
+     * {@inheritDoc}
      */
     public VelMethod getMethod(Object obj, String methodName, Object[] args, Info i) throws Exception {
-        if (obj == null)
+        if (obj == null) {
             return null;
+        }
 
         Method m = introspector.getMethod(obj.getClass(), methodName, args);
         if (m == null && obj instanceof Class) {
@@ -115,7 +121,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     }
 
     /**
-     * Property getter.
+     * {@inheritDoc}
      */
     public VelPropertyGet getPropertyGet(Object obj, String identifier, Info i) throws Exception {
         AbstractExecutor executor;
@@ -148,7 +154,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     }
 
     /**
-     * Property setter
+     * {@inheritDoc}
      */
     public VelPropertySet getPropertySet(Object obj, String identifier, Object arg, Info i) throws Exception {
         Class claz = obj.getClass();
@@ -171,10 +177,10 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
                 StringBuffer sb = new StringBuffer("set");
                 sb.append(identifier);
 
-                if (Character.isLowerCase(sb.charAt(3))) {
-                    sb.setCharAt(3, Character.toUpperCase(sb.charAt(3)));
+                if (Character.isLowerCase(sb.charAt(PROPERTY_START_INDEX))) {
+                    sb.setCharAt(PROPERTY_START_INDEX, Character.toUpperCase(sb.charAt(PROPERTY_START_INDEX)));
                 } else {
-                    sb.setCharAt(3, Character.toLowerCase(sb.charAt(3)));
+                    sb.setCharAt(PROPERTY_START_INDEX, Character.toLowerCase(sb.charAt(PROPERTY_START_INDEX)));
                 }
 
                 vm = getMethod(obj, sb.toString(), params, i);
@@ -193,8 +199,9 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
 
                 vm = getMethod(obj, "put", params, i);
 
-                if (vm != null)
+                if (vm != null) {
                     return new VelSetterImpl(vm, identifier);
+                }
             }
         }
 
@@ -202,18 +209,27 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     }
 
     /**
-     * Implementation of VelMethod
+     * An implementation of {@link VelMethod}.
      */
     public class VelMethodImpl implements VelMethod {
-        Method method = null;
-
+        /** the method. */
+        protected Method method = null;
+        /** 
+         * Create a new instance.
+         * 
+         * @param m the method.
+         */
         public VelMethodImpl(Method m) {
             method = m;
         }
 
-        private VelMethodImpl() {
-        }
-
+        /**
+         * Invoke the method on the object.
+         * @param o the object
+         * @param params method parameters.
+         * @return the result
+         * @throws Exception on any error.
+         */
         public Object invoke(Object o, Object[] params) throws Exception {
             try {
                 return method.invoke(o, params);
