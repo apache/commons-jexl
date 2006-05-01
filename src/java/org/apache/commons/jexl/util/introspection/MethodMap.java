@@ -35,20 +35,22 @@ import java.util.Map;
  * @version $Id$
  */
 public class MethodMap {
+    /** whether a method is more specific than a previously compared one. */
     private static final int MORE_SPECIFIC = 0;
-
+    /** whether a method is less specific than a previously compared one. */
     private static final int LESS_SPECIFIC = 1;
-
+    /** A method doesn't match a previously compared one. */
     private static final int INCOMPARABLE = 2;
 
     /**
      * Keep track of all methods with the same name.
      */
-    Map methodByNameMap = new Hashtable();
+    protected Map methodByNameMap = new Hashtable();
 
     /**
      * Add a method to a list of methods by name. For a particular class we are
      * keeping track of all the methods with the same name.
+     * @param method the method.
      */
     public void add(Method method) {
         String methodName = method.getName();
@@ -128,6 +130,13 @@ public class MethodMap {
         static final long serialVersionUID = 8758118091728717367L;
     }
 
+    /**
+     * Gets the most specific method from a list.
+     * @param methods list of {@link Method methods}
+     * @param classes argument types
+     * @return the most specific method, or null
+     * @throws AmbiguousException if there is more than one specific method
+     */
     private static Method getMostSpecific(List methods, Class[] classes) throws AmbiguousException {
         LinkedList applicables = getApplicables(methods, classes);
 
@@ -320,27 +329,35 @@ public class MethodMap {
          */
 
         if (formal.isPrimitive()) {
-            if (formal == Boolean.TYPE && actual == Boolean.class)
+            if (formal == Boolean.TYPE && actual == Boolean.class) {
                 return true;
-            if (formal == Character.TYPE && actual == Character.class)
+            }
+            if (formal == Character.TYPE && actual == Character.class) {
                 return true;
-            if (formal == Byte.TYPE && actual == Byte.class)
+            }
+            if (formal == Byte.TYPE && actual == Byte.class) {
                 return true;
-            if (formal == Short.TYPE && (actual == Short.class || actual == Byte.class))
+            }
+            if (formal == Short.TYPE && (actual == Short.class || actual == Byte.class)) {
                 return true;
-            if (formal == Integer.TYPE && (actual == Integer.class || actual == Short.class || actual == Byte.class))
+            }
+            if (formal == Integer.TYPE && (actual == Integer.class || actual == Short.class || actual == Byte.class)) {
                 return true;
+            }
             if (formal == Long.TYPE
-                && (actual == Long.class || actual == Integer.class || actual == Short.class || actual == Byte.class))
+                && (actual == Long.class || actual == Integer.class || actual == Short.class || actual == Byte.class)) {
                 return true;
+            }
             if (formal == Float.TYPE
                 && (actual == Float.class || actual == Long.class || actual == Integer.class 
-                    || actual == Short.class || actual == Byte.class))
+                    || actual == Short.class || actual == Byte.class)) {
                 return true;
+            }
             if (formal == Double.TYPE
                 && (actual == Double.class || actual == Float.class || actual == Long.class || actual == Integer.class
-                    || actual == Short.class || actual == Byte.class))
+                    || actual == Short.class || actual == Byte.class)) {
                 return true;
+            }
         }
 
         return false;
@@ -381,19 +398,24 @@ public class MethodMap {
          */
 
         if (formal.isPrimitive()) {
-            if (formal == Short.TYPE && (actual == Byte.TYPE))
+            if (formal == Short.TYPE && (actual == Byte.TYPE)) {
                 return true;
-            if (formal == Integer.TYPE && (actual == Short.TYPE || actual == Byte.TYPE))
+            }
+            if (formal == Integer.TYPE && (actual == Short.TYPE || actual == Byte.TYPE)) {
                 return true;
-            if (formal == Long.TYPE && (actual == Integer.TYPE || actual == Short.TYPE || actual == Byte.TYPE))
+            }
+            if (formal == Long.TYPE && (actual == Integer.TYPE || actual == Short.TYPE || actual == Byte.TYPE)) {
                 return true;
+            }
             if (formal == Float.TYPE
-                && (actual == Long.TYPE || actual == Integer.TYPE || actual == Short.TYPE || actual == Byte.TYPE))
+                && (actual == Long.TYPE || actual == Integer.TYPE || actual == Short.TYPE || actual == Byte.TYPE)) {
                 return true;
+            }
             if (formal == Double.TYPE
                 && (actual == Float.TYPE || actual == Long.TYPE || actual == Integer.TYPE || actual == Short.TYPE 
-                    || actual == Byte.TYPE))
+                    || actual == Byte.TYPE)) {
                 return true;
+            }
         }
         return false;
     }
