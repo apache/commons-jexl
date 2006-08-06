@@ -23,8 +23,10 @@ import org.apache.commons.jexl.parser.ASTIfStatement;
 import org.apache.commons.jexl.parser.ASTReferenceExpression;
 import org.apache.commons.jexl.parser.ASTStatementExpression;
 import org.apache.commons.jexl.parser.ASTWhileStatement;
+import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
+import org.apache.commons.jexl.parser.TokenMgrError;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -117,7 +119,11 @@ public class ExpressionFactory {
         SimpleNode tree;
         synchronized (parser) {
             log.debug("Parsing expression: " + expr);
-            tree = parser.parse(new StringReader(expr));
+            try {
+                tree = parser.parse(new StringReader(expr));
+            } catch (TokenMgrError tme) {
+                throw new ParseException(tme.getMessage());
+            }
         }
 
         if (tree.jjtGetNumChildren() > 1 && log.isWarnEnabled()) {
