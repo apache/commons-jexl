@@ -20,8 +20,9 @@ import junit.framework.TestCase;
 import org.apache.commons.jexl.parser.ParseException;
 
 /**
- * Tests for malformed expressions.
- * ({@link ExpressionFactory} should throw {@link ParseException}s).
+ * Tests for malformed expressions and scripts.
+ * ({@link ExpressionFactory} and {@link ScriptFactory} should throw
+ * {@link ParseException}s).
  *
  * @since 1.1
  */
@@ -54,6 +55,43 @@ public class ParseFailuresTest extends TestCase {
         try {
             Expression e = ExpressionFactory.createExpression(badExpression);
             fail("Parsing \"" + badExpression
+                + "\" should result in a ParseException");
+        } catch (ParseException pe) {
+            // expected
+        }
+    }
+
+    public void testMalformedScript1() throws Exception {
+        // this will throw a TokenMgrErr, which we rethrow as a ParseException
+        String badScript = "eq";
+        try {
+            Script s = ScriptFactory.createScript(badScript);
+            fail("Parsing \"" + badScript
+                + "\" should result in a ParseException");
+        } catch (ParseException pe) {
+            // expected
+        }
+    }
+
+
+    public void testMalformedScript2() throws Exception {
+        // this will throw a TokenMgrErr, which we rethrow as a ParseException
+        String badScript = "?";
+        try {
+            Script s = ScriptFactory.createScript(badScript);
+            fail("Parsing \"" + badScript
+                + "\" should result in a ParseException");
+        } catch (ParseException pe) {
+            // expected
+        }
+    }
+
+    public void testMalformedScript3() throws Exception {
+        // this will throw a TokenMgrErr, which we rethrow as a ParseException
+        String badScript = "foo=1;bar=2;a?b:c;";
+        try {
+            Script s = ScriptFactory.createScript(badScript);
+            fail("Parsing \"" + badScript
                 + "\" should result in a ParseException");
         } catch (ParseException pe) {
             // expected

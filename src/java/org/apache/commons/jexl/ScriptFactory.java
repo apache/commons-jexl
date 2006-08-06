@@ -25,8 +25,10 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.apache.commons.jexl.parser.ASTJexlScript;
+import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
+import org.apache.commons.jexl.parser.TokenMgrError;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -155,7 +157,12 @@ public class ScriptFactory {
         // Parse the Expression
         synchronized (parser) {
             log.debug("Parsing script: " + cleanText);
-            SimpleNode script = parser.parse(new StringReader(cleanText));
+            SimpleNode script;
+            try {
+                script = parser.parse(new StringReader(cleanText));
+            } catch (TokenMgrError tme) {
+                throw new ParseException(tme.getMessage());
+            }
             if (script instanceof ASTJexlScript) {
                 return new ScriptImpl(cleanText, (ASTJexlScript) script);
             } else {
