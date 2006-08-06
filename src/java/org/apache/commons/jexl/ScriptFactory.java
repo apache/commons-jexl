@@ -96,7 +96,7 @@ public class ScriptFactory {
      *      problem parsing the script.
      */
     public static Script createScript(String scriptText) throws Exception {
-        return getInstance().newScript(scriptText);
+        return getInstance().createNewScript(scriptText);
     }
 
     /**
@@ -152,23 +152,23 @@ public class ScriptFactory {
      *  @return Script a new script
      *  @throws Exception for a variety of reasons - mostly malformed scripts
      */
-    protected Script newScript(String scriptText) throws Exception {
+    protected Script createNewScript(String scriptText) throws Exception {
         String cleanText = cleanScript(scriptText);
+        SimpleNode script;
         // Parse the Expression
         synchronized (parser) {
             log.debug("Parsing script: " + cleanText);
-            SimpleNode script;
             try {
                 script = parser.parse(new StringReader(cleanText));
             } catch (TokenMgrError tme) {
                 throw new ParseException(tme.getMessage());
             }
-            if (script instanceof ASTJexlScript) {
-                return new ScriptImpl(cleanText, (ASTJexlScript) script);
-            } else {
-                throw new IllegalStateException("Parsed script is not "
-                    + "an ASTJexlScript");
-            }
+        }
+        if (script instanceof ASTJexlScript) {
+            return new ScriptImpl(cleanText, (ASTJexlScript) script);
+        } else {
+            throw new IllegalStateException("Parsed script is not "
+                + "an ASTJexlScript");
         }
     }
 
