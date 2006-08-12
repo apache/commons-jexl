@@ -66,6 +66,10 @@
     <!-- Copy xdoc files -->
     <copy todir="${maven.dist.src.assembly.dir}/xdocs">
       <fileset dir="./xdocs"/>
+    </copy>
+
+    <!-- Copy examples -->
+    <copy todir="${maven.dist.src.assembly.dir}/examples">
       <fileset dir="./examples"/>
     </copy>
 
