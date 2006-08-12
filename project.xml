@@ -111,14 +111,26 @@
   </developers>
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-    </dependency>
-    <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <version>1.0.3</version>
+      <url>http://jakarta.apache.org/commons/logging/</url>
+      <properties>
+        <comment>
+            &lt;strong&gt;Required&lt;/strong&gt;
+        </comment>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <url>http://www.junit.org/</url>
+      <properties>
+        <comment>
+            &lt;strong&gt;Test Only&lt;/strong&gt;
+        </comment>
+      </properties>
     </dependency>
     <dependency>
       <groupId>maven</groupId>
