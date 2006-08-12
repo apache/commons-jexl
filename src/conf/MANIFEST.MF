@@ -6,7 +6,7 @@ Specification-Title: Commons JEXL Expression Language Engine
 Specification-Vendor: The Apache Software Foundation
 Implementation-Title: org.apache.commons.jexl
 Implementation-Vendor: The Apache Software Foundation
-Implementation-Version: 1.1-SNAPSHOT
+Implementation-Version: 1.1-RC1
 Implementation-Vendor-Id: org.apache
 X-Compile-Source-JDK: 1.2
 X-Compile-Target-JDK: 1.2
