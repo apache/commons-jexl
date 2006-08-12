@@ -39,10 +39,7 @@ limitations under the License.
     The result will be in "target/docs/apidocs".
   </p>
   <p>
-    To build the full website, run "maven site". You will need to fetch the
-    <a href="http://svn.apache.org/repos/asf/jakarta/commons/proper/commons-build/trunk/">commons-build</a>
-    directory to build the full website, and place it as a sibling directory of the
-    JEXL root directory. The result will be in "target/docs".
+    To build the full website, run "maven site". The result will be in "target/docs".
   </p>
   <p>
     To build the site, you need Maven 1.0.2 and version 1.9.2 of the maven-xdoc-plugin installed.
