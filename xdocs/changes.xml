@@ -2,7 +2,7 @@
 
 <!-- 
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,26 +25,26 @@
   </properties>
   <body>
     <release version="1.1-SNAPSHOT" date="unreleased">
-      <action dev="dion" type="fix" issue="39193" due-to="Guido Anzuoni">Allow for static methods to be called on classes and not just objects.</action>
+      <action dev="dion" type="fix" issue="JEXL-3" due-to="Guido Anzuoni">Allow for static methods to be called on classes and not just objects.</action>
       <action dev="dion" type="add">Added Script and ScriptFactory to allow scripts to be executed from text, files or a URL.</action>
       <action dev="dion" type="add">Added implementation for bitwise operators: and, complement, or, xor.</action>
       <action dev="dion" type="add">Added implementation for the foreach statement.</action>
       <action dev="dion" type="add">Added implementation for the while statement.</action>
       <action dev="dion" type="add">Added implementation for block statements, e.g. curly braces containing multiple statements.</action>
       <action dev="dion" type="add">Added implementation for the if statement.</action>
-      <action dev="dion" type="fix" issue="36857">Unary minus was only working for integer values.</action>
+      <action dev="dion" type="fix" issue="JEXL-6">Unary minus was only working for integer values.</action>
       <action dev="dion" type="update">Add @since tags to code so we can track API additions via javadoc</action>
-      <action dev="dion" type="add" issue="32110" due-to="Barry Lagerweij">Support assignment to variables</action>
-      <action dev="dion" type="fix" issue="32829">'abc'.substring(0,1+1) is empty (method matching problem)</action>
+      <action dev="dion" type="add" issue="JEXL-4" due-to="Barry Lagerweij">Support assignment to variables</action>
+      <action dev="dion" type="fix" issue="JEXL-5">'abc'.substring(0,1+1) is empty (method matching problem)</action>
     </release>
     <release version="1.0" date="2004-09-07">
       <action dev="dion" type="fix">Support ant-style properties</action>
     </release>
     <release version="1.0-RC1" date="2004-08-26">
       <action dev="dion" type="fix" due-to="Geoff Waggott">Fix string concatenation broken for variables</action>
-      <action dev="dion" type="fix" issue="29550">Implement short circuit logic for boolean and/or</action>
+      <action dev="dion" type="fix" issue="JEXL-12">Implement short circuit logic for boolean and/or</action>
       <action dev="dion" type="add">Handle any size() method that returns an int</action>
-      <action dev="dion" type="fix" issue="30562">Can't issue .size() on java.util.Set</action>
+      <action dev="dion" type="fix" issue="JEXL-9">Can't issue .size() on java.util.Set</action>
     </release>
   </body>
 </document>
