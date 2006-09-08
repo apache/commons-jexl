@@ -23,7 +23,8 @@ $Id$
 INTRODUCTION:
 =============
 
-Jexl is an implementation of the JSTL Expression Language with extensions.
+Jexl is an Expression Language supporting most of the constructs in the
+JSTL Expression Language, along with some additional extensions.
 
 http://jakarta.apache.org/commons/jexl/
 
