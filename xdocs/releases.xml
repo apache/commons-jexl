@@ -24,31 +24,23 @@
          
          <p><strong>Latest Stable Release</strong></p>
          <ul>
-           <li><a href="http://jakarta.apache.org/site/binindex.cgi#JEXL">1.0 Binary</a></li>
-           <li><a href="http://jakarta.apache.org/site/sourceindex.cgi#JEXL">1.0 Source</a></li>
+           <li><a href="http://jakarta.apache.org/site/downloads/downloads_commons-jexl.cgi">1.1 Binary/Source</a></li>
          </ul>
 
-          <!-- p><strong>Latest Development Release</strong></p>
-          <ul>
-            <li><a href="http://www.apache.org/~martinc/validator/v1.1.2/commons-validator-1.1.2.zip">1.1.2 Binary</a></li>
-            <li><a href="http://www.apache.org/~martinc/validator/v1.1.2/commons-validator-1.1.2-src.zip">1.1.2 Source</a></li>
-          </ul-->
 
          <p><strong>Nightly Builds</strong></p>
          <ul>
             <li><a href="http://people.apache.org/builds/jakarta-commons/nightly/commons-jexl/">Binary/Source</a></li>
          </ul>
 
-          <!--
           <p>
              <strong>Archived Releases</strong>
              <br/>
              Older releases are retained by the Apache Software Foundation but are
              moved into a
-             <a href="http://archive.apache.org/dist/jakarta/commons/validator/">
+             <a href="http://archive.apache.org/dist/jakarta/commons/jexl/">
              special archive area</a>.
           </p>
-          -->
 
       </section>
 

@@ -66,6 +66,11 @@
   </mailingLists>
   <versions>
     <version>
+      <id>1.1</id>
+      <name>1.1</name>
+      <tag>COMMONS_JEXL-1_1</tag>
+    </version>
+    <version>
       <id>1.0</id>
       <name>1.0</name>
       <tag>COMMONS_JEXL-1_0</tag>
