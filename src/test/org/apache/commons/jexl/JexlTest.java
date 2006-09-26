@@ -964,6 +964,11 @@ public class JexlTest extends TestCase
 //        jc.getVars().put("commons-logging", version);
 //        assertExpression(jc, "commons-logging", version);
     }
+    
+    public void testUnicodeSupport() throws Exception
+    {
+        assertExpression(JexlHelper.createContext(), "myvar == 'Użytkownik'", Boolean.FALSE);
+    }
 
     /**
      * Asserts that the given expression returns the given value when applied to the
