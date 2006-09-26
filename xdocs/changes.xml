@@ -24,6 +24,10 @@
     <author email="dion@apache.org">dIon Gillard</author>
   </properties>
   <body>
+    <release version="1.1.1-SNAPSHOT" date="unreleased">
+      <action dev="diong" type="update" issue="JEXL-23">Fix jdk1.3 only code that has crept into Jexl tests</action>
+      <action dev="diong" type="update" issue="JEXL-22" due-to="Randy H.">Allow unicode literals to be used</action>
+    </release>
     <release version="1.1" date="2006-09-10">
       <action dev="rahul" type="fix" issue="JEXL-17" due-to="Kohsuke Kawaguchi">Consistently throw ParseException in case of a parsing failure, not an Error.</action>
       <action dev="dion" type="fix" issue="JEXL-3" due-to="Guido Anzuoni">Allow for static methods to be called on classes and not just objects.</action>
