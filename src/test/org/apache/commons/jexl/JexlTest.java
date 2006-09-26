@@ -327,8 +327,9 @@ public class JexlTest extends TestCase
     public void testSizeAsProperty() throws Exception
     {
         JexlContext jc = JexlHelper.createContext();
-
-        jc.getVars().put("map", Collections.singletonMap( "size", "cheese"));
+        Map map = new HashMap();
+        map.put("size", "cheese");
+        jc.getVars().put("map", map);
         jc.getVars().put("foo", new Foo());
 
         assertExpression(jc, "map['size']", "cheese");
@@ -751,7 +752,8 @@ public class JexlTest extends TestCase
     public void testEmptySubListOfMap() throws Exception
     {
         JexlContext jc = JexlHelper.createContext();
-        Map m = Collections.singletonMap("aList", Collections.EMPTY_LIST);
+        Map m = new HashMap();
+        m.put("aList", new ArrayList());
 
         jc.getVars().put( "aMap", m );
 
