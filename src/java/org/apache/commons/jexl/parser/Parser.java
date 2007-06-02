@@ -18,10 +18,13 @@
 package org.apache.commons.jexl.parser;
 
 import java.io.Reader;
-import java.io.ByteArrayInputStream;
+
+import org.apache.commons.jexl.util.introspection.Uberspect;
+import org.apache.commons.jexl.util.Introspector;
 
 public class Parser/* @bgen(jjtree) */implements ParserTreeConstants, ParserConstants { /* @bgen(jjtree) */
     protected JJTParserState jjtree = new JJTParserState();
+    private final Uberspect uberspect;
 
     public SimpleNode parse(Reader reader) throws Exception {
         ReInit(reader);
@@ -2932,11 +2935,12 @@ public class Parser/* @bgen(jjtree) */implements ParserTreeConstants, ParserCons
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
-  public Parser(java.io.InputStream stream) {
-     this(stream, null);
+  public Parser( java.io.InputStream stream, Uberspect uberspect ) {
+     this(stream, null, uberspect);
   }
-  public Parser(java.io.InputStream stream, String encoding) {
-    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e.getMessage()); }
+  public Parser( java.io.InputStream stream, String encoding, Uberspect uberspect ) {
+      this.uberspect = uberspect;
+      try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e.getMessage()); }
     token_source = new ParserTokenManager(jj_input_stream);
     token = new Token();
     jj_ntk = -1;
@@ -2958,8 +2962,13 @@ public class Parser/* @bgen(jjtree) */implements ParserTreeConstants, ParserCons
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
-  public Parser(java.io.Reader stream) {
-    jj_input_stream = new SimpleCharStream(stream, 1, 1);
+  public Parser( java.io.Reader stream ) {
+    this( stream, Introspector.getUberspect());
+  }
+
+  public Parser( java.io.Reader stream, Uberspect uberspect ) {
+      this.uberspect = uberspect;
+      jj_input_stream = new SimpleCharStream(stream, 1, 1);
     token_source = new ParserTokenManager(jj_input_stream);
     token = new Token();
     jj_ntk = -1;
@@ -2978,8 +2987,9 @@ public class Parser/* @bgen(jjtree) */implements ParserTreeConstants, ParserCons
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
-  public Parser(ParserTokenManager tm) {
-    token_source = tm;
+  public Parser( ParserTokenManager tm, Uberspect uberspect ) {
+      this.uberspect = uberspect;
+      token_source = tm;
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
@@ -3020,7 +3030,11 @@ public class Parser/* @bgen(jjtree) */implements ParserTreeConstants, ParserCons
     throw generateParseException();
   }
 
-  static private final class LookaheadSuccess extends java.lang.Error { }
+    public Uberspect getUberspect() {
+        return uberspect;
+    }
+
+    static private final class LookaheadSuccess extends java.lang.Error { }
   final private LookaheadSuccess jj_ls = new LookaheadSuccess();
   final private boolean jj_scan_token(int kind) {
     if (jj_scanpos == jj_lastpos) {

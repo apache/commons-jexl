@@ -20,14 +20,14 @@ import org.apache.commons.jexl.JexlContext;
 
 /**
  * Size Method, e.g. size().
- * 
+ *
  * @author <a href="mailto:mhw@kremvax.net">Mark H. Wilkinson</a>
  * @version $Id$
  */
 public class ASTSizeMethod extends SimpleNode {
     /**
      * Create the node given an id.
-     * 
+     *
      * @param id node id.
      */
     public ASTSizeMethod(int id) {
@@ -36,7 +36,7 @@ public class ASTSizeMethod extends SimpleNode {
 
     /**
      * Create a node with the given parser and id.
-     * 
+     *
      * @param p a parser.
      * @param id node id.
      */
@@ -51,16 +51,16 @@ public class ASTSizeMethod extends SimpleNode {
 
     /**
      * evaluate size as part of an expression on a base object.
-     * 
+     *
      * foo.bar.size
-     * 
+     *
      * @param jc the {@link JexlContext} to evaluate against.
      * @param obj not used.
      * @return the value of the array expression.
      * @throws Exception on any error
      */
     public Object execute(Object obj, JexlContext jc) throws Exception {
-        return new Integer(ASTSizeFunction.sizeOf(obj));
+        return new Integer(ASTSizeFunction.sizeOf(obj, getUberspect() ));
     }
 
 }

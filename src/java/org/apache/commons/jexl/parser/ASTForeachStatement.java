@@ -20,12 +20,11 @@ package org.apache.commons.jexl.parser;
 import java.util.Iterator;
 
 import org.apache.commons.jexl.JexlContext;
-import org.apache.commons.jexl.util.Introspector;
 import org.apache.commons.jexl.util.introspection.Info;
 
 /**
  * ForEach statement. Syntax: foreach (var in iterable) Statement()
- * 
+ *
  * @author Dion Gillard
  * @since 1.1
  */
@@ -42,7 +41,7 @@ public class ASTForeachStatement extends SimpleNode {
 
     /**
      * Create the node given an id.
-     * 
+     *
      * @param id node id.
      */
     public ASTForeachStatement(int id) {
@@ -51,7 +50,7 @@ public class ASTForeachStatement extends SimpleNode {
 
     /**
      * Create a node with the given parser and id.
-     * 
+     *
      * @param p a parser.
      * @param id node id.
      */
@@ -78,7 +77,7 @@ public class ASTForeachStatement extends SimpleNode {
             SimpleNode statement = (SimpleNode) jjtGetChild(2);
             // get an iterator for the collection/array etc via the
             // introspector.
-            Iterator itemsIterator = Introspector.getUberspect().getIterator(
+            Iterator itemsIterator = getUberspect().getIterator(
                     iterableValue, DUMMY);
             while (itemsIterator.hasNext()) {
                 // set loopVariable to value of iterator

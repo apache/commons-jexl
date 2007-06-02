@@ -28,6 +28,8 @@ import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.parser.TokenMgrError;
+import org.apache.commons.jexl.util.introspection.Uberspect;
+import org.apache.commons.jexl.util.Introspector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -64,7 +66,9 @@ public class ExpressionFactory {
      * When parsing expressions, ExpressionFactory synchronizes on Parser.
      */
     protected static Parser parser =
-            new Parser(new StringReader(";")); //$NON-NLS-1$
+            new Parser(new StringReader(";"), Introspector.getUberspect() ); //$NON-NLS-1$
+
+    private final Parser _parser;
 
     /**
      * ExpressionFactory is a singleton and this is the private
@@ -77,13 +81,18 @@ public class ExpressionFactory {
      * with a call to getInstance().
      */
     private ExpressionFactory() {
+        _parser = parser;
+    }
+
+    public ExpressionFactory( Uberspect uberspect ) {
+        _parser = new Parser(new StringReader(";"), uberspect);
     }
 
     /**
      * Returns the single instance of ExpressionFactory.
      * @return the instance of ExpressionFactory.
      */
-    protected static  ExpressionFactory getInstance() {
+    public static ExpressionFactory getInstance() {
         return ef;
     }
 
@@ -111,17 +120,17 @@ public class ExpressionFactory {
      *  @throws Exception for a variety of reasons - mostly malformed
      *          Jexl expression
      */
-    protected Expression createNewExpression(final String expression)
+    public Expression createNewExpression(final String expression)
         throws Exception {
 
         String expr = cleanExpression(expression);
 
         // Parse the Expression
         SimpleNode tree;
-        synchronized (parser) {
+        synchronized (_parser) {
             log.debug("Parsing expression: " + expr);
             try {
-                tree = parser.parse(new StringReader(expr));
+                tree = _parser.parse(new StringReader(expr));
             } catch (TokenMgrError tme) {
                 throw new ParseException(tme.getMessage());
             }

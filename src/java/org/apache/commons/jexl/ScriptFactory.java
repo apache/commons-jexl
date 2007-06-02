@@ -30,20 +30,21 @@ import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.parser.TokenMgrError;
+import org.apache.commons.jexl.util.Introspector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <p> 
+ * <p>
  * Creates {@link Script}s.  To create a JEXL Script, pass
  * valid JEXL syntax to the static createScript() method:
  * </p>
- * 
+ *
  * <pre>
  * String jexl = "y = x * 12 + 44; y = y * 4;";
  * Script script = ScriptFactory.createScript( jexl );
  * </pre>
- * 
+ *
  * <p>
  * When an {@link Script} is created, the JEXL syntax is
  * parsed and verified.
@@ -58,11 +59,11 @@ public class ScriptFactory {
         LogFactory.getLog("org.apache.commons.jexl.ScriptFactory");
 
     /**
-     * The singleton ScriptFactory also holds a single instance of 
-     * {@link Parser}. When parsing expressions, ScriptFactory 
+     * The singleton ScriptFactory also holds a single instance of
+     * {@link Parser}. When parsing expressions, ScriptFactory
      * synchronizes on Parser.
      */
-    protected static Parser parser = new Parser(new StringReader(";"));
+    protected static Parser parser = new Parser(new StringReader(";"), Introspector.getUberspect() );
 
     /**
      * ScriptFactory is a singleton and this is the private
@@ -87,13 +88,13 @@ public class ScriptFactory {
     }
 
     /**
-     * Creates a Script from a String containing valid JEXL syntax. 
+     * Creates a Script from a String containing valid JEXL syntax.
      * This method parses the script which validates the syntax.
-     * 
+     *
      * @param scriptText A String containing valid JEXL syntax
-     * @return A {@link Script} which can be executed with a 
+     * @return A {@link Script} which can be executed with a
      *      {@link JexlContext}.
-     * @throws Exception An exception can be thrown if there is a 
+     * @throws Exception An exception can be thrown if there is a
      *      problem parsing the script.
      */
     public static Script createScript(String scriptText) throws Exception {
@@ -101,14 +102,14 @@ public class ScriptFactory {
     }
 
     /**
-     * Creates a Script from a {@link File} containing valid JEXL syntax. 
+     * Creates a Script from a {@link File} containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
-     * 
+     *
      * @param scriptFile A {@link File} containing valid JEXL syntax.
      *      Must not be null. Must be a readable file.
-     * @return A {@link Script} which can be executed with a 
+     * @return A {@link Script} which can be executed with a
      *      {@link JexlContext}.
-     * @throws Exception An exception can be thrown if there is a problem 
+     * @throws Exception An exception can be thrown if there is a problem
      *      parsing the script.
      */
     public static Script createScript(File scriptFile) throws Exception {
@@ -116,21 +117,21 @@ public class ScriptFactory {
             throw new NullPointerException("scriptFile is null");
         }
         if (!scriptFile.canRead()) {
-            throw new IOException("Can't read scriptFile (" 
+            throw new IOException("Can't read scriptFile ("
                 + scriptFile.getCanonicalPath() + ")");
         }
         BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
         return createScript(readerToString(reader));
-            
+
     }
 
     /**
-     * Creates a Script from a {@link URL} containing valid JEXL syntax. 
+     * Creates a Script from a {@link URL} containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
-     * 
+     *
      * @param scriptUrl A {@link URL} containing valid JEXL syntax.
      *      Must not be null. Must be a readable file.
-     * @return A {@link Script} which can be executed with a 
+     * @return A {@link Script} which can be executed with a
      *      {@link JexlContext}.
      * @throws Exception An exception can be thrown if there is a problem
      *      parsing the script.
@@ -140,7 +141,7 @@ public class ScriptFactory {
             throw new NullPointerException("scriptUrl is null");
         }
         URLConnection connection = scriptUrl.openConnection();
-        
+
         BufferedReader reader = new BufferedReader(
             new InputStreamReader(connection.getInputStream()));
         return createScript(readerToString(reader));
@@ -186,7 +187,7 @@ public class ScriptFactory {
         }
         return expr;
     }
-    
+
     /**
      * Read a buffered reader into a StringBuffer and return a String with
      * the contents of the reader.
@@ -198,7 +199,7 @@ public class ScriptFactory {
         throws IOException {
         StringBuffer buffer = new StringBuffer();
         try {
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 buffer.append(line).append('\n');
             }
