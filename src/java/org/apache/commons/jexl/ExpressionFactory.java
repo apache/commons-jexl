@@ -28,8 +28,8 @@ import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.parser.TokenMgrError;
-import org.apache.commons.jexl.util.introspection.Uberspect;
 import org.apache.commons.jexl.util.Introspector;
+import org.apache.commons.jexl.util.introspection.Uberspect;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -57,7 +57,7 @@ public class ExpressionFactory {
     /**
      * The Log to which all ExpressionFactory messages will be logged.
      */
-    protected static Log log =
+    protected static final Log log =
         LogFactory.getLog("org.apache.commons.jexl.ExpressionFactory");
 
     /**
@@ -65,27 +65,25 @@ public class ExpressionFactory {
      * {@link Parser}.
      * When parsing expressions, ExpressionFactory synchronizes on Parser.
      */
-    protected static Parser parser =
-            new Parser(new StringReader(";"), Introspector.getUberspect() ); //$NON-NLS-1$
-
-    private final Parser _parser;
+    protected final Parser parser =
+            new Parser(new StringReader(";") ); //$NON-NLS-1$
 
     /**
      * ExpressionFactory is a singleton and this is the private
      * instance fufilling that pattern.
      */
-    protected static ExpressionFactory ef = new ExpressionFactory();
+    protected static final ExpressionFactory ef = new ExpressionFactory();
 
     /**
      * Private constructor, the single instance is always obtained
      * with a call to getInstance().
      */
     private ExpressionFactory() {
-        _parser = parser;
+        this(Introspector.getUberspect());
     }
 
     public ExpressionFactory( Uberspect uberspect ) {
-        _parser = new Parser(new StringReader(";"), uberspect);
+        parser.setUberspect( uberspect );
     }
 
     /**
@@ -127,10 +125,10 @@ public class ExpressionFactory {
 
         // Parse the Expression
         SimpleNode tree;
-        synchronized (_parser) {
+        synchronized (parser) {
             log.debug("Parsing expression: " + expr);
             try {
-                tree = _parser.parse(new StringReader(expr));
+                tree = parser.parse(new StringReader(expr));
             } catch (TokenMgrError tme) {
                 throw new ParseException(tme.getMessage());
             }
