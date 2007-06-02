@@ -17,26 +17,27 @@
 
 package org.apache.commons.jexl.util.introspection;
 
-import org.apache.commons.jexl.util.ArrayIterator;
-import org.apache.commons.jexl.util.EnumerationIterator;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.List;
+
 import org.apache.commons.jexl.util.AbstractExecutor;
-import org.apache.commons.jexl.util.GetExecutor;
+import org.apache.commons.jexl.util.ArrayIterator;
 import org.apache.commons.jexl.util.BooleanPropertyExecutor;
+import org.apache.commons.jexl.util.EnumerationIterator;
+import org.apache.commons.jexl.util.GetExecutor;
 import org.apache.commons.jexl.util.PropertyExecutor;
 import org.apache.commons.logging.Log;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Enumeration;
-import java.util.ArrayList;
 
 /**
  * Implementation of Uberspect to provide the default introspective
  * functionality of Velocity.
- * 
+ *
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
@@ -53,7 +54,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     /**
      * the default Velocity introspector.
      */
-    private static Introspector introspector;
+    private Introspector introspector;
 
     /**
      * init - does nothing - we need to have setRuntimeLogger called before
@@ -151,7 +152,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
             executor = new GetExecutor(rlog, introspector, claz, identifier);
         }
 
-        return (executor == null) ? null : new VelGetterImpl(executor);
+        return new VelGetterImpl(executor);
     }
 
     /**
@@ -215,9 +216,9 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     public class VelMethodImpl implements VelMethod {
         /** the method. */
         protected Method method = null;
-        /** 
+        /**
          * Create a new instance.
-         * 
+         *
          * @param m the method.
          */
         public VelMethodImpl(Method m) {
@@ -268,7 +269,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     /**
      * {@inheritDoc}
      */
-    public class VelGetterImpl implements VelPropertyGet {
+    public static class VelGetterImpl implements VelPropertyGet {
         /** executor for performing the get. */
         protected AbstractExecutor ae = null;
 
@@ -293,6 +294,13 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
          */
         public boolean isCacheable() {
             return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean isAlive() {
+            return ae.isAlive();
         }
 
         /**
@@ -333,7 +341,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
 
         /** {@inheritDoc} */
         public Object invoke(Object o, Object value) throws Exception {
-            ArrayList al = new ArrayList();
+            List al = new ArrayList();
 
             if (putKey == null) {
                 al.add(value);

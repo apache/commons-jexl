@@ -17,10 +17,11 @@
 package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl.util.introspection.Uberspect;
 
 /**
  * represents an integer.
- * 
+ *
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  */
@@ -30,7 +31,7 @@ public class ASTIntegerLiteral extends SimpleNode {
 
     /**
      * Create the node given an id.
-     * 
+     *
      * @param id node id.
      */
     public ASTIntegerLiteral(int id) {
@@ -39,7 +40,7 @@ public class ASTIntegerLiteral extends SimpleNode {
 
     /**
      * Create a node with the given parser and id.
-     * 
+     *
      * @param p a parser.
      * @param id node id.
      */
@@ -60,10 +61,10 @@ public class ASTIntegerLiteral extends SimpleNode {
      * @param ctx the {@link JexlContext}.
      * @throws Exception on any error.
      * @return the resulting value.
-     * @see ASTArrayAccess#evaluateExpr(Object, Object)
+     * @see ASTArrayAccess#evaluateExpr(Object, Object, Uberspect)
      */
     public Object execute(Object obj, JexlContext ctx) throws Exception {
-        return ASTArrayAccess.evaluateExpr(obj, val);
+        return ASTArrayAccess.evaluateExpr(obj, val, getUberspect() );
     }
 
     /** {@inheritDoc} */

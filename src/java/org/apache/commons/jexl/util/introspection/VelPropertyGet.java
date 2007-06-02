@@ -20,9 +20,9 @@ package org.apache.commons.jexl.util.introspection;
 /**
  * Interface defining a 'getter'. For uses when looking for resolution of
  * property references
- * 
+ *
  * $foo.bar
- * 
+ *
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
@@ -40,7 +40,7 @@ public interface VelPropertyGet {
     /**
      * specifies if this VelPropertyGet is cacheable and able to be reused for
      * this class of object it was returned for.
-     * 
+     *
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();
@@ -50,4 +50,12 @@ public interface VelPropertyGet {
      * @return the method name.
      */
     String getMethodName();
+
+    /**
+     * Tell whether the method underlying this 'property' is alive by
+     * checking to see if represents a successful name resolution
+     *
+     * @return boolean Whether 'property' is alive.
+     */
+    boolean isAlive();
 }

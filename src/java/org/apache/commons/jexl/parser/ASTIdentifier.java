@@ -18,10 +18,11 @@
 package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl.util.introspection.Uberspect;
 
 /**
  * Simple identifier - $foo or $foo.bar (both parts are identifiers).
- * 
+ *
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  */
@@ -31,7 +32,7 @@ public class ASTIdentifier extends SimpleNode {
 
     /**
      * Create the node given an id.
-     * 
+     *
      * @param id node id.
      */
     public ASTIdentifier(int id) {
@@ -40,7 +41,7 @@ public class ASTIdentifier extends SimpleNode {
 
     /**
      * Create a node with the given parser and id.
-     * 
+     *
      * @param p a parser.
      * @param id node id.
      */
@@ -63,18 +64,18 @@ public class ASTIdentifier extends SimpleNode {
      * identifier can be gotten via a get(String).
      * e.g. if we have bean.property, 'property' has been parsed as an identifier,
      * and we need to resolve the expression by calling the property getter.
-     * 
+     *
      * @param obj the object to evaluate against.
      * @param jc the {@link JexlContext}.
      * @throws Exception on any error.
      * @return the resulting value.
-     * @see ASTArrayAccess#evaluateExpr(Object, Object)
+     * @see ASTArrayAccess#evaluateExpr(Object, Object, Uberspect)
      */
     public Object execute(Object obj, JexlContext jc) throws Exception {
-        return ASTArrayAccess.evaluateExpr(obj, val);
+        return ASTArrayAccess.evaluateExpr(obj, val, getUberspect() );
     }
 
-    /** 
+    /**
      * Gets the name of the variable.
      * @return the variable name.
      */
