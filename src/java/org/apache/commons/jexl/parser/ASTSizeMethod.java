@@ -60,6 +60,9 @@ public class ASTSizeMethod extends SimpleNode {
      * @throws Exception on any error
      */
     public Object execute(Object obj, JexlContext jc) throws Exception {
+        if( null == obj ) {
+            return null;
+        }
         return new Integer(ASTSizeFunction.sizeOf(obj, getUberspect() ));
     }
 
