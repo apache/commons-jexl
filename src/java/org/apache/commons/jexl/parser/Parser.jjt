@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,6 +30,7 @@ options
    STATIC=false;
    VISITOR=true;
    NODE_USES_PARSER=true;
+   UNICODE_INPUT=true;
 }
 
 PARSER_BEGIN(Parser)
@@ -39,8 +40,23 @@ package org.apache.commons.jexl.parser;
 import java.io.Reader;
 import java.io.ByteArrayInputStream;
 
+import org.apache.commons.jexl.util.introspection.Uberspect;
+
 public class Parser
 {
+
+    private Uberspect uberspect;
+
+    public void setUberspect(Uberspect uberspect)
+    {
+        this.uberspect = uberspect;
+    }
+
+    protected Uberspect getUberspect()
+    {
+        return uberspect;
+    }
+
     public SimpleNode parse(Reader reader)
         throws Exception
     {
@@ -269,6 +285,7 @@ void PrimaryExpression() #void :
 {
   Literal()
 |
+  LOOKAHEAD(3)
   Reference()
 |
   "(" Expression() ")"
@@ -276,6 +293,8 @@ void PrimaryExpression() #void :
   EmptyFunction()
 |
   SizeFunction()
+|
+  MapLiteral()
 }
 
 
@@ -356,6 +375,7 @@ void Statement() #void :
 {
   ";"
 |
+  LOOKAHEAD(3)
   Block()
 |
   LOOKAHEAD( Reference() ";" ) ReferenceExpression()
@@ -405,6 +425,16 @@ void ForeachStatement() :
   "foreach" "(" Reference() "in"  Reference() ")" Statement()
 }
 
+void MapLiteral() : {}
+{
+  "["  MapEntry() ( "," MapEntry() )* "]"
+}
+
+void MapEntry() : {}
+{
+    Parameter() "=>" Parameter()
+}
+
 void Method() : {}
 {
    Identifier() "("[ Parameter() ( "," Parameter() )* ] ")"
@@ -422,7 +452,7 @@ void SizeMethod() : {}
 
 void Reference() : {}
 {
-  (LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() | Identifier())
+  (LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() | Identifier() | MapLiteral())
   (LOOKAHEAD(2) "."
     (
       LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() |

@@ -76,7 +76,7 @@ public class ScriptFactory {
      * with a call to getInstance().
      */
     private ScriptFactory() {
-
+        parser.setUberspect( Introspector.getUberspect());
     }
 
     /**
