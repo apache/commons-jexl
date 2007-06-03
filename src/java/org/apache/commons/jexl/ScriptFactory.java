@@ -31,6 +31,7 @@ import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.parser.TokenMgrError;
 import org.apache.commons.jexl.util.Introspector;
+import org.apache.commons.jexl.util.introspection.Uberspect;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -63,7 +64,7 @@ public class ScriptFactory {
      * {@link Parser}. When parsing expressions, ScriptFactory
      * synchronizes on Parser.
      */
-    protected static Parser parser = new Parser(new StringReader(";"), Introspector.getUberspect() );
+    protected static Parser parser = new Parser(new StringReader(";"));
 
     /**
      * ScriptFactory is a singleton and this is the private
@@ -76,7 +77,11 @@ public class ScriptFactory {
      * with a call to getInstance().
      */
     private ScriptFactory() {
-        parser.setUberspect( Introspector.getUberspect());
+        this( Introspector.getUberspect());
+    }
+    
+    public ScriptFactory( Uberspect uberspect ) {
+        parser.setUberspect( uberspect );
     }
 
     /**
