@@ -42,7 +42,7 @@ public class ParseFailuresTest extends TestCase {
         // this will throw a ParseException
         String badExpression = "eq";
         try {
-            Expression e = ExpressionFactory.createExpression(badExpression);
+            ExpressionFactory.createExpression(badExpression);
             fail("Parsing \"" + badExpression
                 + "\" should result in a ParseException");
         } catch (ParseException pe) {
@@ -54,7 +54,7 @@ public class ParseFailuresTest extends TestCase {
         // this will throw a TokenMgrErr, which we rethrow as a ParseException
         String badExpression = "?";
         try {
-            Expression e = ExpressionFactory.createExpression(badExpression);
+            ExpressionFactory.createExpression(badExpression);
             fail("Parsing \"" + badExpression
                 + "\" should result in a ParseException");
         } catch (ParseException pe) {
@@ -66,7 +66,7 @@ public class ParseFailuresTest extends TestCase {
         // this will throw a TokenMgrErr, which we rethrow as a ParseException
         String badScript = "eq";
         try {
-            Script s = ScriptFactory.createScript(badScript);
+            ScriptFactory.createScript(badScript);
             fail("Parsing \"" + badScript
                 + "\" should result in a ParseException");
         } catch (ParseException pe) {
@@ -79,7 +79,7 @@ public class ParseFailuresTest extends TestCase {
         // this will throw a TokenMgrErr, which we rethrow as a ParseException
         String badScript = "?";
         try {
-            Script s = ScriptFactory.createScript(badScript);
+            ScriptFactory.createScript(badScript);
             fail("Parsing \"" + badScript
                 + "\" should result in a ParseException");
         } catch (ParseException pe) {
@@ -91,7 +91,7 @@ public class ParseFailuresTest extends TestCase {
         // this will throw a TokenMgrErr, which we rethrow as a ParseException
         String badScript = "foo=1;bar=2;a?b:c;";
         try {
-            Script s = ScriptFactory.createScript(badScript);
+            ScriptFactory.createScript(badScript);
             fail("Parsing \"" + badScript
                 + "\" should result in a ParseException");
         } catch (ParseException pe) {

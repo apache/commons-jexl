@@ -21,21 +21,23 @@ package org.apache.commons.jexl.parser;
 import org.apache.commons.jexl.JexlContext;
 
 public class ASTMapEntry extends SimpleNode {
-    public ASTMapEntry( int id ) {
-        super( id );
+    public ASTMapEntry(int id) {
+        super(id);
     }
 
-    public ASTMapEntry( Parser p, int id ) {
-        super( p, id );
+    public ASTMapEntry(Parser p, int id) {
+        super(p, id);
     }
 
     /** Accept the visitor. * */
-    public Object jjtAccept( ParserVisitor visitor, Object data ) {
-        return visitor.visit( this, data );
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
+        return visitor.visit(this, data);
     }
 
-    public Object value( JexlContext context ) throws Exception {
-        return new Object[]{ ( (SimpleNode) jjtGetChild( 0 ) ).value( context ),
-                             ( (SimpleNode) jjtGetChild( 1 ) ).value( context ) };
+    public Object value(JexlContext context) throws Exception {
+        return new Object[]{
+            ((SimpleNode) jjtGetChild(0)).value(context),
+            ((SimpleNode) jjtGetChild(1)).value(context) 
+        };
     }
 }

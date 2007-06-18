@@ -67,7 +67,7 @@ public class ASTSizeFunction extends SimpleNode {
             throw new Exception("size() : null arg");
         }
 
-        return new Integer(ASTSizeFunction.sizeOf(val, getUberspect() ));
+        return new Integer(ASTSizeFunction.sizeOf(val, getUberspect()));
     }
 
     /**
@@ -79,7 +79,7 @@ public class ASTSizeFunction extends SimpleNode {
      * @return the size of val
      * @throws Exception if the size cannot be determined.
      */
-    public static int sizeOf( Object val, Uberspect uberspect ) throws Exception {
+    public static int sizeOf(Object val, Uberspect uberspect) throws Exception {
         if (val instanceof Collection) {
             return ((Collection) val).size();
         } else if (val.getClass().isArray()) {

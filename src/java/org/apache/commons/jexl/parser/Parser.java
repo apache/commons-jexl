@@ -18,7 +18,6 @@
 package org.apache.commons.jexl.parser;
 
 import java.io.Reader;
-import java.io.ByteArrayInputStream;
 
 import org.apache.commons.jexl.util.introspection.Uberspect;
 
@@ -57,7 +56,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
  /*@bgen(jjtree) JexlScript */
    ASTJexlScript jjtn000 = new ASTJexlScript(this, JJTJEXLSCRIPT);
    boolean jjtc000 = true;
-   jjtree.openNodeScope(jjtn000);String name;
+   jjtree.openNodeScope(jjtn000);
     try {
       label_1:
       while (true) {
@@ -1408,7 +1407,6 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
   }
 
   final public void Literal() throws ParseException {
-   Token t;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INTEGER_LITERAL:
       IntegerLiteral();
@@ -3177,7 +3175,6 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants, ParserConsta
   private Token jj_scanpos, jj_lastpos;
   private int jj_la;
   public boolean lookingAhead = false;
-  private boolean jj_semLA;
   private int jj_gen;
   final private int[] jj_la1 = new int[36];
   static private int[] jj_la1_0;
