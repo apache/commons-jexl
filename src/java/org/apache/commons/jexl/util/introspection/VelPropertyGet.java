@@ -53,7 +53,7 @@ public interface VelPropertyGet {
 
     /**
      * Tell whether the method underlying this 'property' is alive by
-     * checking to see if represents a successful name resolution
+     * checking to see if represents a successful name resolution.
      *
      * @return boolean Whether 'property' is alive.
      */

@@ -24,26 +24,26 @@ import java.util.Map;
 import org.apache.commons.jexl.JexlContext;
 
 public class ASTMapLiteral extends SimpleNode {
-    public ASTMapLiteral( int id ) {
-        super( id );
+    public ASTMapLiteral(int id) {
+        super(id);
     }
 
-    public ASTMapLiteral( Parser p, int id ) {
-        super( p, id );
+    public ASTMapLiteral(Parser p, int id) {
+        super(p, id);
     }
 
     /** Accept the visitor. * */
-    public Object jjtAccept( ParserVisitor visitor, Object data ) {
-        return visitor.visit( this, data );
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
+        return visitor.visit(this, data);
     }
 
-    public Object value( JexlContext context ) throws Exception {
+    public Object value(JexlContext context) throws Exception {
         int childCount = jjtGetNumChildren();
         Map map = new HashMap();
 
-        for ( int i = 0; i < childCount; i++ ) {
-            Object[] entry = (Object[]) ( (SimpleNode) jjtGetChild( i ) ).value( context );
-            map.put( entry[0], entry[1] );
+        for (int i = 0; i < childCount; i++) {
+            Object[] entry = (Object[]) ((SimpleNode) jjtGetChild(i)).value(context);
+            map.put(entry[0], entry[1]);
         }
 
         return map;

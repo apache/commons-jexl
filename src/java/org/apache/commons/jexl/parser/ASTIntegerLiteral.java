@@ -17,7 +17,6 @@
 package org.apache.commons.jexl.parser;
 
 import org.apache.commons.jexl.JexlContext;
-import org.apache.commons.jexl.util.introspection.Uberspect;
 
 /**
  * represents an integer.
@@ -64,7 +63,7 @@ public class ASTIntegerLiteral extends SimpleNode {
      * @see ASTArrayAccess#evaluateExpr(Object, Object, Uberspect)
      */
     public Object execute(Object obj, JexlContext ctx) throws Exception {
-        return ASTArrayAccess.evaluateExpr(obj, val, getUberspect() );
+        return ASTArrayAccess.evaluateExpr(obj, val, getUberspect());
     }
 
     /** {@inheritDoc} */

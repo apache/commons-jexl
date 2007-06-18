@@ -77,11 +77,11 @@ public class ScriptFactory {
      * with a call to getInstance().
      */
     private ScriptFactory() {
-        this( Introspector.getUberspect());
+        this(Introspector.getUberspect());
     }
     
-    public ScriptFactory( Uberspect uberspect ) {
-        parser.setUberspect( uberspect );
+    public ScriptFactory(Uberspect uberspect) {
+        parser.setUberspect(uberspect);
     }
 
     /**

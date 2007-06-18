@@ -66,7 +66,7 @@ public class ExpressionFactory {
      * When parsing expressions, ExpressionFactory synchronizes on Parser.
      */
     protected final Parser parser =
-            new Parser(new StringReader(";") ); //$NON-NLS-1$
+            new Parser(new StringReader(";")); //$NON-NLS-1$
 
     /**
      * ExpressionFactory is a singleton and this is the private
@@ -82,8 +82,12 @@ public class ExpressionFactory {
         this(Introspector.getUberspect());
     }
 
-    public ExpressionFactory( Uberspect uberspect ) {
-        parser.setUberspect( uberspect );
+    /**
+     * Creates an expression factory using the provided {@link Uberspect}.
+     * @param uberspect to allow different introspection behaviour
+     */
+    public ExpressionFactory(Uberspect uberspect) {
+        parser.setUberspect(uberspect);
     }
 
     /**

@@ -89,7 +89,7 @@ public class ASTArrayAccess extends SimpleNode {
                 return null;
             }
 
-            result = evaluateExpr(result, loc, getUberspect() );
+            result = evaluateExpr(result, loc, getUberspect());
         }
 
         return result;
@@ -115,7 +115,7 @@ public class ASTArrayAccess extends SimpleNode {
                 return null;
             }
 
-            o = evaluateExpr(o, loc, getUberspect() );
+            o = evaluateExpr(o, loc, getUberspect());
         }
 
         return o;
@@ -137,7 +137,7 @@ public class ASTArrayAccess extends SimpleNode {
      * @return the resulting value.
      * @throws Exception on any error.
      */
-    public static Object evaluateExpr( Object o, Object loc, Uberspect uberspect ) throws Exception {
+    public static Object evaluateExpr(Object o, Object loc, Uberspect uberspect) throws Exception {
         /*
          * following the JSTL EL rules
          */
