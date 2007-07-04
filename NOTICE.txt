@@ -1,4 +1,4 @@
-Apache Jakarta Commons JEXL
+Apache Commons JEXL
 Copyright 2001-2006 The Apache Software Foundation
 
 This product includes software developed by
