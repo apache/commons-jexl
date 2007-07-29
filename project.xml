@@ -27,12 +27,12 @@
   <shortDescription>Commons JEXL Expression Language Engine</shortDescription>
   <description>Jexl is an implementation of the JSTL Expression Language with extensions.</description>
   <logo>/images/jexl-logo-white.png</logo>
-  <url>http://jakarta.apache.org/commons/jexl/</url>
+  <url>http://commons.apache.org/jexl/</url>
   <package>org.apache.commons.jexl</package>
   <organization>
     <name>The Apache Software Foundation</name>
-    <url>http://jakarta.apache.org</url>
-    <logo>http://jakarta.apache.org/images/jakarta-logo.gif</logo>
+    <url>http://commons.apache.org/</url>
+    <logo>http://commons.apache.org/images/logo.png</logo>
   </organization>
   <licenses>
     <license>
@@ -41,28 +41,28 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  <gumpRepositoryId>jakarta</gumpRepositoryId>
+  <gumpRepositoryId>commons</gumpRepositoryId>
   <issueTrackingUrl>http://issues.apache.org/jira/</issueTrackingUrl>
   <siteAddress>people.apache.org</siteAddress>
-  <siteDirectory>/www/jakarta.apache.org/commons/jexl/</siteDirectory>
-  <distributionDirectory>/www/jakarta.apache.org/builds/jakarta-commons/jexl/</distributionDirectory>
+  <siteDirectory>/www/commons.apache.org/jexl/</siteDirectory>
+  <distributionDirectory>/www/people.apache.org/builds/commons/jexl/</distributionDirectory>
   <repository>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/jakarta/commons/proper/jexl/trunk</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/jakarta/commons/proper/jexl/trunk</developerConnection>
-    <url>http://svn.apache.org/repos/asf/jakarta/commons/proper/jexl/trunk</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/commons/proper/jexl/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/commons/proper/jexl/trunk</developerConnection>
+    <url>http://svn.apache.org/repos/asf/commons/proper/jexl/trunk</url>
   </repository>
   <mailingLists>
     <mailingList>
       <name>Commons Dev List</name>
-      <subscribe>commons-dev-subscribe@jakarta.apache.org</subscribe>
-      <unsubscribe>commons-dev-unsubscribe@jakarta.apache.org</unsubscribe>
-      <archive>http://mail-archives.apache.org/mod_mbox/jakarta-commons-dev/</archive>
+      <subscribe>dev-subscribe@commons.apache.org</subscribe>
+      <unsubscribe>dev-unsubscribe@commons.apache.org</unsubscribe>
+      <archive>http://mail-archives.apache.org/mod_mbox/commons-dev/</archive>
     </mailingList>
     <mailingList>
       <name>Commons User List</name>
-      <subscribe>commons-user-subscribe@jakarta.apache.org</subscribe>
-      <unsubscribe>commons-user-unsubscribe@jakarta.apache.org</unsubscribe>
-      <archive>http://mail-archives.apache.org/mod_mbox/jakarta-commons-user/</archive>
+      <subscribe>user-subscribe@commons.apache.org</subscribe>
+      <unsubscribe>user-unsubscribe@commons.apache.org</unsubscribe>
+      <archive>http://mail-archives.apache.org/mod_mbox/commons-user/</archive>
     </mailingList>
   </mailingLists>
   <versions>
@@ -120,7 +120,7 @@
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <version>1.0.4</version>
-      <url>http://jakarta.apache.org/commons/logging/</url>
+      <url>http://commons.apache.org/logging/</url>
       <properties>
         <comment>
             &lt;strong&gt;Required&lt;/strong&gt;
@@ -164,7 +164,7 @@
     </dependency>
   </dependencies>
   <build>
-    <nagEmailAddress>commons-dev@jakarta.apache.org</nagEmailAddress>
+    <nagEmailAddress>dev@commons.apache.org</nagEmailAddress>
     <resources>
       <resource>
         <targetPath>META-INF</targetPath>
