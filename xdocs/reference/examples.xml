@@ -35,14 +35,14 @@
       <p>
         You can find two sample programs in JEXL's CVS repository:
         <ul>
-          <li><a href="http://svn.apache.org/viewcvs.cgi/jakarta/commons/proper/jexl/trunk/examples/ArrayExample.java?view=markup">Using arrays</a></li>
-          <li><a href="http://svn.apache.org/viewcvs.cgi/jakarta/commons/proper/jexl/trunk/examples/MethodPropertyExample.java?view=markup">Accessing Properties and invoking methods</a></li>
+          <li><a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/examples/ArrayExample.java?view=markup">Using arrays</a></li>
+          <li><a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/examples/MethodPropertyExample.java?view=markup">Accessing Properties and invoking methods</a></li>
         </ul>
       </p>
       <p>
-        As well, <a href="http://svn.apache.org/viewcvs.cgi/jakarta/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl/JexlTest.java?view=markup">JEXL's Unit Tests</a>
+        As well, <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl/JexlTest.java?view=markup">JEXL's Unit Tests</a>
         provide handy examples of expressions. The test code also contains a
-        <a href="http://svn.apache.org/viewcvs.cgi/jakarta/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl/Jexl.java?view=markup">simple class</a>
+        <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl/Jexl.java?view=markup">simple class</a>
         that evaluates its command line arguments as JEXL expressions when run.
       </p>
     </section>
@@ -50,24 +50,24 @@
       <p>
         To evaluate expressions using JEXL, you need two things:
         <ul>
-          <li>A <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">context</a> containing any variables, and</li>
-          <li>An <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/Expression.html">expression</a></li>
+          <li>A <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">context</a> containing any variables, and</li>
+          <li>An <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/Expression.html">expression</a></li>
         </ul>
       </p>
       <p>
         The easiest way of obtaining a a context is to use the
-        <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlHelper.html#createContext()">JexlHelper.createContext()</a>
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlHelper.html#createContext()">JexlHelper.createContext()</a>
         method. This creates a context which is simply an extension of a
         <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/HashMap.html">HashMap</a>
       </p>
       <p>
-        <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/Expression.html">Expressions</a> are
-        created using the <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/ExpressionFactory.html#createExpression(java.lang.String)">ExpressionFactory.createExpression(String)</a>
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/Expression.html">Expressions</a> are
+        created using the <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/ExpressionFactory.html#createExpression(java.lang.String)">ExpressionFactory.createExpression(String)</a>
         method. 
       </p>
       <p>
         Once you have your expression, you can then use use the
-        <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/Expression.html#evaluate(org.apache.commons.jexl.JexlContext)">evaluate</a>
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/Expression.html#evaluate(org.apache.commons.jexl.JexlContext)">evaluate</a>
         to execute it and obtain a result.
       </p>
       <p>
@@ -98,7 +98,7 @@
         own.
       </p>
       <p>
-        The <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">JexlContext</a>
+        The <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">JexlContext</a>
         interface is very simple with only two methods, one to get the variables of the
         context as a <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Map.html">Map</a> and
         another to set the variables of the context from a Map.
@@ -119,7 +119,7 @@
         evaluation.
       </p>
       <p>
-        If <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlExprResolver.html">pre-resolvers</a>
+        If <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlExprResolver.html">pre-resolvers</a>
         is added to an expression, any value it returns will be used instead of that normally provided by JEXL. If JEXL evaluates
         an expression to <code>null</code> post-resolvers of an expression are called in turn in an attempt to get a value.
       </p>

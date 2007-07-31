@@ -27,7 +27,7 @@ INTRODUCTION:
 Jexl is an Expression Language supporting most of the constructs in the
 JSTL Expression Language, along with some additional extensions.
 
-http://jakarta.apache.org/commons/jexl/
+http://commons.apache.org/jexl/
 
 Changes in this version include:
 
