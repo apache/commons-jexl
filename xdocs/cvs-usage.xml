@@ -24,20 +24,20 @@ limitations under the License.
 <!-- ================================================== -->
 <section name="Commons JEXL Source repository">
 <p>
-  Jakarta Commons JEXL is hosted on the Apache
+  Apache Commons JEXL is hosted on the Apache
   <a href="http://subversion.tigris.org/">subversion</a> repository.
 </p>
 <p>
   The project URL is:<br />
-  <code>http://svn.apache.org/repos/asf/jakarta/commons/proper/jexl/trunk</code>
+  <code>http://svn.apache.org/repos/asf/commons/proper/jexl/trunk</code>
 </p>
 <p>
   The best way to view the repository is via the
-  <a href="http://svn.apache.org/viewcvs.cgi/jakarta/commons/proper/jexl/trunk/">subversion viewer</a>.
+  <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/">subversion viewer</a>.
 </p>
 <p>
   The alternative is to use the
-  <a href="http://svn.apache.org/repos/asf/jakarta/commons/proper/jexl/trunk/">native subversion</a> display.
+  <a href="http://svn.apache.org/repos/asf/commons/proper/jexl/trunk/">native subversion</a> display.
 </p>
 </section>
 <!-- ================================================== -->

@@ -32,14 +32,14 @@
       While inspired by JSTL EL, it must be noted that JEXL is not a compatible 
       implementation of EL as defined in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152). For a 
       compatible implementation of these specifications, see the 
-      <a href="http://jakarta.apache.org/commons/el/">Commons EL</a> project.
+      <a href="http://commons.apache.org/el/">Commons EL</a> project.
 
     </p>
 
     <p>
       JEXL attempts to bring some of the lessons learned by the Velocity
       community about expression languages in templating to a wider audience.
-      <a href="http://jakarta.apache.org/commons/jelly">Commons Jelly</a> needed
+      <a href="http://commons.apache.org/jelly">Commons Jelly</a> needed
       Velocity-ish method access, it just had to have it.
     </p>
     
@@ -48,11 +48,11 @@
     <section name="A Brief Example">
 
     <p>
-      When evaluating expressions, JEXL merges an <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/Expression.html">Expression</a> with a <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">JexlContext</a>.
-      An Expression is created using <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/ExpressionFactory.html#createExpression(java.lang.String)">ExpressionFactory.createExpression()</a>, passing a
+      When evaluating expressions, JEXL merges an <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/Expression.html">Expression</a> with a <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">JexlContext</a>.
+      An Expression is created using <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/ExpressionFactory.html#createExpression(java.lang.String)">ExpressionFactory.createExpression()</a>, passing a
       String containing valid JEXL syntax.  A JexlContext is created using 
-      <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlHelper.html#createContext()">JexlHelper.createContext()</a>, and variables are put into a map exposed through
-      the <a href="http://jakarta.apache.org/commons/jexl/apidocs/org/apache/commons/jexl/JexlContext.html#getVars()">getVars()</a> method on JexlContext.  The following example, takes a variable
+      <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlHelper.html#createContext()">JexlHelper.createContext()</a>, and variables are put into a map exposed through
+      the <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlContext.html#getVars()">getVars()</a> method on JexlContext.  The following example, takes a variable
       named foo, and invokes the bar() method on the property innerFoo:
     </p>
 
@@ -122,7 +122,7 @@
           </li>
           <li>
             Apache has an implementation of the expression language for JSP 2.0,
-            called <a href="http://jakarta.apache.org/commons/el/index.html">EL</a>
+            called <a href="http://commons.apache.org/el/index.html">EL</a>
           </li>
           <li>
             <a href="http://java.sun.com/products/jsp/jstl/">JSTL 1.1</a> is covered 
@@ -148,10 +148,10 @@
     <section name="Anyone Using It Yet?">
         <ul>
           <li>
-           <a href="http://jakarta.apache.org/commons/jelly">Jelly</a>
+           <a href="http://commons.apache.org/jelly">Jelly</a>
           </li>
           <li>
-           <a href="http://jakarta.apache.org/commons/scxml">Commons SCXML</a>
+           <a href="http://commons.apache.org/scxml">Commons SCXML</a>
           </li>
         </ul>
     </section>
