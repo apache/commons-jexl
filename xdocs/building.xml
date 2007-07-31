@@ -26,7 +26,7 @@ limitations under the License.
 <p>
   Commons JEXL uses <a href="http://maven.apache.org">Maven</a> or
   <a href="http://ant.apache.org">Ant</a> as a build system. The source is
-  <a href="http://svn.apache.org/repos/asf/jakarta/commons/proper/jexl/trunk/">here</a>.
+  <a href="http://svn.apache.org/repos/asf/commons/proper/jexl/trunk/">here</a>.
 </p>
 </section>
 <!-- ================================================== -->
