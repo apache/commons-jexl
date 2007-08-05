@@ -31,7 +31,7 @@
       <item name="Jar Downloads"                 href="/downloads.html"/>
       <item name="Reference"                     href="/reference/index.html"/>
       <item name="Building"                      href="/building.html"/>
-      <item name="JEXL Wiki"                     href="http://wiki.apache.org/jakarta-commons/JEXL"/>
+      <item name="JEXL Wiki"                     href="http://wiki.apache.org/commons/JEXL"/>
     </menu>
     &commons;
   </body>
