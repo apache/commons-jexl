@@ -6,9 +6,9 @@
    The ASF licenses this file to You under the Apache License, Version 2.0
    (the "License"); you may not use this file except in compliance with
    the License.  You may obtain a copy of the License at
-  
+
         http://www.apache.org/licenses/LICENSE-2.0
-  
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -103,7 +103,7 @@
           <td>
             1 or more digits from <code>0</code> to <code>9</code>, followed
             by a decimal point and then one or more digits from
-            <code>0</code> to <code>9</code>. 
+            <code>0</code> to <code>9</code>.
           </td>
         </tr>
         <tr>
@@ -126,6 +126,20 @@
           <td>
             The null value is represented as in java using the literal <code>null</code>, e.g.
             <source>val1 == null</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Map literal</td>
+          <td>
+            You can construct a <code>java.util.HashMap</code> by using <source>[ key => value, key => value ]</source>.
+              <code>key</code> and <code>value</code> can be any valid expression.
+          </td>
+        </tr>
+        <tr>
+          <td>Array literal</td>
+          <td>
+            You can construct an <code>Object[]</code> array by using <source>[ item, item, item ]</source>.
+              <code>item</code> can be be any valid expression.
           </td>
         </tr>
       </table>
@@ -193,7 +207,7 @@
         <tr>
           <td>Bitwise <code>and</code></td>
           <td>
-            The usual <code>&amp;</code> operator is used, e.g. 
+            The usual <code>&amp;</code> operator is used, e.g.
             <source>33 &amp; 4</source>, 0010 0001 &amp; 0000 0100 = 0.
           </td>
         </tr>
@@ -222,7 +236,7 @@
           <td>Equality</td>
           <td>
             The usual <code>==</code> operator can be used as well as the abbreviation <code>eq</code>.
-            For example 
+            For example
             <source>val1 == val2</source> and
             <source>val1 eq val2</source> are equivalent.
             <ol>
@@ -375,4 +389,4 @@
 
   </body>
 </document>
-    
+

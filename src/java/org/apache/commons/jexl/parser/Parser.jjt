@@ -294,6 +294,9 @@ void PrimaryExpression() #void :
 |
   SizeFunction()
 |
+  LOOKAHEAD(3)
+  ArrayLiteral()
+|
   MapLiteral()
 }
 
@@ -430,6 +433,11 @@ void MapLiteral() : {}
   "["  MapEntry() ( "," MapEntry() )* "]"
 }
 
+void ArrayLiteral() : {}
+{
+  "["  Parameter() ( "," Parameter() )* "]"
+}
+
 void MapEntry() : {}
 {
     Parameter() "=>" Parameter()
@@ -452,7 +460,16 @@ void SizeMethod() : {}
 
 void Reference() : {}
 {
-  (LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() | Identifier() | MapLiteral())
+  (LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]")
+      ArrayAccess()
+    |
+      Identifier()
+    |
+      LOOKAHEAD(3)
+      MapLiteral()
+    |
+      ArrayLiteral()
+  )
   (LOOKAHEAD(2) "."
     (
       LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() |

@@ -43,7 +43,8 @@ public class ParseException extends Exception {
   public ParseException(Token currentTokenVal,
                         int[][] expectedTokenSequencesVal,
                         String[] tokenImageVal
-                       ) {
+                       )
+  {
     super("");
     specialConstructor = true;
     currentToken = currentTokenVal;
@@ -113,19 +114,19 @@ public class ParseException extends Exception {
     if (!specialConstructor) {
       return super.getMessage();
     }
-    String expected = "";
+    StringBuffer expected = new StringBuffer();
     int maxSize = 0;
     for (int i = 0; i < expectedTokenSequences.length; i++) {
       if (maxSize < expectedTokenSequences[i].length) {
         maxSize = expectedTokenSequences[i].length;
       }
       for (int j = 0; j < expectedTokenSequences[i].length; j++) {
-        expected += tokenImage[expectedTokenSequences[i][j]] + " ";
+        expected.append(tokenImage[expectedTokenSequences[i][j]]).append(" ");
       }
       if (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {
-        expected += "...";
+        expected.append("...");
       }
-      expected += eol + "    ";
+      expected.append(eol).append("    ");
     }
     String retval = "Encountered \"";
     Token tok = currentToken.next;
@@ -136,7 +137,7 @@ public class ParseException extends Exception {
         break;
       }
       retval += add_escapes(tok.image);
-      tok = tok.next; 
+      tok = tok.next;
     }
     retval += "\" at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;
     retval += "." + eol;
@@ -145,7 +146,7 @@ public class ParseException extends Exception {
     } else {
       retval += "Was expecting one of:" + eol + "    ";
     }
-    retval += expected;
+    retval += expected.toString();
     return retval;
   }
 
@@ -153,7 +154,7 @@ public class ParseException extends Exception {
    * The end of line string for this machine.
    */
   protected String eol = System.getProperty("line.separator", "\n");
- 
+
   /**
    * Used to convert raw characters to their escaped version
    * when these raw version cannot be used as part of an ASCII
