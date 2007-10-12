@@ -36,12 +36,12 @@ import org.apache.commons.logging.Log;
 public abstract class AbstractExecutor {
     /** The executor instance log. */
     protected Log rlog = null;
-    
+
     /**
      * Method to be executed.
      */
     protected Method method = null;
-    
+
     /**
      * Execute method against context.
      *

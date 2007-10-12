@@ -22,7 +22,7 @@ package org.apache.commons.jexl.util.introspection;
  * Ex.
  * 
  * #set($foo.bar = "hello")
- * 
+ *
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
@@ -30,7 +30,7 @@ package org.apache.commons.jexl.util.introspection;
 public interface VelPropertySet {
     /**
      * method used to set the value in the object.
-     * 
+     *
      * @param o Object on which the method will be called with the arg
      * @param arg value to be set
      * @return the value returned from the set operation (impl specific)
@@ -41,7 +41,7 @@ public interface VelPropertySet {
     /**
      * specifies if this VelPropertySet is cacheable and able to be reused for
      * this class of object it was returned for.
-     * 
+     *
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();
