@@ -60,11 +60,12 @@ public interface ParserTreeConstants
   public int JJTWHILESTATEMENT = 37;
   public int JJTFOREACHSTATEMENT = 38;
   public int JJTMAPLITERAL = 39;
-  public int JJTMAPENTRY = 40;
-  public int JJTMETHOD = 41;
-  public int JJTARRAYACCESS = 42;
-  public int JJTSIZEMETHOD = 43;
-  public int JJTREFERENCE = 44;
+  public int JJTARRAYLITERAL = 40;
+  public int JJTMAPENTRY = 41;
+  public int JJTMETHOD = 42;
+  public int JJTARRAYACCESS = 43;
+  public int JJTSIZEMETHOD = 44;
+  public int JJTREFERENCE = 45;
 
 
   public String[] jjtNodeName = {
@@ -108,6 +109,7 @@ public interface ParserTreeConstants
     "WhileStatement",
     "ForeachStatement",
     "MapLiteral",
+    "ArrayLiteral",
     "MapEntry",
     "Method",
     "ArrayAccess",

@@ -60,6 +60,7 @@ public interface ParserVisitor
   public Object visit(ASTWhileStatement node, Object data);
   public Object visit(ASTForeachStatement node, Object data);
   public Object visit(ASTMapLiteral node, Object data);
+  public Object visit(ASTArrayLiteral node, Object data);
   public Object visit(ASTMapEntry node, Object data);
   public Object visit(ASTMethod node, Object data);
   public Object visit(ASTArrayAccess node, Object data);
