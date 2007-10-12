@@ -70,7 +70,7 @@ public class PropertyExecutor extends AbstractExecutor {
 
             /*
              *  start with get<property>
-             *  this leaves the property name 
+             *  this leaves the property name
              *  as is...
              */
             sb = new StringBuffer("get");
@@ -79,17 +79,14 @@ public class PropertyExecutor extends AbstractExecutor {
             methodUsed = sb.toString();
 
             method = introspector.getMethod(clazz, methodUsed, params);
-             
+
             if (method != null) {
                 return;
             }
-        
+
             /*
              *  now the convenience, flip the 1st character
              */
-         
-            sb = new StringBuffer("get");
-            sb.append(property);
 
             c = sb.charAt(PROPERTY_START_INDEX);
 
@@ -105,8 +102,12 @@ public class PropertyExecutor extends AbstractExecutor {
             if (method != null) {
                 return;
             }
-            
-        } catch (Exception e) {
+        /**
+         * pass through application level runtime exceptions
+         */
+        } catch( RuntimeException e ) {
+            throw e;
+        } catch(Exception e) {
             rlog.error("PROGRAMMER ERROR : PropertyExector() : " + e);
         }
     }

@@ -70,6 +70,7 @@ public class Introspector extends IntrospectorBase {
      *  @param logger a {@link Log}.
      */
     public Introspector(Log logger) {
+        super(logger);
         this.rlog = logger;
     }
 
@@ -83,9 +84,9 @@ public class Introspector extends IntrospectorBase {
      *               the parameters
      *
      * @return The desired Method object.
-     * @throws Exception if the superclass does.
+     * @throws IllegalArgumentException When the parameters passed in can not be used for introspection.
      */
-    public Method getMethod(Class c, String name, Object[] params) throws Exception {
+    public Method getMethod(Class c, String name, Object[] params) throws IllegalArgumentException {
         /*
          *  just delegate to the base class
          */
