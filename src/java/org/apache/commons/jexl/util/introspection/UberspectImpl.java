@@ -428,6 +428,13 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
         /**
          * {@inheritDoc}
          */
+        public boolean isAlive() {
+            return ae.isAlive();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
         public String getMethodName() {
             return ae.getMethod().getName();
         }
