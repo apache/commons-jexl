@@ -1,0 +1,74 @@
+<html>
+<head>
+<title>Proposal for Jexl Package</title>
+</head>
+<body bgcolor="white">
+
+<div align="center">
+<h1>Proposal for <em>Jexl</em> Package</h1>
+</div>
+
+<h3>(0) Rationale</h3>
+
+<p>The <em>Jexl</em> package implements a simple expression language for
+accessing Java objects.
+</p>
+
+<h3>(1) Scope of the Package</h3>
+<p>
+   The package will create and maintain a number of classes for
+   implementing a simple expression language and processing engine,
+   and to be distributed under the ASF license.
+</p>
+
+<h3>(1.5) Interaction With Other Packages</h3>
+
+<p><em>Jexl</em> relies  on standard JDK 1.2 (or later) APIs for
+production deployment. </p>
+
+<p>
+<i>Jexl</i> utilizes the JUnit unit testing framework for developing and
+executing unit tests, but this is of interest only to developers of the
+component.
+</p>
+
+<p>
+<i>Jexl</i> also depends on Jakarta Velocity, Commons Logging, dom4j
+and Velocity DVSL for documentation rendering.
+</p>
+
+<h3>(2) Initial Source of the Package</h3>
+
+<p>
+   The code base is new and uses ideas from Jakarta Velocity.
+</p>
+
+<p>The proposed package name for the new component is
+<code>org.apache.commons.jexl</code>.</p>
+
+
+<h3>(3)  Required Jakarta-Commons Resources</h3>
+
+<ul>
+<li>CVS Repository - New directory <code>jexl</code> in the
+    <code>jakarta-commons</code> CVS repository.  All initial committers
+    are already committers on <code>jakarta-commons</code>, so no
+    additional user setups are required.</li>
+<li>Mailing List - Discussions will take place on the general
+    <em>jakarta-commons@jakarta.apache.org</em> mailing list.  To help
+    list subscribers identify messages of interest, it is suggested that
+    the message subject of messages about this component be prefixed with
+    [Jexl].  Strongly suggested.</li>
+<li>Bugzilla - New component "Jexl" under the "Commons" product
+    category, with appropriate version identifiers as needed.</li>
+<li>Jyve FAQ - New category "commons-jexl" (when available). </li>
+</ul>
+
+
+<h3>(4) Initial Committers</h3>
+<ul>
+   <li>Geir Magnusson Jr.</li>
+   <li>James Strachan</li>
+</ul>
+</body>
+</html>

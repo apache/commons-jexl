@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements.  See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<project>
+  <pomVersion>3</pomVersion>
+  <groupId>commons-jexl</groupId>
+  <artifactId>commons-jexl</artifactId>
+  <inceptionYear>2003</inceptionYear>
+  <currentVersion>SNAPSHOT</currentVersion>
+  <name>Commons JEXL</name>
+  <shortDescription>Commons JEXL Expression Language Engine</shortDescription>
+  <description>Jexl is an implementation of the JSTL Expression Language with extensions.</description>
+  <logo>/images/jexl-logo-white.png</logo>
+  <url>http://commons.apache.org/jexl/</url>
+  <package>org.apache.commons.jexl</package>
+  <organization>
+    <name>The Apache Software Foundation</name>
+    <url>http://commons.apache.org/</url>
+    <logo>http://commons.apache.org/images/logo.png</logo>
+  </organization>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>/LICENSE.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <gumpRepositoryId>commons</gumpRepositoryId>
+  <issueTrackingUrl>http://issues.apache.org/jira/</issueTrackingUrl>
+  <siteAddress>people.apache.org</siteAddress>
+  <siteDirectory>/www/commons.apache.org/jexl/</siteDirectory>
+  <distributionDirectory>/www/people.apache.org/builds/commons/jexl/</distributionDirectory>
+  <repository>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/commons/proper/jexl/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/commons/proper/jexl/trunk</developerConnection>
+    <url>http://svn.apache.org/repos/asf/commons/proper/jexl/trunk</url>
+  </repository>
+  <mailingLists>
+    <mailingList>
+      <name>Commons Dev List</name>
+      <subscribe>dev-subscribe@commons.apache.org</subscribe>
+      <unsubscribe>dev-unsubscribe@commons.apache.org</unsubscribe>
+      <archive>http://mail-archives.apache.org/mod_mbox/commons-dev/</archive>
+    </mailingList>
+    <mailingList>
+      <name>Commons User List</name>
+      <subscribe>user-subscribe@commons.apache.org</subscribe>
+      <unsubscribe>user-unsubscribe@commons.apache.org</unsubscribe>
+      <archive>http://mail-archives.apache.org/mod_mbox/commons-user/</archive>
+    </mailingList>
+  </mailingLists>
+  <versions>
+    <version>
+      <id>1.1</id>
+      <name>1.1</name>
+      <tag>COMMONS_JEXL-1_1</tag>
+    </version>
+    <version>
+      <id>1.0</id>
+      <name>1.0</name>
+      <tag>COMMONS_JEXL-1_0</tag>
+    </version>
+  </versions>
+  <developers>
+    <developer>
+      <name>dIon Gillard</name>
+      <id>dion</id>
+      <email>dion@apache.org</email>
+      <organization>Apache Software Foundation</organization>
+    </developer>
+    <developer>
+      <name>Geir Magnusson Jr.</name>
+      <id>geirm</id>
+      <email>geirm@apache.org</email>
+      <organization>independent</organization>
+    </developer>
+    <developer>
+      <name>Tim O'Brien</name>
+      <id>tobrien</id>
+      <email>tobrien@apache.org</email>
+      <organization>independent</organization>
+    </developer>
+    <developer>
+      <name>Peter Royal</name>
+      <id>proyal</id>
+      <email>proyal@apache.org</email>
+      <organization>Apache Software Foundation</organization>
+    </developer>
+    <developer>
+      <name>James Strachan</name>
+      <id>jstrachan</id>
+      <email>jstrachan@apache.org</email>
+      <organization>SpiritSoft, Inc.</organization>
+    </developer>
+    <developer>
+      <name>Rahul Akolkar</name>
+      <id>rahul</id>
+      <email>rahul AT apache.org</email>
+      <organization>Apache Software Foundation</organization>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0.4</version>
+      <url>http://commons.apache.org/logging/</url>
+      <properties>
+        <comment>
+            &lt;strong&gt;Required&lt;/strong&gt;
+        </comment>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <url>http://www.junit.org/</url>
+      <properties>
+        <comment>
+            &lt;strong&gt;Test Only&lt;/strong&gt;
+        </comment>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>maven</groupId>
+      <artifactId>maven-jcoverage-plugin</artifactId>
+      <version>1.0.9</version>
+      <url>http://maven.apache.org/maven-1.x/plugins/jcoverage/</url>
+      <type>plugin</type>
+      <properties>
+        <comment>
+            &lt;strong&gt;Site Only&lt;/strong&gt;
+        </comment>
+      </properties>
+    </dependency>
+    <dependency>
+      <groupId>maven-plugins</groupId>
+      <artifactId>maven-findbugs-plugin</artifactId>
+      <version>1.1</version>
+      <url>http://maven-plugins.sourceforge.net/maven-findbugs-plugin/</url>
+      <type>plugin</type>
+      <properties>
+        <comment>
+            &lt;strong&gt;Site Only&lt;/strong&gt; - v1.1 (minimum)
+        </comment>
+      </properties>
+    </dependency>
+  </dependencies>
+  <build>
+    <nagEmailAddress>dev@commons.apache.org</nagEmailAddress>
+    <resources>
+      <resource>
+        <targetPath>META-INF</targetPath>
+        <includes>
+          <include>NOTICE.txt</include>
+        </includes>
+      </resource>
+    </resources>
+    <sourceDirectory>src/java</sourceDirectory>
+    <unitTestSourceDirectory>src/test</unitTestSourceDirectory>
+    <integrationUnitTestSourceDirectory/>
+    <aspectSourceDirectory/>
+    <unitTest>
+      <includes>
+        <include>**/*Test.java</include>
+      </includes>
+    </unitTest>
+  </build>
+  <reports>
+    <report>maven-changes-plugin</report>
+    <report>maven-checkstyle-plugin</report>
+    <report>maven-javadoc-plugin</report>
+    <report>maven-jcoverage-plugin</report>
+    <report>maven-jdepend-plugin</report>
+    <report>maven-junit-report-plugin</report>
+    <report>maven-jxr-plugin</report>
+    <report>maven-license-plugin</report>
+    <report>maven-pmd-plugin</report>
+    <report>maven-tasklist-plugin</report>
+  </reports>
+</project>
