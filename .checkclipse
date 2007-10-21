@@ -1,0 +1,7 @@
+#Tue May 02 15:43:07 EST 2006
+filenames.properties=/Jexl/src/conf/checkstyle.properties
+enabled=true
+projectclassloader=true
+filenames.config=/Jexl/src/conf/checkstyle.xml
+additional_jars=|
+filenames.filter=/Jexl/src/conf/checkclipse-filter.properties

@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.5.3 
+Package: org.apache.commons.jexl
+Extension-Name: commons-jexl
+Specification-Title: Commons JEXL Expression Language Engine
+Specification-Vendor: The Apache Software Foundation
+Implementation-Title: org.apache.commons.jexl
+Implementation-Vendor: The Apache Software Foundation
+Implementation-Version: 1.1.1-SNAPSHOT
+Implementation-Vendor-Id: org.apache
+X-Compile-Source-JDK: 1.2
+X-Compile-Target-JDK: 1.2
+
