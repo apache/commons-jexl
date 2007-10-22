@@ -80,6 +80,10 @@ public class ScriptFactory {
         this(Introspector.getUberspect());
     }
     
+    /**
+     * Create a script factory with an alternate {@link Uberspect}.
+     * @param uberspect the uberspect implementation.
+     */
     public ScriptFactory(Uberspect uberspect) {
         parser.setUberspect(uberspect);
     }
