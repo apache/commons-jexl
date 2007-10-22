@@ -29,15 +29,16 @@ import org.apache.commons.jexl.parser.ASTIdentifier;
 import org.apache.commons.jexl.parser.ASTIntegerLiteral;
 import org.apache.commons.jexl.parser.ASTNullLiteral;
 import org.apache.commons.jexl.parser.ASTReference;
-import org.apache.commons.jexl.parser.ASTReferenceExpression;
-import org.apache.commons.jexl.parser.ParserTreeConstants;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.parser.VisitorAdapter;
 import org.apache.commons.jexl.util.Coercion;
 import org.apache.commons.jexl.util.Introspector;
 import org.apache.commons.jexl.util.introspection.Uberspect;
 
-
+/**
+ * Starting point for an interpreter of JEXL syntax.
+ * @author Dion Gillard
+ */
 class Interpreter extends VisitorAdapter {
 
     /** The uberspect. */
@@ -46,7 +47,7 @@ class Interpreter extends VisitorAdapter {
     /** The context to store/retrieve variables. */
     private JexlContext context;
     
-    /** the stack that holds values during expressions */
+    /** the stack that holds values during expressions. */
     private Stack valueStack;
 
     //private Resolver resolver;
@@ -59,6 +60,12 @@ class Interpreter extends VisitorAdapter {
         setUberspect(Introspector.getUberspect());
     }
 
+    /** 
+     * Interpret the given script/expression.
+     * @param node the script or expression to interpret.
+     * @param aContext the context to interpret against.
+     * @return the result of the interpretation.
+     */
     public Object interpret(SimpleNode node, JexlContext aContext) {
         setContext(aContext);
         valueStack = new Stack();
@@ -66,13 +73,19 @@ class Interpreter extends VisitorAdapter {
         return node.jjtAccept(this, null);
     }
 
-    public void setUberspect(Uberspect anUberspect)
-    {
+    /**
+     * sets the uberspect to use for divining bean properties etc.
+     * @param anUberspect the uberspect.
+     */
+    public void setUberspect(Uberspect anUberspect) {
         uberspect = anUberspect;
     }
 
-    protected Uberspect getUberspect()
-    {
+    /** 
+     * Gets the uberspect.
+     * @return an {@link Uberspect}
+     */
+    protected Uberspect getUberspect() {
         return uberspect;
     }
 
@@ -81,11 +94,8 @@ class Interpreter extends VisitorAdapter {
     }
 
     public Object visit(ASTBitwiseAndNode node, Object data) {
-        // evaluate left as long
-        Object left = ((SimpleNode) node.jjtGetChild(0)).jjtAccept(this, data);
-        // evaluate right as long
-        Object right = ((SimpleNode) node.jjtGetChild(1)).jjtAccept(this, data);
-        System.out.println("left is " + left + ", and right is " + right);
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
         // coerce these two values longs and add.
         long l = Coercion.coercelong(left);
         long r = Coercion.coercelong(right);
