@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.jexl.parser.SimpleNode;
-import org.apache.commons.jexl.parser.ParserVisitor;
 
 /**
  * Instances of ExpressionImpl are created by the {@link ExpressionFactory},
@@ -33,7 +32,7 @@ import org.apache.commons.jexl.parser.ParserVisitor;
  */
 class ExpressionImpl implements Expression {
 
-	// TODO: move resolving to interpreter
+    // TODO: move resolving to interpreter
     /** resolvers called before expression evaluation. */
     protected List preResolvers;
 
@@ -52,7 +51,7 @@ class ExpressionImpl implements Expression {
     protected SimpleNode node;
 
     /**
-     * The interpreter of the expression
+     * The interpreter of the expression.
      */
     protected Interpreter interpreter;
 
@@ -61,6 +60,7 @@ class ExpressionImpl implements Expression {
      *
      * @param expr the expression.
      * @param ref the parsed expression.
+     * @param interp the interpreter to evaluate the expression
      */
     ExpressionImpl(String expr, SimpleNode ref, Interpreter interp) {
         expression = expr;
@@ -85,7 +85,7 @@ class ExpressionImpl implements Expression {
             }
         }
 
-		val = interpreter.interpret(node, context);
+        val = interpreter.interpret(node, context);
 
         /*
          * if null, call post resolvers
