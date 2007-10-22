@@ -68,31 +68,40 @@ public class Coercion {
         throw new Exception("Integer coercion exception");
     }
 
+    
+    /**
+     * Coerce to a long (not a java.lang.Long).
+     *
+     * @param val Object to be coerced.
+     * @return The Long coerced value.
+     */
+    public static long coercelong(Object val) {
+        if (val == null) {
+            return 0;
+        } else if (val instanceof String) {
+            if ("".equals(val)) {
+                return 0;
+            }
+            return Long.parseLong((String) val);
+        } else if (val instanceof Character) {
+            return ((Character) val).charValue();
+        } else if (val instanceof Boolean) {
+            throw new NumberFormatException("Boolean->Long coercion exception");
+        } else if (val instanceof Number) {
+            return ((Number) val).longValue();
+        }
+
+        throw new NumberFormatException("Long coercion exception for '" + val + "'");
+    }
+
     /**
      * Coerce to a Long.
      *
      * @param val Object to be coerced.
      * @return The Long coerced value.
-     * @throws Exception If Long coercion fails.
      */
-    public static Long coerceLong(Object val)
-    throws Exception {
-        if (val == null) {
-            return new Long(0);
-        } else if (val instanceof String) {
-            if ("".equals(val)) {
-                return new Long(0);
-            }
-            return Long.valueOf((String) val);
-        } else if (val instanceof Character) {
-            return new Long(((Character) val).charValue());
-        } else if (val instanceof Boolean) {
-            throw new Exception("Boolean->Long coercion exception");
-        } else if (val instanceof Number) {
-            return new Long(((Number) val).longValue());
-        }
-
-        throw new Exception("Long coercion exception");
+    public static Long coerceLong(Object val) {
+        return new Long(coercelong(val));
     }
 
     /**
