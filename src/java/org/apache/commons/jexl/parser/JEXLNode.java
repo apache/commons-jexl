@@ -17,7 +17,6 @@
 
 package org.apache.commons.jexl.parser;
 
-
 /**
  * Base class for parser nodes - holds an 'image' of the token for later use.
  */
