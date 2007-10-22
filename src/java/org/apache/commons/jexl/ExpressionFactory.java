@@ -18,12 +18,6 @@ package org.apache.commons.jexl;
 
 import java.io.StringReader;
 
-import org.apache.commons.jexl.parser.ASTExpressionExpression;
-import org.apache.commons.jexl.parser.ASTForeachStatement;
-import org.apache.commons.jexl.parser.ASTIfStatement;
-import org.apache.commons.jexl.parser.ASTReferenceExpression;
-import org.apache.commons.jexl.parser.ASTStatementExpression;
-import org.apache.commons.jexl.parser.ASTWhileStatement;
 import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
@@ -57,7 +51,7 @@ public class ExpressionFactory {
     /**
      * The Log to which all ExpressionFactory messages will be logged.
      */
-    protected static final Log log =
+    protected static final Log LOG =
         LogFactory.getLog("org.apache.commons.jexl.ExpressionFactory");
 
     /**
@@ -70,9 +64,9 @@ public class ExpressionFactory {
 
     /**
      * ExpressionFactory is a singleton and this is the private
-     * instance fufilling that pattern.
+     * instance fulfilling that pattern.
      */
-    protected static final ExpressionFactory ef = new ExpressionFactory();
+    protected static final ExpressionFactory EF = new ExpressionFactory();
 
     /**
      * Private constructor, the single instance is always obtained
@@ -95,7 +89,7 @@ public class ExpressionFactory {
      * @return the instance of ExpressionFactory.
      */
     public static ExpressionFactory getInstance() {
-        return ef;
+        return EF;
     }
 
     /**
@@ -130,7 +124,7 @@ public class ExpressionFactory {
         // Parse the Expression
         SimpleNode tree;
         synchronized (parser) {
-            log.debug("Parsing expression: " + expr);
+            LOG.debug("Parsing expression: " + expr);
             try {
                 tree = parser.parse(new StringReader(expr));
             } catch (TokenMgrError tme) {
@@ -138,8 +132,8 @@ public class ExpressionFactory {
             }
         }
 
-        if (tree.jjtGetNumChildren() > 1 && log.isWarnEnabled()) {
-            log.warn("The JEXL Expression created will be a reference"
+        if (tree.jjtGetNumChildren() > 1 && LOG.isWarnEnabled()) {
+            LOG.warn("The JEXL Expression created will be a reference"
                 + " to the first expression from the supplied script: \""
                 + expression + "\" ");
         }
