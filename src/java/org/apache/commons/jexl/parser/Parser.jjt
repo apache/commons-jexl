@@ -152,6 +152,11 @@ void Expression() : {}
   ConditionalOrExpression()
 }
 
+/*
+ * WTF? How is the LHS of the assignment a 'PrimaryExpression'?
+ * This includes Literal, Null, String literal etc...
+ */
+
 void Assignment() #Assignment(2) :
 {}
 {
@@ -357,7 +362,7 @@ void StringLiteral() :
 {
  (
   t=<STRING_LITERAL>
-  { jjtThis.image = t.image; }
+  { jjtThis.image = t.image.substring(1, t.image.length() -1); }
  )
 }
 
