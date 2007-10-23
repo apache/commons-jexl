@@ -28,6 +28,7 @@ class JEXLNode {
     public JEXLNode() {
     }
 
+    // CSOFF: VisibilityModifier
     /** token value. */
     public String image;
 }
