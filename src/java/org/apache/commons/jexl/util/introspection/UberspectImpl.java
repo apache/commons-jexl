@@ -60,9 +60,8 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
      * init - does nothing - we need to have setRuntimeLogger called before
      * getting our introspector, as the default vel introspector depends upon
      * it.
-     * @throws Exception on any error.
      */
-    public void init() throws Exception {
+    public void init() {
     }
 
     /**
@@ -78,7 +77,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     /**
      * {@inheritDoc}
      */
-    public Iterator getIterator(Object obj, Info i) throws Exception {
+    public Iterator getIterator(Object obj, Info i) {
         if (obj.getClass().isArray()) {
             return new ArrayIterator(obj);
         } else if (obj instanceof Collection) {
@@ -109,7 +108,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     /**
      * {@inheritDoc}
      */
-    public VelMethod getMethod(Object obj, String methodName, Object[] args, Info i) throws Exception {
+    public VelMethod getMethod(Object obj, String methodName, Object[] args, Info i) {
         if (obj == null) {
             return null;
         }
@@ -125,7 +124,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     /**
      * {@inheritDoc}
      */
-    public VelPropertyGet getPropertyGet(Object obj, String identifier, Info i) throws Exception {
+    public VelPropertyGet getPropertyGet(Object obj, String identifier, Info i) {
         AbstractExecutor executor;
 
         Class claz = obj.getClass();
@@ -158,7 +157,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     /**
      * {@inheritDoc}
      */
-    public VelPropertySet getPropertySet(Object obj, String identifier, Object arg, Info i) throws Exception {
+    public VelPropertySet getPropertySet(Object obj, String identifier, Object arg, Info i)  {
         Class claz = obj.getClass();
 
         VelMethod vm = null;
