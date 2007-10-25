@@ -25,6 +25,24 @@ package org.apache.commons.jexl.util;
 public class Coercion {
 
     /**
+     * Coerce to a boolean (not a java.lang.Boolean).
+     *
+     * @param val Object to be coerced.
+     * @return The Boolean coerced value, or false if none possible.
+     */
+    public static boolean coerceboolean(Object val) {
+        if (val == null) {
+            return false;
+        } else if (val instanceof Boolean) {
+            return ((Boolean) val).booleanValue();
+        } else if (val instanceof String) {
+            return Boolean.valueOf((String) val).booleanValue();
+        }
+        // TODO: is this a reasonable default?
+        return false;
+    }
+
+    /**
      * Coerce to a Boolean.
      *
      * @param val Object to be coerced.
@@ -109,38 +127,42 @@ public class Coercion {
      *
      * @param val Object to be coerced.
      * @return The Double coerced value.
-     * @throws Exception If Double coercion fails.
      */
-    public static Double coerceDouble(Object val)
-    throws Exception {
+    public static Double coerceDouble(Object val) {
+        return new Double(coercedouble(val));
+    }
+    
+    /**
+     * Coerce to a double.
+     *
+     * @param val Object to be coerced.
+     * @return The Double coerced value.
+     */
+    public static double coercedouble(Object val) {
         if (val == null) {
-            return new Double(0);
+            return 0;
         } else if (val instanceof String) {
-            if ("".equals(val)) {
-                return new Double(0);
+            String string = (String) val;
+            if ("".equals(string.trim())) {
+                return 0;
             }
-
-            /*
-             * the spec seems to be iffy about this.  Going to give it a wack
-             *  anyway
-             */
-
-            return new Double((String) val);
+            // the spec seems to be iffy about this.  Going to give it a wack anyway
+            return Double.parseDouble(string);
         } else if (val instanceof Character) {
             int i = ((Character) val).charValue();
 
-            return new Double(Double.parseDouble(String.valueOf(i)));
-        } else if (val instanceof Boolean) {
-            throw new Exception("Boolean->Double coercion exception");
+            return i;
         } else if (val instanceof Double) {
-            return (Double) val;
+            return ((Double) val).doubleValue();
         } else if (val instanceof Number) {
             //The below construct is used rather than ((Number)val).doubleValue() to ensure
-            //equality between comparint new Double( 6.4 / 3 ) and the jexl expression of 6.4 / 3
-            return new Double(Double.parseDouble(String.valueOf(val)));
+            //equality between comparing new Double( 6.4 / 3 ) and the jexl expression of 6.4 / 3
+            return Double.parseDouble(String.valueOf(val));
+        } else if (val instanceof Boolean) {
+            throw new IllegalArgumentException("Boolean->Double coercion exception");
         }
 
-        throw new Exception("Double coercion exception");
+        throw new IllegalArgumentException("Double coercion exception, don't know how to convert " + val);
     }
 
     /**
