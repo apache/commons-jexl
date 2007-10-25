@@ -20,49 +20,23 @@ package org.apache.commons.jexl.parser;
 /**
  * Implementation of the ParserVisitor that dumps the current node and it's
  * children and then visits them.
- * 
- * @author Dion Gillard
  */
 public class VisitorAdapter implements ParserVisitor {
 
     /** {@inheritDoc} */
-    public Object visit(SimpleNode node, Object data) {
+    public Object visit(ASTAddNode node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTJexlScript node, Object data) {
+    public Object visit(ASTAndNode node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTBlock node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTEmptyFunction node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTSizeFunction node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTIdentifier node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTExpression node, Object data) {
+    public Object visit(ASTArrayAccess node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
@@ -74,13 +48,13 @@ public class VisitorAdapter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTOrNode node, Object data) {
+    public Object visit(ASTBitwiseAndNode node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTAndNode node, Object data) {
+    public Object visit(ASTBitwiseComplNode node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
@@ -98,61 +72,7 @@ public class VisitorAdapter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTBitwiseAndNode node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTEQNode node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTNENode node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTLTNode node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTGTNode node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTLENode node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTGENode node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTAddNode node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTSubtractNode node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTMulNode node, Object data) {
+    public Object visit(ASTBlock node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
@@ -164,19 +84,127 @@ public class VisitorAdapter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
+    public Object visit(ASTEmptyFunction node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTEQNode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTExpression node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTExpressionExpression node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTFalseNode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTFloatLiteral node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTForeachStatement node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTGENode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTGTNode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTIdentifier node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTIfStatement node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTIntegerLiteral node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTJexlScript node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTLENode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTLTNode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTMapEntry node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTMapLiteral node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTMethod node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
     public Object visit(ASTModNode node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTUnaryMinusNode node, Object data) {
+    public Object visit(ASTMulNode node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTBitwiseComplNode node, Object data) {
+    public Object visit(ASTNENode node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
@@ -194,43 +222,13 @@ public class VisitorAdapter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTTrueNode node, Object data) {
+    public Object visit(ASTOrNode node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTFalseNode node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTIntegerLiteral node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTFloatLiteral node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTStringLiteral node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTExpressionExpression node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTStatementExpression node, Object data) {
+    public Object visit(ASTReference node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
@@ -242,43 +240,7 @@ public class VisitorAdapter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTIfStatement node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTWhileStatement node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTForeachStatement node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTMapLiteral node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTMapEntry node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTMethod node, Object data) {
-        node.dump(" ");
-        return node.childrenAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTArrayAccess node, Object data) {
+    public Object visit(ASTSizeFunction node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
@@ -290,8 +252,45 @@ public class VisitorAdapter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTReference node, Object data) {
+    public Object visit(ASTStatementExpression node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
     }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTStringLiteral node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTSubtractNode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTTrueNode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTUnaryMinusNode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTWhileStatement node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(SimpleNode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
 }
