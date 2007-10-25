@@ -17,12 +17,11 @@
 
 package org.apache.commons.jexl.util.introspection;
 
-import java.util.Map;
-import java.util.Set;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
-
-import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This basic function of this class is to return a Method object for a
@@ -74,11 +73,11 @@ public class IntrospectorBase {
      *            parameters
      * 
      * @return The desired Method object.
-     * @throws Exception on any logical error.
+     * @throws MethodMap.AmbiguousException when an ambiguous method declaration is found.
      */
-    public Method getMethod(Class c, String name, Object[] params) throws Exception {
+    public Method getMethod(Class c, String name, Object[] params) throws MethodMap.AmbiguousException {
         if (c == null) {
-            throw new Exception("Introspector.getMethod(): Class method key was null: " + name);
+            throw new IllegalArgumentException("Introspector.getMethod(): Class method key was null: " + name);
         }
 
         ClassMap classMap = null;
