@@ -47,11 +47,10 @@ public class GetExecutor extends AbstractExecutor {
      * @param ispect The JEXL introspector.
      * @param c The class being examined.
      * @param key The key for the get(key) operation.
-     * @throws Exception Failure while trying to obtain the pertinent method.
      */
     public GetExecutor(Log r,
             org.apache.commons.jexl.util.introspection.Introspector ispect,
-            Class c, String key) throws Exception {
+            Class c, String key) {
         rlog = r;
         args[0] = key;
         method = ispect.getMethod(c, "get", args);
