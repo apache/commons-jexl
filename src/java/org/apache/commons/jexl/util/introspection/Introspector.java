@@ -83,9 +83,8 @@ public class Introspector extends IntrospectorBase {
      *               the parameters
      *
      * @return The desired Method object.
-     * @throws Exception if the superclass does.
      */
-    public Method getMethod(Class c, String name, Object[] params) throws Exception {
+    public Method getMethod(Class c, String name, Object[] params) {
         /*
          *  just delegate to the base class
          */
