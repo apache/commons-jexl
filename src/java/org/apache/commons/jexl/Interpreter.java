@@ -116,6 +116,7 @@ class Interpreter extends VisitorAdapter {
     }
 
     /**
+     * TODO: Does this need to be a setter.
      * sets the uberspect to use for divining bean properties etc.
      * 
      * @param anUberspect the uberspect.
