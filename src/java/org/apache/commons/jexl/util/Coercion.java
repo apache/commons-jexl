@@ -64,26 +64,34 @@ public class Coercion {
      *
      * @param val Object to be coerced.
      * @return The Integer coerced value.
-     * @throws Exception If Integer coercion fails.
      */
-    public static Integer coerceInteger(Object val)
-    throws Exception {
+    public static Integer coerceInteger(Object val) {
+        return new Integer(coerceinteger(val));
+    }
+    
+    /**
+     * Coerce to a Integer.
+     *
+     * @param val Object to be coerced.
+     * @return The Integer coerced value.
+     */
+    public static int coerceinteger(Object val) {
         if (val == null) {
-            return new Integer(0);
+            return 0;
         } else if (val instanceof String) {
             if ("".equals(val)) {
-                return new Integer(0);
+                return 0;
             }
-            return Integer.valueOf((String) val);
+            return Integer.parseInt((String) val);
         } else if (val instanceof Character) {
-            return new Integer(((Character) val).charValue());
+            return ((Character) val).charValue();
         } else if (val instanceof Boolean) {
-            throw new Exception("Boolean->Integer coercion exception");
+            throw new IllegalArgumentException("Boolean->Integer coercion exception");
         } else if (val instanceof Number) {
-            return new Integer(((Number) val).intValue());
+            return ((Number) val).intValue();
         }
 
-        throw new Exception("Integer coercion exception");
+        throw new IllegalArgumentException("Integer coercion exception, don't know how to convert " + val);
     }
 
     
