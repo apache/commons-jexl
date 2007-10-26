@@ -88,8 +88,10 @@ class Interpreter extends VisitorAdapter {
 
     /** The uberspect. */
     private Uberspect uberspect;
+
     /** The context to store/retrieve variables. */
     private JexlContext context;
+
     /** dummy velocity info. */
     private static final Info DUMMY = new Info("", 1, 1);
 
@@ -101,28 +103,30 @@ class Interpreter extends VisitorAdapter {
         setUberspect(Introspector.getUberspect());
     }
 
-    /** 
+    /**
      * Interpret the given script/expression.
+     * 
      * @param node the script or expression to interpret.
      * @param aContext the context to interpret against.
      * @return the result of the interpretation.
      */
     public Object interpret(SimpleNode node, JexlContext aContext) {
         setContext(aContext);
-        System.out.println("node is: " + node);
         return node.jjtAccept(this, null);
     }
 
     /**
      * sets the uberspect to use for divining bean properties etc.
+     * 
      * @param anUberspect the uberspect.
      */
     public void setUberspect(Uberspect anUberspect) {
         uberspect = anUberspect;
     }
 
-    /** 
+    /**
      * Gets the uberspect.
+     * 
      * @return an {@link Uberspect}
      */
     protected Uberspect getUberspect() {
@@ -131,6 +135,7 @@ class Interpreter extends VisitorAdapter {
 
     /**
      * Sets the context that contain variables.
+     * 
      * @param aContext a {link JexlContext}
      */
     public void setContext(JexlContext aContext) {
@@ -150,7 +155,8 @@ class Interpreter extends VisitorAdapter {
 
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
 
-            // in the event that either is null and not both, then just make the null a 0
+            // in the event that either is null and not both, then just make the
+            // null a 0
             try {
                 double l = Coercion.coercedouble(left);
                 double r = Coercion.coercedouble(right);
@@ -162,7 +168,7 @@ class Interpreter extends VisitorAdapter {
         }
 
         // TODO: support BigDecimal/BigInteger too
-        
+
         // attempt to use Longs
         try {
             long l = Coercion.coercelong(left);
@@ -176,41 +182,40 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTAndNode node, Object data) {
-        node.dump("+");
+
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         boolean leftValue = Coercion.coerceboolean(left);
 
         // coercion rules
-        return (leftValue && Coercion.coerceboolean(
-                node.jjtGetChild(1).jjtAccept(this, data))) ? Boolean.TRUE
-                : Boolean.FALSE;
+        return (leftValue && Coercion.coerceboolean(node.jjtGetChild(1).jjtAccept(this, data))) ? Boolean.TRUE
+            : Boolean.FALSE;
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTArrayAccess node, Object data) {
-        node.dump("+");
         // first child is the identifier
         Object object = node.jjtGetChild(0).jjtAccept(this, data);
-        // can have multiple nodes - either an expression, integer literal or reference
+        // can have multiple nodes - either an expression, integer literal or
+        // reference
         int numChildren = node.jjtGetNumChildren();
         for (int i = 1; i < numChildren; i++) {
             Object index = node.jjtGetChild(i).jjtAccept(this, null);
             object = getAttribute(object, index);
         }
-        
+
         return object;
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTAssignment node, Object data) {
-        node.dump("+");
         // child 0 should be the variable (reference) to assign to
         Node left = node.jjtGetChild(0);
         Object result = null;
         if (left instanceof ASTReference) {
             ASTReference reference = (ASTReference) left;
             left = reference.jjtGetChild(0);
-            // TODO: this only works for a Reference that has a single identifier as it's child
+            // TODO: this only works for a Reference that has a single
+            // identifier as it's child
             if (left instanceof ASTIdentifier) {
                 String identifier = ((ASTIdentifier) left).image;
                 result = node.jjtGetChild(1).jjtAccept(this, data);
@@ -219,7 +224,7 @@ class Interpreter extends VisitorAdapter {
         } else {
             throw new RuntimeException("Trying to assign to something other than a reference: " + left);
         }
-            
+
         return result;
     }
 
@@ -234,16 +239,14 @@ class Interpreter extends VisitorAdapter {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTBitwiseComplNode node, Object data) { 
-        node.dump("+");
+    public Object visit(ASTBitwiseComplNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         long l = Coercion.coercelong(left);
         return new Long(~l);
     }
-    
+
     /** {@inheritDoc} */
-    public Object visit(ASTBitwiseOrNode node, Object data) { 
-        node.dump("+");
+    public Object visit(ASTBitwiseOrNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         long l = Coercion.coercelong(left);
@@ -252,8 +255,7 @@ class Interpreter extends VisitorAdapter {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTBitwiseXorNode node, Object data) { 
-        node.dump("+");
+    public Object visit(ASTBitwiseXorNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         long l = Coercion.coercelong(left);
@@ -263,7 +265,6 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTBlock node, Object data) {
-        node.dump("+");
         int numChildren = node.jjtGetNumChildren();
         Object result = null;
         for (int i = 0; i < numChildren; i++) {
@@ -274,7 +275,7 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTDivNode node, Object data) {
-        node.dump("+");
+
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
@@ -296,7 +297,7 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTEmptyFunction node, Object data) {
-        node.dump("+");
+
         Object o = node.jjtGetChild(0).jjtAccept(this, data);
 
         if (o == null) {
@@ -325,15 +326,15 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTEQNode node, Object data) {
-        node.dump("+");
+
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
-        return equals(left, right) ? Boolean.TRUE : Boolean.FALSE; 
+        return equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTExpression node, Object data) { 
+    public Object visit(ASTExpression node, Object data) {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
@@ -344,19 +345,18 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTFalseNode node, Object data) {
-        node.dump("+");
+
         return Boolean.FALSE;
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTFloatLiteral node, Object data) {
-        node.dump("+");
+
         return Float.valueOf(node.image);
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTForeachStatement node, Object data) {
-        node.dump("+");
 
         Object result = null;
         /* first child is the loop variable */
@@ -368,9 +368,9 @@ class Interpreter extends VisitorAdapter {
         if (iterableValue != null && node.jjtGetNumChildren() >= 3) {
             /* third child is the statement to execute */
             SimpleNode statement = (SimpleNode) node.jjtGetChild(2);
-            // get an iterator for the collection/array etc via the introspector.
-            Iterator itemsIterator = getUberspect().getIterator(
-                    iterableValue, DUMMY);
+            // get an iterator for the collection/array etc via the
+            // introspector.
+            Iterator itemsIterator = getUberspect().getIterator(iterableValue, DUMMY);
             while (itemsIterator.hasNext()) {
                 // set loopVariable to value of iterator
                 Object value = itemsIterator.next();
@@ -384,25 +384,25 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTGENode node, Object data) {
-        node.dump("+");
+
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
-        return greaterThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE; 
+        return greaterThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTGTNode node, Object data) {
-        node.dump("+");
+
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
-        return greaterThan(left, right) ? Boolean.TRUE : Boolean.FALSE; 
+        return greaterThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTIdentifier node, Object data) { 
-        node.dump("+");
+    public Object visit(ASTIdentifier node, Object data) {
+
         String name = node.image;
         if (data == null) {
             return context.getVars().get(name);
@@ -410,10 +410,10 @@ class Interpreter extends VisitorAdapter {
             return getAttribute(data, name);
         }
     }
-    
+
     /** {@inheritDoc} */
     public Object visit(ASTIfStatement node, Object data) {
-        node.dump("+");
+
         Object result = null;
         /* first child is the expression */
         Object expression = node.jjtGetChild(0).jjtAccept(this, data);
@@ -421,7 +421,8 @@ class Interpreter extends VisitorAdapter {
             // first child is true statement
             result = node.jjtGetChild(1).jjtAccept(this, data);
         } else {
-            // if there is a false, execute it. false statement is the second child
+            // if there is a false, execute it. false statement is the second
+            // child
             if (node.jjtGetNumChildren() == 3) {
                 result = node.jjtGetChild(2).jjtAccept(this, data);
             }
@@ -429,7 +430,7 @@ class Interpreter extends VisitorAdapter {
 
         return result;
     }
-    
+
     /** {@inheritDoc} */
     public Object visit(ASTIntegerLiteral node, Object data) {
         Integer value = Integer.valueOf(node.image);
@@ -442,7 +443,7 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTJexlScript node, Object data) {
-        node.dump("+");
+
         int numChildren = node.jjtGetNumChildren();
         Object result = null;
         for (int i = 0; i < numChildren; i++) {
@@ -454,34 +455,34 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTLENode node, Object data) {
-        node.dump("+");
+
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
-        return lessThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE; 
+        return lessThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTLTNode node, Object data) {
-        node.dump("+");
+
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
-        return lessThan(left, right) ? Boolean.TRUE : Boolean.FALSE; 
+        return lessThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTMapEntry node, Object data) {
-        node.dump("+");
-        return new Object[]{
-            (node.jjtGetChild(0)).jjtAccept(this, data),
+
+        return new Object[] { 
+            (node.jjtGetChild(0)).jjtAccept(this, data), 
             (node.jjtGetChild(1)).jjtAccept(this, data) 
         };
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTMapLiteral node, Object data) {
-        node.dump("+");
+
         int childCount = node.jjtGetNumChildren();
         Map map = new HashMap();
 
@@ -495,7 +496,7 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTMethod node, Object data) {
-        node.dump("+"); 
+
         // child 0 is the identifier (method name), the others are parameters.
         // the object to invoke the method on should be in the data argument
         String methodName = ((ASTIdentifier) node.jjtGetChild(0)).image;
@@ -511,7 +512,8 @@ class Interpreter extends VisitorAdapter {
             }
 
             VelMethod vm = getUberspect().getMethod(data, methodName, params, DUMMY);
-            //  DG: If we can't find an exact match, narrow the parameters and try again!
+            // DG: If we can't find an exact match, narrow the parameters and
+            // try again!
             if (vm == null) {
 
                 // replace all numbers with the smallest type that will fit
@@ -543,7 +545,7 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTModNode node, Object data) {
-        node.dump("+");
+
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
@@ -581,7 +583,7 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTMulNode node, Object data) {
-        node.dump("+");
+
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
@@ -592,27 +594,14 @@ class Interpreter extends VisitorAdapter {
 
         // if anything is float, double or string with ( "." | "E" | "e") coerce
         // all to doubles and do it
-        if (left instanceof Float
-            || left instanceof Double
-            || right instanceof Float
-            || right instanceof Double
-            || (left instanceof String 
-                && (((String) left).indexOf(".") != -1 
-                    || ((String) left).indexOf("e") != -1 
-                    || ((String) left).indexOf("E") != -1))
-            || (right instanceof String 
-                && (((String) right).indexOf(".") != -1 
-                    || ((String) right).indexOf("e") != -1 
-                    || ((String) right).indexOf("E") != -1))) {
+        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             Double l = Coercion.coerceDouble(left);
             Double r = Coercion.coerceDouble(right);
 
             return new Double(l.doubleValue() * r.doubleValue());
         }
 
-        /*
-         * otherwise to longs with thee!
-         */
+        // otherwise to longs with thee!
 
         long l = Coercion.coercelong(left);
         long r = Coercion.coercelong(right);
@@ -620,19 +609,18 @@ class Interpreter extends VisitorAdapter {
         return new Long(l * r);
     }
 
-
     /** {@inheritDoc} */
     public Object visit(ASTNENode node, Object data) {
-        node.dump("+");
+
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
-        return equals(left, right) ? Boolean.FALSE : Boolean.TRUE; 
+        return equals(left, right) ? Boolean.FALSE : Boolean.TRUE;
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTNotNode node, Object data) {
-        node.dump("+");
+
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
 
         // coercion rules
@@ -644,30 +632,30 @@ class Interpreter extends VisitorAdapter {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTNullLiteral node, Object data) { 
-        return null; 
+    public Object visit(ASTNullLiteral node, Object data) {
+        return null;
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTOrNode node, Object data) {
-        node.dump("+");
+
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         boolean leftValue = Coercion.coerceboolean(left);
 
         // coercion rules
-        return (leftValue || Coercion.coerceboolean(
-                node.jjtGetChild(1).jjtAccept(this, data))) ? Boolean.TRUE
-                : Boolean.FALSE;
+        return (leftValue || Coercion.coerceboolean(node.jjtGetChild(1).jjtAccept(this, data))) ? Boolean.TRUE
+            : Boolean.FALSE;
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTReference node, Object data) {
         // could be array access, identifier or map literal
-        // followed by zero or more ("." and array access, method, size, identifier or integer literal)
-        node.dump("+");
+        // followed by zero or more ("." and array access, method, size,
+        // identifier or integer literal)
+
         int numChildren = node.jjtGetNumChildren();
 
-        // pass  first piece of data in and loop through children
+        // pass first piece of data in and loop through children
         Object result = null;
         StringBuffer variableName = new StringBuffer();
         boolean isVariable = true;
@@ -679,25 +667,25 @@ class Interpreter extends VisitorAdapter {
             if (result == null && isVariable) {
                 if (i != 0) {
                     variableName.append('.');
-                } 
+                }
                 String name = ((ASTIdentifier) theNode).image;
                 variableName.append(name);
                 result = context.getVars().get(variableName.toString());
             }
         }
-        
-        return result;            
+
+        return result;
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTReferenceExpression node, Object data) {
-        node.dump("+");
+
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTSizeFunction node, Object data) {
-        node.dump("+");
+
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
 
         if (val == null) {
@@ -709,13 +697,13 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTSizeMethod node, Object data) {
-        node.dump("+");
+
         return new Integer(sizeOf(data));
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTStatementExpression node, Object data) {
-        node.dump("+");
+
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
@@ -726,7 +714,7 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTSubtractNode node, Object data) {
-        node.dump("+");
+
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
@@ -739,7 +727,8 @@ class Interpreter extends VisitorAdapter {
         // all to doubles and do it
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
 
-            // in the event that either is null and not both, then just make the null a 0
+            // in the event that either is null and not both, then just make the
+            // null a 0
             double l = Coercion.coercedouble(left);
             double r = Coercion.coercedouble(right);
             return new Double(l - r);
@@ -760,7 +749,7 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTUnaryMinusNode node, Object data) {
-        node.dump("+");
+
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
 
         if (val instanceof Byte) {
@@ -793,7 +782,7 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTWhileStatement node, Object data) {
-        node.dump("+");
+
         Object result = null;
         /* first child is the expression */
         Node expressionNode = (Node) node.jjtGetChild(0);
@@ -805,7 +794,7 @@ class Interpreter extends VisitorAdapter {
         return result;
     }
 
-// other stuff    
+    // other stuff
 
     /**
      * Given a Number, return back the value using the smallest type the result
@@ -813,7 +802,7 @@ class Interpreter extends VisitorAdapter {
      * method calls, e.g. a call to substring(int,int) with an int and a long
      * will fail, but a call to substring(int,int) with an int and a short will
      * succeed.
-     *
+     * 
      * @param original the original number.
      * @return a value of the smallest type the original number will fit into.
      * @since 1.1
@@ -845,9 +834,9 @@ class Interpreter extends VisitorAdapter {
     }
 
     /**
-     * Calculate the <code>size</code> of various types: Collection, Array, Map, String,
-     * and anything that has a int size() method.
-     *
+     * Calculate the <code>size</code> of various types: Collection, Array,
+     * Map, String, and anything that has a int size() method.
+     * 
      * @param val the object to get the size of.
      * @return the size of val
      */
@@ -865,7 +854,7 @@ class Interpreter extends VisitorAdapter {
             // integer
             // and if so, just use it
             Object[] params = new Object[0];
-            //Info velInfo = new Info("", 1, 1);
+            // Info velInfo = new Info("", 1, 1);
             VelMethod vm = uberspect.getMethod(val, "size", params, DUMMY);
             if (vm != null && vm.getReturnType() == Integer.TYPE) {
                 Integer result;
@@ -879,14 +868,16 @@ class Interpreter extends VisitorAdapter {
             throw new IllegalArgumentException("size() : unknown type : " + val.getClass());
         }
     }
-    
+
     /**
-     * Test if the passed value is a floating point number, i.e. a float, double or string with ( "." | "E" | "e").
+     * Test if the passed value is a floating point number, i.e. a float, double
+     * or string with ( "." | "E" | "e").
+     * 
      * @param val the object to be tested
      * @return true if it is, false otherwise.
      */
     private boolean isFloatingPointNumber(Object val) {
-        if (val instanceof Float  || val instanceof Double) {
+        if (val instanceof Float || val instanceof Double) {
             return true;
         }
         if (val instanceof String) {
@@ -896,12 +887,12 @@ class Interpreter extends VisitorAdapter {
         return false;
     }
 
-
     /**
-     * Get an attribute of an object. 
-     * @param object to retrieve value from  
+     * Get an attribute of an object.
+     * 
+     * @param object to retrieve value from
      * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or
-     *      key for a map
+     *            key for a map
      * @return the attribute.
      */
     private Object getAttribute(Object object, Object attribute) {
@@ -948,6 +939,7 @@ class Interpreter extends VisitorAdapter {
 
     /**
      * Test if left and right are equal.
+     * 
      * @param left first value
      * @param right second value
      * @return test result.
@@ -965,18 +957,17 @@ class Interpreter extends VisitorAdapter {
             return false;
         } else if (left.getClass().equals(right.getClass())) {
             return left.equals(right);
-        } else if (left instanceof Float || left instanceof Double
-                || right instanceof Float || right instanceof Double) {
+        } else if (left instanceof Float || left instanceof Double 
+            || right instanceof Float || right instanceof Double) {
             Double l = Coercion.coerceDouble(left);
             Double r = Coercion.coerceDouble(right);
 
             return l.equals(r);
-        } else if (left instanceof Number || right instanceof Number
-                || left instanceof Character || right instanceof Character) {
+        } else if (left instanceof Number || right instanceof Number || left instanceof Character
+            || right instanceof Character) {
             return Coercion.coerceLong(left).equals(Coercion.coerceLong(right));
         } else if (left instanceof Boolean || right instanceof Boolean) {
-            return Coercion.coerceBoolean(left).equals(
-                    Coercion.coerceBoolean(right));
+            return Coercion.coerceBoolean(left).equals(Coercion.coerceBoolean(right));
         } else if (left instanceof java.lang.String || right instanceof String) {
             return left.toString().equals(right.toString());
         }
@@ -986,6 +977,7 @@ class Interpreter extends VisitorAdapter {
 
     /**
      * Test if left < right.
+     * 
      * @param left first value
      * @param right second value
      * @return test result.
@@ -993,8 +985,7 @@ class Interpreter extends VisitorAdapter {
     private boolean lessThan(Object left, Object right) {
         if ((left == right) || (left == null) || (right == null)) {
             return false;
-        } else if (Coercion.isFloatingPoint(left)
-                || Coercion.isFloatingPoint(right)) {
+        } else if (Coercion.isFloatingPoint(left) || Coercion.isFloatingPoint(right)) {
             double leftDouble = Coercion.coerceDouble(left).doubleValue();
             double rightDouble = Coercion.coerceDouble(right).doubleValue();
 
@@ -1015,13 +1006,14 @@ class Interpreter extends VisitorAdapter {
             return ((Comparable) right).compareTo(left) > 0;
         }
 
-        throw new IllegalArgumentException("Invalid comparison : comparing cardinality for left: " 
-            + left + " and right: " + right);
+        throw new IllegalArgumentException("Invalid comparison : comparing cardinality for left: " + left
+            + " and right: " + right);
 
     }
-    
+
     /**
      * Test if left > right.
+     * 
      * @param left first value
      * @param right second value
      * @return test result.
@@ -1035,6 +1027,7 @@ class Interpreter extends VisitorAdapter {
 
     /**
      * Test if left <= right.
+     * 
      * @param left first value
      * @param right second value
      * @return test result.
@@ -1045,6 +1038,7 @@ class Interpreter extends VisitorAdapter {
 
     /**
      * Test if left >= right.
+     * 
      * @param left first value
      * @param right second value
      * @return test result.
