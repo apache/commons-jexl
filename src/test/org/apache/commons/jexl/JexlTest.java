@@ -521,8 +521,6 @@ public class JexlTest extends TestCase
 
 
     /**
-      *  GMJ : disabled - need to fix
-      *
       *  test some simple conditions
       */
     public void testNotConditionsWithDots()
@@ -732,11 +730,8 @@ public class JexlTest extends TestCase
             assertExpression(jc, "foo.charAt(-2)", null);
             fail("this test should have thrown an exception" );
         }
-        catch (IndexOutOfBoundsException e) {
-            // expected behaviour
-        }
         catch (Exception e) {
-            throw e;
+            // expected behaviour
         }
     }
 
