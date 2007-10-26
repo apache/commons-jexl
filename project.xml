@@ -22,7 +22,7 @@
   <groupId>commons-jexl</groupId>
   <artifactId>commons-jexl</artifactId>
   <inceptionYear>2003</inceptionYear>
-  <currentVersion>SNAPSHOT</currentVersion>
+  <currentVersion>2.0-SNAPSHOT</currentVersion>
   <name>Commons JEXL</name>
   <shortDescription>Commons JEXL Expression Language Engine</shortDescription>
   <description>Jexl is an implementation of the JSTL Expression Language with extensions.</description>
