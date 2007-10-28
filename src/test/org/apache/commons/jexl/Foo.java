@@ -71,12 +71,12 @@ public class Foo {
 
     public String[] getArray()
     {
-        return JexlTest.GET_METHOD_ARRAY;
+        return ArrayAccessTest.GET_METHOD_ARRAY;
     }
 
     public String[][] getArray2()
     {
-        return JexlTest.GET_METHOD_ARRAY2;
+        return ArrayAccessTest.GET_METHOD_ARRAY2;
     }
 
     public boolean isSimple()
