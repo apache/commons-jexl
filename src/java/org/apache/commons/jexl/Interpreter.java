@@ -686,7 +686,6 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTSizeFunction node, Object data) {
-
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
 
         if (val == null) {
@@ -698,13 +697,11 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTSizeMethod node, Object data) {
-
         return new Integer(sizeOf(data));
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTStatementExpression node, Object data) {
-
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
@@ -783,7 +780,6 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTWhileStatement node, Object data) {
-
         Object result = null;
         /* first child is the expression */
         Node expressionNode = (Node) node.jjtGetChild(0);
