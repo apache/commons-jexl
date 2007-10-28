@@ -68,14 +68,21 @@ public class BooleanPropertyExecutor extends PropertyExecutor {
             sb = new StringBuffer("is");
             sb.append(property);
 
-            c = sb.charAt(2);
-
-            if (Character.isLowerCase(c)) {
-                sb.setCharAt(2, Character.toUpperCase(c));
-            }
-
             methodUsed = sb.toString();
             method = introspector.getMethod(clazz, methodUsed, params);
+
+            if (null == method) {
+                c = sb.charAt(2);
+
+                if (Character.isLowerCase(c)) {
+                    sb.setCharAt(2, Character.toUpperCase(c));
+                } else {
+                    sb.setCharAt(2, Character.toLowerCase(c));
+                }
+
+                methodUsed = sb.toString();
+                method = introspector.getMethod(clazz, methodUsed, params);
+            }
 
             if (method != null) {
                 /*
@@ -88,8 +95,13 @@ public class BooleanPropertyExecutor extends PropertyExecutor {
 
                 method = null;
             }
+            /**
+             * pass through application level runtime exceptions
+             */
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            rlog.error("PROGRAMMER ERROR : BooleanPropertyExector() : " + e);
+            rlog.error("PROGRAMMER ERROR : BooleanPropertyExector() : " + e, e);
         }
     }
 }
