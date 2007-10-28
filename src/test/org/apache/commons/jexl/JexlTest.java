@@ -17,8 +17,6 @@
 package org.apache.commons.jexl;
 
 import java.io.StringReader;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -250,35 +248,6 @@ public class JexlTest extends TestCase
         //assertExpression(jc, "foo.size", new Integer(22));
     }
 
-   /**
-    *  test some simple mathematical calculations
-    */
-   public void testUnaryMinus()
-        throws Exception
-   {
-       JexlContext jc = JexlHelper.createContext();
-
-       jc.getVars().put("aByte", new Byte((byte)1));
-       jc.getVars().put("aShort", new Short((short)2));
-       jc.getVars().put("anInteger", new Integer(3));
-       jc.getVars().put("aLong", new Long(4));
-       jc.getVars().put("aFloat", new Float(5.5));
-       jc.getVars().put("aDouble", new Double(6.6));
-       jc.getVars().put("aBigInteger", new BigInteger("7"));
-       jc.getVars().put("aBigDecimal", new BigDecimal("8.8"));
-       assertExpression(jc, "-3", new Integer("-3"));
-       assertExpression(jc, "-3.0", new Float("-3.0"));
-       assertExpression(jc, "-aByte", new Byte((byte)-1));
-       assertExpression(jc, "-aShort", new Short((short)-2));
-       assertExpression(jc, "-anInteger", new Integer(-3));
-       assertExpression(jc, "-aLong", new Long(-4));
-       assertExpression(jc, "-aFloat", new Float(-5.5));
-       assertExpression(jc, "-aDouble", new Double(-6.6));
-       assertExpression(jc, "-aBigInteger", new BigInteger("-7"));
-       assertExpression(jc, "-aBigDecimal", new BigDecimal("-8.8"));
-   }
-
-    
     /**
       *  test some simple mathematical calculations
       */
@@ -286,31 +255,6 @@ public class JexlTest extends TestCase
          throws Exception
     {
         JexlContext jc = JexlHelper.createContext();
-
-        jc.getVars().put("foo", new Integer(2) );
-
-        assertExpression(jc, "foo + 2", new Long(4));
-        assertExpression(jc, "3 + 3", new Long(6));
-        assertExpression(jc, "3 + 3 + foo", new Long(8));
-        assertExpression(jc, "3 * 3", new Long(9));
-        assertExpression(jc, "3 * 3 + foo", new Long(11));
-        assertExpression(jc, "3 * 3 - foo", new Long(7));
-
-        /*
-         * test some floaty stuff
-         */
-        assertExpression(jc, "3 * \"3.0\"", new Double(9));
-        assertExpression(jc, "3 * 3.0", new Double(9));
-
-        /*
-         *  test / and %
-         */
-        assertExpression(jc, "6 / 3", new Double(6/3));
-        assertExpression(jc, "6.4 / 3", new Double(6.4 / 3));
-        assertExpression(jc, "0 / 3", new Double(0 / 3));
-        assertExpression(jc, "3 / 0", new Double(0));
-        assertExpression(jc, "4 % 3", new Long(1));
-        assertExpression(jc, "4.8 % 3", new Double(4.8 % 3));
 
         /*
          * test to ensure new string cat works
