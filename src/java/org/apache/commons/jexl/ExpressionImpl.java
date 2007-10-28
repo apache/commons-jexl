@@ -17,7 +17,6 @@
 
 package org.apache.commons.jexl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.jexl.parser.SimpleNode;
@@ -72,60 +71,7 @@ class ExpressionImpl implements Expression {
      * {@inheritDoc}
      */
     public Object evaluate(JexlContext context) throws Exception {
-        Object val = null;
-
-        /*
-         * if we have pre resolvers, give them a wack
-         */
-        if (preResolvers != null) {
-            val = tryResolver(preResolvers, context);
-
-            if (val != JexlExprResolver.NO_VALUE) {
-                return val;
-            }
-        }
-
-        val = interpreter.interpret(node, context);
-
-        /*
-         * if null, call post resolvers
-         */
-        if (val == null && postResolvers != null) {
-            val = tryResolver(postResolvers, context);
-
-            if (val != JexlExprResolver.NO_VALUE) {
-                return val;
-            }
-        }
-
-        return val;
-    }
-
-    /**
-     * Tries the resolvers in the given resolverlist against the context.
-     *
-     * @param resolverList list of JexlExprResolvers
-     * @param context JexlContext to use for evauluation
-     * @return value (including null) or JexlExprResolver.NO_VALUE
-     */
-    protected Object tryResolver(List resolverList, JexlContext context) {
-        Object val = JexlExprResolver.NO_VALUE;
-        String expr = getExpression();
-
-        for (int i = 0; i < resolverList.size(); i++) {
-            JexlExprResolver jer = (JexlExprResolver) resolverList.get(i);
-
-            val = jer.evaluate(context, expr);
-
-            /*
-             * as long as it's not NO_VALUE, return it
-             */
-            if (val != JexlExprResolver.NO_VALUE) {
-                return val;
-            }
-        }
-
-        return val;
+        return interpreter.interpret(node, context);
     }
 
     /**
@@ -133,26 +79,6 @@ class ExpressionImpl implements Expression {
      */
     public String getExpression() {
         return expression;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void addPreResolver(JexlExprResolver resolver) {
-        if (preResolvers == null) {
-            preResolvers = new ArrayList();
-        }
-        preResolvers.add(resolver);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void addPostResolver(JexlExprResolver resolver) {
-        if (postResolvers == null) {
-            postResolvers = new ArrayList();
-        }
-        postResolvers.add(resolver);
     }
 
     /**

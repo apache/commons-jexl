@@ -36,7 +36,6 @@ import junit.framework.TestSuite;
 
 import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
-import org.apache.commons.jexl.resolver.FlatResolver;
 
 /**
  *  Simple testcases
@@ -773,50 +772,6 @@ public class JexlTest extends TestCase
         assertExpression(jc, "2 < '1'", Boolean.FALSE);
         assertExpression(jc, "2 <= '1'", Boolean.FALSE);
         assertExpression(jc, "2 <= '2'", Boolean.TRUE);
-}
-
-    public void testResolver()
-        throws Exception
-    {
-        /*
-         * first, a simple override
-         */
-
-        Expression expr = ExpressionFactory.createExpression("foo.bar");
-        expr.addPreResolver(new FlatResolver());
-
-        JexlContext jc = JexlHelper.createContext();
-        Foo foo = new Foo();
-        jc.getVars().put("foo.bar", "flat value");
-        jc.getVars().put("foo", foo );
-
-        Object o = expr.evaluate(jc);
-        assertEquals("flat override", "flat value", o);
-
-        /*
-         * now, let the resolver not find it and have it drop to jexl
-         */
-        expr = ExpressionFactory.createExpression("foo.bar.length()");
-        expr.addPreResolver(new FlatResolver());
-        o = expr.evaluate(jc);
-        assertEquals("flat override 1", new Integer(GET_METHOD_STRING.length()), o);
-
-        /*
-         * now, let the resolver not find it and NOT drop to jexl
-         */
-
-        expr = ExpressionFactory.createExpression("foo.bar.length()");
-        expr.addPreResolver(new FlatResolver(false));
-        o = expr.evaluate(jc);
-        assertEquals("flat override 2", o, null);
-        
-        // now for a post resolver
-        expr = ExpressionFactory.createExpression("foo.bar.baz");
-        Long result = new Long(1);
-        jc.getVars().put("foo.bar.baz", result);
-        expr.addPostResolver(new FlatResolver());
-        assertEquals("flat override", result, expr.evaluate(jc));
-
     }
 
     /**

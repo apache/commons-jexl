@@ -98,7 +98,7 @@ public class ScriptFactoryTest extends TestCase {
      * @throws Exception on a parse error.
      */
     public void testCreateFromURL() throws Exception {
-        URL testUrl = new File("src/test-scripts/test1.jexl").toURL();
+        URL testUrl = new File("src/test-scripts/test1.jexl").toURI().toURL();
         assertNotNull("No script created", ScriptFactory.createScript(testUrl));
     }
 
