@@ -122,5 +122,27 @@ public class ArrayAccessTest extends TestCase {
         asserter.assertExpression("foo.array2[1][1]", GET_METHOD_ARRAY2[1][1]);
         // asserter.assertExpression("foo.array2.1.1", GET_METHOD_ARRAY2[1][1]);
     }
+    
+    // This is JEXL-26
+    public void testArrayAndDottedConflict() throws Exception {
+        Object[] objects = new Object[] {"an", "array", new Long(0)};
+        
+        asserter.setVariable("objects", objects);
+        asserter.setVariable("status", "Enabled");
+        asserter.assertExpression("objects[1].status", null);
+        
+        asserter.setVariable("base.status", "Ok");
+        asserter.assertExpression("base.objects[1].status", null);
+    }
 
+    public void testArrayMethods() throws Exception {
+        Object[] objects = new Object[] {"an", "array", new Long(0)};
+        
+        asserter.setVariable("objects", objects);
+        asserter.assertExpression("objects.get(1)", "array");
+        asserter.assertExpression("objects.size()", new Integer(3));
+        // setting an index returns the old value
+        asserter.assertExpression("objects.set(1, 'dion')", "array");
+        asserter.assertExpression("objects[1]", "dion");
+    }
 }
