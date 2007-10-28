@@ -416,6 +416,15 @@ public class JexlTest extends TestCase
         assertExpression(jc, "empty(foo)", Boolean.TRUE);
     }
 
+    /** 
+     * test quoting in strings 
+     */
+    public void testStringQuoting() throws Exception {
+        JexlContext jc = JexlHelper.createContext();
+        assertExpression(jc, "'\"Hello\"'", "\"Hello\"");
+        assertExpression(jc, "\"I'm testing\"", "I'm testing");
+    }
+    
     /**
       *  test some blank strings
       */
