@@ -1025,6 +1025,8 @@ class Interpreter extends VisitorAdapter {
             return false;
         } else if (left.getClass().equals(right.getClass())) {
             return left.equals(right);
+        } else if (left instanceof BigDecimal || right instanceof BigDecimal) {
+            return Coercion.coerceBigDecimal(left).compareTo(Coercion.coerceBigDecimal(right)) == 0;
         } else if (isFloatingPointType(left, right)) {
             Double l = Coercion.coerceDouble(left);
             Double r = Coercion.coerceDouble(right);
@@ -1067,6 +1069,10 @@ class Interpreter extends VisitorAdapter {
             double rightDouble = Coercion.coerceDouble(right).doubleValue();
 
             return leftDouble < rightDouble;
+            } else if (left instanceof BigDecimal || right instanceof BigDecimal) {
+                BigDecimal l  = Coercion.coerceBigDecimal(left);
+                BigDecimal r  = Coercion.coerceBigDecimal(right);
+                return l.compareTo(r) < 0;
         } else if (Coercion.isNumberable(left) || Coercion.isNumberable(right)) {
             long leftLong = Coercion.coerceLong(left).longValue();
             long rightLong = Coercion.coerceLong(right).longValue();
