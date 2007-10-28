@@ -118,8 +118,8 @@ class Interpreter extends VisitorAdapter {
     }
 
     /**
-     * TODO: Does this need to be a setter.
-     * sets the uberspect to use for divining bean properties etc.
+     * TODO: Does this need to be a setter. sets the uberspect to use for
+     * divining bean properties etc.
      * 
      * @param anUberspect the uberspect.
      */
@@ -169,8 +169,20 @@ class Interpreter extends VisitorAdapter {
                 return left.toString().concat(right.toString());
             }
         }
+        
+        if (left instanceof BigDecimal || right instanceof BigDecimal) {
+            // coerce both to big decimal and add
+            BigDecimal l = Coercion.coerceBigDecimal(left);
+            BigDecimal r = Coercion.coerceBigDecimal(right);
+            return l.add(r);
+        }
 
-        // TODO: support BigDecimal/BigInteger too
+        if (left instanceof BigInteger || right instanceof BigInteger) {
+            // coerce both to big decimal and add
+            BigInteger l = Coercion.coerceBigInteger(left);
+            BigInteger r = Coercion.coerceBigInteger(right);
+            return l.add(r);
+        }
 
         // attempt to use Longs
         try {
@@ -285,6 +297,20 @@ class Interpreter extends VisitorAdapter {
         // the spec says 'and', I think 'or'
         if (left == null && right == null) {
             return new Byte((byte) 0);
+        }
+
+        if (left instanceof BigDecimal || right instanceof BigDecimal) {
+            // coerce both to big decimal and add
+            BigDecimal l = Coercion.coerceBigDecimal(left);
+            BigDecimal r = Coercion.coerceBigDecimal(right);
+            return l.divide(r, BigDecimal.ROUND_HALF_UP);
+        }
+
+        if (left instanceof BigInteger || right instanceof BigInteger) {
+            // coerce both to big decimal and add
+            BigInteger l = Coercion.coerceBigInteger(left);
+            BigInteger r = Coercion.coerceBigInteger(right);
+            return l.divide(r);
         }
 
         Double l = Coercion.coerceDouble(left);
@@ -476,11 +502,9 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTMapEntry node, Object data) {
-
-        return new Object[] { 
-            (node.jjtGetChild(0)).jjtAccept(this, data), 
-            (node.jjtGetChild(1)).jjtAccept(this, data) 
-        };
+        Object key = node.jjtGetChild(0).jjtAccept(this, data);
+        Object value = node.jjtGetChild(1).jjtAccept(this, data); 
+        return new Object[] {key, value};
     }
 
     /** {@inheritDoc} */
@@ -571,6 +595,23 @@ class Interpreter extends VisitorAdapter {
             return new Double(l.doubleValue() % r.doubleValue());
         }
 
+        if (left instanceof BigDecimal || right instanceof BigDecimal) {
+            // coerce both to big decimal and add
+            BigDecimal l = Coercion.coerceBigDecimal(left);
+            BigDecimal r = Coercion.coerceBigDecimal(right);
+            BigInteger intDiv = l.divide(r, BigDecimal.ROUND_HALF_UP).toBigInteger();
+            BigInteger intValue = (r.multiply(new BigDecimal(intDiv))).toBigInteger();
+            BigDecimal remainder = new BigDecimal(l.subtract(new BigDecimal(intValue)).toBigInteger());
+            return remainder;
+        }
+
+        if (left instanceof BigInteger || right instanceof BigInteger) {
+            // coerce both to big decimal and add
+            BigInteger l = Coercion.coerceBigInteger(left);
+            BigInteger r = Coercion.coerceBigInteger(right);
+            return l.mod(r);
+        }
+
         // otherwise to longs with thee!
 
         long l = Coercion.coercelong(left);
@@ -602,6 +643,20 @@ class Interpreter extends VisitorAdapter {
             Double r = Coercion.coerceDouble(right);
 
             return new Double(l.doubleValue() * r.doubleValue());
+        }
+
+        if (left instanceof BigDecimal || right instanceof BigDecimal) {
+            // coerce both to big decimal and add
+            BigDecimal l = Coercion.coerceBigDecimal(left);
+            BigDecimal r = Coercion.coerceBigDecimal(right);
+            return l.multiply(r);
+        }
+
+        if (left instanceof BigInteger || right instanceof BigInteger) {
+            // coerce both to big decimal and add
+            BigInteger l = Coercion.coerceBigInteger(left);
+            BigInteger r = Coercion.coerceBigInteger(right);
+            return l.multiply(r);
         }
 
         // otherwise to longs with thee!
@@ -734,6 +789,20 @@ class Interpreter extends VisitorAdapter {
             return new Double(l - r);
         }
 
+        if (left instanceof BigDecimal || right instanceof BigDecimal) {
+            // coerce both to big decimal and add
+            BigDecimal l = Coercion.coerceBigDecimal(left);
+            BigDecimal r = Coercion.coerceBigDecimal(right);
+            return l.subtract(r);
+        }
+
+        if (left instanceof BigInteger || right instanceof BigInteger) {
+            // coerce both to big decimal and add
+            BigInteger l = Coercion.coerceBigInteger(left);
+            BigInteger r = Coercion.coerceBigInteger(right);
+            return l.subtract(r);
+        }
+        
         // otherwise to longs with thee!
 
         long l = Coercion.coercelong(left);
@@ -956,8 +1025,7 @@ class Interpreter extends VisitorAdapter {
             return false;
         } else if (left.getClass().equals(right.getClass())) {
             return left.equals(right);
-        } else if (left instanceof Float || left instanceof Double 
-            || right instanceof Float || right instanceof Double) {
+        } else if (isFloatingPointType(left, right)) {
             Double l = Coercion.coerceDouble(left);
             Double r = Coercion.coerceDouble(right);
 
@@ -972,6 +1040,16 @@ class Interpreter extends VisitorAdapter {
         }
 
         return left.equals(right);
+    }
+
+    /**
+     * Test if either left or right are either a Float or Double.
+     * @param left one object to test
+     * @param right the other
+     * @return the result of the test.
+     */
+    private boolean isFloatingPointType(Object left, Object right) {
+        return left instanceof Float || left instanceof Double || right instanceof Float || right instanceof Double;
     }
 
     /**
