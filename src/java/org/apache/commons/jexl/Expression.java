@@ -52,20 +52,4 @@ public interface Expression {
      */
     String getExpression();
 
-    /**
-     * Allows addition of a resolver to allow custom interdiction of
-     * expression evaluation.
-     *
-     * @param resolver resolver to be called before Jexl expression evaluated
-     */
-    void addPreResolver(JexlExprResolver resolver);
-
-    /**
-     * Allows addition of a resolver to allow custom interdiction of
-     * expression evaluation.
-     *
-     * @param resolver resolver to be called if Jexl expression
-     *  evaluated to null.
-     */
-    void addPostResolver(JexlExprResolver resolver);
 }
