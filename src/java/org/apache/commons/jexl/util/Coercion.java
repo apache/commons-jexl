@@ -16,6 +16,9 @@
  */
 package org.apache.commons.jexl.util;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 /**
  *  Coercion utilities for the JSTL EL-like coercion.
  *
@@ -138,6 +141,60 @@ public class Coercion {
      */
     public static Double coerceDouble(Object val) {
         return new Double(coercedouble(val));
+    }
+    
+    /**
+     * Get a BigInteger from the object passed.
+     * Null and empty string maps to zero.
+     * @param val the object to be coerced.
+     * @return a BigDecimal.
+     */
+    public static BigInteger coerceBigInteger(Object val) {
+        if (val instanceof BigInteger) {
+            return (BigInteger) val;
+        } else if (val == null) {
+            return BigInteger.valueOf(0);
+        } else if (val instanceof String) {
+            String string = (String) val;
+            if ("".equals(string.trim())) {
+                return BigInteger.valueOf(0);
+            }
+            return new BigInteger(string);
+        } else if (val instanceof Number) {
+            return new BigInteger(val.toString());
+        } else if (val instanceof Character) {
+            int i = ((Character) val).charValue();
+            return BigInteger.valueOf(i);
+        }
+        
+        throw new IllegalArgumentException("BigInteger coercion. Can't coerce type " + val.getClass().getName());
+    }
+    
+    /**
+     * Get a BigDecimal from the object passed.
+     * Null and empty string maps to zero.
+     * @param val the object to be coerced.
+     * @return a BigDecimal.
+     */
+    public static BigDecimal coerceBigDecimal(Object val) {
+        if (val instanceof BigDecimal) {
+            return (BigDecimal) val;
+        } else if (val == null) {
+            return BigDecimal.valueOf(0);
+        } else if (val instanceof String) {
+            String string = (String) val;
+            if ("".equals(string.trim())) {
+                return BigDecimal.valueOf(0);
+            }
+            return new BigDecimal(string);
+        } else if (val instanceof Number) {
+            return new BigDecimal(val.toString());
+        } else if (val instanceof Character) {
+            int i = ((Character) val).charValue();
+            return new BigDecimal(i);
+        }
+        
+        throw new IllegalArgumentException("BigDecimal coercion. Can't coerce type " + val.getClass().getName());
     }
     
     /**
