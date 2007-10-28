@@ -17,6 +17,8 @@
 package org.apache.commons.jexl;
 
 import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
@@ -115,6 +117,8 @@ public class JexlTest extends TestCase
         jc.getVars().put("now", Calendar.getInstance().getTime());
         GregorianCalendar gc = new GregorianCalendar(5000, 11, 20);
         jc.getVars().put("now2", gc.getTime());
+        jc.getVars().put("bdec", new BigDecimal(7));
+        jc.getVars().put("bint", new BigInteger("7"));
 
         assertExpression(jc, "a == b", Boolean.FALSE);
         assertExpression(jc, "a==true", Boolean.TRUE);
@@ -152,6 +156,15 @@ public class JexlTest extends TestCase
 
         assertExpression(jc, "\"foo\" + \"bar\" == \"foobar\"", Boolean.TRUE);
 
+        assertExpression(jc, "bdec > num", Boolean.TRUE);
+        assertExpression(jc, "bdec >= num", Boolean.TRUE);
+        assertExpression(jc, "num <= bdec", Boolean.TRUE);
+        assertExpression(jc, "num < bdec", Boolean.TRUE);
+        assertExpression(jc, "bint > num", Boolean.TRUE);
+        assertExpression(jc, "bint == bdec", Boolean.TRUE);
+        assertExpression(jc, "bint >= num", Boolean.TRUE);
+        assertExpression(jc, "num <= bint", Boolean.TRUE);
+        assertExpression(jc, "num < bint", Boolean.TRUE);
     }
 
     public void testEmpty()
