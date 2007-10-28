@@ -88,20 +88,6 @@ public class JexlTest extends TestCase
     /**
       *  test a simple method expression
       */
-    public void testMethod()
-         throws Exception
-    {
-        /*
-         *  tests a simple method expression
-         */
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("foo", new Foo() );
-        assertExpression(jc, "foo.bar()", METHOD_STRING);
-    }
-
-    /**
-      *  test a simple method expression
-      */
     public void testArrayAccess()
          throws Exception
     {
@@ -155,17 +141,6 @@ public class JexlTest extends TestCase
         assertExpression(jc, "foo[\"bar\"]", GET_METHOD_STRING);
         assertExpression(jc, "foo[\"bar\"] == foo.bar", Boolean.TRUE);
 
-    }
-
-    public void testMulti()
-         throws Exception
-    {
-        /*
-         *  tests a simple property expression
-         */
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("foo", new Foo() );
-        assertExpression(jc, "foo.innerFoo.bar()", METHOD_STRING);
     }
 
     public void testBoolean()
@@ -338,25 +313,6 @@ public class JexlTest extends TestCase
         // failing assertion for size property
         //assertExpression(jc, "foo.size", new Integer(22));
     }
-
-    /**
-      *  test some String method calls
-      */
-    public void testStringMethods()
-         throws Exception
-    {
-        JexlContext jc = JexlHelper.createContext();
-
-        jc.getVars().put("foo", "abcdef");
-
-        assertExpression(jc, "foo.substring(3)", "def");
-        assertExpression(jc, "foo.substring(0,(size(foo)-3))", "abc");
-        assertExpression(jc, "foo.substring(0,size(foo)-3)", "abc");
-        assertExpression(jc, "foo.substring(0,foo.length()-3)", "abc");
-        assertExpression(jc, "foo.substring(0, 1+1)", "ab");
-    }
-
-
 
    /**
     *  test some simple mathematical calculations
@@ -830,23 +786,6 @@ public class JexlTest extends TestCase
         assertExpression(jc, "first + ' ' + second", "Hello World");
     }
 
-    /**
-     * Ensures static methods on objects can be called.
-     */
-    public void testStaticMethodInvocation() throws Exception
-    {
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("aBool", Boolean.FALSE);
-        assertExpression(jc, "aBool.valueOf('true')", Boolean.TRUE);
-    }
-    
-    public void testStaticMethodInvocationOnClasses() throws Exception
-    {
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("Boolean", Boolean.class);
-        assertExpression(jc, "Boolean.valueOf('true')", Boolean.TRUE);        
-    }
-    
     public void testToString() throws Exception {
         String code = "abcd";
         Expression expr = ExpressionFactory.createExpression(code);
