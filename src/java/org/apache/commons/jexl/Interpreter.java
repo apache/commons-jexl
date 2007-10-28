@@ -82,7 +82,9 @@ import org.apache.commons.jexl.util.introspection.VelMethod;
 import org.apache.commons.jexl.util.introspection.VelPropertyGet;
 
 /**
- * Starting point for an interpreter of JEXL syntax.
+ * An interpreter of JEXL syntax.
+ * 
+ * @since 2.0
  */
 class Interpreter extends VisitorAdapter {
 
