@@ -20,6 +20,8 @@ package org.apache.commons.jexl.parser;
 /**
  * Implementation of the ParserVisitor that dumps the current node and it's
  * children and then visits them.
+ * 
+ * @since 2.0
  */
 public class VisitorAdapter implements ParserVisitor {
 
