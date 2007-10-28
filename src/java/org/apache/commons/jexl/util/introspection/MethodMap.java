@@ -26,31 +26,39 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
  * @author <a href="mailto:Christoph.Reck@dlr.de">Christoph Reck</a>
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
- * @since 1.0
  * @version $Id$
+ * @since 1.0
  */
 public class MethodMap {
-    /** whether a method is more specific than a previously compared one. */
+    /**
+     * whether a method is more specific than a previously compared one.
+     */
     private static final int MORE_SPECIFIC = 0;
-    /** whether a method is less specific than a previously compared one. */
+    /**
+     * whether a method is less specific than a previously compared one.
+     */
     private static final int LESS_SPECIFIC = 1;
-    /** A method doesn't match a previously compared one. */
+    /**
+     * A method doesn't match a previously compared one.
+     */
     private static final int INCOMPARABLE = 2;
 
     /**
      * Keep track of all methods with the same name.
      */
-    protected Map methodByNameMap = new Hashtable();
+    // CSOFF: VisibilityModifier
+    Map methodByNameMap = new Hashtable();
+    // CSON: VisibilityModifier
 
     /**
      * Add a method to a list of methods by name. For a particular class we are
      * keeping track of all the methods with the same name.
+     *
      * @param method the method.
      */
     public void add(Method method) {
@@ -68,9 +76,9 @@ public class MethodMap {
 
     /**
      * Return a list of methods with the same name.
-     * 
-     * @param key The method name.
-     * @return List list of methods
+     *
+     * @param key the name.
+     * @return List list of methods.
      */
     public List get(String key) {
         return (List) methodByNameMap.get(key);
@@ -78,28 +86,35 @@ public class MethodMap {
 
     /**
      * <p>
-     * Find a method. Attempts to find the most specific applicable method using
-     * the algorithm described in the JLS section 15.12.2 (with the exception
-     * that it can't distinguish a primitive type argument from an object type
-     * argument, since in reflection primitive type arguments are represented by
-     * their object counterparts, so for an argument of type (say)
-     * java.lang.Integer, it will not be able to decide between a method that
-     * takes int and a method that takes java.lang.Integer as a parameter.
+     * Find a method.  Attempts to find the
+     * most specific applicable method using the
+     * algorithm described in the JLS section
+     * 15.12.2 (with the exception that it can't
+     * distinguish a primitive type argument from
+     * an object type argument, since in reflection
+     * primitive type arguments are represented by
+     * their object counterparts, so for an argument of
+     * type (say) java.lang.Integer, it will not be able
+     * to decide between a method that takes int and a
+     * method that takes java.lang.Integer as a parameter.
      * </p>
-     * 
+     *
      * <p>
-     * This turns out to be a relatively rare case where this is needed -
-     * however, functionality like this is needed.
+     * This turns out to be a relatively rare case
+     * where this is needed - however, functionality
+     * like this is needed.
      * </p>
-     * 
+     *
      * @param methodName name of method
-     * @param args the actual arguments with which the method is called
-     * @return the most specific applicable method, or null if no method is
-     *         applicable.
-     * @throws AmbiguousException if there is more than one maximally specific
-     *             applicable method
+     * @param args       the actual arguments with which the method is called
+     * @return the most specific applicable method, or null if no
+     *         method is applicable.
+     * @throws AmbiguousException if there is more than one maximally
+     *                            specific applicable method
      */
-    public Method find(String methodName, Object[] args) throws AmbiguousException {
+    // CSOFF: RedundantThrows
+    public Method find(String methodName, Object[] args)
+            throws AmbiguousException {
         List methodList = get(methodName);
 
         if (methodList == null) {
@@ -113,32 +128,40 @@ public class MethodMap {
             Object arg = args[i];
 
             /*
-             * if we are careful down below, a null argument goes in there so we
-             * can know that the null was passed to the method
+             * if we are careful down below, a null argument goes in there
+             * so we can know that the null was passed to the method
              */
-            classes[i] = arg == null ? null : arg.getClass();
+            classes[i] =
+                    arg == null ? null : arg.getClass();
         }
 
         return getMostSpecific(methodList, classes);
-    }
+    } // CSON: RedundantThrows
+
 
     /**
-     * simple distinguishable exception, used when we run across ambiguous
-     * overloading.
+     * Simple distinguishable exception, used when
+     * we run across ambiguous overloading.  Caught
+     * by the introspector.
      */
-    public static class AmbiguousException extends Exception {
-        /** serialization version id jdk13 generated. */
-        static final long serialVersionUID = 8758118091728717367L;
+    public static class AmbiguousException extends RuntimeException {
+        /**
+         * Version Id for serializable.
+         */
+        private static final long serialVersionUID = -2314636505414551663L;
     }
 
+
+    // CSOFF: RedundantThrows
     /**
-     * Gets the most specific method from a list.
-     * @param methods list of {@link Method methods}
-     * @param classes argument types
-     * @return the most specific method, or null
-     * @throws AmbiguousException if there is more than one specific method
+     * Gets the most specific method that is applicable to actual argument types.
+     * @param methods a list of methods.
+     * @param classes list of argument types.
+     * @return the most specific method.
+     * @throws AmbiguousException if there is more than one.
      */
-    private static Method getMostSpecific(List methods, Class[] classes) throws AmbiguousException {
+    private static Method getMostSpecific(List methods, Class[] classes)
+            throws AmbiguousException {
         LinkedList applicables = getApplicables(methods, classes);
 
         if (applicables.isEmpty()) {
@@ -157,14 +180,17 @@ public class MethodMap {
 
         LinkedList maximals = new LinkedList();
 
-        for (Iterator applicable = applicables.iterator(); applicable.hasNext();) {
+        for (Iterator applicable = applicables.iterator();
+             applicable.hasNext();) {
             Method app = (Method) applicable.next();
             Class[] appArgs = app.getParameterTypes();
             boolean lessSpecific = false;
 
-            for (Iterator maximal = maximals.iterator(); !lessSpecific && maximal.hasNext();) {
+            for (Iterator maximal = maximals.iterator();
+                 !lessSpecific && maximal.hasNext();) {
                 Method max = (Method) maximal.next();
 
+                // CSOFF: MissingSwitchDefault
                 switch (moreSpecific(appArgs, max.getParameterTypes())) {
                     case MORE_SPECIFIC:
                         /*
@@ -181,10 +207,11 @@ public class MethodMap {
                          * won't add it into the set of maximally specific
                          * methods
                          */
+
                         lessSpecific = true;
                         break;
                 }
-            }
+            } // CSON: MissingSwitchDefault
 
             if (!lessSpecific) {
                 maximals.addLast(app);
@@ -197,32 +224,47 @@ public class MethodMap {
         }
 
         return (Method) maximals.getFirst();
-    }
+    } // CSON: RedundantThrows
+
 
     /**
      * Determines which method signature (represented by a class array) is more
      * specific. This defines a partial ordering on the method signatures.
-     * 
+     *
      * @param c1 first signature to compare
      * @param c2 second signature to compare
-     * @return MORE_SPECIFIC if c1 is more specific than c2, LESS_SPECIFIC if c1
-     *         is less specific than c2, INCOMPARABLE if they are incomparable.
+     * @return MORE_SPECIFIC if c1 is more specific than c2, LESS_SPECIFIC if
+     *         c1 is less specific than c2, INCOMPARABLE if they are incomparable.
      */
     private static int moreSpecific(Class[] c1, Class[] c2) {
         boolean c1MoreSpecific = false;
         boolean c2MoreSpecific = false;
 
+        // compare lengths to handle comparisons where the size of the arrays
+        // doesn't match, but the methods are both applicable due to the fact
+        // that one is a varargs method
+        if (c1.length > c2.length) {
+            return MORE_SPECIFIC;
+        }
+        if (c2.length > c1.length) {
+            return LESS_SPECIFIC;
+        }
+
+        // ok, move on and compare those of equal lengths
         for (int i = 0; i < c1.length; ++i) {
             if (c1[i] != c2[i]) {
-                c1MoreSpecific = c1MoreSpecific || isStrictMethodInvocationConvertible(c2[i], c1[i]);
-                c2MoreSpecific = c2MoreSpecific || isStrictMethodInvocationConvertible(c1[i], c2[i]);
+                boolean last = (i == c1.length - 1);
+                c1MoreSpecific = c1MoreSpecific
+                    || isStrictConvertible(c2[i], c1[i], last);
+                c2MoreSpecific = c2MoreSpecific
+                    || isStrictConvertible(c1[i], c2[i], last);
             }
         }
 
         if (c1MoreSpecific) {
             if (c2MoreSpecific) {
                 /*
-                 * Incomparable due to cross-assignable arguments (i.e.
+                 *  Incomparable due to cross-assignable arguments (i.e.
                  * foo(String, Object) vs. foo(Object, String))
                  */
 
@@ -237,8 +279,8 @@ public class MethodMap {
         }
 
         /*
-         * Incomparable due to non-related arguments (i.e. foo(Runnable) vs.
-         * foo(Serializable))
+         * Incomparable due to non-related arguments (i.e.
+         * foo(Runnable) vs. foo(Serializable))
          */
 
         return INCOMPARABLE;
@@ -246,11 +288,11 @@ public class MethodMap {
 
     /**
      * Returns all methods that are applicable to actual argument types.
-     * 
+     *
      * @param methods list of all candidate methods
      * @param classes the actual types of the arguments
-     * @return a list that contains only applicable methods (number of formal
-     *         and actual arguments matches, and argument types are assignable
+     * @return a list that contains only applicable methods (number of
+     *         formal and actual arguments matches, and argument types are assignable
      *         to formal types through a method invocation conversion).
      */
     private static LinkedList getApplicables(List methods, Class[] classes) {
@@ -268,22 +310,57 @@ public class MethodMap {
     }
 
     /**
-     * Returns true if the supplied method is applicable to actual argument
-     * types.
-     * @param method the method to check
-     * @param classes possible argument types
-     * @return true if the arguments are applicable to the method.
+     * Returns true if the supplied method is applicable to actual
+     * argument types.
+     *
+     * @param method  method that will be called
+     * @param classes arguments to method
+     * @return true if method is applicable to arguments
      */
     private static boolean isApplicable(Method method, Class[] classes) {
         Class[] methodArgs = method.getParameterTypes();
 
-        if (methodArgs.length != classes.length) {
-            return false;
-        }
-
-        for (int i = 0; i < classes.length; ++i) {
-            if (!isMethodInvocationConvertible(methodArgs[i], classes[i])) {
+        if (methodArgs.length > classes.length) {
+            // if there's just one more methodArg than class arg
+            // and the last methodArg is an array, then treat it as a vararg
+            return methodArgs.length == classes.length + 1
+                && methodArgs[methodArgs.length - 1].isArray();
+        } else if (methodArgs.length == classes.length) {
+            // this will properly match when the last methodArg
+            // is an array/varargs and the last class is the type of array
+            // (e.g. String when the method is expecting String...)
+            for (int i = 0; i < classes.length; ++i) {
+                if (!isConvertible(methodArgs[i], classes[i], false)) {
+                    // if we're on the last arg and the method expects an array
+                    if (i == classes.length - 1 && methodArgs[i].isArray()) {
+                        // check to see if the last arg is convertible
+                        // to the array's component type
+                        return isConvertible(methodArgs[i], classes[i], true);
+                    }
+                    return false;
+                }
+            }
+        } else if (methodArgs.length > 0) // more arguments given than the method accepts; check for varargs
+        {
+            // check that the last methodArg is an array
+            Class lastarg = methodArgs[methodArgs.length - 1];
+            if (!lastarg.isArray()) {
                 return false;
+            }
+
+            // check that they all match up to the last method arg
+            for (int i = 0; i < methodArgs.length - 1; ++i) {
+                if (!isConvertible(methodArgs[i], classes[i], false)) {
+                    return false;
+                }
+            }
+
+            // check that all remaining arguments are convertible to the vararg type
+            Class vararg = lastarg.getComponentType();
+            for (int i = methodArgs.length - 1; i < classes.length; ++i) {
+                if (!isConvertible(vararg, classes[i], false)) {
+                    return false;
+                }
             }
         }
 
@@ -291,132 +368,32 @@ public class MethodMap {
     }
 
     /**
-     * Determines whether a type represented by a class object is convertible to
-     * another type represented by a class object using a method invocation
-     * conversion, treating object types of primitive types as if they were
-     * primitive types (that is, a Boolean actual parameter type matches boolean
-     * primitive formal type). This behavior is because this method is used to
-     * determine applicable methods for an actual parameter list, and primitive
-     * types are represented by their object duals in reflective method calls.
-     * 
-     * @param formal the formal parameter type to which the actual parameter
-     *            type should be convertible
-     * @param actual the actual parameter type.
-     * @return true if either formal type is assignable from actual type, or
-     *         formal is a primitive type and actual is its corresponding object
-     *         type or an object type of a primitive type that can be converted
-     *         to the formal type.
+     * @see IntrospectionUtils#isMethodInvocationConvertible(Class, Class, boolean)
+     * @param formal         the formal parameter type to which the actual
+     *                       parameter type should be convertible
+     * @param actual         the actual parameter type.
+     * @param possibleVarArg whether or not we're dealing with the last parameter
+     *                       in the method declaration
+     * @return see isMethodInvocationConvertible.
      */
-    private static boolean isMethodInvocationConvertible(Class formal, Class actual) {
-        /*
-         * if it's a null, it means the arg was null
-         */
-        if (actual == null && !formal.isPrimitive()) {
-            return true;
-        }
-
-        /*
-         * Check for identity or widening reference conversion
-         */
-
-        if (actual != null && formal.isAssignableFrom(actual)) {
-            return true;
-        }
-
-        /*
-         * Check for boxing with widening primitive conversion. Note that actual
-         * parameters are never primitives.
-         */
-
-        if (formal.isPrimitive()) {
-            if (formal == Boolean.TYPE && actual == Boolean.class) {
-                return true;
-            }
-            if (formal == Character.TYPE && actual == Character.class) {
-                return true;
-            }
-            if (formal == Byte.TYPE && actual == Byte.class) {
-                return true;
-            }
-            if (formal == Short.TYPE && (actual == Short.class || actual == Byte.class)) {
-                return true;
-            }
-            if (formal == Integer.TYPE && (actual == Integer.class || actual == Short.class || actual == Byte.class)) {
-                return true;
-            }
-            if (formal == Long.TYPE
-                && (actual == Long.class || actual == Integer.class || actual == Short.class || actual == Byte.class)) {
-                return true;
-            }
-            if (formal == Float.TYPE
-                && (actual == Float.class || actual == Long.class || actual == Integer.class 
-                    || actual == Short.class || actual == Byte.class)) {
-                return true;
-            }
-            if (formal == Double.TYPE
-                && (actual == Double.class || actual == Float.class || actual == Long.class || actual == Integer.class
-                    || actual == Short.class || actual == Byte.class)) {
-                return true;
-            }
-        }
-
-        return false;
+    private static boolean isConvertible(Class formal, Class actual,
+                                         boolean possibleVarArg) {
+        return IntrospectionUtils.
+                isMethodInvocationConvertible(formal, actual, possibleVarArg);
     }
 
     /**
-     * Determines whether a type represented by a class object is convertible to
-     * another type represented by a class object using a method invocation
-     * conversion, without matching object and primitive types. This method is
-     * used to determine the more specific type when comparing signatures of
-     * methods.
-     * 
-     * @param formal the formal parameter type to which the actual parameter
-     *            type should be convertible
-     * @param actual the actual parameter type.
-     * @return true if either formal type is assignable from actual type, or
-     *         formal and actual are both primitive types and actual can be
-     *         subject to widening conversion to formal.
+     * @see IntrospectionUtils#isStrictMethodInvocationConvertible(Class, Class, boolean)
+     * @param formal         the formal parameter type to which the actual
+     *                       parameter type should be convertible
+     * @param actual         the actual parameter type.
+     * @param possibleVarArg whether or not we're dealing with the last parameter
+     *                       in the method declaration
+     * @return see isStrictMethodInvocationConvertible.
      */
-    private static boolean isStrictMethodInvocationConvertible(Class formal, Class actual) {
-        /*
-         * we shouldn't get a null into, but if so
-         */
-        if (actual == null && !formal.isPrimitive()) {
-            return true;
-        }
-
-        /*
-         * Check for identity or widening reference conversion
-         */
-
-        if (formal.isAssignableFrom(actual)) {
-            return true;
-        }
-
-        /*
-         * Check for widening primitive conversion.
-         */
-
-        if (formal.isPrimitive()) {
-            if (formal == Short.TYPE && (actual == Byte.TYPE)) {
-                return true;
-            }
-            if (formal == Integer.TYPE && (actual == Short.TYPE || actual == Byte.TYPE)) {
-                return true;
-            }
-            if (formal == Long.TYPE && (actual == Integer.TYPE || actual == Short.TYPE || actual == Byte.TYPE)) {
-                return true;
-            }
-            if (formal == Float.TYPE
-                && (actual == Long.TYPE || actual == Integer.TYPE || actual == Short.TYPE || actual == Byte.TYPE)) {
-                return true;
-            }
-            if (formal == Double.TYPE
-                && (actual == Float.TYPE || actual == Long.TYPE || actual == Integer.TYPE || actual == Short.TYPE 
-                    || actual == Byte.TYPE)) {
-                return true;
-            }
-        }
-        return false;
+    private static boolean isStrictConvertible(Class formal, Class actual,
+                                               boolean possibleVarArg) {
+        return IntrospectionUtils.
+                isStrictMethodInvocationConvertible(formal, actual, possibleVarArg);
     }
 }
