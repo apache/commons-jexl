@@ -74,7 +74,7 @@ public class ScriptTest extends TestCase {
     }
 
     public void testScriptFromURL() throws Exception {
-        URL testUrl = new File("src/test-scripts/test1.jexl").toURL();
+        URL testUrl = new File("src/test-scripts/test1.jexl").toURI().toURL();
         Script s = ScriptFactory.createScript(testUrl);
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("out", System.out);
