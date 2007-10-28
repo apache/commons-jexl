@@ -16,14 +16,11 @@
  */
 package org.apache.commons.jexl.parser;
 
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.framework.Test;
-
 import java.io.StringReader;
 
-import org.apache.commons.jexl.JexlContext;
-import org.apache.commons.jexl.JexlHelper;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * @since 1.0
@@ -50,11 +47,7 @@ public class ParserTest extends TestCase
          Parser parser = new Parser(new StringReader(";"));
 
          SimpleNode sn = parser.parse(new StringReader("foo = 1;"));
-
-         JexlContext jc = JexlHelper.createContext();
-
-		// TODO: Remove
-        //sn.interpret(jc);
+         assertNotNull("parsed node is null", sn);
      }
 
     public void testParse2()
@@ -62,14 +55,11 @@ public class ParserTest extends TestCase
     {
         Parser parser = new Parser(new StringReader(";"));
 
-        JexlContext jc = JexlHelper.createContext();
-
         SimpleNode sn = parser.parse(new StringReader("foo = \"bar\";"));
-        // TODO: Remove
-        //sn.interpret(jc);
+        assertNotNull("parsed node is null", sn);
+
         sn = parser.parse(new StringReader("foo = 'bar';"));
-        // TODO: Remove
-        //sn.interpret(jc);
+        assertNotNull("parsed node is null", sn);
     }
 
     public static void main(String[] args)
