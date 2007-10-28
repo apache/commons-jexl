@@ -49,12 +49,6 @@ public class JexlTest extends TestCase
     protected static final String METHOD_STRING = "Method string";
     protected static final String GET_METHOD_STRING = "GetMethod string";
 
-    protected static final String[] GET_METHOD_ARRAY =
-        new String[] { "One", "Two", "Three" };
-
-    protected static final String[][] GET_METHOD_ARRAY2 =
-        new String[][] { {"One", "Two", "Three"},{"Four", "Five", "Six"} };
-
     public static Test suite()
     {
         return new TestSuite(JexlTest.class);
@@ -83,64 +77,6 @@ public class JexlTest extends TestCase
 
         assertTrue("o not instanceof String", o instanceof String);
         assertEquals("o incorrect", GET_METHOD_STRING, o);
-    }
-
-    /**
-      *  test a simple method expression
-      */
-    public void testArrayAccess()
-         throws Exception
-    {
-        JexlContext jc = JexlHelper.createContext();
-
-        /*
-         *  test List access
-         */
-
-        List l = new ArrayList();
-        l.add(new Integer(1));
-        l.add(new Integer(2));
-        l.add(new Integer(3));
-
-        jc.getVars().put("list", l);
-
-        assertExpression(jc, "list[1]", new Integer(2));
-        assertExpression(jc, "list[1+1]", new Integer(3));
-        jc.getVars().put("loc", new Integer(1));
-        assertExpression(jc, "list[loc+1]", new Integer(3));
-
-        /*
-         * test array access
-         */
-
-        String[] args = {"hello", "there"};
-        jc.getVars().put("array", args);
-        assertExpression(jc, "array[0]", "hello");
-
-        /*
-         * to think that this was an intentional syntax...
-         */
-        assertExpression(jc, "array.0", "hello");
-
-        /*
-         * test map access
-         */
-        Map m = new HashMap();
-        m.put("foo", "bar");
-
-        jc.getVars().put("map", m);
-        jc.getVars().put("key", "foo");
-
-        assertExpression(jc, "map[\"foo\"]", "bar");
-        assertExpression(jc, "map[key]", "bar");
-
-        /*
-         *  test bean access
-         */
-        jc.getVars().put("foo", new Foo());
-        assertExpression(jc, "foo[\"bar\"]", GET_METHOD_STRING);
-        assertExpression(jc, "foo[\"bar\"] == foo.bar", Boolean.TRUE);
-
     }
 
     public void testBoolean()
@@ -563,23 +499,6 @@ public class JexlTest extends TestCase
 
 
     /**
-      *  test some simple double array lookups
-      */
-    public void testDoubleArrays()
-         throws Exception
-    {
-        JexlContext jc = JexlHelper.createContext();
-
-        Object[][] foo = new Object[2][2];
-        foo[0][0] = "one";
-        foo[0][1] = "two";
-
-        jc.getVars().put("foo", foo );
-
-        assertExpression(jc, "foo[0][1]", "two");
-    }
-
-    /**
       *  test variables with underscore names
       */
     public void testVariableNames()
@@ -652,20 +571,6 @@ public class JexlTest extends TestCase
         assertExpression(jc, "foo.count != -1", Boolean.TRUE);
         assertExpression(jc, "foo.count == 5", Boolean.TRUE);
         assertExpression(jc, "foo.count == -1", Boolean.FALSE);
-    }
-
-    public void testArrayProperty()
-        throws Exception
-    {
-        Foo foo = new Foo();
-
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("foo", foo );
-
-        assertExpression(jc, "foo.array[1]", GET_METHOD_ARRAY[1]);
-        assertExpression(jc, "foo.array.1", GET_METHOD_ARRAY[1]);
-        assertExpression(jc, "foo.array2[1][1]", GET_METHOD_ARRAY2[1][1]);
-        //assertExpression(jc, "foo.array2.1.1", GET_METHOD_ARRAY2[1][1]);
     }
 
     /**
