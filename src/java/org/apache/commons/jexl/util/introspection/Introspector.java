@@ -70,6 +70,7 @@ public class Introspector extends IntrospectorBase {
      *  @param logger a {@link Log}.
      */
     public Introspector(Log logger) {
+        super(logger);
         this.rlog = logger;
     }
 
@@ -83,8 +84,10 @@ public class Introspector extends IntrospectorBase {
      *               the parameters
      *
      * @return The desired Method object.
+     * @throws IllegalArgumentException When the parameters passed in can not be used for introspection.
+     * CSOFF: RedundantThrows
      */
-    public Method getMethod(Class c, String name, Object[] params) {
+    public Method getMethod(Class c, String name, Object[] params) throws IllegalArgumentException {
         /*
          *  just delegate to the base class
          */
@@ -113,7 +116,7 @@ public class Introspector extends IntrospectorBase {
         }
 
         return null;
-    }
+    } // CSON: RedundantThrows
 
     /**
      * Clears the classmap and classname
