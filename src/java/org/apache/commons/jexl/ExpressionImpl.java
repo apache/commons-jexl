@@ -49,9 +49,7 @@ class ExpressionImpl implements Expression {
      */
     protected SimpleNode node;
 
-    /**
-     * The interpreter of the expression.
-     */
+    /** The interpreter of the expression. */
     protected Interpreter interpreter;
 
     /**

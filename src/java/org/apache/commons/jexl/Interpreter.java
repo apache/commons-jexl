@@ -75,7 +75,6 @@ import org.apache.commons.jexl.parser.Node;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.parser.VisitorAdapter;
 import org.apache.commons.jexl.util.Coercion;
-import org.apache.commons.jexl.util.Introspector;
 import org.apache.commons.jexl.util.introspection.Info;
 import org.apache.commons.jexl.util.introspection.Uberspect;
 import org.apache.commons.jexl.util.introspection.VelMethod;
@@ -83,53 +82,48 @@ import org.apache.commons.jexl.util.introspection.VelPropertyGet;
 
 /**
  * An interpreter of JEXL syntax.
- * 
+ *
  * @since 2.0
  */
 class Interpreter extends VisitorAdapter {
 
     /** The uberspect. */
     private Uberspect uberspect;
-
     /** The context to store/retrieve variables. */
     private JexlContext context;
+    /** the arithmetic handler. */
+    private Arithmetic arithmetic;
 
     /** dummy velocity info. */
     private static final Info DUMMY = new Info("", 1, 1);
 
     /**
-     * Create the interpreter with the default settings.
+     * Create the interpreter.
+     * @param ctx the context to retrieve variables from.
+     * @param uber the helper to perform introspection,
+     * @param arith the arithmetic handler
      */
-    public Interpreter() {
-        super();
-        setUberspect(Introspector.getUberspect());
+    public Interpreter(JexlContext ctx, Uberspect uber, Arithmetic arith) {
+        uberspect = uber;
+        context = ctx;
+        arithmetic = arith;
     }
 
     /**
      * Interpret the given script/expression.
-     * 
+     *
      * @param node the script or expression to interpret.
      * @param aContext the context to interpret against.
      * @return the result of the interpretation.
      */
     public Object interpret(SimpleNode node, JexlContext aContext) {
-        setContext(aContext);
+        context = aContext;
         return node.jjtAccept(this, null);
     }
 
     /**
-     * TODO: Does this need to be a setter. sets the uberspect to use for
-     * divining bean properties etc.
-     * 
-     * @param anUberspect the uberspect.
-     */
-    public void setUberspect(Uberspect anUberspect) {
-        uberspect = anUberspect;
-    }
-
-    /**
      * Gets the uberspect.
-     * 
+     *
      * @return an {@link Uberspect}
      */
     protected Uberspect getUberspect() {
@@ -138,7 +132,7 @@ class Interpreter extends VisitorAdapter {
 
     /**
      * Sets the context that contain variables.
-     * 
+     *
      * @param aContext a {link JexlContext}
      */
     public void setContext(JexlContext aContext) {
@@ -150,49 +144,7 @@ class Interpreter extends VisitorAdapter {
     public Object visit(ASTAddNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-
-        // the spec says 'and'
-        if (left == null && right == null) {
-            return new Long(0);
-        }
-
-        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-
-            // in the event that either is null and not both, then just make the
-            // null a 0
-            try {
-                double l = Coercion.coercedouble(left);
-                double r = Coercion.coercedouble(right);
-                return new Double(l + r);
-            } catch (java.lang.NumberFormatException nfe) {
-                // Well, use strings!
-                return left.toString().concat(right.toString());
-            }
-        }
-        
-        if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            // coerce both to big decimal and add
-            BigDecimal l = Coercion.coerceBigDecimal(left);
-            BigDecimal r = Coercion.coerceBigDecimal(right);
-            return l.add(r);
-        }
-
-        if (left instanceof BigInteger || right instanceof BigInteger) {
-            // coerce both to big decimal and add
-            BigInteger l = Coercion.coerceBigInteger(left);
-            BigInteger r = Coercion.coerceBigInteger(right);
-            return l.add(r);
-        }
-
-        // attempt to use Longs
-        try {
-            long l = Coercion.coercelong(left);
-            long r = Coercion.coercelong(right);
-            return new Long(l + r);
-        } catch (java.lang.NumberFormatException nfe) {
-            // Well, use strings!
-            return left.toString().concat(right.toString());
-        }
+        return arithmetic.add(left, right);
     }
 
     /** {@inheritDoc} */
@@ -293,35 +245,8 @@ class Interpreter extends VisitorAdapter {
 
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-
-        // the spec says 'and', I think 'or'
-        if (left == null && right == null) {
-            return new Byte((byte) 0);
-        }
-
-        if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            // coerce both to big decimal and add
-            BigDecimal l = Coercion.coerceBigDecimal(left);
-            BigDecimal r = Coercion.coerceBigDecimal(right);
-            return l.divide(r, BigDecimal.ROUND_HALF_UP);
-        }
-
-        if (left instanceof BigInteger || right instanceof BigInteger) {
-            // coerce both to big decimal and add
-            BigInteger l = Coercion.coerceBigInteger(left);
-            BigInteger r = Coercion.coerceBigInteger(right);
-            return l.divide(r);
-        }
-
-        Double l = Coercion.coerceDouble(left);
-        Double r = Coercion.coerceDouble(right);
-
-        // catch div/0
-        if (r.doubleValue() == 0.0) {
-            return r;
-        }
-
-        return new Double(l.doubleValue() / r.doubleValue());
+        
+        return arithmetic.divide(left, right);
     }
 
     /** {@inheritDoc} */
@@ -503,7 +428,7 @@ class Interpreter extends VisitorAdapter {
     /** {@inheritDoc} */
     public Object visit(ASTMapEntry node, Object data) {
         Object key = node.jjtGetChild(0).jjtAccept(this, data);
-        Object value = node.jjtGetChild(1).jjtAccept(this, data); 
+        Object value = node.jjtGetChild(1).jjtAccept(this, data);
         return new Object[] {key, value};
     }
 
@@ -576,95 +501,15 @@ class Interpreter extends VisitorAdapter {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
-        // the spec says 'and', I think 'or'
-        if (left == null && right == null) {
-            return new Byte((byte) 0);
-        }
-
-        // if anything is float, double or string with ( "." | "E" | "e") coerce
-        // all to doubles and do it
-        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            Double l = Coercion.coerceDouble(left);
-            Double r = Coercion.coerceDouble(right);
-
-            // catch div/0
-            if (r.doubleValue() == 0.0) {
-                return r;
-            }
-
-            return new Double(l.doubleValue() % r.doubleValue());
-        }
-
-        if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            // coerce both to big decimal and add
-            BigDecimal l = Coercion.coerceBigDecimal(left);
-            BigDecimal r = Coercion.coerceBigDecimal(right);
-            BigInteger intDiv = l.divide(r, BigDecimal.ROUND_HALF_UP).toBigInteger();
-            BigInteger intValue = (r.multiply(new BigDecimal(intDiv))).toBigInteger();
-            BigDecimal remainder = new BigDecimal(l.subtract(new BigDecimal(intValue)).toBigInteger());
-            return remainder;
-        }
-
-        if (left instanceof BigInteger || right instanceof BigInteger) {
-            // coerce both to big decimal and add
-            BigInteger l = Coercion.coerceBigInteger(left);
-            BigInteger r = Coercion.coerceBigInteger(right);
-            return l.mod(r);
-        }
-
-        // otherwise to longs with thee!
-
-        long l = Coercion.coercelong(left);
-        long r = Coercion.coercelong(right);
-
-        // catch the div/0
-        if (r == 0) {
-            return new Long(0);
-        }
-
-        return new Long(l % r);
+        return arithmetic.mod(left, right);
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTMulNode node, Object data) {
-
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-
-        // the spec says 'and', I think 'or'
-        if (left == null && right == null) {
-            return new Byte((byte) 0);
-        }
-
-        // if anything is float, double or string with ( "." | "E" | "e") coerce
-        // all to doubles and do it
-        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            Double l = Coercion.coerceDouble(left);
-            Double r = Coercion.coerceDouble(right);
-
-            return new Double(l.doubleValue() * r.doubleValue());
-        }
-
-        if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            // coerce both to big decimal and add
-            BigDecimal l = Coercion.coerceBigDecimal(left);
-            BigDecimal r = Coercion.coerceBigDecimal(right);
-            return l.multiply(r);
-        }
-
-        if (left instanceof BigInteger || right instanceof BigInteger) {
-            // coerce both to big decimal and add
-            BigInteger l = Coercion.coerceBigInteger(left);
-            BigInteger r = Coercion.coerceBigInteger(right);
-            return l.multiply(r);
-        }
-
-        // otherwise to longs with thee!
-
-        long l = Coercion.coercelong(left);
-        long r = Coercion.coercelong(right);
-
-        return new Long(l * r);
+        
+        return arithmetic.multiply(left, right);
     }
 
     /** {@inheritDoc} */
@@ -769,46 +614,10 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTSubtractNode node, Object data) {
-
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-
-        // the spec says 'and', I think 'or'
-        if (left == null && right == null) {
-            return new Byte((byte) 0);
-        }
-
-        // if anything is float, double or string with ( "." | "E" | "e") coerce
-        // all to doubles and do it
-        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-
-            // in the event that either is null and not both, then just make the
-            // null a 0
-            double l = Coercion.coercedouble(left);
-            double r = Coercion.coercedouble(right);
-            return new Double(l - r);
-        }
-
-        if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            // coerce both to big decimal and add
-            BigDecimal l = Coercion.coerceBigDecimal(left);
-            BigDecimal r = Coercion.coerceBigDecimal(right);
-            return l.subtract(r);
-        }
-
-        if (left instanceof BigInteger || right instanceof BigInteger) {
-            // coerce both to big decimal and add
-            BigInteger l = Coercion.coerceBigInteger(left);
-            BigInteger r = Coercion.coerceBigInteger(right);
-            return l.subtract(r);
-        }
         
-        // otherwise to longs with thee!
-
-        long l = Coercion.coercelong(left);
-        long r = Coercion.coercelong(right);
-
-        return new Long(l - r);
+        return arithmetic.subtract(left, right);
     }
 
     /** {@inheritDoc} */
@@ -870,23 +679,37 @@ class Interpreter extends VisitorAdapter {
      * method calls, e.g. a call to substring(int,int) with an int and a long
      * will fail, but a call to substring(int,int) with an int and a short will
      * succeed.
-     * 
+     *
      * @param original the original number.
      * @return a value of the smallest type the original number will fit into.
      * @since 1.1
      */
     private Number narrow(Number original) {
-        if (original == null || original instanceof BigDecimal || original instanceof BigInteger) {
+        if (original == null) {
             return original;
         }
         Number result = original;
-        if (original instanceof Double || original instanceof Float) {
+        if (original instanceof BigDecimal) {
+            BigDecimal bigd = (BigDecimal) original;
+            // if it's bigger than a double it can't be narrowed
+            if (bigd.compareTo(new BigDecimal(Double.MAX_VALUE)) > 0) {
+                return original;
+            }
+        }
+        if (original instanceof Double || original instanceof Float || original instanceof BigDecimal) {
             double value = original.doubleValue();
             if (value <= Float.MAX_VALUE && value >= Float.MIN_VALUE) {
                 result = new Float(result.floatValue());
             }
-            // else it was already a double
+            // else it fits in a double only
         } else {
+            if (original instanceof BigInteger) {
+                BigInteger bigi = (BigInteger) original;
+                // if it's bigger than a Long it can't be narrowed
+                if (bigi.compareTo(new BigInteger(String.valueOf(Long.MAX_VALUE))) > 0) {
+                    return original;
+                }
+            }
             long value = original.longValue();
             if (value <= Byte.MAX_VALUE && value >= Byte.MIN_VALUE) {
                 // it will fit in a byte
@@ -896,7 +719,7 @@ class Interpreter extends VisitorAdapter {
             } else if (value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE) {
                 result = new Integer((int) value);
             }
-            // else it was already a long
+            // else it fits in a long
         }
         return result;
     }
@@ -904,7 +727,7 @@ class Interpreter extends VisitorAdapter {
     /**
      * Calculate the <code>size</code> of various types: Collection, Array,
      * Map, String, and anything that has a int size() method.
-     * 
+     *
      * @param val the object to get the size of.
      * @return the size of val
      */
@@ -938,26 +761,8 @@ class Interpreter extends VisitorAdapter {
     }
 
     /**
-     * Test if the passed value is a floating point number, i.e. a float, double
-     * or string with ( "." | "E" | "e").
-     * 
-     * @param val the object to be tested
-     * @return true if it is, false otherwise.
-     */
-    private boolean isFloatingPointNumber(Object val) {
-        if (val instanceof Float || val instanceof Double) {
-            return true;
-        }
-        if (val instanceof String) {
-            String string = (String) val;
-            return string.indexOf(".") != -1 || string.indexOf("e") != -1 || string.indexOf("E") != -1;
-        }
-        return false;
-    }
-
-    /**
      * Get an attribute of an object.
-     * 
+     *
      * @param object to retrieve value from
      * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or
      *            key for a map
@@ -1007,7 +812,7 @@ class Interpreter extends VisitorAdapter {
 
     /**
      * Test if left and right are equal.
-     * 
+     *
      * @param left first value
      * @param right second value
      * @return test result.
@@ -1056,7 +861,7 @@ class Interpreter extends VisitorAdapter {
 
     /**
      * Test if left < right.
-     * 
+     *
      * @param left first value
      * @param right second value
      * @return test result.
@@ -1096,7 +901,7 @@ class Interpreter extends VisitorAdapter {
 
     /**
      * Test if left > right.
-     * 
+     *
      * @param left first value
      * @param right second value
      * @return test result.
@@ -1110,7 +915,7 @@ class Interpreter extends VisitorAdapter {
 
     /**
      * Test if left <= right.
-     * 
+     *
      * @param left first value
      * @param right second value
      * @return test result.
@@ -1121,7 +926,7 @@ class Interpreter extends VisitorAdapter {
 
     /**
      * Test if left >= right.
-     * 
+     *
      * @param left first value
      * @param right second value
      * @return test result.

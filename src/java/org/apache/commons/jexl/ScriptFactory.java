@@ -68,7 +68,7 @@ public class ScriptFactory {
 
     /**
      * ScriptFactory is a singleton and this is the private
-     * instance fufilling that pattern.
+     * instance fulfilling that pattern.
      */
     protected static ScriptFactory factory = new ScriptFactory();
 
@@ -176,7 +176,11 @@ public class ScriptFactory {
             }
         }
         if (script instanceof ASTJexlScript) {
-            return new ScriptImpl(cleanText, (ASTJexlScript) script);
+            Interpreter interpreter = new Interpreter(
+                null,
+                Introspector.getUberspect(), 
+                new JexlArithmetic());
+            return new ScriptImpl(cleanText, (ASTJexlScript) script, interpreter);
         } else {
             throw new IllegalStateException("Parsed script is not "
                 + "an ASTJexlScript");
