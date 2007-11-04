@@ -98,12 +98,12 @@ public class ExpressionFactory {
      * must contain either a reference or an expression.
      * @param expression A String containing valid JEXL syntax
      * @return An Expression object which can be evaluated with a JexlContext
-     * @throws Exception An exception can be thrown if there is a problem
+     * @throws ParseException An exception can be thrown if there is a problem
      *      parsing this expression, or if the expression is neither an
      *      expression or a reference.
      */
     public static Expression createExpression(String expression)
-        throws Exception {
+        throws ParseException {
         return getInstance().createNewExpression(expression);
     }
 
@@ -113,11 +113,9 @@ public class ExpressionFactory {
      *
      *  @param expression valid Jexl expression
      *  @return Expression
-     *  @throws Exception for a variety of reasons - mostly malformed
-     *          Jexl expression
+     *  @throws ParseException for malformed Jexl expression
      */
-    public Expression createNewExpression(final String expression)
-        throws Exception {
+    public Expression createNewExpression(final String expression) throws ParseException {
 
         String expr = cleanExpression(expression);
 
@@ -129,6 +127,10 @@ public class ExpressionFactory {
                 tree = parser.parse(new StringReader(expr));
             } catch (TokenMgrError tme) {
                 throw new ParseException(tme.getMessage());
+            } catch (ParseException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
 
