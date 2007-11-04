@@ -142,7 +142,10 @@ public class ExpressionFactory {
         // throw an exception.
         SimpleNode node = (SimpleNode) tree.jjtGetChild(0);
 
-        Interpreter interpreter = new Interpreter();
+        Interpreter interpreter = new Interpreter(
+            null,
+            Introspector.getUberspect(), 
+            new JexlArithmetic());
         // TODO: remove this from the parser.
         // interpreter.setUberspect(parser.getUberspect());
         return new ExpressionImpl(expression, node, interpreter);

@@ -29,24 +29,26 @@ class ScriptImpl implements Script {
     private final String text;
     /** syntax tree. */
     private final ASTJexlScript parsedScript;
+    /** The interpreter of the expression. */
+    protected Interpreter interpreter;
 
     /**
      * Create a new Script from the given string and parsed syntax.
      * @param scriptText the text of the script.
      * @param scriptTree the parsed script.
+     * @param interp the interpreter to evaluate the expression
      */
-    public ScriptImpl(String scriptText, ASTJexlScript scriptTree) {
+    public ScriptImpl(String scriptText, ASTJexlScript scriptTree, Interpreter interp) {
         text = scriptText;
         parsedScript = scriptTree;
+        interpreter = interp;
     }
 
     /**
      * {@inheritDoc}
      */
     public Object execute(JexlContext context) throws Exception {
-        Interpreter interpreter = new Interpreter();
         return interpreter.interpret(parsedScript, context);
-        //return parsedScript.value(context);
     }
 
     /**
