@@ -117,7 +117,7 @@ public class JexlTest extends TestCase
         jc.getVars().put("now", Calendar.getInstance().getTime());
         GregorianCalendar gc = new GregorianCalendar(5000, 11, 20);
         jc.getVars().put("now2", gc.getTime());
-        jc.getVars().put("bdec", new BigDecimal(7));
+        jc.getVars().put("bdec", new BigDecimal("7"));
         jc.getVars().put("bint", new BigInteger("7"));
 
         assertExpression(jc, "a == b", Boolean.FALSE);
