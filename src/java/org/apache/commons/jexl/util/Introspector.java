@@ -32,7 +32,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Introspector {
     /**
-     *  The uberspector from Velocity that handles all instrospection patterns.
+     *  The uberspector from Velocity that handles all introspection patterns.
      */
     private static Uberspect uberSpect;
 
