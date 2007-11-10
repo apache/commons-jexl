@@ -36,7 +36,7 @@
       <p>
         For more technical information about the JEXL Grammar, you can find the
         <a href="https://javacc.dev.java.net/">JavaCC</a> grammar for JEXL
-        here: <a href="http://svn.apache.org/viewcvs.cgi/jakarta/commons/proper/jexl/trunk/src/java/org/apache/commons/jexl/parser/Parser.jj?view=markup">Parser.jj</a>
+        here: <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/java/org/apache/commons/jexl/parser/Parser.jj?view=markup">Parser.jj</a>
       </p>
     </section>
     <section name="Language Elements">
