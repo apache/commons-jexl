@@ -186,17 +186,40 @@
             </reportSet>
           </reportSets>
         </plugin>
-        <!--
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
           <configuration>
             <configLocation>src/conf/checkstyle.xml</configLocation>
+            <excludes>org/apache/commons/jexl/parser/*.java</excludes>
+            <headerFile>src/conf/header.txt</headerFile>
             <enableRulesSummary>false</enableRulesSummary>
-            <propertyExpansion>checkstyle.header.file=src/conf/header.txt</propertyExpansion>
           </configuration>
         </plugin>
-        -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>cobertura-maven-plugin</artifactId>
+          <version>2.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>2.2</version>
+          <configuration>
+            <excludes>
+              <exclude>org/apache/commons/jexl/parser/*.java</exclude>
+            </excludes>
+            <rulesets>
+              <ruleset>/rulesets/braces.xml</ruleset>
+              <ruleset>/rulesets/unusedcode.xml</ruleset>
+              <ruleset>/rulesets/imports.xml</ruleset>
+              <ruleset>/rulesets/codesize.xml</ruleset>
+              <ruleset>/rulesets/coupling.xml</ruleset>
+              <ruleset>/rulesets/design.xml</ruleset>
+              <ruleset>/rulesets/strings.xml</ruleset>
+            </rulesets>
+          </configuration>
+        </plugin>
       </plugins>
     </reporting>
 
