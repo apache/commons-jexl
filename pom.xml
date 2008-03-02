@@ -22,9 +22,10 @@
   <parent>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-parent</artifactId>
-    <version>7</version>
+    <version>8</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
+  <packaging>bundle</packaging>
   <groupId>commons-jexl</groupId>
   <artifactId>commons-jexl</artifactId>
   <version>1.1.1-SNAPSHOT</version>
@@ -100,6 +101,11 @@
   <properties>
     <maven.compile.source>1.4</maven.compile.source>
     <maven.compile.target>1.4</maven.compile.target>
+    <commons.componentid>jexl</commons.componentid>
+    <commons.release.version>1.1</commons.release.version>
+    <commons.binary.suffix></commons.binary.suffix>
+    <commons.jira.id>JEXL</commons.jira.id>
+    <commons.jira.pid>12310479</commons.jira.pid>
   </properties> 
 
   <build>
