@@ -105,6 +105,10 @@
     <commons.binary.suffix></commons.binary.suffix>
     <commons.jira.id>JEXL</commons.jira.id>
     <commons.jira.pid>12310479</commons.jira.pid>
+    <commons.osgi.export>
+       !org.apache.commons.jexl.junit,
+        org.apache.commons.jexl.*;version=${pom.version}
+    </commons.osgi.export>
   </properties> 
 
   <build>
@@ -138,6 +142,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-changes-plugin</artifactId>
+          <version>2.0</version>
           <configuration>
             <xmlPath>${basedir}/xdocs/changes.xml</xmlPath>
             <issueLinkTemplate>%URL%/%ISSUE%</issueLinkTemplate>
@@ -163,12 +168,12 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>cobertura-maven-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
-          <version>2.2</version>
+          <version>2.3</version>
           <configuration>
             <excludes>
               <exclude>org/apache/commons/jexl/parser/*.java</exclude>
