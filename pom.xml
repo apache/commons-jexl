@@ -154,10 +154,11 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>2.1</version>
           <configuration>
-            <configLocation>src/conf/checkstyle.xml</configLocation>
+            <configLocation>${basedir}/src/conf/checkstyle.xml</configLocation>
             <excludes>org/apache/commons/jexl/parser/*.java</excludes>
-            <headerFile>src/conf/header.txt</headerFile>
+            <headerFile>${basedir}/src/conf/header.txt</headerFile>
             <enableRulesSummary>false</enableRulesSummary>
           </configuration>
         </plugin>
