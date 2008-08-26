@@ -17,19 +17,22 @@
 
 package org.apache.commons.jexl.parser;
 
+import java.math.BigInteger;
+import java.math.BigDecimal;
+
 import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Coercion;
 
 /**
  * Multiplication.
- * 
+ *
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  */
 public class ASTMulNode extends SimpleNode {
     /**
      * Create the node given an id.
-     * 
+     *
      * @param id node id.
      */
     public ASTMulNode(int id) {
@@ -38,7 +41,7 @@ public class ASTMulNode extends SimpleNode {
 
     /**
      * Create a node with the given parser and id.
-     * 
+     *
      * @param p a parser.
      * @param id node id.
      */
@@ -63,6 +66,18 @@ public class ASTMulNode extends SimpleNode {
             return new Byte((byte) 0);
         }
 
+        if (left instanceof BigInteger || right instanceof BigInteger) {
+			BigInteger l = Coercion.coerceBigInteger(left);
+			BigInteger r = Coercion.coerceBigInteger(right);
+			return l.multiply(r);
+		}
+
+        if (left instanceof BigDecimal || right instanceof BigDecimal) {
+			BigDecimal l = Coercion.coerceBigDecimal(left);
+			BigDecimal r = Coercion.coerceBigDecimal(right);
+			return l.multiply(r);
+		}
+
         /*
          * if anything is float, double or string with ( "." | "E" | "e") coerce
          * all to doubles and do it
@@ -71,13 +86,13 @@ public class ASTMulNode extends SimpleNode {
             || left instanceof Double
             || right instanceof Float
             || right instanceof Double
-            || (left instanceof String 
-                && (((String) left).indexOf(".") != -1 
-                    || ((String) left).indexOf("e") != -1 
+            || (left instanceof String
+                && (((String) left).indexOf(".") != -1
+                    || ((String) left).indexOf("e") != -1
                     || ((String) left).indexOf("E") != -1))
-            || (right instanceof String 
-                && (((String) right).indexOf(".") != -1 
-                    || ((String) right).indexOf("e") != -1 
+            || (right instanceof String
+                && (((String) right).indexOf(".") != -1
+                    || ((String) right).indexOf("e") != -1
                     || ((String) right).indexOf("E") != -1))) {
             Double l = Coercion.coerceDouble(left);
             Double r = Coercion.coerceDouble(right);

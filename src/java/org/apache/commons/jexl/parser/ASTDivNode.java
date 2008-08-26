@@ -16,19 +16,22 @@
  */
 package org.apache.commons.jexl.parser;
 
+import java.math.BigInteger;
+import java.math.BigDecimal;
+
 import org.apache.commons.jexl.util.Coercion;
 import org.apache.commons.jexl.JexlContext;
 
 /**
  * a / b, mathematical divide.
- * 
+ *
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  */
 public class ASTDivNode extends SimpleNode {
     /**
      * Create the node given an id.
-     * 
+     *
      * @param id node id.
      */
     public ASTDivNode(int id) {
@@ -37,7 +40,7 @@ public class ASTDivNode extends SimpleNode {
 
     /**
      * Create a node with the given parser and id.
-     * 
+     *
      * @param p a parser.
      * @param id node id.
      */
@@ -61,6 +64,18 @@ public class ASTDivNode extends SimpleNode {
         if (left == null && right == null) {
             return new Byte((byte) 0);
         }
+
+        if (left instanceof BigInteger || right instanceof BigInteger) {
+			BigInteger l = Coercion.coerceBigInteger(left);
+			BigInteger r = Coercion.coerceBigInteger(right);
+			return l.divide(r);
+		}
+
+        if (left instanceof BigDecimal || right instanceof BigDecimal) {
+			BigDecimal l = Coercion.coerceBigDecimal(left);
+			BigDecimal r = Coercion.coerceBigDecimal(right);
+			return l.divide(r);
+		}
 
         Double l = Coercion.coerceDouble(left);
         Double r = Coercion.coerceDouble(right);
