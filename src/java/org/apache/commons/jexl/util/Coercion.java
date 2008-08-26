@@ -16,6 +16,9 @@
  */
 package org.apache.commons.jexl.util;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 /**
  *  Coercion utilities for the JSTL EL-like coercion.
  *
@@ -132,6 +135,70 @@ public class Coercion {
         }
 
         throw new Exception("Double coercion exception");
+    }
+
+    /**
+     * Coerce to a BigDecimal.
+     *
+     * @param val Object to be coerced.
+     * @return The Double coerced value.
+     * @throws Exception If coercion fails.
+     */
+    public static BigDecimal coerceBigDecimal(Object val)
+    throws Exception {
+        if (val == null) {
+            return BigDecimal.valueOf(0);
+        } else if (val instanceof String) {
+            if ("".equals(val)) {
+                return BigDecimal.valueOf(0);
+            }
+
+            /*
+             * the spec seems to be iffy about this.  Going to give it a wack
+             *  anyway
+             */
+
+            return new BigDecimal((String) val);
+        } else if (val instanceof BigDecimal) {
+            return (BigDecimal) val;
+        } else if (val instanceof Character) {
+            return BigDecimal.valueOf(((Character) val).charValue());
+        } else if (val instanceof Number) {
+            return new BigDecimal(val.toString());
+        } else if (val instanceof Boolean) {
+            throw new Exception("Boolean->Double coercion exception");
+        }
+
+        throw new Exception("Double coercion exception");
+    }
+
+    /**
+     * Coerce to a BigInteger.
+     *
+     * @param val Object to be coerced.
+     * @return The Integer coerced value.
+     * @throws Exception If coercion fails.
+     */
+    public static BigInteger coerceBigInteger(Object val)
+    throws Exception {
+        if (val == null) {
+            return BigInteger.ZERO;
+        } else if (val instanceof String) {
+            if ("".equals(val)) {
+                return BigInteger.ZERO;
+            }
+            return new BigInteger((String) val);
+        } else if (val instanceof BigInteger) {
+            return (BigInteger) val;
+        } else if (val instanceof Character) {
+            return BigInteger.valueOf(((Character) val).charValue());
+        } else if (val instanceof Number) {
+            return BigInteger.valueOf(((Number) val).longValue());
+        } else if (val instanceof Boolean) {
+            throw new Exception("Boolean->Integer coercion exception");
+        }
+
+        throw new Exception("Integer coercion exception");
     }
 
     /**
