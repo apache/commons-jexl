@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -212,7 +212,7 @@ public class JexlTest extends TestCase
         assertExpression(jc, "a==true", Boolean.TRUE);
         assertExpression(jc, "a==false", Boolean.FALSE);
         assertExpression(jc, "true==false", Boolean.FALSE);
-        
+
         assertExpression(jc, "2 < 3", Boolean.TRUE);
         assertExpression(jc, "num < 5", Boolean.FALSE);
         assertExpression(jc, "num < num", Boolean.FALSE);
@@ -227,7 +227,7 @@ public class JexlTest extends TestCase
         assertExpression(jc, "num <= 2.5", Boolean.FALSE);
         assertExpression(jc, "now2 <= now", Boolean.FALSE); // test comparable
 
-//        
+//
         assertExpression(jc, "'6' >= '5'", Boolean.TRUE);
         assertExpression(jc, "num >= 5", Boolean.TRUE);
         assertExpression(jc, "num >= num", Boolean.TRUE);
@@ -301,9 +301,9 @@ public class JexlTest extends TestCase
         Set set = new HashSet();
         set.addAll(list);
         set.add("1");
-        
+
         jc.getVars().put("set", set);
-        
+
         // support generic int size() method
         BitSet bitset = new BitSet(5);
         jc.getVars().put("bitset", bitset);
@@ -333,7 +333,7 @@ public class JexlTest extends TestCase
         jc.getVars().put("foo", new Foo());
 
         assertExpression(jc, "map['size']", "cheese");
-// PR - unsure whether or not we should support map.size or force usage of the above 'escaped' version        
+// PR - unsure whether or not we should support map.size or force usage of the above 'escaped' version
 //        assertExpression(jc, "map.size", "cheese");
         assertExpression(jc, "foo.getSize()", new Integer(22));
         // failing assertion for size property
@@ -387,7 +387,7 @@ public class JexlTest extends TestCase
        assertExpression(jc, "-aBigDecimal", new BigDecimal("-8.8"));
    }
 
-    
+
     /**
       *  test some simple mathematical calculations
       */
@@ -433,7 +433,7 @@ public class JexlTest extends TestCase
         jc.getVars().put("imanull", null );
         assertExpression(jc, "imanull + 2", new Long(2));
         assertExpression(jc, "imanull + imanull", new Long(0));
-        
+
         /* test for bugzilla 31577 */
         jc.getVars().put("n", new Integer(0));
         assertExpression(jc, "n != null && n != 0", Boolean.FALSE);
@@ -457,7 +457,7 @@ public class JexlTest extends TestCase
         jc.getVars().put("aBuffer", buffer);
         jc.getVars().put("aList", list);
         jc.getVars().put("bList", list2);
-        
+
         assertExpression(jc, "foo == 2", Boolean.TRUE);
         assertExpression(jc, "2 == 3", Boolean.FALSE);
         assertExpression(jc, "3 == foo", Boolean.FALSE);
@@ -634,7 +634,7 @@ public class JexlTest extends TestCase
     {
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("foo_bar", "123" );
-        
+
         assertExpression(jc, "foo_bar", "123");
     }
 
@@ -649,7 +649,7 @@ public class JexlTest extends TestCase
 
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("foo", foo );
-        
+
         assertExpression(jc, "foo.bar", "123");
     }
 
@@ -814,7 +814,7 @@ public class JexlTest extends TestCase
         expr.addPreResolver(new FlatResolver(false));
         o = expr.evaluate(jc);
         assertEquals("flat override 2", o, null);
-        
+
         // now for a post resolver
         expr = ExpressionFactory.createExpression("foo.bar.baz");
         Long result = new Long(1);
@@ -838,14 +838,14 @@ public class JexlTest extends TestCase
         Expression expr = ExpressionFactory.createExpression("first and foo.trueAndModify");
         expr.evaluate(jc);
         assertTrue("Short circuit failure: rhs evaluated when lhs FALSE", !tester.getModified());
-        // handle true for the left arg of 'and' 
+        // handle true for the left arg of 'and'
         tester = new Foo();
         jc.getVars().put("first", Boolean.TRUE);
         jc.getVars().put("foo", tester);
         expr.evaluate(jc);
         assertTrue("Short circuit failure: rhs not evaluated when lhs TRUE", tester.getModified());
     }
-    
+
     /**
      * Test that 'or' only evaluates the second item if needed
      * @throws Exception if there are errors
@@ -860,7 +860,7 @@ public class JexlTest extends TestCase
         Expression expr = ExpressionFactory.createExpression("first or foo.trueAndModify");
         expr.evaluate(jc);
         assertTrue("Short circuit failure: rhs not evaluated when lhs FALSE", tester.getModified());
-        // handle true for the left arg of 'or' 
+        // handle true for the left arg of 'or'
         tester = new Foo();
         jc.getVars().put("first", Boolean.TRUE);
         jc.getVars().put("foo", tester);
@@ -889,20 +889,20 @@ public class JexlTest extends TestCase
         jc.getVars().put("aBool", Boolean.FALSE);
         assertExpression(jc, "aBool.valueOf('true')", Boolean.TRUE);
     }
-    
+
     public void testStaticMethodInvocationOnClasses() throws Exception
     {
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("Boolean", Boolean.class);
-        assertExpression(jc, "Boolean.valueOf('true')", Boolean.TRUE);        
+        assertExpression(jc, "Boolean.valueOf('true')", Boolean.TRUE);
     }
-    
+
     public void testToString() throws Exception {
         String code = "abcd";
         Expression expr = ExpressionFactory.createExpression(code);
         assertEquals("Bad expression value", code, expr.toString());
     }
-    
+
     /**
      * Make sure bad syntax throws ParseException
      * @throws Exception on errors
@@ -928,7 +928,7 @@ public class JexlTest extends TestCase
     {
         assertExpression(JexlHelper.createContext(), "## double or nothing\n 1 + 1", Long.valueOf("2"));
     }
-    
+
     /**
      * Test assignment.
      * @throws Exception
@@ -941,7 +941,7 @@ public class JexlTest extends TestCase
         jc.getVars().put("foo", foo);
         Parser parser = new Parser(new StringReader(";"));
         parser.parse(new StringReader("aString = 'World';"));
-        
+
         assertExpression(jc, "hello = 'world'", "world");
         assertEquals("hello variable not changed", "world", jc.getVars().get("hello"));
         assertExpression(jc, "result = 1 + 1", new Long(2));
@@ -950,7 +950,7 @@ public class JexlTest extends TestCase
         // assertExpression(jc, "foo.property1 = '99'", "99");
         // assertEquals("property not set", "99", foo.getProperty1());
     }
-    
+
     public void testAntPropertiesWithMethods() throws Exception
     {
         JexlContext jc = JexlHelper.createContext();
@@ -966,7 +966,35 @@ public class JexlTest extends TestCase
 //        jc.getVars().put("commons-logging", version);
 //        assertExpression(jc, "commons-logging", version);
     }
-    
+
+    public void testBigIntegerArithmetic() throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+
+        jc.getVars().put("foo", BigInteger.valueOf(2) );
+
+        assertExpression(jc, "foo + 2", BigInteger.valueOf(4));
+        assertExpression(jc, "3 + 3 + foo", BigInteger.valueOf(8));
+        assertExpression(jc, "3 * 3 + foo", BigInteger.valueOf(11));
+        assertExpression(jc, "3 * 3 - foo", BigInteger.valueOf(7));
+        assertExpression(jc, "1 + foo / 2", BigInteger.valueOf(2));
+        assertExpression(jc, "10 + foo * 95", BigInteger.valueOf(200));
+	}
+
+    public void testBigDecimalArithmetic() throws Exception
+    {
+        JexlContext jc = JexlHelper.createContext();
+
+        jc.getVars().put("foo", new BigDecimal("1.41421350"));
+
+        assertExpression(jc, "foo + 2", new BigDecimal("3.41421350"));
+        assertExpression(jc, "3 + 3 + foo", new BigDecimal("7.41421350"));
+        assertExpression(jc, "3 * 3 + foo", new BigDecimal("10.41421350"));
+        assertExpression(jc, "3 * 3 - foo", new BigDecimal("7.58578650"));
+        assertExpression(jc, "1 + foo / 2", new BigDecimal("1.70710675"));
+        assertExpression(jc, "10 + foo * 95", new BigDecimal("144.35028250"));
+	}
+
     public void testUnicodeSupport() throws Exception
     {
         assertExpression(JexlHelper.createContext(), "myvar == 'Użytkownik'", Boolean.FALSE);
