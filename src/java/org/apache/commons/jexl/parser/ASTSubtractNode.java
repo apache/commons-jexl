@@ -63,16 +63,16 @@ public class ASTSubtractNode extends SimpleNode {
         }
 
         if (left instanceof BigInteger || right instanceof BigInteger) {
-			BigInteger l = Coercion.coerceBigInteger(left);
-			BigInteger r = Coercion.coerceBigInteger(right);
-			return l.subtract(r);
-		}
+            BigInteger l = Coercion.coerceBigInteger(left);
+            BigInteger r = Coercion.coerceBigInteger(right);
+            return l.subtract(r);
+        }
 
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
-			BigDecimal l = Coercion.coerceBigDecimal(left);
-			BigDecimal r = Coercion.coerceBigDecimal(right);
-			return l.subtract(r);
-		}
+            BigDecimal l = Coercion.coerceBigDecimal(left);
+            BigDecimal r = Coercion.coerceBigDecimal(right);
+            return l.subtract(r);
+        }
 
         /*
          * if anything is float, double or string with ( "." | "E" | "e") coerce

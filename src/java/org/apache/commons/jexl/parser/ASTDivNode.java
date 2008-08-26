@@ -66,16 +66,16 @@ public class ASTDivNode extends SimpleNode {
         }
 
         if (left instanceof BigInteger || right instanceof BigInteger) {
-			BigInteger l = Coercion.coerceBigInteger(left);
-			BigInteger r = Coercion.coerceBigInteger(right);
-			return l.divide(r);
-		}
+            BigInteger l = Coercion.coerceBigInteger(left);
+            BigInteger r = Coercion.coerceBigInteger(right);
+            return l.divide(r);
+        }
 
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
-			BigDecimal l = Coercion.coerceBigDecimal(left);
-			BigDecimal r = Coercion.coerceBigDecimal(right);
-			return l.divide(r);
-		}
+            BigDecimal l = Coercion.coerceBigDecimal(left);
+            BigDecimal r = Coercion.coerceBigDecimal(right);
+            return l.divide(r);
+        }
 
         Double l = Coercion.coerceDouble(left);
         Double r = Coercion.coerceDouble(right);
