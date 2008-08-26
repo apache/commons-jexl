@@ -17,8 +17,12 @@
 
 package org.apache.commons.jexl.parser;
 
+import java.math.BigInteger;
+import java.math.BigDecimal;
+
 import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.util.Coercion;
+
 
 /**
  *  Addition : either integer addition or string concatenation.
@@ -29,7 +33,7 @@ import org.apache.commons.jexl.util.Coercion;
 public class ASTAddNode extends SimpleNode {
     /**
      * Create the node given an id.
-     * 
+     *
      * @param id node id.
      */
     public ASTAddNode(int id) {
@@ -38,7 +42,7 @@ public class ASTAddNode extends SimpleNode {
 
     /**
      * Create a node with the given parser and id.
-     * 
+     *
      * @param p a parser.
      * @param id node id.
      */
@@ -47,7 +51,7 @@ public class ASTAddNode extends SimpleNode {
     }
 
 
-    /** 
+    /**
      * {@inheritDoc}
      */
     public Object jjtAccept(ParserVisitor visitor, Object data) {
@@ -55,7 +59,7 @@ public class ASTAddNode extends SimpleNode {
     }
 
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      */
     public Object value(JexlContext context) throws Exception {
         Object left = ((SimpleNode) jjtGetChild(0)).value(context);
@@ -68,6 +72,19 @@ public class ASTAddNode extends SimpleNode {
             return new Long(0);
         }
 
+
+        if (left instanceof BigInteger || right instanceof BigInteger) {
+			BigInteger l = Coercion.coerceBigInteger(left);
+			BigInteger r = Coercion.coerceBigInteger(right);
+			return l.add(r);
+		}
+
+        if (left instanceof BigDecimal || right instanceof BigDecimal) {
+			BigDecimal l = Coercion.coerceBigDecimal(left);
+			BigDecimal r = Coercion.coerceBigDecimal(right);
+			return l.add(r);
+		}
+
         /*
          *  if anything is float, double or string with ( "." | "E" | "e")
          *  coerce all to doubles and do it
@@ -75,7 +92,7 @@ public class ASTAddNode extends SimpleNode {
         if (left instanceof Float || left instanceof Double
             || right instanceof Float || right instanceof Double
             || (left instanceof String
-                  && (((String) left).indexOf(".") != -1 
+                  && (((String) left).indexOf(".") != -1
                           || ((String) left).indexOf("e") != -1
                           || ((String) left).indexOf("E") != -1)
                )
