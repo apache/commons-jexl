@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public class HashMapContext extends HashMap implements JexlContext {
     /** serialization version id jdk13 generated. */
-    static final long serialVersionUID = 5715964743204418854L;
+    private static final long serialVersionUID = 5715964743204418854L;
     /**
      * {@inheritDoc}
      */
