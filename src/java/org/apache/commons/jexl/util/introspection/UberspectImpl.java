@@ -20,11 +20,9 @@ package org.apache.commons.jexl.util.introspection;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.jexl.util.AbstractExecutor;
@@ -51,7 +49,10 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
      * index of the first character of the property.
      */
     private static final int PROPERTY_START_INDEX = 3;
-
+    /*
+     * static signature for method(object,object)
+     */
+    static final Class[] OBJECT_OBJECT = { Object.class, Object.class };
     /**
      * Our runtime logger.
      */
@@ -62,6 +63,9 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
      */
     private Introspector introspector;
 
+    public Introspector getIntrospector() {
+        return introspector;
+    }
     /**
      * init - does nothing - we need to have setRuntimeLogger called before
      * getting our introspector, as the default vel introspector depends upon
@@ -91,13 +95,13 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
         } else if (obj instanceof Map) {
             return ((Map) obj).values().iterator();
         } else if (obj instanceof Iterator) {
-            rlog.warn("Warning! The iterative " + " is an Iterator in the #foreach() loop at [" + i.getLine() + ","
+                rlog.warn("Warning! The iterative " + " is an Iterator in the #foreach() loop at [" + i.getLine() + ","
                     + i.getColumn() + "]" + " in template " + i.getTemplateName() + ". Because it's not resetable,"
                     + " if used in more than once, this may lead to" + " unexpected results.");
 
             return ((Iterator) obj);
         } else if (obj instanceof Enumeration) {
-            rlog.warn("Warning! The iterative " + " is an Enumeration in the #foreach() loop at [" + i.getLine() + ","
+                rlog.warn("Warning! The iterative " + " is an Enumeration in the #foreach() loop at [" + i.getLine() + ","
                     + i.getColumn() + "]" + " in template " + i.getTemplateName() + ". Because it's not resetable,"
                     + " if used in more than once, this may lead to" + " unexpected results.");
 
@@ -108,10 +112,10 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
             // foreach without implementing the Collection interface
             Class type = obj.getClass();
             try {
-                Method iter = type.getMethod("iterator", null);
+                Method iter = type.getMethod("iterator", (Class[]) null);
                 Class returns = iter.getReturnType();
                 if (Iterator.class.isAssignableFrom(returns)) {
-                    return (Iterator) iter.invoke(obj, null);
+                    return (Iterator) iter.invoke(obj, (Object[])null);
                 } else {
                     rlog.error("iterator() method of reference in #foreach loop at "
                             + i + " does not return a true Iterator.");
@@ -129,7 +133,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
         }
 
         /*  we have no clue what this is  */
-        rlog.warn("Could not determine type of iterator in " + "#foreach loop " + " at [" + i.getLine() + ","
+            rlog.warn("Could not determine type of iterator in " + "#foreach loop " + " at [" + i.getLine() + ","
                 + i.getColumn() + "]" + " in template " + i.getTemplateName());
 
         return null;
@@ -221,7 +225,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
                     throw new NoSuchMethodException();
                 }
             } catch (NoSuchMethodException nsme2) {
-                StringBuffer sb = new StringBuffer("set");
+                StringBuilder sb = new StringBuilder("set");
                 sb.append(identifier);
 
                 if (Character.isLowerCase(sb.charAt(PROPERTY_START_INDEX))) {
@@ -242,10 +246,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
              */
 
             if (Map.class.isAssignableFrom(claz)) {
-                Object[] params = {new Object(), new Object()};
-
-                vm = getMethod(obj, "put", params, i);
-
+                vm = getMethod(obj, "put", OBJECT_OBJECT, i);
                 if (vm != null) {
                     return new VelSetterImpl(vm, identifier);
                 }
@@ -494,16 +495,13 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
          * {@inheritDoc}
          */
         public Object invoke(Object o, Object value) throws Exception {
-            List al = new ArrayList();
-
             if (putKey == null) {
-                al.add(value);
+                Object[] a0 = { value };
+                return vm.invoke(o, a0);
             } else {
-                al.add(putKey);
-                al.add(value);
+                Object[] a1 = { putKey, value };
+                return vm.invoke(o, a1);
             }
-
-            return vm.invoke(o, al.toArray());
         }
 
         /**

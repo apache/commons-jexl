@@ -57,19 +57,15 @@ public class BooleanPropertyExecutor extends PropertyExecutor {
     protected void discover(Class clazz, String property) {
         try {
             char c;
-            StringBuffer sb;
-
-            Object[] params = {};
-
             /*
              *  now look for a boolean isFoo
              */
 
-            sb = new StringBuffer("is");
+            StringBuilder  sb = new StringBuilder("is");
             sb.append(property);
 
             methodUsed = sb.toString();
-            method = introspector.getMethod(clazz, methodUsed, params);
+            method = introspector.getMethod(clazz, methodUsed, EMPTY_PARAMS);
 
             if (null == method) {
                 c = sb.charAt(2);
@@ -81,7 +77,7 @@ public class BooleanPropertyExecutor extends PropertyExecutor {
                 }
 
                 methodUsed = sb.toString();
-                method = introspector.getMethod(clazz, methodUsed, params);
+                method = introspector.getMethod(clazz, methodUsed, EMPTY_PARAMS);
             }
 
             if (method != null) {
@@ -101,7 +97,7 @@ public class BooleanPropertyExecutor extends PropertyExecutor {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            rlog.error("PROGRAMMER ERROR : BooleanPropertyExector() : " + e, e);
+                rlog.error("PROGRAMMER ERROR : BooleanPropertyExector()", e);
         }
     }
 }

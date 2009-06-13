@@ -49,6 +49,9 @@ class ExpressionImpl implements Expression {
      */
     protected SimpleNode node;
 
+	/** The engine for this expression. */
+     protected final JexlEngine jexl;
+
     /** The interpreter of the expression. */
     protected Interpreter interpreter;
 
@@ -59,17 +62,23 @@ class ExpressionImpl implements Expression {
      * @param ref the parsed expression.
      * @param interp the interpreter to evaluate the expression
      */
-    ExpressionImpl(String expr, SimpleNode ref, Interpreter interp) {
+    ExpressionImpl(JexlEngine engine, String expr, SimpleNode ref) {
         expression = expr;
         node = ref;
-        interpreter = interp;
+        jexl = engine;
     }
 
     /**
      * {@inheritDoc}
      */
     public Object evaluate(JexlContext context) throws Exception {
-        return interpreter.interpret(node, context);
+        Interpreter interpreter = jexl.createInterpreter(context);
+        return interpreter.interpret(node, jexl.isSilent());
+    }
+    
+    public String dump() {
+        Debugger debug = new Debugger();
+        return debug.debug(node)? debug.toString() : "/*?*/";
     }
 
     /**

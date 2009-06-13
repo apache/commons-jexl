@@ -46,20 +46,6 @@ import org.apache.commons.jexl.util.introspection.Uberspect;
 public class Parser
 {
 
-
-    /** TODO: The uberspect belongs in the interpreter's implementation */
-    private Uberspect uberspect;
-
-    public void setUberspect(Uberspect uberspect)
-    {
-        this.uberspect = uberspect;
-    }
-
-    protected Uberspect getUberspect()
-    {
-        return uberspect;
-    }
-
     public SimpleNode parse(Reader reader)
         throws Exception
     {
@@ -146,21 +132,16 @@ void Identifier() :
 
 void Expression() : {}
 {
-  LOOKAHEAD( PrimaryExpression() "=" )
+        LOOKAHEAD( Reference() "=" )
   Assignment()
 |
   ConditionalOrExpression()
 }
 
-/*
- * WTF? How is the LHS of the assignment a 'PrimaryExpression'?
- * This includes Literal, Null, String literal etc...
- */
 
-void Assignment() #Assignment(2) :
-{}
+void Assignment() #Assignment(2) : {}
 {
-  PrimaryExpression() "=" Expression()
+  Reference() "=" Expression()
 }
 
 void ConditionalOrExpression() #void :
@@ -172,6 +153,11 @@ void ConditionalOrExpression() #void :
   |
     "or" ConditionalAndExpression() #OrNode(2)
   )*
+  (
+    "?" Expression() ":" Expression() #TernaryNode(3)
+  |
+    "?:" Expression() #TernaryNode(2)
+  )?
 }
 
 void ConditionalAndExpression() #void :
@@ -380,7 +366,7 @@ void Statement() #void :
 |
   LOOKAHEAD( Reference() ";" ) ReferenceExpression()
 |
-  LOOKAHEAD( PrimaryExpression() "=" ) StatementExpression()
+  LOOKAHEAD( Reference() "=" ) StatementExpression()
 |
   ExpressionExpression()
 |

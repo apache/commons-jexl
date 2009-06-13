@@ -89,7 +89,7 @@ public class ParseFailuresTest extends TestCase {
 
     public void testMalformedScript3() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a ParseException
-        String badScript = "foo=1;bar=2;a?b:c;";
+        String badScript = "foo=1;bar=2;a?b:c:d;";
         try {
             ScriptFactory.createScript(badScript);
             fail("Parsing \"" + badScript

@@ -33,6 +33,9 @@ public interface Uberspect {
      */
     void init();
 
+    /** Returns the underlying introspector. */
+    public Introspector getIntrospector();
+    
     /**
      * To support iteratives - #foreach().
      * @param info template info.

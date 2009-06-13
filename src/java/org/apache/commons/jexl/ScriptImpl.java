@@ -24,13 +24,12 @@ import org.apache.commons.jexl.parser.ASTJexlScript;
  * @since 1.1
  */
 class ScriptImpl implements Script {
-
+    /** The engine for this expression. */
+    protected final JexlEngine jexl;
     /** text of the script. */
     private final String text;
     /** syntax tree. */
     private final ASTJexlScript parsedScript;
-    /** The interpreter of the expression. */
-    protected Interpreter interpreter;
 
     /**
      * Create a new Script from the given string and parsed syntax.
@@ -38,17 +37,18 @@ class ScriptImpl implements Script {
      * @param scriptTree the parsed script.
      * @param interp the interpreter to evaluate the expression
      */
-    public ScriptImpl(String scriptText, ASTJexlScript scriptTree, Interpreter interp) {
+    public ScriptImpl(JexlEngine engine, String scriptText, ASTJexlScript scriptTree) {
         text = scriptText;
         parsedScript = scriptTree;
-        interpreter = interp;
+        jexl = engine;
     }
 
     /**
      * {@inheritDoc}
      */
     public Object execute(JexlContext context) throws Exception {
-        return interpreter.interpret(parsedScript, context);
+        Interpreter interpreter = jexl.createInterpreter(context);
+        return interpreter.interpret(parsedScript, jexl.isSilent());
     }
 
     /**

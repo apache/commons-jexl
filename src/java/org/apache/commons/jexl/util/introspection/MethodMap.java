@@ -19,7 +19,7 @@ package org.apache.commons.jexl.util.introspection;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class MethodMap {
      * Keep track of all methods with the same name.
      */
     // CSOFF: VisibilityModifier
-    Map methodByNameMap = new Hashtable();
+    private Map<String, List<Method>> methodByNameMap = new HashMap<String, List<Method>>();
     // CSON: VisibilityModifier
 
     /**
@@ -61,13 +61,13 @@ public class MethodMap {
      *
      * @param method the method.
      */
-    public void add(Method method) {
+    public synchronized void add(Method method) {
         String methodName = method.getName();
 
-        List l = get(methodName);
+        List<Method> l = methodByNameMap.get(methodName);
 
         if (l == null) {
-            l = new ArrayList();
+            l = new ArrayList<Method>();
             methodByNameMap.put(methodName, l);
         }
 
@@ -80,8 +80,8 @@ public class MethodMap {
      * @param key the name.
      * @return List list of methods.
      */
-    public List get(String key) {
-        return (List) methodByNameMap.get(key);
+    public synchronized List<Method> get(String key) {
+        return methodByNameMap.get(key);
     }
 
     /**
@@ -115,27 +115,15 @@ public class MethodMap {
     // CSOFF: RedundantThrows
     public Method find(String methodName, Object[] args)
             throws AmbiguousException {
-        List methodList = get(methodName);
+        return find(new ClassMap.MethodKey(methodName, args));
+    }
 
+    Method find(ClassMap.MethodKey methodKey) throws AmbiguousException {
+        List<Method> methodList = get(methodKey.method);
         if (methodList == null) {
             return null;
         }
-
-        int l = args.length;
-        Class[] classes = new Class[l];
-
-        for (int i = 0; i < l; ++i) {
-            Object arg = args[i];
-
-            /*
-             * if we are careful down below, a null argument goes in there
-             * so we can know that the null was passed to the method
-             */
-            classes[i] =
-                    arg == null ? null : arg.getClass();
-        }
-
-        return getMostSpecific(methodList, classes);
+        return getMostSpecific(methodList, methodKey.params);
     } // CSON: RedundantThrows
 
 
@@ -160,16 +148,16 @@ public class MethodMap {
      * @return the most specific method.
      * @throws AmbiguousException if there is more than one.
      */
-    private static Method getMostSpecific(List methods, Class[] classes)
+    private static Method getMostSpecific(List<Method> methods, Class[] classes)
             throws AmbiguousException {
-        LinkedList applicables = getApplicables(methods, classes);
+        LinkedList<Method> applicables = getApplicables(methods, classes);
 
         if (applicables.isEmpty()) {
             return null;
         }
 
         if (applicables.size() == 1) {
-            return (Method) applicables.getFirst();
+            return applicables.getFirst();
         }
 
         /*
@@ -178,17 +166,17 @@ public class MethodMap {
          * (the most specific method) otherwise we have ambiguity.
          */
 
-        LinkedList maximals = new LinkedList();
+        LinkedList<Method> maximals = new LinkedList<Method>();
 
-        for (Iterator applicable = applicables.iterator();
+        for (Iterator<Method> applicable = applicables.iterator();
              applicable.hasNext();) {
-            Method app = (Method) applicable.next();
+            Method app = applicable.next();
             Class[] appArgs = app.getParameterTypes();
             boolean lessSpecific = false;
 
-            for (Iterator maximal = maximals.iterator();
+            for (Iterator<Method> maximal = maximals.iterator();
                  !lessSpecific && maximal.hasNext();) {
-                Method max = (Method) maximal.next();
+                Method max = maximal.next();
 
                 // CSOFF: MissingSwitchDefault
                 switch (moreSpecific(appArgs, max.getParameterTypes())) {
@@ -223,7 +211,7 @@ public class MethodMap {
             throw new AmbiguousException();
         }
 
-        return (Method) maximals.getFirst();
+        return maximals.getFirst();
     } // CSON: RedundantThrows
 
 
@@ -295,12 +283,11 @@ public class MethodMap {
      *         formal and actual arguments matches, and argument types are assignable
      *         to formal types through a method invocation conversion).
      */
-    private static LinkedList getApplicables(List methods, Class[] classes) {
-        LinkedList list = new LinkedList();
+    private static LinkedList<Method> getApplicables(List<Method> methods, Class[] classes) {
+        LinkedList<Method> list = new LinkedList<Method>();
 
-        for (Iterator imethod = methods.iterator(); imethod.hasNext();) {
-            Method method = (Method) imethod.next();
-
+        for (Iterator<Method> imethod = methods.iterator(); imethod.hasNext();) {
+            Method method = imethod.next();
             if (isApplicable(method, classes)) {
                 list.add(method);
             }

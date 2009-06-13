@@ -52,4 +52,9 @@ public interface Expression {
      */
     String getExpression();
 
+    /**
+     * Returns the JEXL expression by reconstructing it from the parsed tree.
+     * @return the JEXL expression
+     */
+    String dump();
 }

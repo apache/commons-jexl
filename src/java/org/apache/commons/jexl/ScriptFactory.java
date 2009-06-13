@@ -16,24 +16,14 @@
  */
 package org.apache.commons.jexl;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URL;
-import java.net.URLConnection;
 
-import org.apache.commons.jexl.parser.ASTJexlScript;
-import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
-import org.apache.commons.jexl.parser.SimpleNode;
-import org.apache.commons.jexl.parser.TokenMgrError;
-import org.apache.commons.jexl.util.Introspector;
-import org.apache.commons.jexl.util.introspection.Uberspect;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 
 /**
  * <p>
@@ -76,18 +66,8 @@ public class ScriptFactory {
      * Private constructor, the single instance is always obtained
      * with a call to getInstance().
      */
-    private ScriptFactory() {
-        this(Introspector.getUberspect());
-    }
+    private ScriptFactory() {}
     
-    /**
-     * Create a script factory with an alternate {@link Uberspect}.
-     * @param uberspect the uberspect implementation.
-     */
-    public ScriptFactory(Uberspect uberspect) {
-        parser.setUberspect(uberspect);
-    }
-
     /**
      * Returns the single instance of ScriptFactory.
      * @return the instance of ScriptFactory.
@@ -107,7 +87,7 @@ public class ScriptFactory {
      *      problem parsing the script.
      */
     public static Script createScript(String scriptText) throws Exception {
-        return getInstance().createNewScript(scriptText);
+        return JexlEngine.DEFAULT.createScript(scriptText);
     }
 
     /**
@@ -122,16 +102,7 @@ public class ScriptFactory {
      *      parsing the script.
      */
     public static Script createScript(File scriptFile) throws Exception {
-        if (scriptFile == null) {
-            throw new NullPointerException("scriptFile is null");
-        }
-        if (!scriptFile.canRead()) {
-            throw new IOException("Can't read scriptFile ("
-                + scriptFile.getCanonicalPath() + ")");
-        }
-        BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
-        return createScript(readerToString(reader));
-
+        return JexlEngine.DEFAULT.createScript(scriptFile);
     }
 
     /**
@@ -146,81 +117,7 @@ public class ScriptFactory {
      *      parsing the script.
      */
     public static Script createScript(URL scriptUrl) throws Exception {
-        if (scriptUrl == null) {
-            throw new NullPointerException("scriptUrl is null");
-        }
-        URLConnection connection = scriptUrl.openConnection();
-
-        BufferedReader reader = new BufferedReader(
-            new InputStreamReader(connection.getInputStream()));
-        return createScript(readerToString(reader));
-    }
-
-    /**
-     *  Creates a new Script based on the string.
-     *
-     *  @param scriptText valid Jexl script
-     *  @return Script a new script
-     *  @throws Exception for a variety of reasons - mostly malformed scripts
-     */
-    protected Script createNewScript(String scriptText) throws Exception {
-        String cleanText = cleanScript(scriptText);
-        SimpleNode script;
-        // Parse the Expression
-        synchronized (parser) {
-            log.debug("Parsing script: " + cleanText);
-            try {
-                script = parser.parse(new StringReader(cleanText));
-            } catch (TokenMgrError tme) {
-                throw new ParseException(tme.getMessage());
-            }
-        }
-        if (script instanceof ASTJexlScript) {
-            Interpreter interpreter = new Interpreter(
-                null,
-                Introspector.getUberspect(), 
-                new JexlArithmetic());
-            return new ScriptImpl(cleanText, (ASTJexlScript) script, interpreter);
-        } else {
-            throw new IllegalStateException("Parsed script is not "
-                + "an ASTJexlScript");
-        }
-    }
-
-    /**
-     * @todo move to ParseUtils?
-     * Trims the expression and adds a semi-colon if missing.
-     * @param script to clean
-     * @return trimmed expression ending in a semi-colon
-     */
-    private String cleanScript(String script) {
-        String expr = script.trim();
-        if (!expr.endsWith(";")) {
-            expr += ";";
-        }
-        return expr;
-    }
-
-    /**
-     * Read a buffered reader into a StringBuffer and return a String with
-     * the contents of the reader.
-     * @param reader to be read.
-     * @return the contents of the reader as a String.
-     * @throws IOException on any error reading the reader.
-     */
-    private static String readerToString(BufferedReader reader)
-        throws IOException {
-        StringBuffer buffer = new StringBuffer();
-        try {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line).append('\n');
-            }
-            return buffer.toString();
-        } finally {
-            reader.close();
-        }
-
+        return JexlEngine.DEFAULT.createScript(scriptUrl);
     }
 
 }

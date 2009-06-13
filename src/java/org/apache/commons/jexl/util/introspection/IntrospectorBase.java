@@ -59,15 +59,16 @@ public class IntrospectorBase {
 
     /**
      * Holds the method maps for the classes we know about, keyed by Class
+     * Made WeakHashMap so we wont prevent a class from being GCed.
      * object.
      */
-    protected final Map classMethodMaps = new HashMap();
+    protected final Map<Class, ClassMap> classMethodMaps = new java.util.WeakHashMap<Class, ClassMap>();
 
     /**
      * Holds the qualified class names for the classes we hold in the
      * classMethodMaps hash.
      */
-    private Set cachedClassNames = new HashSet();
+    private Set<String> cachedClassNames = new HashSet<String>();
 
     /**
      * Create the introspector.
@@ -104,8 +105,7 @@ public class IntrospectorBase {
         ClassMap classMap;
 
         synchronized (classMethodMaps) {
-            classMap = (ClassMap) classMethodMaps.get(c);
-
+            classMap = classMethodMaps.get(c);
             /*
              * if we don't have this, check to see if we have it by name. if so,
              * then we have a classloader change so dump our caches.
@@ -157,6 +157,6 @@ public class IntrospectorBase {
         /*
          * for speed, we can just make a new one and let the old one be GC'd
          */
-        cachedClassNames = new HashSet();
+        cachedClassNames = new HashSet<String>();
     }
 }
