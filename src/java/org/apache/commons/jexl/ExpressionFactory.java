@@ -16,16 +16,7 @@
  */
 package org.apache.commons.jexl;
 
-import java.io.StringReader;
-
 import org.apache.commons.jexl.parser.ParseException;
-import org.apache.commons.jexl.parser.Parser;
-import org.apache.commons.jexl.parser.SimpleNode;
-import org.apache.commons.jexl.parser.TokenMgrError;
-import org.apache.commons.jexl.util.Introspector;
-import org.apache.commons.jexl.util.introspection.Uberspect;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -49,48 +40,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ExpressionFactory {
     /**
-     * The Log to which all ExpressionFactory messages will be logged.
-     */
-    protected static final Log LOG =
-        LogFactory.getLog("org.apache.commons.jexl.ExpressionFactory");
-
-    /**
-     * The singleton ExpressionFactory also holds a single instance of
-     * {@link Parser}.
-     * When parsing expressions, ExpressionFactory synchronizes on Parser.
-     */
-    protected final Parser parser =
-            new Parser(new StringReader(";")); //$NON-NLS-1$
-
-    /**
-     * ExpressionFactory is a singleton and this is the private
-     * instance fulfilling that pattern.
-     */
-    protected static final ExpressionFactory EF = new ExpressionFactory();
-
-    /**
      * Private constructor, the single instance is always obtained
      * with a call to getInstance().
      */
-    private ExpressionFactory() {
-        this(Introspector.getUberspect());
-    }
+    private ExpressionFactory() {}
 
-    /**
-     * Creates an expression factory using the provided {@link Uberspect}.
-     * @param uberspect to allow different introspection behaviour
-     */
-    public ExpressionFactory(Uberspect uberspect) {
-        parser.setUberspect(uberspect);
-    }
-
-    /**
-     * Returns the single instance of ExpressionFactory.
-     * @return the instance of ExpressionFactory.
-     */
-    public static ExpressionFactory getInstance() {
-        return EF;
-    }
 
     /**
      * Creates an Expression from a String containing valid
@@ -104,65 +58,7 @@ public class ExpressionFactory {
      */
     public static Expression createExpression(String expression)
         throws ParseException {
-        return getInstance().createNewExpression(expression);
+        return JexlEngine.DEFAULT.createExpression(expression);
     }
 
-
-    /**
-     *  Creates a new Expression based on the expression string.
-     *
-     *  @param expression valid Jexl expression
-     *  @return Expression
-     *  @throws ParseException for malformed Jexl expression
-     */
-    public Expression createNewExpression(final String expression) throws ParseException {
-
-        String expr = cleanExpression(expression);
-
-        // Parse the Expression
-        SimpleNode tree;
-        synchronized (parser) {
-            LOG.debug("Parsing expression: " + expr);
-            try {
-                tree = parser.parse(new StringReader(expr));
-            } catch (TokenMgrError tme) {
-                throw new ParseException(tme.getMessage());
-            } catch (ParseException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        if (tree.jjtGetNumChildren() > 1 && LOG.isWarnEnabled()) {
-            LOG.warn("The JEXL Expression created will be a reference"
-                + " to the first expression from the supplied script: \""
-                + expression + "\" ");
-        }
-
-        // Must be a simple reference, expression, statement or if, otherwise
-        // throw an exception.
-        SimpleNode node = (SimpleNode) tree.jjtGetChild(0);
-
-        Interpreter interpreter = new Interpreter(
-            null,
-            Introspector.getUberspect(), 
-            new JexlArithmetic());
-        // TODO: remove this from the parser.
-        // interpreter.setUberspect(parser.getUberspect());
-        return new ExpressionImpl(expression, node, interpreter);
-    }
-
-    /**
-     * Trims the expression and adds a semi-colon if missing.
-     * @param expression to clean
-     * @return trimmed expression ending in a semi-colon
-     */
-    private String cleanExpression(String expression) {
-        String expr = expression.trim();
-        if (!expr.endsWith(";")) {
-            expr += ";";
-        }
-        return expr;
-    }
 }

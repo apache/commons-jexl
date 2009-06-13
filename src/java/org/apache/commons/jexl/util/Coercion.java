@@ -27,6 +27,27 @@ import java.math.BigInteger;
  */
 public class Coercion {
 
+}
+class noCoercion {
+
+    public boolean toBoolean(Object arg) {
+        return coerceboolean(arg);
+    }
+    public int toInteger(Object arg) {
+        return coerceinteger(arg);
+    }
+    public long toLong(Object arg) {
+        return coerceLong(arg);
+    }
+    public double toDouble(Object arg) {
+        return coercedouble(arg);
+    }
+    public java.math.BigInteger toBigInteger(Object arg) {
+        return coerceBigInteger(arg);
+    }
+    public java.math.BigDecimal toBigDecimal(Object arg) {
+        return coerceBigDecimal(arg);
+    }
     /**
      * Coerce to a boolean (not a java.lang.Boolean).
      *

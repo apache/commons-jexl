@@ -551,14 +551,8 @@ public class JexlTest extends TestCase
 
         assertExpression(jc, "foo.substring(2,4)", "cd");
         assertExpression(jc, "foo.charAt(2)", new Character('c'));
-
-        try {
             assertExpression(jc, "foo.charAt(-2)", null);
-            fail("this test should have thrown an exception" );
-        }
-        catch (Exception e) {
-            // expected behaviour
-        }
+
     }
 
     public void testEmptyDottedVariableName() throws Exception

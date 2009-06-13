@@ -26,6 +26,7 @@ import junit.framework.TestCase;
  * @since 1.1
  */
 public class ScriptTest extends TestCase {
+    static final String TEST1 =  "src/test-scripts/test1.jexl";
 
     // test class for testScriptUpdatesContext
     // making this class private static will cause the test to fail.
@@ -64,7 +65,7 @@ public class ScriptTest extends TestCase {
     }
     
     public void testScriptFromFile() throws Exception {
-        File testScript = new File("src/test-scripts/test1.jexl");
+        File testScript = new File(TEST1);
         Script s = ScriptFactory.createScript(testScript);
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("out", System.out);

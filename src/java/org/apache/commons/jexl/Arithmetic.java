@@ -16,9 +16,9 @@
  */
 package org.apache.commons.jexl;
 /**
- * Pluggable arithmetic operators. 
+ * Pluggable arithmetic, coercion & comparison operators. 
  */
-interface Arithmetic {
+public interface Arithmetic {
 
     /**
      * Add two values together.
@@ -64,4 +64,104 @@ interface Arithmetic {
      * @return left + right.
      */
     Object subtract(Object left, Object right);
+    
+    /**
+     * Coerce an object into a boolean.
+     * @param arg the value to convert
+     * @return a boolean
+     */
+    boolean toBoolean(Object arg);
+    
+    /**
+     * Coerce an object into an integer.
+     * @param arg the object to coerce
+     * @return an int
+     */
+    int toInteger(Object arg);    
+    
+    /**
+     * Coerce an object into a long.
+     * @param arg the object to coerce
+     * @return a long
+     */
+    long toLong(Object arg);   
+    
+    /**
+     * Coerce an object into a double.
+     * @param arg the object to coerce
+     * @return a double
+     */
+    double toDouble(Object arg);
+        
+    /**
+     * Coerce an object into a big integer.
+     * @param arg the object to coerce
+     * @return a big integer
+     */
+    java.math.BigInteger toBigInteger(Object arg);     
+    
+    /**
+     * Coerce an object into a big decimal.
+     * @param arg the object to coerce
+     * @return a big decimal
+     */
+    java.math.BigDecimal toBigDecimal(Object arg);
+    
+    /**
+     * Given a Number, return back the value using the smallest type the result
+     * will fit into. This works hand in hand with parameter 'widening' in java
+     * method calls, e.g. a call to substring(int,int) with an int and a long
+     * will fail, but a call to substring(int,int) with an int and a short will
+     * succeed.
+     *
+     * @param original the original number.
+     * @return a value of the smallest type the original number will fit into.
+     * @since 1.1
+     */
+    public Number narrow(Number original);
+    
+    /**
+     * Test if left == right.
+     *
+     * @param left first value
+     * @param right second value
+     * @return test result.
+     */
+    boolean equals(Object left, Object right);
+    
+    /**
+     * Test if left < right.
+     *
+     * @param left first value
+     * @param right second value
+     * @return test result.
+     */
+    boolean lessThan(Object left, Object right);
+
+    /**
+     * Test if left > right.
+     *
+     * @param left first value
+     * @param right second value
+     * @return test result.
+     */
+    boolean greaterThan(Object left, Object right);
+
+    /**
+     * Test if left <= right.
+     *
+     * @param left first value
+     * @param right second value
+     * @return test result.
+     */
+    boolean lessThanOrEqual(Object left, Object right);
+
+    /**
+     * Test if left >= right.
+     *
+     * @param left first value
+     * @param right second value
+     * @return test result.
+     */
+    boolean greaterThanOrEqual(Object left, Object right);
 }

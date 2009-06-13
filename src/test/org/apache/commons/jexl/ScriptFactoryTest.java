@@ -26,7 +26,7 @@ import junit.framework.TestCase;
  * @since 1.1
  */
 public class ScriptFactoryTest extends TestCase {
-
+    static final String TEST1 = "src/test-scripts/test1.jexl";
     /**
      * Creates a new test case.
      * @param name the test case name.
@@ -72,7 +72,7 @@ public class ScriptFactoryTest extends TestCase {
      * @throws Exception on a parse error.
      */
     public void testCreateFromFile() throws Exception {
-        File testScript = new File("src/test-scripts/test1.jexl");
+        File testScript = new File(TEST1);
         assertNotNull("No script created", ScriptFactory.createScript(testScript));
     }
 

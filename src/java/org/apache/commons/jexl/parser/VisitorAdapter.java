@@ -272,6 +272,12 @@ public class VisitorAdapter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
+    public Object visit(ASTTernaryNode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+    
+    /** {@inheritDoc} */
     public Object visit(ASTTrueNode node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);

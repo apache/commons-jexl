@@ -68,34 +68,37 @@ import org.apache.commons.jexl.parser.ASTSizeMethod;
 import org.apache.commons.jexl.parser.ASTStatementExpression;
 import org.apache.commons.jexl.parser.ASTStringLiteral;
 import org.apache.commons.jexl.parser.ASTSubtractNode;
+import org.apache.commons.jexl.parser.ASTTernaryNode;
 import org.apache.commons.jexl.parser.ASTTrueNode;
 import org.apache.commons.jexl.parser.ASTUnaryMinusNode;
 import org.apache.commons.jexl.parser.ASTWhileStatement;
 import org.apache.commons.jexl.parser.Node;
 import org.apache.commons.jexl.parser.SimpleNode;
-import org.apache.commons.jexl.parser.VisitorAdapter;
-import org.apache.commons.jexl.util.Coercion;
 import org.apache.commons.jexl.util.introspection.Info;
 import org.apache.commons.jexl.util.introspection.Uberspect;
 import org.apache.commons.jexl.util.introspection.VelMethod;
 import org.apache.commons.jexl.util.introspection.VelPropertyGet;
+import org.apache.commons.jexl.util.introspection.VelPropertySet;
+
+import org.apache.commons.jexl.parser.ParserVisitor;
 
 /**
  * An interpreter of JEXL syntax.
  *
  * @since 2.0
  */
-class Interpreter extends VisitorAdapter {
-
+public class Interpreter implements ParserVisitor {
     /** The uberspect. */
-    private Uberspect uberspect;
-    /** The context to store/retrieve variables. */
-    private JexlContext context;
+    private final Uberspect uberspect;
     /** the arithmetic handler. */
-    private Arithmetic arithmetic;
+    private final Arithmetic arithmetic;
+    /** The context to store/retrieve variables. */
+    private final JexlContext context;
 
     /** dummy velocity info. */
     private static final Info DUMMY = new Info("", 1, 1);
+    /** empty params for method matching. */
+    static private final Object[] EMPTY_PARAMS = new Object[0];
 
     /**
      * Create the interpreter.
@@ -103,10 +106,10 @@ class Interpreter extends VisitorAdapter {
      * @param uber the helper to perform introspection,
      * @param arith the arithmetic handler
      */
-    public Interpreter(JexlContext ctx, Uberspect uber, Arithmetic arith) {
-        uberspect = uber;
-        context = ctx;
-        arithmetic = arith;
+    public Interpreter(Uberspect uber, Arithmetic arith, JexlContext context) {
+        this.uberspect = uber;
+        this.arithmetic = arith;
+        this.context = context;
     }
 
     /**
@@ -116,9 +119,29 @@ class Interpreter extends VisitorAdapter {
      * @param aContext the context to interpret against.
      * @return the result of the interpretation.
      */
-    public Object interpret(SimpleNode node, JexlContext aContext) {
-        context = aContext;
+    public Object interpret(SimpleNode node, boolean silent) {
+        try {
         return node.jjtAccept(this, null);
+    }
+        catch(JexlException error) {
+            if (silent)
+                return null;
+            throw error;
+        }
+    }
+
+    public String debug(SimpleNode node) {
+        return debug(node, null);
+    }
+    
+    public String debug(SimpleNode node, int[] offsets) {
+        Debugger debug = new Debugger();
+        debug.debug(node);
+        if (offsets != null) {
+            offsets[0] = debug.start();
+            offsets[1] = debug.end();
+        }
+        return debug.data();
     }
 
     /**
@@ -130,44 +153,64 @@ class Interpreter extends VisitorAdapter {
         return uberspect;
     }
 
-    /**
-     * Sets the context that contain variables.
-     *
-     * @param aContext a {link JexlContext}
-     */
-    public void setContext(JexlContext aContext) {
-        context = aContext;
+
+    public Object visit(SimpleNode node, Object data) {
+        throw new UnsupportedOperationException("unexpected node " + node);
     }
 
-    // up to here
     /** {@inheritDoc} */
     public Object visit(ASTAddNode node, Object data) {
+        /**
+         * The pattern for exception mgmt is to let the child*.jjtAccept
+         * out of the try/catch loop so that if one fails, the ex will
+         * traverse up to the interpreter.
+         * In cases where this is not convenient/possible, JexlException must
+         * be caught explicitly and rethrown.
+         */
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        try {
         return arithmetic.add(left, right);
+    }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node, "add error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTAndNode node, Object data) {
-
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
-        boolean leftValue = Coercion.coerceboolean(left);
-
-        // coercion rules
-        return (leftValue && Coercion.coerceboolean(node.jjtGetChild(1).jjtAccept(this, data))) ? Boolean.TRUE
-            : Boolean.FALSE;
+        try {
+            boolean leftValue = arithmetic.toBoolean(left);
+            if (!leftValue)
+                return Boolean.FALSE;
+        }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node.jjtGetChild(0), "boolean coercion error", xrt);
+        }
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        try {
+            boolean rightValue = arithmetic.toBoolean(right);
+            if (!rightValue)
+                return Boolean.FALSE;
+        }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node.jjtGetChild(1), "boolean coercion error", xrt);
+        }
+        return Boolean.TRUE;
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTArrayAccess node, Object data) {
-        // first child is the identifier
+        // first objectNode is the identifier
         Object object = node.jjtGetChild(0).jjtAccept(this, data);
         // can have multiple nodes - either an expression, integer literal or
         // reference
         int numChildren = node.jjtGetNumChildren();
         for (int i = 1; i < numChildren; i++) {
-            Object index = node.jjtGetChild(i).jjtAccept(this, null);
-            object = getAttribute(object, index);
+            Node nindex = node.jjtGetChild(i);
+            Object index = nindex.jjtAccept(this, null);
+            object = getAttribute(object, index, nindex);
         }
 
         return object;
@@ -175,59 +218,155 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTAssignment node, Object data) {
-        // child 0 should be the variable (reference) to assign to
+        // left contains the reference to assign to
         Node left = node.jjtGetChild(0);
-        Object result = null;
-        if (left instanceof ASTReference) {
-            ASTReference reference = (ASTReference) left;
-            left = reference.jjtGetChild(0);
-            // TODO: this only works for a Reference that has a single
-            // identifier as it's child
-            if (left instanceof ASTIdentifier) {
-                String identifier = ((ASTIdentifier) left).image;
-                result = node.jjtGetChild(1).jjtAccept(this, data);
-                context.getVars().put(identifier, result);
-            }
-        } else {
-            throw new RuntimeException("Trying to assign to something other than a reference: " + left);
-        }
+        if (!(left instanceof ASTReference))
+                throw new JexlException(left, "illegal assignment form");
+        // right is the value expression to assign
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
-        return result;
+        // determine initial object & property:
+        Node objectNode = null;
+        Object object = null;
+        Node propertyNode = null;
+        Object property = null;
+        boolean isVariable = true;
+        StringBuilder variableName = null;
+        // 1: follow children till penultimate
+        int last = left.jjtGetNumChildren() - 1;
+        for (int c = 0; c < last; ++c) {
+            objectNode = left.jjtGetChild(c);
+            // evaluate the property within the object
+            object = objectNode.jjtAccept(this, object);
+            if (object != null)
+                continue;
+            isVariable &= objectNode instanceof ASTIdentifier;
+            // if we get null back as a result, check for an ant variable
+            if (isVariable) {
+                String name = ((ASTIdentifier) objectNode).image;
+                if (c == 0)
+                    variableName = new StringBuilder(name);
+                else {
+                    variableName.append('.');
+                    variableName.append(name);
+                }
+                object = context.getVars().get(variableName.toString());
+                // disallow mixing ant & bean with same root; avoid ambiguity
+                if (object != null)
+                    isVariable = false;
+            }
+            else
+                throw new JexlException(objectNode, "illegal assignment form");
+        }
+        // 2: last objectNode will perform assignement in all cases
+        propertyNode = left.jjtGetChild(last);
+        if (propertyNode instanceof ASTIdentifier) {
+            property = ((ASTIdentifier) propertyNode).image;
+            // deal with ant variable
+            if (isVariable && object == null) {
+                if (variableName != null) {
+                    if (last > 0) variableName.append('.');
+                    variableName.append(property);
+                    property = variableName.toString();
+                }
+                context.getVars().put(property, right);
+                return right;
+            }
+        } else if (propertyNode instanceof ASTArrayAccess) {
+            // first objectNode is the identifier
+            objectNode = propertyNode;
+            ASTArrayAccess narray = (ASTArrayAccess) objectNode;
+            Object nobject = narray.jjtGetChild(0).jjtAccept(this, object);
+            if (nobject == null)
+                throw new JexlException(objectNode, "array element is null");
+            else
+                object = nobject;
+            // can have multiple nodes - either an expression, integer literal or
+            // reference
+            last = narray.jjtGetNumChildren() - 1;
+            for (int i = 1; i < last; i++) {
+                objectNode = narray.jjtGetChild(i);
+                Object index = objectNode.jjtAccept(this, null);
+                object = getAttribute(object, index, objectNode);
+            }
+            property = narray.jjtGetChild(last).jjtAccept(this, null);
+        } else {
+            throw new JexlException(objectNode, "illegal assignment form");
+        }
+        if (property == null) {
+            // no property, we fail
+            throw new JexlException(propertyNode, "property is null");
+        }
+        if (object == null) {
+            // no object, we fail
+            throw new JexlException(objectNode, "bean is null");
+        }
+        // one before last, assign
+        setAttribute(object, property, right, propertyNode);
+        return right;
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTBitwiseAndNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        // coerce these two values longs and add.
-        long l = Coercion.coercelong(left);
-        long r = Coercion.coercelong(right);
+        int n = 0;
+        // coerce these two values longs and 'and'.
+        try {
+            long l = arithmetic.toLong(left);
+            n = 1;
+            long r = arithmetic.toLong(right);
         return new Long(l & r);
+    }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTBitwiseComplNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
-        long l = Coercion.coercelong(left);
+        try {
+            long l = arithmetic.toLong(left);
         return new Long(~l);
+    }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node.jjtGetChild(0), "long coercion error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTBitwiseOrNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        long l = Coercion.coercelong(left);
-        long r = Coercion.coercelong(right);
+        int n = 0;
+        // coerce these two values longs and 'or'.
+        try {
+            long l = arithmetic.toLong(left);
+            n = 1;
+            long r = arithmetic.toLong(right);
         return new Long(l | r);
+    }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTBitwiseXorNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        long l = Coercion.coercelong(left);
-        long r = Coercion.coercelong(right);
+        int n = 0;
+        // coerce these two values longs and 'xor'.
+        try {
+            long l = arithmetic.toLong(left);
+            n = 1;
+            long r = arithmetic.toLong(right);
         return new Long(l ^ r);
+    }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
@@ -242,11 +381,14 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTDivNode node, Object data) {
-
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        
+        try {
         return arithmetic.divide(left, right);
+    }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node, "divide error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
@@ -280,11 +422,14 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTEQNode node, Object data) {
-
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-
-        return equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
+        try {
+            return arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
+        }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node, "== error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
@@ -311,16 +456,15 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTForeachStatement node, Object data) {
-
         Object result = null;
-        /* first child is the loop variable */
+        /* first objectNode is the loop variable */
         ASTReference loopReference = (ASTReference) node.jjtGetChild(0);
         ASTIdentifier loopVariable = (ASTIdentifier) loopReference.jjtGetChild(0);
-        /* second child is the variable to iterate */
+        /* second objectNode is the variable to iterate */
         Object iterableValue = node.jjtGetChild(1).jjtAccept(this, data);
         // make sure there is a value to iterate on and a statement to execute
         if (iterableValue != null && node.jjtGetNumChildren() >= 3) {
-            /* third child is the statement to execute */
+            /* third objectNode is the statement to execute */
             SimpleNode statement = (SimpleNode) node.jjtGetChild(2);
             // get an iterator for the collection/array etc via the
             // introspector.
@@ -338,20 +482,26 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTGENode node, Object data) {
-
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-
-        return greaterThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
+        try {
+            return arithmetic.greaterThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
+        }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node, ">= error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTGTNode node, Object data) {
-
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-
-        return greaterThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
+        try {
+            return arithmetic.greaterThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
+        }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node, "> error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
@@ -361,28 +511,37 @@ class Interpreter extends VisitorAdapter {
         if (data == null) {
             return context.getVars().get(name);
         } else {
-            return getAttribute(data, name);
+            return getAttribute(data, name, node);
         }
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTIfStatement node, Object data) {
-
+        int n = 0;
+        try {
         Object result = null;
-        /* first child is the expression */
+            /* first objectNode is the expression */
         Object expression = node.jjtGetChild(0).jjtAccept(this, data);
-        if (Coercion.coerceboolean(expression)) {
-            // first child is true statement
+            if (arithmetic.toBoolean(expression)) {
+                // first objectNode is true statement
+                n = 1;
             result = node.jjtGetChild(1).jjtAccept(this, data);
         } else {
             // if there is a false, execute it. false statement is the second
-            // child
+                // objectNode
             if (node.jjtGetNumChildren() == 3) {
+                    n = 2;
                 result = node.jjtGetChild(2).jjtAccept(this, data);
             }
         }
-
         return result;
+    }
+        catch(JexlException error) {
+            throw error;
+        }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node.jjtGetChild(n), "if error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
@@ -409,20 +568,26 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTLENode node, Object data) {
-
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-
-        return lessThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
+        try {
+            return arithmetic.lessThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
+        }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node, "<= error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTLTNode node, Object data) {
-
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-
-        return lessThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
+        try {
+            return arithmetic.lessThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
+        }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node, "< error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
@@ -448,21 +613,18 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTMethod node, Object data) {
-
-        // child 0 is the identifier (method name), the others are parameters.
+        // objectNode 0 is the identifier (method name), the others are parameters.
         // the object to invoke the method on should be in the data argument
         String methodName = ((ASTIdentifier) node.jjtGetChild(0)).image;
 
-        int paramCount = node.jjtGetNumChildren() - 1;
-
         // get our params
+        int paramCount = node.jjtGetNumChildren() - 1;
         Object[] params = new Object[paramCount];
-
-        try {
             for (int i = 0; i < paramCount; i++) {
                 params[i] = node.jjtGetChild(i + 1).jjtAccept(this, null);
             }
 
+        try {
             VelMethod vm = getUberspect().getMethod(data, methodName, params, DUMMY);
             // DG: If we can't find an exact match, narrow the parameters and
             // try again!
@@ -472,7 +634,7 @@ class Interpreter extends VisitorAdapter {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
                     if (param instanceof Number) {
-                        params[i] = narrow((Number) param);
+                        params[i] = arithmetic.narrow((Number) param);
                     }
                 }
                 vm = getUberspect().getMethod(data, methodName, params, DUMMY);
@@ -484,54 +646,55 @@ class Interpreter extends VisitorAdapter {
             return vm.invoke(data, params);
         } catch (InvocationTargetException e) {
             Throwable t = e.getTargetException();
-
-            if (t instanceof Exception) {
-                throw new RuntimeException(t);
+            if (!(t instanceof Exception)) {
+                t = e;
             }
-
-            throw new RuntimeException(e);
+            throw new JexlException(node, "method invocation error", t); 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new JexlException(node, "method error", e); 
         }
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTModNode node, Object data) {
-
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-
+        try {
         return arithmetic.mod(left, right);
+    }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node, "% error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTMulNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        
+        try {
         return arithmetic.multiply(left, right);
+    }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node, "* error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTNENode node, Object data) {
-
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-
-        return equals(left, right) ? Boolean.FALSE : Boolean.TRUE;
+        try {
+            return arithmetic.equals(left, right) ? Boolean.FALSE : Boolean.TRUE;
+        }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node, "!= error", xrt);
+        }
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTNotNode node, Object data) {
-
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
-
-        // coercion rules
-        if (val != null) {
-            return Coercion.coerceboolean(val) ? Boolean.FALSE : Boolean.TRUE;
-        }
-
-        throw new IllegalArgumentException("not expression: not boolean valued " + val);
+        return arithmetic.toBoolean(val) ? Boolean.FALSE : Boolean.TRUE;
     }
 
     /** {@inheritDoc} */
@@ -541,13 +704,25 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTOrNode node, Object data) {
-
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
-        boolean leftValue = Coercion.coerceboolean(left);
-
-        // coercion rules
-        return (leftValue || Coercion.coerceboolean(node.jjtGetChild(1).jjtAccept(this, data))) ? Boolean.TRUE
-            : Boolean.FALSE;
+        try {
+            boolean leftValue = arithmetic.toBoolean(left);
+            if (leftValue)
+                return Boolean.TRUE;
+        }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node.jjtGetChild(0), "boolean coercion error", xrt);
+        }
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        try {
+            boolean rightValue = arithmetic.toBoolean(right);
+            if (rightValue)
+                return Boolean.TRUE;
+        }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node.jjtGetChild(1), "boolean coercion error", xrt);
+        }
+        return Boolean.FALSE;
     }
 
     /** {@inheritDoc} */
@@ -560,19 +735,21 @@ class Interpreter extends VisitorAdapter {
 
         // pass first piece of data in and loop through children
         Object result = null;
-        StringBuffer variableName = new StringBuffer();
+        StringBuilder variableName = null;
         boolean isVariable = true;
         for (int i = 0; i < numChildren; i++) {
             Node theNode = node.jjtGetChild(i);
-            isVariable = isVariable && (theNode instanceof ASTIdentifier);
+            isVariable &= (theNode instanceof ASTIdentifier);
             result = theNode.jjtAccept(this, result);
             // if we get null back a result, check for an ant variable
             if (result == null && isVariable) {
-                if (i != 0) {
-                    variableName.append('.');
-                }
                 String name = ((ASTIdentifier) theNode).image;
+                if (i == 0)
+                    variableName = new StringBuilder(name);
+                else {
+                    variableName.append('.');
                 variableName.append(name);
+                }
                 result = context.getVars().get(variableName.toString());
             }
         }
@@ -591,15 +768,15 @@ class Interpreter extends VisitorAdapter {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
 
         if (val == null) {
-            throw new IllegalArgumentException("size() : null arg");
+            throw new JexlException(node, "size() : argument is null", null);
         }
 
-        return new Integer(sizeOf(val));
+        return new Integer(sizeOf(node, val));
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTSizeMethod node, Object data) {
-        return new Integer(sizeOf(data));
+        return new Integer(sizeOf(node, data));
     }
 
     /** {@inheritDoc} */
@@ -616,8 +793,22 @@ class Interpreter extends VisitorAdapter {
     public Object visit(ASTSubtractNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        
+        try {
         return arithmetic.subtract(left, right);
+    }
+        catch(RuntimeException xrt) {
+            throw new JexlException(node, "- error", xrt);
+        }
+    }
+    
+    /** {@inheritDoc} */
+    public Object visit(ASTTernaryNode node, Object data) {
+        Object condition = node.jjtGetChild(0).jjtAccept(this, data);
+        if (node.jjtGetNumChildren() == 3)
+            return arithmetic.toBoolean(condition)?
+                node.jjtGetChild(1).jjtAccept(this, data) :
+                node.jjtGetChild(2).jjtAccept(this, data);
+        return condition != null && !Boolean.FALSE.equals(condition)? condition : node.jjtGetChild(1).jjtAccept(this, data);
     }
 
     /** {@inheritDoc} */
@@ -627,8 +818,8 @@ class Interpreter extends VisitorAdapter {
 
     /** {@inheritDoc} */
     public Object visit(ASTUnaryMinusNode node, Object data) {
-
-        Object val = node.jjtGetChild(0).jjtAccept(this, data);
+        Node valNode = node.jjtGetChild(0);
+        Object val = valNode.jjtAccept(this, data);
 
         if (val instanceof Byte) {
             byte valueAsByte = ((Byte) val).byteValue();
@@ -655,72 +846,19 @@ class Interpreter extends VisitorAdapter {
             BigInteger valueAsBigI = (BigInteger) val;
             return valueAsBigI.negate();
         }
-        throw new NumberFormatException("expression not a number: " + val);
+        throw new JexlException(valNode, "not a number");
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTWhileStatement node, Object data) {
         Object result = null;
-        /* first child is the expression */
+        /* first objectNode is the expression */
         Node expressionNode = (Node) node.jjtGetChild(0);
-        while (Coercion.coerceboolean(expressionNode.jjtAccept(this, data))) {
+        while (arithmetic.toBoolean(expressionNode.jjtAccept(this, data))) {
             // execute statement
             result = node.jjtGetChild(1).jjtAccept(this, data);
         }
 
-        return result;
-    }
-
-    // other stuff
-
-    /**
-     * Given a Number, return back the value using the smallest type the result
-     * will fit into. This works hand in hand with parameter 'widening' in java
-     * method calls, e.g. a call to substring(int,int) with an int and a long
-     * will fail, but a call to substring(int,int) with an int and a short will
-     * succeed.
-     *
-     * @param original the original number.
-     * @return a value of the smallest type the original number will fit into.
-     * @since 1.1
-     */
-    private Number narrow(Number original) {
-        if (original == null) {
-            return original;
-        }
-        Number result = original;
-        if (original instanceof BigDecimal) {
-            BigDecimal bigd = (BigDecimal) original;
-            // if it's bigger than a double it can't be narrowed
-            if (bigd.compareTo(new BigDecimal(Double.MAX_VALUE)) > 0) {
-                return original;
-            }
-        }
-        if (original instanceof Double || original instanceof Float || original instanceof BigDecimal) {
-            double value = original.doubleValue();
-            if (value <= Float.MAX_VALUE && value >= Float.MIN_VALUE) {
-                result = new Float(result.floatValue());
-            }
-            // else it fits in a double only
-        } else {
-            if (original instanceof BigInteger) {
-                BigInteger bigi = (BigInteger) original;
-                // if it's bigger than a Long it can't be narrowed
-                if (bigi.compareTo(new BigInteger(String.valueOf(Long.MAX_VALUE))) > 0) {
-                    return original;
-                }
-            }
-            long value = original.longValue();
-            if (value <= Byte.MAX_VALUE && value >= Byte.MIN_VALUE) {
-                // it will fit in a byte
-                result = new Byte((byte) value);
-            } else if (value <= Short.MAX_VALUE && value >= Short.MIN_VALUE) {
-                result = new Short((short) value);
-            } else if (value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE) {
-                result = new Integer((int) value);
-            }
-            // else it fits in a long
-        }
         return result;
     }
 
@@ -731,7 +869,7 @@ class Interpreter extends VisitorAdapter {
      * @param val the object to get the size of.
      * @return the size of val
      */
-    private int sizeOf(Object val) {
+    private int sizeOf(Node node, Object val) {
         if (val instanceof Collection) {
             return ((Collection) val).size();
         } else if (val.getClass().isArray()) {
@@ -742,21 +880,19 @@ class Interpreter extends VisitorAdapter {
             return ((String) val).length();
         } else {
             // check if there is a size method on the object that returns an
-            // integer
-            // and if so, just use it
+            // integer and if so, just use it
             Object[] params = new Object[0];
-            // Info velInfo = new Info("", 1, 1);
-            VelMethod vm = uberspect.getMethod(val, "size", params, DUMMY);
+            VelMethod vm = uberspect.getMethod(val, "size", EMPTY_PARAMS, DUMMY);
             if (vm != null && vm.getReturnType() == Integer.TYPE) {
                 Integer result;
                 try {
                     result = (Integer) vm.invoke(val, params);
                 } catch (Exception e) {
-                    throw new RuntimeException("size() : error executing", e);
+                    throw new JexlException(node, "size() : error executing", e);
                 }
                 return result.intValue();
             }
-            throw new IllegalArgumentException("size() : unknown type : " + val.getClass());
+            throw new JexlException(node, "size() : unsupported type : " + val.getClass(), null);
         }
     }
 
@@ -768,171 +904,118 @@ class Interpreter extends VisitorAdapter {
      *            key for a map
      * @return the attribute.
      */
-    private Object getAttribute(Object object, Object attribute) {
+    public Object getAttribute(Object object, Object attribute) {
+        return getAttribute(object, attribute, null);
+    }
+
+    protected Object getAttribute(Object object, Object attribute, Node node) {
         if (object == null) {
             return null;
+        }
+        // maps do accept null keys; check attribute null status after trying
+        if (object instanceof Map) {
+            try {
+                return ((Map) object).get(attribute);
+            } catch (RuntimeException xrt) {
+                throw node == null ? xrt : new JexlException(node, "get map element error", xrt);
+            }
         }
         if (attribute == null) {
             return null;
         }
-        if (object instanceof Map) {
-            return ((Map) object).get(attribute);
-        } else if (object instanceof List) {
-            int idx = Coercion.coerceinteger(attribute);
-
+        if (object instanceof List) {
             try {
+                int idx = arithmetic.toInteger(attribute);
                 return ((List) object).get(idx);
-            } catch (IndexOutOfBoundsException iobe) {
-                return null;
+            } catch (RuntimeException xrt) {
+                throw node == null ? xrt : new JexlException(node, "get list element error", xrt);
             }
-        } else if (object.getClass().isArray()) {
-            int idx = Coercion.coerceinteger(attribute);
-
+        }
+        if (object.getClass().isArray()) {
             try {
+                int idx = arithmetic.toInteger(attribute);
                 return Array.get(object, idx);
-            } catch (ArrayIndexOutOfBoundsException aiobe) {
-                return null;
+            } catch (RuntimeException xrt) {
+                throw node == null ? xrt : new JexlException(node, "get array element error", xrt);
             }
-        } else {
+            }
             // look up bean property of data and return
             VelPropertyGet vg = getUberspect().getPropertyGet(object, attribute.toString(), DUMMY);
-
             if (vg != null) {
                 try {
                     return vg.invoke(object);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+            } catch (Exception xany) {
+                throw node == null ? new RuntimeException(xany) : new JexlException(node, "get object property error", xany);
                 }
-            } else {
-                return null;
             }
 
-        }
+        return null;
     }
 
     /**
-     * Test if left and right are equal.
+     * Sets an attribute of an object.
      *
-     * @param left first value
-     * @param right second value
-     * @return test result.
-     */
-    private boolean equals(Object left, Object right) {
-        if (left == null && right == null) {
-            /*
-             * if both are null L == R
+     * @param object to set the value to
+     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or
+     *            key for a map
+     * @param value the value to assign to the object's attribute
+     * @return the attribute.
              */
-            return true;
-        } else if (left == null || right == null) {
-            /*
-             * we know both aren't null, therefore L != R
-             */
-            return false;
-        } else if (left.getClass().equals(right.getClass())) {
-            return left.equals(right);
-        } else if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            return Coercion.coerceBigDecimal(left).compareTo(Coercion.coerceBigDecimal(right)) == 0;
-        } else if (isFloatingPointType(left, right)) {
-            Double l = Coercion.coerceDouble(left);
-            Double r = Coercion.coerceDouble(right);
-
-            return l.equals(r);
-        } else if (left instanceof Number || right instanceof Number || left instanceof Character
-            || right instanceof Character) {
-            return Coercion.coerceLong(left).equals(Coercion.coerceLong(right));
-        } else if (left instanceof Boolean || right instanceof Boolean) {
-            return Coercion.coerceBoolean(left).equals(Coercion.coerceBoolean(right));
-        } else if (left instanceof java.lang.String || right instanceof String) {
-            return left.toString().equals(right.toString());
+    public void setAttribute(Object object, Object attribute, Object value) {
+        setAttribute(object, attribute, null);
         }
 
-        return left.equals(right);
+    protected void setAttribute(Object object, Object attribute, Object value, Node node) {
+        if (object instanceof JexlContext) {
+            ((JexlContext) object).getVars().put(attribute, value);
+            return;
     }
 
-    /**
-     * Test if either left or right are either a Float or Double.
-     * @param left one object to test
-     * @param right the other
-     * @return the result of the test.
-     */
-    private boolean isFloatingPointType(Object left, Object right) {
-        return left instanceof Float || left instanceof Double || right instanceof Float || right instanceof Double;
+        if (object instanceof Map) {
+            try {
+                ((Map) object).put(attribute, value);
+                return;
+            } catch (RuntimeException xrt) {
+                throw node == null ? xrt : new JexlException(node, "set map element error", xrt);
     }
-
-    /**
-     * Test if left < right.
-     *
-     * @param left first value
-     * @param right second value
-     * @return test result.
-     */
-    private boolean lessThan(Object left, Object right) {
-        if ((left == right) || (left == null) || (right == null)) {
-            return false;
-        } else if (Coercion.isFloatingPoint(left) || Coercion.isFloatingPoint(right)) {
-            double leftDouble = Coercion.coerceDouble(left).doubleValue();
-            double rightDouble = Coercion.coerceDouble(right).doubleValue();
-
-            return leftDouble < rightDouble;
-            } else if (left instanceof BigDecimal || right instanceof BigDecimal) {
-                BigDecimal l  = Coercion.coerceBigDecimal(left);
-                BigDecimal r  = Coercion.coerceBigDecimal(right);
-                return l.compareTo(r) < 0;
-        } else if (Coercion.isNumberable(left) || Coercion.isNumberable(right)) {
-            long leftLong = Coercion.coerceLong(left).longValue();
-            long rightLong = Coercion.coerceLong(right).longValue();
-
-            return leftLong < rightLong;
-        } else if (left instanceof String || right instanceof String) {
-            String leftString = left.toString();
-            String rightString = right.toString();
-
-            return leftString.compareTo(rightString) < 0;
-        } else if (left instanceof Comparable) {
-            return ((Comparable) left).compareTo(right) < 0;
-        } else if (right instanceof Comparable) {
-            return ((Comparable) right).compareTo(left) > 0;
         }
-
-        throw new IllegalArgumentException("Invalid comparison : comparing cardinality for left: " + left
-            + " and right: " + right);
-
+        if (object instanceof List) {
+            try {
+                int idx = arithmetic.toInteger(attribute);
+                ((List) object).set(idx, value);
+                return;
+            } catch (RuntimeException xrt) {
+                throw node == null ? xrt : new JexlException(node, "set list element error", xrt);
+            }
     }
 
-    /**
-     * Test if left > right.
-     *
-     * @param left first value
-     * @param right second value
-     * @return test result.
-     */
-    private boolean greaterThan(Object left, Object right) {
-        if (left == null || right == null) {
-            return false;
+        if (object.getClass().isArray()) {
+            try {
+                int idx = arithmetic.toInteger(attribute);
+                Array.set(object, idx, value);
+                return;
+            } catch (RuntimeException xrt) {
+                throw node == null ? xrt : new JexlException(node, "set array element error", xrt);
         }
-        return !equals(left, right) && !lessThan(left, right);
     }
 
-    /**
-     * Test if left <= right.
-     *
-     * @param left first value
-     * @param right second value
-     * @return test result.
-     */
-    private boolean lessThanOrEqual(Object left, Object right) {
-        return equals(left, right) || lessThan(left, right);
+        // "Otherwise (a JavaBean object)..." huh? :)
+        String s = attribute.toString();
+        VelPropertySet vs = getUberspect().getPropertySet(object, s, value, DUMMY);
+        if (vs != null) {
+            try {
+                vs.invoke(object, value);
+            } catch (RuntimeException xrt) {
+                throw node == null ? xrt : new JexlException(node, "set object property error", xrt);
+            } catch (Exception xany) {
+                throw node == null ? new RuntimeException(xany) : new JexlException(node, "set object property error", xany);
+            }
+            return;
+        }
+        if (node == null)
+            new UnsupportedOperationException("unable to set object property, object:" + object + ", property: " + attribute);
+        throw new JexlException(node, "unable to set bean property", null);
     }
 
-    /**
-     * Test if left >= right.
-     *
-     * @param left first value
-     * @param right second value
-     * @return test result.
-     */
-    private boolean greaterThanOrEqual(Object left, Object right) {
-        return equals(left, right) || greaterThan(left, right);
-    }
 
 }

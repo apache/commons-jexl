@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,23 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.apache.commons.jexl.parser;
+package org.apache.commons.jexl.logging;
 
 /**
- * Base class for parser nodes - holds an 'image' of the token for later use.
+ * A local log manager class to allow diverting JUL logging without adding dependency upfront.
  * 
- * @since 2.0
  */
-abstract class JEXLNode {
-
-    /**
-     * Create the interpreter with the default settings.
-     */
-    public JEXLNode() {
-    }
-
-    // CSOFF: VisibilityModifier
-    /** token value. */
-    public String image;
+public class LogManager {
+  static public java.util.logging.Logger getLogger(String name) {
+    return java.util.logging.Logger.getLogger(name);
+  }
+  static public void update() {
+    //noop;
+  }
 }

@@ -26,7 +26,8 @@ import org.apache.commons.logging.Log;
  * @since 1.0
  */
 public class PropertyExecutor extends AbstractExecutor {
-
+    /* Empty param list. */
+    protected static final Object[] EMPTY_PARAMS = {};
     /** index of the first character of the property. */
     private static final int PROPERTY_START_INDEX = 3;
     /** The JEXL introspector used. */
@@ -64,21 +65,17 @@ public class PropertyExecutor extends AbstractExecutor {
 
         try {
             char c;
-            StringBuffer sb;
-
-            Object[] params = {};
-
             /*
              *  start with get<property>
              *  this leaves the property name
              *  as is...
              */
-            sb = new StringBuffer("get");
+            StringBuilder sb = new StringBuilder("get");
             sb.append(property);
 
             methodUsed = sb.toString();
 
-            method = introspector.getMethod(clazz, methodUsed, params);
+            method = introspector.getMethod(clazz, methodUsed, EMPTY_PARAMS);
 
             if (method != null) {
                 return;
@@ -97,7 +94,7 @@ public class PropertyExecutor extends AbstractExecutor {
             }
 
             methodUsed = sb.toString();
-            method = introspector.getMethod(clazz, methodUsed, params);
+            method = introspector.getMethod(clazz, methodUsed, EMPTY_PARAMS);
 
             if (method != null) {
                 return;
@@ -108,7 +105,7 @@ public class PropertyExecutor extends AbstractExecutor {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            rlog.error("PROGRAMMER ERROR : PropertyExector() : " + e);
+                rlog.error("PROGRAMMER ERROR : PropertyExector() : ", e);
         }
     }
 
@@ -122,7 +119,7 @@ public class PropertyExecutor extends AbstractExecutor {
             return null;
         }
 
-        return method.invoke(o, null);
+        return method.invoke(o, (Object[])null);
     }
 }
 

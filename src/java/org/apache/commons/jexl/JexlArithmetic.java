@@ -19,8 +19,6 @@ package org.apache.commons.jexl;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.apache.commons.jexl.util.Coercion;
-
 /**
  * Perform arithmetic.
  * @since 2.0
@@ -48,28 +46,28 @@ class JexlArithmetic implements Arithmetic {
         
         try {
             if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-                double l = Coercion.coercedouble(left);
-                double r = Coercion.coercedouble(right);
+                double l = toDouble(left);
+                double r = toDouble(right);
                 return new Double(l + r);
             }
         
             // if both are bigintegers use that type
             if (left instanceof BigInteger && right instanceof BigInteger) {
-                BigInteger l = Coercion.coerceBigInteger(left);
-                BigInteger r = Coercion.coerceBigInteger(right);
+                BigInteger l = toBigInteger(left);
+                BigInteger r = toBigInteger(right);
                 return l.add(r);
             }
             
             // if either are bigdecimal use that type 
             if (left instanceof BigDecimal || right instanceof BigDecimal) {
-                BigDecimal l = Coercion.coerceBigDecimal(left);
-                BigDecimal r = Coercion.coerceBigDecimal(right);
+                BigDecimal l = toBigDecimal(left);
+                BigDecimal r = toBigDecimal(right);
                 return l.add(r);
             }
             
             // otherwise treat as integers
-            BigInteger l = Coercion.coerceBigInteger(left);
-            BigInteger r = Coercion.coerceBigInteger(right);
+            BigInteger l = toBigInteger(left);
+            BigInteger r = toBigInteger(right);
             BigInteger result = l.add(r);
             BigInteger maxLong = BigInteger.valueOf(Long.MAX_VALUE); 
             if (result.compareTo(maxLong) <= 0) {
@@ -99,8 +97,8 @@ class JexlArithmetic implements Arithmetic {
 
         // if both are bigintegers use that type
         if (left instanceof BigInteger && right instanceof BigInteger) {
-            BigInteger l = Coercion.coerceBigInteger(left);
-            BigInteger r = Coercion.coerceBigInteger(right);
+            BigInteger l = toBigInteger(left);
+            BigInteger r = toBigInteger(right);
             if (r.compareTo(BigInteger.valueOf(0)) == 0) {
                 return r;
             }
@@ -109,16 +107,16 @@ class JexlArithmetic implements Arithmetic {
         
         // if either are bigdecimal use that type 
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            BigDecimal l = Coercion.coerceBigDecimal(left);
-            BigDecimal r = Coercion.coerceBigDecimal(right);
+            BigDecimal l = toBigDecimal(left);
+            BigDecimal r = toBigDecimal(right);
             if (r.compareTo(BigDecimal.valueOf(0)) == 0) {
                 return r;
             }
             return l.divide(r, BigDecimal.ROUND_HALF_UP);
         }
 
-        double l = Coercion.coercedouble(left);
-        double r = Coercion.coercedouble(right);
+        double l = toDouble(left);
+        double r = toDouble(right);
         if (r == 0) {
             return new Double(r);
         }
@@ -142,15 +140,15 @@ class JexlArithmetic implements Arithmetic {
         }
 
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            double l = Coercion.coercedouble(left);
-            double r = Coercion.coercedouble(right);
+            double l = toDouble(left);
+            double r = toDouble(right);
             return new Double(l % r);
         }
 
         // if both are bigintegers use that type
         if (left instanceof BigInteger && right instanceof BigInteger) {
-            BigInteger l = Coercion.coerceBigInteger(left);
-            BigInteger r = Coercion.coerceBigInteger(right);
+            BigInteger l = toBigInteger(left);
+            BigInteger r = toBigInteger(right);
             if (r.compareTo(BigInteger.valueOf(0)) == 0) {
                 return r;
             }
@@ -159,8 +157,8 @@ class JexlArithmetic implements Arithmetic {
 
         // if either are bigdecimal use that type 
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            BigDecimal l = Coercion.coerceBigDecimal(left);
-            BigDecimal r = Coercion.coerceBigDecimal(right);
+            BigDecimal l = toBigDecimal(left);
+            BigDecimal r = toBigDecimal(right);
             if (r.compareTo(BigDecimal.valueOf(0)) == 0) {
                 return r;
             }
@@ -171,8 +169,8 @@ class JexlArithmetic implements Arithmetic {
         }
 
         // otherwise treat as integers
-        BigInteger l = Coercion.coerceBigInteger(left);
-        BigInteger r = Coercion.coerceBigInteger(right);
+        BigInteger l = toBigInteger(left);
+        BigInteger r = toBigInteger(right);
         BigInteger result = l.mod(r);
         BigInteger maxLong = BigInteger.valueOf(Long.MAX_VALUE); 
         if (result.compareTo(maxLong) <= 0) {
@@ -201,28 +199,28 @@ class JexlArithmetic implements Arithmetic {
         }
         
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            double l = Coercion.coercedouble(left);
-            double r = Coercion.coercedouble(right);
+            double l = toDouble(left);
+            double r = toDouble(right);
             return new Double(l * r);
         }
         
         // if both are bigintegers use that type
         if (left instanceof BigInteger && right instanceof BigInteger) {
-            BigInteger l = Coercion.coerceBigInteger(left);
-            BigInteger r = Coercion.coerceBigInteger(right);
+            BigInteger l = toBigInteger(left);
+            BigInteger r = toBigInteger(right);
             return l.multiply(r);
         }
         
         // if either are bigdecimal use that type 
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            BigDecimal l = Coercion.coerceBigDecimal(left);
-            BigDecimal r = Coercion.coerceBigDecimal(right);
+            BigDecimal l = toBigDecimal(left);
+            BigDecimal r = toBigDecimal(right);
             return l.multiply(r);
         }
 
         // otherwise treat as integers
-        BigInteger l = Coercion.coerceBigInteger(left);
-        BigInteger r = Coercion.coerceBigInteger(right);
+        BigInteger l = toBigInteger(left);
+        BigInteger r = toBigInteger(right);
         BigInteger result = l.multiply(r);
         BigInteger maxLong = BigInteger.valueOf(Long.MAX_VALUE); 
         if (result.compareTo(maxLong) <= 0) {
@@ -251,34 +249,159 @@ class JexlArithmetic implements Arithmetic {
         }
         
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            double l = Coercion.coercedouble(left);
-            double r = Coercion.coercedouble(right);
+            double l = toDouble(left);
+            double r = toDouble(right);
             return new Double(l - r);
         }
         
         // if both are bigintegers use that type
         if (left instanceof BigInteger && right instanceof BigInteger) {
-            BigInteger l = Coercion.coerceBigInteger(left);
-            BigInteger r = Coercion.coerceBigInteger(right);
+            BigInteger l = toBigInteger(left);
+            BigInteger r = toBigInteger(right);
             return l.subtract(r);
         }
         
         // if either are bigdecimal use that type 
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            BigDecimal l = Coercion.coerceBigDecimal(left);
-            BigDecimal r = Coercion.coerceBigDecimal(right);
+            BigDecimal l = toBigDecimal(left);
+            BigDecimal r = toBigDecimal(right);
             return l.subtract(r);
         }
 
         // otherwise treat as integers
-        BigInteger l = Coercion.coerceBigInteger(left);
-        BigInteger r = Coercion.coerceBigInteger(right);
+        BigInteger l = toBigInteger(left);
+        BigInteger r = toBigInteger(right);
         BigInteger result = l.subtract(r);
         BigInteger maxLong = BigInteger.valueOf(Long.MAX_VALUE); 
         if (result.compareTo(maxLong) <= 0) {
             return new Long(result.longValue());
         }
         return result;
+    }
+    
+    /**
+     * Test if left and right are equal.
+     *
+     * @param left first value
+     * @param right second value
+     * @return test result.
+     */
+    public boolean equals(Object left, Object right) {
+        if (left == null && right == null) {
+            /*
+             * if both are null L == R
+             */
+            return true;
+        } else if (left == null || right == null) {
+            /*
+             * we know both aren't null, therefore L != R
+             */
+            return false;
+        } else if (left.getClass().equals(right.getClass())) {
+            return left.equals(right);
+        } else if (left instanceof BigDecimal || right instanceof BigDecimal) {
+            return toBigDecimal(left).compareTo(toBigDecimal(right)) == 0;
+        } else if (isFloatingPointType(left, right)) {
+            return toDouble(left) == toDouble(right);
+        } else if (left instanceof Number || right instanceof Number || left instanceof Character
+            || right instanceof Character) {
+            return toLong(left) == toLong(right);
+        } else if (left instanceof Boolean || right instanceof Boolean) {
+            return toBoolean(left) == toBoolean(right);
+        } else if (left instanceof java.lang.String || right instanceof String) {
+            return left.toString().equals(right.toString());
+        }
+
+        return left.equals(right);
+    }
+
+
+    /**
+     * Test if left < right.
+     *
+     * @param left first value
+     * @param right second value
+     * @return test result.
+     */
+    public boolean lessThan(Object left, Object right) {
+        if ((left == right) || (left == null) || (right == null)) {
+            return false;
+        } else if (isFloatingPoint(left) || isFloatingPoint(right)) {
+            double leftDouble = toDouble(left);
+            double rightDouble = toDouble(right);
+
+            return leftDouble < rightDouble;
+            } else if (left instanceof BigDecimal || right instanceof BigDecimal) {
+                BigDecimal l  = toBigDecimal(left);
+                BigDecimal r  = toBigDecimal(right);
+                return l.compareTo(r) < 0;
+        } else if (isNumberable(left) || isNumberable(right)) {
+            long leftLong = toLong(left);
+            long rightLong = toLong(right);
+
+            return leftLong < rightLong;
+        } else if (left instanceof String || right instanceof String) {
+            String leftString = left.toString();
+            String rightString = right.toString();
+
+            return leftString.compareTo(rightString) < 0;
+        } else if (left instanceof Comparable) {
+            return ((Comparable) left).compareTo(right) < 0;
+        } else if (right instanceof Comparable) {
+            return ((Comparable) right).compareTo(left) > 0;
+        }
+
+        throw new IllegalArgumentException("Invalid comparison : comparing cardinality for left: " + left
+            + " and right: " + right);
+
+    }
+
+    /**
+     * Test if left > right.
+     *
+     * @param left first value
+     * @param right second value
+     * @return test result.
+     */
+    public boolean greaterThan(Object left, Object right) {
+        if (left == null || right == null) {
+            return false;
+        }
+        return !equals(left, right) && !lessThan(left, right);
+    }
+
+    /**
+     * Test if left <= right.
+     *
+     * @param left first value
+     * @param right second value
+     * @return test result.
+     */
+    public boolean lessThanOrEqual(Object left, Object right) {
+        return equals(left, right) || lessThan(left, right);
+    }
+
+    /**
+     * Test if left >= right.
+     *
+     * @param left first value
+     * @param right second value
+     * @return test result.
+     */
+    public boolean greaterThanOrEqual(Object left, Object right) {
+        return equals(left, right) || greaterThan(left, right);
+    }
+    
+
+    
+    /**
+     * Test if either left or right are either a Float or Double.
+     * @param left one object to test
+     * @param right the other
+     * @return the result of the test.
+     */
+    private boolean isFloatingPointType(Object left, Object right) {
+        return left instanceof Float || left instanceof Double || right instanceof Float || right instanceof Double;
     }
     
     /**
@@ -298,4 +421,235 @@ class JexlArithmetic implements Arithmetic {
         }
         return false;
     }
+    
+    /**
+     * Coerce to a boolean (not a java.lang.Boolean).
+     *
+     * @param val Object to be coerced.
+     * @return The Boolean coerced value, or false if none possible.
+     */
+    public boolean toBoolean(Object val) {
+        if (val == null) {
+            return false;
+        } else if (val instanceof Boolean) {
+            return ((Boolean) val).booleanValue();
+        } else if (val instanceof String) {
+            return Boolean.valueOf((String) val).booleanValue();
+        }
+        // TODO: is this a reasonable default?
+        return false;
+    }
+
+    /**
+     * Coerce to a Integer.
+     *
+     * @param val Object to be coerced.
+     * @return The Integer coerced value.
+     */
+    public int toInteger(Object val) {
+        if (val == null) {
+            return 0;
+        } else if (val instanceof String) {
+            if ("".equals(val)) {
+                return 0;
+            }
+            return Integer.parseInt((String) val);
+        } else if (val instanceof Character) {
+            return ((Character) val).charValue();
+        } else if (val instanceof Boolean) {
+            throw new IllegalArgumentException("Boolean->Integer coercion exception");
+        } else if (val instanceof Number) {
+            return ((Number) val).intValue();
+        }
+
+        throw new IllegalArgumentException("Integer coercion exception, don't know how to convert " + val);
+    }
+
+    
+    /**
+     * Coerce to a long (not a java.lang.Long).
+     *
+     * @param val Object to be coerced.
+     * @return The Long coerced value.
+     */
+    public long toLong(Object val) {
+        if (val == null) {
+            return 0;
+        } else if (val instanceof String) {
+            if ("".equals(val)) {
+                return 0;
+            }
+            return Long.parseLong((String) val);
+        } else if (val instanceof Character) {
+            return ((Character) val).charValue();
+        } else if (val instanceof Boolean) {
+            throw new NumberFormatException("Boolean->Long coercion exception");
+        } else if (val instanceof Number) {
+            return ((Number) val).longValue();
+        }
+
+        throw new NumberFormatException("Long coercion exception for '" + val + "'");
+    }
+
+    /**
+     * Get a BigInteger from the object passed.
+     * Null and empty string maps to zero.
+     * @param val the object to be coerced.
+     * @return a BigDecimal.
+     */
+    public BigInteger toBigInteger(Object val) {
+        if (val instanceof BigInteger) {
+            return (BigInteger) val;
+        } else if (val == null) {
+            return BigInteger.valueOf(0);
+        } else if (val instanceof String) {
+            String string = (String) val;
+            if ("".equals(string.trim())) {
+                return BigInteger.valueOf(0);
+            }
+            return new BigInteger(string);
+        } else if (val instanceof Number) {
+            return new BigInteger(val.toString());
+        } else if (val instanceof Character) {
+            int i = ((Character) val).charValue();
+            return BigInteger.valueOf(i);
+        }
+        
+        throw new IllegalArgumentException("BigInteger coercion. Can't coerce type " + val.getClass().getName());
+    }
+    
+    /**
+     * Get a BigDecimal from the object passed.
+     * Null and empty string maps to zero.
+     * @param val the object to be coerced.
+     * @return a BigDecimal.
+     */
+    public BigDecimal toBigDecimal(Object val) {
+        if (val instanceof BigDecimal) {
+            return (BigDecimal) val;
+        } else if (val == null) {
+            return BigDecimal.valueOf(0);
+        } else if (val instanceof String) {
+            String string = (String) val;
+            if ("".equals(string.trim())) {
+                return BigDecimal.valueOf(0);
+            }
+            return new BigDecimal(string);
+        } else if (val instanceof Number) {
+            return new BigDecimal(val.toString());
+        } else if (val instanceof Character) {
+            int i = ((Character) val).charValue();
+            return new BigDecimal(i);
+        }
+        
+        throw new IllegalArgumentException("BigDecimal coercion. Can't coerce type " + val.getClass().getName());
+    }
+    
+    /**
+     * Coerce to a double.
+     *
+     * @param val Object to be coerced.
+     * @return The Double coerced value.
+     */
+    public double toDouble(Object val) {
+        if (val == null) {
+            return 0;
+        } else if (val instanceof String) {
+            String string = (String) val;
+            if ("".equals(string.trim())) {
+                return 0;
+            }
+            // the spec seems to be iffy about this.  Going to give it a wack anyway
+            return Double.parseDouble(string);
+        } else if (val instanceof Character) {
+            int i = ((Character) val).charValue();
+
+            return i;
+        } else if (val instanceof Double) {
+            return ((Double) val).doubleValue();
+        } else if (val instanceof Number) {
+            //The below construct is used rather than ((Number)val).doubleValue() to ensure
+            //equality between comparing new Double( 6.4 / 3 ) and the jexl expression of 6.4 / 3
+            return Double.parseDouble(String.valueOf(val));
+        } else if (val instanceof Boolean) {
+            throw new IllegalArgumentException("Boolean->Double coercion exception");
+        }
+
+        throw new IllegalArgumentException("Double coercion exception, don't know how to convert " + val);
+    }
+    /**
+     * Is Object a floating point number.
+     *
+     * @param o Object to be analyzed.
+     * @return true if it is a Float or a Double.
+     */
+    public static boolean isFloatingPoint(final Object o) {
+        return o instanceof Float || o instanceof Double;
+    }
+
+    /**
+     * Is Object a whole number.
+     *
+     * @param o Object to be analyzed.
+     * @return true if Integer, Long, Byte, Short or Character.
+     */
+    public static boolean isNumberable(final Object o) {
+        return o instanceof Integer
+            || o instanceof Long
+            || o instanceof Byte
+            || o instanceof Short
+            || o instanceof Character;
+    }
+
+    /**
+     * Given a Number, return back the value using the smallest type the result
+     * will fit into. This works hand in hand with parameter 'widening' in java
+     * method calls, e.g. a call to substring(int,int) with an int and a long
+     * will fail, but a call to substring(int,int) with an int and a short will
+     * succeed.
+     *
+     * @param original the original number.
+     * @return a value of the smallest type the original number will fit into.
+     * @since 1.1
+     */
+    public Number narrow(Number original) {
+        if (original == null) {
+            return original;
+        }
+        Number result = original;
+        if (original instanceof BigDecimal) {
+            BigDecimal bigd = (BigDecimal) original;
+            // if it's bigger than a double it can't be narrowed
+            if (bigd.compareTo(new BigDecimal(Double.MAX_VALUE)) > 0) {
+                return original;
+            }
+        }
+        if (original instanceof Double || original instanceof Float || original instanceof BigDecimal) {
+            double value = original.doubleValue();
+            if (value <= Float.MAX_VALUE && value >= Float.MIN_VALUE) {
+                result = new Float(result.floatValue());
+            }
+            // else it fits in a double only
+        } else {
+            if (original instanceof BigInteger) {
+                BigInteger bigi = (BigInteger) original;
+                // if it's bigger than a Long it can't be narrowed
+                if (bigi.compareTo(new BigInteger(String.valueOf(Long.MAX_VALUE))) > 0) {
+                    return original;
+                }
+            }
+            long value = original.longValue();
+            if (value <= Byte.MAX_VALUE && value >= Byte.MIN_VALUE) {
+                // it will fit in a byte
+                result = new Byte((byte) value);
+            } else if (value <= Short.MAX_VALUE && value >= Short.MIN_VALUE) {
+                result = new Short((short) value);
+            } else if (value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE) {
+                result = new Integer((int) value);
+            }
+            // else it fits in a long
+        }
+        return result;
+    }
+
 }
