@@ -583,7 +583,7 @@ class JexlArithmetic implements Arithmetic {
      * @param o Object to be analyzed.
      * @return true if it is a Float or a Double.
      */
-    public static boolean isFloatingPoint(final Object o) {
+    public boolean isFloatingPoint(final Object o) {
         return o instanceof Float || o instanceof Double;
     }
 
@@ -593,7 +593,7 @@ class JexlArithmetic implements Arithmetic {
      * @param o Object to be analyzed.
      * @return true if Integer, Long, Byte, Short or Character.
      */
-    public static boolean isNumberable(final Object o) {
+    public boolean isNumberable(final Object o) {
         return o instanceof Integer
             || o instanceof Long
             || o instanceof Byte

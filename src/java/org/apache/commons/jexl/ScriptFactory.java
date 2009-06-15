@@ -21,8 +21,6 @@ import java.io.StringReader;
 import java.net.URL;
 
 import org.apache.commons.jexl.parser.Parser;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -44,10 +42,6 @@ import org.apache.commons.logging.LogFactory;
  * @version $Id$
  */
 public class ScriptFactory {
-
-    /** The Log to which all ScriptFactory messages will be logged.*/
-    protected static Log log =
-        LogFactory.getLog("org.apache.commons.jexl.ScriptFactory");
 
     /**
      * The singleton ScriptFactory also holds a single instance of

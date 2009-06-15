@@ -24,10 +24,8 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.logging.Logger;
-import java.util.logging.Level;
+import org.apache.commons.logging.*;
 
-import org.apache.commons.jexl.logging.LogManager;
 import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
 import org.apache.commons.jexl.parser.SimpleNode;
@@ -55,7 +53,7 @@ public class JexlEngine {
     /**
      * The Log to which all JexlEngine messages will be logged.
      */
-    protected final Logger LOG;
+    protected final Log LOG;
     /**
      * The singleton ExpressionFactory also holds a single instance of
      * {@link Parser}.
@@ -87,10 +85,14 @@ public class JexlEngine {
      * @param arithmetic to allow different arithmetic behaviour
      * @param log the logger for various messages
      */
-    public JexlEngine(Uberspect uberspect, Arithmetic arithmetic, Logger log) {
+    public JexlEngine(Uberspect uberspect, Arithmetic arithmetic, Log log) {
         this.uberspect = uberspect == null? Introspector.getUberspect() : uberspect;
         this.arithmetic = arithmetic == null? new JexlArithmetic() : arithmetic;
-        this.LOG = log == null? LogManager.getLogger("org.apache.commons.jexl.JexlEngine") : log;
+        if (log == null)
+            log = LogFactory.getLog(JexlEngine.class);
+        if (log == null)
+            throw new NullPointerException("logger can not be null");
+        this.LOG = log;
     }
     
     /**
@@ -125,8 +127,7 @@ public class JexlEngine {
         // Parse the Expression
         SimpleNode tree;
         synchronized (parser) {
-            if (LOG != null)
-                LOG.finest("Parsing expression: " + expr);
+            LOG.debug("Parsing expression: " + expr);
             try {
                 tree = parser.parse(new StringReader(expr));
             } catch (TokenMgrError tme) {
@@ -138,8 +139,8 @@ public class JexlEngine {
             }
         }
 
-        if (LOG != null && tree.jjtGetNumChildren() > 1 && LOG.isLoggable(Level.WARNING)) {
-            LOG.warning("The JEXL Expression created will be a reference"
+        if (tree.jjtGetNumChildren() > 1) {
+            LOG.warn("The JEXL Expression created will be a reference"
                 + " to the first expression from the supplied script: \""
                 + expression + "\" ");
         }
@@ -166,8 +167,7 @@ public class JexlEngine {
         SimpleNode script;
         // Parse the Expression
         synchronized (parser) {
-            if (LOG != null)
-                LOG.finest("Parsing script: " + cleanText);
+            LOG.debug("Parsing script: " + cleanText);
             try {
                 script = parser.parse(new StringReader(cleanText));
             } catch (TokenMgrError tme) {
