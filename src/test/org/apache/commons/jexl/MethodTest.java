@@ -37,6 +37,21 @@ public class MethodTest extends TestCase {
         }
     }
 
+    public static class Functor {
+        public int ten() {
+            return 10;
+        }
+        public int plus10(int num) {
+            return num + 10;
+        }
+        public static int TWENTY() {
+            return 20;
+        }
+        public static int PLUS20(int num) {
+            return num + 20;
+        }
+    }
+
     public void setUp() {
         asserter = new Asserter();
     }
@@ -83,6 +98,65 @@ public class MethodTest extends TestCase {
     public void testStaticMethodInvocationOnClasses() throws Exception {
         asserter.setVariable("Boolean", Boolean.class);
         asserter.assertExpression("Boolean.valueOf('true')", Boolean.TRUE);
+    }
+
+   public void testTopLevelCall() throws Exception {
+        java.util.Map funcs = new java.util.HashMap();
+        funcs.put(null, new Functor());
+        JexlEngine JEXL = new JexlEngine();
+        JEXL.setFunctions(funcs);
+
+        Expression e = JEXL.createExpression("ten()");
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate(jc);
+        assertEquals("Result is not 10", new Integer(10), o);
+
+        e = JEXL.createExpression("plus10(10)");
+        jc = JexlHelper.createContext();
+        o = e.evaluate(jc);
+        assertEquals("Result is not 20", new Integer(20), o);
+
+        e = JEXL.createExpression("plus10(ten())");
+        jc = JexlHelper.createContext();
+        o = e.evaluate(jc);
+        assertEquals("Result is not 20", new Integer(20), o);
+    }
+
+    public void testNamespaceCall() throws Exception {
+        java.util.Map funcs = new java.util.HashMap();
+        funcs.put("func", new Functor());
+        funcs.put("FUNC", Functor.class);
+        JexlEngine JEXL = new JexlEngine();
+        JEXL.setFunctions(funcs);
+
+        Expression e = JEXL.createExpression("func:ten()");
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate(jc);
+        assertEquals("Result is not 10", new Integer(10), o);
+
+        e = JEXL.createExpression("func:plus10(10)");
+        jc = JexlHelper.createContext();
+        o = e.evaluate(jc);
+        assertEquals("Result is not 20", new Integer(20), o);
+
+        e = JEXL.createExpression("func:plus10(func:ten())");
+        jc = JexlHelper.createContext();
+        o = e.evaluate(jc);
+        assertEquals("Result is not 20", new Integer(20), o);
+
+        e = JEXL.createExpression("FUNC:PLUS20(10)");
+        jc = JexlHelper.createContext();
+        o = e.evaluate(jc);
+        assertEquals("Result is not 30", new Integer(30), o);
+
+        e = JEXL.createExpression("FUNC:PLUS20(FUNC:TWENTY())");
+        jc = JexlHelper.createContext();
+        o = e.evaluate(jc);
+        assertEquals("Result is not 40", new Integer(40), o);
+    }
+
+    public static void main(String[] args) throws Exception {
+        new MethodTest().testTopLevelCall();
     }
 
 }

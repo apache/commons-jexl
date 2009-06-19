@@ -33,6 +33,7 @@ import org.apache.commons.jexl.parser.ASTExpressionExpression;
 import org.apache.commons.jexl.parser.ASTFalseNode;
 import org.apache.commons.jexl.parser.ASTFloatLiteral;
 import org.apache.commons.jexl.parser.ASTForeachStatement;
+import org.apache.commons.jexl.parser.ASTFunctionNode;
 import org.apache.commons.jexl.parser.ASTGENode;
 import org.apache.commons.jexl.parser.ASTGTNode;
 import org.apache.commons.jexl.parser.ASTIdentifier;
@@ -43,7 +44,7 @@ import org.apache.commons.jexl.parser.ASTLENode;
 import org.apache.commons.jexl.parser.ASTLTNode;
 import org.apache.commons.jexl.parser.ASTMapEntry;
 import org.apache.commons.jexl.parser.ASTMapLiteral;
-import org.apache.commons.jexl.parser.ASTMethod;
+import org.apache.commons.jexl.parser.ASTMethodNode;
 import org.apache.commons.jexl.parser.ASTModNode;
 import org.apache.commons.jexl.parser.ASTMulNode;
 import org.apache.commons.jexl.parser.ASTNENode;
@@ -361,7 +362,24 @@ public class Debugger implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTMethod node, Object data) {
+    public Object visit(ASTFunctionNode node, Object data) {
+        int num = node.jjtGetNumChildren();
+        accept(node.jjtGetChild(0), data);
+        builder.append(":");
+        accept(node.jjtGetChild(1), data);
+        builder.append("(");
+        for (int i = 2; i < num; ++i) {
+            if (i > 2) {
+                builder.append(", ");
+            }
+            accept(node.jjtGetChild(i), data);
+        }
+        builder.append(")");
+        return data;
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTMethodNode node, Object data) {
         int num = node.jjtGetNumChildren();
         accept(node.jjtGetChild(0), data);
         builder.append("(");

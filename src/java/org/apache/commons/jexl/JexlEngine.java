@@ -22,6 +22,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.util.Map;
+import java.util.Collections;
+import java.util.HashMap;
 import java.net.URL;
 import java.net.URLConnection;
 import org.apache.commons.logging.*;
@@ -66,6 +69,11 @@ public class JexlEngine {
      * return null
      */
     boolean silent = true;
+
+    /**
+     *  The map of 'prefix:function' to object implementing the function.
+     */
+    protected Map<String,Object> functions = Collections.EMPTY_MAP;
     /**
      * ExpressionFactory & ScriptFactory need a singleton and this is the package
      * instance fulfilling that pattern.
@@ -76,18 +84,21 @@ public class JexlEngine {
      * Creates a default engine
      */
     public JexlEngine() {
-        this(null, null, null);
+        this(null, null, null, null);
     }
 
     /**
      * Creates a JEXL engine using the provided {@link Uberspect}, (@link Arithmetic) and logger.
      * @param uberspect to allow different introspection behaviour
      * @param arithmetic to allow different arithmetic behaviour
+     * @param funcs an optional map of functions (@see setFunctions)
      * @param log the logger for various messages
      */
-    public JexlEngine(Uberspect uberspect, Arithmetic arithmetic, Log log) {
+    public JexlEngine(Uberspect uberspect, Arithmetic arithmetic, Map<String,Object> funcs, Log log) {
         this.uberspect = uberspect == null? Introspector.getUberspect() : uberspect;
         this.arithmetic = arithmetic == null? new JexlArithmetic() : arithmetic;
+        if (funcs != null)
+            this.functions = funcs;
         if (log == null)
             log = LogFactory.getLog(JexlEngine.class);
         if (log == null)
@@ -109,7 +120,46 @@ public class JexlEngine {
     public boolean isSilent() {
         return this.silent;
     }
+    
+    /**
+     * Sets the map of function namespaces.
+     * <p>
+     * It should be defined once not modified afterwards since it might be shared
+     * between multiple engines evaluating expressions concurrently.
+     * </p>
+     * <p>
+     * Each entry key is used as a prefix, each entry value used as a bean implementing
+     * methods; an expression like 'nsx:method(123)' will thus be solved by looking at
+     * a registered bean named 'nsx' that implements method 'method' in that map.
+     * If all methods are static, you may use the bean class instead of an instance as value.
+     * </p>
+     * <p>
+     * The key or prefix allows to retrieve the bean that plays the role of the namespace.
+     * If the prefix is null, the namespace is the top-level namespace allowing to define
+     * top-level user defined functions ( ie: myfunc(...) )
+     * </p>
+     * <p>
+     * Note that you can always use a variable implementing methods & use
+     * the 'var.func(...)' syntax if you need more dynamic constructs.
+     * </p>
+     * @param funcs the map of functions that should not mutate after the call; if null
+     * is passed, the empty collection is used.
+     */
+    public void setFunctions(Map<String, Object> funcs) {
+        functions = funcs != null? funcs : Collections.EMPTY_MAP;
+    }
 
+
+    /**
+     * Retrieves the map of function namespaces.
+     *
+     * @return the map passed in setFunctions or the empty map if the
+     * original was null.
+     */
+    public Map<String, Object> getFunctions() {
+        return functions;
+    }
+    
     /**
      * Creates an Expression from a String containing valid
      * JEXL syntax.  This method parses the expression which
@@ -232,7 +282,7 @@ public class JexlEngine {
      * Creates an interpreter
      */
     protected Interpreter createInterpreter(JexlContext context) {
-        return new Interpreter(uberspect, arithmetic, context);
+        return new Interpreter(uberspect, arithmetic, functions, context);
     }
     /**
      * Trims the expression and adds a semi-colon if missing.
