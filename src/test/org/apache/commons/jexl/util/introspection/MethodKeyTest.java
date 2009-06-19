@@ -162,7 +162,7 @@ public class MethodKeyTest extends TestCase {
         
     }
     
-    static final int LOOP = 300;
+    static final int LOOP = 3;//00;
     
     public void testPerfKey() throws Exception {
         for(int l = 0; l < LOOP; ++l)

@@ -41,6 +41,7 @@ import org.apache.commons.jexl.parser.ASTEmptyFunction;
 import org.apache.commons.jexl.parser.ASTExpression;
 import org.apache.commons.jexl.parser.ASTExpressionExpression;
 import org.apache.commons.jexl.parser.ASTFalseNode;
+import org.apache.commons.jexl.parser.ASTFunctionNode;
 import org.apache.commons.jexl.parser.ASTFloatLiteral;
 import org.apache.commons.jexl.parser.ASTForeachStatement;
 import org.apache.commons.jexl.parser.ASTGENode;
@@ -53,7 +54,7 @@ import org.apache.commons.jexl.parser.ASTLENode;
 import org.apache.commons.jexl.parser.ASTLTNode;
 import org.apache.commons.jexl.parser.ASTMapEntry;
 import org.apache.commons.jexl.parser.ASTMapLiteral;
-import org.apache.commons.jexl.parser.ASTMethod;
+import org.apache.commons.jexl.parser.ASTMethodNode;
 import org.apache.commons.jexl.parser.ASTModNode;
 import org.apache.commons.jexl.parser.ASTMulNode;
 import org.apache.commons.jexl.parser.ASTNENode;
@@ -91,6 +92,8 @@ public class Interpreter implements ParserVisitor {
     private final Uberspect uberspect;
     /** the arithmetic handler. */
     private final Arithmetic arithmetic;
+    /** The map of registered functions. */
+    private final Map<String,Object> functions;
     /** The context to store/retrieve variables. */
     private final JexlContext context;
     /** dummy velocity info. */
@@ -104,9 +107,10 @@ public class Interpreter implements ParserVisitor {
      * @param uber the helper to perform introspection,
      * @param arith the arithmetic handler
      */
-    public Interpreter(Uberspect uber, Arithmetic arith, JexlContext context) {
+    public Interpreter(Uberspect uber, Arithmetic arith, Map<String,Object> functions, JexlContext context) {
         this.uberspect = uber;
         this.arithmetic = arith;
+        this.functions = functions;
         this.context = context;
     }
 
@@ -608,9 +612,22 @@ public class Interpreter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTMethod node, Object data) {
-        // objectNode 0 is the identifier (method name), the others are parameters.
+    public Object visit(ASTMethodNode node, Object data) {
         // the object to invoke the method on should be in the data argument
+        if (data == null) {
+            // if the first child of the (ASTReference) parent,
+            // it is considered as calling a 'top level' function
+            if (node.jjtGetParent().jjtGetChild(0) == node) {
+                data = functions.get(null);
+                if (data == null) {
+                    throw new JexlException(node, "no default function namespace");
+                }
+            }
+            else {
+                throw new JexlException(node, "attempting to call method on null");
+            }
+        }
+        // objectNode 0 is the identifier (method name), the others are parameters.
         String methodName = ((ASTIdentifier) node.jjtGetChild(0)).image;
 
         // get our params
@@ -650,6 +667,56 @@ public class Interpreter implements ParserVisitor {
         }
         catch (Exception e) {
             throw new JexlException(node, "method error", e);
+        }
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTFunctionNode node, Object data) {
+        // objectNode 0 is the prefix
+        String prefix = ((ASTIdentifier) node.jjtGetChild(0)).image;
+        Object functor = functions.get(prefix);
+        if (functor == null)
+            throw new JexlException(node, "no such function " + prefix);
+        // objectNode 1 is the identifier , the others are parameters.
+        String methodName = ((ASTIdentifier) node.jjtGetChild(1)).image;
+
+        // get our params
+        int paramCount = node.jjtGetNumChildren() - 2;
+        Object[] params = new Object[paramCount];
+        for (int i = 0; i < paramCount; i++) {
+            params[i] = node.jjtGetChild(i + 2).jjtAccept(this, null);
+        }
+
+        try {
+            VelMethod vm = getUberspect().getMethod(functor, methodName, params, DUMMY);
+            // DG: If we can't find an exact match, narrow the parameters and
+            // try again!
+            if (vm == null) {
+
+                // replace all numbers with the smallest type that will fit
+                for (int i = 0; i < params.length; i++) {
+                    Object param = params[i];
+                    if (param instanceof Number) {
+                        params[i] = arithmetic.narrow((Number) param);
+                    }
+                }
+                vm = getUberspect().getMethod(functor, methodName, params, DUMMY);
+                if (vm == null) {
+                    return null;
+                }
+            }
+
+            return vm.invoke(functor, params);
+        }
+        catch (InvocationTargetException e) {
+            Throwable t = e.getTargetException();
+            if (!(t instanceof Exception)) {
+                t = e;
+            }
+            throw new JexlException(node, "function invocation error", t);
+        }
+        catch (Exception e) {
+            throw new JexlException(node, "function error", e);
         }
     }
 

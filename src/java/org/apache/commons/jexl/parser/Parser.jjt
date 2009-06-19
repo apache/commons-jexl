@@ -421,14 +421,26 @@ void MapEntry() : {}
     Parameter() "=>" Parameter()
 }
 
-void Method() : {}
+void Method() #MethodNode: {}
 {
-   Identifier() "("[ Parameter() ( "," Parameter() )* ] ")"
+   Identifier() "("[ Parameter() ( "," Parameter() )* ] ")"  
+}
+
+void Function() #FunctionNode: {}
+{
+   Identifier() ":" Identifier() "("[ Parameter() ( "," Parameter() )* ] ")"
 }
 
 void ArrayAccess() : {}
 {
     Identifier() ("[" ( LOOKAHEAD(3) Expression() | IntegerLiteral() | Reference() ) "]")+
+}
+
+void AnyMethod() #void : {}
+{
+    LOOKAHEAD("size") SizeMethod()
+  |
+    LOOKAHEAD(Identifier() "(") Method()
 }
 
 void SizeMethod() : {}
@@ -438,12 +450,16 @@ void SizeMethod() : {}
 
 void Reference() : {}
 {
-  (LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() | Identifier() | MapLiteral())
+  (LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() |
+   LOOKAHEAD(Identifier() ":" Identifier() "(") Function() |
+   LOOKAHEAD(Identifier() "(") Method() |
+   Identifier() |
+   MapLiteral())
   (LOOKAHEAD(2) "."
     (
       LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() |
-//      (LOOKAHEAD(3) Method() | Identifier() |  IntegerLiteral() )
-      (LOOKAHEAD(3) Method() | SizeMethod() | Identifier() |  IntegerLiteral() )
+//      (LOOKAHEAD(3) AnyMethod() | Identifier() |  IntegerLiteral() )
+      (LOOKAHEAD(3) AnyMethod() | Identifier() |  IntegerLiteral() )
 
     )
   )*
