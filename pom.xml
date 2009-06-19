@@ -82,6 +82,14 @@
       <organization>Apache Software Foundation</organization>
     </developer>
   </developers>
+	
+  <contributors>
+    <contributor>
+      <name>Henri Biestro</name>
+      <email>hbiestro at gmail dot com</email>
+    </contributor>
+  </contributors>
+	
 
   <dependencies>
     <dependency>
