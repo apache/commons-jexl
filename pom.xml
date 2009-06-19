@@ -139,8 +139,8 @@
               <id>jexl-jjtree</id>
               <configuration>
                 <sourceDirectory>${basedir}/src/java/org/apache/commons/jexl/parser</sourceDirectory>
-                <outputDirectory>${project.build.directory}/generated-src/java/org/apache/commons/jexl/parser</outputDirectory>
-                <timestampDirectory>${project.build.directory}/generated-src/javacc-timestamp</timestampDirectory>
+                <outputDirectory>${project.build.directory}/generated-sources/java/org/apache/commons/jexl/parser</outputDirectory>
+                <timestampDirectory>${project.build.directory}/generated-sources/javacc-timestamp</timestampDirectory>
                 <packageName>org.apache.commons.jexl.parser</packageName>
               </configuration>
               <goals>
@@ -150,9 +150,9 @@
             <execution>
               <id>jexl-javacc</id>
               <configuration>
-                <sourceDirectory>${project.build.directory}/generated-src/java/org/apache/commons/jexl/parser</sourceDirectory>
-                <outputDirectory>${project.build.directory}/generated-src/java</outputDirectory>
-                <timestampDirectory>${project.build.directory}/generated-src/javacc-timestamp</timestampDirectory>
+                <sourceDirectory>${project.build.directory}/generated-sources/java/org/apache/commons/jexl/parser</sourceDirectory>
+                <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
+                <timestampDirectory>${project.build.directory}/generated-sources/javacc-timestamp</timestampDirectory>
                 <packageName>org.apache.commons.jexl.parser</packageName>
               </configuration>
               <goals>
