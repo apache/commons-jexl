@@ -68,7 +68,8 @@ public class Coercion {
             return new Integer(((Number) val).intValue());
         }
 
-        throw new Exception("Integer coercion exception");
+        throw new Exception("Integer coercion exception ["
+            + val.getClass().getName() + "]");
     }
 
     /**
@@ -95,7 +96,8 @@ public class Coercion {
             return new Long(((Number) val).longValue());
         }
 
-        throw new Exception("Long coercion exception");
+        throw new Exception("Long coercion exception ["
+            + val.getClass().getName() + "]");
     }
 
     /**
@@ -134,7 +136,8 @@ public class Coercion {
             return new Double(Double.parseDouble(String.valueOf(val)));
         }
 
-        throw new Exception("Double coercion exception");
+        throw new Exception("Double coercion exception ["
+            + val.getClass().getName() + "]");
     }
 
     /**
@@ -169,7 +172,8 @@ public class Coercion {
             throw new Exception("Boolean->BigDecimal coercion exception");
         }
 
-        throw new Exception("BigDecimal coercion exception");
+        throw new Exception("BigDecimal coercion exception ["
+            + val.getClass().getName() + "]");
     }
 
     /**
@@ -198,7 +202,8 @@ public class Coercion {
             throw new Exception("Boolean->BigInteger coercion exception");
         }
 
-        throw new Exception("BigInteger coercion exception");
+        throw new Exception("BigInteger coercion exception ["
+            + val.getClass().getName() + "]");
     }
 
     /**
