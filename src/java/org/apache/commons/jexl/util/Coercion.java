@@ -166,10 +166,10 @@ public class Coercion {
         } else if (val instanceof Number) {
             return new BigDecimal(val.toString());
         } else if (val instanceof Boolean) {
-            throw new Exception("Boolean->Double coercion exception");
+            throw new Exception("Boolean->BigDecimal coercion exception");
         }
 
-        throw new Exception("Double coercion exception");
+        throw new Exception("BigDecimal coercion exception");
     }
 
     /**
@@ -195,10 +195,10 @@ public class Coercion {
         } else if (val instanceof Number) {
             return BigInteger.valueOf(((Number) val).longValue());
         } else if (val instanceof Boolean) {
-            throw new Exception("Boolean->Integer coercion exception");
+            throw new Exception("Boolean->BigInteger coercion exception");
         }
 
-        throw new Exception("Integer coercion exception");
+        throw new Exception("BigInteger coercion exception");
     }
 
     /**
