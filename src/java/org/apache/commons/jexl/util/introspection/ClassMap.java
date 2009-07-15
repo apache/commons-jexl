@@ -29,9 +29,9 @@ import org.apache.commons.logging.Log;
 /**
  * Taken from the Velocity tree so we can be self-sufficient
  *
- * A cache of introspection information for a specific class instance. Keys
- * {@link MethodKey} objects by an agregation of the method name and
- * the names of classes that make up the parameters.
+ * A cache of introspection information for a specific class instance.
+ * Keys objects by an agregation of the method name and the names of classes
+ * that make up the parameters.
  *
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>

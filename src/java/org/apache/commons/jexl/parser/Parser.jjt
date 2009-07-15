@@ -47,7 +47,7 @@ public class Parser
 {
 
     public SimpleNode parse(Reader reader)
-        throws Exception
+        throws ParseException
     {
         ReInit(reader);
 
@@ -66,9 +66,10 @@ PARSER_END(Parser)
 
 SKIP : /* WHITE SPACE */
 {
-    <COMMENT: ( "##" ( ~["\"","\n","\r"] )* ("\n" | "\r") ) >
-|
-  " "
+  <COMMENT: ( "##" ( ~["\"","\n","\r"] )* ("\n" | "\r") ) >
+| <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+| <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")>
+| " "
 | "\t"
 | "\n"
 | "\r"

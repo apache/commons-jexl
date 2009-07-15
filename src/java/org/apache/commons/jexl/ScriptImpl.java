@@ -43,17 +43,11 @@ class ScriptImpl implements Script {
         jexl = engine;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public Object execute(JexlContext context) throws Exception {
         Interpreter interpreter = jexl.createInterpreter(context);
-        return interpreter.interpret(parsedScript, jexl.isSilent());
+        return interpreter.interpret(parsedScript);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public String getText() {
         return text;
     }

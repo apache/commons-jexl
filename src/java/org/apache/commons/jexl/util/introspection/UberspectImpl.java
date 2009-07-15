@@ -409,9 +409,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
         }
     } // CSON: VisibilityModifier
 
-    /**
-     * {@inheritDoc}
-     */
+    
     public static class VelGetterImpl implements VelPropertyGet {
         /**
          * executor for performing the get.
@@ -457,9 +455,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    
     public static class VelSetterImpl implements VelPropertySet {
         /**
          * the method to call.

@@ -41,9 +41,9 @@ public interface Expression {
      *
      * @param context A JexlContext containing variables.
      * @return The result of this evaluation
-     * @throws Exception on any error
+     * @throws JexlException on any error
      */
-    Object evaluate(JexlContext context) throws Exception;
+    Object evaluate(JexlContext context);
 
     /**
      * Returns the JEXL expression this Expression was created with.

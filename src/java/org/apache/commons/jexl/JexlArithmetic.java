@@ -24,7 +24,13 @@ import java.math.BigInteger;
  * @since 2.0
  */
 class JexlArithmetic implements Arithmetic {
-
+    /**
+     * The result of +,/,-,* when both operands are null.
+     * @return Long(0)
+     */
+    protected Object NullNull() {
+        return 0l;
+    }
     /**
      * Add two values together.
      * Rules are:<ol>
@@ -41,7 +47,7 @@ class JexlArithmetic implements Arithmetic {
      */
     public Object add(Object left, Object right) {
         if (left == null && right == null) {
-            return new Long(0);
+            return NullNull();
         }
         
         try {
@@ -76,6 +82,8 @@ class JexlArithmetic implements Arithmetic {
             return result;
         } catch (java.lang.NumberFormatException nfe) {
             // Well, use strings!
+            if (left == null) left = "";
+            else if (right == null) right = "";
             return left.toString().concat(right.toString());
         }
     }
@@ -92,16 +100,13 @@ class JexlArithmetic implements Arithmetic {
      */
     public Object divide(Object left, Object right) {
         if (left == null && right == null) {
-            return new Long(0);
+            return NullNull();
         }
 
         // if both are bigintegers use that type
         if (left instanceof BigInteger && right instanceof BigInteger) {
             BigInteger l = toBigInteger(left);
             BigInteger r = toBigInteger(right);
-            if (r.compareTo(BigInteger.valueOf(0)) == 0) {
-                return r;
-            }
             return l.divide(r);
         }
         
@@ -109,18 +114,16 @@ class JexlArithmetic implements Arithmetic {
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
-            if (r.compareTo(BigDecimal.valueOf(0)) == 0) {
-                return r;
-            }
             return l.divide(r, BigDecimal.ROUND_HALF_UP);
         }
 
         double l = toDouble(left);
         double r = toDouble(right);
-        if (r == 0) {
-            return new Double(r);
+        double d = l / r;
+        if (Double.isNaN(d) || Double.isInfinite(d)) {
+            throw new ArithmeticException("/");
         }
-        return new Double(l / r);
+        return d;
 
     }
     
@@ -136,22 +139,23 @@ class JexlArithmetic implements Arithmetic {
      */
     public Object mod(Object left, Object right) {
         if (left == null && right == null) {
-            return new Long(0);
+            return NullNull();
         }
 
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             double l = toDouble(left);
             double r = toDouble(right);
-            return new Double(l % r);
+            double d = l % r;
+            if (Double.isNaN(d) || Double.isInfinite(d)) {
+                throw new ArithmeticException("%");
+            }
+            return d;
         }
 
         // if both are bigintegers use that type
         if (left instanceof BigInteger && right instanceof BigInteger) {
             BigInteger l = toBigInteger(left);
             BigInteger r = toBigInteger(right);
-            if (r.compareTo(BigInteger.valueOf(0)) == 0) {
-                return r;
-            }
             return l.mod(r);
         }
 
@@ -159,9 +163,6 @@ class JexlArithmetic implements Arithmetic {
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
-            if (r.compareTo(BigDecimal.valueOf(0)) == 0) {
-                return r;
-            }
             BigInteger intDiv = l.divide(r, BigDecimal.ROUND_HALF_UP).toBigInteger();
             BigInteger intValue = (r.multiply(new BigDecimal(intDiv))).toBigInteger();
             BigDecimal remainder = new BigDecimal(l.subtract(new BigDecimal(intValue)).toBigInteger());
@@ -195,7 +196,7 @@ class JexlArithmetic implements Arithmetic {
      */
     public Object multiply(Object left, Object right) {
         if (left == null && right == null) {
-            return new Long(0);
+            return NullNull();
         }
         
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
@@ -245,7 +246,7 @@ class JexlArithmetic implements Arithmetic {
      */
     public Object subtract(Object left, Object right) {
         if (left == null && right == null) {
-            return new Long(0);
+            return NullNull();
         }
         
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
