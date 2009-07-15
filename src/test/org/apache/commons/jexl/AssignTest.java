@@ -120,7 +120,6 @@ public class AssignTest extends TestCase {
     public void testArray() throws Exception {
         Expression assign = JEXL.createExpression("froboz[\"value\"] = 10");
         Expression check = JEXL.createExpression("froboz[\"value\"]");
-        System.out.print(assign.dump());
         JexlContext jc = JexlHelper.createContext();
         Froboz froboz = new Froboz(0);
         jc.getVars().put("froboz", froboz);
@@ -134,11 +133,23 @@ public class AssignTest extends TestCase {
         Expression assign = JEXL.createExpression("quux.froboz.value = 10");
         Expression check = JEXL.createExpression("quux[\"froboz\"].value");
         JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("quux", new Quux("xuuq", 100));
+        Quux quux = new Quux("xuuq", 100);
+        jc.getVars().put("quux", quux);
         Object o = assign.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
         o = check.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
+    }
+
+    public void testUtil() throws Exception {
+        JexlContext jc = JexlHelper.createContext();
+        Quux quux = new Quux("xuuq", 100);
+        JEXL.setProperty(quux, "froboz.value", 100);
+        Object o = JEXL.getProperty(quux, "froboz.value");
+        assertEquals("Result is not 100", new Integer(100), o);
+        JEXL.setProperty(quux, "['froboz'].value", 1000);
+        o = JEXL.getProperty(quux, "['froboz']['value']");
+        assertEquals("Result is not 1000", new Integer(1000), o);
     }
     
     
@@ -169,7 +180,7 @@ public class AssignTest extends TestCase {
     }
     
     public static void main(String[] args) throws Exception {
-        new AssignTest("debug").testAmbiguous();
+        new AssignTest("debug").testUtil();
         //new AssignTest("debug").testArray();
     }
 }

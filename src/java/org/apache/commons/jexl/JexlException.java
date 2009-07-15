@@ -26,6 +26,7 @@ public class JexlException extends RuntimeException {
 
     public JexlException(Node node, String msg) {
         super(msg);
+        mark = node;
     }
 
     public JexlException(Node node, String msg, Throwable cause) {
@@ -60,7 +61,8 @@ public class JexlException extends RuntimeException {
      * - msg is the actual explanation message for this error
      * @return this error as a string
      */
-    public String toString() {
+    @Override
+    public String getMessage() {
         Debugger dbg = new Debugger();
         StringBuilder msg = new StringBuilder();
         if (dbg.debug(mark)) {
@@ -72,7 +74,7 @@ public class JexlException extends RuntimeException {
             msg.append(dbg.data());
             msg.append("\n");
         }
-        msg.append(super.toString());
+        msg.append(super.getMessage());
         return msg.toString();
     }
 }

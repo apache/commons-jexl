@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl;
 
+import java.util.Map;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -112,4 +113,78 @@ public class ArithmeticTest extends TestCase {
         asserter.assertExpression("imanull + 2", new Long(2));
         asserter.assertExpression("imanull + imanull", new Long(0));
     }
+
+    /**
+     *
+     * if silent, all arith exception return 0.0
+     * if not silent, all arith exception throw
+     * @throws Exception
+     */
+    public void testDivideByZero() throws Exception {
+        JexlContext context = JexlHelper.createContext();
+        Map vars = context.getVars();
+        vars.put("aByte", new Byte((byte) 1));
+        vars.put("aShort", new Short((short) 2));
+        vars.put("anInteger", new Integer(3));
+        vars.put("aLong", new Long(4));
+        vars.put("aFloat", new Float(5.5));
+        vars.put("aDouble", new Double(6.6));
+        vars.put("aBigInteger", new BigInteger("7"));
+        vars.put("aBigDecimal", new BigDecimal("8.8"));
+
+
+        vars.put("zByte", new Byte((byte) 0));
+        vars.put("zShort", new Short((short) 0));
+        vars.put("zInteger", new Integer(0));
+        vars.put("zLong", new Long(0));
+        vars.put("zFloat", new Float(0));
+        vars.put("zDouble", new Double(0));
+        vars.put("zBigInteger", new BigInteger("0"));
+        vars.put("zBigDecimal", new BigDecimal("0"));
+
+        String[] tnames = {
+            "Byte", "Short", "Integer", "Long",
+            "Float", "Double",
+            "BigInteger", "BigDecimal"
+        };
+        // number of permutations this will generate
+        final int PERMS = tnames.length * tnames.length;
+
+        JexlEngine jexl = new JexlEngine();
+        // for non-silent, silent...
+        for (int s = 0; s < 2; ++s) {
+            jexl.setSilent(s != 0);
+            int zthrow = 0;
+            int zeval = 0;
+            // for vars of all types...
+            for (String vname : tnames) {
+                // for zeros of all types...
+                for (String zname : tnames) {
+                    // divide var by zero
+                    String expr = "a" + vname + " / " + "z" + zname;
+                    try {
+                        Expression zexpr = jexl.createExpression(expr);
+                        Object nan = zexpr.evaluate(context);
+                        // check we have a zero & incremement zero count
+                        if (nan instanceof Number) {
+                            double zero = ((Number) nan).doubleValue();
+                            if (zero == 0.0)
+                                zeval += 1;
+                        }
+                    }
+                    catch (Exception any) {
+                        // increment the exception count
+                        zthrow += 1;
+                    }
+                }
+            }
+            if (!jexl.isSilent())
+                assertTrue("All expressions should have thrown " + zthrow,
+                        zthrow == PERMS);
+            else
+                assertTrue("All expressions should have zeroed" + zeval,
+                        zeval == PERMS);
+        }
+    }
+
 }

@@ -26,6 +26,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.*;
+
 import org.apache.commons.jexl.parser.ASTAddNode;
 import org.apache.commons.jexl.parser.ASTAndNode;
 import org.apache.commons.jexl.parser.ASTArrayAccess;
@@ -74,13 +76,13 @@ import org.apache.commons.jexl.parser.ASTUnaryMinusNode;
 import org.apache.commons.jexl.parser.ASTWhileStatement;
 import org.apache.commons.jexl.parser.Node;
 import org.apache.commons.jexl.parser.SimpleNode;
+import org.apache.commons.jexl.parser.ParserVisitor;
+
 import org.apache.commons.jexl.util.introspection.Info;
 import org.apache.commons.jexl.util.introspection.Uberspect;
 import org.apache.commons.jexl.util.introspection.VelMethod;
 import org.apache.commons.jexl.util.introspection.VelPropertyGet;
 import org.apache.commons.jexl.util.introspection.VelPropertySet;
-
-import org.apache.commons.jexl.parser.ParserVisitor;
 
 /**
  * An interpreter of JEXL syntax.
@@ -88,47 +90,73 @@ import org.apache.commons.jexl.parser.ParserVisitor;
  * @since 2.0
  */
 public class Interpreter implements ParserVisitor {
+    /** The logger. */
+    protected final Log LOG;
     /** The uberspect. */
-    private final Uberspect uberspect;
+    protected final Uberspect uberspect;
     /** the arithmetic handler. */
-    private final Arithmetic arithmetic;
+    protected final Arithmetic arithmetic;
     /** The map of registered functions. */
-    private final Map<String,Object> functions;
+    protected final Map<String,Object> functions;
     /** The context to store/retrieve variables. */
-    private final JexlContext context;
+    protected final JexlContext context;
+    /** silent */
+    protected boolean silent;
+    /** registers; 2 * {name, value} */
+    protected Object[] registers = null;
     /** dummy velocity info. */
-    private static final Info DUMMY = new Info("", 1, 1);
+    protected static final Info DUMMY = new Info("", 1, 1);
     /** empty params for method matching. */
-    static private final Object[] EMPTY_PARAMS = new Object[0];
-
+    protected static final Object[] EMPTY_PARAMS = new Object[0];
     /**
      * Create the interpreter.
-     * @param ctx the context to retrieve variables from.
-     * @param uber the helper to perform introspection,
-     * @param arith the arithmetic handler
+     * @param jexl the engine creating this interpreter
+     * @param context the context to evaluate expression
      */
-    public Interpreter(Uberspect uber, Arithmetic arith, Map<String,Object> functions, JexlContext context) {
-        this.uberspect = uber;
-        this.arithmetic = arith;
-        this.functions = functions;
+    public Interpreter(JexlEngine jexl, JexlContext context) {
+        this.LOG = jexl.LOG;
+        this.uberspect = jexl.uberspect;
+        this.arithmetic = jexl.arithmetic;
+        this.functions = jexl.functions;
+        this.silent = jexl.silent;
         this.context = context;
     }
 
     /**
-     * Interpret the given script/expression.
-     *
-     * @param node the script or expression to interpret.
-     * @param aContext the context to interpret against.
-     * @return the result of the interpretation.
+     * Sets whether this interpreter throws JexlException during evaluation.
+     * @param silent true means no JexlException will be thrown but will be logged
+     *        as info through the Jexl engine logger, false allows them to be thrown.
      */
-    public Object interpret(SimpleNode node, boolean silent) {
+    public void setSilent(boolean silent) {
+        this.silent = silent;
+    }
+
+    /**
+     * Checks whether this interpreter throws JexlException during evaluation.
+     */
+    public boolean isSilent() {
+        return this.silent;
+    }
+
+    /**
+     * Interpret the given script/expression.
+     * <p>
+     * If the underlying JEXL engine is silent, errors will be logged through its logger as info.
+     * </p>
+     * @param node the script or expression to interpret.
+     * @return the result of the interpretation.
+     * @throws JexlException if any error occurs during interpretation.
+     */
+    public Object interpret(SimpleNode node) {
         try {
             return node.jjtAccept(this, null);
         }
-        catch (JexlException error) {
-            if (silent)
+        catch(JexlException xjexl) {
+            if (silent) {
+                LOG.warn(xjexl.getMessage(), xjexl.getCause());
                 return null;
-            throw error;
+            }
+            throw xjexl;
         }
     }
 
@@ -148,15 +176,28 @@ public class Interpreter implements ParserVisitor {
 
     /**
      * Gets the uberspect.
-     *
      * @return an {@link Uberspect}
      */
     protected Uberspect getUberspect() {
         return uberspect;
     }
 
+    /**
+     * Sets this interpreter registers for bean access/assign expressions.
+     * @param registers the array of registers
+     */
+    protected void setRegisters(Object[] registers) {
+        this.registers = registers;
+    }
+
+    
     public Object visit(SimpleNode node, Object data) {
-        throw new UnsupportedOperationException("unexpected node " + node);
+        int numChildren = node.jjtGetNumChildren();
+        Object result = null;
+        for (int i = 0; i < numChildren; i++) {
+            result = node.jjtGetChild(i).jjtAccept(this, data);
+        }
+        return result;
     }
 
     /** {@inheritDoc} */
@@ -216,7 +257,7 @@ public class Interpreter implements ParserVisitor {
 
         return object;
     }
-
+  
     /** {@inheritDoc} */
     public Object visit(ASTAssignment node, Object data) {
         // left contains the reference to assign to
@@ -388,6 +429,8 @@ public class Interpreter implements ParserVisitor {
             return arithmetic.divide(left, right);
         }
         catch (RuntimeException xrt) {
+            if (silent && xrt instanceof ArithmeticException)
+                return 0.0;
             throw new JexlException(node, "divide error", xrt);
         }
     }
@@ -509,6 +552,10 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTIdentifier node, Object data) {
         String name = node.image;
         if (data == null) {
+            if (registers != null) {
+                if (registers[0].equals(name)) return registers[1];
+                if (registers[2].equals(name)) return registers[3];
+            }
             return context.getVars().get(name);
         } else {
             return getAttribute(data, name, node);
@@ -728,6 +775,8 @@ public class Interpreter implements ParserVisitor {
             return arithmetic.mod(left, right);
         }
         catch (RuntimeException xrt) {
+            if (silent && xrt instanceof ArithmeticException)
+                return 0.0;
             throw new JexlException(node, "% error", xrt);
         }
     }
@@ -824,7 +873,6 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTReferenceExpression node, Object data) {
-
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
@@ -1027,7 +1075,6 @@ public class Interpreter implements ParserVisitor {
      * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or
      *            key for a map
      * @param value the value to assign to the object's attribute
-     * @return the attribute.
      */
     public void setAttribute(Object object, Object attribute, Object value) {
         setAttribute(object, attribute, null);

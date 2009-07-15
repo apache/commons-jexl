@@ -31,15 +31,6 @@ public class Jexl {
         JexlContext context = new JexlContext() {
             public Map getVars() { return System.getProperties(); }
             public void setVars(Map map) { }
-
-            public void setFunctions(Map<String, Object> prefixes) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-
-            public Map<String, Object> getFunctions() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-
         };
         try {
             for (int i = 0; i < args.length; i++) {

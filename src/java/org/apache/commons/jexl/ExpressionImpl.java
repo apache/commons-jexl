@@ -17,12 +17,10 @@
 
 package org.apache.commons.jexl;
 
-import java.util.List;
-
 import org.apache.commons.jexl.parser.SimpleNode;
 
 /**
- * Instances of ExpressionImpl are created by the {@link ExpressionFactory},
+ * Instances of ExpressionImpl are created by the {@link JexlEngine},
  * and this is the default implementation of the {@link Expression} interface.
  *
  * @since 1.0
@@ -30,30 +28,19 @@ import org.apache.commons.jexl.parser.SimpleNode;
  * @version $Id$
  */
 class ExpressionImpl implements Expression {
-
-    // TODO: move resolving to interpreter
-    /** resolvers called before expression evaluation. */
-    protected List preResolvers;
-
-    /** resolvers called after expression evaluation. */
-    protected List postResolvers;
-
+    /** The engine for this expression. */
+    protected final JexlEngine jexl;
     /**
      * Original expression. This is just a 'snippet', not a valid statement
      * (i.e. foo.bar() vs foo.bar();
      */
-    protected String expression;
+    protected final String expression;
 
     /**
-     * The resulting AST we can call value() on.
+     * The resulting AST we can interpret.
      */
-    protected SimpleNode node;
+    protected final SimpleNode node;
 
-	/** The engine for this expression. */
-     protected final JexlEngine jexl;
-
-    /** The interpreter of the expression. */
-    protected Interpreter interpreter;
 
     /**
      * do not let this be generally instantiated with a 'new'.
@@ -71,11 +58,14 @@ class ExpressionImpl implements Expression {
     /**
      * {@inheritDoc}
      */
-    public Object evaluate(JexlContext context) throws Exception {
+    public Object evaluate(JexlContext context) {
         Interpreter interpreter = jexl.createInterpreter(context);
-        return interpreter.interpret(node, jexl.isSilent());
+        return interpreter.interpret(node);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     public String dump() {
         Debugger debug = new Debugger();
         return debug.debug(node)? debug.toString() : "/*?*/";
@@ -93,6 +83,7 @@ class ExpressionImpl implements Expression {
      *
      * @return the expression or blank if it's null.
      */
+    @Override
     public String toString() {
         String expr = getExpression();
         return expr == null ? "" : expr;

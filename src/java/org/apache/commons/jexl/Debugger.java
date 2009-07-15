@@ -91,17 +91,19 @@ public class Debugger implements ParserVisitor {
      * @return true if the cause was located, false otherwise
      */
     public boolean debug(Node cause) {
-        builder = new StringBuilder();
-        this.cause = cause;
-        // make arg cause become the root cause
-        Node root = cause;
-        while (root.jjtGetParent() != null) {
-            root = root.jjtGetParent();
-        }
         start = 0;
         end = 0;
-        root.jjtAccept(this, null);
-        return start > 0;
+        if (cause != null) {
+            builder = new StringBuilder();
+            this.cause = cause;
+            // make arg cause become the root cause
+            Node root = cause;
+            while (root.jjtGetParent() != null) {
+                root = root.jjtGetParent();
+            }
+            root.jjtAccept(this, null);
+        }
+        return end > 0;
     }
 
     /**
