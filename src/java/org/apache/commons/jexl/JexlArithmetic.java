@@ -463,7 +463,7 @@ class JexlArithmetic implements Arithmetic {
             return ((Number) val).intValue();
         }
 
-        throw new IllegalArgumentException("Integer coercion exception, don't know how to convert " + val);
+        throw new IllegalArgumentException("Integer coercion exception. Can't coerce type: " + val.getClass().getName());
     }
 
     
@@ -489,7 +489,7 @@ class JexlArithmetic implements Arithmetic {
             return ((Number) val).longValue();
         }
 
-        throw new NumberFormatException("Long coercion exception for '" + val + "'");
+        throw new NumberFormatException("Long coercion exception. Can't coerce type: " + val.getClass().getName());
     }
 
     /**
@@ -516,7 +516,7 @@ class JexlArithmetic implements Arithmetic {
             return BigInteger.valueOf(i);
         }
         
-        throw new IllegalArgumentException("BigInteger coercion. Can't coerce type " + val.getClass().getName());
+        throw new IllegalArgumentException("BigInteger coercion exception. Can't coerce type: " + val.getClass().getName());
     }
     
     /**
@@ -543,7 +543,7 @@ class JexlArithmetic implements Arithmetic {
             return new BigDecimal(i);
         }
         
-        throw new IllegalArgumentException("BigDecimal coercion. Can't coerce type " + val.getClass().getName());
+        throw new IllegalArgumentException("BigDecimal coercion exception. Can't coerce type: " + val.getClass().getName());
     }
     
     /**
@@ -576,7 +576,7 @@ class JexlArithmetic implements Arithmetic {
             throw new IllegalArgumentException("Boolean->Double coercion exception");
         }
 
-        throw new IllegalArgumentException("Double coercion exception, don't know how to convert " + val);
+        throw new IllegalArgumentException("Double coercion exception. Can't coerce type: " + val.getClass().getName());
     }
     /**
      * Is Object a floating point number.
