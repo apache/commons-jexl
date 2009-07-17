@@ -43,7 +43,7 @@ import java.io.ByteArrayInputStream;
 
 import org.apache.commons.jexl.util.introspection.Uberspect;
 
-public class Parser
+public class Parser extends StringParser
 {
 
     public SimpleNode parse(Reader reader)
@@ -349,7 +349,7 @@ void StringLiteral() :
 {
  (
   t=<STRING_LITERAL>
-  { jjtThis.image = t.image.substring(1, t.image.length() -1); }
+  { jjtThis.image = Parser.buildString(t.image, true); }
  )
 }
 
@@ -484,8 +484,8 @@ TOKEN : /* IDENTIFIERS */
 TOKEN :
 {
     <STRING_LITERAL :
-        ("\"" ( ~["\"","\n","\r"] )* "\"" )
+        ("\"" ( ~["\"","\n","\r"] | "\\" ["n","t","b","r","f","\\","\""] )* "\"" )
      |
-        ("\'" ( ~["\'","\n","\r"] )* "\'" )
+        ("\'" ( ~["\'","\n","\r"] | "\\" ["n","t","b","r","f","\\","\'"])* "\'" )
     >
 }
