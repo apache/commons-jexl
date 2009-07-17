@@ -48,8 +48,8 @@ public class IntrospectionUtils {
      *         type or an object type of a primitive type that can be converted to
      *         the formal type.
      */
-    public static boolean isMethodInvocationConvertible(Class formal,
-                                                        Class actual,
+    public static boolean isMethodInvocationConvertible(Class<?> formal,
+                                                        Class<?> actual,
                                                         boolean possibleVarArg) {
         /* if it's a null, it means the arg was null */
         if (actual == null && !formal.isPrimitive()) {
@@ -122,8 +122,8 @@ public class IntrospectionUtils {
      *         or formal and actual are both primitive types and actual can be
      *         subject to widening conversion to formal.
      */
-    public static boolean isStrictMethodInvocationConvertible(Class formal,
-                                                              Class actual,
+    public static boolean isStrictMethodInvocationConvertible(Class<?> formal,
+                                                              Class<?> actual,
                                                               boolean possibleVarArg) {
         /* we shouldn't get a null into, but if so */
         if (actual == null && !formal.isPrimitive()) {

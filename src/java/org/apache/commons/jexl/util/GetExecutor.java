@@ -50,7 +50,7 @@ public class GetExecutor extends AbstractExecutor {
      */
     public GetExecutor(Log r,
             org.apache.commons.jexl.util.introspection.Introspector ispect,
-            Class c, String key) {
+            Class<?> c, String key) {
         rlog = r;
         args[0] = key;
         method = ispect.getMethod(c, "get", args);
@@ -69,4 +69,3 @@ public class GetExecutor extends AbstractExecutor {
     }
 
 }
-

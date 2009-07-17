@@ -27,10 +27,12 @@ import java.util.Map;
 import java.util.Collections;
 import java.net.URL;
 import java.net.URLConnection;
-import org.apache.commons.logging.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
+import org.apache.commons.jexl.parser.Node;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.parser.TokenMgrError;
 import org.apache.commons.jexl.parser.ASTJexlScript;
@@ -39,19 +41,55 @@ import org.apache.commons.jexl.util.introspection.Uberspect;
 
 /**
  * <p>
- * Creates Expression and Script objects.
- * Determines the behavior of Expressions & Scripts during their evaluation wrt:
- *  - introspection
- *  - arithmetic & comparison
- *  - error reporting
- *  - logging
+ * Creates and evaluates Expression and Script objects.
+ * Determines the behavior of Expressions & Scripts during their evaluation with respect to:
+ * <ul>
+ *  <li>Introspection, see {@link Uberspect}</li>
+ *  <li>Arithmetic & comparison, see {@link Arithmetic}</li>
+ *  <li>Error reporting</li>
+ *  <li>Logging</li>
+ * </ul>
  * </p>
+ * <p>The <code>setSilent</code>and<code>setLenient</code> methods allow to fine-tune an engine instance behavior according to
+ * various error control needs.
+ * </p>
+ * <ul>
+ * <li>When "silent" & "lenient" (not-strict):
+ * <p> 0 & null should be indicators of "default" values so that even in an case of error,
+ * something meaningfull can still be inferred; may be convenient for configurations.
+ * </p>
+ * </li>
+ * <li>When "silent" & "strict":
+ * <p>One should probably consider using null as an error case - ie, every object
+ * manipulated by JEXL should be valued; the ternary operator, especially the '?:' form
+ * can be used to workaround exceptional cases.
+ * Use case could be configuration with no implicit values or defaults.
+ * </p>
+ * </li>
+ * <li>When "not-silent" & "not-strict":
+ * <p>The error control grain is roughly on par with JEXL 1.0</p>
+ * </li>
+ * <li>When "not-silent" & "strict":
+ * <p>The finest error control grain is obtained; it is the closest to Java code -
+ * still augmented by "script" capabilities regarding automated conversions & type matching.
+ * </p>
+ * </li>
+ * </ul>
+ * <p>
+ * Note that methods that evaluate expressions may throw <em>unchecked</em> exceptions;
+ * The {@link JexlException} are thrown in "non-silent" mode but since these are
+ * RuntimeException, user-code <em>should</em> catch them wherever most appropriate.
+ * </p>
+ * @since 2.0
  */
 public class JexlEngine {
     /**
-     * The Uberspect & Arithmetic
+     * The Uberspect instance.
      */
     protected final Uberspect uberspect;
+    /**
+     * The Arithmetic instance.
+     */
     protected final Arithmetic arithmetic;
     /**
      * The Log to which all JexlEngine messages will be logged.
@@ -66,9 +104,9 @@ public class JexlEngine {
 
     /**
      * Whether expressions evaluated by this engine will throw exceptions or 
-     * return null
+     * return null.
      */
-    protected boolean silent = true;
+    protected boolean silent = false;
 
     /**
      *  The map of 'prefix:function' to object implementing the function.
@@ -79,12 +117,6 @@ public class JexlEngine {
      * The expression cache.
      */
     protected Map<String,SimpleNode> cache = null;
-
-    /**
-     * ExpressionFactory & ScriptFactory need a singleton and this is the package
-     * instance fulfilling that pattern.
-     */
-    protected static final JexlEngine DEFAULT = new JexlEngine();
 
     /**
      * An empty/static/non-mutable JexlContext used instead of null context
@@ -114,7 +146,7 @@ public class JexlEngine {
      */
     public JexlEngine(Uberspect uberspect, Arithmetic arithmetic, Map<String,Object> funcs, Log log) {
         this.uberspect = uberspect == null? Introspector.getUberspect() : uberspect;
-        this.arithmetic = arithmetic == null? new JexlArithmetic() : arithmetic;
+        this.arithmetic = arithmetic == null? new JexlArithmetic(true) : arithmetic;
         if (funcs != null) {
             this.functions = funcs;
         }
@@ -128,7 +160,7 @@ public class JexlEngine {
     }
     
     /**
-     * Sets whether this engine throws JexlException during evaluation.
+     * Sets whether this engine throws JexlException during evaluation when an error is triggered.
      * @param silent true means no JexlException will occur, false allows them
      */
     public void setSilent(boolean silent) {
@@ -142,6 +174,22 @@ public class JexlEngine {
         return this.silent;
     }
 
+    /**
+     * Sets whether this engine triggers errors during evaluation when null is used as
+     * an operand.
+     * @param lenient true means no JexlException will occur, false allows them
+     */
+    public void setLenient(boolean lenient) {
+        this.arithmetic.setLenient(lenient);
+    }
+
+    /**
+     * Checks whether this engine triggers errors during evaluation when null is used as
+     * an operand.
+     */
+    public boolean isLenient() {
+        return this.arithmetic.isLenient();
+    }
     /**
      * Sets a cache of the defined size for expressions.
      * @param size if not strictly positive, no cache is used.
@@ -225,12 +273,10 @@ public class JexlEngine {
      * This method parses the script which validates the syntax.
      *
      * @param scriptText A String containing valid JEXL syntax
-     * @return A {@link Script} which can be executed with a
-     *      {@link JexlContext}.
-     * @throws Exception An exception can be thrown if there is a
-     *      problem parsing the script.
+     * @return A {@link Script} which can be executed using a {@link JexlContext}.
+     * @throws ParseException if there is a problem parsing the script.
      */
-    public Script createScript(String scriptText) throws Exception {
+    public Script createScript(String scriptText) throws ParseException {
         if (scriptText == null) {
             throw new NullPointerException("scriptText is null");
         }
@@ -250,10 +296,10 @@ public class JexlEngine {
      *      Must not be null. Must be a readable file.
      * @return A {@link Script} which can be executed with a
      *      {@link JexlContext}.
-     * @throws Exception An exception can be thrown if there is a problem
-     *      parsing the script.
+     * @throws IOException if there is a problem reading the script.
+     * @throws ParseException if there is a problem parsing the script.
      */
-    public Script createScript(File scriptFile) throws Exception {
+    public Script createScript(File scriptFile) throws ParseException, IOException {
         if (scriptFile == null) {
             throw new NullPointerException("scriptFile is null");
         }
@@ -274,10 +320,10 @@ public class JexlEngine {
      *      Must not be null. Must be a readable file.
      * @return A {@link Script} which can be executed with a
      *      {@link JexlContext}.
-     * @throws Exception An exception can be thrown if there is a problem
-     *      parsing the script.
+     * @throws IOException if there is a problem reading the script.
+     * @throws ParseException if there is a problem parsing the script.
      */
-    public Script createScript(URL scriptUrl) throws Exception {
+    public Script createScript(URL scriptUrl) throws ParseException, IOException {
         if (scriptUrl == null) {
             throw new NullPointerException("scriptUrl is null");
         }
@@ -300,6 +346,7 @@ public class JexlEngine {
      * @param bean the bean to get properties from
      * @param expr the property expression
      * @return the value of the property
+     * @throws JexlException if there is an error parsing the expression or during evaluation
      */
     public Object getProperty(Object bean, String expr) {
         return getProperty(EMPTY_CONTEXT, bean, expr);
@@ -331,7 +378,7 @@ public class JexlEngine {
                 LOG.warn(xparse.getMessage(), xparse.getCause());
                 return null;
             }
-            throw new RuntimeException(xparse);
+            throw new JexlException(null, "parsing error", xparse);
         }
     }
 
@@ -347,6 +394,7 @@ public class JexlEngine {
      * @param bean the bean to set properties in
      * @param expr the property expression
      * @param value the value of the property
+     * @throws JexlException if there is an error parsing the expression or during evaluation
      */
     public void setProperty(Object bean, String expr, Object value) {
        setProperty(EMPTY_CONTEXT, bean, expr, value);
@@ -380,7 +428,7 @@ public class JexlEngine {
                 LOG.warn(xparse.getMessage(), xparse.getCause());
                 return;
             }
-            throw new RuntimeException(xparse);
+            throw new JexlException(null, "parsing error", xparse);
         }
     }
     
@@ -481,5 +529,29 @@ public class JexlEngine {
             reader.close();
         }
 
+    }
+
+    /**
+     * ExpressionFactory & ScriptFactory need a singleton and this is the package
+     * instance fulfilling that pattern.
+     */
+    @Deprecated
+    private static volatile JexlEngine DEFAULT = null;
+    /**
+     * Retrieves a default JEXL engine.
+     * @return the singleton
+     */
+    @Deprecated
+    static JexlEngine getDefault() {
+        // java 5 allows the lazy singleton initialization
+        // using a double-check locking pattern
+        if (DEFAULT == null) {
+            synchronized(JexlEngine.class) {
+                if (DEFAULT == null) {
+                    DEFAULT = new JexlEngine();
+                }
+            }
+        }
+        return DEFAULT;
     }
 }

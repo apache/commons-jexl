@@ -17,11 +17,7 @@
 package org.apache.commons.jexl;
 
 import java.io.File;
-import java.io.StringReader;
 import java.net.URL;
-
-import org.apache.commons.jexl.parser.Parser;
-
 
 /**
  * <p>
@@ -38,37 +34,20 @@ import org.apache.commons.jexl.parser.Parser;
  * When an {@link Script} is created, the JEXL syntax is
  * parsed and verified.
  * </p>
+ *
+ * <p>
+ * This is a convenience class; using an instance of a {@link JexlEngine}
+ * that serves the same purpose with more control is recommended.
+ * </p>
  * @since 1.1
  * @version $Id$
  */
-public class ScriptFactory {
-
+@Deprecated
+public final class ScriptFactory {
     /**
-     * The singleton ScriptFactory also holds a single instance of
-     * {@link Parser}. When parsing expressions, ScriptFactory
-     * synchronizes on Parser.
-     */
-    protected static Parser parser = new Parser(new StringReader(";"));
-
-    /**
-     * ScriptFactory is a singleton and this is the private
-     * instance fulfilling that pattern.
-     */
-    protected static ScriptFactory factory = new ScriptFactory();
-
-    /**
-     * Private constructor, the single instance is always obtained
-     * with a call to getInstance().
+     * Private constructor, ensure no instance.
      */
     private ScriptFactory() {}
-    
-    /**
-     * Returns the single instance of ScriptFactory.
-     * @return the instance of ScriptFactory.
-     */
-    protected static  ScriptFactory getInstance() {
-        return factory;
-    }
 
     /**
      * Creates a Script from a String containing valid JEXL syntax.
@@ -81,7 +60,7 @@ public class ScriptFactory {
      *      problem parsing the script.
      */
     public static Script createScript(String scriptText) throws Exception {
-        return JexlEngine.DEFAULT.createScript(scriptText);
+        return JexlEngine.getDefault().createScript(scriptText);
     }
 
     /**
@@ -96,7 +75,7 @@ public class ScriptFactory {
      *      parsing the script.
      */
     public static Script createScript(File scriptFile) throws Exception {
-        return JexlEngine.DEFAULT.createScript(scriptFile);
+        return JexlEngine.getDefault().createScript(scriptFile);
     }
 
     /**
@@ -111,7 +90,7 @@ public class ScriptFactory {
      *      parsing the script.
      */
     public static Script createScript(URL scriptUrl) throws Exception {
-        return JexlEngine.DEFAULT.createScript(scriptUrl);
+        return JexlEngine.getDefault().createScript(scriptUrl);
     }
 
 }

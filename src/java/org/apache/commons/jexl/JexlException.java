@@ -22,7 +22,10 @@ import org.apache.commons.jexl.parser.Node;
  * Wraps any error that might occur during interpretation of a script or expression.
  */
 public class JexlException extends RuntimeException {
-    Node mark;
+    /** The point of origin for this exception. */
+    protected Node mark;
+    /** A marker to use in NPEs stating a null operand error. */
+    public static final String NULL_OPERAND = "jexl.null";
 
     public JexlException(Node node, String msg) {
         super(msg);
@@ -70,11 +73,15 @@ public class JexlException extends RuntimeException {
             msg.append(dbg.start());
             msg.append(",");
             msg.append(dbg.end());
-            msg.append("]: ");
+            msg.append("]: '");
             msg.append(dbg.data());
-            msg.append("\n");
+            msg.append("' ");
         }
         msg.append(super.getMessage());
+        Throwable cause = getCause();
+        if (cause != null && NULL_OPERAND == cause.getMessage()) {
+            msg.append(" caused by null operand");
+        }
         return msg.toString();
     }
 }

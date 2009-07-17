@@ -52,7 +52,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     /*
      * static signature for method(object,object)
      */
-    static final Class[] OBJECT_OBJECT = { Object.class, Object.class };
+    static final Class<?>[] OBJECT_OBJECT = { Object.class, Object.class };
     /**
      * Our runtime logger.
      */
@@ -87,35 +87,35 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     /**
      * {@inheritDoc}
      */
-    public Iterator getIterator(Object obj, Info i) {
+    public Iterator<?> getIterator(Object obj, Info i) {
         if (obj.getClass().isArray()) {
             return new ArrayIterator(obj);
-        } else if (obj instanceof Collection) {
-            return ((Collection) obj).iterator();
-        } else if (obj instanceof Map) {
-            return ((Map) obj).values().iterator();
-        } else if (obj instanceof Iterator) {
+        } else if (obj instanceof Collection<?>) {
+            return ((Collection<?>) obj).iterator();
+        } else if (obj instanceof Map<?,?>) {
+            return ((Map<?,?>) obj).values().iterator();
+        } else if (obj instanceof Iterator<?>) {
                 rlog.warn("Warning! The iterative " + " is an Iterator in the #foreach() loop at [" + i.getLine() + ","
                     + i.getColumn() + "]" + " in template " + i.getTemplateName() + ". Because it's not resetable,"
                     + " if used in more than once, this may lead to" + " unexpected results.");
 
-            return ((Iterator) obj);
-        } else if (obj instanceof Enumeration) {
+            return ((Iterator<?>) obj);
+        } else if (obj instanceof Enumeration<?>) {
                 rlog.warn("Warning! The iterative " + " is an Enumeration in the #foreach() loop at [" + i.getLine() + ","
                     + i.getColumn() + "]" + " in template " + i.getTemplateName() + ". Because it's not resetable,"
                     + " if used in more than once, this may lead to" + " unexpected results.");
 
-            return new EnumerationIterator((Enumeration) obj);
+            return new EnumerationIterator((Enumeration<?>) obj);
         } else {
             // look for an iterator() method to support the JDK5 Iterable
             // interface or any user tools/DTOs that want to work in
             // foreach without implementing the Collection interface
-            Class type = obj.getClass();
+            Class<?> type = obj.getClass();
             try {
-                Method iter = type.getMethod("iterator", (Class[]) null);
-                Class returns = iter.getReturnType();
+                Method iter = type.getMethod("iterator", (Class<?>[]) null);
+                Class<?> returns = iter.getReturnType();
                 if (Iterator.class.isAssignableFrom(returns)) {
-                    return (Iterator) iter.invoke(obj, (Object[])null);
+                    return (Iterator<?>) iter.invoke(obj, (Object[])null);
                 } else {
                     rlog.error("iterator() method of reference in #foreach loop at "
                             + i + " does not return a true Iterator.");
@@ -158,8 +158,8 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
                 // before invoking the method
                 return new VelMethodImpl(m, true);
             }
-        } else if (obj instanceof Class) {
-            m = introspector.getMethod((Class) obj, methodName, args);
+        } else if (obj instanceof Class<?>) {
+            m = introspector.getMethod((Class<?>) obj, methodName, args);
         }
 
         return (m == null) ? null : new VelMethodImpl(m);
@@ -171,7 +171,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
     public VelPropertyGet getPropertyGet(Object obj, String identifier, Info i) {
         AbstractExecutor executor;
 
-        Class claz = obj.getClass();
+        Class<?> claz = obj.getClass();
 
         /*
          * first try for a getFoo() type of property (also getfoo() )
@@ -208,7 +208,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
      * {@inheritDoc}
      */
     public VelPropertySet getPropertySet(Object obj, String identifier, Object arg, Info i) {
-        Class claz = obj.getClass();
+        Class<?> claz = obj.getClass();
 
         VelMethod vm = null;
         try {
@@ -296,9 +296,9 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
          */
         public Object invoke(Object o, Object[] params) throws Exception {
             if (isVarArg()) {
-                Class[] formal = method.getParameterTypes();
+                Class<?>[] formal = method.getParameterTypes();
                 int index = formal.length - 1;
-                Class type = formal[index].getComponentType();
+                Class<?> type = formal[index].getComponentType();
                 if (params.length >= index) {
                     params = handleVarArg(type, index, params);
                 }
@@ -326,11 +326,11 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
          */
         public boolean isVarArg() {
             if (isVarArg == null) {
-                Class[] formal = method.getParameterTypes();
+                Class<?>[] formal = method.getParameterTypes();
                 if (formal == null || formal.length == 0) {
                     this.isVarArg = Boolean.FALSE;
                 } else {
-                    Class last = formal[formal.length - 1];
+                    Class<?> last = formal[formal.length - 1];
                     // if the last arg is an array, then
                     // we consider this a varargs method
                     this.isVarArg = Boolean.valueOf(last.isArray());
@@ -349,7 +349,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
          * @return The actual parameters adjusted for the varargs in order
          * to fit the method declaration.
          */
-        private Object[] handleVarArg(Class type, int index, Object[] actual) {
+        private Object[] handleVarArg(Class<?> type, int index, Object[] actual) {
             // if no values are being passed into the vararg
             if (actual.length == index) {
                 // create an empty array of the expected type
@@ -404,7 +404,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
         /**
          * {@inheritDoc}
          */
-        public Class getReturnType() {
+        public Class<?> getReturnType() {
             return method.getReturnType();
         }
     } // CSON: VisibilityModifier

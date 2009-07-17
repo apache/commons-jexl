@@ -27,20 +27,21 @@ import org.apache.commons.jexl.parser.ParseException;
  * It is intended to be used in configuration modules, XML based frameworks or JSP taglibs
  * and facilitate the implementation of expression evaluation.
  * <p>
- * An expression can mix immediate, deferred and nested sub-expressions as well as string constants;<ol>
+ * An expression can mix immediate, deferred and nested sub-expressions as well as string constants;
+ * <ul>
  * <li>The "immediate" syntax is of the form "...${jexl-expr}..."</li>
  * <li>The "deferred" syntax is of the form "...#{jexl-expr}..."</li>
  * <li>The "nested" syntax is of the form "...#{...${jexl-expr0}...}..."</li>
  * <li>The "composite" syntax is of the form "...${jexl-expr0}... #{jexl-expr1}..."</li>
- * </ol>
+ * </ul>
  * </p>
  * <p>
  * Deferred & immediate expression carry different intentions:
- * <ol>
+ * <ul>
  * <li>An immediate expression indicate that evaluation is intended to be performed close to
  * the definition/parsing point.</li>
  * <li>A deferred expression indicate that evaluation is intended to occur at a later stage.</li>
- * </ol>
+ * </ul>
  * </p>
  * <p>
  * For instance: "Hello ${name}, now is #{time}" is a composite "deferred" expression since one
@@ -67,9 +68,14 @@ import org.apache.commons.jexl.parser.ParseException;
  * The most common mistake leading to an invalid expression being the following:
  * <code>"#{${bar}charAt(2)}"</code>
  * </p>
+ * <p>Also note that methods that parse evaluate expressions may throw <em>unchecked</em> ecxeptions;
+ * The {@link UnifiedJEXL.Exception} are thrown when the engine instance is in "non-silent" mode
+ * but since these are RuntimeException, user-code <em>should</em> catch them where appropriate.
+ * </p>
+ * @since 2.0
  */
 public class UnifiedJEXL {
-    /** The engine for this expression. */
+    /** The JEXL engine instance. */
     private final JexlEngine jexl;
     /** The expression cache. */
     private final Map<String, Expression> cache;
@@ -94,10 +100,10 @@ public class UnifiedJEXL {
 
     /**
      * Creates an expression cache.
-     * @param size the cache size, must be > 0
+     * @param cacheSize the cache size, must be > 0
      * @return a LinkedHashMap
      */
-    static private Map<String, Expression> createCache(final int cacheSize) {
+    private static Map<String, Expression> createCache(final int cacheSize) {
         return new LinkedHashMap<String, Expression>(cacheSize, 0.75f, true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry eldest) {
@@ -129,8 +135,8 @@ public class UnifiedJEXL {
      * Keeps count of sub-expressions by type.
      */
     private static class ExpressionBuilder {
-        final int[] counts;
-        final ArrayList<Expression> expressions;
+        private final int[] counts;
+        private final ArrayList<Expression> expressions;
 
         ExpressionBuilder(int size) {
            counts = new int[]{0, 0, 0};
@@ -147,14 +153,16 @@ public class UnifiedJEXL {
         }
 
         /**
-         * Builds an expression from a source, performs checks
+         * Builds an expression from a source, performs checks.
          * @param el the unified el instance
          * @param source the source expression
          * @return an expression
          */
         Expression build(UnifiedJEXL el, Expression source) {
             int sum = 0;
-            for(int i : counts) sum += i;
+            for(int count : counts) {
+                sum += count;
+            }
             if (expressions.size() != sum) {
                 String error = "parsing algorithm error, exprs: " + expressions.size() +
                    ", constant:" + counts[ExpressionType.CONSTANT.index] +
@@ -215,22 +223,22 @@ public class UnifiedJEXL {
          * This only has an effect to nested & composite expressions that contain differed & immediate sub-expressions.
          * </p>
          * <p>
-         * If the underlying JEXL engine is silent, errors will be logged through its logger as info.
+         * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
          * </p>
          * @param context the context to use for immediate expression evaluations
          * @return  an expression or null if an error occurs and the {@link JexlEngine} is silent
-         * @throws {@link Exception} if any error occurs and the {@link JexlEngine} is not silent
+         * @throws {@link UnifiedJEXL.Exception} if an error occurs and the {@link JexlEngine} is not silent
          */
         public abstract Expression prepare(JexlContext context);
 
         /**
          * Evaluates this expression.
          * <p>
-         * If the underlying JEXL engine is silent, errors will be logged through its logger as info.
+         * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
          * </p>
          * @param context the variable context
          * @return the result of this expression evaluation or null if an error occurs and the {@link JexlEngine} is silent
-         * @throws [@link Exception} if an error occurs and the {@link JexlEngine} is not silent
+         * @throws {@link UnifiedJEXL.Exception} if an error occurs and the {@link JexlEngine} is not silent
          */
         public abstract Object evaluate(JexlContext context);
 
@@ -354,15 +362,65 @@ public class UnifiedJEXL {
     }
 
 
-    /** An immediate expression: ${jexl}. */
-    private class Immediate extends Expression {
-        private final CharSequence expr;
-        private final SimpleNode node;
+    /** The base for Jexl based expressions. */
+    abstract private class JexlBased extends Expression {
+        protected final CharSequence expr;
+        protected final SimpleNode node;
 
-        Immediate(CharSequence expr, SimpleNode node, Expression source) {
+        JexlBased(CharSequence expr, SimpleNode node, Expression source) {
             super(source);
             this.expr = expr;
             this.node = node;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder strb = new StringBuilder(expr.length() + 3);
+            if (source != this) {
+                strb.append(source.toString());
+                strb.append(" /*= ");
+            }
+            strb.append(isImmediate()? '$' : '#');
+            strb.append("{");
+            strb.append(expr);
+            strb.append("}");
+            if (source != this) {
+                strb.append(" */");
+            }
+            return strb.toString();
+        }
+
+        @Override
+        public String asString() {
+            return expr.toString();
+        }
+
+        @Override
+        public Expression prepare(JexlContext context) {
+            return this;
+        }
+
+        @Override
+        Expression prepare(Interpreter interpreter) throws ParseException {
+            return this;
+        }
+
+        @Override
+        public Object evaluate(JexlContext context) {
+            return UnifiedJEXL.this.evaluate(context, this);
+        }
+
+        @Override
+        Object evaluate(Interpreter interpreter) throws ParseException {
+            return interpreter.interpret(node);
+        }
+
+    }
+
+    /** An immediate expression: ${jexl}. */
+    private class Immediate extends JexlBased {
+        Immediate(CharSequence expr, SimpleNode node, Expression source) {
+            super(expr, node, source);
         }
 
         @Override
@@ -371,111 +429,27 @@ public class UnifiedJEXL {
         }
 
         @Override
-        public String toString() {
-            StringBuilder strb = new StringBuilder(expr.length() + 3);
-            if (source != this) {
-                strb.append(source.toString());
-                strb.append(" /*= ");
-            }
-            strb.append("${");
-            strb.append(expr);
-            strb.append("}");
-            if (source != this) {
-                strb.append(" */");
-            }
-            return strb.toString();
+        public boolean isImmediate() {
+            return true;
         }
-
-        @Override
-        public String asString() {
-            return expr.toString();
-        }
-
-        @Override
-        public Expression prepare(JexlContext context) {
-            return this;
-        }
-
-        @Override
-        Expression prepare(Interpreter interpreter) throws ParseException {
-            return this;
-        }
-
-        @Override
-        public Object evaluate(JexlContext context) {
-            return UnifiedJEXL.this.evaluate(context, this);
-        }
-
-        @Override
-        Object evaluate(Interpreter interpreter) throws ParseException {
-            return interpreter.interpret(node);
-        }
-
     }
 
-
-    /** A deferred expression: #{jexl}. */
-    private class Deferred extends Expression {
-        protected final CharSequence expr;
-        protected final SimpleNode node;
-
+    /** An immediate expression: ${jexl}. */
+    private class Deferred extends JexlBased {
         Deferred(CharSequence expr, SimpleNode node, Expression source) {
-            super(source);
-            this.expr = expr.toString();
-            this.node = node;
+            super(expr, node, source);
+        }
+
+        @Override
+        ExpressionType getType() {
+            return ExpressionType.DEFERRED;
         }
 
         @Override
         public boolean isImmediate() {
             return false;
         }
-
-        ExpressionType getType() {
-            return ExpressionType.DEFERRED;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder strb = new StringBuilder(expr.length() + 3);
-            if (source != this) {
-                strb.append(source.toString());
-                strb.append(" /*= ");
-            }
-            strb.append("#{");
-            strb.append(expr);
-            strb.append("}");
-            if (source != this) {
-                strb.append(" */");
-            }
-            return strb.toString();
-        }
-
-        @Override
-        public String asString() {
-            return expr.toString();
-        }
-
-        @Override
-        public Expression prepare(JexlContext context) {
-            return this;
-        }
-
-        @Override
-        Expression prepare(Interpreter interpreter) throws ParseException {
-            return this;
-        }
-
-        @Override
-        public Object evaluate(JexlContext context) {
-            return UnifiedJEXL.this.evaluate(context, this);
-        }
-
-        @Override
-        Object evaluate(Interpreter interpreter) throws ParseException {
-            return interpreter.interpret(node);
-        }
     }
-
 
     /**
      * A deferred expression that nests an immediate expression.
@@ -633,11 +607,11 @@ public class UnifiedJEXL {
     /** Creates a a {@link UnifiedJEXL.Expression} from an expression string.
      *  Uses & fills up the expression cache if any.
      * <p>
-     * If the underlying JEXL engine is silent, errors will be logged through its logger as info.
+     * If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.
      * </p>
      * @param expression the UnifiedJEXL string expression
      * @return the UnifiedJEXL object expression, null if silent and an error occured
-     * @throws [@link Exception} if an error occurs and the {@link JexlEngine} is not silent
+     * @throws {@link UnifiedJEXL.Exception} if an error occurs and the {@link JexlEngine} is not silent
      */
     public Expression parse(String expression) {
         try {
@@ -677,6 +651,7 @@ public class UnifiedJEXL {
      * @param context the JEXL context to use
      * @param expr the expression to prepare
      * @return a prepared expression
+     * @throws {@link UnifiedJEXL.Exception} if an error occurs and the {@link JexlEngine} is not silent
      */
     Expression prepare(JexlContext context, Expression expr) {
         try {
@@ -708,6 +683,7 @@ public class UnifiedJEXL {
      * @param context the JEXL context to use
      * @param expr the expression to prepare
      * @return the result of the evaluation
+     * @throws {@link UnifiedJEXL.Exception} if an error occurs and the {@link JexlEngine} is not silent
      */
     Object evaluate(JexlContext context, Expression expr) {
         try {

@@ -42,7 +42,7 @@ public interface Uberspect {
      * @param obj to get the iterator for.
      * @return an iterator over obj.
      */
-    Iterator getIterator(Object obj, Info info);
+    Iterator<?> getIterator(Object obj, Info info);
 
     /**
      * Returns a general method, corresponding to $foo.bar( $woogie ).

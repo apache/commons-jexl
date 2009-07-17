@@ -28,11 +28,11 @@ import java.util.Enumeration;
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public class EnumerationIterator implements Iterator {
+public class EnumerationIterator<T> implements Iterator<T> {
     /**
      * The enumeration to iterate over.
      */
-    private final Enumeration enumeration;
+    private final Enumeration<T> enumeration;
 
     /**
      * Creates a new iteratorwrapper instance for the specified 
@@ -40,7 +40,7 @@ public class EnumerationIterator implements Iterator {
      *
      * @param enumer  The Enumeration to wrap.
      */
-    public EnumerationIterator(Enumeration enumer) {
+    public EnumerationIterator(Enumeration<T> enumer) {
         enumeration = enumer;
     }
 
@@ -49,7 +49,7 @@ public class EnumerationIterator implements Iterator {
      *
      * @return The next object in the array.
      */
-    public Object next() {
+    public T next() {
         return enumeration.nextElement();
     }
     

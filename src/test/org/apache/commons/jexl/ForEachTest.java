@@ -122,4 +122,8 @@ public class ForEachTest extends TestCase {
         Object o = e.evaluate(jc);
         assertEquals("Result is not last evaluated expression", "brie", o);
     }
+
+    public static void main(String[] args) throws Exception {
+        new ForEachTest("").testForEachWithEmptyStatement();
+    }
 }

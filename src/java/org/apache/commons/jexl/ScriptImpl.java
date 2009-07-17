@@ -33,9 +33,9 @@ class ScriptImpl implements Script {
 
     /**
      * Create a new Script from the given string and parsed syntax.
+     * @param engine the interpreter to evaluate the expression
      * @param scriptText the text of the script.
      * @param scriptTree the parsed script.
-     * @param interp the interpreter to evaluate the expression
      */
     public ScriptImpl(JexlEngine engine, String scriptText, ASTJexlScript scriptTree) {
         text = scriptText;
@@ -43,11 +43,13 @@ class ScriptImpl implements Script {
         jexl = engine;
     }
 
+    /** {@inheritDoc} */
     public Object execute(JexlContext context) throws Exception {
         Interpreter interpreter = jexl.createInterpreter(context);
         return interpreter.interpret(parsedScript);
     }
 
+    /** {@inheritDoc} */
     public String getText() {
         return text;
     }
