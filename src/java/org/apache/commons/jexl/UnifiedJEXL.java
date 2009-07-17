@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.parser.ParseException;
+import org.apache.commons.jexl.util.StringParser;
 
 /**
  * An evaluator similar to the unified EL evaluator used in JSP/JSF based on JEXL.
@@ -173,7 +174,7 @@ public class UnifiedJEXL {
             // if only one sub-expr, no need to create a composite
             return (expressions.size() == 1)?
                     expressions.get(0) :
-                    el.new Composite(counts, expressions, source);
+                    el.new CompositeExpression(counts, expressions, source);
         }
     }
 
@@ -199,19 +200,39 @@ public class UnifiedJEXL {
      * The abstract base class for all expressions, immediate '${...}' and deferred '#{...}'.
      */
     public abstract class Expression {
-        final Expression source;
+        protected final Expression source;
 
         Expression(Expression source) {
             this.source = source != null ? source : this;
         }
 
+        @Override
+        public String toString() {
+            StringBuilder strb = new StringBuilder();
+            if (source != this) {
+                strb.append(source.toString());
+                strb.append(" /*= ");
+            }
+            asString(strb);
+            if (source != this) {
+                strb.append(" */");
+            }
+            return strb.toString();
+        }
         /**
-         * Generate the string corresponding to this expression.
+         * Generates this expression's string representation.
          * @return the string representation
          */
         public String asString() {
-            return toString();
+            StringBuilder strb = new StringBuilder();
+            asString(strb);
+            return strb.toString();
         }
+
+        /**
+         * Adds this expression's string representation to a StringBuilder.
+         */
+        abstract void asString(StringBuilder strb);
 
         /**
          * When the expression is dependant upon immediate and deferred sub-expressions,
@@ -294,49 +315,50 @@ public class UnifiedJEXL {
 
 
     /** A constant expression. */
-    private class Constant extends Expression {
+    private class ConstantExpression extends Expression {
         private final Object value;
 
-        Constant(Object value, Expression source) {
+        ConstantExpression(Object value, Expression source) {
             super(source);
             if (value == null) {
                 throw new NullPointerException("constant can not be null");
             }
+            if (value instanceof String) {
+                value = StringParser.buildString((String) value, false);
+            }
             this.value = value;
         }
 
+        @Override
+        public String asString() {
+            StringBuilder strb = new StringBuilder();
+            strb.append('"');
+            asString(strb);
+            strb.append('"');
+            return strb.toString();
+        }
+
+        @Override
         ExpressionType getType() {
             return ExpressionType.CONSTANT;
         }
 
         @Override
-        public String toString() {
+        void asString(StringBuilder strb) {
             String str = value.toString();
             if (value instanceof String || value instanceof CharSequence) {
-                StringBuilder strb = new StringBuilder(str.length() + 2);
-                if (source != this) {
-                    strb.append(source.toString());
-                    strb.append(" /*= ");
-                }
-                strb.append('"');
                 for (int i = 0, size = str.length(); i < size; ++i) {
                     char c = str.charAt(i);
                     if (c == '"')
                         strb.append('\\');
+                    else if (c == '\\')
+                        strb.append("\\\\");
                     strb.append(c);
                 }
-                strb.append('"');
-                if (source != this) {
-                    strb.append(" */");
-                }
-                return strb.toString();
             }
-            return str;
-        }
-
-        @Override
-        public String asString() {
-            return value.toString();
+            else {
+                strb.append(str);
+            }
         }
 
         @Override
@@ -363,11 +385,11 @@ public class UnifiedJEXL {
 
 
     /** The base for Jexl based expressions. */
-    abstract private class JexlBased extends Expression {
+    abstract private class JexlBasedExpression extends Expression {
         protected final CharSequence expr;
         protected final SimpleNode node;
 
-        JexlBased(CharSequence expr, SimpleNode node, Expression source) {
+        JexlBasedExpression(CharSequence expr, SimpleNode node, Expression source) {
             super(source);
             this.expr = expr;
             this.node = node;
@@ -391,8 +413,11 @@ public class UnifiedJEXL {
         }
 
         @Override
-        public String asString() {
-            return expr.toString();
+        public void asString(StringBuilder strb) {
+            strb.append(isImmediate()? '$' : '#');
+            strb.append("{");
+            strb.append(expr);
+            strb.append("}");
         }
 
         @Override
@@ -418,8 +443,8 @@ public class UnifiedJEXL {
     }
 
     /** An immediate expression: ${jexl}. */
-    private class Immediate extends JexlBased {
-        Immediate(CharSequence expr, SimpleNode node, Expression source) {
+    private class ImmediateExpression extends JexlBasedExpression {
+        ImmediateExpression(CharSequence expr, SimpleNode node, Expression source) {
             super(expr, node, source);
         }
 
@@ -435,8 +460,8 @@ public class UnifiedJEXL {
     }
 
     /** An immediate expression: ${jexl}. */
-    private class Deferred extends JexlBased {
-        Deferred(CharSequence expr, SimpleNode node, Expression source) {
+    private class DeferredExpression extends JexlBasedExpression {
+        DeferredExpression(CharSequence expr, SimpleNode node, Expression source) {
             super(expr, node, source);
         }
 
@@ -456,8 +481,8 @@ public class UnifiedJEXL {
      * #{...${jexl}...}
      * Note that the deferred syntax is JEXL's, not UnifiedJEXL.
      */
-    private class Nested extends Deferred {
-        Nested(CharSequence expr, SimpleNode node, Expression source) {
+    private class NestedExpression extends DeferredExpression {
+        NestedExpression(CharSequence expr, SimpleNode node, Expression source) {
             super(expr, node, source);
             if (this.source != this) {
                 throw new IllegalArgumentException("Nested expression can not have a source");
@@ -483,7 +508,7 @@ public class UnifiedJEXL {
         public Expression prepare(Interpreter interpreter) throws ParseException {
             String value = interpreter.interpret(node).toString();
             SimpleNode dnode = toNode(value);
-            return new Deferred(value, dnode, this);
+            return new DeferredExpression(value, dnode, this);
         }
 
         @Override
@@ -494,13 +519,13 @@ public class UnifiedJEXL {
 
 
     /** A composite expression: "... ${...} ... #{...} ...". */
-    private class Composite extends Expression {
+    private class CompositeExpression extends Expression {
         // bit encoded (deferred count > 0) bit 1, (immediate count > 0) bit 0
         final int meta;
         // the list of expression resulting from parsing
         final Expression[] exprs;
 
-        Composite(int[] counts, ArrayList<Expression> exprs, Expression source) {
+        CompositeExpression(int[] counts, ArrayList<Expression> exprs, Expression source) {
             super(source);
             this.exprs = exprs.toArray(new Expression[exprs.size()]);
             this.meta = (counts[ExpressionType.DEFERRED.index] > 0? 2 : 0) |
@@ -518,32 +543,14 @@ public class UnifiedJEXL {
         @Override
         public boolean isImmediate() {
             // immediate if no deferred
-            return (meta & 2) != 0;
-        }
-        
-        @Override
-        public String toString() {
-            StringBuilder strb = new StringBuilder();
-            if (source != this) {
-                strb.append(source.toString());
-                strb.append(" /*= ");
-            }
-            for (Expression e : exprs) {
-                strb.append(e.toString());
-            }
-            if (source != this) {
-                strb.append(" */ ");
-            }
-            return strb.toString();
+            return (meta & 2) == 0;
         }
 
         @Override
-        public String asString() {
-            StringBuilder strb = new StringBuilder();
+        void asString(StringBuilder strb) {
             for (Expression e : exprs) {
-                strb.append(e.asString());
+                e.asString(strb);
             }
-            return strb.toString();
         }
 
         @Override
@@ -565,10 +572,10 @@ public class UnifiedJEXL {
             for(int e = 0; e < size; ++e) {
                 Expression expr = exprs[e];
                 Expression prepared = expr.prepare(interpreter);
-                if (evalImmediate && prepared instanceof Immediate) {
+                if (evalImmediate && prepared instanceof ImmediateExpression) {
                     // evaluate immediate as constant
                     Object value = prepared.evaluate(interpreter);
-                    prepared = value == null? null : new Constant(value, prepared);
+                    prepared = value == null? null : new ConstantExpression(value, prepared);
                 }
                 // add it if not null
                 if (prepared != null) {
@@ -789,7 +796,7 @@ public class UnifiedJEXL {
                         state = ParseState.IMMEDIATE1;
                         // if chars in buffer, create constant
                         if (strb.length() > 0) {
-                            Expression cexpr = new Constant(strb.toString(), null);
+                            Expression cexpr = new ConstantExpression(strb.toString(), null);
                             builder.add(cexpr);
                             strb.delete(0, Integer.MAX_VALUE);
                         }
@@ -806,7 +813,7 @@ public class UnifiedJEXL {
                         state = ParseState.DEFERRED1;
                         // if chars in buffer, create constant
                         if (strb.length() > 0) {
-                            Expression cexpr = new Constant(strb.toString(), null);
+                            Expression cexpr = new ConstantExpression(strb.toString(), null);
                             builder.add(cexpr);
                             strb.delete(0, Integer.MAX_VALUE);
                         }
@@ -822,7 +829,7 @@ public class UnifiedJEXL {
                     if (c == '}') {
                         // materialize the immediate expr
                         //Expression iexpr = createExpression(ExpressionType.IMMEDIATE, strb, null);
-                        Expression iexpr = new Immediate(strb.toString(), toNode(strb), null);
+                        Expression iexpr = new ImmediateExpression(strb.toString(), toNode(strb), null);
                         builder.add(iexpr);
                         strb.delete(0, Integer.MAX_VALUE);
                         state = ParseState.CONST;
@@ -836,7 +843,7 @@ public class UnifiedJEXL {
                     // skip inner strings (for '}')
                     if (c == '"' || c == '\'') {
                         strb.append(c);
-                        i = readDeferredString(strb, expr, i + 1, c);
+                        i = StringParser.readString(strb, expr, i + 1, c);
                         continue;
                     }
                     // nested immediate in deferred; need to balance count of '{' & '}'
@@ -856,8 +863,8 @@ public class UnifiedJEXL {
                         } else {
                             // materialize the nested/deferred expr
                             Expression dexpr = nested?
-                                               new Nested(expr.substring(inested, i+1), toNode(strb), null) :
-                                               new Deferred(strb.toString(), toNode(strb), null);
+                                               new NestedExpression(expr.substring(inested, i+1), toNode(strb), null) :
+                                               new DeferredExpression(strb.toString(), toNode(strb), null);
                             builder.add(dexpr);
                             strb.delete(0, Integer.MAX_VALUE);
                             nested = false;
@@ -883,42 +890,12 @@ public class UnifiedJEXL {
         }
         // we should be in that state
         if (state != ParseState.CONST)
-            throw new IllegalStateException("malformed expression: " + expr);
+            throw new ParseException("malformed expression: " + expr);
         // if any chars were buffered, add them as a constant
         if (strb.length() > 0) {
-            Expression cexpr = new Constant(strb.toString(), null);
+            Expression cexpr = new ConstantExpression(strb.toString(), null);
             builder.add(cexpr);
         }
         return builder.build(this, null);
-    }
-
-    /**
-     * Read the remainder of a string till a given separator,
-     * handles escaping through '\' syntax.
-     * @param strb the destination buffer to copy characters into
-     * @param str the origin
-     * @param index the offset into the origin
-     * @param sep the separator, single or double quote, marking end of string
-     * @return the offset in origin
-     */
-    static private int readDeferredString(StringBuilder strb, String str, int index, char sep) {
-        boolean escape = false;
-        for(;index < str.length();++index) {
-           char c = str.charAt(index);
-           if (escape) {
-               strb.append(c);
-               escape = false;
-               continue;
-           }
-           if (c == '\\') {
-               escape = true;
-               continue;
-           }
-           strb.append(c);
-           if (c == sep) {
-              break;
-           }
-        }
-        return index;
     }
 }

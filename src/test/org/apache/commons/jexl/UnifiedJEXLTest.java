@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 package org.apache.commons.jexl;
-
+import java.util.Map;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import junit.framework.TestCase;
 /**
  * Test cases for the UnifiedEL.
@@ -28,10 +30,16 @@ public class UnifiedJEXLTest extends TestCase {
         JEXL.setCache(128);
     }
     static UnifiedJEXL EL = new UnifiedJEXL(JEXL);
-    
+    static Log LOG = LogFactory.getLog(UnifiedJEXL.class);
+    JexlContext context = null;
+    Map<String,Object> vars =null;
+
+    @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error
         java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
+        context = JexlHelper.createContext();
+        vars = context.getVars();
     }
     
     public static class Froboz {
@@ -80,79 +88,154 @@ public class UnifiedJEXLTest extends TestCase {
     public void testAssign() throws Exception {
         UnifiedJEXL.Expression assign = EL.parse("${froboz.value = 10}");
         UnifiedJEXL.Expression check = EL.parse("${froboz.value}");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = assign.evaluate(jc);
+        Object o = assign.evaluate(context);
         assertEquals("Result is not 10", new Integer(10), o);
-        o = check.evaluate(jc);
+        o = check.evaluate(context);
         assertEquals("Result is not 10", new Integer(10), o);
     }
     
-    public void testDear() throws Exception {
-        UnifiedJEXL.Expression assign = EL.parse("Dear ${p} ${name};");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("p", "Mr");
-        jc.getVars().put("name", "Doe");
-        Object o = assign.evaluate(jc);
+    public void testComposite() throws Exception {
+        UnifiedJEXL.Expression expr = EL.parse("Dear ${p} ${name};");
+        vars.put("p", "Mr");
+        vars.put("name", "Doe");
+        assertTrue("expression should be immediate", expr.isImmediate());
+        Object o = expr.evaluate(context);
         assertEquals("Dear Mr Doe;", o);
-        jc.getVars().put("p", "Ms");
-        jc.getVars().put("name", "Jones");
-        o = assign.evaluate(jc);
+        vars.put("p", "Ms");
+        vars.put("name", "Jones");
+        o = expr.evaluate(context);
         assertEquals("Dear Ms Jones;", o);
     }
 
-    public void testDear2Phase() throws Exception {
-        UnifiedJEXL.Expression assign = EL.parse("Dear #{p} ${name};");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("name", "Doe");
-        UnifiedJEXL.Expression  phase1 = assign.prepare(jc);
-        jc.getVars().put("p", "Mr");
-        jc.getVars().put("name", "Should not be used in 2nd phase");
-        Object o = phase1.evaluate(jc);
+    public void testPrepareEvaluate() throws Exception {
+        UnifiedJEXL.Expression expr = EL.parse("Dear #{p} ${name};");
+        assertTrue("expression should be deferred", expr.isDeferred());
+        vars.put("name", "Doe");
+        UnifiedJEXL.Expression  phase1 = expr.prepare(context);
+        String as = phase1.asString();
+        assertEquals("Dear #{p} Doe;", as);
+        vars.put("p", "Mr");
+        vars.put("name", "Should not be used in 2nd phase");
+        Object o = phase1.evaluate(context);
         assertEquals("Dear Mr Doe;", o);
     }
     
     public void testNested() throws Exception {
         UnifiedJEXL.Expression expr = EL.parse("#{${hi}+'.world'}");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("hi", "hello");
-        jc.getVars().put("hello.world", "Hello World!");
-        Object o = expr.evaluate(jc);
+        vars.put("hi", "hello");
+        vars.put("hello.world", "Hello World!");
+        Object o = expr.evaluate(context);
+        assertTrue("source should not be expression", expr.getSource() != expr.prepare(context));
+        assertTrue("expression should be deferred", expr.isDeferred());
         assertEquals("Hello World!", o);
     }
 
     public void testImmediate() throws Exception {
+        JexlContext none = null;
         UnifiedJEXL.Expression expr = EL.parse("${'Hello ' + 'World!'}");
-        JexlContext jc = null;
-        Object o = expr.evaluate(jc);
+        assertTrue("prepare should return same expression", expr.prepare(none) == expr);
+        Object o = expr.evaluate(none);
+        assertTrue("expression should be immediate", expr.isImmediate());
+        assertEquals("Hello World!", o);
+    }
+
+    public void testConstant() throws Exception {
+        JexlContext none = null;
+        UnifiedJEXL.Expression expr = EL.parse("Hello World!");
+        assertTrue("prepare should return same expression", expr.prepare(none) == expr);
+        Object o = expr.evaluate(none);
+        assertTrue("expression should be immediate", expr.isImmediate());
         assertEquals("Hello World!", o);
     }
 
     public void testDeferred() throws Exception {
+        JexlContext none = null;
         UnifiedJEXL.Expression expr = EL.parse("#{'world'}");
-        JexlContext jc = null;
-        Object o = expr.evaluate(jc);
+        assertTrue("prepare should return same expression", expr.prepare(none) == expr);
+        Object o = expr.evaluate(none);
+        assertTrue("expression should be deferred", expr.isDeferred());
         assertEquals("world", o);
+    }
+
+    public void testEscape() throws Exception {
+        UnifiedJEXL.Expression expr = EL.parse("#\\{'world'\\}");
+        JexlContext none = null;
+        Object o = expr.evaluate(none);
+        assertEquals("#{'world'}", o);
+    }
+
+    public void testEscapeString() throws Exception {
+        UnifiedJEXL.Expression expr = EL.parse("\\\"${'world\\'s finest'}\\\"");
+        JexlContext none = null;
+        Object o = expr.evaluate(none);
+        assertEquals("\"world's finest\"", o);
+    }
+
+    public void testMalformed() throws Exception {
+        try {
+            UnifiedJEXL.Expression expr = EL.parse("${'world'");
+            JexlContext none = null;
+            Object o = expr.evaluate(none);
+            fail("should be malformed");
+        }
+        catch(UnifiedJEXL.Exception xjexl) {
+            // expected
+            String xmsg = xjexl.getMessage();
+            LOG.warn(xmsg);
+        }
+    }
+    
+    public void testMalformedNested() throws Exception {
+        try {
+            UnifiedJEXL.Expression expr = EL.parse("#{${hi} world}");
+            JexlContext none = null;
+            Object o = expr.evaluate(none);
+            fail("should be malformed");
+        }
+        catch(UnifiedJEXL.Exception xjexl) {
+            // expected
+            String xmsg = xjexl.getMessage();
+            LOG.warn(xmsg);
+        }
+    }
+    
+    public void testBadContextNested() throws Exception {
+        try {
+            UnifiedJEXL.Expression expr = EL.parse("#{${hi}+'.world'}");
+            JexlContext none = null;
+            Object o = expr.evaluate(none);
+            fail("should be malformed");
+        }
+        catch(UnifiedJEXL.Exception xjexl) {
+            // expected
+            String xmsg = xjexl.getMessage();
+            LOG.warn(xmsg);
+        }
     }
     
     public void testCharAtBug() throws Exception {
-        JexlContext jc = JexlHelper.createContext();
-
-        jc.getVars().put("foo", "abcdef");
+        vars.put("foo", "abcdef");
         UnifiedJEXL.Expression expr = EL.parse("${foo.substring(2,4)/*comment*/}");
-        Object o = expr.evaluate(jc);
+        Object o = expr.evaluate(context);
         assertEquals("cd", o);
         
-        jc.getVars().put("bar", "foo");
-        EL.getEngine().setSilent(true);
-        expr = EL.parse("#{${bar}+'.charAt(-2)'}");
-        expr = expr.prepare(jc);
-        o = expr.evaluate(jc);
-        assertEquals(null, o);
+        vars.put("bar", "foo");
+        try {
+            JEXL.setSilent(true);
+            expr = EL.parse("#{${bar}+'.charAt(-2)'}");
+            expr = expr.prepare(context);
+            o = expr.evaluate(context);
+            assertEquals(null, o);
+        }
+        finally {
+            JEXL.setSilent(false);
+        }
 
     }
- 
+
     public static void main(String[] args) throws Exception {
-        //new UnifiedELTest("debug").testClassHash();
-        new UnifiedJEXLTest("debug").testAssign();
+        UnifiedJEXLTest test = new UnifiedJEXLTest("debug");
+        test.setUp();
+        test.testBadContextNested();
     }
 }
