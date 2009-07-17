@@ -286,7 +286,8 @@ public class Debugger implements ParserVisitor {
         builder.append(" in ");
         accept(node.jjtGetChild(1), data);
         builder.append(") ");
-        accept(node.jjtGetChild(2), data);
+        if (node.jjtGetNumChildren() > 2)
+            accept(node.jjtGetChild(2), data);
         return data;
     }
 

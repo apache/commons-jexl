@@ -24,13 +24,37 @@ import java.math.BigInteger;
  * @since 2.0
  */
 class JexlArithmetic implements Arithmetic {
+    protected boolean strict;
+
+    JexlArithmetic(boolean lenient) {
+        this.strict = !lenient;
+    }
+
+    public void setLenient(boolean lenient) {
+        this.strict = !lenient;
+    }
+    
+    public boolean isLenient() {
+        return !this.strict;
+    }
+
     /**
-     * The result of +,/,-,* when both operands are null.
+     * The result of +,/,-,*,% when both operands are null.
      * @return Long(0)
      */
-    protected Object NullNull() {
-        return 0l;
+    protected Object controlNullNullOperands() {
+        return strict? null : 0l;
     }
+
+    /**
+     * Throw a NPE if arithmetic is strict.
+     */
+    protected void controlNullOperand() {
+        if (strict) {
+            throw new NullPointerException(JexlException.NULL_OPERAND);
+        }
+    }
+
     /**
      * Add two values together.
      * Rules are:<ol>
@@ -47,7 +71,7 @@ class JexlArithmetic implements Arithmetic {
      */
     public Object add(Object left, Object right) {
         if (left == null && right == null) {
-            return NullNull();
+            return controlNullNullOperands();
         }
         
         try {
@@ -82,9 +106,7 @@ class JexlArithmetic implements Arithmetic {
             return result;
         } catch (java.lang.NumberFormatException nfe) {
             // Well, use strings!
-            if (left == null) left = "";
-            else if (right == null) right = "";
-            return left.toString().concat(right.toString());
+            return toString(left).concat(toString(right));
         }
     }
 
@@ -100,7 +122,7 @@ class JexlArithmetic implements Arithmetic {
      */
     public Object divide(Object left, Object right) {
         if (left == null && right == null) {
-            return NullNull();
+            return controlNullNullOperands();
         }
 
         // if both are bigintegers use that type
@@ -119,11 +141,10 @@ class JexlArithmetic implements Arithmetic {
 
         double l = toDouble(left);
         double r = toDouble(right);
-        double d = l / r;
-        if (Double.isNaN(d) || Double.isInfinite(d)) {
+        if (r == 0.0) {
             throw new ArithmeticException("/");
         }
-        return d;
+        return l / r;
 
     }
     
@@ -139,17 +160,16 @@ class JexlArithmetic implements Arithmetic {
      */
     public Object mod(Object left, Object right) {
         if (left == null && right == null) {
-            return NullNull();
+            return controlNullNullOperands();
         }
 
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             double l = toDouble(left);
             double r = toDouble(right);
-            double d = l % r;
-            if (Double.isNaN(d) || Double.isInfinite(d)) {
-                throw new ArithmeticException("%");
+            if (r == 0.0) {
+                throw new ArithmeticException("/");
             }
-            return d;
+            return l % r;
         }
 
         // if both are bigintegers use that type
@@ -196,7 +216,7 @@ class JexlArithmetic implements Arithmetic {
      */
     public Object multiply(Object left, Object right) {
         if (left == null && right == null) {
-            return NullNull();
+            return controlNullNullOperands();
         }
         
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
@@ -246,7 +266,7 @@ class JexlArithmetic implements Arithmetic {
      */
     public Object subtract(Object left, Object right) {
         if (left == null && right == null) {
-            return NullNull();
+            return controlNullNullOperands();
         }
         
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
@@ -346,10 +366,10 @@ class JexlArithmetic implements Arithmetic {
             String rightString = right.toString();
 
             return leftString.compareTo(rightString) < 0;
-        } else if (left instanceof Comparable) {
-            return ((Comparable) left).compareTo(right) < 0;
-        } else if (right instanceof Comparable) {
-            return ((Comparable) right).compareTo(left) > 0;
+        } else if (left instanceof Comparable<?>) {
+            return ((Comparable<Object>) left).compareTo(right) < 0;
+        } else if (right instanceof Comparable<?>) {
+            return ((Comparable<Object>) right).compareTo(left) > 0;
         }
 
         throw new IllegalArgumentException("Invalid comparison : comparing cardinality for left: " + left
@@ -431,6 +451,7 @@ class JexlArithmetic implements Arithmetic {
      */
     public boolean toBoolean(Object val) {
         if (val == null) {
+            controlNullOperand();
             return false;
         } else if (val instanceof Boolean) {
             return ((Boolean) val).booleanValue();
@@ -449,6 +470,7 @@ class JexlArithmetic implements Arithmetic {
      */
     public int toInteger(Object val) {
         if (val == null) {
+            controlNullOperand();
             return 0;
         } else if (val instanceof String) {
             if ("".equals(val)) {
@@ -475,6 +497,7 @@ class JexlArithmetic implements Arithmetic {
      */
     public long toLong(Object val) {
         if (val == null) {
+            controlNullOperand();
             return 0;
         } else if (val instanceof String) {
             if ("".equals(val)) {
@@ -502,6 +525,7 @@ class JexlArithmetic implements Arithmetic {
         if (val instanceof BigInteger) {
             return (BigInteger) val;
         } else if (val == null) {
+            controlNullOperand();
             return BigInteger.valueOf(0);
         } else if (val instanceof String) {
             String string = (String) val;
@@ -529,6 +553,7 @@ class JexlArithmetic implements Arithmetic {
         if (val instanceof BigDecimal) {
             return (BigDecimal) val;
         } else if (val == null) {
+            controlNullOperand();
             return BigDecimal.valueOf(0);
         } else if (val instanceof String) {
             String string = (String) val;
@@ -554,6 +579,7 @@ class JexlArithmetic implements Arithmetic {
      */
     public double toDouble(Object val) {
         if (val == null) {
+            controlNullOperand();
             return 0;
         } else if (val instanceof String) {
             String string = (String) val;
@@ -578,6 +604,22 @@ class JexlArithmetic implements Arithmetic {
 
         throw new IllegalArgumentException("Double coercion exception. Can't coerce type: " + val.getClass().getName());
     }
+
+
+    /**
+     * Coerce to a string.
+     *
+     * @param val Object to be coerced.
+     * @return The String coerced value.
+     */
+    public String toString(Object val) {
+        if (val == null) {
+            controlNullOperand();
+            val = "";
+        }
+        return val.toString();
+    }
+
     /**
      * Is Object a floating point number.
      *

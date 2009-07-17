@@ -551,7 +551,7 @@ public class JexlTest extends TestCase
 
         assertExpression(jc, "foo.substring(2,4)", "cd");
         assertExpression(jc, "foo.charAt(2)", new Character('c'));
-            assertExpression(jc, "foo.charAt(-2)", null);
+        assertExpression(jc, "foo.charAt(-2)", null);
 
     }
 

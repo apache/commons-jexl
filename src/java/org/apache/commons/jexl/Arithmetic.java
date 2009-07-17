@@ -20,6 +20,19 @@ package org.apache.commons.jexl;
  */
 public interface Arithmetic {
 
+    /** Sets how to behave when null is used as an operand.
+     * @param lenient
+     * If true, some reasonable default conversion occurs (0 for numbers, empty string,).
+     * If false, encountering null as an operand is considered an error.
+     */
+    void setLenient(boolean lenient);
+
+    /**
+     * Checks whether arithmetic is lenient.
+     * @return true when lenient, false when strict
+     */
+    boolean isLenient();
+
     /**
      * Add two values together.
      *

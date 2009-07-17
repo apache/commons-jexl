@@ -148,7 +148,7 @@ public class MethodMap {
      * @return the most specific method.
      * @throws AmbiguousException if there is more than one.
      */
-    private static Method getMostSpecific(List<Method> methods, Class[] classes)
+    private static Method getMostSpecific(List<Method> methods, Class<?>[] classes)
             throws AmbiguousException {
         LinkedList<Method> applicables = getApplicables(methods, classes);
 
@@ -171,7 +171,7 @@ public class MethodMap {
         for (Iterator<Method> applicable = applicables.iterator();
              applicable.hasNext();) {
             Method app = applicable.next();
-            Class[] appArgs = app.getParameterTypes();
+            Class<?>[] appArgs = app.getParameterTypes();
             boolean lessSpecific = false;
 
             for (Iterator<Method> maximal = maximals.iterator();
@@ -224,7 +224,7 @@ public class MethodMap {
      * @return MORE_SPECIFIC if c1 is more specific than c2, LESS_SPECIFIC if
      *         c1 is less specific than c2, INCOMPARABLE if they are incomparable.
      */
-    private static int moreSpecific(Class[] c1, Class[] c2) {
+    private static int moreSpecific(Class<?>[] c1, Class<?>[] c2) {
         boolean c1MoreSpecific = false;
         boolean c2MoreSpecific = false;
 
@@ -283,7 +283,7 @@ public class MethodMap {
      *         formal and actual arguments matches, and argument types are assignable
      *         to formal types through a method invocation conversion).
      */
-    private static LinkedList<Method> getApplicables(List<Method> methods, Class[] classes) {
+    private static LinkedList<Method> getApplicables(List<Method> methods, Class<?>[] classes) {
         LinkedList<Method> list = new LinkedList<Method>();
 
         for (Iterator<Method> imethod = methods.iterator(); imethod.hasNext();) {
@@ -304,8 +304,8 @@ public class MethodMap {
      * @param classes arguments to method
      * @return true if method is applicable to arguments
      */
-    private static boolean isApplicable(Method method, Class[] classes) {
-        Class[] methodArgs = method.getParameterTypes();
+    private static boolean isApplicable(Method method, Class<?>[] classes) {
+        Class<?>[] methodArgs = method.getParameterTypes();
 
         if (methodArgs.length > classes.length) {
             // if there's just one more methodArg than class arg
@@ -330,7 +330,7 @@ public class MethodMap {
         } else if (methodArgs.length > 0) // more arguments given than the method accepts; check for varargs
         {
             // check that the last methodArg is an array
-            Class lastarg = methodArgs[methodArgs.length - 1];
+            Class<?> lastarg = methodArgs[methodArgs.length - 1];
             if (!lastarg.isArray()) {
                 return false;
             }
@@ -343,7 +343,7 @@ public class MethodMap {
             }
 
             // check that all remaining arguments are convertible to the vararg type
-            Class vararg = lastarg.getComponentType();
+            Class<?> vararg = lastarg.getComponentType();
             for (int i = methodArgs.length - 1; i < classes.length; ++i) {
                 if (!isConvertible(vararg, classes[i], false)) {
                     return false;
@@ -363,7 +363,7 @@ public class MethodMap {
      *                       in the method declaration
      * @return see isMethodInvocationConvertible.
      */
-    private static boolean isConvertible(Class formal, Class actual,
+    private static boolean isConvertible(Class<?> formal, Class<?> actual,
                                          boolean possibleVarArg) {
         return IntrospectionUtils.
                 isMethodInvocationConvertible(formal, actual, possibleVarArg);
@@ -378,7 +378,7 @@ public class MethodMap {
      *                       in the method declaration
      * @return see isStrictMethodInvocationConvertible.
      */
-    private static boolean isStrictConvertible(Class formal, Class actual,
+    private static boolean isStrictConvertible(Class<?> formal, Class<?> actual,
                                                boolean possibleVarArg) {
         return IntrospectionUtils.
                 isStrictMethodInvocationConvertible(formal, actual, possibleVarArg);

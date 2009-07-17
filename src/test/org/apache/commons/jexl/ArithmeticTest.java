@@ -125,7 +125,7 @@ public class ArithmeticTest extends TestCase {
         Map vars = context.getVars();
         vars.put("aByte", new Byte((byte) 1));
         vars.put("aShort", new Short((short) 2));
-        vars.put("anInteger", new Integer(3));
+        vars.put("aInteger", new Integer(3));
         vars.put("aLong", new Long(4));
         vars.put("aFloat", new Float(5.5));
         vars.put("aDouble", new Double(6.6));
@@ -151,9 +151,10 @@ public class ArithmeticTest extends TestCase {
         final int PERMS = tnames.length * tnames.length;
 
         JexlEngine jexl = new JexlEngine();
+        jexl.setSilent(false);
         // for non-silent, silent...
         for (int s = 0; s < 2; ++s) {
-            jexl.setSilent(s != 0);
+            jexl.setLenient(s == 0);
             int zthrow = 0;
             int zeval = 0;
             // for vars of all types...
@@ -178,11 +179,11 @@ public class ArithmeticTest extends TestCase {
                     }
                 }
             }
-            if (!jexl.isSilent())
-                assertTrue("All expressions should have thrown " + zthrow,
+            if (!jexl.isLenient())
+                assertTrue("All expressions should have thrown " + zthrow + "/" + PERMS,
                         zthrow == PERMS);
             else
-                assertTrue("All expressions should have zeroed" + zeval,
+                assertTrue("All expressions should have zeroed " + zeval + "/" + PERMS,
                         zeval == PERMS);
         }
     }

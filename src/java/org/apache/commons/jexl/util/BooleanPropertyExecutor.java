@@ -44,7 +44,7 @@ public class BooleanPropertyExecutor extends PropertyExecutor {
      */
     public BooleanPropertyExecutor(Log rlog,
         org.apache.commons.jexl.util.introspection.Introspector is,
-        Class clazz, String property) {
+        Class<?> clazz, String property) {
             super(rlog, is, clazz, property);
     }
 
@@ -54,7 +54,8 @@ public class BooleanPropertyExecutor extends PropertyExecutor {
      * @param clazz The class being analyzed.
      * @param property Name of boolean property.
      */
-    protected void discover(Class clazz, String property) {
+    @Override
+    protected void discover(Class<?> clazz, String property) {
         try {
             char c;
             /*

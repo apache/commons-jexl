@@ -34,11 +34,17 @@ import org.apache.commons.jexl.parser.ParseException;
  * parsed and verified.  If the supplied expression is neither an
  * expression nor a reference, an exception is thrown from createException().
  * </p>
+ * 
+ * <p>
+ * This is a convenience class; using an instance of a {@link JexlEngine}
+ * that serves the same purpose with more control is recommended.
+ * </p>
  * @since 1.0
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public class ExpressionFactory {
+@Deprecated
+public final class ExpressionFactory {
     /**
      * Private constructor, the single instance is always obtained
      * with a call to getInstance().
@@ -58,7 +64,7 @@ public class ExpressionFactory {
      */
     public static Expression createExpression(String expression)
         throws ParseException {
-        return JexlEngine.DEFAULT.createExpression(expression);
+        return JexlEngine.getDefault().createExpression(expression);
     }
 
 }

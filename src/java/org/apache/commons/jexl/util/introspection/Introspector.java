@@ -87,6 +87,7 @@ public class Introspector extends IntrospectorBase {
      * @throws IllegalArgumentException When the parameters passed in can not be used for introspection.
      * CSOFF: RedundantThrows
      */
+    @Override
     public Method getMethod(Class c, String name, Object[] params) throws IllegalArgumentException {
         /*
          *  just delegate to the base class
@@ -94,14 +95,12 @@ public class Introspector extends IntrospectorBase {
 
         try {
             return super.getMethod(c, name, params);
-        } catch (MethodMap.AmbiguousException ae) {
+        }
+        catch (MethodMap.AmbiguousException ae) {
             /*
              *  whoops.  Ambiguous.  Make a nice log message and return null...
              */
-
-            StringBuilder msg = new StringBuilder("Introspection Error : Ambiguous method invocation ")
-                .append(name).append("( ");
-
+            StringBuilder msg = new StringBuilder("Introspection Error : Ambiguous method invocation ").append(name).append("( ");
             for (int i = 0; i < params.length; i++) {
                 if (i > 0) {
                     msg.append(", ");
@@ -109,10 +108,10 @@ public class Introspector extends IntrospectorBase {
 
                 msg.append(null == params[i] ? "null" : params[i].getClass().getName());
             }
-
             msg.append(") for class ").append(c.getName());
-
-           if (rlog != null)  rlog.error(msg.toString());
+            if (rlog != null) {
+                rlog.error(msg.toString());
+            }
         }
 
         return null;

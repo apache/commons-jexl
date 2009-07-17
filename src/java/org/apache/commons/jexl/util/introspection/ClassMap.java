@@ -105,48 +105,43 @@ public class ClassMap {
         // until Velocity 1.4. As we always reflect all elements of the tree (that's what we have a cache for), we will
         // hit the public elements sooner or later because we reflect all the public elements anyway.
         //
-        List<Class> classesToReflect = new ArrayList<Class>();
-
         // Ah, the miracles of Java for(;;) ...
-        for (Class classToReflect = getCachedClass(); classToReflect != null;
-                classToReflect = classToReflect.getSuperclass()) {
+        for (Class classToReflect = getCachedClass(); classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
             if (Modifier.isPublic(classToReflect.getModifiers())) {
-                classesToReflect.add(classToReflect);
+                populateMethodCacheWith(methodCache, classToReflect);
             }
             Class[] interfaces = classToReflect.getInterfaces();
             for (int i = 0; i < interfaces.length; i++) {
-                if (Modifier.isPublic(interfaces[i].getModifiers())) {
-                    classesToReflect.add(interfaces[i]);
+                populateMethodCacheWithInterface(methodCache, interfaces[i]);
+            }
+        }
+    }
+
+    /* recurses up interface hierarchy to get all super interfaces */
+    private void populateMethodCacheWithInterface(MethodCache methodCache, Class iface) {
+        if (Modifier.isPublic(iface.getModifiers())) {
+            populateMethodCacheWith(methodCache, iface);
+        }
+        Class[] supers = iface.getInterfaces();
+        for (int i = 0; i < supers.length; i++) {
+            populateMethodCacheWithInterface(methodCache, supers[i]);
+        }
+    }
+
+    private void populateMethodCacheWith(MethodCache methodCache, Class classToReflect) {
+        try {
+            Method[] methods = classToReflect.getDeclaredMethods();
+            for (int i = 0; i < methods.length; i++) {
+                int modifiers = methods[i].getModifiers();
+                if (Modifier.isPublic(modifiers)) {
+                    methodCache.put(methods[i]);
                 }
             }
         }
-
-        for (Iterator<Class> it = classesToReflect.iterator(); it.hasNext();) {
-            Class classToReflect = it.next();
-
-            try {
-                Method[] methods = classToReflect.getMethods();
-
-                for (int i = 0; i < methods.length; i++) {
-                    // Strictly spoken that check shouldn't be necessary
-                    // because getMethods only returns public methods.
-                    int modifiers = methods[i].getModifiers();
-                    if (Modifier.isPublic(modifiers)) //  && !)
-                    {
-                        // Some of the interfaces contain abstract methods. That is fine, because the actual object must
-                        // implement them anyway (else it wouldn't be implementing the interface).
-                        // If we find an abstract method in a non-interface, we skip it, because we do want to make sure
-                        // that no abstract methods end up in  the cache.
-                        if (classToReflect.isInterface() || !Modifier.isAbstract(modifiers)) {
-                            methodCache.put(methods[i]);
-                        }
-                    }
-                }
-            } catch (SecurityException se) // Everybody feels better with...
-            {
-                if (rlog != null && rlog.isDebugEnabled()) {
-                    rlog.debug("While accessing methods of " + classToReflect + ": ", se);
-                }
+        catch (SecurityException se) // Everybody feels better with...
+        {
+            if (rlog.isDebugEnabled()) {
+                rlog.debug("While accessing methods of " + classToReflect + ": ", se);
             }
         }
     }

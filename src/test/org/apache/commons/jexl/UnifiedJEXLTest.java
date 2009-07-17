@@ -23,9 +23,16 @@ import junit.framework.TestCase;
 public class UnifiedJEXLTest extends TestCase {
     static JexlEngine JEXL = new JexlEngine();
     static {
+        JEXL.setLenient(false);
         JEXL.setSilent(false);
+        JEXL.setCache(128);
     }
     static UnifiedJEXL EL = new UnifiedJEXL(JEXL);
+    
+    public void setUp() throws Exception {
+        // ensure jul logging is only error
+        java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
+    }
     
     public static class Froboz {
         int value;
@@ -115,14 +122,14 @@ public class UnifiedJEXLTest extends TestCase {
 
     public void testImmediate() throws Exception {
         UnifiedJEXL.Expression expr = EL.parse("${'Hello ' + 'World!'}");
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = null;
         Object o = expr.evaluate(jc);
         assertEquals("Hello World!", o);
     }
 
     public void testDeferred() throws Exception {
         UnifiedJEXL.Expression expr = EL.parse("#{'world'}");
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = null;
         Object o = expr.evaluate(jc);
         assertEquals("world", o);
     }
@@ -146,6 +153,6 @@ public class UnifiedJEXLTest extends TestCase {
  
     public static void main(String[] args) throws Exception {
         //new UnifiedELTest("debug").testClassHash();
-        new UnifiedJEXLTest("debug").testCharAtBug();
+        new UnifiedJEXLTest("debug").testAssign();
     }
 }

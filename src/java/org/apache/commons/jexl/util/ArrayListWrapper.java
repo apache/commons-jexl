@@ -25,9 +25,9 @@ import java.util.AbstractList;
  * @author Chris Schultz &lt;chris@christopherschultz.net$gt;
  * @version $Revision$ $Date: 2006-04-14 19:40:41 $
  */
-public class ArrayListWrapper extends AbstractList {
+public class ArrayListWrapper extends AbstractList<Object> {
     /** the array to wrap. */
-    private Object array;
+    private final Object array;
 
     /**
      * Create the wrapper.
@@ -40,11 +40,13 @@ public class ArrayListWrapper extends AbstractList {
     // CSON: HiddenField
 
     /** {@inheritDoc} */
+    @Override
     public Object get(int index) {
         return Array.get(array, index);
     }
 
     /** {@inheritDoc} */
+    @Override
     public Object set(int index, Object element) {
         Object old = get(index);
         Array.set(array, index, element);

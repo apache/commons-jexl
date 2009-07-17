@@ -45,7 +45,7 @@ public class PropertyExecutor extends AbstractExecutor {
      * @param property The property being addressed.
      */
     public PropertyExecutor(Log r, Introspector ispctr,
-            Class clazz, String property) {
+            Class<?> clazz, String property) {
         rlog = r;
         introspector = ispctr;
 
@@ -58,7 +58,7 @@ public class PropertyExecutor extends AbstractExecutor {
      * @param clazz The class being analyzed.
      * @param property Name of the property.
      */
-    protected void discover(Class clazz, String property) {
+    protected void discover(Class<?> clazz, String property) {
         /*
          *  this is gross and linear, but it keeps it straightforward.
          */
@@ -122,4 +122,3 @@ public class PropertyExecutor extends AbstractExecutor {
         return method.invoke(o, (Object[])null);
     }
 }
-

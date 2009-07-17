@@ -39,7 +39,7 @@ public class MapGetExecutor extends AbstractExecutor {
      * @param clazz the class to execute the get on.
      * @param aProperty the property or key to get.
      */
-    public MapGetExecutor(final Log rlog, final Class clazz, final String aProperty) {
+    public MapGetExecutor(final Log rlog, final Class<?> clazz, final String aProperty) {
         this.rlog = rlog;
         this.property = aProperty;
         discover(clazz);
@@ -49,13 +49,13 @@ public class MapGetExecutor extends AbstractExecutor {
      * Discover the method to call.
      * @param clazz the class to find the method on.
      */
-    protected void discover(final Class clazz) {
-        Class[] interfaces = clazz.getInterfaces();
+    protected void discover(final Class<?> clazz) {
+        Class<?>[] interfaces = clazz.getInterfaces();
         for (int i = 0; i < interfaces.length; i++) {
             if (interfaces[i].equals(Map.class)) {
                 try {
                     if (property != null) {
-                        method = Map.class.getMethod("get", new Class[]{Object.class});
+                        method = Map.class.getMethod("get", new Class<?>[]{Object.class});
                     }
                     /**
                      * pass through application level runtime exceptions
@@ -76,6 +76,6 @@ public class MapGetExecutor extends AbstractExecutor {
      * @return o.get(property)
      */
     public Object execute(final Object o) {
-        return ((Map) o).get(property);
+        return ((Map<?,?>) o).get(property);
     }
 }
