@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.parser.ParseException;
-import org.apache.commons.jexl.util.StringParser;
+import org.apache.commons.jexl.parser.StringParser;
 
 /**
  * An evaluator similar to the unified EL evaluator used in JSP/JSF based on JEXL.

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl.util;
+package org.apache.commons.jexl.parser;
 
 /**
  * Common constant strings utilities.
