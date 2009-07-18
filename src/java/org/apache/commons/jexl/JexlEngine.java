@@ -32,7 +32,6 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
-import org.apache.commons.jexl.parser.Node;
 import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.jexl.parser.TokenMgrError;
 import org.apache.commons.jexl.parser.ASTJexlScript;
@@ -500,8 +499,8 @@ public class JexlEngine {
             int start = 0;
             int end = str.length();
             if (end > 0) {
-                for(start = 0; start < end && str.charAt(start) == ' '; ++start); // trim front spaces
-                for(;end > 0 && str.charAt(end - 1) == ' '; --end); // trim ending spaces
+                for(start = 0; start < end && str.charAt(start) == ' '; ++start) {} // trim front spaces
+                for(;end > 0 && str.charAt(end - 1) == ' '; --end) {} // trim ending spaces
                 return str.subSequence(start, end).toString();
             }
             return "";

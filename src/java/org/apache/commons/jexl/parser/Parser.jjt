@@ -41,8 +41,6 @@ package org.apache.commons.jexl.parser;
 import java.io.Reader;
 import java.io.ByteArrayInputStream;
 
-import org.apache.commons.jexl.util.introspection.Uberspect;
-
 public class Parser extends StringParser
 {
 

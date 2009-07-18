@@ -88,7 +88,7 @@ public class Introspector extends IntrospectorBase {
      * CSOFF: RedundantThrows
      */
     @Override
-    public Method getMethod(Class c, String name, Object[] params) throws IllegalArgumentException {
+    public Method getMethod(Class<?> c, String name, Object[] params) throws IllegalArgumentException {
         /*
          *  just delegate to the base class
          */
@@ -121,6 +121,7 @@ public class Introspector extends IntrospectorBase {
      * Clears the classmap and classname
      * caches, and logs that we did so.
      */
+    @Override
     protected void clearCache() {
         super.clearCache();
         rlog.info(CACHEDUMP_MSG);
