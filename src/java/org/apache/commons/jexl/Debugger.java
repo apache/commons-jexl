@@ -66,38 +66,47 @@ import org.apache.commons.jexl.parser.Node;
 import org.apache.commons.jexl.parser.SimpleNode;
 
 import org.apache.commons.jexl.parser.ParserVisitor;
+
 /**
  * Helps pinpoint the cause of problems in expressions that fail during evaluation.
  * It rebuilds an expression string from the tree and the start/end offsets of the cause
- * in that string (TODO pretty print).
+ * in that string.
  * This implies that exceptions during evaluation should allways carry the node that's causing
  * the error.
  */
-public class Debugger implements ParserVisitor {
-    StringBuilder builder;
-    Node cause;
-    int start = 0;
-    int end = 0;
+final class Debugger implements ParserVisitor {
+    /** The builder to compose messages. */
+    private StringBuilder builder;
+    /** The cause of the issue to debug. */
+    private Node cause;
+    /** The starting character location offset of the cause in the builder. */
+    private int start;
+    /** The ending character location offset of the cause in the builder. */
+    private int end;
 
-    public Debugger() {
+    /**
+     * Creates a Debugger.
+     */
+    Debugger() {
         builder = new StringBuilder();
         cause = null;
         start = 0;
         end = 0;
     }
-    
+
     /**
      * Seeks the location of an error cause (a node) in an expression.
+     * @param node the node to debug
      * @return true if the cause was located, false otherwise
      */
-    public boolean debug(Node cause) {
+    public boolean debug(Node node) {
         start = 0;
         end = 0;
-        if (cause != null) {
+        if (node != null) {
             builder = new StringBuilder();
-            this.cause = cause;
+            this.cause = node;
             // make arg cause become the root cause
-            Node root = cause;
+            Node root = node;
             while (root.jjtGetParent() != null) {
                 root = root.jjtGetParent();
             }
@@ -119,6 +128,7 @@ public class Debugger implements ParserVisitor {
     public int start() {
         return start;
     }
+
     /**
      * @return The end offset location of the cause in the expression
      */
@@ -127,7 +137,11 @@ public class Debugger implements ParserVisitor {
     }
 
     /**
-     * Checks if a child node is the cause to debug & adds its representation to the rebuilt expression
+     * Checks if a child node is the cause to debug &amp; adds its representation
+     * to the rebuilt expression.
+     * @param node the child node
+     * @param data visitor pattern argument
+     * @return visitor pattern value
      */
     private Object accept(Node node, Object data) {
         if (node == cause) {
@@ -141,7 +155,12 @@ public class Debugger implements ParserVisitor {
     }
 
     /**
-     * Checks if a terminal node is the the cause to debug & adds its representation to the rebuilt expression
+     * Checks if a terminal node is the the cause to debug &amp; adds its
+     * representation to the rebuilt expression.
+     * @param node the child node
+     * @param image the child node token image (may be null)
+     * @param data visitor pattern argument
+     * @return visitor pattern value
      */
     private Object check(Node node, String image, Object data) {
         if (node == cause) {
@@ -157,10 +176,14 @@ public class Debugger implements ParserVisitor {
         }
         return data;
     }
-    
+
     /**
      * Checks if the children of a node using infix notation is the cause to debug,
-     * adds their representation to the rebuilt expression
+     * adds their representation to the rebuilt expression.
+     * @param node the child node
+     * @param infix the child node token
+     * @param data visitor pattern argument
+     * @return visitor pattern value
      */
     private Object infixChildren(Node node, String infix, Object data) {
         int num = node.jjtGetNumChildren();
@@ -286,8 +309,9 @@ public class Debugger implements ParserVisitor {
         builder.append(" in ");
         accept(node.jjtGetChild(1), data);
         builder.append(") ");
-        if (node.jjtGetNumChildren() > 2)
+        if (node.jjtGetNumChildren() > 2) {
             accept(node.jjtGetChild(2), data);
+        }
         return data;
     }
 

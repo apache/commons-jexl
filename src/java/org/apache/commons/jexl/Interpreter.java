@@ -91,20 +91,20 @@ import org.apache.commons.jexl.util.introspection.VelPropertySet;
  */
 public class Interpreter implements ParserVisitor {
     /** The logger. */
-    protected final Log LOG;
+    protected final Log logger;
     /** The uberspect. */
     protected final Uberspect uberspect;
-    /** the arithmetic handler. */
+    /** The arithmetic handler. */
     protected final Arithmetic arithmetic;
     /** The map of registered functions. */
     protected final Map<String, Object> functions;
     /** The context to store/retrieve variables. */
     protected final JexlContext context;
-    /** Strict interpreter flag */
+    /** Strict interpreter flag. */
     protected final boolean strict;
-    /** Silent intepreter  flag */
+    /** Silent intepreter flag. */
     protected boolean silent;
-    /** Registers; 2 * {name, value} */
+    /** Registers made of 2 pairs of {register-name, value}. */
     protected Object[] registers = null;
     /** Dummy velocity info. */
     protected static final Info DUMMY = new Info("", 1, 1);
@@ -112,31 +112,32 @@ public class Interpreter implements ParserVisitor {
     protected static final Object[] EMPTY_PARAMS = new Object[0];
 
     /**
-     * Create the interpreter.
+     * Creates an interpreter.
      * @param jexl the engine creating this interpreter
-     * @param context the context to evaluate expression
+     * @param aContext the context to evaluate expression
      */
-    public Interpreter(JexlEngine jexl, JexlContext context) {
-        this.LOG = jexl.LOG;
+    public Interpreter(JexlEngine jexl, JexlContext aContext) {
+        this.logger = jexl.logger;
         this.uberspect = jexl.uberspect;
         this.arithmetic = jexl.arithmetic;
         this.functions = jexl.functions;
         this.strict = !this.arithmetic.isLenient();
         this.silent = jexl.silent;
-        this.context = context;
+        this.context = aContext;
     }
 
     /**
      * Sets whether this interpreter throws JexlException during evaluation.
-     * @param silent true means no JexlException will be thrown but will be logged
+     * @param flag true means no JexlException will be thrown but will be logged
      *        as info through the Jexl engine logger, false allows them to be thrown.
      */
-    public void setSilent(boolean silent) {
-        this.silent = silent;
+    public void setSilent(boolean flag) {
+        this.silent = flag;
     }
 
     /**
      * Checks whether this interpreter throws JexlException during evaluation.
+     * @return true if silent, false otherwise
      */
     public boolean isSilent() {
         return this.silent;
@@ -154,28 +155,13 @@ public class Interpreter implements ParserVisitor {
     public Object interpret(SimpleNode node) {
         try {
             return node.jjtAccept(this, null);
-        }
-        catch (JexlException xjexl) {
+        } catch (JexlException xjexl) {
             if (silent) {
-                LOG.warn(xjexl.getMessage(), xjexl.getCause());
+                logger.warn(xjexl.getMessage(), xjexl.getCause());
                 return null;
             }
             throw xjexl;
         }
-    }
-
-    public String debug(SimpleNode node) {
-        return debug(node, null);
-    }
-
-    public String debug(SimpleNode node, int[] offsets) {
-        Debugger debug = new Debugger();
-        debug.debug(node);
-        if (offsets != null) {
-            offsets[0] = debug.start();
-            offsets[1] = debug.end();
-        }
-        return debug.data();
     }
 
     /**
@@ -188,10 +174,10 @@ public class Interpreter implements ParserVisitor {
 
     /**
      * Sets this interpreter registers for bean access/assign expressions.
-     * @param registers the array of registers
+     * @param theRegisters the array of registers
      */
-    protected void setRegisters(Object[] registers) {
-        this.registers = registers;
+    protected void setRegisters(Object[] theRegisters) {
+        this.registers = theRegisters;
     }
 
     /**
@@ -203,8 +189,8 @@ public class Interpreter implements ParserVisitor {
      * @return the left, right or parent node
      */
     protected Node findNullOperand(RuntimeException xrt, Node node, Object left, Object right) {
-        if (xrt instanceof NullPointerException &&
-                JexlException.NULL_OPERAND == xrt.getMessage()) {
+        if (xrt instanceof NullPointerException
+                && JexlException.NULL_OPERAND == xrt.getMessage()) {
             if (left == null) {
                 return node.jjtGetChild(0);
             }
@@ -238,8 +224,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.add(left, right);
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             Node xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "add error", xrt);
         }
@@ -250,19 +235,19 @@ public class Interpreter implements ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         try {
             boolean leftValue = arithmetic.toBoolean(left);
-            if (!leftValue)
+            if (!leftValue) {
                 return Boolean.FALSE;
-        }
-        catch (RuntimeException xrt) {
+            }
+        } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(0), "boolean coercion error", xrt);
         }
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             boolean rightValue = arithmetic.toBoolean(right);
-            if (!rightValue)
+            if (!rightValue) {
                 return Boolean.FALSE;
-        }
-        catch (RuntimeException xrt) {
+            }
+        } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(1), "boolean coercion error", xrt);
         }
         return Boolean.TRUE;
@@ -288,8 +273,9 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTAssignment node, Object data) {
         // left contains the reference to assign to
         Node left = node.jjtGetChild(0);
-        if (!(left instanceof ASTReference))
+        if (!(left instanceof ASTReference)) {
             throw new JexlException(left, "illegal assignment form");
+        }
         // right is the value expression to assign
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
 
@@ -306,24 +292,27 @@ public class Interpreter implements ParserVisitor {
             objectNode = left.jjtGetChild(c);
             // evaluate the property within the object
             object = objectNode.jjtAccept(this, object);
-            if (object != null)
+            if (object != null) {
                 continue;
+            }
             isVariable &= objectNode instanceof ASTIdentifier;
             // if we get null back as a result, check for an ant variable
             if (isVariable) {
                 String name = ((ASTIdentifier) objectNode).image;
-                if (c == 0)
+                if (c == 0) {
                     variableName = new StringBuilder(name);
-                else {
+                } else {
                     variableName.append('.');
                     variableName.append(name);
                 }
                 object = context.getVars().get(variableName.toString());
                 // disallow mixing ant & bean with same root; avoid ambiguity
-                if (object != null)
+                if (object != null) {
                     isVariable = false;
-            } else
+                }
+            } else {
                 throw new JexlException(objectNode, "illegal assignment form");
+            }
         }
         // 2: last objectNode will perform assignement in all cases
         propertyNode = left.jjtGetChild(last);
@@ -332,8 +321,9 @@ public class Interpreter implements ParserVisitor {
             // deal with ant variable
             if (isVariable && object == null) {
                 if (variableName != null) {
-                    if (last > 0)
+                    if (last > 0) {
                         variableName.append('.');
+                    }
                     variableName.append(property);
                     property = variableName.toString();
                 }
@@ -345,10 +335,11 @@ public class Interpreter implements ParserVisitor {
             objectNode = propertyNode;
             ASTArrayAccess narray = (ASTArrayAccess) objectNode;
             Object nobject = narray.jjtGetChild(0).jjtAccept(this, object);
-            if (nobject == null)
+            if (nobject == null) {
                 throw new JexlException(objectNode, "array element is null");
-            else
+            } else {
                 object = nobject;
+            }
             // can have multiple nodes - either an expression, integer literal or
             // reference
             last = narray.jjtGetNumChildren() - 1;
@@ -385,8 +376,7 @@ public class Interpreter implements ParserVisitor {
             n = 1;
             long r = arithmetic.toLong(right);
             return new Long(l & r);
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
         }
     }
@@ -397,8 +387,7 @@ public class Interpreter implements ParserVisitor {
         try {
             long l = arithmetic.toLong(left);
             return new Long(~l);
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(0), "long coercion error", xrt);
         }
     }
@@ -414,8 +403,7 @@ public class Interpreter implements ParserVisitor {
             n = 1;
             long r = arithmetic.toLong(right);
             return new Long(l | r);
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
         }
     }
@@ -431,8 +419,7 @@ public class Interpreter implements ParserVisitor {
             n = 1;
             long r = arithmetic.toLong(right);
             return new Long(l ^ r);
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
         }
     }
@@ -453,10 +440,10 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.divide(left, right);
-        }
-        catch (RuntimeException xrt) {
-            if (!strict && xrt instanceof ArithmeticException)
+        } catch (RuntimeException xrt) {
+            if (!strict && xrt instanceof ArithmeticException) {
                 return 0.0;
+            }
             Node xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "divide error", xrt);
         }
@@ -464,30 +451,23 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTEmptyFunction node, Object data) {
-
         Object o = node.jjtGetChild(0).jjtAccept(this, data);
-
         if (o == null) {
             return Boolean.TRUE;
         }
-
         if (o instanceof String && "".equals(o)) {
             return Boolean.TRUE;
         }
-
         if (o.getClass().isArray() && ((Object[]) o).length == 0) {
             return Boolean.TRUE;
         }
-
         if (o instanceof Collection<?> && ((Collection<?>) o).isEmpty()) {
             return Boolean.TRUE;
         }
-
         // Map isn't a collection
         if (o instanceof Map<?, ?> && ((Map<?, ?>) o).isEmpty()) {
             return Boolean.TRUE;
         }
-
         return Boolean.FALSE;
     }
 
@@ -497,8 +477,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             throw new JexlException(node, "== error", xrt);
         }
     }
@@ -557,8 +536,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.greaterThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             throw new JexlException(node, ">= error", xrt);
         }
     }
@@ -569,8 +547,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.greaterThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             throw new JexlException(node, "> error", xrt);
         }
     }
@@ -580,20 +557,24 @@ public class Interpreter implements ParserVisitor {
         String name = node.image;
         if (data == null) {
             if (registers != null) {
-                if (registers[0].equals(name))
+                if (registers[0].equals(name)) {
                     return registers[1];
-                if (registers[2].equals(name))
+                }
+                if (registers[2].equals(name)) {
                     return registers[3];
+                }
             }
             Object value = context.getVars().get(name);
-            if (value == null &&
-                !(node.jjtGetParent() instanceof ASTReference) &&
-                !context.getVars().containsKey(name)) {
+            if (value == null
+                && !(node.jjtGetParent() instanceof ASTReference)
+                && !context.getVars().containsKey(name)) {
                 JexlException xjexl = new JexlException(node, "undefined variable " + name);
-                if (strict)
+                if (strict) {
                     throw xjexl;
-                if (!silent)
-                    LOG.warn(xjexl.getMessage());
+                }
+                if (!silent) {
+                    logger.warn(xjexl.getMessage());
+                }
             }
             return value;
         } else {
@@ -621,11 +602,9 @@ public class Interpreter implements ParserVisitor {
                 }
             }
             return result;
-        }
-        catch (JexlException error) {
+        } catch (JexlException error) {
             throw error;
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(n), "if error", xrt);
         }
     }
@@ -653,8 +632,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.lessThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             throw new JexlException(node, "<= error", xrt);
         }
     }
@@ -665,8 +643,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.lessThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             throw new JexlException(node, "< error", xrt);
         }
     }
@@ -738,21 +715,20 @@ public class Interpreter implements ParserVisitor {
             if (xjexl == null) {
                 return vm.invoke(data, params);
             }
-        }
-        catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             Throwable t = e.getTargetException();
             if (!(t instanceof Exception)) {
                 t = e;
             }
             xjexl = new JexlException(node, "method invocation error", t);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             xjexl = new JexlException(node, "method error", e);
         }
         if (xjexl != null) {
-            if (strict)
+            if (strict) {
                 throw xjexl;
-            LOG.warn(xjexl.getMessage(), xjexl.getCause());
+            }
+            logger.warn(xjexl.getMessage(), xjexl.getCause());
         }
         return null;
     }
@@ -762,8 +738,9 @@ public class Interpreter implements ParserVisitor {
         // objectNode 0 is the prefix
         String prefix = ((ASTIdentifier) node.jjtGetChild(0)).image;
         Object functor = functions.get(prefix);
-        if (functor == null)
+        if (functor == null) {
             throw new JexlException(node, "no such function namespace " + prefix);
+        }
         // objectNode 1 is the identifier , the others are parameters.
         String methodName = ((ASTIdentifier) node.jjtGetChild(1)).image;
 
@@ -796,21 +773,20 @@ public class Interpreter implements ParserVisitor {
             if (xjexl == null) {
                 return vm.invoke(functor, params);
             }
-        }
-        catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             Throwable t = e.getTargetException();
             if (!(t instanceof Exception)) {
                 t = e;
             }
             xjexl = new JexlException(node, "function invocation error", t);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             xjexl = new JexlException(node, "function error", e);
         }
         if (xjexl != null) {
-            if (strict)
+            if (strict) {
                 throw xjexl;
-            LOG.warn(xjexl.getMessage(), xjexl.getCause());
+            }
+            logger.warn(xjexl.getMessage(), xjexl.getCause());
         }
         return null;
     }
@@ -821,10 +797,10 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.mod(left, right);
-        }
-        catch (RuntimeException xrt) {
-            if (!strict && xrt instanceof ArithmeticException)
+        } catch (RuntimeException xrt) {
+            if (!strict && xrt instanceof ArithmeticException) {
                 return 0.0;
+            }
             Node xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "% error", xrt);
         }
@@ -836,8 +812,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.multiply(left, right);
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             Node xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "* error", xrt);
         }
@@ -849,8 +824,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.equals(left, right) ? Boolean.FALSE : Boolean.TRUE;
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             Node xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "!= error", xrt);
         }
@@ -872,19 +846,19 @@ public class Interpreter implements ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         try {
             boolean leftValue = arithmetic.toBoolean(left);
-            if (leftValue)
+            if (leftValue) {
                 return Boolean.TRUE;
-        }
-        catch (RuntimeException xrt) {
+            }
+        } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(0), "boolean coercion error", xrt);
         }
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             boolean rightValue = arithmetic.toBoolean(right);
-            if (rightValue)
+            if (rightValue) {
                 return Boolean.TRUE;
-        }
-        catch (RuntimeException xrt) {
+            }
+        } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(1), "boolean coercion error", xrt);
         }
         return Boolean.FALSE;
@@ -910,9 +884,9 @@ public class Interpreter implements ParserVisitor {
             // if we get null back a result, check for an ant variable
             if (result == null && isVariable) {
                 String name = ((ASTIdentifier) theNode).image;
-                if (i == 0)
+                if (i == 0) {
                     variableName = new StringBuilder(name);
-                else {
+                } else {
                     variableName.append('.');
                     variableName.append(name);
                 }
@@ -920,13 +894,14 @@ public class Interpreter implements ParserVisitor {
             }
         }
         if (result == null) {
-            if (isVariable &&
-                !(node.jjtGetParent() instanceof ASTTernaryNode) &&
-                !vars.containsKey(variableName.toString())) {
+            if (isVariable
+                && !(node.jjtGetParent() instanceof ASTTernaryNode)
+                && !vars.containsKey(variableName.toString())) {
                 JexlException xjexl = new JexlException(node, "undefined variable " + variableName.toString());
-                if (strict)
+                if (strict) {
                     throw xjexl;
-                LOG.warn(xjexl.getMessage());
+                }
+                logger.warn(xjexl.getMessage());
             }
         }
         return result;
@@ -969,8 +944,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.subtract(left, right);
-        }
-        catch (RuntimeException xrt) {
+        } catch (RuntimeException xrt) {
             Node xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "- error", xrt);
         }
@@ -979,9 +953,18 @@ public class Interpreter implements ParserVisitor {
     /** {@inheritDoc} */
     public Object visit(ASTTernaryNode node, Object data) {
         Object condition = node.jjtGetChild(0).jjtAccept(this, data);
-        if (node.jjtGetNumChildren() == 3)
-            return arithmetic.toBoolean(condition) ? node.jjtGetChild(1).jjtAccept(this, data) : node.jjtGetChild(2).jjtAccept(this, data);
-        return condition != null && !Boolean.FALSE.equals(condition) ? condition : node.jjtGetChild(1).jjtAccept(this, data);
+        if (node.jjtGetNumChildren() == 3) {
+            if (arithmetic.toBoolean(condition)) {
+                return node.jjtGetChild(1).jjtAccept(this, data);
+            } else {
+                return node.jjtGetChild(2).jjtAccept(this, data);
+            }
+        }
+        if (condition != null && !Boolean.FALSE.equals(condition)) {
+            return condition;
+        } else {
+            return node.jjtGetChild(1).jjtAccept(this, data);
+        }
     }
 
     /** {@inheritDoc} */
@@ -993,7 +976,6 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTUnaryMinusNode node, Object data) {
         Node valNode = node.jjtGetChild(0);
         Object val = valNode.jjtAccept(this, data);
-
         if (val instanceof Byte) {
             byte valueAsByte = ((Byte) val).byteValue();
             return new Byte((byte) -valueAsByte);
@@ -1038,7 +1020,7 @@ public class Interpreter implements ParserVisitor {
     /**
      * Calculate the <code>size</code> of various types: Collection, Array,
      * Map, String, and anything that has a int size() method.
-     *
+     * @param node the node that gave the value to size
      * @param val the object to get the size of.
      * @return the size of val
      */
@@ -1060,8 +1042,7 @@ public class Interpreter implements ParserVisitor {
                 Integer result;
                 try {
                     result = (Integer) vm.invoke(val, params);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     throw new JexlException(node, "size() : error executing", e);
                 }
                 return result.intValue();
@@ -1071,17 +1052,26 @@ public class Interpreter implements ParserVisitor {
     }
 
     /**
-     * Get an attribute of an object.
+     * Gets an attribute of an object.
      *
      * @param object to retrieve value from
      * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or
      *            key for a map
-     * @return the attribute.
+     * @return the attribute value
      */
     public Object getAttribute(Object object, Object attribute) {
         return getAttribute(object, attribute, null);
     }
 
+    /**
+     * Gets an attribute of an object.
+     *
+     * @param object to retrieve value from
+     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or
+     *            key for a map
+     * @param node the node that evaluated as the object
+     * @return the attribute value
+     */
     protected Object getAttribute(Object object, Object attribute, Node node) {
         if (object == null) {
             throw new JexlException(node, "object is null");
@@ -1090,8 +1080,7 @@ public class Interpreter implements ParserVisitor {
         if (object instanceof Map<?, ?>) {
             try {
                 return ((Map<Object, Object>) object).get(attribute);
-            }
-            catch (RuntimeException xrt) {
+            } catch (RuntimeException xrt) {
                 throw node == null ? xrt : new JexlException(node, "get map element error", xrt);
             }
         }
@@ -1102,8 +1091,7 @@ public class Interpreter implements ParserVisitor {
             try {
                 int idx = arithmetic.toInteger(attribute);
                 return ((List<?>) object).get(idx);
-            }
-            catch (RuntimeException xrt) {
+            } catch (RuntimeException xrt) {
                 throw node == null ? xrt : new JexlException(node, "get list element error", xrt);
             }
         }
@@ -1111,8 +1099,7 @@ public class Interpreter implements ParserVisitor {
             try {
                 int idx = arithmetic.toInteger(attribute);
                 return Array.get(object, idx);
-            }
-            catch (RuntimeException xrt) {
+            } catch (RuntimeException xrt) {
                 throw node == null ? xrt : new JexlException(node, "get array element error", xrt);
             }
         }
@@ -1121,9 +1108,13 @@ public class Interpreter implements ParserVisitor {
         if (vg != null) {
             try {
                 return vg.invoke(object);
-            }
-            catch (Exception xany) {
-                throw node == null ? new RuntimeException(xany) : new JexlException(node, "get object property error", xany);
+            } catch (Exception xany) {
+                if (node == null) {
+                    throw new RuntimeException(xany);
+                }
+                else {
+                    throw new JexlException(node, "get object property error", xany);
+                }
             }
         }
 
@@ -1142,6 +1133,15 @@ public class Interpreter implements ParserVisitor {
         setAttribute(object, attribute, null);
     }
 
+    /**
+     * Sets an attribute of an object.
+     *
+     * @param object to set the value to
+     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or
+     *            key for a map
+     * @param value the value to assign to the object's attribute
+     * @param node the node that evaluated as the object
+     */
     protected void setAttribute(Object object, Object attribute, Object value, Node node) {
         if (object instanceof JexlContext) {
             ((JexlContext) object).getVars().put(attribute, value);
@@ -1152,8 +1152,7 @@ public class Interpreter implements ParserVisitor {
             try {
                 ((Map<Object, Object>) object).put(attribute, value);
                 return;
-            }
-            catch (RuntimeException xrt) {
+            } catch (RuntimeException xrt) {
                 throw node == null ? xrt : new JexlException(node, "set map element error", xrt);
             }
         }
@@ -1162,8 +1161,7 @@ public class Interpreter implements ParserVisitor {
                 int idx = arithmetic.toInteger(attribute);
                 ((List<Object>) object).set(idx, value);
                 return;
-            }
-            catch (RuntimeException xrt) {
+            } catch (RuntimeException xrt) {
                 throw node == null ? xrt : new JexlException(node, "set list element error", xrt);
             }
         }
@@ -1177,8 +1175,7 @@ public class Interpreter implements ParserVisitor {
                 int idx = arithmetic.toInteger(attribute);
                 Array.set(object, idx, value);
                 return;
-            }
-            catch (RuntimeException xrt) {
+            } catch (RuntimeException xrt) {
                 throw node == null ? xrt : new JexlException(node, "set array element error", xrt);
             }
         }
@@ -1189,17 +1186,21 @@ public class Interpreter implements ParserVisitor {
         if (vs != null) {
             try {
                 vs.invoke(object, value);
-            }
-            catch (RuntimeException xrt) {
+            } catch (RuntimeException xrt) {
                 throw node == null ? xrt : new JexlException(node, "set object property error", xrt);
-            }
-            catch (Exception xany) {
-                throw node == null ? new RuntimeException(xany) : new JexlException(node, "set object property error", xany);
+            } catch (Exception xany) {
+                if (node == null) {
+                    throw new RuntimeException(xany);
+                } else {
+                    throw new JexlException(node, "set object property error", xany);
+                }
             }
             return;
         }
-        if (node == null)
-            new UnsupportedOperationException("unable to set object property, object:" + object + ", property: " + attribute);
+        if (node == null) {
+            new UnsupportedOperationException("unable to set object property, "
+                            + "object:" + object + ", property: " + attribute);
+        }
         throw new JexlException(node, "unable to set bean property", null);
     }
 }

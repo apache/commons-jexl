@@ -49,8 +49,8 @@ import org.apache.commons.jexl.util.introspection.Uberspect;
  *  <li>Logging</li>
  * </ul>
  * </p>
- * <p>The <code>setSilent</code>and<code>setLenient</code> methods allow to fine-tune an engine instance behavior according to
- * various error control needs.
+ * <p>The <code>setSilent</code>and<code>setLenient</code> methods allow to fine-tune an engine instance behavior
+ * according to various error control needs.
  * </p>
  * <ul>
  * <li>When "silent" & "lenient" (not-strict):
@@ -93,44 +93,46 @@ public class JexlEngine {
     /**
      * The Log to which all JexlEngine messages will be logged.
      */
-    protected final Log LOG;
+    protected final Log logger;
     /**
      * The singleton ExpressionFactory also holds a single instance of
      * {@link Parser}.
      * When parsing expressions, ExpressionFactory synchronizes on Parser.
      */
     protected final Parser parser = new Parser(new StringReader(";")); //$NON-NLS-1$
-
     /**
      * Whether expressions evaluated by this engine will throw exceptions or 
      * return null.
      */
     protected boolean silent = false;
-
     /**
      *  The map of 'prefix:function' to object implementing the function.
      */
-    protected Map<String,Object> functions = Collections.EMPTY_MAP;
-
+    protected Map<String, Object> functions = Collections.EMPTY_MAP;
     /**
      * The expression cache.
      */
-    protected Map<String,SimpleNode> cache = null;
-
+    protected Map<String, SimpleNode> cache = null;
     /**
-     * An empty/static/non-mutable JexlContext used instead of null context
+     * An empty/static/non-mutable JexlContext used instead of null context.
      */
     protected static final JexlContext EMPTY_CONTEXT = new JexlContext() {
+        /** {@inheritDoc} */
         public void setVars(Map vars) {
             throw new UnsupportedOperationException("Immutable JexlContext");
         }
+        /** {@inheritDoc} */
         public Map getVars() {
             return java.util.Collections.EMPTY_MAP;
         }
     };
+    /**
+     * The default cache load factor.
+     */
+    private static final float LOAD_FACTOR = 0.75f;
 
     /**
-     * Creates a default engine
+     * Creates an engine with default arguments.
      */
     public JexlEngine() {
         this(null, null, null, null);
@@ -138,16 +140,16 @@ public class JexlEngine {
 
     /**
      * Creates a JEXL engine using the provided {@link Uberspect}, (@link Arithmetic) and logger.
-     * @param uberspect to allow different introspection behaviour
-     * @param arithmetic to allow different arithmetic behaviour
-     * @param funcs an optional map of functions (@see setFunctions)
+     * @param anUberspect to allow different introspection behaviour
+     * @param anArithmetic to allow different arithmetic behaviour
+     * @param theFunctions an optional map of functions (@see setFunctions)
      * @param log the logger for various messages
      */
-    public JexlEngine(Uberspect uberspect, Arithmetic arithmetic, Map<String,Object> funcs, Log log) {
-        this.uberspect = uberspect == null? Introspector.getUberspect() : uberspect;
-        this.arithmetic = arithmetic == null? new JexlArithmetic(true) : arithmetic;
-        if (funcs != null) {
-            this.functions = funcs;
+    public JexlEngine(Uberspect anUberspect, Arithmetic anArithmetic, Map<String, Object> theFunctions, Log log) {
+        this.uberspect = anUberspect == null ? Introspector.getUberspect() : anUberspect;
+        this.arithmetic = anArithmetic == null ? new JexlArithmetic(true) : anArithmetic;
+        if (theFunctions != null) {
+            this.functions = theFunctions;
         }
         if (log == null) {
             log = LogFactory.getLog(JexlEngine.class);
@@ -155,17 +157,17 @@ public class JexlEngine {
         if (log == null) {
             throw new NullPointerException("logger can not be null");
         }
-        this.LOG = log;
+        this.logger = log;
     }
-    
+
     /**
      * Sets whether this engine throws JexlException during evaluation when an error is triggered.
-     * @param silent true means no JexlException will occur, false allows them
+     * @param flag true means no JexlException will occur, false allows them
      */
-    public void setSilent(boolean silent) {
-        this.silent = silent;
+    public void setSilent(boolean flag) {
+        this.silent = flag;
     }
-    
+
     /**
      * Checks whether this engine throws JexlException during evaluation.
      */
@@ -176,30 +178,31 @@ public class JexlEngine {
     /**
      * Sets whether this engine triggers errors during evaluation when null is used as
      * an operand.
-     * @param lenient true means no JexlException will occur, false allows them
+     * @param flag true means no JexlException will occur, false allows them
      */
-    public void setLenient(boolean lenient) {
-        this.arithmetic.setLenient(lenient);
+    public void setLenient(boolean flag) {
+        this.arithmetic.setLenient(flag);
     }
 
     /**
      * Checks whether this engine triggers errors during evaluation when null is used as
      * an operand.
+     * @return true if lenient, false if strict
      */
     public boolean isLenient() {
         return this.arithmetic.isLenient();
     }
+
     /**
      * Sets a cache of the defined size for expressions.
      * @param size if not strictly positive, no cache is used.
      */
     public void setCache(int size) {
         // since the cache is only used during parse, use same sync object
-        synchronized(parser) {
+        synchronized (parser) {
             if (size <= 0) {
                 cache = null;
-            }
-            else if (cache == null || cache.size() != size) {
+            } else if (cache == null || cache.size() != size) {
                 cache = createCache(size);
             }
         }
@@ -230,9 +233,8 @@ public class JexlEngine {
      * is passed, the empty collection is used.
      */
     public void setFunctions(Map<String, Object> funcs) {
-        functions = funcs != null? funcs : Collections.EMPTY_MAP;
+        functions = funcs != null ? funcs : Collections.EMPTY_MAP;
     }
-
 
     /**
      * Retrieves the map of function namespaces.
@@ -255,13 +257,12 @@ public class JexlEngine {
      *      expression or a reference.
      */
     public Expression createExpression(String expression)
-        throws ParseException {
+            throws ParseException {
         // Parse the expression
         SimpleNode tree = parse(expression);
         if (tree.jjtGetNumChildren() > 1) {
-            LOG.warn("The JEXL Expression created will be a reference"
-                + " to the first expression from the supplied script: \""
-                + expression + "\" ");
+            logger.warn("The JEXL Expression created will be a reference"
+                     + " to the first expression from the supplied script: \"" + expression + "\" ");
         }
         SimpleNode node = (SimpleNode) tree.jjtGetChild(0);
         return new ExpressionImpl(this, expression, node);
@@ -303,8 +304,7 @@ public class JexlEngine {
             throw new NullPointerException("scriptFile is null");
         }
         if (!scriptFile.canRead()) {
-            throw new IOException("Can't read scriptFile ("
-                + scriptFile.getCanonicalPath() + ")");
+            throw new IOException("Can't read scriptFile (" + scriptFile.getCanonicalPath() + ")");
         }
         BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
         return createScript(readerToString(reader));
@@ -329,18 +329,18 @@ public class JexlEngine {
         URLConnection connection = scriptUrl.openConnection();
 
         BufferedReader reader = new BufferedReader(
-            new InputStreamReader(connection.getInputStream()));
+                new InputStreamReader(connection.getInputStream()));
         return createScript(readerToString(reader));
     }
 
     /**
-     * Access properties of a bean using an expression.
+     * Accesses properties of a bean using an expression.
      * <p>
      * jexl.get(myobject, "foo.bar"); should equate to
      * myobject.getFoo().getBar(); (or myobject.getFoo().get("bar"))
      * </p>
      * <p>
-     * If the JEXL engine is silent, errors will be logged through its logger as info.
+     * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
      * @param bean the bean to get properties from
      * @param expr the property expression
@@ -348,14 +348,31 @@ public class JexlEngine {
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
     public Object getProperty(Object bean, String expr) {
-        return getProperty(EMPTY_CONTEXT, bean, expr);
+        return getProperty(null, bean, expr);
     }
+
+    /**
+     * Accesses properties of a bean using an expression.
+     * <p>
+     * If the JEXL engine is silent, errors will be logged through its logger as warning.
+     * </p>
+     * @param context the evaluation context
+     * @param bean the bean to get properties from
+     * @param expr the property expression
+     * @return the value of the property
+     * @throws JexlException if there is an error parsing the expression or during evaluation
+     */
     public Object getProperty(JexlContext context, Object bean, String expr) {
+        if (context == null) {
+            context = EMPTY_CONTEXT;
+        }
         Map<String, Object> vars = context.getVars();
         // lets build 1 unique & unused identifiers wrt context
         String r0 = "$0";
-        for(int s = 0; vars.containsKey(r0); ++s) r0 = r0 + s;
-        expr = r0 + (expr.charAt(0) =='['? "" : "." )+ expr +";";
+        for (int s = 0; vars.containsKey(r0); ++s) {
+            r0 = r0 + s;
+        }
+        expr = r0 + (expr.charAt(0) == '[' ? "" : ".") + expr + ";";
         try {
             SimpleNode tree = parse(expr);
             SimpleNode node = (SimpleNode) tree.jjtGetChild(0).jjtGetChild(0);
@@ -364,17 +381,15 @@ public class JexlEngine {
             Object[] r = {r0, bean, r0, bean};
             interpreter.setRegisters(r);
             return node.jjtAccept(interpreter, null);
-        }
-        catch(JexlException xjexl) {
+        } catch (JexlException xjexl) {
             if (silent) {
-                LOG.warn(xjexl.getMessage(), xjexl.getCause());
+                logger.warn(xjexl.getMessage(), xjexl.getCause());
                 return null;
             }
             throw xjexl;
-        }
-        catch(ParseException xparse) {
+        } catch (ParseException xparse) {
             if (silent) {
-                LOG.warn(xparse.getMessage(), xparse.getCause());
+                logger.warn(xparse.getMessage(), xparse.getCause());
                 return null;
             }
             throw new JexlException(null, "parsing error", xparse);
@@ -388,7 +403,7 @@ public class JexlEngine {
      * myobject.getFoo().setBar(10); (or myobject.getFoo().put("bar", 10) )
      * </p>
      * <p>
-     * If the JEXL engine is silent, errors will be logged through its logger as info.
+     * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
      * @param bean the bean to set properties in
      * @param expr the property expression
@@ -396,16 +411,34 @@ public class JexlEngine {
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
     public void setProperty(Object bean, String expr, Object value) {
-       setProperty(EMPTY_CONTEXT, bean, expr, value);
+        setProperty(null, bean, expr, value);
     }
+
+    /**
+     * Assign properties of a bean using an expression.
+     * <p>
+     * If the JEXL engine is silent, errors will be logged through its logger as warning.
+     * </p>
+     * @param bean the bean to set properties in
+     * @param expr the property expression
+     * @param value the value of the property
+     * @throws JexlException if there is an error parsing the expression or during evaluation
+     */
     public void setProperty(JexlContext context, Object bean, String expr, Object value) {
+        if (context == null) {
+            context = EMPTY_CONTEXT;
+        }
         Map<String, Object> vars = context.getVars();
         // lets build 2 unique & unused identifiers wrt context
         String r0 = "$0", r1 = "$1";
-        for(int s = 0; vars.containsKey(r0); ++s) r0 = r0 + s;
-        for(int s = 0; vars.containsKey(r1); ++s) r1 = r1 + s;
+        for (int s = 0; vars.containsKey(r0); ++s) {
+            r0 = r0 + s;
+        }
+        for (int s = 0; vars.containsKey(r1); ++s) {
+            r1 = r1 + s;
+        }
         // synthetize expr
-        expr = r0 + (expr.charAt(0) =='['? "" : "." )+ expr +"=" + r1 +";";
+        expr = r0 + (expr.charAt(0) == '[' ? "" : ".") + expr + "=" + r1 + ";";
         try {
             SimpleNode tree = parse(expr);
             SimpleNode node = (SimpleNode) tree.jjtGetChild(0).jjtGetChild(0);
@@ -414,40 +447,40 @@ public class JexlEngine {
             Object[] r = {r0, bean, r1, value};
             interpreter.setRegisters(r);
             node.jjtAccept(interpreter, null);
-        }
-        catch(JexlException xjexl) {
+        } catch (JexlException xjexl) {
             if (silent) {
-                LOG.warn(xjexl.getMessage(), xjexl.getCause());
+                logger.warn(xjexl.getMessage(), xjexl.getCause());
                 return;
             }
             throw xjexl;
-        }
-        catch(ParseException xparse) {
+        } catch (ParseException xparse) {
             if (silent) {
-                LOG.warn(xparse.getMessage(), xparse.getCause());
+                logger.warn(xparse.getMessage(), xparse.getCause());
                 return;
             }
             throw new JexlException(null, "parsing error", xparse);
         }
     }
-    
+
     /**
      * Creates an interpreter.
      * @param context a JexlContext; if null, the EMPTY_CONTEXT is used instead.
      * @return an Interpreter
      */
     protected Interpreter createInterpreter(JexlContext context) {
-        if (context == null) context = EMPTY_CONTEXT;
+        if (context == null) {
+            context = EMPTY_CONTEXT;
+        }
         return new Interpreter(this, context);
     }
-    
+
     /**
      * Creates a SimpleNode cache.
      * @param cacheSize the cache size, must be > 0
      * @return a Map usable as a cache bounded to the given size
      */
-    protected Map<String,SimpleNode> createCache(final int cacheSize) {
-        return new java.util.LinkedHashMap<String,SimpleNode>(cacheSize, 0.75f, true) {
+    protected Map<String, SimpleNode> createCache(final int cacheSize) {
+        return new java.util.LinkedHashMap<String, SimpleNode>(cacheSize, LOAD_FACTOR, true) {
             @Override
             protected boolean removeEldestEntry(Map.Entry eldest) {
                 return size() > cacheSize;
@@ -457,7 +490,7 @@ public class JexlEngine {
 
     /**
      * Parses an expression.
-     * @param expression
+     * @param expression the expression to parse
      * @return the parsed tree
      * @throws ParseException if any error occured during parsing
      */
@@ -465,7 +498,7 @@ public class JexlEngine {
         String expr = cleanExpression(expression);
         SimpleNode tree = null;
         synchronized (parser) {
-            LOG.debug("Parsing expression: " + expression);
+            logger.debug("Parsing expression: " + expression);
             if (cache != null) {
                 tree = cache.get(expr);
                 if (tree != null) {
@@ -473,9 +506,7 @@ public class JexlEngine {
                 }
             }
             try {
-                Reader reader = expr.endsWith(";")?
-                            new StringReader(expr) :
-                            new StringReader(expr + ";");
+                Reader reader = expr.endsWith(";") ? new StringReader(expr) : new StringReader(expr + ";");
                 tree = parser.parse(reader);
                 if (cache != null) {
                     cache.put(expr, tree);
@@ -499,15 +530,15 @@ public class JexlEngine {
             int start = 0;
             int end = str.length();
             if (end > 0) {
-                for(start = 0; start < end && str.charAt(start) == ' '; ++start) {} // trim front spaces
-                for(;end > 0 && str.charAt(end - 1) == ' '; --end) {} // trim ending spaces
+                for (start = 0; start < end && str.charAt(start) == ' '; ++start); // trim front spaces
+                for (; end > 0 && str.charAt(end - 1) == ' '; --end); // trim ending spaces
                 return str.subSequence(start, end).toString();
             }
             return "";
         }
         return null;
     }
-    
+
     /**
      * Read a buffered reader into a StringBuffer and return a String with
      * the contents of the reader.
@@ -516,7 +547,7 @@ public class JexlEngine {
      * @throws IOException on any error reading the reader.
      */
     protected static String readerToString(BufferedReader reader)
-        throws IOException {
+            throws IOException {
         StringBuilder buffer = new StringBuilder();
         try {
             String line;
@@ -529,13 +560,14 @@ public class JexlEngine {
         }
 
     }
-
+    
     /**
      * ExpressionFactory & ScriptFactory need a singleton and this is the package
      * instance fulfilling that pattern.
      */
     @Deprecated
     private static volatile JexlEngine DEFAULT = null;
+
     /**
      * Retrieves a default JEXL engine.
      * @return the singleton
@@ -545,7 +577,7 @@ public class JexlEngine {
         // java 5 allows the lazy singleton initialization
         // using a double-check locking pattern
         if (DEFAULT == null) {
-            synchronized(JexlEngine.class) {
+            synchronized (JexlEngine.class) {
                 if (DEFAULT == null) {
                     DEFAULT = new JexlEngine();
                 }

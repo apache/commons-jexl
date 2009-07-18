@@ -68,5 +68,4 @@ public class EnumerationIterator<T> implements Iterator<T> {
     public void remove() {
         // not implemented
     }
-   
 }

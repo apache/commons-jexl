@@ -205,6 +205,14 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>cobertura-maven-plugin</artifactId>
           <version>2.3</version>
+          <configuration>
+            <instrumentation>
+              <excludes>
+                <exclude>org/apache/commons/jexl/parser/*.class</exclude>
+                <exclude>apache/commons/jexl/**/*Test.class</exclude>
+              </excludes>
+            </instrumentation>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
