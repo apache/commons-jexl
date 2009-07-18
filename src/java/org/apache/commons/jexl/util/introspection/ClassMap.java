@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 
 /**
- * Taken from the Velocity tree so we can be self-sufficient
+ * Taken from the Velocity tree so we can be self-sufficient.
  *
  * A cache of introspection information for a specific class instance.
  * Keys objects by an agregation of the method name and the names of classes
@@ -39,13 +39,6 @@ import org.apache.commons.logging.Log;
  * @since 1.0
  */
 public class ClassMap {
-
-    /**
-     * Class passed into the constructor used to as the basis for the Method map.
-     */
-    private final Class<?> clazz;
-    /** logger. */
-    private final Log rlog;
     /** cache of methods. */
     private final MethodCache methodCache;
 
@@ -56,18 +49,15 @@ public class ClassMap {
      * @param log the logger.
      */
     public ClassMap(Class<?> aClass, Log log) {
-        clazz = aClass;
-        this.rlog = log;
-        methodCache = new MethodCache();
-
-        populateMethodCache();
+        methodCache = createMethodCache(aClass, log);
     }
 
     /**
-     * @return the class object whose methods are cached by this map.
+     * Gets the methods names cached by this map.
+     * @return the array of method names
      */
-    Class<?> getCachedClass() {
-        return clazz;
+    String[] getMethodNames() {
+        return methodCache.names();
     }
 
     /**
@@ -84,11 +74,13 @@ public class ClassMap {
     }
 
     /**
-     * Populate the Map of direct hits. These
-     * are taken from all the public methods
+     * Populate the Map of direct hits. These are taken from all the public methods
      * that our class, its parents and their implemented interfaces provide.
+     * @param classToReflect the class to cache
+     * @param log the Log
+     * @return a newly allocated & filled up cache
      */
-    private void populateMethodCache() {
+    private static MethodCache createMethodCache(Class<?> classToReflect, Log log) {
         //
         // Build a list of all elements in the class hierarchy. This one is bottom-first (i.e. we start
         // with the actual declaring class and its interfaces and then move up (superclass etc.) until we
@@ -103,42 +95,54 @@ public class ClassMap {
         // hit the public elements sooner or later because we reflect all the public elements anyway.
         //
         // Ah, the miracles of Java for(;;) ...
-        for (Class<?> classToReflect = getCachedClass(); classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
+        MethodCache cache = new MethodCache();
+        for (;classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
             if (Modifier.isPublic(classToReflect.getModifiers())) {
-                populateMethodCacheWith(methodCache, classToReflect);
+                populateMethodCacheWith(cache, classToReflect, log);
             }
             Class<?>[] interfaces = classToReflect.getInterfaces();
             for (int i = 0; i < interfaces.length; i++) {
-                populateMethodCacheWithInterface(methodCache, interfaces[i]);
+                populateMethodCacheWithInterface(cache, interfaces[i], log);
             }
         }
+        return cache;
     }
 
-    /* recurses up interface hierarchy to get all super interfaces */
-    private void populateMethodCacheWithInterface(MethodCache methodCache, Class<?> iface) {
+    /**
+     * Recurses up interface hierarchy to get all super interfaces.
+     * @param cache the cache to fill
+     * @param iface the interface to populate the cache from
+     * @param log the Log
+     */
+    private static void populateMethodCacheWithInterface(MethodCache cache, Class<?> iface, Log log) {
         if (Modifier.isPublic(iface.getModifiers())) {
-            populateMethodCacheWith(methodCache, iface);
+            populateMethodCacheWith(cache, iface, log);
         }
         Class<?>[] supers = iface.getInterfaces();
         for (int i = 0; i < supers.length; i++) {
-            populateMethodCacheWithInterface(methodCache, supers[i]);
+            populateMethodCacheWithInterface(cache, supers[i], log);
         }
     }
 
-    private void populateMethodCacheWith(MethodCache methodCache, Class<?> classToReflect) {
+    /**
+     * Recurses up class hierarchy to get all super classes.
+     * @param cache the cache to fill
+     * @param clazz the class to populate the cache from
+     * @param log the Log
+     */
+    private static void populateMethodCacheWith(MethodCache cache, Class<?> clazz, Log log) {
         try {
-            Method[] methods = classToReflect.getDeclaredMethods();
+            Method[] methods = clazz.getDeclaredMethods();
             for (int i = 0; i < methods.length; i++) {
                 int modifiers = methods[i].getModifiers();
                 if (Modifier.isPublic(modifiers)) {
-                    methodCache.put(methods[i]);
+                    cache.put(methods[i]);
                 }
             }
-        }
-        catch (SecurityException se) // Everybody feels better with...
-        {
-            if (rlog.isDebugEnabled()) {
-                rlog.debug("While accessing methods of " + classToReflect + ": ", se);
+        } catch (SecurityException se) {
+            // Everybody feels better with...
+            if (log.isDebugEnabled()) {
+                log.debug("While accessing methods of " + clazz + ": ", se);
             }
         }
     }
@@ -150,8 +154,8 @@ public class ClassMap {
      * @version $Id$
      * <p>
      * It stores the association between:
-     *  a key made of a method name & an array of argument types. (@see MethodCache.MethodKey)
-     *  a method.
+     *  - a key made of a method name & an array of argument types. (@see MethodCache.MethodKey)
+     *  - a method.
      * </p>
      * <p>
      * Since the invocation of the associated method is dynamic, there is no need (nor way) to differentiate between
@@ -161,31 +165,35 @@ public class ClassMap {
      * @version $Id$
      */
     static class MethodCache {
-
         /**
          * A method that returns itself used as a marker for cache miss,
          * allows the underlying cache map to be strongly typed.
+         * @return itself as a method
          */
-        public static Method CacheMiss() {
+        public static Method cacheMiss() {
             try {
-                return MethodCache.class.getMethod("CacheMiss");
+                return MethodCache.class.getMethod("cacheMiss");
             } // this really cant make an error...
             catch (Exception xio) {
             }
             return null;
         }
-        private static final Method CACHE_MISS = CacheMiss();
-        private static final Map<Class<?>, Class<?>> convertPrimitives;
+        /** The cache miss marker method. */
+        private static final Method CACHE_MISS = cacheMiss();
+        /** The initial size of the primitive conversion map. */
+        private static final int PRIMITIVE_SIZE = 13;
+        /** The primitive type to class conversion map. */
+        private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES;
         static {
-            convertPrimitives = new HashMap<Class<?>, Class<?>>(13);
-            convertPrimitives.put(Boolean.TYPE, Boolean.class);
-            convertPrimitives.put(Byte.TYPE, Byte.class);
-            convertPrimitives.put(Character.TYPE, Character.class);
-            convertPrimitives.put(Double.TYPE, Double.class);
-            convertPrimitives.put(Float.TYPE, Float.class);
-            convertPrimitives.put(Integer.TYPE, Integer.class);
-            convertPrimitives.put(Long.TYPE, Long.class);
-            convertPrimitives.put(Short.TYPE, Short.class);
+            PRIMITIVE_TYPES = new HashMap<Class<?>, Class<?>>(PRIMITIVE_SIZE);
+            PRIMITIVE_TYPES.put(Boolean.TYPE, Boolean.class);
+            PRIMITIVE_TYPES.put(Byte.TYPE, Byte.class);
+            PRIMITIVE_TYPES.put(Character.TYPE, Character.class);
+            PRIMITIVE_TYPES.put(Double.TYPE, Double.class);
+            PRIMITIVE_TYPES.put(Float.TYPE, Float.class);
+            PRIMITIVE_TYPES.put(Integer.TYPE, Integer.class);
+            PRIMITIVE_TYPES.put(Long.TYPE, Long.class);
+            PRIMITIVE_TYPES.put(Short.TYPE, Short.class);
         }
 
         /** Converts a primitive type to its corresponding class.
@@ -199,7 +207,7 @@ public class ClassMap {
         static final Class<?> primitiveClass(Class<?> parm) {
             // it is marginally faster to get from the map than call isPrimitive...
             //if (!parm.isPrimitive()) return parm;
-            Class<?> prim = convertPrimitives.get(parm);
+            Class<?> prim = PRIMITIVE_TYPES.get(parm);
             return prim == null ? parm : prim;
         }
         /**
@@ -229,12 +237,18 @@ public class ClassMap {
          * @return A Method object representing the method to invoke or null.
          * @throws MethodMap.AmbiguousException When more than one method is a match for the parameters.
          */
-        public Method get(final String name, final Object[] params)
+        Method get(final String name, final Object[] params)
                 throws MethodMap.AmbiguousException {
             return get(new MethodKey(name, params));
         }
 
-        public Method get(final MethodKey methodKey)
+        /**
+         * Finds a Method using a MethodKey.
+         * @param methodKey the method key
+         * @return a method
+         * @throws org.apache.commons.jexl.util.introspection.MethodMap.AmbiguousException
+         */
+        Method get(final MethodKey methodKey)
                 throws MethodMap.AmbiguousException {
             synchronized (methodMap) {
                 Method cacheEntry = cache.get(methodKey);
@@ -264,7 +278,11 @@ public class ClassMap {
             }
         }
 
-        public void put(Method method) {
+        /**
+         * Adds a method to the map.
+         * @param method the method to add
+         */
+        void put(Method method) {
             synchronized (methodMap) {
                 MethodKey methodKey = new MethodKey(method);
                 // We don't overwrite methods. Especially not if we fill the
@@ -277,27 +295,45 @@ public class ClassMap {
                 }
             }
         }
+
+        /**
+         * Gets all the method names from this map.
+         * @return the array of method name
+         */
+        String[] names() {
+            synchronized (methodMap) {
+                return methodMap.names();
+            }
+        }
     }
 
     /**
-     * A method key for the introspector cache:
-     * This replaces the original key scheme which used to build the key by concatenating the method name and parameters
-     * class names as one string with the exception that primitive types were converted to their object class equivalents.
+     * A method key for the introspector cache.
+     * <p>
+     * This replaces the original key scheme which used to build the key
+     * by concatenating the method name and parameters class names as one string
+     * with the exception that primitive types were converted to their object class equivalents.
+     * </p>
+     * <p>
      * The key is still based on the same information, it is just wrapped in an object instead.
-     * Primitive type classes are converted to they object equivalent to make a key; int foo(int) and int foo(Integer) do
-     * generate the same key.
-     * A key can be constructed either from arguments (array of objects) or from parameters (array of class).
+     * Primitive type classes are converted to they object equivalent to make a key;
+     * int foo(int) and int foo(Integer) do generate the same key.
+     * </p>
+     * A key can be constructed either from arguments (array of objects) or from parameters
+     * (array of class).
      * Roughly 3x faster than string key to access the map & uses less memory.
      */
     static class MethodKey {
-        /** The hash code */
-        final int hashCode;
+        /** The hash code. */
+        private final int hashCode;
         /** The method name. */
         final String method;
         /** The parameters. */
         final Class<?>[] params;
         /** A marker for empty parameter list. */
-        static final Class<?>[] NOARGS = new Class<?>[0];
+        private static final Class<?>[] NOARGS = new Class<?>[0];
+        /** The hash code constants. */
+        private static final int HASH = 37;
 
         /** Builds a MethodKey from a method.
          *  Used to store information in the method map.
@@ -306,12 +342,14 @@ public class ClassMap {
             this(method.getName(), method.getParameterTypes());
         }
 
-        /** Builds a MethodKey from a method name and a set of arguments (objects).
+        /** Creates a MethodKey from a method name and a set of arguments (objects).
          *  Used to query the method map.
+         * @param method the method name
+         * @param args the arguments instances to match the method signature
          */
-        MethodKey(String method, Object[] args) {
+        MethodKey(String aMethod, Object[] args) {
             // !! keep this in sync with the other ctor (hash code) !!
-            this.method = method;
+            this.method = aMethod;
             int hash = this.method.hashCode();
             final int size;
             if (args != null && (size = args.length) > 0) {
@@ -322,7 +360,7 @@ public class ClassMap {
                     // no need to go thru primitive type conversion since these are objects
                     Class<?> parm = arg == null ? Object.class : arg.getClass();
                     // }
-                    hash = (37 * hash) + parm.hashCode();
+                    hash = (HASH * hash) + parm.hashCode();
                     this.params[p] = parm;
                 }
             } else {
@@ -331,12 +369,14 @@ public class ClassMap {
             this.hashCode = hash;
         }
 
-        /** Builds a MethodKey from a method name and a set of parameters (classes).
+        /** Creates a MethodKey from a method name and a set of parameters (classes).
          *  Used to store information in the method map. ( @see MethodKey#primitiveClass )
+         * @param method the method name
+         * @param args the argument classes to match the method signature
          */
-        MethodKey(String method, Class<?>[] args) {
+        MethodKey(String aMethod, Class<?>[] args) {
             // !! keep this in sync with the other ctor (hash code) !!
-            this.method = method;
+            this.method = aMethod;
             int hash = this.method.hashCode();
             final int size;
             if (args != null && (size = args.length) > 0) {
@@ -345,7 +385,7 @@ public class ClassMap {
                     // ctor(Class): {
                     Class<?> parm = MethodCache.primitiveClass(args[p]);
                     // }
-                    hash = (37 * hash) + parm.hashCode();
+                    hash = (HASH * hash) + parm.hashCode();
                     this.params[p] = parm;
                 }
             } else {

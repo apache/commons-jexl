@@ -101,10 +101,32 @@ public class IntrospectorBase {
             throw new IllegalArgumentException("params object is null!");
         }
 
-        ClassMap classMap;
+        ClassMap classMap = getMap(c);
 
+        return classMap.findMethod(name, params);
+    } // CSON: RedundantThrows
+
+    /**
+     * Gets the accessible methods names known for a given class.
+     * @param c the class
+     * @return the class method names
+     */
+    public String[] getMethodNames(Class<?> c) {
+        if (c == null) {
+            return new String[0];
+        }
+        ClassMap classMap = getMap(c);
+        return classMap.getMethodNames();
+
+    }
+
+    /**
+     * Gets the ClassMap for a given class.
+     * @return the class map
+     */
+    private ClassMap getMap(Class<?> c) {
         synchronized (classMethodMaps) {
-            classMap = classMethodMaps.get(c);
+            ClassMap classMap = classMethodMaps.get(c);
             /*
              * if we don't have this, check to see if we have it by name. if so,
              * then we have a classloader change so dump our caches.
@@ -122,11 +144,9 @@ public class IntrospectorBase {
 
                 classMap = createClassMap(c);
             }
+            return classMap;
         }
-
-        return classMap.findMethod(name, params);
-    } // CSON: RedundantThrows
-
+    }
 
     /**
      * Creates a class map for specific class and registers it in the cache.

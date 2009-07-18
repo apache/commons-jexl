@@ -24,16 +24,27 @@ import java.math.BigInteger;
  * @since 2.0
  */
 class JexlArithmetic implements Arithmetic {
+    /** Whether this Arithmetic instance behaves in strict or lenient mode. */
     protected boolean strict;
 
+    /**
+     * Creates a JexlArithmetic.
+     * @param lenient whether this arithmetic is lenient or strict
+     */
     JexlArithmetic(boolean lenient) {
         this.strict = !lenient;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setLenient(boolean lenient) {
         this.strict = !lenient;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     public boolean isLenient() {
         return !this.strict;
     }
@@ -43,7 +54,7 @@ class JexlArithmetic implements Arithmetic {
      * @return Long(0)
      */
     protected Object controlNullNullOperands() {
-        return strict? null : 0l;
+        return strict? null : 0L;
     }
 
     /**
@@ -485,7 +496,8 @@ class JexlArithmetic implements Arithmetic {
             return ((Number) val).intValue();
         }
 
-        throw new IllegalArgumentException("Integer coercion exception. Can't coerce type: " + val.getClass().getName());
+        throw new IllegalArgumentException("Integer coercion exception. Can't coerce type: "
+                + val.getClass().getName());
     }
 
     
@@ -540,7 +552,8 @@ class JexlArithmetic implements Arithmetic {
             return BigInteger.valueOf(i);
         }
         
-        throw new IllegalArgumentException("BigInteger coercion exception. Can't coerce type: " + val.getClass().getName());
+        throw new IllegalArgumentException("BigInteger coercion exception. Can't coerce type: "
+                + val.getClass().getName());
     }
     
     /**
@@ -568,7 +581,8 @@ class JexlArithmetic implements Arithmetic {
             return new BigDecimal(i);
         }
         
-        throw new IllegalArgumentException("BigDecimal coercion exception. Can't coerce type: " + val.getClass().getName());
+        throw new IllegalArgumentException("BigDecimal coercion exception. Can't coerce type: "
+                + val.getClass().getName());
     }
     
     /**
@@ -602,7 +616,8 @@ class JexlArithmetic implements Arithmetic {
             throw new IllegalArgumentException("Boolean->Double coercion exception");
         }
 
-        throw new IllegalArgumentException("Double coercion exception. Can't coerce type: " + val.getClass().getName());
+        throw new IllegalArgumentException("Double coercion exception. Can't coerce type: "
+                + val.getClass().getName());
     }
 
 
@@ -626,7 +641,7 @@ class JexlArithmetic implements Arithmetic {
      * @param o Object to be analyzed.
      * @return true if it is a Float or a Double.
      */
-    public boolean isFloatingPoint(final Object o) {
+    protected boolean isFloatingPoint(final Object o) {
         return o instanceof Float || o instanceof Double;
     }
 
@@ -636,7 +651,7 @@ class JexlArithmetic implements Arithmetic {
      * @param o Object to be analyzed.
      * @return true if Integer, Long, Byte, Short or Character.
      */
-    public boolean isNumberable(final Object o) {
+    protected boolean isNumberable(final Object o) {
         return o instanceof Integer
             || o instanceof Long
             || o instanceof Byte
@@ -653,7 +668,6 @@ class JexlArithmetic implements Arithmetic {
      *
      * @param original the original number.
      * @return a value of the smallest type the original number will fit into.
-     * @since 1.1
      */
     public Number narrow(Number original) {
         if (original == null) {

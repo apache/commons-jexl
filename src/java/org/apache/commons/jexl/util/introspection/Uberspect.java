@@ -33,7 +33,9 @@ public interface Uberspect {
      */
     void init();
 
-    /** Returns the underlying introspector. */
+    /** Gets underlying introspector.
+     * @return the introspector
+     */
     public Introspector getIntrospector();
     
     /**

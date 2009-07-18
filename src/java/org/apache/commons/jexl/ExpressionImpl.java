@@ -43,11 +43,11 @@ class ExpressionImpl implements Expression {
 
 
     /**
-     * do not let this be generally instantiated with a 'new'.
+     * Do not let this be generally instantiated with a 'new'.
      *
+     * @param engine the interpreter to evaluate the expression
      * @param expr the expression.
      * @param ref the parsed expression.
-     * @param interp the interpreter to evaluate the expression
      */
     ExpressionImpl(JexlEngine engine, String expr, SimpleNode ref) {
         expression = expr;

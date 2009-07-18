@@ -76,6 +76,6 @@ public class MapGetExecutor extends AbstractExecutor {
      * @return o.get(property)
      */
     public Object execute(final Object o) {
-        return ((Map<?,?>) o).get(property);
+        return ((Map<String,?>) o).get(property);
     }
 }

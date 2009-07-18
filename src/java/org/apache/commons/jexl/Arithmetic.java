@@ -105,6 +105,13 @@ public interface Arithmetic {
      * @return a double
      */
     double toDouble(Object arg);
+
+    /**
+     * Coerce an object into a string.
+     * @param arg the object to coerce
+     * @return a double
+     */
+    String toString(Object arg);
         
     /**
      * Coerce an object into a big integer.
@@ -131,8 +138,8 @@ public interface Arithmetic {
      * @return a value of the smallest type the original number will fit into.
      * @since 1.1
      */
-    public Number narrow(Number original);
-    
+    Number narrow(Number original);
+
     /**
      * Test if left == right.
      *

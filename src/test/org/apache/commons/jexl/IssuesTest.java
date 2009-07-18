@@ -139,21 +139,21 @@ public class IssuesTest  extends TestCase {
         assertTrue("should be true", (Boolean) value);
     }
 
-    // JEXL-52: can be implemented by deriving Interpreter.{g,s}etAttribute; wontfix
-    // JEXL-50: can be implemented through a namespace:function or through JexlArithmetic derivation - wontfix
+    // JEXL-52: can be implemented by deriving Interpreter.{g,s}etAttribute; later
+    public void test52base() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        // most likely, call will be in an Interpreter, getUberspect
+        String[] names = jexl.uberspect.getIntrospector().getMethodNames(Another.class);
+        assertTrue("should find methods", names.length > 0);
+        int found = 0;
+        for(String name : names) {
+            if ("foo".equals(name) || "goo".equals(name))
+                found += 1;
+        }
+        assertTrue("should have foo & goo", found == 2);
+    }
 
-    // JEXL-46: regexp syntax; should we really add more syntactic elements? - later/vote?
-    // JEXL-45: unhandled division by zero; already fixed in trunk
-
-    // JEXL-35: final API requirements; fixed in trunk ?
-    // JEXL-32: BigDecimal values are treated as Long values which results in loss of precision; no longer affects 2.0 // Dion
-    // JEXL-21: operator overloading / hooks on operator processing (wontfix, derive JexlArithmetic)
-    // JEXL-20: checkstyle
-    // JEXL-3: static method resolution; fixed in trunk
-    // JEXL-3: change to JexlContext (setVar, getVar) - later, watch out for JEXL-10, differentiate null versus undefined?
-
-    // JEXL-10: Make possible checking for unresolved variables
-    // JEXL-11: Don't make null convertible into anything
+    // JEXL-10/JEXL-11: variable checking, null operand is error
     public void test11() throws Exception {
         JexlEngine jexl = new JexlEngine();
         // ensure errors will throw
@@ -183,7 +183,7 @@ public class IssuesTest  extends TestCase {
         }
     }
     public static void main(String[] args) throws Exception {
-        new IssuesTest().test11();
+        new IssuesTest().test52base();
     }
 
 }

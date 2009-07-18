@@ -46,23 +46,23 @@ import org.apache.commons.logging.Log;
  */
 public class UberspectImpl implements Uberspect, UberspectLoggable {
     /**
-     * index of the first character of the property.
+     * Index of the first character of the property.
      */
     private static final int PROPERTY_START_INDEX = 3;
-    /*
-     * static signature for method(object,object)
+    /**
+     * Static signature for method(object,object).
      */
     static final Class<?>[] OBJECT_OBJECT = { Object.class, Object.class };
     /**
      * Our runtime logger.
      */
     private Log rlog;
-
     /**
-     * the default Velocity introspector.
+     * The default Velocity introspector.
      */
     private Introspector introspector;
-
+    
+    /** {@inheritDoc} */
     public Introspector getIntrospector() {
         return introspector;
     }
@@ -95,13 +95,15 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
         } else if (obj instanceof Map<?,?>) {
             return ((Map<?,?>) obj).values().iterator();
         } else if (obj instanceof Iterator<?>) {
-                rlog.warn("Warning! The iterative " + " is an Iterator in the #foreach() loop at [" + i.getLine() + ","
+                rlog.warn("Warning! The iterative "
+                    + " is an Iterator in the #foreach() loop at [" + i.getLine() + ","
                     + i.getColumn() + "]" + " in template " + i.getTemplateName() + ". Because it's not resetable,"
                     + " if used in more than once, this may lead to" + " unexpected results.");
 
             return ((Iterator<?>) obj);
         } else if (obj instanceof Enumeration<?>) {
-                rlog.warn("Warning! The iterative " + " is an Enumeration in the #foreach() loop at [" + i.getLine() + ","
+                rlog.warn("Warning! The iterative "
+                    + " is an Enumeration in the #foreach() loop at [" + i.getLine() + ","
                     + i.getColumn() + "]" + " in template " + i.getTemplateName() + ". Because it's not resetable,"
                     + " if used in more than once, this may lead to" + " unexpected results.");
 
@@ -409,7 +411,10 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
         }
     } // CSON: VisibilityModifier
 
-    
+
+    /**
+     * Concrete instance of VelPropertyGet.
+     */
     public static class VelGetterImpl implements VelPropertyGet {
         /**
          * executor for performing the get.
@@ -455,7 +460,9 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
         }
     }
 
-    
+    /**
+     * Concrete instance of VelPropertySet.
+     */
     public static class VelSetterImpl implements VelPropertySet {
         /**
          * the method to call.

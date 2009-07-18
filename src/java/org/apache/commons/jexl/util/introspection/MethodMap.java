@@ -85,6 +85,15 @@ public class MethodMap {
     }
 
     /**
+     * Returns the array of method names accessible in this class.
+     * @return the array of names
+     */
+    public synchronized String[] names() {
+        java.util.Set<String> set = methodByNameMap.keySet();
+        return set.toArray(new String[set.size()]);
+    }
+
+    /**
      * <p>
      * Find a method.  Attempts to find the
      * most specific applicable method using the
@@ -113,11 +122,16 @@ public class MethodMap {
      *                            specific applicable method
      */
     // CSOFF: RedundantThrows
-    public Method find(String methodName, Object[] args)
-            throws AmbiguousException {
+    public Method find(String methodName, Object[] args) throws AmbiguousException {
         return find(new ClassMap.MethodKey(methodName, args));
     }
 
+    /**
+     * Finds a method by key.
+     * @param methodKey the key
+     * @return the method
+     * @throws AmbiguousException if find is ambiguous
+     */
     Method find(ClassMap.MethodKey methodKey) throws AmbiguousException {
         List<Method> methodList = get(methodKey.method);
         if (methodList == null) {
