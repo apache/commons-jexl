@@ -61,7 +61,7 @@ public class IntrospectorBase {
      * Made WeakHashMap so we wont prevent a class from being GCed.
      * object.
      */
-    protected final Map<Class, ClassMap> classMethodMaps = new java.util.WeakHashMap<Class, ClassMap>();
+    protected final Map<Class<?>, ClassMap> classMethodMaps = new java.util.WeakHashMap<Class<?>, ClassMap>();
 
     /**
      * Holds the qualified class names for the classes we hold in the
@@ -91,7 +91,7 @@ public class IntrospectorBase {
      *  one match for the requested signature.
      *  CSOFF: RedundantThrows
      */
-    public Method getMethod(Class c, String name, Object[] params) 
+    public Method getMethod(Class<?> c, String name, Object[] params)
     throws IllegalArgumentException, MethodMap.AmbiguousException {
         if (c == null) {
             throw new IllegalArgumentException("Introspector.getMethod(): Class method key was null: " + name);
@@ -135,7 +135,7 @@ public class IntrospectorBase {
      * @param c class.
      * @return a {@link ClassMap}
      */
-    protected ClassMap createClassMap(Class c) {
+    protected ClassMap createClassMap(Class<?> c) {
         ClassMap classMap = new ClassMap(c,rlog);
         classMethodMaps.put(c, classMap);
         cachedClassNames.add(c.getName());

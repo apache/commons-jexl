@@ -105,7 +105,7 @@ public class UberspectImpl implements Uberspect, UberspectLoggable {
                     + i.getColumn() + "]" + " in template " + i.getTemplateName() + ". Because it's not resetable,"
                     + " if used in more than once, this may lead to" + " unexpected results.");
 
-            return new EnumerationIterator((Enumeration<?>) obj);
+            return new EnumerationIterator<Object>((Enumeration<Object>) obj);
         } else {
             // look for an iterator() method to support the JDK5 Iterable
             // interface or any user tools/DTOs that want to work in

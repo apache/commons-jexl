@@ -18,10 +18,7 @@ package org.apache.commons.jexl.util.introspection;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -46,7 +43,7 @@ public class ClassMap {
     /**
      * Class passed into the constructor used to as the basis for the Method map.
      */
-    private final Class clazz;
+    private final Class<?> clazz;
     /** logger. */
     private final Log rlog;
     /** cache of methods. */
@@ -58,7 +55,7 @@ public class ClassMap {
      * @param aClass the class to deconstruct.
      * @param log the logger.
      */
-    public ClassMap(Class aClass, Log log) {
+    public ClassMap(Class<?> aClass, Log log) {
         clazz = aClass;
         this.rlog = log;
         methodCache = new MethodCache();
@@ -69,7 +66,7 @@ public class ClassMap {
     /**
      * @return the class object whose methods are cached by this map.
      */
-    Class getCachedClass() {
+    Class<?> getCachedClass() {
         return clazz;
     }
 
@@ -106,11 +103,11 @@ public class ClassMap {
         // hit the public elements sooner or later because we reflect all the public elements anyway.
         //
         // Ah, the miracles of Java for(;;) ...
-        for (Class classToReflect = getCachedClass(); classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
+        for (Class<?> classToReflect = getCachedClass(); classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
             if (Modifier.isPublic(classToReflect.getModifiers())) {
                 populateMethodCacheWith(methodCache, classToReflect);
             }
-            Class[] interfaces = classToReflect.getInterfaces();
+            Class<?>[] interfaces = classToReflect.getInterfaces();
             for (int i = 0; i < interfaces.length; i++) {
                 populateMethodCacheWithInterface(methodCache, interfaces[i]);
             }
@@ -118,17 +115,17 @@ public class ClassMap {
     }
 
     /* recurses up interface hierarchy to get all super interfaces */
-    private void populateMethodCacheWithInterface(MethodCache methodCache, Class iface) {
+    private void populateMethodCacheWithInterface(MethodCache methodCache, Class<?> iface) {
         if (Modifier.isPublic(iface.getModifiers())) {
             populateMethodCacheWith(methodCache, iface);
         }
-        Class[] supers = iface.getInterfaces();
+        Class<?>[] supers = iface.getInterfaces();
         for (int i = 0; i < supers.length; i++) {
             populateMethodCacheWithInterface(methodCache, supers[i]);
         }
     }
 
-    private void populateMethodCacheWith(MethodCache methodCache, Class classToReflect) {
+    private void populateMethodCacheWith(MethodCache methodCache, Class<?> classToReflect) {
         try {
             Method[] methods = classToReflect.getDeclaredMethods();
             for (int i = 0; i < methods.length; i++) {
@@ -178,9 +175,9 @@ public class ClassMap {
             return null;
         }
         private static final Method CACHE_MISS = CacheMiss();
-        private static final Map<Class, Class> convertPrimitives;
+        private static final Map<Class<?>, Class<?>> convertPrimitives;
         static {
-            convertPrimitives = new HashMap<Class, Class>(13);
+            convertPrimitives = new HashMap<Class<?>, Class<?>>(13);
             convertPrimitives.put(Boolean.TYPE, Boolean.class);
             convertPrimitives.put(Byte.TYPE, Byte.class);
             convertPrimitives.put(Character.TYPE, Character.class);
@@ -199,10 +196,10 @@ public class ClassMap {
          * correctly.
          * </p>
          */
-        static final Class primitiveClass(Class parm) {
+        static final Class<?> primitiveClass(Class<?> parm) {
             // it is marginally faster to get from the map than call isPrimitive...
             //if (!parm.isPrimitive()) return parm;
-            Class prim = convertPrimitives.get(parm);
+            Class<?> prim = convertPrimitives.get(parm);
             return prim == null ? parm : prim;
         }
         /**
@@ -294,13 +291,13 @@ public class ClassMap {
      */
     static class MethodKey {
         /** The hash code */
-        final int hash;
+        final int hashCode;
         /** The method name. */
         final String method;
         /** The parameters. */
-        final Class[] params;
+        final Class<?>[] params;
         /** A marker for empty parameter list. */
-        static final Class[] NOARGS = new Class[0];
+        static final Class<?>[] NOARGS = new Class<?>[0];
 
         /** Builds a MethodKey from a method.
          *  Used to store information in the method map.
@@ -318,12 +315,12 @@ public class ClassMap {
             int hash = this.method.hashCode();
             final int size;
             if (args != null && (size = args.length) > 0) {
-                this.params = new Class[size];
+                this.params = new Class<?>[size];
                 for (int p = 0; p < size; ++p) {
                     // ctor(Object) : {
                     Object arg = args[p];
                     // no need to go thru primitive type conversion since these are objects
-                    Class parm = arg == null ? Object.class : arg.getClass();
+                    Class<?> parm = arg == null ? Object.class : arg.getClass();
                     // }
                     hash = (37 * hash) + parm.hashCode();
                     this.params[p] = parm;
@@ -331,22 +328,22 @@ public class ClassMap {
             } else {
                 this.params = NOARGS;
             }
-            this.hash = hash;
+            this.hashCode = hash;
         }
 
         /** Builds a MethodKey from a method name and a set of parameters (classes).
          *  Used to store information in the method map. ( @see MethodKey#primitiveClass )
          */
-        MethodKey(String method, Class[] args) {
+        MethodKey(String method, Class<?>[] args) {
             // !! keep this in sync with the other ctor (hash code) !!
             this.method = method;
             int hash = this.method.hashCode();
             final int size;
             if (args != null && (size = args.length) > 0) {
-                this.params = new Class[size];
+                this.params = new Class<?>[size];
                 for (int p = 0; p < size; ++p) {
                     // ctor(Class): {
-                    Class parm = MethodCache.primitiveClass(args[p]);
+                    Class<?> parm = MethodCache.primitiveClass(args[p]);
                     // }
                     hash = (37 * hash) + parm.hashCode();
                     this.params[p] = parm;
@@ -354,25 +351,28 @@ public class ClassMap {
             } else {
                 this.params = NOARGS;
             }
-            this.hash = hash;
+            this.hashCode = hash;
         }
 
         @Override
         public int hashCode() {
-            return hash;
+            return hashCode;
         }
 
         @Override
         public boolean equals(Object arg) {
-            MethodKey key = (MethodKey) arg;
-            return method.equals(key.method) && java.util.Arrays.equals(params, key.params);
+            if (arg instanceof MethodKey) {
+                MethodKey key = (MethodKey) arg;
+                return method.equals(key.method) && java.util.Arrays.equals(params, key.params);
+            }
+            return false;
         }
 
         @Override
         /** Compatible with original string key. */
         public String toString() {
             StringBuilder builder = new StringBuilder(method);
-            for (Class c : params) {
+            for (Class<?> c : params) {
                 builder.append(c.getName());
             }
             return builder.toString();
