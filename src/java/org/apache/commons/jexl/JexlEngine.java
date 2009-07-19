@@ -170,6 +170,7 @@ public class JexlEngine {
 
     /**
      * Checks whether this engine throws JexlException during evaluation.
+     * @return true if silent, false otherwise
      */
     public boolean isSilent() {
         return this.silent;
@@ -419,6 +420,7 @@ public class JexlEngine {
      * <p>
      * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
+     * @param context the evaluation context
      * @param bean the bean to set properties in
      * @param expr the property expression
      * @param value the value of the property
@@ -530,8 +532,14 @@ public class JexlEngine {
             int start = 0;
             int end = str.length();
             if (end > 0) {
-                for (start = 0; start < end && str.charAt(start) == ' '; ++start); // trim front spaces
-                for (; end > 0 && str.charAt(end - 1) == ' '; --end); // trim ending spaces
+                // trim front spaces
+                while (start < end && str.charAt(start) == ' ') {
+                    ++start;
+                }
+                // trim ending spaces
+                while (end > 0 && str.charAt(end - 1) == ' ') {
+                    --end;
+                }
                 return str.subSequence(start, end).toString();
             }
             return "";
@@ -566,16 +574,19 @@ public class JexlEngine {
      * instance fulfilling that pattern.
      */
     @Deprecated
+    // CSOFF: StaticVariableName
     private static volatile JexlEngine DEFAULT = null;
+    // CSON: StaticVariableName
 
     /**
      * Retrieves a default JEXL engine.
      * @return the singleton
      */
+    // CSOFF: DoubleCheckedLocking
     @Deprecated
     static JexlEngine getDefault() {
-        // java 5 allows the lazy singleton initialization
-        // using a double-check locking pattern
+        // java 5 memory model fixes the lazy singleton initialization
+        // using a double-check locking pattern using a volatile
         if (DEFAULT == null) {
             synchronized (JexlEngine.class) {
                 if (DEFAULT == null) {
@@ -585,4 +596,5 @@ public class JexlEngine {
         }
         return DEFAULT;
     }
+    // CSON: DoubleCheckedLocking
 }

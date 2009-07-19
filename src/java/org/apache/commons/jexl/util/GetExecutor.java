@@ -17,7 +17,7 @@
 
 package org.apache.commons.jexl.util;
 
-import java.lang.reflect.InvocationTargetException;
+import org.apache.commons.jexl.util.introspection.Introspector;
 
 import org.apache.commons.logging.Log;
 
@@ -38,34 +38,27 @@ public class GetExecutor extends AbstractExecutor {
      * Container to hold the 'key' part of 
      * get(key).
      */
-    private final Object[] args = new Object[1];
-    
+    private final Object[] args;
+
+    /**
+     * Creates an arguments array.
+     * @param key the key to use as argument
+     * @return the arguments array
+     */
+    private static Object[] makeArgs(String key) {
+        return new Object[]{key};
+    }
     /**
      * Default constructor.
      *
-     * @param r The instance log.
+     * @param rlog The logger.
      * @param ispect The JEXL introspector.
      * @param c The class being examined.
      * @param key The key for the get(key) operation.
      */
-    public GetExecutor(Log r,
-            org.apache.commons.jexl.util.introspection.Introspector ispect,
-            Class<?> c, String key) {
-        rlog = r;
-        args[0] = key;
-        method = ispect.getMethod(c, "get", args);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Object execute(Object o)
-    throws IllegalAccessException, InvocationTargetException {
-        if (method == null) {
-            return null;
-        }
-
-        return method.invoke(o, args);
+    public GetExecutor(final Log rlog, Introspector ispect, Class<?> c, String key) {
+        super(ispect.getMethod(c, "get", makeArgs(key)));
+        args = makeArgs(key);
     }
 
 }

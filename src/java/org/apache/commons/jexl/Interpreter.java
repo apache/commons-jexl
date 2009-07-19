@@ -1111,8 +1111,7 @@ public class Interpreter implements ParserVisitor {
             } catch (Exception xany) {
                 if (node == null) {
                     throw new RuntimeException(xany);
-                }
-                else {
+                } else {
                     throw new JexlException(node, "get object property error", xany);
                 }
             }

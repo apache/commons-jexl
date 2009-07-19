@@ -26,12 +26,21 @@ public class JexlException extends RuntimeException {
     protected Node mark;
     /** A marker to use in NPEs stating a null operand error. */
     public static final String NULL_OPERAND = "jexl.null";
-    /** {@inheritDoc} */
+    /**
+     * Creates a new JexlException.
+     * @param node the node causing the error
+     * @param msg the error message
+     */
     public JexlException(Node node, String msg) {
         super(msg);
         mark = node;
     }
-    /** {@inheritDoc} */
+    /**
+     * Creates a new JexlException.
+     * @param node the node causing the error
+     * @param msg the error message
+     * @param cause the exception causing the error
+     */
     public JexlException(Node node, String msg, Throwable cause) {
         super(msg, cause);
         mark = node;

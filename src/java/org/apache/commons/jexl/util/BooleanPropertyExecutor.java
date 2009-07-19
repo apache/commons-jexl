@@ -17,6 +17,9 @@
 
 package org.apache.commons.jexl.util;
 
+import java.lang.reflect.Method;
+import org.apache.commons.jexl.util.introspection.Introspector;
+
 import org.apache.commons.logging.Log;
 /**
  *  Handles discovery and valuation of a
@@ -32,73 +35,64 @@ import org.apache.commons.logging.Log;
  *  @author <a href="geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public class BooleanPropertyExecutor extends PropertyExecutor {
-
+public class BooleanPropertyExecutor extends AbstractExecutor {
+    /** index of the first character of the property. */
+    private static final int PROPERTY_START_INDEX = 2;
     /**
      * Constructor.
      *
-     * @param rlog The instance log.
+     * @param rlog The logger.
      * @param is The JEXL introspector.
      * @param clazz The class being analyzed.
      * @param property The boolean property.
      */
-    public BooleanPropertyExecutor(Log rlog,
-        org.apache.commons.jexl.util.introspection.Introspector is,
-        Class<?> clazz, String property) {
-            super(rlog, is, clazz, property);
+    public BooleanPropertyExecutor(final Log rlog, Introspector is, Class<?> clazz, String property) {
+        super(discover(rlog, is, clazz, property));
     }
 
     /**
-     * Locate the getter method for this boolean property.
+     * Finds the method for a BooleanPropertyExecutor.
      *
+     * @param rlog The logger.
+     * @param is The JEXL introspector.
      * @param clazz The class being analyzed.
-     * @param property Name of boolean property.
+     * @param property The boolean property.
+     * @return The method.
      */
-    @Override
-    protected void discover(Class<?> clazz, String property) {
+   private static Method discover(final Log rlog, Introspector is, Class<?> clazz, String property) {
+        String mname = null;
+        Method m = null;
         try {
             char c;
-            /*
-             *  now look for a boolean isFoo
-             */
-
+            //  now look for a boolean isFoo
             StringBuilder  sb = new StringBuilder("is");
             sb.append(property);
 
-            methodUsed = sb.toString();
-            method = introspector.getMethod(clazz, methodUsed, EMPTY_PARAMS);
-
-            if (null == method) {
-                c = sb.charAt(2);
-
+            mname = sb.toString();
+            m = is.getMethod(clazz, mname, EMPTY_PARAMS);
+            if (null == m) {
+                //now the convenience, flip the 1st character
+                c = sb.charAt(PROPERTY_START_INDEX);
                 if (Character.isLowerCase(c)) {
-                    sb.setCharAt(2, Character.toUpperCase(c));
+                    sb.setCharAt(PROPERTY_START_INDEX, Character.toUpperCase(c));
                 } else {
-                    sb.setCharAt(2, Character.toLowerCase(c));
+                    sb.setCharAt(PROPERTY_START_INDEX, Character.toLowerCase(c));
                 }
 
-                methodUsed = sb.toString();
-                method = introspector.getMethod(clazz, methodUsed, EMPTY_PARAMS);
+                mname = sb.toString();
+                m = is.getMethod(clazz, mname, EMPTY_PARAMS);
             }
 
-            if (method != null) {
-                /*
-                 *  now, this has to return a boolean
-                 */
-
-                if (method.getReturnType() == Boolean.TYPE) {
-                    return;
-                }
-
-                method = null;
+            //  now, this has to return a boolean
+            if (m != null && m.getReturnType() != Boolean.TYPE) {
+                m = null;
             }
-            /**
-             * pass through application level runtime exceptions
-             */
+            // pass through application level runtime exceptions
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
                 rlog.error("PROGRAMMER ERROR : BooleanPropertyExector()", e);
         }
+        return m;
     }
 }

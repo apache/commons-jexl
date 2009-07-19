@@ -89,24 +89,17 @@ public class Introspector extends IntrospectorBase {
      */
     @Override
     public Method getMethod(Class<?> c, String name, Object[] params) throws IllegalArgumentException {
-        /*
-         *  just delegate to the base class
-         */
-
+        //  just delegate to the base class
         try {
             return super.getMethod(c, name, params);
-        }
-        catch (MethodMap.AmbiguousException ae) {
-            /*
-             *  whoops.  Ambiguous.  Make a nice log message and return null...
-             */
+        } catch (MethodMap.AmbiguousException ae) {
+            // whoops.  Ambiguous.  Make a nice log message and return null...
             StringBuilder msg = new StringBuilder("Introspection Error : Ambiguous method invocation ");
             msg.append(name).append("( ");
             for (int i = 0; i < params.length; i++) {
                 if (i > 0) {
                     msg.append(", ");
                 }
-
                 msg.append(null == params[i] ? "null" : params[i].getClass().getName());
             }
             msg.append(") for class ").append(c.getName());
@@ -114,7 +107,6 @@ public class Introspector extends IntrospectorBase {
                 rlog.error(msg.toString());
             }
         }
-
         return null;
     } // CSON: RedundantThrows
 
