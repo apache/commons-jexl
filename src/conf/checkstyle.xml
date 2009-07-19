@@ -57,7 +57,11 @@
 
     <!-- Checks whether files end with a new line.                        -->
     <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
-    <module name="NewlineAtEndOfFile"/>
+    <!-- JEXL-20: tried every combination on a Mac to no avail...
+    <module name="NewlineAtEndOfFile">
+        <property name="lineSeparator" value="lf"/>
+    </module>
+    -->
 
     <!-- Checks that property files contain the same keys.         -->
     <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
@@ -70,7 +74,10 @@
 
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
-        <module name="JavadocMethod"/>
+        <!-- JEXL-20: many of those by API choice -->
+        <module name="JavadocMethod">
+           <property name="allowUndeclaredRTE" value="true"/>
+        </module>
         <module name="JavadocType"/>
         <module name="JavadocVariable"/>
         <module name="JavadocStyle"/>
@@ -133,15 +140,16 @@
         <!-- Checks for whitespace                               -->
         <!-- See http://checkstyle.sf.net/config_whitespace.html -->
         <module name="EmptyForIteratorPad"/>
+        <!-- <module name="GenericWhitespace"/> -->
+        <!-- JEXL-20: because the above is not yet supported through Maven plugin, disable others-->
         <!-- <module name="NoWhitespaceAfter"/> -->
         <!-- <module name="NoWhitespaceBefore"/> -->
-        <!-- <module name="GenericWhitespace"/> -->
+        <!-- <module name="WhitespaceAfter"/> -->
+        <!-- <module name="WhitespaceAround"/> -->
         <module name="OperatorWrap"/>
         <module name="ParenPad"/>
         <module name="TypecastParenPad"/>
         <module name="TabCharacter"/>
-        <!--<module name="WhitespaceAfter"/>-->
-        <!--<module name="WhitespaceAround"/>-->
 
 
         <!-- Modifier Checks                                    -->
@@ -161,8 +169,8 @@
 
         <!-- Checks for common coding problems               -->
         <!-- See http://checkstyle.sf.net/config_coding.html -->
-        <!--  JEXL: module name="AvoidInlineConditionals"/-->
-        <module name="DoubleCheckedLocking"/>    <!-- MY FAVOURITE -->
+        <!-- JEXL: module name="AvoidInlineConditionals"/-->
+        <module name="DoubleCheckedLocking"/>
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
         <module name="HiddenField"/>
@@ -172,7 +180,8 @@
         	<property name="ignoreNumbers" value="-1, 0, 1, 2, 3"/>
         </module>
         <module name="MissingSwitchDefault"/>
-        <module name="RedundantThrows"/>
+        <!-- JEXL-20: used in introspection -->
+        <!--<module name="RedundantThrows"/>-->
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
 

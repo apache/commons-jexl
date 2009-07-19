@@ -16,16 +16,13 @@
  */
 
 package org.apache.commons.jexl.util;
-
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.apache.commons.logging.Log;
 
 /**
  * Abstract class that is used to execute an arbitrary
- * method that is in introspected. This is the superclass
+ * method that is introspected. This is the superclass
  * for the GetExecutor and PropertyExecutor.
  *
  * @since 1.0
@@ -34,14 +31,21 @@ import org.apache.commons.logging.Log;
  * @version $Id$
  */
 public abstract class AbstractExecutor {
-    /** The executor instance log. */
-    protected Log rlog = null;
-    
+    /** Empty parameters list for method matching. */
+    protected static final Object[] EMPTY_PARAMS = {};
     /**
      * Method to be executed.
      */
-    protected Method method = null;
-    
+    protected final Method method;
+
+    /**
+     * Default and sole constructor.
+     * @param theMethod the method held by this executor
+     */
+    protected AbstractExecutor(Method theMethod) {
+        method = theMethod;
+    }
+
     /**
      * Execute method against context.
      *
@@ -50,8 +54,11 @@ public abstract class AbstractExecutor {
      * @throws IllegalAccessException Method is inaccessible.
      * @throws InvocationTargetException Method body throws an exception.
      */
-     public abstract Object execute(Object o)
-         throws IllegalAccessException, InvocationTargetException;
+    public Object execute(Object o)
+            throws IllegalAccessException, InvocationTargetException {
+        return method == null? null : method.invoke(o, (Object[]) null);
+    }
+
 
     /**
      * Tell whether the executor is alive by looking
@@ -59,16 +66,15 @@ public abstract class AbstractExecutor {
      *
      * @return boolean Whether the executor is alive.
      */
-    public boolean isAlive() {
+    public final boolean isAlive() {
         return (method != null);
     }
 
     /**
-     * Get the method to be executed.
-     *
+     * Gets the method to be executed.
      * @return Method The method to be executed.
      */
-    public Method getMethod() {
+    public final Method getMethod() {
         return method;
     }
-}
+ }

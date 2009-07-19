@@ -164,7 +164,7 @@ public class ClassMap {
      * </p>
      * @version $Id$
      */
-    static class MethodCache {
+    static final class MethodCache {
         /**
          * A method that returns itself used as a marker for cache miss,
          * allows the underlying cache map to be strongly typed.
@@ -173,10 +173,10 @@ public class ClassMap {
         public static Method cacheMiss() {
             try {
                 return MethodCache.class.getMethod("cacheMiss");
-            } // this really cant make an error...
-            catch (Exception xio) {
+            } catch (Exception xio) {
+                // this really cant make an error...
+                return null;
             }
-            return null;
         }
         /** The cache miss marker method. */
         private static final Method CACHE_MISS = cacheMiss();
@@ -203,20 +203,25 @@ public class ClassMap {
          * introspection for methods with primitive types will work
          * correctly.
          * </p>
+         * @param parm a may-be primitive type class
+         * @return the equivalent object class 
          */
-        static final Class<?> primitiveClass(Class<?> parm) {
+        static Class<?> primitiveClass(Class<?> parm) {
             // it is marginally faster to get from the map than call isPrimitive...
             //if (!parm.isPrimitive()) return parm;
             Class<?> prim = PRIMITIVE_TYPES.get(parm);
             return prim == null ? parm : prim;
         }
         /**
+         * The method cache.
+         * <p>
          * Cache of Methods, or CACHE_MISS, keyed by method
          * name and actual arguments used to find it.
+         * </p>
          */
         private final Map<MethodKey, Method> cache = new HashMap<MethodKey, Method>();
         /**
-         * Map of methods that are searchable according to method parameters to find a match
+         * Map of methods that are searchable according to method parameters to find a match.
          */
         private final MethodMap methodMap = new MethodMap();
 
@@ -246,7 +251,7 @@ public class ClassMap {
          * Finds a Method using a MethodKey.
          * @param methodKey the method key
          * @return a method
-         * @throws org.apache.commons.jexl.util.introspection.MethodMap.AmbiguousException
+         * @throws MethodMap.AmbiguousException if method resolution is ambiguous
          */
         Method get(final MethodKey methodKey)
                 throws MethodMap.AmbiguousException {
@@ -323,28 +328,29 @@ public class ClassMap {
      * (array of class).
      * Roughly 3x faster than string key to access the map & uses less memory.
      */
-    static class MethodKey {
+    static final class MethodKey {
         /** The hash code. */
         private final int hashCode;
         /** The method name. */
-        final String method;
+        private final String method;
         /** The parameters. */
-        final Class<?>[] params;
+        private final Class<?>[] params;
         /** A marker for empty parameter list. */
         private static final Class<?>[] NOARGS = new Class<?>[0];
         /** The hash code constants. */
         private static final int HASH = 37;
 
-        /** Builds a MethodKey from a method.
+        /** Creates a MethodKey from a method.
          *  Used to store information in the method map.
+         * @param aMethod the method to build the key from
          */
-        MethodKey(Method method) {
-            this(method.getName(), method.getParameterTypes());
+        MethodKey(Method aMethod) {
+            this(aMethod.getName(), aMethod.getParameterTypes());
         }
 
         /** Creates a MethodKey from a method name and a set of arguments (objects).
          *  Used to query the method map.
-         * @param method the method name
+         * @param aMethod the method name
          * @param args the arguments instances to match the method signature
          */
         MethodKey(String aMethod, Object[] args) {
@@ -352,7 +358,9 @@ public class ClassMap {
             this.method = aMethod;
             int hash = this.method.hashCode();
             final int size;
+             // CSOFF: InnerAssignment
             if (args != null && (size = args.length) > 0) {
+                // CSON: InnerAssignment
                 this.params = new Class<?>[size];
                 for (int p = 0; p < size; ++p) {
                     // ctor(Object) : {
@@ -371,7 +379,7 @@ public class ClassMap {
 
         /** Creates a MethodKey from a method name and a set of parameters (classes).
          *  Used to store information in the method map. ( @see MethodKey#primitiveClass )
-         * @param method the method name
+         * @param aMethod the method name
          * @param args the argument classes to match the method signature
          */
         MethodKey(String aMethod, Class<?>[] args) {
@@ -379,7 +387,9 @@ public class ClassMap {
             this.method = aMethod;
             int hash = this.method.hashCode();
             final int size;
+            // CSOFF: InnerAssignment
             if (args != null && (size = args.length) > 0) {
+                // CSON: InnerAssignment
                 this.params = new Class<?>[size];
                 for (int p = 0; p < size; ++p) {
                     // ctor(Class): {
@@ -392,6 +402,22 @@ public class ClassMap {
                 this.params = NOARGS;
             }
             this.hashCode = hash;
+        }
+
+        /**
+         * Gets this key's method name.
+         * @return the method name
+         */
+        String getMethod() {
+            return method;
+        }
+
+        /**
+         * Gets this key's method parameter classes.
+         * @return the parameters
+         */
+        Class<?>[] getParameters() {
+            return params;
         }
 
         @Override

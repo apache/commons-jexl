@@ -122,19 +122,24 @@ public final class UnifiedJEXL {
      * @see ExpressionBuilder
      */
     private static enum ExpressionType {
-        CONSTANT(0), // constant count at index 0
-        IMMEDIATE(1), // immediate count at index 1
-        DEFERRED(2), // deferred count at index 2
-        NESTED(2), // nested are counted as deferred thus count at index 2
-        COMPOSITE(-1); // composite are not counted
-        /** the index in arrays of expression counters for composite expressions. */
+        /** Constant expression, count index 0. */
+        CONSTANT(0),
+        /** Immediate expression, count index 1. */
+        IMMEDIATE(1),
+        /** Deferred expression, count index 2. */
+        DEFERRED(2),
+        /** Nested (which are deferred) expressions, count index 2. */
+        NESTED(2),
+        /** Composite expressions are not counted, index -1. */
+        COMPOSITE(-1);
+        /** The index in arrays of expression counters for composite expressions. */
         private final int index;
         /**
          * Creates an ExpressionType.
-         * @param index the index for this type in counters arrays.
+         * @param idx the index for this type in counters arrays.
          */
-        ExpressionType(int index) {
-            this.index = index;
+        ExpressionType(int idx) {
+            this.index = idx;
         }
     }
 
@@ -143,7 +148,9 @@ public final class UnifiedJEXL {
      * Keeps count of sub-expressions by type.
      */
     private static class ExpressionBuilder {
+        /** Per expression type counters. */
         private final int[] counts;
+        /** The list of expressions. */
         private final ArrayList<Expression> expressions;
 
         /**
@@ -207,7 +214,11 @@ public final class UnifiedJEXL {
      * The sole type of (runtime) exception the UnifiedJEXL can throw.
      */
     public class Exception extends RuntimeException {
-        /** {@inheritDoc} */
+        /**
+         * Creates a UnifiedJEXL.Exception.
+         * @param msg the exception message
+         * @param cause the exception cause
+         */
         public Exception(String msg, Throwable cause) {
             super(msg, cause);
         }
@@ -217,13 +228,14 @@ public final class UnifiedJEXL {
      * The abstract base class for all expressions, immediate '${...}' and deferred '#{...}'.
      */
     public abstract class Expression {
+        /** The source of this expression ({@see Expression#prepare}. */
         protected final Expression source;
         /**
          * Creates an expression.
-         * @param source the source expression if any
+         * @param src the source expression if any
          */
-        Expression(Expression source) {
-            this.source = source != null ? source : this;
+        Expression(Expression src) {
+            this.source = src != null ? src : this;
         }
 
         @Override
@@ -252,6 +264,7 @@ public final class UnifiedJEXL {
 
         /**
          * Adds this expression's string representation to a StringBuilder.
+         * @param strb the builder to fill
          */
         abstract void asString(StringBuilder strb);
 
@@ -338,21 +351,26 @@ public final class UnifiedJEXL {
 
     /** A constant expression. */
     private class ConstantExpression extends Expression {
+        /** The constant held by this expression. */
         private final Object value;
         /**
          * Creates a constant expression.
-         * @param value the constant value
+         * <p>
+         * If the wrapped constant is a string, it is treated
+         * as a JEXL strings with respect to escaping.
+         * </p>
+         * @param val the constant value
          * @param source the source expression if any
          */
-        ConstantExpression(Object value, Expression source) {
+        ConstantExpression(Object val, Expression source) {
             super(source);
-            if (value == null) {
+            if (val == null) {
                 throw new NullPointerException("constant can not be null");
             }
-            if (value instanceof String) {
-                value = StringParser.buildString((String) value, false);
+            if (val instanceof String) {
+                val = StringParser.buildString((String) val, false);
             }
-            this.value = value;
+            this.value = val;
         }
 
         @Override
@@ -409,7 +427,9 @@ public final class UnifiedJEXL {
 
     /** The base for Jexl based expressions. */
     private abstract class JexlBasedExpression extends Expression {
+        /** The JEXL string for this expression. */
         protected final CharSequence expr;
+        /** The JEXL node for this expression. */
         protected final SimpleNode node;
         /**
          * Creates a JEXL interpretable expression.
@@ -566,21 +586,21 @@ public final class UnifiedJEXL {
 
     /** A composite expression: "... ${...} ... #{...} ...". */
     private class CompositeExpression extends Expression {
-        // bit encoded (deferred count > 0) bit 1, (immediate count > 0) bit 0
+        /** Bit encoded (deferred count > 0) bit 1, (immediate count > 0) bit 0. */
         private final int meta;
-        // the list of expression resulting from parsing
+        /** The list of sub-expression resulting from parsing. */
         private final Expression[] exprs;
         /**
          * Creates a composite expression.
-         * @param counts counters of expression per type
-         * @param exprs the sub-expressions
-         * @param source the source for this expresion if any
+         * @param counter counters of expression per type
+         * @param list the sub-expressions
+         * @param src the source for this expresion if any
          */
-        CompositeExpression(int[] counts, ArrayList<Expression> exprs, Expression source) {
-            super(source);
-            this.exprs = exprs.toArray(new Expression[exprs.size()]);
-            this.meta = (counts[ExpressionType.DEFERRED.index] > 0 ? 2 : 0) |
-                        (counts[ExpressionType.IMMEDIATE.index] > 0 ? 1 : 0);
+        CompositeExpression(int[] counters, ArrayList<Expression> list, Expression src) {
+            super(src);
+            this.exprs = list.toArray(new Expression[list.size()]);
+            this.meta = (counters[ExpressionType.DEFERRED.index] > 0 ? 2 : 0)
+                      | (counters[ExpressionType.IMMEDIATE.index] > 0 ? 1 : 0);
         }
 
         @Override
@@ -794,19 +814,24 @@ public final class UnifiedJEXL {
 
     /** The different parsing states. */
     private static enum ParseState {
-        CONST, // parsing a constant string
-        IMMEDIATE0, // seen $
-        DEFERRED0, // seen #
-        IMMEDIATE1, // seen ${
-        DEFERRED1, // seen #{
-        ESCAPE // seen \
+        /** Parsing a constant. */
+        CONST,
+        /** Parsing after $ .*/
+        IMMEDIATE0,
+        /** Parsing after # .*/
+        DEFERRED0,
+        /** Parsing afer ${ . */
+        IMMEDIATE1,
+        /** Parsing afer #{ . */
+        DEFERRED1,
+        /** Parsing afer \ . */
+        ESCAPE
     }
 
     /**
      * Parses a unified expression.
-     * @param expr the expression
-     * @param counts the expression type counters
-     * @return the list of expressions
+     * @param expr the string expression
+     * @return the expression instance
      * @throws Exception
      */
     private Expression parseExpression(String expr) throws ParseException {

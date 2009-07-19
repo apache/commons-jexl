@@ -36,7 +36,7 @@ public interface Uberspect {
     /** Gets underlying introspector.
      * @return the introspector
      */
-    public Introspector getIntrospector();
+    Introspector getIntrospector();
     
     /**
      * To support iteratives - #foreach().

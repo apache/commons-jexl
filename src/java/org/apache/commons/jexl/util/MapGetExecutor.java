@@ -18,6 +18,7 @@
 package org.apache.commons.jexl.util;
 
 import java.util.Map;
+import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 
@@ -30,51 +31,56 @@ import org.apache.commons.logging.Log;
  * @version $Id$
  */
 public class MapGetExecutor extends AbstractExecutor {
+    /** A one argument signature to find method. */
+    private static final Class<?>[] OBJECT_PARM = new Class<?>[]{Object.class};
     /** the property to get. */
     private final String property;
 
     /**
-     * Create the instance.
-     * @param rlog the logger.
+     * Creates the instance.
+     * @param rlog The logger.
      * @param clazz the class to execute the get on.
      * @param aProperty the property or key to get.
      */
     public MapGetExecutor(final Log rlog, final Class<?> clazz, final String aProperty) {
-        this.rlog = rlog;
+        super(aProperty != null? discover(rlog, clazz, aProperty) : null);
         this.property = aProperty;
-        discover(clazz);
     }
 
     /**
-     * Discover the method to call.
-     * @param clazz the class to find the method on.
+     * Finds the method for a MapGetExecutor.
+     *
+     * @param rlog The logger.
+     * @param clazz The class being analyzed.
+     * @param property The boolean property.
+     * @return The method.
      */
-    protected void discover(final Class<?> clazz) {
+    private static Method discover(final Log rlog, final Class<?> clazz, final String property) {
+        Method m = null;
         Class<?>[] interfaces = clazz.getInterfaces();
         for (int i = 0; i < interfaces.length; i++) {
             if (interfaces[i].equals(Map.class)) {
                 try {
-                    if (property != null) {
-                        method = Map.class.getMethod("get", new Class<?>[]{Object.class});
-                    }
-                    /**
-                     * pass through application level runtime exceptions
-                     */
+                    m = Map.class.getMethod("get", OBJECT_PARM);
+                    // pass through application level runtime exceptions
                 } catch (RuntimeException e) {
                     throw e;
                 } catch (Exception e) {
-                        rlog.error("While looking for get('" + property + "') method:", e);
+                    rlog.error("While looking for get('" + property + "') method:", e);
                 }
                 break;
             }
         }
+        return m;
     }
+
 
     /** 
      * Get the property from the map.
      * @param o the map.
      * @return o.get(property)
      */
+    @Override
     public Object execute(final Object o) {
         return ((Map<String,?>) o).get(property);
     }

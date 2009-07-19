@@ -122,6 +122,7 @@ public class IntrospectorBase {
 
     /**
      * Gets the ClassMap for a given class.
+     * @param c the class
      * @return the class map
      */
     private ClassMap getMap(Class<?> c) {

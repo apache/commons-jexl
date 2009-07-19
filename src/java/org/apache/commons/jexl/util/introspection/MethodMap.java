@@ -133,11 +133,11 @@ public class MethodMap {
      * @throws AmbiguousException if find is ambiguous
      */
     Method find(ClassMap.MethodKey methodKey) throws AmbiguousException {
-        List<Method> methodList = get(methodKey.method);
+        List<Method> methodList = get(methodKey.getMethod());
         if (methodList == null) {
             return null;
         }
-        return getMostSpecific(methodList, methodKey.params);
+        return getMostSpecific(methodList, methodKey.getParameters());
     } // CSON: RedundantThrows
 
 

@@ -143,7 +143,7 @@ public class MethodKeyTest extends TestCase {
     public void testObjectKey() throws Exception {
         for(int k = 0; k < keyList.length; ++k) {
             ClassMap.MethodKey ctl = keyList[k];
-            ClassMap.MethodKey key = makeKey(ctl.method, ctl.params);
+            ClassMap.MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
             String out = byKey.get(key);
             assertTrue(out != null);
             assertTrue(ctl.toString() + " != " + out, ctl.toString().equals(out));
@@ -154,7 +154,7 @@ public class MethodKeyTest extends TestCase {
     public void testStringKey() throws Exception {
         for(int k = 0; k < keyList.length; ++k) {
             ClassMap.MethodKey ctl = keyList[k];
-            String key = makeStringKey(ctl.method, ctl.params);
+            String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
             ClassMap.MethodKey out = byString.get(key);
             assertTrue(out != null);
             assertTrue(ctl.toString() + " != " + key, ctl.equals(out));
@@ -168,7 +168,7 @@ public class MethodKeyTest extends TestCase {
         for(int l = 0; l < LOOP; ++l)
         for(int k = 0; k < keyList.length; ++k) {
             ClassMap.MethodKey ctl = keyList[k];
-            ClassMap.MethodKey key = makeKey(ctl.method, ctl.params);
+            ClassMap.MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
             String out = byKey.get(key);
             assertTrue(out != null);
         }
@@ -178,7 +178,7 @@ public class MethodKeyTest extends TestCase {
         for(int l = 0; l < LOOP; ++l)
         for(int k = 0; k < keyList.length; ++k) {
             ClassMap.MethodKey ctl = keyList[k];
-            String key = makeStringKey(ctl.method, ctl.params);
+            String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
             ClassMap.MethodKey out = byString.get(key);
             assertTrue(out != null);
         }
