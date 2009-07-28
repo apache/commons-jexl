@@ -110,7 +110,7 @@ public final class UnifiedJEXL {
     private static Map<String, Expression> createCache(final int cacheSize) {
         return new LinkedHashMap<String, Expression>(cacheSize, LOAD_FACTOR, true) {
             @Override
-            protected boolean removeEldestEntry(Map.Entry eldest) {
+            protected boolean removeEldestEntry(Map.Entry<String, Expression> eldest) {
                 return size() > cacheSize;
             }
         };
@@ -228,7 +228,7 @@ public final class UnifiedJEXL {
      * The abstract base class for all expressions, immediate '${...}' and deferred '#{...}'.
      */
     public abstract class Expression {
-        /** The source of this expression ({@see Expression#prepare}. */
+        /** The source of this expression (see {@link Expression#prepare}) */
         protected final Expression source;
         /**
          * Creates an expression.
@@ -282,7 +282,7 @@ public final class UnifiedJEXL {
          * </p>
          * @param context the context to use for immediate expression evaluations
          * @return  an expression or null if an error occurs and the {@link JexlEngine} is silent
-         * @throws {@link UnifiedJEXL.Exception} if an error occurs and the {@link JexlEngine} is not silent
+         * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
          */
         public abstract Expression prepare(JexlContext context);
 
@@ -294,7 +294,7 @@ public final class UnifiedJEXL {
          * @param context the variable context
          * @return the result of this expression evaluation or null if an error occurs and the {@link JexlEngine} is
          * silent
-         * @throws {@link UnifiedJEXL.Exception} if an error occurs and the {@link JexlEngine} is not silent
+         * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
          */
         public abstract Object evaluate(JexlContext context);
 
@@ -687,7 +687,7 @@ public final class UnifiedJEXL {
      * </p>
      * @param expression the UnifiedJEXL string expression
      * @return the UnifiedJEXL object expression, null if silent and an error occured
-     * @throws {@link UnifiedJEXL.Exception} if an error occurs and the {@link JexlEngine} is not silent
+     * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
      */
     public Expression parse(String expression) {
         try {
