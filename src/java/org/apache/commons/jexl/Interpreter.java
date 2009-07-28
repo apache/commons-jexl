@@ -1129,7 +1129,7 @@ public class Interpreter implements ParserVisitor {
      * @param value the value to assign to the object's attribute
      */
     public void setAttribute(Object object, Object attribute, Object value) {
-        setAttribute(object, attribute, null);
+        setAttribute(object, attribute, value, null);
     }
 
     /**
