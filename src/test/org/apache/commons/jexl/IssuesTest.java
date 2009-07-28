@@ -24,6 +24,7 @@ import junit.framework.TestCase;
  */
 public class IssuesTest  extends TestCase {
 
+    @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error to avoid warning in silent mode
         java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);

@@ -52,6 +52,7 @@ public class MethodTest extends TestCase {
         }
     }
 
+    @Override
     public void setUp() {
         asserter = new Asserter();
     }

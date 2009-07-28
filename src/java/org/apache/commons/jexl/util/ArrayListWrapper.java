@@ -54,6 +54,7 @@ public class ArrayListWrapper extends AbstractList<Object> {
     }
 
     /** {@inheritDoc} */
+    @Override
     public int size() {
         return Array.getLength(array);
     }
