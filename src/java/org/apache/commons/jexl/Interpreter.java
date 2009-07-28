@@ -978,10 +978,10 @@ public class Interpreter implements ParserVisitor {
         Object val = valNode.jjtAccept(this, data);
         if (val instanceof Byte) {
             byte valueAsByte = ((Byte) val).byteValue();
-            return new Byte((byte) -valueAsByte);
+            return Byte.valueOf((byte) -valueAsByte);
         } else if (val instanceof Short) {
             short valueAsShort = ((Short) val).shortValue();
-            return new Short((short) -valueAsShort);
+            return Short.valueOf((short) -valueAsShort);
         } else if (val instanceof Integer) {
             int valueAsInt = ((Integer) val).intValue();
             return new Integer(-valueAsInt);
@@ -1008,7 +1008,7 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTWhileStatement node, Object data) {
         Object result = null;
         /* first objectNode is the expression */
-        Node expressionNode = (Node) node.jjtGetChild(0);
+        Node expressionNode = node.jjtGetChild(0);
         while (arithmetic.toBoolean(expressionNode.jjtAccept(this, data))) {
             // execute statement
             result = node.jjtGetChild(1).jjtAccept(this, data);
@@ -1197,7 +1197,7 @@ public class Interpreter implements ParserVisitor {
             return;
         }
         if (node == null) {
-            new UnsupportedOperationException("unable to set object property, "
+            throw new UnsupportedOperationException("unable to set object property, "
                             + "object:" + object + ", property: " + attribute);
         }
         throw new JexlException(node, "unable to set bean property", null);
