@@ -698,9 +698,9 @@ class JexlArithmetic implements Arithmetic {
             long value = original.longValue();
             if (value <= Byte.MAX_VALUE && value >= Byte.MIN_VALUE) {
                 // it will fit in a byte
-                result = new Byte((byte) value);
+                result = Byte.valueOf((byte) value);
             } else if (value <= Short.MAX_VALUE && value >= Short.MIN_VALUE) {
-                result = new Short((short) value);
+                result = Short.valueOf((short) value);
             } else if (value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE) {
                 result = new Integer((int) value);
             }
