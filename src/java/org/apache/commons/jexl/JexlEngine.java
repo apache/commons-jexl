@@ -484,7 +484,7 @@ public class JexlEngine {
     protected Map<String, SimpleNode> createCache(final int cacheSize) {
         return new java.util.LinkedHashMap<String, SimpleNode>(cacheSize, LOAD_FACTOR, true) {
             @Override
-            protected boolean removeEldestEntry(Map.Entry eldest) {
+            protected boolean removeEldestEntry(Map.Entry<String, SimpleNode> eldest) {
                 return size() > cacheSize;
             }
         };
