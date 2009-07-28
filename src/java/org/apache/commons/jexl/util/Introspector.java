@@ -34,7 +34,7 @@ public class Introspector {
     /**
      *  The uberspector from Velocity that handles all introspection patterns.
      */
-    private static Uberspect uberSpect;
+    private static final Uberspect uberSpect;
 
     static {
 
