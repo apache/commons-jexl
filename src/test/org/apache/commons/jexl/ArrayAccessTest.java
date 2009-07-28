@@ -41,6 +41,7 @@ public class ArrayAccessTest extends TestCase {
     protected static final String[][] GET_METHOD_ARRAY2 =
         new String[][] { {"One", "Two", "Three"},{"Four", "Five", "Six"} };
 
+    @Override
     public void setUp() {
         asserter = new Asserter();
     }
