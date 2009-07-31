@@ -182,7 +182,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
 
         public Object put(final Object key, final Object value) {
             Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.put(key, value);
+            return bnd.put(String.valueOf(key), value);
         }
 
         public void putAll(Map t) {
