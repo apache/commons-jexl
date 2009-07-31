@@ -42,6 +42,8 @@ import org.apache.commons.jexl.parser.ParseException;
 /**
  * Implements the Jexl ScriptEngine for JSF-223.
  * <p>
+ * This implementation only gives access to the ENGINE_SCOPE bindings.
+ * </p>
  * See
  * <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">Java Scripting API</a>
  * Javadoc.
@@ -121,7 +123,12 @@ public class JexlScriptEngine extends AbstractScriptEngine {
 
     /** {@inheritDoc} */
     public ScriptEngineFactory getFactory() {
-        return factory == null ? new JexlScriptEngineFactory() : factory;
+        return factory == null ? SingletonHolder.DEFAULT_FACTORY : factory;
+    }
+
+    // IODH - lazy initialisation
+    private static class SingletonHolder {
+        private static final JexlScriptEngineFactory DEFAULT_FACTORY = new JexlScriptEngineFactory();
     }
 
     /**
