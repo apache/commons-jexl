@@ -95,13 +95,20 @@
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <version>1.0.4</version>
+      <version>1.1.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>3.8.2</version>
       <optional>true</optional>
+    </dependency>
+    <!-- For JSR-223 API -->
+    <dependency>
+      <groupId>org.apache.bsf</groupId>
+      <artifactId>bsf-api</artifactId>
+      <version>3.0-beta3</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 
@@ -113,9 +120,27 @@
     <commons.binary.suffix></commons.binary.suffix>
     <commons.jira.id>JEXL</commons.jira.id>
     <commons.jira.pid>12310479</commons.jira.pid>
+    <!-- Temp fix until parent POM is updated -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties> 
 
   <build>
+    <!-- temporarily override the parent POM (v 11) until that is updated -->
+    <resources>
+      <resource>
+        <directory>${basedir}</directory>
+        <targetPath>META-INF</targetPath>
+        <includes>
+          <include>NOTICE.txt</include>
+          <include>LICENSE.txt</include>
+        </includes>
+      </resource>
+      <!-- This is the default, but is currently missing from the parent POM (v11) -->
+      <resource>
+          <directory>src/main/resources</directory>
+      </resource>
+    </resources>
     <sourceDirectory>src/java</sourceDirectory>
     <testSourceDirectory>src/test</testSourceDirectory>
       <plugins>
