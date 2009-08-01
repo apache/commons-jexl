@@ -183,4 +183,35 @@ public class IssuesTest  extends JexlTestCase {
         }
     }
 
+    // JEXL-62
+    public void test62() throws Exception {
+        JexlContext ctxt;
+        JexlEngine jexl = new JexlEngine();
+        jexl.setSilent(true); // to avoid throwing JexlException on null method call
+        
+        Script jscript;
+
+        ctxt = JexlHelper.createContext();
+        jscript = jexl.createScript("dummy.hashCode()");
+        assertEquals(jscript.getText(), null, jscript.execute(ctxt)); // OK
+
+        ctxt.getVars().put("dummy", "abcd");
+        assertEquals(jscript.getText(), Integer.valueOf("abcd".hashCode()), jscript.execute(ctxt)); // OK
+        
+        jscript = jexl.createScript("dummy.hashCode");
+        assertEquals(jscript.getText(), null, jscript.execute(ctxt)); // OK
+
+        Expression jexpr;
+
+        ctxt = JexlHelper.createContext();
+        jexpr = jexl.createExpression("dummy.hashCode()");
+        assertEquals(jexpr.getExpression(), null, jexpr.evaluate(ctxt)); // OK
+
+        ctxt.getVars().put("dummy", "abcd");
+        assertEquals(jexpr.getExpression(), Integer.valueOf("abcd".hashCode()), jexpr.evaluate(ctxt)); // OK
+
+        jexpr = jexl.createExpression("dummy.hashCode");
+        assertEquals(jexpr.getExpression(), null, jexpr.evaluate(ctxt)); // OK
+    }
+
 }
