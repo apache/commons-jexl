@@ -17,7 +17,6 @@
 
 package org.apache.commons.jexl;
 
-import junit.framework.TestCase;
 
 /**
  * Test cases for the if statement.
@@ -25,7 +24,7 @@ import junit.framework.TestCase;
  * @author Dion Gillard
  * @since 1.1
  */
-public class IfTest extends TestCase {
+public class IfTest extends JexlTestCase {
 
     public IfTest(String testName) {
         super(testName);

@@ -17,12 +17,11 @@
 
 package org.apache.commons.jexl;
 import java.util.Map;
-import junit.framework.TestCase;
 
 /**
  * Test cases for reported issues
  */
-public class IssuesTest  extends TestCase {
+public class IssuesTest  extends JexlTestCase {
 
     @Override
     public void setUp() throws Exception {
@@ -182,9 +181,6 @@ public class IssuesTest  extends TestCase {
                 String xmsg = msg;
             }
         }
-    }
-    public static void main(String[] args) throws Exception {
-        new IssuesTest().test52base();
     }
 
 }

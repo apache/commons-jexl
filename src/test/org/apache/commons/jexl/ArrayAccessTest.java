@@ -23,14 +23,13 @@ import java.util.Map;
 
 import org.apache.commons.jexl.junit.Asserter;
 
-import junit.framework.TestCase;
 
 /**
  * Tests for array access operator []
  * 
  * @since 2.0
  */
-public class ArrayAccessTest extends TestCase {
+public class ArrayAccessTest extends JexlTestCase {
 
     private Asserter asserter;
 

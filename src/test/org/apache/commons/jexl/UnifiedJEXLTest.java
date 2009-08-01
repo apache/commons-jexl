@@ -18,11 +18,10 @@ package org.apache.commons.jexl;
 import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import junit.framework.TestCase;
 /**
  * Test cases for the UnifiedEL.
  */
-public class UnifiedJEXLTest extends TestCase {
+public class UnifiedJEXLTest extends JexlTestCase {
     static JexlEngine JEXL = new JexlEngine();
     static {
         JEXL.setLenient(false);

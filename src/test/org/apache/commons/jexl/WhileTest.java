@@ -17,13 +17,12 @@
 
 package org.apache.commons.jexl;
 
-import junit.framework.TestCase;
 /**
  * Tests for while statement.
  * @author Dion Gillard
  * @since 1.1
  */
-public class WhileTest extends TestCase {
+public class WhileTest extends JexlTestCase {
 
     public WhileTest(String testName) {
         super(testName);

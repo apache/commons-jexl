@@ -16,15 +16,13 @@
  */
 package org.apache.commons.jexl;
 
-import junit.framework.TestCase;
-
 /**
  * Test cases for the if statement.
  * 
  * @author Dion Gillard
  * @since 1.1
  */
-public class AssignTest extends TestCase {
+public class AssignTest extends JexlTestCase {
     static JexlEngine JEXL = new JexlEngine();
     static {
         JEXL.setSilent(false);
@@ -178,9 +176,5 @@ public class AssignTest extends TestCase {
         o = jc.getVars().get("x.y.z");
         assertEquals("Should be bar", "bar", o);
     }
-    
-    public static void main(String[] args) throws Exception {
-        new AssignTest("debug").testUtil();
-        //new AssignTest("debug").testArray();
-    }
+
 }

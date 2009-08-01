@@ -19,13 +19,12 @@ package org.apache.commons.jexl;
 import java.io.File;
 import java.net.URL;
 
-import junit.framework.TestCase;
 
 /**
  * Tests for ScriptFactory
  * @since 1.1
  */
-public class ScriptFactoryTest extends TestCase {
+public class ScriptFactoryTest extends JexlTestCase {
     static final String TEST1 = "src/test-scripts/test1.jexl";
     /**
      * Creates a new test case.
