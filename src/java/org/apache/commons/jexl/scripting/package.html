@@ -16,10 +16,10 @@
    limitations under the License.
 -->
  <head>
-  <title>Package Documentation for org.apache.commons.jexl.junit Package</title>
+  <title>Package Documentation for org.apache.commons.jexl.scripting Package</title>
  </head>
  <body bgcolor="white">
-  Using JEXL expressions in JUnit assertions.
+  Contains the JSR-223 Scripting Engine for JEXL script.
   <br/><br/>
   <p>
    <ul>
@@ -28,26 +28,7 @@
   </p>
   <h2><a name="intro">Introduction</a></h2>
   <p>
-   This package only contains one class, Asserter, which
-   allows you to use a JEXL expression in a JUnit assertion.
-   The following example demonstrates the use of the Asserter
-   class.  An instance is created, and the internal JexlContext
-   is populated via calls to setVariable().  Calls to 
-   assertExpression() succeed if the expression evaluates to
-   the value of the second parameter, otherwise an 
-   AssertionFailedException is thrown.
+   This package contains the JSR-223 Scripting Engine for JEXL script.
   </p>
-  
-  <pre>
-   Asserter asserter = new Asserter();
-   asserter.setVariable("foo", new Foo());
-   asserter.setVariable("person", "James");
-
-   asserter.assertExpression("person", "James");
-   asserter.assertExpression("size(person)", new Integer(5));
-        
-   asserter.assertExpression("foo.getCount()", new Integer(5));
-   asserter.assertExpression("foo.count", new Integer(5));
-  </pre>
 </body>
 </html>
