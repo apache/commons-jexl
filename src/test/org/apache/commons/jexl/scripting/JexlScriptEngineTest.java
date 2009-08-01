@@ -18,10 +18,12 @@
 
 package org.apache.commons.jexl.scripting;
 
+import java.io.Reader;
 import java.util.Map;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import junit.framework.TestCase;
 
@@ -49,6 +51,25 @@ public class JexlScriptEngineTest extends TestCase {
         assertEquals(newValue,engine.eval("old=value;value=value+1"));
         assertEquals(initialValue,engine.get("old"));
         assertEquals(newValue,engine.get("value"));
+    }
+    
+    public void testNulls() throws Exception {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        assertNotNull("Manager should not be null", manager);
+        ScriptEngine engine = manager.getEngineByName("jexl");
+        assertNotNull("Engine should not be null (name)", engine);
+        try {
+            engine.eval((String)null);
+            fail("Should have caused NPE");
+        } catch (NullPointerException e) {
+            // NOOP
+        }
+        try {
+            engine.eval((Reader)null);
+            fail("Should have caused NPE");
+        } catch (NullPointerException e) {
+            // NOOP
+        }
     }
 
     public void testEngineNames() throws Exception {

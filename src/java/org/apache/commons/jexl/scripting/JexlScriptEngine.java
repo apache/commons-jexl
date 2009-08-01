@@ -75,6 +75,10 @@ public class JexlScriptEngine extends AbstractScriptEngine {
 
     /** {@inheritDoc} */
     public Object eval(Reader script, ScriptContext context) throws ScriptException {
+        // This is mandated by JSR-223 (see SCR.5.5.2   Methods)
+        if (script == null || context == null) {
+            throw new NullPointerException("script and context must be non-null");
+        }
         BufferedReader reader = new BufferedReader(script);
         StringBuilder buffer = new StringBuilder();
         try {
@@ -98,8 +102,9 @@ public class JexlScriptEngine extends AbstractScriptEngine {
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public Object eval(String scriptText, final ScriptContext context) throws ScriptException {
-        if (scriptText == null) {
-            return null;
+        // This is mandated by JSR-223 (see SCR.5.5.2   Methods)
+        if (scriptText == null || context == null) {
+            throw new NullPointerException("script and context must be non-null");
         }
         // This is mandated by JSR-223 (end of section SCR.4.3.4.1.2 - Script Execution)
         context.setAttribute("context", context, ScriptContext.ENGINE_SCOPE);
