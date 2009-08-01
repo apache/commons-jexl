@@ -279,6 +279,7 @@ public class Interpreter implements ParserVisitor {
         JexlNode propertyNode = null;
         Object property = null;
         boolean isVariable = true;
+        int v = 0;
         StringBuilder variableName = null;
         // 1: follow children till penultimate
         int last = left.jjtGetNumChildren() - 1;
@@ -293,9 +294,11 @@ public class Interpreter implements ParserVisitor {
             // if we get null back as a result, check for an ant variable
             if (isVariable) {
                 String name = ((ASTIdentifier) objectNode).image;
-                if (c == 0) {
+                if (v == 0) {
                     variableName = new StringBuilder(name);
-                } else {
+                    v = 1;
+                }
+                for(; v <= c; ++v) {
                     variableName.append('.');
                     variableName.append(name);
                 }
@@ -958,6 +961,7 @@ public class Interpreter implements ParserVisitor {
         StringBuilder variableName = null;
         Map<String, ?> vars = context.getVars();
         boolean isVariable = true;
+        int v = 0;
         for (int i = 0; i < numChildren; i++) {
             JexlNode theNode = node.jjtGetChild(i);
             isVariable &= (theNode instanceof ASTIdentifier);
@@ -965,9 +969,11 @@ public class Interpreter implements ParserVisitor {
             // if we get null back a result, check for an ant variable
             if (result == null && isVariable) {
                 String name = ((ASTIdentifier) theNode).image;
-                if (i == 0) {
+                if (v == 0) {
                     variableName = new StringBuilder(name);
-                } else {
+                    v = 1;
+                }
+                for(; v <= i; ++v) {
                     variableName.append('.');
                     variableName.append(name);
                 }
