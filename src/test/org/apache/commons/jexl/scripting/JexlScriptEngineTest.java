@@ -81,6 +81,18 @@ public class JexlScriptEngineTest extends TestCase {
         assertEquals(Long.valueOf(8),engine.get("both"));
         assertEquals(Integer.valueOf(42),engine.get("newvar"));
         assertNull(manager.get("newvar"));
-        // TODO how to delete variables in Jexl?
+    }
+
+    public void testDottedNames() throws Exception {
+        ScriptEngine engine;
+        ScriptEngineManager manager = new ScriptEngineManager();
+        assertNotNull("Manager should not be null", manager);
+        engine = manager.getEngineByName("JEXL");
+        assertNotNull("Engine should not be null (JEXL)", engine);
+        engine.eval("this.is.a.test=null");
+        assertNull(engine.get("this.is.a.test"));
+        assertEquals(Boolean.TRUE, engine.eval("empty(this.is.a.test)"));
+        final Object mymap = engine.eval("testmap=[ 'key1' => 'value1', 'key2' => 'value2' ]");
+        assertEquals("{key1=value1, key2=value2}",mymap.toString());
     }
 }
