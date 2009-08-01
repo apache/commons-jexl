@@ -23,8 +23,6 @@ import java.util.Map;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
 import junit.framework.TestCase;
 
 public class JexlScriptEngineTest extends TestCase {
@@ -116,7 +114,7 @@ public class JexlScriptEngineTest extends TestCase {
         assertNull(engine.get("this.is.a.test"));
         assertEquals(Boolean.TRUE, engine.eval("empty(this.is.a.test)"));
         final Object mymap = engine.eval("testmap=[ 'key1' => 'value1', 'key2' => 'value2' ]");
-        assertTrue(mymap instanceof Map);
-        assertEquals(2,((Map)mymap).size());
+        assertTrue(mymap instanceof Map<?, ?>);
+        assertEquals(2,((Map<?, ?>)mymap).size());
     }
 }
