@@ -18,6 +18,8 @@
 
 package org.apache.commons.jexl.scripting;
 
+import java.util.Map;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
@@ -93,6 +95,7 @@ public class JexlScriptEngineTest extends TestCase {
         assertNull(engine.get("this.is.a.test"));
         assertEquals(Boolean.TRUE, engine.eval("empty(this.is.a.test)"));
         final Object mymap = engine.eval("testmap=[ 'key1' => 'value1', 'key2' => 'value2' ]");
-        assertEquals("{key1=value1, key2=value2}",mymap.toString());
+        assertTrue(mymap instanceof Map);
+        assertEquals(2,((Map)mymap).size());
     }
 }
