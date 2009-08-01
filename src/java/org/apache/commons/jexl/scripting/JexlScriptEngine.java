@@ -141,6 +141,13 @@ public class JexlScriptEngine extends AbstractScriptEngine {
             context = _context;
         }
 
+        /*
+         * TODO how to handle clear, containsKey() etc.?
+         * Should they be restricted to engine scope, or should they apply to the
+         * union of the two scopes?
+         * Are they actually used by Jexl? 
+         */
+
         public void clear() {
             Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
             bnd.clear();
@@ -161,9 +168,12 @@ public class JexlScriptEngine extends AbstractScriptEngine {
             return bnd.entrySet();
         }
 
+        // Fetch first match of key, either engine or global
         public Object get(final Object key) {
-            Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.get(key);
+            if (key instanceof String) {
+                return context.getAttribute((String) key);
+            }
+            return null;
         }
 
         public boolean isEmpty() {
@@ -176,9 +186,14 @@ public class JexlScriptEngine extends AbstractScriptEngine {
             return bnd.keySet();
         }
 
+        // Update existing key if found, else create new engine key
+        // TODO - how do we create global keys?
         public Object put(final String key, final Object value) {
-            Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.put(key, value);
+            int scope = context.getAttributesScope(key);
+            if (scope == -1) { // not found, default to engine
+                scope = ScriptContext.ENGINE_SCOPE;
+            }
+            return context.getBindings(scope).put(key , value);
         }
 
         public void putAll(Map t) {
@@ -186,9 +201,15 @@ public class JexlScriptEngine extends AbstractScriptEngine {
             bnd.putAll(t); // N.B. SimpleBindings checks for valid keys
         }
 
+        // N.B. if there is more than one copy of the key, only the nearest will be removed.
         public Object remove(Object key) {
-            Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.remove(key);
+            if (key instanceof String){
+                int scope = context.getAttributesScope((String) key);
+                if (scope != -1) { // found an entry
+                    return context.removeAttribute((String)key, scope);
+                }
+            }
+            return null;
         }
 
         public int size() {
