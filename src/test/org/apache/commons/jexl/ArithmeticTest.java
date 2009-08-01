@@ -22,9 +22,8 @@ import java.math.BigInteger;
 
 import org.apache.commons.jexl.junit.Asserter;
 
-import junit.framework.TestCase;
 
-public class ArithmeticTest extends TestCase {
+public class ArithmeticTest extends JexlTestCase {
     private Asserter asserter;
 
     public void setUp() {
@@ -187,5 +186,4 @@ public class ArithmeticTest extends TestCase {
                         zeval == PERMS);
         }
     }
-
 }

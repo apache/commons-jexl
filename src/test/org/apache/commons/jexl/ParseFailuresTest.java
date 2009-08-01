@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.jexl.parser.ParseException;
 
 /**
@@ -27,7 +25,7 @@ import org.apache.commons.jexl.parser.ParseException;
  *
  * @since 1.1
  */
-public class ParseFailuresTest extends TestCase {
+public class ParseFailuresTest extends JexlTestCase {
 
     /**
      * Create the test.

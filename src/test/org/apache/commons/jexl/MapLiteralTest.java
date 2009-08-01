@@ -20,15 +20,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 /**
  * Tests for map literals
  *
  * @author Peter Royal
  * @since 1.2
  */
-public class MapLiteralTest extends TestCase {
+public class MapLiteralTest extends JexlTestCase {
 
     public void testLiteralWithStrings() throws Exception {
         Expression e = ExpressionFactory.createExpression( "[ 'foo' => 'bar' ]" );

@@ -22,14 +22,13 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import junit.framework.TestCase;
 
 /**
  * Tests for the foreach statement
  * @author Dion Gillard
  * @since 1.1
  */
-public class ForEachTest extends TestCase {
+public class ForEachTest extends JexlTestCase {
 
     /** create a named test */
     public ForEachTest(String name) {
@@ -123,7 +122,4 @@ public class ForEachTest extends TestCase {
         assertEquals("Result is not last evaluated expression", "brie", o);
     }
 
-    public static void main(String[] args) throws Exception {
-        new ForEachTest("").testForEachWithEmptyStatement();
-    }
 }

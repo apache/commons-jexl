@@ -17,14 +17,13 @@
 
 package org.apache.commons.jexl;
 
-import junit.framework.TestCase;
 
 /**
  * Tests for the bitwise operators.
  * @author Dion Gillard
  * @since 1.1
  */
-public class BitwiseOperatorTest extends TestCase {
+public class BitwiseOperatorTest extends JexlTestCase {
 
     /**
      * Create the named test.

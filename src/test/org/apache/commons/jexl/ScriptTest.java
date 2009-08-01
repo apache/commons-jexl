@@ -19,13 +19,11 @@ package org.apache.commons.jexl;
 import java.io.File;
 import java.net.URL;
 
-import junit.framework.TestCase;
-
 /**
  * Tests for Script
  * @since 1.1
  */
-public class ScriptTest extends TestCase {
+public class ScriptTest extends JexlTestCase {
     static final String TEST1 =  "src/test-scripts/test1.jexl";
 
     // test class for testScriptUpdatesContext

@@ -75,15 +75,15 @@ public class MethodKeyTest extends TestCase {
     };
     
     /** from key to string */
-    static java.util.Map<ClassMap.MethodKey, String> byKey;
+    static java.util.Map< MethodKey, String> byKey;
     /** form string to key */
-    static java.util.Map<String, ClassMap.MethodKey> byString;
+    static java.util.Map<String,MethodKey> byString;
     /** the list of keys we generated & test against */
-    static ClassMap.MethodKey[] keyList;
+    static MethodKey[] keyList;
     
     /** Creates & inserts a key into the byKey & byString map */
     static void setUpKey(String name, Class[] parms) {
-        ClassMap.MethodKey key = new ClassMap.MethodKey(name, parms);
+        MethodKey key = new MethodKey(name, parms);
         String str = key.toString();
         byKey.put(key, str);
         byString.put(str, key);
@@ -92,8 +92,8 @@ public class MethodKeyTest extends TestCase {
 
     /** Generate a list of method*(prims*), method(prims*, prims*), method*(prims*,prims*,prims*) */
     static {
-        byKey = new java.util.HashMap<ClassMap.MethodKey, String>();
-        byString = new java.util.HashMap<String, ClassMap.MethodKey>();
+        byKey = new java.util.HashMap< MethodKey, String>();
+        byString = new java.util.HashMap<String,MethodKey>();
         for (int m = 0; m < METHODS.length; ++m) {
             String method = METHODS[m];
             for (int p0 = 0; p0 < PRIMS.length; ++p0) {
@@ -109,7 +109,7 @@ public class MethodKeyTest extends TestCase {
                 }
             }
         }
-        keyList = byKey.keySet().toArray(new ClassMap.MethodKey[byKey.size()]);
+        keyList = byKey.keySet().toArray(new MethodKey[byKey.size()]);
     }
 
     /** Builds a string key */
@@ -124,26 +124,26 @@ public class MethodKeyTest extends TestCase {
     /** Checks that a string key does exist */
     void checkStringKey(String method, Class... params) {
         String key = makeStringKey(method, params);
-        ClassMap.MethodKey out = byString.get(key);
+        MethodKey out = byString.get(key);
         assertTrue(out != null);
     }
         
     /** Builds a method key */
-    ClassMap.MethodKey makeKey(String method, Class... params) {
-        return new ClassMap.MethodKey(method, params);
+    MethodKey makeKey(String method, Class... params) {
+        return new MethodKey(method, params);
     }
     
     /** Checks that a method key exists */
     void checkKey(String method, Class... params) {
-        ClassMap.MethodKey key = makeKey(method, params);
+        MethodKey key = makeKey(method, params);
         String out = byKey.get(key);
         assertTrue(out != null);
     }
     
     public void testObjectKey() throws Exception {
         for(int k = 0; k < keyList.length; ++k) {
-            ClassMap.MethodKey ctl = keyList[k];
-            ClassMap.MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
+            MethodKey ctl = keyList[k];
+            MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
             String out = byKey.get(key);
             assertTrue(out != null);
             assertTrue(ctl.toString() + " != " + out, ctl.toString().equals(out));
@@ -153,9 +153,9 @@ public class MethodKeyTest extends TestCase {
     
     public void testStringKey() throws Exception {
         for(int k = 0; k < keyList.length; ++k) {
-            ClassMap.MethodKey ctl = keyList[k];
+            MethodKey ctl = keyList[k];
             String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
-            ClassMap.MethodKey out = byString.get(key);
+            MethodKey out = byString.get(key);
             assertTrue(out != null);
             assertTrue(ctl.toString() + " != " + key, ctl.equals(out));
         }
@@ -167,8 +167,8 @@ public class MethodKeyTest extends TestCase {
     public void testPerfKey() throws Exception {
         for(int l = 0; l < LOOP; ++l)
         for(int k = 0; k < keyList.length; ++k) {
-            ClassMap.MethodKey ctl = keyList[k];
-            ClassMap.MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
+            MethodKey ctl = keyList[k];
+            MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
             String out = byKey.get(key);
             assertTrue(out != null);
         }
@@ -177,9 +177,9 @@ public class MethodKeyTest extends TestCase {
     public void testPerfString() throws Exception {
         for(int l = 0; l < LOOP; ++l)
         for(int k = 0; k < keyList.length; ++k) {
-            ClassMap.MethodKey ctl = keyList[k];
+            MethodKey ctl = keyList[k];
             String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
-            ClassMap.MethodKey out = byString.get(key);
+            MethodKey out = byString.get(key);
             assertTrue(out != null);
         }
     }

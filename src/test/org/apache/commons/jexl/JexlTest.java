@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.commons.jexl.parser.ParseException;
@@ -44,7 +43,7 @@ import org.apache.commons.jexl.parser.Parser;
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public class JexlTest extends TestCase
+public class JexlTest extends JexlTestCase
 {
     protected static final String METHOD_STRING = "Method string";
     protected static final String GET_METHOD_STRING = "GetMethod string";
@@ -259,6 +258,26 @@ public class JexlTest extends TestCase
         assertExpression(jc, "foo.getSize()", new Integer(22));
         // failing assertion for size property
         //assertExpression(jc, "foo.size", new Integer(22));
+    }
+
+    /**
+      *  test the new function e.g constructor invocation
+      */
+    public void testNew() throws Exception {
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("double", Double.class);
+        jc.getVars().put("foo", "org.apache.commons.jexl.Foo");
+        Expression expr;
+        Object value;
+        expr = ExpressionFactory.createExpression("new(double, 1)");
+        value = expr.evaluate(jc);
+        assertEquals(expr.toString(), new Double(1.0), value);
+        expr = ExpressionFactory.createExpression("new('java.lang.Float', 100)");
+        value = expr.evaluate(jc);
+        assertEquals(expr.toString(), new Float(100.0), value);
+        expr = ExpressionFactory.createExpression("new(foo).quux");
+        value = expr.evaluate(jc);
+        assertEquals(expr.toString(), "Repeat : quux", value);
     }
 
     /**
@@ -694,7 +713,7 @@ public class JexlTest extends TestCase
         Foo foo = new Foo();
         jc.getVars().put("foo", foo);
         Parser parser = new Parser(new StringReader(";"));
-        parser.parse(new StringReader("aString = 'World';"));
+        parser.parse(new StringReader("aString = 'World';"), null);
         
         assertExpression(jc, "hello = 'world'", "world");
         assertEquals("hello variable not changed", "world", jc.getVars().get("hello"));
@@ -726,6 +745,72 @@ public class JexlTest extends TestCase
         assertExpression(JexlHelper.createContext(), "myvar == 'Użytkownik'", Boolean.FALSE);
     }
 
+    public static final class Duck {
+        int user = 10;
+        public Integer get(String val) {
+            if ("zero".equals(val))
+                return 0;
+            if ("one".equals(val))
+                return 1;
+            if ("user".equals(val))
+                return user;
+            return -1;
+        }
+        public void put(String val, Object value) {
+            if ("user".equals(val)) {
+                if ("zero".equals(value))
+                    user = 0;
+                else if ("one".equals(value))
+                    user = 1;
+                else
+                    user = value instanceof Integer? (Integer) value : -1;
+            }
+        }
+    }
+
+    public void testDuck() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("duck", new Duck());
+        Expression expr;
+        Object result;
+        expr = jexl.createExpression("duck.zero");
+        result = expr.evaluate(jc);
+        assertEquals(expr.toString(), 0, result);
+        expr = jexl.createExpression("duck.one");
+        result = expr.evaluate(jc);
+        assertEquals(expr.toString(), 1, result);
+        expr = jexl.createExpression("duck.user = 20");
+        result = expr.evaluate(jc);
+        assertEquals(expr.toString(), 20, result);
+        expr = jexl.createExpression("duck.user");
+        result = expr.evaluate(jc);
+        assertEquals(expr.toString(), 20, result);
+        expr = jexl.createExpression("duck.user = 'zero'");
+        result = expr.evaluate(jc);
+        expr = jexl.createExpression("duck.user");
+        result = expr.evaluate(jc);
+        assertEquals(expr.toString(), 0, result);
+    }
+
+    public void testArray() throws Exception {
+        int[] array = { 100, 101 , 102 };
+        JexlEngine jexl = new JexlEngine();
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("array", array);
+        Expression expr;
+        Object result;
+        expr = jexl.createExpression("array.1");
+        result = expr.evaluate(jc);
+        assertEquals(expr.toString(), 101, result);
+        expr = jexl.createExpression("array[1] = 1010");
+        result = expr.evaluate(jc);
+        assertEquals(expr.toString(), 1010, result);
+        expr = jexl.createExpression("array.0");
+        result = expr.evaluate(jc);
+        assertEquals(expr.toString(), 100, result);
+    }
+
     /**
      * Asserts that the given expression returns the given value when applied to the
      * given context
@@ -737,16 +822,8 @@ public class JexlTest extends TestCase
         assertEquals(expression, expected, actual);
     }
 
-
-    /**
-     *  Helps in debugging the testcases when working with it
-     *
-     */
-    public static void main(String[] args)
-        throws Exception
-    {
-        JexlTest jt = new JexlTest("foo");
-        jt.testEmpty();
+    public static void main(String[] args) throws Exception {
+        new JexlTest("debug").runTest("testNew");
     }
 
 }

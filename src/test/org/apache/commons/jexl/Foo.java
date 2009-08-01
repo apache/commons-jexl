@@ -30,6 +30,7 @@ public class Foo {
     
     private boolean beenModified = false;
     private String property1 = "some value";
+    public Foo() {}
     
     public String bar()
     {

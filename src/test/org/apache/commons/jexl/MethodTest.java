@@ -18,14 +18,12 @@ package org.apache.commons.jexl;
 
 import org.apache.commons.jexl.junit.Asserter;
 
-import junit.framework.TestCase;
-
 /**
  * Tests for calling methods on objects
  * 
  * @since 2.0
  */
-public class MethodTest extends TestCase {
+public class MethodTest extends JexlTestCase {
 
     private Asserter asserter;
 
@@ -157,7 +155,7 @@ public class MethodTest extends TestCase {
     }
 
     public static void main(String[] args) throws Exception {
-        new MethodTest().testTopLevelCall();
+        new MethodTest().runTest("testNamespaceCall");
     }
 
 }

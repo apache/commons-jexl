@@ -46,7 +46,7 @@ public class ParserTest extends TestCase
      {
          Parser parser = new Parser(new StringReader(";"));
 
-         SimpleNode sn = parser.parse(new StringReader("foo = 1;"));
+         SimpleNode sn = parser.parse(new StringReader("foo = 1;"), null);
          assertNotNull("parsed node is null", sn);
      }
 
@@ -55,10 +55,10 @@ public class ParserTest extends TestCase
     {
         Parser parser = new Parser(new StringReader(";"));
 
-        SimpleNode sn = parser.parse(new StringReader("foo = \"bar\";"));
+        SimpleNode sn = parser.parse(new StringReader("foo = \"bar\";"), null);
         assertNotNull("parsed node is null", sn);
 
-        sn = parser.parse(new StringReader("foo = 'bar';"));
+        sn = parser.parse(new StringReader("foo = 'bar';"), null);
         assertNotNull("parsed node is null", sn);
     }
 
