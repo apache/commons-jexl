@@ -17,12 +17,9 @@
 
 package org.apache.commons.jexl.util;
 
-
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.lang.reflect.Array;
-
 
 /**
  *  <p>
@@ -44,41 +41,29 @@ import java.lang.reflect.Array;
  * @version $Id$
  */
 public class ArrayIterator implements Iterator<Object> {
-    /**
-     * The objects to iterate over.
-     */
+    /** The objects to iterate over. */
     private final Object array;
-
-    /**
-     * The current position and size in the array.
-     */
+    /** The size of the array. */
+    private final int size;
+    /** The current position and size in the array. */
     private int pos;
 
     /**
-     * The size of the array.
-     */
-    private final int size;
-
-    /**
      * Creates a new iterator instance for the specified array.
-     *
      * @param arr The array for which an iterator is desired.
      */
     public ArrayIterator(Object arr) {
-        /*
-         * if this isn't an array, then throw.  Note that this is 
-         * for internal use - so this should never happen - if it does
-         *  we screwed up.
-         */
-         
-        if (!arr.getClass().isArray()) {
-            throw new IllegalArgumentException("Programmer error :"
-                      + " internal ArrayIterator invoked w/o array");
+        if (arr == null) {
+            array = null;
+            pos = 0;
+            size = 0;
+        } else if (!arr.getClass().isArray()) {
+            throw new IllegalArgumentException(arr.getClass() + " is not an array");
+        } else {
+            array = arr;
+            pos = 0;
+            size = Array.getLength(array);
         }
-            
-        array = arr;
-        pos = 0;
-        size = Array.getLength(array);
     }
 
     /**
@@ -89,12 +74,8 @@ public class ArrayIterator implements Iterator<Object> {
     public Object next() {
         if (pos < size) {
             return Array.get(array, pos++);
-        }
-                
-        /*
-         *  we screwed up...
-         */
-         
+        }    
+        // we screwed up...
         throw new NoSuchElementException("No more elements: " + pos
                                          + " / " + size);
     }

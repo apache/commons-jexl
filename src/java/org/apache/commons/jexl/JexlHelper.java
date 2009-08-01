@@ -31,11 +31,11 @@ import org.apache.commons.jexl.context.HashMapContext;
  */
 public class JexlHelper {
     /** singleton instance. */
-    protected static JexlHelper helper = new JexlHelper();
+    protected static final JexlHelper HELPER = new JexlHelper();
 
     /** @return the single instance. */
     protected static JexlHelper getInstance() {
-        return helper;
+        return HELPER;
     }
 
     /**

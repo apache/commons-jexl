@@ -31,13 +31,14 @@ public class ArrayListWrapper extends AbstractList<Object> {
 
     /**
      * Create the wrapper.
-     * @param array {@link #array}
+     * @param anArray {@link #array}
      */
-    // CSOFF: HiddenField
-    public ArrayListWrapper(Object array) {
-        this.array = array;
+    public ArrayListWrapper(Object anArray) {
+        if (!anArray.getClass().isArray()) {
+            throw new IllegalArgumentException(anArray.getClass() + " is not an array");
+        }
+        this.array = anArray;
     }
-    // CSON: HiddenField
 
     /** {@inheritDoc} */
     @Override

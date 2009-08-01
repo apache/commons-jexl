@@ -35,7 +35,7 @@ public interface JexlContext {
      * @param vars Contents of vars will be replaced with the content 
      *      of this Map
      */
-    void setVars(Map vars);
+    void setVars(Map<String,Object> vars);
     
     /**
      * Retrives the Map of variables associated with this JexlContext.  The
@@ -44,5 +44,5 @@ public interface JexlContext {
      * 
      * @return A reference to the variable Map associated with this JexlContext.
      */
-    Map getVars();
+    Map<String,Object> getVars();
 }

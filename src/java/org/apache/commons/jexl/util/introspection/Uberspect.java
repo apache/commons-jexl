@@ -18,6 +18,7 @@
 package org.apache.commons.jexl.util.introspection;
 
 import java.util.Iterator;
+import java.lang.reflect.Constructor;
 
 /**
  * 'Federated' introspection/reflection interface to allow the introspection
@@ -28,11 +29,6 @@ import java.util.Iterator;
  * @version $Id$
  */
 public interface Uberspect {
-    /**
-     * Initializer - will be called before use.
-     */
-    void init();
-
     /** Gets underlying introspector.
      * @return the introspector
      */
@@ -44,8 +40,16 @@ public interface Uberspect {
      * @param obj to get the iterator for.
      * @return an iterator over obj.
      */
-    Iterator<?> getIterator(Object obj, Info info);
+    Iterator<?> getIterator(Object obj, DebugInfo info);
 
+    /**
+     * Returns a class constructor.
+     * @param ctorHandle a class or class name
+     * @param args constructor arguments
+     * @param info template info
+     * @return a {@link Constructor}.
+     */
+    Constructor<?> getConstructor(Object ctorHandle, Object[] args, DebugInfo info);
     /**
      * Returns a general method, corresponding to $foo.bar( $woogie ).
      * @param obj the object
@@ -54,7 +58,7 @@ public interface Uberspect {
      * @param info template info
      * @return a {@link VelMethod}.
      */
-    VelMethod getMethod(Object obj, String method, Object[] args, Info info);
+    VelMethod getMethod(Object obj, String method, Object[] args, DebugInfo info);
 
     /**
      * Property getter - returns VelPropertyGet appropos for #set($foo =
@@ -64,7 +68,7 @@ public interface Uberspect {
      * @param info template info
      * @return a {@link VelPropertyGet}.
      */
-    VelPropertyGet getPropertyGet(Object obj, String identifier, Info info);
+    VelPropertyGet getPropertyGet(Object obj, Object identifier, DebugInfo info);
 
     /**
      * Property setter - returns VelPropertySet appropos for #set($foo.bar =
@@ -75,5 +79,5 @@ public interface Uberspect {
      * @param info template info
      * @return a {@link VelPropertySet}.
      */
-    VelPropertySet getPropertySet(Object obj, String identifier, Object arg, Info info);
+    VelPropertySet getPropertySet(Object obj, Object identifier, Object arg, DebugInfo info);
 }

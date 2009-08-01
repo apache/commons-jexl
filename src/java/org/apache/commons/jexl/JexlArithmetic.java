@@ -23,27 +23,39 @@ import java.math.BigInteger;
  * Perform arithmetic.
  * @since 2.0
  */
-class JexlArithmetic implements Arithmetic {
-    /** Whether this Arithmetic instance behaves in strict or lenient mode. */
+public class JexlArithmetic {
+    /** Integer.MAX_VALUE as BigDecimal. */
+    private static final BigDecimal BIGD_DOUBLE_MAX_VALUE = BigDecimal.valueOf(Double.MAX_VALUE);
+    /** Integer.MIN_VALUE as BigDecimal. */
+    private static final BigDecimal BIGD_DOUBLE_MIN_VALUE = BigDecimal.valueOf(-Double.MAX_VALUE);
+    /** Long.MAX_VALUE as BigInteger. */
+    private static final BigInteger BIGI_LONG_MAX_VALUE = BigInteger.valueOf(Long.MAX_VALUE);
+    /** Long.MIN_VALUE as BigInteger. */
+    private static final BigInteger BIGI_LONG_MIN_VALUE = BigInteger.valueOf(Long.MIN_VALUE);
+    /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
     protected boolean strict;
 
     /**
      * Creates a JexlArithmetic.
      * @param lenient whether this arithmetic is lenient or strict
      */
-    JexlArithmetic(boolean lenient) {
+    public JexlArithmetic(boolean lenient) {
         this.strict = !lenient;
     }
 
     /**
-     * {@inheritDoc}
+     * Sets whether this JexlArithmetic instance triggers errors during evaluation when
+     * null is used as an operand.
+     * @param lenient true means no JexlException will occur, false allows them
      */
     public void setLenient(boolean lenient) {
         this.strict = !lenient;
     }
 
     /**
-     * {@inheritDoc}
+     * Checks whether this JexlArithmetic instance triggers errors during evaluation
+     * when null is used as an operand.
+     * @return true if lenient, false if strict
      */
     public boolean isLenient() {
         return !this.strict;
@@ -89,7 +101,7 @@ class JexlArithmetic implements Arithmetic {
             if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
                 double l = toDouble(left);
                 double r = toDouble(right);
-                return new Double(l + r);
+                return l + r;
             }
         
             // if both are bigintegers use that type
@@ -110,9 +122,9 @@ class JexlArithmetic implements Arithmetic {
             BigInteger l = toBigInteger(left);
             BigInteger r = toBigInteger(right);
             BigInteger result = l.add(r);
-            BigInteger maxLong = BigInteger.valueOf(Long.MAX_VALUE); 
-            if (result.compareTo(maxLong) <= 0) {
-                return new Long(result.longValue());
+            if (result.compareTo(BIGI_LONG_MAX_VALUE) <= 0
+                && result.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
+                return result.longValue();
             }
             return result;
         } catch (java.lang.NumberFormatException nfe) {
@@ -204,9 +216,9 @@ class JexlArithmetic implements Arithmetic {
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
         BigInteger result = l.mod(r);
-        BigInteger maxLong = BigInteger.valueOf(Long.MAX_VALUE); 
-        if (result.compareTo(maxLong) <= 0) {
-            return new Long(result.longValue());
+        if (result.compareTo(BIGI_LONG_MAX_VALUE) <= 0
+            && result.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
+            return result.longValue();
         }
         return result;
     }
@@ -233,7 +245,7 @@ class JexlArithmetic implements Arithmetic {
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             double l = toDouble(left);
             double r = toDouble(right);
-            return new Double(l * r);
+            return l * r;
         }
         
         // if both are bigintegers use that type
@@ -254,9 +266,9 @@ class JexlArithmetic implements Arithmetic {
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
         BigInteger result = l.multiply(r);
-        BigInteger maxLong = BigInteger.valueOf(Long.MAX_VALUE); 
-        if (result.compareTo(maxLong) <= 0) {
-            return new Long(result.longValue());
+        if (result.compareTo(BIGI_LONG_MAX_VALUE) <= 0
+            && result.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
+            return result.longValue();
         }
         return result;
     }
@@ -283,7 +295,7 @@ class JexlArithmetic implements Arithmetic {
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             double l = toDouble(left);
             double r = toDouble(right);
-            return new Double(l - r);
+            return l - r;
         }
         
         // if both are bigintegers use that type
@@ -304,9 +316,9 @@ class JexlArithmetic implements Arithmetic {
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
         BigInteger result = l.subtract(r);
-        BigInteger maxLong = BigInteger.valueOf(Long.MAX_VALUE); 
-        if (result.compareTo(maxLong) <= 0) {
-            return new Long(result.longValue());
+        if (result.compareTo(BIGI_LONG_MAX_VALUE) <= 0
+            && result.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
+            return result.longValue();
         }
         return result;
     }
@@ -677,21 +689,21 @@ class JexlArithmetic implements Arithmetic {
         if (original instanceof BigDecimal) {
             BigDecimal bigd = (BigDecimal) original;
             // if it's bigger than a double it can't be narrowed
-            if (bigd.compareTo(new BigDecimal(Double.MAX_VALUE)) > 0) {
+            if (bigd.compareTo(BIGD_DOUBLE_MAX_VALUE) > 0) {
                 return original;
             }
         }
         if (original instanceof Double || original instanceof Float || original instanceof BigDecimal) {
             double value = original.doubleValue();
             if (value <= Float.MAX_VALUE && value >= Float.MIN_VALUE) {
-                result = new Float(result.floatValue());
+                result = Float.valueOf(result.floatValue());
             }
             // else it fits in a double only
         } else {
             if (original instanceof BigInteger) {
                 BigInteger bigi = (BigInteger) original;
                 // if it's bigger than a Long it can't be narrowed
-                if (bigi.compareTo(new BigInteger(String.valueOf(Long.MAX_VALUE))) > 0) {
+                if (bigi.compareTo(BIGI_LONG_MAX_VALUE) > 0) {
                     return original;
                 }
             }
@@ -702,7 +714,7 @@ class JexlArithmetic implements Arithmetic {
             } else if (value <= Short.MAX_VALUE && value >= Short.MIN_VALUE) {
                 result = Short.valueOf((short) value);
             } else if (value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE) {
-                result = new Integer((int) value);
+                result = Integer.valueOf((int) value);
             }
             // else it fits in a long
         }

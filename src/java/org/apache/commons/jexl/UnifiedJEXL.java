@@ -19,9 +19,10 @@ package org.apache.commons.jexl;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
-import org.apache.commons.jexl.parser.SimpleNode;
+import org.apache.commons.jexl.parser.JexlNode;
 import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.StringParser;
+import org.apache.commons.jexl.util.introspection.Info;
 
 /**
  * An evaluator similar to the unified EL evaluator used in JSP/JSF based on JEXL.
@@ -213,7 +214,7 @@ public final class UnifiedJEXL {
     /**
      * The sole type of (runtime) exception the UnifiedJEXL can throw.
      */
-    public class Exception extends RuntimeException {
+    public static class Exception extends RuntimeException {
         /**
          * Creates a UnifiedJEXL.Exception.
          * @param msg the exception message
@@ -228,7 +229,7 @@ public final class UnifiedJEXL {
      * The abstract base class for all expressions, immediate '${...}' and deferred '#{...}'.
      */
     public abstract class Expression {
-        /** The source of this expression (see {@link Expression#prepare}) */
+        /** The source of this expression (see {@link Expression#prepare}). */
         protected final Expression source;
         /**
          * Creates an expression.
@@ -238,6 +239,11 @@ public final class UnifiedJEXL {
             this.source = src != null ? src : this;
         }
 
+        /**
+         * Formats this expression, adding its source string representation in
+         * comments if available: 'expression /*= source *\/'' .
+         * @return the formatted expression string
+         */
         @Override
         public String toString() {
             StringBuilder strb = new StringBuilder();
@@ -343,7 +349,7 @@ public final class UnifiedJEXL {
          * Intreprets a sub-expression.
          * @param interpreter a JEXL interpreter
          * @return the result of interpretation
-         * @throws ParseException (only for nested & composite)
+         * @throws org.apache.commons.jexl.parser.ParseException (only for nested & composite)
          */
         abstract Object evaluate(Interpreter interpreter) throws ParseException;
     }
@@ -373,6 +379,7 @@ public final class UnifiedJEXL {
             this.value = val;
         }
 
+        /** {@inheritDoc} */
         @Override
         public String asString() {
             StringBuilder strb = new StringBuilder();
@@ -382,11 +389,13 @@ public final class UnifiedJEXL {
             return strb.toString();
         }
 
+        /** {@inheritDoc} */
         @Override
         ExpressionType getType() {
             return ExpressionType.CONSTANT;
         }
 
+        /** {@inheritDoc} */
         @Override
         void asString(StringBuilder strb) {
             String str = value.toString();
@@ -403,21 +412,25 @@ public final class UnifiedJEXL {
             }
         }
 
+        /** {@inheritDoc} */
         @Override
         public Expression prepare(JexlContext context) {
             return this;
         }
 
+        /** {@inheritDoc} */
         @Override
         Expression prepare(Interpreter interpreter) throws ParseException {
             return this;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Object evaluate(JexlContext context) {
             return value;
         }
 
+        /** {@inheritDoc} */
         @Override
         Object evaluate(Interpreter interpreter) throws ParseException {
             return value;
@@ -430,19 +443,20 @@ public final class UnifiedJEXL {
         /** The JEXL string for this expression. */
         protected final CharSequence expr;
         /** The JEXL node for this expression. */
-        protected final SimpleNode node;
+        protected final JexlNode node;
         /**
          * Creates a JEXL interpretable expression.
-         * @param expr the expression as a string
-         * @param node the expression as an AST
-         * @param source the source expression if any
+         * @param theExpr the expression as a string
+         * @param theNode the expression as an AST
+         * @param theSource the source expression if any
          */
-        protected JexlBasedExpression(CharSequence expr, SimpleNode node, Expression source) {
-            super(source);
-            this.expr = expr;
-            this.node = node;
+        protected JexlBasedExpression(CharSequence theExpr, JexlNode theNode, Expression theSource) {
+            super(theSource);
+            this.expr = theExpr;
+            this.node = theNode;
         }
 
+        /** {@inheritDoc} */
         @Override
         public String toString() {
             StringBuilder strb = new StringBuilder(expr.length() + 3);
@@ -460,6 +474,7 @@ public final class UnifiedJEXL {
             return strb.toString();
         }
 
+        /** {@inheritDoc} */
         @Override
         public void asString(StringBuilder strb) {
             strb.append(isImmediate() ? '$' : '#');
@@ -468,21 +483,25 @@ public final class UnifiedJEXL {
             strb.append("}");
         }
 
+        /** {@inheritDoc} */
         @Override
         public Expression prepare(JexlContext context) {
             return this;
         }
 
+        /** {@inheritDoc} */
         @Override
         Expression prepare(Interpreter interpreter) throws ParseException {
             return this;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Object evaluate(JexlContext context) {
             return UnifiedJEXL.this.evaluate(context, this);
         }
 
+        /** {@inheritDoc} */
         @Override
         Object evaluate(Interpreter interpreter) throws ParseException {
             return interpreter.interpret(node);
@@ -498,15 +517,17 @@ public final class UnifiedJEXL {
          * @param node the expression as an AST
          * @param source the source expression if any
          */
-        ImmediateExpression(CharSequence expr, SimpleNode node, Expression source) {
+        ImmediateExpression(CharSequence expr, JexlNode node, Expression source) {
             super(expr, node, source);
         }
 
+        /** {@inheritDoc} */
         @Override
         ExpressionType getType() {
             return ExpressionType.IMMEDIATE;
         }
 
+        /** {@inheritDoc} */
         @Override
         public boolean isImmediate() {
             return true;
@@ -521,15 +542,17 @@ public final class UnifiedJEXL {
          * @param node the expression as an AST
          * @param source the source expression if any
          */
-        DeferredExpression(CharSequence expr, SimpleNode node, Expression source) {
+        DeferredExpression(CharSequence expr, JexlNode node, Expression source) {
             super(expr, node, source);
         }
 
+        /** {@inheritDoc} */
         @Override
         ExpressionType getType() {
             return ExpressionType.DEFERRED;
         }
 
+        /** {@inheritDoc} */
         @Override
         public boolean isImmediate() {
             return false;
@@ -548,35 +571,40 @@ public final class UnifiedJEXL {
          * @param node the expression as an AST
          * @param source the source expression if any
          */
-        NestedExpression(CharSequence expr, SimpleNode node, Expression source) {
+        NestedExpression(CharSequence expr, JexlNode node, Expression source) {
             super(expr, node, source);
             if (this.source != this) {
                 throw new IllegalArgumentException("Nested expression can not have a source");
             }
         }
 
+        /** {@inheritDoc} */
         @Override
         ExpressionType getType() {
             return ExpressionType.NESTED;
         }
 
+        /** {@inheritDoc} */
         @Override
         public String toString() {
             return expr.toString();
         }
 
+        /** {@inheritDoc} */
         @Override
         public Expression prepare(JexlContext context) {
             return UnifiedJEXL.this.prepare(context, this);
         }
 
+        /** {@inheritDoc} */
         @Override
         public Expression prepare(Interpreter interpreter) throws ParseException {
             String value = interpreter.interpret(node).toString();
-            SimpleNode dnode = toNode(value);
+            JexlNode dnode = toNode(value, jexl.isDebug()? node.getInfo() : null);
             return new DeferredExpression(value, dnode, this);
         }
 
+        /** {@inheritDoc} */
         @Override
         public Object evaluate(Interpreter interpreter) throws ParseException {
             return prepare(interpreter).evaluate(interpreter);
@@ -592,7 +620,7 @@ public final class UnifiedJEXL {
         private final Expression[] exprs;
         /**
          * Creates a composite expression.
-         * @param counter counters of expression per type
+         * @param counters counters of expression per type
          * @param list the sub-expressions
          * @param src the source for this expresion if any
          */
@@ -603,17 +631,20 @@ public final class UnifiedJEXL {
                       | (counters[ExpressionType.IMMEDIATE.index] > 0 ? 1 : 0);
         }
 
+        /** {@inheritDoc} */
         @Override
         ExpressionType getType() {
             return ExpressionType.COMPOSITE;
         }
 
+        /** {@inheritDoc} */
         @Override
         public boolean isImmediate() {
             // immediate if no deferred
             return (meta & 2) == 0;
         }
 
+        /** {@inheritDoc} */
         @Override
         void asString(StringBuilder strb) {
             for (Expression e : exprs) {
@@ -621,11 +652,13 @@ public final class UnifiedJEXL {
             }
         }
 
+        /** {@inheritDoc} */
         @Override
         public Expression prepare(JexlContext context) {
             return UnifiedJEXL.this.prepare(context, this);
         }
 
+        /** {@inheritDoc} */
         @Override
         Expression prepare(Interpreter interpreter) throws ParseException {
             // if this composite is not its own source, it is already prepared
@@ -658,11 +691,13 @@ public final class UnifiedJEXL {
             return ready;
         }
 
+        /** {@inheritDoc} */
         @Override
         public Object evaluate(JexlContext context) {
             return UnifiedJEXL.this.evaluate(context, this);
         }
 
+        /** {@inheritDoc} */
         @Override
         Object evaluate(Interpreter interpreter) throws ParseException {
             final int size = exprs.length;
@@ -783,8 +818,18 @@ public final class UnifiedJEXL {
      * @param expression the expression to parse
      * @return the AST
      */
-    private SimpleNode toNode(CharSequence expression) throws ParseException {
-        return (SimpleNode) jexl.parse(expression).jjtGetChild(0);
+    private JexlNode toNode(CharSequence expression) throws ParseException {
+        return jexl.parse(expression, null).jjtGetChild(0);
+    }
+    
+    /**
+     * Use the JEXL parser to create the AST for an expression.
+     * @param expression the expression to parse
+     * @param info debug information
+     * @return the AST
+     */
+    private JexlNode toNode(CharSequence expression, Info info) throws ParseException {
+        return jexl.parse(expression, info).jjtGetChild(0);
     }
 
     /**
@@ -832,7 +877,7 @@ public final class UnifiedJEXL {
      * Parses a unified expression.
      * @param expr the string expression
      * @return the expression instance
-     * @throws Exception
+     * @throws org.apache.commons.jexl.parser.ParseException if an error occur during parsing
      */
     private Expression parseExpression(String expr) throws ParseException {
         final int size = expr.length();

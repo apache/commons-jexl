@@ -20,8 +20,6 @@ package org.apache.commons.jexl.util.introspection;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,20 +32,7 @@ import java.util.Map;
  * @version $Id$
  * @since 1.0
  */
-public class MethodMap {
-    /**
-     * whether a method is more specific than a previously compared one.
-     */
-    private static final int MORE_SPECIFIC = 0;
-    /**
-     * whether a method is less specific than a previously compared one.
-     */
-    private static final int LESS_SPECIFIC = 1;
-    /**
-     * A method doesn't match a previously compared one.
-     */
-    private static final int INCOMPARABLE = 2;
-
+final class MethodMap {
     /**
      * Keep track of all methods with the same name.
      */
@@ -118,26 +103,26 @@ public class MethodMap {
      * @param args       the actual arguments with which the method is called
      * @return the most specific applicable method, or null if no
      *         method is applicable.
-     * @throws AmbiguousException if there is more than one maximally
+     * @throws MethodKey.AmbiguousException if there is more than one maximally
      *                            specific applicable method
      */
     // CSOFF: RedundantThrows
-    public Method find(String methodName, Object[] args) throws AmbiguousException {
-        return find(new ClassMap.MethodKey(methodName, args));
+    public Method find(String methodName, Object[] args) throws MethodKey.AmbiguousException {
+        return find(new MethodKey(methodName, args));
     }
 
     /**
      * Finds a method by key.
      * @param methodKey the key
      * @return the method
-     * @throws AmbiguousException if find is ambiguous
+     * @throws MethodKey.AmbiguousException if find is ambiguous
      */
-    Method find(ClassMap.MethodKey methodKey) throws AmbiguousException {
+    Method find(MethodKey methodKey) throws MethodKey.AmbiguousException {
         List<Method> methodList = get(methodKey.getMethod());
         if (methodList == null) {
             return null;
         }
-        return getMostSpecific(methodList, methodKey.getParameters());
+        return MethodKey.METHODS.getMostSpecific(methodList, methodKey.getParameters());
     } // CSON: RedundantThrows
 
 
@@ -154,247 +139,4 @@ public class MethodMap {
     }
 
 
-    // CSOFF: RedundantThrows
-    /**
-     * Gets the most specific method that is applicable to actual argument types.
-     * @param methods a list of methods.
-     * @param classes list of argument types.
-     * @return the most specific method.
-     * @throws AmbiguousException if there is more than one.
-     */
-    private static Method getMostSpecific(List<Method> methods, Class<?>[] classes)
-            throws AmbiguousException {
-        LinkedList<Method> applicables = getApplicables(methods, classes);
-
-        if (applicables.isEmpty()) {
-            return null;
-        }
-
-        if (applicables.size() == 1) {
-            return applicables.getFirst();
-        }
-
-        /*
-         * This list will contain the maximally specific methods. Hopefully at
-         * the end of the below loop, the list will contain exactly one method,
-         * (the most specific method) otherwise we have ambiguity.
-         */
-
-        LinkedList<Method> maximals = new LinkedList<Method>();
-
-        for (Iterator<Method> applicable = applicables.iterator();
-             applicable.hasNext();) {
-            Method app = applicable.next();
-            Class<?>[] appArgs = app.getParameterTypes();
-            boolean lessSpecific = false;
-
-            for (Iterator<Method> maximal = maximals.iterator();
-                 !lessSpecific && maximal.hasNext();) {
-                Method max = maximal.next();
-
-                // CSOFF: MissingSwitchDefault
-                switch (moreSpecific(appArgs, max.getParameterTypes())) {
-                    case MORE_SPECIFIC:
-                        /*
-                         * This method is more specific than the previously
-                         * known maximally specific, so remove the old maximum.
-                         */
-                        maximal.remove();
-                        break;
-
-                    case LESS_SPECIFIC:
-                        /*
-                         * This method is less specific than some of the
-                         * currently known maximally specific methods, so we
-                         * won't add it into the set of maximally specific
-                         * methods
-                         */
-
-                        lessSpecific = true;
-                        break;
-                }
-            } // CSON: MissingSwitchDefault
-
-            if (!lessSpecific) {
-                maximals.addLast(app);
-            }
-        }
-
-        if (maximals.size() > 1) {
-            // We have more than one maximally specific method
-            throw new AmbiguousException();
-        }
-
-        return maximals.getFirst();
-    } // CSON: RedundantThrows
-
-
-    /**
-     * Determines which method signature (represented by a class array) is more
-     * specific. This defines a partial ordering on the method signatures.
-     *
-     * @param c1 first signature to compare
-     * @param c2 second signature to compare
-     * @return MORE_SPECIFIC if c1 is more specific than c2, LESS_SPECIFIC if
-     *         c1 is less specific than c2, INCOMPARABLE if they are incomparable.
-     */
-    private static int moreSpecific(Class<?>[] c1, Class<?>[] c2) {
-        boolean c1MoreSpecific = false;
-        boolean c2MoreSpecific = false;
-
-        // compare lengths to handle comparisons where the size of the arrays
-        // doesn't match, but the methods are both applicable due to the fact
-        // that one is a varargs method
-        if (c1.length > c2.length) {
-            return MORE_SPECIFIC;
-        }
-        if (c2.length > c1.length) {
-            return LESS_SPECIFIC;
-        }
-
-        // ok, move on and compare those of equal lengths
-        for (int i = 0; i < c1.length; ++i) {
-            if (c1[i] != c2[i]) {
-                boolean last = (i == c1.length - 1);
-                c1MoreSpecific = c1MoreSpecific
-                    || isStrictConvertible(c2[i], c1[i], last);
-                c2MoreSpecific = c2MoreSpecific
-                    || isStrictConvertible(c1[i], c2[i], last);
-            }
-        }
-
-        if (c1MoreSpecific) {
-            if (c2MoreSpecific) {
-                /*
-                 *  Incomparable due to cross-assignable arguments (i.e.
-                 * foo(String, Object) vs. foo(Object, String))
-                 */
-
-                return INCOMPARABLE;
-            }
-
-            return MORE_SPECIFIC;
-        }
-
-        if (c2MoreSpecific) {
-            return LESS_SPECIFIC;
-        }
-
-        /*
-         * Incomparable due to non-related arguments (i.e.
-         * foo(Runnable) vs. foo(Serializable))
-         */
-
-        return INCOMPARABLE;
-    }
-
-    /**
-     * Returns all methods that are applicable to actual argument types.
-     *
-     * @param methods list of all candidate methods
-     * @param classes the actual types of the arguments
-     * @return a list that contains only applicable methods (number of
-     *         formal and actual arguments matches, and argument types are assignable
-     *         to formal types through a method invocation conversion).
-     */
-    private static LinkedList<Method> getApplicables(List<Method> methods, Class<?>[] classes) {
-        LinkedList<Method> list = new LinkedList<Method>();
-
-        for (Iterator<Method> imethod = methods.iterator(); imethod.hasNext();) {
-            Method method = imethod.next();
-            if (isApplicable(method, classes)) {
-                list.add(method);
-            }
-
-        }
-        return list;
-    }
-
-    /**
-     * Returns true if the supplied method is applicable to actual
-     * argument types.
-     *
-     * @param method  method that will be called
-     * @param classes arguments to method
-     * @return true if method is applicable to arguments
-     */
-    private static boolean isApplicable(Method method, Class<?>[] classes) {
-        Class<?>[] methodArgs = method.getParameterTypes();
-
-        if (methodArgs.length > classes.length) {
-            // if there's just one more methodArg than class arg
-            // and the last methodArg is an array, then treat it as a vararg
-            return methodArgs.length == classes.length + 1
-                && methodArgs[methodArgs.length - 1].isArray();
-        } else if (methodArgs.length == classes.length) {
-            // this will properly match when the last methodArg
-            // is an array/varargs and the last class is the type of array
-            // (e.g. String when the method is expecting String...)
-            for (int i = 0; i < classes.length; ++i) {
-                if (!isConvertible(methodArgs[i], classes[i], false)) {
-                    // if we're on the last arg and the method expects an array
-                    if (i == classes.length - 1 && methodArgs[i].isArray()) {
-                        // check to see if the last arg is convertible
-                        // to the array's component type
-                        return isConvertible(methodArgs[i], classes[i], true);
-                    }
-                    return false;
-                }
-            }
-        } else if (methodArgs.length > 0) // more arguments given than the method accepts; check for varargs
-        {
-            // check that the last methodArg is an array
-            Class<?> lastarg = methodArgs[methodArgs.length - 1];
-            if (!lastarg.isArray()) {
-                return false;
-            }
-
-            // check that they all match up to the last method arg
-            for (int i = 0; i < methodArgs.length - 1; ++i) {
-                if (!isConvertible(methodArgs[i], classes[i], false)) {
-                    return false;
-                }
-            }
-
-            // check that all remaining arguments are convertible to the vararg type
-            Class<?> vararg = lastarg.getComponentType();
-            for (int i = methodArgs.length - 1; i < classes.length; ++i) {
-                if (!isConvertible(vararg, classes[i], false)) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @see IntrospectionUtils#isMethodInvocationConvertible(Class, Class, boolean)
-     * @param formal         the formal parameter type to which the actual
-     *                       parameter type should be convertible
-     * @param actual         the actual parameter type.
-     * @param possibleVarArg whether or not we're dealing with the last parameter
-     *                       in the method declaration
-     * @return see isMethodInvocationConvertible.
-     */
-    private static boolean isConvertible(Class<?> formal, Class<?> actual,
-                                         boolean possibleVarArg) {
-        return IntrospectionUtils.
-                isMethodInvocationConvertible(formal, actual, possibleVarArg);
-    }
-
-    /**
-     * @see IntrospectionUtils#isStrictMethodInvocationConvertible(Class, Class, boolean)
-     * @param formal         the formal parameter type to which the actual
-     *                       parameter type should be convertible
-     * @param actual         the actual parameter type.
-     * @param possibleVarArg whether or not we're dealing with the last parameter
-     *                       in the method declaration
-     * @return see isStrictMethodInvocationConvertible.
-     */
-    private static boolean isStrictConvertible(Class<?> formal, Class<?> actual,
-                                               boolean possibleVarArg) {
-        return IntrospectionUtils.
-                isStrictMethodInvocationConvertible(formal, actual, possibleVarArg);
-    }
 }

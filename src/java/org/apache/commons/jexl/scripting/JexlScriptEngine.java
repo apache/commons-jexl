@@ -104,7 +104,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
                     context.setBindings(new SimpleBindings(vars), ScriptContext.ENGINE_SCOPE);
                 }
 
-                public Map getVars() {
+                public Map<String,Object> getVars() {
                     return new JexlContextWrapper(context);
                 }
             };
@@ -137,7 +137,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
      * Current implementation only gives access to ENGINE_SCOPE binding.
      */
     @SuppressWarnings("unchecked")
-    private static class JexlContextWrapper implements Map {
+    private static class JexlContextWrapper implements Map<String,Object> {
         
         private final ScriptContext context;
 
@@ -180,7 +180,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
             return bnd.keySet();
         }
 
-        public Object put(final Object key, final Object value) {
+        public Object put(final String key, final Object value) {
             Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
             return bnd.put(String.valueOf(key), value);
         }

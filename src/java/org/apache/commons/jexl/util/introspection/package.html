@@ -1,0 +1,39 @@
+<html>
+ <head>
+  <title>Package Documentation for org.apache.commons.jexl.introspection Package</title>
+ </head>
+ <body bgcolor="white">
+  Provides low &amp; high-level introspective services.
+  <br><br>
+  <p>
+   <ul>
+    <li><a href="#low">Low level</a></li>
+    <li><a href="#high">High level</a></li>
+   </ul>
+  </p>
+  <h2><a name="low">Low level</a></h2>
+  <p>
+  The IntrospectorBase, Introspector, ClassMap, IntrospectionUtils form the
+  base of the introspection service. They allow to describe classes and their
+  methods, keeping them in a cache (@see Introspector) to speed up property
+  getters/setters and method discovery used during expression evaluation.
+  </p>
+  <p>
+  The cache materialized in Introspector creates one entry per class containing a map of all
+  accessible public methods keyed by name and signature.
+  </p>
+
+  <h2><a name="high">High level</a></h2>
+  
+  <p>
+  The Uberspect, VelMethod, VelPropertyGet and VelPropertySet interfaces
+  form the exposed face of introspective services.
+  </p>
+  <p>
+  The Uberspectimpl is the concrete class implementing the Uberspect interface.
+  Deriving from this class is the preferred way of augmenting Jexl introspective
+  capabilities when special needs to be fullfilled or when default behaviors
+  need to be modified.
+  </p>
+</body>
+</html>

@@ -32,11 +32,12 @@ import org.apache.commons.logging.LogFactory;
 
 import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
-import org.apache.commons.jexl.parser.SimpleNode;
+import org.apache.commons.jexl.parser.JexlNode;
 import org.apache.commons.jexl.parser.TokenMgrError;
 import org.apache.commons.jexl.parser.ASTJexlScript;
 import org.apache.commons.jexl.util.Introspector;
 import org.apache.commons.jexl.util.introspection.Uberspect;
+import org.apache.commons.jexl.util.introspection.Info;
 
 /**
  * <p>
@@ -44,7 +45,7 @@ import org.apache.commons.jexl.util.introspection.Uberspect;
  * Determines the behavior of Expressions & Scripts during their evaluation with respect to:
  * <ul>
  *  <li>Introspection, see {@link Uberspect}</li>
- *  <li>Arithmetic & comparison, see {@link Arithmetic}</li>
+ *  <li>Arithmetic & comparison, see {@link JexlArithmetic}</li>
  *  <li>Error reporting</li>
  *  <li>Logging</li>
  * </ul>
@@ -87,9 +88,9 @@ public class JexlEngine {
      */
     protected final Uberspect uberspect;
     /**
-     * The Arithmetic instance.
+     * The JexlArithmetic instance.
      */
-    protected final Arithmetic arithmetic;
+    protected final JexlArithmetic arithmetic;
     /**
      * The Log to which all JexlEngine messages will be logged.
      */
@@ -106,13 +107,17 @@ public class JexlEngine {
      */
     protected boolean silent = false;
     /**
+     * Wheter error messages will carry debugging information.
+     */
+    protected boolean debug = true;
+    /**
      *  The map of 'prefix:function' to object implementing the function.
      */
     protected Map<String, Object> functions = Collections.EMPTY_MAP;
     /**
      * The expression cache.
      */
-    protected Map<String, SimpleNode> cache = null;
+    protected Map<String, JexlNode> cache = null;
     /**
      * An empty/static/non-mutable JexlContext used instead of null context.
      */
@@ -139,18 +144,14 @@ public class JexlEngine {
     }
 
     /**
-     * Creates a JEXL engine using the provided {@link Uberspect}, (@link Arithmetic) and logger.
+     * Creates a JEXL engine using the provided {@link Uberspect}, (@link JexlArithmetic),
+     * a function map and logger.
      * @param anUberspect to allow different introspection behaviour
      * @param anArithmetic to allow different arithmetic behaviour
-     * @param theFunctions an optional map of functions (@see setFunctions)
+     * @param theFunctions an optional map of functions (@link setFunctions)
      * @param log the logger for various messages
      */
-    public JexlEngine(Uberspect anUberspect, Arithmetic anArithmetic, Map<String, Object> theFunctions, Log log) {
-        this.uberspect = anUberspect == null ? Introspector.getUberspect() : anUberspect;
-        this.arithmetic = anArithmetic == null ? new JexlArithmetic(true) : anArithmetic;
-        if (theFunctions != null) {
-            this.functions = theFunctions;
-        }
+    public JexlEngine(Uberspect anUberspect, JexlArithmetic anArithmetic, Map<String, Object> theFunctions, Log log) {
         if (log == null) {
             log = LogFactory.getLog(JexlEngine.class);
         }
@@ -158,6 +159,27 @@ public class JexlEngine {
             throw new NullPointerException("logger can not be null");
         }
         this.logger = log;
+        this.uberspect = anUberspect == null ? Introspector.getUberspect(log) : anUberspect;
+        this.arithmetic = anArithmetic == null ? new JexlArithmetic(true) : anArithmetic;
+        if (theFunctions != null) {
+            this.functions = theFunctions;
+        }
+    }
+
+    /**
+     * Sets whether this engine reports debugging information when error occurs.
+     * @param flag true implies debug is on, false implies debug is off.
+     */
+    public void setDebug(boolean flag) {
+        this.debug = flag;
+    }
+
+    /**
+     * Checks whether this engine is in debug mode.
+     * @return true if debug is on, false otherwise
+     */
+    public boolean isDebug() {
+        return this.debug;
     }
 
     /**
@@ -258,14 +280,30 @@ public class JexlEngine {
      *      expression or a reference.
      */
     public Expression createExpression(String expression)
+            throws ParseException  {
+        return createExpression(expression, null);
+    }
+
+    /**
+     * Creates an Expression from a String containing valid
+     * JEXL syntax.  This method parses the expression which
+     * must contain either a reference or an expression.
+     * @param expression A String containing valid JEXL syntax
+     * @return An Expression object which can be evaluated with a JexlContext
+     * @param info An info structure to carry debugging information if needed
+     * @throws ParseException An exception can be thrown if there is a problem
+     *      parsing this expression, or if the expression is neither an
+     *      expression or a reference.
+     */
+    public Expression createExpression(String expression, Info info)
             throws ParseException {
         // Parse the expression
-        SimpleNode tree = parse(expression);
+        JexlNode tree = parse(expression, info);
         if (tree.jjtGetNumChildren() > 1) {
             logger.warn("The JEXL Expression created will be a reference"
                      + " to the first expression from the supplied script: \"" + expression + "\" ");
         }
-        SimpleNode node = (SimpleNode) tree.jjtGetChild(0);
+        JexlNode node = tree.jjtGetChild(0);
         return new ExpressionImpl(this, expression, node);
     }
 
@@ -278,10 +316,23 @@ public class JexlEngine {
      * @throws ParseException if there is a problem parsing the script.
      */
     public Script createScript(String scriptText) throws ParseException {
+        return createScript(scriptText, null);
+    }
+
+    /**
+     * Creates a Script from a String containing valid JEXL syntax.
+     * This method parses the script which validates the syntax.
+     *
+     * @param scriptText A String containing valid JEXL syntax
+     * @param info An info structure to carry debugging information if needed
+     * @return A {@link Script} which can be executed using a {@link JexlContext}.
+     * @throws ParseException if there is a problem parsing the script.
+     */
+    public Script createScript(String scriptText, Info info) throws ParseException {
         if (scriptText == null) {
             throw new NullPointerException("scriptText is null");
         }
-        SimpleNode script = parse(scriptText);
+        JexlNode script = parse(scriptText, info);
         if (script instanceof ASTJexlScript) {
             return new ScriptImpl(this, scriptText, (ASTJexlScript) script);
         } else {
@@ -308,7 +359,11 @@ public class JexlEngine {
             throw new IOException("Can't read scriptFile (" + scriptFile.getCanonicalPath() + ")");
         }
         BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
-        return createScript(readerToString(reader));
+        Info info = null;
+        if (debug) {
+            info = new Info(scriptFile.getName(), 0, 0);
+        }
+        return createScript(readerToString(reader), info);
 
     }
 
@@ -331,7 +386,11 @@ public class JexlEngine {
 
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(connection.getInputStream()));
-        return createScript(readerToString(reader));
+        Info info = null;
+        if (debug) {
+            info = new Info(scriptUrl.toString(), 0, 0);
+        }
+        return createScript(readerToString(reader), info);
     }
 
     /**
@@ -375,8 +434,8 @@ public class JexlEngine {
         }
         expr = r0 + (expr.charAt(0) == '[' ? "" : ".") + expr + ";";
         try {
-            SimpleNode tree = parse(expr);
-            SimpleNode node = (SimpleNode) tree.jjtGetChild(0).jjtGetChild(0);
+            JexlNode tree = parse(expr, null);
+            JexlNode node = tree.jjtGetChild(0).jjtGetChild(0);
             Interpreter interpreter = createInterpreter(context);
             // ensure 4 objects in register array
             Object[] r = {r0, bean, r0, bean};
@@ -442,8 +501,8 @@ public class JexlEngine {
         // synthetize expr
         expr = r0 + (expr.charAt(0) == '[' ? "" : ".") + expr + "=" + r1 + ";";
         try {
-            SimpleNode tree = parse(expr);
-            SimpleNode node = (SimpleNode) tree.jjtGetChild(0).jjtGetChild(0);
+            JexlNode tree = parse(expr, null);
+            JexlNode node = tree.jjtGetChild(0).jjtGetChild(0);
             Interpreter interpreter = createInterpreter(context);
             // set the registers
             Object[] r = {r0, bean, r1, value};
@@ -481,10 +540,10 @@ public class JexlEngine {
      * @param cacheSize the cache size, must be > 0
      * @return a Map usable as a cache bounded to the given size
      */
-    protected Map<String, SimpleNode> createCache(final int cacheSize) {
-        return new java.util.LinkedHashMap<String, SimpleNode>(cacheSize, LOAD_FACTOR, true) {
+    protected Map<String, JexlNode> createCache(final int cacheSize) {
+        return new java.util.LinkedHashMap<String, JexlNode>(cacheSize, LOAD_FACTOR, true) {
             @Override
-            protected boolean removeEldestEntry(Map.Entry<String, SimpleNode> eldest) {
+            protected boolean removeEldestEntry(Map.Entry<String, JexlNode> eldest) {
                 return size() > cacheSize;
             }
         };
@@ -493,12 +552,13 @@ public class JexlEngine {
     /**
      * Parses an expression.
      * @param expression the expression to parse
+     * @param info debug information structure
      * @return the parsed tree
      * @throws ParseException if any error occured during parsing
      */
-    protected SimpleNode parse(CharSequence expression) throws ParseException {
+    protected JexlNode parse(CharSequence expression, Info info) throws ParseException {
         String expr = cleanExpression(expression);
-        SimpleNode tree = null;
+        JexlNode tree = null;
         synchronized (parser) {
             logger.debug("Parsing expression: " + expression);
             if (cache != null) {
@@ -509,7 +569,29 @@ public class JexlEngine {
             }
             try {
                 Reader reader = expr.endsWith(";") ? new StringReader(expr) : new StringReader(expr + ";");
-                tree = parser.parse(reader);
+                // use first calling method of JexlEngine as debug info
+                if (info == null && debug) {
+                    Throwable xinfo = new Throwable();
+                    xinfo.fillInStackTrace();
+                    StackTraceElement[] stack = xinfo.getStackTrace();
+                    StackTraceElement se = null;
+                    Class<?> clazz = getClass();
+                    for(int s = 0; s < stack.length; ++s, se = null) {
+                        se = stack[s];
+                        if (!se.getClassName().equals(clazz.getName())) {
+                            // go deeper if called from UnifiedJEXL
+                            if (se.getClassName().equals(UnifiedJEXL.class.getName())) {
+                                clazz = UnifiedJEXL.class;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                    if (se != null) {
+                        info = new Info(se.getClassName()+"."+se.getMethodName(), se.getLineNumber(), 0);
+                    }
+                }
+                tree = parser.parse(reader, info);
                 if (cache != null) {
                     cache.put(expr, tree);
                 }
