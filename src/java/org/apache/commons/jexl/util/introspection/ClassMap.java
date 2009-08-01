@@ -24,11 +24,12 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 
 /**
- * Taken from the Velocity tree so we can be self-sufficient.
+ * Originally taken from the Velocity tree so we can be self-sufficient.
  *
  * A cache of introspection information for a specific class instance.
- * Keys objects by an agregation of the method name and the names of classes
+ * Keys objects by an agregation of the method name and the classes
  * that make up the parameters.
+ * @see MethodKey
  *
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
@@ -38,7 +39,7 @@ import org.apache.commons.logging.Log;
  * @version $Id$
  * @since 1.0
  */
-public class ClassMap {
+final class ClassMap {
     /** cache of methods. */
     private final MethodCache methodCache;
 
@@ -63,14 +64,13 @@ public class ClassMap {
     /**
      * Find a Method using the method name and parameter objects.
      *
-     * @param name   The method name to look up.
-     * @param params An array of parameters for the method.
+     * @param key the method key
      * @return A Method object representing the method to invoke or null.
-     * @throws MethodMap.AmbiguousException When more than one method is a match for the parameters.
+     * @throws MethodKey.AmbiguousException When more than one method is a match for the parameters.
      */
-    public Method findMethod(final String name, final Object[] params)
-            throws MethodMap.AmbiguousException {
-        return methodCache.get(name, params);
+    public Method findMethod(final MethodKey key)
+            throws MethodKey.AmbiguousException {
+        return methodCache.get(key);
     }
 
     /**
@@ -154,7 +154,7 @@ public class ClassMap {
      * @version $Id$
      * <p>
      * It stores the association between:
-     *  - a key made of a method name & an array of argument types. (@see MethodCache.MethodKey)
+     *  - a key made of a method name & an array of argument types.
      *  - a method.
      * </p>
      * <p>
@@ -237,24 +237,12 @@ public class ClassMap {
          * If nothing is found, then we must actually go
          * and introspect the method from the MethodMap.
          *</p>
-         * @param name   The method name to look up.
-         * @param params An array of parameters for the method.
-         * @return A Method object representing the method to invoke or null.
-         * @throws MethodMap.AmbiguousException When more than one method is a match for the parameters.
-         */
-        Method get(final String name, final Object[] params)
-                throws MethodMap.AmbiguousException {
-            return get(new MethodKey(name, params));
-        }
-
-        /**
-         * Finds a Method using a MethodKey.
          * @param methodKey the method key
-         * @return a method
-         * @throws MethodMap.AmbiguousException if method resolution is ambiguous
+         * @return A Method object representing the method to invoke or null.
+         * @throws MethodKey.AmbiguousException When more than one method is a match for the parameters.
          */
         Method get(final MethodKey methodKey)
-                throws MethodMap.AmbiguousException {
+                throws MethodKey.AmbiguousException {
             synchronized (methodMap) {
                 Method cacheEntry = cache.get(methodKey);
                 // We looked this up before and failed.
@@ -271,7 +259,7 @@ public class ClassMap {
                         } else {
                             cache.put(methodKey, CACHE_MISS);
                         }
-                    } catch (MethodMap.AmbiguousException ae) {
+                    } catch (MethodKey.AmbiguousException ae) {
                         // that's a miss :-)
                         cache.put(methodKey, CACHE_MISS);
                         throw ae;
@@ -309,139 +297,6 @@ public class ClassMap {
             synchronized (methodMap) {
                 return methodMap.names();
             }
-        }
-    }
-
-    /**
-     * A method key for the introspector cache.
-     * <p>
-     * This replaces the original key scheme which used to build the key
-     * by concatenating the method name and parameters class names as one string
-     * with the exception that primitive types were converted to their object class equivalents.
-     * </p>
-     * <p>
-     * The key is still based on the same information, it is just wrapped in an object instead.
-     * Primitive type classes are converted to they object equivalent to make a key;
-     * int foo(int) and int foo(Integer) do generate the same key.
-     * </p>
-     * A key can be constructed either from arguments (array of objects) or from parameters
-     * (array of class).
-     * Roughly 3x faster than string key to access the map & uses less memory.
-     */
-    static final class MethodKey {
-        /** The hash code. */
-        private final int hashCode;
-        /** The method name. */
-        private final String method;
-        /** The parameters. */
-        private final Class<?>[] params;
-        /** A marker for empty parameter list. */
-        private static final Class<?>[] NOARGS = new Class<?>[0];
-        /** The hash code constants. */
-        private static final int HASH = 37;
-
-        /** Creates a MethodKey from a method.
-         *  Used to store information in the method map.
-         * @param aMethod the method to build the key from
-         */
-        MethodKey(Method aMethod) {
-            this(aMethod.getName(), aMethod.getParameterTypes());
-        }
-
-        /** Creates a MethodKey from a method name and a set of arguments (objects).
-         *  Used to query the method map.
-         * @param aMethod the method name
-         * @param args the arguments instances to match the method signature
-         */
-        MethodKey(String aMethod, Object[] args) {
-            // !! keep this in sync with the other ctor (hash code) !!
-            this.method = aMethod;
-            int hash = this.method.hashCode();
-            final int size;
-             // CSOFF: InnerAssignment
-            if (args != null && (size = args.length) > 0) {
-                // CSON: InnerAssignment
-                this.params = new Class<?>[size];
-                for (int p = 0; p < size; ++p) {
-                    // ctor(Object) : {
-                    Object arg = args[p];
-                    // no need to go thru primitive type conversion since these are objects
-                    Class<?> parm = arg == null ? Object.class : arg.getClass();
-                    // }
-                    hash = (HASH * hash) + parm.hashCode();
-                    this.params[p] = parm;
-                }
-            } else {
-                this.params = NOARGS;
-            }
-            this.hashCode = hash;
-        }
-
-        /** Creates a MethodKey from a method name and a set of parameters (classes).
-         *  Used to store information in the method map. ( @see MethodKey#primitiveClass )
-         * @param aMethod the method name
-         * @param args the argument classes to match the method signature
-         */
-        MethodKey(String aMethod, Class<?>[] args) {
-            // !! keep this in sync with the other ctor (hash code) !!
-            this.method = aMethod;
-            int hash = this.method.hashCode();
-            final int size;
-            // CSOFF: InnerAssignment
-            if (args != null && (size = args.length) > 0) {
-                // CSON: InnerAssignment
-                this.params = new Class<?>[size];
-                for (int p = 0; p < size; ++p) {
-                    // ctor(Class): {
-                    Class<?> parm = MethodCache.primitiveClass(args[p]);
-                    // }
-                    hash = (HASH * hash) + parm.hashCode();
-                    this.params[p] = parm;
-                }
-            } else {
-                this.params = NOARGS;
-            }
-            this.hashCode = hash;
-        }
-
-        /**
-         * Gets this key's method name.
-         * @return the method name
-         */
-        String getMethod() {
-            return method;
-        }
-
-        /**
-         * Gets this key's method parameter classes.
-         * @return the parameters
-         */
-        Class<?>[] getParameters() {
-            return params;
-        }
-
-        @Override
-        public int hashCode() {
-            return hashCode;
-        }
-
-        @Override
-        public boolean equals(Object arg) {
-            if (arg instanceof MethodKey) {
-                MethodKey key = (MethodKey) arg;
-                return method.equals(key.method) && java.util.Arrays.equals(params, key.params);
-            }
-            return false;
-        }
-
-        @Override
-        /** Compatible with original string key. */
-        public String toString() {
-            StringBuilder builder = new StringBuilder(method);
-            for (Class<?> c : params) {
-                builder.append(c.getName());
-            }
-            return builder.toString();
         }
     }
 }

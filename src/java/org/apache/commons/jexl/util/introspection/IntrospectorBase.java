@@ -18,9 +18,15 @@
 package org.apache.commons.jexl.util.introspection;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Constructor;
+import java.lang.ref.SoftReference;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.WeakHashMap;
 import java.util.Set;
+import java.util.List;
+import java.util.LinkedList;
 
 import org.apache.commons.logging.Log;
 
@@ -54,20 +60,26 @@ import org.apache.commons.logging.Log;
  */
 public class IntrospectorBase {
     /** the logger. */
-    private final Log rlog;
+    protected final Log rlog;
 
     /**
-     * Holds the method maps for the classes we know about, keyed by Class
-     * Made WeakHashMap so we wont prevent a class from being GCed.
-     * object.
+     * Holds the method maps for the classes we know about, keyed by Class.
+     * Implemented as WeakHashMap so we wont prevent an unused class from being GCed.
      */
-    protected final Map<Class<?>, ClassMap> classMethodMaps = new java.util.WeakHashMap<Class<?>, ClassMap>();
-
+    private final Map<Class<?>, ClassMap> classMethodMaps = new WeakHashMap<Class<?>, ClassMap>();
     /**
      * Holds the qualified class names for the classes we hold in the
      * classMethodMaps hash.
      */
     private Set<String> cachedClassNames = new HashSet<String>();
+    /**
+     * Holds the map of classes ctors we know about as well as unknown ones.
+     */
+    private final Map<MethodKey, Constructor<?>> constructorsMap = new HashMap<MethodKey, Constructor<?>>();
+    /**
+     * Holds the set of classes we have introspected.
+     */
+    private Map<String, SoftReference<Class<?>>> constructibleClasses = new HashMap<String, SoftReference<Class<?>>>();
 
     /**
      * Create the introspector.
@@ -78,33 +90,21 @@ public class IntrospectorBase {
     }
 
     /**
-     * Gets the method defined by <code>name</code> and <code>params</code>
-     * for the Class <code>c</code>.
+     * Gets the method defined by the <code>MethodKey</code> for the class <code>c</code>.
      *
-     * @param c      Class in which the method search is taking place
-     * @param name   Name of the method being searched for
-     * @param params An array of Objects (not Classes) that describe the the
-     *               parameters
+     * @param c     Class in which the method search is taking place
+     * @param key   Key of the method being searched for
      * @return The desired Method object.
      * @throws IllegalArgumentException     When the parameters passed in can not be used for introspection.
-     * @throws MethodMap.AmbiguousException When the method map contains more than 
+     * @throws MethodKey.AmbiguousException When the method map contains more than
      *  one match for the requested signature.
      *  CSOFF: RedundantThrows
      */
-    public Method getMethod(Class<?> c, String name, Object[] params)
-    throws IllegalArgumentException, MethodMap.AmbiguousException {
-        if (c == null) {
-            throw new IllegalArgumentException("Introspector.getMethod(): Class method key was null: " + name);
-        }
-
-        if (params == null) {
-            throw new IllegalArgumentException("params object is null!");
-        }
-
+    public Method getMethod(Class<?> c, MethodKey key) {
         ClassMap classMap = getMap(c);
+        return classMap.findMethod(key);
 
-        return classMap.findMethod(name, params);
-    } // CSON: RedundantThrows
+    }  // CSON: RedundantThrows
 
     /**
      * Gets the accessible methods names known for a given class.
@@ -118,6 +118,80 @@ public class IntrospectorBase {
         ClassMap classMap = getMap(c);
         return classMap.getMethodNames();
 
+    }
+
+    /**
+     * A Constructor get cache-miss.
+     */
+    private static class CacheMiss {
+        /** The constructor used as cache-miss. */
+        public CacheMiss() {}
+    }
+    /** The cache-miss marker for the constructors map. */
+    private static final Constructor<?> CTOR_MISS = CacheMiss.class.getConstructors()[0];
+    
+    /**
+     * Gets the constructor defined by the <code>MethodKey</code>.
+     *
+     * @param key   Key of the constructor being searched for
+     * @return The desired Constructor object.
+     * @throws IllegalArgumentException     When the parameters passed in can not be used for introspection.
+     * @throws MethodKey.AmbiguousException When the method map contains more than
+     *  one match for the requested signature.
+     *  CSOFF: RedundantThrows
+     */
+    public Constructor<?> getConstructor(final MethodKey key) {
+        Constructor<?> ctor = null;
+        synchronized(constructorsMap) {
+            ctor = constructorsMap.get(key);
+            // that's a clear miss
+            if (CTOR_MISS.equals(ctor)) {
+                return null;
+            }
+            // let's introspect...
+            if (ctor == null) {
+                final String cname = key.getMethod();
+                // do we know about this class?
+                Class<?> clazz = null;
+                SoftReference<Class<?>> sc = constructibleClasses.get(cname);
+                if (sc != null) {
+                    clazz = sc.get();
+                    if (clazz == null) {
+                        // we knew about this class & it's gone, clear cache
+                        constructorsMap.clear();
+                        constructibleClasses = new HashMap<String, SoftReference<Class<?>>>();
+                    }
+                }
+                try {
+                    // do find the most specific ctor
+                    if (clazz == null) {
+                        clazz = Class.forName(cname);
+                        // add it to list of know loaded classes
+                        constructibleClasses.put(cname, new SoftReference<Class<?>>(clazz));
+                    }
+                    List<Constructor<?>> l = new LinkedList<Constructor<?>>();
+                    for(Constructor<?> ictor : clazz.getConstructors()) {
+                        l.add(ictor);
+                    }
+                    // try to find one
+                    ctor = MethodKey.CONSTRUCTORS.getMostSpecific(l, key.getParameters());
+                    if (ctor != null) {
+                        constructorsMap.put(key, ctor);
+                    } else {
+                        constructorsMap.put(key, CTOR_MISS);
+                    }
+                } catch(ClassNotFoundException xnotfound) {
+                    if (rlog.isDebugEnabled()) {
+                        rlog.debug("could not load class " + cname, xnotfound);
+                    }
+                    ctor = null;
+                } catch(MethodKey.AmbiguousException xambiguous) {
+                    rlog.warn("ambiguous ctor detected for " + cname, xambiguous);
+                    ctor = null;
+                }
+            }
+        }
+        return ctor;
     }
 
     /**
@@ -156,7 +230,7 @@ public class IntrospectorBase {
      * @param c class.
      * @return a {@link ClassMap}
      */
-    protected ClassMap createClassMap(Class<?> c) {
+    private ClassMap createClassMap(Class<?> c) {
         ClassMap classMap = new ClassMap(c,rlog);
         classMethodMaps.put(c, classMap);
         cachedClassNames.add(c.getName());
@@ -168,15 +242,10 @@ public class IntrospectorBase {
      * Clears the classmap and classname caches.
      */
     protected void clearCache() {
-        /*
-         * since we are synchronizing on this object, we have to clear it rather
-         * than just dump it.
-         */
+        // since we are synchronizing on this object, we have to clear it rather
+        // than just dump it.
         classMethodMaps.clear();
-
-        /*
-         * for speed, we can just make a new one and let the old one be GC'd
-         */
+        // for speed, we can just make a new one and let the old one be GC'd
         cachedClassNames = new HashSet<String>();
     }
 }

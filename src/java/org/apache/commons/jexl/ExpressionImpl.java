@@ -17,7 +17,7 @@
 
 package org.apache.commons.jexl;
 
-import org.apache.commons.jexl.parser.SimpleNode;
+import org.apache.commons.jexl.parser.JexlNode;
 
 /**
  * Instances of ExpressionImpl are created by the {@link JexlEngine},
@@ -39,7 +39,7 @@ class ExpressionImpl implements Expression {
     /**
      * The resulting AST we can interpret.
      */
-    protected final SimpleNode node;
+    protected final JexlNode node;
 
 
     /**
@@ -49,7 +49,7 @@ class ExpressionImpl implements Expression {
      * @param expr the expression.
      * @param ref the parsed expression.
      */
-    ExpressionImpl(JexlEngine engine, String expr, SimpleNode ref) {
+    ExpressionImpl(JexlEngine engine, String expr, JexlNode ref) {
         expression = expr;
         node = ref;
         jexl = engine;

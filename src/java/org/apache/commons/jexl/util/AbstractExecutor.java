@@ -14,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.jexl.util;
+import org.apache.commons.jexl.util.introspection.MethodKey;
+import org.apache.commons.jexl.util.introspection.VelMethod;
+import org.apache.commons.jexl.util.introspection.VelPropertySet;
+import org.apache.commons.jexl.util.introspection.VelPropertyGet;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 
 /**
  * Abstract class that is used to execute an arbitrary
  * method that is introspected. This is the superclass
- * for the GetExecutor and PropertyExecutor.
+ * for all other AbstractExecutor classes.
  *
  * @since 1.0
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
@@ -31,34 +32,52 @@ import java.lang.reflect.Method;
  * @version $Id$
  */
 public abstract class AbstractExecutor {
-    /** Empty parameters list for method matching. */
-    protected static final Object[] EMPTY_PARAMS = {};
+    /** A marker for invocation failures in tryInvoke. */
+    public static final Object TRY_FAILED = new Object() {
+        @Override
+        public String toString() {
+            return "tryExecute failed";
+        }
+    };
+
     /**
-     * Method to be executed.
+     * A helper to initialize the marker methods (array.get, list.get, etc...).
+     * @param clazz the class to introspect
+     * @param name the name of the method
+     * @param parms the parameters
+     * @return the method
      */
-    protected final Method method;
+    static java.lang.reflect.Method initMarker(Class<?> clazz, String name, Class<?>... parms) {
+        try {
+            return clazz.getMethod(name, parms);
+        } catch (Exception xnever) {
+            throw new Error(xnever);
+        }
+    }
+
+    /**
+     * Creates an arguments array.
+     * @param args the list of arguments
+     * @return the arguments array
+     */
+    static Object[] makeArgs(Object... args) {
+        return args;
+    }
+
+    /** The class this executor applies to. */
+    protected final Class<?> objectClass;
+    /** Method to be executed. */
+    protected final java.lang.reflect.Method method;
 
     /**
      * Default and sole constructor.
+     * @param theClass the class this executor applies to
      * @param theMethod the method held by this executor
      */
-    protected AbstractExecutor(Method theMethod) {
+    protected AbstractExecutor(Class<?> theClass, java.lang.reflect.Method theMethod) {
+        objectClass = theClass;
         method = theMethod;
     }
-
-    /**
-     * Execute method against context.
-     *
-     * @param o The owner.
-     * @return The return value.
-     * @throws IllegalAccessException Method is inaccessible.
-     * @throws InvocationTargetException Method body throws an exception.
-     */
-    public Object execute(Object o)
-            throws IllegalAccessException, InvocationTargetException {
-        return method == null? null : method.invoke(o, (Object[]) null);
-    }
-
 
     /**
      * Tell whether the executor is alive by looking
@@ -71,10 +90,188 @@ public abstract class AbstractExecutor {
     }
 
     /**
-     * Gets the method to be executed.
-     * @return Method The method to be executed.
+     * Specifies if this executor is cacheable and able to be reused for this
+     * class of object it was returned for.
+     *
+     * @return true if can be reused for this class, false if not
      */
-    public final Method getMethod() {
+    public boolean isCacheable() {
+        return method != null;
+    }
+
+    /**
+     * Gets the method to be executed or used as a marker.
+     * @return Method The method used by execute in derived classes.
+     */
+    public final java.lang.reflect.Method getMethod() {
         return method;
     }
- }
+
+    /**
+     * Gets the method name used.
+     * @return method name
+     */
+    public final String getMethodName() {
+        return method.getName();
+    }
+
+    /**
+     * Abstract class that is used to execute an arbitrary 'get' method.
+     */
+    public abstract static class Get extends AbstractExecutor implements VelPropertyGet {
+        /**
+         * Default and sole constructor.
+         * @param theClass the class this executor applies to
+         * @param theMethod the method held by this executor
+         */
+        protected Get(Class<?> theClass, java.lang.reflect.Method theMethod) {
+            super(theClass, theMethod);
+        }
+
+        /** {@inheritDoc} */
+        public final Object invoke(Object o) throws Exception {
+            return execute(o);
+        }
+
+        /**
+         * Gets the property value from an object.
+         *
+         * @param o The object to get the property from.
+         * @return The property value.
+         * @throws IllegalAccessException Method is inaccessible.
+         * @throws InvocationTargetException Method body throws an exception.
+         */
+        public abstract Object execute(Object o)
+                throws IllegalAccessException, InvocationTargetException;
+
+        /**
+         * Tries to reuse this executor, checking that it is compatible with
+         * the actual set of arguments.
+         * @param o The object to get the property from.
+         * @param property The property to get from the object.
+         * @return The property value or TRY_FAILED if checking failed.
+         */
+        public Object tryExecute(Object o, Object property) {
+            return TRY_FAILED;
+        }
+    }
+    
+    /**
+     * Abstract class that is used to execute an arbitrary 'set' method.
+     */
+    public abstract static class Set extends AbstractExecutor implements VelPropertySet {
+        /**
+         * Default and sole constructor.
+         * @param theClass the class this executor applies to
+         * @param theMethod the method held by this executor
+         */
+        protected Set(Class<?> theClass, java.lang.reflect.Method theMethod) {
+            super(theClass, theMethod);
+        }
+
+        /** {@inheritDoc} */
+        public Object invoke(Object o, Object arg) throws Exception {
+            return execute(o, arg);
+        }
+
+        /**
+         * Sets the property value of an object.
+         *
+         * @param o The object to set the property in.
+         * @param arg The value.
+         * @return The return value.
+         * @throws IllegalAccessException Method is inaccessible.
+         * @throws InvocationTargetException Method body throws an exception.
+         */
+        public abstract Object execute(Object o, Object arg)
+                throws IllegalAccessException, InvocationTargetException;
+
+        /**
+         * Tries to reuse this executor, checking that it is compatible with
+         * the actual set of arguments.
+         * @param o The object to invoke the method from.
+         * @param property The property to set in the object.
+         * @param arg The value to use as the property value.
+         * @return The return value or TRY_FAILED if checking failed.
+         */
+        public Object tryExecute(Object o, Object property, Object arg) {
+            return TRY_FAILED;
+        }
+        
+    }
+
+
+
+    /**
+     * Abstract class that is used to execute an arbitrary method.
+     */
+    public abstract static class Method extends AbstractExecutor implements VelMethod {
+        /**
+         * A helper class to pass the method &amp; parameters.
+         */
+        protected static final class Parameter {
+            /** The method. */
+            private final java.lang.reflect.Method method;
+            /** The method key. */
+            private final MethodKey key;
+            /** Creates an instance.
+             * @param m the method
+             * @param k the method key
+             */
+            public Parameter(java.lang.reflect.Method m, MethodKey k) {
+                method = m;
+                key = k;
+            }
+        }
+        /** The method key discovered from the arguments. */
+        protected final MethodKey key;
+        /**
+         * Creates a new instance.
+         * @param c the class this executor applies to
+         * @param km the method and MethodKey to encapsulate.
+         */
+        protected Method(Class<?> c, Parameter km) {
+            super(c, km.method);
+            key = km.key;
+        }
+
+        /** {@inheritDoc} */
+        public final Object invoke(Object o, Object[] args) throws Exception {
+            return execute(o, args);
+        }
+
+        /**
+         * Returns the return type of the method invoked.
+         * @return return type
+         */
+        public final Class<?> getReturnType() {
+            return method.getReturnType();
+        }
+
+        /**
+         * Invokes the method to be executed.
+         *
+         * @param o the object to invoke the method upon
+         * @param args the method arguments
+         * @return the result of the method invocation
+         * @throws IllegalAccessException Method is inaccessible.
+         * @throws InvocationTargetException Method body throws an exception.
+         */
+        public abstract Object execute(Object o, Object[] args)
+                throws IllegalAccessException, InvocationTargetException;
+
+        /**
+         * Tries to reuse this executor, checking that it is compatible with
+         * the actual set of arguments.
+         * @param o the object to invoke the method upon
+         * @param name the method name
+         * @param args the method arguments
+         * @return the result of the method invocation or INVOKE_FAILED if checking failed.
+         */
+        public Object tryExecute(String name, Object o, Object[] args){
+            return TRY_FAILED;
+        }
+
+    }
+
+}

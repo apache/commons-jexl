@@ -16,14 +16,14 @@
  */
 package org.apache.commons.jexl;
 
-import org.apache.commons.jexl.parser.Node;
+import org.apache.commons.jexl.parser.JexlNode;
 
 /**
  * Wraps any error that might occur during interpretation of a script or expression.
  */
 public class JexlException extends RuntimeException {
     /** The point of origin for this exception. */
-    protected Node mark;
+    protected JexlNode mark;
     /** A marker to use in NPEs stating a null operand error. */
     public static final String NULL_OPERAND = "jexl.null";
     /**
@@ -31,7 +31,7 @@ public class JexlException extends RuntimeException {
      * @param node the node causing the error
      * @param msg the error message
      */
-    public JexlException(Node node, String msg) {
+    public JexlException(JexlNode node, String msg) {
         super(msg);
         mark = node;
     }
@@ -41,7 +41,7 @@ public class JexlException extends RuntimeException {
      * @param msg the error message
      * @param cause the exception causing the error
      */
-    public JexlException(Node node, String msg, Throwable cause) {
+    public JexlException(JexlNode node, String msg, Throwable cause) {
         super(msg, cause);
         mark = node;
     }
@@ -70,7 +70,8 @@ public class JexlException extends RuntimeException {
     
     /**
      * Detailed info message about this error.
-     * Format is "@[begin,end]: string \n msg" where:
+     * Format is "debug![begin,end]: string \n msg" where:
+     * - debug is the debugging information if it exists (@link JexlEngine.setDebug)
      * - begin, end are character offsets in the string for the precise location of the error
      * - string is the string representation of the offending expression
      * - msg is the actual explanation message for this error
@@ -81,7 +82,8 @@ public class JexlException extends RuntimeException {
         Debugger dbg = new Debugger();
         StringBuilder msg = new StringBuilder();
         if (dbg.debug(mark)) {
-            msg.append("@[");
+            msg.append(mark.debugString());
+            msg.append("![");
             msg.append(dbg.start());
             msg.append(",");
             msg.append(dbg.end());

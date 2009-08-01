@@ -14,36 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.apache.commons.jexl.context;
-
-import org.apache.commons.jexl.JexlContext;
-
-import java.util.HashMap;
-import java.util.Map;
+package org.apache.commons.jexl.util.introspection;
 
 /**
- *  Implementation of JexlContext based on a HashMap.
- *
- *  @since 1.0
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id$
+ * A little class to abstract debugging info.
  */
-public class HashMapContext extends HashMap<String,Object> implements JexlContext {
-    /** serialization version id jdk13 generated. */
-    static final long serialVersionUID = 5715964743204418854L;
+public interface DebugInfo {
+    /** A default debug info with (oviously) no information. */
+    DebugInfo NONE = new DebugInfo() {
+        public String debugString() {
+            return "?@?:?";
+        }
+    };
     /**
-     * {@inheritDoc}
+     * Formats this information.
+     * @return a human readable string.
      */
-    public void setVars(Map<String,Object> vars) {
-        clear();
-        putAll(vars);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Map<String,Object> getVars() {
-        return this;
-    }
+    String debugString();
 }

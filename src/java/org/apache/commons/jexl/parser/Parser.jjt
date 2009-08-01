@@ -29,7 +29,7 @@ options
    MULTI=true;
    STATIC=false;
    VISITOR=true;
-   NODE_EXTENDS="JEXLNode";
+   NODE_CLASS="JexlNode";
    NODE_USES_PARSER=true;
    UNICODE_INPUT=true;
 }
@@ -39,22 +39,24 @@ PARSER_BEGIN(Parser)
 package org.apache.commons.jexl.parser;
 
 import java.io.Reader;
-import java.io.ByteArrayInputStream;
+import org.apache.commons.jexl.util.introspection.Info;
 
 public class Parser extends StringParser
 {
+    /** Base debug information. */
+    protected Info debug = null;
 
-    public SimpleNode parse(Reader reader)
+    public JexlNode parse(Reader reader, Info info)
         throws ParseException
     {
         ReInit(reader);
-
         /*
          *  lets do the 'Unique Init' in here to be
          *  safe - it's a pain to remember
          */
 
-        SimpleNode tree = JexlScript();
+        JexlNode tree = JexlScript();
+        tree.value = info;
         return tree;
     }
 }
@@ -85,7 +87,7 @@ TOKEN : /* LITERALS */
  * Program structuring syntax follows.
  */
 
-SimpleNode JexlScript() :
+JexlNode JexlScript() :
 {
    String name;
 }
@@ -442,6 +444,12 @@ void AnyMethod() #void : {}
     LOOKAHEAD(Identifier() "(") Method()
 }
 
+void Constructor() # ConstructorNode() : {}
+{
+
+  "new" "("[ Parameter() ( "," Parameter() )* ] ")"
+}
+
 void SizeMethod() : {}
 {
     "size" "(" ")"
@@ -449,7 +457,8 @@ void SizeMethod() : {}
 
 void Reference() : {}
 {
-  (LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() |
+  (LOOKAHEAD("new") Constructor() |
+   LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() |
    LOOKAHEAD(Identifier() ":" Identifier() "(") Function() |
    LOOKAHEAD(Identifier() "(") Method() |
    Identifier() |

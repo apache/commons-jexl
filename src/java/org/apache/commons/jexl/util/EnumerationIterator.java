@@ -23,10 +23,10 @@ import java.util.Enumeration;
 
 /**
  * An Iterator wrapper for an Enumeration.
- *
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
+ * @param <T> the type of object this iterator returns
  */
 public class EnumerationIterator<T> implements Iterator<T> {
     /**

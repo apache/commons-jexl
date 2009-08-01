@@ -25,6 +25,7 @@ import org.apache.commons.jexl.parser.ASTBitwiseComplNode;
 import org.apache.commons.jexl.parser.ASTBitwiseOrNode;
 import org.apache.commons.jexl.parser.ASTBitwiseXorNode;
 import org.apache.commons.jexl.parser.ASTBlock;
+import org.apache.commons.jexl.parser.ASTConstructorNode;
 import org.apache.commons.jexl.parser.ASTDivNode;
 import org.apache.commons.jexl.parser.ASTEQNode;
 import org.apache.commons.jexl.parser.ASTEmptyFunction;
@@ -62,7 +63,7 @@ import org.apache.commons.jexl.parser.ASTTernaryNode;
 import org.apache.commons.jexl.parser.ASTTrueNode;
 import org.apache.commons.jexl.parser.ASTUnaryMinusNode;
 import org.apache.commons.jexl.parser.ASTWhileStatement;
-import org.apache.commons.jexl.parser.Node;
+import org.apache.commons.jexl.parser.JexlNode;
 import org.apache.commons.jexl.parser.SimpleNode;
 
 import org.apache.commons.jexl.parser.ParserVisitor;
@@ -78,7 +79,7 @@ final class Debugger implements ParserVisitor {
     /** The builder to compose messages. */
     private StringBuilder builder;
     /** The cause of the issue to debug. */
-    private Node cause;
+    private JexlNode cause;
     /** The starting character location offset of the cause in the builder. */
     private int start;
     /** The ending character location offset of the cause in the builder. */
@@ -99,14 +100,14 @@ final class Debugger implements ParserVisitor {
      * @param node the node to debug
      * @return true if the cause was located, false otherwise
      */
-    public boolean debug(Node node) {
+    public boolean debug(JexlNode node) {
         start = 0;
         end = 0;
         if (node != null) {
             builder = new StringBuilder();
             this.cause = node;
             // make arg cause become the root cause
-            Node root = node;
+            JexlNode root = node;
             while (root.jjtGetParent() != null) {
                 root = root.jjtGetParent();
             }
@@ -143,7 +144,7 @@ final class Debugger implements ParserVisitor {
      * @param data visitor pattern argument
      * @return visitor pattern value
      */
-    private Object accept(Node node, Object data) {
+    private Object accept(JexlNode node, Object data) {
         if (node == cause) {
             start = builder.length();
         }
@@ -162,7 +163,7 @@ final class Debugger implements ParserVisitor {
      * @param data visitor pattern argument
      * @return visitor pattern value
      */
-    private Object check(Node node, String image, Object data) {
+    private Object check(JexlNode node, String image, Object data) {
         if (node == cause) {
             start = builder.length();
         }
@@ -185,7 +186,7 @@ final class Debugger implements ParserVisitor {
      * @param data visitor pattern argument
      * @return visitor pattern value
      */
-    private Object infixChildren(Node node, String infix, Object data) {
+    private Object infixChildren(JexlNode node, String infix, Object data) {
         int num = node.jjtGetNumChildren();
         for (int i = 0; i < num; ++i) {
             if (i > 0) {
@@ -389,6 +390,22 @@ final class Debugger implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
+    public Object visit(ASTConstructorNode node, Object data) {
+        int num = node.jjtGetNumChildren();
+        builder.append("new ");
+        accept(node.jjtGetChild(0), data);
+        builder.append("(");
+        for (int i = 1; i < num; ++i) {
+            if (i > 1) {
+                builder.append(", ");
+            }
+            accept(node.jjtGetChild(i), data);
+        }
+        builder.append(")");
+        return data;
+    }
+
+    /** {@inheritDoc} */
     public Object visit(ASTFunctionNode node, Object data) {
         int num = node.jjtGetNumChildren();
         accept(node.jjtGetChild(0), data);
@@ -553,10 +570,6 @@ final class Debugger implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(SimpleNode node, Object data) {
-        int num = node.jjtGetNumChildren();
-        for (int i = 0; i < num; ++i) {
-            accept(node.jjtGetChild(i), data);
-        }
-        return data;
+        throw new UnsupportedOperationException("unexpected type of node");
     }
 }

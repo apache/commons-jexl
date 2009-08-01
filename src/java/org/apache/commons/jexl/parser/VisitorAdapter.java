@@ -74,6 +74,12 @@ public class VisitorAdapter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
+    public Object visit(ASTConstructorNode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** {@inheritDoc} */
     public Object visit(ASTBlock node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);
@@ -301,7 +307,19 @@ public class VisitorAdapter implements ParserVisitor {
         return node.childrenAccept(this, data);
     }
 
-    /** {@inheritDoc} */
+    /** Sink, should not be used.
+     * @param node the node
+     * @param data some data
+     */
+    public Object visit(JexlNode node, Object data) {
+        node.dump(" ");
+        return node.childrenAccept(this, data);
+    }
+
+    /** Unused, required for generated interface compliance.
+     * @param node the node
+     * @param data some data
+     */
     public Object visit(SimpleNode node, Object data) {
         node.dump(" ");
         return node.childrenAccept(this, data);

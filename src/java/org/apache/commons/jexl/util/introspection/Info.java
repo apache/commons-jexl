@@ -17,22 +17,22 @@
 package org.apache.commons.jexl.util.introspection;
 
 /**
- * Little class to carry in info such as template name, line and column for
- * information error reporting from the uberspector implementations
+ * Little class to carry in info such as a file or template name, line and column for
+ * information error reporting from the uberspector implementations.
  * 
- * Taken from velocity for self-sufficiency.
+ * Originally taken from velocity for self-sufficiency.
  * 
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public class Info {
+public class Info implements DebugInfo {
     /** line number. */
-    private int line;
+    private final int line;
     /** column number. */
-    private int column;
+    private final int column;
     /** name. */
-    private String templateName;
+    private final String name;
     /** 
      * Create info.
      * @param tn template name
@@ -40,17 +40,49 @@ public class Info {
      * @param c column
      */
     public Info(String tn, int l, int c) {
-        templateName = tn;
+        name = tn;
         line = l;
         column = c;
+    }
+
+    /**
+     * Formats this info in the form 'name&#064;line:column'.
+     * @return the formatted info
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(name != null? name : "");
+        if (line > 0) {
+            sb.append("@");
+            sb.append(line);
+            if (column > 0) {
+                sb.append(":");
+                sb.append(column);
+            }
+        }
+        return sb.toString();
+    }
+    
+    /** {@inheritDoc} */
+    public String debugString() {
+        return toString();
+    }
+
+    /**
+     * Gets the file/script/url name.
+     * @return template name
+     */
+    public String getName() {
+        return name;
     }
 
     /**
      * Gets the template name.
      * @return template name
      */
+    @Deprecated
     public String getTemplateName() {
-        return templateName;
+        return name;
     }
 
     /**
