@@ -96,6 +96,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
         if (scriptText == null) {
             return null;
         }
+        // This is mandated by JSR-223 (end of section SCR.4.3.4.1.2 - Script Execution)
         context.setAttribute("context", context, ScriptContext.ENGINE_SCOPE);
         try {
             Script script = engine.createScript(scriptText);
@@ -108,15 +109,10 @@ public class JexlScriptEngine extends AbstractScriptEngine {
                     return new JexlContextWrapper(context);
                 }
             };
-
-            ctxt.getVars().put("context", "value");
-
             return script.execute(ctxt);
         } catch (ParseException e) {
-            e.printStackTrace();
-            throw new ScriptException(e);
+            throw new ScriptException(e.toString());
         } catch (Exception e) {
-            e.printStackTrace();
             throw new ScriptException(e.toString());
         }
     }
@@ -131,8 +127,8 @@ public class JexlScriptEngine extends AbstractScriptEngine {
         private static final JexlScriptEngineFactory DEFAULT_FACTORY = new JexlScriptEngineFactory();
     }
 
-    /**
-     * Wrapper to convert a JSR-223 ScriptContext into a JexlContext.
+    /*
+     * Wrapper to help convert a JSR-223 ScriptContext into a JexlContext.
      * 
      * Current implementation only gives access to ENGINE_SCOPE binding.
      */
@@ -182,7 +178,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
 
         public Object put(final String key, final Object value) {
             Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.put(String.valueOf(key), value);
+            return bnd.put(key, value);
         }
 
         public void putAll(Map t) {
