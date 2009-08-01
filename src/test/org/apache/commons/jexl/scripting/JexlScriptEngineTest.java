@@ -49,4 +49,38 @@ public class JexlScriptEngineTest extends TestCase {
         assertEquals(newValue,engine.get("value"));
     }
 
+    public void testEngineNames() throws Exception {
+        ScriptEngine engine;
+        ScriptEngineManager manager = new ScriptEngineManager();
+        assertNotNull("Manager should not be null", manager);
+        engine = manager.getEngineByName("JEXL");
+        assertNotNull("Engine should not be null (JEXL)", engine);        
+        engine = manager.getEngineByName("Jexl");
+        assertNotNull("Engine should not be null (Jexl)", engine);        
+        engine = manager.getEngineByName("jexl");
+        assertNotNull("Engine should not be null (jexl)", engine);        
+    }
+
+    public void testScopes() throws Exception {
+        ScriptEngine engine;
+        ScriptEngineManager manager = new ScriptEngineManager();
+        assertNotNull("Manager should not be null", manager);
+        engine = manager.getEngineByName("JEXL");
+        assertNotNull("Engine should not be null (JEXL)", engine);
+        manager.put("global",Integer.valueOf(1));
+        engine.put("local", Integer.valueOf(10));
+        manager.put("both",Integer.valueOf(7));
+        engine.put("both", Integer.valueOf(7));
+        engine.eval("local=local+1");
+        engine.eval("global=global+1");
+        engine.eval("both=both+1"); // should update engine value only
+        engine.eval("newvar=42;");
+        assertEquals(Long.valueOf(2),manager.get("global"));
+        assertEquals(Long.valueOf(11),engine.get("local"));
+        assertEquals(Integer.valueOf(7),manager.get("both"));
+        assertEquals(Long.valueOf(8),engine.get("both"));
+        assertEquals(Integer.valueOf(42),engine.get("newvar"));
+        assertNull(manager.get("newvar"));
+        // TODO how to delete variables in Jexl?
+    }
 }
