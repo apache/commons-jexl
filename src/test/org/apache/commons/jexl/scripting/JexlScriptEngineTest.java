@@ -49,6 +49,7 @@ public class JexlScriptEngineTest extends TestCase {
         assertEquals(newValue,engine.eval("old=value;value=value+1"));
         assertEquals(initialValue,engine.get("old"));
         assertEquals(newValue,engine.get("value"));
+        assertEquals(engine.getContext(),engine.get(JexlScriptEngine.CONTEXT_KEY));
     }
     
     public void testNulls() throws Exception {

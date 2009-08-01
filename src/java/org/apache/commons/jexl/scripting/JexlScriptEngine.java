@@ -55,6 +55,8 @@ import org.apache.commons.jexl.parser.ParseException;
  */
 public class JexlScriptEngine extends AbstractScriptEngine {
 
+    public static final String CONTEXT_KEY = "context";
+
     private final ScriptEngineFactory factory;
     
     private final JexlEngine engine;
@@ -107,7 +109,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
             throw new NullPointerException("script and context must be non-null");
         }
         // This is mandated by JSR-223 (end of section SCR.4.3.4.1.2 - Script Execution)
-        context.setAttribute("context", context, ScriptContext.ENGINE_SCOPE);
+        context.setAttribute(CONTEXT_KEY, context, ScriptContext.ENGINE_SCOPE);
         try {
             Script script = engine.createScript(scriptText);
             JexlContext ctxt = new JexlContext(){
