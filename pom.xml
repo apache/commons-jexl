@@ -82,14 +82,14 @@
       <organization>Apache Software Foundation</organization>
     </developer>
   </developers>
-	
+
   <contributors>
     <contributor>
       <name>Henri Biestro</name>
       <email>hbiestro at gmail dot com</email>
     </contributor>
   </contributors>
-	
+
 
   <dependencies>
     <dependency>
@@ -166,30 +166,18 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>javacc-maven-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.5</version>
           <executions>
             <execution>
               <id>jexl-jjtree</id>
               <configuration>
                 <sourceDirectory>${basedir}/src/java/org/apache/commons/jexl/parser</sourceDirectory>
-                <outputDirectory>${project.build.directory}/generated-sources/java/org/apache/commons/jexl/parser</outputDirectory>
-                <timestampDirectory>${project.build.directory}/generated-sources/javacc-timestamp</timestampDirectory>
-                <packageName>org.apache.commons.jexl.parser</packageName>
-              </configuration>
-              <goals>
-                <goal>jjtree</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>jexl-javacc</id>
-              <configuration>
-                <sourceDirectory>${project.build.directory}/generated-sources/java/org/apache/commons/jexl/parser</sourceDirectory>
                 <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                 <timestampDirectory>${project.build.directory}/generated-sources/javacc-timestamp</timestampDirectory>
                 <packageName>org.apache.commons.jexl.parser</packageName>
               </configuration>
               <goals>
-                <goal>javacc</goal>
+                <goal>jjtree-javacc</goal>
               </goals>
             </execution>
           </executions>
@@ -237,6 +225,16 @@
                 <exclude>apache/commons/jexl/**/*Test.class</exclude>
               </excludes>
             </instrumentation>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>findbugs-maven-plugin</artifactId>
+          <version>2.0.1</version>
+          <configuration>
+            <xmlOutput>true</xmlOutput>
+            <!-- Optional derectory to put findbugs xdoc xml report -->
+            <xmlOutputDirectory>target/site</xmlOutputDirectory>
           </configuration>
         </plugin>
         <plugin>
