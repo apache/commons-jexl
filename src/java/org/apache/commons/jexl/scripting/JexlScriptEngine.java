@@ -42,7 +42,12 @@ import org.apache.commons.jexl.parser.ParseException;
 /**
  * Implements the Jexl ScriptEngine for JSF-223.
  * <p>
- * This implementation only gives access to the ENGINE_SCOPE bindings.
+ * This implementation gives access to both ENGINE_SCOPE and GLOBAL_SCOPE bindings.
+ * When a JEXL script accesses a variable for read or write,
+ * this implementation checks first ENGINE and then GLOBAL scope.
+ * The first one found is used. 
+ * If no variable is found, and the JEXL script is writing to a variable,
+ * it will be stored in the ENGINE scope.
  * </p>
  * See
  * <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">Java Scripting API</a>
