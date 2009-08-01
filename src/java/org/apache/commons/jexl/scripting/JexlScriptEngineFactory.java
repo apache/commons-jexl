@@ -28,6 +28,11 @@ import javax.script.ScriptEngineFactory;
 /**
  * Implements the Jexl ScriptEngineFactory for JSF-223.
  * <p>
+ * Supports the following:<br.>
+ * Language short names: "JEXL", "Jexl", "jexl" <br/>
+ * Extension: "jexl"
+ * </p>
+ * <p>
  * See
  * <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">Java Scripting API</a>
  * Javadoc.
@@ -41,16 +46,16 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
             Arrays.asList("application/x-jexl"));
 
     private final List<String> names = Collections.unmodifiableList(
-            Arrays.asList( "jexl" ));
+            Arrays.asList( "JEXL", "Jexl", "jexl" ));
 
     /** {@inheritDoc} */
     public String getEngineName() {
-        return "Jexl Engine";
+        return "JEXL Engine";
     }
 
     /** {@inheritDoc} */
     public String getEngineVersion() {
-        return "1.0";
+        return "1.0"; // ensure this is updated if function changes are made to this class
     }
 
     /** {@inheritDoc} */
@@ -60,7 +65,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     /** {@inheritDoc} */
     public String getLanguageName() {
-        return "Jexl";
+        return "JEXL";
     }
 
     /** {@inheritDoc} */
