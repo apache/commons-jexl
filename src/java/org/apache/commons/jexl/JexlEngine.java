@@ -102,8 +102,8 @@ public class JexlEngine {
      */
     protected final Parser parser = new Parser(new StringReader(";")); //$NON-NLS-1$
     /**
-     * Whether expressions evaluated by this engine will throw exceptions or 
-     * return null.
+     * Whether expressions evaluated by this engine will throw exceptions (false) or 
+     * return null (true). Default is false.
      */
     protected boolean silent = false;
     /**
@@ -192,7 +192,7 @@ public class JexlEngine {
 
     /**
      * Checks whether this engine throws JexlException during evaluation.
-     * @return true if silent, false otherwise
+     * @return true if silent, false (default) otherwise
      */
     public boolean isSilent() {
         return this.silent;
