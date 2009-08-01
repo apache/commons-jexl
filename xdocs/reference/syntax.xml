@@ -60,8 +60,19 @@
               <li>Invalid: <code>9v</code>,<code>!a99</code>,<code>1$</code></li>
             </ul>
             <p>
+            Variable names are case-sensitive, e.g. <code>var1</code> and <code>Var1</code> are different variables. 
+            </p>
+            <p>
               JEXL also supports <code>ant-style</code> variables, e.g. <source>my.dotted.var</source>
               is a valid variable name.
+              <br/>
+              N.B. the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
+              <code>or and eq ne lt gt le ge div mod not null true false new</code>
+              For example, 
+              <code>my.new.dotted.var</code>
+              is invalid.
+              In such cases, the [ ] operator can be used, for example:
+              <code>my.['new'].dotted.var</code>
             </p>
             <p>
               <strong>NOTE:</strong> JEXL does not support variables with hyphens in them, e.g.
@@ -306,17 +317,11 @@
         <tr>
           <td>Division</td>
           <td>
-            The usual <code>/</code> operator is used.
+            The usual <code>/</code> operator is used, or one can use the <code>div</code> operator.
             For example
             <source>val1 / val2</source>
-          </td>
-        </tr>
-        <tr>
-          <td>Integer Division</td>
-          <td>
-            The <code>div</code> operator is used.
-            For example
-            <source>4 div 3</source> gives 1.
+            or
+            <source>val1 div val2</source>
           </td>
         </tr>
         <tr>
