@@ -49,11 +49,17 @@ import org.apache.commons.jexl.parser.ParseException;
  * If no variable is found, and the JEXL script is writing to a variable,
  * it will be stored in the ENGINE scope.
  * </p>
+ * <p>
+ * The implementation also creates the "JEXL" script object as an instance of the
+ * class {@link JexlScriptObject} for access to utility methods and variables.
+ * </p>
  * See
  * <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">Java Scripting API</a>
  * Javadoc.
  */
 public class JexlScriptEngine extends AbstractScriptEngine {
+
+    public static final String JEXL_OBJECT_KEY = "JEXL";
 
     public static final String CONTEXT_KEY = "context";
 
@@ -68,6 +74,8 @@ public class JexlScriptEngine extends AbstractScriptEngine {
     public JexlScriptEngine(final ScriptEngineFactory _factory) {
         factory = _factory;
         engine = new JexlEngine();
+        // Add utility object
+        this.put(JEXL_OBJECT_KEY, new JexlScriptObject());
     }
 
     /** {@inheritDoc} */
@@ -110,6 +118,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
         }
         // This is mandated by JSR-223 (end of section SCR.4.3.4.1.2 - Script Execution)
         context.setAttribute(CONTEXT_KEY, context, ScriptContext.ENGINE_SCOPE);
+        
         try {
             Script script = engine.createScript(scriptText);
             JexlContext ctxt = new JexlContext(){

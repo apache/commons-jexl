@@ -50,6 +50,10 @@ public class JexlScriptEngineTest extends TestCase {
         assertEquals(initialValue,engine.get("old"));
         assertEquals(newValue,engine.get("value"));
         assertEquals(engine.getContext(),engine.get(JexlScriptEngine.CONTEXT_KEY));
+        // Check behaviour of JEXL object
+        assertNotNull(engine.get("JEXL"));
+        assertEquals(System.out,engine.eval("JEXL.out"));
+        assertEquals(System.err,engine.eval("JEXL.err"));
     }
     
     public void testNulls() throws Exception {
