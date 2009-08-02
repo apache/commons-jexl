@@ -65,24 +65,24 @@
               <li>Invalid: <code>9v</code>,<code>!a99</code>,<code>1$</code></li>
             </ul>
             <p>
-            Variable names are case-sensitive, e.g. <code>var1</code> and <code>Var1</code> are different variables.
-            </p>
-            <p>
-              JEXL also supports <code>ant-style</code> variables, e.g. <source>my.dotted.var</source>
-              is a valid variable name.
-              <br/>
-              N.B. the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
-              <code>or and eq ne lt gt le ge div mod not null true false new</code>
-              For example,
-              <code>my.new.dotted.var</code>
-              is invalid.
-              In such cases, the [ ] operator can be used, for example:
-              <code>my.['new'].dotted.var</code>
+            Variable names are <strong>case-sensitive</strong>, e.g. <code>var1</code> and <code>Var1</code> are different variables.
             </p>
             <p>
               <strong>NOTE:</strong> JEXL does not support variables with hyphens in them, e.g.
-              <source>commons-logging</source> is not a valid variable, but instead is treated as a
+              <source>commons-logging // invalid variable name (hyphenated)</source> is not a valid variable, but instead is treated as a
               subtraction of the variable <code>logging</code> from the variable <code>commons</code>
+            </p>
+            <p>
+              JEXL also supports <code>ant-style</code> variables, the following is a valid variable name:
+              <source>my.dotted.var</source>
+            </p>
+            <p>
+              <strong>N.B.</strong> the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
+              <code>or and eq ne lt gt le ge div mod not null true false new</code>
+              For example, the following is invalid:
+              <source>my.new.dotted.var // invalid ('new' is keyword)</source>
+              In such cases, the [ ] operator can be used, for example:
+              <source>my['new'].dotted.var</source>
             </p>
           </td>
         </tr>
