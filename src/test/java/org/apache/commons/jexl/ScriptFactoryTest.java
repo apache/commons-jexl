@@ -25,7 +25,7 @@ import java.net.URL;
  * @since 1.1
  */
 public class ScriptFactoryTest extends JexlTestCase {
-    static final String TEST1 = "src/test-scripts/test1.jexl";
+    static final String TEST1 = "src/test/scripts/test1.jexl";
     /**
      * Creates a new test case.
      * @param name the test case name.
@@ -97,7 +97,7 @@ public class ScriptFactoryTest extends JexlTestCase {
      * @throws Exception on a parse error.
      */
     public void testCreateFromURL() throws Exception {
-        URL testUrl = new File("src/test-scripts/test1.jexl").toURI().toURL();
+        URL testUrl = new File("src/test/scripts/test1.jexl").toURI().toURL();
         assertNotNull("No script created", ScriptFactory.createScript(testUrl));
     }
 
