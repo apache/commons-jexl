@@ -38,10 +38,10 @@ public class JexlScriptEngineTest extends TestCase {
         assertEquals(initialValue,engine.eval("123"));
         assertEquals(initialValue,engine.eval("0;123"));// multiple statements
         long time1 = System.currentTimeMillis();
-        Long time2 = (Long) engine.eval("" +
-        		"sys=context.class.forName(\"java.lang.System\");"
-        		+"now=sys.currentTimeMillis();"
-        		);
+        Long time2 = (Long) engine.eval(
+             "sys=context.class.forName(\"java.lang.System\");"
+            +"now=sys.currentTimeMillis();"
+            );
         assertTrue("Must take some time to process this",time1 <= time2.longValue());
         engine.put("value", initialValue);
         assertEquals(initialValue,engine.get("value"));
