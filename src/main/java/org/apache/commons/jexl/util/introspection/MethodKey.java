@@ -428,7 +428,7 @@ public final class MethodKey {
         }
 
         /**
-         * @see isInvocationConvertible(Class, Class, boolean)
+         * @see #isInvocationConvertible(Class, Class, boolean)
          * @param formal         the formal parameter type to which the actual
          *                       parameter type should be convertible
          * @param actual         the actual parameter type.
@@ -448,7 +448,7 @@ public final class MethodKey {
         }
 
         /**
-         * @see isStrictInvocationConvertible(Class, Class, boolean)
+         * @see #isStrictInvocationConvertible(Class, Class, boolean)
          * @param formal         the formal parameter type to which the actual
          *                       parameter type should be convertible
          * @param actual         the actual parameter type.
@@ -608,6 +608,7 @@ public final class MethodKey {
      * The parameter matching service for methods.
      */
     public static final Parameters<Method> METHODS = new Parameters<Method>() {
+        @Override
         protected Class<?>[] getParameterTypes(Method app) {
             return app.getParameterTypes();
         }
@@ -618,6 +619,7 @@ public final class MethodKey {
      * The parameter matching service for constructors.
      */
     public static final Parameters<Constructor<?>> CONSTRUCTORS = new Parameters<Constructor<?>>() {
+        @Override
         protected Class<?>[] getParameterTypes(Constructor<?> app) {
             return app.getParameterTypes();
         }
