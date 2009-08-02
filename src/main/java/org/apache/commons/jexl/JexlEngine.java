@@ -107,13 +107,13 @@ public class JexlEngine {
      */
     protected boolean silent = false;
     /**
-     * Wheter error messages will carry debugging information.
+     * Whether error messages will carry debugging information.
      */
     protected boolean debug = true;
     /**
      *  The map of 'prefix:function' to object implementing the function.
      */
-    protected Map<String, Object> functions = Collections.EMPTY_MAP;
+    protected Map<String, Object> functions = Collections.emptyMap();
     /**
      * The expression cache.
      */
@@ -123,12 +123,12 @@ public class JexlEngine {
      */
     protected static final JexlContext EMPTY_CONTEXT = new JexlContext() {
         /** {@inheritDoc} */
-        public void setVars(Map vars) {
+        public void setVars(Map<String, Object> vars) {
             throw new UnsupportedOperationException("Immutable JexlContext");
         }
         /** {@inheritDoc} */
-        public Map getVars() {
-            return java.util.Collections.EMPTY_MAP;
+        public Map<String, Object> getVars() {
+            return Collections.emptyMap();
         }
     };
     /**
