@@ -6,14 +6,13 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
  */
 
 package org.apache.commons.jexl.scripting;
@@ -59,23 +58,39 @@ import org.apache.commons.jexl.parser.ParseException;
  */
 public class JexlScriptEngine extends AbstractScriptEngine {
 
+    /** Reserved key for JexlScriptObject. */
     public static final String JEXL_OBJECT_KEY = "JEXL";
 
+    /** Reserved key for context (mandated by JSR-223). */
     public static final String CONTEXT_KEY = "context";
 
-    private final ScriptEngineFactory factory;
+    /** The factory which created this instance. */
+    private final ScriptEngineFactory parentFactory;
     
-    private final JexlEngine engine;
+    /** The JEXL EL engine. */
+    private final JexlEngine jexlEngine;
     
+    /**
+     * Default constructor.
+     */
     public JexlScriptEngine() {
         this(null);
     }
 
-    public JexlScriptEngine(final ScriptEngineFactory _factory) {
-        factory = _factory;
-        engine = new JexlEngine();
+    /**
+     * Create a scripting engine using the supplied factory.
+     * 
+     * @param factory the factory which created this instance.
+     * @throws NullPointerException if factory is null
+     */
+    public JexlScriptEngine(final ScriptEngineFactory factory) {
+        if (factory == null) {
+            throw new NullPointerException("ScriptEngineFactory must not be null");
+        }
+        parentFactory = factory;
+        jexlEngine = new JexlEngine();
         // Add utility object
-        this.put(JEXL_OBJECT_KEY, new JexlScriptObject());
+        put(JEXL_OBJECT_KEY, new JexlScriptObject());
     }
 
     /** {@inheritDoc} */
@@ -104,6 +119,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
             try {
                 reader.close();
             } catch (IOException e) {
+                // NOOP
             }
         }
         return eval(buffer.toString(), context);
@@ -120,7 +136,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
         context.setAttribute(CONTEXT_KEY, context, ScriptContext.ENGINE_SCOPE);
         
         try {
-            Script script = engine.createScript(scriptText);
+            Script script = jexlEngine.createScript(scriptText);
             JexlContext ctxt = new JexlContext(){
                 public void setVars(Map vars) {
                     context.setBindings(new SimpleBindings(vars), ScriptContext.ENGINE_SCOPE);
@@ -140,15 +156,18 @@ public class JexlScriptEngine extends AbstractScriptEngine {
 
     /** {@inheritDoc} */
     public ScriptEngineFactory getFactory() {
-        return factory == null ? SingletonHolder.DEFAULT_FACTORY : factory;
+        return parentFactory == null ? SingletonHolder.DEFAULT_FACTORY : parentFactory;
     }
 
-    // IODH - lazy initialisation
+    /**
+     * Holds singleton JexlScriptEngineFactory (IODH). 
+     */
     private static class SingletonHolder {
+        /** The singleton instance. */
         private static final JexlScriptEngineFactory DEFAULT_FACTORY = new JexlScriptEngineFactory();
     }
 
-    /*
+    /**
      * Wrapper to help convert a JSR-223 ScriptContext into a JexlContext.
      * 
      * Current implementation only gives access to ENGINE_SCOPE binding.
@@ -156,90 +175,100 @@ public class JexlScriptEngine extends AbstractScriptEngine {
     @SuppressWarnings("unchecked")
     private static class JexlContextWrapper implements Map<String,Object> {
         
-        private final ScriptContext context;
+        /** The engine context. */
+        private final ScriptContext engineContext;
 
-        private JexlContextWrapper (final ScriptContext _context){
-            context = _context;
+        /**
+         * Create the class.
+         * 
+         * @param context the engine context.
+         */
+        private JexlContextWrapper (final ScriptContext  context){
+            engineContext = context;
         }
 
-        /*
-         * TODO how to handle clear, containsKey() etc.?
-         * Should they be restricted to engine scope, or should they apply to the
-         * union of the two scopes?
-         * Are they actually used by Jexl? 
-         */
-
+        /** {@inheritDoc} */
         public void clear() {
-            Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
+            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
             bnd.clear();
         }
 
+        /** {@inheritDoc} */
         public boolean containsKey(final Object key) {
-            Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
+            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
             return bnd.containsKey(key);
         }
 
+        /** {@inheritDoc} */
         public boolean containsValue(final Object value) {
-            Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
+            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
             return bnd.containsValue(value);
         }
 
+        /** {@inheritDoc} */
         public Set entrySet() {
-            Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
+            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
             return bnd.entrySet();
         }
 
         // Fetch first match of key, either engine or global
+        /** {@inheritDoc} */
         public Object get(final Object key) {
             if (key instanceof String) {
-                return context.getAttribute((String) key);
+                return engineContext.getAttribute((String) key);
             }
             return null;
         }
 
+        /** {@inheritDoc} */
         public boolean isEmpty() {
-            Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
+            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
             return bnd.isEmpty();
         }
 
+        /** {@inheritDoc} */
         public Set keySet() {
-            Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
+            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
             return bnd.keySet();
         }
 
         // Update existing key if found, else create new engine key
-        // TODO - how do we create global keys?
+        /** {@inheritDoc} */
         public Object put(final String key, final Object value) {
-            int scope = context.getAttributesScope(key);
+            int scope = engineContext.getAttributesScope(key);
             if (scope == -1) { // not found, default to engine
                 scope = ScriptContext.ENGINE_SCOPE;
             }
-            return context.getBindings(scope).put(key , value);
+            return engineContext.getBindings(scope).put(key , value);
         }
 
+        /** {@inheritDoc} */
         public void putAll(Map t) {
-            Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
+            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
             bnd.putAll(t); // N.B. SimpleBindings checks for valid keys
         }
 
         // N.B. if there is more than one copy of the key, only the nearest will be removed.
+        /** {@inheritDoc} */
         public Object remove(Object key) {
             if (key instanceof String){
-                int scope = context.getAttributesScope((String) key);
+                int scope = engineContext.getAttributesScope((String) key);
                 if (scope != -1) { // found an entry
-                    return context.removeAttribute((String)key, scope);
+                    return engineContext.removeAttribute((String)key, scope);
                 }
             }
             return null;
         }
 
+        /** {@inheritDoc} */
         public int size() {
-            Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
+            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
             return bnd.size();
         }
 
+        /** {@inheritDoc} */
         public Collection values() {
-            Bindings bnd = context.getBindings(ScriptContext.ENGINE_SCOPE);
+            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
             return bnd.values();
         }
 
