@@ -178,7 +178,6 @@ public class Introspector  {
     public final AbstractExecutor.Get getGetExecutor(Object obj, Object identifier) {
         final Class<?> claz = obj.getClass();
         final String property = toString(identifier);
-        Method method;
         AbstractExecutor.Get executor;
         // first try for a getFoo() type of property (also getfoo() )
         if (property != null) {
