@@ -736,7 +736,7 @@ public class Interpreter implements ParserVisitor {
                 }
             }
             if (xjexl == null) {
-                Object eval = vm.invoke(data, argv);
+                Object eval = vm.invoke(data, argv); // vm cannot be null if xjexl is null
                 // cache executor in volatile JexlNode.value
                 if (cache) {
                     node.jjtSetValue(vm);
@@ -752,12 +752,11 @@ public class Interpreter implements ParserVisitor {
         } catch (Exception e) {
             xjexl = new JexlException(node, "method error", e);
         }
-        if (xjexl != null) {
-            if (strict) {
-                throw xjexl;
-            }
-            logger.warn(xjexl.getMessage(), xjexl.getCause());
+        // xjexl cannot be null here
+        if (strict) {
+            throw xjexl;
         }
+        logger.warn(xjexl.getMessage(), xjexl.getCause());
         return null;
     }
 
@@ -797,12 +796,11 @@ public class Interpreter implements ParserVisitor {
         } catch (Exception e) {
             xjexl = new JexlException(node, "constructor error", e);
         }
-        if (xjexl != null) {
-            if (strict) {
-                throw xjexl;
-            }
-            logger.warn(xjexl.getMessage(), xjexl.getCause());
+        // xjexl cannot be null here
+        if (strict) {
+            throw xjexl;
         }
+        logger.warn(xjexl.getMessage(), xjexl.getCause());
         return null;
     }
 
@@ -849,7 +847,7 @@ public class Interpreter implements ParserVisitor {
                 }
             }
             if (xjexl == null) {
-                Object eval = vm.invoke(namespace, argv);
+                Object eval = vm.invoke(namespace, argv); // vm cannot be null if xjexl is null
                 // cache executor in volatile JexlNode.value
                 if (cache) {
                     node.jjtSetValue(vm);
@@ -865,12 +863,11 @@ public class Interpreter implements ParserVisitor {
         } catch (Exception e) {
             xjexl = new JexlException(node, "function error", e);
         }
-        if (xjexl != null) {
-            if (strict) {
-                throw xjexl;
-            }
-            logger.warn(xjexl.getMessage(), xjexl.getCause());
+        // xjexl cannot be null here
+        if (strict) {
+            throw xjexl;
         }
+        logger.warn(xjexl.getMessage(), xjexl.getCause());
         return null;
     }
 
