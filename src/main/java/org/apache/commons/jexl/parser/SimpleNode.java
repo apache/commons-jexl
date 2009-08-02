@@ -108,6 +108,7 @@ public class SimpleNode implements Node {
      toString(String), otherwise overriding toString() is probably all
      you need to do. */
 
+  @Override
   public String toString() { return ParserTreeConstants.jjtNodeName[id]; }
   public String toString(String prefix) { return prefix + toString(); }
 
@@ -118,7 +119,7 @@ public class SimpleNode implements Node {
     System.out.println(toString(prefix));
     if (children != null) {
       for (int i = 0; i < children.length; ++i) {
-  SimpleNode n = (SimpleNode)children[i];
+  SimpleNode n = children[i];
   if (n != null) {
     n.dump(prefix + " ");
   }
