@@ -90,10 +90,10 @@ public class Introspector  {
             return null;
         }
         if (arg instanceof Number) {
-            return ((Number) arg).intValue();
+            return Integer.valueOf(((Number) arg).intValue());
         }
         try {
-            return Integer.parseInt(arg.toString());
+            return Integer.valueOf(arg.toString());
         } catch(NumberFormatException xnumber) {
             return null;
         }
