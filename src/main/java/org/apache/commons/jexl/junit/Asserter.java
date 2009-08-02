@@ -39,7 +39,7 @@ import org.apache.commons.jexl.JexlHelper;
 public class Asserter extends Assert {
 
     /** variables used during asserts. */
-    private final Map variables = new HashMap();
+    private final Map<String, Object> variables = new HashMap<String, Object>();
     /** context to use during asserts. */
     private final JexlContext context = JexlHelper.createContext();
 
