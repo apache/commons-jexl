@@ -155,8 +155,8 @@
           <artifactId>maven-assembly-plugin</artifactId>
           <configuration>
             <descriptors>
-              <descriptor>src/assembly/bin.xml</descriptor>
-              <descriptor>src/assembly/src.xml</descriptor>
+              <descriptor>src/main/assembly/bin.xml</descriptor>
+              <descriptor>src/main/assembly/src.xml</descriptor>
             </descriptors>
             <tarLongFileMode>gnu</tarLongFileMode>
           </configuration>
@@ -206,9 +206,9 @@
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>2.3</version>
           <configuration>
-            <configLocation>${basedir}/src/conf/checkstyle.xml</configLocation>
+            <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
             <excludes>org/apache/commons/jexl/parser/*.java</excludes>
-            <headerFile>${basedir}/src/conf/header.txt</headerFile>
+            <headerFile>${basedir}/src/main/config/header.txt</headerFile>
             <enableRulesSummary>false</enableRulesSummary>
           </configuration>
         </plugin>
