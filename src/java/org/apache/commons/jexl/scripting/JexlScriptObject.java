@@ -27,14 +27,14 @@ import java.io.PrintStream;
  * <ul>
  * <li>out - System.out</li>
  * <li>err - System.err</li>
+ * <li>System - System.class</li>
  * <li></li>
  * </ul>
  * </p>
  */
 public class JexlScriptObject {
 
-     public JexlScriptObject(){
-        
+    public JexlScriptObject(){
     }
 
     public static PrintStream getOut() {
@@ -43,6 +43,10 @@ public class JexlScriptObject {
 
     public static PrintStream getErr() {
         return System.err;
+    }
+
+    public static Class<System> getSystem() {
+        return System.class;
     }
 
 }
