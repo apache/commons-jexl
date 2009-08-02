@@ -141,8 +141,6 @@
           <directory>src/main/resources</directory>
       </resource>
     </resources>
-    <sourceDirectory>src/java</sourceDirectory>
-    <testSourceDirectory>src/test</testSourceDirectory>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -171,7 +169,7 @@
             <execution>
               <id>jexl-jjtree</id>
               <configuration>
-                <sourceDirectory>${basedir}/src/java/org/apache/commons/jexl/parser</sourceDirectory>
+                <sourceDirectory>${basedir}/src/main/java/org/apache/commons/jexl/parser</sourceDirectory>
                 <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                 <timestampDirectory>${project.build.directory}/generated-sources/javacc-timestamp</timestampDirectory>
                 <packageName>org.apache.commons.jexl.parser</packageName>
