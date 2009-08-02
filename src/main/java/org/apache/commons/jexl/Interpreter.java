@@ -81,7 +81,6 @@ import org.apache.commons.jexl.parser.Node;
 import org.apache.commons.jexl.parser.ParserVisitor;
 
 import org.apache.commons.jexl.util.AbstractExecutor;
-import org.apache.commons.jexl.util.introspection.DebugInfo;
 import org.apache.commons.jexl.util.introspection.Uberspect;
 import org.apache.commons.jexl.util.introspection.VelMethod;
 import org.apache.commons.jexl.util.introspection.VelPropertyGet;
@@ -515,7 +514,7 @@ public class Interpreter implements ParserVisitor {
         // make sure there is a value to iterate on and a statement to execute
         if (iterableValue != null && node.jjtGetNumChildren() >= 3) {
             /* third objectNode is the statement to execute */
-            JexlNode statement = (JexlNode) node.jjtGetChild(2);
+            JexlNode statement = node.jjtGetChild(2);
             // get an iterator for the collection/array etc via the
             // introspector.
             Iterator<?> itemsIterator = getUberspect().getIterator(iterableValue, node);
@@ -717,7 +716,7 @@ public class Interpreter implements ParserVisitor {
         JexlException xjexl = null;
         try {
             // attempt to reuse last executor cached in volatile JexlNode.value
-            if (node != null && cache) {
+            if (cache) {
                 Object cached = node.jjtGetValue();
                 if (cached instanceof AbstractExecutor.Method) {
                     AbstractExecutor.Method me = (AbstractExecutor.Method) cached;
@@ -739,7 +738,7 @@ public class Interpreter implements ParserVisitor {
             if (xjexl == null) {
                 Object eval = vm.invoke(data, argv);
                 // cache executor in volatile JexlNode.value
-                if (node != null && cache) {
+                if (cache) {
                     node.jjtSetValue(vm);
                 }
                 return eval;
@@ -828,7 +827,7 @@ public class Interpreter implements ParserVisitor {
         JexlException xjexl = null;
         try {
             // attempt to reuse last executor cached in volatile JexlNode.value
-            if (node != null && cache) {
+            if (cache) {
                 Object cached = node.jjtGetValue();
                 if (cached instanceof AbstractExecutor.Method) {
                     AbstractExecutor.Method me = (AbstractExecutor.Method) cached;
@@ -852,7 +851,7 @@ public class Interpreter implements ParserVisitor {
             if (xjexl == null) {
                 Object eval = vm.invoke(namespace, argv);
                 // cache executor in volatile JexlNode.value
-                if (node != null && cache) {
+                if (cache) {
                     node.jjtSetValue(vm);
                 }
                 return eval;
@@ -1124,7 +1123,7 @@ public class Interpreter implements ParserVisitor {
             // check if there is a size method on the object that returns an
             // integer and if so, just use it
             Object[] params = new Object[0];
-            VelMethod vm = uberspect.getMethod(val, "size", EMPTY_PARAMS, (DebugInfo) node);
+            VelMethod vm = uberspect.getMethod(val, "size", EMPTY_PARAMS, node);
             if (vm != null && vm.getReturnType() == Integer.TYPE) {
                 Integer result;
                 try {
