@@ -99,17 +99,17 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     /** {@inheritDoc} */
     public Object getParameter(String key) {
-        if (key == ScriptEngine.ENGINE) {
+        if (key.equals(ScriptEngine.ENGINE)) {
             return getEngineName();
-        } else if (key == ScriptEngine.ENGINE_VERSION) {
+        } else if (key.equals(ScriptEngine.ENGINE_VERSION)) {
             return getEngineVersion();
-        } else if (key == ScriptEngine.NAME) {
+        } else if (key.equals(ScriptEngine.NAME)) {
             return getNames();
-        } else if (key == ScriptEngine.LANGUAGE) {
+        } else if (key.equals(ScriptEngine.LANGUAGE)) {
             return getLanguageName();
-        } else if(key == ScriptEngine.ENGINE_VERSION) {
+        } else if(key.equals(ScriptEngine.ENGINE_VERSION)) {
             return getLanguageVersion();
-        } else if (key == "THREADING") {
+        } else if (key.equals("THREADING")) {
             return null;//"MULTITHREADED"; // TODO what is the correct value here?
         } 
         return null;
