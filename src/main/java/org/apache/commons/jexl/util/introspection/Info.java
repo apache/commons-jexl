@@ -79,6 +79,7 @@ public class Info implements DebugInfo {
     /**
      * Gets the template name.
      * @return template name
+     * @deprecated Use {@link #getName()} instead
      */
     @Deprecated
     public String getTemplateName() {

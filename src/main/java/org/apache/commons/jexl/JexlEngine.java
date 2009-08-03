@@ -663,6 +663,7 @@ public class JexlEngine {
     /**
      * Retrieves a default JEXL engine.
      * @return the singleton
+     * @deprecated use a new instance JexlEngine instead.
      */
     // CSOFF: DoubleCheckedLocking
     @Deprecated
