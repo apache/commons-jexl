@@ -72,9 +72,12 @@ public class JexlScriptEngine extends AbstractScriptEngine {
     
     /**
      * Default constructor.
+     * <p>
+     * Only intended for use when not using a factory.
+     * Sets the factory to {@link JexlScriptEngineFactory}.
      */
     public JexlScriptEngine() {
-        this(null);
+        this(SingletonHolder.DEFAULT_FACTORY);
     }
 
     /**
@@ -156,7 +159,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
 
     /** {@inheritDoc} */
     public ScriptEngineFactory getFactory() {
-        return parentFactory == null ? SingletonHolder.DEFAULT_FACTORY : parentFactory;
+        return parentFactory;
     }
 
     /**
