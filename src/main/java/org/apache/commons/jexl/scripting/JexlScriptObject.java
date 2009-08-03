@@ -19,6 +19,9 @@ package org.apache.commons.jexl.scripting;
 
 import java.io.PrintStream;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Implements variables and methods for use by JEXL scripts.
  * <p>
@@ -26,6 +29,7 @@ import java.io.PrintStream;
  * <ul>
  * <li>out - System.out</li>
  * <li>err - System.err</li>
+ * <li>logger - a logger</li>
  * <li>System - System.class</li>
  * <li></li>
  * </ul>
@@ -66,4 +70,7 @@ public class JexlScriptObject {
         return System.class;
     }
 
+    public static Log getLogger(){
+        return LogFactory.getLog(JexlScriptEngine.class); // TODO is this the correct class?
+    }
 }
