@@ -70,6 +70,11 @@ public class JexlScriptObject {
         return System.class;
     }
 
+    /**
+     * Gives access to a logger.
+     * 
+     * @return a logger using the class JexlScriptEngine
+     */
     public static Log getLogger(){
         return LogFactory.getLog(JexlScriptEngine.class); // TODO is this the correct class?
     }
