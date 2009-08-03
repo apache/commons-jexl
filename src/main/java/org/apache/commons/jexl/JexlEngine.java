@@ -256,7 +256,7 @@ public class JexlEngine {
      * is passed, the empty collection is used.
      */
     public void setFunctions(Map<String, Object> funcs) {
-        functions = funcs != null ? funcs : Collections.EMPTY_MAP;
+        functions = funcs != null ? funcs : Collections.<String, Object>emptyMap();
     }
 
     /**
