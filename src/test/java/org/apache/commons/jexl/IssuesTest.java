@@ -33,16 +33,16 @@ public class IssuesTest  extends JexlTestCase {
     public void test49() throws Exception {
         JexlContext ctxt = JexlHelper.createContext();
         String stmt = "{a = 'b'; c = 'd';}";
-        Script expr = ScriptFactory.createScript(stmt);
-        Object value = expr.execute(ctxt);
-        Map vars = ctxt.getVars();
+        Script expr = JEXL.createScript(stmt);
+        /* Object value = */ expr.execute(ctxt);
+        Map<String, Object> vars = ctxt.getVars();
         assertTrue("JEXL-49 is not fixed", vars.get("a").equals("b") && vars.get("c").equals("d"));
     }
 
 
     // JEXL-48: bad assignment detection
      public static class Another {
-        private Boolean foo = true;
+        private Boolean foo = Boolean.TRUE;
         public Boolean foo() {
             return foo;
         }
@@ -71,7 +71,7 @@ public class IssuesTest  extends JexlTestCase {
         jc.getVars().put("foo", new Foo() );
 
         try {
-            Object o = e.evaluate(jc);
+            /* Object o = */ e.evaluate(jc);
             fail("Should have failed due to invalid assignment");
         }
         catch(JexlException xjexl) {
@@ -89,15 +89,15 @@ public class IssuesTest  extends JexlTestCase {
 
         Expression expr = jexl.createExpression( "true//false\n" );
         Object value = expr.evaluate(ctxt);
-        assertTrue("should be true", (Boolean) value);
+        assertTrue("should be true", ((Boolean) value).booleanValue());
 
         expr = jexl.createExpression( "/*true*/false" );
         value = expr.evaluate(ctxt);
-        assertFalse("should be false", (Boolean) value);
+        assertFalse("should be false", ((Boolean) value).booleanValue());
 
         expr = jexl.createExpression( "/*\"true\"*/false" );
         value = expr.evaluate(ctxt);
-        assertFalse("should be false", (Boolean) value);
+        assertFalse("should be false", ((Boolean) value).booleanValue());
     }
 
     // JEXL-42: NullPointerException evaluating an expression
@@ -122,6 +122,7 @@ public class IssuesTest  extends JexlTestCase {
     }
 
     class Derived extends Base {
+      @Override
       public boolean foo() {
           return true;
       }
@@ -136,7 +137,7 @@ public class IssuesTest  extends JexlTestCase {
 
         Expression expr = jexl.createExpression( "derived.foo()" );
         Object value = expr.evaluate(ctxt);
-        assertTrue("should be true", (Boolean) value);
+        assertTrue("should be true", ((Boolean) value).booleanValue());
     }
 
     // JEXL-52: can be implemented by deriving Interpreter.{g,s}etAttribute; later
@@ -172,13 +173,11 @@ public class IssuesTest  extends JexlTestCase {
         for(int e = 0; e < exprs.length; ++e) {
             try {
                 Expression expr = jexl.createExpression( exprs[e]);
-                Object value = expr.evaluate(ctxt);
+                /* Object value = */ expr.evaluate(ctxt);
                 fail("Should have failed due to null argument");
             }
             catch(JexlException xjexl) {
                 // expected
-                String msg = xjexl.toString();
-                String xmsg = msg;
             }
         }
     }

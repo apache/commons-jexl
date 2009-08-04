@@ -26,6 +26,9 @@ import junit.framework.TestCase;
 public class JexlTestCase extends TestCase {
     private static final Class<?>[] noParms = {};
 
+    /** A default Jexl engine instance. */
+    protected final JexlEngine JEXL = new JexlEngine();
+
     public JexlTestCase(String name) {
         super(name);
     }

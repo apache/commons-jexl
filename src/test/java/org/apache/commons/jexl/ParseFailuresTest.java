@@ -20,7 +20,7 @@ import org.apache.commons.jexl.parser.ParseException;
 
 /**
  * Tests for malformed expressions and scripts.
- * ({@link ExpressionFactory} and {@link ScriptFactory} should throw
+ * ({@link JexlEngine#createExpression(String)} and {@link JexlEngine#createScript(String)} should throw
  * {@link ParseException}s).
  *
  * @since 1.1
@@ -40,7 +40,7 @@ public class ParseFailuresTest extends JexlTestCase {
         // this will throw a ParseException
         String badExpression = "eq";
         try {
-            ExpressionFactory.createExpression(badExpression);
+            JEXL.createExpression(badExpression);
             fail("Parsing \"" + badExpression
                 + "\" should result in a ParseException");
         } catch (ParseException pe) {
@@ -52,7 +52,7 @@ public class ParseFailuresTest extends JexlTestCase {
         // this will throw a TokenMgrErr, which we rethrow as a ParseException
         String badExpression = "?";
         try {
-            ExpressionFactory.createExpression(badExpression);
+            JEXL.createExpression(badExpression);
             fail("Parsing \"" + badExpression
                 + "\" should result in a ParseException");
         } catch (ParseException pe) {
@@ -64,7 +64,7 @@ public class ParseFailuresTest extends JexlTestCase {
         // this will throw a TokenMgrErr, which we rethrow as a ParseException
         String badScript = "eq";
         try {
-            ScriptFactory.createScript(badScript);
+            JEXL.createScript(badScript);
             fail("Parsing \"" + badScript
                 + "\" should result in a ParseException");
         } catch (ParseException pe) {
@@ -77,7 +77,7 @@ public class ParseFailuresTest extends JexlTestCase {
         // this will throw a TokenMgrErr, which we rethrow as a ParseException
         String badScript = "?";
         try {
-            ScriptFactory.createScript(badScript);
+            JEXL.createScript(badScript);
             fail("Parsing \"" + badScript
                 + "\" should result in a ParseException");
         } catch (ParseException pe) {
@@ -89,7 +89,7 @@ public class ParseFailuresTest extends JexlTestCase {
         // this will throw a TokenMgrErr, which we rethrow as a ParseException
         String badScript = "foo=1;bar=2;a?b:c:d;";
         try {
-            ScriptFactory.createScript(badScript);
+            JEXL.createScript(badScript);
             fail("Parsing \"" + badScript
                 + "\" should result in a ParseException");
         } catch (ParseException pe) {

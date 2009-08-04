@@ -68,7 +68,7 @@ public class JexlTest extends JexlTestCase
          *  tests a simple property expression
          */
 
-        Expression e = ExpressionFactory.createExpression("foo.bar");
+        Expression e = JEXL.createExpression("foo.bar");
         JexlContext jc = JexlHelper.createContext();
 
         jc.getVars().put("foo", new Foo() );
@@ -172,9 +172,9 @@ public class JexlTest extends JexlTestCase
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("string", "");
         jc.getVars().put("array", new Object[0]);
-        jc.getVars().put("map", new HashMap());
-        jc.getVars().put("list", new ArrayList());
-        jc.getVars().put("set", (new HashMap()).keySet());
+        jc.getVars().put("map", new HashMap<Object, Object>());
+        jc.getVars().put("list", new ArrayList<Object>());
+        jc.getVars().put("set", (new HashMap<Object, Object>()).keySet());
         jc.getVars().put("longstring", "thingthing");
 
         /*
@@ -197,7 +197,7 @@ public class JexlTest extends JexlTestCase
         jc.getVars().put("s", "five!");
         jc.getVars().put("array", new Object[5]);
 
-        Map map = new HashMap();
+        Map<String, Integer> map = new HashMap<String, Integer>();
 
         map.put("1", new Integer(1));
         map.put("2", new Integer(2));
@@ -207,7 +207,7 @@ public class JexlTest extends JexlTestCase
 
         jc.getVars().put("map", map);
 
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
 
         list.add("1");
         list.add("2");
@@ -218,7 +218,7 @@ public class JexlTest extends JexlTestCase
         jc.getVars().put("list", list);
 
         // 30652 - support for set
-        Set set = new HashSet();
+        Set<String> set = new HashSet<String>();
         set.addAll(list);
         set.add("1");
         
@@ -247,7 +247,7 @@ public class JexlTest extends JexlTestCase
     public void testSizeAsProperty() throws Exception
     {
         JexlContext jc = JexlHelper.createContext();
-        Map map = new HashMap();
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("size", "cheese");
         jc.getVars().put("map", map);
         jc.getVars().put("foo", new Foo());
@@ -269,13 +269,13 @@ public class JexlTest extends JexlTestCase
         jc.getVars().put("foo", "org.apache.commons.jexl.Foo");
         Expression expr;
         Object value;
-        expr = ExpressionFactory.createExpression("new(double, 1)");
+        expr = JEXL.createExpression("new(double, 1)");
         value = expr.evaluate(jc);
         assertEquals(expr.toString(), new Double(1.0), value);
-        expr = ExpressionFactory.createExpression("new('java.lang.Float', 100)");
+        expr = JEXL.createExpression("new('java.lang.Float', 100)");
         value = expr.evaluate(jc);
         assertEquals(expr.toString(), new Float(100.0), value);
-        expr = ExpressionFactory.createExpression("new(foo).quux");
+        expr = JEXL.createExpression("new(foo).quux");
         value = expr.evaluate(jc);
         assertEquals(expr.toString(), "Repeat : quux", value);
     }
@@ -319,8 +319,8 @@ public class JexlTest extends JexlTestCase
         jc.getVars().put("aChar", new Character('A'));
         jc.getVars().put("aBool", Boolean.TRUE);
         StringBuffer buffer = new StringBuffer("abc");
-        List list = new ArrayList();
-        List list2 = new LinkedList();
+        List<Object> list = new ArrayList<Object>();
+        List<Object> list2 = new LinkedList<Object>();
         jc.getVars().put("aBuffer", buffer);
         jc.getVars().put("aList", list);
         jc.getVars().put("bList", list2);
@@ -501,7 +501,7 @@ public class JexlTest extends JexlTestCase
     public void testMapDot()
          throws Exception
     {
-        Map foo = new HashMap();
+        Map<String, String> foo = new HashMap<String, String>();
         foo.put( "bar", "123" );
 
         JexlContext jc = JexlHelper.createContext();
@@ -586,8 +586,8 @@ public class JexlTest extends JexlTestCase
     public void testEmptySubListOfMap() throws Exception
     {
         JexlContext jc = JexlHelper.createContext();
-        Map m = new HashMap();
-        m.put("aList", new ArrayList());
+        Map<String, ArrayList<?>> m = new HashMap<String, ArrayList<?>>();
+        m.put("aList", new ArrayList<Object>());
 
         jc.getVars().put( "aMap", m );
 
@@ -625,7 +625,7 @@ public class JexlTest extends JexlTestCase
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("first", Boolean.FALSE);
         jc.getVars().put("foo", tester);
-        Expression expr = ExpressionFactory.createExpression("first and foo.trueAndModify");
+        Expression expr = JEXL.createExpression("first and foo.trueAndModify");
         expr.evaluate(jc);
         assertTrue("Short circuit failure: rhs evaluated when lhs FALSE", !tester.getModified());
         // handle true for the left arg of 'and' 
@@ -647,7 +647,7 @@ public class JexlTest extends JexlTestCase
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("first", Boolean.FALSE);
         jc.getVars().put("foo", tester);
-        Expression expr = ExpressionFactory.createExpression("first or foo.trueAndModify");
+        Expression expr = JEXL.createExpression("first or foo.trueAndModify");
         expr.evaluate(jc);
         assertTrue("Short circuit failure: rhs not evaluated when lhs FALSE", tester.getModified());
         // handle true for the left arg of 'or' 
@@ -672,7 +672,7 @@ public class JexlTest extends JexlTestCase
 
     public void testToString() throws Exception {
         String code = "abcd";
-        Expression expr = ExpressionFactory.createExpression(code);
+        Expression expr = JEXL.createExpression(code);
         assertEquals("Bad expression value", code, expr.toString());
     }
     
@@ -747,6 +747,7 @@ public class JexlTest extends JexlTestCase
 
     public static final class Duck {
         int user = 10;
+        @SuppressWarnings("boxing")
         public Integer get(String val) {
             if ("zero".equals(val))
                 return 0;
@@ -756,6 +757,7 @@ public class JexlTest extends JexlTestCase
                 return user;
             return -1;
         }
+        @SuppressWarnings("boxing")
         public void put(String val, Object value) {
             if ("user".equals(val)) {
                 if ("zero".equals(value))
@@ -768,6 +770,7 @@ public class JexlTest extends JexlTestCase
         }
     }
 
+    @SuppressWarnings("boxing")
     public void testDuck() throws Exception {
         JexlEngine jexl = new JexlEngine();
         JexlContext jc = JexlHelper.createContext();
@@ -793,6 +796,7 @@ public class JexlTest extends JexlTestCase
         assertEquals(expr.toString(), 0, result);
     }
 
+    @SuppressWarnings("boxing")
     public void testArray() throws Exception {
         int[] array = { 100, 101 , 102 };
         JexlEngine jexl = new JexlEngine();
@@ -817,7 +821,7 @@ public class JexlTest extends JexlTestCase
      */
     protected void assertExpression(JexlContext jc, String expression, Object expected) throws Exception
     {
-        Expression e = ExpressionFactory.createExpression(expression);
+        Expression e = JEXL.createExpression(expression);
         Object actual = e.evaluate(jc);
         assertEquals(expression, expected, actual);
     }
