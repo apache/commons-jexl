@@ -26,6 +26,7 @@ import org.apache.commons.jexl.junit.Asserter;
 public class ArithmeticTest extends JexlTestCase {
     private Asserter asserter;
 
+    @Override
     public void setUp() {
         asserter = new Asserter();
     }
