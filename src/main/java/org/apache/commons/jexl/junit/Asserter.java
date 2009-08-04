@@ -23,8 +23,8 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.ExpressionFactory;
 import org.apache.commons.jexl.JexlContext;
+import org.apache.commons.jexl.JexlEngine;
 import org.apache.commons.jexl.JexlHelper;
 
 /**
@@ -42,6 +42,9 @@ public class Asserter extends Assert {
     private final Map<String, Object> variables = new HashMap<String, Object>();
     /** context to use during asserts. */
     private final JexlContext context = JexlHelper.createContext();
+
+    /** Jexl engine to use during Asserts. */
+    private static final JexlEngine engine = new JexlEngine();
 
     /**
      * 
@@ -71,7 +74,7 @@ public class Asserter extends Assert {
      * fails
      */
     public void assertExpression(String expression, Object expected) throws Exception {
-        Expression exp = ExpressionFactory.createExpression(expression);
+        Expression exp = engine.createExpression(expression);
 
         context.setVars(variables);
         Object value = exp.evaluate(context);
