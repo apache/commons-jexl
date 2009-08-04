@@ -390,9 +390,13 @@ public class JexlArithmetic {
 
             return leftString.compareTo(rightString) < 0;
         } else if (left instanceof Comparable<?>) {
-            return ((Comparable<Object>) left).compareTo(right) < 0;
+            @SuppressWarnings("unchecked")
+            final Comparable<Object> comparable = (Comparable<Object>) left;
+            return comparable.compareTo(right) < 0;
         } else if (right instanceof Comparable<?>) {
-            return ((Comparable<Object>) right).compareTo(left) > 0;
+            @SuppressWarnings("unchecked")
+            final Comparable<Object> comparable = (Comparable<Object>) right;
+            return comparable.compareTo(left) > 0;
         }
 
         throw new IllegalArgumentException("Invalid comparison : comparing cardinality for left: " + left
