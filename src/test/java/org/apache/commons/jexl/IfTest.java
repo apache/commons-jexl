@@ -36,7 +36,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testSimpleIfTrue() throws Exception {
-        Expression e = ExpressionFactory.createExpression("if (true) 1");
+        Expression e = JEXL.createExpression("if (true) 1");
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
@@ -49,7 +49,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testSimpleIfFalse() throws Exception {
-        Expression e = ExpressionFactory.createExpression("if (false) 1");
+        Expression e = JEXL.createExpression("if (false) 1");
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
@@ -62,7 +62,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testSimpleElse() throws Exception {
-        Expression e = ExpressionFactory
+        Expression e = JEXL
                 .createExpression("if (false) 1; else 2;");
         JexlContext jc = JexlHelper.createContext();
 
@@ -76,7 +76,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testBlockIfTrue() throws Exception {
-        Expression e = ExpressionFactory
+        Expression e = JEXL
                 .createExpression("if (true) { 'hello'; }");
         JexlContext jc = JexlHelper.createContext();
 
@@ -90,7 +90,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testBlockElse() throws Exception {
-        Expression e = ExpressionFactory
+        Expression e = JEXL
                 .createExpression("if (false) {1;} else {2;}");
         JexlContext jc = JexlHelper.createContext();
 
@@ -104,7 +104,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testIfWithSimpleExpression() throws Exception {
-        Expression e = ExpressionFactory
+        Expression e = JEXL
                 .createExpression("if (x == 1) true;");
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Integer(1));
@@ -119,7 +119,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testIfWithArithmeticExpression() throws Exception {
-        Expression e = ExpressionFactory
+        Expression e = JEXL
                 .createExpression("if ((x * 2) + 1 == 5) true;");
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Integer(2));
@@ -134,7 +134,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testIfWithDecimalArithmeticExpression() throws Exception {
-        Expression e = ExpressionFactory
+        Expression e = JEXL
                 .createExpression("if ((x * 2) == 5) true;");
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Float(2.5f));
@@ -149,7 +149,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testIfWithAssignment() throws Exception {
-        Expression e = ExpressionFactory
+        Expression e = JEXL
                 .createExpression("if ((x * 2) == 5) {y = 1;} else {y = 2;}");
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Float(2.5f));

@@ -29,7 +29,7 @@ public class WhileTest extends JexlTestCase {
     }
 
     public void testSimpleWhileFalse() throws Exception {
-        Expression e = ExpressionFactory.createExpression("while (false) ;");
+        Expression e = JEXL.createExpression("while (false) ;");
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
@@ -37,7 +37,7 @@ public class WhileTest extends JexlTestCase {
     }
     
     public void testWhileExecutesExpressionWhenLooping() throws Exception {
-        Expression e = ExpressionFactory.createExpression("while (x < 10) x = x + 1;");
+        Expression e = JEXL.createExpression("while (x < 10) x = x + 1;");
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Integer(1));
 
@@ -46,7 +46,7 @@ public class WhileTest extends JexlTestCase {
     }
 
     public void testWhileWithBlock() throws Exception {
-        Expression e = ExpressionFactory.createExpression("while (x < 10) { x = x + 1; y = y * 2; }");
+        Expression e = JEXL.createExpression("while (x < 10) { x = x + 1; y = y * 2; }");
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Integer(1));
         jc.getVars().put("y", new Integer(1));

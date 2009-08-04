@@ -53,7 +53,7 @@ public class ScriptTest extends JexlTestCase {
      */
     public void testSimpleScript() throws Exception {
         String code = "while (x < 10) x = x + 1;";
-        Script s = ScriptFactory.createScript(code);
+        Script s = JEXL.createScript(code);
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Integer(1));
     
@@ -64,7 +64,7 @@ public class ScriptTest extends JexlTestCase {
     
     public void testScriptFromFile() throws Exception {
         File testScript = new File(TEST1);
-        Script s = ScriptFactory.createScript(testScript);
+        Script s = JEXL.createScript(testScript);
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("out", System.out);
         Object result = s.execute(jc);
@@ -74,7 +74,7 @@ public class ScriptTest extends JexlTestCase {
 
     public void testScriptFromURL() throws Exception {
         URL testUrl = new File("src/test/scripts/test1.jexl").toURI().toURL();
-        Script s = ScriptFactory.createScript(testUrl);
+        Script s = JEXL.createScript(testUrl);
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("out", System.out);
         Object result = s.execute(jc);
@@ -84,8 +84,8 @@ public class ScriptTest extends JexlTestCase {
     
     public void testScriptUpdatesContext() throws Exception {
         String jexlCode = "resultat.setCode('OK')";
-        Expression e = ExpressionFactory.createExpression(jexlCode);
-        Script s = ScriptFactory.createScript(jexlCode);
+        Expression e = JEXL.createExpression(jexlCode);
+        Script s = JEXL.createScript(jexlCode);
 
         Tester resultatJexl = new Tester();
         JexlContext jc = JexlHelper.createContext();

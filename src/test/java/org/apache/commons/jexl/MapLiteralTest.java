@@ -29,7 +29,7 @@ import java.util.Map;
 public class MapLiteralTest extends JexlTestCase {
 
     public void testLiteralWithStrings() throws Exception {
-        Expression e = ExpressionFactory.createExpression( "[ 'foo' => 'bar' ]" );
+        Expression e = JEXL.createExpression( "[ 'foo' => 'bar' ]" );
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate( jc );
@@ -37,10 +37,10 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     public void testLiteralWithMultipleEntries() throws Exception {
-        Expression e = ExpressionFactory.createExpression( "[ 'foo' => 'bar', 'eat' => 'food' ]" );
+        Expression e = JEXL.createExpression( "[ 'foo' => 'bar', 'eat' => 'food' ]" );
         JexlContext jc = JexlHelper.createContext();
 
-        Map expected = new HashMap();
+        Map<String, String> expected = new HashMap<String, String>();
         expected.put( "foo", "bar" );
         expected.put( "eat", "food" );
 
@@ -49,7 +49,7 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     public void testLiteralWithNumbers() throws Exception {
-        Expression e = ExpressionFactory.createExpression( "[ 5 => 10 ]" );
+        Expression e = JEXL.createExpression( "[ 5 => 10 ]" );
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate( jc );
@@ -57,7 +57,7 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     public void testSizeOfSimpleMapLiteral() throws Exception {
-        Expression e = ExpressionFactory.createExpression( "size([ 'foo' => 'bar' ])" );
+        Expression e = JEXL.createExpression( "size([ 'foo' => 'bar' ])" );
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate( jc );
@@ -65,7 +65,7 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     public void testCallingMethodsOnNewMapLiteral() throws Exception {
-        Expression e = ExpressionFactory.createExpression( "size([ 'foo' => 'bar' ].values())" );
+        Expression e = JEXL.createExpression( "size([ 'foo' => 'bar' ].values())" );
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate( jc );
@@ -73,7 +73,7 @@ public class MapLiteralTest extends JexlTestCase {
     }
 
     public void testNotEmptySimpleMapLiteral() throws Exception {
-        Expression e = ExpressionFactory.createExpression( "empty([ 'foo' => 'bar' ])" );
+        Expression e = JEXL.createExpression( "empty([ 'foo' => 'bar' ])" );
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate( jc );

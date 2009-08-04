@@ -32,16 +32,14 @@ public class BlockTest extends JexlTestCase {
     }
 
     public void testBlockSimple() throws Exception {
-        Expression e = ExpressionFactory
-                .createExpression("if (true) { 'hello'; }");
+        Expression e = JEXL.createExpression("if (true) { 'hello'; }");
         JexlContext jc = JexlHelper.createContext();
         Object o = e.evaluate(jc);
         assertEquals("Result is wrong", "hello", o);
     }
-    
+
     public void testBlockExecutesAll() throws Exception {
-        Expression e = ExpressionFactory
-                .createExpression("if (true) { x = 'Hello'; y = 'World';}");
+        Expression e = JEXL.createExpression("if (true) { x = 'Hello'; y = 'World';}");
         JexlContext jc = JexlHelper.createContext();
         Object o = e.evaluate(jc);
         assertEquals("First result is wrong", "Hello", jc.getVars().get("x"));
@@ -50,37 +48,33 @@ public class BlockTest extends JexlTestCase {
     }
 
     public void testEmptyBlock() throws Exception {
-        Expression e = ExpressionFactory
-                .createExpression("if (true) { }");
+        Expression e = JEXL.createExpression("if (true) { }");
         JexlContext jc = JexlHelper.createContext();
         Object o = e.evaluate(jc);
         assertNull("Result is wrong", o);
     }
 
     public void testBlockLastExecuted01() throws Exception {
-        Expression e = ExpressionFactory
-                .createExpression("if (true) { x = 1; } else { x = 2; }");
+        Expression e = JEXL.createExpression("if (true) { x = 1; } else { x = 2; }");
         JexlContext jc = JexlHelper.createContext();
         Object o = e.evaluate(jc);
         assertEquals("Block result is wrong", new Integer(1), o);
     }
 
     public void testBlockLastExecuted02() throws Exception {
-        Expression e = ExpressionFactory
-                .createExpression("if (false) { x = 1; } else { x = 2; }");
+        Expression e = JEXL.createExpression("if (false) { x = 1; } else { x = 2; }");
         JexlContext jc = JexlHelper.createContext();
         Object o = e.evaluate(jc);
         assertEquals("Block result is wrong", new Integer(2), o);
     }
 
     public void testNestedBlock() throws Exception {
-        Expression e = ExpressionFactory
-                .createExpression("if (true) { x = 'hello'; y = 'world';"
-                    + " if (true) { x; } y; }");
+        Expression e = JEXL.createExpression("if (true) { x = 'hello'; y = 'world';" + " if (true) { x; } y; }");
         JexlContext jc = JexlHelper.createContext();
         Object o = e.evaluate(jc);
         assertEquals("Block result is wrong", "world", o);
     }
+
     public static void main(String[] args) throws Exception {
         new BlockTest("debug").testBlockExecutesAll();
         //new AssignTest("debug").testArray();

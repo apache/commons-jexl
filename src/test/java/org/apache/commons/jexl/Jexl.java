@@ -27,14 +27,16 @@ import java.util.Map;
 public class Jexl {
 
     public static void main(String[] args) {
+        final JexlEngine JEXL = new JexlEngine();
         // dummy context to get variables
         JexlContext context = new JexlContext() {
+            @SuppressWarnings("unchecked")
             public Map getVars() { return System.getProperties(); }
-            public void setVars(Map map) { }
+            public void setVars(Map<String,Object> map) { }
         };
         try {
             for (int i = 0; i < args.length; i++) {
-                Expression e = ExpressionFactory.createExpression(args[i]);
+                Expression e = JEXL.createExpression(args[i]);
                 System.out.println("evaluate(" + args[i] + ") = '" + e.evaluate(context) + "'");
             }
         } catch (Exception e) {
