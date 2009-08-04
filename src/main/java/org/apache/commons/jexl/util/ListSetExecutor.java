@@ -47,9 +47,11 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
     @Override
     public Object execute(final Object list, Object arg) {
         if (method == ARRAY_SET) {
-            java.lang.reflect.Array.set(list, property, arg);
+            java.lang.reflect.Array.set(list, property.intValue(), arg);
         } else {
-            ((List<Object>) list).set(property, arg);
+            @SuppressWarnings("unchecked")
+            final List<Object> asList = (List<Object>) list;
+            asList.set(property.intValue(), arg);
         }
         return arg;
     }
@@ -62,9 +64,11 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
             && index instanceof Integer) {
             Integer idx = (Integer) index;
         if (method == ARRAY_SET) {
-            java.lang.reflect.Array.set(list, idx, arg);
+            java.lang.reflect.Array.set(list, idx.intValue(), arg);
         } else {
-            ((List<Object>) list).set(idx, arg);
+            @SuppressWarnings("unchecked")
+            final List<Object> asList = (List<Object>) list;
+            asList.set(idx.intValue(), arg);
         }
         }
         return TRY_FAILED;
