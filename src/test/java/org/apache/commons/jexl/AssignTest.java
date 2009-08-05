@@ -17,15 +17,15 @@
 package org.apache.commons.jexl;
 
 /**
- * Test cases for the if statement.
+ * Test cases for assignment.
  * 
  * @author Dion Gillard
  * @since 1.1
  */
 public class AssignTest extends JexlTestCase {
-    private static final JexlEngine JEXLEngine = new JexlEngine();
+    private static final JexlEngine ENGINE = new JexlEngine();
     static {
-        JEXLEngine.setSilent(false);
+        ENGINE.setSilent(false);
     }
     
     public static class Froboz {
@@ -76,8 +76,8 @@ public class AssignTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testAntish() throws Exception {
-        Expression assign = JEXLEngine.createExpression("froboz.value = 10");
-        Expression check = JEXLEngine.createExpression("froboz.value");
+        Expression assign = ENGINE.createExpression("froboz.value = 10");
+        Expression check = ENGINE.createExpression("froboz.value");
         JexlContext jc = JexlHelper.createContext();
         Object o = assign.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
@@ -86,8 +86,8 @@ public class AssignTest extends JexlTestCase {
     }
     
     public void testBeanish() throws Exception {
-        Expression assign = JEXLEngine.createExpression("froboz.value = 10");
-        Expression check = JEXLEngine.createExpression("froboz.value");
+        Expression assign = ENGINE.createExpression("froboz.value = 10");
+        Expression check = ENGINE.createExpression("froboz.value");
         JexlContext jc = JexlHelper.createContext();
         Froboz froboz = new Froboz(-169);
         jc.getVars().put("froboz", froboz);
@@ -98,7 +98,7 @@ public class AssignTest extends JexlTestCase {
     }
     
     public void testAmbiguous() throws Exception {
-        Expression assign = JEXLEngine.createExpression("froboz.nosuchbean = 10");
+        Expression assign = ENGINE.createExpression("froboz.nosuchbean = 10");
         JexlContext jc = JexlHelper.createContext();
         Froboz froboz = new Froboz(-169);
         jc.getVars().put("froboz", froboz);
@@ -116,8 +116,8 @@ public class AssignTest extends JexlTestCase {
     }
         
     public void testArray() throws Exception {
-        Expression assign = JEXLEngine.createExpression("froboz[\"value\"] = 10");
-        Expression check = JEXLEngine.createExpression("froboz[\"value\"]");
+        Expression assign = ENGINE.createExpression("froboz[\"value\"] = 10");
+        Expression check = ENGINE.createExpression("froboz[\"value\"]");
         JexlContext jc = JexlHelper.createContext();
         Froboz froboz = new Froboz(0);
         jc.getVars().put("froboz", froboz);
@@ -128,8 +128,8 @@ public class AssignTest extends JexlTestCase {
     }
     
     public void testMore() throws Exception {
-        Expression assign = JEXLEngine.createExpression("quux.froboz.value = 10");
-        Expression check = JEXLEngine.createExpression("quux[\"froboz\"].value");
+        Expression assign = ENGINE.createExpression("quux.froboz.value = 10");
+        Expression check = ENGINE.createExpression("quux[\"froboz\"].value");
         JexlContext jc = JexlHelper.createContext();
         Quux quux = new Quux("xuuq", 100);
         jc.getVars().put("quux", quux);
@@ -141,18 +141,18 @@ public class AssignTest extends JexlTestCase {
 
     public void testUtil() throws Exception {
         Quux quux = new Quux("xuuq", 100);
-        JEXLEngine.setProperty(quux, "froboz.value", Integer.valueOf(100));
-        Object o = JEXLEngine.getProperty(quux, "froboz.value");
+        ENGINE.setProperty(quux, "froboz.value", Integer.valueOf(100));
+        Object o = ENGINE.getProperty(quux, "froboz.value");
         assertEquals("Result is not 100", new Integer(100), o);
-        JEXLEngine.setProperty(quux, "['froboz'].value", Integer.valueOf(1000));
-        o = JEXLEngine.getProperty(quux, "['froboz']['value']");
+        ENGINE.setProperty(quux, "['froboz'].value", Integer.valueOf(1000));
+        o = ENGINE.getProperty(quux, "['froboz']['value']");
         assertEquals("Result is not 1000", new Integer(1000), o);
     }
     
     
     public void testTernary() throws Exception {
         JexlContext jc = JexlHelper.createContext();
-        Expression e = JEXLEngine.createExpression("x.y.z = foo ?'bar':'quux'");
+        Expression e = ENGINE.createExpression("x.y.z = foo ?'bar':'quux'");
         String canonical = e.dump();
         System.out.print(canonical);
         Object o = e.evaluate(jc);
@@ -166,7 +166,7 @@ public class AssignTest extends JexlTestCase {
     
     public void testNotNull() throws Exception {
         JexlContext jc = JexlHelper.createContext();
-        Expression e = JEXLEngine.createExpression("x.y.z = foo?:'quux'");
+        Expression e = ENGINE.createExpression("x.y.z = foo?:'quux'");
         Object o = e.evaluate(jc);
         assertEquals("Should be quux", "quux", o);
         jc.getVars().put("foo","bar");
