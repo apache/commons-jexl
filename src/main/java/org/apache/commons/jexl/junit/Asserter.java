@@ -37,32 +37,22 @@ import org.apache.commons.jexl.JexlHelper;
  * @version $Revision$
  */
 public class Asserter extends Assert {
-
     /** variables used during asserts. */
     private final Map<String, Object> variables = new HashMap<String, Object>();
     /** context to use during asserts. */
     private final JexlContext context = JexlHelper.createContext();
 
     /** Jexl engine to use during Asserts. */
-    private static final JexlEngine engine = new JexlEngine();
+    private final JexlEngine engine;
 
     /**
      * 
      * Create an asserter.
      */
-    public Asserter() {
-
+    public Asserter(JexlEngine jexl) {
+        engine = jexl;
     }
 
-    /**
-     * This constructor will register the given variableValue as the
-     * "this" variable.
-     * 
-     * @param variableValue 'this'.
-     */
-    public Asserter(Object variableValue) {
-        setVariable("this", variableValue);
-    }
 
     /**
      * Performs an assertion that the value of the given Jexl expression 
@@ -75,7 +65,6 @@ public class Asserter extends Assert {
      */
     public void assertExpression(String expression, Object expected) throws Exception {
         Expression exp = engine.createExpression(expression);
-
         context.setVars(variables);
         Object value = exp.evaluate(context);
 
