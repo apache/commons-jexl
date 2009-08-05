@@ -55,6 +55,7 @@ import org.apache.commons.jexl.parser.ParseException;
  * See
  * <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">Java Scripting API</a>
  * Javadoc.
+ * @since 2.0
  */
 public class JexlScriptEngine extends AbstractScriptEngine {
 
