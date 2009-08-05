@@ -17,7 +17,7 @@
 $Id$
 
                             Commons JEXL Package
-                                Version 1.1
+                                Version 2.0
                                Release Notes
 
 
@@ -46,31 +46,17 @@ Please create a JexlEngine() and us createExpression() or createScript() instead
 * JexlEngine.getDefault() was used by the above. Use "new JexlEngine()" instead
 
 * Info.getTemplateName() - use Info.getName() instead
+
 New Features:
 =============
 
-o Added Script and ScriptFactory to allow scripts to be executed from text,
-  files or a URL.
-o Added implementation for bitwise operators: and, complement, or, xor.
-o Added implementation for the foreach statement.
-o Added implementation for the while statement.
-o Added implementation for block statements, e.g. curly braces containing
-  multiple statements.
-o Added implementation for the if statement.
-o [JEXL-4] Support assignment to variables. Thanks to Barry Lagerweij.
 
 Bugs fixed:
 ===========
 
-o [JEXL-17] Consistently throw ParseException in case of a parsing failure,
-  not an Error. Thanks to Kohsuke Kawaguchi.
-o [JEXL-3] Allow for static methods to be called on classes and not just objects.
-  Thanks to Guido Anzuoni.
-o [JEXL-6] Unary minus was only working for integer values.
-o [JEXL-5] 'abc'.substring(0,1+1) is empty (method matching problem).
 
 Other Changes:
 ==============
 
-o Add @since tags to code so we can track API additions via javadoc
+o Add @since 2.0 tags to code so we can track API additions via Javadoc
 
