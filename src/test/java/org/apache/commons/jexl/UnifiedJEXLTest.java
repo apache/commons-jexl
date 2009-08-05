@@ -22,13 +22,13 @@ import org.apache.commons.logging.LogFactory;
  * Test cases for the UnifiedEL.
  */
 public class UnifiedJEXLTest extends JexlTestCase {
-    private static final JexlEngine Engine = new JexlEngine();
+    private static final JexlEngine ENGINE = new JexlEngine();
     static {
-        Engine.setLenient(false);
-        Engine.setSilent(false);
-        Engine.setCache(128);
+        ENGINE.setLenient(false);
+        ENGINE.setSilent(false);
+        ENGINE.setCache(128);
     }
-    static UnifiedJEXL EL = new UnifiedJEXL(Engine);
+    static UnifiedJEXL EL = new UnifiedJEXL(ENGINE);
     static Log LOG = LogFactory.getLog(UnifiedJEXL.class);
     JexlContext context = null;
     Map<String,Object> vars =null;
@@ -220,14 +220,14 @@ public class UnifiedJEXLTest extends JexlTestCase {
         
         vars.put("bar", "foo");
         try {
-            Engine.setSilent(true);
+            ENGINE.setSilent(true);
             expr = EL.parse("#{${bar}+'.charAt(-2)'}");
             expr = expr.prepare(context);
             o = expr.evaluate(context);
             assertEquals(null, o);
         }
         finally {
-            Engine.setSilent(false);
+            ENGINE.setSilent(false);
         }
 
     }
