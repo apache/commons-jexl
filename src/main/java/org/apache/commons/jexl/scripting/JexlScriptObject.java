@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
  * <li></li>
  * </ul>
  * </p>
+ * @since 2.0
  */
 public class JexlScriptObject {
 
