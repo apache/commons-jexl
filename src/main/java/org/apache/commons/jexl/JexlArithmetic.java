@@ -25,13 +25,13 @@ import java.math.BigInteger;
  */
 public class JexlArithmetic {
     /** Integer.MAX_VALUE as BigDecimal. */
-    private static final BigDecimal BIGD_DOUBLE_MAX_VALUE = BigDecimal.valueOf(Double.MAX_VALUE);
+    protected static final BigDecimal BIGD_DOUBLE_MAX_VALUE = BigDecimal.valueOf(Double.MAX_VALUE);
     /** Integer.MIN_VALUE as BigDecimal. */
-    private static final BigDecimal BIGD_DOUBLE_MIN_VALUE = BigDecimal.valueOf(-Double.MAX_VALUE);
+    protected static final BigDecimal BIGD_DOUBLE_MIN_VALUE = BigDecimal.valueOf(-Double.MAX_VALUE);
     /** Long.MAX_VALUE as BigInteger. */
-    private static final BigInteger BIGI_LONG_MAX_VALUE = BigInteger.valueOf(Long.MAX_VALUE);
+    protected static final BigInteger BIGI_LONG_MAX_VALUE = BigInteger.valueOf(Long.MAX_VALUE);
     /** Long.MIN_VALUE as BigInteger. */
-    private static final BigInteger BIGI_LONG_MIN_VALUE = BigInteger.valueOf(Long.MIN_VALUE);
+    protected static final BigInteger BIGI_LONG_MIN_VALUE = BigInteger.valueOf(Long.MIN_VALUE);
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
     protected boolean strict;
 
@@ -122,11 +122,7 @@ public class JexlArithmetic {
             BigInteger l = toBigInteger(left);
             BigInteger r = toBigInteger(right);
             BigInteger result = l.add(r);
-            if (result.compareTo(BIGI_LONG_MAX_VALUE) <= 0
-                && result.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
-                return result;
-            }
-            return result;
+            return narrowBigInteger(result);
         } catch (java.lang.NumberFormatException nfe) {
             // Well, use strings!
             return toString(left).concat(toString(right));
@@ -216,11 +212,7 @@ public class JexlArithmetic {
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
         BigInteger result = l.mod(r);
-        if (result.compareTo(BIGI_LONG_MAX_VALUE) <= 0
-            && result.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
-            return result;
-        }
-        return result;
+        return narrowBigInteger(result);
     }
     
     /**
@@ -266,11 +258,7 @@ public class JexlArithmetic {
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
         BigInteger result = l.multiply(r);
-        if (result.compareTo(BIGI_LONG_MAX_VALUE) <= 0
-            && result.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
-            return result;
-        }
-        return result;
+        return narrowBigInteger(result);
     }
     
     /**
@@ -316,11 +304,7 @@ public class JexlArithmetic {
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
         BigInteger result = l.subtract(r);
-        if (result.compareTo(BIGI_LONG_MAX_VALUE) <= 0
-            && result.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
-            return result;
-        }
-        return result;
+        return narrowBigInteger(result);
     }
     
     /**
@@ -707,7 +691,8 @@ public class JexlArithmetic {
             if (original instanceof BigInteger) {
                 BigInteger bigi = (BigInteger) original;
                 // if it's bigger than a Long it can't be narrowed
-                if (bigi.compareTo(BIGI_LONG_MAX_VALUE) > 0) {
+                if (bigi.compareTo(BIGI_LONG_MAX_VALUE) > 0
+                    || bigi.compareTo(BIGI_LONG_MIN_VALUE) < 0) {
                     return original;
                 }
             }
@@ -725,4 +710,24 @@ public class JexlArithmetic {
         return result;
     }
 
+    /**
+     * Given a BigInteger, narrow it to a Long if it fits.
+     * @param bigi the BigInteger to narrow
+     * @return a Long if narrowing is possible, the original BigInteger otherwise
+     */
+    protected Number narrowBigInteger(BigInteger bigi) {
+        //coerce to long if possible
+        if (bigi.compareTo(BIGI_LONG_MAX_VALUE) <= 0
+            && bigi.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
+            // coerce to int if possible
+            long l = bigi.longValue();
+// TODO: think about coercing to int when possible to avoid method calls to fail
+// once and force a narrow call in the general 'int' case
+//            if (l <= ((long) Integer.MAX_VALUE) && l >= ((long) Integer.MIN_VALUE)) {
+//                return new Integer((int) l);
+//            }
+            return new Long(l);
+        }
+        return bigi;
+    }
 }
