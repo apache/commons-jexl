@@ -54,6 +54,36 @@ public class MapLiteralTest extends JexlTestCase {
 
         Object o = e.evaluate( jc );
         assertEquals( Collections.singletonMap( new Integer( 5 ), new Integer( 10 ) ), o );
+
+        e = JEXL.createExpression("m = [ 3 => 30, 4 => 40, 5 => 'fifty', '7' => 'seven', 7 => 'SEVEN' ]");
+        e.evaluate(jc);
+
+        e = JEXL.createExpression("m.3");
+        o = e.evaluate(jc);
+        assertEquals(new Integer(30), o);
+
+        e = JEXL.createExpression("m[4]");
+        o = e.evaluate(jc);
+        assertEquals(new Integer(40), o);
+
+        jc.getVars().put("i", Integer.valueOf(5));
+        e = JEXL.createExpression("m[i]");
+        o = e.evaluate(jc);
+        assertEquals("fifty", o);
+
+        e = JEXL.createExpression("m.3 = 'thirty'");
+        e.evaluate(jc);
+        e = JEXL.createExpression("m.3");
+        o = e.evaluate(jc);
+        assertEquals("thirty", o);
+
+        e = JEXL.createExpression("m['7']");
+        o = e.evaluate(jc);
+        assertEquals("seven", o);
+
+        e = JEXL.createExpression("m.7");
+        o = e.evaluate(jc);
+        assertEquals("SEVEN", o);
     }
 
     public void testSizeOfSimpleMapLiteral() throws Exception {
@@ -80,4 +110,16 @@ public class MapLiteralTest extends JexlTestCase {
         assertFalse( ( (Boolean) o ).booleanValue() );
     }
 
+    public void testMapMapLiteral() throws Exception {
+        Expression e = JEXL.createExpression( "['foo' => [ 'inner' => 'bar' ]]" );
+        JexlContext jc = JexlHelper.createContext();
+        Object o = e.evaluate( jc );
+        assertNotNull(o);
+
+        jc.getVars().put("outer", o);
+        e = JEXL.createExpression("outer.foo.inner");
+        o = e.evaluate( jc );
+        assertEquals( "bar", o );
+    }
+    
 }
