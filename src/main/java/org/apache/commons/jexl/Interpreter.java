@@ -325,6 +325,20 @@ public class Interpreter implements ParserVisitor {
                 context.getVars().put(String.valueOf(property), right);
                 return right;
             }
+        } else if (propertyNode instanceof ASTIntegerLiteral) {
+            property = visit((ASTIntegerLiteral) propertyNode, null);
+            // deal with ant variable
+            if (isVariable && object == null) {
+                if (variableName != null) {
+                    if (last > 0) {
+                        variableName.append('.');
+                    }
+                    variableName.append(property);
+                    property = variableName.toString();
+                }
+                context.getVars().put(String.valueOf(property), right);
+                return right;
+            }
         } else if (propertyNode instanceof ASTArrayAccess) {
             // first objectNode is the identifier
             objectNode = propertyNode;
@@ -1168,7 +1182,7 @@ public class Interpreter implements ParserVisitor {
                 }
             }
         }
-        VelPropertyGet vg = uberspect.getPropertyGet(object, attribute.toString(), node);
+        VelPropertyGet vg = uberspect.getPropertyGet(object, attribute, node);
         if (vg != null) {
             try {
                 Object value = vg.invoke(object);
@@ -1211,7 +1225,6 @@ public class Interpreter implements ParserVisitor {
      * @param node the node that evaluated as the object
      */
     protected void setAttribute(Object object, Object attribute, Object value, JexlNode node) {
-        String s = attribute.toString();
         // attempt to reuse last executor cached in volatile JexlNode.value
         if (node != null && cache) {
             Object cached = node.jjtGetValue();
@@ -1223,7 +1236,7 @@ public class Interpreter implements ParserVisitor {
                 }
             }
         }
-        VelPropertySet vs = uberspect.getPropertySet(object, s, value, node);
+        VelPropertySet vs = uberspect.getPropertySet(object, attribute, value, node);
         if (vs != null) {
             try {
                 // cache executor in volatile JexlNode.value
