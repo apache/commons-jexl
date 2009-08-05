@@ -41,7 +41,8 @@ The following classes have been removed:
   * ExpressionFactory
   * ScriptFactory
 
-  Please create a JexlEngine and use createExpression() or createScript() instead.
+  Please create a JexlEngine and use createExpression() or createScript()
+  instead.
 
 The following methods have been removed:
 
