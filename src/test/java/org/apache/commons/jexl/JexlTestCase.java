@@ -24,6 +24,7 @@ import junit.framework.TestCase;
  * Eases the implementation of main methods to debug.
  */
 public class JexlTestCase extends TestCase {
+    /** No parameters signature for test run. */
     private static final Class<?>[] noParms = {};
 
     /** A default Jexl engine instance. */
