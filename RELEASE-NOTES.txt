@@ -31,6 +31,21 @@ http://commons.apache.org/jexl/
 
 Changes in this version include:
 
+Incompatible Changes
+====================
+
+Now requires Java 1.5 or later
+
+The following classes and methods have been removed:
+
+* ExpressionFactory
+* ScriptFactory
+
+Please create a JexlEngine() and us createExpression() or createScript() instead.
+
+* JexlEngine.getDefault() was used by the above. Use "new JexlEngine()" instead
+
+* Info.getTemplateName() - use Info.getName() instead
 New Features:
 =============
 
