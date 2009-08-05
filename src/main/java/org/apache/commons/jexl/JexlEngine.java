@@ -650,34 +650,4 @@ public class JexlEngine {
         }
 
     }
-    
-//    /**
-//     * ExpressionFactory & ScriptFactory need a singleton and this is the package
-//     * instance fulfilling that pattern.
-//     */
-//    @Deprecated
-//    // CSOFF: StaticVariableName
-//    private static volatile JexlEngine DEFAULT = null;
-//    // CSON: StaticVariableName
-//
-//    /**
-//     * Retrieves a default JEXL engine.
-//     * @return the singleton
-//     * @deprecated use a new instance JexlEngine instead.
-//     */
-//    // CSOFF: DoubleCheckedLocking
-//    @Deprecated
-//    static JexlEngine getDefault() {
-//        // java 5 memory model fixes the lazy singleton initialization
-//        // using a double-check locking pattern using a volatile
-//        if (DEFAULT == null) {
-//            synchronized (JexlEngine.class) {
-//                if (DEFAULT == null) {
-//                    DEFAULT = new JexlEngine();
-//                }
-//            }
-//        }
-//        return DEFAULT;
-//    }
-//    // CSON: DoubleCheckedLocking
 }
