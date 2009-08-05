@@ -371,7 +371,7 @@ public class Interpreter implements ParserVisitor {
             long l = arithmetic.toLong(left);
             n = 1;
             long r = arithmetic.toLong(right);
-            return l & r;
+            return new Long(l & r);
         } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
         }
@@ -382,7 +382,7 @@ public class Interpreter implements ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         try {
             long l = arithmetic.toLong(left);
-            return ~l;
+            return new Long(~l);
         } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(0), "long coercion error", xrt);
         }
@@ -398,7 +398,7 @@ public class Interpreter implements ParserVisitor {
             long l = arithmetic.toLong(left);
             n = 1;
             long r = arithmetic.toLong(right);
-            return l | r;
+            return new Long(l | r);
         } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
         }
@@ -414,7 +414,7 @@ public class Interpreter implements ParserVisitor {
             long l = arithmetic.toLong(left);
             n = 1;
             long r = arithmetic.toLong(right);
-            return l ^ r;
+            return new Long(l ^ r);
         } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
         }
@@ -438,7 +438,7 @@ public class Interpreter implements ParserVisitor {
             return arithmetic.divide(left, right);
         } catch (RuntimeException xrt) {
             if (!strict && xrt instanceof ArithmeticException) {
-                return 0.0;
+                return new Double(0.0);
             }
             JexlNode xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "divide error", xrt);
@@ -879,7 +879,7 @@ public class Interpreter implements ParserVisitor {
             return arithmetic.mod(left, right);
         } catch (RuntimeException xrt) {
             if (!strict && xrt instanceof ArithmeticException) {
-                return 0.0;
+                return new Double(0.0);
             }
             JexlNode xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "% error", xrt);
@@ -1003,12 +1003,12 @@ public class Interpreter implements ParserVisitor {
             throw new JexlException(node, "size() : argument is null", null);
         }
 
-        return sizeOf(node, val);
+        return Integer.valueOf(sizeOf(node, val));
     }
 
     /** {@inheritDoc} */
     public Object visit(ASTSizeMethod node, Object data) {
-        return sizeOf(node, data);
+        return Integer.valueOf(sizeOf(node, data));
     }
 
     /** {@inheritDoc} */

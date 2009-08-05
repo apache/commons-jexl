@@ -66,7 +66,7 @@ public class JexlArithmetic {
      * @return Long(0)
      */
     protected Object controlNullNullOperands() {
-        return strict? null : 0L;
+        return strict? null : Long.valueOf(0);
     }
 
     /**
@@ -101,7 +101,7 @@ public class JexlArithmetic {
             if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
                 double l = toDouble(left);
                 double r = toDouble(right);
-                return l + r;
+                return new Double(l + r);
             }
         
             // if both are bigintegers use that type
@@ -124,7 +124,7 @@ public class JexlArithmetic {
             BigInteger result = l.add(r);
             if (result.compareTo(BIGI_LONG_MAX_VALUE) <= 0
                 && result.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
-                return result.longValue();
+                return result;
             }
             return result;
         } catch (java.lang.NumberFormatException nfe) {
@@ -167,7 +167,7 @@ public class JexlArithmetic {
         if (r == 0.0) {
             throw new ArithmeticException("/");
         }
-        return l / r;
+        return new Double(l / r);
 
     }
     
@@ -192,7 +192,7 @@ public class JexlArithmetic {
             if (r == 0.0) {
                 throw new ArithmeticException("/");
             }
-            return l % r;
+            return new Double(l % r);
         }
 
         // if both are bigintegers use that type
@@ -218,7 +218,7 @@ public class JexlArithmetic {
         BigInteger result = l.mod(r);
         if (result.compareTo(BIGI_LONG_MAX_VALUE) <= 0
             && result.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
-            return result.longValue();
+            return result;
         }
         return result;
     }
@@ -245,7 +245,7 @@ public class JexlArithmetic {
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             double l = toDouble(left);
             double r = toDouble(right);
-            return l * r;
+            return new Double(l * r);
         }
         
         // if both are bigintegers use that type
@@ -268,7 +268,7 @@ public class JexlArithmetic {
         BigInteger result = l.multiply(r);
         if (result.compareTo(BIGI_LONG_MAX_VALUE) <= 0
             && result.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
-            return result.longValue();
+            return result;
         }
         return result;
     }
@@ -295,7 +295,7 @@ public class JexlArithmetic {
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             double l = toDouble(left);
             double r = toDouble(right);
-            return l - r;
+            return new Double(l - r);
         }
         
         // if both are bigintegers use that type
@@ -318,7 +318,7 @@ public class JexlArithmetic {
         BigInteger result = l.subtract(r);
         if (result.compareTo(BIGI_LONG_MAX_VALUE) <= 0
             && result.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
-            return result.longValue();
+            return result;
         }
         return result;
     }
