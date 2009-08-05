@@ -18,10 +18,11 @@ package org.apache.commons.jexl.junit;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
 
+import org.apache.commons.jexl.JexlEngine;
+import org.apache.commons.jexl.JexlTestCase;
 import org.apache.commons.jexl.Foo;
 
 /**
@@ -31,7 +32,7 @@ import org.apache.commons.jexl.Foo;
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public class AsserterTest extends TestCase {
+public class AsserterTest extends JexlTestCase {
     
     public static Test suite() {
         return new TestSuite(AsserterTest.class);
@@ -46,7 +47,8 @@ public class AsserterTest extends TestCase {
     }
 
     public void testThis() throws Exception {
-        Asserter asserter = new Asserter(new Foo());
+        Asserter asserter = new Asserter(JEXL);
+        asserter.setVariable("this", new Foo());
         
         asserter.assertExpression("this.get('abc')", "Repeat : abc");
         
@@ -60,7 +62,9 @@ public class AsserterTest extends TestCase {
     }
 
     public void testVariable() throws Exception {
-        Asserter asserter = new Asserter();
+        JexlEngine jexl = new JexlEngine();
+        jexl.setSilent(true);
+        Asserter asserter = new Asserter(jexl);
         asserter.setVariable("foo", new Foo());
         asserter.setVariable("person", "James");
 

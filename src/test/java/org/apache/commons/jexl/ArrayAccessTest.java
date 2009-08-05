@@ -42,7 +42,7 @@ public class ArrayAccessTest extends JexlTestCase {
 
     @Override
     public void setUp() {
-        asserter = new Asserter();
+        asserter = new Asserter(JEXL);
     }
 
     /**

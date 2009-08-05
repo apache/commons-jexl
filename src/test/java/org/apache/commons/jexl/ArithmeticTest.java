@@ -28,7 +28,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Override
     public void setUp() {
-        asserter = new Asserter();
+        asserter = new Asserter(JEXL);
     }
 
     public void testBigDecimal() throws Exception {
