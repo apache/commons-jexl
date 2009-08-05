@@ -292,14 +292,13 @@ public class Interpreter implements ParserVisitor {
             isVariable &= objectNode instanceof ASTIdentifier;
             // if we get null back as a result, check for an ant variable
             if (isVariable) {
-                String name = ((ASTIdentifier) objectNode).image;
                 if (v == 0) {
-                    variableName = new StringBuilder(name);
+                    variableName = new StringBuilder(left.jjtGetChild(0).image);
                     v = 1;
                 }
                 for(; v <= c; ++v) {
                     variableName.append('.');
-                    variableName.append(name);
+                    variableName.append(left.jjtGetChild(v).image);
                 }
                 object = context.getVars().get(variableName.toString());
                 // disallow mixing ant & bean with same root; avoid ambiguity
@@ -964,14 +963,13 @@ public class Interpreter implements ParserVisitor {
             result = theNode.jjtAccept(this, result);
             // if we get null back a result, check for an ant variable
             if (result == null && isVariable) {
-                String name = ((ASTIdentifier) theNode).image;
                 if (v == 0) {
-                    variableName = new StringBuilder(name);
+                    variableName = new StringBuilder(node.jjtGetChild(0).image);
                     v = 1;
                 }
                 for(; v <= i; ++v) {
                     variableName.append('.');
-                    variableName.append(name);
+                    variableName.append(node.jjtGetChild(v).image);
                 }
                 result = vars.get(variableName.toString());
             }
@@ -1254,7 +1252,7 @@ public class Interpreter implements ParserVisitor {
     }
 
     /**
-     * Unused, satisfy PArserVisitor interface.
+     * Unused, satisfy ParserVisitor interface.
      * @param node a node
      * @param data the date
      * @return does not return,

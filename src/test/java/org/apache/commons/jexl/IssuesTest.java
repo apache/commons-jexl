@@ -213,4 +213,29 @@ public class IssuesTest  extends JexlTestCase {
         assertEquals(jexpr.getExpression(), null, jexpr.evaluate(ctxt)); // OK
     }
 
+    // JEXL-73
+    public void test73() throws Exception {
+        JexlContext ctxt = JexlHelper.createContext();
+        JexlEngine jexl = new JexlEngine();
+        jexl.setSilent(false);
+        jexl.setLenient(false);
+        Expression e;
+        e = jexl.createExpression("c.e");
+        try {
+            /* Object o = */ e.evaluate(ctxt);
+        } catch(JexlException xjexl) {
+            String msg = xjexl.getMessage();
+            assertTrue(msg.indexOf("variable c.e") > 0);
+        }
+
+        ctxt.getVars().put("c", "{ 'a' : 3, 'b' : 5}");
+        ctxt.getVars().put("e", Integer.valueOf(2));
+        try {
+            /* Object o = */ e.evaluate(ctxt);
+        } catch(JexlException xjexl) {
+            String msg = xjexl.getMessage();
+            assertTrue(msg.indexOf("variable c.e") > 0);
+        }
+
+    }
 }
