@@ -127,11 +127,11 @@ public class CacheTest extends JexlTestCase {
         }
 
         public void setFlag(boolean b) {
-            flag = b;
+            flag = Boolean.valueOf(b);
         }
 
         public boolean isFlag() {
-            return flag;
+            return flag.booleanValue();
         }
     }
 
@@ -157,7 +157,7 @@ public class CacheTest extends JexlTestCase {
             if ("value".equals(prop)) {
                 return value;
             } else if ("flag".equals(prop)) {
-                return flag;
+                return Boolean.valueOf(flag);
             }
             throw new RuntimeException("no such property");
         }
@@ -428,8 +428,8 @@ public class CacheTest extends JexlTestCase {
                 vars.put("a1", "S1");
                 expected = "Cached" + mix + "@s#S0,s#S1";
             } else if (x.value instanceof Integer) {
-                vars.put("a0", 7);
-                vars.put("a1", 9);
+                vars.put("a0", Integer.valueOf(7));
+                vars.put("a1", Integer.valueOf(9));
                 expected = "Cached" + mix + "@i#7,i#9";
             } else {
                 fail("unexpected value type");
@@ -439,8 +439,8 @@ public class CacheTest extends JexlTestCase {
 
             if (x.value instanceof Integer) {
                 try {
-                    vars.put("a0", (short) 17);
-                    vars.put("a1", (short) 19);
+                    vars.put("a0", Short.valueOf((short) 17));
+                    vars.put("a1", Short.valueOf((short) 19));
                     result = ambiguous.evaluate(jc);
                     fail("should have thrown an exception");
                 } catch (JexlException xany) {
@@ -452,7 +452,7 @@ public class CacheTest extends JexlTestCase {
                 vars.put("a0", "X0");
                 expected = "Cached" + mix + "@s#X0";
             } else if (x.value instanceof Integer) {
-                vars.put("a0", 5);
+                vars.put("a0", Integer.valueOf(5));
                 expected = "Cached" + mix + "@i#5";
             } else {
                 fail("unexpected value type");
@@ -525,8 +525,8 @@ public class CacheTest extends JexlTestCase {
                 vars.put("a1", "S1");
                 expected = "CACHED@s#S0,s#S1";
             } else if (x.value instanceof Integer) {
-                vars.put("a0", 7);
-                vars.put("a1", 9);
+                vars.put("a0", Integer.valueOf(7));
+                vars.put("a1", Integer.valueOf(9));
                 expected = "CACHED@i#7,i#9";
             } else {
                 fail("unexpected value type");
@@ -538,7 +538,7 @@ public class CacheTest extends JexlTestCase {
                 vars.put("a0", "X0");
                 expected = "CACHED@s#X0";
             } else if (x.value instanceof Integer) {
-                vars.put("a0", 5);
+                vars.put("a0", Integer.valueOf(5));
                 expected = "CACHED@i#5";
             } else {
                 fail("unexpected value type");

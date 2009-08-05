@@ -122,7 +122,7 @@ public class ArithmeticTest extends JexlTestCase {
      */
     public void testDivideByZero() throws Exception {
         JexlContext context = JexlHelper.createContext();
-        Map vars = context.getVars();
+        Map<String, Object> vars = context.getVars();
         vars.put("aByte", new Byte((byte) 1));
         vars.put("aShort", new Short((short) 2));
         vars.put("aInteger", new Integer(3));
