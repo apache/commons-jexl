@@ -21,7 +21,7 @@ import junit.framework.TestCase;
  */
 public class MethodKeyTest extends TestCase {
     // A set of classes (most of them primitives)
-    static Class[] PRIMS = {
+    static Class<?>[] PRIMS = {
         Boolean.TYPE,
         Byte.TYPE,
         Character.TYPE,
@@ -82,7 +82,7 @@ public class MethodKeyTest extends TestCase {
     static MethodKey[] keyList;
     
     /** Creates & inserts a key into the byKey & byString map */
-    static void setUpKey(String name, Class[] parms) {
+    static void setUpKey(String name, Class<?>[] parms) {
         MethodKey key = new MethodKey(name, parms);
         String str = key.toString();
         byKey.put(key, str);
@@ -97,13 +97,13 @@ public class MethodKeyTest extends TestCase {
         for (int m = 0; m < METHODS.length; ++m) {
             String method = METHODS[m];
             for (int p0 = 0; p0 < PRIMS.length; ++p0) {
-                Class[] arg0 = {PRIMS[p0]};
+                Class<?>[] arg0 = {PRIMS[p0]};
                 setUpKey(method, arg0);
                 for (int p1 = 0; p1 < PRIMS.length; ++p1) {
-                    Class[] arg1 = {PRIMS[p0], PRIMS[p1]};
+                    Class<?>[] arg1 = {PRIMS[p0], PRIMS[p1]};
                     setUpKey(method, arg1);
                     for (int p2 = 0; p2 < PRIMS.length; ++p2) {
-                        Class[] arg2 = {PRIMS[p0], PRIMS[p1], PRIMS[p2]};
+                        Class<?>[] arg2 = {PRIMS[p0], PRIMS[p1], PRIMS[p2]};
                         setUpKey(method, arg2);
                     }
                 }
@@ -113,7 +113,7 @@ public class MethodKeyTest extends TestCase {
     }
 
     /** Builds a string key */
-    String makeStringKey(String method, Class... params) {
+    String makeStringKey(String method, Class<?>... params) {
             StringBuilder builder = new StringBuilder(method);
             for(int p = 0; p < params.length; ++p) {
                 builder.append(ClassMap.MethodCache.primitiveClass(params[p]).getName());
@@ -122,19 +122,19 @@ public class MethodKeyTest extends TestCase {
     }
     
     /** Checks that a string key does exist */
-    void checkStringKey(String method, Class... params) {
+    void checkStringKey(String method, Class<?>... params) {
         String key = makeStringKey(method, params);
         MethodKey out = byString.get(key);
         assertTrue(out != null);
     }
         
     /** Builds a method key */
-    MethodKey makeKey(String method, Class... params) {
+    MethodKey makeKey(String method, Class<?>... params) {
         return new MethodKey(method, params);
     }
     
     /** Checks that a method key exists */
-    void checkKey(String method, Class... params) {
+    void checkKey(String method, Class<?>... params) {
         MethodKey key = makeKey(method, params);
         String out = byKey.get(key);
         assertTrue(out != null);

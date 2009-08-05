@@ -54,7 +54,7 @@ public class ArrayAccessTest extends JexlTestCase {
          * test List access
          */
 
-        List l = new ArrayList();
+        List<Integer> l = new ArrayList<Integer>();
         l.add(new Integer(1));
         l.add(new Integer(2));
         l.add(new Integer(3));
@@ -82,7 +82,7 @@ public class ArrayAccessTest extends JexlTestCase {
         /*
          * test map access
          */
-        Map m = new HashMap();
+        Map<String, String> m = new HashMap<String, String>();
         m.put("foo", "bar");
 
         asserter.setVariable("map", m);

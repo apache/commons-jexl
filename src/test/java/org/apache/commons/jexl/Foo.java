@@ -61,9 +61,9 @@ public class Foo {
         return 5;
     }
 
-    public List getCheeseList()
+    public List<String> getCheeseList()
     {
-        ArrayList answer = new ArrayList();
+        ArrayList<String> answer = new ArrayList<String>();
         answer.add("cheddar");
         answer.add("edam");
         answer.add("brie");

@@ -100,7 +100,7 @@ public class MethodTest extends JexlTestCase {
     }
 
    public void testTopLevelCall() throws Exception {
-        java.util.Map funcs = new java.util.HashMap();
+        java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
         funcs.put(null, new Functor());
         JexlEngine JEXL = new JexlEngine();
         JEXL.setFunctions(funcs);
@@ -122,7 +122,7 @@ public class MethodTest extends JexlTestCase {
     }
 
     public void testNamespaceCall() throws Exception {
-        java.util.Map funcs = new java.util.HashMap();
+        java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
         funcs.put("func", new Functor());
         funcs.put("FUNC", Functor.class);
         JexlEngine JEXL = new JexlEngine();
