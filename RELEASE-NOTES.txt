@@ -24,28 +24,28 @@ $Id$
 INTRODUCTION:
 =============
 
-Jexl is an Expression Language supporting most of the constructs in the
+JEXL is an Expression Language supporting most of the constructs in the
 JSTL Expression Language, along with some additional extensions.
 
-http://commons.apache.org/jexl/
+  http://commons.apache.org/jexl/
 
 Changes in this version include:
 
 Incompatible Changes
 ====================
 
-Now requires Java 1.5 or later
+Now requires Java 1.5 or later.
 
-The following classes and methods have been removed:
+The following classes have been removed:
 
-* ExpressionFactory
-* ScriptFactory
+  * ExpressionFactory
+  * ScriptFactory
 
-Please create a JexlEngine() and us createExpression() or createScript() instead.
+  Please create a JexlEngine and use createExpression() or createScript() instead.
 
-* JexlEngine.getDefault() was used by the above. Use "new JexlEngine()" instead
+The following methods have been removed:
 
-* Info.getTemplateName() - use Info.getName() instead
+  * Info.getTemplateName() - use Info.getName() instead
 
 New Features:
 =============
