@@ -148,32 +148,6 @@ public class AssignTest extends JexlTestCase {
         o = ENGINE.getProperty(quux, "['froboz']['value']");
         assertEquals("Result is not 1000", new Integer(1000), o);
     }
-    
-    
-    public void testTernary() throws Exception {
-        JexlContext jc = JexlHelper.createContext();
-        Expression e = ENGINE.createExpression("x.y.z = foo ?'bar':'quux'");
-        String canonical = e.dump();
-        System.out.print(canonical);
-        Object o = e.evaluate(jc);
-        assertEquals("Should be quux", "quux", o);
-        jc.getVars().put("foo",Boolean.TRUE);
-        o = e.evaluate(jc);
-        assertEquals("Should be bar", "bar", o);
-        o = jc.getVars().get("x.y.z");
-        assertEquals("Should be bar", "bar", o);
-    }
-    
-    public void testNotNull() throws Exception {
-        JexlContext jc = JexlHelper.createContext();
-        Expression e = ENGINE.createExpression("x.y.z = foo?:'quux'");
-        Object o = e.evaluate(jc);
-        assertEquals("Should be quux", "quux", o);
-        jc.getVars().put("foo","bar");
-        o = e.evaluate(jc);
-        assertEquals("Should be bar", "bar", o);
-        o = jc.getVars().get("x.y.z");
-        assertEquals("Should be bar", "bar", o);
-    }
+
 
 }

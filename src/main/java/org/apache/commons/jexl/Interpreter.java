@@ -1061,7 +1061,7 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTTernaryNode node, Object data) {
         Object condition = node.jjtGetChild(0).jjtAccept(this, data);
         if (node.jjtGetNumChildren() == 3) {
-            if (arithmetic.toBoolean(condition)) {
+            if (condition != null && arithmetic.toBoolean(condition)) {
                 return node.jjtGetChild(1).jjtAccept(this, data);
             } else {
                 return node.jjtGetChild(2).jjtAccept(this, data);
