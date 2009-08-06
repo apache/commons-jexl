@@ -294,11 +294,17 @@
         <tr>
           <td>Ternary conditional <code>?:</code> </td>
           <td>
-            The usual ternary conditional operator <code>condition? if_true : if_null_or_false;</code> operator can be used as well as
-            the abbreviation <code>value ?: if_null_or_false</code> which returns the <code>value</code> if
-            it is non-null and non-false, e.g.
+            The usual ternary conditional operator <code>condition ? if_true : if_false</code> operator can be
+            used as well as the abbreviation <code>value ?: if_false</code> which returns the <code>value</code> if
+            its evaluation is defined, non-null and non-false, e.g.
             <source>val1 ? val1 : val2</source> and
             <source>val1 ?: val2 </source> are equivalent.
+            <p>
+              <strong>NOTE:</strong> The condition will evaluate to <code>false</code> when it
+              refers to an undefined variable or <code>null</code> for all <code>JexlEngine</code>
+              flag combinations. This allows explicit syntactic leniency and treats the condition
+              'if undefined or null or false' the same way in all cases.
+            </p>
           </td>
         </tr>
         <tr>

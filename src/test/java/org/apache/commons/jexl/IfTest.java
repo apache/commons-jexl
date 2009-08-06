@@ -158,4 +158,116 @@ public class IfTest extends JexlTestCase {
         Object result = jc.getVars().get("y");
         assertEquals("y has the wrong value", new Integer(1), result);
     }
+
+    /**
+     * Ternary operator condition undefined or null evaluates to false
+     * independantly of engine flags.
+     * @throws Exception
+     */
+    public void testTernary() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        JexlContext jc = JexlHelper.createContext();
+        Expression e = jexl.createExpression("x.y.z = foo ?'bar':'quux'");
+        Object o;
+
+        // undefined foo
+
+        for(int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be quux", "quux", o);
+            o = jc.getVars().get("x.y.z");
+            assertEquals("Should be quux", "quux", o);
+        }
+
+        jc.getVars().put("foo", null);
+
+        for(int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be quux", "quux", o);
+            o = jc.getVars().get("x.y.z");
+            assertEquals("Should be quux", "quux", o);
+        }
+
+        jc.getVars().put("foo",Boolean.FALSE);
+
+        for(int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be quux", "quux", o);
+            o = jc.getVars().get("x.y.z");
+            assertEquals("Should be quux", "quux", o);
+        }
+
+        jc.getVars().put("foo",Boolean.TRUE);
+
+        for(int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be bar", "bar", o);
+            o = jc.getVars().get("x.y.z");
+            assertEquals("Should be bar", "bar", o);
+        }
+    }
+
+    /**
+     * Ternary operator condition undefined or null evaluates to false
+     * independantly of engine flags.
+     * @throws Exception
+     */
+    public void testTernaryShorthand() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        JexlContext jc = JexlHelper.createContext();
+        Expression e = JEXL.createExpression("x.y.z = foo?:'quux'");
+        Object o;
+
+        // undefined foo
+
+        for(int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be quux", "quux", o);
+            o = jc.getVars().get("x.y.z");
+            assertEquals("Should be quux", "quux", o);
+        }
+
+        jc.getVars().put("foo", null);
+
+        for(int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be quux", "quux", o);
+            o = jc.getVars().get("x.y.z");
+            assertEquals("Should be quux", "quux", o);
+        }
+
+        jc.getVars().put("foo", Boolean.FALSE);
+
+        for(int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be quux", "quux", o);
+            o = jc.getVars().get("x.y.z");
+            assertEquals("Should be quux", "quux", o);
+        }
+
+        jc.getVars().put("foo","bar");
+        
+        for(int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be bar", "bar", o);
+            o = jc.getVars().get("x.y.z");
+            assertEquals("Should be bar", "bar", o);
+        }
+    }
 }
