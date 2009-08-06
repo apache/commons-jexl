@@ -19,6 +19,7 @@ package org.apache.commons.jexl;
 import org.apache.commons.jexl.parser.ASTAddNode;
 import org.apache.commons.jexl.parser.ASTAndNode;
 import org.apache.commons.jexl.parser.ASTArrayAccess;
+import org.apache.commons.jexl.parser.ASTArrayLiteral;
 import org.apache.commons.jexl.parser.ASTAssignment;
 import org.apache.commons.jexl.parser.ASTBitwiseAndNode;
 import org.apache.commons.jexl.parser.ASTBitwiseComplNode;
@@ -220,6 +221,19 @@ final class Debugger implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
+    public Object visit(ASTArrayLiteral node, Object data) {
+        int num = node.jjtGetNumChildren();
+        builder.append("[ ");
+        accept(node.jjtGetChild(0), data);
+        for (int i = 1; i < num; ++i) {
+            builder.append(", ");
+            accept(node.jjtGetChild(i), data);
+        }
+        builder.append(" ]");
+        return data;
+    }
+    
+    /** {@inheritDoc} */
     public Object visit(ASTAssignment node, Object data) {
         return infixChildren(node, " = ", data);
     }
@@ -379,13 +393,13 @@ final class Debugger implements ParserVisitor {
     /** {@inheritDoc} */
     public Object visit(ASTMapLiteral node, Object data) {
         int num = node.jjtGetNumChildren();
-        builder.append("[");
+        builder.append("{ ");
         accept(node.jjtGetChild(0), data);
         for (int i = 1; i < num; ++i) {
             builder.append(", ");
             accept(node.jjtGetChild(i), data);
         }
-        builder.append("]");
+        builder.append(" }");
         return data;
     }
 

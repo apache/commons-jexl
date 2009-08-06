@@ -109,12 +109,12 @@ void Block() :
 void EmptyFunction() : {}
 {
     "empty"
-    ( Reference() | "(" Reference() ")" )
+    ( Reference() | "(" Expression() ")" )
 }
 
 void SizeFunction() : {}
 {
-    "size" "(" Reference() ")"
+    "size" "(" Expression() ")"
 }
 
 void Identifier() :
@@ -281,13 +281,19 @@ void PrimaryExpression() #void :
   LOOKAHEAD(3)
   Reference()
 |
-  "(" Expression() ")"
+  LOOKAHEAD("(") "(" Expression() ")"
 |
-  EmptyFunction()
+  LOOKAHEAD("empty") EmptyFunction()
 |
-  SizeFunction()
+  LOOKAHEAD("size") SizeFunction()
 |
-  MapLiteral()
+  LOOKAHEAD("new" "(") Constructor()
+|
+  LOOKAHEAD( "{" MapEntry() ( "," MapEntry() )* "}" )
+    MapLiteral()
+|
+  LOOKAHEAD( "[" Parameter() ( "," Parameter() )* "]" )
+    ArrayLiteral()
 }
 
 
@@ -412,19 +418,24 @@ void ForeachStatement() :
   "foreach" "(" Reference() "in"  Reference() ")" Statement()
 }
 
+void ArrayLiteral() : {}
+{
+  "[" Parameter() ( "," Parameter() )* "]"
+}
+
 void MapLiteral() : {}
 {
-  "["  MapEntry() ( "," MapEntry() )* "]"
+    "{"  MapEntry() ( "," MapEntry() )* "}"
 }
 
 void MapEntry() : {}
 {
-    Parameter() "=>" Parameter()
+    Parameter() ":" Parameter()
 }
 
 void Method() #MethodNode: {}
 {
-   Identifier() "("[ Parameter() ( "," Parameter() )* ] ")"  
+   Identifier() "("[ Parameter() ( "," Parameter() )* ] ")"
 }
 
 void Function() #FunctionNode: {}

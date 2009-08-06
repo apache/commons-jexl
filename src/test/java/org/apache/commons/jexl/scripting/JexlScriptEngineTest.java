@@ -119,7 +119,7 @@ public class JexlScriptEngineTest extends TestCase {
         engine.eval("this.is.a.test=null");
         assertNull(engine.get("this.is.a.test"));
         assertEquals(Boolean.TRUE, engine.eval("empty(this.is.a.test)"));
-        final Object mymap = engine.eval("testmap=[ 'key1' => 'value1', 'key2' => 'value2' ]");
+        final Object mymap = engine.eval("testmap={ 'key1' : 'value1', 'key2' : 'value2' }");
         assertTrue(mymap instanceof Map<?, ?>);
         assertEquals(2,((Map<?, ?>)mymap).size());
     }
