@@ -426,6 +426,16 @@
             <source>arr1[0]</source> and <source>arr1.0</source> are equivalent
           </td>
         </tr>
+        <tr>
+          <td>HashMap access</td>
+          <td>
+            Map elements are accessed using square brackets, e.g.
+            <source>map[0]; map['name']; map[var];</source>
+            Note that <source>map['7']</source> and <source>map[7]</source> refer to different elements.
+            Map elements with a numeric key may also be accessed using a dotted numeral, e.g.
+            <source>map[0]</source> and <source>map.0</source> are equivalent.
+          </td>
+        </tr>
       </table>
     </section>
     <section name="Conditional">
