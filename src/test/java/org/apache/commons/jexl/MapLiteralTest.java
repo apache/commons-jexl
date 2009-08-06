@@ -84,6 +84,16 @@ public class MapLiteralTest extends JexlTestCase {
         e = JEXL.createExpression("m.7");
         o = e.evaluate(jc);
         assertEquals("SEVEN", o);
+
+        jc.getVars().put("k", Integer.valueOf(7));
+        e = JEXL.createExpression("m[k]");
+        o = e.evaluate(jc);
+        assertEquals("SEVEN", o);
+
+        jc.getVars().put("k", "7");
+        e = JEXL.createExpression("m[k]");
+        o = e.evaluate(jc);
+        assertEquals("seven", o);
     }
 
     public void testSizeOfSimpleMapLiteral() throws Exception {
