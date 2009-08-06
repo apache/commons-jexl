@@ -325,4 +325,8 @@ public class VisitorAdapter implements ParserVisitor {
         return node.childrenAccept(this, data);
     }
 
+    public Object visit(ASTArrayLiteral node, Object data) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

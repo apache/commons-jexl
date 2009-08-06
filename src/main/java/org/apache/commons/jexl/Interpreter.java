@@ -33,6 +33,7 @@ import org.apache.commons.jexl.parser.JexlNode;
 import org.apache.commons.jexl.parser.ASTAddNode;
 import org.apache.commons.jexl.parser.ASTAndNode;
 import org.apache.commons.jexl.parser.ASTArrayAccess;
+import org.apache.commons.jexl.parser.ASTArrayLiteral;
 import org.apache.commons.jexl.parser.ASTAssignment;
 import org.apache.commons.jexl.parser.ASTBitwiseAndNode;
 import org.apache.commons.jexl.parser.ASTBitwiseComplNode;
@@ -262,6 +263,17 @@ public class Interpreter implements ParserVisitor {
         return object;
     }
 
+    /** {@inheritDoc} */
+    public Object visit(ASTArrayLiteral node, Object data) {
+        int childCount = node.jjtGetNumChildren();
+        Object[] array = new Object[childCount];
+        for (int i = 0; i < childCount; i++) {
+            Object entry = node.jjtGetChild(i).jjtAccept(this, data);
+            array[i] = entry;
+        }
+        return array;
+    }
+    
     /** {@inheritDoc} */
     public Object visit(ASTAssignment node, Object data) {
         // left contains the reference to assign to
@@ -971,8 +983,8 @@ public class Interpreter implements ParserVisitor {
         Map<String, ?> vars = context.getVars();
         boolean isVariable = true;
         int v = 0;
-        for (int i = 0; i < numChildren; i++) {
-            JexlNode theNode = node.jjtGetChild(i);
+        for (int c = 0; c < numChildren; c++) {
+            JexlNode theNode = node.jjtGetChild(c);
             isVariable &= (theNode instanceof ASTIdentifier);
             result = theNode.jjtAccept(this, result);
             // if we get null back a result, check for an ant variable
@@ -981,7 +993,7 @@ public class Interpreter implements ParserVisitor {
                     variableName = new StringBuilder(node.jjtGetChild(0).image);
                     v = 1;
                 }
-                for(; v <= i; ++v) {
+                for(; v <= c; ++v) {
                     variableName.append('.');
                     variableName.append(node.jjtGetChild(v).image);
                 }
