@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-import org.apache.commons.jexl.JexlHelper;
-import org.apache.commons.jexl.JexlContext;
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.ExpressionFactory;
+package org.apache.commons.jexl.examples;
+
+import org.apache.commons.jexl.*;
+import junit.framework.TestCase;
 
 /**
  *  Simple example to show how to access method and properties.
@@ -27,49 +27,58 @@ import org.apache.commons.jexl.ExpressionFactory;
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public class MethodPropertyExample {
+public class MethodPropertyTest extends TestCase {
     /**
-     * Command line entry point.
-     * @param args Command line arguments
-     * @throws Exception on any error.
+     * An example for method access.
      */
-    public static void main(String[] args) throws Exception {
+    public static void example(final Output out) throws Exception {
+        /**
+         * First step is to retrieve an instance of a JexlEngine;
+         * it might be already existing and shared or created anew.
+         */
+        JexlEngine jexl = new JexlEngine();
         /*
-         *  First make a jexlContext and put stuff in it
+         *  Second make a jexlContext and put stuff in it
          */
         JexlContext jc = JexlHelper.createContext();
 
-        jc.getVars().put("foo", new Foo());
-        jc.getVars().put("number", new Integer(10));
+        /**
+         * The Java equivalents of foo and number for comparison and checking
+         */
+        Foo foo = new Foo();
+        Integer number = new Integer(10);
+
+        jc.getVars().put("foo", foo);
+        jc.getVars().put("number", number);
 
         /*
          *  access a method w/o args
          */
-        Expression e = ExpressionFactory.createExpression("foo.getFoo()");
+        Expression e = jexl.createExpression("foo.getFoo()");
         Object o = e.evaluate(jc);
-        System.out.println("value returned by the method getFoo() is : " + o);
+        out.print("value returned by the method getFoo() is : ", o, foo.getFoo());
 
         /*
          *  access a method w/ args
          */
-        e = ExpressionFactory.createExpression("foo.convert(1)");
+        e = jexl.createExpression("foo.convert(1)");
         o = e.evaluate(jc);
-        System.out.println("value of " + e.getExpression() + " is : " + o);
+        out.print("value of " + e.getExpression() + " is : ", o, foo.convert(1));
 
-        e = ExpressionFactory.createExpression("foo.convert(1+7)");
+        e = jexl.createExpression("foo.convert(1+7)");
         o = e.evaluate(jc);
-        System.out.println("value of " + e.getExpression() + " is : " + o);
+        out.print("value of " + e.getExpression() + " is : ", o, foo.convert(1+7));
 
-        e = ExpressionFactory.createExpression("foo.convert(1+number)");
+        e = jexl.createExpression("foo.convert(1+number)");
         o = e.evaluate(jc);
-        System.out.println("value of " + e.getExpression() + " is : " + o);
+        out.print("value of " + e.getExpression() + " is : ", o, foo.convert(1+number));
 
         /*
          * access a property
          */
-        e = ExpressionFactory.createExpression("foo.bar");
+        e = jexl.createExpression("foo.bar");
         o = e.evaluate(jc);
-        System.out.println("value returned for the property 'bar' is : " + o);
+        out.print("value returned for the property 'bar' is : ", o, foo.get("bar"));
 
     }
 
@@ -104,4 +113,21 @@ public class MethodPropertyExample {
         }
     }
 
+
+    /**
+     * Unit test entry point.
+     * @throws Exception
+     */
+    public void testExample() throws Exception {
+        example(Output.JUNIT);
+    }
+
+    /**
+     * Command line entry point.
+     * @param args command line arguments
+     * @throws Exception cos jexl does.
+     */
+    public static void main(String[] args) throws Exception {
+        example(Output.SYSTEM);
+    }
 }

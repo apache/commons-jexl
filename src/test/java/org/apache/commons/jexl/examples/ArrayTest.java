@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-import org.apache.commons.jexl.Expression;
-import org.apache.commons.jexl.ExpressionFactory;
-import org.apache.commons.jexl.JexlContext;
-import org.apache.commons.jexl.JexlHelper;
+package org.apache.commons.jexl.examples;
 
+import org.apache.commons.jexl.*;
+import junit.framework.TestCase;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -30,30 +29,51 @@ import java.util.ArrayList;
  *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
-public class ArrayExample {
+public class ArrayTest extends TestCase {
+    /**
+     * An example for array access.
+     */
+    static void example(Output out) throws Exception {
+        /**
+         * First step is to retrieve an instance of a JexlEngine;
+         * it might be already existing and shared or created anew.
+         */
+        JexlEngine jexl = new JexlEngine();
+        /*
+         *  Second make a jexlContext and put stuff in it
+         */
+        JexlContext jc = JexlHelper.createContext();
+
+        List<Object> l = new ArrayList<Object>();
+        l.add("Hello from location 0");
+        Integer two = new Integer(2);
+        l.add(two);
+        jc.getVars().put("array", l);
+
+        Expression e = jexl.createExpression("array[1]");
+        Object o = e.evaluate(jc);
+        out.print("Object @ location 1 = ", o, two);
+
+        e = jexl.createExpression("array[0].length()");
+        o = e.evaluate(jc);
+
+        out.print("The length of the string at location 0 is : ", o, 21);
+    }
+
+    /**
+     * Unit test entry point.
+     * @throws Exception
+     */
+    public void testExample() throws Exception {
+        example(Output.JUNIT);
+    }
+
     /** 
      * Command line entry point.
      * @param args command line arguments
      * @throws Exception cos jexl does. 
      */
     public static void main(String[] args) throws Exception {
-        /*
-         *  First make a jexlContext and put stuff in it
-         */
-        JexlContext jc = JexlHelper.createContext();
-
-        List l = new ArrayList();
-        l.add("Hello from location 0");
-        l.add(new Integer(2));
-        jc.getVars().put("array", l);
-
-        Expression e = ExpressionFactory.createExpression("array[1]");
-        Object o = e.evaluate(jc);
-        System.out.println("Object @ location 1 = " + o);
-
-        e = ExpressionFactory.createExpression("array[0].length()");
-        o = e.evaluate(jc);
-
-        System.out.println("The length of the string at location 0 is : " + o);
+        example(Output.SYSTEM);
     }
 }
