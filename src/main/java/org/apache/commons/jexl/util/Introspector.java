@@ -198,11 +198,6 @@ public class Introspector  {
         if (executor.isAlive()) {
             return executor;
         }
-        // if that didn't work, look for get("foo")
-        executor = new DuckGetExecutor(this, claz, identifier);
-        if (executor.isAlive()) {
-            return executor;
-        }
         // let's see if we can convert the identifier to an int,
         // if obj is an array or a list, we can still do something
         Integer index = toInteger(identifier);
@@ -212,7 +207,11 @@ public class Introspector  {
                 return executor;
             }
         }
-
+        // if that didn't work, look for get("foo")
+        executor = new DuckGetExecutor(this, claz, identifier);
+        if (executor.isAlive()) {
+            return executor;
+        }
         return null;
     }
 
@@ -239,11 +238,6 @@ public class Introspector  {
         if (executor.isAlive()) {
             return executor;
         }
-        // if that didn't work, look for get("foo")
-        executor = new DuckSetExecutor(this, claz, property, arg);
-        if (executor.isAlive()) {
-            return executor;
-        }
         // let's see if we can convert the identifier to an int,
         // if obj is an array or a list, we can still do something
         Integer index = toInteger(identifier);
@@ -252,6 +246,11 @@ public class Introspector  {
             if (executor.isAlive()) {
                 return executor;
             }
+        }
+        // if that didn't work, look for get("foo")
+        executor = new DuckSetExecutor(this, claz, property, arg);
+        if (executor.isAlive()) {
+            return executor;
         }
         return null;
      }
