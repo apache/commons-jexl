@@ -27,7 +27,7 @@ package org.apache.commons.jexl.util.introspection;
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public interface VelPropertySet {
+public interface JexlPropertySet {
     /**
      * method used to set the value in the object.
      * 

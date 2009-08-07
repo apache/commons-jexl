@@ -56,9 +56,9 @@ public interface Uberspect {
      * @param method the method name
      * @param args method arguments
      * @param info template info
-     * @return a {@link VelMethod}.
+     * @return a {@link JexlMethod}.
      */
-    VelMethod getMethod(Object obj, String method, Object[] args, DebugInfo info);
+    JexlMethod getMethod(Object obj, String method, Object[] args, DebugInfo info);
 
     /**
      * Property getter - returns VelPropertyGet appropos for #set($foo =
@@ -66,9 +66,9 @@ public interface Uberspect {
      * @param obj the object to get the property from.
      * @param identifier property name
      * @param info template info
-     * @return a {@link VelPropertyGet}.
+     * @return a {@link JexlPropertyGet}.
      */
-    VelPropertyGet getPropertyGet(Object obj, Object identifier, DebugInfo info);
+    JexlPropertyGet getPropertyGet(Object obj, Object identifier, DebugInfo info);
 
     /**
      * Property setter - returns VelPropertySet appropos for #set($foo.bar =
@@ -77,7 +77,7 @@ public interface Uberspect {
      * @param identifier property name
      * @param arg value to set.
      * @param info template info
-     * @return a {@link VelPropertySet}.
+     * @return a {@link JexlPropertySet}.
      */
-    VelPropertySet getPropertySet(Object obj, Object identifier, Object arg, DebugInfo info);
+    JexlPropertySet getPropertySet(Object obj, Object identifier, Object arg, DebugInfo info);
 }

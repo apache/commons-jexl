@@ -27,7 +27,7 @@ package org.apache.commons.jexl.util.introspection;
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public interface VelMethod {
+public interface JexlMethod {
     /**
      * invocation method - called when the method invocation should be performed
      * and a value returned.

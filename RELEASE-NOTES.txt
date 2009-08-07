@@ -44,6 +44,12 @@ The following classes have been removed:
   Please create a JexlEngine and use createExpression() or createScript()
   instead.
 
+  * VelMethod
+  * VelPropertyGet
+  * VelPropertySet
+
+  Please use JexlMethod, JexlPropertyGet and JexlPropertySet instead.
+
 The following methods have been removed:
 
   * Info.getTemplateName() - use Info.getName() instead

@@ -83,9 +83,9 @@ import org.apache.commons.jexl.parser.ParserVisitor;
 
 import org.apache.commons.jexl.util.AbstractExecutor;
 import org.apache.commons.jexl.util.introspection.Uberspect;
-import org.apache.commons.jexl.util.introspection.VelMethod;
-import org.apache.commons.jexl.util.introspection.VelPropertyGet;
-import org.apache.commons.jexl.util.introspection.VelPropertySet;
+import org.apache.commons.jexl.util.introspection.JexlMethod;
+import org.apache.commons.jexl.util.introspection.JexlPropertyGet;
+import org.apache.commons.jexl.util.introspection.JexlPropertySet;
 
 /**
  * An interpreter of JEXL syntax.
@@ -751,7 +751,7 @@ public class Interpreter implements ParserVisitor {
                     }
                 }
             }
-            VelMethod vm = uberspect.getMethod(data, methodName, argv, node);
+            JexlMethod vm = uberspect.getMethod(data, methodName, argv, node);
             // DG: If we can't find an exact match, narrow the parameters and try again!
             if (vm == null) {
                 narrowArguments(argv);
@@ -860,7 +860,7 @@ public class Interpreter implements ParserVisitor {
                     }
                 }
             }
-            VelMethod vm = uberspect.getMethod(namespace, function, argv, node);
+            JexlMethod vm = uberspect.getMethod(namespace, function, argv, node);
             // DG: If we can't find an exact match, narrow the parameters and
             // try again!
             if (vm == null) {
@@ -1144,7 +1144,7 @@ public class Interpreter implements ParserVisitor {
             // check if there is a size method on the object that returns an
             // integer and if so, just use it
             Object[] params = new Object[0];
-            VelMethod vm = uberspect.getMethod(val, "size", EMPTY_PARAMS, node);
+            JexlMethod vm = uberspect.getMethod(val, "size", EMPTY_PARAMS, node);
             if (vm != null && vm.getReturnType() == Integer.TYPE) {
                 Integer result;
                 try {
@@ -1194,7 +1194,7 @@ public class Interpreter implements ParserVisitor {
                 }
             }
         }
-        VelPropertyGet vg = uberspect.getPropertyGet(object, attribute, node);
+        JexlPropertyGet vg = uberspect.getPropertyGet(object, attribute, node);
         if (vg != null) {
             try {
                 Object value = vg.invoke(object);
@@ -1248,7 +1248,7 @@ public class Interpreter implements ParserVisitor {
                 }
             }
         }
-        VelPropertySet vs = uberspect.getPropertySet(object, attribute, value, node);
+        JexlPropertySet vs = uberspect.getPropertySet(object, attribute, value, node);
         if (vs != null) {
             try {
                 // cache executor in volatile JexlNode.value

@@ -126,21 +126,21 @@ public class UberspectImpl extends org.apache.commons.jexl.util.Introspector imp
     /**
      * {@inheritDoc}
      */
-    public VelMethod getMethod(Object obj, String methodName, Object[] args, DebugInfo i) {
+    public JexlMethod getMethod(Object obj, String methodName, Object[] args, DebugInfo i) {
         return getMethodExecutor(obj, methodName, args);
     }
 
     /**
      * {@inheritDoc}
      */
-    public VelPropertyGet getPropertyGet(Object obj, Object identifier, DebugInfo i) {
+    public JexlPropertyGet getPropertyGet(Object obj, Object identifier, DebugInfo i) {
         return getGetExecutor(obj, identifier);
     }
 
     /**
      * {@inheritDoc}
      */
-    public VelPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, DebugInfo i) {
+    public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, DebugInfo i) {
         return getSetExecutor(obj, identifier, arg);
     }
 }
