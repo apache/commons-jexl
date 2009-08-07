@@ -16,9 +16,9 @@
  */
 package org.apache.commons.jexl.util;
 import org.apache.commons.jexl.util.introspection.MethodKey;
-import org.apache.commons.jexl.util.introspection.VelMethod;
-import org.apache.commons.jexl.util.introspection.VelPropertySet;
-import org.apache.commons.jexl.util.introspection.VelPropertyGet;
+import org.apache.commons.jexl.util.introspection.JexlMethod;
+import org.apache.commons.jexl.util.introspection.JexlPropertySet;
+import org.apache.commons.jexl.util.introspection.JexlPropertyGet;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -118,7 +118,7 @@ public abstract class AbstractExecutor {
     /**
      * Abstract class that is used to execute an arbitrary 'get' method.
      */
-    public abstract static class Get extends AbstractExecutor implements VelPropertyGet {
+    public abstract static class Get extends AbstractExecutor implements JexlPropertyGet {
         /**
          * Default and sole constructor.
          * @param theClass the class this executor applies to
@@ -159,7 +159,7 @@ public abstract class AbstractExecutor {
     /**
      * Abstract class that is used to execute an arbitrary 'set' method.
      */
-    public abstract static class Set extends AbstractExecutor implements VelPropertySet {
+    public abstract static class Set extends AbstractExecutor implements JexlPropertySet {
         /**
          * Default and sole constructor.
          * @param theClass the class this executor applies to
@@ -205,7 +205,7 @@ public abstract class AbstractExecutor {
     /**
      * Abstract class that is used to execute an arbitrary method.
      */
-    public abstract static class Method extends AbstractExecutor implements VelMethod {
+    public abstract static class Method extends AbstractExecutor implements JexlMethod {
         /**
          * A helper class to pass the method &amp; parameters.
          */

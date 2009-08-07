@@ -27,7 +27,7 @@ package org.apache.commons.jexl.util.introspection;
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public interface VelPropertyGet {
+public interface JexlPropertyGet {
     /**
      * invocation method - called when the 'get action' should be performed and
      * a value returned.
