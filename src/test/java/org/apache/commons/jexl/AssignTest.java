@@ -26,6 +26,7 @@ public class AssignTest extends JexlTestCase {
     private static final JexlEngine ENGINE = new JexlEngine();
     static {
         ENGINE.setSilent(false);
+        ENGINE.setLenient(false);
     }
     
     public static class Froboz {
