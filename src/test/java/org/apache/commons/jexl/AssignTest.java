@@ -109,6 +109,7 @@ public class AssignTest extends JexlTestCase {
         }
         catch(RuntimeException xrt) {
             String str = xrt.toString();
+            assertTrue(str.contains("nosuchbean"));
             return;
         }
         finally {

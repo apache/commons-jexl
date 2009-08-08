@@ -174,7 +174,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         try {
             UnifiedJEXL.Expression expr = EL.parse("${'world'");
             JexlContext none = null;
-            Object o = expr.evaluate(none);
+            expr.evaluate(none);
             fail("should be malformed");
         }
         catch(UnifiedJEXL.Exception xjexl) {
@@ -188,7 +188,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         try {
             UnifiedJEXL.Expression expr = EL.parse("#{${hi} world}");
             JexlContext none = null;
-            Object o = expr.evaluate(none);
+            expr.evaluate(none);
             fail("should be malformed");
         }
         catch(UnifiedJEXL.Exception xjexl) {
@@ -202,7 +202,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         try {
             UnifiedJEXL.Expression expr = EL.parse("#{${hi}+'.world'}");
             JexlContext none = null;
-            Object o = expr.evaluate(none);
+            expr.evaluate(none);
             fail("should be malformed");
         }
         catch(UnifiedJEXL.Exception xjexl) {
