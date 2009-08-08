@@ -22,6 +22,8 @@ import org.apache.commons.jexl.parser.JexlNode;
  * Wraps any error that might occur during interpretation of a script or expression.
  */
 public class JexlException extends RuntimeException {
+    /** Serial version UID. */
+    private static final long serialVersionUID = 2690666400232612395L;
     /** The point of origin for this exception. */
     protected JexlNode mark;
     /** A marker to use in NPEs stating a null operand error. */

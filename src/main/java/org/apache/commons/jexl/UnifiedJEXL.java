@@ -110,6 +110,8 @@ public final class UnifiedJEXL {
      */
     private static Map<String, Expression> createCache(final int cacheSize) {
         return new LinkedHashMap<String, Expression>(cacheSize, LOAD_FACTOR, true) {
+            /** Serial version UID. */
+            private static final long serialVersionUID = -6515503595421899722L;
             @Override
             protected boolean removeEldestEntry(Map.Entry<String, Expression> eldest) {
                 return size() > cacheSize;
@@ -215,6 +217,8 @@ public final class UnifiedJEXL {
      * The sole type of (runtime) exception the UnifiedJEXL can throw.
      */
     public static class Exception extends RuntimeException {
+        /** Serial version UID. */
+        private static final long serialVersionUID = -8201402995815975726L;
         /**
          * Creates a UnifiedJEXL.Exception.
          * @param msg the exception message
