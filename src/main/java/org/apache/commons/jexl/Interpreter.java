@@ -1207,7 +1207,13 @@ public class Interpreter implements ParserVisitor {
                 if (node == null) {
                     throw new RuntimeException(xany);
                 } else {
-                    throw new JexlException(node, "get object property error", xany);
+                    JexlException xjexl = new JexlException(node, "get object property error", xany);
+                    if (strict) {
+                        throw xjexl;
+                    }
+                    if (!silent) {
+                        logger.warn(xjexl.getMessage());
+                    }
                 }
             }
         }
@@ -1248,6 +1254,7 @@ public class Interpreter implements ParserVisitor {
                 }
             }
         }
+        JexlException xjexl = null;
         JexlPropertySet vs = uberspect.getPropertySet(object, attribute, value, node);
         if (vs != null) {
             try {
@@ -1256,31 +1263,41 @@ public class Interpreter implements ParserVisitor {
                 if (node != null && cache) {
                     node.jjtSetValue(vs);
                 }
+                return;
             } catch (RuntimeException xrt) {
-                throw node == null ? xrt : new JexlException(node, "set object property error", xrt);
+                if (node == null) {
+                    throw xrt;
+                }
+                xjexl = new JexlException(node, "set object property error", xrt);
             } catch (Exception xany) {
                 if (node == null) {
                     throw new RuntimeException(xany);
-                } else {
-                    throw new JexlException(node, "set object property error", xany);
                 }
+                xjexl = new JexlException(node, "set object property error", xany);
             }
-            return;
         }
-        String error = "unable to set object property"
-                       + ", class: " + object.getClass().getName()
-                       + ", property: " + attribute;
-        if (node == null) {
-            throw new UnsupportedOperationException(error);
+        if (xjexl == null) {
+            String error = "unable to set object property"
+                           + ", class: " + object.getClass().getName()
+                           + ", property: " + attribute;
+            if (node == null) {
+                throw new UnsupportedOperationException(error);
+            }
+            xjexl = new JexlException(node, error, null);
         }
-        throw new JexlException(node, error, null);
+        if (strict) {
+            throw xjexl;
+        }
+        if (!silent) {
+            logger.warn(xjexl.getMessage());
+        }
     }
 
     /**
      * Unused, satisfy ParserVisitor interface.
      * @param node a node
-     * @param data the date
-     * @return does not return,
+     * @param data the data
+     * @return does not return
      */
     public Object visit(SimpleNode node, Object data) {
         throw new UnsupportedOperationException("Not supported yet.");
