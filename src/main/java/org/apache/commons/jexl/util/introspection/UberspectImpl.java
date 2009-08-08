@@ -65,7 +65,8 @@ public class UberspectImpl extends org.apache.commons.jexl.util.Introspector imp
     /**
      * {@inheritDoc}
      */
-     public Iterator<?> getIterator(Object obj, DebugInfo i) {
+    @SuppressWarnings("unchecked")
+    public Iterator<?> getIterator(Object obj, DebugInfo i) {
         if (obj.getClass().isArray()) {
             return new ArrayIterator(obj);
         } else if (obj instanceof Collection<?>) {

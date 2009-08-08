@@ -40,6 +40,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     }
 
     /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
     public Object execute(final Object map, Object value)
     throws IllegalAccessException, InvocationTargetException {
@@ -48,6 +49,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     }
 
     /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
     public Object tryExecute(final Object map, Object key, Object value) {
         if (objectClass.equals(map.getClass())
