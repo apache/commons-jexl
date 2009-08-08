@@ -542,6 +542,8 @@ public class JexlEngine {
      */
     protected Map<String, JexlNode> createCache(final int cacheSize) {
         return new java.util.LinkedHashMap<String, JexlNode>(cacheSize, LOAD_FACTOR, true) {
+            /** Serial version UID. */
+            private static final long serialVersionUID = 3801124242820219131L;
             @Override
             protected boolean removeEldestEntry(Map.Entry<String, JexlNode> eldest) {
                 return size() > cacheSize;
