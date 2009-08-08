@@ -177,6 +177,7 @@ public class CacheTest extends JexlTestCase {
     }
 
     public static class Cached3 extends java.util.TreeMap<String, Object> {
+        private static final long serialVersionUID = 1L;
         boolean flag = false;
 
         public Cached3() {
@@ -208,6 +209,8 @@ public class CacheTest extends JexlTestCase {
     }
 
     public static class Cached4 extends java.util.ArrayList<String> {
+        private static final long serialVersionUID = 1L;
+
         public Cached4() {
             super.add("Cached4:new");
             super.add("false");
