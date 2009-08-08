@@ -122,21 +122,7 @@ final class MethodMap {
         if (methodList == null) {
             return null;
         }
-        return MethodKey.METHODS.getMostSpecific(methodList, methodKey.getParameters());
+        return methodKey.getMostSpecific(methodList);
     } // CSON: RedundantThrows
-
-
-    /**
-     * Simple distinguishable exception, used when
-     * we run across ambiguous overloading.  Caught
-     * by the introspector.
-     */
-    public static class AmbiguousException extends RuntimeException {
-        /**
-         * Version Id for serializable.
-         */
-        private static final long serialVersionUID = -2314636505414551663L;
-    }
-
 
 }

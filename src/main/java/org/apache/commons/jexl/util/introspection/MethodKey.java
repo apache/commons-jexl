@@ -40,7 +40,7 @@ import java.util.Arrays;
  * A key can be constructed either from arguments (array of objects) or from parameters
  * (array of class).
  * Roughly 3x faster than string key to access the map & uses less memory.
- * 
+ *
  * For the parameters methods:
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
@@ -181,6 +181,26 @@ public final class MethodKey {
     }
 
     /**
+     * Gets the most specific method that is applicable to the parameters of this key.
+     * @param methods a list of methods.
+     * @return the most specific method.
+     * @throws MethodKey.AmbiguousException if there is more than one.
+     */
+    public Method getMostSpecific(List<Method> methods) {
+        return METHODS.getMostSpecific(methods, params);
+    }
+
+    /**
+     * Gets the most specific constructor that is applicable to the parameters of this key.
+     * @param methods a list of constructors.
+     * @return the most specific constructor.
+     * @throws MethodKey.AmbiguousException if there is more than one.
+     */
+    public Constructor<?> getMostSpecific(List<Constructor<?>> methods) {
+        return CONSTRUCTORS.getMostSpecific(methods, params);
+    }
+
+    /**
      * whether a method/ctor is more specific than a previously compared one.
      */
     private static final int MORE_SPECIFIC = 0;
@@ -207,9 +227,9 @@ public final class MethodKey {
 
     /**
      * Utility for parameters matching.
-     * @param <T> method or contructor
+     * @param <T> Method or Constructor
      */
-     public abstract static class Parameters<T> {
+     private abstract static class Parameters<T> {
         /**
          * Extract the parameter types from its applicable argument.
          * @param app a method or constructor
@@ -225,7 +245,7 @@ public final class MethodKey {
          * @return the most specific method.
          * @throws MethodKey.AmbiguousException if there is more than one.
          */
-        protected T getMostSpecific(List<T> methods, Class<?>[] classes) {
+        private T getMostSpecific(List<T> methods, Class<?>[] classes) {
             LinkedList<T> applicables = getApplicables(methods, classes);
 
             if (applicables.isEmpty()) {
@@ -357,7 +377,7 @@ public final class MethodKey {
          *         formal and actual arguments matches, and argument types are assignable
          *         to formal types through a method invocation conversion).
          */
-        protected LinkedList<T> getApplicables(List<T> methods, Class<?>[] classes) {
+        private LinkedList<T> getApplicables(List<T> methods, Class<?>[] classes) {
             LinkedList<T> list = new LinkedList<T>();
 
             for (Iterator<T> imethod = methods.iterator(); imethod.hasNext();) {
@@ -438,13 +458,8 @@ public final class MethodKey {
          */
         private boolean isConvertible(Class<?> formal, Class<?> actual,
                 boolean possibleVarArg) {
-            // if we see Void.class as the class of an argument most likely
-            // obtained through a MethodKey, we consider it
-            // as a wildcard; non primitives are thus convertible.
-            if (actual.equals(Void.class) && !formal.isPrimitive()) {
-                return true;
-            }
-            return isInvocationConvertible(formal, actual, possibleVarArg);
+            // if we see Void.class, the argument was null
+            return isInvocationConvertible(formal, actual.equals(Void.class)? null : actual, possibleVarArg);
         }
 
         /**
@@ -458,7 +473,8 @@ public final class MethodKey {
          */
         private boolean isStrictConvertible(Class<?> formal, Class<?> actual,
                 boolean possibleVarArg) {
-            return isStrictInvocationConvertible(formal, actual, possibleVarArg);
+            // if we see Void.class, the argument was null
+            return isStrictInvocationConvertible(formal, actual.equals(Void.class)? null : actual, possibleVarArg);
         }
 
     }
@@ -531,7 +547,7 @@ public final class MethodKey {
 
         /* Check for vararg conversion. */
         if (possibleVarArg && formal.isArray()) {
-            if (actual.isArray()) {
+            if (actual != null && actual.isArray()) {
                 actual = actual.getComponentType();
             }
             return isInvocationConvertible(formal.getComponentType(),
@@ -595,7 +611,7 @@ public final class MethodKey {
 
         /* Check for vararg conversion. */
         if (possibleVarArg && formal.isArray()) {
-            if (actual.isArray()) {
+            if (actual != null && actual.isArray()) {
                 actual = actual.getComponentType();
             }
             return isStrictInvocationConvertible(formal.getComponentType(),
@@ -607,7 +623,7 @@ public final class MethodKey {
     /**
      * The parameter matching service for methods.
      */
-    public static final Parameters<Method> METHODS = new Parameters<Method>() {
+    private static final Parameters<Method> METHODS = new Parameters<Method>() {
         @Override
         protected Class<?>[] getParameterTypes(Method app) {
             return app.getParameterTypes();
@@ -618,7 +634,7 @@ public final class MethodKey {
     /**
      * The parameter matching service for constructors.
      */
-    public static final Parameters<Constructor<?>> CONSTRUCTORS = new Parameters<Constructor<?>>() {
+    private static final Parameters<Constructor<?>> CONSTRUCTORS = new Parameters<Constructor<?>>() {
         @Override
         protected Class<?>[] getParameterTypes(Constructor<?> app) {
             return app.getParameterTypes();
