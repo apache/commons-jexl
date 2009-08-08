@@ -45,12 +45,14 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
      * @param map the map.
      * @return map.get(property)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public Object execute(final Object map) {
         return ((Map<Object, ?>) map).get(property);
     }
 
     /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
     public Object tryExecute(final Object map, Object key) {
         if (objectClass.equals(map.getClass())
