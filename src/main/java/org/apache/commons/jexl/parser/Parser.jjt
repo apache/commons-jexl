@@ -415,6 +415,8 @@ void WhileStatement() :
 void ForeachStatement() :
 {}
 {
+  "for" "(" Reference() ":"  Reference() ")" Statement()
+|
   "foreach" "(" Reference() "in"  Reference() ")" Statement()
 }
 
