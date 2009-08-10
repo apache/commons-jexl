@@ -449,11 +449,12 @@
           </td>
         </tr>
         <tr>
-          <td>foreach</td>
+          <td>for</td>
           <td>
             Loop through items of an Array, Collection, Map, Iterator or Enumeration, e.g.
-            <code>foreach (item in list) { x = x + item; }</code>
+            <code>for(item : list) { x = x + item; }</code>
             Where <code>item</code> and <code>list</code> are variables.
+            The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>deprecated</strong>.
           </td>
         </tr>
         <tr>
