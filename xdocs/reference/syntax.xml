@@ -445,14 +445,20 @@
           <td>if</td>
           <td>
             Classic, if/else statement, e.g.
-            <code>if ((x * 2) == 5) {y = 1;} else {y = 2;}</code>
+            <source>if ((x * 2) == 5) {
+    y = 1;
+} else {
+    y = 2;
+}</source>
           </td>
         </tr>
         <tr>
           <td>for</td>
           <td>
             Loop through items of an Array, Collection, Map, Iterator or Enumeration, e.g.
-            <code>for(item : list) { x = x + item; }</code>
+            <source>for(item : list) {
+    x = x + item; 
+}</source>
             Where <code>item</code> and <code>list</code> are variables.
             The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>deprecated</strong>.
           </td>
@@ -461,7 +467,9 @@
           <td>while</td>
           <td>
             Loop until a condition is satisfied, e.g.
-            <code>while (x lt 10) { x = x + 2; }</code>
+            <source>while (x lt 10) {
+    x = x + 2; 
+}</source>
           </td>
         </tr>
       </table>
