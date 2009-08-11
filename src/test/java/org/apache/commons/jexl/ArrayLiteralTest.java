@@ -47,7 +47,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate( jc );
-        Object[] check = { 5, 10 };
+        Object[] check = { Integer.valueOf(5), Integer.valueOf(10) };
         assertTrue( Arrays.equals(check, (Object[])o) );
     }
 
