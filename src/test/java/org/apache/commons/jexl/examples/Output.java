@@ -52,6 +52,7 @@ public abstract class Output {
      * The output instance for the general outputing to System.out.
      */
     public static final Output SYSTEM = new Output() {
+        @Override
         public void print(String expr, Object actual, Object expected) {
             System.out.print(expr);
             System.out.println(actual);
