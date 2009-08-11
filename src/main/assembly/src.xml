@@ -32,9 +32,6 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>examples</directory>
-        </fileSet>
-        <fileSet>
             <directory>src</directory>
         </fileSet>
         <fileSet>
