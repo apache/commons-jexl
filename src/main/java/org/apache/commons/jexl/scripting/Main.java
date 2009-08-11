@@ -35,7 +35,8 @@ public class Main {
     /**
      * Test application for JexlScriptEngine (JSR-223 implementation).
      * 
-     * If a single argument is present, it is treated as a filename to be evaluated.
+     * If a single argument is present, it is treated as a filename of a JEXL
+     * script to be executed.
      * Otherwise, lines are read from standard input and evaluated.
      * 
      * @param args (optional) filename to evaluate. Stored in the args variable.
