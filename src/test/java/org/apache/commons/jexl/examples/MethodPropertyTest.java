@@ -71,7 +71,7 @@ public class MethodPropertyTest extends TestCase {
 
         e = jexl.createExpression("foo.convert(1+number)");
         o = e.evaluate(jc);
-        out.print("value of " + e.getExpression() + " is : ", o, foo.convert(1+number));
+        out.print("value of " + e.getExpression() + " is : ", o, foo.convert(1+number.intValue()));
 
         /*
          * access a property

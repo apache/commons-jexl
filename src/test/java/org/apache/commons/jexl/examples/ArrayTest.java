@@ -57,7 +57,7 @@ public class ArrayTest extends TestCase {
         e = jexl.createExpression("array[0].length()");
         o = e.evaluate(jc);
 
-        out.print("The length of the string at location 0 is : ", o, 21);
+        out.print("The length of the string at location 0 is : ", o, Integer.valueOf(21));
     }
 
     /**
