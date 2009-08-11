@@ -34,7 +34,8 @@ public class Main {
     /**
      * Test application for Jexl
      * 
-     * If a single argument is present, it is treated as a filename to be sourced.
+     * If a single argument is present, it is treated as a filename of a JEXL
+     * script to be executed.
      * Otherwise, lines are read from standard input and evaluated.
      * 
      * @param args (optional) filename to evaluate. Stored in the args variable.
