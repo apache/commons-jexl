@@ -459,7 +459,6 @@ void AnyMethod() #void : {}
 
 void Constructor() # ConstructorNode() : {}
 {
-
   "new" "("[ Parameter() ( "," Parameter() )* ] ")"
 }
 
@@ -479,9 +478,7 @@ void Reference() : {}
   (LOOKAHEAD(2) "."
     (
       LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() |
-//      (LOOKAHEAD(3) AnyMethod() | Identifier() |  IntegerLiteral() )
       (LOOKAHEAD(3) AnyMethod() | Identifier() |  IntegerLiteral() )
-
     )
   )*
 }
