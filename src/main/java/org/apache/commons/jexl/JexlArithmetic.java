@@ -24,10 +24,10 @@ import java.math.BigInteger;
  * @since 2.0
  */
 public class JexlArithmetic {
-    /** Integer.MAX_VALUE as BigDecimal. */
+    /** Double.MAX_VALUE as BigDecimal. */
     protected static final BigDecimal BIGD_DOUBLE_MAX_VALUE = BigDecimal.valueOf(Double.MAX_VALUE);
-    /** Integer.MIN_VALUE as BigDecimal. */
-    protected static final BigDecimal BIGD_DOUBLE_MIN_VALUE = BigDecimal.valueOf(-Double.MAX_VALUE);
+    /** Double.MIN_VALUE as BigDecimal. */
+    protected static final BigDecimal BIGD_DOUBLE_MIN_VALUE = BigDecimal.valueOf(Double.MIN_VALUE);
     /** Long.MAX_VALUE as BigInteger. */
     protected static final BigInteger BIGI_LONG_MAX_VALUE = BigInteger.valueOf(Long.MAX_VALUE);
     /** Long.MIN_VALUE as BigInteger. */
@@ -63,7 +63,7 @@ public class JexlArithmetic {
 
     /**
      * The result of +,/,-,*,% when both operands are null.
-     * @return Long(0)
+     * @return null if strict, else Long(0)
      */
     protected Object controlNullNullOperands() {
         return strict? null : Long.valueOf(0);
@@ -82,10 +82,11 @@ public class JexlArithmetic {
      * Add two values together.
      * Rules are:<ol>
      * <li>If both are null, result is 0</li>
-     * <li>If either are floating point numbers, coerce to BigDecimals
-     *      and add together</li>
-     * <li>Else treat as BigIntegers and add together</li>
-     * <li>If either numeric add fails on coercion to the appropriate type,
+     * <li>If either is a floating point number, coerce both to Double and add together</li>
+     * <li>If both are BigInteger, treat as BigInteger and add together</li>
+     * <li>If either is a BigDecimal, coerce both to BigDecimal and add together</li>
+     * <li>Else treat as BigInteger and add together</li>
+     * <li>If any numeric add fails on coercion to the appropriate type,
      *      treat as Strings and do concatenation</li>
      * </ol>
      * @param left first value
@@ -132,12 +133,15 @@ public class JexlArithmetic {
     /**
      * Divide the left value by the right.
      * Rules are:<ol>
-     * <li>If both are null, result is 0</li>
-     * <li>Treat as BigDecimals and divide</li>
+     * <li>If both are null, result is Long(0)</li>
+     * <li>If both are BigInteger, return result of BigInteger divide</li>
+     * <li>If both are BigDecimal, return result of BigDecimal divide (rounded up if necessary to fit the scale)</li>
+     * <li>Else treat as Doubles and divide</li>
      * </ol>
      * @param left first value
      * @param right second value
-     * @return left - right.
+     * @return left / right
+     * @throws ArithmeticException if right == 0
      */
     public Object divide(Object left, Object right) {
         if (left == null && right == null) {
@@ -171,11 +175,15 @@ public class JexlArithmetic {
      * left value mod right.
      * Rules are:<ol>
      * <li>If both are null, result is 0</li>
-     * <li>Treat both as BigIntegers and perform modulus</li>
+     * <li>If either is a floating point number, treat both as double and perform modulus, returning Double</li>
+     * <li>If both are BigInteger numbers, treat as BigInteger and perform modulus, returning BigInteger</li>
+     * <li>If either is a BigDecimal number, coerce both to BigDecimal and perform modulus, returning BigDecimal</li>
+     * <li>Else treat both as BigInteger and perform modulus, returning Number: BigInteger or Long(if in range)</li>
      * </ol>
      * @param left first value
      * @param right second value
-     * @return left mod right.
+     * @return left mod right
+     * @throws ArithmeticException if right == 0.0
      */
     public Object mod(Object left, Object right) {
         if (left == null && right == null) {
@@ -218,12 +226,12 @@ public class JexlArithmetic {
     /**
      * Multiply the left value by the right.
      * Rules are:<ol>
-     * <li>If both are null, result is 0</li>
-     * <li>If either are floating point numbers, coerce to BigDecimals
-     *      and multiply</li>
-     * <li>Else treat as BigIntegers and multiply</li>
-     * <li>If either numeric operation fails on coercion to the appropriate type,
-     *      treat as Strings and do concatenation</li>
+     * <li>If both are null, result is null(strict) or Long(0)</li>
+     * <li>If either are floating point numbers, coerce to double
+     *      and multiply, returning Double</li>
+     * <li>If both are BigInteger numbers, treat as BigInteger and perform multiply, returning BigInteger</li>
+     * <li>If either is a BigDecimal number, coerce both to BigDecimal and perform multiply, returning BigDecimal</li>
+     * <li>Else treat both as BigInteger and perform multiply, returning Number: BigInteger or Long(if in range)</li>
      * </ol>
      * @param left first value
      * @param right second value
@@ -265,15 +273,15 @@ public class JexlArithmetic {
      * Subtract the right value from the left.
      * Rules are:<ol>
      * <li>If both are null, result is 0</li>
-     * <li>If either are floating point numbers, coerce to BigDecimals
-     *      and subtract</li>
-     * <li>Else treat as BigIntegers and subtract</li>
-     * <li>If either numeric operation fails on coercion to the appropriate type,
-     *      treat as Strings and do concatenation</li>
+     * <li>If either are floating point numbers, coerce to double
+     *      and subtract, returning Double</li>
+     * <li>If both are BigInteger numbers, treat as BigInteger and subtract, returning BigInteger</li>
+     * <li>If either is a BigDecimal number, coerce both to BigDecimal and subtract, returning BigDecimal</li>
+     * <li>Else treat both as BigInteger and subtract, returning Number: BigInteger or Long(if in range)</li>
      * </ol>
      * @param left first value
      * @param right second value
-     * @return left + right.
+     * @return left - right.
      */
     public Object subtract(Object left, Object right) {
         if (left == null && right == null) {
@@ -458,7 +466,7 @@ public class JexlArithmetic {
      * Coerce to a boolean (not a java.lang.Boolean).
      *
      * @param val Object to be coerced.
-     * @return The Boolean coerced value, or false if none possible.
+     * @return The boolean coerced value, or false if none possible.
      */
     public boolean toBoolean(Object val) {
         if (val == null) {
@@ -474,10 +482,10 @@ public class JexlArithmetic {
     }
 
     /**
-     * Coerce to a Integer.
+     * Coerce to a int.
      *
      * @param val Object to be coerced.
-     * @return The Integer coerced value.
+     * @return The int coerced value.
      */
     public int toInteger(Object val) {
         if (val == null) {
@@ -505,7 +513,7 @@ public class JexlArithmetic {
      * Coerce to a long (not a java.lang.Long).
      *
      * @param val Object to be coerced.
-     * @return The Long coerced value.
+     * @return The long coerced value.
      */
     public long toLong(Object val) {
         if (val == null) {
@@ -532,6 +540,7 @@ public class JexlArithmetic {
      * Null and empty string maps to zero.
      * @param val the object to be coerced.
      * @return a BigDecimal.
+     * @throws NullPointerException if val is null and mode is strict.
      */
     public BigInteger toBigInteger(Object val) {
         if (val instanceof BigInteger) {
@@ -561,6 +570,7 @@ public class JexlArithmetic {
      * Null and empty string maps to zero.
      * @param val the object to be coerced.
      * @return a BigDecimal.
+     * @throws NullPointerException if val is null and mode is strict.
      */
     public BigDecimal toBigDecimal(Object val) {
         if (val instanceof BigDecimal) {
@@ -589,7 +599,8 @@ public class JexlArithmetic {
      * Coerce to a double.
      *
      * @param val Object to be coerced.
-     * @return The Double coerced value.
+     * @return The double coerced value.
+     * @throws NullPointerException if val is null and mode is strict.
      */
     public double toDouble(Object val) {
         if (val == null) {
@@ -626,6 +637,7 @@ public class JexlArithmetic {
      *
      * @param val Object to be coerced.
      * @return The String coerced value.
+     * @throws NullPointerException if val is null and mode is strict.
      */
     public String toString(Object val) {
         if (val == null) {
