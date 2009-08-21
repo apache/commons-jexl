@@ -174,7 +174,7 @@ public class IntrospectorBase {
                         l.add(ictor);
                     }
                     // try to find one
-                    ctor = key.getMostSpecific(l);
+                    ctor = key.getMostSpecificConstructor(l);
                     if (ctor != null) {
                         constructorsMap.put(key, ctor);
                     } else {

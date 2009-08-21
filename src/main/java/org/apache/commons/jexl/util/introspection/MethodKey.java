@@ -186,7 +186,7 @@ public final class MethodKey {
      * @return the most specific method.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
-    public Method getMostSpecific(List<Method> methods) {
+    public Method getMostSpecificMethod(List<Method> methods) {
         return METHODS.getMostSpecific(methods, params);
     }
 
@@ -196,7 +196,7 @@ public final class MethodKey {
      * @return the most specific constructor.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
-    public Constructor<?> getMostSpecific(List<Constructor<?>> methods) {
+    public Constructor<?> getMostSpecificConstructor(List<Constructor<?>> methods) {
         return CONSTRUCTORS.getMostSpecific(methods, params);
     }
 

@@ -122,7 +122,7 @@ final class MethodMap {
         if (methodList == null) {
             return null;
         }
-        return methodKey.getMostSpecific(methodList);
+        return methodKey.getMostSpecificMethod(methodList);
     } // CSON: RedundantThrows
 
 }
