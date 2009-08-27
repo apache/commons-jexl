@@ -81,15 +81,12 @@
       <email>rahul AT apache.org</email>
       <organization>Apache Software Foundation</organization>
     </developer>
-  </developers>
-
-  <contributors>
-    <contributor>
+    <developer>
       <name>Henri Biestro</name>
-      <email>hbiestro at gmail dot com</email>
-    </contributor>
-  </contributors>
-
+      <id>henrib</id>
+      <email>henrib AT apache.org</email>
+    </developer>
+  </developers>
 
   <dependencies>
     <dependency>
