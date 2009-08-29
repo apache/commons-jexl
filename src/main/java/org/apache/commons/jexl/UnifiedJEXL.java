@@ -869,11 +869,11 @@ public final class UnifiedJEXL {
         IMMEDIATE0,
         /** Parsing after # .*/
         DEFERRED0,
-        /** Parsing afer ${ .*/
+        /** Parsing after ${ .*/
         IMMEDIATE1,
-        /** Parsing afer #{ .*/
+        /** Parsing after #{ .*/
         DEFERRED1,
-        /** Parsing afer \ .*/
+        /** Parsing after \ .*/
         ESCAPE
     }
 
