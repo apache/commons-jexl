@@ -102,7 +102,6 @@ public class MethodTest extends JexlTestCase {
    public void testTopLevelCall() throws Exception {
         java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
         funcs.put(null, new Functor());
-        JexlEngine JEXL = new JexlEngine();
         JEXL.setFunctions(funcs);
 
         Expression e = JEXL.createExpression("ten()");

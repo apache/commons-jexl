@@ -777,7 +777,7 @@ public class JexlTest extends JexlTestCase
 
     @SuppressWarnings("boxing")
     public void testDuck() throws Exception {
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = JEXL;
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("duck", new Duck());
         Expression expr;
@@ -804,7 +804,7 @@ public class JexlTest extends JexlTestCase
     @SuppressWarnings("boxing")
     public void testArray() throws Exception {
         int[] array = { 100, 101 , 102 };
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = JEXL;
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("array", array);
         Expression expr;

@@ -34,6 +34,7 @@ public class CacheTest extends JexlTestCase {
     static JexlEngine jexl = new JexlEngine();
 
     static {
+        jexl.setCache(512);
         jexl.setLenient(false);
         jexl.setSilent(false);
     }
@@ -44,6 +45,11 @@ public class CacheTest extends JexlTestCase {
         3, 3, 3, 4, 4, 4, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 2, 2, 3, 3, 0
     };
 
+    @Override
+    protected void tearDown() throws Exception {
+        debuggerCheck(jexl);
+    }
+    
     public static class Cached {
         public String compute(String arg) {
             if (arg == null) {
