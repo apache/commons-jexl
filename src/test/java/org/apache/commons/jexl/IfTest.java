@@ -135,7 +135,7 @@ public class IfTest extends JexlTestCase {
      */
     public void testIfWithDecimalArithmeticExpression() throws Exception {
         Expression e = JEXL
-                .createExpression("if ((x * 2) == 5) true;");
+                .createExpression("if ((x * 2) == 5) true");
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Float(2.5f));
 
@@ -150,7 +150,7 @@ public class IfTest extends JexlTestCase {
      */
     public void testIfWithAssignment() throws Exception {
         Expression e = JEXL
-                .createExpression("if ((x * 2) == 5) {y = 1;} else {y = 2;}");
+                .createExpression("if ((x * 2) == 5) {y = 1} else {y = 2;}");
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Float(2.5f));
 
@@ -166,6 +166,7 @@ public class IfTest extends JexlTestCase {
      */
     public void testTernary() throws Exception {
         JexlEngine jexl = new JexlEngine();
+        jexl.setCache(64);
         JexlContext jc = JexlHelper.createContext();
         Expression e = jexl.createExpression("x.y.z = foo ?'bar':'quux'");
         Object o;
@@ -213,6 +214,8 @@ public class IfTest extends JexlTestCase {
             o = jc.getVars().get("x.y.z");
             assertEquals("Should be bar", "bar", o);
         }
+
+        debuggerCheck(jexl);
     }
 
     /**
@@ -222,6 +225,7 @@ public class IfTest extends JexlTestCase {
      */
     public void testTernaryShorthand() throws Exception {
         JexlEngine jexl = new JexlEngine();
+        jexl.setCache(64);
         JexlContext jc = JexlHelper.createContext();
         Expression e = JEXL.createExpression("x.y.z = foo?:'quux'");
         Object o;
@@ -269,5 +273,7 @@ public class IfTest extends JexlTestCase {
             o = jc.getVars().get("x.y.z");
             assertEquals("Should be bar", "bar", o);
         }
+
+        debuggerCheck(jexl);
     }
 }

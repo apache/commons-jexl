@@ -40,7 +40,13 @@ public class UnifiedJEXLTest extends JexlTestCase {
         context = JexlHelper.createContext();
         vars = context.getVars();
     }
-    
+
+    @Override
+    protected void tearDown() throws Exception {
+        debuggerCheck(ENGINE);
+        super.tearDown();
+    }
+
     public static class Froboz {
         int value;
         public Froboz(int v) {
