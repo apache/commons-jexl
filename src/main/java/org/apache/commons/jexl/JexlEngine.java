@@ -435,7 +435,7 @@ public class JexlEngine {
         expr = r0 + (expr.charAt(0) == '[' ? "" : ".") + expr + ";";
         try {
             JexlNode tree = parse(expr, null);
-            JexlNode node = tree.jjtGetChild(0).jjtGetChild(0);
+            JexlNode node = tree.jjtGetChild(0);
             Interpreter interpreter = createInterpreter(context);
             // ensure 4 objects in register array
             Object[] r = {r0, bean, r0, bean};
@@ -502,7 +502,7 @@ public class JexlEngine {
         expr = r0 + (expr.charAt(0) == '[' ? "" : ".") + expr + "=" + r1 + ";";
         try {
             JexlNode tree = parse(expr, null);
-            JexlNode node = tree.jjtGetChild(0).jjtGetChild(0);
+            JexlNode node = tree.jjtGetChild(0);
             Interpreter interpreter = createInterpreter(context);
             // set the registers
             Object[] r = {r0, bean, r1, value};
@@ -570,7 +570,7 @@ public class JexlEngine {
                 }
             }
             try {
-                Reader reader = expr.endsWith(";") ? new StringReader(expr) : new StringReader(expr + ";");
+                Reader reader = new StringReader(expr);
                 // use first calling method of JexlEngine as debug info
                 if (info == null && debug) {
                     Throwable xinfo = new Throwable();

@@ -30,7 +30,8 @@ import org.apache.commons.jexl.parser.SimpleNode;
 import org.apache.commons.logging.Log;
 
 import org.apache.commons.jexl.parser.JexlNode;
-import org.apache.commons.jexl.parser.ASTAddNode;
+import org.apache.commons.jexl.parser.ASTAdditiveNode;
+import org.apache.commons.jexl.parser.ASTAdditiveOperator;
 import org.apache.commons.jexl.parser.ASTAndNode;
 import org.apache.commons.jexl.parser.ASTArrayAccess;
 import org.apache.commons.jexl.parser.ASTArrayLiteral;
@@ -44,8 +45,6 @@ import org.apache.commons.jexl.parser.ASTConstructorNode;
 import org.apache.commons.jexl.parser.ASTDivNode;
 import org.apache.commons.jexl.parser.ASTEQNode;
 import org.apache.commons.jexl.parser.ASTEmptyFunction;
-import org.apache.commons.jexl.parser.ASTExpression;
-import org.apache.commons.jexl.parser.ASTExpressionExpression;
 import org.apache.commons.jexl.parser.ASTFalseNode;
 import org.apache.commons.jexl.parser.ASTFunctionNode;
 import org.apache.commons.jexl.parser.ASTFloatLiteral;
@@ -68,12 +67,9 @@ import org.apache.commons.jexl.parser.ASTNotNode;
 import org.apache.commons.jexl.parser.ASTNullLiteral;
 import org.apache.commons.jexl.parser.ASTOrNode;
 import org.apache.commons.jexl.parser.ASTReference;
-import org.apache.commons.jexl.parser.ASTReferenceExpression;
 import org.apache.commons.jexl.parser.ASTSizeFunction;
 import org.apache.commons.jexl.parser.ASTSizeMethod;
-import org.apache.commons.jexl.parser.ASTStatementExpression;
 import org.apache.commons.jexl.parser.ASTStringLiteral;
-import org.apache.commons.jexl.parser.ASTSubtractNode;
 import org.apache.commons.jexl.parser.ASTTernaryNode;
 import org.apache.commons.jexl.parser.ASTTrueNode;
 import org.apache.commons.jexl.parser.ASTUnaryMinusNode;
@@ -205,8 +201,8 @@ public class Interpreter implements ParserVisitor {
         return node;
     }
 
-    /** {@inheritDoc} */
-    public Object visit(ASTAddNode node, Object data) {
+/** {@inheritDoc} */
+    public Object visit(ASTAdditiveNode node, Object data) {
         /**
          * The pattern for exception mgmt is to let the child*.jjtAccept
          * out of the try/catch loop so that if one fails, the ex will
@@ -215,13 +211,34 @@ public class Interpreter implements ParserVisitor {
          * be caught explicitly and rethrown.
          */
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
-        Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        try {
-            return arithmetic.add(left, right);
-        } catch (RuntimeException xrt) {
-            JexlNode xnode = findNullOperand(xrt, node, left, right);
-            throw new JexlException(xnode, "add error", xrt);
+        for(int c = 2, size = node.jjtGetNumChildren(); c < size; c += 2) {
+            Object right = node.jjtGetChild(c).jjtAccept(this, data);
+            try {
+                JexlNode op = node.jjtGetChild(c - 1);
+                if (op instanceof ASTAdditiveOperator) {
+                    String which = ((ASTAdditiveOperator) op).image;
+                    if ("+".equals(which)) {
+                        left = arithmetic.add(left, right);
+                        continue;
+                    }
+                    if ("-".equals(which)) {
+                        left = arithmetic.subtract(left, right);
+                        continue;
+                    }
+                    throw new UnsupportedOperationException("unknown operator " + which);
+                }
+                throw new IllegalArgumentException("unknown operator " + op);
+            } catch (RuntimeException xrt) {
+                JexlNode xnode = findNullOperand(xrt, node, left, right);
+                throw new JexlException(xnode, "+/- error", xrt);
+            }
         }
+        return left;
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTAdditiveOperator node, Object data) {
+        throw new UnsupportedOperationException("Shoud not be called.");
     }
 
     /** {@inheritDoc} */
@@ -501,16 +518,6 @@ public class Interpreter implements ParserVisitor {
         } catch (RuntimeException xrt) {
             throw new JexlException(node, "== error", xrt);
         }
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTExpression node, Object data) {
-        return node.jjtGetChild(0).jjtAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTExpressionExpression node, Object data) {
-        return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
     /** {@inheritDoc} */
@@ -1015,11 +1022,6 @@ public class Interpreter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTReferenceExpression node, Object data) {
-        return node.jjtGetChild(0).jjtAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
     public Object visit(ASTSizeFunction node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
 
@@ -1036,25 +1038,8 @@ public class Interpreter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTStatementExpression node, Object data) {
-        return node.jjtGetChild(0).jjtAccept(this, data);
-    }
-
-    /** {@inheritDoc} */
     public Object visit(ASTStringLiteral node, Object data) {
         return node.image;
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTSubtractNode node, Object data) {
-        Object left = node.jjtGetChild(0).jjtAccept(this, data);
-        Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        try {
-            return arithmetic.subtract(left, right);
-        } catch (RuntimeException xrt) {
-            JexlNode xnode = findNullOperand(xrt, node, left, right);
-            throw new JexlException(xnode, "- error", xrt);
-        }
     }
 
     /** {@inheritDoc} */
