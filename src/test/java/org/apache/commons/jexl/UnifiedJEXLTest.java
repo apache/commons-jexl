@@ -157,10 +157,16 @@ public class UnifiedJEXLTest extends JexlTestCase {
     }
 
     public void testEscape() throws Exception {
-        UnifiedJEXL.Expression expr = EL.parse("#\\{'world'\\}");
         JexlContext none = null;
-        Object o = expr.evaluate(none);
+        UnifiedJEXL.Expression expr;
+        Object o;
+        // $ and # are escapable in UnifiedJEXL
+        expr = EL.parse("\\#{'world'}");
+        o = expr.evaluate(none);
         assertEquals("#{'world'}", o);
+        expr = EL.parse("\\${'world'}");
+        o = expr.evaluate(none);
+        assertEquals("${'world'}", o);
     }
 
     public void testEscapeString() throws Exception {
@@ -168,6 +174,13 @@ public class UnifiedJEXLTest extends JexlTestCase {
         JexlContext none = null;
         Object o = expr.evaluate(none);
         assertEquals("\"world's finest\"", o);
+    }
+
+    public void testNonEscapeString() throws Exception {
+        UnifiedJEXL.Expression expr = EL.parse("c:\\some\\windows\\path");
+        JexlContext none = null;
+        Object o = expr.evaluate(none);
+        assertEquals("c:\\some\\windows\\path", o);
     }
 
     public void testMalformed() throws Exception {

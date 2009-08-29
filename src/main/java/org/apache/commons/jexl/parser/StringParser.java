@@ -18,6 +18,20 @@ package org.apache.commons.jexl.parser;
 
 /**
  * Common constant strings utilities.
+ * <p>
+ * This package methods read JEXL string literals and handle escaping through the
+ * 'backslash' (ie: \) character. Escaping is used to neutralize string delimiters (the single
+ * and double quotes) and read Unicode hexadecimal encoded characters.
+ * </p>
+ * <p>
+ * The only escapable characters are the single and double quotes - ''' and '"' -,
+ * a Unicode sequence starting with 'u' followed by 4 hexadecimals and
+ * the backslash character - '\' - itself.
+ * </p>
+ * <p>
+ * A sequence where '\' occurs before any non-escapable character or sequence has no effect, the
+ * sequence output being the same as the input.
+ * </p>
  */
 public class StringParser {
     /**
@@ -47,7 +61,7 @@ public class StringParser {
     public static int readString(StringBuilder strb, CharSequence str, int index, char sep) {
         return read(strb, str, index, str.length(), sep);
     }
-    
+
     /**
      * Read the remainder of a string till a given separator,
      * handles escaping through '\' syntax.
@@ -64,9 +78,17 @@ public class StringParser {
         for (; index < end; ++index) {
             char c = str.charAt(index);
             if (escape) {
-                strb.append(c);
-                if (c == '\\')
-                    strb.append('\\');
+                if (c == 'u' && (index + 4) < end && readUnicodeChar(strb, str, index + 1) > 0) {
+                    index += 4;
+                }
+                else {
+                    // if c is not an escapable character, re-emmit the backslash before it
+                    boolean notSeparator = sep == 0? c != '\'' && c != '"' : c != sep;
+                    if (notSeparator && c != '\\' ) {
+                        strb.append('\\');
+                    }
+                    strb.append(c);
+                }
                 escape = false;
                 continue;
             }
@@ -80,5 +102,37 @@ public class StringParser {
             }
         }
         return index;
+    }
+
+    /**
+     * Reads a Unicode escape character.
+     * @param strb the builder to write the character to
+     * @param str the sequence
+     * @param begin the begin offset in sequence (after the '\\u')
+     * @return 0 if char could not be read, 4 otherwise
+     */
+    private static final int readUnicodeChar(StringBuilder strb, CharSequence str, int begin) {
+        char xc = 0;
+        int bits = 12;
+        int value = 0;
+        for(int offset = 0; offset < 4; ++offset) {
+            char c = str.charAt(begin + offset);
+            if (c >= '0' && c <= '9') {
+                value = (c - '0');
+            }
+            else if (c >= 'a' && c <= 'h') {
+               value = (c - 'a' + 10);
+            }
+            else if (c >= 'A' && c <= 'H') {
+                value = (c - 'A' + 10);
+            }
+            else {
+                return 0;
+            }
+            xc |= value << bits;
+            bits -= 4;
+        }
+        strb.append(xc);
+        return 4;
     }
 }
