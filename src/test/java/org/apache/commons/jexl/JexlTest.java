@@ -739,10 +739,15 @@ public class JexlTest extends JexlTestCase
 //        jc.getVars().put("commons-logging", version);
 //        assertExpression(jc, "commons-logging", version);
     }
-    
+
     public void testUnicodeSupport() throws Exception
     {
-        assertExpression(JexlHelper.createContext(), "myvar == 'Użytkownik'", Boolean.FALSE);
+        JexlContext jc = JexlHelper.createContext();
+        assertExpression(jc, "myvar == 'Użytkownik'", Boolean.FALSE);
+        assertExpression(jc, "'c:\\some\\windows\\path'", "c:\\some\\windows\\path");
+        assertExpression(jc, "'foo\\u0020bar'", "foo\u0020bar");
+        assertExpression(jc, "'foo\\u0020\\u0020bar'", "foo\u0020\u0020bar");
+        assertExpression(jc, "'\\u0020foobar\\u0020'", "\u0020foobar\u0020");
     }
 
     public static final class Duck {

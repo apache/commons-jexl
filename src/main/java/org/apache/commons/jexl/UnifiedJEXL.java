@@ -869,11 +869,11 @@ public final class UnifiedJEXL {
         IMMEDIATE0,
         /** Parsing after # .*/
         DEFERRED0,
-        /** Parsing afer ${ . */
+        /** Parsing afer ${ .*/
         IMMEDIATE1,
-        /** Parsing afer #{ . */
+        /** Parsing afer #{ .*/
         DEFERRED1,
-        /** Parsing afer \ . */
+        /** Parsing afer \ .*/
         ESCAPE
     }
 
@@ -944,7 +944,6 @@ public final class UnifiedJEXL {
                 case IMMEDIATE1: // ${...
                     if (c == '}') {
                         // materialize the immediate expr
-                        //Expression iexpr = createExpression(ExpressionType.IMMEDIATE, strb, null);
                         Expression iexpr = new ImmediateExpression(strb.toString(), toNode(strb), null);
                         builder.add(iexpr);
                         strb.delete(0, Integer.MAX_VALUE);
@@ -996,6 +995,8 @@ public final class UnifiedJEXL {
                 case ESCAPE:
                     if (c == '#') {
                         strb.append('#');
+                    } else if (c == '$') {
+                        strb.append('$');
                     } else {
                         strb.append('\\');
                         strb.append(c);
