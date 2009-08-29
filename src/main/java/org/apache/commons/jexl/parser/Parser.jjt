@@ -43,10 +43,7 @@ import org.apache.commons.jexl.util.introspection.Info;
 
 public class Parser extends StringParser
 {
-    /** Base debug information. */
-    protected Info debug = null;
-
-    public JexlNode parse(Reader reader, Info info)
+    public ASTJexlScript parse(Reader reader, Info info)
         throws ParseException
     {
         ReInit(reader);
@@ -55,7 +52,7 @@ public class Parser extends StringParser
          *  safe - it's a pain to remember
          */
 
-        JexlNode tree = JexlScript();
+        ASTJexlScript tree = JexlScript();
         tree.value = info;
         return tree;
     }
@@ -63,6 +60,10 @@ public class Parser extends StringParser
 
 PARSER_END(Parser)
 
+
+/***************************************
+ *     Skip & Number literal tokens
+ ***************************************/
 
 SKIP : /* WHITE SPACE */
 {
@@ -83,27 +84,21 @@ TOKEN : /* LITERALS */
   < FLOAT_LITERAL: (<DIGIT>)+ "."(<DIGIT>)+ >
 }
 
-/*
- * Program structuring syntax follows.
- */
 
-JexlNode JexlScript() :
+/***************************************
+ *      Program
+ ***************************************/
+
+ASTJexlScript JexlScript() : {}
 {
-   String name;
-}
-{
-    (
-       Statement()
-    )*
-    <EOF>
+   ( Statement() )* <EOF>
    { return jjtThis;}
 }
 
 
-void Block() :
-{}
+void Block() #Block : {}
 {
-  "{" ( Statement() )* "}"
+    "{" ( Statement() )* "}"
 }
 
 void EmptyFunction() : {}
@@ -127,22 +122,31 @@ void Identifier() :
 }
 
 
-/*
- * Expression syntax follows.
- */
-
-void Expression() : {}
+void Expression() #void : {}
 {
-        LOOKAHEAD( Reference() "=" )
-  Assignment()
+    LOOKAHEAD( Reference() "=" )  Assignment()
 |
-  ConditionalOrExpression()
+    ConditionalExpression()
 }
 
 
 void Assignment() #Assignment(2) : {}
 {
   Reference() "=" Expression()
+}
+
+/***************************************
+ *      Conditional & relational
+ ***************************************/
+
+void ConditionalExpression() #void : {}
+{
+  ConditionalOrExpression()
+  (
+    "?" Expression() ":" Expression() #TernaryNode(3)
+  |
+    "?:" Expression() #TernaryNode(2)
+  )?
 }
 
 void ConditionalOrExpression() #void :
@@ -153,11 +157,6 @@ void ConditionalOrExpression() #void :
     "||" ConditionalAndExpression() #OrNode(2)
   |
     "or" ConditionalAndExpression() #OrNode(2)
-  )*
-  (
-    "?" Expression() ":" Expression() #TernaryNode(3)
-  |
-    "?:" Expression() #TernaryNode(2)
   )?
 }
 
@@ -169,28 +168,28 @@ void ConditionalAndExpression() #void :
     "&&" InclusiveOrExpression() #AndNode(2)
   |
     "and" InclusiveOrExpression() #AndNode(2)
-  )*
+  )?
 }
 
 void InclusiveOrExpression() #void :
 {}
 {
   ExclusiveOrExpression()
-  ( "|" ExclusiveOrExpression() #BitwiseOrNode(2) )*
+  ( "|" ExclusiveOrExpression() #BitwiseOrNode(2) )?
 }
 
 void ExclusiveOrExpression() #void :
 {}
 {
   AndExpression()
-  ( "^" AndExpression() #BitwiseXorNode(2) )*
+  ( "^" AndExpression() #BitwiseXorNode(2) )?
 }
 
 void AndExpression() #void :
 {}
 {
   EqualityExpression()
-  ( "&" EqualityExpression() #BitwiseAndNode(2) )*
+  ( "&" EqualityExpression() #BitwiseAndNode(2) )?
 }
 
 void EqualityExpression() #void :
@@ -205,7 +204,7 @@ void EqualityExpression() #void :
      "!=" RelationalExpression() #NENode(2)
    |
      "ne" RelationalExpression() #NENode(2)
-  )*
+  )?
 }
 
 void RelationalExpression() #void :
@@ -228,18 +227,23 @@ void RelationalExpression() #void :
     ">=" AdditiveExpression() #GENode(2)
    |
     "ge" AdditiveExpression() #GENode(2)
-  )*
+  )?
 }
 
-void AdditiveExpression() #void :
-{}
+/***************************************
+ *      Arithmetic
+ ***************************************/
+
+void AdditiveExpression() #AdditiveNode(>1) : {}
 {
-  MultiplicativeExpression()
-  (
-    "+" MultiplicativeExpression() #AddNode(2)
-   |
-    "-" MultiplicativeExpression() #SubtractNode(2)
-  )*
+    MultiplicativeExpression() ( LOOKAHEAD(1) AdditiveOperator() MultiplicativeExpression())*
+}
+
+void AdditiveOperator() : {}
+{
+    "+" { jjtThis.image = "+"; }
+|
+    "-" { jjtThis.image = "-"; }
 }
 
 void MultiplicativeExpression() #void :
@@ -256,7 +260,7 @@ void MultiplicativeExpression() #void :
     "%" UnaryExpression() #ModNode(2)
    |
     "mod" UnaryExpression() #ModNode(2)
-  )*
+  )?
 }
 
 void UnaryExpression() #void :
@@ -273,13 +277,11 @@ void UnaryExpression() #void :
   PrimaryExpression()
 }
 
-void PrimaryExpression() #void :
-{}
+void PrimaryExpression() #void : {}
 {
   Literal()
 |
-  LOOKAHEAD(3)
-  Reference()
+  LOOKAHEAD(3)  Reference()
 |
   LOOKAHEAD("(") "(" Expression() ")"
 |
@@ -289,13 +291,15 @@ void PrimaryExpression() #void :
 |
   LOOKAHEAD("new" "(") Constructor()
 |
-  LOOKAHEAD( "{" MapEntry() ( "," MapEntry() )* "}" )
-    MapLiteral()
+  LOOKAHEAD( "{" MapEntry() ) MapLiteral()
 |
-  LOOKAHEAD( "[" Parameter() ( "," Parameter() )* "]" )
-    ArrayLiteral()
+  LOOKAHEAD( "[" Expression() ) ArrayLiteral()
 }
 
+
+/***************************************
+ *      Literals
+ ***************************************/
 
 void Literal() #void :
 {
@@ -331,10 +335,8 @@ void IntegerLiteral() :
   Token t;
 }
 {
- (
   t=<INTEGER_LITERAL>
   { jjtThis.image = t.image; }
- )
 }
 
 void FloatLiteral() :
@@ -342,10 +344,8 @@ void FloatLiteral() :
   Token t;
 }
 {
- (
   t=<FLOAT_LITERAL>
   { jjtThis.image = t.image; }
- )
 }
 
 void StringLiteral() :
@@ -353,76 +353,52 @@ void StringLiteral() :
    Token t;
 }
 {
- (
   t=<STRING_LITERAL>
   { jjtThis.image = Parser.buildString(t.image, true); }
- )
 }
 
-/*
- * Statement syntax follows.
- */
+/***************************************
+ *      Statements
+ ***************************************/
 
-void Statement() #void :
-{}
+void Statement() #void : {}
 {
-  ";"
-|
-  LOOKAHEAD(3)
-  Block()
-|
-  LOOKAHEAD( Reference() ";" ) ReferenceExpression()
-|
-  LOOKAHEAD( Reference() "=" ) StatementExpression()
-|
-  ExpressionExpression()
-|
-  IfStatement()
-|
-  ForeachStatement()
-|
-  WhileStatement()
+    ";"
+    | LOOKAHEAD(3) Block()
+    | IfStatement()
+    | ForeachStatement()
+    | WhileStatement()
+    | ExpressionStatement()
 }
 
 
-void ExpressionExpression() : {}
+void ExpressionStatement() #void : {}
 {
-    Expression() ";"
+    Expression() (LOOKAHEAD(2) ";")?
 }
 
-void StatementExpression() : {}
+
+void IfStatement() : {}
 {
-  Assignment() ";"
-}
-
-void ReferenceExpression() : {}
-{
-  Reference() ";"
-}
-
-void IfStatement() :{}
-{
-  "if" "(" Expression() ")" Statement() [ LOOKAHEAD(1) "else" Statement() ]
+    "if" "(" Expression() ")" Statement() ( LOOKAHEAD(1) "else" Statement() )?
 }
 
 
-void WhileStatement() :
-{}
+void WhileStatement() : {}
 {
   "while" "(" Expression() ")" Statement()
 }
 
-void ForeachStatement() :
-{}
+void ForeachStatement() : {}
 {
-  "for" "(" Reference() ":"  Reference() ")" Statement()
+    "for" "(" Reference() ":"  Expression() ")" Statement()
 |
-  "foreach" "(" Reference() "in"  Reference() ")" Statement()
+    "foreach" "(" Reference() "in"  Expression() ")" Statement()
 }
 
 void ArrayLiteral() : {}
 {
-  "[" Parameter() ( "," Parameter() )* "]"
+  "[" Expression() ( "," Expression() )* "]"
 }
 
 void MapLiteral() : {}
@@ -432,22 +408,22 @@ void MapLiteral() : {}
 
 void MapEntry() : {}
 {
-    Parameter() ":" Parameter()
+    Expression() ":" Expression()
 }
 
 void Method() #MethodNode: {}
 {
-   Identifier() "("[ Parameter() ( "," Parameter() )* ] ")"
+   Identifier() "("[ Expression() ( "," Expression() )* ] ")"
 }
 
 void Function() #FunctionNode: {}
 {
-   Identifier() ":" Identifier() "("[ Parameter() ( "," Parameter() )* ] ")"
+   Identifier() ":" Identifier() "("[ Expression() ( "," Expression() )* ] ")"
 }
 
 void ArrayAccess() : {}
 {
-    Identifier() ("[" ( LOOKAHEAD(3) Expression() | IntegerLiteral() | Reference() ) "]")+
+   Identifier() (LOOKAHEAD(2) "[" Expression() "]")+
 }
 
 void AnyMethod() #void : {}
@@ -459,7 +435,7 @@ void AnyMethod() #void : {}
 
 void Constructor() # ConstructorNode() : {}
 {
-  "new" "("[ Parameter() ( "," Parameter() )* ] ")"
+  "new" "("[ Expression() ( "," Expression() )* ] ")"
 }
 
 void SizeMethod() : {}
@@ -469,25 +445,42 @@ void SizeMethod() : {}
 
 void Reference() : {}
 {
-  (LOOKAHEAD("new") Constructor() |
-   LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() |
-   LOOKAHEAD(Identifier() ":" Identifier() "(") Function() |
-   LOOKAHEAD(Identifier() "(") Method() |
-   Identifier() |
-   MapLiteral())
-  (LOOKAHEAD(2) "."
-    (
-      LOOKAHEAD(Identifier() "[" ( Expression() | IntegerLiteral() | Reference()) "]") ArrayAccess() |
-      (LOOKAHEAD(3) AnyMethod() | Identifier() |  IntegerLiteral() )
-    )
+  ( LOOKAHEAD("new") Constructor()
+|
+   LOOKAHEAD(Identifier() "[" ) ArrayAccess()
+|
+   LOOKAHEAD(Identifier() ":" Identifier() "(") Function()
+|
+   LOOKAHEAD(Identifier() "(") Method()
+|
+   Identifier()
+|
+   LOOKAHEAD("{") MapLiteral()
+|
+   LOOKAHEAD("[") ArrayLiteral() ) DotReference()
+}
+
+void DotReference() #void : {}
+{
+  ("."
+     ( LOOKAHEAD(Identifier() "[" )
+         ArrayAccess()
+       |
+       ( LOOKAHEAD(3)
+            AnyMethod()
+          |
+            Identifier()
+          |
+            IntegerLiteral()
+        )
+      )
   )*
 }
 
 
-void Parameter() #void: {}
-{
-   LOOKAHEAD(3) Expression() |  Literal() | Reference()
-}
+/***************************************
+ *     Identifier & String tokens
+ ***************************************/
 
 TOKEN : /* IDENTIFIERS */
 {
@@ -501,8 +494,8 @@ TOKEN : /* IDENTIFIERS */
 TOKEN :
 {
     <STRING_LITERAL :
-        ("\"" ( ~["\"","\n","\r"] | "\\" ["n","t","b","r","f","\\","\""] )* "\"" )
+        ("\"" ( ~["\"","\n","\r"] | "\\" ["u","n","t","b","r","f","\\","\""] )* "\"" )
      |
-        ("\'" ( ~["\'","\n","\r"] | "\\" ["n","t","b","r","f","\\","\'"])* "\'" )
+        ("\'" ( ~["\'","\n","\r"] | "\\" ["u","n","t","b","r","f","\\","\'"])* "\'" )
     >
 }
