@@ -234,4 +234,12 @@ public class JexlTestCase extends TestCase {
         test.runTest(mname);
     }
 
+    /**
+     * Runs a test.
+     * @param args where args[0] is the test class name and args[1] the test class method
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+        runTest(args[0], args[1]);
+    }
 }

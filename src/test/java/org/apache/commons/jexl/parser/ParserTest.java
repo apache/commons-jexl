@@ -18,9 +18,7 @@ package org.apache.commons.jexl.parser;
 
 import java.io.StringReader;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * @since 1.0
@@ -28,11 +26,6 @@ import junit.framework.TestSuite;
  */
 public class ParserTest extends TestCase
 {
-    public static Test suite()
-    {
-        return new TestSuite(ParserTest.class);
-    }
-
     public ParserTest(String testName)
     {
         super(testName);
@@ -61,13 +54,4 @@ public class ParserTest extends TestCase
         sn = parser.parse(new StringReader("foo = 'bar';"), null);
         assertNotNull("parsed node is null", sn);
     }
-
-    public static void main(String[] args)
-        throws Exception
-    {
-        ParserTest pt = new ParserTest("foo");
-
-        pt.testParse1();
-    }
-
 }

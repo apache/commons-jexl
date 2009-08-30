@@ -30,9 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.Parser;
 
@@ -47,11 +44,6 @@ public class JexlTest extends JexlTestCase
 {
     protected static final String METHOD_STRING = "Method string";
     protected static final String GET_METHOD_STRING = "GetMethod string";
-
-    public static Test suite()
-    {
-        return new TestSuite(JexlTest.class);
-    }
 
     public JexlTest(String testName)
     {
@@ -829,10 +821,6 @@ public class JexlTest extends JexlTestCase
         Expression e = JEXL.createExpression(expression);
         Object actual = e.evaluate(jc);
         assertEquals(expression, expected, actual);
-    }
-
-    public static void main(String[] args) throws Exception {
-        new JexlTest("debug").runTest("testNew");
     }
 
 }
