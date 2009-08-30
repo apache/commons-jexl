@@ -30,7 +30,6 @@ options
    STATIC=false;
    VISITOR=true;
    NODE_CLASS="JexlNode";
-   NODE_USES_PARSER=true;
    UNICODE_INPUT=true;
 }
 
@@ -86,7 +85,7 @@ TOKEN : /* LITERALS */
 
 
 /***************************************
- *      Program
+ *      Statements
  ***************************************/
 
 ASTJexlScript JexlScript() : {}
@@ -96,31 +95,51 @@ ASTJexlScript JexlScript() : {}
 }
 
 
+void Statement() #void : {}
+{
+    ";"
+    | LOOKAHEAD(3) Block()
+    | IfStatement()
+    | ForeachStatement()
+    | WhileStatement()
+    | ExpressionStatement()
+}
+
 void Block() #Block : {}
 {
     "{" ( Statement() )* "}"
 }
 
-void EmptyFunction() : {}
+
+void ExpressionStatement() #void : {}
 {
-    "empty"
-    ( Reference() | "(" Expression() ")" )
+    Expression() (LOOKAHEAD(2) ";")?
 }
 
-void SizeFunction() : {}
+
+void IfStatement() : {}
 {
-    "size" "(" Expression() ")"
+    "if" "(" Expression() ")" Statement() ( LOOKAHEAD(1) "else" Statement() )?
 }
 
-void Identifier() :
+
+void WhileStatement() : {}
 {
-   Token t;
-}
-{
-    t=<IDENTIFIER>
-    { jjtThis.image = t.image; }
+  "while" "(" Expression() ")" Statement()
 }
 
+
+void ForeachStatement() : {}
+{
+    "for" "(" Reference() ":"  Expression() ")" Statement()
+|
+    "foreach" "(" Reference() "in"  Expression() ")" Statement()
+}
+
+
+/***************************************
+ *      Expression syntax
+ ***************************************/
 
 void Expression() #void : {}
 {
@@ -132,7 +151,7 @@ void Expression() #void : {}
 
 void Assignment() #Assignment(2) : {}
 {
-  Reference() "=" Expression()
+    Reference() "=" Expression()
 }
 
 /***************************************
@@ -246,8 +265,7 @@ void AdditiveOperator() : {}
     "-" { jjtThis.image = "-"; }
 }
 
-void MultiplicativeExpression() #void :
-{}
+void MultiplicativeExpression() #void : {}
 {
   UnaryExpression()
   (
@@ -263,8 +281,7 @@ void MultiplicativeExpression() #void :
   )?
 }
 
-void UnaryExpression() #void :
-{}
+void UnaryExpression() #void : {}
 {
   "-" UnaryExpression() #UnaryMinusNode(1)
 |
@@ -277,29 +294,19 @@ void UnaryExpression() #void :
   PrimaryExpression()
 }
 
-void PrimaryExpression() #void : {}
-{
-  Literal()
-|
-  LOOKAHEAD(3)  Reference()
-|
-  LOOKAHEAD("(") "(" Expression() ")"
-|
-  LOOKAHEAD("empty") EmptyFunction()
-|
-  LOOKAHEAD("size") SizeFunction()
-|
-  LOOKAHEAD("new" "(") Constructor()
-|
-  LOOKAHEAD( "{" MapEntry() ) MapLiteral()
-|
-  LOOKAHEAD( "[" Expression() ) ArrayLiteral()
-}
-
 
 /***************************************
- *      Literals
+ *      Identifier & Literals
  ***************************************/
+
+void Identifier() :
+{
+    Token t;
+}
+{
+    t=<IDENTIFIER>
+    { jjtThis.image = t.image; }
+}
 
 void Literal() #void :
 {
@@ -357,45 +364,6 @@ void StringLiteral() :
   { jjtThis.image = Parser.buildString(t.image, true); }
 }
 
-/***************************************
- *      Statements
- ***************************************/
-
-void Statement() #void : {}
-{
-    ";"
-    | LOOKAHEAD(3) Block()
-    | IfStatement()
-    | ForeachStatement()
-    | WhileStatement()
-    | ExpressionStatement()
-}
-
-
-void ExpressionStatement() #void : {}
-{
-    Expression() (LOOKAHEAD(2) ";")?
-}
-
-
-void IfStatement() : {}
-{
-    "if" "(" Expression() ")" Statement() ( LOOKAHEAD(1) "else" Statement() )?
-}
-
-
-void WhileStatement() : {}
-{
-  "while" "(" Expression() ")" Statement()
-}
-
-void ForeachStatement() : {}
-{
-    "for" "(" Reference() ":"  Expression() ")" Statement()
-|
-    "foreach" "(" Reference() "in"  Expression() ")" Statement()
-}
-
 void ArrayLiteral() : {}
 {
   "[" Expression() ( "," Expression() )* "]"
@@ -411,19 +379,32 @@ void MapEntry() : {}
     Expression() ":" Expression()
 }
 
-void Method() #MethodNode: {}
+
+/***************************************
+ *      Functions & Methods
+ ***************************************/
+
+void EmptyFunction() : {}
 {
-   Identifier() "("[ Expression() ( "," Expression() )* ] ")"
+    LOOKAHEAD(3) "empty" "(" Expression() ")"
+|
+    "empty" Reference()
+}
+
+void SizeFunction() : {}
+{
+    "size" "(" Expression() ")"
 }
 
 void Function() #FunctionNode: {}
 {
+
    Identifier() ":" Identifier() "("[ Expression() ( "," Expression() )* ] ")"
 }
 
-void ArrayAccess() : {}
+void Method() #MethodNode: {}
 {
-   Identifier() (LOOKAHEAD(2) "[" Expression() "]")+
+   Identifier() "("[ Expression() ( "," Expression() )* ] ")"
 }
 
 void AnyMethod() #void : {}
@@ -433,31 +414,44 @@ void AnyMethod() #void : {}
     LOOKAHEAD(Identifier() "(") Method()
 }
 
-void Constructor() # ConstructorNode() : {}
-{
-  "new" "("[ Expression() ( "," Expression() )* ] ")"
-}
-
 void SizeMethod() : {}
 {
     "size" "(" ")"
 }
 
-void Reference() : {}
+void Constructor() # ConstructorNode() : {}
 {
-  ( LOOKAHEAD("new") Constructor()
+  "new" "("[ Expression() ( "," Expression() )* ] ")"
+}
+
+
+/***************************************
+ *     References
+ ***************************************/
+
+void PrimaryExpression() #void : {}
+{
+  Literal()
 |
-   LOOKAHEAD(Identifier() "[" ) ArrayAccess()
+  LOOKAHEAD(3)  Reference()
 |
-   LOOKAHEAD(Identifier() ":" Identifier() "(") Function()
+  LOOKAHEAD("(") "(" Expression() ")"
 |
-   LOOKAHEAD(Identifier() "(") Method()
+  LOOKAHEAD("empty") EmptyFunction()
 |
-   Identifier()
+  LOOKAHEAD("size") SizeFunction()
 |
-   LOOKAHEAD("{") MapLiteral()
+  LOOKAHEAD("new" "(") Constructor()
 |
-   LOOKAHEAD("[") ArrayLiteral() ) DotReference()
+  LOOKAHEAD( "{" MapEntry() ) MapLiteral()
+|
+  LOOKAHEAD( "[" Expression() ) ArrayLiteral()
+}
+
+
+void ArrayAccess() : {}
+{
+    Identifier() (LOOKAHEAD(2) "[" Expression() "]")+
 }
 
 void DotReference() #void : {}
@@ -477,6 +471,22 @@ void DotReference() #void : {}
   )*
 }
 
+void Reference() : {}
+{
+  ( LOOKAHEAD("new") Constructor()
+|
+   LOOKAHEAD(Identifier() "[" ) ArrayAccess()
+|
+   LOOKAHEAD(Identifier() ":" Identifier() "(") Function()
+|
+   LOOKAHEAD(Identifier() "(") Method()
+|
+   Identifier()
+|
+   LOOKAHEAD("{") MapLiteral()
+|
+   LOOKAHEAD("[") ArrayLiteral() ) DotReference()
+}
 
 /***************************************
  *     Identifier & String tokens
