@@ -168,6 +168,10 @@ public class JexlEngine {
 
     /**
      * Sets whether this engine reports debugging information when error occurs.
+     * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
+     * initialization code before expression creation &amp; evaluation.</p>
+     * @see JexlEngine#setSilent
+     * @see JexlEngine#setLenient
      * @param flag true implies debug is on, false implies debug is off.
      */
     public void setDebug(boolean flag) {
@@ -184,6 +188,10 @@ public class JexlEngine {
 
     /**
      * Sets whether this engine throws JexlException during evaluation when an error is triggered.
+     * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
+     * initialization code before expression creation &amp; evaluation.</p>
+     * @see JexlEngine#setDebug
+     * @see JexlEngine#setLenient
      * @param flag true means no JexlException will occur, false allows them
      */
     public void setSilent(boolean flag) {
@@ -201,6 +209,10 @@ public class JexlEngine {
     /**
      * Sets whether this engine triggers errors during evaluation when null is used as
      * an operand.
+     * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
+     * initialization code before expression creation &amp; evaluation.</p>
+     * @see JexlEngine#setSilent
+     * @see JexlEngine#setDebug
      * @param flag true means no JexlException will occur, false allows them
      */
     public void setLenient(boolean flag) {
@@ -234,8 +246,8 @@ public class JexlEngine {
     /**
      * Sets the map of function namespaces.
      * <p>
-     * It should be defined once and not modified afterwards since it might be shared
-     * between multiple engines evaluating expressions concurrently.
+     * This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
+     * initialization code before expression creation &amp; evaluation.
      * </p>
      * <p>
      * Each entry key is used as a prefix, each entry value used as a bean implementing

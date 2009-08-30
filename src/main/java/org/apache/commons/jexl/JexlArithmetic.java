@@ -46,9 +46,13 @@ public class JexlArithmetic {
     /**
      * Sets whether this JexlArithmetic instance triggers errors during evaluation when
      * null is used as an operand.
+     * <p>This method is <em>not</em> thread safe; it may be called as an optional step by the JexlEngine
+     * in its initialization code before expression creation &amp; evaluation.</p>
+     * @see JexlEngine#setSilent
+     * @see JexlEngine#setDebug
      * @param lenient true means no JexlException will occur, false allows them
      */
-    public void setLenient(boolean lenient) {
+    void setLenient(boolean lenient) {
         this.strict = !lenient;
     }
 
