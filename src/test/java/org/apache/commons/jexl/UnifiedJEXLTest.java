@@ -251,9 +251,4 @@ public class UnifiedJEXLTest extends JexlTestCase {
 
     }
 
-    public static void main(String[] args) throws Exception {
-        UnifiedJEXLTest test = new UnifiedJEXLTest("debug");
-        test.setUp();
-        test.testBadContextNested();
-    }
 }

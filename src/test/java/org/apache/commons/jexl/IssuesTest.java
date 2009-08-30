@@ -174,7 +174,7 @@ public class IssuesTest  extends JexlTestCase {
             try {
                 Expression expr = jexl.createExpression( exprs[e]);
                 /* Object value = */ expr.evaluate(ctxt);
-                fail("Should have failed due to null argument");
+                fail(exprs[e] + " : should have failed due to null argument");
             }
             catch(JexlException xjexl) {
                 // expected

@@ -16,7 +16,7 @@
  */
 
 package org.apache.commons.jexl;
-
+import org.apache.commons.jexl.junit.Asserter;
 
 /**
  * Tests for the bitwise operators.
@@ -24,6 +24,12 @@ package org.apache.commons.jexl;
  * @since 1.1
  */
 public class BitwiseOperatorTest extends JexlTestCase {
+    private Asserter asserter;
+
+    @Override
+    public void setUp() {
+        asserter = new Asserter(JEXL);
+    }
 
     /**
      * Create the named test.
@@ -34,170 +40,114 @@ public class BitwiseOperatorTest extends JexlTestCase {
     }
     
     public void testAndWithTwoNulls() throws Exception {
-        Expression e = JEXL.createExpression("null & null");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(0), o);
+        asserter.assertExpression("null & null", new Long(0));
     }
 
     public void testAndWithLeftNull() throws Exception {
-        Expression e = JEXL.createExpression("null & 1");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(0), o);
+        asserter.assertExpression("null & 1", new Long(0));
     }
 
     public void testAndWithRightNull() throws Exception {
-        Expression e = JEXL.createExpression("1 & null");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(0), o);
+        asserter.assertExpression("1 & null", new Long(0));
     }
 
     public void testAndSimple() throws Exception {
-        Expression e = JEXL.createExpression("15 & 3");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(3), o);
+        asserter.assertExpression("15 & 3", new Long(15 & 3));
     }
 
     public void testAndVariableNumberCoercion() throws Exception {
-        Expression e = JEXL.createExpression("x & y");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", new Integer(15));
-        jc.getVars().put("y", new Short((short)7));
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(7), o);
+        asserter.setVariable("x", new Integer(15));
+        asserter.setVariable("y", new Short((short)7));
+        asserter.assertExpression("x & y", new Long(15 & 7));
     }
 
     public void testAndVariableStringCoercion() throws Exception {
-        Expression e = JEXL.createExpression("x & y");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", new Integer(15));
-        jc.getVars().put("y", "7");
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(7), o);
+        asserter.setVariable("x", new Integer(15));
+        asserter.setVariable("y", "7");
+        asserter.assertExpression("x & y", new Long(15 & 7));
     }
 
     public void testComplementWithNull() throws Exception {
-        Expression e = JEXL.createExpression("~null");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(-1), o);
+        asserter.assertExpression("~null", new Long(-1));
     }
     
     public void testComplementSimple() throws Exception {
-        Expression e = JEXL.createExpression("~128");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(-129), o);
+        asserter.assertExpression("~128", new Long(-129));
     }
 
     public void testComplementVariableNumberCoercion() throws Exception {
-        Expression e = JEXL.createExpression("~x");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", new Integer(15));
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(-16), o);
+        asserter.setVariable("x", new Integer(15));
+        asserter.assertExpression("~x", new Long(~15));
     }
 
     public void testComplementVariableStringCoercion() throws Exception {
-        Expression e = JEXL.createExpression("~x");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", "15");
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(-16), o);
+        asserter.setVariable("x", "15");
+        asserter.assertExpression("~x", new Long(~15));
     }
 
     public void testOrWithTwoNulls() throws Exception {
-        Expression e = JEXL.createExpression("null | null");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(0), o);
+        asserter.assertExpression("null | null", new Long(0));
     }
 
     public void testOrWithLeftNull() throws Exception {
-        Expression e = JEXL.createExpression("null | 1");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(1), o);
+        asserter.assertExpression("null | 1", new Long(1));
     }
 
     public void testOrWithRightNull() throws Exception {
-        Expression e = JEXL.createExpression("1 | null");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(1), o);
+        asserter.assertExpression("1 | null", new Long(1));
     }
 
     public void testOrSimple() throws Exception {
-        Expression e = JEXL.createExpression("12 | 3");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(15), o);
+        asserter.assertExpression("12 | 3", new Long(15));
     }
 
     public void testOrVariableNumberCoercion() throws Exception {
-        Expression e = JEXL.createExpression("x | y");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", new Integer(12));
-        jc.getVars().put("y", new Short((short) 3));
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(15), o);
+        asserter.setVariable("x", new Integer(12));
+        asserter.setVariable("y", new Short((short) 3));
+        asserter.assertExpression("x | y", new Long(15));
     }
 
     public void testOrVariableStringCoercion() throws Exception {
-        Expression e = JEXL.createExpression("x | y");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", new Integer(12));
-        jc.getVars().put("y", "3");
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(15), o);
+        asserter.setVariable("x", new Integer(12));
+        asserter.setVariable("y", "3");
+        asserter.assertExpression("x | y", new Long(15));
     }
 
     public void testXorWithTwoNulls() throws Exception {
-        Expression e = JEXL.createExpression("null ^ null");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(0), o);
+        asserter.assertExpression("null ^ null", new Long(0));
     }
 
     public void testXorWithLeftNull() throws Exception {
-        Expression e = JEXL.createExpression("null ^ 1");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(1), o);
+        asserter.assertExpression("null ^ 1", new Long(1));
     }
 
     public void testXorWithRightNull() throws Exception {
-        Expression e = JEXL.createExpression("1 ^ null");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(1), o);
+        asserter.assertExpression("1 ^ null", new Long(1));
     }
 
     public void testXorSimple() throws Exception {
-        Expression e = JEXL.createExpression("1 ^ 3");
-        JexlContext jc = JexlHelper.createContext();
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(2), o);
+        asserter.assertExpression("1 ^ 3", new Long(1 ^ 3));
     }
 
     public void testXorVariableNumberCoercion() throws Exception {
-        Expression e = JEXL.createExpression("x ^ y");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", new Integer(1));
-        jc.getVars().put("y", new Short((short) 3));
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(2), o);
+        asserter.setVariable("x", new Integer(1));
+        asserter.setVariable("y", new Short((short) 3));
+        asserter.assertExpression("x ^ y", new Long(1 ^ 3));
     }
 
     public void testXorVariableStringCoercion() throws Exception {
-        Expression e = JEXL.createExpression("x ^ y");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", new Integer(1));
-        jc.getVars().put("y", "3");
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(2), o);
+        asserter.setVariable("x", new Integer(1));
+        asserter.setVariable("y", "3");
+        asserter.assertExpression("x ^ y", new Long(1 ^ 3));
+    }
+
+    public void testParenthesized() throws Exception {
+        asserter.assertExpression("(2 | 1) & 3", 3L);
+        asserter.assertExpression("(2 & 1) | 3", 3L);
+        asserter.assertExpression("~(120 | 42)", new Long( ~(120 | 42) ));
+    }
+
+    public static void main(String[] args) throws Exception {
+        new BitwiseOperatorTest("debug").runTest("testAndVariableNumberCoercion");
     }
 }

@@ -575,7 +575,4 @@ public class CacheTest extends JexlTestCase {
         doCOMPUTE(args, LOOPS, true);
     }
 
-    public static void main(String[] args) throws Exception {
-        new CacheTest("debug").runTest("testNew");
-    }
 }

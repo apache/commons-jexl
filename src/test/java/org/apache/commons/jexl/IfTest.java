@@ -63,7 +63,7 @@ public class IfTest extends JexlTestCase {
      */
     public void testSimpleElse() throws Exception {
         Expression e = JEXL
-                .createExpression("if (false) 1; else 2;");
+                .createExpression("if (false) 1 else 2;");
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
@@ -91,11 +91,11 @@ public class IfTest extends JexlTestCase {
      */
     public void testBlockElse() throws Exception {
         Expression e = JEXL
-                .createExpression("if (false) {1;} else {2;}");
+                .createExpression("if (false) {1} else {2 ; 3}");
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Integer(2), o);
+        assertEquals("Result is wrong", new Integer(3), o);
     }
 
     /**

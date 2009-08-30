@@ -124,7 +124,6 @@ public class MethodTest extends JexlTestCase {
         java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
         funcs.put("func", new Functor());
         funcs.put("FUNC", Functor.class);
-        JexlEngine JEXL = new JexlEngine();
         JEXL.setFunctions(funcs);
 
         Expression e = JEXL.createExpression("func:ten()");
@@ -151,10 +150,6 @@ public class MethodTest extends JexlTestCase {
         jc = JexlHelper.createContext();
         o = e.evaluate(jc);
         assertEquals("Result is not 40", new Integer(40), o);
-    }
-
-    public static void main(String[] args) throws Exception {
-        new MethodTest().runTest("testNamespaceCall");
     }
 
 }

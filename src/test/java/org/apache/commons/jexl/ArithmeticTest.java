@@ -91,6 +91,12 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("3 * 3 - foo", new Long(7));
 
         /*
+         * test parenthesized exprs
+         */
+        asserter.assertExpression("(4 + 3) * 6", new Long(42));
+        asserter.assertExpression("(8 - 2) * 7", new Long(42));
+
+        /*
          * test some floaty stuff
          */
         asserter.assertExpression("3 * \"3.0\"", new Double(9));
@@ -151,6 +157,7 @@ public class ArithmeticTest extends JexlTestCase {
         final int PERMS = tnames.length * tnames.length;
 
         JexlEngine jexl = new JexlEngine();
+        jexl.setCache(128);
         jexl.setSilent(false);
         // for non-silent, silent...
         for (int s = 0; s < 2; ++s) {
@@ -186,5 +193,6 @@ public class ArithmeticTest extends JexlTestCase {
                 assertTrue("All expressions should have zeroed " + zeval + "/" + PERMS,
                         zeval == PERMS);
         }
+        debuggerCheck(jexl);
     }
 }

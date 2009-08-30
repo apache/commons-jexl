@@ -74,9 +74,4 @@ public class BlockTest extends JexlTestCase {
         Object o = e.evaluate(jc);
         assertEquals("Block result is wrong", "world", o);
     }
-
-    public static void main(String[] args) throws Exception {
-        new BlockTest("debug").testBlockExecutesAll();
-        //new AssignTest("debug").testArray();
-    }
 }
