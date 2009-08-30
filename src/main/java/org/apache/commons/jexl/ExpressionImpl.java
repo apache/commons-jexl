@@ -17,29 +17,28 @@
 
 package org.apache.commons.jexl;
 
-import org.apache.commons.jexl.parser.JexlNode;
+import org.apache.commons.jexl.parser.ASTJexlScript;
 
 /**
  * Instances of ExpressionImpl are created by the {@link JexlEngine},
- * and this is the default implementation of the {@link Expression} interface.
+ * and this is the default implementation of the {@link Expression} and
+ * {@link Script} interface.
  *
  * @since 1.0
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-class ExpressionImpl implements Expression {
+class ExpressionImpl implements Expression, Script {
     /** The engine for this expression. */
     protected final JexlEngine jexl;
     /**
-     * Original expression. This is just a 'snippet', not a valid statement
-     * (i.e. foo.bar() vs foo.bar();
+     * Original expression stripped from leading & trailing spaces.
      */
     protected final String expression;
-
     /**
      * The resulting AST we can interpret.
      */
-    protected final JexlNode node;
+    protected final ASTJexlScript script;
 
 
     /**
@@ -49,9 +48,9 @@ class ExpressionImpl implements Expression {
      * @param expr the expression.
      * @param ref the parsed expression.
      */
-    ExpressionImpl(JexlEngine engine, String expr, JexlNode ref) {
+    ExpressionImpl(JexlEngine engine, String expr, ASTJexlScript ref) {
         expression = expr;
-        node = ref;
+        script = ref;
         jexl = engine;
     }
 
@@ -59,8 +58,11 @@ class ExpressionImpl implements Expression {
      * {@inheritDoc}
      */
     public Object evaluate(JexlContext context) {
+        if (script.jjtGetNumChildren() < 1) {
+            return null;
+        }
         Interpreter interpreter = jexl.createInterpreter(context);
-        return interpreter.interpret(node);
+        return interpreter.interpret(script.jjtGetChild(0));
     }
 
     /**
@@ -68,7 +70,7 @@ class ExpressionImpl implements Expression {
      */
     public String dump() {
         Debugger debug = new Debugger();
-        return debug.debug(node)? debug.toString() : "/*?*/";
+        return debug.debug(script)? debug.toString() : "/*?*/";
     }
 
     /**
@@ -87,6 +89,21 @@ class ExpressionImpl implements Expression {
     public String toString() {
         String expr = getExpression();
         return expr == null ? "" : expr;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getText() {
+        return toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Object execute(JexlContext context) throws Exception {
+        Interpreter interpreter = jexl.createInterpreter(context);
+        return interpreter.interpret(script);
     }
 
 }
