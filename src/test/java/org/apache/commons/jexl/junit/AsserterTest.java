@@ -17,9 +17,6 @@
 package org.apache.commons.jexl.junit;
 
 import junit.framework.AssertionFailedError;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
 
 import org.apache.commons.jexl.JexlEngine;
 import org.apache.commons.jexl.JexlTestCase;
@@ -33,15 +30,6 @@ import org.apache.commons.jexl.Foo;
  *  @version $Id$
  */
 public class AsserterTest extends JexlTestCase {
-    
-    public static Test suite() {
-        return new TestSuite(AsserterTest.class);
-    }
-
-    public static void main(String[] args) {
-        TestRunner.run(suite());
-    }
-
     public AsserterTest(String testName) {
         super(testName);
     }

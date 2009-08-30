@@ -17,17 +17,11 @@
 package org.apache.commons.jexl;
 
 import java.util.Map;
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 /**
  * Verifies cache & tryExecute
  */
 public class CacheTest extends JexlTestCase {
-    public static Test suite() {
-        return new TestSuite(CacheTest.class);
-    }
-
     public CacheTest(String testName) {
         super(testName);
     }

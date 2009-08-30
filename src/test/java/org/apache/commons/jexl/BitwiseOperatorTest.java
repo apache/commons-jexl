@@ -147,7 +147,4 @@ public class BitwiseOperatorTest extends JexlTestCase {
         asserter.assertExpression("~(120 | 42)", new Long( ~(120 | 42) ));
     }
 
-    public static void main(String[] args) throws Exception {
-        new BitwiseOperatorTest("debug").runTest("testAndVariableNumberCoercion");
-    }
 }
