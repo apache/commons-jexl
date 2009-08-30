@@ -117,7 +117,7 @@ public class JexlEngine {
     /**
      * The expression cache.
      */
-    protected Map<String, JexlNode> cache = null;
+    protected Map<String, ASTJexlScript> cache = null;
     /**
      * An empty/static/non-mutable JexlContext used instead of null context.
      */
@@ -298,13 +298,12 @@ public class JexlEngine {
     public Expression createExpression(String expression, Info info)
             throws ParseException {
         // Parse the expression
-        JexlNode tree = parse(expression, info);
+        ASTJexlScript tree = parse(expression, info);
         if (tree.jjtGetNumChildren() > 1) {
             logger.warn("The JEXL Expression created will be a reference"
                      + " to the first expression from the supplied script: \"" + expression + "\" ");
         }
-        JexlNode node = tree.jjtGetChild(0);
-        return new ExpressionImpl(this, expression, node);
+        return new ExpressionImpl(this, expression, tree);
     }
 
     /**
@@ -332,12 +331,9 @@ public class JexlEngine {
         if (scriptText == null) {
             throw new NullPointerException("scriptText is null");
         }
-        JexlNode script = parse(scriptText, info);
-        if (script instanceof ASTJexlScript) {
-            return new ScriptImpl(this, scriptText, (ASTJexlScript) script);
-        } else {
-            throw new IllegalStateException("Parsed script is not an ASTJexlScript");
-        }
+        // Parse the expression
+        ASTJexlScript tree = parse(scriptText, info);
+        return new ExpressionImpl(this, scriptText, tree);
     }
 
     /**
@@ -540,12 +536,12 @@ public class JexlEngine {
      * @param cacheSize the cache size, must be > 0
      * @return a Map usable as a cache bounded to the given size
      */
-    protected Map<String, JexlNode> createCache(final int cacheSize) {
-        return new java.util.LinkedHashMap<String, JexlNode>(cacheSize, LOAD_FACTOR, true) {
+    protected Map<String, ASTJexlScript> createCache(final int cacheSize) {
+        return new java.util.LinkedHashMap<String, ASTJexlScript>(cacheSize, LOAD_FACTOR, true) {
             /** Serial version UID. */
             private static final long serialVersionUID = 3801124242820219131L;
             @Override
-            protected boolean removeEldestEntry(Map.Entry<String, JexlNode> eldest) {
+            protected boolean removeEldestEntry(Map.Entry<String, ASTJexlScript> eldest) {
                 return size() > cacheSize;
             }
         };
@@ -558,9 +554,9 @@ public class JexlEngine {
      * @return the parsed tree
      * @throws ParseException if any error occured during parsing
      */
-    protected JexlNode parse(CharSequence expression, Info info) throws ParseException {
+    protected ASTJexlScript parse(CharSequence expression, Info info) throws ParseException {
         String expr = cleanExpression(expression);
-        JexlNode tree = null;
+        ASTJexlScript tree = null;
         synchronized (parser) {
             logger.debug("Parsing expression: " + expression);
             if (cache != null) {

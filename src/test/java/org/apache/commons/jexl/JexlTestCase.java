@@ -17,6 +17,7 @@
 
 package org.apache.commons.jexl;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
@@ -24,17 +25,21 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.apache.commons.jexl.parser.JexlNode;
+import org.apache.commons.jexl.parser.ASTJexlScript;
 import org.apache.commons.jexl.parser.ParseException;
 
 import junit.framework.TestCase;
+
 /**
- * Implements a runTest method to dynamically invoke a test,
+ * Implements runTest methods to dynamically instantiate and invoke a test,
  * wrapping the call with setUp(), tearDown() calls.
  * Eases the implementation of main methods to debug.
  */
 public class JexlTestCase extends TestCase {
     /** No parameters signature for test run. */
     private static final Class<?>[] noParms = {};
+    /** String parameter signature for test run. */
+    private static final Class<?>[] stringParm = {String.class};
 
     /** A default Jexl engine instance. */
     protected final JexlEngine JEXL = new JexlEngine();
@@ -67,9 +72,9 @@ public class JexlTestCase extends TestCase {
         JexlEngine jdbg = new JexlEngine();
         Debugger dbg = new Debugger();
         // iterate over all expression in cache
-        Iterator<Map.Entry<String,JexlNode>> inodes = jexl.cache.entrySet().iterator();
+        Iterator<Map.Entry<String,ASTJexlScript>> inodes = jexl.cache.entrySet().iterator();
         while (inodes.hasNext()) {
-            Map.Entry<String,JexlNode> entry = inodes.next();
+            Map.Entry<String,ASTJexlScript> entry = inodes.next();
             JexlNode node = entry.getValue();
             // recreate expr string from AST
             dbg.debug(node);
@@ -78,7 +83,7 @@ public class JexlTestCase extends TestCase {
                 // recreate expr from string
                 Expression exprdbg = jdbg.createExpression(expressiondbg);
                 // make arg cause become the root cause
-                JexlNode root = ((ExpressionImpl) exprdbg).node;
+                JexlNode root = ((ExpressionImpl) exprdbg).script;
                 while (root.jjtGetParent() != null) {
                     root = root.jjtGetParent();
                 }
@@ -101,8 +106,8 @@ public class JexlTestCase extends TestCase {
     }
 
     /**
-     * Creates a list of all descendants of a node including itself.
-     * @param node the node to flatten
+     * Creates a list of all descendants of a script including itself.
+     * @param script the script to flatten
      * @return the descendants-and-self list
      */
     private static ArrayList<JexlNode> flatten(JexlNode node) {
@@ -112,9 +117,9 @@ public class JexlTestCase extends TestCase {
     }
 
     /**
-     * Recursively adds all children of a node to the list of descendants.
+     * Recursively adds all children of a script to the list of descendants.
      * @param list the list of descendants to add to
-     * @param node the node & descendants to add
+     * @param script the script & descendants to add
      */
     private static void flatten(List<JexlNode> list, JexlNode node) {
         int nc = node.jjtGetNumChildren();
@@ -127,8 +132,8 @@ public class JexlTestCase extends TestCase {
     /**
      * Checks the equality of 2 nodes by comparing all their descendants.
      * Descendants must have the same class and same image if non null.
-     * @param lhs the left node
-     * @param rhs the right node
+     * @param lhs the left script
+     * @param rhs the right script
      * @return null if true, a reason otherwise
      */
     private static String checkEquals(JexlNode lhs, JexlNode rhs) {
@@ -156,6 +161,11 @@ public class JexlTestCase extends TestCase {
         return null;
     }
 
+    /**
+     * Dynamically runs a test method.
+     * @param name the test method to run
+     * @throws Exception if anything goes wrong
+     */
     public void runTest(String name) throws Exception {
         if ("runTest".equals(name)) {
             return;
@@ -176,8 +186,52 @@ public class JexlTestCase extends TestCase {
         }
     }
 
-    /*public void testRunTest() throws Exception {
-        new JexlTestCase().runTest("runTest");
-    }*/
+    /**
+     * Instantiate and runs a test method; useful for debugging purpose.
+     * For instance:
+     * <code>
+     * public static void main(String[] args) throws Exception {
+     *   runTest("BitwiseOperatorTest","testAndVariableNumberCoercion");
+     * }
+     * </code>
+     * @param tname the test class name
+     * @param mname the test class method
+     * @throws Exception
+     */
+    public static void runTest(String tname, String mname) throws Exception {
+        String testClassName = "org.apache.commons.jexl."+tname;
+        Class<JexlTestCase> clazz = null;
+        JexlTestCase test = null;
+        // find the class
+        try {
+            clazz = (Class<JexlTestCase>) Class.forName(testClassName);
+        }
+        catch(ClassNotFoundException xclass) {
+            fail("no such class: " + testClassName);
+            return;
+        }
+        // find ctor & instantiate
+        Constructor<JexlTestCase> ctor = null;
+        try {
+            ctor = clazz.getConstructor(stringParm);
+            test = ctor.newInstance("debug");
+        }
+        catch(NoSuchMethodException xctor) {
+            // instantiate default class ctor
+            try {
+                test = clazz.newInstance();
+            }
+            catch(Exception xany) {
+                fail("cant instantiate test: " + xany);
+                return;
+            }
+        }
+        catch(Exception xany) {
+            fail("cant instantiate test: " + xany);
+            return;
+        }
+        // Run the test
+        test.runTest(mname);
+    }
 
 }
