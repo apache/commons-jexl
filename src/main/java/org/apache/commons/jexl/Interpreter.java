@@ -33,6 +33,7 @@ import org.apache.commons.jexl.parser.JexlNode;
 import org.apache.commons.jexl.parser.ASTAdditiveNode;
 import org.apache.commons.jexl.parser.ASTAdditiveOperator;
 import org.apache.commons.jexl.parser.ASTAndNode;
+import org.apache.commons.jexl.parser.ASTAmbiguous;
 import org.apache.commons.jexl.parser.ASTArrayAccess;
 import org.apache.commons.jexl.parser.ASTArrayLiteral;
 import org.apache.commons.jexl.parser.ASTAssignment;
@@ -1286,5 +1287,15 @@ public class Interpreter implements ParserVisitor {
      */
     public Object visit(SimpleNode node, Object data) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    /**
+     * Unused, should throw in Parser.
+     * @param node a node
+     * @param data the data
+     * @return does not return
+     */
+    public Object visit(ASTAmbiguous node, Object data) {
+        throw new UnsupportedOperationException("unexpected type of node");
     }
 }

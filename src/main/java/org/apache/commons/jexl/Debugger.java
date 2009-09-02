@@ -19,6 +19,7 @@ package org.apache.commons.jexl;
 import org.apache.commons.jexl.parser.ASTAdditiveNode;
 import org.apache.commons.jexl.parser.ASTAdditiveOperator;
 import org.apache.commons.jexl.parser.ASTAndNode;
+import org.apache.commons.jexl.parser.ASTAmbiguous;
 import org.apache.commons.jexl.parser.ASTArrayAccess;
 import org.apache.commons.jexl.parser.ASTArrayLiteral;
 import org.apache.commons.jexl.parser.ASTAssignment;
@@ -615,6 +616,11 @@ final class Debugger implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(SimpleNode node, Object data) {
+        throw new UnsupportedOperationException("unexpected type of node");
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTAmbiguous node, Object data) {
         throw new UnsupportedOperationException("unexpected type of node");
     }
 }
