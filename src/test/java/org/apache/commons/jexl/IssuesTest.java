@@ -14,22 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.jexl;
+
 import org.apache.commons.jexl.parser.ParseException;
 import java.util.Map;
 
 /**
  * Test cases for reported issues
  */
-public class IssuesTest  extends JexlTestCase {
-
+public class IssuesTest extends JexlTestCase {
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error to avoid warning in silent mode
         //java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
     }
-    
+
     // JEXL-49: blocks not parsed (fixed)
     public void test49() throws Exception {
         JexlContext ctxt = JexlHelper.createContext();
@@ -40,23 +39,26 @@ public class IssuesTest  extends JexlTestCase {
         assertTrue("JEXL-49 is not fixed", vars.get("a").equals("b") && vars.get("c").equals("d"));
     }
 
-
     // JEXL-48: bad assignment detection
-     public static class Another {
+    public static class Another {
         private Boolean foo = Boolean.TRUE;
+
         public Boolean foo() {
             return foo;
         }
+
         public int goo() {
             return 100;
         }
     }
 
-     public static class Foo {
+    public static class Foo {
         private Another inner;
+
         Foo() {
             inner = new Another();
         }
+
         public Another getInner() {
             return inner;
         }
@@ -67,15 +69,14 @@ public class IssuesTest  extends JexlTestCase {
         // ensure errors will throw
         jexl.setSilent(false);
         String jexlExp = "(foo.getInner().foo() eq true) and (foo.getInner().goo() = (foo.getInner().goo()+1-1))";
-        Expression e = jexl.createExpression( jexlExp );
+        Expression e = jexl.createExpression(jexlExp);
         JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("foo", new Foo() );
+        jc.getVars().put("foo", new Foo());
 
         try {
             /* Object o = */ e.evaluate(jc);
             fail("Should have failed due to invalid assignment");
-        }
-        catch(JexlException xjexl) {
+        } catch (JexlException xjexl) {
             // expected
         }
     }
@@ -88,15 +89,15 @@ public class IssuesTest  extends JexlTestCase {
         jexl.setSilent(false);
         JexlContext ctxt = JexlHelper.createContext();
 
-        Expression expr = jexl.createExpression( "true//false\n" );
+        Expression expr = jexl.createExpression("true//false\n");
         Object value = expr.evaluate(ctxt);
         assertTrue("should be true", ((Boolean) value).booleanValue());
 
-        expr = jexl.createExpression( "/*true*/false" );
+        expr = jexl.createExpression("/*true*/false");
         value = expr.evaluate(ctxt);
         assertFalse("should be false", ((Boolean) value).booleanValue());
 
-        expr = jexl.createExpression( "/*\"true\"*/false" );
+        expr = jexl.createExpression("/*\"true\"*/false");
         value = expr.evaluate(ctxt);
         assertFalse("should be false", ((Boolean) value).booleanValue());
     }
@@ -109,9 +110,9 @@ public class IssuesTest  extends JexlTestCase {
         // ensure errors will throw
         //jexl.setSilent(false);
         JexlContext ctxt = JexlHelper.createContext();
-        ctxt.getVars().put("ax", "ok" );
+        ctxt.getVars().put("ax", "ok");
 
-        UnifiedJEXL.Expression expr = uel.parse( "${ax+(bx)}" );
+        UnifiedJEXL.Expression expr = uel.parse("${ax+(bx)}");
         Object value = expr.evaluate(ctxt);
         assertTrue("should be ok", "ok".equals(value));
     }
@@ -119,14 +120,14 @@ public class IssuesTest  extends JexlTestCase {
     // JEXL-40: failed to discover all methods (non public class implements public method)
     // fixed in ClassMap by taking newer version of populateCache from Velocity
     public static abstract class Base {
-      public abstract boolean foo();
+        public abstract boolean foo();
     }
 
     class Derived extends Base {
-      @Override
-      public boolean foo() {
-          return true;
-      }
+        @Override
+        public boolean foo() {
+            return true;
+        }
     }
 
     public void test40() throws Exception {
@@ -134,9 +135,9 @@ public class IssuesTest  extends JexlTestCase {
         // ensure errors will throw
         jexl.setSilent(false);
         JexlContext ctxt = JexlHelper.createContext();
-        ctxt.getVars().put("derived", new Derived() );
+        ctxt.getVars().put("derived", new Derived());
 
-        Expression expr = jexl.createExpression( "derived.foo()" );
+        Expression expr = jexl.createExpression("derived.foo()");
         Object value = expr.evaluate(ctxt);
         assertTrue("should be true", ((Boolean) value).booleanValue());
     }
@@ -148,9 +149,10 @@ public class IssuesTest  extends JexlTestCase {
         String[] names = jexl.uberspect.getIntrospector().getMethodNames(Another.class);
         assertTrue("should find methods", names.length > 0);
         int found = 0;
-        for(String name : names) {
-            if ("foo".equals(name) || "goo".equals(name))
+        for (String name : names) {
+            if ("foo".equals(name) || "goo".equals(name)) {
                 found += 1;
+            }
         }
         assertTrue("should have foo & goo", found == 2);
     }
@@ -162,7 +164,7 @@ public class IssuesTest  extends JexlTestCase {
         jexl.setSilent(false);
         jexl.setLenient(false);
         JexlContext ctxt = JexlHelper.createContext();
-        ctxt.getVars().put("a", null );
+        ctxt.getVars().put("a", null);
 
         String[] exprs = {
             "10 + null",
@@ -171,13 +173,12 @@ public class IssuesTest  extends JexlTestCase {
             "a % b",
             "1000 / a"
         };
-        for(int e = 0; e < exprs.length; ++e) {
+        for (int e = 0; e < exprs.length; ++e) {
             try {
-                Expression expr = jexl.createExpression( exprs[e]);
+                Expression expr = jexl.createExpression(exprs[e]);
                 /* Object value = */ expr.evaluate(ctxt);
                 fail(exprs[e] + " : should have failed due to null argument");
-            }
-            catch(JexlException xjexl) {
+            } catch (JexlException xjexl) {
                 // expected
             }
         }
@@ -188,7 +189,7 @@ public class IssuesTest  extends JexlTestCase {
         JexlContext ctxt;
         JexlEngine jexl = new JexlEngine();
         jexl.setSilent(true); // to avoid throwing JexlException on null method call
-        
+
         Script jscript;
 
         ctxt = JexlHelper.createContext();
@@ -197,7 +198,7 @@ public class IssuesTest  extends JexlTestCase {
 
         ctxt.getVars().put("dummy", "abcd");
         assertEquals(jscript.getText(), Integer.valueOf("abcd".hashCode()), jscript.execute(ctxt)); // OK
-        
+
         jscript = jexl.createScript("dummy.hashCode");
         assertEquals(jscript.getText(), null, jscript.execute(ctxt)); // OK
 
@@ -224,7 +225,7 @@ public class IssuesTest  extends JexlTestCase {
         e = jexl.createExpression("c.e");
         try {
             /* Object o = */ e.evaluate(ctxt);
-        } catch(JexlException xjexl) {
+        } catch (JexlException xjexl) {
             String msg = xjexl.getMessage();
             assertTrue(msg.indexOf("variable c.e") > 0);
         }
@@ -233,7 +234,7 @@ public class IssuesTest  extends JexlTestCase {
         ctxt.getVars().put("e", Integer.valueOf(2));
         try {
             /* Object o = */ e.evaluate(ctxt);
-        } catch(JexlException xjexl) {
+        } catch (JexlException xjexl) {
             String msg = xjexl.getMessage();
             assertTrue(msg.indexOf("variable c.e") > 0);
         }
@@ -260,30 +261,47 @@ public class IssuesTest  extends JexlTestCase {
         assertEquals("1", modulo.evaluate(ctxt).toString());
     }
 
-    // JEXL-90: ';' is necessary between expressions
+    // JEXL-90
     public void test90() throws Exception {
         JexlContext ctxt = JexlHelper.createContext();
         JexlEngine jexl = new JexlEngine();
         jexl.setSilent(false);
         jexl.setLenient(false);
-        String[] exprs = {
+        jexl.setCache(16);
+        // ';' is necessary between expressions
+        String[] fexprs = {
             "a=3 b=4",
             "while(a) while(a)",
             "1 2",
-            "if (true) 2; 3 {}"
+            "if (true) 2; 3 {}",
+            "while (x) 1 if (y) 2 3"
         };
-        for(int s = 0; s < exprs.length; ++s) {
+        for (int f = 0; f < fexprs.length; ++f) {
             boolean fail = true;
             try {
-                Script e = jexl.createScript(exprs[s]);
-            }
-            catch(ParseException xany) {
+                Script s = jexl.createScript(fexprs[f]);
+            } catch (ParseException xany) {
                 // expected to fail in parse
                 fail = false;
             }
             if (fail) {
-                fail(exprs[s] + ": Should have failed in parse");
+                fail(fexprs[f] + ": Should have failed in parse");
             }
         }
+        // ';' is necessary between expressions and only expressions
+        String[] exprs = {
+            "if (x) {1} if (y) {2}",
+            "if (x) 1 if (y) 2",
+            "while (x) 1 if (y) 2 else 3",
+            "for(z : [3, 4, 5]) { z } y ? 2 : 1",
+            "for(z : [3, 4, 5]) { z } if (y) 2 else 1"
+        };
+        ctxt.getVars().put("x", false);
+        ctxt.getVars().put("y", true);
+        for (int e = 0; e < exprs.length; ++e) {
+            Script s = jexl.createScript(exprs[e]);
+            assertEquals(2, s.execute(ctxt));
+        }
+        debuggerCheck(jexl);
     }
 }
