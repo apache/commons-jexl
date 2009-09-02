@@ -240,6 +240,26 @@ public class IssuesTest  extends JexlTestCase {
 
     }
 
+    // JEXL-87
+    public void test87() throws Exception {
+        JexlContext ctxt = JexlHelper.createContext();
+        JexlEngine jexl = new JexlEngine();
+        jexl.setSilent(false);
+        jexl.setLenient(false);
+        Expression divide = jexl.createExpression("l / r");
+        Expression modulo = jexl.createExpression("l % r");
+
+        ctxt.getVars().put("l", java.math.BigInteger.valueOf(7));
+        ctxt.getVars().put("r", java.math.BigInteger.valueOf(2));
+        assertEquals("3", divide.evaluate(ctxt).toString());
+        assertEquals("1", modulo.evaluate(ctxt).toString());
+
+        ctxt.getVars().put("l", java.math.BigDecimal.valueOf(7));
+        ctxt.getVars().put("r", java.math.BigDecimal.valueOf(2));
+        assertEquals("3.5", divide.evaluate(ctxt).toString());
+        assertEquals("1", modulo.evaluate(ctxt).toString());
+    }
+
     // JEXL-90: ';' is necessary between expressions
     public void test90() throws Exception {
         JexlContext ctxt = JexlHelper.createContext();

@@ -193,7 +193,7 @@ void ConditionalOrExpression() #void :
     "||" ConditionalAndExpression() #OrNode(2)
   |
     "or" ConditionalAndExpression() #OrNode(2)
-  )?
+  )*
 }
 
 void ConditionalAndExpression() #void :
@@ -204,28 +204,28 @@ void ConditionalAndExpression() #void :
     "&&" InclusiveOrExpression() #AndNode(2)
   |
     "and" InclusiveOrExpression() #AndNode(2)
-  )?
+  )*
 }
 
 void InclusiveOrExpression() #void :
 {}
 {
   ExclusiveOrExpression()
-  ( "|" ExclusiveOrExpression() #BitwiseOrNode(2) )?
+  ( "|" ExclusiveOrExpression() #BitwiseOrNode(2) )*
 }
 
 void ExclusiveOrExpression() #void :
 {}
 {
   AndExpression()
-  ( "^" AndExpression() #BitwiseXorNode(2) )?
+  ( "^" AndExpression() #BitwiseXorNode(2) )*
 }
 
 void AndExpression() #void :
 {}
 {
   EqualityExpression()
-  ( "&" EqualityExpression() #BitwiseAndNode(2) )?
+  ( "&" EqualityExpression() #BitwiseAndNode(2) )*
 }
 
 void EqualityExpression() #void :
@@ -295,7 +295,7 @@ void MultiplicativeExpression() #void : {}
     "%" UnaryExpression() #ModNode(2)
    |
     "mod" UnaryExpression() #ModNode(2)
-  )?
+  )*
 }
 
 void UnaryExpression() #void : {}

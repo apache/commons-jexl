@@ -99,8 +99,8 @@ public class ForEachTest extends JexlTestCase {
         jc.getVars().put("list", new Object[] {"1", "1"});
         jc.getVars().put("x", new Integer(0));
         Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(2), o);
-        assertEquals("x is wrong", new Long(2), jc.getVars().get("x"));
+        assertEquals("Result is wrong", new Integer(2), o);
+        assertEquals("x is wrong", new Integer(2), jc.getVars().get("x"));
     }
 
     public void testForEachWithListExpression() throws Exception {

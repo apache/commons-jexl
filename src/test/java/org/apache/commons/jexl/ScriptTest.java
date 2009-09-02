@@ -58,7 +58,7 @@ public class ScriptTest extends JexlTestCase {
         jc.getVars().put("x", new Integer(1));
     
         Object o = s.execute(jc);
-        assertEquals("Result is wrong", new Long(10), o);
+        assertEquals("Result is wrong", new Integer(10), o);
         assertEquals("getText is wrong", code, s.getText());
     }
     
@@ -69,7 +69,7 @@ public class ScriptTest extends JexlTestCase {
         jc.getVars().put("out", System.out);
         Object result = s.execute(jc);
         assertNotNull("No result", result);
-        assertEquals("Wrong result", new Long(7), result);
+        assertEquals("Wrong result", new Integer(7), result);
     }
 
     public void testScriptFromURL() throws Exception {
@@ -79,7 +79,7 @@ public class ScriptTest extends JexlTestCase {
         jc.getVars().put("out", System.out);
         Object result = s.execute(jc);
         assertNotNull("No result", result);
-        assertEquals("Wrong result", new Long(7), result);
+        assertEquals("Wrong result", new Integer(7), result);
     }
     
     public void testScriptUpdatesContext() throws Exception {

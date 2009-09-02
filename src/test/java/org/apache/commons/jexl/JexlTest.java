@@ -290,8 +290,8 @@ public class JexlTest extends JexlTestCase
          * test new null coersion
          */
         jc.getVars().put("imanull", null );
-        assertExpression(jc, "imanull + 2", new Long(2));
-        assertExpression(jc, "imanull + imanull", new Long(0));
+        assertExpression(jc, "imanull + 2", new Integer(2));
+        assertExpression(jc, "imanull + imanull", new Integer(0));
         
         /* test for bugzilla 31577 */
         jc.getVars().put("n", new Integer(0));
@@ -691,7 +691,7 @@ public class JexlTest extends JexlTestCase
      */
     public void testComment() throws Exception
     {
-        assertExpression(JexlHelper.createContext(), "## double or nothing\n 1 + 1", Long.valueOf("2"));
+        assertExpression(JexlHelper.createContext(), "## double or nothing\n 1 + 1", Integer.valueOf("2"));
     }
     
     /**
@@ -709,8 +709,8 @@ public class JexlTest extends JexlTestCase
         
         assertExpression(jc, "hello = 'world'", "world");
         assertEquals("hello variable not changed", "world", jc.getVars().get("hello"));
-        assertExpression(jc, "result = 1 + 1", new Long(2));
-        assertEquals("result variable not changed", new Long(2), jc.getVars().get("result"));
+        assertExpression(jc, "result = 1 + 1", new Integer(2));
+        assertEquals("result variable not changed", new Integer(2), jc.getVars().get("result"));
         // todo: make sure properties can be assigned to, fall back to flat var if no property
         // assertExpression(jc, "foo.property1 = '99'", "99");
         // assertEquals("property not set", "99", foo.getProperty1());
