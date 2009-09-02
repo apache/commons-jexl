@@ -83,18 +83,18 @@ public class ArithmeticTest extends JexlTestCase {
 
         asserter.setVariable("foo", new Integer(2));
 
-        asserter.assertExpression("foo + 2", new Long(4));
-        asserter.assertExpression("3 + 3", new Long(6));
-        asserter.assertExpression("3 + 3 + foo", new Long(8));
-        asserter.assertExpression("3 * 3", new Long(9));
-        asserter.assertExpression("3 * 3 + foo", new Long(11));
-        asserter.assertExpression("3 * 3 - foo", new Long(7));
+        asserter.assertExpression("foo + 2", new Integer(4));
+        asserter.assertExpression("3 + 3", new Integer(6));
+        asserter.assertExpression("3 + 3 + foo", new Integer(8));
+        asserter.assertExpression("3 * 3", new Integer(9));
+        asserter.assertExpression("3 * 3 + foo", new Integer(11));
+        asserter.assertExpression("3 * 3 - foo", new Integer(7));
 
         /*
          * test parenthesized exprs
          */
-        asserter.assertExpression("(4 + 3) * 6", new Long(42));
-        asserter.assertExpression("(8 - 2) * 7", new Long(42));
+        asserter.assertExpression("(4 + 3) * 6", new Integer(42));
+        asserter.assertExpression("(8 - 2) * 7", new Integer(42));
 
         /*
          * test some floaty stuff
@@ -105,19 +105,19 @@ public class ArithmeticTest extends JexlTestCase {
         /*
          * test / and %
          */
-        asserter.assertExpression("6 / 3", new Double(6 / 3));
+        asserter.assertExpression("6 / 3", new Integer(6 / 3));
         asserter.assertExpression("6.4 / 3", new Double(6.4 / 3));
-        asserter.assertExpression("0 / 3", new Double(0 / 3));
+        asserter.assertExpression("0 / 3", new Integer(0 / 3));
         asserter.assertExpression("3 / 0", new Double(0));
-        asserter.assertExpression("4 % 3", new Long(1));
+        asserter.assertExpression("4 % 3", new Integer(1));
         asserter.assertExpression("4.8 % 3", new Double(4.8 % 3));
 
         /*
          * test new null coersion
          */
         asserter.setVariable("imanull", null);
-        asserter.assertExpression("imanull + 2", new Long(2));
-        asserter.assertExpression("imanull + imanull", new Long(0));
+        asserter.assertExpression("imanull + 2", new Integer(2));
+        asserter.assertExpression("imanull + imanull", new Integer(0));
     }
 
     /**

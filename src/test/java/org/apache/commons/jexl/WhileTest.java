@@ -42,7 +42,7 @@ public class WhileTest extends JexlTestCase {
         jc.getVars().put("x", new Integer(1));
 
         Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(10), o);
+        assertEquals("Result is wrong", new Integer(10), o);
     }
 
     public void testWhileWithBlock() throws Exception {
@@ -52,8 +52,8 @@ public class WhileTest extends JexlTestCase {
         jc.getVars().put("y", new Integer(1));
 
         Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Long(512), o);
-        assertEquals("x is wrong", new Long(10), jc.getVars().get("x"));
-        assertEquals("y is wrong", new Long(512), jc.getVars().get("y"));
+        assertEquals("Result is wrong", new Integer(512), o);
+        assertEquals("x is wrong", new Integer(10), jc.getVars().get("x"));
+        assertEquals("y is wrong", new Integer(512), jc.getVars().get("y"));
     }
 }
