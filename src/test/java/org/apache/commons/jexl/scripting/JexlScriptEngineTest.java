@@ -45,7 +45,7 @@ public class JexlScriptEngineTest extends TestCase {
         assertTrue("Must take some time to process this",time1 <= time2.longValue());
         engine.put("value", initialValue);
         assertEquals(initialValue,engine.get("value"));
-        final Long newValue = Long.valueOf(124);
+        final Integer newValue = Integer.valueOf(124);
         assertEquals(newValue,engine.eval("old=value;value=value+1"));
         assertEquals(initialValue,engine.get("old"));
         assertEquals(newValue,engine.get("value"));
@@ -102,10 +102,10 @@ public class JexlScriptEngineTest extends TestCase {
         engine.eval("global=global+1");
         engine.eval("both=both+1"); // should update engine value only
         engine.eval("newvar=42;");
-        assertEquals(Long.valueOf(2),manager.get("global"));
-        assertEquals(Long.valueOf(11),engine.get("local"));
+        assertEquals(Integer.valueOf(2),manager.get("global"));
+        assertEquals(Integer.valueOf(11),engine.get("local"));
         assertEquals(Integer.valueOf(7),manager.get("both"));
-        assertEquals(Long.valueOf(8),engine.get("both"));
+        assertEquals(Integer.valueOf(8),engine.get("both"));
         assertEquals(Integer.valueOf(42),engine.get("newvar"));
         assertNull(manager.get("newvar"));
     }
