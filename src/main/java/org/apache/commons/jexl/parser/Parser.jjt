@@ -29,6 +29,7 @@ options
    MULTI=true;
    STATIC=false;
    VISITOR=true;
+   NODE_SCOPE_HOOK=true;
    NODE_CLASS="JexlNode";
    UNICODE_INPUT=true;
 }
@@ -54,6 +55,22 @@ public class Parser extends StringParser
         ASTJexlScript tree = JexlScript();
         tree.value = info;
         return tree;
+    }
+
+    void jjtreeOpenNodeScope(Node n) {}
+    void jjtreeCloseNodeScope(Node n) throws ParseException {
+      if (n instanceof ASTAmbiguous && n.jjtGetNumChildren() > 0) {
+          Token tok = this.getToken(0);
+          StringBuilder strb = new StringBuilder("Ambiguous statement ");
+          if (tok != null) {
+              strb.append("@");
+              strb.append(tok.beginLine);
+              strb.append(":");
+              strb.append(tok.beginColumn);
+          }
+          strb.append(", missing ';' between expressions");
+         throw new ParseException(strb.toString());
+      }
     }
 }
 
@@ -113,7 +130,7 @@ void Block() #Block : {}
 
 void ExpressionStatement() #void : {}
 {
-    Expression() (LOOKAHEAD(2) ";")?
+    Expression() (LOOKAHEAD(1) Expression() #Ambiguous())* (LOOKAHEAD(2) ";")?
 }
 
 

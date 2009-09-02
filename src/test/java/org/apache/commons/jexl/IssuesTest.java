@@ -16,6 +16,7 @@
  */
 
 package org.apache.commons.jexl;
+import org.apache.commons.jexl.parser.ParseException;
 import java.util.Map;
 
 /**
@@ -26,7 +27,7 @@ public class IssuesTest  extends JexlTestCase {
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error to avoid warning in silent mode
-        java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
+        //java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
     }
     
     // JEXL-49: blocks not parsed (fixed)
@@ -237,5 +238,32 @@ public class IssuesTest  extends JexlTestCase {
             assertTrue(msg.indexOf("variable c.e") > 0);
         }
 
+    }
+
+    // JEXL-90: ';' is necessary between expressions
+    public void test90() throws Exception {
+        JexlContext ctxt = JexlHelper.createContext();
+        JexlEngine jexl = new JexlEngine();
+        jexl.setSilent(false);
+        jexl.setLenient(false);
+        String[] exprs = {
+            "a=3 b=4",
+            "while(a) while(a)",
+            "1 2",
+            "if (true) 2; 3 {}"
+        };
+        for(int s = 0; s < exprs.length; ++s) {
+            boolean fail = true;
+            try {
+                Script e = jexl.createScript(exprs[s]);
+            }
+            catch(ParseException xany) {
+                // expected to fail in parse
+                fail = false;
+            }
+            if (fail) {
+                fail(exprs[s] + ": Should have failed in parse");
+            }
+        }
     }
 }
