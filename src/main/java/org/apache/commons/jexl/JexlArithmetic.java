@@ -158,7 +158,7 @@ public class JexlArithmetic {
             // coerce to int if possible
             long l = bigi.longValue();
             // coerce to int when possible (int being so often used in method parms)
-            if (l <= ((long) Integer.MAX_VALUE) && l >= ((long) Integer.MIN_VALUE)) {
+            if (l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE) {
                 return new Integer((int) l);
             }
             return new Long(l);
