@@ -304,4 +304,17 @@ public class IssuesTest extends JexlTestCase {
         }
         debuggerCheck(jexl);
     }
+
+    // JEXL-44
+    public void test44() throws Exception {
+        JexlContext ctxt = JexlHelper.createContext();
+        JexlEngine jexl = new JexlEngine();
+        jexl.setSilent(false);
+        jexl.setLenient(false);
+        Script script;
+        script = jexl.createScript("'hello world!'//commented");
+        assertEquals("hello world!", script.execute(ctxt));
+        script = jexl.createScript("'hello world!';//commented\n'bye...'");
+        assertEquals("bye...", script.execute(ctxt));
+    }
 }
