@@ -312,5 +312,9 @@ public class IssuesTest extends JexlTestCase {
         assertEquals("hello world!", script.execute(ctxt));
         script = jexl.createScript("'hello world!';//commented\n'bye...'");
         assertEquals("bye...", script.execute(ctxt));
+        script = jexl.createScript("'hello world!'## commented");
+        assertEquals("hello world!", script.execute(ctxt));
+        script = jexl.createScript("'hello world!';## commented\n'bye...'");
+        assertEquals("bye...", script.execute(ctxt));
     }
 }
