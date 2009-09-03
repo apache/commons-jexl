@@ -54,9 +54,35 @@ The following methods have been removed:
 
   * Info.getTemplateName() - use Info.getName() instead
 
+Division (/ operator) behavior change:
+  * Division between integers no longer casts its operands to double; integer division
+    allways results in a integer.
+
 New Features:
 =============
 
+Assignment expression: a = b (and a.b.c = d)
+   * Assigns a variable (ant-like variable or bean-property)
+
+Ternary operator expression: a ? b : c  (and a ?: c)
+   * The usual inline conditional shortcut and its 'Elvis' form (a ?: b evaluates as a ? a : b)
+
+Constructor call expression: new('my.class.name', arguments...)
+   * Creates a new instance of a class using the most appropriate constructor according
+     to the actual arguments
+
+Function namespace: ns:func(arguments...)
+   * A function namespaces allows to use a class or instance methods in function calls
+
+UnifiedJEXL
+   * Adds ${...} and #{...} JSP/EL syntax support on top of the JexlEngine
+
+JSR-223 support
+   * Implement JSR-223 Scripting Engine for JEXL script (need BSF-3.0 on Java < 6)
+
+Error and exception handling
+   * Configuring the leniency and verbosity of the Jexl engine allows user control over the
+     error handling policy
 
 Bugs fixed:
 ===========
