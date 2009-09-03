@@ -21,6 +21,18 @@ import java.math.BigInteger;
 
 /**
  * Perform arithmetic.
+ * <p>
+ * All arithmetic operators (+, - , *, /, %) follow the same rules regarding their arguments.
+ * <ol>
+ * <li>If both are null, result is 0</li>
+ * <li>If either is a floating point number, coerce both to Double and perform operation</li>
+ * <li>If both are BigInteger, treat as BigInteger and perform operation</li>
+ * <li>If either is a BigDecimal, coerce both to BigDecimal and and perform operation</li>
+ * <li>Else treat as BigInteger and and perform operation</li>
+ * </ol>
+ * If the result of the operation is an integer, it will be narrowed to integer or long if
+ * possible.
+ * </p>
  * @since 2.0
  */
 public class JexlArithmetic {
@@ -83,16 +95,83 @@ public class JexlArithmetic {
     }
 
     /**
+     * Test if either left or right are either a Float or Double.
+     * @param left one object to test
+     * @param right the other
+     * @return the result of the test.
+     */
+    protected boolean isFloatingPointType(Object left, Object right) {
+        return left instanceof Float || left instanceof Double || right instanceof Float || right instanceof Double;
+    }
+
+    /**
+     * Test if the passed value is a floating point number, i.e. a float, double
+     * or string with ( "." | "E" | "e").
+     *
+     * @param val the object to be tested
+     * @return true if it is, false otherwise.
+     */
+    protected boolean isFloatingPointNumber(Object val) {
+        if (val instanceof Float || val instanceof Double) {
+            return true;
+        }
+        if (val instanceof String) {
+            String string = (String) val;
+            return string.indexOf(".") != -1 || string.indexOf("e") != -1 || string.indexOf("E") != -1;
+        }
+        return false;
+    }
+
+    /**
+     * Is Object a floating point number.
+     *
+     * @param o Object to be analyzed.
+     * @return true if it is a Float or a Double.
+     */
+    protected boolean isFloatingPoint(final Object o) {
+        return o instanceof Float || o instanceof Double;
+    }
+
+    /**
+     * Is Object a whole number.
+     *
+     * @param o Object to be analyzed.
+     * @return true if Integer, Long, Byte, Short or Character.
+     */
+    protected boolean isNumberable(final Object o) {
+        return o instanceof Integer
+            || o instanceof Long
+            || o instanceof Byte
+            || o instanceof Short
+            || o instanceof Character;
+    }
+
+    /**
+     * Given a BigInteger, narrow it to an Integer or Long if it fits.
+     * @param bigi the BigInteger to narrow
+     * @return an Integer or Long if narrowing is possible, the original BigInteger otherwise
+     */
+    protected Number narrowBigInteger(BigInteger bigi) {
+        //coerce to long if possible
+        if (bigi.compareTo(BIGI_LONG_MAX_VALUE) <= 0
+            && bigi.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
+            // coerce to int if possible
+            long l = bigi.longValue();
+            // coerce to int when possible (int being so often used in method parms)
+            if (l <= ((long) Integer.MAX_VALUE) && l >= ((long) Integer.MIN_VALUE)) {
+                return new Integer((int) l);
+            }
+            return new Long(l);
+        }
+        return bigi;
+    }
+
+    /**
      * Add two values together.
-     * Rules are:<ol>
-     * <li>If both are null, result is 0</li>
-     * <li>If either is a floating point number, coerce both to Double and add together</li>
-     * <li>If both are BigInteger, treat as BigInteger and add together</li>
-     * <li>If either is a BigDecimal, coerce both to BigDecimal and add together</li>
-     * <li>Else treat as BigInteger and add together</li>
-     * <li>If any numeric add fails on coercion to the appropriate type,
-     *      treat as Strings and do concatenation</li>
-     * </ol>
+     * <p>
+     * If any numeric add fails on coercion to the appropriate type,
+     * treat as Strings and do concatenation</li>
+     * </p>
      * @param left first value
      * @param right second value
      * @return left + right.
@@ -137,12 +216,6 @@ public class JexlArithmetic {
 
     /**
      * Divide the left value by the right.
-     * Rules are:<ol>
-     * <li>If both are null, result is Long(0)</li>
-     * <li>If both are BigInteger, return result of BigInteger divide</li>
-     * <li>If both are BigDecimal, return result of BigDecimal divide (rounded up if necessary to fit the scale)</li>
-     * <li>Else treat as Doubles and divide</li>
-     * </ol>
      * @param left first value
      * @param right second value
      * @return left / right
@@ -187,13 +260,6 @@ public class JexlArithmetic {
     
     /**
      * left value mod right.
-     * Rules are:<ol>
-     * <li>If both are null, result is 0</li>
-     * <li>If either is a floating point number, treat both as double and perform modulus, returning Double</li>
-     * <li>If both are BigInteger numbers, treat as BigInteger and perform modulus, returning BigInteger</li>
-     * <li>If either is a BigDecimal number, coerce both to BigDecimal and perform modulus, returning BigDecimal</li>
-     * <li>Else treat both as BigInteger and perform modulus, returning Number: BigInteger or Long(if in range)</li>
-     * </ol>
      * @param left first value
      * @param right second value
      * @return left mod right
@@ -238,14 +304,6 @@ public class JexlArithmetic {
     
     /**
      * Multiply the left value by the right.
-     * Rules are:<ol>
-     * <li>If both are null, result is null(strict) or Long(0)</li>
-     * <li>If either are floating point numbers, coerce to double
-     *      and multiply, returning Double</li>
-     * <li>If both are BigInteger numbers, treat as BigInteger and perform multiply, returning BigInteger</li>
-     * <li>If either is a BigDecimal number, coerce both to BigDecimal and perform multiply, returning BigDecimal</li>
-     * <li>Else treat both as BigInteger and perform multiply, returning Number: BigInteger or Long(if in range)</li>
-     * </ol>
      * @param left first value
      * @param right second value
      * @return left * right.
@@ -285,14 +343,6 @@ public class JexlArithmetic {
     
     /**
      * Subtract the right value from the left.
-     * Rules are:<ol>
-     * <li>If both are null, result is 0</li>
-     * <li>If either are floating point numbers, coerce to double
-     *      and subtract, returning Double</li>
-     * <li>If both are BigInteger numbers, treat as BigInteger and subtract, returning BigInteger</li>
-     * <li>If either is a BigDecimal number, coerce both to BigDecimal and subtract, returning BigDecimal</li>
-     * <li>Else treat both as BigInteger and subtract, returning Number: BigInteger or Long(if in range)</li>
-     * </ol>
      * @param left first value
      * @param right second value
      * @return left - right.
@@ -445,36 +495,6 @@ public class JexlArithmetic {
      */
     public boolean greaterThanOrEqual(Object left, Object right) {
         return equals(left, right) || greaterThan(left, right);
-    }
-    
-
-    
-    /**
-     * Test if either left or right are either a Float or Double.
-     * @param left one object to test
-     * @param right the other
-     * @return the result of the test.
-     */
-    private boolean isFloatingPointType(Object left, Object right) {
-        return left instanceof Float || left instanceof Double || right instanceof Float || right instanceof Double;
-    }
-    
-    /**
-     * Test if the passed value is a floating point number, i.e. a float, double
-     * or string with ( "." | "E" | "e").
-     *
-     * @param val the object to be tested
-     * @return true if it is, false otherwise.
-     */
-    private boolean isFloatingPointNumber(Object val) {
-        if (val instanceof Float || val instanceof Double) {
-            return true;
-        }
-        if (val instanceof String) {
-            String string = (String) val;
-            return string.indexOf(".") != -1 || string.indexOf("e") != -1 || string.indexOf("E") != -1;
-        }
-        return false;
     }
     
     /**
@@ -663,30 +683,6 @@ public class JexlArithmetic {
     }
 
     /**
-     * Is Object a floating point number.
-     *
-     * @param o Object to be analyzed.
-     * @return true if it is a Float or a Double.
-     */
-    protected boolean isFloatingPoint(final Object o) {
-        return o instanceof Float || o instanceof Double;
-    }
-
-    /**
-     * Is Object a whole number.
-     *
-     * @param o Object to be analyzed.
-     * @return true if Integer, Long, Byte, Short or Character.
-     */
-    protected boolean isNumberable(final Object o) {
-        return o instanceof Integer
-            || o instanceof Long
-            || o instanceof Byte
-            || o instanceof Short
-            || o instanceof Character;
-    }
-
-    /**
      * Given a Number, return back the value using the smallest type the result
      * will fit into. This works hand in hand with parameter 'widening' in java
      * method calls, e.g. a call to substring(int,int) with an int and a long
@@ -737,23 +733,4 @@ public class JexlArithmetic {
         return result;
     }
 
-    /**
-     * Given a BigInteger, narrow it to a Long if it fits.
-     * @param bigi the BigInteger to narrow
-     * @return a Long if narrowing is possible, the original BigInteger otherwise
-     */
-    protected Number narrowBigInteger(BigInteger bigi) {
-        //coerce to long if possible
-        if (bigi.compareTo(BIGI_LONG_MAX_VALUE) <= 0
-            && bigi.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
-            // coerce to int if possible
-            long l = bigi.longValue();
-            // coerce to int when possible (int being so often used in method parms)
-            if (l <= ((long) Integer.MAX_VALUE) && l >= ((long) Integer.MIN_VALUE)) {
-                return new Integer((int) l);
-            }
-            return new Long(l);
-        }
-        return bigi;
-    }
 }
