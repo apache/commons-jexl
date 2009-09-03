@@ -823,7 +823,7 @@ public final class UnifiedJEXL {
      * @return the AST
      */
     private JexlNode toNode(CharSequence expression) throws ParseException {
-        return jexl.parse(expression, null).jjtGetChild(0);
+        return jexl.parse(expression, null);
     }
     
     /**
@@ -833,7 +833,7 @@ public final class UnifiedJEXL {
      * @return the AST
      */
     private JexlNode toNode(CharSequence expression, Info info) throws ParseException {
-        return jexl.parse(expression, info).jjtGetChild(0);
+        return jexl.parse(expression, info);
     }
 
     /**

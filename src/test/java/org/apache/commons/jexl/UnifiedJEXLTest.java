@@ -58,30 +58,10 @@ public class UnifiedJEXLTest extends JexlTestCase {
         public int getValue() {
             return value;
         }
-    }
-    
-    public static class Quux {
-        String str;
-        Froboz froboz;
-        public Quux(String str, int fro) {
-            this.str = str;
-            froboz = new Froboz(fro);
-        }
-        
-        public Froboz getFroboz() {
-            return froboz;
-        }
-        
-        public void setFroboz(Froboz froboz) {
-            this.froboz = froboz;
-        }
-        
-        public String getStr() {
-            return str;
-        }
-        
-        public void setStr(String str) {
-            this.str = str;
+        public int plus10() {
+            int i = value;
+            value += 10;
+            return i;
         }
     }
 
@@ -89,6 +69,12 @@ public class UnifiedJEXLTest extends JexlTestCase {
         super(testName);
     }
 
+    public void testStatement() throws Exception {
+        vars.put("froboz", new Froboz(123));
+        UnifiedJEXL.Expression check = EL.parse("${froboz.value = 32; froboz.plus10(); froboz.value}");
+        Object o = check.evaluate(context);
+        assertEquals("Result is not 42", new Integer(42), o);
+    }
 
     public void testAssign() throws Exception {
         UnifiedJEXL.Expression assign = EL.parse("${froboz.value = 10}");
