@@ -277,15 +277,11 @@ public class IssuesTest extends JexlTestCase {
             "while (x) 1 if (y) 2 3"
         };
         for (int f = 0; f < fexprs.length; ++f) {
-            boolean fail = true;
             try {
-                Script s = jexl.createScript(fexprs[f]);
+                jexl.createScript(fexprs[f]);
+                fail(fexprs[f] + ": Should have failed in parse");
             } catch (ParseException xany) {
                 // expected to fail in parse
-                fail = false;
-            }
-            if (fail) {
-                fail(fexprs[f] + ": Should have failed in parse");
             }
         }
         // ';' is necessary between expressions and only expressions
@@ -296,11 +292,11 @@ public class IssuesTest extends JexlTestCase {
             "for(z : [3, 4, 5]) { z } y ? 2 : 1",
             "for(z : [3, 4, 5]) { z } if (y) 2 else 1"
         };
-        ctxt.getVars().put("x", false);
-        ctxt.getVars().put("y", true);
+        ctxt.getVars().put("x", Boolean.FALSE);
+        ctxt.getVars().put("y", Boolean.TRUE);
         for (int e = 0; e < exprs.length; ++e) {
             Script s = jexl.createScript(exprs[e]);
-            assertEquals(2, s.execute(ctxt));
+            assertEquals(Integer.valueOf(2), s.execute(ctxt));
         }
         debuggerCheck(jexl);
     }
