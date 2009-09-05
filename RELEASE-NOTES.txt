@@ -17,45 +17,79 @@
 $Id$
 
                             Commons JEXL Package
-                                Version 1.1
+                                Version 2.0
                                Release Notes
 
 
 INTRODUCTION:
 =============
 
-Jexl is an Expression Language supporting most of the constructs in the
+JEXL is an Expression Language supporting most of the constructs in the
 JSTL Expression Language, along with some additional extensions.
 
-http://commons.apache.org/jexl/
+  http://commons.apache.org/jexl/
 
 Changes in this version include:
+
+Incompatible Changes
+====================
+
+Now requires Java 1.5 or later.
+
+The following classes have been removed:
+
+  * ExpressionFactory
+  * ScriptFactory
+
+  Please create a JexlEngine and use createExpression() or createScript()
+  instead.
+
+  * VelMethod
+  * VelPropertyGet
+  * VelPropertySet
+
+  Please use JexlMethod, JexlPropertyGet and JexlPropertySet instead.
+
+The following methods have been removed:
+
+  * Info.getTemplateName() - use Info.getName() instead
+
+Division (/ operator) behavior change:
+  * Division between integers no longer casts its operands to double; integer division
+    allways results in a integer.
 
 New Features:
 =============
 
-o Added Script and ScriptFactory to allow scripts to be executed from text,
-  files or a URL.
-o Added implementation for bitwise operators: and, complement, or, xor.
-o Added implementation for the foreach statement.
-o Added implementation for the while statement.
-o Added implementation for block statements, e.g. curly braces containing
-  multiple statements.
-o Added implementation for the if statement.
-o [JEXL-4] Support assignment to variables. Thanks to Barry Lagerweij.
+Assignment expression: a = b (and a.b.c = d)
+   * Assigns a variable (ant-like variable or bean-property)
+
+Ternary operator expression: a ? b : c  (and a ?: c)
+   * The usual inline conditional shortcut and its 'Elvis' form (a ?: b evaluates as a ? a : b)
+
+Constructor call expression: new('my.class.name', arguments...)
+   * Creates a new instance of a class using the most appropriate constructor according
+     to the actual arguments
+
+Function namespace: ns:func(arguments...)
+   * A function namespaces allows to use a class or instance methods in function calls
+
+UnifiedJEXL
+   * Adds ${...} and #{...} JSP/EL syntax support on top of the JexlEngine
+
+JSR-223 support
+   * Implement JSR-223 Scripting Engine for JEXL script (need BSF-3.0 on Java < 6)
+
+Error and exception handling
+   * Configuring the leniency and verbosity of the Jexl engine allows user control over the
+     error handling policy
 
 Bugs fixed:
 ===========
 
-o [JEXL-17] Consistently throw ParseException in case of a parsing failure,
-  not an Error. Thanks to Kohsuke Kawaguchi.
-o [JEXL-3] Allow for static methods to be called on classes and not just objects.
-  Thanks to Guido Anzuoni.
-o [JEXL-6] Unary minus was only working for integer values.
-o [JEXL-5] 'abc'.substring(0,1+1) is empty (method matching problem).
 
 Other Changes:
 ==============
 
-o Add @since tags to code so we can track API additions via javadoc
+o Add @since 2.0 tags to code so we can track API additions via Javadoc
 

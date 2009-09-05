@@ -28,6 +28,7 @@
         <ul>
           <li><a href="syntax.html">JEXL Syntax</a></li>
           <li><a href="examples.html">Common examples</a> using JEXL and the expression language</li>
+          <li><a href="jsr223.html">JSR-223 (scripting)</a> using JEXL via JSR-223 (scripting)</li>
         </ul>
       </p>
     </section>
