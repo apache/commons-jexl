@@ -27,7 +27,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>commons-jexl</groupId>
   <artifactId>commons-jexl</artifactId>
-  <version>1.1.1-SNAPSHOT</version>
+  <version>2.0-SNAPSHOT</version>
   <name>Commons JEXL</name>
   <inceptionYear>2003</inceptionYear>
   <description>Jexl is an implementation of the JSTL Expression Language with extensions.</description>
@@ -81,35 +81,63 @@
       <email>rahul AT apache.org</email>
       <organization>Apache Software Foundation</organization>
     </developer>
+    <developer>
+      <name>Henri Biestro</name>
+      <id>henrib</id>
+      <email>henrib AT apache.org</email>
+    </developer>
   </developers>
 
   <dependencies>
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <version>1.0.4</version>
+      <version>1.1.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>3.8.2</version>
       <optional>true</optional>
+    </dependency>
+    <!-- For JSR-223 API -->
+    <dependency>
+      <groupId>org.apache.bsf</groupId>
+      <artifactId>bsf-api</artifactId>
+      <version>3.0-beta3</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 
   <properties>
-    <maven.compile.source>1.4</maven.compile.source>
-    <maven.compile.target>1.4</maven.compile.target>
+    <maven.compile.source>1.5</maven.compile.source>
+    <maven.compile.target>1.5</maven.compile.target>
     <commons.componentid>jexl</commons.componentid>
-    <commons.release.version>1.1</commons.release.version>
+    <commons.release.version>2.0</commons.release.version>
     <commons.binary.suffix></commons.binary.suffix>
     <commons.jira.id>JEXL</commons.jira.id>
     <commons.jira.pid>12310479</commons.jira.pid>
+    <!-- Temp fix until parent POM is updated -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties> 
 
   <build>
-    <sourceDirectory>src/java</sourceDirectory>
-    <testSourceDirectory>src/test</testSourceDirectory>
+    <!-- temporarily override the parent POM (v 11) until that is updated -->
+    <resources>
+      <resource>
+        <directory>${basedir}</directory>
+        <targetPath>META-INF</targetPath>
+        <includes>
+          <include>NOTICE.txt</include>
+          <include>LICENSE.txt</include>
+        </includes>
+      </resource>
+      <!-- This is the default, but is currently missing from the parent POM (v11) -->
+      <resource>
+          <directory>src/main/resources</directory>
+      </resource>
+    </resources>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -124,11 +152,30 @@
           <artifactId>maven-assembly-plugin</artifactId>
           <configuration>
             <descriptors>
-              <descriptor>src/assembly/bin.xml</descriptor>
-              <descriptor>src/assembly/src.xml</descriptor>
+              <descriptor>src/main/assembly/bin.xml</descriptor>
+              <descriptor>src/main/assembly/src.xml</descriptor>
             </descriptors>
             <tarLongFileMode>gnu</tarLongFileMode>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>javacc-maven-plugin</artifactId>
+          <version>2.5</version>
+          <executions>
+            <execution>
+              <id>jexl-jjtree</id>
+              <configuration>
+                <sourceDirectory>${basedir}/src/main/java/org/apache/commons/jexl/parser</sourceDirectory>
+                <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
+                <timestampDirectory>${project.build.directory}/generated-sources/javacc-timestamp</timestampDirectory>
+                <packageName>org.apache.commons.jexl.parser</packageName>
+              </configuration>
+              <goals>
+                <goal>jjtree-javacc</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </build>
@@ -154,24 +201,43 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.3</version>
           <configuration>
-            <configLocation>${basedir}/src/conf/checkstyle.xml</configLocation>
+            <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
             <excludes>org/apache/commons/jexl/parser/*.java</excludes>
-            <headerFile>${basedir}/src/conf/header.txt</headerFile>
+            <headerFile>${basedir}/src/main/config/header.txt</headerFile>
             <enableRulesSummary>false</enableRulesSummary>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>cobertura-maven-plugin</artifactId>
-          <version>2.2</version>
+          <version>2.3</version>
+          <configuration>
+            <instrumentation>
+              <excludes>
+                <exclude>org/apache/commons/jexl/parser/*.class</exclude>
+                <exclude>apache/commons/jexl/**/*Test.class</exclude>
+              </excludes>
+            </instrumentation>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>findbugs-maven-plugin</artifactId>
+          <version>2.0.1</version>
+          <configuration>
+            <xmlOutput>true</xmlOutput>
+            <!-- Optional derectory to put findbugs xdoc xml report -->
+            <xmlOutputDirectory>target/site</xmlOutputDirectory>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
           <version>2.3</version>
           <configuration>
+            <targetJdk>1.5</targetJdk>
             <excludes>
               <exclude>org/apache/commons/jexl/parser/*.java</exclude>
             </excludes>
