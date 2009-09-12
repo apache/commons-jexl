@@ -36,13 +36,15 @@ Incompatible Changes
 
 Now requires Java 1.5 or later.
 
-The following classes have been removed:
+The following classes have been deprecated:
 
   * ExpressionFactory
   * ScriptFactory
 
   Please create a JexlEngine and use createExpression() or createScript()
   instead.
+
+The following classes have been removed:
 
   * VelMethod
   * VelPropertyGet
@@ -72,7 +74,7 @@ Constructor call expression: new('my.class.name', arguments...)
      to the actual arguments
 
 Function namespace: ns:func(arguments...)
-   * A function namespaces allows to use a class or instance methods in function calls
+   * A function namespace allows the use of class or instance methods in function calls
 
 UnifiedJEXL
    * Adds ${...} and #{...} JSP/EL syntax support on top of the JexlEngine
