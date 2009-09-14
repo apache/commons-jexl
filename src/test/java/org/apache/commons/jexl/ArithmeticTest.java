@@ -120,6 +120,37 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("imanull + imanull", new Integer(0));
     }
 
+    public void testCoercions() throws Exception {
+        asserter.assertExpression("1", new Integer(1)); // numerics default to Integer
+//        asserter.assertExpression("5L", new Long(5)); // TODO when implemented
+        
+        asserter.setVariable("I2", new Integer(2));
+        asserter.setVariable("L2", new Long(2));
+        asserter.setVariable("L3", new Long(3));
+        asserter.setVariable("B10", BigInteger.TEN);
+        
+        // Integer & Integer => Integer
+        asserter.assertExpression("I2 + 2", new Integer(4));
+        asserter.assertExpression("I2 * 2", new Integer(4));
+        asserter.assertExpression("I2 - 2", new Integer(0));
+        asserter.assertExpression("I2 / 2", new Integer(1));
+        
+        // Integer & Long => Long
+        asserter.assertExpression("I2 * L2", new Long(4));
+        asserter.assertExpression("I2 / L2", new Long(1));
+
+        // Long & Long => Long
+        asserter.assertExpression("L2 + 3", new Long(5));
+        asserter.assertExpression("L2 + L3", new Long(5));
+        asserter.assertExpression("L2 / L2", new Long(1));
+        asserter.assertExpression("L2 / 2", new Long(1));
+        
+        // BigInteger
+        asserter.assertExpression("B10 / 10", BigInteger.ONE);
+        asserter.assertExpression("B10 / I2", new BigInteger("5"));
+        asserter.assertExpression("B10 / L2", new BigInteger("5"));
+    }
+    
     /**
      *
      * if silent, all arith exception return 0.0
