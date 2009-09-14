@@ -18,7 +18,7 @@ package org.apache.commons.jexl;
 
 import java.io.File;
 import java.net.URL;
-
+import org.apache.commons.jexl.parser.JexlNode;
 /**
  * <p>
  * Creates {@link Script}s.  To create a JEXL Script, pass
@@ -46,6 +46,76 @@ import java.net.URL;
 @Deprecated
 public final class ScriptFactory {
     /**
+     * Lazy JexlEngine singleton; since this class is deprecated, let's not create the shared
+     * engine if it's not gonna be used.
+     */
+    private static volatile JexlEngine INSTANCE = null;
+    
+    /**
+     * An interpreter made compatible with v1.1 behavior (at least Jelly's expectations).
+     */
+    private static class LegacyInterpreter extends Interpreter {
+        public LegacyInterpreter(JexlEngine jexl, JexlContext aContext) {
+            super(jexl, aContext);
+        }
+
+        @Override
+        public Object interpret(JexlNode node) {
+            try {
+                return node.jjtAccept(this, null);
+            } catch (JexlException xjexl) {
+                Throwable e = xjexl.getCause();
+                if (e instanceof RuntimeException)
+                        throw (RuntimeException)e;
+                if (e instanceof IllegalStateException)
+                        throw (IllegalStateException )e;
+                throw new IllegalStateException(e.getMessage(), e);
+            }
+        }
+
+        @Override
+        protected Object invocationFailed(JexlException xjexl) {
+            throw xjexl;
+        }
+
+        @Override
+        protected Object unknownVariable(JexlException xjexl) {
+            return null;
+        }
+    }
+    
+    /**
+     * An engine that uses a LegacyInterpreter.
+     */
+    private static class LegacyEngine extends JexlEngine {
+        @Override
+        protected Interpreter createInterpreter(JexlContext context) {
+            if (context == null) {
+                context = EMPTY_CONTEXT;
+            }
+            return new ScriptFactory.LegacyInterpreter(this, context);
+        }
+    }
+    
+    /**
+     * Retrieves the static shared JexlEngine instance.
+     */
+    static JexlEngine getInstance() {
+        // Java5 memory model allows double-lock pattern
+        if (INSTANCE == null) {
+            synchronized(ScriptFactory.class){
+                if (INSTANCE == null) {
+                    JexlEngine jexl = new LegacyEngine();
+                    jexl.setCache(256);
+                    jexl.setSilent(false);
+                    INSTANCE = jexl;
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    /**
      * Private constructor, ensure no instance.
      */
     private ScriptFactory() {}
@@ -63,7 +133,7 @@ public final class ScriptFactory {
      */
     @Deprecated
     public static Script createScript(String scriptText) throws Exception {
-        return new JexlEngine().createScript(scriptText);
+        return getInstance().createScript(scriptText);
     }
 
     /**
@@ -80,7 +150,7 @@ public final class ScriptFactory {
      */
     @Deprecated
     public static Script createScript(File scriptFile) throws Exception {
-        return new JexlEngine().createScript(scriptFile);
+        return getInstance().createScript(scriptFile);
     }
 
     /**
@@ -97,7 +167,7 @@ public final class ScriptFactory {
      */
     @Deprecated
     public static Script createScript(URL scriptUrl) throws Exception {
-        return new JexlEngine().createScript(scriptUrl);
+        return getInstance().createScript(scriptUrl);
     }
 
 }

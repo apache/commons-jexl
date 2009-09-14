@@ -202,7 +202,37 @@ public class Interpreter implements ParserVisitor {
         return node;
     }
 
-/** {@inheritDoc} */
+    /**
+     * Triggered when variable can not be resolved.
+     * @param xjexl the JexlException ("undefined variable " + variable)
+     * @return throws JexlException if strict, null otherwise
+     */
+    protected Object unknownVariable(JexlException xjexl) {
+        if (strict) {
+            throw xjexl;
+        }
+        if (!silent) {
+            logger.warn(xjexl.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Triggered when method, function or constructor invocation fails.
+     * @param xjexl the JexlException wrapping the original error
+     * @return throws JexlException if strict, null otherwise
+     */
+    protected Object invocationFailed(JexlException xjexl) {
+        if (strict) {
+            throw xjexl;
+        }
+        if (!silent) {
+            logger.warn(xjexl.getMessage(), xjexl.getCause());
+        }
+        return null;
+    }
+
+    /** {@inheritDoc} */
     public Object visit(ASTAdditiveNode node, Object data) {
         /**
          * The pattern for exception mgmt is to let the child*.jjtAccept
@@ -600,13 +630,8 @@ public class Interpreter implements ParserVisitor {
             if (value == null
                 && !(node.jjtGetParent() instanceof ASTReference)
                 && !context.getVars().containsKey(name)) {
-                JexlException xjexl = new JexlException(node, "undefined variable " + name);
-                if (strict) {
-                    throw xjexl;
-                }
-                if (!silent) {
-                    logger.warn(xjexl.getMessage());
-                }
+                JexlException xjexl = new JexlException(node, "undefined variable " + node.image);
+                return unknownVariable(xjexl);
             }
             return value;
         } else {
@@ -777,20 +802,11 @@ public class Interpreter implements ParserVisitor {
                 return eval;
             }
         } catch (InvocationTargetException e) {
-            Throwable t = e.getTargetException();
-            if (!(t instanceof Exception)) {
-                t = e;
-            }
-            xjexl = new JexlException(node, "method invocation error", t);
+            xjexl = new JexlException(node, "method invocation error", e.getCause());
         } catch (Exception e) {
             xjexl = new JexlException(node, "method error", e);
         }
-        // xjexl cannot be null here
-        if (strict) {
-            throw xjexl;
-        }
-        logger.warn(xjexl.getMessage(), xjexl.getCause());
-        return null;
+        return invocationFailed(xjexl);
     }
 
     /** {@inheritDoc} */
@@ -821,20 +837,11 @@ public class Interpreter implements ParserVisitor {
                 return ctor.newInstance(argv);
             }
         } catch (InvocationTargetException e) {
-            Throwable t = e.getTargetException();
-            if (!(t instanceof Exception)) {
-                t = e;
-            }
-            xjexl = new JexlException(node, "constructor invocation error", t);
+            xjexl = new JexlException(node, "constructor invocation error", e.getCause());
         } catch (Exception e) {
             xjexl = new JexlException(node, "constructor error", e);
         }
-        // xjexl cannot be null here
-        if (strict) {
-            throw xjexl;
-        }
-        logger.warn(xjexl.getMessage(), xjexl.getCause());
-        return null;
+        return invocationFailed(xjexl);
     }
 
     /** {@inheritDoc} */
@@ -888,20 +895,11 @@ public class Interpreter implements ParserVisitor {
                 return eval;
             }
         } catch (InvocationTargetException e) {
-            Throwable t = e.getTargetException();
-            if (!(t instanceof Exception)) {
-                t = e;
-            }
-            xjexl = new JexlException(node, "function invocation error", t);
+            xjexl = new JexlException(node, "function invocation error", e.getCause());
         } catch (Exception e) {
             xjexl = new JexlException(node, "function error", e);
         }
-        // xjexl cannot be null here
-        if (strict) {
-            throw xjexl;
-        }
-        logger.warn(xjexl.getMessage(), xjexl.getCause());
-        return null;
+        return invocationFailed(xjexl);
     }
 
     /** {@inheritDoc} */
