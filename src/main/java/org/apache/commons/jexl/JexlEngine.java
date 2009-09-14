@@ -586,12 +586,19 @@ public class JexlEngine {
                     StackTraceElement[] stack = xinfo.getStackTrace();
                     StackTraceElement se = null;
                     Class<?> clazz = getClass();
-                    for(int s = 0; s < stack.length; ++s, se = null) {
+                    for(int s = 1; s < stack.length; ++s, se = null) {
                         se = stack[s];
-                        if (!se.getClassName().equals(clazz.getName())) {
-                            // go deeper if called from UnifiedJEXL
-                            if (se.getClassName().equals(UnifiedJEXL.class.getName())) {
+                        String className = se.getClassName();
+                        if (!className.equals(clazz.getName())) {
+                            // go deeper if called from JexlEngine, UnifiedJEXL or a Factory
+                            if (className.equals(JexlEngine.class.getName())) {
+                                clazz = JexlEngine.class;
+                            } else if (className.equals(UnifiedJEXL.class.getName())) {
                                 clazz = UnifiedJEXL.class;
+                            } else if (className.equals(ScriptFactory.class.getName())) {
+                                clazz = ScriptFactory.class;
+                            } else if (className.equals(ExpressionFactory.class.getName())) {
+                                clazz = ExpressionFactory.class;
                             } else {
                                 break;
                             }

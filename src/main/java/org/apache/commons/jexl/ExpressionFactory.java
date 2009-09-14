@@ -66,7 +66,7 @@ public final class ExpressionFactory {
     @Deprecated
     public static Expression createExpression(String expression)
         throws ParseException {
-        return new JexlEngine().createExpression(expression);
+        return ScriptFactory.getInstance().createExpression(expression);
     }
 
 }
