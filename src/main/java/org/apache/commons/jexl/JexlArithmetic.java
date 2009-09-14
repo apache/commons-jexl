@@ -28,10 +28,13 @@ import java.math.BigInteger;
  * <li>If either is a floating point number, coerce both to Double and perform operation</li>
  * <li>If both are BigInteger, treat as BigInteger and perform operation</li>
  * <li>If either is a BigDecimal, coerce both to BigDecimal and and perform operation</li>
- * <li>Else treat as BigInteger and and perform operation</li>
+ * <li>Else treat as BigInteger, perform operation and attempt to narrow result:
+ * <ol>
+ * <li>if both arguments can be narrowed to Integer, narrow result to Integer</li>
+ * <li>if both arguments can be narrowed to Long, narrow result to Long</li>
+ * <li>Else return result as BigInteger</li>
  * </ol>
- * If the result of the operation is an integer, it will be narrowed to integer or long if
- * possible.
+ * </ol>
  * </p>
  * @since 2.0
  */
@@ -147,18 +150,30 @@ public class JexlArithmetic {
     }
 
     /**
-     * Given a BigInteger, narrow it to an Integer or Long if it fits.
+     * Given a BigInteger, narrow it to an Integer or Long if it fits and the arguments
+     * class allow it.
+     * <p>
+     * The rules are:
+     * if either arguments is a BigInteger, no narrowing will occur
+     * if either arguments is a Long, no narrowing to Integer will occur
+     * </p>
+     * @param lhs the left hand side operand that lead to the bigi result
+     * @param rhs the right hand side operand that lead to the bigi result
      * @param bigi the BigInteger to narrow
+     * @param narrowInt whether we should try narrowing to int (@see mayNarrowToInt)
      * @return an Integer or Long if narrowing is possible, the original BigInteger otherwise
      */
-    protected Number narrowBigInteger(BigInteger bigi) {
+    protected Number narrowBigInteger(Object lhs, Object rhs, BigInteger bigi) {
         //coerce to long if possible
-        if (bigi.compareTo(BIGI_LONG_MAX_VALUE) <= 0
+        if (!(lhs instanceof BigInteger || rhs instanceof BigInteger)
+            && bigi.compareTo(BIGI_LONG_MAX_VALUE) <= 0
             && bigi.compareTo(BIGI_LONG_MIN_VALUE) >= 0) {
             // coerce to int if possible
             long l = bigi.longValue();
             // coerce to int when possible (int being so often used in method parms)
-            if (l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE) {
+            if (!(lhs instanceof Long || rhs instanceof Long)
+                && l <= Integer.MAX_VALUE
+                && l >= Integer.MIN_VALUE) {
                 return new Integer((int) l);
             }
             return new Long(l);
@@ -207,7 +222,7 @@ public class JexlArithmetic {
             BigInteger l = toBigInteger(left);
             BigInteger r = toBigInteger(right);
             BigInteger result = l.add(r);
-            return narrowBigInteger(result);
+            return narrowBigInteger(left, right, result);
         } catch (java.lang.NumberFormatException nfe) {
             // Well, use strings!
             return toString(left).concat(toString(right));
@@ -255,7 +270,7 @@ public class JexlArithmetic {
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
         BigInteger result = l.divide(r);
-        return narrowBigInteger(result);
+        return narrowBigInteger(left, right, result);
     }
     
     /**
@@ -299,7 +314,7 @@ public class JexlArithmetic {
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
         BigInteger result = l.mod(r);
-        return narrowBigInteger(result);
+        return narrowBigInteger(left, right, result);
     }
     
     /**
@@ -338,7 +353,7 @@ public class JexlArithmetic {
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
         BigInteger result = l.multiply(r);
-        return narrowBigInteger(result);
+        return narrowBigInteger(left, right, result);
     }
     
     /**
@@ -377,7 +392,7 @@ public class JexlArithmetic {
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
         BigInteger result = l.subtract(r);
-        return narrowBigInteger(result);
+        return narrowBigInteger(left, right, result);
     }
     
     /**
