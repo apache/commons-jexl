@@ -101,7 +101,7 @@ class ExpressionImpl implements Expression, Script {
     /**
      * {@inheritDoc}
      */
-    public Object execute(JexlContext context) throws Exception {
+    public Object execute(JexlContext context) {
         Interpreter interpreter = jexl.createInterpreter(context);
         return interpreter.interpret(script);
     }
