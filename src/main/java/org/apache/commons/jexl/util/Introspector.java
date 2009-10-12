@@ -207,7 +207,7 @@ public class Introspector  {
                 return executor;
             }
         }
-        // if that didn't work, look for get("foo")
+        // if that didn't work, look for set("foo")
         executor = new DuckGetExecutor(this, claz, identifier);
         if (executor.isAlive()) {
             return executor;

@@ -40,6 +40,12 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
         property = key;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Object getTargetProperty() {
+        return property;
+    }
+    
     /**
      * Get the property from the map.
      * @param map the map.
@@ -55,7 +61,8 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
     @SuppressWarnings("unchecked")
     @Override
     public Object tryExecute(final Object map, Object key) {
-        if (objectClass.equals(map.getClass())
+        if (map != null &&  method != null
+            && objectClass.equals(map.getClass())
             && (key == null || property.getClass().equals(key.getClass()))) {
             return ((Map<Object, ?>) map).get(key);
         }

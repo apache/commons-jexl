@@ -40,6 +40,12 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
 
     /** {@inheritDoc} */
     @Override
+    public Object getTargetProperty() {
+        return property;
+    }
+    
+    /** {@inheritDoc} */
+    @Override
     public Object execute(Object o)
         throws IllegalAccessException, InvocationTargetException {
         return method == null ? null : method.invoke(o, (Object[]) null);

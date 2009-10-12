@@ -41,6 +41,12 @@ public final class PropertySetExecutor extends AbstractExecutor.Set {
 
     /** {@inheritDoc} */
     @Override
+    public Object getTargetProperty() {
+        return property;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Object execute(Object o, Object arg)
             throws IllegalAccessException, InvocationTargetException {
         Object[] pargs = {arg};

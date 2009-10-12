@@ -42,6 +42,12 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
         property = index;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Object getTargetProperty() {
+        return property;
+    }
+    
     /**
      * Get the property from the list or array.
      * @param list the List/array.
@@ -59,7 +65,7 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
     /** {@inheritDoc} */
     @Override
     public Object tryExecute(final Object list, Object index) {
-        if (method == discover(list.getClass())
+        if (list != null && method != null
             && objectClass.equals(list.getClass())
             && index instanceof Integer) {
             if (method == ARRAY_GET) {

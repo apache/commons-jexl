@@ -45,6 +45,12 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
 
     /** {@inheritDoc} */
     @Override
+    public Object getTargetProperty() {
+        return property;
+    }
+    
+    /** {@inheritDoc} */
+    @Override
     public Object execute(final Object list, Object arg) {
         if (method == ARRAY_SET) {
             java.lang.reflect.Array.set(list, property.intValue(), arg);
@@ -59,17 +65,17 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
     /** {@inheritDoc} */
     @Override
     public Object tryExecute(final Object list, Object index, Object arg) {
-        if (method == discover(list.getClass())
+        if (list != null && method != null
             && objectClass.equals(list.getClass())
             && index instanceof Integer) {
-            Integer idx = (Integer) index;
-        if (method == ARRAY_SET) {
-            java.lang.reflect.Array.set(list, idx.intValue(), arg);
-        } else {
-            @SuppressWarnings("unchecked")
-            final List<Object> asList = (List<Object>) list;
-            asList.set(idx.intValue(), arg);
-        }
+            if (method == ARRAY_SET) {
+                Array.set(list, (Integer) index, arg);
+            } else {
+                @SuppressWarnings("unchecked")
+                final List<Object> asList = (List<Object>) list;
+                asList.set((Integer) index, arg);
+            }
+            return arg;
         }
         return TRY_FAILED;
     }
