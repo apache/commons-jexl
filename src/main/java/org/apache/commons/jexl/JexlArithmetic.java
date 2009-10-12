@@ -160,7 +160,6 @@ public class JexlArithmetic {
      * @param lhs the left hand side operand that lead to the bigi result
      * @param rhs the right hand side operand that lead to the bigi result
      * @param bigi the BigInteger to narrow
-     * @param narrowInt whether we should try narrowing to int (@see mayNarrowToInt)
      * @return an Integer or Long if narrowing is possible, the original BigInteger otherwise
      */
     protected Number narrowBigInteger(Object lhs, Object rhs, BigInteger bigi) {
@@ -174,9 +173,9 @@ public class JexlArithmetic {
             if (!(lhs instanceof Long || rhs instanceof Long)
                 && l <= Integer.MAX_VALUE
                 && l >= Integer.MIN_VALUE) {
-                return new Integer((int) l);
+                return Integer.valueOf((int) l);
             }
-            return new Long(l);
+            return Long.valueOf(l);
         }
         return bigi;
     }
@@ -185,7 +184,7 @@ public class JexlArithmetic {
      * Add two values together.
      * <p>
      * If any numeric add fails on coercion to the appropriate type,
-     * treat as Strings and do concatenation</li>
+     * treat as Strings and do concatenation.
      * </p>
      * @param left first value
      * @param right second value

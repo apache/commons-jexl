@@ -233,7 +233,7 @@ public final class UnifiedJEXL {
      * The abstract base class for all expressions, immediate '${...}' and deferred '#{...}'.
      */
     public abstract class Expression {
-        /** The source of this expression (see {@link Expression#prepare}). */
+        /** The source of this expression (see {@link UnifiedJEXL.Expression#prepare}). */
         protected final Expression source;
         /**
          * Creates an expression.
@@ -353,7 +353,7 @@ public final class UnifiedJEXL {
          * Intreprets a sub-expression.
          * @param interpreter a JEXL interpreter
          * @return the result of interpretation
-         * @throws org.apache.commons.jexl.parser.ParseException (only for nested & composite)
+         * @throws ParseException (only for nested & composite)
          */
         abstract Object evaluate(Interpreter interpreter) throws ParseException;
     }
@@ -763,7 +763,7 @@ public final class UnifiedJEXL {
      * @param context the JEXL context to use
      * @param expr the expression to prepare
      * @return a prepared expression
-     * @throws {@link UnifiedJEXL.Exception} if an error occurs and the {@link JexlEngine} is not silent
+     * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
      */
     Expression prepare(JexlContext context, Expression expr) {
         try {
@@ -793,7 +793,7 @@ public final class UnifiedJEXL {
      * @param context the JEXL context to use
      * @param expr the expression to prepare
      * @return the result of the evaluation
-     * @throws {@link UnifiedJEXL.Exception} if an error occurs and the {@link JexlEngine} is not silent
+     * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
      */
     Object evaluate(JexlContext context, Expression expr) {
         try {
@@ -821,6 +821,7 @@ public final class UnifiedJEXL {
      * Use the JEXL parser to create the AST for an expression.
      * @param expression the expression to parse
      * @return the AST
+     * @throws ParseException if an error occur during parsing
      */
     private JexlNode toNode(CharSequence expression) throws ParseException {
         return jexl.parse(expression, null);
@@ -831,6 +832,7 @@ public final class UnifiedJEXL {
      * @param expression the expression to parse
      * @param info debug information
      * @return the AST
+     * @throws ParseException if an error occur during parsing
      */
     private JexlNode toNode(CharSequence expression, Info info) throws ParseException {
         return jexl.parse(expression, info);
@@ -841,7 +843,7 @@ public final class UnifiedJEXL {
      * @param action parse, prepare, evaluate
      * @param expr the expression
      * @param xany the exception
-     * @return an exception contained an explicit error message
+     * @return an exception containing an explicit error message
      */
     private Exception createException(String action, Expression expr, java.lang.Exception xany) {
         StringBuilder strb = new StringBuilder("failed to ");
@@ -881,7 +883,7 @@ public final class UnifiedJEXL {
      * Parses a unified expression.
      * @param expr the string expression
      * @return the expression instance
-     * @throws org.apache.commons.jexl.parser.ParseException if an error occur during parsing
+     * @throws ParseException if an error occur during parsing
      */
     private Expression parseExpression(String expr) throws ParseException {
         final int size = expr.length();

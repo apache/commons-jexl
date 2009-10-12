@@ -39,7 +39,7 @@ public interface JexlPropertySet {
     Object invoke(Object o, Object arg) throws Exception;
 
     /**
-     * specifies if this VelPropertySet is cacheable and able to be reused for
+     * specifies if this JexlPropertySet is cacheable and able to be reused for
      * this class of object it was returned for.
      * 
      * @return true if can be reused for this class, false if not

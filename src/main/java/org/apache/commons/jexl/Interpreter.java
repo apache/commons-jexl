@@ -444,7 +444,7 @@ public class Interpreter implements ParserVisitor {
             long l = arithmetic.toLong(left);
             n = 1;
             long r = arithmetic.toLong(right);
-            return new Long(l & r);
+            return Long.valueOf(l & r);
         } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
         }
@@ -455,7 +455,7 @@ public class Interpreter implements ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         try {
             long l = arithmetic.toLong(left);
-            return new Long(~l);
+            return Long.valueOf(~l);
         } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(0), "long coercion error", xrt);
         }
@@ -471,7 +471,7 @@ public class Interpreter implements ParserVisitor {
             long l = arithmetic.toLong(left);
             n = 1;
             long r = arithmetic.toLong(right);
-            return new Long(l | r);
+            return Long.valueOf(l | r);
         } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
         }
@@ -487,7 +487,7 @@ public class Interpreter implements ParserVisitor {
             long l = arithmetic.toLong(left);
             n = 1;
             long r = arithmetic.toLong(right);
-            return new Long(l ^ r);
+            return Long.valueOf(l ^ r);
         } catch (RuntimeException xrt) {
             throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
         }
@@ -1081,10 +1081,10 @@ public class Interpreter implements ParserVisitor {
             return Long.valueOf(-valueAsLong);
         } else if (val instanceof Float) {
             float valueAsFloat = ((Float) val).floatValue();
-            return Float.valueOf(-valueAsFloat);
+            return new Float(-valueAsFloat);
         } else if (val instanceof Double) {
             double valueAsDouble = ((Double) val).doubleValue();
-            return Double.valueOf(-valueAsDouble);
+            return new Double(-valueAsDouble);
         } else if (val instanceof BigDecimal) {
             BigDecimal valueAsBigD = (BigDecimal) val;
             return valueAsBigD.negate();

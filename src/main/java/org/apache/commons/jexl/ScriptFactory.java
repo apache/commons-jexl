@@ -49,35 +49,46 @@ public final class ScriptFactory {
      * Lazy JexlEngine singleton; since this class is deprecated, let's not create the shared
      * engine if it's not gonna be used.
      */
-    private static volatile JexlEngine INSTANCE = null;
+    private static volatile JexlEngine jexl10 = null;
+    /**
+     * Default cache size.
+     */
+    private static final int CACHE_SIZE = 256;
     
     /**
      * An interpreter made compatible with v1.1 behavior (at least Jelly's expectations).
      */
     private static class LegacyInterpreter extends Interpreter {
+        /**
+         * Creates an instance.
+         * @param jexl the jexl engine
+         * @param aContext the jexl context
+         */
         public LegacyInterpreter(JexlEngine jexl, JexlContext aContext) {
             super(jexl, aContext);
         }
-
+        /**{@inheritDoc}*/
         @Override
         public Object interpret(JexlNode node) {
             try {
                 return node.jjtAccept(this, null);
             } catch (JexlException xjexl) {
                 Throwable e = xjexl.getCause();
-                if (e instanceof RuntimeException)
-                        throw (RuntimeException)e;
-                if (e instanceof IllegalStateException)
-                        throw (IllegalStateException )e;
+                if (e instanceof RuntimeException) {
+                    throw (RuntimeException) e;
+                }
+                if (e instanceof IllegalStateException) {
+                    throw (IllegalStateException) e;
+                }
                 throw new IllegalStateException(e.getMessage(), e);
             }
         }
-
+        /**{@inheritDoc}*/
         @Override
         protected Object invocationFailed(JexlException xjexl) {
             throw xjexl;
         }
-
+        /**{@inheritDoc}*/
         @Override
         protected Object unknownVariable(JexlException xjexl) {
             return null;
@@ -88,6 +99,7 @@ public final class ScriptFactory {
      * An engine that uses a LegacyInterpreter.
      */
     private static class LegacyEngine extends JexlEngine {
+        /**{@inheritDoc}*/
         @Override
         protected Interpreter createInterpreter(JexlContext context) {
             if (context == null) {
@@ -99,21 +111,24 @@ public final class ScriptFactory {
     
     /**
      * Retrieves the static shared JexlEngine instance.
+     * @return the static "legacy" shared instance
      */
+    // CSOFF: DoubleCheckedLocking
     static JexlEngine getInstance() {
         // Java5 memory model allows double-lock pattern
-        if (INSTANCE == null) {
+        if (jexl10 == null) {
             synchronized(ScriptFactory.class){
-                if (INSTANCE == null) {
+                if (jexl10 == null) {
                     JexlEngine jexl = new LegacyEngine();
-                    jexl.setCache(256);
+                    jexl.setCache(CACHE_SIZE);
                     jexl.setSilent(false);
-                    INSTANCE = jexl;
+                    jexl10 = jexl;
                 }
             }
         }
-        return INSTANCE;
+        return jexl10;
     }
+    // CSON: DoubleCheckedLocking
 
     /**
      * Private constructor, ensure no instance.

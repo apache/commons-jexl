@@ -35,9 +35,8 @@ public interface Script {
      * @param context A JexlContext containing variables.
      * @return The result of this script, usually the result of 
      *      the last statement.
-     * @throws Exception on any script parse or execution error.
      */
-    Object execute(JexlContext context) throws Exception;
+    Object execute(JexlContext context);
 
     /**
      * Returns the text of this Script.
