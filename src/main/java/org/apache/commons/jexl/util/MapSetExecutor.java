@@ -40,6 +40,12 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     }
 
     /** {@inheritDoc} */
+    @Override
+    public Object getTargetProperty() {
+        return property;
+    }
+    
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
     public Object execute(final Object map, Object value)
@@ -52,9 +58,11 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     @SuppressWarnings("unchecked")
     @Override
     public Object tryExecute(final Object map, Object key, Object value) {
-        if (objectClass.equals(map.getClass())
+        if (map != null && method != null
+            && objectClass.equals(map.getClass())
             && (key == null || property.getClass().equals(key.getClass()))) {
-            return ((Map<Object, Object>) map).put(key, value);
+            ((Map<Object, Object>) map).put(key, value);
+            return value;
         }
         return TRY_FAILED;
     }

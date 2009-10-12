@@ -46,6 +46,12 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
 
     /** {@inheritDoc} */
     @Override
+    public Object getTargetProperty() {
+        return property;
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public Object execute(Object o, Object arg)
             throws IllegalAccessException, InvocationTargetException {
         Object[] pargs = {property, arg};
@@ -64,7 +70,8 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
             && objectClass.equals(o.getClass())) {
             try {
                 Object[] args = {property, arg};
-                return method.invoke(o, args);
+                method.invoke(o, args);
+                return arg;
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
@@ -84,6 +91,6 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
      */
     private static java.lang.reflect.Method discover(Introspector is,
             Class<?> clazz, Object identifier, Object arg) {
-        return is.getMethod(clazz, "put", makeArgs(identifier, arg));
+        return is.getMethod(clazz, "set", makeArgs(identifier, arg));
     }
 }

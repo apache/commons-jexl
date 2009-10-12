@@ -755,7 +755,7 @@ public class JexlTest extends JexlTestCase
             return -1;
         }
         @SuppressWarnings("boxing")
-        public void put(String val, Object value) {
+        public void set(String val, Object value) {
             if ("user".equals(val)) {
                 if ("zero".equals(value))
                     user = 0;

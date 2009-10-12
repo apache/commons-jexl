@@ -47,6 +47,12 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
         property = identifier;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public Object getTargetProperty() {
+        return property;
+    }
+
     /**
      * Get the property from the object.
      * @param o the object.

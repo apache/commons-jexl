@@ -162,7 +162,7 @@ public class CacheTest extends JexlTestCase {
             throw new RuntimeException("no such property");
         }
 
-        public void put(String p, Object v) {
+        public void set(String p, Object v) {
             if (v == null) {
                 v = "na";
             }

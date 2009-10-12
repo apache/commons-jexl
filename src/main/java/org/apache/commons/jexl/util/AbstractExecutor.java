@@ -79,6 +79,46 @@ public abstract class AbstractExecutor {
         method = theMethod;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object arg) {
+        return this == arg || (arg instanceof AbstractExecutor && equals((AbstractExecutor) arg));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return method.hashCode();
+    }
+
+    /**
+     *  Indicates whether some other executor is equivalent to this one.
+     * @param arg the other executor to check
+     * @return true if both executors are equivalent, false otherwise
+     */
+    public boolean equals(AbstractExecutor arg) {
+        // common equality check
+        if (!this.getClass().equals(arg.getClass())) {
+            return false;
+        }
+        if (!this.getMethod().equals(arg.getMethod())) {
+            return false;
+        }
+        if (!this.getTargetClass().equals(arg.getTargetClass())) {
+            return false;
+        }
+        // specific equality check
+        Object lhsp = this.getTargetProperty();
+        Object rhsp = arg.getTargetProperty();
+        if (lhsp == null && rhsp == null) {
+            return true;
+        }
+        if (lhsp != null && rhsp != null) {
+            return lhsp.equals(rhsp);
+        }
+        return false;
+    }
+
     /**
      * Tell whether the executor is alive by looking
      * at the value of the method.
@@ -105,6 +145,22 @@ public abstract class AbstractExecutor {
      */
     public final java.lang.reflect.Method getMethod() {
         return method;
+    }
+
+    /**
+     * Gets the object class targeted by this executor.
+     * @return the target object class
+     */
+    public final Class<?> getTargetClass() {
+        return objectClass;
+    }
+    
+    /**
+     * Gets the property targeted by this executor.
+     * @return the target property
+     */
+    public Object getTargetProperty() {
+        return null;
     }
 
     /**
@@ -147,6 +203,12 @@ public abstract class AbstractExecutor {
         /**
          * Tries to reuse this executor, checking that it is compatible with
          * the actual set of arguments.
+         * <p>Compatibility means that:
+         * <code>o</code> must be of the same class as this executor's
+         * target class and
+         * <code>property</code> must be of the same class as this
+         * executor's target property (for list and map based executors) and have the same
+         * value (for other types).</p>
          * @param o The object to get the property from.
          * @param property The property to get from the object.
          * @return The property value or TRY_FAILED if checking failed.
@@ -189,6 +251,14 @@ public abstract class AbstractExecutor {
         /**
          * Tries to reuse this executor, checking that it is compatible with
          * the actual set of arguments.
+         * <p>Compatibility means that:
+         * <code>o</code> must be of the same class as this executor's
+         * target class,
+         * <code>property</code> must be of the same class as this
+         * executor's target property (for list and map based executors) and have the same
+         * value (for other types)
+         * and that <code>arg</code> must be a valid argument for this
+         * executor underlying method.</p>
          * @param o The object to invoke the method from.
          * @param property The property to set in the object.
          * @param arg The value to use as the property value.
@@ -240,6 +310,12 @@ public abstract class AbstractExecutor {
             return execute(o, args);
         }
 
+        /** {@inheritDoc} */
+        @Override
+        public Object getTargetProperty() {
+            return key;
+        }
+        
         /**
          * Returns the return type of the method invoked.
          * @return return type
