@@ -19,9 +19,9 @@ package org.apache.commons.jexl.util.introspection;
 /**
  * Little class to carry in info such as a file or template name, line and column for
  * information error reporting from the uberspector implementations.
- * 
- * Originally taken from velocity for self-sufficiency.
- * 
+ * <p>
+ * Originally taken from Velocity for self-sufficiency.
+ * </p>
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$

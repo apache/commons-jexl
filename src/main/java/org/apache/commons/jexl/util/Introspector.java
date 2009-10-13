@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  *  Default introspection services.
  *  <p>Finding methods as well as property getters & setters.</p>
+ * @since 1.0
  */
 public class Introspector  {
     /** The default uberspector that handles all introspection patterns. */

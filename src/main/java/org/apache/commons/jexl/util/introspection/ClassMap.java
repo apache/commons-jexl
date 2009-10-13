@@ -24,11 +24,12 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 
 /**
- * Originally taken from the Velocity tree so we can be self-sufficient.
- *
  * A cache of introspection information for a specific class instance.
  * Keys objects by an agregation of the method name and the classes
  * that make up the parameters.
+ * <p>
+ * Originally taken from the Velocity tree so we can be self-sufficient.
+ * </p>
  * @see MethodKey
  *
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>

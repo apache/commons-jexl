@@ -28,9 +28,9 @@ import org.apache.commons.logging.Log;
  * The first time the Introspector sees a
  * class it creates a class method map for the
  * class in question. Basically the class method map
- * is a map where Method objects are keyed by a
- * concatenation of the method name and the names of
- * classes that make up the parameters.
+ * is a map where Method objects are keyed by an
+ * aggregation of the method name and the instances of
+ * classes that make up the parameters (see {@link MethodKey}).
  * </p>
  * <p>
  * For example, a method with the following signature:
@@ -39,7 +39,7 @@ import org.apache.commons.logging.Log;
  * </code>
  * would be mapped by the key:
  * <code>
- * { "method", {"java.lang.String", "java.lang.StringBuffer" } }
+ * { "method", {java.lang.String.class, java.lang.StringBuffer.class } }
  * </code>
  * </p>
  * <p>

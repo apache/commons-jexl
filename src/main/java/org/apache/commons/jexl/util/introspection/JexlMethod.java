@@ -18,10 +18,11 @@
 package org.apache.commons.jexl.util.introspection;
 
 /**
- * Method used for regular method invocation.
- * 
- * $foo.bar()
- * 
+ * Interface used for regular method invocation.
+ * Ex.
+ * <code>
+ * ${foo.bar()}
+ * </code>
  * 
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>

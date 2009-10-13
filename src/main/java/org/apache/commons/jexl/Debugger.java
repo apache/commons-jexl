@@ -68,10 +68,13 @@ import org.apache.commons.jexl.parser.ParserVisitor;
 
 /**
  * Helps pinpoint the cause of problems in expressions that fail during evaluation.
+ * <p>
  * It rebuilds an expression string from the tree and the start/end offsets of the cause
  * in that string.
- * This implies that exceptions during evaluation should allways carry the node that's causing
+ * </p>
+ * This implies that exceptions during evaluation do allways carry the node that's causing
  * the error.
+ * @since 2.0
  */
 final class Debugger implements ParserVisitor {
     /** The builder to compose messages. */

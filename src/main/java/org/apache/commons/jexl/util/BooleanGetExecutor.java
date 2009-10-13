@@ -19,6 +19,7 @@ package org.apache.commons.jexl.util;
 import java.lang.reflect.InvocationTargetException;
 /**
  * Specialized executor to get a boolean property from an object.
+ * @since 2.0
  */
 public final class BooleanGetExecutor extends AbstractExecutor.Get {
     /** The property. */
