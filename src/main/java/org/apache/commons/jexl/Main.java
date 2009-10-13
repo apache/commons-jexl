@@ -22,21 +22,25 @@ import java.io.File;
 import java.io.InputStreamReader;
 
 import org.apache.commons.jexl.context.HashMapContext;
+import org.apache.commons.jexl.parser.ParseException;
 
 /**
- * Test application for Jexl
- * TODO - needs more options to be more useful.
+ * Test application for JEXL.
+ *
  * @since 2.0
  */
 public class Main {
     /**
-     * Test application for Jexl
+     * Test application for JEXL
      * 
      * If a single argument is present, it is treated as a filename of a JEXL
-     * script to be executed.
-     * Otherwise, lines are read from standard input and evaluated.
+     * script to be executed as a script. Any exceptions terminate the application.
      * 
-     * @param args (optional) filename to evaluate. Stored in the args variable.
+     * Otherwise, lines are read from standard input and evaluated.
+     * ParseExceptions and JexlExceptions are logged, and do not cause the application to exit.
+     * This is done so that interactive testing is easier.
+     * 
+     * @param args (optional) filename to execute. Stored in the args variable.
      * 
      * @throws Exception if parsing or IO fail
      */
@@ -57,10 +61,12 @@ public class Main {
                     Expression expression = engine.createExpression(line);
                     Object value = expression.evaluate(context);
                     System.out.println("Return value: " + value);
-                    System.out.print("> ");
+                } catch (ParseException e) {
+                    System.out.println(e.getLocalizedMessage());
                 } catch (JexlException e) {
                     System.out.println(e.getLocalizedMessage());
                 }
+                System.out.print("> ");
             }
         }
     }
