@@ -29,7 +29,6 @@ import org.apache.commons.jexl.context.HashMapContext;
  * @since 2.0
  */
 public class Main {
-
     /**
      * Test application for Jexl
      * 
@@ -45,24 +44,24 @@ public class Main {
         JexlEngine engine = new JexlEngine();
         JexlContext context = new HashMapContext();
         context.getVars().put("args", args);
-        try {
-            if (args.length == 1) {
-                Script script = engine.createScript(new File(args[0]));
-                Object value = script.execute(context);
-                System.out.println("Return value: " + value);
-            } else {
-                BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
-                String line;
-                System.out.print("> ");
-                while (null != (line = console.readLine())) {
+        if (args.length == 1) {
+            Script script = engine.createScript(new File(args[0]));
+            Object value = script.execute(context);
+            System.out.println("Return value: " + value);
+        } else {
+            BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+            String line;
+            System.out.print("> ");
+            while (null != (line = console.readLine())) {
+                try {
                     Expression expression = engine.createExpression(line);
                     Object value = expression.evaluate(context);
                     System.out.println("Return value: " + value);
                     System.out.print("> ");
+                } catch (JexlException e) {
+                    System.out.println(e.getLocalizedMessage());
                 }
             }
-        } catch (JexlException e) {
-            System.out.println(e.getLocalizedMessage());
         }
     }
 }
