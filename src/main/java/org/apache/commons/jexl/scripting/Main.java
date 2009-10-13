@@ -22,8 +22,7 @@ import java.io.FileReader;
 import java.io.InputStreamReader;
 
 import javax.script.ScriptEngine;
-
-import org.apache.commons.jexl.JexlException;
+import javax.script.ScriptException;
 
 /**
  * Test application for JexlScriptEngine (JSR-223 implementation).
@@ -35,8 +34,11 @@ public class Main {
      * Test application for JexlScriptEngine (JSR-223 implementation).
      * 
      * If a single argument is present, it is treated as a filename of a JEXL
-     * script to be executed.
+     * script to be evaluated. Any exceptions terminate the application.
+     * 
      * Otherwise, lines are read from standard input and evaluated.
+     * ScriptExceptions are logged, and do not cause the application to exit.
+     * This is done so that interactive testing is easier.
      * 
      * @param args (optional) filename to evaluate. Stored in the args variable.
      * 
@@ -57,10 +59,10 @@ public class Main {
                 try {
                     Object value = engine.eval(line);
                     System.out.println("Return value: "+value);
-                    System.out.print("> ");
-                } catch (JexlException e) {
+                } catch (ScriptException e) {
                     System.out.println(e.getLocalizedMessage());
                 }
+                System.out.print("> ");
             }
         }
     }
