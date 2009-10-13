@@ -31,10 +31,10 @@ import org.apache.commons.jexl.util.introspection.Info;
  * <p>
  * An expression can mix immediate, deferred and nested sub-expressions as well as string constants;
  * <ul>
- * <li>The "immediate" syntax is of the form "...${jexl-expr}..."</li>
- * <li>The "deferred" syntax is of the form "...#{jexl-expr}..."</li>
- * <li>The "nested" syntax is of the form "...#{...${jexl-expr0}...}..."</li>
- * <li>The "composite" syntax is of the form "...${jexl-expr0}... #{jexl-expr1}..."</li>
+ * <li>The "immediate" syntax is of the form <code>"...${jexl-expr}..."</code></li>
+ * <li>The "deferred" syntax is of the form <code>"...#{jexl-expr}..."</code></li>
+ * <li>The "nested" syntax is of the form <code>"...#{...${jexl-expr0}...}..."</code></li>
+ * <li>The "composite" syntax is of the form <code>"...${jexl-expr0}... #{jexl-expr1}..."</code></li>
  * </ul>
  * </p>
  * <p>
@@ -46,7 +46,7 @@ import org.apache.commons.jexl.util.introspection.Info;
  * </ul>
  * </p>
  * <p>
- * For instance: "Hello ${name}, now is #{time}" is a composite "deferred" expression since one
+ * For instance: <code>"Hello ${name}, now is #{time}"</code> is a composite "deferred" expression since one
  * of its subexpressions is deferred. Furthermore, this (composite) expression intent is
  * to perform two evaluations; one close to its definition and another one in a later
  * phase.

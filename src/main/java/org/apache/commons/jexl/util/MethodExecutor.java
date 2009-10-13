@@ -22,6 +22,7 @@ import org.apache.commons.jexl.util.introspection.MethodKey;
 
 /**
  * Specialized executor to invoke a method on an object.
+ * @since 2.0
  */
 public final class MethodExecutor extends AbstractExecutor.Method {
     /** Whether this method handles varargs. */

@@ -27,10 +27,7 @@ import java.lang.reflect.InvocationTargetException;
  * }
  * </code>
  * </p>
- */
-/**
- * Specialized executor to get a property from an object.
- * <p>Duck as in duck-typing for classes that implement an get(object) method.</p>
+ * @since 2.0
  */
 public final class DuckGetExecutor extends AbstractExecutor.Get {
     /** The property. */

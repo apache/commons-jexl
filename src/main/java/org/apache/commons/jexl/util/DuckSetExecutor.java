@@ -23,10 +23,11 @@ import java.lang.reflect.InvocationTargetException;
  * <p>Duck as in duck-typing for an interface like:
  * <code>
  * interface Set {
- *      Object put(Object property, Object value);
+ *      Object set(Object property, Object value);
  * }
  * </code>
  * </p>
+ * @since 2.0
  */
 public final class DuckSetExecutor extends AbstractExecutor.Set {
     /** The property. */

@@ -19,8 +19,9 @@ package org.apache.commons.jexl;
 import org.apache.commons.jexl.parser.ParseException;
 
 /**
+ * Creates Expression objects. 
  * <p>
- * Creates Expression objects.  To create a JEXL Expression object, pass
+ * To create a JEXL Expression object, pass
  * valid JEXL syntax to the static createExpression() method:
  * </p>
  *

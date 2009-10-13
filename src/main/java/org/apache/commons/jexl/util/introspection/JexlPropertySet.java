@@ -18,11 +18,11 @@
 package org.apache.commons.jexl.util.introspection;
 
 /**
- * Interface used for setting values that appear to be properties in Velocity.
+ * Interface used for setting values that appear to be properties.
  * Ex.
- * 
- * #set($foo.bar = "hello")
- * 
+ * <code>
+ * ${foo.bar = "hello"}
+ * </code>
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$

@@ -19,10 +19,10 @@ package org.apache.commons.jexl;
 
 
 /**
+ * Represents a single JEXL expression.
  * <p>
- * Represents a single JEXL expression.  This simple interface
- * provides access to the underlying expression through getExpression(),
- * and it provides hooks to add a pre- and post- expression resolver.
+ * This simple interface provides access to the underlying expression through
+ * {@link Epxression#getExpression()}.
  * </p>
  *
  * <p>

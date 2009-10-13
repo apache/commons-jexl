@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * Specialized executor to get a property from an object.
+ * @since 2.0
  */
 public final class PropertyGetExecutor extends AbstractExecutor.Get {
     /** A static signature for method(). */

@@ -18,11 +18,11 @@
 package org.apache.commons.jexl.util.introspection;
 
 /**
- * Interface defining a 'getter'. For uses when looking for resolution of
- * property references
- *
- * $foo.bar
- *
+ * Interface for getting values that appear to be properties.
+ * Ex.
+ * <code>
+ * ${foo.bar}
+ * </code>
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$

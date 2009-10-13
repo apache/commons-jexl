@@ -20,6 +20,7 @@ import java.util.List;
 import java.lang.reflect.Array;
 /**
  * Specialized executor to get a property from a List or array.
+ * @since 2.0
  */
 public final class ListGetExecutor extends AbstractExecutor.Get {
     /** The java.lang.reflect.Array.get method used as an active marker in ListGet. */

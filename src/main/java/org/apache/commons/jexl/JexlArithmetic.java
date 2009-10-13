@@ -34,6 +34,7 @@ import java.math.BigInteger;
  * <li>if both arguments can be narrowed to Long, narrow result to Long</li>
  * <li>Else return result as BigInteger</li>
  * </ol>
+ * </li>
  * </ol>
  * </p>
  * @since 2.0

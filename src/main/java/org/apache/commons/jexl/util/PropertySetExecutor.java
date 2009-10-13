@@ -19,6 +19,7 @@ package org.apache.commons.jexl.util;
 import java.lang.reflect.InvocationTargetException;
 /**
  * Specialized executor to set a property in an object.
+ * @since 2.0
  */
 public final class PropertySetExecutor extends AbstractExecutor.Set {
     /** Index of the first character of the set{p,P}roperty. */

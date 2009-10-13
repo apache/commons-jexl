@@ -20,6 +20,7 @@ import org.apache.commons.jexl.parser.JexlNode;
 
 /**
  * Wraps any error that might occur during interpretation of a script or expression.
+ * @since 2.0
  */
 public class JexlException extends RuntimeException {
     /** Serial version UID. */

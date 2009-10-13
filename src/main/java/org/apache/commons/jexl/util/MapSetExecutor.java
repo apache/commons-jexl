@@ -20,6 +20,7 @@ import java.util.Map;
 import java.lang.reflect.InvocationTargetException;
 /**
  * Specialized executor to set a property in a Map.
+ * @since 2.0
  */
 public final class MapSetExecutor extends AbstractExecutor.Set {
     /** The java.util.map.put method used as an active marker in MapSet. */
