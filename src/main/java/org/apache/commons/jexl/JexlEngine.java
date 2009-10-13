@@ -289,7 +289,7 @@ public class JexlEngine {
      * @return An Expression object which can be evaluated with a JexlContext
      * @throws ParseException An exception can be thrown if there is a problem
      *      parsing this expression, or if the expression is neither an
-     *      expression or a reference.
+     *      expression nor a reference.
      */
     public Expression createExpression(String expression)
             throws ParseException  {
