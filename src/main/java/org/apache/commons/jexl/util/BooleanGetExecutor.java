@@ -28,11 +28,11 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
      * Creates an instance by attempting discovery of the get method.
      * @param is the introspector
      * @param clazz the class to introspect
-     * @param identifier the property to get
+     * @param key the property to get
      */
-    public BooleanGetExecutor(Introspector is, Class<?> clazz, String identifier) {
-        super(clazz, discover(is, clazz, identifier));
-        property = identifier;
+    public BooleanGetExecutor(Introspector is, Class<?> clazz, String key) {
+        super(clazz, discover(is, clazz, key));
+        property = key;
     }
 
     /** {@inheritDoc} */
@@ -43,20 +43,20 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
 
     /** {@inheritDoc} */
     @Override
-    public Object execute(Object o)
+    public Object execute(Object obj)
         throws IllegalAccessException, InvocationTargetException {
-        return method == null ? null : method.invoke(o, (Object[]) null);
+        return method == null ? null : method.invoke(obj, (Object[]) null);
     }
     
     /** {@inheritDoc} */
     @Override
-    public Object tryExecute(Object o, Object identifier) {
-        if (o != null && method !=  null
+    public Object tryExecute(Object obj, Object key) {
+        if (obj != null && method !=  null
             // ensure method name matches the property name
-            && property.equals(identifier)
-            && objectClass.equals(o.getClass())) {
+            && property.equals(key)
+            && objectClass.equals(obj.getClass())) {
             try {
-                return method.invoke(o, (Object[]) null);
+                return method.invoke(obj, (Object[]) null);
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {

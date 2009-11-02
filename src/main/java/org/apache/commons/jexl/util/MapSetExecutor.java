@@ -49,20 +49,22 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
-    public Object execute(final Object map, Object value)
+    public Object execute(final Object obj, Object value)
     throws IllegalAccessException, InvocationTargetException {
-        ((Map<Object, Object>) map).put(property, value);
+        final Map<Object,Object> map = ((Map<Object, Object>) obj);
+        map.put(property, value);
         return value;
     }
 
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
-    public Object tryExecute(final Object map, Object key, Object value) {
-        if (map != null && method != null
-            && objectClass.equals(map.getClass())
+    public Object tryExecute(final Object obj, Object key, Object value) {
+        if (obj != null && method != null
+            && objectClass.equals(obj.getClass())
             && (key == null || property.getClass().equals(key.getClass()))) {
-            ((Map<Object, Object>) map).put(key, value);
+            final Map<Object,Object> map = ((Map<Object, Object>) obj);
+            map.put(key, value);
             return value;
         }
         return TRY_FAILED;
