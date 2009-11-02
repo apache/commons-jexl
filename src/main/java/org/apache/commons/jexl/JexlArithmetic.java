@@ -439,34 +439,30 @@ public class JexlArithmetic {
      * @param right second value
      * @return test result.
      */
+    @SuppressWarnings("unchecked")
     public boolean lessThan(Object left, Object right) {
         if ((left == right) || (left == null) || (right == null)) {
             return false;
         } else if (isFloatingPoint(left) || isFloatingPoint(right)) {
             double leftDouble = toDouble(left);
             double rightDouble = toDouble(right);
-
             return leftDouble < rightDouble;
-            } else if (left instanceof BigDecimal || right instanceof BigDecimal) {
-                BigDecimal l  = toBigDecimal(left);
-                BigDecimal r  = toBigDecimal(right);
-                return l.compareTo(r) < 0;
+        } else if (left instanceof BigDecimal || right instanceof BigDecimal) {
+            BigDecimal l  = toBigDecimal(left);
+            BigDecimal r  = toBigDecimal(right);
+            return l.compareTo(r) < 0;
         } else if (isNumberable(left) || isNumberable(right)) {
             long leftLong = toLong(left);
             long rightLong = toLong(right);
-
             return leftLong < rightLong;
         } else if (left instanceof String || right instanceof String) {
             String leftString = left.toString();
             String rightString = right.toString();
-
             return leftString.compareTo(rightString) < 0;
         } else if (left instanceof Comparable<?>) {
-            @SuppressWarnings("unchecked")
             final Comparable<Object> comparable = (Comparable<Object>) left;
             return comparable.compareTo(right) < 0;
         } else if (right instanceof Comparable<?>) {
-            @SuppressWarnings("unchecked")
             final Comparable<Object> comparable = (Comparable<Object>) right;
             return comparable.compareTo(left) > 0;
         }

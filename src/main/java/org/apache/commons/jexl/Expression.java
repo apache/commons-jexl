@@ -22,7 +22,7 @@ package org.apache.commons.jexl;
  * Represents a single JEXL expression.
  * <p>
  * This simple interface provides access to the underlying expression through
- * {@link Epxression#getExpression()}.
+ * {@link Expression#getExpression()}.
  * </p>
  *
  * <p>
