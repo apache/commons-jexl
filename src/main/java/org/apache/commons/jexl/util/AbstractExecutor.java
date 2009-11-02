@@ -81,8 +81,8 @@ public abstract class AbstractExecutor {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equals(Object arg) {
-        return this == arg || (arg instanceof AbstractExecutor && equals((AbstractExecutor) arg));
+    public boolean equals(Object obj) {
+        return this == obj || (obj instanceof AbstractExecutor && equals((AbstractExecutor) obj));
     }
 
     /** {@inheritDoc} */
@@ -185,19 +185,19 @@ public abstract class AbstractExecutor {
         }
 
         /** {@inheritDoc} */
-        public final Object invoke(Object o) throws Exception {
-            return execute(o);
+        public final Object invoke(Object obj) throws Exception {
+            return execute(obj);
         }
 
         /**
          * Gets the property value from an object.
          *
-         * @param o The object to get the property from.
+         * @param obj The object to get the property from.
          * @return The property value.
          * @throws IllegalAccessException Method is inaccessible.
          * @throws InvocationTargetException Method body throws an exception.
          */
-        public abstract Object execute(Object o)
+        public abstract Object execute(Object obj)
                 throws IllegalAccessException, InvocationTargetException;
 
         /**
@@ -209,11 +209,11 @@ public abstract class AbstractExecutor {
          * <code>property</code> must be of the same class as this
          * executor's target property (for list and map based executors) and have the same
          * value (for other types).</p>
-         * @param o The object to get the property from.
-         * @param property The property to get from the object.
+         * @param obj The object to get the property from.
+         * @param key The property to get from the object.
          * @return The property value or TRY_FAILED if checking failed.
          */
-        public Object tryExecute(Object o, Object property) {
+        public Object tryExecute(Object obj, Object key) {
             return TRY_FAILED;
         }
     }
@@ -232,20 +232,20 @@ public abstract class AbstractExecutor {
         }
 
         /** {@inheritDoc} */
-        public Object invoke(Object o, Object arg) throws Exception {
-            return execute(o, arg);
+        public Object invoke(Object obj, Object arg) throws Exception {
+            return execute(obj, arg);
         }
 
         /**
          * Sets the property value of an object.
          *
-         * @param o The object to set the property in.
-         * @param arg The value.
+         * @param obj The object to set the property in.
+         * @param value The value.
          * @return The return value.
          * @throws IllegalAccessException Method is inaccessible.
          * @throws InvocationTargetException Method body throws an exception.
          */
-        public abstract Object execute(Object o, Object arg)
+        public abstract Object execute(Object obj, Object value)
                 throws IllegalAccessException, InvocationTargetException;
 
         /**
@@ -259,12 +259,12 @@ public abstract class AbstractExecutor {
          * value (for other types)
          * and that <code>arg</code> must be a valid argument for this
          * executor underlying method.</p>
-         * @param o The object to invoke the method from.
-         * @param property The property to set in the object.
-         * @param arg The value to use as the property value.
+         * @param obj The object to invoke the method from.
+         * @param key The property to set in the object.
+         * @param value The value to use as the property value.
          * @return The return value or TRY_FAILED if checking failed.
          */
-        public Object tryExecute(Object o, Object property, Object arg) {
+        public Object tryExecute(Object obj, Object key, Object value) {
             return TRY_FAILED;
         }
         
@@ -306,8 +306,8 @@ public abstract class AbstractExecutor {
         }
 
         /** {@inheritDoc} */
-        public final Object invoke(Object o, Object[] args) throws Exception {
-            return execute(o, args);
+        public final Object invoke(Object obj, Object[] args) throws Exception {
+            return execute(obj, args);
         }
 
         /** {@inheritDoc} */
@@ -327,24 +327,24 @@ public abstract class AbstractExecutor {
         /**
          * Invokes the method to be executed.
          *
-         * @param o the object to invoke the method upon
+         * @param obj the object to invoke the method upon
          * @param args the method arguments
          * @return the result of the method invocation
          * @throws IllegalAccessException Method is inaccessible.
          * @throws InvocationTargetException Method body throws an exception.
          */
-        public abstract Object execute(Object o, Object[] args)
+        public abstract Object execute(Object obj, Object[] args)
                 throws IllegalAccessException, InvocationTargetException;
 
         /**
          * Tries to reuse this executor, checking that it is compatible with
          * the actual set of arguments.
-         * @param o the object to invoke the method upon
+         * @param obj the object to invoke the method upon
          * @param name the method name
          * @param args the method arguments
          * @return the result of the method invocation or INVOKE_FAILED if checking failed.
          */
-        public Object tryExecute(String name, Object o, Object[] args){
+        public Object tryExecute(String name, Object obj, Object[] args){
             return TRY_FAILED;
         }
 

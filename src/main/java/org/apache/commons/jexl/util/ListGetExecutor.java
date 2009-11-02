@@ -26,7 +26,7 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
     /** The java.lang.reflect.Array.get method used as an active marker in ListGet. */
     private static final java.lang.reflect.Method ARRAY_GET =
             initMarker(Array.class, "get", Object.class, Integer.TYPE);
-    /** The java.util.list.get method used as an active marker in ListGet. */
+    /** The java.util.obj.get method used as an active marker in ListGet. */
     private static final java.lang.reflect.Method LIST_GET =
             initMarker(List.class, "get", Integer.TYPE);
     /** The property. */
@@ -36,11 +36,11 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
      * Creates an instance checking for the List interface or Array capability.
      * @param is the introspector
      * @param clazz the class to introspect
-     * @param index the index to use in list.get(index)
+     * @param key the key to use in obj.get(key)
      */
-    public ListGetExecutor(Introspector is, Class<?> clazz, Integer index) {
+    public ListGetExecutor(Introspector is, Class<?> clazz, Integer key) {
         super(clazz, discover(clazz));
-        property = index;
+        property = key;
     }
 
     /** {@inheritDoc} */
@@ -50,29 +50,29 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
     }
     
     /**
-     * Get the property from the list or array.
-     * @param list the List/array.
-     * @return list.get(index)
+     * Get the property from the obj or array.
+     * @param obj the List/array.
+     * @return obj.get(key)
      */
     @Override
-    public Object execute(final Object list) {
+    public Object execute(final Object obj) {
         if (method == ARRAY_GET) {
-            return java.lang.reflect.Array.get(list, property.intValue());
+            return java.lang.reflect.Array.get(obj, property.intValue());
         } else {
-            return ((List<?>) list).get(property.intValue());
+            return ((List<?>) obj).get(property.intValue());
         }
     }
 
     /** {@inheritDoc} */
     @Override
-    public Object tryExecute(final Object list, Object index) {
-        if (list != null && method != null
-            && objectClass.equals(list.getClass())
-            && index instanceof Integer) {
+    public Object tryExecute(final Object obj, Object key) {
+        if (obj != null && method != null
+            && objectClass.equals(obj.getClass())
+            && key instanceof Integer) {
             if (method == ARRAY_GET) {
-                return java.lang.reflect.Array.get(list, (Integer) index);
+                return java.lang.reflect.Array.get(obj, (Integer) key);
             } else {
-                return ((List<?>) list).get((Integer) index);
+                return ((List<?>) obj).get((Integer) key);
             }
         }
         return TRY_FAILED;
@@ -80,9 +80,9 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
 
 
     /**
-     * Finds the method to perform the get on a list of array.
+     * Finds the method to perform the get on a obj of array.
      * @param clazz the class to introspect
-     * @return a marker method, list.get or array.get
+     * @return a marker method, obj.get or array.get
      */
     static java.lang.reflect.Method discover(Class<?> clazz) {
         //return discoverList(false, clazz, property);

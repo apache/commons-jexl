@@ -52,28 +52,28 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
 
     /**
      * Get the property from the object.
-     * @param o the object.
+     * @param obj the object.
      * @return object.get(property)
      * @throws IllegalAccessException Method is inaccessible.
      * @throws InvocationTargetException Method body throws an exception.
      */
     @Override
-    public Object execute(Object o)
+    public Object execute(Object obj)
             throws IllegalAccessException, InvocationTargetException {
         Object[] args = {property};
-        return method == null ? null : method.invoke(o, args);
+        return method == null ? null : method.invoke(obj, args);
     }
 
     /** {@inheritDoc} */
     @Override
-    public Object tryExecute(Object o, Object identifier) {
-        if (o != null && method !=  null
+    public Object tryExecute(Object obj, Object key) {
+        if (obj != null && method !=  null
             // ensure method name matches the property name
-            && property.equals(identifier)
-            && objectClass.equals(o.getClass())) {
+            && property.equals(key)
+            && objectClass.equals(obj.getClass())) {
             try {
                 Object[] args = {property};
-                return method.invoke(o, args);
+                return method.invoke(obj, args);
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {

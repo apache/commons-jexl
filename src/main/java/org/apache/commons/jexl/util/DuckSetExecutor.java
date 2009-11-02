@@ -37,12 +37,12 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
      * Creates an instance.
      *@param is the introspector
      *@param clazz the class to find the set method from
-     *@param identifier the key to use as 1st argument to the set method
-     *@param arg the value to use as 2nd argument to the set method
+     *@param key the key to use as 1st argument to the set method
+     *@param value the value to use as 2nd argument to the set method
      */
-    public DuckSetExecutor(Introspector is, Class<?> clazz, Object identifier, Object arg) {
-        super(clazz, discover(is, clazz, identifier, arg));
-        property = identifier;
+    public DuckSetExecutor(Introspector is, Class<?> clazz, Object key, Object value) {
+        super(clazz, discover(is, clazz, key, value));
+        property = key;
     }
 
     /** {@inheritDoc} */
@@ -53,26 +53,26 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
 
     /** {@inheritDoc} */
     @Override
-    public Object execute(Object o, Object arg)
+    public Object execute(Object obj, Object value)
             throws IllegalAccessException, InvocationTargetException {
-        Object[] pargs = {property, arg};
+        Object[] pargs = {property, value};
         if (method != null) {
-            method.invoke(o, pargs);
+            method.invoke(obj, pargs);
         }
-        return arg;
+        return value;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Object tryExecute(Object o, Object identifier, Object arg) {
-        if (o != null && method !=  null
+    public Object tryExecute(Object obj, Object key, Object value) {
+        if (obj != null && method !=  null
             // ensure method name matches the property name
-            && property.equals(identifier)
-            && objectClass.equals(o.getClass())) {
+            && property.equals(key)
+            && objectClass.equals(obj.getClass())) {
             try {
-                Object[] args = {property, arg};
-                method.invoke(o, args);
-                return arg;
+                Object[] args = {property, value};
+                method.invoke(obj, args);
+                return value;
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
@@ -86,12 +86,12 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
      * Discovers the method for a {@link DuckSet}.
      *@param is the introspector
      *@param clazz the class to find the set method from
-     *@param identifier the key to use as 1st argument to the set method
-     *@param arg the value to use as 2nd argument to the set method
+     *@param key the key to use as 1st argument to the set method
+     *@param value the value to use as 2nd argument to the set method
      *@return the method if found, null otherwise
      */
     private static java.lang.reflect.Method discover(Introspector is,
-            Class<?> clazz, Object identifier, Object arg) {
-        return is.getMethod(clazz, "set", makeArgs(identifier, arg));
+            Class<?> clazz, Object key, Object value) {
+        return is.getMethod(clazz, "set", makeArgs(key, value));
     }
 }

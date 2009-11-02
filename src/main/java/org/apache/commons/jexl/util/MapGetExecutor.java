@@ -49,23 +49,25 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
     
     /**
      * Get the property from the map.
-     * @param map the map.
+     * @param obj the map.
      * @return map.get(property)
      */
     @SuppressWarnings("unchecked")
     @Override
-    public Object execute(final Object map) {
-        return ((Map<Object, ?>) map).get(property);
+    public Object execute(final Object obj) {
+        final Map<Object,?> map = (Map<Object, ?>) obj;
+        return map.get(property);
     }
 
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
-    public Object tryExecute(final Object map, Object key) {
-        if (map != null &&  method != null
-            && objectClass.equals(map.getClass())
+    public Object tryExecute(final Object obj, Object key) {
+        if (obj != null &&  method != null
+            && objectClass.equals(obj.getClass())
             && (key == null || property.getClass().equals(key.getClass()))) {
-            return ((Map<Object, ?>) map).get(key);
+            final Map<Object,?> map = (Map<Object, ?>) obj;
+            return map.get(key);
         }
         return TRY_FAILED;
     }

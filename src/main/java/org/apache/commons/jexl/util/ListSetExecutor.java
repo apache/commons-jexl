@@ -26,7 +26,7 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
         /** The java.lang.reflect.Array.get method used as an active marker in ListGet. */
     private static final java.lang.reflect.Method ARRAY_SET =
             initMarker(Array.class, "set", Object.class, Integer.TYPE, Object.class);
-    /** The java.util.list.set method used as an active marker in ListSet. */
+    /** The java.util.obj.set method used as an active marker in ListSet. */
     private static final java.lang.reflect.Method LIST_SET =
             initMarker(List.class, "set", Integer.TYPE, Object.class);
     /** The property. */
@@ -36,12 +36,12 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
      * Creates an instance checking for the List interface or Array capability.
      * @param is the introspector
      * @param clazz the class that might implement the map interface
-     * @param index the index to use in list.set(index,value)
-     * @param value the value to use in list.set(index,value)
+     * @param key the key to use in obj.set(key,value)
+     * @param value the value to use in obj.set(key,value)
      */
-    public ListSetExecutor(Introspector is, Class<?> clazz, Integer index, Object value) {
+    public ListSetExecutor(Introspector is, Class<?> clazz, Integer key, Object value) {
         super(clazz, discover(clazz));
-        property = index;
+        property = key;
     }
 
     /** {@inheritDoc} */
@@ -51,48 +51,48 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
     }
     
     /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
-    public Object execute(final Object list, Object arg) {
+    public Object execute(final Object obj, Object value) {
         if (method == ARRAY_SET) {
-            java.lang.reflect.Array.set(list, property.intValue(), arg);
+            java.lang.reflect.Array.set(obj, property.intValue(), value);
         } else {
-            @SuppressWarnings("unchecked")
-            final List<Object> asList = (List<Object>) list;
-            asList.set(property.intValue(), arg);
+            final List<Object> list = (List<Object>) obj;
+            list.set(property.intValue(), value);
         }
-        return arg;
+        return value;
     }
 
     /** {@inheritDoc} */
+    @SuppressWarnings("unchecked")
     @Override
-    public Object tryExecute(final Object list, Object index, Object arg) {
-        if (list != null && method != null
-            && objectClass.equals(list.getClass())
-            && index instanceof Integer) {
+    public Object tryExecute(final Object obj, Object key, Object value) {
+        if (obj != null && method != null
+            && objectClass.equals(obj.getClass())
+            && key instanceof Integer) {
             if (method == ARRAY_SET) {
-                Array.set(list, (Integer) index, arg);
+                Array.set(obj, (Integer) key, value);
             } else {
-                @SuppressWarnings("unchecked")
-                final List<Object> asList = (List<Object>) list;
-                asList.set((Integer) index, arg);
+                final List<Object> list = (List<Object>) obj;
+                list.set((Integer) key, value);
             }
-            return arg;
+            return value;
         }
         return TRY_FAILED;
     }
 
 
     /**
-     * Finds the method to perform 'set' on a list of array.
+     * Finds the method to perform 'set' on a obj of array.
      * @param clazz the class to introspect
-     * @return a marker method, list.set or array.set
+     * @return a marker method, obj.set or array.set
      */
     static java.lang.reflect.Method discover(Class<?> clazz) {
         if (clazz.isArray()) {
             // we could verify if the call can be performed but it does not change
             // the fact we would fail...
             // Class<?> formal = clazz.getComponentType();
-            // Class<?> actual = arg == null? Object.class : arg.getClass();
+            // Class<?> actual = value == null? Object.class : value.getClass();
             // if (IntrospectionUtils.isMethodInvocationConvertible(formal, actual, false)) {
                 return ARRAY_SET;
             // }
