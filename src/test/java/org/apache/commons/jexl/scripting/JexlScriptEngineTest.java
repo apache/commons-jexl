@@ -19,6 +19,7 @@
 package org.apache.commons.jexl.scripting;
 
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.script.ScriptEngine;
@@ -26,7 +27,27 @@ import javax.script.ScriptEngineManager;
 import junit.framework.TestCase;
 
 public class JexlScriptEngineTest extends TestCase {
-    
+
+    public void testScriptEngineFactory() throws Exception {
+        JexlScriptEngineFactory factory = new JexlScriptEngineFactory();
+        assertEquals("JEXL Engine", factory.getParameter(ScriptEngine.ENGINE));
+        assertEquals("1.0", factory.getParameter(ScriptEngine.ENGINE_VERSION));
+        assertEquals("JEXL", factory.getParameter(ScriptEngine.LANGUAGE));
+        assertEquals("2.0", factory.getParameter(ScriptEngine.LANGUAGE_VERSION));
+        assertEquals(Arrays.asList("JEXL", "Jexl", "jexl"), factory.getParameter(ScriptEngine.NAME));
+        assertNull(factory.getParameter("THREADING"));
+
+        assertEquals(Arrays.asList("jexl"), factory.getExtensions());
+        assertEquals(Arrays.asList("application/x-jexl"), factory.getMimeTypes());
+
+        assertEquals("42;", factory.getProgram(new String[]{"42"}));
+        assertEquals("str.substring(3,4)", factory.getMethodCallSyntax("str", "substring", new String[]{"3", "4"}));
+        try {
+            factory.getOutputStatement("foo");
+            fail("getOutputStatement() should have thrown");
+        } catch(Exception xignore) {}
+    }
+
     public void testScripting() throws Exception {
         ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull("Manager should not be null", manager);
