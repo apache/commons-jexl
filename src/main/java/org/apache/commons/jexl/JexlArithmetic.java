@@ -439,7 +439,6 @@ public class JexlArithmetic {
      * @param right second value
      * @return test result.
      */
-    @SuppressWarnings("unchecked")
     public boolean lessThan(Object left, Object right) {
         if ((left == right) || (left == null) || (right == null)) {
             return false;
@@ -460,9 +459,11 @@ public class JexlArithmetic {
             String rightString = right.toString();
             return leftString.compareTo(rightString) < 0;
         } else if (left instanceof Comparable<?>) {
+            @SuppressWarnings("unchecked")
             final Comparable<Object> comparable = (Comparable<Object>) left;
             return comparable.compareTo(right) < 0;
         } else if (right instanceof Comparable<?>) {
+            @SuppressWarnings("unchecked")
             final Comparable<Object> comparable = (Comparable<Object>) right;
             return comparable.compareTo(left) > 0;
         }
