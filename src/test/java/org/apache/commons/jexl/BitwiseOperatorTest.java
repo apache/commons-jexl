@@ -142,8 +142,8 @@ public class BitwiseOperatorTest extends JexlTestCase {
     }
 
     public void testParenthesized() throws Exception {
-        asserter.assertExpression("(2 | 1) & 3", 3L);
-        asserter.assertExpression("(2 & 1) | 3", 3L);
+        asserter.assertExpression("(2 | 1) & 3", Long.valueOf(3L));
+        asserter.assertExpression("(2 & 1) | 3", Long.valueOf(3L));
         asserter.assertExpression("~(120 | 42)", new Long( ~(120 | 42) ));
     }
 

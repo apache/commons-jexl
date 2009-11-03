@@ -70,9 +70,9 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
             && objectClass.equals(obj.getClass())
             && key instanceof Integer) {
             if (method == ARRAY_GET) {
-                return java.lang.reflect.Array.get(obj, (Integer) key);
+                return java.lang.reflect.Array.get(obj, ((Integer) key).intValue());
             } else {
-                return ((List<?>) obj).get((Integer) key);
+                return ((List<?>) obj).get(((Integer) key).intValue());
             }
         }
         return TRY_FAILED;

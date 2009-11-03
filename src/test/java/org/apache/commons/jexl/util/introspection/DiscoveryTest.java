@@ -135,7 +135,7 @@ public class DiscoveryTest extends JexlTestCase {
         assertTrue("duck property getter", get instanceof DuckGetExecutor);
         assertTrue("duck property setter", set instanceof DuckSetExecutor);
         // introspector and uberspect should return same result
-        assertEquals(get, (AbstractExecutor) uber.getPropertyGet(duck, "value", null));
+        assertEquals(get, uber.getPropertyGet(duck, "value", null));
         assertEquals(set, uber.getPropertySet(duck, "value", "foo", null));
         // different property should return different setter/getter
         assertFalse(get.equals(intro.getGetExecutor(duck, "eulav")));
@@ -160,23 +160,23 @@ public class DiscoveryTest extends JexlTestCase {
         list.add("LIST");
         list.add("TSIL");
 
-        AbstractExecutor.Get get = intro.getGetExecutor(list, 1);
-        AbstractExecutor.Set set  = intro.getSetExecutor(list, 1, "foo");
+        AbstractExecutor.Get get = intro.getGetExecutor(list, Integer.valueOf(1));
+        AbstractExecutor.Set set  = intro.getSetExecutor(list, Integer.valueOf(1), "foo");
         assertTrue("list property getter", get instanceof ListGetExecutor);
         assertTrue("list property setter", set instanceof ListSetExecutor);
         // introspector and uberspect should return same result
-        assertEquals(get, uber.getPropertyGet(list, 1, null));
-        assertEquals(set, uber.getPropertySet(list, 1, "foo", null));
+        assertEquals(get, uber.getPropertyGet(list, Integer.valueOf(1), null));
+        assertEquals(set, uber.getPropertySet(list, Integer.valueOf(1), "foo", null));
         // different property should return different setter/getter
-        assertFalse(get.equals(intro.getGetExecutor(list, 0)));
-        assertFalse(get.equals(intro.getSetExecutor(list, 0, "foo")));
+        assertFalse(get.equals(intro.getGetExecutor(list, Integer.valueOf(0))));
+        assertFalse(get.equals(intro.getSetExecutor(list, Integer.valueOf(0), "foo")));
         // setter returns argument
         Object bar = set.execute(list, "bar");
         assertEquals("bar", bar);
         // getter should return last value
         assertEquals("bar", get.execute(list));
         // tryExecute should succeed on integer property
-        Object quux = set.tryExecute(list, 1, "quux");
+        Object quux = set.tryExecute(list, Integer.valueOf(1), "quux");
         assertEquals("quux", quux);
         // getter should return last value
         assertEquals("quux", get.execute(list));
@@ -212,7 +212,7 @@ public class DiscoveryTest extends JexlTestCase {
         // getter should return last value
         assertEquals("quux", get.execute(map));
         // tryExecute should fail on different property class
-        assertEquals(AbstractExecutor.TRY_FAILED, set.tryExecute(map, 1, "nope"));
+        assertEquals(AbstractExecutor.TRY_FAILED, set.tryExecute(map, Integer.valueOf(1), "nope"));
     }
 
 }
