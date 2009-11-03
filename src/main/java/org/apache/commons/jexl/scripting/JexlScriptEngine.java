@@ -130,7 +130,6 @@ public class JexlScriptEngine extends AbstractScriptEngine {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     public Object eval(String scriptText, final ScriptContext context) throws ScriptException {
         // This is mandated by JSR-223 (see SCR.5.5.2   Methods)
         if (scriptText == null || context == null) {
@@ -142,6 +141,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
         try {
             Script script = jexlEngine.createScript(scriptText);
             JexlContext ctxt = new JexlContext(){
+                @SuppressWarnings("unchecked")
                 public void setVars(Map vars) {
                     context.setBindings(new SimpleBindings(vars), ScriptContext.ENGINE_SCOPE);
                 }
