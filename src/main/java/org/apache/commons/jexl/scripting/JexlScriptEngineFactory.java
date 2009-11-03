@@ -108,7 +108,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
             return getNames();
         } else if (key.equals(ScriptEngine.LANGUAGE)) {
             return getLanguageName();
-        } else if(key.equals(ScriptEngine.ENGINE_VERSION)) {
+        } else if(key.equals(ScriptEngine.LANGUAGE_VERSION)) {
             return getLanguageVersion();
         } else if (key.equals("THREADING")) {
             return null;//"MULTITHREADED"; // TODO what is the correct value here?
