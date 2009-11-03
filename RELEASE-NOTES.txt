@@ -55,6 +55,8 @@ The following classes have been removed:
 The following methods have been removed:
 
   * Info.getTemplateName() - use Info.getName() instead
+  * Expression.addPostResolver() / Expression.addPreResolver() - set ant-like variables in JexlContext, implement
+    a specific JexlContext or derive JexlcontextInterpreter/JexlEngine instead
 
 Division (/ operator) behavior change:
   * Division between integers no longer casts its operands to double; integer division
