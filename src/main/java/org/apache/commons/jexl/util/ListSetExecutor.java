@@ -71,10 +71,10 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
             && objectClass.equals(obj.getClass())
             && key instanceof Integer) {
             if (method == ARRAY_SET) {
-                Array.set(obj, (Integer) key, value);
+                Array.set(obj, ((Integer) key).intValue(), value);
             } else {
                 final List<Object> list = (List<Object>) obj;
-                list.set((Integer) key, value);
+                list.set(((Integer) key).intValue(), value);
             }
             return value;
         }
