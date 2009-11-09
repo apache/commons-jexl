@@ -19,7 +19,7 @@ package org.apache.commons.jexl;
 import java.util.Arrays;
 
 /**
- * Tests for map literals
+ * Tests for array literals
  * @since 2.0
  */
 public class ArrayLiteralTest extends JexlTestCase {
@@ -43,12 +43,21 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     public void testLiteralWithNumbers() throws Exception {
+        Expression e = JEXL.createExpression( "[ 5.0 , 10 ]" );
+        JexlContext jc = JexlHelper.createContext();
+
+        Object o = e.evaluate( jc );
+        Object[] check = { new Float(5), new Integer(10) };
+        assertTrue( Arrays.equals(check, (Object[])o) );
+    }
+
+    public void testLiteralWithIntegers() throws Exception {
         Expression e = JEXL.createExpression( "[ 5 , 10 ]" );
         JexlContext jc = JexlHelper.createContext();
 
         Object o = e.evaluate( jc );
-        Object[] check = { Integer.valueOf(5), Integer.valueOf(10) };
-        assertTrue( Arrays.equals(check, (Object[])o) );
+        int[] check = { 5, 10 };
+        assertTrue( Arrays.equals(check, (int[])o) );
     }
 
     public void testSizeOfSimpleArrayLiteral() throws Exception {

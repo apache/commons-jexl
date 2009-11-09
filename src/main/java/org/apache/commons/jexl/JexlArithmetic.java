@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -179,6 +181,59 @@ public class JexlArithmetic {
             return Long.valueOf(l);
         }
         return bigi;
+    }
+
+    /**
+     * Given an array of objects, attempt to type it more strictly.
+     * <ul>
+     * <li>If all objects are of the same type, the array returned will be an array of that same type</li>
+     * <li>If all objects are Numbers, the array returned will be an array of Numbers</li>
+     * <li>If all objects are convertible to a primitive type, the array returned will be an array
+     * of the primitive type</li>
+     * </ul>
+     * @param untyped an untyped array
+     * @return the original array if the attempt to strictly type the array fails, a typed array otherwise
+     */
+    protected Object narrowArrayType(Object[] untyped) {
+        final int size = untyped.length;
+        Class<?> commonClass = null;
+        if (size > 0) {
+            // base common class on first entry
+            commonClass = untyped[0].getClass();
+            final boolean isNumber = Number.class.isAssignableFrom(commonClass);
+            // for all children after first...
+            for (int i = 1; i < size; i++) {
+                Class<?> eclass = untyped[i].getClass();
+                // detect same type for all elements in array
+                if (!Object.class.equals(commonClass) && !commonClass.equals(eclass)) {
+                    // if both are numbers...
+                    if (isNumber && Number.class.isAssignableFrom(eclass)) {
+                        commonClass = Number.class;
+                    } else {
+                        commonClass = Object.class;
+                    }
+                }
+            }
+            // convert array to the common class if not Object.class
+            if (!Object.class.equals(commonClass)) {
+                // if the commonClass has an equivalent primitive type, get it
+                if (isNumber) {
+                    try {
+                        Field TYPE = commonClass.getField("TYPE");
+                        commonClass = (Class<?>) TYPE.get(null);
+                    } catch (Exception xany) {
+                        // ignore
+                    }
+                }
+                // allocate and fill up the typed array
+                Object typed = Array.newInstance(commonClass, size);
+                for(int i = 0; i < size; ++i) {
+                    Array.set(typed, i, untyped[i]);
+                }
+                return typed;
+            }
+        }
+        return untyped;
     }
 
     /**
