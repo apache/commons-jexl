@@ -36,9 +36,7 @@ final class MethodMap {
     /**
      * Keep track of all methods with the same name.
      */
-    // CSOFF: VisibilityModifier
-    private Map<String, List<Method>> methodByNameMap = new HashMap<String, List<Method>>();
-    // CSON: VisibilityModifier
+    private final Map<String, List<Method>> methodByNameMap = new HashMap<String, List<Method>>();
 
     /**
      * Add a method to a list of methods by name. For a particular class we are

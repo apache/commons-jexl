@@ -19,12 +19,8 @@ package org.apache.commons.jexl.util.introspection;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
-import java.lang.ref.SoftReference;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.WeakHashMap;
-import java.util.Set;
 import java.util.List;
 import java.util.LinkedList;
 
@@ -61,17 +57,14 @@ import org.apache.commons.logging.Log;
 public class IntrospectorBase {
     /** the logger. */
     protected final Log rlog;
-
     /**
      * Holds the method maps for the classes we know about, keyed by Class.
-     * Implemented as WeakHashMap so we wont prevent an unused class from being GCed.
      */
-    private final Map<Class<?>, ClassMap> classMethodMaps = new WeakHashMap<Class<?>, ClassMap>();
+    private final Map<Class<?>, ClassMap> classMethodMaps = new HashMap<Class<?>, ClassMap>();
     /**
-     * Holds the qualified class names for the classes we hold in the
-     * classMethodMaps hash.
+     * The class loader used to solve constructors if needed.
      */
-    private Set<String> cachedClassNames = new HashSet<String>();
+    private ClassLoader loader;
     /**
      * Holds the map of classes ctors we know about as well as unknown ones.
      */
@@ -79,7 +72,7 @@ public class IntrospectorBase {
     /**
      * Holds the set of classes we have introspected.
      */
-    private Map<String, SoftReference<Class<?>>> constructibleClasses = new HashMap<String, SoftReference<Class<?>>>();
+    private final Map<String, Class<?>> constructibleClasses = new HashMap<String, Class<?>>();
 
     /**
      * Create the introspector.
@@ -87,6 +80,7 @@ public class IntrospectorBase {
      */
     public IntrospectorBase(Log log) {
         this.rlog = log;
+        loader = getClass().getClassLoader();
     }
 
     /**
@@ -98,13 +92,15 @@ public class IntrospectorBase {
      * @throws IllegalArgumentException     When the parameters passed in can not be used for introspection.
      * @throws MethodKey.AmbiguousException When the method map contains more than
      *  one match for the requested signature.
-     *  CSOFF: RedundantThrows
+     *  
      */
+    //CSOFF: RedundantThrows
     public Method getMethod(Class<?> c, MethodKey key) {
         ClassMap classMap = getMap(c);
         return classMap.findMethod(key);
 
-    }  // CSON: RedundantThrows
+    }
+    // CSON: RedundantThrows
 
     /**
      * Gets the accessible methods names known for a given class.
@@ -131,6 +127,24 @@ public class IntrospectorBase {
     private static final Constructor<?> CTOR_MISS = CacheMiss.class.getConstructors()[0];
     
     /**
+     * Sets the class loader used to solve constructors.
+     * <p>Also cleans the constructors cache.</p>
+     * @param cloader the class loader; if null, use this instance class loader
+     */
+    public void setLoader(ClassLoader cloader) {
+        if (cloader == null) {
+            cloader = getClass().getClassLoader();
+        }
+        if (!cloader.equals(loader)) {
+            synchronized(constructorsMap) {
+                loader = cloader;
+                constructorsMap.clear();
+                constructibleClasses.clear();
+            }
+        }
+    }
+
+    /**
      * Gets the constructor defined by the <code>MethodKey</code>.
      *
      * @param key   Key of the constructor being searched for
@@ -138,9 +152,22 @@ public class IntrospectorBase {
      * @throws IllegalArgumentException     When the parameters passed in can not be used for introspection.
      * @throws MethodKey.AmbiguousException When the method map contains more than
      *  one match for the requested signature.
-     *  CSOFF: RedundantThrows
      */
     public Constructor<?> getConstructor(final MethodKey key) {
+        return getConstructor(null, key);
+    }
+    
+    /**
+     * Gets the constructor defined by the <code>MethodKey</code>.
+     * @param c the class we want to instantiate
+     * @param key   Key of the constructor being searched for
+     * @return The desired Constructor object.
+     * @throws IllegalArgumentException     When the parameters passed in can not be used for introspection.
+     * @throws MethodKey.AmbiguousException When the method map contains more than
+     *  one match for the requested signature.
+     */
+    //CSOFF: RedundantThrows
+    public Constructor<?> getConstructor(final Class<?> c, final MethodKey key) {
         Constructor<?> ctor = null;
         synchronized(constructorsMap) {
             ctor = constructorsMap.get(key);
@@ -152,22 +179,17 @@ public class IntrospectorBase {
             if (ctor == null) {
                 final String cname = key.getMethod();
                 // do we know about this class?
-                Class<?> clazz = null;
-                SoftReference<Class<?>> sc = constructibleClasses.get(cname);
-                if (sc != null) {
-                    clazz = sc.get();
-                    if (clazz == null) {
-                        // we knew about this class & it's gone, clear cache
-                        constructorsMap.clear();
-                        constructibleClasses = new HashMap<String, SoftReference<Class<?>>>();
-                    }
-                }
+                Class<?> clazz = constructibleClasses.get(cname);
                 try {
                     // do find the most specific ctor
                     if (clazz == null) {
-                        clazz = Class.forName(cname);
-                        // add it to list of know loaded classes
-                        constructibleClasses.put(cname, new SoftReference<Class<?>>(clazz));
+                        if (c != null && c.getName().equals(key.getMethod())) {
+                            clazz = c;
+                        } else {
+                            clazz = loader.loadClass(cname);
+                        }
+                        // add it to list of known loaded classes
+                        constructibleClasses.put(cname, clazz);
                     }
                     List<Constructor<?>> l = new LinkedList<Constructor<?>>();
                     for(Constructor<?> ictor : clazz.getConstructors()) {
@@ -193,6 +215,7 @@ public class IntrospectorBase {
         }
         return ctor;
     }
+    // CSON: RedundantThrows
 
     /**
      * Gets the ClassMap for a given class.
@@ -202,50 +225,11 @@ public class IntrospectorBase {
     private ClassMap getMap(Class<?> c) {
         synchronized (classMethodMaps) {
             ClassMap classMap = classMethodMaps.get(c);
-            /*
-             * if we don't have this, check to see if we have it by name. if so,
-             * then we have a classloader change so dump our caches.
-             */
-
             if (classMap == null) {
-                if (cachedClassNames.contains(c.getName())) {
-                    /*
-                     * we have a map for a class with same name, but not this
-                     * class we are looking at. This implies a classloader
-                     * change, so dump
-                     */
-                    clearCache();
-                }
-
-                classMap = createClassMap(c);
+                classMap = new ClassMap(c,rlog);
+                classMethodMaps.put(c, classMap);
             }
             return classMap;
         }
-    }
-
-    /**
-     * Creates a class map for specific class and registers it in the cache.
-     * Also adds the qualified name to the name->class map for later Classloader
-     * change detection.
-     * @param c class.
-     * @return a {@link ClassMap}
-     */
-    private ClassMap createClassMap(Class<?> c) {
-        ClassMap classMap = new ClassMap(c,rlog);
-        classMethodMaps.put(c, classMap);
-        cachedClassNames.add(c.getName());
-
-        return classMap;
-    }
-
-    /**
-     * Clears the classmap and classname caches.
-     */
-    protected void clearCache() {
-        // since we are synchronizing on this object, we have to clear it rather
-        // than just dump it.
-        classMethodMaps.clear();
-        // for speed, we can just make a new one and let the old one be GC'd
-        cachedClassNames = new HashSet<String>();
     }
 }

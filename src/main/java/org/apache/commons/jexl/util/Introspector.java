@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl.util;
 
+import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
 
@@ -31,13 +32,70 @@ import org.apache.commons.logging.LogFactory;
  *  <p>Finding methods as well as property getters & setters.</p>
  * @since 1.0
  */
-public class Introspector  {
+public class Introspector {
     /** The default uberspector that handles all introspection patterns. */
     private static volatile Uberspect uberSpect;
     /** The logger to use for all warnings & errors. */
     protected final Log rlog;
     /** The (low level) introspector to use for introspection services. */
-    protected final org.apache.commons.jexl.util.introspection.Introspector introspector;
+    protected final Reference introspector;
+
+    /**
+     * A soft reference to an Introspector.
+     * <p>
+     * If memory pressure becomes critical, this will allow the introspector to be GCed;
+     * in turn, classes it introspected that are no longer in use may be GCed as well.
+     * </p>
+     */
+    protected final class Reference {
+        /**
+         * The introspector logger.
+         */
+        private final Log logger;
+        /**
+         * The soft reference to the introspector currently in use.
+         */
+        private volatile SoftReference<org.apache.commons.jexl.util.introspection.Introspector> ref;
+        /**
+         * Creates a new instance.
+         * @param theLogger logger used by the underlying introspector instance
+         * @param is the underlying introspector instance
+         */
+        protected Reference(Log theLogger, org.apache.commons.jexl.util.introspection.Introspector is) {
+            logger = theLogger;
+            ref = new SoftReference<org.apache.commons.jexl.util.introspection.Introspector>(is);
+        }
+
+        /**
+         * Creates a new instance.
+         * @param theLogger logger used by the underlying introspector instance
+         */
+        protected Reference(Log theLogger) {
+            this(theLogger, new org.apache.commons.jexl.util.introspection.Introspector(theLogger));
+        }
+
+        /**
+         * Gets the current introspector.
+         * <p>If the reference has been collected, this method will recreate the underlying introspector.</p>
+         * @return the introspector
+         */
+        // CSOFF: DoubleCheckedLocking
+        public org.apache.commons.jexl.util.introspection.Introspector get() {
+            org.apache.commons.jexl.util.introspection.Introspector intro = ref.get();
+            if (intro == null) {
+                // double checked locking (fixed by Java 5 memory model).
+                synchronized(this) {
+                    intro = ref.get();
+                    if (intro == null) {
+                        intro = new org.apache.commons.jexl.util.introspection.Introspector(logger);
+                        ref = new SoftReference<org.apache.commons.jexl.util.introspection.Introspector>(intro);
+                    }
+                }
+            }
+            return intro;
+        }
+        // CSON: DoubleCheckedLocking
+    }
 
     /**
      *  Gets the default instance of Uberspect.
@@ -49,7 +107,7 @@ public class Introspector  {
      */
     // CSOFF: DoubleCheckedLocking
     public static Uberspect getUberspect() {
-        // uses a double-locking pattern since java5 memory model allows it
+        // uses a double-locking pattern
         if (uberSpect == null) {
             synchronized (Uberspect.class) {
                 if (uberSpect == null) {
@@ -78,7 +136,7 @@ public class Introspector  {
      */
     public Introspector(Log log, org.apache.commons.jexl.util.introspection.Introspector is) {
         rlog = log;
-        introspector = is;
+        introspector = new Reference(log, is);
     }
 
     /**
@@ -95,7 +153,7 @@ public class Introspector  {
         }
         try {
             return Integer.valueOf(arg.toString());
-        } catch(NumberFormatException xnumber) {
+        } catch (NumberFormatException xnumber) {
             return null;
         }
     }
@@ -106,7 +164,7 @@ public class Introspector  {
      * @return a String if it can be converted, null otherwise
      */
     protected String toString(Object arg) {
-        return arg == null? null : arg.toString();
+        return arg == null ? null : arg.toString();
     }
 
     /**
@@ -123,7 +181,7 @@ public class Introspector  {
      * CSOFF: RedundantThrows
      */
     protected final Method getMethod(Class<?> c, String name, Object[] params) throws IllegalArgumentException {
-        return introspector.getMethod(c, new MethodKey(name, params));
+        return introspector.get().getMethod(c, new MethodKey(name, params));
     }
 
     /**
@@ -137,7 +195,7 @@ public class Introspector  {
      * CSOFF: RedundantThrows
      */
     protected final Method getMethod(Class<?> c, MethodKey key) throws IllegalArgumentException {
-        return introspector.getMethod(c, key);
+        return introspector.get().getMethod(c, key);
     }
 
     /**
@@ -148,14 +206,16 @@ public class Introspector  {
      */
     public final Constructor<?> getConstructor(Object ctorHandle, Object[] args) {
         String className = null;
+        Class<?> clazz = null;
         if (ctorHandle instanceof Class<?>) {
-            className = ((Class<?>) ctorHandle).getName();
+            clazz = (Class<?>) ctorHandle;
+            className = clazz.getName();
         } else if (ctorHandle != null) {
             className = ctorHandle.toString();
         } else {
             return null;
         }
-        return introspector.getConstructor(new MethodKey(className, args));
+        return introspector.get().getConstructor(clazz, new MethodKey(className, args));
     }
 
     /**
@@ -167,7 +227,7 @@ public class Introspector  {
      */
     public final AbstractExecutor.Method getMethodExecutor(Object obj, String name, Object[] args) {
         AbstractExecutor.Method me = new MethodExecutor(this, obj, name, args);
-        return me.isAlive()? me : null;
+        return me.isAlive() ? me : null;
     }
 
     /**
@@ -248,12 +308,11 @@ public class Introspector  {
                 return executor;
             }
         }
-        // if that didn't work, look for get("foo")
+        // if that didn't work, look for set("foo")
         executor = new DuckSetExecutor(this, claz, property, arg);
         if (executor.isAlive()) {
             return executor;
         }
         return null;
-     }
-
+    }
 }
