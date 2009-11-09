@@ -42,7 +42,7 @@ import org.apache.commons.logging.Log;
 public class UberspectImpl extends org.apache.commons.jexl.util.Introspector implements Uberspect {
     /** {@inheritDoc} */
     public Introspector getIntrospector() {
-        return introspector;
+        return introspector.get();
     }
 
     /**
@@ -66,7 +66,7 @@ public class UberspectImpl extends org.apache.commons.jexl.util.Introspector imp
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    public Iterator<?> getIterator(Object obj, DebugInfo i) {
+    public Iterator<?> getIterator(Object obj, DebugInfo info) {
         if (obj.getClass().isArray()) {
             return new ArrayIterator(obj);
         } else if (obj instanceof Collection<?>) {
@@ -74,13 +74,13 @@ public class UberspectImpl extends org.apache.commons.jexl.util.Introspector imp
         } else if (obj instanceof Map<?,?>) {
             return ((Map<?,?>) obj).values().iterator();
         } else if (obj instanceof Iterator<?>) {
-            rlog.warn(i.debugString()
+            rlog.warn(info.debugString()
                     + "The iterative is not resetable; if used more than once, "
                     + "this may lead to unexpected results.");
 
             return ((Iterator<?>) obj);
         } else if (obj instanceof Enumeration<?>) {
-            rlog.warn(i.debugString()
+            rlog.warn(info.debugString()
                     + "The iterative is not resetable; if used more than once, "
                     + "this may lead to unexpected results.");
             return new EnumerationIterator<Object>((Enumeration<Object>) obj);
@@ -95,7 +95,7 @@ public class UberspectImpl extends org.apache.commons.jexl.util.Introspector imp
                 if (Iterator.class.isAssignableFrom(returns)) {
                     return (Iterator<?>) iter.invoke(obj, (Object[])null);
                 } else {
-                    rlog.error(i.debugString()
+                    rlog.error(info.debugString()
                             + "iterator() method does not return a true Iterator.");
                 }
             // CSOFF: EmptyBlock
@@ -111,7 +111,7 @@ public class UberspectImpl extends org.apache.commons.jexl.util.Introspector imp
         }
 
         /*  we have no clue what this is  */
-        rlog.warn(i.toString()
+        rlog.warn(info.toString()
                 + "Could not determine type of iterator");
 
         return null;
@@ -120,28 +120,28 @@ public class UberspectImpl extends org.apache.commons.jexl.util.Introspector imp
     /**
      * {@inheritDoc}
      */
-   public Constructor<?> getConstructor(Object ctorHandle, Object[] args, DebugInfo i) {
+   public Constructor<?> getConstructor(Object ctorHandle, Object[] args, DebugInfo info) {
         return getConstructor(ctorHandle, args);
    }
 
     /**
      * {@inheritDoc}
      */
-    public JexlMethod getMethod(Object obj, String methodName, Object[] args, DebugInfo i) {
-        return getMethodExecutor(obj, methodName, args);
+    public JexlMethod getMethod(Object obj, String method, Object[] args, DebugInfo info) {
+        return getMethodExecutor(obj, method, args);
     }
 
     /**
      * {@inheritDoc}
      */
-    public JexlPropertyGet getPropertyGet(Object obj, Object identifier, DebugInfo i) {
+    public JexlPropertyGet getPropertyGet(Object obj, Object identifier, DebugInfo info) {
         return getGetExecutor(obj, identifier);
     }
 
     /**
      * {@inheritDoc}
      */
-    public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, DebugInfo i) {
+    public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, DebugInfo info) {
         return getSetExecutor(obj, identifier, arg);
     }
 }

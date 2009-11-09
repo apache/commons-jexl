@@ -23,10 +23,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.Reader;
+import java.lang.ref.SoftReference;
 import java.util.Map;
 import java.util.Collections;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Map.Entry;
+import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -117,7 +120,7 @@ public class JexlEngine {
     /**
      * The expression cache.
      */
-    protected Map<String, ASTJexlScript> cache = null;
+    protected SoftCache<String, ASTJexlScript> cache = null;
     /**
      * An empty/static/non-mutable JexlContext used instead of null context.
      */
@@ -229,6 +232,16 @@ public class JexlEngine {
     }
 
     /**
+     * Sets the class loader used to discover classes in 'new' expressions.
+     * <p>This method should be called as an optional step of the JexlEngine
+     * initialization code before expression creation &amp; evaluation.</p>
+     * @param loader the class loader to use
+     */
+    public void setClassLoader(ClassLoader loader) {
+        uberspect.getIntrospector().setLoader(loader);
+    }
+
+    /**
      * Sets a cache of the defined size for expressions.
      * @param size if not strictly positive, no cache is used.
      */
@@ -238,7 +251,7 @@ public class JexlEngine {
             if (size <= 0) {
                 cache = null;
             } else if (cache == null || cache.size() != size) {
-                cache = createCache(size);
+                cache = new SoftCache<String,ASTJexlScript>(size);
             }
         }
     }
@@ -543,17 +556,86 @@ public class JexlEngine {
         return new Interpreter(this, context);
     }
 
+   /**
+    * A soft reference on cache.
+    * <p>The cache is held through a soft reference, allowing it to be GCed under
+    * memory pressure.</p>
+    * @param <K> the cache key entry type
+    * @param <V> the cache key value type
+    */
+   protected class SoftCache<K,V> {
+       /**
+        * The cache size.
+        */
+        private final int size;
+        /**
+         * The soft reference to the cache map.
+         */
+        private SoftReference<Map<K, V>> ref = null;
+        /**
+         * Creates a new instance of a soft cache.
+         * @param theSize the cache size
+         */
+        SoftCache(int theSize) {
+            size = theSize;
+        }
+
+        /**
+         * Returns the cache size.
+         * @return the cache size
+         */
+        int size() {
+            return size;
+        }
+
+        /**
+         * Produces the cache entry set.
+         * @return the cache entry set
+         */
+        @SuppressWarnings("unchecked")
+        Set<Entry<K,V>> entrySet() {
+            Map<K, V> map = ref != null? ref.get() : null;
+            return map != null? map.entrySet() : (Set<Entry<K,V>>) Collections.EMPTY_SET;
+        }
+
+        /**
+         * Gets a value from cache.
+         * @param key the cache entry key
+         * @return the cache entry value
+         */
+        V get(K key) {
+            final Map<K, V> map = ref != null? ref.get() : null;
+            return map != null? map.get(key) : null;
+        }
+
+        /**
+         * Puts a value in cache.
+         * @param key the cache entry key
+         * @param script the cache entry value
+         */
+        void put(K key, V script) {
+            Map<K, V> map = ref != null? ref.get() : null;
+            if (map == null) {
+                map = createCache(size);
+                ref = new SoftReference<Map<K, V>>(map);
+            }
+            map.put(key, script);
+        }
+    }
+
     /**
-     * Creates a SimpleNode cache.
+     * Creates a cache.
+     * @param <K> the key type
+     * @param <V> the value type
      * @param cacheSize the cache size, must be > 0
      * @return a Map usable as a cache bounded to the given size
      */
-    protected Map<String, ASTJexlScript> createCache(final int cacheSize) {
-        return new java.util.LinkedHashMap<String, ASTJexlScript>(cacheSize, LOAD_FACTOR, true) {
+    protected <K,V> Map<K, V> createCache(final int cacheSize) {
+        return new java.util.LinkedHashMap<K, V>(cacheSize, LOAD_FACTOR, true) {
             /** Serial version UID. */
             private static final long serialVersionUID = 3801124242820219131L;
             @Override
-            protected boolean removeEldestEntry(Map.Entry<String, ASTJexlScript> eldest) {
+            protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
                 return size() > cacheSize;
             }
         };

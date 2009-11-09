@@ -319,7 +319,7 @@ public class Interpreter implements ParserVisitor {
             Object entry = node.jjtGetChild(i).jjtAccept(this, data);
             array[i] = entry;
         }
-        return array;
+        return arithmetic.narrowArrayType(array);
     }
     
     /** {@inheritDoc} */
@@ -630,7 +630,7 @@ public class Interpreter implements ParserVisitor {
             if (value == null
                 && !(node.jjtGetParent() instanceof ASTReference)
                 && !context.getVars().containsKey(name)) {
-                JexlException xjexl = new JexlException(node, "undefined variable " + node.image);
+                JexlException xjexl = new JexlException(node, "undefined variable " + name);
                 return unknownVariable(xjexl);
             }
             return value;

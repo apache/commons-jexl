@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl;
 
-import java.util.Map;
-import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import org.apache.commons.jexl.parser.JexlNode;
 import org.apache.commons.jexl.parser.ParseException;
@@ -80,11 +78,9 @@ public final class UnifiedJEXL {
     /** The JEXL engine instance. */
     private final JexlEngine jexl;
     /** The expression cache. */
-    private final Map<String, Expression> cache;
+    private final JexlEngine.SoftCache<String,Expression> cache;
     /** The default cache size. */
     private static final int CACHE_SIZE = 512;
-    /** The default cache load-factor. */
-    private static final float LOAD_FACTOR = 0.75f;
     /**
      * Creates a new instance of UnifiedJEXL with a default size cache.
      * @param aJexl the JexlEngine to use.
@@ -100,23 +96,7 @@ public final class UnifiedJEXL {
      */
     public UnifiedJEXL(JexlEngine aJexl, int cacheSize) {
         this.jexl = aJexl;
-        this.cache = cacheSize > 0 ? createCache(cacheSize) : null;
-    }
-
-    /**
-     * Creates an expression cache.
-     * @param cacheSize the cache size, must be > 0
-     * @return a LinkedHashMap
-     */
-    private static Map<String, Expression> createCache(final int cacheSize) {
-        return new LinkedHashMap<String, Expression>(cacheSize, LOAD_FACTOR, true) {
-            /** Serial version UID. */
-            private static final long serialVersionUID = -6515503595421899722L;
-            @Override
-            protected boolean removeEldestEntry(Map.Entry<String, Expression> eldest) {
-                return size() > cacheSize;
-            }
-        };
+        this.cache = aJexl.new SoftCache<String,Expression>(cacheSize);
     }
 
     /**
@@ -732,13 +712,15 @@ public final class UnifiedJEXL {
         try {
             if (cache == null) {
                 return parseExpression(expression);
-            } else synchronized (cache) {
-                Expression stmt = cache.get(expression);
-                if (stmt == null) {
-                    stmt = parseExpression(expression);
-                    cache.put(expression, stmt);
+            } else {
+                synchronized (cache) {
+                    Expression stmt = cache.get(expression);
+                    if (stmt == null) {
+                        stmt = parseExpression(expression);
+                        cache.put(expression, stmt);
+                    }
+                    return stmt;
                 }
-                return stmt;
             }
         } catch (JexlException xjexl) {
             Exception xuel = new Exception("failed to parse '" + expression + "'", xjexl);

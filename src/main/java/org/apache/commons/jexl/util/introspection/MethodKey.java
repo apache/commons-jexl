@@ -145,9 +145,9 @@ public final class MethodKey {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equals(Object arg) {
-        if (arg instanceof MethodKey) {
-            MethodKey key = (MethodKey) arg;
+    public boolean equals(Object obj) {
+        if (obj instanceof MethodKey) {
+            MethodKey key = (MethodKey) obj;
             return method.equals(key.method) && Arrays.equals(params, key.params);
         }
         return false;

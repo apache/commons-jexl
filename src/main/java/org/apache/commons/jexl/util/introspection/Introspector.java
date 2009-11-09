@@ -56,13 +56,6 @@ import org.apache.commons.logging.Log;
  */
 public final class Introspector extends IntrospectorBase {
     /**
-     *  define a public string so that it can be looked for
-     *  if interested.
-     */
-    public static final String CACHEDUMP_MSG =
-        "Introspector : detected classloader change. Dumping cache.";
-
-    /**
      *  Creates a new instance.
      *  @param logger a {@link Log}.
      */
@@ -78,8 +71,8 @@ public final class Introspector extends IntrospectorBase {
      *
      * @return The desired Method object.
      * @throws IllegalArgumentException When the parameters passed in can not be used for introspection.
-     * CSOFF: RedundantThrows
      */
+    // CSOFF: RedundantThrows
     @Override
     public Method getMethod(Class<?> c, MethodKey key) throws IllegalArgumentException {
         //  just delegate to the base class
@@ -95,22 +88,25 @@ public final class Introspector extends IntrospectorBase {
         }
         return null;
     }
-
     // CSON: RedundantThrows
+
     /**
-     * Gets the method defined by <code>key</code> for the Class <code>c</code>.
+     * Gets the constructor defined by <code>key</code> for the Class <code>c</code>.
      *
+     * @param c the class to instantiate an object of if known, null otherwise
      * @param key MethodKey of the method being searched for
      *
      * @return The desired Method object.
      * @throws IllegalArgumentException When the parameters passed in can not be used for introspection.
-     * CSOFF: RedundantThrows
+     *
+     *
      */
+    // CSOFF: RedundantThrows
     @Override
-    public Constructor<?> getConstructor(MethodKey key) throws IllegalArgumentException {
+    public Constructor<?> getConstructor(Class<?> c, MethodKey key) throws IllegalArgumentException {
         //  just delegate to the base class
         try {
-            return super.getConstructor(key);
+            return super.getConstructor(c, key);
         } catch (MethodKey.AmbiguousException ae) {
             // whoops.  Ambiguous.  Make a nice log message and return null...
             if (rlog != null) {
@@ -119,15 +115,6 @@ public final class Introspector extends IntrospectorBase {
             }
         }
         return null;
-    } // CSON: RedundantThrows
-
-    /**
-     * Clears the classmap and classname
-     * caches, and logs that we did so.
-     */
-    @Override
-    protected void clearCache() {
-        super.clearCache();
-        rlog.info(CACHEDUMP_MSG);
     }
+    // CSON: RedundantThrows
 }
