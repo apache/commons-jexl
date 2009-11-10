@@ -237,6 +237,27 @@ public class JexlArithmetic {
     }
 
     /**
+     * Replace all numbers in an arguments array with the smallest type that will fit.
+     * @param args the argument array
+     * @return true if some arguments were narrowed and args array is modified,
+     *         false if no narrowing occured and args array has not been modified
+     */
+    protected boolean narrowArguments(Object[] args) {
+        boolean narrowed = false;
+        for (int a = 0; a < args.length; ++a) {
+            Object arg = args[a];
+            if (arg instanceof Number) {
+                Object narg = narrow((Number) arg);
+                if (narg != arg) {
+                    narrowed = true;
+                }
+                args[a] = narg;
+            }
+        }
+        return narrowed;
+    }
+
+    /**
      * Add two values together.
      * <p>
      * If any numeric add fails on coercion to the appropriate type,

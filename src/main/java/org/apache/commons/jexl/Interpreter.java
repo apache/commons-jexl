@@ -733,19 +733,6 @@ public class Interpreter implements ParserVisitor {
         return map;
     }
 
-    /**
-     * Replace all numbers in an arguments array with the smallest type that will fit.
-     * @param args the argument array
-     */
-    protected final void narrowArguments(Object[] args) {
-        for (int a = 0; a < args.length; a++) {
-            Object arg = args[a];
-            if (arg instanceof Number) {
-                args[a] = arithmetic.narrow((Number) arg);
-            }
-        }
-    }
-
     /** {@inheritDoc} */
     public Object visit(ASTMethodNode node, Object data) {
         // the object to invoke the method on should be in the data argument
@@ -787,8 +774,9 @@ public class Interpreter implements ParserVisitor {
             JexlMethod vm = uberspect.getMethod(data, methodName, argv, node);
             // DG: If we can't find an exact match, narrow the parameters and try again!
             if (vm == null) {
-                narrowArguments(argv);
-                vm = uberspect.getMethod(data, methodName, argv, node);
+                if (arithmetic.narrowArguments(argv)) {
+                    vm = uberspect.getMethod(data, methodName, argv, node);
+                }
                 if (vm == null) {
                     xjexl = new JexlException(node, "unknown or ambiguous method", null);
                 }
@@ -826,9 +814,9 @@ public class Interpreter implements ParserVisitor {
             // DG: If we can't find an exact match, narrow the parameters and
             // try again!
             if (ctor == null) {
-                // replace all numbers with the smallest type that will fit
-                narrowArguments(argv);
-                ctor = uberspect.getConstructor(cobject, argv, node);
+                if (arithmetic.narrowArguments(argv)) {
+                    ctor = uberspect.getConstructor(cobject, argv, node);
+                }
                 if (ctor == null) {
                     xjexl = new JexlException(node, "unknown constructor", null);
                 }
@@ -880,8 +868,9 @@ public class Interpreter implements ParserVisitor {
             // try again!
             if (vm == null) {
                 // replace all numbers with the smallest type that will fit
-                narrowArguments(argv);
-                vm = uberspect.getMethod(namespace, function, argv, node);
+                if (arithmetic.narrowArguments(argv)) {
+                    vm = uberspect.getMethod(namespace, function, argv, node);
+                }
                 if (vm == null) {
                     xjexl = new JexlException(node, "unknown function", null);
                 }

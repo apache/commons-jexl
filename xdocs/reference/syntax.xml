@@ -170,6 +170,13 @@
             with <code>]</code>, e.g.
             <source>[ 1, 2, "three" ]</source>
             <p>This syntax creates an <code>Object[]</code>.</p>
+            <p>
+            JEXL will attempt to strongly type the array; if all entries are of the same class or if all
+            entries are Number instance, the array literal will be an <code>MyClass[]</code> in the former
+            case, a <code>Number[]</code> in the latter case.</p>
+            <p>Furthermore, if all entries in the array literal are of the same class
+            and that class has an equivalent primitive type, the array returned will be a primitive array. e.g.
+            <code>[1, 2, 3]</code> will be interpreted as <code>int[]</code>.</p>
           </td>
         </tr>
         <tr>

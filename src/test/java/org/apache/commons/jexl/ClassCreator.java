@@ -28,16 +28,32 @@ import java.net.URLClassLoader;
  * load it through a dedicated class loader.
  */
 public class ClassCreator {
+    private final JexlEngine jexl;
     private final File base;
     private File packageDir = null;
     private int seed = 0;
     private String className = null;
     private String sourceName = null;
     private ClassLoader loader = null;
+    public static final boolean canRun = comSunToolsJavacMain();
+    /**
+     * Check if we can invoke Sun's java compiler.
+     * @return true if it is possible, false otherwise
+     */
+    private static boolean comSunToolsJavacMain() {
+        try {
+            Class<?> javac = ClassCreatorTest.class.getClassLoader().loadClass("com.sun.tools.javac.Main");
+            return javac != null;
+        } catch (Exception xany) {
+            return false;
+        }
+    }
 
-    public ClassCreator(File theBase) throws Exception {
+    public ClassCreator(JexlEngine theJexl, File theBase) throws Exception {
+        jexl = theJexl;
         base = theBase;
     }
+
 
     public void clear() {
         seed = 0;
@@ -106,8 +122,13 @@ public class ClassCreator {
     }
 
     Class<?> compile() throws Exception {
-        String[] source = {packageDir.getPath() + "/" + sourceName};
-        if (com.sun.tools.javac.Main.compile(source) >= 0) {
+        String source = packageDir.getPath() + "/" + sourceName;
+        Class<?> javac = getClassLoader().loadClass("com.sun.tools.javac.Main");
+        if (javac == null) {
+            return null;
+        }
+        Integer r = (Integer) jexl.invokeMethod(javac, "compile", source);
+        if (r >= 0) {
             return getClassLoader().loadClass("org.apache.commons.jexl.generated." + className);
         }
         return null;

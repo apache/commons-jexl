@@ -52,8 +52,14 @@ public class ScriptTest extends JexlTestCase {
      * Test creating a script from a string.
      */
     public void testSimpleScript() throws Exception {
+        simpleScript(true);
+    }
+    public void testLegacySimpleScript() throws Exception {
+        simpleScript(false);
+    }
+    private void simpleScript(boolean jexl) throws Exception {
         String code = "while (x < 10) x = x + 1;";
-        Script s = JEXL.createScript(code);
+        Script s = jexl? JEXL.createScript(code) : ScriptFactory.createScript(code);
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("x", new Integer(1));
     
@@ -61,10 +67,16 @@ public class ScriptTest extends JexlTestCase {
         assertEquals("Result is wrong", new Integer(10), o);
         assertEquals("getText is wrong", code, s.getText());
     }
-    
+
     public void testScriptFromFile() throws Exception {
+        scriptFromFile(true);
+    }
+    public void testLegacyScriptFromFile() throws Exception {
+        scriptFromFile(false);
+    }
+    private void scriptFromFile(boolean jexl) throws Exception {
         File testScript = new File(TEST1);
-        Script s = JEXL.createScript(testScript);
+        Script s = jexl? JEXL.createScript(testScript) : ScriptFactory.createScript(testScript);
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("out", System.out);
         Object result = s.execute(jc);
@@ -73,19 +85,31 @@ public class ScriptTest extends JexlTestCase {
     }
 
     public void testScriptFromURL() throws Exception {
+        scriptFromURL(true);
+    }
+    public void testLegacyScriptFromURL() throws Exception {
+        scriptFromURL(false);
+    }
+    private void scriptFromURL(boolean jexl) throws Exception {
         URL testUrl = new File("src/test/scripts/test1.jexl").toURI().toURL();
-        Script s = JEXL.createScript(testUrl);
+        Script s = jexl? JEXL.createScript(testUrl) : ScriptFactory.createScript(testUrl);
         JexlContext jc = JexlHelper.createContext();
         jc.getVars().put("out", System.out);
         Object result = s.execute(jc);
         assertNotNull("No result", result);
         assertEquals("Wrong result", new Integer(7), result);
     }
-    
+
     public void testScriptUpdatesContext() throws Exception {
+        scriptUpdatesContext(true);
+    }
+    public void testLegacyScriptUpdatesContext() throws Exception {
+        scriptUpdatesContext(false);
+    }
+    private void scriptUpdatesContext(boolean jexl) throws Exception {
         String jexlCode = "resultat.setCode('OK')";
-        Expression e = JEXL.createExpression(jexlCode);
-        Script s = JEXL.createScript(jexlCode);
+        Expression e = jexl? JEXL.createExpression(jexlCode) : ExpressionFactory.createExpression(jexlCode);
+        Script s = jexl? JEXL.createScript(jexlCode) : ScriptFactory.createScript(jexlCode);
 
         Tester resultatJexl = new Tester();
         JexlContext jc = JexlHelper.createContext();
@@ -98,4 +122,5 @@ public class ScriptTest extends JexlTestCase {
         s.execute(jc);
         assertEquals("OK", resultatJexl.getCode());
     }
+
 }
