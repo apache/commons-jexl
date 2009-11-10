@@ -33,13 +33,14 @@ public class ClassCreatorTest extends JexlTestCase {
     static final Log logger = LogFactory.getLog(JexlTestCase.class);
     static final int LOOPS = 8;
     private File base = null;
+    private JexlEngine jexl = null;
 
     @Override
     public void setUp() throws Exception {
-        base = new File(System.getProperty("java.io.tmpdir")
-                + File.pathSeparator
-                + "jexl"
-                + System.currentTimeMillis());
+        base = new File(System.getProperty("java.io.tmpdir") + File.pathSeparator + "jexl" + System.currentTimeMillis());
+        jexl = new JexlEngine();
+        jexl.setCache(512);
+
     }
 
     @Override
@@ -72,7 +73,7 @@ public class ClassCreatorTest extends JexlTestCase {
             return id;
         }
     }
-    
+
     // A soft reference on class
     static final class ClassReference extends WeakReference<Class<?>> {
         ClassReference(Class<?> clazz, ReferenceQueue<Object> queue) {
@@ -87,7 +88,11 @@ public class ClassCreatorTest extends JexlTestCase {
     }
 
     public void testOne() throws Exception {
-        ClassCreator cctor = new ClassCreator(base);
+        // abort test if class creator can not run
+        if (!ClassCreator.canRun) {
+            return;
+        }
+        ClassCreator cctor = new ClassCreator(jexl, base);
         cctor.setSeed(1);
         Class<?> foo1 = cctor.createClass();
         assertEquals("foo1", foo1.getSimpleName());
@@ -95,23 +100,25 @@ public class ClassCreatorTest extends JexlTestCase {
     }
 
     public void testMany() throws Exception {
+        // abort test if class creator can not run
+        if (!ClassCreator.canRun) {
+            return;
+        }
         int pass = 0;
         int gced = -1;
         ReferenceQueue<Object> queue = new ReferenceQueue<Object>();
         List<Reference<?>> stuff = new ArrayList<Reference<?>>();
         // keeping a reference on methods prevent classes from being GCed
 //        List<Object> mm = new ArrayList<Object>();
-        JexlEngine jexl = new JexlEngine();
-        jexl.setCache(512);
         Expression expr = jexl.createExpression("foo.value");
         Expression newx = jexl.createExpression("foo = new(clazz)");
         JexlContext context = JexlHelper.createContext();
 
-        ClassCreator cctor = new ClassCreator(base);
+        ClassCreator cctor = new ClassCreator(jexl, base);
         for (int i = 0; i < LOOPS && gced < 0; ++i) {
             cctor.setSeed(i);
             Class<?> clazz;
-            if (pass ==0) {
+            if (pass == 0) {
                 clazz = cctor.createClass();
             } else {
                 clazz = cctor.getClassInstance();

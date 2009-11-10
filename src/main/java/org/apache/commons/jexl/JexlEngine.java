@@ -39,8 +39,10 @@ import org.apache.commons.jexl.parser.JexlNode;
 import org.apache.commons.jexl.parser.TokenMgrError;
 import org.apache.commons.jexl.parser.ASTJexlScript;
 import org.apache.commons.jexl.util.Introspector;
+import org.apache.commons.jexl.util.introspection.DebugInfo;
 import org.apache.commons.jexl.util.introspection.Uberspect;
 import org.apache.commons.jexl.util.introspection.Info;
+import org.apache.commons.jexl.util.introspection.JexlMethod;
 
 /**
  * <p>
@@ -251,7 +253,7 @@ public class JexlEngine {
             if (size <= 0) {
                 cache = null;
             } else if (cache == null || cache.size() != size) {
-                cache = new SoftCache<String,ASTJexlScript>(size);
+                cache = new SoftCache<String, ASTJexlScript>(size);
             }
         }
     }
@@ -305,7 +307,7 @@ public class JexlEngine {
      *      expression nor a reference.
      */
     public Expression createExpression(String expression)
-            throws ParseException  {
+            throws ParseException {
         return createExpression(expression, null);
     }
 
@@ -325,8 +327,7 @@ public class JexlEngine {
         // Parse the expression
         ASTJexlScript tree = parse(expression, info);
         if (tree.jjtGetNumChildren() > 1) {
-            logger.warn("The JEXL Expression created will be a reference"
-                     + " to the first expression from the supplied script: \"" + expression + "\" ");
+            logger.warn("The JEXL Expression created will be a reference" + " to the first expression from the supplied script: \"" + expression + "\" ");
         }
         return new ExpressionImpl(this, expression, tree);
     }
@@ -545,6 +546,41 @@ public class JexlEngine {
     }
 
     /**
+     * Invokes an object's method by name and arguments.
+     * @param obj the method's invoker object
+     * @param meth the method's name
+     * @param args the method's arguments
+     * @return the method returned value or null if it failed and engine is silent
+     * @throws JexlException if method could not be found or failed and engine is not silent
+     */
+    public Object invokeMethod(Object obj, String meth, Object... args) {
+        JexlException xjexl = null;
+        Object result = null;
+        try {
+            JexlMethod method = uberspect.getMethod(obj, meth, args, DebugInfo.NONE);
+            if (method == null && arithmetic.narrowArguments(args)) {
+                method = uberspect.getMethod(obj, meth, args, DebugInfo.NONE);
+            }
+            if (method != null) {
+                result = method.invoke(obj, args);
+            } else {
+                xjexl = new JexlException(null, "failed finding method " + meth);
+            }
+        } catch (Exception xany) {
+            xjexl = new JexlException(null, "failed executing method " + meth, xany);
+        } finally {
+            if (xjexl != null) {
+                if (silent) {
+                    logger.warn(xjexl.getMessage(), xjexl.getCause());
+                    return null;
+                }
+                throw xjexl;
+            }
+        }
+        return result;
+    }
+
+    /**
      * Creates an interpreter.
      * @param context a JexlContext; if null, the EMPTY_CONTEXT is used instead.
      * @return an Interpreter
@@ -556,22 +592,23 @@ public class JexlEngine {
         return new Interpreter(this, context);
     }
 
-   /**
-    * A soft reference on cache.
-    * <p>The cache is held through a soft reference, allowing it to be GCed under
-    * memory pressure.</p>
-    * @param <K> the cache key entry type
-    * @param <V> the cache key value type
-    */
-   protected class SoftCache<K,V> {
-       /**
-        * The cache size.
-        */
+    /**
+     * A soft reference on cache.
+     * <p>The cache is held through a soft reference, allowing it to be GCed under
+     * memory pressure.</p>
+     * @param <K> the cache key entry type
+     * @param <V> the cache key value type
+     */
+    protected class SoftCache<K, V> {
+        /**
+         * The cache size.
+         */
         private final int size;
         /**
          * The soft reference to the cache map.
          */
         private SoftReference<Map<K, V>> ref = null;
+
         /**
          * Creates a new instance of a soft cache.
          * @param theSize the cache size
@@ -593,9 +630,9 @@ public class JexlEngine {
          * @return the cache entry set
          */
         @SuppressWarnings("unchecked")
-        Set<Entry<K,V>> entrySet() {
-            Map<K, V> map = ref != null? ref.get() : null;
-            return map != null? map.entrySet() : (Set<Entry<K,V>>) Collections.EMPTY_SET;
+        Set<Entry<K, V>> entrySet() {
+            Map<K, V> map = ref != null ? ref.get() : null;
+            return map != null ? map.entrySet() : (Set<Entry<K, V>>) Collections.EMPTY_SET;
         }
 
         /**
@@ -604,8 +641,8 @@ public class JexlEngine {
          * @return the cache entry value
          */
         V get(K key) {
-            final Map<K, V> map = ref != null? ref.get() : null;
-            return map != null? map.get(key) : null;
+            final Map<K, V> map = ref != null ? ref.get() : null;
+            return map != null ? map.get(key) : null;
         }
 
         /**
@@ -614,7 +651,7 @@ public class JexlEngine {
          * @param script the cache entry value
          */
         void put(K key, V script) {
-            Map<K, V> map = ref != null? ref.get() : null;
+            Map<K, V> map = ref != null ? ref.get() : null;
             if (map == null) {
                 map = createCache(size);
                 ref = new SoftReference<Map<K, V>>(map);
@@ -630,10 +667,11 @@ public class JexlEngine {
      * @param cacheSize the cache size, must be > 0
      * @return a Map usable as a cache bounded to the given size
      */
-    protected <K,V> Map<K, V> createCache(final int cacheSize) {
+    protected <K, V> Map<K, V> createCache(final int cacheSize) {
         return new java.util.LinkedHashMap<K, V>(cacheSize, LOAD_FACTOR, true) {
             /** Serial version UID. */
             private static final long serialVersionUID = 3801124242820219131L;
+
             @Override
             protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
                 return size() > cacheSize;
@@ -668,7 +706,7 @@ public class JexlEngine {
                     StackTraceElement[] stack = xinfo.getStackTrace();
                     StackTraceElement se = null;
                     Class<?> clazz = getClass();
-                    for(int s = 1; s < stack.length; ++s, se = null) {
+                    for (int s = 1; s < stack.length; ++s, se = null) {
                         se = stack[s];
                         String className = se.getClassName();
                         if (!className.equals(clazz.getName())) {
@@ -687,7 +725,7 @@ public class JexlEngine {
                         }
                     }
                     if (se != null) {
-                        info = new Info(se.getClassName()+"."+se.getMethodName(), se.getLineNumber(), 0);
+                        info = new Info(se.getClassName() + "." + se.getMethodName(), se.getLineNumber(), 0);
                     }
                 }
                 tree = parser.parse(reader, info);

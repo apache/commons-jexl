@@ -17,6 +17,7 @@
 package org.apache.commons.jexl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,6 +32,11 @@ public class Foo {
     private boolean beenModified = false;
     private String property1 = "some value";
     public Foo() {}
+    public class Cheezy {
+        public Iterator<String> iterator() {
+            return getCheeseList().iterator();
+        }
+    }
     
     public String bar()
     {
@@ -68,6 +74,11 @@ public class Foo {
         answer.add("edam");
         answer.add("brie");
         return answer;
+    }
+
+    public Cheezy getCheezy()
+    {
+        return new Cheezy();
     }
 
     public String[] getArray()

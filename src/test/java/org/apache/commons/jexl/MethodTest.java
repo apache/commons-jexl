@@ -48,6 +48,9 @@ public class MethodTest extends JexlTestCase {
         public static int PLUS20(int num) {
             return num + 20;
         }
+        public static Class<?> NPEIfNull(Object x) {
+            return x.getClass();
+        }
     }
 
     @Override
@@ -58,6 +61,24 @@ public class MethodTest extends JexlTestCase {
     public void testCallVarArgMethod() throws Exception {
         asserter.setVariable("test", new TestClass());
         asserter.assertExpression("test.testVarArgs(1,2,3,4,5)", "Test");
+    }
+
+    public void testInvoke() throws Exception {
+        Functor func = new Functor();
+        assertEquals(Integer.valueOf(10), JEXL.invokeMethod(func, "ten"));
+        assertEquals(Integer.valueOf(42), JEXL.invokeMethod(func, "PLUS20", 22));
+        try {
+            JEXL.invokeMethod(func, "nonExistentMethod");
+            fail("method does not exist!");
+        } catch(Exception xj0) {
+            // ignore
+        }
+        try {
+            JEXL.invokeMethod(func, "NPEIfNull", null);
+            fail("method should have thrown!");
+        } catch(Exception xj0) {
+            // ignore
+        }
     }
 
     /**
