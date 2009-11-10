@@ -25,6 +25,28 @@
     <author email="dion@apache.org">dIon Gillard</author>
   </properties>
   <body>
+    <release version="2.0" date="unreleased">
+        <action dev="henrib" type="add" issue="JEXL-27" due-to="Weikuo Liaw">Bean-ish & ant-ish like assignment</action>
+        <action dev="henrib" type="add" issue="JEXL-19" due-to="Jesse Glick">Ternary operator support</action>
+        <action dev="henrib" type="add" issue="JEXL-41" due-to="Alejandro Torras">Support for ${...} and #{...} expressions</action>
+        <action dev="henrib" type="add" issue="JEXL-15" due-to="Paul Libbrecht">User definable functions</action>
+        <action dev="Sebb" type="add" issue="JEXL-63">JSR-223 support</action>
+        <action dev="henrib" type="update" issue="JEXL-10" due-to="Paul Libbrecht">Make possible checking for unresolved variables</action>
+        <action dev="henrib" type="update" issue="JEXL-11" due-to="Paul Libbrecht">Don't make null convertible into anything</action>
+        <action dev="henrib" type="fix" issue="JEXL-47" due-to="Sebb">Allow single-line comments with //</action>
+        <action dev="henrib" type="fix" issue="JEXL-44" due-to="Sebb">Comments don't allow double-quotes</action>
+        <action dev="henrib" type="add" issue="JEXL-71" due-to="Sebb">Array literal syntax is not supported</action>
+        <action dev="diong" type="fix" issue="JEXL-17" due-to="Nestor Urquiza">allowing quote escaping</action>
+        <action dev="diong" type="fix" issue="JEXL-25" due-to="Marek Lewczuk">Call method with varargs</action>
+        <action dev="diong" type="fix" issue="JEXL-32" due-to="Kedar Dave">BigDecimal values are treated as Long values which results in loss of precision</action>
+        <action dev="diong" type="fix" issue="JEXL-33">Remove unnecessary throws Exception from various classes</action>
+        <action dev="henrib" type="fix" issue="JEXL-50" due-to="Sebb">Div operator does not do integer division</action>
+        <action dev="henrib" type="fix" issue="JEXL-87" due-to="Sebb">Inconsistent behaviour of arithmetical operations<action>
+        <action dev="henrib" type="fix" issue="JEXL-21" due-to="AC">operator overloading / hooks on operator processing</action>
+        <action dev="henrib" type="add">'new' operator support</action>
+        <action dev="henrib" type="add">Support Unicode escapes in string literals</action>
+        <action dev="henrib" type="update">Various performance enhancements & caches</action>
+    </release>
     <release version="1.1.1-SNAPSHOT" date="unreleased">
       <action dev="diong" type="update" issue="JEXL-23">Fix jdk1.3 only code that has crept into Jexl tests</action>
       <action dev="diong" type="update" issue="JEXL-22" due-to="Randy H.">Allow unicode literals to be used</action>
