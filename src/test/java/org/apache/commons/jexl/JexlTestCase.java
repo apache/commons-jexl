@@ -26,7 +26,6 @@ import java.util.ArrayList;
 
 import org.apache.commons.jexl.parser.JexlNode;
 import org.apache.commons.jexl.parser.ASTJexlScript;
-import org.apache.commons.jexl.parser.ParseException;
 
 import junit.framework.TestCase;
 
@@ -79,28 +78,20 @@ public class JexlTestCase extends TestCase {
             // recreate expr string from AST
             dbg.debug(node);
             String expressiondbg = dbg.data();
-            try {
-                // recreate expr from string
-                Expression exprdbg = jdbg.createExpression(expressiondbg);
-                // make arg cause become the root cause
-                JexlNode root = ((ExpressionImpl) exprdbg).script;
-                while (root.jjtGetParent() != null) {
-                    root = root.jjtGetParent();
-                }
-                // test equality
-                String reason = JexlTestCase.checkEquals(root, node);
-                if (reason != null) {
-                    throw new RuntimeException("debugger equal failed: "
-                                               + expressiondbg
-                                               +" /**** "  +reason+" **** */ "
-                                               + entry.getKey());
-                }
+            // recreate expr from string
+            Expression exprdbg = jdbg.createExpression(expressiondbg);
+            // make arg cause become the root cause
+            JexlNode root = ((ExpressionImpl) exprdbg).script;
+            while (root.jjtGetParent() != null) {
+                root = root.jjtGetParent();
             }
-            catch(ParseException xparse) {
-                    throw new RuntimeException("debugger parse failed: "
-                                               + expressiondbg
-                                               +" /**** != **** */ "
-                                               + entry.getKey());
+            // test equality
+            String reason = JexlTestCase.checkEquals(root, node);
+            if (reason != null) {
+                throw new RuntimeException("debugger equal failed: "
+                                           + expressiondbg
+                                           +" /**** "  +reason+" **** */ "
+                                           + entry.getKey());
             }
         }
     }

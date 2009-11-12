@@ -679,7 +679,7 @@ public class JexlTest extends JexlTestCase
             assertExpression(JexlHelper.createContext(), "empty()", null);
             fail("Bad expression didn't throw ParseException");
         }
-        catch (ParseException pe)
+        catch (JexlException pe)
         {
             // expected behaviour
         }

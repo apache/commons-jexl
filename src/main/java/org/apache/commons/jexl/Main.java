@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.InputStreamReader;
 
 import org.apache.commons.jexl.context.HashMapContext;
-import org.apache.commons.jexl.parser.ParseException;
 
 /**
  * Test application for JEXL.
@@ -61,8 +60,6 @@ public class Main {
                     Expression expression = engine.createExpression(line);
                     Object value = expression.evaluate(context);
                     System.out.println("Return value: " + value);
-                } catch (ParseException e) {
-                    System.out.println(e.getLocalizedMessage());
                 } catch (JexlException e) {
                     System.out.println(e.getLocalizedMessage());
                 }

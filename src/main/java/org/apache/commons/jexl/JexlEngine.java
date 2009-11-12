@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.Reader;
 import java.lang.ref.SoftReference;
+import java.lang.reflect.Constructor;
 import java.util.Map;
 import java.util.Collections;
 import java.net.URL;
@@ -39,7 +40,6 @@ import org.apache.commons.jexl.parser.JexlNode;
 import org.apache.commons.jexl.parser.TokenMgrError;
 import org.apache.commons.jexl.parser.ASTJexlScript;
 import org.apache.commons.jexl.util.Introspector;
-import org.apache.commons.jexl.util.introspection.DebugInfo;
 import org.apache.commons.jexl.util.introspection.Uberspect;
 import org.apache.commons.jexl.util.introspection.Info;
 import org.apache.commons.jexl.util.introspection.JexlMethod;
@@ -302,12 +302,11 @@ public class JexlEngine {
      * must contain either a reference or an expression.
      * @param expression A String containing valid JEXL syntax
      * @return An Expression object which can be evaluated with a JexlContext
-     * @throws ParseException An exception can be thrown if there is a problem
+     * @throws JexlException An exception can be thrown if there is a problem
      *      parsing this expression, or if the expression is neither an
      *      expression nor a reference.
      */
-    public Expression createExpression(String expression)
-            throws ParseException {
+    public Expression createExpression(String expression) {
         return createExpression(expression, null);
     }
 
@@ -318,12 +317,11 @@ public class JexlEngine {
      * @param expression A String containing valid JEXL syntax
      * @return An Expression object which can be evaluated with a JexlContext
      * @param info An info structure to carry debugging information if needed
-     * @throws ParseException An exception can be thrown if there is a problem
+     * @throws JexlException An exception can be thrown if there is a problem
      *      parsing this expression, or if the expression is neither an
      *      expression or a reference.
      */
-    public Expression createExpression(String expression, Info info)
-            throws ParseException {
+    public Expression createExpression(String expression, Info info) {
         // Parse the expression
         ASTJexlScript tree = parse(expression, info);
         if (tree.jjtGetNumChildren() > 1) {
@@ -338,9 +336,9 @@ public class JexlEngine {
      *
      * @param scriptText A String containing valid JEXL syntax
      * @return A {@link Script} which can be executed using a {@link JexlContext}.
-     * @throws ParseException if there is a problem parsing the script.
+     * @throws JexlException if there is a problem parsing the script.
      */
-    public Script createScript(String scriptText) throws ParseException {
+    public Script createScript(String scriptText) {
         return createScript(scriptText, null);
     }
 
@@ -351,9 +349,9 @@ public class JexlEngine {
      * @param scriptText A String containing valid JEXL syntax
      * @param info An info structure to carry debugging information if needed
      * @return A {@link Script} which can be executed using a {@link JexlContext}.
-     * @throws ParseException if there is a problem parsing the script.
+     * @throws JexlException if there is a problem parsing the script.
      */
-    public Script createScript(String scriptText, Info info) throws ParseException {
+    public Script createScript(String scriptText, Info info) {
         if (scriptText == null) {
             throw new NullPointerException("scriptText is null");
         }
@@ -371,9 +369,9 @@ public class JexlEngine {
      * @return A {@link Script} which can be executed with a
      *      {@link JexlContext}.
      * @throws IOException if there is a problem reading the script.
-     * @throws ParseException if there is a problem parsing the script.
+     * @throws JexlException if there is a problem parsing the script.
      */
-    public Script createScript(File scriptFile) throws ParseException, IOException {
+    public Script createScript(File scriptFile) throws IOException {
         if (scriptFile == null) {
             throw new NullPointerException("scriptFile is null");
         }
@@ -398,9 +396,9 @@ public class JexlEngine {
      * @return A {@link Script} which can be executed with a
      *      {@link JexlContext}.
      * @throws IOException if there is a problem reading the script.
-     * @throws ParseException if there is a problem parsing the script.
+     * @throws JexlException if there is a problem parsing the script.
      */
-    public Script createScript(URL scriptUrl) throws ParseException, IOException {
+    public Script createScript(URL scriptUrl) throws IOException {
         if (scriptUrl == null) {
             throw new NullPointerException("scriptUrl is null");
         }
@@ -469,12 +467,6 @@ public class JexlEngine {
                 return null;
             }
             throw xjexl;
-        } catch (ParseException xparse) {
-            if (silent) {
-                logger.warn(xparse.getMessage(), xparse.getCause());
-                return null;
-            }
-            throw new JexlException(null, "parsing error", xparse);
         }
     }
 
@@ -536,12 +528,6 @@ public class JexlEngine {
                 return;
             }
             throw xjexl;
-        } catch (ParseException xparse) {
-            if (silent) {
-                logger.warn(xparse.getMessage(), xparse.getCause());
-                return;
-            }
-            throw new JexlException(null, "parsing error", xparse);
         }
     }
 
@@ -556,18 +542,77 @@ public class JexlEngine {
     public Object invokeMethod(Object obj, String meth, Object... args) {
         JexlException xjexl = null;
         Object result = null;
+        Info info = debugInfo();
         try {
-            JexlMethod method = uberspect.getMethod(obj, meth, args, DebugInfo.NONE);
+            JexlMethod method = uberspect.getMethod(obj, meth, args, info);
             if (method == null && arithmetic.narrowArguments(args)) {
-                method = uberspect.getMethod(obj, meth, args, DebugInfo.NONE);
+                method = uberspect.getMethod(obj, meth, args, info);
             }
             if (method != null) {
                 result = method.invoke(obj, args);
             } else {
-                xjexl = new JexlException(null, "failed finding method " + meth);
+                xjexl = new JexlException(info, "failed finding method " + meth);
             }
         } catch (Exception xany) {
-            xjexl = new JexlException(null, "failed executing method " + meth, xany);
+            xjexl = new JexlException(info, "failed executing method " + meth, xany);
+        } finally {
+            if (xjexl != null) {
+                if (silent) {
+                    logger.warn(xjexl.getMessage(), xjexl.getCause());
+                    return null;
+                }
+                throw xjexl;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Creates a new instance of an object using the most appropriate constructor
+     * based on the arguments.
+     * @param <T> the type of object
+     * @param clazz the class to instantiate
+     * @param args the constructor arguments
+     * @return the created object instance or null on failure when silent
+     */
+    public <T> T newInstance(Class<? extends T> clazz, Object...args) {
+        return clazz.cast(doCreateInstance(clazz, args));
+    }
+
+    /**
+     * Creates a new instance of an object using the most appropriate constructor
+     * based on the arguments.
+     * @param clazz the name of the class to instantiate resolved through this engine's class loader
+     * @param args the constructor arguments
+     * @return the created object instance or null on failure when silent
+     */
+    public Object newInstance(String clazz, Object...args) {
+       return doCreateInstance(clazz, args);
+    }
+
+    /**
+     * Creates a new instance of an object using the most appropriate constructor
+     * based on the arguments.
+     * @param clazz the class to instantiate
+     * @param args the constructor arguments
+     * @return the created object instance or null on failure when silent
+     */
+    protected Object doCreateInstance(Object clazz, Object...args) {
+        JexlException xjexl = null;
+        Object result = null;
+        Info info = debugInfo();
+        try {
+            Constructor<?> ctor = uberspect.getConstructor(clazz, args, info);
+            if (ctor == null && arithmetic.narrowArguments(args)) {
+                ctor = uberspect.getConstructor(clazz, args, info);
+            }
+            if (ctor != null) {
+                result = ctor.newInstance(args);
+            } else {
+                xjexl = new JexlException(info, "failed finding constructor for " + clazz.toString());
+            }
+        } catch (Exception xany) {
+            xjexl = new JexlException(info, "failed executing constructor for " + clazz.toString(), xany);
         } finally {
             if (xjexl != null) {
                 if (silent) {
@@ -684,13 +729,12 @@ public class JexlEngine {
      * @param expression the expression to parse
      * @param info debug information structure
      * @return the parsed tree
-     * @throws ParseException if any error occured during parsing
+     * @throws JexlException if any error occured during parsing
      */
-    protected ASTJexlScript parse(CharSequence expression, Info info) throws ParseException {
+    protected ASTJexlScript parse(CharSequence expression, Info info) {
         String expr = cleanExpression(expression);
         ASTJexlScript tree = null;
         synchronized (parser) {
-            logger.debug("Parsing expression: " + expression);
             if (cache != null) {
                 tree = cache.get(expr);
                 if (tree != null) {
@@ -700,45 +744,59 @@ public class JexlEngine {
             try {
                 Reader reader = new StringReader(expr);
                 // use first calling method of JexlEngine as debug info
-                if (info == null && debug) {
-                    Throwable xinfo = new Throwable();
-                    xinfo.fillInStackTrace();
-                    StackTraceElement[] stack = xinfo.getStackTrace();
-                    StackTraceElement se = null;
-                    Class<?> clazz = getClass();
-                    for (int s = 1; s < stack.length; ++s, se = null) {
-                        se = stack[s];
-                        String className = se.getClassName();
-                        if (!className.equals(clazz.getName())) {
-                            // go deeper if called from JexlEngine, UnifiedJEXL or a Factory
-                            if (className.equals(JexlEngine.class.getName())) {
-                                clazz = JexlEngine.class;
-                            } else if (className.equals(UnifiedJEXL.class.getName())) {
-                                clazz = UnifiedJEXL.class;
-                            } else if (className.equals(ScriptFactory.class.getName())) {
-                                clazz = ScriptFactory.class;
-                            } else if (className.equals(ExpressionFactory.class.getName())) {
-                                clazz = ExpressionFactory.class;
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-                    if (se != null) {
-                        info = new Info(se.getClassName() + "." + se.getMethodName(), se.getLineNumber(), 0);
-                    }
+                if (info == null) {
+                    info = debugInfo();
                 }
                 tree = parser.parse(reader, info);
                 if (cache != null) {
                     cache.put(expr, tree);
                 }
-            } catch (TokenMgrError tme) {
-                throw new ParseException(tme.getMessage());
-            } catch (ParseException e) {
-                throw e;
+            } catch (TokenMgrError xtme) {
+                throw new JexlException(info, "parsing failed", xtme);
+            } catch (ParseException xparse) {
+                throw new JexlException(info, "pasing failed", xparse);
             }
         }
         return tree;
+    }
+
+    /**
+     * Creates and fills up debugging information.
+     * <p>This gathers the class, method and line number of the first calling method
+     * not owned by JexlEngine, UnifiedJEXL or {Script,Expression}Factory.</p>
+     * @return an Info if debug is set, null otherwise
+     */
+    protected Info debugInfo() {
+        Info info = null;
+        if (debug) {
+            Throwable xinfo = new Throwable();
+            xinfo.fillInStackTrace();
+            StackTraceElement[] stack = xinfo.getStackTrace();
+            StackTraceElement se = null;
+            Class<?> clazz = getClass();
+            for (int s = 1; s < stack.length; ++s, se = null) {
+                se = stack[s];
+                String className = se.getClassName();
+                if (!className.equals(clazz.getName())) {
+                    // go deeper if called from JexlEngine, UnifiedJEXL or a Factory
+                    if (className.equals(JexlEngine.class.getName())) {
+                        clazz = JexlEngine.class;
+                    } else if (className.equals(UnifiedJEXL.class.getName())) {
+                        clazz = UnifiedJEXL.class;
+                    } else if (className.equals(ScriptFactory.class.getName())) {
+                        clazz = ScriptFactory.class;
+                    } else if (className.equals(ExpressionFactory.class.getName())) {
+                        clazz = ExpressionFactory.class;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            if (se != null) {
+                info = new Info(se.getClassName() + "." + se.getMethodName(), se.getLineNumber(), 0);
+            }
+        }
+        return info;
     }
 
     /**

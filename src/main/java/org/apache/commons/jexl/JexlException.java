@@ -17,6 +17,7 @@
 package org.apache.commons.jexl;
 
 import org.apache.commons.jexl.parser.JexlNode;
+import org.apache.commons.jexl.util.introspection.Info;
 
 /**
  * Wraps any error that might occur during interpretation of a script or expression.
@@ -26,7 +27,9 @@ public class JexlException extends RuntimeException {
     /** Serial version UID. */
     private static final long serialVersionUID = 2690666400232612395L;
     /** The point of origin for this exception. */
-    protected JexlNode mark;
+    protected final JexlNode mark;
+    /** The debug info */
+    protected final Info info;
     /** A marker to use in NPEs stating a null operand error. */
     public static final String NULL_OPERAND = "jexl.null";
     /**
@@ -37,7 +40,10 @@ public class JexlException extends RuntimeException {
     public JexlException(JexlNode node, String msg) {
         super(msg);
         mark = node;
+        info = node != null? node.getInfo() : null;
+
     }
+
     /**
      * Creates a new JexlException.
      * @param node the node causing the error
@@ -47,6 +53,30 @@ public class JexlException extends RuntimeException {
     public JexlException(JexlNode node, String msg, Throwable cause) {
         super(msg, cause);
         mark = node;
+        info = node != null? node.getInfo() : null;
+    }
+    
+    /**
+     * Creates a new JexlException.
+     * @param dbg the debugging information associated
+     * @param msg the error message
+     */
+    public JexlException(Info dbg, String msg) {
+        super(msg);
+        mark = null;
+        info = dbg;
+    }
+
+    /**
+     * Creates a new JexlException.
+     * @param dbg the debugging information associated
+     * @param msg the error message
+     * @param cause the exception causing the error
+     */
+    public JexlException(Info dbg, String msg, Throwable cause) {
+        super(msg, cause);
+        mark = null;
+        info = dbg;
     }
     
     /**
@@ -84,8 +114,10 @@ public class JexlException extends RuntimeException {
     public String getMessage() {
         Debugger dbg = new Debugger();
         StringBuilder msg = new StringBuilder();
+        if (info != null) {
+            msg.append(info.debugString());
+        }
         if (dbg.debug(mark)) {
-            msg.append(mark.debugString());
             msg.append("![");
             msg.append(dbg.start());
             msg.append(",");

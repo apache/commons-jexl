@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl;
 
-import org.apache.commons.jexl.parser.ParseException;
-
 /**
  * Creates Expression objects. 
  * <p>
@@ -59,14 +57,13 @@ public final class ExpressionFactory {
      * must contain either a reference or an expression.
      * @param expression A String containing valid JEXL syntax
      * @return An Expression object which can be evaluated with a JexlContext
-     * @throws ParseException An exception can be thrown if there is a problem
+     * @throws JexlException An exception can be thrown if there is a problem
      *      parsing this expression, or if the expression is neither an
      *      expression or a reference.
      * @deprecated Create a JexlEngine and use createExpression() on that
      */
     @Deprecated
-    public static Expression createExpression(String expression)
-        throws ParseException {
+    public static Expression createExpression(String expression) {
         return ScriptFactory.getInstance().createExpression(expression);
     }
 
