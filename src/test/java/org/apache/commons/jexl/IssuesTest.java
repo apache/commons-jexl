@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl;
 
-import org.apache.commons.jexl.parser.ParseException;
 import java.util.Map;
 
 /**
@@ -103,7 +102,7 @@ public class IssuesTest extends JexlTestCase {
     }
 
     // JEXL-42: NullPointerException evaluating an expression
-    // fixed in JexlArithmetic by allowing add to deal with string, null
+    // fixed in JexlArithmetic by allowing add operator to deal with string, null
     public void test42() throws Exception {
         JexlEngine jexl = new JexlEngine();
         UnifiedJEXL uel = new UnifiedJEXL(jexl);
@@ -280,7 +279,7 @@ public class IssuesTest extends JexlTestCase {
             try {
                 jexl.createScript(fexprs[f]);
                 fail(fexprs[f] + ": Should have failed in parse");
-            } catch (ParseException xany) {
+            } catch (JexlException xany) {
                 // expected to fail in parse
             }
         }

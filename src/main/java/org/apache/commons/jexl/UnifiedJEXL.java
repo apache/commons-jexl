@@ -18,12 +18,11 @@ package org.apache.commons.jexl;
 
 import java.util.ArrayList;
 import org.apache.commons.jexl.parser.JexlNode;
-import org.apache.commons.jexl.parser.ParseException;
 import org.apache.commons.jexl.parser.StringParser;
 import org.apache.commons.jexl.util.introspection.Info;
 
 /**
- * An evaluator similar to the unified EL evaluator used in JSP/JSF based on JEXL.
+ * An evaluator similar to the Unified EL evaluator used in JSP/JSF based on JEXL.
  * It is intended to be used in configuration modules, XML based frameworks or JSP taglibs
  * and facilitate the implementation of expression evaluation.
  * <p>
@@ -80,7 +79,7 @@ public final class UnifiedJEXL {
     /** The expression cache. */
     private final JexlEngine.SoftCache<String,Expression> cache;
     /** The default cache size. */
-    private static final int CACHE_SIZE = 512;
+    private static final int CACHE_SIZE = 256;
     /**
      * Creates a new instance of UnifiedJEXL with a default size cache.
      * @param aJexl the JexlEngine to use.
@@ -325,17 +324,17 @@ public final class UnifiedJEXL {
          * Prepares a sub-expression for interpretation.
          * @param interpreter a JEXL interpreter
          * @return a prepared expression
-         * @throws ParseException (only for nested & composite)
+         * @throws JexlException (only for nested & composite)
          */
-        abstract Expression prepare(Interpreter interpreter) throws ParseException;
+        abstract Expression prepare(Interpreter interpreter);
 
         /**
          * Intreprets a sub-expression.
          * @param interpreter a JEXL interpreter
          * @return the result of interpretation
-         * @throws ParseException (only for nested & composite)
+         * @throws JexlException (only for nested & composite)
          */
-        abstract Object evaluate(Interpreter interpreter) throws ParseException;
+        abstract Object evaluate(Interpreter interpreter);
     }
 
 
@@ -404,7 +403,7 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        Expression prepare(Interpreter interpreter) throws ParseException {
+        Expression prepare(Interpreter interpreter) {
             return this;
         }
 
@@ -416,7 +415,7 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        Object evaluate(Interpreter interpreter) throws ParseException {
+        Object evaluate(Interpreter interpreter) {
             return value;
         }
     }
@@ -475,7 +474,7 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        Expression prepare(Interpreter interpreter) throws ParseException {
+        Expression prepare(Interpreter interpreter) {
             return this;
         }
 
@@ -487,7 +486,7 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        Object evaluate(Interpreter interpreter) throws ParseException {
+        Object evaluate(Interpreter interpreter) {
             return interpreter.interpret(node);
         }
     }
@@ -582,7 +581,7 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        public Expression prepare(Interpreter interpreter) throws ParseException {
+        public Expression prepare(Interpreter interpreter) {
             String value = interpreter.interpret(node).toString();
             JexlNode dnode = toNode(value, jexl.isDebug()? node.getInfo() : null);
             return new DeferredExpression(value, dnode, this);
@@ -590,7 +589,7 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        public Object evaluate(Interpreter interpreter) throws ParseException {
+        public Object evaluate(Interpreter interpreter) {
             return prepare(interpreter).evaluate(interpreter);
         }
     }
@@ -644,7 +643,7 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        Expression prepare(Interpreter interpreter) throws ParseException {
+        Expression prepare(Interpreter interpreter) {
             // if this composite is not its own source, it is already prepared
             if (source != this) {
                 return this;
@@ -683,7 +682,7 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        Object evaluate(Interpreter interpreter) throws ParseException {
+        Object evaluate(Interpreter interpreter) {
             final int size = exprs.length;
             Object value = null;
             // common case: evaluate all expressions & concatenate them as a string
@@ -709,34 +708,34 @@ public final class UnifiedJEXL {
      * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
      */
     public Expression parse(String expression) {
+        Exception xuel = null;
+        Expression stmt = null;
         try {
             if (cache == null) {
-                return parseExpression(expression);
+                stmt = parseExpression(expression);
             } else {
                 synchronized (cache) {
-                    Expression stmt = cache.get(expression);
+                    stmt = cache.get(expression);
                     if (stmt == null) {
                         stmt = parseExpression(expression);
                         cache.put(expression, stmt);
                     }
-                    return stmt;
                 }
             }
         } catch (JexlException xjexl) {
-            Exception xuel = new Exception("failed to parse '" + expression + "'", xjexl);
-            if (jexl.isSilent()) {
-                jexl.logger.warn(xuel.getMessage(), xuel.getCause());
-                return null;
+            xuel = new Exception("failed to parse '" + expression + "'", xjexl);
+        } catch (Exception xuel$) {
+            xuel = xuel$;
+        } finally {
+            if (xuel != null) {
+                if (jexl.isSilent()) {
+                    jexl.logger.warn(xuel.getMessage(), xuel.getCause());
+                    return null;
+                }
+                throw xuel;
             }
-            throw xuel;
-        } catch (ParseException xparse) {
-            Exception xuel = new Exception("failed to parse '" + expression + "'", xparse);
-            if (jexl.isSilent()) {
-                jexl.logger.warn(xuel.getMessage(), xuel.getCause());
-                return null;
-            }
-            throw xuel;
         }
+        return stmt;
     }
 
     /**
@@ -754,13 +753,6 @@ public final class UnifiedJEXL {
             return expr.prepare(interpreter);
         } catch (JexlException xjexl) {
             Exception xuel = createException("prepare", expr, xjexl);
-            if (jexl.isSilent()) {
-                jexl.logger.warn(xuel.getMessage(), xuel.getCause());
-                return null;
-            }
-            throw xuel;
-        } catch (ParseException xparse) {
-            Exception xuel = createException("prepare", expr, xparse);
             if (jexl.isSilent()) {
                 jexl.logger.warn(xuel.getMessage(), xuel.getCause());
                 return null;
@@ -789,13 +781,6 @@ public final class UnifiedJEXL {
                 return null;
             }
             throw xuel;
-        } catch (ParseException xparse) {
-            Exception xuel = createException("evaluate", expr, xparse);
-            if (jexl.isSilent()) {
-                jexl.logger.warn(xuel.getMessage(), xuel.getCause());
-                return null;
-            }
-            throw xuel;
         }
     }
 
@@ -803,9 +788,9 @@ public final class UnifiedJEXL {
      * Use the JEXL parser to create the AST for an expression.
      * @param expression the expression to parse
      * @return the AST
-     * @throws ParseException if an error occur during parsing
+     * @throws JexlException if an error occur during parsing
      */
-    private JexlNode toNode(CharSequence expression) throws ParseException {
+    private JexlNode toNode(CharSequence expression) {
         return jexl.parse(expression, null);
     }
     
@@ -814,9 +799,9 @@ public final class UnifiedJEXL {
      * @param expression the expression to parse
      * @param info debug information
      * @return the AST
-     * @throws ParseException if an error occur during parsing
+     * @throws JexlException if an error occur during parsing
      */
-    private JexlNode toNode(CharSequence expression, Info info) throws ParseException {
+    private JexlNode toNode(CharSequence expression, Info info) {
         return jexl.parse(expression, info);
     }
 
@@ -865,9 +850,9 @@ public final class UnifiedJEXL {
      * Parses a unified expression.
      * @param expr the string expression
      * @return the expression instance
-     * @throws ParseException if an error occur during parsing
+     * @throws JexlException if an error occur during parsing
      */
-    private Expression parseExpression(String expr) throws ParseException {
+    private Expression parseExpression(String expr) {
         final int size = expr.length();
         ExpressionBuilder builder = new ExpressionBuilder(0);
         StringBuilder strb = new StringBuilder(size);
@@ -990,7 +975,7 @@ public final class UnifiedJEXL {
         }
         // we should be in that state
         if (state != ParseState.CONST) {
-            throw new ParseException("malformed expression: " + expr);
+            throw new Exception("malformed expression: " + expr, null);
         }
         // if any chars were buffered, add them as a constant
         if (strb.length() > 0) {

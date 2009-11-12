@@ -120,25 +120,36 @@ public class MethodTest extends JexlTestCase {
         asserter.assertExpression("Boolean.valueOf('true')", Boolean.TRUE);
     }
 
+    public static class MyMath {
+        public double cos(double x) {
+            return Math.cos(x);
+        }
+    }
+
    public void testTopLevelCall() throws Exception {
         java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
         funcs.put(null, new Functor());
+        funcs.put("math", new MyMath());
         JEXL.setFunctions(funcs);
 
-        Expression e = JEXL.createExpression("ten()");
         JexlContext jc = JexlHelper.createContext();
+
+        Expression e = JEXL.createExpression("ten()");
         Object o = e.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
 
         e = JEXL.createExpression("plus10(10)");
-        jc = JexlHelper.createContext();
         o = e.evaluate(jc);
         assertEquals("Result is not 20", new Integer(20), o);
 
         e = JEXL.createExpression("plus10(ten())");
-        jc = JexlHelper.createContext();
         o = e.evaluate(jc);
         assertEquals("Result is not 20", new Integer(20), o);
+
+        jc.getVars().put("pi", Math.PI);
+        e = JEXL.createExpression("math:cos(pi)");
+        o = e.evaluate(jc);
+        assertEquals(Double.valueOf(-1),o);
     }
 
     public void testNamespaceCall() throws Exception {

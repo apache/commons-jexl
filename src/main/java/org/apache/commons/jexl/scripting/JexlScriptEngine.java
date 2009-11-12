@@ -35,9 +35,6 @@ import org.apache.commons.jexl.JexlContext;
 import org.apache.commons.jexl.JexlEngine;
 import org.apache.commons.jexl.Script;
 
-// Note: this is a generated class, so won't be present until JavaCC has been run
-import org.apache.commons.jexl.parser.ParseException;
-
 /**
  * Implements the Jexl ScriptEngine for JSF-223.
  * <p>
@@ -151,8 +148,6 @@ public class JexlScriptEngine extends AbstractScriptEngine {
                 }
             };
             return script.execute(ctxt);
-        } catch (ParseException e) {
-            throw new ScriptException(e.toString());
         } catch (Exception e) {
             throw new ScriptException(e.toString());
         }

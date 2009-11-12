@@ -130,11 +130,14 @@ public class AssignTest extends JexlTestCase {
     }
     
     public void testMore() throws Exception {
+        JexlContext jc = JexlHelper.createContext();
+        jc.getVars().put("quuxClass", Quux.class);
+        Expression create = ENGINE.createExpression("quux = new(quuxClass, 'xuuq', 100)");
         Expression assign = ENGINE.createExpression("quux.froboz.value = 10");
         Expression check = ENGINE.createExpression("quux[\"froboz\"].value");
-        JexlContext jc = JexlHelper.createContext();
-        Quux quux = new Quux("xuuq", 100);
-        jc.getVars().put("quux", quux);
+
+        Quux quux = (Quux) create.evaluate(jc);
+        assertNotNull("quux is null", quux);
         Object o = assign.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
         o = check.evaluate(jc);
@@ -142,7 +145,7 @@ public class AssignTest extends JexlTestCase {
     }
 
     public void testUtil() throws Exception {
-        Quux quux = new Quux("xuuq", 100);
+        Quux quux = ENGINE.newInstance(Quux.class, "xuuq", 100);
         ENGINE.setProperty(quux, "froboz.value", Integer.valueOf(100));
         Object o = ENGINE.getProperty(quux, "froboz.value");
         assertEquals("Result is not 100", new Integer(100), o);
