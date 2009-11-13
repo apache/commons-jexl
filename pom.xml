@@ -141,11 +141,13 @@
             </resource>
         </resources>
         <pluginManagement>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.0-alpha-3</version>
-            </plugin>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.0-alpha-3</version>
+                </plugin>
+            </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
