@@ -45,7 +45,7 @@
         <action dev="henrib" type="fix" issue="JEXL-21" due-to="AC">operator overloading / hooks on operator processing</action>
         <action dev="henrib" type="add">'new' operator support</action>
         <action dev="henrib" type="add">Support Unicode escapes in string literals</action>
-        <action dev="henrib" type="update">Various performance enhancements & caches</action>
+        <action dev="henrib" type="update">Various performance enhancements &amp; caches</action>
     </release>
     <release version="1.1.1-SNAPSHOT" date="unreleased">
       <action dev="dion" type="update" issue="JEXL-23">Fix jdk1.3 only code that has crept into Jexl tests</action>
