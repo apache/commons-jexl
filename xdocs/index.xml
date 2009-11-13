@@ -23,55 +23,68 @@
 
     <body>
     <section name="Java Expression Language (JEXL)">
-
-    <p>
-      Java Expression Language (JEXL) is an expression language engine which can be 
-      embedded in applications and frameworks.  JEXL is inspired by Jakarta Velocity 
-      and the Expression Language defined in the JavaServer Pages Standard Tag Library 
-      version 1.1 (JSTL) and JavaServer Pages version 2.0 (JSP).  
-      While inspired by JSTL EL, it must be noted that JEXL is not a compatible 
-      implementation of EL as defined in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152). For a 
-      compatible implementation of these specifications, see the 
-      <a href="http://commons.apache.org/el/">Commons EL</a> project.
-
-    </p>
-
-    <p>
-      JEXL attempts to bring some of the lessons learned by the Velocity
-      community about expression languages in templating to a wider audience.
-      <a href="http://commons.apache.org/jelly">Commons Jelly</a> needed
-      Velocity-ish method access, it just had to have it.
-    </p>
-    
+        <p>
+            JEXL is a library intended to facilitate the implementation of dynamic and scripting features in applications
+            and frameworks.
+            It enables coding configuration, module/component loose-coupling dependencies or simple template capabilities using a
+            small footprint API.
+        </p>
+        <p>
+            Its name itself stands for Java EXpression Language, a simple expression language inspired by Jakarta Velocity
+            and the Expression Language defined in the JavaServer Pages Standard Tag Library version 1.1 (JSTL) and
+            JavaServer Pages version 2.0 (JSP).
+        </p>
+        <p>
+            The API and the expression language exploit Java-beans naming patterns through
+            introspection to expose property getters and setters.
+        </p>
+        <p>
+            JEXL attempts to bring some of the lessons learned by the Velocity
+            community about expression languages in templating to a wider audience.
+            <a href="http://commons.apache.org/jelly">Commons Jelly needed</a>
+            Velocity-ish method access, it just had to have it.
+        </p>
+        <p>
+            It must be noted that JEXL is not a compatibile implementation of EL as defined
+            in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152). For a compatible implementation of
+            these specifications, see the <a href="http://commons.apache.org/el">
+                Commons EL</a> project.
+        </p>
     </section>
-
+    
     <section name="A Brief Example">
+        <p>
+            When evaluating expressions, JEXL merges an
+            <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/Expression.html">Expression</a>
+            with a
+            <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">JexlContext</a>.
+            An Expression is created using
+            <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/ExpressionFactory.html#createExpression(java.lang.String)">ExpressionFactory.createExpression()</a>,
+            passing a String containing valid JEXL syntax.  A JexlContext is created using
+            <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlHelper.html#createContext()">JexlHelper.createContext()</a>,
+            and variables are put into a map exposed through the
+            <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlContext.html#getVars()">getVars()</a>
+            method on JexlContext.  The following example, takes a variable named foo, and
+            invokes the bar() method on the property innerFoo:
+        </p>
 
-    <p>
-      When evaluating expressions, JEXL merges an <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/Expression.html">Expression</a> with a <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">JexlContext</a>.
-      An Expression is created using <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/ExpressionFactory.html#createExpression(java.lang.String)">ExpressionFactory.createExpression()</a>, passing a
-      String containing valid JEXL syntax.  A JexlContext is created using 
-      <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlHelper.html#createContext()">JexlHelper.createContext()</a>, and variables are put into a map exposed through
-      the <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlContext.html#getVars()">getVars()</a> method on JexlContext.  The following example, takes a variable
-      named foo, and invokes the bar() method on the property innerFoo:
-    </p>
+        <source><![CDATA[
+            // Create or retrieve a JexlEngine
+            JexlEngine jexl = new JexlEngine();
+            // Create an expression object
+            String jexlExp = "foo.innerFoo.bar()";
+            Expression e = jexl.createExpression( jexlExp );
 
-    <source><![CDATA[
-    // Create an expression object
-    String jexlExp = "foo.innerFoo.bar()";
-    Expression e = ExpressionFactory.createExpression( jexlExp );
+            // Create a context and add data
+            JexlContext jc = JexlHelper.createContext();
+            jc.getVars().put("foo", new Foo() );
 
-    // Create a context and add data
-    JexlContext jc = JexlHelper.createContext();
-    jc.getVars().put("foo", new Foo() );
-
-    // Now evaluate the expression, getting the result
-    Object o = e.evaluate(jc);]]></source>
-
+            // Now evaluate the expression, getting the result
+            Object o = e.evaluate(jc);
+        ]]></source>
     </section>
-    
-    <section name="Extensions to JSTL Expression Language">
 
+    <section name="Extensions to JSTL Expression Language">
     <p>
     While JEXL is similar to the expression language defined in JSTL, it has improved
     upon the syntax in a few areas:
@@ -82,7 +95,7 @@
         Support for invocation of any accessible method (see example above).
         </li>
         <li>
-        Added a general <span class="literal">size()</span> method, which works on:
+        A general <span class="literal">size()</span> method, which works on:
           <ul>
             <li><span class="literal">String</span> - returns length</li>
             <li><span class="literal">Map</span> - returns number of keys</li>
@@ -90,7 +103,13 @@
           </ul>
         </li>
         <li>
-        Optional syntax for the 'empty' function : empty(obj)
+        A general <span class="literal">empty()</span> method, which works on Collections and Strings.
+        </li>
+        <li>
+        A general <span class="literal">new()</span> method allowing to instantiate objects.
+        </li>
+        <li>
+        Support for the ternary operator 'a ? b : c' - and its GNU-C / "Elvis" variant 'a ?: c'.
         </li>
         <li>
         Misc : '+' has been overloaded to be use as a String concatenation operator
@@ -102,7 +121,7 @@
 
     <section name="Releases">
         <p>
-        JEXL 1.1 has been released.
+        JEXL 2.0 is soon to be released; the current released version is 1.1.
         See the <a href="releases.html">releases</a> page for information on obtaining releases.
         </p>
     </section>
