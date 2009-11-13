@@ -32,18 +32,18 @@
         <action dev="henrib" type="add" issue="JEXL-15" due-to="Paul Libbrecht">User definable functions</action>
         <action dev="sebb" type="add" issue="JEXL-63">JSR-223 support</action>
         <action dev="henrib" type="update" issue="JEXL-10" due-to="Paul Libbrecht">Make possible checking for unresolved variables</action>
-        <action dev="henrib" type="update" issue="JEXL-11" due-to="Paul Libbrecht">Don't make null convertible into anything</action>
+        <action dev="henrib" type="update" issue="JEXL-11" due-to="Paul Libbrecht">Don&quot;t make null convertible into anything</action>
         <action dev="henrib" type="fix" issue="JEXL-47" due-to="sebb">Allow single-line comments with //</action>
-        <action dev="henrib" type="fix" issue="JEXL-44" due-to="sebb">Comments don't allow double-quotes</action>
+        <action dev="henrib" type="fix" issue="JEXL-44" due-to="sebb">Comments don&quot;t allow double-quotes</action>
         <action dev="henrib" type="add" issue="JEXL-71" due-to="sebb">Array literal syntax is not supported</action>
         <action dev="dion" type="fix" issue="JEXL-17" due-to="Nestor Urquiza">allowing quote escaping</action>
         <action dev="dion" type="fix" issue="JEXL-25" due-to="Marek Lewczuk">Call method with varargs</action>
         <action dev="dion" type="fix" issue="JEXL-32" due-to="Kedar Dave">BigDecimal values are treated as Long values which results in loss of precision</action>
         <action dev="dion" type="fix" issue="JEXL-33">Remove unnecessary throws Exception from various classes</action>
         <action dev="henrib" type="fix" issue="JEXL-50" due-to="sebb">Div operator does not do integer division</action>
-        <action dev="henrib" type="fix" issue="JEXL-87" due-to="sebb">Inconsistent behaviour of arithmetical operations<action>
+        <action dev="henrib" type="fix" issue="JEXL-87" due-to="sebb">Inconsistent behaviour of arithmetical operations</action>
         <action dev="henrib" type="fix" issue="JEXL-21" due-to="AC">operator overloading / hooks on operator processing</action>
-        <action dev="henrib" type="add">'new' operator support</action>
+        <action dev="henrib" type="add">&quot;new&quot; operator support</action>
         <action dev="henrib" type="add">Support Unicode escapes in string literals</action>
         <action dev="henrib" type="update">Various performance enhancements &amp; caches</action>
     </release>
