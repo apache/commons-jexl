@@ -1,7 +1,1 @@
-#banner, #footer, #leftcol, #breadcrumbs, .docs #toc, .docs .courtesylinks	{
-	display: none;
-	}
-body.docs div.docs	{
-	margin: 0 !important;
-	border: none !important
-	}
+@import url("http://commons.apache.org/style/print.css");
