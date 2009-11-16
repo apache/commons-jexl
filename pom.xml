@@ -117,7 +117,7 @@
         <commons.componentid>jexl</commons.componentid>
         <commons.release.version>2.0</commons.release.version>
         <!-- The RC version used in the staging repository URL. -->
-        <commons.rc.version>RC1</commons.rc.version>
+        <commons.rc.version>RC2</commons.rc.version>
         <commons.binary.suffix />
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
@@ -195,22 +195,6 @@
                     </comparisonArtifacts>
                 </configuration>
             </plugin>
-
-            <!-- For some yet unknown reason, this is required to generate the reports -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>2.0.1</version>
-                <configuration>
-              <!-- Exclude the navigation file for Maven 1 sites
-                   and the changes file used by the changes-plugin,
-                   as they interfere with the site generation. -->
-                    <moduleExcludes>
-                        <xdoc>navigation.xml,changes.xml</xdoc>
-                    </moduleExcludes>
-                </configuration>
-            </plugin>
-
         </plugins>
     </build>
 
