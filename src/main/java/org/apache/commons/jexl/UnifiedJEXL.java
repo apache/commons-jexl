@@ -724,8 +724,8 @@ public final class UnifiedJEXL {
             }
         } catch (JexlException xjexl) {
             xuel = new Exception("failed to parse '" + expression + "'", xjexl);
-        } catch (Exception xuel$) {
-            xuel = xuel$;
+        } catch (Exception xany) {
+            xuel = xany;
         } finally {
             if (xuel != null) {
                 if (jexl.isSilent()) {
