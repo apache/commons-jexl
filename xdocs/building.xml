@@ -43,7 +43,7 @@ limitations under the License.
     To build the full website, run "maven site". The result will be in "target/docs".
   </p>
   <p>
-    To build the site, you need Maven 1.0.2 and version 1.9.2 of the maven-xdoc-plugin installed.
+    To build the site, you need Maven 2.2.
   </p>
 </section>
 <!-- ================================================== -->
