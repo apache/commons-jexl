@@ -28,7 +28,7 @@ public class JexlException extends RuntimeException {
     private static final long serialVersionUID = 2690666400232612395L;
     /** The point of origin for this exception. */
     protected final JexlNode mark;
-    /** The debug info */
+    /** The debug info. */
     protected final Info info;
     /** A marker to use in NPEs stating a null operand error. */
     public static final String NULL_OPERAND = "jexl.null";
@@ -86,15 +86,15 @@ public class JexlException extends RuntimeException {
      * The info parameter, an int[2] optionally provided by the caller, will be filled with the begin/end offset
      * characters of the precise error's trigger.
      * </p>
-     * @param info character offset interval of the precise node triggering the error
+     * @param offsets character offset interval of the precise node triggering the error
      * @return a string representation of the offending expression, the empty string if it could not be determined
      */
-    public String getInfo(int[] info) {
+    public String getInfo(int[] offsets) {
         Debugger dbg = new Debugger();
         if (dbg.debug(mark)) {
-            if (info != null && info.length >= 2) {
-                info[0] = dbg.start();
-                info[1] = dbg.end();
+            if (offsets != null && offsets.length >= 2) {
+                offsets[0] = dbg.start();
+                offsets[1] = dbg.end();
             }
             return dbg.data();
         }

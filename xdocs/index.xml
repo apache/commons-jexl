@@ -30,7 +30,7 @@
             small footprint API.
         </p>
         <p>
-            Its name itself stands for Java EXpression Language, a simple expression language inspired by Jakarta Velocity
+            Its name stands for Java EXpression Language, a simple expression language inspired by Jakarta Velocity
             and the Expression Language defined in the JavaServer Pages Standard Tag Library version 1.1 (JSTL) and
             JavaServer Pages version 2.0 (JSP).
         </p>
@@ -121,7 +121,7 @@
 
     <section name="Releases">
         <p>
-        JEXL 2.0 is soon to be released; the current released version is 1.1.
+        The current released version is 2.0.
         See the <a href="releases.html">releases</a> page for information on obtaining releases.
         </p>
     </section>

@@ -325,7 +325,8 @@ public class JexlEngine {
         // Parse the expression
         ASTJexlScript tree = parse(expression, info);
         if (tree.jjtGetNumChildren() > 1) {
-            logger.warn("The JEXL Expression created will be a reference" + " to the first expression from the supplied script: \"" + expression + "\" ");
+            logger.warn("The JEXL Expression created will be a reference"
+                      + " to the first expression from the supplied script: \"" + expression + "\" ");
         }
         return new ExpressionImpl(this, expression, tree);
     }
