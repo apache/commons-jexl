@@ -34,30 +34,7 @@
             JEXL is a library intended to facilitate the implementation of dynamic and scripting features in applications
             and frameworks.
         </p>
-        <p>
-            It enables coding configuration, module/component loose-coupling dependencies or simple template capabilities using a
-            small footprint API.
-            Its name itself stands for Java EXpression Language, a simple expression language inspired by Jakarta Velocity
-            and the Expression Language defined in the JavaServer Pages Standard Tag Library version 1.1 (JSTL) and
-            JavaServer Pages version 2.0 (JSP).
-        </p>
-        <p>
-            The API and the expression language exploit Java-beans naming patterns through
-            introspection to expose property getters and setters.
-        </p>
-        <p>
-            JEXL attempts to bring some of the lessons learned by the Velocity
-            community about expression languages in templating to a wider audience.
-            <a href="http://commons.apache.org/jelly">Commons Jelly needed</a>
-            Velocity-ish method access, it just had to have it.
-        </p>
-        <p>
-            It must be noted that JEXL is not a compatibile implementation of EL as defined
-            in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152). For a compatible implementation of
-            these specifications, see the <a href="http://commons.apache.org/el">
-                Commons EL</a> project.
-        </p>
-
+        
         <h2><a name="example">A Brief Example</a></h2>
         <p>
             When evaluating expressions, JEXL merges an
@@ -93,7 +70,7 @@
         <ul>
             <li>Dynamic invocation of setters, getters, methods and constructors</li>
             <li>Script expressions known as JEXL expressions</li>
-            <li>JSP/JSF like expression known as UnifiedJEXL expresions</li>
+            <li>JSP/JSF like expression known as UnifiedJEXL expressions</li>
         </ul>
 
         <h3><a name="usage_api">Dynamic invocation</a></h3>
@@ -104,10 +81,10 @@
             set of methods:
         </p>
         <ul>
+            <li>{@link org.apache.commons.jexl.JexlEngine#newInstance}</li>
             <li>{@link org.apache.commons.jexl.JexlEngine#setProperty}</li>
             <li>{@link org.apache.commons.jexl.JexlEngine#getProperty}</li>
             <li>{@link org.apache.commons.jexl.JexlEngine#invokeMethod}</li>
-            <li>{@link org.apache.commons.jexl.JexlEngine#newInstance}</li>
         </ul>
         The following example illustrate their usage:
         <pre>
@@ -186,7 +163,7 @@
             JexlEngine jexl = new JexlEngine();
             UnifiedJEXL ujexl = new UnifiedJEXL(jexl);
             UnifiedJEXL.Expression expr = ujexl.parse("Hello ${user}");
-            String hello = expr.evaluate(context, expr);
+            String hello = expr.evaluate(context, expr).toString();
         </pre>
 
         <h2><a name="configuration">JEXL Configuration</a></h2>

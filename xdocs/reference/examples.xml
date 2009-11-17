@@ -18,7 +18,7 @@
 
 <document>
   <properties>
-    <title>Commons JEXL 1.0 Examples</title>
+    <title>Commons JEXL Examples</title>
   </properties>
 
   <body>
@@ -28,7 +28,6 @@
         <ul>
           <li><a href="#Evaluating Expressions">Evaluating Expressions</a></li>
           <li><a href="#Custom Contexts">Custom Contexts</a></li>
-          <li><a href="#Custom Resolvers">Custom Resolvers</a></li>
           <li><a href="#Example Expressions">Example Expressions</a></li>
         </ul>
       </p>
@@ -113,20 +112,6 @@
         </source>
       </p>
     </section>
-    <section name="Custom Resolvers">
-      <p>
-        JEXL allows you to add custom expression resolvers that will get called with before or after expression
-        evaluation.
-      </p>
-      <p>
-        If <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlExprResolver.html">pre-resolvers</a>
-        is added to an expression, any value it returns will be used instead of that normally provided by JEXL. If JEXL evaluates
-        an expression to <code>null</code> post-resolvers of an expression are called in turn in an attempt to get a value.
-      </p>
-      <p>
-        Expression resolvers are called in the order that they are added.
-      </p>
-    </section>
     <section name="Example Expressions">
       <!--  invoking methods, property access, array access, empty, size etc... -->
       <subsection name="Arithmetic">
@@ -136,11 +121,11 @@
 12.0 - 5.2
 6 * 12 + 5 / 2.6
 12 % 2
-6 div 4
+6 / 4
 -12 + 77.2
 x * 1.1 + y
         </source>
-        <p>Arithmetic expressions can use variables. <code>null</code> is treated as a zero for arithmetic.</p>
+        <p>Arithmetic expressions can use variables. <code>null</code> can be treated as a zero for arithmetic.</p>
       </subsection>
       <subsection name="Calling methods">
         <p>
