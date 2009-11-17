@@ -16,34 +16,33 @@
    limitations under the License.
 -->
 <document>
-   <properties>
-      <title>Downloads</title>
-   </properties>
+    <properties>
+        <title>Downloads</title>
+    </properties>
 
-   <body>
-      <section name="Releases">
-         
-         <p><strong>Latest Stable Release</strong></p>
-         <ul>
-           <li><a href="http://commons.apache.org/downloads/download_jexl.cgi">1.1 Binary/Source</a></li>
-         </ul>
-
-
-         <p><strong>Nightly Builds</strong></p>
-         <ul>
-            <li><a href="http://people.apache.org/builds/commons/nightly/commons-jexl/">Binary/Source</a></li>
-         </ul>
-
-          <p>
-             <strong>Archived Releases</strong>
-             <br/>
+    <body>
+        <section name="Releases">
+            <p><strong>Latest Stable Release</strong></p>
+            <ul>
+                <li>
+                    <a href="http://commons.apache.org/downloads/download_jexl.cgi">2.0 Binary/Source</a>
+                </li>
+            </ul>
+            <p><strong>Nightly Builds</strong></p>
+            <ul>
+                <li>
+                    <a href="http://people.apache.org/builds/commons/nightly/commons-jexl/">Binary/Source</a>
+                </li>
+            </ul>
+            <p>
+                <strong>Archived Releases</strong>
+                <br/>
              Older releases are retained by the Apache Software Foundation but are
              moved into a
-             <a href="http://archive.apache.org/dist/commons/jexl/">
-             special archive area</a>.
-          </p>
-
-      </section>
-
-   </body>
+                <a href="http://archive.apache.org/dist/commons/jexl/">
+             special archive area
+                </a>.
+            </p>
+        </section>
+    </body>
 </document>
