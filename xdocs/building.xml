@@ -24,8 +24,7 @@ limitations under the License.
 <!-- ================================================== -->
 <section name="Overview">
 <p>
-  Commons JEXL uses <a href="http://maven.apache.org">Maven</a> or
-  <a href="http://ant.apache.org">Ant</a> as a build system. The source is
+  Commons JEXL uses <a href="http://maven.apache.org">Maven 2.2</a>. The source is
   <a href="http://svn.apache.org/repos/asf/commons/proper/jexl/trunk/">here</a>.
 </p>
 </section>
@@ -33,30 +32,16 @@ limitations under the License.
 <section name="Maven Goals">
   <p>
     To build a jar file, change into JEXL's root directory (see source link above)
-    and run "maven jar". The result will be in the "target" subdirectory.
+    and run "mvn jar". The result will be in the "target" subdirectory.
   </p>
   <p>
-    To build the Javadocs, run "maven javadoc".
-    The result will be in "target/docs/apidocs".
+    To build the Javadocs, run "mvn javadoc".
+    The result will be in "target/site/apidocs".
   </p>
   <p>
-    To build the full website, run "maven site". The result will be in "target/docs".
+    To build the full website, run "mvn site". The result will be in "target/site".
   </p>
-  <p>
-    To build the site, you need Maven 2.2.
-  </p>
+
 </section>
-<!-- ================================================== -->
-<section name="Ant Goals">
-  <p>
-    To build a jar file, change into JEXL's root directory and run "ant jar".
-    The result will be in the "target" subdirectory.
-  </p>
-  <p>
-    To build the Javadocs, run "ant javadoc".
-    The result will be in "dist/docs".
-  </p>
-</section>
-<!-- ================================================== -->
 </body>
 </document>

@@ -23,10 +23,10 @@
     </bannerRight>
 
     <body>
-        <menu name="JEXL">
+        <menu name="Commons&#xA0;Jexl">
             <item name="Overview"                href="/index.html" />
+            <item name="2.0&#xA0;Javadoc"        href="/apidocs/index.html"/>
             <item name="1.1&#xA0;Javadoc"        href="/apidocs-1.1/index.html"/>
-            <item name="1.0&#xA0;Javadoc"        href="/apidocs-1.0/index.html"/>
             <item name="Releases and Builds"     href="/releases.html"/>
             <item name="Download"                href="http://commons.apache.org/downloads/download_jexl.cgi"/>
             <item name="Reference"               href="/reference/index.html"/>
