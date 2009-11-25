@@ -170,10 +170,10 @@
                     <execution>
                         <id>jexl-jjtree</id>
                         <configuration>
-                            <sourceDirectory>${basedir}/src/main/java/org/apache/commons/jexl/parser</sourceDirectory>
+                            <sourceDirectory>${basedir}/src/main/java/org/apache/commons/jexl2/parser</sourceDirectory>
                             <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                             <timestampDirectory>${project.build.directory}/generated-sources/javacc-timestamp</timestampDirectory>
-                            <packageName>org.apache.commons.jexl.parser</packageName>
+                            <packageName>org.apache.commons.jexl2.parser</packageName>
                         </configuration>
                         <goals>
                             <goal>jjtree-javacc</goal>
