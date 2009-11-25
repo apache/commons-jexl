@@ -66,7 +66,7 @@
       </p>
       <p>
         Once you have your expression, you can then use use the
-        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/Expression.html#evaluate(org.apache.commons.jexl.JexlContext)">evaluate</a>
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/Expression.html#evaluate(org.apache.commons.jexl2.JexlContext)">evaluate</a>
         to execute it and obtain a result.
       </p>
       <p>

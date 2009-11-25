@@ -16,4 +16,4 @@
 #  
 # 
 
-org.apache.commons.jexl.scripting.JexlScriptEngineFactory
+org.apache.commons.jexl2.scripting.JexlScriptEngineFactory

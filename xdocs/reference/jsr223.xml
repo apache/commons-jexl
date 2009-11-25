@@ -48,7 +48,7 @@
         <p>
         The binary release includes a command-line application which can be used to exercise the JSR-223 script engine.
         For example:
-        <source>java -cp commons-jexl-2.0.jar;commons-logging-1.1.1.jar[;bsf-api-3.0.jar] org.apache.commons.jexl.scripting.Main script.jexl</source>
+        <source>java -cp commons-jexl-2.0.jar;commons-logging-1.1.1.jar[;bsf-api-3.0.jar] org.apache.commons.jexl2.scripting.Main script.jexl</source>
         If a single argument is provided, then that is assumed to be the name of a script file;
         otherwise, the application prompts for script input to be evaluated.
         In both cases, the variable "args" contains the command-line arguments.
@@ -71,9 +71,9 @@
       <p>
         The classes used to support JSR-223 scripting access are:
         <ul>
-        <li>org.apache.commons.jexl.scripting.JexlScriptEngineFactory - the factory</li>
-        <li>org.apache.commons.jexl.scripting.JexlScriptEngine - the engine</li>
-        <li>org.apache.commons.jexl.scripting.JexlScriptObject - class used to give scripts access to JEXL objects</li>
+        <li>org.apache.commons.jexl2.scripting.JexlScriptEngineFactory - the factory</li>
+        <li>org.apache.commons.jexl2.scripting.JexlScriptEngine - the engine</li>
+        <li>org.apache.commons.jexl2.scripting.JexlScriptObject - class used to give scripts access to JEXL objects</li>
         </ul>
       </p>
     </section>
