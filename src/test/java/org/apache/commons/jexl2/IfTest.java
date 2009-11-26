@@ -37,7 +37,7 @@ public class IfTest extends JexlTestCase {
      */
     public void testSimpleIfTrue() throws Exception {
         Expression e = JEXL.createExpression("if (true) 1");
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Object o = e.evaluate(jc);
         assertEquals("Result is not 1", new Integer(1), o);
@@ -50,7 +50,7 @@ public class IfTest extends JexlTestCase {
      */
     public void testSimpleIfFalse() throws Exception {
         Expression e = JEXL.createExpression("if (false) 1");
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Object o = e.evaluate(jc);
         assertNull("Return value is not empty", o);
@@ -64,7 +64,7 @@ public class IfTest extends JexlTestCase {
     public void testSimpleElse() throws Exception {
         Expression e = JEXL
                 .createExpression("if (false) 1 else 2;");
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Object o = e.evaluate(jc);
         assertEquals("Result is not 2", new Integer(2), o);
@@ -78,7 +78,7 @@ public class IfTest extends JexlTestCase {
     public void testBlockIfTrue() throws Exception {
         Expression e = JEXL
                 .createExpression("if (true) { 'hello'; }");
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Object o = e.evaluate(jc);
         assertEquals("Result is wrong", "hello", o);
@@ -92,7 +92,7 @@ public class IfTest extends JexlTestCase {
     public void testBlockElse() throws Exception {
         Expression e = JEXL
                 .createExpression("if (false) {1} else {2 ; 3}");
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Object o = e.evaluate(jc);
         assertEquals("Result is wrong", new Integer(3), o);
@@ -106,8 +106,8 @@ public class IfTest extends JexlTestCase {
     public void testIfWithSimpleExpression() throws Exception {
         Expression e = JEXL
                 .createExpression("if (x == 1) true;");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", new Integer(1));
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("x", new Integer(1));
 
         Object o = e.evaluate(jc);
         assertEquals("Result is not true", Boolean.TRUE, o);
@@ -121,8 +121,8 @@ public class IfTest extends JexlTestCase {
     public void testIfWithArithmeticExpression() throws Exception {
         Expression e = JEXL
                 .createExpression("if ((x * 2) + 1 == 5) true;");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", new Integer(2));
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("x", new Integer(2));
 
         Object o = e.evaluate(jc);
         assertEquals("Result is not true", Boolean.TRUE, o);
@@ -136,8 +136,8 @@ public class IfTest extends JexlTestCase {
     public void testIfWithDecimalArithmeticExpression() throws Exception {
         Expression e = JEXL
                 .createExpression("if ((x * 2) == 5) true");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", new Float(2.5f));
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("x", new Float(2.5f));
 
         Object o = e.evaluate(jc);
         assertEquals("Result is not true", Boolean.TRUE, o);
@@ -151,11 +151,11 @@ public class IfTest extends JexlTestCase {
     public void testIfWithAssignment() throws Exception {
         Expression e = JEXL
                 .createExpression("if ((x * 2) == 5) {y = 1} else {y = 2;}");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", new Float(2.5f));
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("x", new Float(2.5f));
 
         e.evaluate(jc);
-        Object result = jc.getVars().get("y");
+        Object result = jc.getJexlVariable("y");
         assertEquals("y has the wrong value", new Integer(1), result);
     }
 
@@ -167,7 +167,7 @@ public class IfTest extends JexlTestCase {
     public void testTernary() throws Exception {
         JexlEngine jexl = new JexlEngine();
         jexl.setCache(64);
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
         Expression e = jexl.createExpression("x.y.z = foo ?'bar':'quux'");
         Object o;
 
@@ -178,40 +178,40 @@ public class IfTest extends JexlTestCase {
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             assertEquals("Should be quux", "quux", o);
-            o = jc.getVars().get("x.y.z");
+            o = jc.getJexlVariable("x.y.z");
             assertEquals("Should be quux", "quux", o);
         }
 
-        jc.getVars().put("foo", null);
+        jc.setJexlVariable("foo", null);
 
         for(int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             assertEquals("Should be quux", "quux", o);
-            o = jc.getVars().get("x.y.z");
+            o = jc.getJexlVariable("x.y.z");
             assertEquals("Should be quux", "quux", o);
         }
 
-        jc.getVars().put("foo",Boolean.FALSE);
+        jc.setJexlVariable("foo",Boolean.FALSE);
 
         for(int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             assertEquals("Should be quux", "quux", o);
-            o = jc.getVars().get("x.y.z");
+            o = jc.getJexlVariable("x.y.z");
             assertEquals("Should be quux", "quux", o);
         }
 
-        jc.getVars().put("foo",Boolean.TRUE);
+        jc.setJexlVariable("foo",Boolean.TRUE);
 
         for(int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             assertEquals("Should be bar", "bar", o);
-            o = jc.getVars().get("x.y.z");
+            o = jc.getJexlVariable("x.y.z");
             assertEquals("Should be bar", "bar", o);
         }
 
@@ -226,7 +226,7 @@ public class IfTest extends JexlTestCase {
     public void testTernaryShorthand() throws Exception {
         JexlEngine jexl = new JexlEngine();
         jexl.setCache(64);
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
         Expression e = JEXL.createExpression("x.y.z = foo?:'quux'");
         Object o;
 
@@ -237,40 +237,40 @@ public class IfTest extends JexlTestCase {
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             assertEquals("Should be quux", "quux", o);
-            o = jc.getVars().get("x.y.z");
+            o = jc.getJexlVariable("x.y.z");
             assertEquals("Should be quux", "quux", o);
         }
 
-        jc.getVars().put("foo", null);
+        jc.setJexlVariable("foo", null);
 
         for(int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             assertEquals("Should be quux", "quux", o);
-            o = jc.getVars().get("x.y.z");
+            o = jc.getJexlVariable("x.y.z");
             assertEquals("Should be quux", "quux", o);
         }
 
-        jc.getVars().put("foo", Boolean.FALSE);
+        jc.setJexlVariable("foo", Boolean.FALSE);
 
         for(int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             assertEquals("Should be quux", "quux", o);
-            o = jc.getVars().get("x.y.z");
+            o = jc.getJexlVariable("x.y.z");
             assertEquals("Should be quux", "quux", o);
         }
 
-        jc.getVars().put("foo","bar");
+        jc.setJexlVariable("foo","bar");
         
         for(int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             assertEquals("Should be bar", "bar", o);
-            o = jc.getVars().get("x.y.z");
+            o = jc.getJexlVariable("x.y.z");
             assertEquals("Should be bar", "bar", o);
         }
 

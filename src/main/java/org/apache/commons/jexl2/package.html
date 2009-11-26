@@ -58,8 +58,8 @@
             Expression e = jexl.createExpression( jexlExp );
 
             // Create a context and add data
-            JexlContext jc = JexlHelper.createContext();
-            jc.getVars().put("foo", new Foo() );
+            JexlContext jc = new JexlContext.Mapped();
+            jc.setJexlVariable("foo", new Foo() );
 
             // Now evaluate the expression, getting the result
             Object o = e.evaluate(jc);
@@ -134,8 +134,8 @@
         <pre>
             JexlEngine jexl = nex JexlEngine();
 
-            JexlContext jc = JexlHelper.createContext();
-            jc.getVars().put("quuxClass", quux.class);
+            JexlContext jc = new JexlContext.Mapped();
+            jc.setJexlVariable("quuxClass", quux.class);
 
             Expression create = jexl.createExpression("quux = new(quuxClass, 'xuuq', 100)");
             Expression assign = jexl.createExpression("quux.froboz.value = 10");
@@ -219,8 +219,8 @@
             JexlEngine jexl = new JexlEngine();
             jexl.setFunctions(funcs);
 
-            JexlContext jc = JexlHelper.createContext();
-            jc.getVars().put("pi", Math.PI);
+            JexlContext jc = new JexlContext.Mapped();
+            jc.setJexlVariable("pi", Math.PI);
 
             e = JEXL.createExpression("math:cos(pi)");
             o = e.evaluate(jc);

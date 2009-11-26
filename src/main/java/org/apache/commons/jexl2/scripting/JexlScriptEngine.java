@@ -20,9 +20,6 @@ package org.apache.commons.jexl2.scripting;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 
 import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
@@ -137,16 +134,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
         
         try {
             Script script = jexlEngine.createScript(scriptText);
-            JexlContext ctxt = new JexlContext(){
-                @SuppressWarnings("unchecked")
-                public void setVars(Map vars) {
-                    context.setBindings(new SimpleBindings(vars), ScriptContext.ENGINE_SCOPE);
-                }
-
-                public Map<String,Object> getVars() {
-                    return new JexlContextWrapper(context);
-                }
-            };
+            JexlContext ctxt = new JexlContextWrapper(context);
             return script.execute(ctxt);
         } catch (Exception e) {
             throw new ScriptException(e.toString());
@@ -168,18 +156,16 @@ public class JexlScriptEngine extends AbstractScriptEngine {
 
     /**
      * Wrapper to help convert a JSR-223 ScriptContext into a JexlContext.
-     * 
+     *
      * Current implementation only gives access to ENGINE_SCOPE binding.
      */
     @SuppressWarnings("unchecked")
-    private static class JexlContextWrapper implements Map<String,Object> {
-        
+    private static class JexlContextWrapper implements JexlContext.Nullable {
         /** The engine context. */
         private final ScriptContext engineContext;
-
         /**
          * Create the class.
-         * 
+         *
          * @param context the engine context.
          */
         private JexlContextWrapper (final ScriptContext  context){
@@ -187,88 +173,23 @@ public class JexlScriptEngine extends AbstractScriptEngine {
         }
 
         /** {@inheritDoc} */
-        public void clear() {
-            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
-            bnd.clear();
+        public Object getJexlVariable(String name) {
+            return engineContext.getAttribute(name);
         }
 
         /** {@inheritDoc} */
-        public boolean containsKey(final Object key) {
-            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.containsKey(key);
-        }
-
-        /** {@inheritDoc} */
-        public boolean containsValue(final Object value) {
-            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.containsValue(value);
-        }
-
-        /** {@inheritDoc} */
-        public Set entrySet() {
-            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.entrySet();
-        }
-
-        // Fetch first match of key, either engine or global
-        /** {@inheritDoc} */
-        public Object get(final Object key) {
-            if (key instanceof String) {
-                return engineContext.getAttribute((String) key);
-            }
-            return null;
-        }
-
-        /** {@inheritDoc} */
-        public boolean isEmpty() {
-            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.isEmpty();
-        }
-
-        /** {@inheritDoc} */
-        public Set keySet() {
-            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.keySet();
-        }
-
-        // Update existing key if found, else create new engine key
-        /** {@inheritDoc} */
-        public Object put(final String key, final Object value) {
-            int scope = engineContext.getAttributesScope(key);
+        public void setJexlVariable(String name, Object value) {
+            int scope = engineContext.getAttributesScope(name);
             if (scope == -1) { // not found, default to engine
                 scope = ScriptContext.ENGINE_SCOPE;
             }
-            return engineContext.getBindings(scope).put(key , value);
+            engineContext.getBindings(scope).put(name , value);
         }
 
         /** {@inheritDoc} */
-        public void putAll(Map t) {
+        public boolean definesJexlVariable(String name) {
             Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
-            bnd.putAll(t); // N.B. SimpleBindings checks for valid keys
-        }
-
-        // N.B. if there is more than one copy of the key, only the nearest will be removed.
-        /** {@inheritDoc} */
-        public Object remove(Object key) {
-            if (key instanceof String){
-                int scope = engineContext.getAttributesScope((String) key);
-                if (scope != -1) { // found an entry
-                    return engineContext.removeAttribute((String)key, scope);
-                }
-            }
-            return null;
-        }
-
-        /** {@inheritDoc} */
-        public int size() {
-            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.size();
-        }
-
-        /** {@inheritDoc} */
-        public Collection values() {
-            Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
-            return bnd.values();
+            return bnd.containsKey(name);
         }
 
     }

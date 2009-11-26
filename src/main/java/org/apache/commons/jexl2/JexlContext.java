@@ -16,33 +16,84 @@
  */
 package org.apache.commons.jexl2;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Holds a Map of variables which are referenced in a JEXL expression.
+ * Manages variables which can be referenced in a JEXL expression.
  *
  *  @since 1.0
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  *  @version $Id$
  */
 public interface JexlContext {
     /**
-     * Replaces variables in a JexlContext with the variables contained
-     * in the supplied Map.  When setVars() is called on a JexlContext,
-     * it clears the current Map and puts each entry of the
-     * supplied Map into the current variable Map. 
-     * 
-     * @param vars Contents of vars will be replaced with the content 
-     *      of this Map
+     * Gets the value of a variable.
+     * @param name the variable's name
+     * @return the value
      */
-    void setVars(Map<String,Object> vars);
-    
+    Object getJexlVariable(String name);
+
     /**
-     * Retrives the Map of variables associated with this JexlContext.  The
-     * keys of this map correspond to variable names referenced in a
-     * JEXL expression.
-     * 
-     * @return A reference to the variable Map associated with this JexlContext.
+     * Sets the value of a variable.
+     * @param name the variable's name
+     * @param value the variable's value
      */
-    Map<String,Object> getVars();
+    void setJexlVariable(String name, Object value);
+
+    /**
+     * A context that differentiates null valued variables and undefined ones.
+     * <p>A non-nullable context does not allow differentiating a variable whose
+     * value is null and an undefined one; thus the Nullable name for this kind of context.</p>
+     */
+    public interface Nullable extends JexlContext {
+        /**
+         * Checks whether a variable is defined in this context.
+         * <p>A variable may be defined with a null value; this method checks whether the
+         * value is null or if the variable is undefined.</p>
+         * @param name the variable's name
+         * @return true if it exists, false otherwise
+         */
+        boolean definesJexlVariable(String name);
+    }
+
+    /**
+     * Wraps a map in a context.
+     * <p>Each entry in the map is considered a variable name, value pair.</p>
+     */
+    public static class Mapped implements Nullable {
+        /**
+         * The wrapped variable map.
+         */
+        protected final Map<Object,Object> map;
+        /**
+         * Creates an instance using an HashMap as the underlying variable storage.
+         */
+        public Mapped() {
+            this(null);
+        }
+        /**
+         * Creates an instance using a provided map as the underlying variable storage.
+         * @param vars the variables map
+         */
+        @SuppressWarnings("unchecked")
+        public Mapped(Map<?, ?> vars) {
+            map = (Map<Object,Object>) (vars == null? new HashMap<String,Object>() : vars);
+        }
+
+        /** {@inheritDoc} */
+        public boolean definesJexlVariable(String name) {
+            return map.containsKey(name);
+        }
+
+        /** {@inheritDoc} */
+        public Object getJexlVariable(String name) {
+            return map.get(name);
+        }
+
+        /** {@inheritDoc} */
+        public void setJexlVariable(String name, Object value) {
+            map.put(name, value);
+        }
+    }
+
 }

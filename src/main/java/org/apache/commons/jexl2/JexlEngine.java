@@ -87,7 +87,39 @@ import org.apache.commons.jexl2.util.introspection.JexlMethod;
  * </p>
  * @since 2.0
  */
-public class JexlEngine {
+public class JexlEngine {    
+
+    /**
+     * Checks whether a variable is defined in a context.
+     * @param context the context
+     * @param name the variable's name
+     * @return true if the variable is defined, false otherwise
+     */
+    protected static boolean isVariableUndefined(JexlContext context, String name) {
+        if (context instanceof JexlContext.Nullable) {
+            return !((JexlContext.Nullable) context).definesJexlVariable(name);
+        }
+        return context.getJexlVariable(name) == null;
+    }
+    
+    /**
+     * An empty/static/non-mutable JexlContext used instead of null context.
+     */
+    protected static final JexlContext EMPTY_CONTEXT = new JexlContext.Nullable() {
+        /** {@inheritDoc} */
+        public Object getJexlVariable(String name) {
+            return null;
+        }
+        /** {@inheritDoc} */
+        public boolean definesJexlVariable(String name) {
+            return false;
+        }
+        /** {@inheritDoc} */
+        public void setJexlVariable(String name, Object value) {
+            throw new UnsupportedOperationException("Not supported in void context.");
+        }
+    };
+
     /**
      * The Uberspect instance.
      */
@@ -123,19 +155,6 @@ public class JexlEngine {
      * The expression cache.
      */
     protected SoftCache<String, ASTJexlScript> cache = null;
-    /**
-     * An empty/static/non-mutable JexlContext used instead of null context.
-     */
-    protected static final JexlContext EMPTY_CONTEXT = new JexlContext() {
-        /** {@inheritDoc} */
-        public void setVars(Map<String, Object> vars) {
-            throw new UnsupportedOperationException("Immutable JexlContext");
-        }
-        /** {@inheritDoc} */
-        public Map<String, Object> getVars() {
-            return Collections.emptyMap();
-        }
-    };
     /**
      * The default cache load factor.
      */
@@ -447,10 +466,9 @@ public class JexlEngine {
         if (context == null) {
             context = EMPTY_CONTEXT;
         }
-        Map<String, Object> vars = context.getVars();
         // lets build 1 unique & unused identifiers wrt context
         String r0 = "$0";
-        for (int s = 0; vars.containsKey(r0); ++s) {
+        for (int s = 0; !isVariableUndefined(context, r0); ++s) {
             r0 = r0 + s;
         }
         expr = r0 + (expr.charAt(0) == '[' ? "" : ".") + expr + ";";
@@ -504,13 +522,12 @@ public class JexlEngine {
         if (context == null) {
             context = EMPTY_CONTEXT;
         }
-        Map<String, Object> vars = context.getVars();
         // lets build 2 unique & unused identifiers wrt context
         String r0 = "$0", r1 = "$1";
-        for (int s = 0; vars.containsKey(r0); ++s) {
+        for (int s = 0; !isVariableUndefined(context, r0); ++s) {
             r0 = r0 + s;
         }
-        for (int s = 0; vars.containsKey(r1); ++s) {
+        for (int s = 0; !isVariableUndefined(context, r1); ++s) {
             r1 = r1 + s;
         }
         // synthetize expr
@@ -753,9 +770,9 @@ public class JexlEngine {
                     cache.put(expr, tree);
                 }
             } catch (TokenMgrError xtme) {
-                throw new JexlException(info, "parsing failed", xtme);
+                throw new JexlException(info, "tokenization failed", xtme);
             } catch (ParseException xparse) {
-                throw new JexlException(info, "pasing failed", xparse);
+                throw new JexlException(info, "parsing failed", xparse);
             }
         }
         return tree;

@@ -40,7 +40,7 @@ public class MethodPropertyTest extends TestCase {
         /*
          *  Second make a jexlContext and put stuff in it
          */
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         /**
          * The Java equivalents of foo and number for comparison and checking
@@ -48,8 +48,8 @@ public class MethodPropertyTest extends TestCase {
         Foo foo = new Foo();
         Integer number = new Integer(10);
 
-        jc.getVars().put("foo", foo);
-        jc.getVars().put("number", number);
+        jc.setJexlVariable("foo", foo);
+        jc.setJexlVariable("number", number);
 
         /*
          *  access a method w/o args

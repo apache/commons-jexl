@@ -30,7 +30,7 @@ public class MapLiteralTest extends JexlTestCase {
 
     public void testLiteralWithStrings() throws Exception {
         Expression e = JEXL.createExpression( "{ 'foo' : 'bar' }" );
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Object o = e.evaluate( jc );
         assertEquals( Collections.singletonMap( "foo", "bar" ), o );
@@ -38,7 +38,7 @@ public class MapLiteralTest extends JexlTestCase {
 
     public void testLiteralWithMultipleEntries() throws Exception {
         Expression e = JEXL.createExpression( "{ 'foo' : 'bar', 'eat' : 'food' }" );
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Map<String, String> expected = new HashMap<String, String>();
         expected.put( "foo", "bar" );
@@ -50,7 +50,7 @@ public class MapLiteralTest extends JexlTestCase {
 
     public void testLiteralWithNumbers() throws Exception {
         Expression e = JEXL.createExpression( "{ 5 : 10 }" );
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Object o = e.evaluate( jc );
         assertEquals( Collections.singletonMap( new Integer( 5 ), new Integer( 10 ) ), o );
@@ -66,7 +66,7 @@ public class MapLiteralTest extends JexlTestCase {
         o = e.evaluate(jc);
         assertEquals(new Integer(40), o);
 
-        jc.getVars().put("i", Integer.valueOf(5));
+        jc.setJexlVariable("i", Integer.valueOf(5));
         e = JEXL.createExpression("m[i]");
         o = e.evaluate(jc);
         assertEquals("fifty", o);
@@ -85,12 +85,12 @@ public class MapLiteralTest extends JexlTestCase {
         o = e.evaluate(jc);
         assertEquals("SEVEN", o);
 
-        jc.getVars().put("k", Integer.valueOf(7));
+        jc.setJexlVariable("k", Integer.valueOf(7));
         e = JEXL.createExpression("m[k]");
         o = e.evaluate(jc);
         assertEquals("SEVEN", o);
 
-        jc.getVars().put("k", "7");
+        jc.setJexlVariable("k", "7");
         e = JEXL.createExpression("m[k]");
         o = e.evaluate(jc);
         assertEquals("seven", o);
@@ -98,7 +98,7 @@ public class MapLiteralTest extends JexlTestCase {
 
     public void testSizeOfSimpleMapLiteral() throws Exception {
         Expression e = JEXL.createExpression( "size({ 'foo' : 'bar' })" );
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Object o = e.evaluate( jc );
         assertEquals( new Integer( 1 ), o );
@@ -106,7 +106,7 @@ public class MapLiteralTest extends JexlTestCase {
 
     public void testCallingMethodsOnNewMapLiteral() throws Exception {
         Expression e = JEXL.createExpression( "size({ 'foo' : 'bar' }.values())" );
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Object o = e.evaluate( jc );
         assertEquals( new Integer( 1 ), o );
@@ -114,7 +114,7 @@ public class MapLiteralTest extends JexlTestCase {
 
     public void testNotEmptySimpleMapLiteral() throws Exception {
         Expression e = JEXL.createExpression( "empty({ 'foo' : 'bar' })" );
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Object o = e.evaluate( jc );
         assertFalse( ( (Boolean) o ).booleanValue() );
@@ -122,11 +122,11 @@ public class MapLiteralTest extends JexlTestCase {
 
     public void testMapMapLiteral() throws Exception {
         Expression e = JEXL.createExpression( "{'foo' : { 'inner' : 'bar' }}" );
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
         Object o = e.evaluate( jc );
         assertNotNull(o);
 
-        jc.getVars().put("outer", o);
+        jc.setJexlVariable("outer", o);
         e = JEXL.createExpression("outer.foo.inner");
         o = e.evaluate( jc );
         assertEquals( "bar", o );
@@ -134,11 +134,11 @@ public class MapLiteralTest extends JexlTestCase {
 
     public void testMapArrayLiteral() throws Exception {
         Expression e = JEXL.createExpression( "{'foo' : [ 'inner' , 'bar' ]}" );
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
         Object o = e.evaluate( jc );
         assertNotNull(o);
 
-        jc.getVars().put("outer", o);
+        jc.setJexlVariable("outer", o);
         e = JEXL.createExpression("outer.foo.1");
         o = e.evaluate( jc );
         assertEquals( "bar", o );

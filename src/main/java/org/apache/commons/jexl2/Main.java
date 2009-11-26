@@ -21,8 +21,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 
-import org.apache.commons.jexl2.context.HashMapContext;
-
 /**
  * Test application for JEXL.
  *
@@ -45,8 +43,8 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
         JexlEngine engine = new JexlEngine();
-        JexlContext context = new HashMapContext();
-        context.getVars().put("args", args);
+        JexlContext context = new JexlContext.Mapped();
+        context.setJexlVariable("args", args);
         if (args.length == 1) {
             Script script = engine.createScript(new File(args[0]));
             Object value = script.execute(context);

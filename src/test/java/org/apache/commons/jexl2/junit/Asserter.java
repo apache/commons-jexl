@@ -25,7 +25,6 @@ import junit.framework.Assert;
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
-import org.apache.commons.jexl2.JexlHelper;
 
 /**
  * A utility class for performing JUnit based assertions using Jexl
@@ -40,7 +39,7 @@ public class Asserter extends Assert {
     /** variables used during asserts. */
     private final Map<String, Object> variables = new HashMap<String, Object>();
     /** context to use during asserts. */
-    private final JexlContext context = JexlHelper.createContext();
+    private final JexlContext context = new JexlContext.Mapped(variables);
 
     /** Jexl engine to use during Asserts. */
     private final JexlEngine engine;
@@ -65,7 +64,6 @@ public class Asserter extends Assert {
      */
     public void assertExpression(String expression, Object expected) throws Exception {
         Expression exp = engine.createExpression(expression);
-        context.setVars(variables);
         Object value = exp.evaluate(context);
 
         assertEquals("expression: " + expression, expected, value);
