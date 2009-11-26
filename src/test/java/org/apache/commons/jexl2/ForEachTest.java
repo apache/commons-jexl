@@ -37,7 +37,7 @@ public class ForEachTest extends JexlTestCase {
 
     public void testForEachWithEmptyStatement() throws Exception {
         Expression e = JEXL.createExpression("for(item : list) ;");
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Object o = e.evaluate(jc);
         assertNull("Result is not null", o);
@@ -45,7 +45,7 @@ public class ForEachTest extends JexlTestCase {
 
     public void testForEachWithEmptyList() throws Exception {
         Expression e = JEXL.createExpression("for(item : list) 1+1");
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
 
         Object o = e.evaluate(jc);
         assertNull("Result is not null", o);
@@ -53,78 +53,78 @@ public class ForEachTest extends JexlTestCase {
 
     public void testForEachWithArray() throws Exception {
         Expression e = JEXL.createExpression("for(item : list) item");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("list", new Object[] {"Hello", "World"});
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("list", new Object[] {"Hello", "World"});
         Object o = e.evaluate(jc);
         assertEquals("Result is not last evaluated expression", "World", o);
     }
 
     public void testForEachWithCollection() throws Exception {
         Expression e = JEXL.createExpression("for(item : list) item");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("list", Arrays.asList(new Object[] {"Hello", "World"}));
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("list", Arrays.asList(new Object[] {"Hello", "World"}));
         Object o = e.evaluate(jc);
         assertEquals("Result is not last evaluated expression", "World", o);
     }
 
     public void testForEachWithEnumeration() throws Exception {
         Expression e = JEXL.createExpression("for(item : list) item");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("list", new StringTokenizer("Hello,World", ","));
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("list", new StringTokenizer("Hello,World", ","));
         Object o = e.evaluate(jc);
         assertEquals("Result is not last evaluated expression", "World", o);
     }
 
     public void testForEachWithIterator() throws Exception {
         Expression e = JEXL.createExpression("for(item : list) item");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("list", Arrays.asList(new Object[] {"Hello", "World"}).iterator());
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("list", Arrays.asList(new Object[] {"Hello", "World"}).iterator());
         Object o = e.evaluate(jc);
         assertEquals("Result is not last evaluated expression", "World", o);
     }
 
     public void testForEachWithMap() throws Exception {
         Expression e = JEXL.createExpression("for(item : list) item");
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
         Map<?, ?> map = System.getProperties();
         String lastProperty = (String) new ArrayList<Object>(map.values()).get(System.getProperties().size() - 1);
-        jc.getVars().put("list", map);
+        jc.setJexlVariable("list", map);
         Object o = e.evaluate(jc);
         assertEquals("Result is not last evaluated expression", lastProperty, o);
     }
 
     public void testForEachWithBlock() throws Exception {
         Expression e = JEXL.createExpression("for(item : list) { x = x + item; }");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("list", new Object[] {"1", "1"});
-        jc.getVars().put("x", new Integer(0));
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("list", new Object[] {"1", "1"});
+        jc.setJexlVariable("x", new Integer(0));
         Object o = e.evaluate(jc);
         assertEquals("Result is wrong", new Integer(2), o);
-        assertEquals("x is wrong", new Integer(2), jc.getVars().get("x"));
+        assertEquals("x is wrong", new Integer(2), jc.getJexlVariable("x"));
     }
 
     public void testForEachWithListExpression() throws Exception {
         Expression e = JEXL.createExpression("for(item : list.keySet()) item");
-        JexlContext jc = JexlHelper.createContext();
+        JexlContext jc = new JexlContext.Mapped();
         Map<?, ?> map = System.getProperties();
         String lastKey = (String) new ArrayList<Object>(map.keySet()).get(System.getProperties().size() - 1);
-        jc.getVars().put("list", map);
+        jc.setJexlVariable("list", map);
         Object o = e.evaluate(jc);
         assertEquals("Result is not last evaluated expression", lastKey, o);
     }
     
     public void testForEachWithProperty() throws Exception {
         Expression e = JEXL.createExpression("for(item : list.cheeseList) item");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("list", new Foo());
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("list", new Foo());
         Object o = e.evaluate(jc);
         assertEquals("Result is not last evaluated expression", "brie", o);
     }
     
     public void testForEachWithIteratorMethod() throws Exception {
         Expression e = JEXL.createExpression("for(item : list.cheezy) item");
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("list", new Foo());
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("list", new Foo());
         Object o = e.evaluate(jc);
         assertEquals("Result is not last evaluated expression", "brie", o);
     }

@@ -112,7 +112,7 @@ public class ClassCreatorTest extends JexlTestCase {
 //        List<Object> mm = new ArrayList<Object>();
         Expression expr = jexl.createExpression("foo.value");
         Expression newx = jexl.createExpression("foo = new(clazz)");
-        JexlContext context = JexlHelper.createContext();
+        JexlContext context = new JexlContext.Mapped();
 
         ClassCreator cctor = new ClassCreator(jexl, base);
         for (int i = 0; i < LOOPS && gced < 0; ++i) {
@@ -132,12 +132,12 @@ public class ClassCreatorTest extends JexlTestCase {
 //          Method m = clazz.getDeclaredMethod("getValue", new Class<?>[0]);
 //          mm.add(m);
             // we should not be able to create foox since it is unknown to the Jexl classloader
-            context.getVars().put("clazz", cctor.getClassName());
-            context.getVars().put("foo", null);
+            context.setJexlVariable("clazz", cctor.getClassName());
+            context.setJexlVariable("foo", null);
             Object z = newx.evaluate(context);
             assertNull(z);
             // check with the class itself
-            context.getVars().put("clazz", clazz);
+            context.setJexlVariable("clazz", clazz);
             z = newx.evaluate(context);
             assertNotNull(clazz + ": class " + i + " could not be instantiated on pass " + pass, z);
             assertEquals(new Integer(i), expr.evaluate(context));

@@ -222,7 +222,7 @@
                 <version>2.3</version>
                 <configuration>
                     <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
-                    <excludes>org/apache/commons/jexl/parser/*.java</excludes>
+                    <excludes>org/apache/commons/jexl2/parser/*.java</excludes>
                     <headerFile>${basedir}/src/main/config/header.txt</headerFile>
                     <enableRulesSummary>false</enableRulesSummary>
                 </configuration>
@@ -234,8 +234,8 @@
                 <configuration>
                     <instrumentation>
                         <excludes>
-                            <exclude>org/apache/commons/jexl/parser/*.class</exclude>
-                            <exclude>apache/commons/jexl/**/*Test.class</exclude>
+                            <exclude>org/apache/commons/jexl2/parser/*.class</exclude>
+                            <exclude>apache/commons/jexl2/**/*Test.class</exclude>
                         </excludes>
                     </instrumentation>
                 </configuration>

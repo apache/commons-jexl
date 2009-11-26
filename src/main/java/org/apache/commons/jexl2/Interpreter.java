@@ -360,7 +360,7 @@ public class Interpreter implements ParserVisitor {
                     variableName.append('.');
                     variableName.append(left.jjtGetChild(v).image);
                 }
-                object = context.getVars().get(variableName.toString());
+                object = context.getJexlVariable(variableName.toString());
                 // disallow mixing ant & bean with same root; avoid ambiguity
                 if (object != null) {
                     isVariable = false;
@@ -382,7 +382,7 @@ public class Interpreter implements ParserVisitor {
                     variableName.append(property);
                     property = variableName.toString();
                 }
-                context.getVars().put(String.valueOf(property), right);
+                context.setJexlVariable(String.valueOf(property), right);
                 return right;
             }
         } else if (propertyNode instanceof ASTIntegerLiteral) {
@@ -396,7 +396,7 @@ public class Interpreter implements ParserVisitor {
                     variableName.append(property);
                     property = variableName.toString();
                 }
-                context.getVars().put(String.valueOf(property), right);
+                context.setJexlVariable(String.valueOf(property), right);
                 return right;
             }
         } else if (propertyNode instanceof ASTArrayAccess) {
@@ -584,7 +584,7 @@ public class Interpreter implements ParserVisitor {
             while (itemsIterator.hasNext()) {
                 // set loopVariable to value of iterator
                 Object value = itemsIterator.next();
-                context.getVars().put(loopVariable.image, value);
+                context.setJexlVariable(loopVariable.image, value);
                 // execute statement
                 result = statement.jjtAccept(this, data);
             }
@@ -626,10 +626,10 @@ public class Interpreter implements ParserVisitor {
                     return registers[3];
                 }
             }
-            Object value = context.getVars().get(name);
+            Object value = context.getJexlVariable(name);
             if (value == null
                 && !(node.jjtGetParent() instanceof ASTReference)
-                && !context.getVars().containsKey(name)) {
+                && JexlEngine.isVariableUndefined(context, name)) {
                 JexlException xjexl = new JexlException(node, "undefined variable " + name);
                 return unknownVariable(xjexl);
             }
@@ -975,7 +975,6 @@ public class Interpreter implements ParserVisitor {
         // pass first piece of data in and loop through children
         Object result = null;
         StringBuilder variableName = null;
-        Map<String, ?> vars = context.getVars();
         boolean isVariable = true;
         int v = 0;
         for (int c = 0; c < numChildren; c++) {
@@ -992,18 +991,15 @@ public class Interpreter implements ParserVisitor {
                     variableName.append('.');
                     variableName.append(node.jjtGetChild(v).image);
                 }
-                result = vars.get(variableName.toString());
+                result = context.getJexlVariable(variableName.toString());
             }
         }
         if (result == null) {
             if (isVariable
                 && !(node.jjtGetParent() instanceof ASTTernaryNode)
-                && !vars.containsKey(variableName.toString())) {
+                && JexlEngine.isVariableUndefined(context, variableName.toString())) {
                 JexlException xjexl = new JexlException(node, "undefined variable " + variableName.toString());
-                if (strict) {
-                    throw xjexl;
-                }
-                logger.warn(xjexl.getMessage());
+                return unknownVariable(xjexl);
             }
         }
         return result;

@@ -60,8 +60,8 @@ public class ScriptTest extends JexlTestCase {
     private void simpleScript(boolean jexl) throws Exception {
         String code = "while (x < 10) x = x + 1;";
         Script s = jexl? JEXL.createScript(code) : ScriptFactory.createScript(code);
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("x", new Integer(1));
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("x", new Integer(1));
     
         Object o = s.execute(jc);
         assertEquals("Result is wrong", new Integer(10), o);
@@ -77,8 +77,8 @@ public class ScriptTest extends JexlTestCase {
     private void scriptFromFile(boolean jexl) throws Exception {
         File testScript = new File(TEST1);
         Script s = jexl? JEXL.createScript(testScript) : ScriptFactory.createScript(testScript);
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("out", System.out);
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("out", System.out);
         Object result = s.execute(jc);
         assertNotNull("No result", result);
         assertEquals("Wrong result", new Integer(7), result);
@@ -93,8 +93,8 @@ public class ScriptTest extends JexlTestCase {
     private void scriptFromURL(boolean jexl) throws Exception {
         URL testUrl = new File("src/test/scripts/test1.jexl").toURI().toURL();
         Script s = jexl? JEXL.createScript(testUrl) : ScriptFactory.createScript(testUrl);
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("out", System.out);
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("out", System.out);
         Object result = s.execute(jc);
         assertNotNull("No result", result);
         assertEquals("Wrong result", new Integer(7), result);
@@ -112,8 +112,8 @@ public class ScriptTest extends JexlTestCase {
         Script s = jexl? JEXL.createScript(jexlCode) : ScriptFactory.createScript(jexlCode);
 
         Tester resultatJexl = new Tester();
-        JexlContext jc = JexlHelper.createContext();
-        jc.getVars().put("resultat", resultatJexl);
+        JexlContext jc = new JexlContext.Mapped();
+        jc.setJexlVariable("resultat", resultatJexl);
 
         resultatJexl.setCode("");
         e.evaluate(jc);

@@ -55,7 +55,7 @@
       </p>
       <p>
         The easiest way of obtaining a a context is to use the
-        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlHelper.html#createContext()">JexlHelper.createContext()</a>
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlHelper.html#createContext()">new JexlContext.Mapped()</a>
         method. This creates a context which is simply an extension of a
         <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/HashMap.html">HashMap</a>
       </p>
@@ -78,11 +78,11 @@
     Expression e = ExpressionFactory.createExpression( calculateTax );
 
     // populate the context
-    JexlContext context = JexlHelper.createContext();
-    context.getVars().put("G1", businessObject.getTotalSales());
-    context.getVars().put("G2", taxManager.getTaxCredit(businessObject.getYear()));
-    context.getVars().put("G3", businessObject.getIntercompanyPayments());
-    context.getVars().put("G4", -taxManager.getAllowances());
+    JexlContext context = new JexlContext.Mapped();
+    context.setJexlVariable("G1", businessObject.getTotalSales());
+    context.setJexlVariable("G2", taxManager.getTaxCredit(businessObject.getYear()));
+    context.setJexlVariable("G3", businessObject.getIntercompanyPayments());
+    context.setJexlVariable("G4", -taxManager.getAllowances());
     // ...
     
     // work it out

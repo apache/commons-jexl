@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package org.apache.commons.jexl2;
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,8 +38,8 @@ public class UnifiedJEXLTest extends JexlTestCase {
     public void setUp() throws Exception {
         // ensure jul logging is only error
         java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
-        context = JexlHelper.createContext();
-        vars = context.getVars();
+        vars = new HashMap<String,Object>();
+        context = new JexlContext.Mapped(vars);
     }
 
     @Override

@@ -20,6 +20,7 @@ import java.util.Map;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import java.util.HashMap;
 import org.apache.commons.jexl2.junit.Asserter;
 
 
@@ -158,8 +159,8 @@ public class ArithmeticTest extends JexlTestCase {
      * @throws Exception
      */
     public void testDivideByZero() throws Exception {
-        JexlContext context = JexlHelper.createContext();
-        Map<String, Object> vars = context.getVars();
+        Map<String,Object> vars = new HashMap<String,Object>();
+        JexlContext context = new JexlContext.Mapped(vars);
         vars.put("aByte", new Byte((byte) 1));
         vars.put("aShort", new Short((short) 2));
         vars.put("aInteger", new Integer(3));

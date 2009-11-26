@@ -28,12 +28,9 @@ public class Jexl {
 
     public static void main(String[] args) {
         final JexlEngine JEXL = new JexlEngine();
+        Map m = System.getProperties();
         // dummy context to get variables
-        JexlContext context = new JexlContext() {
-            @SuppressWarnings("unchecked")
-            public Map getVars() { return System.getProperties(); }
-            public void setVars(Map<String,Object> map) { }
-        };
+        JexlContext context = new JexlContext.Mapped(System.getProperties());
         try {
             for (int i = 0; i < args.length; i++) {
                 Expression e = JEXL.createExpression(args[i]);
