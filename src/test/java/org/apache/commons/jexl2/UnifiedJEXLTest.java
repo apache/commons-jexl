@@ -29,10 +29,10 @@ public class UnifiedJEXLTest extends JexlTestCase {
         ENGINE.setSilent(false);
         ENGINE.setCache(128);
     }
-    static UnifiedJEXL EL = new UnifiedJEXL(ENGINE);
-    static Log LOG = LogFactory.getLog(UnifiedJEXL.class);
-    JexlContext context = null;
-    Map<String,Object> vars =null;
+    private static final UnifiedJEXL EL = new UnifiedJEXL(ENGINE);
+    private static final Log LOG = LogFactory.getLog(UnifiedJEXL.class);
+    private JexlContext context = null;
+    private Map<String,Object> vars =null;
 
     @Override
     public void setUp() throws Exception {

@@ -26,16 +26,16 @@ public class CacheTest extends JexlTestCase {
     public CacheTest(String testName) {
         super(testName);
     }
-    static JexlEngine jexl = new JexlEngine();
+    private static final JexlEngine jexl = new JexlEngine();
 
     static {
         jexl.setCache(512);
         jexl.setLenient(false);
         jexl.setSilent(false);
     }
-    static int LOOPS = 1024;
+    private static final int LOOPS = 1024;
     // A pseudo random mix of accessors
-    static int[] MIX = {
+    private static final int[] MIX = {
         0, 0, 3, 3, 4, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 1, 1, 1, 2, 2, 2,
         3, 3, 3, 4, 4, 4, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 2, 2, 3, 3, 0
     };
