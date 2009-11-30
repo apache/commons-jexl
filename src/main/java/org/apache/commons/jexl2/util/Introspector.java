@@ -33,8 +33,12 @@ import org.apache.commons.logging.LogFactory;
  * @since 1.0
  */
 public class Introspector {
-    /** The default uberspector that handles all introspection patterns. */
-    private static volatile Uberspect uberSpect;
+    
+    private static class UberspectHolder{// Implements init on demand holder idiom
+        /** The default uberspector that handles all introspection patterns. */
+        private static final Uberspect UBERSPECT = new UberspectImpl(LogFactory.getLog(Introspector.class));
+    }
+
     /** The logger to use for all warnings & errors. */
     protected final Log rlog;
     /** The (low level) introspector to use for introspection services. */
@@ -105,20 +109,9 @@ public class Introspector {
      * instead of the default one.</p>
      *  @return Uberspect the default uberspector instance.
      */
-    // CSOFF: DoubleCheckedLocking
     public static Uberspect getUberspect() {
-        // uses a double-locking pattern
-        if (uberSpect == null) {
-            synchronized (Uberspect.class) {
-                if (uberSpect == null) {
-                    Log logger = LogFactory.getLog(Introspector.class);
-                    uberSpect = new UberspectImpl(logger);
-                }
-            }
-        }
-        return uberSpect;
+        return UberspectHolder.UBERSPECT;
     }
-    // CSON: DoubleCheckedLocking
 
     /**
      * Creates a new instance of Uberspect.
