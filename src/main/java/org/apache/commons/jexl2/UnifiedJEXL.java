@@ -19,7 +19,6 @@ package org.apache.commons.jexl2;
 import java.util.ArrayList;
 import org.apache.commons.jexl2.parser.JexlNode;
 import org.apache.commons.jexl2.parser.StringParser;
-import org.apache.commons.jexl2.util.introspection.Info;
 
 /**
  * An evaluator similar to the Unified EL evaluator used in JSP/JSF based on JEXL.
@@ -801,7 +800,7 @@ public final class UnifiedJEXL {
      * @return the AST
      * @throws JexlException if an error occur during parsing
      */
-    private JexlNode toNode(CharSequence expression, Info info) {
+    private JexlNode toNode(CharSequence expression, JexlInfo info) {
         return jexl.parse(expression, info);
     }
 

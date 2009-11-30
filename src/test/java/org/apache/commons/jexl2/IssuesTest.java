@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 package org.apache.commons.jexl2;
-
+import org.apache.commons.jexl2.introspection.Uberspect;
+import org.apache.commons.jexl2.util.Introspector;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-49: blocks not parsed (fixed)
     public void test49() throws Exception {
         Map<String,Object> vars = new HashMap<String,Object>();
-        JexlContext ctxt = new JexlContext.Mapped(vars);
+        JexlContext ctxt = new MapContext(vars);
         String stmt = "{a = 'b'; c = 'd';}";
         Script expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
@@ -70,8 +71,8 @@ public class IssuesTest extends JexlTestCase {
         jexl.setSilent(false);
         String jexlExp = "(foo.getInner().foo() eq true) and (foo.getInner().goo() = (foo.getInner().goo()+1-1))";
         Expression e = jexl.createExpression(jexlExp);
-        JexlContext jc = new JexlContext.Mapped();
-        jc.setJexlVariable("foo", new Foo());
+        JexlContext jc = new MapContext();
+        jc.set("foo", new Foo());
 
         try {
             /* Object o = */ e.evaluate(jc);
@@ -87,7 +88,7 @@ public class IssuesTest extends JexlTestCase {
         JexlEngine jexl = new JexlEngine();
         // ensure errors will throw
         jexl.setSilent(false);
-        JexlContext ctxt = new JexlContext.Mapped();
+        JexlContext ctxt = new MapContext();
 
         Expression expr = jexl.createExpression("true//false\n");
         Object value = expr.evaluate(ctxt);
@@ -109,8 +110,8 @@ public class IssuesTest extends JexlTestCase {
         UnifiedJEXL uel = new UnifiedJEXL(jexl);
         // ensure errors will throw
         //jexl.setSilent(false);
-        JexlContext ctxt = new JexlContext.Mapped();
-        ctxt.setJexlVariable("ax", "ok");
+        JexlContext ctxt = new MapContext();
+        ctxt.set("ax", "ok");
 
         UnifiedJEXL.Expression expr = uel.parse("${ax+(bx)}");
         Object value = expr.evaluate(ctxt);
@@ -134,8 +135,8 @@ public class IssuesTest extends JexlTestCase {
         JexlEngine jexl = new JexlEngine();
         // ensure errors will throw
         jexl.setSilent(false);
-        JexlContext ctxt = new JexlContext.Mapped();
-        ctxt.setJexlVariable("derived", new Derived());
+        JexlContext ctxt = new MapContext();
+        ctxt.set("derived", new Derived());
 
         Expression expr = jexl.createExpression("derived.foo()");
         Object value = expr.evaluate(ctxt);
@@ -145,8 +146,9 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-52: can be implemented by deriving Interpreter.{g,s}etAttribute; later
     public void test52base() throws Exception {
         JexlEngine jexl = new JexlEngine();
+        Uberspect uber = jexl.getUberspect();
         // most likely, call will be in an Interpreter, getUberspect
-        String[] names = jexl.uberspect.getIntrospector().getMethodNames(Another.class);
+        String[] names = ((Introspector) uber).getMethodNames(Another.class);
         assertTrue("should find methods", names.length > 0);
         int found = 0;
         for (String name : names) {
@@ -163,8 +165,8 @@ public class IssuesTest extends JexlTestCase {
         // ensure errors will throw
         jexl.setSilent(false);
         jexl.setLenient(false);
-        JexlContext ctxt = new JexlContext.Mapped();
-        ctxt.setJexlVariable("a", null);
+        JexlContext ctxt = new MapContext();
+        ctxt.set("a", null);
 
         String[] exprs = {
             //"10 + null",
@@ -192,11 +194,11 @@ public class IssuesTest extends JexlTestCase {
 
         Script jscript;
 
-        ctxt = new JexlContext.Mapped();
+        ctxt = new MapContext();
         jscript = jexl.createScript("dummy.hashCode()");
         assertEquals(jscript.getText(), null, jscript.execute(ctxt)); // OK
 
-        ctxt.setJexlVariable("dummy", "abcd");
+        ctxt.set("dummy", "abcd");
         assertEquals(jscript.getText(), Integer.valueOf("abcd".hashCode()), jscript.execute(ctxt)); // OK
 
         jscript = jexl.createScript("dummy.hashCode");
@@ -204,11 +206,11 @@ public class IssuesTest extends JexlTestCase {
 
         Expression jexpr;
 
-        ctxt = new JexlContext.Mapped();
+        ctxt = new MapContext();
         jexpr = jexl.createExpression("dummy.hashCode()");
         assertEquals(jexpr.getExpression(), null, jexpr.evaluate(ctxt)); // OK
 
-        ctxt.setJexlVariable("dummy", "abcd");
+        ctxt.set("dummy", "abcd");
         assertEquals(jexpr.getExpression(), Integer.valueOf("abcd".hashCode()), jexpr.evaluate(ctxt)); // OK
 
         jexpr = jexl.createExpression("dummy.hashCode");
@@ -217,7 +219,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-73
     public void test73() throws Exception {
-        JexlContext ctxt = new JexlContext.Mapped();
+        JexlContext ctxt = new MapContext();
         JexlEngine jexl = new JexlEngine();
         jexl.setSilent(false);
         jexl.setLenient(false);
@@ -230,8 +232,8 @@ public class IssuesTest extends JexlTestCase {
             assertTrue(msg.indexOf("variable c.e") > 0);
         }
 
-        ctxt.setJexlVariable("c", "{ 'a' : 3, 'b' : 5}");
-        ctxt.setJexlVariable("e", Integer.valueOf(2));
+        ctxt.set("c", "{ 'a' : 3, 'b' : 5}");
+        ctxt.set("e", Integer.valueOf(2));
         try {
             /* Object o = */ e.evaluate(ctxt);
         } catch (JexlException xjexl) {
@@ -243,27 +245,27 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-87
     public void test87() throws Exception {
-        JexlContext ctxt = new JexlContext.Mapped();
+        JexlContext ctxt = new MapContext();
         JexlEngine jexl = new JexlEngine();
         jexl.setSilent(false);
         jexl.setLenient(false);
         Expression divide = jexl.createExpression("l / r");
         Expression modulo = jexl.createExpression("l % r");
 
-        ctxt.setJexlVariable("l", java.math.BigInteger.valueOf(7));
-        ctxt.setJexlVariable("r", java.math.BigInteger.valueOf(2));
+        ctxt.set("l", java.math.BigInteger.valueOf(7));
+        ctxt.set("r", java.math.BigInteger.valueOf(2));
         assertEquals("3", divide.evaluate(ctxt).toString());
         assertEquals("1", modulo.evaluate(ctxt).toString());
 
-        ctxt.setJexlVariable("l", java.math.BigDecimal.valueOf(7));
-        ctxt.setJexlVariable("r", java.math.BigDecimal.valueOf(2));
+        ctxt.set("l", java.math.BigDecimal.valueOf(7));
+        ctxt.set("r", java.math.BigDecimal.valueOf(2));
         assertEquals("3.5", divide.evaluate(ctxt).toString());
         assertEquals("1", modulo.evaluate(ctxt).toString());
     }
 
     // JEXL-90
     public void test90() throws Exception {
-        JexlContext ctxt = new JexlContext.Mapped();
+        JexlContext ctxt = new MapContext();
         JexlEngine jexl = new JexlEngine();
         jexl.setSilent(false);
         jexl.setLenient(false);
@@ -292,8 +294,8 @@ public class IssuesTest extends JexlTestCase {
             "for(z : [3, 4, 5]) { z } y ? 2 : 1",
             "for(z : [3, 4, 5]) { z } if (y) 2 else 1"
         };
-        ctxt.setJexlVariable("x", Boolean.FALSE);
-        ctxt.setJexlVariable("y", Boolean.TRUE);
+        ctxt.set("x", Boolean.FALSE);
+        ctxt.set("y", Boolean.TRUE);
         for (int e = 0; e < exprs.length; ++e) {
             Script s = jexl.createScript(exprs[e]);
             assertEquals(Integer.valueOf(2), s.execute(ctxt));
@@ -303,7 +305,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-44
     public void test44() throws Exception {
-        JexlContext ctxt = new JexlContext.Mapped();
+        JexlContext ctxt = new MapContext();
         JexlEngine jexl = new JexlEngine();
         jexl.setSilent(false);
         jexl.setLenient(false);

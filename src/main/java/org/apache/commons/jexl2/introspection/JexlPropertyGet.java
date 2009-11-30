@@ -15,48 +15,47 @@
  * limitations under the License.
  */
 
-package org.apache.commons.jexl2.util.introspection;
+package org.apache.commons.jexl2.introspection;
 
 /**
- * Interface used for regular method invocation.
+ * Interface for getting values that appear to be properties.
  * Ex.
  * <code>
- * ${foo.bar()}
+ * ${foo.bar}
  * </code>
- * 
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public interface JexlMethod {
+public interface JexlPropertyGet {
     /**
-     * invocation method - called when the method invocation should be performed
-     * and a value returned.
-
-     * @param o the object
-     * @param params method parameters.
-     * @return the result
+     * invocation method - called when the 'get action' should be performed and
+     * a value returned.
+     * @param obj the object to get the property from.
+     * @return the property value.
      * @throws Exception on any error.
      */
-    Object invoke(Object o, Object[] params) throws Exception;
+    Object invoke(Object obj) throws Exception;
 
     /**
-     * specifies if this JexlMethod is cacheable and able to be reused for this
-     * class of object it was returned for.
-     * 
+     * Specifies if this JexlPropertyGet is cacheable and able to be reused for
+     * this class of object it was returned for.
+     *
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();
 
     /**
-     * Gets the method name used.
-     * @return method name
+     * returns the method name used to return this 'property'.
+     * @return the method name.
      */
     String getMethodName();
 
     /**
-     * returns the return type of the method invoked.
-     * @return return type
+     * Tell whether the method underlying this 'property' is alive by
+     * checking to see if represents a successful name resolution.
+     *
+     * @return boolean Whether 'property' is alive.
      */
-    Class<?> getReturnType();
+    boolean isAlive();
 }

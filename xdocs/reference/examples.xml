@@ -79,10 +79,10 @@
 
     // populate the context
     JexlContext context = new JexlContext.Mapped();
-    context.setJexlVariable("G1", businessObject.getTotalSales());
-    context.setJexlVariable("G2", taxManager.getTaxCredit(businessObject.getYear()));
-    context.setJexlVariable("G3", businessObject.getIntercompanyPayments());
-    context.setJexlVariable("G4", -taxManager.getAllowances());
+    context.set("G1", businessObject.getTotalSales());
+    context.set("G2", taxManager.getTaxCredit(businessObject.getYear()));
+    context.set("G3", businessObject.getIntercompanyPayments());
+    context.set("G4", -taxManager.getAllowances());
     // ...
     
     // work it out

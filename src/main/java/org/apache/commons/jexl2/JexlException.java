@@ -17,7 +17,6 @@
 package org.apache.commons.jexl2;
 
 import org.apache.commons.jexl2.parser.JexlNode;
-import org.apache.commons.jexl2.util.introspection.Info;
 
 /**
  * Wraps any error that might occur during interpretation of a script or expression.
@@ -29,7 +28,7 @@ public class JexlException extends RuntimeException {
     /** The point of origin for this exception. */
     protected final JexlNode mark;
     /** The debug info. */
-    protected final Info info;
+    protected final JexlInfo info;
     /** A marker to use in NPEs stating a null operand error. */
     public static final String NULL_OPERAND = "jexl.null";
     /**
@@ -61,7 +60,7 @@ public class JexlException extends RuntimeException {
      * @param dbg the debugging information associated
      * @param msg the error message
      */
-    public JexlException(Info dbg, String msg) {
+    public JexlException(JexlInfo dbg, String msg) {
         super(msg);
         mark = null;
         info = dbg;
@@ -73,7 +72,7 @@ public class JexlException extends RuntimeException {
      * @param msg the error message
      * @param cause the exception causing the error
      */
-    public JexlException(Info dbg, String msg, Throwable cause) {
+    public JexlException(JexlInfo dbg, String msg, Throwable cause) {
         super(msg, cause);
         mark = null;
         info = dbg;

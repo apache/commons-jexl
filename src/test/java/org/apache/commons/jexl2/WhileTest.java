@@ -30,7 +30,7 @@ public class WhileTest extends JexlTestCase {
 
     public void testSimpleWhileFalse() throws Exception {
         Expression e = JEXL.createExpression("while (false) ;");
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
 
         Object o = e.evaluate(jc);
         assertNull("Result is not null", o);
@@ -38,8 +38,8 @@ public class WhileTest extends JexlTestCase {
     
     public void testWhileExecutesExpressionWhenLooping() throws Exception {
         Expression e = JEXL.createExpression("while (x < 10) x = x + 1;");
-        JexlContext jc = new JexlContext.Mapped();
-        jc.setJexlVariable("x", new Integer(1));
+        JexlContext jc = new MapContext();
+        jc.set("x", new Integer(1));
 
         Object o = e.evaluate(jc);
         assertEquals("Result is wrong", new Integer(10), o);
@@ -47,13 +47,13 @@ public class WhileTest extends JexlTestCase {
 
     public void testWhileWithBlock() throws Exception {
         Expression e = JEXL.createExpression("while (x < 10) { x = x + 1; y = y * 2; }");
-        JexlContext jc = new JexlContext.Mapped();
-        jc.setJexlVariable("x", new Integer(1));
-        jc.setJexlVariable("y", new Integer(1));
+        JexlContext jc = new MapContext();
+        jc.set("x", new Integer(1));
+        jc.set("y", new Integer(1));
 
         Object o = e.evaluate(jc);
         assertEquals("Result is wrong", new Integer(512), o);
-        assertEquals("x is wrong", new Integer(10), jc.getJexlVariable("x"));
-        assertEquals("y is wrong", new Integer(512), jc.getJexlVariable("y"));
+        assertEquals("x is wrong", new Integer(10), jc.get("x"));
+        assertEquals("y is wrong", new Integer(512), jc.get("y"));
     }
 }

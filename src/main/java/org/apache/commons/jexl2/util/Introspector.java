@@ -20,12 +20,10 @@ import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
 
-import org.apache.commons.jexl2.util.introspection.Uberspect;
-import org.apache.commons.jexl2.util.introspection.UberspectImpl;
+import org.apache.commons.jexl2.util.introspection.IntrospectorBase;
 import org.apache.commons.jexl2.util.introspection.MethodKey;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  *  Default introspection services.
@@ -33,103 +31,18 @@ import org.apache.commons.logging.LogFactory;
  * @since 1.0
  */
 public class Introspector {
-    
-    private static class UberspectHolder{// Implements init on demand holder idiom
-        /** The default uberspector that handles all introspection patterns. */
-        private static final Uberspect UBERSPECT = new UberspectImpl(LogFactory.getLog(Introspector.class));
-    }
-
     /** The logger to use for all warnings & errors. */
     protected final Log rlog;
-    /** The (low level) introspector to use for introspection services. */
-    protected final Reference introspector;
-
-    /**
-     * A soft reference to an Introspector.
-     * <p>
-     * If memory pressure becomes critical, this will allow the introspector to be GCed;
-     * in turn, classes it introspected that are no longer in use may be GCed as well.
-     * </p>
-     */
-    protected final class Reference {
-        /**
-         * The introspector logger.
-         */
-        private final Log logger;
-        /**
-         * The soft reference to the introspector currently in use.
-         */
-        private volatile SoftReference<org.apache.commons.jexl2.util.introspection.Introspector> ref;
-        /**
-         * Creates a new instance.
-         * @param theLogger logger used by the underlying introspector instance
-         * @param is the underlying introspector instance
-         */
-        protected Reference(Log theLogger, org.apache.commons.jexl2.util.introspection.Introspector is) {
-            logger = theLogger;
-            ref = new SoftReference<org.apache.commons.jexl2.util.introspection.Introspector>(is);
-        }
-
-        /**
-         * Creates a new instance.
-         * @param theLogger logger used by the underlying introspector instance
-         */
-        protected Reference(Log theLogger) {
-            this(theLogger, new org.apache.commons.jexl2.util.introspection.Introspector(theLogger));
-        }
-
-        /**
-         * Gets the current introspector.
-         * <p>If the reference has been collected, this method will recreate the underlying introspector.</p>
-         * @return the introspector
-         */
-        // CSOFF: DoubleCheckedLocking
-        public org.apache.commons.jexl2.util.introspection.Introspector get() {
-            org.apache.commons.jexl2.util.introspection.Introspector intro = ref.get();
-            if (intro == null) {
-                // double checked locking (fixed by Java 5 memory model).
-                synchronized(this) {
-                    intro = ref.get();
-                    if (intro == null) {
-                        intro = new org.apache.commons.jexl2.util.introspection.Introspector(logger);
-                        ref = new SoftReference<org.apache.commons.jexl2.util.introspection.Introspector>(intro);
-                    }
-                }
-            }
-            return intro;
-        }
-        // CSON: DoubleCheckedLocking
-    }
-
-    /**
-     *  Gets the default instance of Uberspect.
-     * <p>This is lazily initialized to avoid building a default instance if there
-     * is no use for it. The main reason for not using the default Uberspect instance is to
-     * be able to use a (low level) introspector created with a given logger
-     * instead of the default one.</p>
-     *  @return Uberspect the default uberspector instance.
-     */
-    public static Uberspect getUberspect() {
-        return UberspectHolder.UBERSPECT;
-    }
-
-    /**
-     * Creates a new instance of Uberspect.
-     * @param logger the logger used by this Uberspect.
-     * @return the new instance
-     */
-    public static Uberspect getUberspect(Log logger) {
-        return new UberspectImpl(logger);
-    }
-
+    /** The soft reference to the introspector currently in use. */
+    private volatile SoftReference<IntrospectorBase> ref;
+    
     /**
      * Creates an introspector.
      * @param log the logger to use for warnings.
-     * @param is the low level introspector.
      */
-    public Introspector(Log log, org.apache.commons.jexl2.util.introspection.Introspector is) {
+    protected Introspector(Log log) {
         rlog = log;
-        introspector = new Reference(log, is);
+        ref = new SoftReference<IntrospectorBase>(null);
     }
 
     /**
@@ -161,6 +74,37 @@ public class Introspector {
     }
 
     /**
+     * Gets the current introspector base.
+     * <p>If the reference has been collected, this method will recreate the underlying introspector.</p>
+     * @return the introspector
+     */
+    // CSOFF: DoubleCheckedLocking
+    protected final IntrospectorBase base() {
+        IntrospectorBase intro = ref.get();
+        if (intro == null) {
+            // double checked locking (fixed by Java 5 memory model).
+            synchronized(this) {
+                intro = ref.get();
+                if (intro == null) {
+                    intro = new IntrospectorBase(rlog);
+                    ref = new SoftReference<IntrospectorBase>(intro);
+                }
+            }
+        }
+        return intro;
+    }
+    // CSON: DoubleCheckedLocking
+
+    /**
+     * Sets the underlying class loader for class solving resolution.
+     * @param loader the loader to use
+     */
+    public void setClassLoader(ClassLoader loader) {
+        base().setLoader(loader);
+    }
+
+
+    /**
      * Gets the method defined by <code>name</code> and
      * <code>params</code> for the Class <code>c</code>.
      *
@@ -174,7 +118,7 @@ public class Introspector {
      * CSOFF: RedundantThrows
      */
     protected final Method getMethod(Class<?> c, String name, Object[] params) throws IllegalArgumentException {
-        return introspector.get().getMethod(c, new MethodKey(name, params));
+        return base().getMethod(c, new MethodKey(name, params));
     }
 
     /**
@@ -188,7 +132,17 @@ public class Introspector {
      * CSOFF: RedundantThrows
      */
     protected final Method getMethod(Class<?> c, MethodKey key) throws IllegalArgumentException {
-        return introspector.get().getMethod(c, key);
+        return base().getMethod(c, key);
+    }
+
+
+    /**
+     * Gets the accessible methods names known for a given class.
+     * @param c the class
+     * @return the class method names
+     */
+    public final String[] getMethodNames(Class<?> c) {
+        return base().getMethodNames(c);
     }
 
     /**
@@ -208,7 +162,7 @@ public class Introspector {
         } else {
             return null;
         }
-        return introspector.get().getConstructor(clazz, new MethodKey(className, args));
+        return base().getConstructor(clazz, new MethodKey(className, args));
     }
 
     /**
@@ -225,7 +179,7 @@ public class Introspector {
 
     /**
      * Return a property getter.
-     * @param obj the object to get the property from.
+     * @param obj the object to base the property from.
      * @param identifier property name
      * @return a {@link AbstractExecutor.Get}.
      */
@@ -271,7 +225,7 @@ public class Introspector {
 
     /**
      * Return a property setter.
-     * @param obj the object to get the property from.
+     * @param obj the object to base the property from.
      * @param identifier property name (or identifier)
      * @param arg value to set
      * @return a {@link AbstractExecutor.Set}.

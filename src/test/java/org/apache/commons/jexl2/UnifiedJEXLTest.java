@@ -39,7 +39,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         // ensure jul logging is only error
         java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
         vars = new HashMap<String,Object>();
-        context = new JexlContext.Mapped(vars);
+        context = new MapContext(vars);
     }
 
     @Override

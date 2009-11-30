@@ -107,7 +107,7 @@
 
             // Create a context and add data
             JexlContext jc = new JexlContext.Mapped();
-            jc.setJexlVariable("foo", new Foo() );
+            jc.set("foo", new Foo() );
 
             // Now evaluate the expression, getting the result
             Object o = e.evaluate(jc);

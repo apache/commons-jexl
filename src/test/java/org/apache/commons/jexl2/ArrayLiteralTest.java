@@ -26,7 +26,7 @@ public class ArrayLiteralTest extends JexlTestCase {
 
     public void testLiteralWithStrings() throws Exception {
         Expression e = JEXL.createExpression( "[ 'foo' , 'bar' ]" );
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
 
         Object o = e.evaluate( jc );
         Object[] check = { "foo", "bar" };
@@ -35,7 +35,7 @@ public class ArrayLiteralTest extends JexlTestCase {
 
     public void testLiteralWithOneEntry() throws Exception {
         Expression e = JEXL.createExpression( "[ 'foo' ]" );
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
 
         Object o = e.evaluate( jc );
         Object[] check = { "foo" };
@@ -44,7 +44,7 @@ public class ArrayLiteralTest extends JexlTestCase {
 
     public void testLiteralWithNumbers() throws Exception {
         Expression e = JEXL.createExpression( "[ 5.0 , 10 ]" );
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
 
         Object o = e.evaluate( jc );
         Object[] check = { new Float(5), new Integer(10) };
@@ -53,7 +53,7 @@ public class ArrayLiteralTest extends JexlTestCase {
 
     public void testLiteralWithIntegers() throws Exception {
         Expression e = JEXL.createExpression( "[ 5 , 10 ]" );
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
 
         Object o = e.evaluate( jc );
         int[] check = { 5, 10 };
@@ -62,7 +62,7 @@ public class ArrayLiteralTest extends JexlTestCase {
 
     public void testSizeOfSimpleArrayLiteral() throws Exception {
         Expression e = JEXL.createExpression( "size([ 'foo' , 'bar' ])" );
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
 
         Object o = e.evaluate( jc );
         assertEquals( new Integer( 2 ), o );
@@ -70,7 +70,7 @@ public class ArrayLiteralTest extends JexlTestCase {
 
     public void notestCallingMethodsOnNewMapLiteral() throws Exception {
         Expression e = JEXL.createExpression( "size({ 'foo' : 'bar' }.values())" );
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
 
         Object o = e.evaluate( jc );
         assertEquals( new Integer( 1 ), o );
@@ -78,7 +78,7 @@ public class ArrayLiteralTest extends JexlTestCase {
 
     public void testNotEmptySimpleArrayLiteral() throws Exception {
         Expression e = JEXL.createExpression( "empty([ 'foo' , 'bar' ])" );
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
 
         Object o = e.evaluate( jc );
         assertFalse( ( (Boolean) o ).booleanValue() );

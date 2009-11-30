@@ -39,11 +39,11 @@ PARSER_BEGIN(Parser)
 package org.apache.commons.jexl2.parser;
 
 import java.io.Reader;
-import org.apache.commons.jexl2.util.introspection.Info;
+import org.apache.commons.jexl2.JexlInfo;
 
 public class Parser extends StringParser
 {
-    public ASTJexlScript parse(Reader reader, Info info)
+    public ASTJexlScript parse(Reader reader, JexlInfo info)
         throws ParseException
     {
         ReInit(reader);

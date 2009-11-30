@@ -59,7 +59,7 @@
 
             // Create a context and add data
             JexlContext jc = new JexlContext.Mapped();
-            jc.setJexlVariable("foo", new Foo() );
+            jc.set("foo", new Foo() );
 
             // Now evaluate the expression, getting the result
             Object o = e.evaluate(jc);
@@ -135,7 +135,7 @@
             JexlEngine jexl = nex JexlEngine();
 
             JexlContext jc = new JexlContext.Mapped();
-            jc.setJexlVariable("quuxClass", quux.class);
+            jc.set("quuxClass", quux.class);
 
             Expression create = jexl.createExpression("quux = new(quuxClass, 'xuuq', 100)");
             Expression assign = jexl.createExpression("quux.froboz.value = 10");
@@ -220,7 +220,7 @@
             jexl.setFunctions(funcs);
 
             JexlContext jc = new JexlContext.Mapped();
-            jc.setJexlVariable("pi", Math.PI);
+            jc.set("pi", Math.PI);
 
             e = JEXL.createExpression("math:cos(pi)");
             o = e.evaluate(jc);
