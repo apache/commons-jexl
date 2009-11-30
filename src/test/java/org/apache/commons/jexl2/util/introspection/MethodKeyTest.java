@@ -21,7 +21,7 @@ import junit.framework.TestCase;
  */
 public class MethodKeyTest extends TestCase {
     // A set of classes (most of them primitives)
-    static Class<?>[] PRIMS = {
+    private static final Class<?>[] PRIMS = {
         Boolean.TYPE,
         Byte.TYPE,
         Character.TYPE,
@@ -35,7 +35,7 @@ public class MethodKeyTest extends TestCase {
     };
     
     // A set of instances corresponding to the classes
-    static Object[] ARGS = {
+    private static final Object[] ARGS = {
         new Boolean(true),
         new Byte((byte) 1),
         new Character('2'),
@@ -49,7 +49,7 @@ public class MethodKeyTest extends TestCase {
     };
     
     // A set of (pseudo) method names
-    static String[] METHODS = {
+    private static final String[] METHODS = {
         "plus",
         "minus",
         "execute",
@@ -75,14 +75,14 @@ public class MethodKeyTest extends TestCase {
     };
     
     /** from key to string */
-    static java.util.Map< MethodKey, String> byKey;
+    private static final java.util.Map< MethodKey, String> byKey;
     /** form string to key */
-    static java.util.Map<String,MethodKey> byString;
+    private static final java.util.Map<String,MethodKey> byString;
     /** the list of keys we generated & test against */
-    static MethodKey[] keyList;
+    private static final MethodKey[] keyList;
     
     /** Creates & inserts a key into the byKey & byString map */
-    static void setUpKey(String name, Class<?>[] parms) {
+    private static void setUpKey(String name, Class<?>[] parms) {
         MethodKey key = new MethodKey(name, parms);
         String str = key.toString();
         byKey.put(key, str);
@@ -162,7 +162,7 @@ public class MethodKeyTest extends TestCase {
         
     }
     
-    static final int LOOP = 3;//00;
+    private static final int LOOP = 3;//00;
     
     public void testPerfKey() throws Exception {
         for(int l = 0; l < LOOP; ++l)

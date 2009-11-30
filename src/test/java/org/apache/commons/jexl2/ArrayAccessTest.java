@@ -33,11 +33,14 @@ public class ArrayAccessTest extends JexlTestCase {
 
     private Asserter asserter;
 
-    protected static final String GET_METHOD_STRING = "GetMethod string";
-    protected static final String[] GET_METHOD_ARRAY =
+    private static final String GET_METHOD_STRING = "GetMethod string";
+    
+    // Needs to be accessible by Foo.class
+    static final String[] GET_METHOD_ARRAY =
         new String[] { "One", "Two", "Three" };
 
-    protected static final String[][] GET_METHOD_ARRAY2 =
+    // Needs to be accessible by Foo.class
+    static final String[][] GET_METHOD_ARRAY2 =
         new String[][] { {"One", "Two", "Three"},{"Four", "Five", "Six"} };
 
     @Override
