@@ -75,7 +75,7 @@ public interface JexlContext {
          * Creates an instance using a provided map as the underlying variable storage.
          * @param vars the variables map
          */
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked") // OK to cast Map<?,?> to Map<Object,Object>
         public Mapped(Map<?, ?> vars) {
             map = (Map<Object,Object>) (vars == null? new HashMap<String,Object>() : vars);
         }
