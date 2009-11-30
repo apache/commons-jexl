@@ -65,7 +65,6 @@ public class UberspectImpl extends org.apache.commons.jexl2.util.Introspector im
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     public Iterator<?> getIterator(Object obj, DebugInfo info) {
         if (obj.getClass().isArray()) {
             return new ArrayIterator(obj);
@@ -75,15 +74,17 @@ public class UberspectImpl extends org.apache.commons.jexl2.util.Introspector im
             return ((Map<?,?>) obj).values().iterator();
         } else if (obj instanceof Iterator<?>) {
             rlog.warn(info.debugString()
-                    + "The iterative is not resetable; if used more than once, "
+                    + "The iterator is not resetable; if used more than once, "
                     + "this may lead to unexpected results.");
 
             return ((Iterator<?>) obj);
         } else if (obj instanceof Enumeration<?>) {
             rlog.warn(info.debugString()
-                    + "The iterative is not resetable; if used more than once, "
+                    + "The iterator is not resetable; if used more than once, "
                     + "this may lead to unexpected results.");
-            return new EnumerationIterator<Object>((Enumeration<Object>) obj);
+            @SuppressWarnings("unchecked") // OK because of instanceof check above
+            final Enumeration<Object> enumObj = (Enumeration<Object>) obj;
+            return new EnumerationIterator<Object>(enumObj);
         } else {
             // look for an iterator() method to support the JDK5 Iterable
             // interface or any user tools/DTOs that want to work in
