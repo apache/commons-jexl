@@ -159,7 +159,6 @@ public class JexlScriptEngine extends AbstractScriptEngine {
      *
      * Current implementation only gives access to ENGINE_SCOPE binding.
      */
-    @SuppressWarnings("unchecked")
     private static class JexlContextWrapper implements JexlContext.Nullable {
         /** The engine context. */
         private final ScriptContext engineContext;
