@@ -52,20 +52,20 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
      * @param obj the map.
      * @return map.get(property)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public Object execute(final Object obj) {
+        @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
         final Map<Object,?> map = (Map<Object, ?>) obj;
         return map.get(property);
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     public Object tryExecute(final Object obj, Object key) {
         if (obj != null &&  method != null
             && objectClass.equals(obj.getClass())
             && (key == null || property.getClass().equals(key.getClass()))) {
+            @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
             final Map<Object,?> map = (Map<Object, ?>) obj;
             return map.get(key);
         }

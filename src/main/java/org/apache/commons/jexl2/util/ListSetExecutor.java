@@ -51,12 +51,12 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
     }
     
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     public Object execute(final Object obj, Object value) {
         if (method == ARRAY_SET) {
             java.lang.reflect.Array.set(obj, property.intValue(), value);
         } else {
+            @SuppressWarnings("unchecked") // LSE should only be created for array or list types
             final List<Object> list = (List<Object>) obj;
             list.set(property.intValue(), value);
         }
@@ -64,7 +64,6 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     @Override
     public Object tryExecute(final Object obj, Object key, Object value) {
         if (obj != null && method != null
@@ -73,6 +72,7 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
             if (method == ARRAY_SET) {
                 Array.set(obj, ((Integer) key).intValue(), value);
             } else {
+                @SuppressWarnings("unchecked")  // LSE should only be created for array or list types
                 final List<Object> list = (List<Object>) obj;
                 list.set(((Integer) key).intValue(), value);
             }
