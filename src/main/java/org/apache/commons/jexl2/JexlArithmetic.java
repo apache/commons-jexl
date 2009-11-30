@@ -51,7 +51,7 @@ public class JexlArithmetic {
     /** Long.MIN_VALUE as BigInteger. */
     protected static final BigInteger BIGI_LONG_MIN_VALUE = BigInteger.valueOf(Long.MIN_VALUE);
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
-    protected boolean strict;
+    private boolean strict;
 
     /**
      * Creates a JexlArithmetic.
@@ -535,11 +535,11 @@ public class JexlArithmetic {
             String rightString = right.toString();
             return leftString.compareTo(rightString) < 0;
         } else if (left instanceof Comparable<?>) {
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("unchecked") // OK because of instanceof check above
             final Comparable<Object> comparable = (Comparable<Object>) left;
             return comparable.compareTo(right) < 0;
         } else if (right instanceof Comparable<?>) {
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings("unchecked") // OK because of instanceof check above
             final Comparable<Object> comparable = (Comparable<Object>) right;
             return comparable.compareTo(left) > 0;
         }
