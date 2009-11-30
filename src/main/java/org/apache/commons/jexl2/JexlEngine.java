@@ -692,10 +692,9 @@ public class JexlEngine {
          * Produces the cache entry set.
          * @return the cache entry set
          */
-        @SuppressWarnings("unchecked")
         Set<Entry<K, V>> entrySet() {
             Map<K, V> map = ref != null ? ref.get() : null;
-            return map != null ? map.entrySet() : (Set<Entry<K, V>>) Collections.EMPTY_SET;
+            return map != null ? map.entrySet() : Collections.<Entry<K, V>>emptySet();
         }
 
         /**
