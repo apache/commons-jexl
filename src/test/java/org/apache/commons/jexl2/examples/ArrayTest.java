@@ -42,13 +42,13 @@ public class ArrayTest extends TestCase {
         /*
          *  Second make a jexlContext and put stuff in it
          */
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
 
         List<Object> l = new ArrayList<Object>();
         l.add("Hello from location 0");
         Integer two = new Integer(2);
         l.add(two);
-        jc.setJexlVariable("array", l);
+        jc.set("array", l);
 
         Expression e = jexl.createExpression("array[1]");
         Object o = e.evaluate(jc);

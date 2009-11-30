@@ -14,20 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl2.util.introspection;
+package org.apache.commons.jexl2;
 
 /**
- * A little class to abstract debugging info.
+ * Interface for objects carrying information usefull to debugging.
+ * @since 1.0
  */
-public interface DebugInfo {
-    /** A default debug info with (oviously) no information. */
-    DebugInfo NONE = new DebugInfo() {
-        public String debugString() {
-            return "?@?:?";
-        }
-    };
+public interface JexlInfo {
     /**
-     * Formats this information.
+     * Formats this information for debugging purpose.
      * @return a human readable string.
      */
     String debugString();

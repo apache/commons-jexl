@@ -90,14 +90,22 @@ public class IntrospectorBase {
      * @param key   Key of the method being searched for
      * @return The desired Method object.
      * @throws IllegalArgumentException     When the parameters passed in can not be used for introspection.
-     * @throws MethodKey.AmbiguousException When the method map contains more than
-     *  one match for the requested signature.
      *  
      */
     //CSOFF: RedundantThrows
     public Method getMethod(Class<?> c, MethodKey key) {
-        ClassMap classMap = getMap(c);
-        return classMap.findMethod(key);
+        try {
+            ClassMap classMap = getMap(c);
+            return classMap.findMethod(key);
+        } catch (MethodKey.AmbiguousException ae) {
+            // whoops.  Ambiguous.  Make a nice log message and return null...
+            if (rlog != null) {
+                rlog.error("ambiguous method invocation: "
+                           + c.getName() + "."
+                           + key.debugString());
+            }
+        }
+        return null;
 
     }
     // CSON: RedundantThrows
@@ -113,7 +121,6 @@ public class IntrospectorBase {
         }
         ClassMap classMap = getMap(c);
         return classMap.getMethodNames();
-
     }
 
     /**
@@ -150,8 +157,6 @@ public class IntrospectorBase {
      * @param key   Key of the constructor being searched for
      * @return The desired Constructor object.
      * @throws IllegalArgumentException     When the parameters passed in can not be used for introspection.
-     * @throws MethodKey.AmbiguousException When the method map contains more than
-     *  one match for the requested signature.
      */
     public Constructor<?> getConstructor(final MethodKey key) {
         return getConstructor(null, key);
@@ -163,57 +168,64 @@ public class IntrospectorBase {
      * @param key   Key of the constructor being searched for
      * @return The desired Constructor object.
      * @throws IllegalArgumentException     When the parameters passed in can not be used for introspection.
-     * @throws MethodKey.AmbiguousException When the method map contains more than
-     *  one match for the requested signature.
      */
     //CSOFF: RedundantThrows
     public Constructor<?> getConstructor(final Class<?> c, final MethodKey key) {
-        Constructor<?> ctor = null;
-        synchronized(constructorsMap) {
-            ctor = constructorsMap.get(key);
-            // that's a clear miss
-            if (CTOR_MISS.equals(ctor)) {
-                return null;
-            }
-            // let's introspect...
-            if (ctor == null) {
-                final String cname = key.getMethod();
-                // do we know about this class?
-                Class<?> clazz = constructibleClasses.get(cname);
-                try {
-                    // do find the most specific ctor
-                    if (clazz == null) {
-                        if (c != null && c.getName().equals(key.getMethod())) {
-                            clazz = c;
-                        } else {
-                            clazz = loader.loadClass(cname);
+        try {
+            Constructor<?> ctor = null;
+            synchronized(constructorsMap) {
+                ctor = constructorsMap.get(key);
+                // that's a clear miss
+                if (CTOR_MISS.equals(ctor)) {
+                    return null;
+                }
+                // let's introspect...
+                if (ctor == null) {
+                    final String cname = key.getMethod();
+                    // do we know about this class?
+                    Class<?> clazz = constructibleClasses.get(cname);
+                    try {
+                        // do find the most specific ctor
+                        if (clazz == null) {
+                            if (c != null && c.getName().equals(key.getMethod())) {
+                                clazz = c;
+                            } else {
+                                clazz = loader.loadClass(cname);
+                            }
+                            // add it to list of known loaded classes
+                            constructibleClasses.put(cname, clazz);
                         }
-                        // add it to list of known loaded classes
-                        constructibleClasses.put(cname, clazz);
+                        List<Constructor<?>> l = new LinkedList<Constructor<?>>();
+                        for(Constructor<?> ictor : clazz.getConstructors()) {
+                            l.add(ictor);
+                        }
+                        // try to find one
+                        ctor = key.getMostSpecificConstructor(l);
+                        if (ctor != null) {
+                            constructorsMap.put(key, ctor);
+                        } else {
+                            constructorsMap.put(key, CTOR_MISS);
+                        }
+                    } catch(ClassNotFoundException xnotfound) {
+                        if (rlog.isDebugEnabled()) {
+                            rlog.debug("could not load class " + cname, xnotfound);
+                        }
+                        ctor = null;
+                    } catch(MethodKey.AmbiguousException xambiguous) {
+                        rlog.warn("ambiguous ctor detected for " + cname, xambiguous);
+                        ctor = null;
                     }
-                    List<Constructor<?>> l = new LinkedList<Constructor<?>>();
-                    for(Constructor<?> ictor : clazz.getConstructors()) {
-                        l.add(ictor);
-                    }
-                    // try to find one
-                    ctor = key.getMostSpecificConstructor(l);
-                    if (ctor != null) {
-                        constructorsMap.put(key, ctor);
-                    } else {
-                        constructorsMap.put(key, CTOR_MISS);
-                    }
-                } catch(ClassNotFoundException xnotfound) {
-                    if (rlog.isDebugEnabled()) {
-                        rlog.debug("could not load class " + cname, xnotfound);
-                    }
-                    ctor = null;
-                } catch(MethodKey.AmbiguousException xambiguous) {
-                    rlog.warn("ambiguous ctor detected for " + cname, xambiguous);
-                    ctor = null;
                 }
             }
+            return ctor;
+        } catch (MethodKey.AmbiguousException ae) {
+            // whoops.  Ambiguous.  Make a nice log message and return null...
+            if (rlog != null) {
+                rlog.error("ambiguous constructor invocation: new "
+                           + key.debugString());
+            }
         }
-        return ctor;
+        return null;
     }
     // CSON: RedundantThrows
 

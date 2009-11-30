@@ -16,9 +16,9 @@
  */
 package org.apache.commons.jexl2.util;
 import org.apache.commons.jexl2.util.introspection.MethodKey;
-import org.apache.commons.jexl2.util.introspection.JexlMethod;
-import org.apache.commons.jexl2.util.introspection.JexlPropertySet;
-import org.apache.commons.jexl2.util.introspection.JexlPropertyGet;
+import org.apache.commons.jexl2.introspection.JexlMethod;
+import org.apache.commons.jexl2.introspection.JexlPropertySet;
+import org.apache.commons.jexl2.introspection.JexlPropertyGet;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -306,8 +306,8 @@ public abstract class AbstractExecutor {
         }
 
         /** {@inheritDoc} */
-        public final Object invoke(Object obj, Object[] args) throws Exception {
-            return execute(obj, args);
+        public final Object invoke(Object obj, Object[] params) throws Exception {
+            return execute(obj, params);
         }
 
         /** {@inheritDoc} */

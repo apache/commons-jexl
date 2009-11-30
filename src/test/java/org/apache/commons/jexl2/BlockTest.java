@@ -33,44 +33,44 @@ public class BlockTest extends JexlTestCase {
 
     public void testBlockSimple() throws Exception {
         Expression e = JEXL.createExpression("if (true) { 'hello'; }");
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
         assertEquals("Result is wrong", "hello", o);
     }
 
     public void testBlockExecutesAll() throws Exception {
         Expression e = JEXL.createExpression("if (true) { x = 'Hello'; y = 'World';}");
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
-        assertEquals("First result is wrong", "Hello", jc.getJexlVariable("x"));
-        assertEquals("Second result is wrong", "World", jc.getJexlVariable("y"));
+        assertEquals("First result is wrong", "Hello", jc.get("x"));
+        assertEquals("Second result is wrong", "World", jc.get("y"));
         assertEquals("Block result is wrong", "World", o);
     }
 
     public void testEmptyBlock() throws Exception {
         Expression e = JEXL.createExpression("if (true) { }");
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
         assertNull("Result is wrong", o);
     }
 
     public void testBlockLastExecuted01() throws Exception {
         Expression e = JEXL.createExpression("if (true) { x = 1; } else { x = 2; }");
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
         assertEquals("Block result is wrong", new Integer(1), o);
     }
 
     public void testBlockLastExecuted02() throws Exception {
         Expression e = JEXL.createExpression("if (false) { x = 1; } else { x = 2; }");
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
         assertEquals("Block result is wrong", new Integer(2), o);
     }
 
     public void testNestedBlock() throws Exception {
         Expression e = JEXL.createExpression("if (true) { x = 'hello'; y = 'world';" + " if (true) { x; } y; }");
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
         assertEquals("Block result is wrong", "world", o);
     }

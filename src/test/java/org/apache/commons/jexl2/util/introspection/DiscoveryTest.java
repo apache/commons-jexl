@@ -22,7 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 
+import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.JexlTestCase;
+import org.apache.commons.jexl2.introspection.Uberspect;
+
 import org.apache.commons.jexl2.util.Introspector;
 import org.apache.commons.jexl2.util.AbstractExecutor;
 import org.apache.commons.jexl2.util.PropertyGetExecutor;
@@ -97,7 +100,7 @@ public class DiscoveryTest extends JexlTestCase {
 
 
     public void testBeanIntrospection() throws Exception {
-        Uberspect uber = Introspector.getUberspect();
+        Uberspect uber = JexlEngine.getUberspect(null);
         Introspector intro = (Introspector) uber;
         Bean bean = new Bean("JEXL", "LXEJ");
 
@@ -126,7 +129,7 @@ public class DiscoveryTest extends JexlTestCase {
     }
 
     public void testDuckIntrospection() throws Exception {
-        Uberspect uber = Introspector.getUberspect();
+        Uberspect uber = JexlEngine.getUberspect(null);
         Introspector intro = (Introspector) uber;
         Duck duck = new Duck("JEXL", "LXEJ");
 
@@ -154,7 +157,7 @@ public class DiscoveryTest extends JexlTestCase {
     }
 
     public void testListIntrospection() throws Exception {
-        Uberspect uber = Introspector.getUberspect();
+        Uberspect uber = JexlEngine.getUberspect(null);
         Introspector intro = (Introspector) uber;
         List<Object> list = new ArrayList<Object>();
         list.add("LIST");
@@ -185,7 +188,7 @@ public class DiscoveryTest extends JexlTestCase {
     }
 
     public void testMapIntrospection() throws Exception {
-        Uberspect uber = Introspector.getUberspect();
+        Uberspect uber = JexlEngine.getUberspect(null);
         Introspector intro = (Introspector) uber;
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("value", "MAP");

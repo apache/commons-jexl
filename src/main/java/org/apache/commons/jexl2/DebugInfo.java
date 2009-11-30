@@ -14,19 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl2.util.introspection;
+package org.apache.commons.jexl2;
+
 
 /**
- * Little class to carry in info such as a file or template name, line and column for
+ * Little class to carry in info such as a url/file name, line and column for
  * information error reporting from the uberspector implementations.
- * <p>
- * Originally taken from Velocity for self-sufficiency.
- * </p>
- * @since 1.0
- * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public class Info implements DebugInfo {
+public class DebugInfo implements JexlInfo {
     /** line number. */
     private final int line;
     /** column number. */
@@ -39,7 +35,7 @@ public class Info implements DebugInfo {
      * @param l line number
      * @param c column
      */
-    public Info(String tn, int l, int c) {
+    public DebugInfo(String tn, int l, int c) {
         name = tn;
         line = l;
         column = c;
@@ -73,16 +69,6 @@ public class Info implements DebugInfo {
      * @return template name
      */
     public String getName() {
-        return name;
-    }
-
-    /**
-     * Gets the template name.
-     * @return template name
-     * @deprecated Use {@link #getName()} instead
-     */
-    @Deprecated
-    public String getTemplateName() {
         return name;
     }
 

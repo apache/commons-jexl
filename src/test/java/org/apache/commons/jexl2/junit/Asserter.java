@@ -24,6 +24,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl2.MapContext;
 import org.apache.commons.jexl2.JexlEngine;
 
 /**
@@ -39,7 +40,7 @@ public class Asserter extends Assert {
     /** variables used during asserts. */
     private final Map<String, Object> variables = new HashMap<String, Object>();
     /** context to use during asserts. */
-    private final JexlContext context = new JexlContext.Mapped(variables);
+    private final JexlContext context = new MapContext(variables);
 
     /** Jexl engine to use during Asserts. */
     private final JexlEngine engine;

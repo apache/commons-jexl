@@ -15,40 +15,48 @@
  * limitations under the License.
  */
 
-package org.apache.commons.jexl2.util.introspection;
+package org.apache.commons.jexl2.introspection;
 
 /**
- * Interface used for setting values that appear to be properties.
+ * Interface used for regular method invocation.
  * Ex.
  * <code>
- * ${foo.bar = "hello"}
+ * ${foo.bar()}
  * </code>
+ * 
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public interface JexlPropertySet {
+public interface JexlMethod {
     /**
-     * method used to set the value in the object.
-     * 
-     * @param o Object on which the method will be called with the arg
-     * @param arg value to be set
-     * @return the value returned from the set operation (impl specific)
+     * invocation method - called when the method invocation should be performed
+     * and a value returned.
+
+     * @param obj the object
+     * @param params method parameters.
+     * @return the result
      * @throws Exception on any error.
      */
-    Object invoke(Object o, Object arg) throws Exception;
-
+    Object invoke(Object obj, Object[] params) throws Exception;
+    
     /**
-     * specifies if this JexlPropertySet is cacheable and able to be reused for
-     * this class of object it was returned for.
+     * specifies if this JexlMethod is cacheable and able to be reused for this
+     * class of object it was returned for.
      * 
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();
 
     /**
-     * returns the method name used to set this 'property'.
-     * @return the method name.
+     * Gets the method name used.
+     * @return method name
      */
     String getMethodName();
+
+    /**
+     * returns the return type of the method invoked.
+     * @return return type
+     */
+    Class<?> getReturnType();
 }

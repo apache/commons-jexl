@@ -39,10 +39,10 @@ import org.apache.commons.jexl2.parser.Parser;
 import org.apache.commons.jexl2.parser.JexlNode;
 import org.apache.commons.jexl2.parser.TokenMgrError;
 import org.apache.commons.jexl2.parser.ASTJexlScript;
-import org.apache.commons.jexl2.util.Introspector;
-import org.apache.commons.jexl2.util.introspection.Uberspect;
-import org.apache.commons.jexl2.util.introspection.Info;
-import org.apache.commons.jexl2.util.introspection.JexlMethod;
+
+import org.apache.commons.jexl2.introspection.Uberspect;
+import org.apache.commons.jexl2.introspection.UberspectImpl;
+import org.apache.commons.jexl2.introspection.JexlMethod;
 
 /**
  * <p>
@@ -88,38 +88,38 @@ import org.apache.commons.jexl2.util.introspection.JexlMethod;
  * @since 2.0
  */
 public class JexlEngine {    
-
-    /**
-     * Checks whether a variable is defined in a context.
-     * @param context the context
-     * @param name the variable's name
-     * @return true if the variable is defined, false otherwise
-     */
-    protected static boolean isVariableUndefined(JexlContext context, String name) {
-        if (context instanceof JexlContext.Nullable) {
-            return !((JexlContext.Nullable) context).definesJexlVariable(name);
-        }
-        return context.getJexlVariable(name) == null;
-    }
-    
     /**
      * An empty/static/non-mutable JexlContext used instead of null context.
      */
-    protected static final JexlContext EMPTY_CONTEXT = new JexlContext.Nullable() {
+    protected static final JexlContext EMPTY_CONTEXT = new JexlContext() {
         /** {@inheritDoc} */
-        public Object getJexlVariable(String name) {
+        public Object get(String name) {
             return null;
         }
         /** {@inheritDoc} */
-        public boolean definesJexlVariable(String name) {
+        public boolean has(String name) {
             return false;
         }
         /** {@inheritDoc} */
-        public void setJexlVariable(String name, Object value) {
+        public void set(String name, Object value) {
             throw new UnsupportedOperationException("Not supported in void context.");
         }
     };
 
+    /**
+     *  Gets the default instance of Uberspect.
+     * <p>This is lazily initialized to avoid building a default instance if there
+     * is no use for it. The main reason for not using the default Uberspect instance is to
+     * be able to use a (low level) introspector created with a given logger
+     * instead of the default one.</p>
+     * <p>Implemented as on demand holder idiom.</p>
+     *  @return Uberspect the default uberspector instance.
+     */
+    private static class UberspectHolder {
+        /** The default uberspector that handles all introspection patterns. */
+        private static final Uberspect UBERSPECT = new UberspectImpl(LogFactory.getLog(JexlEngine.class));
+    }
+    
     /**
      * The Uberspect instance.
      */
@@ -176,18 +176,40 @@ public class JexlEngine {
      * @param log the logger for various messages
      */
     public JexlEngine(Uberspect anUberspect, JexlArithmetic anArithmetic, Map<String, Object> theFunctions, Log log) {
+        this.uberspect = anUberspect == null ? getUberspect(log) : anUberspect;
         if (log == null) {
             log = LogFactory.getLog(JexlEngine.class);
         }
-        if (log == null) {
-            throw new NullPointerException("logger can not be null");
-        }
         this.logger = log;
-        this.uberspect = anUberspect == null ? Introspector.getUberspect(log) : anUberspect;
         this.arithmetic = anArithmetic == null ? new JexlArithmetic(true) : anArithmetic;
         if (theFunctions != null) {
             this.functions = theFunctions;
         }
+    }
+
+
+    /**
+     *  Gets the default instance of Uberspect.
+     * <p>This is lazily initialized to avoid building a default instance if there
+     * is no use for it. The main reason for not using the default Uberspect instance is to
+     * be able to use a (low level) introspector created with a given logger
+     * instead of the default one.</p>
+     * @param logger the logger to use for the underlying Uberspect
+     * @return Uberspect the default uberspector instance.
+     */
+    public static Uberspect getUberspect(Log logger) {
+        if (logger == null || logger.equals(LogFactory.getLog(JexlEngine.class))) {
+            return UberspectHolder.UBERSPECT;
+        }
+        return new UberspectImpl(logger);
+    }
+
+    /**
+     * Gets this engine underlying uberspect.
+     * @return the uberspect
+     */
+    public Uberspect getUberspect() {
+        return uberspect;
     }
 
     /**
@@ -259,7 +281,7 @@ public class JexlEngine {
      * @param loader the class loader to use
      */
     public void setClassLoader(ClassLoader loader) {
-        uberspect.getIntrospector().setLoader(loader);
+        uberspect.setClassLoader(loader);
     }
 
     /**
@@ -340,7 +362,7 @@ public class JexlEngine {
      *      parsing this expression, or if the expression is neither an
      *      expression or a reference.
      */
-    public Expression createExpression(String expression, Info info) {
+    public Expression createExpression(String expression, JexlInfo info) {
         // Parse the expression
         ASTJexlScript tree = parse(expression, info);
         if (tree.jjtGetNumChildren() > 1) {
@@ -371,7 +393,7 @@ public class JexlEngine {
      * @return A {@link Script} which can be executed using a {@link JexlContext}.
      * @throws JexlException if there is a problem parsing the script.
      */
-    public Script createScript(String scriptText, Info info) {
+    public Script createScript(String scriptText, JexlInfo info) {
         if (scriptText == null) {
             throw new NullPointerException("scriptText is null");
         }
@@ -399,9 +421,9 @@ public class JexlEngine {
             throw new IOException("Can't read scriptFile (" + scriptFile.getCanonicalPath() + ")");
         }
         BufferedReader reader = new BufferedReader(new FileReader(scriptFile));
-        Info info = null;
+        JexlInfo info = null;
         if (debug) {
-            info = new Info(scriptFile.getName(), 0, 0);
+            info = createInfo(scriptFile.getName(), 0, 0);
         }
         return createScript(readerToString(reader), info);
 
@@ -426,9 +448,9 @@ public class JexlEngine {
 
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(connection.getInputStream()));
-        Info info = null;
+        JexlInfo info = null;
         if (debug) {
-            info = new Info(scriptUrl.toString(), 0, 0);
+            info = createInfo(scriptUrl.toString(), 0, 0);
         }
         return createScript(readerToString(reader), info);
     }
@@ -468,7 +490,7 @@ public class JexlEngine {
         }
         // lets build 1 unique & unused identifiers wrt context
         String r0 = "$0";
-        for (int s = 0; !isVariableUndefined(context, r0); ++s) {
+        for (int s = 0; context.has(r0); ++s) {
             r0 = r0 + s;
         }
         expr = r0 + (expr.charAt(0) == '[' ? "" : ".") + expr + ";";
@@ -524,10 +546,10 @@ public class JexlEngine {
         }
         // lets build 2 unique & unused identifiers wrt context
         String r0 = "$0", r1 = "$1";
-        for (int s = 0; !isVariableUndefined(context, r0); ++s) {
+        for (int s = 0; context.has(r0); ++s) {
             r0 = r0 + s;
         }
-        for (int s = 0; !isVariableUndefined(context, r1); ++s) {
+        for (int s = 0; context.has(r1); ++s) {
             r1 = r1 + s;
         }
         // synthetize expr
@@ -560,7 +582,7 @@ public class JexlEngine {
     public Object invokeMethod(Object obj, String meth, Object... args) {
         JexlException xjexl = null;
         Object result = null;
-        Info info = debugInfo();
+        JexlInfo info = debugInfo();
         try {
             JexlMethod method = uberspect.getMethod(obj, meth, args, info);
             if (method == null && arithmetic.narrowArguments(args)) {
@@ -618,7 +640,7 @@ public class JexlEngine {
     protected Object doCreateInstance(Object clazz, Object...args) {
         JexlException xjexl = null;
         Object result = null;
-        Info info = debugInfo();
+        JexlInfo info = debugInfo();
         try {
             Constructor<?> ctor = uberspect.getConstructor(clazz, args, info);
             if (ctor == null && arithmetic.narrowArguments(args)) {
@@ -748,7 +770,7 @@ public class JexlEngine {
      * @return the parsed tree
      * @throws JexlException if any error occured during parsing
      */
-    protected ASTJexlScript parse(CharSequence expression, Info info) {
+    protected ASTJexlScript parse(CharSequence expression, JexlInfo info) {
         String expr = cleanExpression(expression);
         ASTJexlScript tree = null;
         synchronized (parser) {
@@ -778,13 +800,24 @@ public class JexlEngine {
     }
 
     /**
+     * Creates a JexlInfo instance.
+     * @param fn url/file name
+     * @param l line number
+     * @param c column number
+     * @return a JexlInfo instance
+     */
+    protected JexlInfo createInfo(String fn, int l, int c) {
+        return new DebugInfo(fn, l, c);
+    }
+
+    /**
      * Creates and fills up debugging information.
      * <p>This gathers the class, method and line number of the first calling method
      * not owned by JexlEngine, UnifiedJEXL or {Script,Expression}Factory.</p>
      * @return an Info if debug is set, null otherwise
      */
-    protected Info debugInfo() {
-        Info info = null;
+    protected JexlInfo debugInfo() {
+        JexlInfo info = null;
         if (debug) {
             Throwable xinfo = new Throwable();
             xinfo.fillInStackTrace();
@@ -810,7 +843,7 @@ public class JexlEngine {
                 }
             }
             if (se != null) {
-                info = new Info(se.getClassName() + "." + se.getMethodName(), se.getLineNumber(), 0);
+                info = createInfo(se.getClassName() + "." + se.getMethodName(), se.getLineNumber(), 0);
             }
         }
         return info;

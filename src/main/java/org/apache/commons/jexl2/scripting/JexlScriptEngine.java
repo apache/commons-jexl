@@ -159,7 +159,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
      *
      * Current implementation only gives access to ENGINE_SCOPE binding.
      */
-    private static class JexlContextWrapper implements JexlContext.Nullable {
+    private static class JexlContextWrapper implements JexlContext {
         /** The engine context. */
         private final ScriptContext engineContext;
         /**
@@ -172,12 +172,12 @@ public class JexlScriptEngine extends AbstractScriptEngine {
         }
 
         /** {@inheritDoc} */
-        public Object getJexlVariable(String name) {
+        public Object get(String name) {
             return engineContext.getAttribute(name);
         }
 
         /** {@inheritDoc} */
-        public void setJexlVariable(String name, Object value) {
+        public void set(String name, Object value) {
             int scope = engineContext.getAttributesScope(name);
             if (scope == -1) { // not found, default to engine
                 scope = ScriptContext.ENGINE_SCOPE;
@@ -186,7 +186,7 @@ public class JexlScriptEngine extends AbstractScriptEngine {
         }
 
         /** {@inheritDoc} */
-        public boolean definesJexlVariable(String name) {
+        public boolean has(String name) {
             Bindings bnd = engineContext.getBindings(ScriptContext.ENGINE_SCOPE);
             return bnd.containsKey(name);
         }

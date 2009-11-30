@@ -16,15 +16,14 @@
  */
 package org.apache.commons.jexl2.parser;
 
-import org.apache.commons.jexl2.util.introspection.Info;
-import org.apache.commons.jexl2.util.introspection.DebugInfo;
+import org.apache.commons.jexl2.JexlInfo;
 
 /**
  * Base class for parser nodes - holds an 'image' of the token for later use.
  *
  * @since 2.0
  */
-public abstract class JexlNode extends SimpleNode implements DebugInfo {
+public abstract class JexlNode extends SimpleNode implements JexlInfo {
     /** token value. */
     public String image;
 
@@ -36,11 +35,11 @@ public abstract class JexlNode extends SimpleNode implements DebugInfo {
         super(p, id);
     }
 
-    public Info getInfo() {
+    public JexlInfo getInfo() {
         JexlNode node = this;
         while (node != null) {
-            if (node.value instanceof Info) {
-                return (Info) node.value;
+            if (node.value instanceof JexlInfo) {
+                return (JexlInfo) node.value;
             }
             node = node.jjtGetParent();
         }
@@ -49,7 +48,7 @@ public abstract class JexlNode extends SimpleNode implements DebugInfo {
     
     /** {@inheritDoc} */
     public String debugString() {
-        Info info = getInfo();
+        JexlInfo info = getInfo();
         return info != null? info.debugString() : "";
     }
 }

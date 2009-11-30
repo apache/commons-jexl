@@ -15,47 +15,40 @@
  * limitations under the License.
  */
 
-package org.apache.commons.jexl2.util.introspection;
+package org.apache.commons.jexl2.introspection;
 
 /**
- * Interface for getting values that appear to be properties.
+ * Interface used for setting values that appear to be properties.
  * Ex.
  * <code>
- * ${foo.bar}
+ * ${foo.bar = "hello"}
  * </code>
  * @since 1.0
  * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-public interface JexlPropertyGet {
+public interface JexlPropertySet {
     /**
-     * invocation method - called when the 'get action' should be performed and
-     * a value returned.
-     * @param o the object to get the property from.
-     * @return the property value.
+     * method used to set the value in the object.
+     * 
+     * @param o Object on which the method will be called with the arg
+     * @param arg value to be set
+     * @return the value returned from the set operation (impl specific)
      * @throws Exception on any error.
      */
-    Object invoke(Object o) throws Exception;
+    Object invoke(Object o, Object arg) throws Exception;
 
     /**
-     * Specifies if this JexlPropertyGet is cacheable and able to be reused for
+     * specifies if this JexlPropertySet is cacheable and able to be reused for
      * this class of object it was returned for.
-     *
+     * 
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();
 
     /**
-     * returns the method name used to return this 'property'.
+     * returns the method name used to set this 'property'.
      * @return the method name.
      */
     String getMethodName();
-
-    /**
-     * Tell whether the method underlying this 'property' is alive by
-     * checking to see if represents a successful name resolution.
-     *
-     * @return boolean Whether 'property' is alive.
-     */
-    boolean isAlive();
 }

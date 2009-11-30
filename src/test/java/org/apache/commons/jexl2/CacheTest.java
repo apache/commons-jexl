@@ -259,7 +259,7 @@ public class CacheTest extends JexlTestCase {
             jexl.setCache(0);
         }
         Map<String, Object> vars = new HashMap<String,Object>();
-        JexlContext jc = new JexlContext.Mapped(vars);
+        JexlContext jc = new MapContext(vars);
         Expression cacheGetValue = jexl.createExpression("cache.value");
         Expression cacheSetValue = jexl.createExpression("cache.value = value");
         Object result;
@@ -318,7 +318,7 @@ public class CacheTest extends JexlTestCase {
             jexl.setCache(0);
         }
         Map<String, Object> vars = new HashMap<String,Object>();
-        JexlContext jc = new JexlContext.Mapped(vars);
+        JexlContext jc = new MapContext(vars);
         Expression cacheGetValue = jexl.createExpression("cache.flag");
         Expression cacheSetValue = jexl.createExpression("cache.flag = value");
         Object result;
@@ -359,7 +359,7 @@ public class CacheTest extends JexlTestCase {
             jexl.setCache(0);
         }
         Map<String, Object> vars = new HashMap<String,Object>();
-        JexlContext jc = new JexlContext.Mapped(vars);
+        JexlContext jc = new MapContext(vars);
         Expression cacheGetValue = jexl.createExpression("cache.0");
         Expression cacheSetValue = jexl.createExpression("cache[0] = value");
         Object result;
@@ -414,7 +414,7 @@ public class CacheTest extends JexlTestCase {
             jexl.setCache(0);
         }
         Map<String, Object> vars = new HashMap<String,Object>();
-        JexlContext jc = new JexlContext.Mapped(vars);
+        JexlContext jc = new MapContext(vars);
         jexl.setDebug(true);
         Expression compute2 = jexl.createExpression("cache.compute(a0, a1)");
         Expression compute1 = jexl.createExpression("cache.compute(a0)");
@@ -513,7 +513,7 @@ public class CacheTest extends JexlTestCase {
             jexl.setCache(0);
         }
         Map<String, Object> vars = new HashMap<String,Object>();
-        JexlContext jc = new JexlContext.Mapped(vars);
+        JexlContext jc = new MapContext(vars);
         java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
         jexl.setFunctions(funcs);
         Expression compute2 = jexl.createExpression("cached:COMPUTE(a0, a1)");

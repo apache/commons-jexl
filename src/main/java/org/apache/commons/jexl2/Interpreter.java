@@ -79,10 +79,10 @@ import org.apache.commons.jexl2.parser.Node;
 import org.apache.commons.jexl2.parser.ParserVisitor;
 
 import org.apache.commons.jexl2.util.AbstractExecutor;
-import org.apache.commons.jexl2.util.introspection.Uberspect;
-import org.apache.commons.jexl2.util.introspection.JexlMethod;
-import org.apache.commons.jexl2.util.introspection.JexlPropertyGet;
-import org.apache.commons.jexl2.util.introspection.JexlPropertySet;
+import org.apache.commons.jexl2.introspection.Uberspect;
+import org.apache.commons.jexl2.introspection.JexlMethod;
+import org.apache.commons.jexl2.introspection.JexlPropertyGet;
+import org.apache.commons.jexl2.introspection.JexlPropertySet;
 
 /**
  * An interpreter of JEXL syntax.
@@ -360,7 +360,7 @@ public class Interpreter implements ParserVisitor {
                     variableName.append('.');
                     variableName.append(left.jjtGetChild(v).image);
                 }
-                object = context.getJexlVariable(variableName.toString());
+                object = context.get(variableName.toString());
                 // disallow mixing ant & bean with same root; avoid ambiguity
                 if (object != null) {
                     isVariable = false;
@@ -382,7 +382,7 @@ public class Interpreter implements ParserVisitor {
                     variableName.append(property);
                     property = variableName.toString();
                 }
-                context.setJexlVariable(String.valueOf(property), right);
+                context.set(String.valueOf(property), right);
                 return right;
             }
         } else if (propertyNode instanceof ASTIntegerLiteral) {
@@ -396,7 +396,7 @@ public class Interpreter implements ParserVisitor {
                     variableName.append(property);
                     property = variableName.toString();
                 }
-                context.setJexlVariable(String.valueOf(property), right);
+                context.set(String.valueOf(property), right);
                 return right;
             }
         } else if (propertyNode instanceof ASTArrayAccess) {
@@ -581,12 +581,14 @@ public class Interpreter implements ParserVisitor {
             // get an iterator for the collection/array etc via the
             // introspector.
             Iterator<?> itemsIterator = getUberspect().getIterator(iterableValue, node);
-            while (itemsIterator.hasNext()) {
-                // set loopVariable to value of iterator
-                Object value = itemsIterator.next();
-                context.setJexlVariable(loopVariable.image, value);
-                // execute statement
-                result = statement.jjtAccept(this, data);
+            if (itemsIterator != null) {
+                while (itemsIterator.hasNext()) {
+                    // set loopVariable to value of iterator
+                    Object value = itemsIterator.next();
+                    context.set(loopVariable.image, value);
+                    // execute statement
+                    result = statement.jjtAccept(this, data);
+                }
             }
         }
         return result;
@@ -626,10 +628,10 @@ public class Interpreter implements ParserVisitor {
                     return registers[3];
                 }
             }
-            Object value = context.getJexlVariable(name);
+            Object value = context.get(name);
             if (value == null
                 && !(node.jjtGetParent() instanceof ASTReference)
-                && JexlEngine.isVariableUndefined(context, name)) {
+                && !context.has(name)) {
                 JexlException xjexl = new JexlException(node, "undefined variable " + name);
                 return unknownVariable(xjexl);
             }
@@ -991,13 +993,13 @@ public class Interpreter implements ParserVisitor {
                     variableName.append('.');
                     variableName.append(node.jjtGetChild(v).image);
                 }
-                result = context.getJexlVariable(variableName.toString());
+                result = context.get(variableName.toString());
             }
         }
         if (result == null) {
             if (isVariable
                 && !(node.jjtGetParent() instanceof ASTTernaryNode)
-                && JexlEngine.isVariableUndefined(context, variableName.toString())) {
+                && !context.has(variableName.toString())) {
                 JexlException xjexl = new JexlException(node, "undefined variable " + variableName.toString());
                 return unknownVariable(xjexl);
             }

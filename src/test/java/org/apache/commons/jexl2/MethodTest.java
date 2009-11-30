@@ -132,7 +132,7 @@ public class MethodTest extends JexlTestCase {
         funcs.put("math", new MyMath());
         JEXL.setFunctions(funcs);
 
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
 
         Expression e = JEXL.createExpression("ten()");
         Object o = e.evaluate(jc);
@@ -146,7 +146,7 @@ public class MethodTest extends JexlTestCase {
         o = e.evaluate(jc);
         assertEquals("Result is not 20", new Integer(20), o);
 
-        jc.setJexlVariable("pi", Math.PI);
+        jc.set("pi", Math.PI);
         e = JEXL.createExpression("math:cos(pi)");
         o = e.evaluate(jc);
         assertEquals(Double.valueOf(-1),o);
@@ -159,27 +159,27 @@ public class MethodTest extends JexlTestCase {
         JEXL.setFunctions(funcs);
 
         Expression e = JEXL.createExpression("func:ten()");
-        JexlContext jc = new JexlContext.Mapped();
+        JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
 
         e = JEXL.createExpression("func:plus10(10)");
-        jc = new JexlContext.Mapped();
+        jc = new MapContext();
         o = e.evaluate(jc);
         assertEquals("Result is not 20", new Integer(20), o);
 
         e = JEXL.createExpression("func:plus10(func:ten())");
-        jc = new JexlContext.Mapped();
+        jc = new MapContext();
         o = e.evaluate(jc);
         assertEquals("Result is not 20", new Integer(20), o);
 
         e = JEXL.createExpression("FUNC:PLUS20(10)");
-        jc = new JexlContext.Mapped();
+        jc = new MapContext();
         o = e.evaluate(jc);
         assertEquals("Result is not 30", new Integer(30), o);
 
         e = JEXL.createExpression("FUNC:PLUS20(FUNC:TWENTY())");
-        jc = new JexlContext.Mapped();
+        jc = new MapContext();
         o = e.evaluate(jc);
         assertEquals("Result is not 40", new Integer(40), o);
     }
