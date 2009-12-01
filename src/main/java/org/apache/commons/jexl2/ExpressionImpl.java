@@ -23,12 +23,11 @@ import org.apache.commons.jexl2.parser.ASTJexlScript;
  * Instances of ExpressionImpl are created by the {@link JexlEngine},
  * and this is the default implementation of the {@link Expression} and
  * {@link Script} interface.
- *
  * @since 1.0
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
  * @version $Id$
  */
-class ExpressionImpl implements Expression, Script {
+public class ExpressionImpl implements Expression, Script {
     /** The engine for this expression. */
     protected final JexlEngine jexl;
     /**
@@ -48,10 +47,10 @@ class ExpressionImpl implements Expression, Script {
      * @param expr the expression.
      * @param ref the parsed expression.
      */
-    ExpressionImpl(JexlEngine engine, String expr, ASTJexlScript ref) {
+    protected ExpressionImpl(JexlEngine engine, String expr, ASTJexlScript ref) {
+        jexl = engine;
         expression = expr;
         script = ref;
-        jexl = engine;
     }
 
     /**

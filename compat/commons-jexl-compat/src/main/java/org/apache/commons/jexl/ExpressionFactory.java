@@ -14,7 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl2;
+package org.apache.commons.jexl;
+
+import org.apache.commons.jexl2.JexlEngine;
 
 /**
  * Creates Expression objects. 
@@ -40,31 +42,8 @@ package org.apache.commons.jexl2;
  * </p>
  * @since 1.0
  * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Id$
+ * @version $Id: ExpressionFactory.java 884175 2009-11-25 16:23:41Z henrib $
+ * @deprecated Create a JexlEngine and use the createScript method on that instead.
  */
 @Deprecated
-public final class ExpressionFactory {
-    /**
-     * Private constructor, the single instance is always obtained
-     * with a call to getInstance().
-     */
-    private ExpressionFactory() {}
-
-
-    /**
-     * Creates an Expression from a String containing valid
-     * JEXL syntax.  This method parses the expression which
-     * must contain either a reference or an expression.
-     * @param expression A String containing valid JEXL syntax
-     * @return An Expression object which can be evaluated with a JexlContext
-     * @throws JexlException An exception can be thrown if there is a problem
-     *      parsing this expression, or if the expression is neither an
-     *      expression or a reference.
-     * @deprecated Create a JexlEngine and use createExpression() on that
-     */
-    @Deprecated
-    public static Expression createExpression(String expression) {
-        return ScriptFactory.getInstance().createExpression(expression);
-    }
-
-}
+public final class ExpressionFactory extends JexlOne {}
