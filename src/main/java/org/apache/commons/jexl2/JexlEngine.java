@@ -91,7 +91,7 @@ public class JexlEngine {
     /**
      * An empty/static/non-mutable JexlContext used instead of null context.
      */
-    protected static final JexlContext EMPTY_CONTEXT = new JexlContext() {
+    public static final JexlContext EMPTY_CONTEXT = new JexlContext() {
         /** {@inheritDoc} */
         public Object get(String name) {
             return null;
@@ -115,9 +115,11 @@ public class JexlEngine {
      * <p>Implemented as on demand holder idiom.</p>
      *  @return Uberspect the default uberspector instance.
      */
-    private static class UberspectHolder {
+    private static final class UberspectHolder {
         /** The default uberspector that handles all introspection patterns. */
         private static final Uberspect UBERSPECT = new UberspectImpl(LogFactory.getLog(JexlEngine.class));
+        /** Non-instantiable. */
+        private UberspectHolder() {}
     }
     
     /**
@@ -338,6 +340,16 @@ public class JexlEngine {
     }
 
     /**
+     * An overridable through covariant return Expression creator.
+     * @param text the script text
+     * @param tree the parse AST tree
+     * @return the script instance
+     */
+    protected Expression createExpression(ASTJexlScript tree, String text) {
+        return new ExpressionImpl(this, text, tree);
+    }
+    
+    /**
      * Creates an Expression from a String containing valid
      * JEXL syntax.  This method parses the expression which
      * must contain either a reference or an expression.
@@ -369,7 +381,7 @@ public class JexlEngine {
             logger.warn("The JEXL Expression created will be a reference"
                       + " to the first expression from the supplied script: \"" + expression + "\" ");
         }
-        return new ExpressionImpl(this, expression, tree);
+        return createExpression(tree, expression);
     }
 
     /**
@@ -399,9 +411,19 @@ public class JexlEngine {
         }
         // Parse the expression
         ASTJexlScript tree = parse(scriptText, info);
-        return new ExpressionImpl(this, scriptText, tree);
+        return createScript(tree, scriptText);
     }
 
+    /**
+     * An overridable through covariant return Script creator.
+     * @param text the script text
+     * @param tree the parse AST tree
+     * @return the script instance
+     */
+    protected Script createScript(ASTJexlScript tree, String text) {
+        return new ExpressionImpl(this, text, tree);
+    }
+    
     /**
      * Creates a Script from a {@link File} containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
@@ -426,7 +448,6 @@ public class JexlEngine {
             info = createInfo(scriptFile.getName(), 0, 0);
         }
         return createScript(readerToString(reader), info);
-
     }
 
     /**
@@ -833,10 +854,6 @@ public class JexlEngine {
                         clazz = JexlEngine.class;
                     } else if (className.equals(UnifiedJEXL.class.getName())) {
                         clazz = UnifiedJEXL.class;
-                    } else if (className.equals(ScriptFactory.class.getName())) {
-                        clazz = ScriptFactory.class;
-                    } else if (className.equals(ExpressionFactory.class.getName())) {
-                        clazz = ExpressionFactory.class;
                     } else {
                         break;
                     }

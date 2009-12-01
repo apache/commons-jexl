@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Export-Package: org.apache.commons.jexl;version="2.0.0.SNAPSHOT",org.a
+ pache.commons.jexl.context;version="2.0.0.SNAPSHOT"
+Tool: Bnd-0.0.238
+Bundle-Name: Commons JEXL (1.x compatibility)
+Created-By: 1.6.0_15 (Apple Inc.)
+Bundle-Vendor: The Apache Software Foundation
+Bundle-Version: 2.0.0.SNAPSHOT
+Bnd-LastModified: 1259670805939
+Bundle-ManifestVersion: 2
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-Description: Jexl is an implementation of the JSTL Expression L
+ anguage with extensions.
+Import-Package: org.apache.commons.jexl;version="2.0.0.SNAPSHOT",org.a
+ pache.commons.jexl.context;version="2.0.0.SNAPSHOT",org.apache.common
+ s.jexl2,org.apache.commons.jexl2.parser
+Bundle-SymbolicName: org.apache.commons.jexl-compat
+Bundle-DocURL: http://commons.apache.org/jexl/
+
