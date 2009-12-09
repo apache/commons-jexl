@@ -30,7 +30,7 @@ package org.apache.commons.jexl2.introspection;
  */
 public interface JexlMethod {
     /**
-     * invocation method - called when the method invocation should be performed
+     * Invocation method, called when the method invocation should be performed
      * and a value returned.
 
      * @param obj the object
@@ -39,7 +39,25 @@ public interface JexlMethod {
      * @throws Exception on any error.
      */
     Object invoke(Object obj, Object[] params) throws Exception;
-    
+
+    /**
+     * Attempts to reuse this JexlMethod, checking that it is compatible with
+     * the actual set of arguments.
+     * @param obj the object to invoke the method upon
+     * @param name the method name
+     * @param params the method arguments
+     * @return the result of the method invocation that should be checked by tryFailed to determine if it succeeded
+     * or failed.
+     */
+    Object tryInvoke(String name, Object obj, Object[] params);
+
+    /**
+     * Checks wether a tryExecute failed or not.
+     * @param rval the value returned by tryInvoke
+     * @return true if tryInvoke failed, false otherwise
+     */
+    boolean tryFailed(Object rval);
+
     /**
      * specifies if this JexlMethod is cacheable and able to be reused for this
      * class of object it was returned for.
@@ -47,12 +65,6 @@ public interface JexlMethod {
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();
-
-    /**
-     * Gets the method name used.
-     * @return method name
-     */
-    String getMethodName();
 
     /**
      * returns the return type of the method invoked.

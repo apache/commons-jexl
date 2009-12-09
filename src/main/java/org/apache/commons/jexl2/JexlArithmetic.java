@@ -123,7 +123,7 @@ public class JexlArithmetic {
         }
         if (val instanceof String) {
             String string = (String) val;
-            return string.indexOf(".") != -1 || string.indexOf("e") != -1 || string.indexOf("E") != -1;
+            return string.indexOf('.') != -1 || string.indexOf('e') != -1 || string.indexOf('E') != -1;
         }
         return false;
     }

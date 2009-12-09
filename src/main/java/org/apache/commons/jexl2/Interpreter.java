@@ -78,7 +78,6 @@ import org.apache.commons.jexl2.parser.ASTWhileStatement;
 import org.apache.commons.jexl2.parser.Node;
 import org.apache.commons.jexl2.parser.ParserVisitor;
 
-import org.apache.commons.jexl2.util.AbstractExecutor;
 import org.apache.commons.jexl2.introspection.Uberspect;
 import org.apache.commons.jexl2.introspection.JexlMethod;
 import org.apache.commons.jexl2.introspection.JexlPropertyGet;
@@ -765,10 +764,10 @@ public class Interpreter implements ParserVisitor {
             // attempt to reuse last executor cached in volatile JexlNode.value
             if (cache) {
                 Object cached = node.jjtGetValue();
-                if (cached instanceof AbstractExecutor.Method) {
-                    AbstractExecutor.Method me = (AbstractExecutor.Method) cached;
-                    Object eval = me.tryExecute(methodName, data, argv);
-                    if (eval != AbstractExecutor.TRY_FAILED) {
+                if (cached instanceof JexlMethod) {
+                    JexlMethod me = (JexlMethod) cached;
+                    Object eval = me.tryInvoke(methodName, data, argv);
+                    if (!me.tryFailed(eval)) {
                         return eval;
                     }
                 }
@@ -857,10 +856,10 @@ public class Interpreter implements ParserVisitor {
             // attempt to reuse last executor cached in volatile JexlNode.value
             if (cache) {
                 Object cached = node.jjtGetValue();
-                if (cached instanceof AbstractExecutor.Method) {
-                    AbstractExecutor.Method me = (AbstractExecutor.Method) cached;
-                    Object eval = me.tryExecute(function, namespace, argv);
-                    if (eval != AbstractExecutor.TRY_FAILED) {
+                if (cached instanceof JexlMethod) {
+                    JexlMethod me = (JexlMethod) cached;
+                    Object eval = me.tryInvoke(function, namespace, argv);
+                    if (!me.tryFailed(eval)) {
                         return eval;
                     }
                 }
@@ -1157,10 +1156,10 @@ public class Interpreter implements ParserVisitor {
         // attempt to reuse last executor cached in volatile JexlNode.value
         if (node != null && cache) {
             Object cached = node.jjtGetValue();
-            if (cached instanceof AbstractExecutor.Get) {
-                AbstractExecutor.Get vg = (AbstractExecutor.Get) cached;
-                Object value = vg.tryExecute(object, attribute);
-                if (value != AbstractExecutor.TRY_FAILED) {
+            if (cached instanceof JexlPropertyGet) {
+                JexlPropertyGet vg = (JexlPropertyGet) cached;
+                Object value = vg.tryInvoke(object, attribute);
+                if (!vg.tryFailed(value)) {
                     return value;
                 }
             }
@@ -1217,10 +1216,10 @@ public class Interpreter implements ParserVisitor {
         // attempt to reuse last executor cached in volatile JexlNode.value
         if (node != null && cache) {
             Object cached = node.jjtGetValue();
-            if (cached instanceof AbstractExecutor.Set) {
-                AbstractExecutor.Set setter = (AbstractExecutor.Set) cached;
-                Object eval = setter.tryExecute(object, attribute, value);
-                if (eval != AbstractExecutor.TRY_FAILED) {
+            if (cached instanceof JexlPropertySet) {
+                JexlPropertySet setter = (JexlPropertySet) cached;
+                Object eval = setter.tryInvoke(object, attribute, value);
+                if (!setter.tryFailed(eval)) {
                     return;
                 }
             }

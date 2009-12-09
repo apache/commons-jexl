@@ -235,7 +235,7 @@
                     <instrumentation>
                         <excludes>
                             <exclude>org/apache/commons/jexl2/parser/*.class</exclude>
-                            <exclude>apache/commons/jexl2/**/*Test.class</exclude>
+                            <exclude>org/apache/commons/jexl2/**/*Test.class</exclude>
                         </excludes>
                     </instrumentation>
                 </configuration>
@@ -245,6 +245,10 @@
                 <artifactId>findbugs-maven-plugin</artifactId>
                 <version>2.1</version>
                 <configuration>
+                        <excludes>
+                            <exclude>org/apache/commons/jexl2/parser/*.class</exclude>
+                            <exclude>org/apache/commons/jexl2/**/*Test.class</exclude>
+                        </excludes>
                     <xmlOutput>true</xmlOutput>
                     <!-- Optional directory to put findbugs xdoc xml report -->
                     <xmlOutputDirectory>target/site</xmlOutputDirectory>
@@ -257,7 +261,8 @@
                 <configuration>
                     <targetJdk>1.5</targetJdk>
                     <excludes>
-                        <exclude>org/apache/commons/jexl/parser/*.java</exclude>
+                        <exclude>org/apache/commons/jexl2/parser/*.class</exclude>
+                        <exclude>org/apache/commons/jexl2/**/*Test.class</exclude>
                     </excludes>
                     <rulesets>
                         <ruleset>/rulesets/braces.xml</ruleset>
