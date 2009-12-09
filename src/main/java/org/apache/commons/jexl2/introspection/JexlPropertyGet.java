@@ -29,13 +29,30 @@ package org.apache.commons.jexl2.introspection;
  */
 public interface JexlPropertyGet {
     /**
-     * invocation method - called when the 'get action' should be performed and
-     * a value returned.
-     * @param obj the object to get the property from.
+     * Method used to get the property value of an object.
+     * 
+     * @param obj the object to get the property value from.
      * @return the property value.
      * @throws Exception on any error.
      */
     Object invoke(Object obj) throws Exception;
+
+    /**
+     * Attempts to reuse this JexlPropertyGet, checking that it is compatible with
+     * the actual set of arguments.
+     * @param obj the object to invoke the property get upon
+     * @param key the property key to get
+     * @return the result of the method invocation that should be checked by tryFailed to determine if it succeeded
+     * or failed.
+     */
+    Object tryInvoke(Object obj, Object key);
+
+    /**
+     * Checks wether a tryExecute failed or not.
+     * @param rval the value returned by tryInvoke
+     * @return true if tryInvoke failed, false otherwise
+     */
+    boolean tryFailed(Object rval);
 
     /**
      * Specifies if this JexlPropertyGet is cacheable and able to be reused for
@@ -44,12 +61,6 @@ public interface JexlPropertyGet {
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();
-
-    /**
-     * returns the method name used to return this 'property'.
-     * @return the method name.
-     */
-    String getMethodName();
 
     /**
      * Tell whether the method underlying this 'property' is alive by

@@ -849,7 +849,7 @@ public class JexlEngine {
                 se = stack[s];
                 String className = se.getClassName();
                 if (!className.equals(clazz.getName())) {
-                    // go deeper if called from JexlEngine, UnifiedJEXL or a Factory
+                    // go deeper if called from JexlEngine or UnifiedJEXL
                     if (className.equals(JexlEngine.class.getName())) {
                         clazz = JexlEngine.class;
                     } else if (className.equals(UnifiedJEXL.class.getName())) {

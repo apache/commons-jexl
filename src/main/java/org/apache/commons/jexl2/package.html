@@ -43,11 +43,10 @@
             {@link org.apache.commons.jexl2.JexlContext}.
             An Expression is created using
             {@link org.apache.commons.jexl2.JexlEngine#createExpression(java.lang.String)},
-            passing a String containing valid JEXL syntax.  A JexlContext is created using
-            {@link org.apache.commons.jexl2.JexlHelper#createContext()},
-            and variables are put into a map exposed through the
-            {@link org.apache.commons.jexl2.JexlContext#getVars()}
-            method on JexlContext.  The following example, takes a variable named foo, and
+            passing a String containing valid JEXL syntax.  A simple JexlContext can be created using
+            a {@link org.apache.commons.jexl2.MapContext} instance;
+            a map of variables that will be internally wrapped can be optionally provided through its constructor.
+            The following example, takes a variable named foo, and
             invokes the bar() method on the property innerFoo:
         </p>
         <pre>
@@ -58,12 +57,13 @@
             Expression e = jexl.createExpression( jexlExp );
 
             // Create a context and add data
-            JexlContext jc = new JexlContext.Mapped();
+            JexlContext jc = new MapContext();
             jc.set("foo", new Foo() );
 
             // Now evaluate the expression, getting the result
             Object o = e.evaluate(jc);
         </pre>
+
 
         <h2><a name="usage">Using JEXL</a></h2>
         The API is composed of three levels addressing different functional needs:
@@ -71,6 +71,23 @@
             <li>Dynamic invocation of setters, getters, methods and constructors</li>
             <li>Script expressions known as JEXL expressions</li>
             <li>JSP/JSF like expression known as UnifiedJEXL expressions</li>
+        </ul>
+
+        <h3><a name="usage_note">Important note</a></h3>
+            The only public packages you should use are:
+        <ul>
+            <li>org.apache.commons.jexl2</li>
+            <li>org.apache.commons.jexl2.introspection</li>
+        </ul>
+            The following packages follow a "use at your own maintenance cost" policy.
+            Their classes and methods are not guaranteed to remain compatible in subsequent versions.
+            If you think you need to use some of their features, it might be a good idea to check with
+            the community through the mailing list first.
+       <ul>
+            <li>org.apache.commons.jexl2.parser</li>
+            <li>org.apache.commons.jexl2.scripting</li>
+            <li>org.apache.commons.jexl2.util</li>
+            <li>org.apache.commons.jexl2.util.introspection</li>
         </ul>
 
         <h3><a name="usage_api">Dynamic invocation</a></h3>
@@ -134,7 +151,7 @@
         <pre>
             JexlEngine jexl = nex JexlEngine();
 
-            JexlContext jc = new JexlContext.Mapped();
+            JexlContext jc = new MapContext();
             jc.set("quuxClass", quux.class);
 
             Expression create = jexl.createExpression("quux = new(quuxClass, 'xuuq', 100)");
@@ -219,7 +236,7 @@
             JexlEngine jexl = new JexlEngine();
             jexl.setFunctions(funcs);
 
-            JexlContext jc = new JexlContext.Mapped();
+            JexlContext jc = new MapContext();
             jc.set("pi", Math.PI);
 
             e = JEXL.createExpression("math:cos(pi)");
@@ -249,7 +266,7 @@
             for variable contexts or add factory based support to the 'new' operator.
         </p>
         <p>
-            {@link org.apache.commons.jexl2.util.introspection.UberspectImpl}
+            {@link org.apache.commons.jexl2.introspection.UberspectImpl}
             is the class to derive if you need to add introspection or reflection capabilities for some objects.
             For instance, being able to expose and manipulate public fields instead of Java-beans conventions.
         </p>

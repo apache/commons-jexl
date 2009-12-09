@@ -29,26 +29,39 @@ package org.apache.commons.jexl2.introspection;
  */
 public interface JexlPropertySet {
     /**
-     * method used to set the value in the object.
+     * Method used to set the property value of an object.
      * 
-     * @param o Object on which the method will be called with the arg
+     * @param obj Object on which the property setter will be called with the value
      * @param arg value to be set
      * @return the value returned from the set operation (impl specific)
      * @throws Exception on any error.
      */
-    Object invoke(Object o, Object arg) throws Exception;
+    Object invoke(Object obj, Object arg) throws Exception;
 
     /**
-     * specifies if this JexlPropertySet is cacheable and able to be reused for
+     * Attempts to reuse this JexlPropertySet, checking that it is compatible with
+     * the actual set of arguments.
+     * @param obj the object to invoke the the get upon
+     * @param key the property key to get
+     * @param value the property value to set
+     * @return the result of the method invocation that should be checked by tryFailed to determine if it succeeded
+     * or failed.
+     */
+    Object tryInvoke(Object obj, Object key, Object value);
+
+    /**
+     * Checks wether a tryInvoke failed or not.
+     * @param rval the value returned by tryInvoke
+     * @return true if tryExecute failed, false otherwise
+     */
+    boolean tryFailed(Object rval);
+    
+    /**
+     * Specifies if this JexlPropertySet is cacheable and able to be reused for
      * this class of object it was returned for.
      * 
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();
 
-    /**
-     * returns the method name used to set this 'property'.
-     * @return the method name.
-     */
-    String getMethodName();
 }

@@ -171,6 +171,16 @@ public abstract class AbstractExecutor {
         return method.getName();
     }
 
+
+    /**
+     * Checks wether a tryExecute failed or not.
+     * @param exec the value returned by tryExecute
+     * @return true if tryExecute failed, false otherwise
+     */
+    public final boolean tryFailed(Object exec) {
+        return exec == TRY_FAILED;
+    }
+
     /**
      * Abstract class that is used to execute an arbitrary 'get' method.
      */
@@ -187,6 +197,11 @@ public abstract class AbstractExecutor {
         /** {@inheritDoc} */
         public final Object invoke(Object obj) throws Exception {
             return execute(obj);
+        }
+        
+        /** {@inheritDoc} */
+        public final Object tryInvoke(Object obj, Object key) {
+            return tryExecute(obj, key);
         }
 
         /**
@@ -232,8 +247,13 @@ public abstract class AbstractExecutor {
         }
 
         /** {@inheritDoc} */
-        public Object invoke(Object obj, Object arg) throws Exception {
+        public final Object invoke(Object obj, Object arg) throws Exception {
             return execute(obj, arg);
+        }
+
+        /** {@inheritDoc} */
+        public final Object tryInvoke(Object obj, Object key, Object value) {
+            return tryExecute(obj, key, value);
         }
 
         /**
@@ -311,6 +331,11 @@ public abstract class AbstractExecutor {
         }
 
         /** {@inheritDoc} */
+        public final Object tryInvoke(String name, Object obj, Object[] params) {
+            return tryExecute(name, obj, params);
+        }
+
+        /** {@inheritDoc} */
         @Override
         public Object getTargetProperty() {
             return key;
@@ -342,7 +367,7 @@ public abstract class AbstractExecutor {
          * @param obj the object to invoke the method upon
          * @param name the method name
          * @param args the method arguments
-         * @return the result of the method invocation or INVOKE_FAILED if checking failed.
+         * @return the result of the method invocation or TRY_FAILED if checking failed.
          */
         public Object tryExecute(String name, Object obj, Object[] args){
             return TRY_FAILED;
