@@ -101,6 +101,26 @@ TOKEN : /* LITERALS */
 }
 
 
+TOKEN : /* KEYWORDS */
+{
+      < IF : "if" >
+    | < ELSE : "else" >
+    | < FOR : "for" >
+    | < FOREACH : "foreach" > : FOR_EACH_IN
+    | < WHILE : "while" >
+    | < NEW : "new" >
+    | < EMPTY : "empty" >
+    | < SIZE : "size" >
+    | < NULL : "null" >
+    | < TRUE : "true" >
+    | < FALSE : "false" >
+}
+
+<FOR_EACH_IN> TOKEN : /* foreach in */
+{
+    < IN : "in" > : DEFAULT
+}
+
 /***************************************
  *      Statements
  ***************************************/
@@ -136,21 +156,21 @@ void ExpressionStatement() #void : {}
 
 void IfStatement() : {}
 {
-    "if" "(" Expression() ")" Statement() ( LOOKAHEAD(1) "else" Statement() )?
+    <IF> "(" Expression() ")" Statement() ( LOOKAHEAD(1) <ELSE> Statement() )?
 }
 
 
 void WhileStatement() : {}
 {
-  "while" "(" Expression() ")" Statement()
+    <WHILE> "(" Expression() ")" Statement()
 }
 
 
 void ForeachStatement() : {}
 {
-    "for" "(" Reference() ":"  Expression() ")" Statement()
+    <FOR> "(" Reference() ":"  Expression() ")" Statement()
 |
-    "foreach" "(" Reference() "in"  Expression() ")" Statement()
+    <FOREACH> "(" Reference() <IN>  Expression() ")" Statement()
 }
 
 
@@ -343,15 +363,15 @@ void Literal() #void :
 
 void NullLiteral() : {}
 {
-    "null"
+    <NULL>
 }
 
 void BooleanLiteral() #void :
 {}
 {
-  "true" #TrueNode
+  <TRUE> #TrueNode
 |
-  "false" #FalseNode
+  <FALSE> #FalseNode
 }
 
 void IntegerLiteral() :
@@ -403,14 +423,14 @@ void MapEntry() : {}
 
 void EmptyFunction() : {}
 {
-    LOOKAHEAD(3) "empty" "(" Expression() ")"
+    LOOKAHEAD(3) <EMPTY> "(" Expression() ")"
 |
-    "empty" Reference()
+    <EMPTY> Reference()
 }
 
 void SizeFunction() : {}
 {
-    "size" "(" Expression() ")"
+    <SIZE> "(" Expression() ")"
 }
 
 void Function() #FunctionNode: {}
@@ -426,19 +446,19 @@ void Method() #MethodNode: {}
 
 void AnyMethod() #void : {}
 {
-    LOOKAHEAD("size") SizeMethod()
+    LOOKAHEAD(<SIZE>) SizeMethod()
   |
     LOOKAHEAD(Identifier() "(") Method()
 }
 
 void SizeMethod() : {}
 {
-    "size" "(" ")"
+    <SIZE> "(" ")"
 }
 
 void Constructor() # ConstructorNode() : {}
 {
-  "new" "("[ Expression() ( "," Expression() )* ] ")"
+  <NEW> "("[ Expression() ( "," Expression() )* ] ")"
 }
 
 
@@ -454,11 +474,11 @@ void PrimaryExpression() #void : {}
 |
   LOOKAHEAD("(") "(" Expression() ")"
 |
-  LOOKAHEAD("empty") EmptyFunction()
+  LOOKAHEAD(<EMPTY>) EmptyFunction()
 |
-  LOOKAHEAD("size") SizeFunction()
+  LOOKAHEAD(<SIZE>) SizeFunction()
 |
-  LOOKAHEAD("new" "(") Constructor()
+  LOOKAHEAD(<NEW> "(") Constructor()
 |
   LOOKAHEAD( "{" MapEntry() ) MapLiteral()
 |
@@ -490,7 +510,7 @@ void DotReference() #void : {}
 
 void Reference() : {}
 {
-  ( LOOKAHEAD("new") Constructor()
+  ( LOOKAHEAD(<NEW>) Constructor()
 |
    LOOKAHEAD(Identifier() "[" ) ArrayAccess()
 |
