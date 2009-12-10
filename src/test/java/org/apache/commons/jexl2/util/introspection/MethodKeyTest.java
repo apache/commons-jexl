@@ -14,7 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl2.util.introspection;
+package org.apache.commons.jexl2.internal.introspection;
+import org.apache.commons.jexl2.internal.introspection.MethodKey;
+import org.apache.commons.jexl2.internal.introspection.ClassMap;
 import junit.framework.TestCase;
 /**
  * Checks the CacheMap.MethodKey implementation

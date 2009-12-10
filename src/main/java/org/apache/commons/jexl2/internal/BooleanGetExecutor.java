@@ -14,34 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl2.util;
 
+package org.apache.commons.jexl2.internal;
 import java.lang.reflect.InvocationTargetException;
-
 /**
- * Specialized executor to set a property of an object.
- * <p>Duck as in duck-typing for an interface like:
- * <code>
- * interface Set {
- *      Object set(Object property, Object value);
- * }
- * </code>
- * </p>
+ * Specialized executor to get a boolean property from an object.
  * @since 2.0
  */
-public final class DuckSetExecutor extends AbstractExecutor.Set {
+public final class BooleanGetExecutor extends AbstractExecutor.Get {
     /** The property. */
-    private final Object property;
-    
+    private final String property;
     /**
-     * Creates an instance.
-     *@param is the introspector
-     *@param clazz the class to find the set method from
-     *@param key the key to use as 1st argument to the set method
-     *@param value the value to use as 2nd argument to the set method
+     * Creates an instance by attempting discovery of the get method.
+     * @param is the introspector
+     * @param clazz the class to introspect
+     * @param key the property to get
      */
-    public DuckSetExecutor(Introspector is, Class<?> clazz, Object key, Object value) {
-        super(clazz, discover(is, clazz, key, value));
+    public BooleanGetExecutor(Introspector is, Class<?> clazz, String key) {
+        super(clazz, discover(is, clazz, key));
         property = key;
     }
 
@@ -53,26 +43,20 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
 
     /** {@inheritDoc} */
     @Override
-    public Object execute(Object obj, Object value)
-            throws IllegalAccessException, InvocationTargetException {
-        Object[] pargs = {property, value};
-        if (method != null) {
-            method.invoke(obj, pargs);
-        }
-        return value;
+    public Object execute(Object obj)
+        throws IllegalAccessException, InvocationTargetException {
+        return method == null ? null : method.invoke(obj, (Object[]) null);
     }
-
+    
     /** {@inheritDoc} */
     @Override
-    public Object tryExecute(Object obj, Object key, Object value) {
+    public Object tryExecute(Object obj, Object key) {
         if (obj != null && method !=  null
             // ensure method name matches the property name
             && property.equals(key)
             && objectClass.equals(obj.getClass())) {
             try {
-                Object[] args = {property, value};
-                method.invoke(obj, args);
-                return value;
+                return method.invoke(obj, (Object[]) null);
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
@@ -83,15 +67,16 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
     }
 
     /**
-     * Discovers the method for a {@link DuckSet}.
+     * Discovers the method for a {@link BooleanGet}.
+     * <p>The method to be found should be named "is{P,p}property and return a boolean.</p>
      *@param is the introspector
-     *@param clazz the class to find the set method from
-     *@param key the key to use as 1st argument to the set method
-     *@param value the value to use as 2nd argument to the set method
+     *@param clazz the class to find the get method from
+     *@param property the the property name
      *@return the method if found, null otherwise
      */
-    private static java.lang.reflect.Method discover(Introspector is,
-            Class<?> clazz, Object key, Object value) {
-        return is.getMethod(clazz, "set", makeArgs(key, value));
+    static java.lang.reflect.Method discover(Introspector is, final Class<?> clazz, String property) {
+        java.lang.reflect.Method m = PropertyGetExecutor.discoverGet(is, "is", clazz, property);
+        return (m != null && m.getReturnType() == Boolean.TYPE) ? m : null;
     }
+
 }

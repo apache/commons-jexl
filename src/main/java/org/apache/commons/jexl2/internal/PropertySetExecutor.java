@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.commons.jexl2.util;
+package org.apache.commons.jexl2.internal;
 import java.lang.reflect.InvocationTargetException;
 /**
  * Specialized executor to set a property in an object.

@@ -16,7 +16,7 @@
  */
 package org.apache.commons.jexl2;
 import org.apache.commons.jexl2.introspection.Uberspect;
-import org.apache.commons.jexl2.util.Introspector;
+import org.apache.commons.jexl2.internal.Introspector;
 import java.util.HashMap;
 import java.util.Map;
 

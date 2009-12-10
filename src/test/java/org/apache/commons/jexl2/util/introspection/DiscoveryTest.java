@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl2.util.introspection;
+package org.apache.commons.jexl2.internal.introspection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,16 +26,16 @@ import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.JexlTestCase;
 import org.apache.commons.jexl2.introspection.Uberspect;
 
-import org.apache.commons.jexl2.util.Introspector;
-import org.apache.commons.jexl2.util.AbstractExecutor;
-import org.apache.commons.jexl2.util.PropertyGetExecutor;
-import org.apache.commons.jexl2.util.PropertySetExecutor;
-import org.apache.commons.jexl2.util.DuckGetExecutor;
-import org.apache.commons.jexl2.util.DuckSetExecutor;
-import org.apache.commons.jexl2.util.ListGetExecutor;
-import org.apache.commons.jexl2.util.ListSetExecutor;
-import org.apache.commons.jexl2.util.MapGetExecutor;
-import org.apache.commons.jexl2.util.MapSetExecutor;
+import org.apache.commons.jexl2.internal.Introspector;
+import org.apache.commons.jexl2.internal.AbstractExecutor;
+import org.apache.commons.jexl2.internal.PropertyGetExecutor;
+import org.apache.commons.jexl2.internal.PropertySetExecutor;
+import org.apache.commons.jexl2.internal.DuckGetExecutor;
+import org.apache.commons.jexl2.internal.DuckSetExecutor;
+import org.apache.commons.jexl2.internal.ListGetExecutor;
+import org.apache.commons.jexl2.internal.ListSetExecutor;
+import org.apache.commons.jexl2.internal.MapGetExecutor;
+import org.apache.commons.jexl2.internal.MapSetExecutor;
 
 /**
  * Tests for checking introspection discovery.

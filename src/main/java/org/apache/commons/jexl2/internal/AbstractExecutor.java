@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl2.util;
-import org.apache.commons.jexl2.util.introspection.MethodKey;
+package org.apache.commons.jexl2.internal;
+import org.apache.commons.jexl2.internal.introspection.MethodKey;
 import org.apache.commons.jexl2.introspection.JexlMethod;
 import org.apache.commons.jexl2.introspection.JexlPropertySet;
 import org.apache.commons.jexl2.introspection.JexlPropertyGet;
