@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl2.util.introspection;
+package org.apache.commons.jexl2.internal.introspection;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

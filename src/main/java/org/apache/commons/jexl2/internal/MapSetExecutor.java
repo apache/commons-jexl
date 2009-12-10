@@ -15,28 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.commons.jexl2.util;
-
+package org.apache.commons.jexl2.internal;
 import java.util.Map;
-
- /**
- * Specialized executor to get a property from a Map.
-  * @since 2.0
+import java.lang.reflect.InvocationTargetException;
+/**
+ * Specialized executor to set a property in a Map.
+ * @since 2.0
  */
-public final class MapGetExecutor extends AbstractExecutor.Get {
-    /** The java.util.map.get method used as an active marker in MapGet. */
-    private static final java.lang.reflect.Method MAP_GET =
-            initMarker(Map.class, "get", Object.class);
+public final class MapSetExecutor extends AbstractExecutor.Set {
+    /** The java.util.map.put method used as an active marker in MapSet. */
+    private static final java.lang.reflect.Method MAP_SET = initMarker(Map.class, "put", Object.class, Object.class);
     /** The property. */
     private final Object property;
 
     /**
      * Creates an instance checking for the Map interface.
-     * @param is the introspector
-     * @param clazz the class that might implement the map interface
-     * @param key the key to use in map.get(key)
-     */
-    public MapGetExecutor(Introspector is, Class<?> clazz, Object key) {
+     *@param is the introspector
+     *@param clazz the class that might implement the map interface
+     *@param key the key to use as argument in map.put(key,value)
+     *@param value the value to use as argument in map.put(key,value)
+    */
+    public MapSetExecutor(Introspector is, Class<?> clazz, Object key, Object value) {
         super(clazz, discover(clazz));
         property = key;
     }
@@ -47,37 +46,36 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
         return property;
     }
     
-    /**
-     * Get the property from the map.
-     * @param obj the map.
-     * @return map.get(property)
-     */
+    /** {@inheritDoc} */
     @Override
-    public Object execute(final Object obj) {
+    public Object execute(final Object obj, Object value)
+    throws IllegalAccessException, InvocationTargetException {
         @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
-        final Map<Object,?> map = (Map<Object, ?>) obj;
-        return map.get(property);
+        final Map<Object,Object> map = ((Map<Object, Object>) obj);
+        map.put(property, value);
+        return value;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Object tryExecute(final Object obj, Object key) {
-        if (obj != null &&  method != null
+    public Object tryExecute(final Object obj, Object key, Object value) {
+        if (obj != null && method != null
             && objectClass.equals(obj.getClass())
             && (key == null || property.getClass().equals(key.getClass()))) {
             @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
-            final Map<Object,?> map = (Map<Object, ?>) obj;
-            return map.get(key);
+            final Map<Object,Object> map = ((Map<Object, Object>) obj);
+            map.put(key, value);
+            return value;
         }
         return TRY_FAILED;
     }
 
     /**
-     * Finds the method to perform 'get' on a map.
+     * Finds the method to perform 'set' on a map.
      * @param clazz the class to introspect
      * @return a marker method, map.get
      */
     static java.lang.reflect.Method discover(Class<?> clazz) {
-        return (Map.class.isAssignableFrom(clazz))? MAP_GET : null;
+        return (Map.class.isAssignableFrom(clazz))? MAP_SET : null;
     }
 }

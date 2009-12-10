@@ -17,7 +17,7 @@
 
 package org.apache.commons.jexl2.introspection;
 
-import org.apache.commons.jexl2.util.Introspector;
+import org.apache.commons.jexl2.internal.Introspector;
 import java.lang.reflect.Constructor;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -25,9 +25,9 @@ import java.util.Iterator;
 import java.util.Map;
 import org.apache.commons.jexl2.JexlInfo;
 import org.apache.commons.jexl2.JexlException;
-import org.apache.commons.jexl2.util.AbstractExecutor;
-import org.apache.commons.jexl2.util.ArrayIterator;
-import org.apache.commons.jexl2.util.EnumerationIterator;
+import org.apache.commons.jexl2.internal.AbstractExecutor;
+import org.apache.commons.jexl2.internal.ArrayIterator;
+import org.apache.commons.jexl2.internal.EnumerationIterator;
 import org.apache.commons.logging.Log;
 
 /**

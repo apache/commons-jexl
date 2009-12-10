@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl2.util;
+package org.apache.commons.jexl2.internal;
 
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
 
-import org.apache.commons.jexl2.util.introspection.IntrospectorBase;
-import org.apache.commons.jexl2.util.introspection.MethodKey;
+import org.apache.commons.jexl2.internal.introspection.IntrospectorBase;
+import org.apache.commons.jexl2.internal.introspection.MethodKey;
 
 import org.apache.commons.logging.Log;
 
