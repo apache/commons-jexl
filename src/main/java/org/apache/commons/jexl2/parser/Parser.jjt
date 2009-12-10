@@ -81,7 +81,7 @@ PARSER_END(Parser)
  *     Skip & Number literal tokens
  ***************************************/
 
-SKIP : /* WHITE SPACE */
+<DEFAULT, FOR_EACH_IN> SKIP : /* WHITE SPACE */
 {
   <"##" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
 | <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
@@ -116,6 +116,15 @@ TOKEN : /* KEYWORDS */
     | < FALSE : "false" >
 }
 
+<DEFAULT, FOR_EACH_IN> TOKEN : {
+      < LPAREN : "(" >
+    | < RPAREN : ")" >
+    | < LCURLY : "{" >
+    | < RCURLY : "}" >
+    | < SEMICOL : ";" >
+    | < COLON : ":" >
+}
+
 <FOR_EACH_IN> TOKEN : /* foreach in */
 {
     < IN : "in" > : DEFAULT
@@ -134,7 +143,7 @@ ASTJexlScript JexlScript() : {}
 
 void Statement() #void : {}
 {
-    ";"
+    <SEMICOL>
     | LOOKAHEAD(3) Block()
     | IfStatement()
     | ForeachStatement()
@@ -144,33 +153,33 @@ void Statement() #void : {}
 
 void Block() #Block : {}
 {
-    "{" ( Statement() )* "}"
+    <LCURLY> ( Statement() )* <RCURLY>
 }
 
 
 void ExpressionStatement() #void : {}
 {
-    Expression() (LOOKAHEAD(1) Expression() #Ambiguous())* (LOOKAHEAD(2) ";")?
+    Expression() (LOOKAHEAD(1) Expression() #Ambiguous())* (LOOKAHEAD(2) <SEMICOL>)?
 }
 
 
 void IfStatement() : {}
 {
-    <IF> "(" Expression() ")" Statement() ( LOOKAHEAD(1) <ELSE> Statement() )?
+    <IF> <LPAREN> Expression() <RPAREN> Statement() ( LOOKAHEAD(1) <ELSE> Statement() )?
 }
 
 
 void WhileStatement() : {}
 {
-    <WHILE> "(" Expression() ")" Statement()
+    <WHILE> <LPAREN> Expression() <RPAREN> Statement()
 }
 
 
 void ForeachStatement() : {}
 {
-    <FOR> "(" Reference() ":"  Expression() ")" Statement()
+    <FOR> <LPAREN> Reference() <COLON>  Expression() <RPAREN> Statement()
 |
-    <FOREACH> "(" Reference() <IN>  Expression() ")" Statement()
+    <FOREACH> <LPAREN> Reference() <IN>  Expression() <RPAREN> Statement()
 }
 
 
@@ -529,7 +538,7 @@ void Reference() : {}
  *     Identifier & String tokens
  ***************************************/
 
-TOKEN : /* IDENTIFIERS */
+<DEFAULT, FOR_EACH_IN> TOKEN : /* IDENTIFIERS */
 {
   < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
 |

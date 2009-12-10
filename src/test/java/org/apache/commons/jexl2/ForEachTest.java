@@ -94,13 +94,17 @@ public class ForEachTest extends JexlTestCase {
     }
 
     public void testForEachWithBlock() throws Exception {
-        Expression e = JEXL.createExpression("for(item : list) { x = x + item; }");
+        Expression exs0 = JEXL.createExpression("for(in : list) { x = x + in; }");
+        Expression exs1 = JEXL.createExpression("foreach(item in list) { x = x + item; }");
+        Expression []exs = { exs0, exs1 };
         JexlContext jc = new MapContext();
-        jc.set("list", new Object[] {"1", "1"});
-        jc.set("x", new Integer(0));
-        Object o = e.evaluate(jc);
-        assertEquals("Result is wrong", new Integer(2), o);
-        assertEquals("x is wrong", new Integer(2), jc.get("x"));
+        jc.set("list", new Object[] {"2", "3"});
+        for(int ex = 0; ex < exs.length; ++ex) {
+            jc.set("x", new Integer(1));
+            Object o = exs[ex].evaluate(jc);
+            assertEquals("Result is wrong", new Integer(6), o);
+            assertEquals("x is wrong", new Integer(6), jc.get("x"));
+        }
     }
 
     public void testForEachWithListExpression() throws Exception {
