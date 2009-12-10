@@ -106,7 +106,7 @@
         <dependency>
             <groupId>org.apache.bsf</groupId>
             <artifactId>bsf-api</artifactId>
-            <version>3.0</version>
+            <version>3.0-beta3</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

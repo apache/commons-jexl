@@ -90,8 +90,8 @@
                 <a href="apidocs/org/apache/commons/jexl2/JexlContext.html">JexlContext</a>.
             An Expression is created using
                 <a href="apidocs/org/apache/commons/jexl2/JexlEngine.html#createExpression(java.lang.String)">JexlEngine#createExpression()</a>,
-            passing a String containing valid JEXL syntax.  A JexlContext can be created using a
-                <a href="apidocs/org/apache/commons/jexl2/MapContext.html">new MapContext.Mapped()</a>;
+            passing a String containing valid JEXL syntax.  A simple JexlContext can be created by instantiating a
+                <a href="apidocs/org/apache/commons/jexl2/MapContext.html">MapContext</a>;
             a map of variables that will be internally wrapped can be optionally provided through its constructor.
             The following example, takes a variable named foo, and invokes the bar() method on the property innerFoo:
             </p>
