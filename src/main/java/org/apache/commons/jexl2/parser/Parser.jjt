@@ -81,7 +81,7 @@ PARSER_END(Parser)
  *     Skip & Number literal tokens
  ***************************************/
 
-<DEFAULT, FOR_EACH_IN> SKIP : /* WHITE SPACE */
+<*> SKIP : /* WHITE SPACE */
 {
   <"##" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
 | <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
@@ -93,7 +93,7 @@ PARSER_END(Parser)
 | "\f"
 }
 
-TOKEN : /* LITERALS */
+<*> TOKEN : /* LITERALS */
 {
   < INTEGER_LITERAL: (<DIGIT>)+ >
 |
@@ -101,7 +101,7 @@ TOKEN : /* LITERALS */
 }
 
 
-TOKEN : /* KEYWORDS */
+<*> TOKEN : /* KEYWORDS */
 {
       < IF : "if" >
     | < ELSE : "else" >
@@ -116,13 +116,16 @@ TOKEN : /* KEYWORDS */
     | < FALSE : "false" >
 }
 
-<DEFAULT, FOR_EACH_IN> TOKEN : {
+<*> TOKEN : { /* SEPARATORS */
       < LPAREN : "(" >
     | < RPAREN : ")" >
     | < LCURLY : "{" >
     | < RCURLY : "}" >
+    | < LBRACKET : "[" >
+    | < RBRACKET : "]" >
     | < SEMICOL : ";" >
     | < COLON : ":" >
+    | < COMMA : "," >
 }
 
 <FOR_EACH_IN> TOKEN : /* foreach in */
@@ -208,7 +211,7 @@ void ConditionalExpression() #void : {}
 {
   ConditionalOrExpression()
   (
-    "?" Expression() ":" Expression() #TernaryNode(3)
+    "?" Expression() <COLON> Expression() #TernaryNode(3)
   |
     "?:" Expression() #TernaryNode(2)
   )?
@@ -412,17 +415,17 @@ void StringLiteral() :
 
 void ArrayLiteral() : {}
 {
-  "[" Expression() ( "," Expression() )* "]"
+  <LBRACKET> Expression() ( <COMMA> Expression() )* <RBRACKET>
 }
 
 void MapLiteral() : {}
 {
-    "{"  MapEntry() ( "," MapEntry() )* "}"
+    <LCURLY>  MapEntry() ( <COMMA> MapEntry() )* <RCURLY>
 }
 
 void MapEntry() : {}
 {
-    Expression() ":" Expression()
+    Expression() <COLON> Expression()
 }
 
 
@@ -432,42 +435,42 @@ void MapEntry() : {}
 
 void EmptyFunction() : {}
 {
-    LOOKAHEAD(3) <EMPTY> "(" Expression() ")"
+    LOOKAHEAD(3) <EMPTY> <LPAREN> Expression() <RPAREN>
 |
     <EMPTY> Reference()
 }
 
 void SizeFunction() : {}
 {
-    <SIZE> "(" Expression() ")"
+    <SIZE> <LPAREN> Expression() <RPAREN>
 }
 
 void Function() #FunctionNode: {}
 {
 
-   Identifier() ":" Identifier() "("[ Expression() ( "," Expression() )* ] ")"
+   Identifier() <COLON> Identifier() <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
 }
 
 void Method() #MethodNode: {}
 {
-   Identifier() "("[ Expression() ( "," Expression() )* ] ")"
+   Identifier() <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
 }
 
 void AnyMethod() #void : {}
 {
     LOOKAHEAD(<SIZE>) SizeMethod()
   |
-    LOOKAHEAD(Identifier() "(") Method()
+    LOOKAHEAD(Identifier() <LPAREN>) Method()
 }
 
 void SizeMethod() : {}
 {
-    <SIZE> "(" ")"
+    <SIZE> <LPAREN> <RPAREN>
 }
 
-void Constructor() # ConstructorNode() : {}
+void Constructor() #ConstructorNode() : {}
 {
-  <NEW> "("[ Expression() ( "," Expression() )* ] ")"
+  <NEW> <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
 }
 
 
@@ -481,29 +484,29 @@ void PrimaryExpression() #void : {}
 |
   LOOKAHEAD(3)  Reference()
 |
-  LOOKAHEAD("(") "(" Expression() ")"
+  LOOKAHEAD( <LPAREN> ) <LPAREN> Expression() <RPAREN>
 |
-  LOOKAHEAD(<EMPTY>) EmptyFunction()
+  LOOKAHEAD( <EMPTY> ) EmptyFunction()
 |
-  LOOKAHEAD(<SIZE>) SizeFunction()
+  LOOKAHEAD( <SIZE> ) SizeFunction()
 |
-  LOOKAHEAD(<NEW> "(") Constructor()
+  LOOKAHEAD( <NEW> <LPAREN> ) Constructor()
 |
-  LOOKAHEAD( "{" MapEntry() ) MapLiteral()
+  LOOKAHEAD( <LCURLY> MapEntry() ) MapLiteral()
 |
-  LOOKAHEAD( "[" Expression() ) ArrayLiteral()
+  LOOKAHEAD( <LBRACKET> Expression() ) ArrayLiteral()
 }
 
 
 void ArrayAccess() : {}
 {
-    Identifier() (LOOKAHEAD(2) "[" Expression() "]")+
+    Identifier() (LOOKAHEAD(2) <LBRACKET> Expression() <RBRACKET>)+
 }
 
 void DotReference() #void : {}
 {
   ("."
-     ( LOOKAHEAD(Identifier() "[" )
+     ( LOOKAHEAD(Identifier() <LBRACKET> )
          ArrayAccess()
        |
        ( LOOKAHEAD(3)
@@ -521,24 +524,24 @@ void Reference() : {}
 {
   ( LOOKAHEAD(<NEW>) Constructor()
 |
-   LOOKAHEAD(Identifier() "[" ) ArrayAccess()
+   LOOKAHEAD(Identifier() <LBRACKET> ) ArrayAccess()
 |
-   LOOKAHEAD(Identifier() ":" Identifier() "(") Function()
+   LOOKAHEAD(Identifier() <COLON> Identifier() <LPAREN>) Function()
 |
-   LOOKAHEAD(Identifier() "(") Method()
+   LOOKAHEAD(Identifier() <LPAREN>) Method()
 |
    Identifier()
 |
-   LOOKAHEAD("{") MapLiteral()
+   LOOKAHEAD(<LCURLY>) MapLiteral()
 |
-   LOOKAHEAD("[") ArrayLiteral() ) DotReference()
+   LOOKAHEAD(<LBRACKET>) ArrayLiteral() ) DotReference()
 }
 
 /***************************************
  *     Identifier & String tokens
  ***************************************/
 
-<DEFAULT, FOR_EACH_IN> TOKEN : /* IDENTIFIERS */
+<*> TOKEN : /* IDENTIFIERS */
 {
   < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
 |
@@ -547,7 +550,7 @@ void Reference() : {}
   < #DIGIT: [ "0"-"9"] >
 }
 
-TOKEN :
+<*> TOKEN :
 {
     <STRING_LITERAL :
         ("\"" ( ~["\"","\n","\r"] | "\\" ["u","n","t","b","r","f","\\","\""] )* "\"" )
