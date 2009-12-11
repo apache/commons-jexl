@@ -48,7 +48,7 @@ public interface JexlPropertyGet {
     Object tryInvoke(Object obj, Object key);
 
     /**
-     * Checks wether a tryInvoke failed or not.
+     * Checks whether a tryInvoke failed or not.
      * @param rval the value returned by tryInvoke
      * @return true if tryInvoke failed, false otherwise
      */
