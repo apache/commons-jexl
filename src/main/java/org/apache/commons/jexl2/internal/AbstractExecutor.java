@@ -173,7 +173,7 @@ public abstract class AbstractExecutor {
 
 
     /**
-     * Checks wether a tryExecute failed or not.
+     * Checks whether a tryExecute failed or not.
      * @param exec the value returned by tryExecute
      * @return true if tryExecute failed, false otherwise
      */

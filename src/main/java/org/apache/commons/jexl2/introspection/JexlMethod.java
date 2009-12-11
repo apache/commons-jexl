@@ -53,7 +53,7 @@ public interface JexlMethod {
     Object tryInvoke(String name, Object obj, Object[] params);
 
     /**
-     * Checks wether a tryInvoke failed or not.
+     * Checks whether a tryInvoke failed or not.
      * @param rval the value returned by tryInvoke
      * @return true if tryInvoke failed, false otherwise
      */
