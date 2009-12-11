@@ -41,14 +41,22 @@ public class JexlTestCase extends TestCase {
     private static final Class<?>[] stringParm = {String.class};
 
     /** A default Jexl engine instance. */
-    protected final JexlEngine JEXL = new JexlEngine();
+    protected final JexlEngine JEXL;
 
     public JexlTestCase(String name) {
+        this(name, new JexlEngine());
+    }
+    protected JexlTestCase(String name, JexlEngine jexl) {
         super(name);
+        JEXL = jexl;
         JEXL.setCache(512);
     }
     public JexlTestCase() {
+        this(new JexlEngine());
+    }
+    protected JexlTestCase(JexlEngine jexl) {
         super();
+        JEXL = jexl;
         JEXL.setCache(512);
     }
 
