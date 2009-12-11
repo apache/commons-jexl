@@ -145,7 +145,7 @@ public class AssignTest extends JexlTestCase {
     }
 
     public void testUtil() throws Exception {
-        Quux quux = ENGINE.newInstance(Quux.class, "xuuq", 100);
+        Quux quux = ENGINE.newInstance(Quux.class, "xuuq", Integer.valueOf(100));
         ENGINE.setProperty(quux, "froboz.value", Integer.valueOf(100));
         Object o = ENGINE.getProperty(quux, "froboz.value");
         assertEquals("Result is not 100", new Integer(100), o);

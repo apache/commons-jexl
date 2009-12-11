@@ -62,6 +62,7 @@ public class ClassCreatorTest extends JexlTestCase {
     // A space hog class
     static final int MEGA = 1024 * 1024;
     public class BigObject {
+        @SuppressWarnings("unused")
         private final byte[] space = new byte[MEGA];
         private final int id;
 
