@@ -187,7 +187,4 @@ public class ClassCreatorTest extends JexlTestCase {
         }
     }
 
-    static public void main(String[] args) throws Exception {
-        (new ClassCreatorTest()).runTest("testMany");
-    }
 }

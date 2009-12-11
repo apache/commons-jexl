@@ -132,8 +132,4 @@ public class ForEachTest extends JexlTestCase {
         Object o = e.evaluate(jc);
         assertEquals("Result is not last evaluated expression", "brie", o);
     }
-
-    static public void main(String[] args) throws Exception {
-        (new ForEachTest("*")).runTest("testForEachWithIteratorMethod");
-    }
 }

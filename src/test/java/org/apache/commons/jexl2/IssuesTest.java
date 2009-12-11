@@ -320,7 +320,4 @@ public class IssuesTest extends JexlTestCase {
         assertEquals("bye...", script.execute(ctxt));
     }
 
-    public static void main(String[] args) throws Exception {
-        runTest("IssuesTest", "test11");
-    }
 }

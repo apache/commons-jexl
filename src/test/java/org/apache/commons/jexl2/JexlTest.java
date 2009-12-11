@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.jexl2.parser.ParseException;
 import org.apache.commons.jexl2.parser.Parser;
 
 /**
