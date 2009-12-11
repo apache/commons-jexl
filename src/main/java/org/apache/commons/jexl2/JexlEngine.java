@@ -113,7 +113,6 @@ public class JexlEngine {
      * be able to use a (low level) introspector created with a given logger
      * instead of the default one.</p>
      * <p>Implemented as on demand holder idiom.</p>
-     *  @return Uberspect the default uberspector instance.
      */
     private static final class UberspectHolder {
         /** The default uberspector that handles all introspection patterns. */
