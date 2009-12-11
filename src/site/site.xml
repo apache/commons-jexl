@@ -28,7 +28,7 @@
             <item name="2.0&#xA0;Javadoc"        href="apidocs/index.html"/>
             <item name="1.1&#xA0;Javadoc"        href="apidocs-1.1/index.html"/>
             <item name="Releases and Builds"     href="releases.html"/>
-            <item name="Download"                href="http://commons.apache.org/downloads/download_jexl.cgi"/>
+            <item name="Download"                href="download_jexl.cgi"/>
             <item name="Reference"               href="reference/index.html"/>
             <item name="JEXL Wiki"               href="http://wiki.apache.org/commons/JEXL"/>
         </menu>

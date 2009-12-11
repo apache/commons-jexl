@@ -67,7 +67,8 @@
             </p>
             <p>
             The API and the expression language exploit Java-beans naming patterns through
-            introspection to expose property getters and setters.
+            introspection to expose property getters and setters. It may also optionally consider public class fields
+            as properties.
             </p>
             <p>
             JEXL attempts to bring some of the lessons learned by the Velocity

@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.jexl2.introspection;
 
 import org.apache.commons.jexl2.internal.Introspector;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.Enumeration;
 import java.util.Iterator;
 
@@ -28,6 +28,7 @@ import org.apache.commons.jexl2.JexlException;
 import org.apache.commons.jexl2.internal.AbstractExecutor;
 import org.apache.commons.jexl2.internal.ArrayIterator;
 import org.apache.commons.jexl2.internal.EnumerationIterator;
+import org.apache.commons.jexl2.internal.introspection.MethodKey;
 import org.apache.commons.logging.Log;
 
 /**
@@ -42,11 +43,22 @@ import org.apache.commons.logging.Log;
  */
 public class UberspectImpl extends Introspector implements Uberspect {
     /**
+     * Publicly exposed special failure object returned by tryInvoke.
+     */
+    public static final Object TRY_FAILED = AbstractExecutor.TRY_FAILED;
+    /**
+     * Whether public fields can be considered as properties.
+     */
+    protected final boolean publicProperties;
+    
+    /**
      * Creates a new UberspectImpl.
      * @param runtimeLogger the logger used for all logging needs
+     * @param publicFields whether public fields should be considered as properties
      */
-    public UberspectImpl(Log runtimeLogger) {
+    public UberspectImpl(Log runtimeLogger, boolean publicFields) {
         super(runtimeLogger);
+        publicProperties = publicFields;
     }
 
     /**
@@ -86,9 +98,9 @@ public class UberspectImpl extends Introspector implements Uberspect {
     /**
      * {@inheritDoc}
      */
-   public Constructor<?> getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
+    public Constructor<?> getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
         return getConstructor(ctorHandle, args);
-   }
+    }
 
     /**
      * {@inheritDoc}
@@ -98,16 +110,163 @@ public class UberspectImpl extends Introspector implements Uberspect {
     }
 
     /**
+     * Gets a field by name from a class.
+     * @param clazz the class to find the field in
+     * @param name the field name
+     * @return the field instance or null if it could not be found
+     */
+    protected static Field getField(Class<?> clazz, String name) {
+        try {
+            Field field = clazz.getField(name);
+            if (!field.isAccessible()) {
+                field.setAccessible(true);
+            }
+            return field;
+        } catch (NoSuchFieldException xnsf) {
+            return null;
+        } catch (SecurityException xsec) {
+            return null;
+        }
+    }
+
+    /**
+     * A JexlPropertyGet for public fields.
+     */
+    public static final class FieldPropertyGet implements JexlPropertyGet {
+        /**
+         * The public field.
+         */
+        private final Field field;
+
+        /**
+         * Creates a new instance of FieldPropertyGet.
+         * @param theField the class public field
+         */
+        public FieldPropertyGet(Field theField) {
+            field = theField;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Object invoke(Object obj) throws Exception {
+            return field.get(obj);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Object tryInvoke(Object obj, Object key) {
+            if (obj.getClass().equals(field.getDeclaringClass()) && key.equals(field.getName())) {
+                try {
+                    return field.get(obj);
+                } catch (IllegalAccessException xill) {
+                    return TRY_FAILED;
+                }
+            }
+            return TRY_FAILED;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean tryFailed(Object rval) {
+            return rval == TRY_FAILED;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean isCacheable() {
+            return true;
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfo info) {
-        return getGetExecutor(obj, identifier);
+        JexlPropertyGet get = getGetExecutor(obj, identifier);
+        if (get == null && publicProperties && obj != null && identifier != null) {
+            Class<?> clazz = obj instanceof Class<?>? (Class<?>) obj : obj.getClass();
+            Field field = getField(clazz, identifier.toString());
+            if (field != null) {
+                return new FieldPropertyGet(field);
+            }
+        }
+        return get;
+    }
+
+    /**
+     * A JexlPropertySet for public fields.
+     */
+    public static final class FieldPropertySet implements JexlPropertySet {
+        /**
+         * The public field.
+         */
+        private final Field field;
+
+        /**
+         * Creates a new instance of FieldPropertySet.
+         * @param theField the class public field
+         */
+        public FieldPropertySet(Field theField) {
+            field = theField;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Object invoke(Object obj, Object arg) throws Exception {
+            field.set(obj, arg);
+            return arg;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Object tryInvoke(Object obj, Object key, Object value) {
+            if (obj.getClass().equals(field.getDeclaringClass())
+                && key.equals(field.getName())
+                && (value == null || MethodKey.isInvocationConvertible(field.getType(), value.getClass(), false))) {
+                try {
+                    field.set(obj, value);
+                    return value;
+                } catch (IllegalAccessException xill) {
+                    return TRY_FAILED;
+                }
+            }
+            return TRY_FAILED;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean tryFailed(Object rval) {
+            return rval == TRY_FAILED;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean isCacheable() {
+            return true;
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, JexlInfo info) {
-        return getSetExecutor(obj, identifier, arg);
+        JexlPropertySet set = getSetExecutor(obj, identifier, arg);
+        if (set == null && publicProperties && obj != null && identifier != null) {
+            Class<?> clazz = obj instanceof Class<?>? (Class<?>) obj : obj.getClass();
+            Field field = getField(clazz, identifier.toString());
+            if (field != null
+                && (arg == null || MethodKey.isInvocationConvertible(field.getType(), arg.getClass(), false))) {
+                return new FieldPropertySet(field);
+            }
+        }
+        return set;
     }
 }

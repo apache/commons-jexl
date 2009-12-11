@@ -43,6 +43,7 @@ public interface JexlMethod {
     /**
      * Attempts to reuse this JexlMethod, checking that it is compatible with
      * the actual set of arguments.
+     * Related to isCacheable since this method is often used with cached JexlMethod instances.
      * @param obj the object to invoke the method upon
      * @param name the method name
      * @param params the method arguments
@@ -52,14 +53,14 @@ public interface JexlMethod {
     Object tryInvoke(String name, Object obj, Object[] params);
 
     /**
-     * Checks wether a tryExecute failed or not.
+     * Checks wether a tryInvoke failed or not.
      * @param rval the value returned by tryInvoke
      * @return true if tryInvoke failed, false otherwise
      */
     boolean tryFailed(Object rval);
 
     /**
-     * specifies if this JexlMethod is cacheable and able to be reused for this
+     * Specifies if this JexlMethod is cacheable and able to be reused for this
      * class of object it was returned for.
      * 
      * @return true if can be reused for this class, false if not
