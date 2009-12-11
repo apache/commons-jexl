@@ -66,7 +66,7 @@ public class MethodTest extends JexlTestCase {
     public void testInvoke() throws Exception {
         Functor func = new Functor();
         assertEquals(Integer.valueOf(10), JEXL.invokeMethod(func, "ten"));
-        assertEquals(Integer.valueOf(42), JEXL.invokeMethod(func, "PLUS20", 22));
+        assertEquals(Integer.valueOf(42), JEXL.invokeMethod(func, "PLUS20", Integer.valueOf(22)));
         try {
             JEXL.invokeMethod(func, "nonExistentMethod");
             fail("method does not exist!");
@@ -74,7 +74,7 @@ public class MethodTest extends JexlTestCase {
             // ignore
         }
         try {
-            JEXL.invokeMethod(func, "NPEIfNull", null);
+            JEXL.invokeMethod(func, "NPEIfNull", (Object[]) null);
             fail("method should have thrown!");
         } catch(Exception xj0) {
             // ignore
@@ -146,7 +146,7 @@ public class MethodTest extends JexlTestCase {
         o = e.evaluate(jc);
         assertEquals("Result is not 20", new Integer(20), o);
 
-        jc.set("pi", Math.PI);
+        jc.set("pi", new Double(Math.PI));
         e = JEXL.createExpression("math:cos(pi)");
         o = e.evaluate(jc);
         assertEquals(Double.valueOf(-1),o);

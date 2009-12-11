@@ -128,7 +128,7 @@ public class ClassCreator {
             return null;
         }
         Integer r = (Integer) jexl.invokeMethod(javac, "compile", source);
-        if (r >= 0) {
+        if (r.intValue() >= 0) {
             return getClassLoader().loadClass("org.apache.commons.jexl2.generated." + className);
         }
         return null;

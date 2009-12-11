@@ -128,6 +128,7 @@ public class IntrospectorBase {
      */
     private static class CacheMiss {
         /** The constructor used as cache-miss. */
+        @SuppressWarnings("unused")
         public CacheMiss() {}
     }
     /** The cache-miss marker for the constructors map. */
