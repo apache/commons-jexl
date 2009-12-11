@@ -48,7 +48,7 @@ public interface JexlPropertyGet {
     Object tryInvoke(Object obj, Object key);
 
     /**
-     * Checks wether a tryExecute failed or not.
+     * Checks wether a tryInvoke failed or not.
      * @param rval the value returned by tryInvoke
      * @return true if tryInvoke failed, false otherwise
      */
@@ -61,12 +61,4 @@ public interface JexlPropertyGet {
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();
-
-    /**
-     * Tell whether the method underlying this 'property' is alive by
-     * checking to see if represents a successful name resolution.
-     *
-     * @return boolean Whether 'property' is alive.
-     */
-    boolean isAlive();
 }

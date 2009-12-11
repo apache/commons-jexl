@@ -23,14 +23,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.Reader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Constructor;
 import java.util.Map;
-import java.util.Collections;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Collections;
+import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -117,7 +117,7 @@ public class JexlEngine {
      */
     private static final class UberspectHolder {
         /** The default uberspector that handles all introspection patterns. */
-        private static final Uberspect UBERSPECT = new UberspectImpl(LogFactory.getLog(JexlEngine.class));
+        private static final Uberspect UBERSPECT = new UberspectImpl(LogFactory.getLog(JexlEngine.class), false);
         /** Non-instantiable. */
         private UberspectHolder() {}
     }
@@ -203,7 +203,7 @@ public class JexlEngine {
         if (logger == null || logger.equals(LogFactory.getLog(JexlEngine.class))) {
             return UberspectHolder.UBERSPECT;
         }
-        return new UberspectImpl(logger);
+        return new UberspectImpl(logger, false);
     }
 
     /**

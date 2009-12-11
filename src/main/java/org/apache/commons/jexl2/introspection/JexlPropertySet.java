@@ -52,7 +52,7 @@ public interface JexlPropertySet {
     /**
      * Checks wether a tryInvoke failed or not.
      * @param rval the value returned by tryInvoke
-     * @return true if tryExecute failed, false otherwise
+     * @return true if tryInvoke failed, false otherwise
      */
     boolean tryFailed(Object rval);
     
@@ -63,5 +63,4 @@ public interface JexlPropertySet {
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();
-
 }

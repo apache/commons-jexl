@@ -785,7 +785,7 @@ public class Interpreter implements ParserVisitor {
             if (xjexl == null) {
                 Object eval = vm.invoke(data, argv); // vm cannot be null if xjexl is null
                 // cache executor in volatile JexlNode.value
-                if (cache) {
+                if (cache && vm.isCacheable()) {
                     node.jjtSetValue(vm);
                 }
                 return eval;
@@ -879,7 +879,7 @@ public class Interpreter implements ParserVisitor {
             if (xjexl == null) {
                 Object eval = vm.invoke(namespace, argv); // vm cannot be null if xjexl is null
                 // cache executor in volatile JexlNode.value
-                if (cache) {
+                if (cache && vm.isCacheable()) {
                     node.jjtSetValue(vm);
                 }
                 return eval;
@@ -1169,7 +1169,7 @@ public class Interpreter implements ParserVisitor {
             try {
                 Object value = vg.invoke(object);
                 // cache executor in volatile JexlNode.value
-                if (node != null && cache) {
+                if (node != null && cache && vg.isCacheable()) {
                     node.jjtSetValue(vg);
                 }
                 return value;
@@ -1230,7 +1230,7 @@ public class Interpreter implements ParserVisitor {
             try {
                 // cache executor in volatile JexlNode.value
                 vs.invoke(object, value);
-                if (node != null && cache) {
+                if (node != null && cache && vs.isCacheable()) {
                     node.jjtSetValue(vs);
                 }
                 return;
