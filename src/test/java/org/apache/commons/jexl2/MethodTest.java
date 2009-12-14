@@ -52,6 +52,21 @@ public class MethodTest extends JexlTestCase {
             return x.getClass();
         }
     }
+    
+    public static class EnhancedContext extends MapContext {
+        int factor = 6;
+    }
+
+    public static class ContextualFunctor {
+        private final EnhancedContext context;
+        public ContextualFunctor(EnhancedContext theContext) {
+            context = theContext;
+        }
+        public int ratio(int n) {
+            context.factor -= 1;
+            return n / context.factor;
+        }
+    }
 
     @Override
     public void setUp() {
@@ -130,9 +145,10 @@ public class MethodTest extends JexlTestCase {
         java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
         funcs.put(null, new Functor());
         funcs.put("math", new MyMath());
+        funcs.put("cx", ContextualFunctor.class);
         JEXL.setFunctions(funcs);
 
-        JexlContext jc = new MapContext();
+        JexlContext jc = new EnhancedContext();
 
         Expression e = JEXL.createExpression("ten()");
         Object o = e.evaluate(jc);
@@ -150,6 +166,10 @@ public class MethodTest extends JexlTestCase {
         e = JEXL.createExpression("math:cos(pi)");
         o = e.evaluate(jc);
         assertEquals(Double.valueOf(-1),o);
+      
+        e = JEXL.createExpression("cx:ratio(10) + cx:ratio(20)");
+        o = e.evaluate(jc);
+        assertEquals(Integer.valueOf(7),o);
     }
 
     public void testNamespaceCall() throws Exception {
@@ -183,5 +203,12 @@ public class MethodTest extends JexlTestCase {
         o = e.evaluate(jc);
         assertEquals("Result is not 40", new Integer(40), o);
     }
-
+    /**
+     * Runs a test.
+     * @param args where args[0] is the test class name and args[1] the test class method
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+        runTest("MethodTest", "testNamespaceCall");
+    }
 }

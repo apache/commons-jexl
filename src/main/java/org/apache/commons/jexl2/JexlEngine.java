@@ -313,13 +313,15 @@ public class JexlEngine {
      * If all methods are static, you may use the bean class instead of an instance as value.
      * </p>
      * <p>
+     * If the entry value is a class that has one contructor taking a JexlContext as argument, an instance
+     * of the namespace will be created at evaluation time. It might be a good idea to derive a JexlContext
+     * to carry the information used by the namespace to avoid variable space pollution and strongly type
+     * the constructor with this specialized JexlContext.
+     * </p>
+     * <p>
      * The key or prefix allows to retrieve the bean that plays the role of the namespace.
      * If the prefix is null, the namespace is the top-level namespace allowing to define
      * top-level user defined functions ( ie: myfunc(...) )
-     * </p>
-     * <p>
-     * Note that you can always use a variable implementing methods & use
-     * the 'var.func(...)' syntax if you need more dynamic constructs.
      * </p>
      * @param funcs the map of functions that should not mutate after the call; if null
      * is passed, the empty collection is used.
