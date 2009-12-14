@@ -78,7 +78,7 @@ import org.apache.commons.jexl2.parser.ParserVisitor;
  */
 final class Debugger implements ParserVisitor {
     /** The builder to compose messages. */
-    private StringBuilder builder;
+    private final StringBuilder builder;
     /** The cause of the issue to debug. */
     private JexlNode cause;
     /** The starting character location offset of the cause in the builder. */
@@ -105,7 +105,7 @@ final class Debugger implements ParserVisitor {
         start = 0;
         end = 0;
         if (node != null) {
-            builder = new StringBuilder();
+            builder.setLength(0);
             this.cause = node;
             // make arg cause become the root cause
             JexlNode root = node;
