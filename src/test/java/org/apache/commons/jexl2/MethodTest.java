@@ -203,12 +203,5 @@ public class MethodTest extends JexlTestCase {
         o = e.evaluate(jc);
         assertEquals("Result is not 40", new Integer(40), o);
     }
-    /**
-     * Runs a test.
-     * @param args where args[0] is the test class name and args[1] the test class method
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-        runTest("MethodTest", "testNamespaceCall");
-    }
+
 }
