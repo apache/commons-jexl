@@ -97,6 +97,8 @@ public class Interpreter implements ParserVisitor {
     protected final JexlArithmetic arithmetic;
     /** The map of registered functions. */
     protected final Map<String, Object> functions;
+    /** The map of registered functions. */
+    protected Map<String, Object> functors;
     /** The context to store/retrieve variables. */
     protected final JexlContext context;
     /** Strict interpreter flag. */
@@ -124,6 +126,7 @@ public class Interpreter implements ParserVisitor {
         this.silent = jexl.silent;
         this.cache = jexl.cache != null;
         this.context = aContext;
+        this.functors = null;
     }
 
     /**
@@ -229,6 +232,46 @@ public class Interpreter implements ParserVisitor {
             logger.warn(xjexl.getMessage(), xjexl.getCause());
         }
         return null;
+    }
+
+    /**
+     * Resolves a namespace, eventually allocating an instance using context as constructor argument.
+     * The lifetime of such instances span the current expression or script evaluation.
+     *
+     * @param prefix the prefix name (may be null for global namespace)
+     * @param node the AST node
+     * @return the namespace instance
+     */
+    protected Object resolveNamespace(String prefix, JexlNode node) {
+        Object namespace;
+        // check whether this namespace is a functor
+        if (functors != null) {
+            namespace = functors.get(prefix);
+            if (namespace != null) {
+                return namespace;
+            }
+        }
+        namespace = functions.get(prefix);
+        if (namespace == null) {
+            throw new JexlException(node, "no such function namespace " + prefix);
+        }
+        // allow namespace to be instantiated as functor with context
+        if (namespace instanceof Class<?>) {
+            Object[] args = new Object[]{context};
+            Constructor<?> ctor = uberspect.getConstructor(namespace,args, node);
+            if (ctor != null) {
+                try {
+                    namespace = ctor.newInstance(args);
+                    if (functors == null) {
+                        functors = new HashMap<String, Object>();
+                    }
+                    functors.put(prefix, namespace);
+                } catch (Exception xinst) {
+                    throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
+                }
+            }
+        }
+        return namespace;
     }
 
     /** {@inheritDoc} */
@@ -741,7 +784,7 @@ public class Interpreter implements ParserVisitor {
             // if the first child of the (ASTReference) parent,
             // it is considered as calling a 'top level' function
             if (node.jjtGetParent().jjtGetChild(0) == node) {
-                data = functions.get(null);
+                data = resolveNamespace(null, node);
                 if (data == null) {
                     throw new JexlException(node, "no default function namespace");
                 }
@@ -837,10 +880,7 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTFunctionNode node, Object data) {
         // objectNode 0 is the prefix
         String prefix = ((ASTIdentifier) node.jjtGetChild(0)).image;
-        Object namespace = functions.get(prefix);
-        if (namespace == null) {
-            throw new JexlException(node, "no such function namespace " + prefix);
-        }
+        Object namespace = resolveNamespace(prefix, node);
         // objectNode 1 is the identifier , the others are parameters.
         String function = ((ASTIdentifier) node.jjtGetChild(1)).image;
 

@@ -547,7 +547,8 @@ public final class MethodKey {
                 // if there's just one more methodArg than class arg
                 // and the last methodArg is an array, then treat it as a vararg
                 return methodArgs.length == classes.length + 1 && methodArgs[methodArgs.length - 1].isArray();
-            } else if (methodArgs.length == classes.length) {
+            }
+            if (methodArgs.length == classes.length) {
                 // this will properly match when the last methodArg
                 // is an array/varargs and the last class is the type of array
                 // (e.g. String when the method is expecting String...)
@@ -562,8 +563,10 @@ public final class MethodKey {
                         return false;
                     }
                 }
-            } else if (methodArgs.length > 0) // more arguments given than the method accepts; check for varargs
-            {
+                return true;
+            }
+            // more arguments given than the method accepts; check for varargs
+            if (methodArgs.length > 0) {
                 // check that the last methodArg is an array
                 Class<?> lastarg = methodArgs[methodArgs.length - 1];
                 if (!lastarg.isArray()) {
@@ -584,9 +587,10 @@ public final class MethodKey {
                         return false;
                     }
                 }
+                return true;
             }
-
-            return true;
+            // no match
+            return false;
         }
 
         /**
