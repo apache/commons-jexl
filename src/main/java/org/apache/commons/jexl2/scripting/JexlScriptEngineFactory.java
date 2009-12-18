@@ -23,6 +23,8 @@ import java.util.List;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
+import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.parser.StringParser;
 
 /**
  * Implements the Jexl ScriptEngineFactory for JSF-223.
@@ -60,11 +62,11 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     }
 
     /** {@inheritDoc} */
-    public String getMethodCallSyntax(String object, String method, String[] args) {
+    public String getMethodCallSyntax(String obj, String m, String... args) {
         StringBuilder sb = new StringBuilder();
-        sb.append(object);
+        sb.append(obj);
         sb.append('.');
-        sb.append(method);
+        sb.append(m);
         sb.append('(');
         boolean needComma = false;
         for(String arg : args){
@@ -94,8 +96,12 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     }
 
     /** {@inheritDoc} */
-    public String getOutputStatement(String message) {  // TODO - is there one?
-        throw new UnsupportedOperationException("Not yet implemented");
+    public String getOutputStatement(String toDisplay) {
+        if (toDisplay == null) {
+            return "print(null)";
+        } else {
+            return "print("+StringParser.escapeString(toDisplay)+")";
+        }
     }
 
     /** {@inheritDoc} */
@@ -117,11 +123,11 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     }
 
     /** {@inheritDoc} */
-    public String getProgram(String[] args) {
+    public String getProgram(String... statements) {
         StringBuilder sb = new StringBuilder();
-        for(String arg : args){
-            sb.append(arg);
-            if (!arg.endsWith(";")){
+        for(String statement : statements){
+            sb.append(JexlEngine.cleanExpression(statement));
+            if (!statement.endsWith(";")){
                 sb.append(';');
             }
         }

@@ -34,6 +34,9 @@ package org.apache.commons.jexl2.parser;
  * </p>
  */
 public class StringParser {
+    /** Default constructor.  */
+    public StringParser() {}
+    
     /**
      * Builds a string, handles escaping through '\' syntax.
      * @param str the string to build from
@@ -134,5 +137,46 @@ public class StringParser {
         }
         strb.append(xc);
         return 4;
+    }
+    
+    /**
+     * Escapes a String representation, expand non-ASCII characters as Unicode escape sequence.
+     * @param str the string to escape
+     * @return the escaped representation
+     */
+    public static String escapeString(String str) {
+        if (str == null) {
+            return null;
+        }
+        final int length = str.length();
+        StringBuilder strb = new StringBuilder(length + 2);
+        strb.append('\'');
+        for (int i = 0; i < length; ++i) {
+            char c = str.charAt(i);
+            if (c < 127) {
+                if (c == '\'') {
+                    // escape quote
+                    strb.append('\\');
+                    strb.append('\'');
+                } else if (c == '\\') {
+                    // escape backslash
+                    strb.append('\\');
+                    strb.append('\\');
+                } else {
+                    strb.append(c);
+                }
+            } else {
+                // convert to Unicode escape sequence
+                strb.append('\\');
+                strb.append('u');
+                String hex = Integer.toHexString(c);
+                for (int h = hex.length(); h < 4; ++h) {
+                    strb.append('0');
+                }
+                strb.append(hex);
+            }
+        }
+        strb.append('\'');
+        return strb.toString();
     }
 }

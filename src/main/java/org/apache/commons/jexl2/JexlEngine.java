@@ -872,7 +872,7 @@ public class JexlEngine {
      * @param str expression to clean
      * @return trimmed expression ending in a semi-colon
      */
-    protected String cleanExpression(CharSequence str) {
+    public static final String cleanExpression(CharSequence str) {
         if (str != null) {
             int start = 0;
             int end = str.length();
@@ -893,15 +893,20 @@ public class JexlEngine {
     }
 
     /**
-     * Read a buffered reader into a StringBuffer and return a String with
+     * Read from a reader into a StringBuffer and return a String with
      * the contents of the reader.
-     * @param reader to be read.
+     * @param scriptReader to be read.
      * @return the contents of the reader as a String.
      * @throws IOException on any error reading the reader.
      */
-    protected static String readerToString(BufferedReader reader)
-            throws IOException {
+    public static final String readerToString(Reader scriptReader) throws IOException {
         StringBuilder buffer = new StringBuilder();
+        BufferedReader reader;
+        if (scriptReader instanceof BufferedReader) {
+            reader = (BufferedReader) scriptReader;
+        } else {
+            reader = new BufferedReader(scriptReader);
+        }
         try {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -909,7 +914,11 @@ public class JexlEngine {
             }
             return buffer.toString();
         } finally {
-            reader.close();
+            try {
+                reader.close();
+            } catch(IOException xio) {
+                // ignore
+            }
         }
 
     }
