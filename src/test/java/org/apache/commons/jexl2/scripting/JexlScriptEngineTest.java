@@ -18,9 +18,13 @@
 
 package org.apache.commons.jexl2.scripting;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.Map;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -42,10 +46,6 @@ public class JexlScriptEngineTest extends TestCase {
 
         assertEquals("42;", factory.getProgram(new String[]{"42"}));
         assertEquals("str.substring(3,4)", factory.getMethodCallSyntax("str", "substring", new String[]{"3", "4"}));
-        try {
-            factory.getOutputStatement("foo");
-            fail("getOutputStatement() should have thrown");
-        } catch(Exception xignore) {}
     }
 
     public void testScripting() throws Exception {
