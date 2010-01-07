@@ -295,6 +295,10 @@ void RelationalExpression() #void :
     ">=" AdditiveExpression() #GENode(2)
    |
     "ge" AdditiveExpression() #GENode(2)
+   |
+    "=~" AdditiveExpression() #ERNode(2) // equals regexp
+   |
+    "!~" AdditiveExpression() #NRNode(2) // not equals regexp
   )?
 }
 

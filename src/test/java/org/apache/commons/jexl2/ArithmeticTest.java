@@ -151,7 +151,26 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("B10 / I2", new BigInteger("5"));
         asserter.assertExpression("B10 / L2", new BigInteger("5"));
     }
-    
+
+
+    public void testRegexp() throws Exception {
+        asserter.setVariable("str", "abc456");
+        asserter.assertExpression("str =~ '.*456'", Boolean.TRUE);
+        asserter.assertExpression("str !~ 'ABC.*'", Boolean.TRUE);
+        asserter.setVariable("match", "abc.*");
+        asserter.setVariable("nomatch", ".*123");
+        asserter.assertExpression("str =~ match", Boolean.TRUE);
+        asserter.assertExpression("str !~ match", Boolean.FALSE);
+        asserter.assertExpression("str !~ nomatch", Boolean.TRUE);
+        asserter.assertExpression("str =~ nomatch", Boolean.FALSE);
+        asserter.setVariable("match", java.util.regex.Pattern.compile("abc.*"));
+        asserter.setVariable("nomatch", java.util.regex.Pattern.compile(".*123"));
+        asserter.assertExpression("str =~ match", Boolean.TRUE);
+        asserter.assertExpression("str !~ match", Boolean.FALSE);
+        asserter.assertExpression("str !~ nomatch", Boolean.TRUE);
+        asserter.assertExpression("str =~ nomatch", Boolean.FALSE);
+    }
+
     /**
      *
      * if silent, all arith exception return 0.0

@@ -470,7 +470,31 @@ public class JexlArithmetic {
         BigInteger result = l.subtract(r);
         return narrowBigInteger(left, right, result);
     }
-    
+
+    /**
+     * Test if left regexp matches right.
+     *
+     * @param left first value
+     * @param right second value
+     * @return test result.
+     */
+    public boolean matches(Object left, Object right) {
+        if (left == null && right == null) {
+            //if both are null L == R
+            return true;
+        }
+        if (left == null || right == null) {
+            // we know both aren't null, therefore L != R
+            return false;
+        }
+        final String arg = left.toString();
+        if (right instanceof java.util.regex.Pattern) {
+            return ((java.util.regex.Pattern) right).matcher(arg).matches();
+        } else {
+            return arg.matches(right.toString());
+        }
+    }
+
     /**
      * Test if left and right are equal.
      *
