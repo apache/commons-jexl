@@ -19,6 +19,7 @@ import org.apache.commons.jexl2.introspection.Uberspect;
 import org.apache.commons.jexl2.internal.Introspector;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.jexl2.introspection.UberspectImpl;
 
 /**
  * Test cases for reported issues
@@ -42,6 +43,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-48: bad assignment detection
     public static class Another {
+        public String name = "whatever";
         private Boolean foo = Boolean.TRUE;
 
         public Boolean foo() {
@@ -157,6 +159,16 @@ public class IssuesTest extends JexlTestCase {
             }
         }
         assertTrue("should have foo & goo", found == 2);
+
+        names = ((UberspectImpl) uber).getFieldNames(Another.class);
+        assertTrue("should find fields", names.length > 0);
+        found = 0;
+        for (String name : names) {
+            if ("name".equals(name)) {
+                found += 1;
+            }
+        }
+        assertTrue("should have name", found == 1);
     }
 
     // JEXL-10/JEXL-11: variable checking, null operand is error
