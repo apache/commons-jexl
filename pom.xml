@@ -100,7 +100,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.2</version>
-            <optional>true</optional>
+            <scope>test</scope>
         </dependency>
         <!-- For JSR-223 API -->
         <dependency>
