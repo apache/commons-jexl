@@ -282,7 +282,7 @@ public class CacheTest extends JexlTestCase {
             jexl.setCache(0);
         }
         java.util.concurrent.ExecutorService execs = java.util.concurrent.Executors.newFixedThreadPool(NTHREADS);
-        List<Task> tasks = new ArrayList<Task>(NTHREADS);
+        List<Callable<Integer>> tasks = new ArrayList<Callable<Integer>>(NTHREADS);
         for(int t = 0; t < NTHREADS; ++t) {
             tasks.add(jexl.newInstance(ctask, loops));
         }
