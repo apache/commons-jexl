@@ -18,8 +18,8 @@
 
 package org.apache.commons.jexl2.scripting;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 
@@ -32,18 +32,23 @@ public class JexlScriptEngineOptionalTest extends TestCase {
     private final ScriptEngineManager manager = new ScriptEngineManager();
     private final ScriptEngine engine = manager.getEngineByName("jexl");
 
-    public void testScriptEngineOutput() throws Exception {
+    public void testOutput() throws Exception {
         String output = factory.getOutputStatement("foo\u00a9bar");
-        assertEquals(output, "print('foo\\u00a9bar')");
+        assertEquals("JEXL.out.print('foo\\u00a9bar')", output);
         // redirect output to capture evaluation result
-        final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
-        try {
-            engine.eval(output);
-        } finally {
-            System.setOut(null);
-        }
-        assertEquals("foo\u00a9bar\n", outContent.toString());
+        final StringWriter outContent = new StringWriter();
+        engine.getContext().setWriter(outContent);
+        engine.eval(output);
+        assertEquals("foo\u00a9bar", outContent.toString());
+    }
+
+    public void testError() throws Exception {
+        String error = "JEXL.err.print('ERROR')";
+        // redirect error to capture evaluation result
+        final StringWriter outContent = new StringWriter();
+        engine.getContext().setErrorWriter(outContent);
+        engine.eval(error);
+        assertEquals("ERROR", outContent.toString());
     }
 
     public void testCompilable() throws Exception {
@@ -53,5 +58,4 @@ public class JexlScriptEngineOptionalTest extends TestCase {
         assertEquals(Integer.valueOf(42), script.eval());
         assertEquals(Integer.valueOf(42), script.eval());
     }
-
 }

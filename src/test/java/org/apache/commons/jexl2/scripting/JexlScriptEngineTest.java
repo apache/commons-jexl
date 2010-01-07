@@ -18,13 +18,9 @@
 
 package org.apache.commons.jexl2.scripting;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.Map;
-import javax.script.Compilable;
-import javax.script.CompiledScript;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -72,9 +68,9 @@ public class JexlScriptEngineTest extends TestCase {
         assertEquals(newValue,engine.get("value"));
         assertEquals(engine.getContext(),engine.get(JexlScriptEngine.CONTEXT_KEY));
         // Check behaviour of JEXL object
-        assertNotNull(engine.get("JEXL"));
-        assertEquals(System.out,engine.eval("JEXL.out"));
-        assertEquals(System.err,engine.eval("JEXL.err"));
+        assertEquals(engine.getContext().getReader(),engine.eval("JEXL.in"));
+        assertEquals(engine.getContext().getWriter(),engine.eval("JEXL.out"));
+        assertEquals(engine.getContext().getErrorWriter(),engine.eval("JEXL.err"));
         assertEquals(System.class,engine.eval("JEXL.System"));
     }
     
@@ -98,10 +94,9 @@ public class JexlScriptEngineTest extends TestCase {
     }
 
     public void testEngineNames() throws Exception {
-        ScriptEngine engine;
         ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull("Manager should not be null", manager);
-        engine = manager.getEngineByName("JEXL");
+        ScriptEngine engine = manager.getEngineByName("JEXL");
         assertNotNull("Engine should not be null (JEXL)", engine);        
         engine = manager.getEngineByName("Jexl");
         assertNotNull("Engine should not be null (Jexl)", engine);        
@@ -110,10 +105,9 @@ public class JexlScriptEngineTest extends TestCase {
     }
 
     public void testScopes() throws Exception {
-        ScriptEngine engine;
         ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull("Manager should not be null", manager);
-        engine = manager.getEngineByName("JEXL");
+        ScriptEngine engine = manager.getEngineByName("JEXL");
         assertNotNull("Engine should not be null (JEXL)", engine);
         manager.put("global",Integer.valueOf(1));
         engine.put("local", Integer.valueOf(10));
@@ -132,10 +126,9 @@ public class JexlScriptEngineTest extends TestCase {
     }
 
     public void testDottedNames() throws Exception {
-        ScriptEngine engine;
         ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull("Manager should not be null", manager);
-        engine = manager.getEngineByName("JEXL");
+        ScriptEngine engine = manager.getEngineByName("JEXL");
         assertNotNull("Engine should not be null (JEXL)", engine);
         engine.eval("this.is.a.test=null");
         assertNull(engine.get("this.is.a.test"));

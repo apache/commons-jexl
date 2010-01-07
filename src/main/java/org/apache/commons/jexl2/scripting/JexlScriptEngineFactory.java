@@ -98,9 +98,9 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     /** {@inheritDoc} */
     public String getOutputStatement(String toDisplay) {
         if (toDisplay == null) {
-            return "print(null)";
+            return "JEXL.out.print(null)";
         } else {
-            return "print("+StringParser.escapeString(toDisplay)+")";
+            return "JEXL.out.print("+StringParser.escapeString(toDisplay)+")";
         }
     }
 
@@ -117,8 +117,14 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
         } else if(key.equals(ScriptEngine.LANGUAGE_VERSION)) {
             return getLanguageVersion();
         } else if (key.equals("THREADING")) {
-            return null;//"MULTITHREADED"; // TODO what is the correct value here?
-        } 
+            /*
+             * To implement multithreading, the scripting engine context (inherited from AbstractScriptEngine)
+             * would need to be made thread-safe; so would the setContext/getContext methods.
+             * It is easier to share the underlying Uberspect and JEXL engine instance, especially
+             * with an expression cache.
+             */
+            return null;
+        }
         return null;
     }
 
