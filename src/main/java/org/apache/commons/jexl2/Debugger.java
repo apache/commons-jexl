@@ -31,6 +31,7 @@ import org.apache.commons.jexl2.parser.ASTBlock;
 import org.apache.commons.jexl2.parser.ASTConstructorNode;
 import org.apache.commons.jexl2.parser.ASTDivNode;
 import org.apache.commons.jexl2.parser.ASTEQNode;
+import org.apache.commons.jexl2.parser.ASTERNode;
 import org.apache.commons.jexl2.parser.ASTEmptyFunction;
 import org.apache.commons.jexl2.parser.ASTFalseNode;
 import org.apache.commons.jexl2.parser.ASTFloatLiteral;
@@ -50,6 +51,7 @@ import org.apache.commons.jexl2.parser.ASTMethodNode;
 import org.apache.commons.jexl2.parser.ASTModNode;
 import org.apache.commons.jexl2.parser.ASTMulNode;
 import org.apache.commons.jexl2.parser.ASTNENode;
+import org.apache.commons.jexl2.parser.ASTNRNode;
 import org.apache.commons.jexl2.parser.ASTNotNode;
 import org.apache.commons.jexl2.parser.ASTNullLiteral;
 import org.apache.commons.jexl2.parser.ASTOrNode;
@@ -361,6 +363,11 @@ final class Debugger implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
+    public Object visit(ASTERNode node, Object data) {
+        return infixChildren(node, " =~ ", false, data);
+    }
+
+    /** {@inheritDoc} */
     public Object visit(ASTFalseNode node, Object data) {
         return check(node, "false", data);
     }
@@ -526,6 +533,11 @@ final class Debugger implements ParserVisitor {
         return infixChildren(node, " != ", false, data);
     }
 
+    /** {@inheritDoc} */
+    public Object visit(ASTNRNode node, Object data) {
+        return infixChildren(node, " !~ ", false, data);
+    }
+    
     /** {@inheritDoc} */
     public Object visit(ASTNotNode node, Object data) {
         builder.append("!");

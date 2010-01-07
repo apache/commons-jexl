@@ -45,6 +45,7 @@ import org.apache.commons.jexl2.parser.ASTBlock;
 import org.apache.commons.jexl2.parser.ASTConstructorNode;
 import org.apache.commons.jexl2.parser.ASTDivNode;
 import org.apache.commons.jexl2.parser.ASTEQNode;
+import org.apache.commons.jexl2.parser.ASTERNode;
 import org.apache.commons.jexl2.parser.ASTEmptyFunction;
 import org.apache.commons.jexl2.parser.ASTFalseNode;
 import org.apache.commons.jexl2.parser.ASTFunctionNode;
@@ -64,6 +65,7 @@ import org.apache.commons.jexl2.parser.ASTMethodNode;
 import org.apache.commons.jexl2.parser.ASTModNode;
 import org.apache.commons.jexl2.parser.ASTMulNode;
 import org.apache.commons.jexl2.parser.ASTNENode;
+import org.apache.commons.jexl2.parser.ASTNRNode;
 import org.apache.commons.jexl2.parser.ASTNotNode;
 import org.apache.commons.jexl2.parser.ASTNullLiteral;
 import org.apache.commons.jexl2.parser.ASTOrNode;
@@ -659,6 +661,17 @@ public class Interpreter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
+    public Object visit(ASTERNode node, Object data) {
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        try {
+            return arithmetic.matches(left, right) ? Boolean.TRUE : Boolean.FALSE;
+        } catch (RuntimeException xrt) {
+            throw new JexlException(node, ">= error", xrt);
+        }
+    }
+
+    /** {@inheritDoc} */
     public Object visit(ASTIdentifier node, Object data) {
         String name = node.image;
         if (data == null) {
@@ -971,6 +984,17 @@ public class Interpreter implements ParserVisitor {
         }
     }
 
+    /** {@inheritDoc} */
+    public Object visit(ASTNRNode node, Object data) {
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        try {
+            return arithmetic.matches(left, right) ? Boolean.FALSE : Boolean.TRUE;
+        } catch (RuntimeException xrt) {
+            throw new JexlException(node, ">= error", xrt);
+        }
+    }
+    
     /** {@inheritDoc} */
     public Object visit(ASTNotNode node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
