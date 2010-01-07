@@ -28,6 +28,7 @@
     <release version="2.0" date="unreleased">
         <action dev="henrib" type="add" issue="JEXL-27" due-to="Weikuo Liaw">Bean-ish &amp; ant-ish like assignment</action>
         <action dev="henrib" type="add" issue="JEXL-19" due-to="Jesse Glick">Ternary operator support</action>
+        <action dev="henrib" type="add" issue="JEXL-46" due-to="Alfred Reibenschuh">adding Perl-like regular-expression operators</action>
         <action dev="henrib" type="add" issue="JEXL-41" due-to="Alejandro Torras">Support for ${...} and #{...} expressions</action>
         <action dev="henrib" type="add" issue="JEXL-15" due-to="Paul Libbrecht">User definable functions</action>
         <action dev="sebb" type="add" issue="JEXL-63">JSR-223 support</action>
