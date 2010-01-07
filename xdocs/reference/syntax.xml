@@ -376,6 +376,24 @@
           </td>
         </tr>
         <tr>
+          <td>Regex match <code>=~</code></td>
+          <td>
+            The Perl inspired <code>=~</code> operator can be used to check that a <code>string</code> matches
+            a regular expression (expressed either a Java String or a java.util.regex.Pattern).
+            For example
+            <code>"abcdef" =~ "abc.*</code> returns <code>true</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Regex no-match <code>!~</code></td>
+          <td>
+            The Perl inspired <code>!~</code> operator can be used to check that a <code>string</code> does not
+            match a regular expression (expressed either a Java String or a java.util.regex.Pattern).
+            For example
+            <code>"abcdef" !~ "abc.*</code> returns <code>false</code>.
+          </td>
+        </tr>
+        <tr>
           <td>Addition</td>
           <td>
             The usual <code>+</code> operator is used.

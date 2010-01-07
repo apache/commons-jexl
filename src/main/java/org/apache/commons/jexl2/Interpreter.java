@@ -667,7 +667,7 @@ public class Interpreter implements ParserVisitor {
         try {
             return arithmetic.matches(left, right) ? Boolean.TRUE : Boolean.FALSE;
         } catch (RuntimeException xrt) {
-            throw new JexlException(node, ">= error", xrt);
+            throw new JexlException(node, "=~ error", xrt);
         }
     }
 
@@ -991,7 +991,7 @@ public class Interpreter implements ParserVisitor {
         try {
             return arithmetic.matches(left, right) ? Boolean.FALSE : Boolean.TRUE;
         } catch (RuntimeException xrt) {
-            throw new JexlException(node, ">= error", xrt);
+            throw new JexlException(node, "!~ error", xrt);
         }
     }
     
