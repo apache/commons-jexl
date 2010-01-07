@@ -19,6 +19,7 @@ package org.apache.commons.jexl2.internal.introspection;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -110,8 +111,34 @@ public class IntrospectorBase {
     }
     // CSON: RedundantThrows
 
+
     /**
-     * Gets the accessible methods names known for a given class.
+     * Gets the field named by <code>key</code> for the class <code>c</code>.
+     *
+     * @param c     Class in which the field search is taking place
+     * @param key   Name of the field being searched for
+     * @return the desired field or null if it does not exist or is not accessible
+     * */
+    public Field getField(Class<?> c, String key) {
+        ClassMap classMap = getMap(c);
+        return classMap.findField(c, key);
+    }
+
+    /**
+     * Gets the array of accessible field names known for a given class.
+     * @param c the class
+     * @return the class field names
+     */
+    public String[] getFieldNames(Class<?> c) {
+        if (c == null) {
+            return new String[0];
+        }
+        ClassMap classMap = getMap(c);
+        return classMap.getFieldNames();
+    }
+
+    /**
+     * Gets the array of accessible methods names known for a given class.
      * @param c the class
      * @return the class method names
      */

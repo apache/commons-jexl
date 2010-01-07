@@ -19,6 +19,7 @@ package org.apache.commons.jexl2.introspection;
 import org.apache.commons.jexl2.internal.Introspector;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Enumeration;
 import java.util.Iterator;
 
@@ -46,19 +47,13 @@ public class UberspectImpl extends Introspector implements Uberspect {
      * Publicly exposed special failure object returned by tryInvoke.
      */
     public static final Object TRY_FAILED = AbstractExecutor.TRY_FAILED;
-    /**
-     * Whether public fields can be considered as properties.
-     */
-    protected final boolean publicProperties;
     
     /**
      * Creates a new UberspectImpl.
      * @param runtimeLogger the logger used for all logging needs
-     * @param publicFields whether public fields should be considered as properties
      */
-    public UberspectImpl(Log runtimeLogger, boolean publicFields) {
+    public UberspectImpl(Log runtimeLogger) {
         super(runtimeLogger);
-        publicProperties = publicFields;
     }
 
     /**
@@ -96,6 +91,18 @@ public class UberspectImpl extends Introspector implements Uberspect {
     }
 
     /**
+     * Returns a class field.
+     * @param obj the object
+     * @param name the field name
+     * @param info debug info
+     * @return a {@link Field}.
+     */
+    public Field getField(Object obj, String name, JexlInfo info) {
+        final Class<?> clazz = obj instanceof Class<?>? (Class<?>) obj : obj.getClass();
+        return getField(clazz, name);
+    }
+
+    /**
      * {@inheritDoc}
      */
     public Constructor<?> getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
@@ -107,26 +114,6 @@ public class UberspectImpl extends Introspector implements Uberspect {
      */
     public JexlMethod getMethod(Object obj, String method, Object[] args, JexlInfo info) {
         return getMethodExecutor(obj, method, args);
-    }
-
-    /**
-     * Gets a field by name from a class.
-     * @param clazz the class to find the field in
-     * @param name the field name
-     * @return the field instance or null if it could not be found
-     */
-    protected static Field getField(Class<?> clazz, String name) {
-        try {
-            Field field = clazz.getField(name);
-            if (!field.isAccessible()) {
-                field.setAccessible(true);
-            }
-            return field;
-        } catch (NoSuchFieldException xnsf) {
-            return null;
-        } catch (SecurityException xsec) {
-            return null;
-        }
     }
 
     /**
@@ -187,9 +174,8 @@ public class UberspectImpl extends Introspector implements Uberspect {
      */
     public JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfo info) {
         JexlPropertyGet get = getGetExecutor(obj, identifier);
-        if (get == null && publicProperties && obj != null && identifier != null) {
-            Class<?> clazz = obj instanceof Class<?>? (Class<?>) obj : obj.getClass();
-            Field field = getField(clazz, identifier.toString());
+        if (get == null && obj != null && identifier != null) {
+            Field field = getField(obj, identifier.toString(), info);
             if (field != null) {
                 return new FieldPropertyGet(field);
             }
@@ -259,10 +245,10 @@ public class UberspectImpl extends Introspector implements Uberspect {
      */
     public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, JexlInfo info) {
         JexlPropertySet set = getSetExecutor(obj, identifier, arg);
-        if (set == null && publicProperties && obj != null && identifier != null) {
-            Class<?> clazz = obj instanceof Class<?>? (Class<?>) obj : obj.getClass();
-            Field field = getField(clazz, identifier.toString());
+        if (set == null && obj != null && identifier != null) {
+            Field field = getField(obj, identifier.toString(), info);
             if (field != null
+                && !Modifier.isFinal(field.getModifiers())
                 && (arg == null || MethodKey.isInvocationConvertible(field.getType(), arg.getClass(), false))) {
                 return new FieldPropertySet(field);
             }

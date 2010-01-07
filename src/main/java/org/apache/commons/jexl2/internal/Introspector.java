@@ -19,6 +19,7 @@ package org.apache.commons.jexl2.internal;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 
 import org.apache.commons.jexl2.internal.introspection.IntrospectorBase;
 import org.apache.commons.jexl2.internal.introspection.MethodKey;
@@ -103,6 +104,26 @@ public class Introspector {
         base().setLoader(loader);
     }
 
+
+    /**
+     * Gets the field named by <code>key</code> for the class <code>c</code>.
+     *
+     * @param c     Class in which the field search is taking place
+     * @param key   Name of the field being searched for
+     * @return the desired field or null if it does not exist or is not accessible
+     * */
+    protected final Field getField(Class<?> c, String key) {
+        return base().getField(c, key);
+    }
+
+    /**
+     * Gets the accessible field names known for a given class.
+     * @param c the class
+     * @return the class field names
+     */
+    public final String[] getFieldNames(Class<?> c) {
+        return base().getFieldNames(c);
+    }
 
     /**
      * Gets the method defined by <code>name</code> and

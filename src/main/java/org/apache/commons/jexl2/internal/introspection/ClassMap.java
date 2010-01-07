@@ -16,8 +16,10 @@
  */
 package org.apache.commons.jexl2.internal.introspection;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +45,8 @@ import org.apache.commons.logging.Log;
 final class ClassMap {
     /** cache of methods. */
     private final MethodCache methodCache;
+    /** cache of fields. */
+    private final Map<String, Field> fieldCache;
 
     /**
      * Standard constructor.
@@ -50,9 +54,50 @@ final class ClassMap {
      * @param aClass the class to deconstruct.
      * @param log the logger.
      */
-    public ClassMap(Class<?> aClass, Log log) {
+    ClassMap(Class<?> aClass, Log log) {
+        // eagerly cache methods
         methodCache = createMethodCache(aClass, log);
+        // eagerly cache public fields
+        fieldCache = createFieldCache(aClass);
     }
+
+    /**
+     * Find a Field using its name.
+     * <p>The clazz parameter <strong>must</strong> be this ClassMap key.</p>
+     * @param clazz the class to introspect
+     * @param fname the field name
+     * @return A Field object representing the field to invoke or null.
+     */
+    Field findField(final Class<?> clazz, final String fname) {
+        return fieldCache.get(fname);
+    }
+
+    /**
+     * Gets the field names cached by this map.
+     * @return the array of field names
+     */
+    String[] getFieldNames() {
+        return fieldCache.keySet().toArray(new String[fieldCache.size()]);
+    }
+
+    /**
+     * Creates a map of all public fields of a given class.
+     * @param clazz the class to introspect
+     * @return the map of fields (may be the empty map, can not be null)
+     */
+    private static Map<String,Field> createFieldCache(Class<?> clazz) {
+        Field[] fields = clazz.getFields();
+        if (fields.length > 0) {
+            Map<String, Field> cache = new HashMap<String, Field>();
+            for(Field field : fields) {
+                cache.put(field.getName(), field);
+            }
+            return cache;
+        } else {
+            return Collections.emptyMap();
+        }
+    }
+
 
     /**
      * Gets the methods names cached by this map.
@@ -69,7 +114,7 @@ final class ClassMap {
      * @return A Method object representing the method to invoke or null.
      * @throws MethodKey.AmbiguousException When more than one method is a match for the parameters.
      */
-    public Method findMethod(final MethodKey key)
+    Method findMethod(final MethodKey key)
             throws MethodKey.AmbiguousException {
         return methodCache.get(key);
     }
@@ -220,7 +265,7 @@ final class ClassMap {
          * name and actual arguments used to find it.
          * </p>
          */
-        private final Map<MethodKey, Method> cache = new HashMap<MethodKey, Method>();
+        private final Map<MethodKey, Method> methods = new HashMap<MethodKey, Method>();
         /**
          * Map of methods that are searchable according to method parameters to find a match.
          */
@@ -242,10 +287,9 @@ final class ClassMap {
          * @return A Method object representing the method to invoke or null.
          * @throws MethodKey.AmbiguousException When more than one method is a match for the parameters.
          */
-        Method get(final MethodKey methodKey)
-                throws MethodKey.AmbiguousException {
+        Method get(final MethodKey methodKey) throws MethodKey.AmbiguousException {
             synchronized (methodMap) {
-                Method cacheEntry = cache.get(methodKey);
+                Method cacheEntry = methods.get(methodKey);
                 // We looked this up before and failed.
                 if (cacheEntry == CACHE_MISS) {
                     return null;
@@ -256,13 +300,13 @@ final class ClassMap {
                         // That one is expensive...
                         cacheEntry = methodMap.find(methodKey);
                         if (cacheEntry != null) {
-                            cache.put(methodKey, cacheEntry);
+                            methods.put(methodKey, cacheEntry);
                         } else {
-                            cache.put(methodKey, CACHE_MISS);
+                            methods.put(methodKey, CACHE_MISS);
                         }
                     } catch (MethodKey.AmbiguousException ae) {
                         // that's a miss :-)
-                        cache.put(methodKey, CACHE_MISS);
+                        methods.put(methodKey, CACHE_MISS);
                         throw ae;
                     }
                 }
@@ -283,8 +327,8 @@ final class ClassMap {
                 // cache from defined class towards java.lang.Object because
                 // abstract methods in superclasses would else overwrite concrete
                 // classes further down the hierarchy.
-                if (cache.get(methodKey) == null) {
-                    cache.put(methodKey, method);
+                if (methods.get(methodKey) == null) {
+                    methods.put(methodKey, method);
                     methodMap.add(method);
                 }
             }

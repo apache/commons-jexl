@@ -116,7 +116,7 @@ public class JexlEngine {
      */
     private static final class UberspectHolder {
         /** The default uberspector that handles all introspection patterns. */
-        private static final Uberspect UBERSPECT = new UberspectImpl(LogFactory.getLog(JexlEngine.class), false);
+        private static final Uberspect UBERSPECT = new UberspectImpl(LogFactory.getLog(JexlEngine.class));
         /** Non-instantiable. */
         private UberspectHolder() {}
     }
@@ -202,7 +202,7 @@ public class JexlEngine {
         if (logger == null || logger.equals(LogFactory.getLog(JexlEngine.class))) {
             return UberspectHolder.UBERSPECT;
         }
-        return new UberspectImpl(logger, false);
+        return new UberspectImpl(logger);
     }
 
     /**

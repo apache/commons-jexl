@@ -48,8 +48,6 @@ public class PublicFieldsTest extends JexlTestCase {
     private JexlContext ctxt;
 
     public PublicFieldsTest() {
-        // create an Uberspect that considers public fields as properties
-        super(new JexlEngine(new UberspectImpl(LogFactory.getLog(PublicFieldsTest.class), true), null, null, null));
         JEXL.setLenient(false);
     }
 
