@@ -107,7 +107,7 @@
             <groupId>org.apache.bsf</groupId>
             <artifactId>bsf-api</artifactId>
             <version>[3.0-beta3,)</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -189,6 +189,7 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>clirr-maven-plugin</artifactId>
@@ -203,6 +204,7 @@
                     </comparisonArtifacts>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </build>
 
@@ -283,6 +285,7 @@
                     </rulesets>
                 </configuration>
             </plugin>
+            <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>clirr-maven-plugin</artifactId>
@@ -297,6 +300,7 @@
                     </comparisonArtifacts>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </reporting>
 

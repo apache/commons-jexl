@@ -18,8 +18,9 @@ package org.apache.commons.jexl2;
 
 /**
  * Tests for malformed expressions and scripts.
- * ({@link JexlEngine#createExpression(String)} and {@link JexlEngine#createScript(String)} should throw
- * {@link JexlException}s).
+ * ({@link org.apache.commons.jexl2.JexlEngine#createExpression(String)} and
+ * {@link org.apache.commons.jexl2.JexlEngine#createScript(String)} should throw
+ * {@link org.apache.commons.jexl2.JexlException}s).
  *
  * @since 1.1
  */
