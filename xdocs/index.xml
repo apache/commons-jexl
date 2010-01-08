@@ -67,8 +67,8 @@
             </p>
             <p>
             The API and the expression language exploit Java-beans naming patterns through
-            introspection to expose property getters and setters. It may also optionally consider public class fields
-            as properties.
+            introspection to expose property getters and setters. It also considers public class fields
+            as properties and allows to invoke any accessible method.
             </p>
             <p>
             JEXL attempts to bring some of the lessons learned by the Velocity
@@ -121,6 +121,7 @@
             </p>
             <ul>
                 <li>Support for invocation of any accessible method (see example above).</li>
+                <li>Support for setting/getting any accessible public field.</li>
                 <li>A general <span class="literal">size()</span> method, which works on:
                     <ul>
                         <li><span class="literal">String</span> - returns length</li>
@@ -131,6 +132,7 @@
                 <li>A general <span class="literal">empty()</span> method, which works on Collections and Strings.</li>
                 <li>A general <span class="literal">new()</span> method allowing to instantiate objects.</li>
                 <li>Support for the ternary operator 'a ? b : c' - and its GNU-C / "Elvis" variant 'a ?: c'.</li>
+                <li>Support for the Perl-like regex matching operators '=~' and '!~'</li>
                 <li>Misc : '+' has been overloaded to be use as a String concatenation operator</li>
             </ul>
 
