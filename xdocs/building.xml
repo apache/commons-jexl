@@ -30,18 +30,14 @@ limitations under the License.
 </section>
 <!-- ================================================== -->
 <section name="Maven Goals">
-  <p>
-    To build a jar file, change into JEXL's root directory (see source link above)
-    and run "mvn jar". The result will be in the "target" subdirectory.
-  </p>
-  <p>
-    To build the Javadocs, run "mvn javadoc".
-    The result will be in "target/site/apidocs".
-  </p>
-  <p>
-    To build the full website, run "mvn site". The result will be in "target/site".
-  </p>
-
+The following goals are available.
+<ul>
+<li>mvn clean - clean up</li>
+<li>mvn test - compile and run the unit tests</li>
+<li>mvn site - create the documentation</li>
+<li>mvn package - build the jar</li>
+<li>mvn install - build the jar and install in local maven repository</li>
+</ul>
 </section>
 </body>
 </document>
