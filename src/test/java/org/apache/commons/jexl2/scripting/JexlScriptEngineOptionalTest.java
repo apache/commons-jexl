@@ -18,7 +18,6 @@
 
 package org.apache.commons.jexl2.scripting;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
