@@ -25,7 +25,7 @@
     <author email="dev@commons.apache.org">Commons Developers</author>
   </properties>
   <body>
-    <release version="2.0" date="unreleased">
+    <release version="2.0" date="2010-02-02">
         <action dev="henrib" type="add" issue="JEXL-27" due-to="Weikuo Liaw">Bean-ish &amp; ant-ish like assignment</action>
         <action dev="henrib" type="add" issue="JEXL-19" due-to="Jesse Glick">Ternary operator support</action>
         <action dev="henrib" type="add" issue="JEXL-46" due-to="Alfred Reibenschuh">adding Perl-like regular-expression operators</action>
