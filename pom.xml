@@ -115,10 +115,11 @@
         <maven.compile.source>1.5</maven.compile.source>
         <maven.compile.target>1.5</maven.compile.target>
         <commons.componentid>jexl</commons.componentid>
-        <commons.release.version>2.1</commons.release.version>
+        <commons.release.version>2.0</commons.release.version>
         <!-- The RC version used in the staging repository URL. -->
-        <commons.rc.version>RC1</commons.rc.version>
-        <commons.binary.suffix />
+        <commons.rc.version>RC6</commons.rc.version>
+        <commons.release.2.version>1.1</commons.release.2.version>
+        <commons.release.2.binary.suffix />
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
         <!-- Temp fix until parent POM is updated -->
