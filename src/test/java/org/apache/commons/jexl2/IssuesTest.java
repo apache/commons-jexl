@@ -332,4 +332,45 @@ public class IssuesTest extends JexlTestCase {
         assertEquals("bye...", script.execute(ctxt));
     }
 
+    public void test97() throws Exception {
+        JexlContext ctxt = new MapContext();
+        for(char v = 'a'; v <= 'z'; ++v) {
+            ctxt.set(Character.toString(v), 10);
+        }
+        String input =
+            "(((((((((((((((((((((((((z+y)/x)*w)-v)*u)/t)-s)*r)/q)+p)-o)*n)-m)+l)*k)+j)/i)+h)*g)+f)/e)+d)-c)/b)+a)";
+
+        JexlEngine jexl = new JexlEngine();
+        Expression script;
+        // Make sure everything is loaded...
+        long start = System.nanoTime();
+        script = jexl.createExpression(input);
+        Object value = script.evaluate(ctxt);
+        assertEquals(Integer.valueOf(11), value);
+        long end = System.nanoTime();
+        System.out.printf("Parse took %.3f seconds\n", (end-start)/1e+9);
+    }
+
+    public static class fn98 {
+        public String replace(String str, String target, String replacement) {
+            return str.replace(target, replacement);
+        }
+    }
+    
+    public void test98() throws Exception {
+        String[] exprs = {
+            "fn:replace('DOMAIN\\somename', '\\\\', '\\\\\\\\')",
+            "fn:replace(\"DOMAIN\\somename\", \"\\\\\", \"\\\\\\\\\")",
+            "fn:replace('DOMAIN\\somename', '\\u005c', '\\u005c\\u005c')"
+        };
+        JexlEngine jexl = new JexlEngine();
+        Map<String,Object> funcs = new HashMap<String,Object>();
+        funcs.put("fn", new fn98());
+        jexl.setFunctions(funcs);
+        for(String expr : exprs) {
+            Object value = jexl.createExpression(expr).evaluate(null);
+            assertEquals(expr, "DOMAIN\\\\somename", value);
+        }
+    }
+
 }
