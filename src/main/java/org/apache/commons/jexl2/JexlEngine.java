@@ -55,26 +55,27 @@ import org.apache.commons.jexl2.introspection.JexlMethod;
  *  <li>Logging</li>
  * </ul>
  * </p>
- * <p>The <code>setSilent</code>and<code>setLenient</code> methods allow to fine-tune an engine instance behavior
- * according to various error control needs.
+ * <p>The <code>setSilent</code> and <code>setLenient</code> methods allow to fine-tune an engine instance behavior
+ * according to various error control needs. The lenient/strict flag tells the engine when and if null as operand is
+ * considered an error, the silent/verbose flag tells the engine what to do with the error (log as warning or throw exception).
  * </p>
  * <ul>
- * <li>When "silent" & "lenient" (not-strict):
+ * <li>When "silent" &amp; "lenient":
  * <p> 0 & null should be indicators of "default" values so that even in an case of error,
  * something meaningfull can still be inferred; may be convenient for configurations.
  * </p>
  * </li>
- * <li>When "silent" & "strict":
+ * <li>When "silent" &amp; "strict":
  * <p>One should probably consider using null as an error case - ie, every object
  * manipulated by JEXL should be valued; the ternary operator, especially the '?:' form
  * can be used to workaround exceptional cases.
  * Use case could be configuration with no implicit values or defaults.
  * </p>
  * </li>
- * <li>When "not-silent" & "not-strict":
+ * <li>When "verbose" &amp; "lenient":
  * <p>The error control grain is roughly on par with JEXL 1.0</p>
  * </li>
- * <li>When "not-silent" & "strict":
+ * <li>When "verbose" &amp; "strict":
  * <p>The finest error control grain is obtained; it is the closest to Java code -
  * still augmented by "script" capabilities regarding automated conversions & type matching.
  * </p>
@@ -286,7 +287,9 @@ public class JexlEngine {
     }
 
     /**
-     * Sets a cache of the defined size for expressions.
+     * Sets a cache for expressions of the defined size.
+     * <p>The cache will contain at most <code>size</code> expressions. Note that
+     * all JEXL caches are held through SoftReferences and may be garbage-collected.</p>
      * @param size if not strictly positive, no cache is used.
      */
     public void setCache(int size) {
