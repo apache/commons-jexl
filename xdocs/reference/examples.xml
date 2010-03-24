@@ -34,51 +34,65 @@
       <p>
         You can find two sample programs in JEXL's CVS repository:
         <ul>
-          <li><a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl/examples/ArrayTest.java?view=markup">Using arrays</a></li>
-          <li><a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl/examples/MethodPropertyTest.java?view=markup">Accessing Properties and invoking methods</a></li>
+          <li><a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/java/org/apache/commons/jexl2/examples/ArrayTest.java?view=markup">Using arrays</a></li>
+          <li><a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/java/org/apache/commons/jexl2/examples/MethodPropertyTest.java?view=markup">Accessing Properties and invoking methods</a></li>
         </ul>
       </p>
       <p>
-        As well, <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl/JexlTest.java?view=markup">JEXL's Unit Tests</a>
+        As well, <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl2/JexlTest.java?view=markup">JEXL's Unit Tests</a>
         provide handy examples of expressions. The test code also contains a
-        <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl/Jexl.java?view=markup">simple class</a>
+        <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl2/Jexl.java?view=markup">simple class</a>
         that evaluates its command line arguments as JEXL expressions when run.
       </p>
     </section>
     <section name="Evaluating Expressions">
       <p>
-        To evaluate expressions using JEXL, you need two things:
+        To evaluate expressions using JEXL, you need three things:
         <ul>
-          <li>A <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">context</a> containing any variables, and</li>
-          <li>An <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/Expression.html">expression</a></li>
+          <li>An <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/JexlEngine.html">engine</a> to create expressions,</li>
+          <li>A <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/JexlContext.html">context</a> containing any variables, and</li>
+          <li>An <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/Expression.html">expression</a></li>
         </ul>
       </p>
       <p>
-        The easiest way of obtaining a a context is to use the
-        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlHelper.html#createContext()">new JexlContext.Mapped()</a>
-        method. This creates a context which is simply an extension of a
-        <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/HashMap.html">HashMap</a>
+        The common way of using a JEXL engine is to allocate it as a singleton and use this opportunity to taylor its
+        behavior and cache.
+        <source>
+            private static final JexlEngine jexl = new JexlEngine();
+            static {
+               jexl.setCache(512);
+               jexl.setLenient(false);
+               jexl.setSilent(false);
+            }
+        </source>
       </p>
       <p>
-        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/Expression.html">Expressions</a> are
-        created using the <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/ExpressionFactory.html#createExpression(java.lang.String)">ExpressionFactory.createExpression(String)</a>
+        The easiest way of obtaining a a context is to use the
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/MapContext.html#MapContext()">new MapContext()</a>
+        statement. This creates a context implemented using an underlying
+        <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/HashMap.html">HashMap</a>
+      </p>
+      <p>
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/Expression.html">Expressions</a> are
+        created using the <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/JexlEngine.html#createExpression(java.lang.String)">JexlEngine.createExpression(String)</a>
         method. 
       </p>
       <p>
         Once you have your expression, you can then use use the
-        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/Expression.html#evaluate(org.apache.commons.jexl2.JexlContext)">evaluate</a>
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/Expression.html#evaluate(org.apache.commons.jexl2.JexlContext)">evaluate</a>
         to execute it and obtain a result.
       </p>
       <p>
         Here's a typical scenario:
       </p>
       <source>
+    // Assuming we have a JexlEngine instance initialized in our class named 'jexl':
     // Create an expression object for our calculation
     String calculateTax = taxManager.getTaxCalc(); //e.g. "((G1 + G2 + G3) * 0.1) + G4";
-    Expression e = ExpressionFactory.createExpression( calculateTax );
+    Expression e = jexl.createExpression( calculateTax );
 
     // populate the context
-    JexlContext context = new JexlContext.Mapped();
+    JexlContext context = new MapContext();
     context.set("G1", businessObject.getTotalSales());
     context.set("G2", taxManager.getTaxCredit(businessObject.getYear()));
     context.set("G3", businessObject.getIntercompanyPayments());
@@ -92,24 +106,15 @@
     <section name="Custom Contexts">
       <p>
         Often you have the objects and values that are needed in the context available
-        elsewhere, and instead of creating the default context and populating it
-        manually in the code, it may be simpler to create a context implementation of your
+        elsewhere. If those are already in a Map, instead of creating the default context and populating it
+        manually in the code, you can wrap a MapContext around your own map using
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/MapContext.html#MapContext()">new MapContext(yourOwnMap)</a>
+      </p>
+      <p>
+        In edge cases, it may be simpler to create a context implementation of your
         own.
-      </p>
-      <p>
-        The <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/JexlContext.html">JexlContext</a>
-        interface is very simple with only two methods, one to get the variables of the
-        context as a <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Map.html">Map</a> and
-        another to set the variables of the context from a Map.
-      </p>
-      <p>
-        Here's a simple context that wraps the JVM's system properties:
-        <source>
-        JexlContext context = new JexlContext() {
-            public Map getVars() { return System.getProperties(); }
-            public void setVars(Map map) { }
-        };
-        </source>
+        The <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/JexlContext.html">JexlContext</a>
+        interface is very simple with only three methods, to set, get and check the existence of variables.
       </p>
     </section>
     <section name="Example Expressions">
@@ -125,7 +130,11 @@
 -12 + 77.2
 x * 1.1 + y
         </source>
-        <p>Arithmetic expressions can use variables. <code>null</code> can be treated as a zero for arithmetic.</p>
+        <p>Arithmetic expressions can use variables. <code>null</code> can be treated as a zero for arithmetic;
+        if you need stricter semantics and consider <code>null</code> as an erroneous operand for arithmetic and
+        comparisons operations, you should initialize your JEXL engine using
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/JexlEngine.html#setLenient(boolean)">JexlEngine.setLenient(false)</a>.
+        </p>
       </subsection>
       <subsection name="Calling methods">
         <p>
