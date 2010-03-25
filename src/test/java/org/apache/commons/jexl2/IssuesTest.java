@@ -373,4 +373,18 @@ public class IssuesTest extends JexlTestCase {
         }
     }
 
+    public void test100() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        jexl.setCache(4);
+        String expr = "foo[0]";
+        JexlContext ctxt = new MapContext();
+        int[] foo = { 42 };
+        ctxt.set("foo", foo);
+
+        for(int l = 0; l < 2; ++l) {
+            Object value = jexl.createExpression(expr).evaluate(ctxt);
+            assertEquals(42, value);
+        }
+    }
+
 }
