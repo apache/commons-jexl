@@ -26,6 +26,7 @@ import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.MapContext;
 import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl2.JexlException;
 
 /**
  * A utility class for performing JUnit based assertions using Jexl
@@ -48,11 +49,27 @@ public class Asserter extends Assert {
     /**
      * 
      * Create an asserter.
+     * @param jexl the JEXL engine to use
      */
     public Asserter(JexlEngine jexl) {
         engine = jexl;
     }
 
+    /**
+     * Retrieves the underlying JEXL engine.
+     * @return the JEXL engine
+     */
+    public JexlEngine getEngine() {
+        return engine;
+    }
+
+    /**
+     * Retrieves the underlying JEXL context.
+     * @return the JEXL context
+     */
+    public JexlContext getContext() {
+        return context;
+    }
 
     /**
      * Performs an assertion that the value of the given Jexl expression 
@@ -71,6 +88,32 @@ public class Asserter extends Assert {
     }
 
     /**
+     * Performs an assertion that the expression fails throwing an exception.
+     * If matchException is not null, the exception message is expected to match it as a regexp.
+     * The engine is temporarily switched to strict * verbose to maximize error detection abilities.
+     * @param expression the expression that should fail
+     * @param matchException the exception message pattern
+     * @throws Exception if the expression did not fail or the exception did not match the expected pattern
+     */
+    public void failExpression(String expression, String matchException) throws Exception {
+        boolean[] flags = { engine.isLenient(), engine.isSilent() };
+        try {
+            engine.setLenient(false);
+            engine.setSilent(false);
+            Expression exp = engine.createExpression(expression);
+            Object value = exp.evaluate(context);
+            fail("expression: " + expression);
+        } catch(JexlException xjexl) {
+            if (matchException != null && !xjexl.getMessage().matches(matchException)) {
+                fail("expression: " + expression + ", expected: " + matchException + ", got " + xjexl.getMessage());
+            }
+        } finally {
+            engine.setLenient(flags[0]);
+            engine.setSilent(flags[1]);
+        }
+    }
+
+    /**
      * Puts a variable of a certain name in the context so that it can be used from
      * assertion expressions.
      * 
@@ -79,6 +122,15 @@ public class Asserter extends Assert {
      */
     public void setVariable(String name, Object value) {
         variables.put(name, value);
+    }
+
+    /**
+     * Removes a variable of a certain name from the context.
+     * @param name variable name
+     * @return variable value
+     */
+    public Object removeVariable(String name) {
+        return variables.remove(name);
     }
 
 }
