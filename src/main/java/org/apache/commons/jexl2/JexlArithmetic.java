@@ -88,7 +88,10 @@ public class JexlArithmetic {
      * @return null if strict, else Long(0)
      */
     protected Object controlNullNullOperands() {
-        return strict? null : Integer.valueOf(0);
+        if (strict) {
+            throw new NullPointerException(JexlException.NULL_OPERAND);
+        }
+        return Integer.valueOf(0);
     }
 
     /**
