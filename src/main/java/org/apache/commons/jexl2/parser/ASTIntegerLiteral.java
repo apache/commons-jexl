@@ -16,46 +16,27 @@
  */
 package org.apache.commons.jexl2.parser;
 
-import org.apache.commons.jexl2.JexlInfo;
+public class ASTIntegerLiteral extends JexlNode implements JexlNode.Literal<Integer> {
+    /** The type literal value. */
+    private Integer literal;
 
-/**
- * Base class for parser nodes - holds an 'image' of the token for later use.
- *
- * @since 2.0
- */
-public abstract class JexlNode extends SimpleNode implements JexlInfo {
-    /** A marker interface for literals.
-     * @param <T> the literal type
-     */
-    public interface Literal<T> {
-        T getLiteral();
-    }
-
-    /** token value. */
-    public String image;
-
-    public JexlNode(int id) {
+    public ASTIntegerLiteral(int id) {
         super(id);
     }
 
-    public JexlNode(Parser p, int id) {
+    public ASTIntegerLiteral(Parser p, int id) {
         super(p, id);
     }
 
-    public JexlInfo getInfo() {
-        JexlNode node = this;
-        while (node != null) {
-            if (node.value instanceof JexlInfo) {
-                return (JexlInfo) node.value;
-            }
-            node = node.jjtGetParent();
+    public Integer getLiteral() {
+        if (literal == null) {
+            literal = Integer.valueOf(image);
         }
-        return null;
+        return literal;
     }
-    
-    /** {@inheritDoc} */
-    public String debugString() {
-        JexlInfo info = getInfo();
-        return info != null? info.debugString() : "";
+
+    /** Accept the visitor. **/
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
+        return visitor.visit(this, data);
     }
 }
