@@ -57,7 +57,8 @@ import org.apache.commons.jexl2.introspection.JexlMethod;
  * </p>
  * <p>The <code>setSilent</code> and <code>setLenient</code> methods allow to fine-tune an engine instance behavior
  * according to various error control needs. The lenient/strict flag tells the engine when and if null as operand is
- * considered an error, the silent/verbose flag tells the engine what to do with the error (log as warning or throw exception).
+ * considered an error, the silent/verbose flag tells the engine what to do with the error
+ * (log as warning or throw exception).
  * </p>
  * <ul>
  * <li>When "silent" &amp; "lenient":
