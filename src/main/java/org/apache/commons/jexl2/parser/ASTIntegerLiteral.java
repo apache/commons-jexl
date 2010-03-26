@@ -36,6 +36,7 @@ public final class ASTIntegerLiteral extends JexlNode implements JexlNode.Litera
     }
 
     /** Accept the visitor. **/
+    @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
