@@ -16,7 +16,7 @@
  */
 package org.apache.commons.jexl2.parser;
 
-public class ASTIntegerLiteral extends JexlNode implements JexlNode.Literal<Integer> {
+public final class ASTIntegerLiteral extends JexlNode implements JexlNode.Literal<Integer> {
     /** The type literal value. */
     private Integer literal;
 

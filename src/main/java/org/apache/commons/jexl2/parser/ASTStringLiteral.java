@@ -16,7 +16,7 @@
  */
 package org.apache.commons.jexl2.parser;
 
-public class ASTStringLiteral extends JexlNode implements JexlNode.Literal<String> {
+public final class ASTStringLiteral extends JexlNode implements JexlNode.Literal<String> {
     
     public ASTStringLiteral(int id) {
         super(id);
