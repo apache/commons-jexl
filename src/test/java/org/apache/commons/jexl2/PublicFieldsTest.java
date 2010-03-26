@@ -16,9 +16,6 @@
  */
 package org.apache.commons.jexl2;
 
-import org.apache.commons.jexl2.introspection.UberspectImpl;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Tests public field set/get.
  */
