@@ -44,6 +44,10 @@
         <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl2/Jexl.java?view=markup">simple class</a>
         that evaluates its command line arguments as JEXL expressions when run.
       </p>
+      <p>
+          The <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/package-summary.html#intro">
+          package javadoc</a> also contains useful information.
+      </p>
     </section>
     <section name="Evaluating Expressions">
       <p>
