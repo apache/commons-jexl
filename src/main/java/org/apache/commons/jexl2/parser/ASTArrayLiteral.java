@@ -16,20 +16,24 @@
  */
 package org.apache.commons.jexl2.parser;
 
-public final class ASTIntegerLiteral extends JexlNode implements JexlNode.Literal<Integer> {
+public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<Object> {
     /** The type literal value. */
-    Integer literal = null;
+    Object literal = null;
 
-    public ASTIntegerLiteral(int id) {
+    public ASTArrayLiteral(int id) {
         super(id);
     }
 
-    public ASTIntegerLiteral(Parser p, int id) {
+    public ASTArrayLiteral(Parser p, int id) {
         super(p, id);
     }
 
-    public Integer getLiteral() {
+    public Object getLiteral() {
         return literal;
+    }
+
+    public void setLiteral(Object literal) {
+        this.literal = literal;
     }
 
     /**

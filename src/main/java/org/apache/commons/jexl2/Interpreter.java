@@ -181,7 +181,7 @@ public class Interpreter implements ParserVisitor {
      * Sets this interpreter registers for bean access/assign expressions.
      * @param theRegisters the array of registers
      */
-    protected void setRegisters(Object[] theRegisters) {
+    protected void setRegisters(Object... theRegisters) {
         this.registers = theRegisters;
     }
 
@@ -361,13 +361,18 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTArrayLiteral node, Object data) {
-        int childCount = node.jjtGetNumChildren();
-        Object[] array = new Object[childCount];
-        for (int i = 0; i < childCount; i++) {
-            Object entry = node.jjtGetChild(i).jjtAccept(this, data);
-            array[i] = entry;
+        Object literal = node.getLiteral();
+        if (literal == null) {
+            int childCount = node.jjtGetNumChildren();
+            Object[] array = new Object[childCount];
+            for (int i = 0; i < childCount; i++) {
+                Object entry = node.jjtGetChild(i).jjtAccept(this, data);
+                array[i] = entry;
+            }
+            literal = arithmetic.narrowArrayType(array);
+            node.setLiteral(literal);
         }
-        return arithmetic.narrowArrayType(array);
+        return literal;
     }
     
     /** {@inheritDoc} */
@@ -603,12 +608,10 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTFloatLiteral node, Object data) {
-        Object value = node.jjtGetValue();
-        if (!(value instanceof Float)) {
-            value = Float.valueOf(node.image);
-            node.jjtSetValue(value);
+        if (data != null) {
+            return getAttribute(data, node.getLiteral(), node);
         }
-        return value;
+        return node.getLiteral();
     }
 
     /** {@inheritDoc} */
@@ -677,12 +680,7 @@ public class Interpreter implements ParserVisitor {
         String name = node.image;
         if (data == null) {
             if (registers != null) {
-                if (registers[0].equals(name)) {
-                    return registers[1];
-                }
-                if (registers[2].equals(name)) {
-                    return registers[3];
-                }
+                return registers[name.charAt(1) - '0'];
             }
             Object value = context.get(name);
             if (value == null
