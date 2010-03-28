@@ -101,7 +101,7 @@ public class Asserter extends Assert {
             engine.setLenient(false);
             engine.setSilent(false);
             Expression exp = engine.createExpression(expression);
-            Object value = exp.evaluate(context);
+            exp.evaluate(context);
             fail("expression: " + expression);
         } catch(JexlException xjexl) {
             if (matchException != null && !xjexl.getMessage().matches(matchException)) {
