@@ -30,7 +30,12 @@ public final class ASTStringLiteral extends JexlNode implements JexlNode.Literal
         return image;
     }
 
-    /** Accept the visitor. **/
+    /**
+     * Accept the visitor.
+     * @param visitor the visitor
+     * @param data contextual data
+     * @return result of visit
+     **/
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);

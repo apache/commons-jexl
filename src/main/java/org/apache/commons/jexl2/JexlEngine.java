@@ -514,19 +514,15 @@ public class JexlEngine {
         if (context == null) {
             context = EMPTY_CONTEXT;
         }
-        // lets build 1 unique & unused identifiers wrt context
-        String r0 = "$0";
-        for (int s = 0; context.has(r0); ++s) {
-            r0 = r0 + s;
-        }
-        expr = r0 + (expr.charAt(0) == '[' ? "" : ".") + expr + ";";
+        // synthetize expr using register
+        expr = "#0" + (expr.charAt(0) == '[' ? "" : ".") + expr + ";";
         try {
+            parser.ALLOW_REGISTERS = true;
             JexlNode tree = parse(expr, null);
             JexlNode node = tree.jjtGetChild(0);
             Interpreter interpreter = createInterpreter(context);
-            // ensure 4 objects in register array
-            Object[] r = {r0, bean, r0, bean};
-            interpreter.setRegisters(r);
+            // set register
+            interpreter.setRegisters(bean);
             return node.jjtAccept(interpreter, null);
         } catch (JexlException xjexl) {
             if (silent) {
@@ -534,6 +530,8 @@ public class JexlEngine {
                 return null;
             }
             throw xjexl;
+        } finally {
+            parser.ALLOW_REGISTERS = false;
         }
     }
 
@@ -570,23 +568,15 @@ public class JexlEngine {
         if (context == null) {
             context = EMPTY_CONTEXT;
         }
-        // lets build 2 unique & unused identifiers wrt context
-        String r0 = "$0", r1 = "$1";
-        for (int s = 0; context.has(r0); ++s) {
-            r0 = r0 + s;
-        }
-        for (int s = 0; context.has(r1); ++s) {
-            r1 = r1 + s;
-        }
-        // synthetize expr
-        expr = r0 + (expr.charAt(0) == '[' ? "" : ".") + expr + "=" + r1 + ";";
+        // synthetize expr using registers
+        expr = "#0" + (expr.charAt(0) == '[' ? "" : ".") + expr + "=" + "#1" + ";";
         try {
+            parser.ALLOW_REGISTERS = true;
             JexlNode tree = parse(expr, null);
             JexlNode node = tree.jjtGetChild(0);
             Interpreter interpreter = createInterpreter(context);
             // set the registers
-            Object[] r = {r0, bean, r1, value};
-            interpreter.setRegisters(r);
+            interpreter.setRegisters(bean, value);
             node.jjtAccept(interpreter, null);
         } catch (JexlException xjexl) {
             if (silent) {
@@ -594,6 +584,8 @@ public class JexlEngine {
                 return;
             }
             throw xjexl;
+        } finally {
+            parser.ALLOW_REGISTERS = false;
         }
     }
 
