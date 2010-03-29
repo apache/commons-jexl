@@ -130,7 +130,14 @@
     <build>
         <!-- temporarily override the parent POM (v 11) until that is updated -->
         <resources>
-            <!-- This is the default, but is currently missing from the parent POM (v11) -->
+            <resource>
+                <directory>${basedir}</directory>
+                <targetPath>META-INF</targetPath>
+                <includes>
+                    <include>NOTICE.txt</include>
+                    <include>LICENSE.txt</include>
+                </includes>
+            </resource>
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
@@ -300,17 +307,10 @@
 
     <distributionManagement>
         <site>
-                    <id>stagingSite</id>
-                    <name>Apache Commons Release Candidate Staging Site</name>
-                    <url>${commons.deployment.protocol}://people.apache.org/home/henrib/public_html/${commons.componentid}-${commons.release.version}-${commons.rc.version}/site</url>
-                </site>
-                <!--
-        <site>
             <id>website</id>
             <name>Apache Website</name>
             <url>${commons.deployment.protocol}://people.apache.org/www/commons.apache.org/jexl/</url>
         </site>
-        -->
     </distributionManagement>
 
     <profiles>
@@ -321,8 +321,7 @@
                 <site>
                     <id>apache.website</id>
                     <name>Apache Commons Release Candidate Staging Site</name>
-                    <url>${commons.deployment.protocol}://people.apache.org/home/henrib/public_html/${commons.componentid}-${commons.release.version}-${commons.rc.version}/site</url>
-                </site>
+                    <url>${commons.deployment.protocol}://people.apache.org/www/people.apache.org/builds/commons/${commons.componentid}/${commons.release.version}/${commons.rc.version}/site</url>                </site>
             </distributionManagement>
         </profile>
     </profiles>

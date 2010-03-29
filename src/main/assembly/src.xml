@@ -24,6 +24,7 @@
     <fileSets>
         <fileSet>
             <includes>
+                <include>BUILDING.txt</include>
                 <include>LICENSE.txt</include>
                 <include>NOTICE.txt</include>
                 <include>pom.xml</include>
@@ -34,7 +35,7 @@
             <directory>src</directory>
         </fileSet>
         <fileSet>
-            <directory>xdocs</directory>
+            <directory>jexl2-compat</directory>
         </fileSet>
     </fileSets>
 </assembly>
