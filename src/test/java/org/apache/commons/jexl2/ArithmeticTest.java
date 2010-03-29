@@ -32,6 +32,55 @@ public class ArithmeticTest extends JexlTestCase {
         asserter = new Asserter(JEXL);
     }
 
+    public void testUndefinedVar() throws Exception {
+        asserter.failExpression("objects[1].status", ".* undefined variable objects.*");
+    }
+    
+    public void testLeftNullOperand() throws Exception {
+        asserter.setVariable("left", null);
+        asserter.setVariable("right", 8);
+        asserter.failExpression("left + right", ".*null.*");
+        asserter.failExpression("left - right", ".*null.*");
+        asserter.failExpression("left * right", ".*null.*");
+        asserter.failExpression("left / right", ".*null.*");
+        asserter.failExpression("left % right", ".*null.*");
+        asserter.failExpression("left & right", ".*null.*");
+        asserter.failExpression("left | right", ".*null.*");
+        asserter.failExpression("left ^ right", ".*null.*");
+    }
+
+    public void testRightNullOperand() throws Exception {
+        asserter.setVariable("left", 9);
+        asserter.setVariable("right", null);
+        asserter.failExpression("left + right", ".*null.*");
+        asserter.failExpression("left - right", ".*null.*");
+        asserter.failExpression("left * right", ".*null.*");
+        asserter.failExpression("left / right", ".*null.*");
+        asserter.failExpression("left % right", ".*null.*");
+        asserter.failExpression("left & right", ".*null.*");
+        asserter.failExpression("left | right", ".*null.*");
+        asserter.failExpression("left ^ right", ".*null.*");
+    }
+
+    public void testNullOperands() throws Exception {
+        asserter.setVariable("left", null);
+        asserter.setVariable("right", null);
+        asserter.failExpression("left + right", ".*null.*");
+        asserter.failExpression("left - right", ".*null.*");
+        asserter.failExpression("left * right", ".*null.*");
+        asserter.failExpression("left / right", ".*null.*");
+        asserter.failExpression("left % right", ".*null.*");
+        asserter.failExpression("left & right", ".*null.*");
+        asserter.failExpression("left | right", ".*null.*");
+        asserter.failExpression("left ^ right", ".*null.*");
+    }
+
+    public void testNullOperand() throws Exception {
+        asserter.setVariable("right", null);
+        asserter.failExpression("~right", ".*null.*");
+        asserter.failExpression("-right", ".*number.*");
+    }
+
     public void testBigDecimal() throws Exception {
         asserter.setVariable("left", new BigDecimal(2));
         asserter.setVariable("right", new BigDecimal(6));
@@ -237,12 +286,14 @@ public class ArithmeticTest extends JexlTestCase {
                     }
                 }
             }
-            if (!jexl.isLenient())
+            if (!jexl.isLenient()) {
                 assertTrue("All expressions should have thrown " + zthrow + "/" + PERMS,
                         zthrow == PERMS);
-            else
+            }
+            else {
                 assertTrue("All expressions should have zeroed " + zeval + "/" + PERMS,
                         zeval == PERMS);
+            }
         }
         debuggerCheck(jexl);
     }

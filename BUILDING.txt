@@ -1,0 +1,11 @@
+Jexl 2.0 uses Maven 2 as the build tool, and requires Java 1.5 (or later).
+
+The following goals may be useful:
+* mvn clean - clean up
+* mvn test - compile and run the unit tests
+* mvn site - create the documentation
+* mvn package - build the jar
+* mvn install - build the jar and install in local maven repository
+
+N.B. When building under Java 1.5, you will need to provide access to an implementation
+of JSR-223 (javax.script), for example BSF 3.0.

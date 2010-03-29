@@ -43,9 +43,16 @@ import org.apache.commons.jexl2.JexlInfo;
 
 public class Parser extends StringParser
 {
+    public boolean ALLOW_REGISTERS = false;
+
     public ASTJexlScript parse(Reader reader, JexlInfo info)
-        throws ParseException
-    {
+        throws ParseException {
+        /*
+         * If registers are allowed, the default parser state has to be REGISTERS.
+         */
+        if (ALLOW_REGISTERS) {
+            token_source.defaultLexState = REGISTERS;
+        }
         ReInit(reader);
         /*
          *  lets do the 'Unique Init' in here to be
@@ -83,23 +90,15 @@ PARSER_END(Parser)
 
 <*> SKIP : /* WHITE SPACE */
 {
-  <"##" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
-| <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
-| <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
-| " "
-| "\t"
-| "\n"
-| "\r"
-| "\f"
+      <"##" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
+    | <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+    | <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
+    | " "
+    | "\t"
+    | "\n"
+    | "\r"
+    | "\f"
 }
-
-<*> TOKEN : /* LITERALS */
-{
-  < INTEGER_LITERAL: (<DIGIT>)+ >
-|
-  < FLOAT_LITERAL: (<DIGIT>)+ "."(<DIGIT>)+ >
-}
-
 
 <*> TOKEN : /* KEYWORDS */
 {
@@ -116,6 +115,11 @@ PARSER_END(Parser)
     | < FALSE : "false" >
 }
 
+<FOR_EACH_IN> TOKEN : /* foreach in */
+{
+    < IN : "in" > : DEFAULT
+}
+
 <*> TOKEN : { /* SEPARATORS */
       < LPAREN : "(" >
     | < RPAREN : ")" >
@@ -126,11 +130,73 @@ PARSER_END(Parser)
     | < SEMICOL : ";" >
     | < COLON : ":" >
     | < COMMA : "," >
+    | <DOT : "." >
 }
 
-<FOR_EACH_IN> TOKEN : /* foreach in */
+<*> TOKEN : { /* CONDITIONALS */
+      < QMARK : "?" >
+    | < ELVIS : "?:" >
+    | < AND : "&&" | "and" >
+    | < OR : "||" | "or" >
+}
+
+<*> TOKEN : { /* COMPARISONS */
+      < eq : "==" | "eq" >
+    | < ne : "!=" | "ne" >
+    | < req : "=~" >
+    | < rne : "!~" >
+    | < gt : ">" | "gt" >
+    | < ge : ">=" | "ge" >
+    | < lt : "<" | "lt" >
+    | < le : "<=" | "le" >
+}
+
+<*> TOKEN : { /* OPERATORS */
+      < assign : "=" >
+    | < mod : "%" | "mod" >
+    | < div : "/" | "div" >
+    | < not : "!" | "not" >
+    | < plus : "+" >
+    | < minus : "-" >
+    | < mult : "*" >
+    | < tilda : "~" >
+    | < and : "&" >
+    | < or : "|" >
+    | < xor : "^" >
+}
+
+/***************************************
+ *     Identifier & String tokens
+ ***************************************/
+
+<*> TOKEN : /* IDENTIFIERS */
 {
-    < IN : "in" > : DEFAULT
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+|
+  < #LETTER: [ "a"-"z", "A"-"Z", "_", "$" ] >
+|
+  < #DIGIT: [ "0"-"9"] >
+}
+
+<REGISTERS> TOKEN : /* REGISTERS: parser.ALLOW_REGISTER must be set to true before calling parse */
+{
+  < REGISTER: "#" ["0"-"9"] >
+}
+
+<*> TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL: (<DIGIT>)+ >
+|
+  < FLOAT_LITERAL: (<DIGIT>)+ "."(<DIGIT>)+ >
+}
+
+<*> TOKEN :
+{
+  < STRING_LITERAL:
+    "\"" (~["\"","\\","\n","\r","\u2028","\u2029"] | "\\" ~["\n","\r","\u2028","\u2029"])* "\""
+  |
+    "'" (~["'","\\","\n","\r","\u2028","\u2029"] | "\\" ~["\n","\r","\u2028","\u2029"])* "'"
+  >
 }
 
 /***************************************
@@ -192,7 +258,7 @@ void ForeachStatement() : {}
 
 void Expression() #void : {}
 {
-    LOOKAHEAD( Reference() "=" )  Assignment()
+    LOOKAHEAD( Reference() <assign> )  Assignment()
 |
     ConditionalExpression()
 }
@@ -200,7 +266,7 @@ void Expression() #void : {}
 
 void Assignment() #Assignment(2) : {}
 {
-    Reference() "=" Expression()
+    Reference() <assign> Expression()
 }
 
 /***************************************
@@ -211,9 +277,9 @@ void ConditionalExpression() #void : {}
 {
   ConditionalOrExpression()
   (
-    "?" Expression() <COLON> Expression() #TernaryNode(3)
+    <QMARK> Expression() <COLON> Expression() #TernaryNode(3)
   |
-    "?:" Expression() #TernaryNode(2)
+    <ELVIS> Expression() #TernaryNode(2)
   )?
 }
 
@@ -222,9 +288,7 @@ void ConditionalOrExpression() #void :
 {
   ConditionalAndExpression()
   (
-    "||" ConditionalAndExpression() #OrNode(2)
-  |
-    "or" ConditionalAndExpression() #OrNode(2)
+    <OR> ConditionalAndExpression() #OrNode(2)
   )*
 }
 
@@ -233,9 +297,7 @@ void ConditionalAndExpression() #void :
 {
   InclusiveOrExpression()
   (
-    "&&" InclusiveOrExpression() #AndNode(2)
-  |
-    "and" InclusiveOrExpression() #AndNode(2)
+    <AND> InclusiveOrExpression() #AndNode(2)
   )*
 }
 
@@ -243,21 +305,21 @@ void InclusiveOrExpression() #void :
 {}
 {
   ExclusiveOrExpression()
-  ( "|" ExclusiveOrExpression() #BitwiseOrNode(2) )*
+  ( <or> ExclusiveOrExpression() #BitwiseOrNode(2) )*
 }
 
 void ExclusiveOrExpression() #void :
 {}
 {
   AndExpression()
-  ( "^" AndExpression() #BitwiseXorNode(2) )*
+  ( <xor> AndExpression() #BitwiseXorNode(2) )*
 }
 
 void AndExpression() #void :
 {}
 {
   EqualityExpression()
-  ( "&" EqualityExpression() #BitwiseAndNode(2) )*
+  ( <and> EqualityExpression() #BitwiseAndNode(2) )*
 }
 
 void EqualityExpression() #void :
@@ -265,13 +327,9 @@ void EqualityExpression() #void :
 {
   RelationalExpression()
   (
-     "==" RelationalExpression() #EQNode(2)
+     <eq> RelationalExpression() #EQNode(2)
    |
-     "eq" RelationalExpression() #EQNode(2)
-   |
-     "!=" RelationalExpression() #NENode(2)
-   |
-     "ne" RelationalExpression() #NENode(2)
+     <ne> RelationalExpression() #NENode(2)
   )?
 }
 
@@ -280,25 +338,17 @@ void RelationalExpression() #void :
 {
   AdditiveExpression()
   (
-    "<" AdditiveExpression() #LTNode(2)
+    <lt> AdditiveExpression() #LTNode(2)
    |
-    "lt" AdditiveExpression() #LTNode(2)
+    <gt> AdditiveExpression() #GTNode(2)
    |
-    ">" AdditiveExpression() #GTNode(2)
+    <le> AdditiveExpression() #LENode(2)
    |
-    "gt" AdditiveExpression() #GTNode(2)
+    <ge> AdditiveExpression() #GENode(2)
    |
-    "<=" AdditiveExpression() #LENode(2)
+    <req> AdditiveExpression() #ERNode(2) // equals regexp
    |
-    "le" AdditiveExpression() #LENode(2)
-   |
-    ">=" AdditiveExpression() #GENode(2)
-   |
-    "ge" AdditiveExpression() #GENode(2)
-   |
-    "=~" AdditiveExpression() #ERNode(2) // equals regexp
-   |
-    "!~" AdditiveExpression() #NRNode(2) // not equals regexp
+    <rne> AdditiveExpression() #NRNode(2) // not equals regexp
   )?
 }
 
@@ -313,36 +363,30 @@ void AdditiveExpression() #AdditiveNode(>1) : {}
 
 void AdditiveOperator() : {}
 {
-    "+" { jjtThis.image = "+"; }
+    <plus> { jjtThis.image = "+"; }
 |
-    "-" { jjtThis.image = "-"; }
+    <minus> { jjtThis.image = "-"; }
 }
 
 void MultiplicativeExpression() #void : {}
 {
   UnaryExpression()
   (
-    "*" UnaryExpression() #MulNode(2)
+    <mult> UnaryExpression() #MulNode(2)
    |
-    "/" UnaryExpression() #DivNode(2)
+    <div> UnaryExpression() #DivNode(2)
    |
-    "div" UnaryExpression() #DivNode(2)
-   |
-    "%" UnaryExpression() #ModNode(2)
-   |
-    "mod" UnaryExpression() #ModNode(2)
+    <mod> UnaryExpression() #ModNode(2)
   )*
 }
 
 void UnaryExpression() #void : {}
 {
-  "-" UnaryExpression() #UnaryMinusNode(1)
+  <minus> UnaryExpression() #UnaryMinusNode(1)
 |
-  "~" UnaryExpression() #BitwiseComplNode(1)
+  <tilda> UnaryExpression() #BitwiseComplNode(1)
 |
-  "!" UnaryExpression() #NotNode(1)
-|
-  "not" UnaryExpression() #NotNode(1)
+  <not> UnaryExpression() #NotNode(1)
 |
   PrimaryExpression()
 }
@@ -357,8 +401,9 @@ void Identifier() :
     Token t;
 }
 {
-    t=<IDENTIFIER>
-    { jjtThis.image = t.image; }
+    t=<IDENTIFIER> { jjtThis.image = t.image; }
+|
+    t=<REGISTER> { jjtThis.image = t.image; }
 }
 
 void Literal() #void :
@@ -396,7 +441,7 @@ void IntegerLiteral() :
 }
 {
   t=<INTEGER_LITERAL>
-  { jjtThis.image = t.image; }
+  { jjtThis.image = t.image; jjtThis.literal = Integer.valueOf(t.image); }
 }
 
 void FloatLiteral() :
@@ -405,7 +450,7 @@ void FloatLiteral() :
 }
 {
   t=<FLOAT_LITERAL>
-  { jjtThis.image = t.image; }
+  { jjtThis.image = t.image; jjtThis.literal = Float.valueOf(t.image); }
 }
 
 void StringLiteral() :
@@ -509,7 +554,7 @@ void ArrayAccess() : {}
 
 void DotReference() #void : {}
 {
-  ("."
+  (<DOT>
      ( LOOKAHEAD(Identifier() <LBRACKET> )
          ArrayAccess()
        |
@@ -541,24 +586,3 @@ void Reference() : {}
    LOOKAHEAD(<LBRACKET>) ArrayLiteral() ) DotReference()
 }
 
-/***************************************
- *     Identifier & String tokens
- ***************************************/
-
-<*> TOKEN : /* IDENTIFIERS */
-{
-  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
-|
-  < #LETTER: [ "a"-"z", "A"-"Z", "_", "$" ] >
-|
-  < #DIGIT: [ "0"-"9"] >
-}
-
-<*> TOKEN :
-{
-    <STRING_LITERAL :
-        ("\"" ( ~["\"","\n","\r"] | "\\" ["u","n","t","b","r","f","\\","\""] )* "\"" )
-     |
-        ("\'" ( ~["\'","\n","\r"] | "\\" ["u","n","t","b","r","f","\\","\'"])* "\'" )
-    >
-}

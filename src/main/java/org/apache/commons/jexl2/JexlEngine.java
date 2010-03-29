@@ -55,26 +55,28 @@ import org.apache.commons.jexl2.introspection.JexlMethod;
  *  <li>Logging</li>
  * </ul>
  * </p>
- * <p>The <code>setSilent</code>and<code>setLenient</code> methods allow to fine-tune an engine instance behavior
- * according to various error control needs.
+ * <p>The <code>setSilent</code> and <code>setLenient</code> methods allow to fine-tune an engine instance behavior
+ * according to various error control needs. The lenient/strict flag tells the engine when and if null as operand is
+ * considered an error, the silent/verbose flag tells the engine what to do with the error
+ * (log as warning or throw exception).
  * </p>
  * <ul>
- * <li>When "silent" & "lenient" (not-strict):
+ * <li>When "silent" &amp; "lenient":
  * <p> 0 & null should be indicators of "default" values so that even in an case of error,
  * something meaningfull can still be inferred; may be convenient for configurations.
  * </p>
  * </li>
- * <li>When "silent" & "strict":
+ * <li>When "silent" &amp; "strict":
  * <p>One should probably consider using null as an error case - ie, every object
  * manipulated by JEXL should be valued; the ternary operator, especially the '?:' form
  * can be used to workaround exceptional cases.
  * Use case could be configuration with no implicit values or defaults.
  * </p>
  * </li>
- * <li>When "not-silent" & "not-strict":
+ * <li>When "verbose" &amp; "lenient":
  * <p>The error control grain is roughly on par with JEXL 1.0</p>
  * </li>
- * <li>When "not-silent" & "strict":
+ * <li>When "verbose" &amp; "strict":
  * <p>The finest error control grain is obtained; it is the closest to Java code -
  * still augmented by "script" capabilities regarding automated conversions & type matching.
  * </p>
@@ -286,7 +288,9 @@ public class JexlEngine {
     }
 
     /**
-     * Sets a cache of the defined size for expressions.
+     * Sets a cache for expressions of the defined size.
+     * <p>The cache will contain at most <code>size</code> expressions. Note that
+     * all JEXL caches are held through SoftReferences and may be garbage-collected.</p>
      * @param size if not strictly positive, no cache is used.
      */
     public void setCache(int size) {
@@ -510,19 +514,15 @@ public class JexlEngine {
         if (context == null) {
             context = EMPTY_CONTEXT;
         }
-        // lets build 1 unique & unused identifiers wrt context
-        String r0 = "$0";
-        for (int s = 0; context.has(r0); ++s) {
-            r0 = r0 + s;
-        }
-        expr = r0 + (expr.charAt(0) == '[' ? "" : ".") + expr + ";";
+        // synthetize expr using register
+        expr = "#0" + (expr.charAt(0) == '[' ? "" : ".") + expr + ";";
         try {
+            parser.ALLOW_REGISTERS = true;
             JexlNode tree = parse(expr, null);
             JexlNode node = tree.jjtGetChild(0);
             Interpreter interpreter = createInterpreter(context);
-            // ensure 4 objects in register array
-            Object[] r = {r0, bean, r0, bean};
-            interpreter.setRegisters(r);
+            // set register
+            interpreter.setRegisters(bean);
             return node.jjtAccept(interpreter, null);
         } catch (JexlException xjexl) {
             if (silent) {
@@ -530,6 +530,8 @@ public class JexlEngine {
                 return null;
             }
             throw xjexl;
+        } finally {
+            parser.ALLOW_REGISTERS = false;
         }
     }
 
@@ -566,23 +568,15 @@ public class JexlEngine {
         if (context == null) {
             context = EMPTY_CONTEXT;
         }
-        // lets build 2 unique & unused identifiers wrt context
-        String r0 = "$0", r1 = "$1";
-        for (int s = 0; context.has(r0); ++s) {
-            r0 = r0 + s;
-        }
-        for (int s = 0; context.has(r1); ++s) {
-            r1 = r1 + s;
-        }
-        // synthetize expr
-        expr = r0 + (expr.charAt(0) == '[' ? "" : ".") + expr + "=" + r1 + ";";
+        // synthetize expr using registers
+        expr = "#0" + (expr.charAt(0) == '[' ? "" : ".") + expr + "=" + "#1" + ";";
         try {
+            parser.ALLOW_REGISTERS = true;
             JexlNode tree = parse(expr, null);
             JexlNode node = tree.jjtGetChild(0);
             Interpreter interpreter = createInterpreter(context);
             // set the registers
-            Object[] r = {r0, bean, r1, value};
-            interpreter.setRegisters(r);
+            interpreter.setRegisters(bean, value);
             node.jjtAccept(interpreter, null);
         } catch (JexlException xjexl) {
             if (silent) {
@@ -590,6 +584,8 @@ public class JexlEngine {
                 return;
             }
             throw xjexl;
+        } finally {
+            parser.ALLOW_REGISTERS = false;
         }
     }
 

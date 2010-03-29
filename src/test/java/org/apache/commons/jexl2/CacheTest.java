@@ -362,6 +362,7 @@ public class CacheTest extends JexlTestCase {
         public AssignTask(int loops) {
             super(loops);
         }
+        @Override
         public Integer call() throws Exception {
             return runAssign("foo");
         }
@@ -374,6 +375,7 @@ public class CacheTest extends JexlTestCase {
         public AssignNullTask(int loops) {
             super(loops);
         }
+        @Override
         public Integer call() throws Exception {
             return runAssign(null);
         }
@@ -386,6 +388,7 @@ public class CacheTest extends JexlTestCase {
         public AssignBooleanTask(int loops) {
             super(loops);
         }
+        @Override
         public Integer call() throws Exception {
             return runAssignBoolean(Boolean.TRUE);
         }
@@ -423,6 +426,7 @@ public class CacheTest extends JexlTestCase {
             super(loops);
         }
 
+        @Override
         public Integer call() throws Exception {
             return runAssignList();
         }
@@ -499,6 +503,7 @@ public class CacheTest extends JexlTestCase {
             super(loops);
         }
 
+        @Override
         public Integer call() throws Exception {
             args.ca = new Object[]{args.c0, args.c1, args.c2};
             args.value = new Object[]{new Integer(2), "quux"};
