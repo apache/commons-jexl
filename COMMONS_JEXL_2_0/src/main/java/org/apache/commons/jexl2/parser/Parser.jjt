@@ -1,0 +1,564 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ *  Jexl : Java Expression Language
+ *
+ *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
+ *  @author <a href="mailto:mhw@kremvax.net">Mark H. Wilkinson</a>
+ *
+ *  @version $Id$
+ */
+
+options
+{
+   MULTI=true;
+   STATIC=false;
+   VISITOR=true;
+   NODE_SCOPE_HOOK=true;
+   NODE_CLASS="JexlNode";
+   UNICODE_INPUT=true;
+}
+
+PARSER_BEGIN(Parser)
+
+package org.apache.commons.jexl2.parser;
+
+import java.io.Reader;
+import org.apache.commons.jexl2.JexlInfo;
+
+public class Parser extends StringParser
+{
+    public ASTJexlScript parse(Reader reader, JexlInfo info)
+        throws ParseException
+    {
+        ReInit(reader);
+        /*
+         *  lets do the 'Unique Init' in here to be
+         *  safe - it's a pain to remember
+         */
+
+        ASTJexlScript tree = JexlScript();
+        tree.value = info;
+        return tree;
+    }
+
+    void jjtreeOpenNodeScope(Node n) {}
+    void jjtreeCloseNodeScope(Node n) throws ParseException {
+      if (n instanceof ASTAmbiguous && n.jjtGetNumChildren() > 0) {
+          Token tok = this.getToken(0);
+          StringBuilder strb = new StringBuilder("Ambiguous statement ");
+          if (tok != null) {
+              strb.append("@");
+              strb.append(tok.beginLine);
+              strb.append(":");
+              strb.append(tok.beginColumn);
+          }
+          strb.append(", missing ';' between expressions");
+         throw new ParseException(strb.toString());
+      }
+    }
+}
+
+PARSER_END(Parser)
+
+
+/***************************************
+ *     Skip & Number literal tokens
+ ***************************************/
+
+<*> SKIP : /* WHITE SPACE */
+{
+  <"##" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
+| <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+| <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")? >
+| " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+<*> TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL: (<DIGIT>)+ >
+|
+  < FLOAT_LITERAL: (<DIGIT>)+ "."(<DIGIT>)+ >
+}
+
+
+<*> TOKEN : /* KEYWORDS */
+{
+      < IF : "if" >
+    | < ELSE : "else" >
+    | < FOR : "for" >
+    | < FOREACH : "foreach" > : FOR_EACH_IN
+    | < WHILE : "while" >
+    | < NEW : "new" >
+    | < EMPTY : "empty" >
+    | < SIZE : "size" >
+    | < NULL : "null" >
+    | < TRUE : "true" >
+    | < FALSE : "false" >
+}
+
+<*> TOKEN : { /* SEPARATORS */
+      < LPAREN : "(" >
+    | < RPAREN : ")" >
+    | < LCURLY : "{" >
+    | < RCURLY : "}" >
+    | < LBRACKET : "[" >
+    | < RBRACKET : "]" >
+    | < SEMICOL : ";" >
+    | < COLON : ":" >
+    | < COMMA : "," >
+}
+
+<FOR_EACH_IN> TOKEN : /* foreach in */
+{
+    < IN : "in" > : DEFAULT
+}
+
+/***************************************
+ *      Statements
+ ***************************************/
+
+ASTJexlScript JexlScript() : {}
+{
+   ( Statement() )* <EOF>
+   { return jjtThis;}
+}
+
+
+void Statement() #void : {}
+{
+    <SEMICOL>
+    | LOOKAHEAD(3) Block()
+    | IfStatement()
+    | ForeachStatement()
+    | WhileStatement()
+    | ExpressionStatement()
+}
+
+void Block() #Block : {}
+{
+    <LCURLY> ( Statement() )* <RCURLY>
+}
+
+
+void ExpressionStatement() #void : {}
+{
+    Expression() (LOOKAHEAD(1) Expression() #Ambiguous())* (LOOKAHEAD(2) <SEMICOL>)?
+}
+
+
+void IfStatement() : {}
+{
+    <IF> <LPAREN> Expression() <RPAREN> Statement() ( LOOKAHEAD(1) <ELSE> Statement() )?
+}
+
+
+void WhileStatement() : {}
+{
+    <WHILE> <LPAREN> Expression() <RPAREN> Statement()
+}
+
+
+void ForeachStatement() : {}
+{
+    <FOR> <LPAREN> Reference() <COLON>  Expression() <RPAREN> Statement()
+|
+    <FOREACH> <LPAREN> Reference() <IN>  Expression() <RPAREN> Statement()
+}
+
+
+/***************************************
+ *      Expression syntax
+ ***************************************/
+
+void Expression() #void : {}
+{
+    LOOKAHEAD( Reference() "=" )  Assignment()
+|
+    ConditionalExpression()
+}
+
+
+void Assignment() #Assignment(2) : {}
+{
+    Reference() "=" Expression()
+}
+
+/***************************************
+ *      Conditional & relational
+ ***************************************/
+
+void ConditionalExpression() #void : {}
+{
+  ConditionalOrExpression()
+  (
+    "?" Expression() <COLON> Expression() #TernaryNode(3)
+  |
+    "?:" Expression() #TernaryNode(2)
+  )?
+}
+
+void ConditionalOrExpression() #void :
+{}
+{
+  ConditionalAndExpression()
+  (
+    "||" ConditionalAndExpression() #OrNode(2)
+  |
+    "or" ConditionalAndExpression() #OrNode(2)
+  )*
+}
+
+void ConditionalAndExpression() #void :
+{}
+{
+  InclusiveOrExpression()
+  (
+    "&&" InclusiveOrExpression() #AndNode(2)
+  |
+    "and" InclusiveOrExpression() #AndNode(2)
+  )*
+}
+
+void InclusiveOrExpression() #void :
+{}
+{
+  ExclusiveOrExpression()
+  ( "|" ExclusiveOrExpression() #BitwiseOrNode(2) )*
+}
+
+void ExclusiveOrExpression() #void :
+{}
+{
+  AndExpression()
+  ( "^" AndExpression() #BitwiseXorNode(2) )*
+}
+
+void AndExpression() #void :
+{}
+{
+  EqualityExpression()
+  ( "&" EqualityExpression() #BitwiseAndNode(2) )*
+}
+
+void EqualityExpression() #void :
+{}
+{
+  RelationalExpression()
+  (
+     "==" RelationalExpression() #EQNode(2)
+   |
+     "eq" RelationalExpression() #EQNode(2)
+   |
+     "!=" RelationalExpression() #NENode(2)
+   |
+     "ne" RelationalExpression() #NENode(2)
+  )?
+}
+
+void RelationalExpression() #void :
+{}
+{
+  AdditiveExpression()
+  (
+    "<" AdditiveExpression() #LTNode(2)
+   |
+    "lt" AdditiveExpression() #LTNode(2)
+   |
+    ">" AdditiveExpression() #GTNode(2)
+   |
+    "gt" AdditiveExpression() #GTNode(2)
+   |
+    "<=" AdditiveExpression() #LENode(2)
+   |
+    "le" AdditiveExpression() #LENode(2)
+   |
+    ">=" AdditiveExpression() #GENode(2)
+   |
+    "ge" AdditiveExpression() #GENode(2)
+   |
+    "=~" AdditiveExpression() #ERNode(2) // equals regexp
+   |
+    "!~" AdditiveExpression() #NRNode(2) // not equals regexp
+  )?
+}
+
+/***************************************
+ *      Arithmetic
+ ***************************************/
+
+void AdditiveExpression() #AdditiveNode(>1) : {}
+{
+    MultiplicativeExpression() ( LOOKAHEAD(1) AdditiveOperator() MultiplicativeExpression())*
+}
+
+void AdditiveOperator() : {}
+{
+    "+" { jjtThis.image = "+"; }
+|
+    "-" { jjtThis.image = "-"; }
+}
+
+void MultiplicativeExpression() #void : {}
+{
+  UnaryExpression()
+  (
+    "*" UnaryExpression() #MulNode(2)
+   |
+    "/" UnaryExpression() #DivNode(2)
+   |
+    "div" UnaryExpression() #DivNode(2)
+   |
+    "%" UnaryExpression() #ModNode(2)
+   |
+    "mod" UnaryExpression() #ModNode(2)
+  )*
+}
+
+void UnaryExpression() #void : {}
+{
+  "-" UnaryExpression() #UnaryMinusNode(1)
+|
+  "~" UnaryExpression() #BitwiseComplNode(1)
+|
+  "!" UnaryExpression() #NotNode(1)
+|
+  "not" UnaryExpression() #NotNode(1)
+|
+  PrimaryExpression()
+}
+
+
+/***************************************
+ *      Identifier & Literals
+ ***************************************/
+
+void Identifier() :
+{
+    Token t;
+}
+{
+    t=<IDENTIFIER>
+    { jjtThis.image = t.image; }
+}
+
+void Literal() #void :
+{
+   Token t;
+}
+{
+  IntegerLiteral()
+|
+  FloatLiteral()
+|
+  BooleanLiteral()
+|
+  StringLiteral()
+|
+  NullLiteral()
+}
+
+void NullLiteral() : {}
+{
+    <NULL>
+}
+
+void BooleanLiteral() #void :
+{}
+{
+  <TRUE> #TrueNode
+|
+  <FALSE> #FalseNode
+}
+
+void IntegerLiteral() :
+{
+  Token t;
+}
+{
+  t=<INTEGER_LITERAL>
+  { jjtThis.image = t.image; }
+}
+
+void FloatLiteral() :
+{
+  Token t;
+}
+{
+  t=<FLOAT_LITERAL>
+  { jjtThis.image = t.image; }
+}
+
+void StringLiteral() :
+{
+   Token t;
+}
+{
+  t=<STRING_LITERAL>
+  { jjtThis.image = Parser.buildString(t.image, true); }
+}
+
+void ArrayLiteral() : {}
+{
+  <LBRACKET> Expression() ( <COMMA> Expression() )* <RBRACKET>
+}
+
+void MapLiteral() : {}
+{
+    <LCURLY>  MapEntry() ( <COMMA> MapEntry() )* <RCURLY>
+}
+
+void MapEntry() : {}
+{
+    Expression() <COLON> Expression()
+}
+
+
+/***************************************
+ *      Functions & Methods
+ ***************************************/
+
+void EmptyFunction() : {}
+{
+    LOOKAHEAD(3) <EMPTY> <LPAREN> Expression() <RPAREN>
+|
+    <EMPTY> Reference()
+}
+
+void SizeFunction() : {}
+{
+    <SIZE> <LPAREN> Expression() <RPAREN>
+}
+
+void Function() #FunctionNode: {}
+{
+
+   Identifier() <COLON> Identifier() <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+}
+
+void Method() #MethodNode: {}
+{
+   Identifier() <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+}
+
+void AnyMethod() #void : {}
+{
+    LOOKAHEAD(<SIZE>) SizeMethod()
+  |
+    LOOKAHEAD(Identifier() <LPAREN>) Method()
+}
+
+void SizeMethod() : {}
+{
+    <SIZE> <LPAREN> <RPAREN>
+}
+
+void Constructor() #ConstructorNode() : {}
+{
+  <NEW> <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+}
+
+
+/***************************************
+ *     References
+ ***************************************/
+
+void PrimaryExpression() #void : {}
+{
+  Literal()
+|
+  LOOKAHEAD(3)  Reference()
+|
+  LOOKAHEAD( <LPAREN> ) <LPAREN> Expression() <RPAREN>
+|
+  LOOKAHEAD( <EMPTY> ) EmptyFunction()
+|
+  LOOKAHEAD( <SIZE> ) SizeFunction()
+|
+  LOOKAHEAD( <NEW> <LPAREN> ) Constructor()
+|
+  LOOKAHEAD( <LCURLY> MapEntry() ) MapLiteral()
+|
+  LOOKAHEAD( <LBRACKET> Expression() ) ArrayLiteral()
+}
+
+
+void ArrayAccess() : {}
+{
+    Identifier() (LOOKAHEAD(2) <LBRACKET> Expression() <RBRACKET>)+
+}
+
+void DotReference() #void : {}
+{
+  ("."
+     ( LOOKAHEAD(Identifier() <LBRACKET> )
+         ArrayAccess()
+       |
+       ( LOOKAHEAD(3)
+            AnyMethod()
+          |
+            Identifier()
+          |
+            IntegerLiteral()
+        )
+      )
+  )*
+}
+
+void Reference() : {}
+{
+  ( LOOKAHEAD(<NEW>) Constructor()
+|
+   LOOKAHEAD(Identifier() <LBRACKET> ) ArrayAccess()
+|
+   LOOKAHEAD(Identifier() <COLON> Identifier() <LPAREN>) Function()
+|
+   LOOKAHEAD(Identifier() <LPAREN>) Method()
+|
+   Identifier()
+|
+   LOOKAHEAD(<LCURLY>) MapLiteral()
+|
+   LOOKAHEAD(<LBRACKET>) ArrayLiteral() ) DotReference()
+}
+
+/***************************************
+ *     Identifier & String tokens
+ ***************************************/
+
+<*> TOKEN : /* IDENTIFIERS */
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+|
+  < #LETTER: [ "a"-"z", "A"-"Z", "_", "$" ] >
+|
+  < #DIGIT: [ "0"-"9"] >
+}
+
+<*> TOKEN :
+{
+    <STRING_LITERAL :
+        ("\"" ( ~["\"","\n","\r"] | "\\" ["u","n","t","b","r","f","\\","\""] )* "\"" )
+     |
+        ("\'" ( ~["\'","\n","\r"] | "\\" ["u","n","t","b","r","f","\\","\'"])* "\'" )
+    >
+}
