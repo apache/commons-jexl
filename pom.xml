@@ -130,7 +130,14 @@
     <build>
         <!-- temporarily override the parent POM (v 11) until that is updated -->
         <resources>
-            <!-- This is the default, but is currently missing from the parent POM (v11) -->
+            <resource>
+                <directory>${basedir}</directory>
+                <targetPath>META-INF</targetPath>
+                <includes>
+                    <include>NOTICE.txt</include>
+                    <include>LICENSE.txt</include>
+                </includes>
+            </resource>
             <resource>
                 <directory>src/main/resources</directory>
             </resource>
