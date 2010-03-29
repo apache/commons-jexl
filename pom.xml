@@ -215,8 +215,10 @@
                 <artifactId>maven-changes-plugin</artifactId>
                 <version>2.3</version>
                 <configuration>
-                    <xmlPath>${basedir}/xdocs/changes.xml</xmlPath>
-                    <issueLinkTemplate>%URL%/%ISSUE%</issueLinkTemplate>
+	          <xmlPath>${basedir}/src/site/xdoc/changes.xml</xmlPath>
+	          <issueLinkTemplatePerSystem>
+	            <default>%URL%/%ISSUE%</default>
+	          </issueLinkTemplatePerSystem>
                 </configuration>
                 <reportSets>
                     <reportSet>
@@ -233,7 +235,7 @@
                 <configuration>
                     <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
                     <excludes>org/apache/commons/jexl2/parser/*.java</excludes>
-                    <headerFile>${basedir}/src/main/config/header.txt</headerFile>
+                    <headerLocation>${basedir}/src/main/config/header.txt</headerLocation>
                     <enableRulesSummary>false</enableRulesSummary>
                 </configuration>
             </plugin>
