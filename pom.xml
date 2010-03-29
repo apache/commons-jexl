@@ -19,12 +19,12 @@
     <parent>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-parent</artifactId>
-        <version>12</version>
+        <version>14</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-jexl</artifactId>
-    <version>2.0</version>
+    <version>2.0.1-RC1</version>
     <name>Commons JEXL</name>
     <inceptionYear>2001</inceptionYear>
     <description>Jexl is an implementation of the JSTL Expression Language with extensions.</description>
@@ -36,9 +36,9 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/commons/proper/jexl/tags/COMMONS_JEXL_2_0-RC6</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/commons/proper/jexl/tags/COMMONS_JEXL_2_0-RC6</developerConnection>
-        <url>http://svn.apache.org/viewvc/commons/proper/jexl/tags/COMMONS_JEXL_2_0-RC6</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/commons/proper/jexl/tags/COMMONS_JEXL_2_0_1-RC1</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/commons/proper/jexl/tags/COMMONS_JEXL_2_0_1-RC1</developerConnection>
+        <url>http://svn.apache.org/viewvc/commons/proper/jexl/tags/COMMONS_JEXL_2_0_1-RC1</url>
     </scm>
 
     <developers>
@@ -106,7 +106,7 @@
         <dependency>
             <groupId>org.apache.bsf</groupId>
             <artifactId>bsf-api</artifactId>
-            <version>[3.0-beta3,)</version>
+            <version>3.0-beta3</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -115,10 +115,11 @@
         <maven.compile.source>1.5</maven.compile.source>
         <maven.compile.target>1.5</maven.compile.target>
         <commons.componentid>jexl</commons.componentid>
-        <commons.release.version>2.0</commons.release.version>
+        <commons.release.version>2.0.1</commons.release.version>
         <!-- The RC version used in the staging repository URL. -->
-        <commons.rc.version>RC6</commons.rc.version>
-        <commons.binary.suffix />
+        <commons.rc.version>RC1</commons.rc.version>
+        <commons.release.2.version>1.1</commons.release.2.version>
+        <commons.release.2.binary.suffix />
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
         <!-- Temp fix until parent POM is updated -->
@@ -129,14 +130,6 @@
     <build>
         <!-- temporarily override the parent POM (v 11) until that is updated -->
         <resources>
-            <resource>
-                <directory>${basedir}</directory>
-                <targetPath>META-INF</targetPath>
-                <includes>
-                    <include>NOTICE.txt</include>
-                    <include>LICENSE.txt</include>
-                </includes>
-            </resource>
             <!-- This is the default, but is currently missing from the parent POM (v11) -->
             <resource>
                 <directory>src/main/resources</directory>
@@ -213,7 +206,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-changes-plugin</artifactId>
-                <version>2.1</version>
+                <version>2.3</version>
                 <configuration>
                     <xmlPath>${basedir}/xdocs/changes.xml</xmlPath>
                     <issueLinkTemplate>%URL%/%ISSUE%</issueLinkTemplate>
@@ -229,7 +222,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.5</version>
                 <configuration>
                     <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
                     <excludes>org/apache/commons/jexl2/parser/*.java</excludes>
@@ -253,7 +246,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.1</version>
+                <version>2.3.1</version>
                 <configuration>
                         <excludes>
                             <exclude>org/apache/commons/jexl2/parser/*.class</exclude>
@@ -307,10 +300,17 @@
 
     <distributionManagement>
         <site>
+                    <id>stagingSite</id>
+                    <name>Apache Commons Release Candidate Staging Site</name>
+                    <url>${commons.deployment.protocol}://people.apache.org/home/henrib/public_html/${commons.componentid}-${commons.release.version}-${commons.rc.version}/site</url>
+                </site>
+                <!--
+        <site>
             <id>website</id>
             <name>Apache Website</name>
             <url>${commons.deployment.protocol}://people.apache.org/www/commons.apache.org/jexl/</url>
         </site>
+        -->
     </distributionManagement>
 
     <profiles>
@@ -321,7 +321,7 @@
                 <site>
                     <id>apache.website</id>
                     <name>Apache Commons Release Candidate Staging Site</name>
-                    <url>${commons.deployment.protocol}://people.apache.org/www/people.apache.org/builds/commons/${commons.componentid}/${commons.release.version}/${commons.rc.version}/site</url>
+                    <url>${commons.deployment.protocol}://people.apache.org/home/henrib/public_html/${commons.componentid}-${commons.release.version}-${commons.rc.version}/site</url>
                 </site>
             </distributionManagement>
         </profile>
