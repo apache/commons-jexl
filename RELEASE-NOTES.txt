@@ -104,15 +104,8 @@ Error and exception handling
    * Configuring the leniency and verbosity of the Jexl engine allows user control over the
      error handling policy
 
-Bugs fixed in 2.0.1:
-====================
-
-* JEXL-100:     Array access expressions fail when evaluated twice and cache is enabled
-* JEXL-99:      Documentation of Thread Safety / Invalid code examples on homepage
-* JEXL-98:      Quote escaping cannot be escaped
-
-Bugs fixed in 2.0:
-==================
+Bugs fixed:
+===========
 
 * JEXL-90:	Jexl parser allows invalid expressions, e.g. "a=1 b=2 3"
 * JEXL-88:	MethodKey.java - name clash getMostSpecific() with Java 1.5.0

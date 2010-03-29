@@ -123,7 +123,7 @@ public class ArrayAccessTest extends JexlTestCase {
         asserter.assertExpression("foo.array[1]", GET_METHOD_ARRAY[1]);
         asserter.assertExpression("foo.array.1", GET_METHOD_ARRAY[1]);
         asserter.assertExpression("foo.array2[1][1]", GET_METHOD_ARRAY2[1][1]);
-        asserter.assertExpression("foo.array2[1].1", GET_METHOD_ARRAY2[1][1]);
+        // asserter.assertExpression("foo.array2.1.1", GET_METHOD_ARRAY2[1][1]);
     }
     
     // This is JEXL-26
@@ -133,11 +133,9 @@ public class ArrayAccessTest extends JexlTestCase {
         asserter.setVariable("objects", objects);
         asserter.setVariable("status", "Enabled");
         asserter.assertExpression("objects[1].status", null);
-        asserter.assertExpression("objects.1.status", null);
         
         asserter.setVariable("base.status", "Ok");
         asserter.assertExpression("base.objects[1].status", null);
-        asserter.assertExpression("base.objects.1.status", null);
     }
 
     public void testArrayMethods() throws Exception {
@@ -149,71 +147,5 @@ public class ArrayAccessTest extends JexlTestCase {
         // setting an index returns the old value
         asserter.assertExpression("objects.set(1, 'dion')", "array");
         asserter.assertExpression("objects[1]", "dion");
-    }
-
-    public void testArrayArray() throws Exception {
-        Integer i42 = Integer.valueOf(42);
-        Integer i43 = Integer.valueOf(43);
-        String s42 = "fourty-two";
-        String s43 = "fourty-three";
-        Object[] foo = new Object[3];
-        foo[0] = foo;
-        foo[1] = i42;
-        foo[2] = s42;
-        asserter.setVariable("foo", foo);
-        asserter.setVariable("zero", 0);
-        asserter.setVariable("one", 1);
-        asserter.setVariable("two", 2);
-        for(int l = 0; l < 2; ++l) {
-            asserter.assertExpression("foo[0]", foo);
-            asserter.assertExpression("foo[0][0]", foo);
-            asserter.assertExpression("foo[1]", foo[1]);
-            asserter.assertExpression("foo[0][1]", foo[1]);
-            asserter.assertExpression("foo[0][1] = 43", i43);
-            asserter.assertExpression("foo[0][1]", i43);
-            asserter.assertExpression("foo[0][1] = 42", i42);
-            asserter.assertExpression("foo[0][1]", i42);
-            asserter.assertExpression("foo[0][0][1]", foo[1]);
-            asserter.assertExpression("foo[0][0][1] = 43", i43);
-            asserter.assertExpression("foo[0][0][1]", i43);
-            asserter.assertExpression("foo[0][0][1] = 42", i42);
-            asserter.assertExpression("foo[0][0][1]", i42);
-            asserter.assertExpression("foo[2]", foo[2]);
-            asserter.assertExpression("foo[0][2]", foo[2]);
-            asserter.assertExpression("foo[0][2] = 'fourty-three'", s43);
-            asserter.assertExpression("foo[0][2]", s43);
-            asserter.assertExpression("foo[0][2] = 'fourty-two'", s42);
-            asserter.assertExpression("foo[0][2]", s42);
-            asserter.assertExpression("foo[0][0][2]", foo[2]);
-            asserter.assertExpression("foo[0][0][2] = 'fourty-three'", s43);
-            asserter.assertExpression("foo[0][0][2]", s43);
-            asserter.assertExpression("foo[0][0][2] = 'fourty-two'", s42);
-            asserter.assertExpression("foo[0][0][2]", s42);
-
-            asserter.assertExpression("foo[zero]", foo);
-            asserter.assertExpression("foo[zero][zero]", foo);
-            asserter.assertExpression("foo[one]", foo[1]);
-            asserter.assertExpression("foo[zero][one]", foo[1]);
-            asserter.assertExpression("foo[zero][one] = 43", i43);
-            asserter.assertExpression("foo[zero][one]", i43);
-            asserter.assertExpression("foo[zero][one] = 42", i42);
-            asserter.assertExpression("foo[zero][one]", i42);
-            asserter.assertExpression("foo[zero][zero][one]", foo[1]);
-            asserter.assertExpression("foo[zero][zero][one] = 43", i43);
-            asserter.assertExpression("foo[zero][zero][one]", i43);
-            asserter.assertExpression("foo[zero][zero][one] = 42", i42);
-            asserter.assertExpression("foo[zero][zero][one]", i42);
-            asserter.assertExpression("foo[two]", foo[2]);
-            asserter.assertExpression("foo[zero][two]", foo[2]);
-            asserter.assertExpression("foo[zero][two] = 'fourty-three'", s43);
-            asserter.assertExpression("foo[zero][two]", s43);
-            asserter.assertExpression("foo[zero][two] = 'fourty-two'", s42);
-            asserter.assertExpression("foo[zero][two]", s42);
-            asserter.assertExpression("foo[zero][zero][two]", foo[2]);
-            asserter.assertExpression("foo[zero][zero][two] = 'fourty-three'", s43);
-            asserter.assertExpression("foo[zero][zero][two]", s43);
-            asserter.assertExpression("foo[zero][zero][two] = 'fourty-two'", s42);
-            asserter.assertExpression("foo[zero][zero][two]", s42);
-        }
     }
 }

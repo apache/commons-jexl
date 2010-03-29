@@ -85,19 +85,14 @@ public class JexlArithmetic {
 
     /**
      * The result of +,/,-,*,% when both operands are null.
-     * @return Integer(0) if lenient
-     * @throws NullPointerException if strict
+     * @return null if strict, else Long(0)
      */
     protected Object controlNullNullOperands() {
-        if (strict) {
-            throw new NullPointerException(JexlException.NULL_OPERAND);
-        }
-        return Integer.valueOf(0);
+        return strict? null : Integer.valueOf(0);
     }
 
     /**
      * Throw a NPE if arithmetic is strict.
-     * @throws NullPointerException if strict
      */
     protected void controlNullOperand() {
         if (strict) {

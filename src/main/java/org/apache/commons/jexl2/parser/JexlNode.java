@@ -24,13 +24,6 @@ import org.apache.commons.jexl2.JexlInfo;
  * @since 2.0
  */
 public abstract class JexlNode extends SimpleNode implements JexlInfo {
-    /** A marker interface for literals.
-     * @param <T> the literal type
-     */
-    public interface Literal<T> {
-        T getLiteral();
-    }
-
     /** token value. */
     public String image;
 

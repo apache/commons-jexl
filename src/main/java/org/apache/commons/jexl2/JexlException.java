@@ -123,9 +123,8 @@ public class JexlException extends RuntimeException {
             msg.append(dbg.end());
             msg.append("]: '");
             msg.append(dbg.data());
-            msg.append("'");
+            msg.append("' ");
         }
-        msg.append(' ');
         msg.append(super.getMessage());
         Throwable cause = getCause();
         if (cause != null && NULL_OPERAND == cause.getMessage()) {

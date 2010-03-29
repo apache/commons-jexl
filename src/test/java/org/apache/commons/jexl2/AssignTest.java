@@ -85,16 +85,6 @@ public class AssignTest extends JexlTestCase {
         o = check.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
     }
-
-    public void testAntishInteger() throws Exception {
-        Expression assign = ENGINE.createExpression("froboz.0 = 10");
-        Expression check = ENGINE.createExpression("froboz.0");
-        JexlContext jc = new MapContext();
-        Object o = assign.evaluate(jc);
-        assertEquals("Result is not 10", new Integer(10), o);
-        o = check.evaluate(jc);
-        assertEquals("Result is not 10", new Integer(10), o);
-    }
     
     public void testBeanish() throws Exception {
         Expression assign = ENGINE.createExpression("froboz.value = 10");

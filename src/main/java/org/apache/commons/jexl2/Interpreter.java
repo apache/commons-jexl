@@ -181,7 +181,7 @@ public class Interpreter implements ParserVisitor {
      * Sets this interpreter registers for bean access/assign expressions.
      * @param theRegisters the array of registers
      */
-    protected void setRegisters(Object... theRegisters) {
+    protected void setRegisters(Object[] theRegisters) {
         this.registers = theRegisters;
     }
 
@@ -348,12 +348,8 @@ public class Interpreter implements ParserVisitor {
         int numChildren = node.jjtGetNumChildren();
         for (int i = 1; i < numChildren; i++) {
             JexlNode nindex = node.jjtGetChild(i);
-            if (nindex instanceof JexlNode.Literal<?>) {
-                object = nindex.jjtAccept(this, object);
-            } else {
-                Object index = nindex.jjtAccept(this, null);
-                object = getAttribute(object, index, nindex);
-            }
+            Object index = nindex.jjtAccept(this, null);
+            object = getAttribute(object, index, nindex);
         }
 
         return object;
@@ -361,18 +357,13 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTArrayLiteral node, Object data) {
-        Object literal = node.getLiteral();
-        if (literal == null) {
-            int childCount = node.jjtGetNumChildren();
-            Object[] array = new Object[childCount];
-            for (int i = 0; i < childCount; i++) {
-                Object entry = node.jjtGetChild(i).jjtAccept(this, data);
-                array[i] = entry;
-            }
-            literal = arithmetic.narrowArrayType(array);
-            node.setLiteral(literal);
+        int childCount = node.jjtGetNumChildren();
+        Object[] array = new Object[childCount];
+        for (int i = 0; i < childCount; i++) {
+            Object entry = node.jjtGetChild(i).jjtAccept(this, data);
+            array[i] = entry;
         }
-        return literal;
+        return arithmetic.narrowArrayType(array);
     }
     
     /** {@inheritDoc} */
@@ -424,13 +415,34 @@ public class Interpreter implements ParserVisitor {
         }
         // 2: last objectNode will perform assignement in all cases
         propertyNode = left.jjtGetChild(last);
-        boolean antVar = false;
         if (propertyNode instanceof ASTIdentifier) {
             property = ((ASTIdentifier) propertyNode).image;
-            antVar = true;
+            // deal with ant variable
+            if (isVariable && object == null) {
+                if (variableName != null) {
+                    if (last > 0) {
+                        variableName.append('.');
+                    }
+                    variableName.append(property);
+                    property = variableName.toString();
+                }
+                context.set(String.valueOf(property), right);
+                return right;
+            }
         } else if (propertyNode instanceof ASTIntegerLiteral) {
-            property = ((ASTIntegerLiteral) propertyNode).getLiteral();
-            antVar = true;
+            property = visit((ASTIntegerLiteral) propertyNode, null);
+            // deal with ant variable
+            if (isVariable && object == null) {
+                if (variableName != null) {
+                    if (last > 0) {
+                        variableName.append('.');
+                    }
+                    variableName.append(property);
+                    property = variableName.toString();
+                }
+                context.set(String.valueOf(property), right);
+                return right;
+            }
         } else if (propertyNode instanceof ASTArrayAccess) {
             // first objectNode is the identifier
             objectNode = propertyNode;
@@ -446,30 +458,12 @@ public class Interpreter implements ParserVisitor {
             last = narray.jjtGetNumChildren() - 1;
             for (int i = 1; i < last; i++) {
                 objectNode = narray.jjtGetChild(i);
-                if (objectNode instanceof JexlNode.Literal<?>) {
-                    object = objectNode.jjtAccept(this, object);
-                } else {
-                    Object index = objectNode.jjtAccept(this, null);
-                    object = getAttribute(object, index, objectNode);
-                }
+                Object index = objectNode.jjtAccept(this, null);
+                object = getAttribute(object, index, objectNode);
             }
             property = narray.jjtGetChild(last).jjtAccept(this, null);
         } else {
             throw new JexlException(objectNode, "illegal assignment form");
-        }
-        // deal with ant variable; set context
-        if (antVar) {
-            if (isVariable && object == null) {
-                if (variableName != null) {
-                    if (last > 0) {
-                        variableName.append('.');
-                    }
-                    variableName.append(property);
-                    property = variableName.toString();
-                }
-                context.set(String.valueOf(property), right);
-                return right;
-            }
         }
         if (property == null) {
             // no property, we fail
@@ -580,12 +574,12 @@ public class Interpreter implements ParserVisitor {
         if (o.getClass().isArray() && ((Object[]) o).length == 0) {
             return Boolean.TRUE;
         }
-        if (o instanceof Collection<?>) {
-            return ((Collection<?>) o).isEmpty()? Boolean.TRUE : Boolean.FALSE;
+        if (o instanceof Collection<?> && ((Collection<?>) o).isEmpty()) {
+            return Boolean.TRUE;
         }
         // Map isn't a collection
-        if (o instanceof Map<?, ?>) {
-            return ((Map<?,?>) o).isEmpty()? Boolean.TRUE : Boolean.FALSE;
+        if (o instanceof Map<?, ?> && ((Map<?, ?>) o).isEmpty()) {
+            return Boolean.TRUE;
         }
         return Boolean.FALSE;
     }
@@ -608,10 +602,12 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTFloatLiteral node, Object data) {
-        if (data != null) {
-            return getAttribute(data, node.getLiteral(), node);
+        Float value = (Float) node.jjtGetValue();
+        if (value == null) {
+            value = Float.valueOf(node.image);
+            node.jjtSetValue(value);
         }
-        return node.getLiteral();
+        return value;
     }
 
     /** {@inheritDoc} */
@@ -680,7 +676,12 @@ public class Interpreter implements ParserVisitor {
         String name = node.image;
         if (data == null) {
             if (registers != null) {
-                return registers[name.charAt(1) - '0'];
+                if (registers[0].equals(name)) {
+                    return registers[1];
+                }
+                if (registers[2].equals(name)) {
+                    return registers[3];
+                }
             }
             Object value = context.get(name);
             if (value == null
@@ -725,9 +726,15 @@ public class Interpreter implements ParserVisitor {
     /** {@inheritDoc} */
     public Object visit(ASTIntegerLiteral node, Object data) {
         if (data != null) {
-            return getAttribute(data, node.getLiteral(), node);
+            Integer value = Integer.valueOf(node.image);
+            return getAttribute(data, value, node);
         }
-        return node.getLiteral();
+        Integer value = (Integer) node.jjtGetValue();
+        if (value == null) {
+            value = Integer.valueOf(node.image);
+            node.jjtSetValue(value);
+        }
+        return value;
     }
 
     /** {@inheritDoc} */
@@ -1037,20 +1044,15 @@ public class Interpreter implements ParserVisitor {
         int v = 0;
         for (int c = 0; c < numChildren; c++) {
             JexlNode theNode = node.jjtGetChild(c);
-            // integer literals may be part of an antish var name only if no bean was found so far
-            if (result == null && theNode instanceof ASTIntegerLiteral) {
-                isVariable &= v > 0;
-            } else {
-                isVariable &= (theNode instanceof ASTIdentifier);
-                result = theNode.jjtAccept(this, result);
-            }
+            isVariable &= (theNode instanceof ASTIdentifier);
+            result = theNode.jjtAccept(this, result);
             // if we get null back a result, check for an ant variable
             if (result == null && isVariable) {
                 if (v == 0) {
                     variableName = new StringBuilder(node.jjtGetChild(0).image);
                     v = 1;
                 }
-                for (; v <= c; ++v) {
+                for(; v <= c; ++v) {
                     variableName.append('.');
                     variableName.append(node.jjtGetChild(v).image);
                 }
@@ -1059,8 +1061,8 @@ public class Interpreter implements ParserVisitor {
         }
         if (result == null) {
             if (isVariable
-                    && !(node.jjtGetParent() instanceof ASTTernaryNode)
-                    && !context.has(variableName.toString())) {
+                && !(node.jjtGetParent() instanceof ASTTernaryNode)
+                && !context.has(variableName.toString())) {
                 JexlException xjexl = new JexlException(node, "undefined variable " + variableName.toString());
                 return unknownVariable(xjexl);
             }
@@ -1086,9 +1088,6 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTStringLiteral node, Object data) {
-        if (data != null) {
-            return getAttribute(data, node.getLiteral(), node);
-        }
         return node.image;
     }
 

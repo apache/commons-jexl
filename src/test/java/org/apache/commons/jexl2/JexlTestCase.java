@@ -77,7 +77,6 @@ public class JexlTestCase extends TestCase {
             return;
         }
         JexlEngine jdbg = new JexlEngine();
-        jdbg.parser.ALLOW_REGISTERS = true;
         Debugger dbg = new Debugger();
         // iterate over all expression in cache
         Iterator<Map.Entry<String,ASTJexlScript>> inodes = jexl.cache.entrySet().iterator();
