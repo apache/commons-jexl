@@ -138,13 +138,6 @@
 
         </section>
 
-        <section name="Releases">
-            <p>
-        The current released version is 2.0.
-        See the <a href="releases.html">releases</a> page for information on obtaining releases.
-            </p>
-        </section>
-
         <section name="Related Resources">
             <p>
           JEXL is not a product of the Java Community Process (JCP), but it provides a
