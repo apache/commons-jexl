@@ -23,7 +23,7 @@
     <category rdf:resource="http://projects.apache.org/category/library"/>
     <license rdf:resource="http://usefulinc.com/doap/licenses/asl20"/>
     <bug-database rdf:resource="http://issues.apache.org/jira/browse/JEXL"/>
-    <download-page rdf:resource="http://jakarta.apache.org/site/downloads/downloads_commons-jexl.cgi"/>
+    <download-page rdf:resource="http://commons.apache.org/jexl/download_jexl.cgi"/>
     <asfext:pmc rdf:resource="http://commons.apache.org/"/>
     <shortdesc xml:lang="en">Commons JEXL Expression Language Engine</shortdesc>
     <description xml:lang="en">Jexl is an implementation of the JSTL Expression Language with extensions.</description>
