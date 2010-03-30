@@ -36,6 +36,9 @@
         </fileSet>
         <fileSet>
             <directory>jexl2-compat</directory>
+            <excludes>
+                <exclude>target/**</exclude>
+            </excludes>
         </fileSet>
     </fileSets>
 </assembly>
