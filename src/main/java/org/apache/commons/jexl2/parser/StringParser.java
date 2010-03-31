@@ -65,6 +65,9 @@ public class StringParser {
         return read(strb, str, index, str.length(), sep);
     }
 
+    /** The length of an escaped unicode sequence. */
+    private static final int UCHAR_LEN = 4;
+
     /**
      * Read the remainder of a string till a given separator,
      * handles escaping through '\' syntax.
@@ -81,13 +84,12 @@ public class StringParser {
         for (; index < end; ++index) {
             char c = str.charAt(index);
             if (escape) {
-                if (c == 'u' && (index + 4) < end && readUnicodeChar(strb, str, index + 1) > 0) {
-                    index += 4;
-                }
-                else {
+                if (c == 'u' && (index + UCHAR_LEN) < end && readUnicodeChar(strb, str, index + 1) > 0) {
+                    index += UCHAR_LEN;
+                } else {
                     // if c is not an escapable character, re-emmit the backslash before it
                     boolean notSeparator = sep == 0? c != '\'' && c != '"' : c != sep;
-                    if (notSeparator && c != '\\' ) {
+                    if (notSeparator && c != '\\') {
                         strb.append('\\');
                     }
                     strb.append(c);
@@ -107,6 +109,10 @@ public class StringParser {
         return index;
     }
 
+    /** Initial shift value for composing a Unicode char from 4 nibbles (16 - 4). */
+    private static final int SHIFT = 12;
+    /** The base 10 offset used to convert hexa characters to decimal. */
+    private static final int BASE10 = 10;
     /**
      * Reads a Unicode escape character.
      * @param strb the builder to write the character to
@@ -114,31 +120,31 @@ public class StringParser {
      * @param begin the begin offset in sequence (after the '\\u')
      * @return 0 if char could not be read, 4 otherwise
      */
-    private static final int readUnicodeChar(StringBuilder strb, CharSequence str, int begin) {
+    private static int readUnicodeChar(StringBuilder strb, CharSequence str, int begin) {
         char xc = 0;
-        int bits = 12;
+        int bits = SHIFT;
         int value = 0;
-        for(int offset = 0; offset < 4; ++offset) {
+        for(int offset = 0; offset < UCHAR_LEN; ++offset) {
             char c = str.charAt(begin + offset);
             if (c >= '0' && c <= '9') {
                 value = (c - '0');
-            }
-            else if (c >= 'a' && c <= 'h') {
-               value = (c - 'a' + 10);
-            }
-            else if (c >= 'A' && c <= 'H') {
-                value = (c - 'A' + 10);
-            }
-            else {
+            } else if (c >= 'a' && c <= 'h') {
+               value = (c - 'a' + BASE10);
+            } else if (c >= 'A' && c <= 'H') {
+                value = (c - 'A' + BASE10);
+            } else {
                 return 0;
             }
             xc |= value << bits;
-            bits -= 4;
+            bits -= UCHAR_LEN;
         }
         strb.append(xc);
-        return 4;
+        return UCHAR_LEN;
     }
     
+    /** The last 7bits ascii character. */
+    private static final char LAST_ASCII = 127;
+
     /**
      * Escapes a String representation, expand non-ASCII characters as Unicode escape sequence.
      * @param str the string to escape
@@ -153,7 +159,7 @@ public class StringParser {
         strb.append('\'');
         for (int i = 0; i < length; ++i) {
             char c = str.charAt(i);
-            if (c < 127) {
+            if (c < LAST_ASCII) {
                 if (c == '\'') {
                     // escape quote
                     strb.append('\\');
@@ -170,7 +176,7 @@ public class StringParser {
                 strb.append('\\');
                 strb.append('u');
                 String hex = Integer.toHexString(c);
-                for (int h = hex.length(); h < 4; ++h) {
+                for (int h = hex.length(); h < UCHAR_LEN; ++h) {
                     strb.append('0');
                 }
                 strb.append(hex);

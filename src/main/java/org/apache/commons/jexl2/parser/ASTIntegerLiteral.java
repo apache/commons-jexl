@@ -20,24 +20,23 @@ public final class ASTIntegerLiteral extends JexlNode implements JexlNode.Litera
     /** The type literal value. */
     Integer literal = null;
 
-    public ASTIntegerLiteral(int id) {
+    ASTIntegerLiteral(int id) {
         super(id);
     }
 
-    public ASTIntegerLiteral(Parser p, int id) {
+    ASTIntegerLiteral(Parser p, int id) {
         super(p, id);
     }
-
+    
+    /**
+     * Gets the literal value.
+     * @return the integer literal
+     */
     public Integer getLiteral() {
         return literal;
     }
 
-    /**
-     * Accept the visitor.
-     * @param visitor the visitor
-     * @param data contextual data
-     * @return result of visit
-     **/
+    /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);

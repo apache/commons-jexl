@@ -17,7 +17,7 @@
 package org.apache.commons.jexl2.parser;
 
 public final class ASTStringLiteral extends JexlNode implements JexlNode.Literal<String> {
-    
+
     public ASTStringLiteral(int id) {
         super(id);
     }
@@ -26,16 +26,15 @@ public final class ASTStringLiteral extends JexlNode implements JexlNode.Literal
         super(p, id);
     }
 
+    /**
+     * Gets the literal value.
+     * @return the string literal
+     */
     public String getLiteral() {
         return image;
     }
 
-    /**
-     * Accept the visitor.
-     * @param visitor the visitor
-     * @param data contextual data
-     * @return result of visit
-     **/
+    /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
