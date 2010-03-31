@@ -889,7 +889,7 @@ public class JexlEngine {
     }
 
     /**
-     * Read from a reader into a StringBuffer and return a String with
+     * Read from a reader into a local buffer and return a String with
      * the contents of the reader.
      * @param scriptReader to be read.
      * @return the contents of the reader as a String.
