@@ -309,7 +309,7 @@ public class JexlTest extends JexlTestCase
         jc.set("aDouble", new Double(2));
         jc.set("aChar", new Character('A'));
         jc.set("aBool", Boolean.TRUE);
-        StringBuffer buffer = new StringBuffer("abc");
+        StringBuilder buffer = new StringBuilder("abc");
         List<Object> list = new ArrayList<Object>();
         List<Object> list2 = new LinkedList<Object>();
         jc.set("aBuffer", buffer);
