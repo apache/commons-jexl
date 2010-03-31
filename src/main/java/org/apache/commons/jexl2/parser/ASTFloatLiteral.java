@@ -27,17 +27,16 @@ public final class ASTFloatLiteral extends JexlNode implements JexlNode.Literal<
     public ASTFloatLiteral(Parser p, int id) {
         super(p, id);
     }
-
+    
+    /**
+     * Gets the literal value.
+     * @return the float literal
+     */
     public Float getLiteral() {
         return literal;
     }
     
-    /**
-     * Accept the visitor.
-     * @param visitor the visitor
-     * @param data contextual data
-     * @return result of visit
-     **/
+    /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);

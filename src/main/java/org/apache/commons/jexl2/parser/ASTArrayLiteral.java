@@ -18,30 +18,37 @@ package org.apache.commons.jexl2.parser;
 
 public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<Object> {
     /** The type literal value. */
-    Object literal = null;
+    Object array = null;
 
-    public ASTArrayLiteral(int id) {
+    ASTArrayLiteral(int id) {
         super(id);
     }
 
-    public ASTArrayLiteral(Parser p, int id) {
+    ASTArrayLiteral(Parser p, int id) {
         super(p, id);
     }
 
+    /**
+     *  Gets the literal value.
+     * @return the array literal
+     */
     public Object getLiteral() {
-        return literal;
-    }
-
-    public void setLiteral(Object literal) {
-        this.literal = literal;
+        return array;
     }
 
     /**
-     * Accept the visitor.
-     * @param visitor the visitor
-     * @param data contextual data
-     * @return result of visit
-     **/
+     * Sets the literal value.
+     * @param literal the literal array value
+     * @throws IllegalArgumentException if literal is not an array or null
+     */
+    public void setLiteral(Object literal) {
+        if (literal != null && !literal.getClass().isArray()) {
+            throw new IllegalArgumentException(literal.getClass() + " is not an array");
+        }
+        this.array = literal;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
