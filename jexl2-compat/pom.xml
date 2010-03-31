@@ -26,7 +26,7 @@
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-jexl-compat</artifactId>
     <name>Commons JEXL (1.x compatibility)</name>
-    <version>2.0-SNAPSHOT</version>
+    <version>2.0.1</version>
     <inceptionYear>2003</inceptionYear>
     <description>Jexl is an implementation of the JSTL Expression Language with extensions.</description>
     <url>http://commons.apache.org/jexl/</url>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-jexl</artifactId>
-            <version>2.0</version>
+            <version>2.0.1</version>
         </dependency>
     </dependencies>
 
@@ -88,9 +88,9 @@
         <maven.compile.source>1.5</maven.compile.source>
         <maven.compile.target>1.5</maven.compile.target>
         <commons.componentid>jexl-compat</commons.componentid>
-        <commons.release.version>2.0</commons.release.version>
+        <commons.release.version>2.0.1</commons.release.version>
         <!-- The RC version used in the staging repository URL. -->
-        <commons.rc.version>RC3</commons.rc.version>
+        <commons.rc.version>RC2</commons.rc.version>
         <commons.binary.suffix />
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
