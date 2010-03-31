@@ -60,7 +60,7 @@
                 </ul>
             </p>
             <p>
-            Its name stands for Java EXpression Language, a simple expression language inspired by Jakarta
+            Its name stands for Java EXpression Language, a simple expression language inspired by Apache
             Velocity and the Expression Language defined in the JavaServer Pages Standard Tag Library version 1.1 (JSTL)
             and JavaServer Pages version 2.0 (JSP). JEXL 2.0 adds features inspired by
             <a href="http://java.sun.com/products/jsp/reference/techart/unifiedEL.html">Unified EL</a>.
@@ -161,15 +161,15 @@
             Tag Library for JavaServer Pages</a>. See the
                     <a href="http://java.sun.com/products/jsp/jstl/1.1/docs/api/index.html">JSTL API</a>.
                 </li>
-          <li>Apache has a <a href="http://jakarta.apache.org/taglibs/doc/standard-doc/intro.html">JSTL Implementation</a>.</li>
+          <li>Apache has a <a href="http://tomcat.apache.org/taglibs/standard/">JSTL Implementation</a>.</li>
             </ul>
             <subsection name="Velocity">
                 <p>
-                    <a href="http://jakarta.apache.org/velocity">Jakarta Velocity</a> implements
+                    <a href="http://velocity.apache.org/">Apache Velocity</a> implements
             a similar expression language. 
                 </p>
                 <p>
-            In particular the <a href="http://jakarta.apache.org/velocity/user-guide.html#References">References</a>
+            In particular the <a href="http://velocity.apache.org/engine/devel/user-guide.html#References">References</a>
             section of the User Guide has some good information on properties and method which correlate
             directly to JEXL.
                 </p>
