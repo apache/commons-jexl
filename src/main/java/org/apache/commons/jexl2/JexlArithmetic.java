@@ -224,8 +224,8 @@ public class JexlArithmetic {
                 // if the commonClass has an equivalent primitive type, get it
                 if (isNumber) {
                     try {
-                        Field TYPE = commonClass.getField("TYPE");
-                        commonClass = (Class<?>) TYPE.get(null);
+                        final Field type = commonClass.getField("TYPE");
+                        commonClass = (Class<?>) type.get(null);
                     } catch (Exception xany) {
                         // ignore
                     }
