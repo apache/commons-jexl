@@ -98,7 +98,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
      * @return a {@link Field}.
      */
     public Field getField(Object obj, String name, JexlInfo info) {
-        final Class<?> clazz = obj instanceof Class<?>? (Class<?>) obj : obj.getClass();
+        final Class<?> clazz = obj instanceof Class<?> ? (Class<?>) obj : obj.getClass();
         return getField(clazz, name);
     }
 
