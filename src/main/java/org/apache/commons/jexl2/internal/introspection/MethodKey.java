@@ -542,13 +542,11 @@ public final class MethodKey {
          */
         private boolean isApplicable(T method, Class<?>[] classes) {
             Class<?>[] methodArgs = getParameterTypes(method);
-
-            if (methodArgs.length > classes.length) {
-                // if there's just one more methodArg than class arg
-                // and the last methodArg is an array, then treat it as a vararg
-                return methodArgs.length == classes.length + 1 && methodArgs[methodArgs.length - 1].isArray();
-            }
-            if (methodArgs.length == classes.length) {
+            // if samee number or args or
+            // there's just one more methodArg than class arg
+            // and the last methodArg is an array, then treat it as a vararg
+            if (methodArgs.length == classes.length
+                || methodArgs.length == classes.length + 1 && methodArgs[methodArgs.length - 1].isArray()) {
                 // this will properly match when the last methodArg
                 // is an array/varargs and the last class is the type of array
                 // (e.g. String when the method is expecting String...)
