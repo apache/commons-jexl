@@ -29,9 +29,33 @@ public class MethodTest extends JexlTestCase {
 
     private static final String METHOD_STRING = "Method string";
 
-    public static class TestClass {
-        public String testVarArgs(Integer[] args) {
-            return "Test";
+    public static class VarArgs {
+        public String callInts(Integer... args) {
+            int result = 0;
+            for (int i = 0; i < args.length; i++) {
+                result += args[i].intValue();
+            }
+            return "Varargs:"+result;
+        }
+
+        public String callMixed(Integer fixed, Integer... args) {
+            int result = fixed.intValue();
+            if (args != null) {
+                for (int i = 0; i < args.length; i++) {
+                    result += args[i].intValue();
+                }
+            }
+            return "Mixed:"+result;
+        }
+        
+        public String callMixed(String mixed, Integer... args) {
+            int result = 0;
+            if (args != null) {
+                for (int arg : args) {
+                    result += arg;
+                }
+            }
+            return mixed+":"+result;
         }
     }
 
@@ -74,8 +98,26 @@ public class MethodTest extends JexlTestCase {
     }
 
     public void testCallVarArgMethod() throws Exception {
-        asserter.setVariable("test", new TestClass());
-        asserter.assertExpression("test.testVarArgs(1,2,3,4,5)", "Test");
+        asserter.setVariable("test", new VarArgs());
+        asserter.assertExpression("test.callInts()", "Varargs:0");
+        asserter.assertExpression("test.callInts(1)", "Varargs:1");
+        asserter.assertExpression("test.callInts(1,2,3,4,5)", "Varargs:15");
+    }
+
+    public void testCallMixedVarArgMethod() throws Exception {
+        asserter.setVariable("test", new VarArgs());
+        asserter.assertExpression("test.callMixed(1)", "Mixed:1");
+        asserter.assertExpression("test.callMixed(1, null)", "Mixed:1");
+        asserter.assertExpression("test.callMixed(1,2)", "Mixed:3");
+        asserter.assertExpression("test.callMixed(1,2,3,4,5)", "Mixed:15");
+    }
+
+    public void testCallJexlVarArgMethod() throws Exception {
+        asserter.setVariable("test", new VarArgs());
+        asserter.assertExpression("test.callMixed('jexl')", "jexl:0");
+        asserter.assertExpression("test.callMixed('jexl', null)", "jexl:0");
+        asserter.assertExpression("test.callMixed('jexl', 2)", "jexl:2");
+        asserter.assertExpression("test.callMixed('jexl',2,3,4,5)", "jexl:14");
     }
 
     public void testInvoke() throws Exception {

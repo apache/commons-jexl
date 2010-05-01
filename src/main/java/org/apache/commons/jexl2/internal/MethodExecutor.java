@@ -67,13 +67,13 @@ public final class MethodExecutor extends AbstractExecutor.Method {
 
     /** {@inheritDoc} */
     @Override
-    public Object tryExecute(String name, Object o, Object[] args) {
+    public Object tryExecute(String name, Object obj, Object[] args) {
         MethodKey tkey = new MethodKey(name, args);
         // let's assume that invocation will fly if the declaring class is the
         // same and arguments have the same type
-        if (objectClass.equals(o.getClass()) && tkey.equals(key)) {
+        if (objectClass.equals(obj.getClass()) && tkey.equals(key)) {
             try {
-                return execute(o, args);
+                return execute(obj, args);
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
@@ -127,35 +127,28 @@ public final class MethodExecutor extends AbstractExecutor.Method {
      * to fit the method declaration.
      */
     protected Object[] handleVarArg(Class<?> type, int index, Object[] actual) {
-        // if no values are being passed into the vararg
-        if (actual.length == index) {
-            // create an empty array of the expected type
-            actual = new Object[]{Array.newInstance(type, 0)};
-        } else if (actual.length == index + 1) {
-            // if one value is being passed into the vararg
-            // make sure the last arg is an array of the expected type
-            if (MethodKey.isInvocationConvertible(type,
-                    actual[index].getClass(),
-                    false)) {
-                // create a 1-length array to hold and replace the last param
+        final int size = actual.length - index;
+        // if no values are being passed into the vararg, size == 0
+        if (size == 1) {
+            // if one non-null value is being passed into the vararg,
+            // make the last arg an array of the expected type
+            if (actual[index] != null) {
+                // create a 1-length array to hold and replace the last argument
                 Object lastActual = Array.newInstance(type, 1);
                 Array.set(lastActual, 0, actual[index]);
                 actual[index] = lastActual;
             }
-        } else if (actual.length > index + 1) {
-            // if multiple values are being passed into the vararg
-            // put the last and extra actual in an array of the expected type
-            int size = actual.length - index;
+        } else {
+            // if no or multiple values are being passed into the vararg,
+            // put them in an array of the expected type
             Object lastActual = Array.newInstance(type, size);
             for (int i = 0; i < size; i++) {
                 Array.set(lastActual, i, actual[index + i]);
             }
 
-            // put all into a new actual array of the appropriate size
+            // put all arguments into a new actual array of the appropriate size
             Object[] newActual = new Object[index + 1];
-            for (int i = 0; i < index; i++) {
-                newActual[i] = actual[i];
-            }
+            System.arraycopy(actual, 0, newActual, 0, index);
             newActual[index] = lastActual;
 
             // replace the old actual array
