@@ -138,6 +138,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
                 Array.set(lastActual, 0, actual[index]);
                 actual[index] = lastActual;
             }
+            // else, the vararg is null and used as is, considered as T[]
         } else {
             // if no or multiple values are being passed into the vararg,
             // put them in an array of the expected type

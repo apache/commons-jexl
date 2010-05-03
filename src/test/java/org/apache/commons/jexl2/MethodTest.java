@@ -32,8 +32,12 @@ public class MethodTest extends JexlTestCase {
     public static class VarArgs {
         public String callInts(Integer... args) {
             int result = 0;
-            for (int i = 0; i < args.length; i++) {
-                result += args[i].intValue();
+            if (args != null) {
+                for (int i = 0; i < args.length; i++) {
+                        result += args[i] != null ?args[i] : -100;
+                }
+            } else {
+                result = -1000;
             }
             return "Varargs:"+result;
         }
@@ -42,8 +46,10 @@ public class MethodTest extends JexlTestCase {
             int result = fixed.intValue();
             if (args != null) {
                 for (int i = 0; i < args.length; i++) {
-                    result += args[i].intValue();
+                    result += args[i] != null ?args[i] : -100;
                 }
+            } else {
+                result -= 1000;
             }
             return "Mixed:"+result;
         }
@@ -51,9 +57,11 @@ public class MethodTest extends JexlTestCase {
         public String callMixed(String mixed, Integer... args) {
             int result = 0;
             if (args != null) {
-                for (int arg : args) {
-                    result += arg;
+                for (int i = 0; i < args.length; i++) {
+                    result += args[i] != null ?args[i] : -100;
                 }
+            } else {
+                result = -1000;
             }
             return mixed+":"+result;
         }
@@ -98,24 +106,37 @@ public class MethodTest extends JexlTestCase {
     }
 
     public void testCallVarArgMethod() throws Exception {
-        asserter.setVariable("test", new VarArgs());
+        VarArgs test = new VarArgs();
+        asserter.setVariable("test", test);
         asserter.assertExpression("test.callInts()", "Varargs:0");
         asserter.assertExpression("test.callInts(1)", "Varargs:1");
         asserter.assertExpression("test.callInts(1,2,3,4,5)", "Varargs:15");
     }
 
     public void testCallMixedVarArgMethod() throws Exception {
-        asserter.setVariable("test", new VarArgs());
+        VarArgs test = new VarArgs();
+        asserter.setVariable("test", test);
+        assertEquals("Mixed:1", test.callMixed(1));
         asserter.assertExpression("test.callMixed(1)", "Mixed:1");
-        asserter.assertExpression("test.callMixed(1, null)", "Mixed:1");
+        // Java and JEXL equivalent behavior: 'Mixed:-999' expected
+        //{
+        assertEquals("Mixed:-999", test.callMixed(1, null));
+        asserter.assertExpression("test.callMixed(1, null)", "Mixed:-999");
+        //}
         asserter.assertExpression("test.callMixed(1,2)", "Mixed:3");
         asserter.assertExpression("test.callMixed(1,2,3,4,5)", "Mixed:15");
     }
 
     public void testCallJexlVarArgMethod() throws Exception {
-        asserter.setVariable("test", new VarArgs());
+        VarArgs test = new VarArgs();
+        asserter.setVariable("test", test);
+        assertEquals("jexl:0", test.callMixed("jexl"));
         asserter.assertExpression("test.callMixed('jexl')", "jexl:0");
-        asserter.assertExpression("test.callMixed('jexl', null)", "jexl:0");
+        // Java and JEXL equivalent behavior: 'jexl:-1000' expected
+        //{
+        assertEquals("jexl:-1000", test.callMixed("jexl", null));
+        asserter.assertExpression("test.callMixed('jexl', null)", "jexl:-1000");
+        //}
         asserter.assertExpression("test.callMixed('jexl', 2)", "jexl:2");
         asserter.assertExpression("test.callMixed('jexl',2,3,4,5)", "jexl:14");
     }
