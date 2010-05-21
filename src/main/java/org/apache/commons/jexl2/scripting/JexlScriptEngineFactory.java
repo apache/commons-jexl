@@ -48,7 +48,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     /** {@inheritDoc} */
     public String getEngineVersion() {
-        return "1.0"; // ensure this is updated if function changes are made to this class
+        return "2.0"; // ensure this is updated if function changes are made to this class
     }
 
     /** {@inheritDoc} */
@@ -82,17 +82,17 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     /** {@inheritDoc} */
     public List<String> getExtensions() {
-        return Collections.unmodifiableList(Arrays.asList("jexl"));
+        return Collections.unmodifiableList(Arrays.asList("jexl", "jexl2"));
     }
 
     /** {@inheritDoc} */
     public List<String> getMimeTypes() {
-        return Collections.unmodifiableList(Arrays.asList("application/x-jexl"));
+        return Collections.unmodifiableList(Arrays.asList("application/x-jexl", "application/x-jexl2"));
     }
 
     /** {@inheritDoc} */
     public List<String> getNames() {
-        return Collections.unmodifiableList(Arrays.asList("JEXL", "Jexl", "jexl"));
+        return Collections.unmodifiableList(Arrays.asList("JEXL", "Jexl", "jexl", "JEXL2", "Jexl2", "jexl2"));
     }
 
     /** {@inheritDoc} */
