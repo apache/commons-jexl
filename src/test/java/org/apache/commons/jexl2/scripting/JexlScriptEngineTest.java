@@ -20,6 +20,7 @@ package org.apache.commons.jexl2.scripting;
 
 import java.io.Reader;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.script.ScriptEngine;
@@ -27,30 +28,46 @@ import javax.script.ScriptEngineManager;
 import junit.framework.TestCase;
 
 public class JexlScriptEngineTest extends TestCase {
+    private static final List<String> NAMES = Arrays.asList("JEXL", "Jexl", "jexl", "JEXL2", "Jexl2", "jexl2");
+    private static final List<String> EXTENSIONS = Arrays.asList("jexl", "jexl2");
+    private static final List<String> MIMES = Arrays.asList("application/x-jexl", "application/x-jexl2");
 
     public void testScriptEngineFactory() throws Exception {
         JexlScriptEngineFactory factory = new JexlScriptEngineFactory();
         assertEquals("JEXL Engine", factory.getParameter(ScriptEngine.ENGINE));
-        assertEquals("1.0", factory.getParameter(ScriptEngine.ENGINE_VERSION));
+        assertEquals("2.0", factory.getParameter(ScriptEngine.ENGINE_VERSION));
         assertEquals("JEXL", factory.getParameter(ScriptEngine.LANGUAGE));
         assertEquals("2.0", factory.getParameter(ScriptEngine.LANGUAGE_VERSION));
-        assertEquals(Arrays.asList("JEXL", "Jexl", "jexl"), factory.getParameter(ScriptEngine.NAME));
         assertNull(factory.getParameter("THREADING"));
-
-        assertEquals(Arrays.asList("jexl"), factory.getExtensions());
-        assertEquals(Arrays.asList("application/x-jexl"), factory.getMimeTypes());
+        assertEquals(NAMES, factory.getParameter(ScriptEngine.NAME));
+        assertEquals(EXTENSIONS, factory.getExtensions());
+        assertEquals(MIMES, factory.getMimeTypes());
 
         assertEquals("42;", factory.getProgram(new String[]{"42"}));
         assertEquals("str.substring(3,4)", factory.getMethodCallSyntax("str", "substring", new String[]{"3", "4"}));
     }
 
+    public void testScriptingGetBy() throws Exception {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        assertNotNull("Manager should not be null", manager);
+        for (String name : NAMES) {
+            ScriptEngine engine = manager.getEngineByName(name);
+            assertNotNull("Engine should not be null (name)", engine);
+        }
+        for (String extension : EXTENSIONS) {
+            ScriptEngine engine = manager.getEngineByExtension(extension);
+            assertNotNull("Engine should not be null (extension)", engine);
+        }
+        for (String mime : MIMES) {
+            ScriptEngine engine = manager.getEngineByMimeType(mime);
+            assertNotNull("Engine should not be null (mime)", engine);
+        }
+    }
+
     public void testScripting() throws Exception {
         ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull("Manager should not be null", manager);
-        ScriptEngine engine = manager.getEngineByName("jexl");
-        assertNotNull("Engine should not be null (name)", engine);
-        engine = manager.getEngineByExtension("jexl");
-        assertNotNull("Engine should not be null (ext)", engine);
+        ScriptEngine engine = manager.getEngineByName("jexl2");
         final Integer initialValue = Integer.valueOf(123);
         assertEquals(initialValue,engine.eval("123"));
         assertEquals(initialValue,engine.eval("0;123"));// multiple statements
@@ -77,7 +94,7 @@ public class JexlScriptEngineTest extends TestCase {
     public void testNulls() throws Exception {
         ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull("Manager should not be null", manager);
-        ScriptEngine engine = manager.getEngineByName("jexl");
+        ScriptEngine engine = manager.getEngineByName("jexl2");
         assertNotNull("Engine should not be null (name)", engine);
         try {
             engine.eval((String)null);
@@ -91,17 +108,6 @@ public class JexlScriptEngineTest extends TestCase {
         } catch (NullPointerException e) {
             // NOOP
         }
-    }
-
-    public void testEngineNames() throws Exception {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        assertNotNull("Manager should not be null", manager);
-        ScriptEngine engine = manager.getEngineByName("JEXL");
-        assertNotNull("Engine should not be null (JEXL)", engine);        
-        engine = manager.getEngineByName("Jexl");
-        assertNotNull("Engine should not be null (Jexl)", engine);        
-        engine = manager.getEngineByName("jexl");
-        assertNotNull("Engine should not be null (jexl)", engine);        
     }
 
     public void testScopes() throws Exception {
