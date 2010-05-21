@@ -62,7 +62,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     }
 
     /** {@inheritDoc} */
-    public String getMethodCallSyntax(String obj, String m, String... args) {
+    public String getMethodCallSyntax(String obj, String m, String[] args) {
         StringBuilder sb = new StringBuilder();
         sb.append(obj);
         sb.append('.');
@@ -129,7 +129,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     }
 
     /** {@inheritDoc} */
-    public String getProgram(String... statements) {
+    public String getProgram(String[] statements) {
         StringBuilder sb = new StringBuilder();
         for(String statement : statements){
             sb.append(JexlEngine.cleanExpression(statement));
