@@ -25,6 +25,12 @@
     <author email="dev@commons.apache.org">Commons Developers</author>
   </properties>
   <body>
+    <release version="2.0.2" date="unreleased">
+        <action dev="henrib" type="add" issue="JEXL-102" due-to="sebb">Add "jexl2" as a supported name</action>
+        <action dev="henrib" type="add" issue="JEXL-101" due-to="Tobias Shulte">
+            Vararg methods where the first argument is no vararg can not be called with only the fixed parameters given
+        </action>
+    </release>
     <release version="2.0.1" date="2010-03-28">
         <action dev="henrib" type="add" issue="JEXL-100">Array access expressions fail when evaluated twice and cache is enabled</action>
         <action dev="henrib" type="add" issue="JEXL-99" due-to="Marcel Schoen">Documentation of Thread Safety / Invalid code examples on homepage</action>
