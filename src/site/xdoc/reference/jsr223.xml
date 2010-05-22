@@ -32,11 +32,17 @@
     </section>
     <section name="Script engine support">
       <p>
-      The provided script engine implements the following:
+      The provided script engine implements the following (engineVersion="1.0"):
       <ul>
       <li>Language names: "JEXL", "Jexl", "jexl"</li>
       <li>Extensions: ".jexl"</li>
       <li>Mime-types: "application/x-jexl"</li>
+      </ul>
+      Script Engine versions from "2.0" also implement the following:
+      <ul>
+      <li>Language names: "JEXL2", "Jexl2", "jexl2"</li>
+      <li>Extensions: ".jexl2"</li>
+      <li>Mime-types: "application/x-jexl2"</li>
       </ul>
       The implementation adds an instance of 
       <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/scripting/JexlScriptObject.html">JexlScriptObject</a>

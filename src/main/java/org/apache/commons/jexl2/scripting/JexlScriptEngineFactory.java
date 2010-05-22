@@ -30,8 +30,9 @@ import org.apache.commons.jexl2.parser.StringParser;
  * Implements the Jexl ScriptEngineFactory for JSF-223.
  * <p>
  * Supports the following:<br.>
- * Language short names: "JEXL", "Jexl", "jexl" <br/>
- * Extension: "jexl"
+ * Language short names: "JEXL", "Jexl", "jexl", "JEXL2", "Jexl2", "jexl2" <br/>
+ * File Extensions: ".jexl", ".jexl2"<br/>
+ * "jexl2" etc. were added for engineVersion="2.0".
  * </p>
  * <p>
  * See
