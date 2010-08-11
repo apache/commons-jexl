@@ -203,24 +203,36 @@ public class JexlArithmetic {
         final int size = untyped.length;
         Class<?> commonClass = null;
         if (size > 0) {
-            // base common class on first entry
-            commonClass = untyped[0].getClass();
-            final boolean isNumber = Number.class.isAssignableFrom(commonClass);
+            boolean isNumber = true;
             // for all children after first...
-            for (int i = 1; i < size; i++) {
-                Class<?> eclass = untyped[i].getClass();
-                // detect same type for all elements in array
-                if (!Object.class.equals(commonClass) && !commonClass.equals(eclass)) {
-                    // if both are numbers...
-                    if (isNumber && Number.class.isAssignableFrom(eclass)) {
-                        commonClass = Number.class;
-                    } else {
-                        commonClass = Object.class;
+            for (int u = 0; u < size && !Object.class.equals(commonClass); ++u) {
+                if (untyped[u] != null) {
+                    Class<?> eclass = untyped[u].getClass();
+                    // base common class on first non-null entry
+                    if (commonClass == null) {
+                        commonClass = eclass;
+                        isNumber &= Number.class.isAssignableFrom(commonClass);
+                    } else if (!commonClass.equals(eclass)) {
+                        // if both are numbers...
+                        if (isNumber && Number.class.isAssignableFrom(eclass)) {
+                            commonClass = Number.class;
+                        } else {
+                            // attempt to find valid superclass
+                            do {
+                                eclass = eclass.getSuperclass();
+                                if (eclass == null) {
+                                    commonClass = Object.class;
+                                    break;
+                                }
+                            } while(!commonClass.isAssignableFrom(eclass));
+                        }
                     }
+                } else {
+                    isNumber = false;
                 }
             }
             // convert array to the common class if not Object.class
-            if (!Object.class.equals(commonClass)) {
+            if (commonClass != null && !Object.class.equals(commonClass)) {
                 // if the commonClass has an equivalent primitive type, get it
                 if (isNumber) {
                     try {
