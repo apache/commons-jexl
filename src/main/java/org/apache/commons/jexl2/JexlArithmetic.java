@@ -68,10 +68,10 @@ public class JexlArithmetic {
      * in its initialization code before expression creation &amp; evaluation.</p>
      * @see JexlEngine#setSilent
      * @see JexlEngine#setDebug
-     * @param lenient true means no JexlException will occur, false allows them
+     * @param flag true means no JexlException will occur, false allows them
      */
-    void setLenient(boolean lenient) {
-        this.strict = !lenient;
+    void setLenient(boolean flag) {
+        this.strict = !flag;
     }
 
     /**
