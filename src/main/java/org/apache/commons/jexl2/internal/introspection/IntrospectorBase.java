@@ -22,8 +22,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 
@@ -89,27 +90,23 @@ public class IntrospectorBase {
      *
      * @param c     Class in which the method search is taking place
      * @param key   Key of the method being searched for
-     * @return The desired Method object.
-     * @throws IllegalArgumentException     When the parameters passed in can not be used for introspection.
-     *  
+     * @return The desired method object or null if no unambiguous method could be found through introspection.
      */
-    //CSOFF: RedundantThrows
     public Method getMethod(Class<?> c, MethodKey key) {
         try {
             ClassMap classMap = getMap(c);
             return classMap.findMethod(key);
-        } catch (MethodKey.AmbiguousException ae) {
+        } catch (MethodKey.AmbiguousException xambiguous) {
             // whoops.  Ambiguous.  Make a nice log message and return null...
-            if (rlog != null) {
-                rlog.error("ambiguous method invocation: "
+            if (rlog != null && rlog.isInfoEnabled()) {
+                rlog.info("ambiguous method invocation: "
                            + c.getName() + "."
-                           + key.debugString());
+                           + key.debugString(), xambiguous);
             }
         }
         return null;
 
     }
-    // CSON: RedundantThrows
 
 
     /**
@@ -163,28 +160,70 @@ public class IntrospectorBase {
     
     /**
      * Sets the class loader used to solve constructors.
-     * <p>Also cleans the constructors cache.</p>
+     * <p>Also cleans the constructors and methods caches.</p>
      * @param cloader the class loader; if null, use this instance class loader
+     * @return true if class loader change had an effect, false otherwise
      */
     public void setLoader(ClassLoader cloader) {
+        ClassLoader previous = loader;
         if (cloader == null) {
             cloader = getClass().getClassLoader();
         }
         if (!cloader.equals(loader)) {
+            // clean up constructor and class maps
             synchronized(constructorsMap) {
-                loader = cloader;
-                constructorsMap.clear();
-                constructibleClasses.clear();
+                Iterator<Map.Entry<MethodKey, Constructor<?>>> entries = constructorsMap.entrySet().iterator();
+                while(entries.hasNext()) {
+                    Map.Entry<MethodKey, Constructor<?>> entry = entries.next();
+                    Class<?> clazz = entry.getValue().getClass();
+                    if (isLoadedBy(previous, clazz)) {
+                        entries.remove();
+                        // the method name is the name of the class
+                        constructibleClasses.remove(entry.getKey().getMethod());
+                    }
+                }
+            }
+            // clean up method maps
+            synchronized (classMethodMaps) {
+                Iterator<Map.Entry<Class<?>, ClassMap>> entries = classMethodMaps.entrySet().iterator();
+                while(entries.hasNext()) {
+                    Map.Entry<Class<?>, ClassMap> entry = entries.next();
+                    Class<?> clazz = entry.getKey();
+                    if (isLoadedBy(previous, clazz)) {
+                        entries.remove();
+                    }
+                }
+            }
+            loader = cloader;
+        }
+    }
+
+    /**
+     * Checks whether a class is loaded through a given class loader or one of its ascendants.
+     * @param loader the class loader
+     * @param clazz the class to check
+     * @return true if clazz was loaded through the loader, false otherwise
+     */
+    private static boolean isLoadedBy(ClassLoader loader, Class<?> clazz) {
+        if (loader != null) {
+            ClassLoader cloader = clazz.getClassLoader();
+            while(cloader != null) {
+                if (cloader.equals(loader)) {
+                    return true;
+                } else {
+                    cloader = cloader.getParent();
+                }
             }
         }
+        return false;
     }
 
     /**
      * Gets the constructor defined by the <code>MethodKey</code>.
      *
      * @param key   Key of the constructor being searched for
-     * @return The desired Constructor object.
-     * @throws IllegalArgumentException     When the parameters passed in can not be used for introspection.
+     * @return The desired constructor object
+     * or null if no unambiguous constructor could be found through introspection.
      */
     public Constructor<?> getConstructor(final MethodKey key) {
         return getConstructor(null, key);
@@ -194,68 +233,63 @@ public class IntrospectorBase {
      * Gets the constructor defined by the <code>MethodKey</code>.
      * @param c the class we want to instantiate
      * @param key   Key of the constructor being searched for
-     * @return The desired Constructor object.
-     * @throws IllegalArgumentException     When the parameters passed in can not be used for introspection.
+     * @return The desired constructor object
+     * or null if no unambiguous constructor could be found through introspection.
      */
-    //CSOFF: RedundantThrows
     public Constructor<?> getConstructor(final Class<?> c, final MethodKey key) {
-        try {
-            Constructor<?> ctor = null;
-            synchronized(constructorsMap) {
-                ctor = constructorsMap.get(key);
-                // that's a clear miss
-                if (CTOR_MISS.equals(ctor)) {
-                    return null;
-                }
-                // let's introspect...
-                if (ctor == null) {
-                    final String cname = key.getMethod();
-                    // do we know about this class?
-                    Class<?> clazz = constructibleClasses.get(cname);
-                    try {
-                        // do find the most specific ctor
-                        if (clazz == null) {
-                            if (c != null && c.getName().equals(key.getMethod())) {
-                                clazz = c;
-                            } else {
-                                clazz = loader.loadClass(cname);
-                            }
-                            // add it to list of known loaded classes
-                            constructibleClasses.put(cname, clazz);
-                        }
-                        List<Constructor<?>> l = new LinkedList<Constructor<?>>();
-                        for(Constructor<?> ictor : clazz.getConstructors()) {
-                            l.add(ictor);
-                        }
-                        // try to find one
-                        ctor = key.getMostSpecificConstructor(l);
-                        if (ctor != null) {
-                            constructorsMap.put(key, ctor);
+        Constructor<?> ctor = null;
+        synchronized(constructorsMap) {
+            ctor = constructorsMap.get(key);
+            // that's a clear miss
+            if (CTOR_MISS.equals(ctor)) {
+                return null;
+            }
+            // let's introspect...
+            if (ctor == null) {
+                final String cname = key.getMethod();
+                // do we know about this class?
+                Class<?> clazz = constructibleClasses.get(cname);
+                try {
+                    // do find the most specific ctor
+                    if (clazz == null) {
+                        if (c != null && c.getName().equals(key.getMethod())) {
+                            clazz = c;
                         } else {
-                            constructorsMap.put(key, CTOR_MISS);
+                            clazz = loader.loadClass(cname);
                         }
-                    } catch(ClassNotFoundException xnotfound) {
-                        if (rlog.isDebugEnabled()) {
-                            rlog.debug("could not load class " + cname, xnotfound);
-                        }
-                        ctor = null;
-                    } catch(MethodKey.AmbiguousException xambiguous) {
-                        rlog.warn("ambiguous ctor detected for " + cname, xambiguous);
-                        ctor = null;
+                        // add it to list of known loaded classes
+                        constructibleClasses.put(cname, clazz);
                     }
+                    List<Constructor<?>> l = new LinkedList<Constructor<?>>();
+                    for(Constructor<?> ictor : clazz.getConstructors()) {
+                        l.add(ictor);
+                    }
+                    // try to find one
+                    ctor = key.getMostSpecificConstructor(l);
+                    if (ctor != null) {
+                        constructorsMap.put(key, ctor);
+                    } else {
+                        constructorsMap.put(key, CTOR_MISS);
+                    }
+                } catch (ClassNotFoundException xnotfound) {
+                    if (rlog != null && rlog.isInfoEnabled()) {
+                        rlog.info("unable to find class: "
+                                + cname + "."
+                                + key.debugString(), xnotfound);
+                    }
+                    ctor = null;
+                } catch (MethodKey.AmbiguousException xambiguous) {
+                    if (rlog != null && rlog.isInfoEnabled()) {
+                        rlog.info("ambiguous constructor invocation: "
+                                + cname + "."
+                                + key.debugString(), xambiguous);
+                    }
+                    ctor = null;
                 }
             }
             return ctor;
-        } catch (MethodKey.AmbiguousException ae) {
-            // whoops.  Ambiguous.  Make a nice log message and return null...
-            if (rlog != null) {
-                rlog.error("ambiguous constructor invocation: new "
-                           + key.debugString());
-            }
         }
-        return null;
     }
-    // CSON: RedundantThrows
 
     /**
      * Gets the ClassMap for a given class.
