@@ -123,7 +123,7 @@ public class AssignTest extends JexlTestCase {
             return;
         }
         finally {
-        assertEquals("Should have failed", null, o);
+            assertEquals("Should have failed", null, o);
         }
     }
         

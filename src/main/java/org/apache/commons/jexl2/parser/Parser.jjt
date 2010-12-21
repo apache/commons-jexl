@@ -209,7 +209,6 @@ ASTJexlScript JexlScript() : {}
    { return jjtThis;}
 }
 
-
 void Statement() #void : {}
 {
     <SEMICOL>

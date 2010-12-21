@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package org.apache.commons.jexl2;
+
 import org.apache.commons.jexl2.introspection.Uberspect;
 import org.apache.commons.jexl2.internal.Introspector;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-49: blocks not parsed (fixed)
     public void test49() throws Exception {
-        Map<String,Object> vars = new HashMap<String,Object>();
+        Map<String, Object> vars = new HashMap<String, Object>();
         JexlContext ctxt = new MapContext(vars);
         String stmt = "{a = 'b'; c = 'd';}";
         Script expr = JEXL.createScript(stmt);
@@ -185,7 +186,7 @@ public class IssuesTest extends JexlTestCase {
             //"a - 10",
             //"b * 10",
             "a % b"//,
-            //"1000 / a"
+        //"1000 / a"
         };
         for (int e = 0; e < exprs.length; ++e) {
             try {
@@ -334,11 +335,11 @@ public class IssuesTest extends JexlTestCase {
 
     public void test97() throws Exception {
         JexlContext ctxt = new MapContext();
-        for(char v = 'a'; v <= 'z'; ++v) {
+        for (char v = 'a'; v <= 'z'; ++v) {
             ctxt.set(Character.toString(v), 10);
         }
         String input =
-            "(((((((((((((((((((((((((z+y)/x)*w)-v)*u)/t)-s)*r)/q)+p)-o)*n)-m)+l)*k)+j)/i)+h)*g)+f)/e)+d)-c)/b)+a)";
+                "(((((((((((((((((((((((((z+y)/x)*w)-v)*u)/t)-s)*r)/q)+p)-o)*n)-m)+l)*k)+j)/i)+h)*g)+f)/e)+d)-c)/b)+a)";
 
         JexlEngine jexl = new JexlEngine();
         Expression script;
@@ -348,7 +349,7 @@ public class IssuesTest extends JexlTestCase {
         Object value = script.evaluate(ctxt);
         assertEquals(Integer.valueOf(11), value);
         long end = System.nanoTime();
-        System.out.printf("Parse took %.3f seconds\n", (end-start)/1e+9);
+        System.out.printf("Parse took %.3f seconds\n", (end - start) / 1e+9);
     }
 
     public static class fn98 {
@@ -356,7 +357,7 @@ public class IssuesTest extends JexlTestCase {
             return str.replace(target, replacement);
         }
     }
-    
+
     public void test98() throws Exception {
         String[] exprs = {
             "fn:replace('DOMAIN\\somename', '\\\\', '\\\\\\\\')",
@@ -364,10 +365,10 @@ public class IssuesTest extends JexlTestCase {
             "fn:replace('DOMAIN\\somename', '\\u005c', '\\u005c\\u005c')"
         };
         JexlEngine jexl = new JexlEngine();
-        Map<String,Object> funcs = new HashMap<String,Object>();
+        Map<String, Object> funcs = new HashMap<String, Object>();
         funcs.put("fn", new fn98());
         jexl.setFunctions(funcs);
-        for(String expr : exprs) {
+        for (String expr : exprs) {
             Object value = jexl.createExpression(expr).evaluate(null);
             assertEquals(expr, "DOMAIN\\\\somename", value);
         }
@@ -377,10 +378,10 @@ public class IssuesTest extends JexlTestCase {
         JexlEngine jexl = new JexlEngine();
         jexl.setCache(4);
         JexlContext ctxt = new MapContext();
-        int[] foo = { 42 };
+        int[] foo = {42};
         ctxt.set("foo", foo);
-        Object value ;
-        for(int l = 0; l < 2; ++l) {
+        Object value;
+        for (int l = 0; l < 2; ++l) {
             value = jexl.createExpression("foo[0]").evaluate(ctxt);
             assertEquals(42, value);
             value = jexl.createExpression("foo[0] = 43").evaluate(ctxt);
@@ -392,4 +393,41 @@ public class IssuesTest extends JexlTestCase {
         }
     }
 
+// A's class definition 
+    public static class A105 {
+        String nameA;
+        String propA;
+
+        public A105(String nameA, String propA) {
+            this.nameA = nameA;
+            this.propA = propA;
+        }
+
+        @Override
+        public String toString() {
+            return "A [nameA=" + nameA + ", propA=" + propA + "]";
+        }
+
+        public String getNameA() {
+            return nameA;
+        }
+
+        public String getPropA() {
+            return propA;
+        }
+    }
+
+    public void test105() throws Exception {
+
+        JexlContext context = new MapContext();
+        Expression selectExp = new JexlEngine().createExpression("[a.propA]");
+        context.set("a", new A105("a1", "p1"));
+        Object[] r = (Object[]) selectExp.evaluate(context);
+        assertEquals("p1", r[0]);
+
+//selectExp = new JexlEngine().createExpression("[a.propA]");
+        context.set("a", new A105("a2", "p2"));
+        r = (Object[]) selectExp.evaluate(context);
+        assertEquals("p2", r[0]);
+    }
 }
