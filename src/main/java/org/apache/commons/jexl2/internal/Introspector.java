@@ -36,7 +36,7 @@ public class Introspector {
     protected final Log rlog;
     /** The soft reference to the introspector currently in use. */
     private volatile SoftReference<IntrospectorBase> ref;
-    
+   
     /**
      * Creates an introspector.
      * @param log the logger to use for warnings.
@@ -110,7 +110,7 @@ public class Introspector {
      *
      * @param c     Class in which the field search is taking place
      * @param key   Name of the field being searched for
-     * @return the desired field or null if it does not exist or is not accessible
+     * @return a {@link java.lang.reflect.Field} or null if it does not exist or is not accessible
      * */
     protected final Field getField(Class<?> c, String key) {
         return base().getField(c, key);
@@ -134,11 +134,10 @@ public class Introspector {
      * @param params An array of Objects (not Classes) that describe the
      *               the parameters
      *
-     * @return The desired Method object.
-     * @throws IllegalArgumentException When the parameters passed in can not be used for introspection.
-     * CSOFF: RedundantThrows
+     * @return a {@link java.lang.reflect.Method}
+     *  or null if no unambiguous method could be found through introspection.
      */
-    protected final Method getMethod(Class<?> c, String name, Object[] params) throws IllegalArgumentException {
+    protected final Method getMethod(Class<?> c, String name, Object[] params) {
         return base().getMethod(c, new MethodKey(name, params));
     }
 
@@ -148,11 +147,10 @@ public class Introspector {
      * @param c Class in which the method search is taking place
      * @param key MethodKey of the method being searched for
      *
-     * @return The desired Method object.
-     * @throws IllegalArgumentException When the parameters passed in can not be used for introspection.
-     * CSOFF: RedundantThrows
+     * @return a {@link java.lang.reflect.Method}
+     *  or null if no unambiguous method could be found through introspection.
      */
-    protected final Method getMethod(Class<?> c, MethodKey key) throws IllegalArgumentException {
+    protected final Method getMethod(Class<?> c, MethodKey key) {
         return base().getMethod(c, key);
     }
 
@@ -169,8 +167,9 @@ public class Introspector {
     /**
      * Returns a general constructor.
      * @param ctorHandle the object
-     * @param args contrusctor arguments
+     * @param args contructor arguments
      * @return a {@link java.lang.reflect.Constructor}
+     *  or null if no unambiguous contructor could be found through introspection.
      */
     public final Constructor<?> getConstructor(Object ctorHandle, Object[] args) {
         String className = null;
