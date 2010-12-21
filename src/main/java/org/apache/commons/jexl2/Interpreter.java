@@ -257,7 +257,7 @@ public class Interpreter implements ParserVisitor {
         if (namespace == null) {
             throw new JexlException(node, "no such function namespace " + prefix);
         }
-        // allow namespace to be instantiated as functor with context
+        // allow namespace to be instantiated as functor with context if possible, not an error otherwise
         if (namespace instanceof Class<?>) {
             Object[] args = new Object[]{context};
             Constructor<?> ctor = uberspect.getConstructor(namespace,args, node);
@@ -1058,14 +1058,31 @@ public class Interpreter implements ParserVisitor {
             }
         }
         if (result == null) {
-            if (isVariable
-                    && !(node.jjtGetParent() instanceof ASTTernaryNode)
-                    && !context.has(variableName.toString())) {
+            if (isVariable && !context.has(variableName.toString()) && !isTernaryProtected(node)) {
                 JexlException xjexl = new JexlException(node, "undefined variable " + variableName.toString());
                 return unknownVariable(xjexl);
             }
         }
         return result;
+    }
+
+    /**
+     * Check if a null evaluated expression is protected by a ternary expression.
+     * The rationale is that the ternary / elvis expressions are meant for the user to explictly take
+     * control over the error generation; ie, ternaries can return null even if the engine in strict mode
+     * would normally throw an exception.
+     * @param node the expression node
+     * @return true if nullable variable, false otherwise
+     */
+    private boolean isTernaryProtected(JexlNode node) {
+        for(JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
+            if (walk instanceof ASTTernaryNode) {
+                return true;
+            } else if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {
+                break;
+            }
+        }
+        return false;
     }
 
     /** {@inheritDoc} */
