@@ -729,6 +729,13 @@ public class JexlEngine {
         }
 
         /**
+         * Clears the cache.
+         */
+        void clear() {
+            ref = null;
+        }
+
+        /**
          * Produces the cache entry set.
          * @return the cache entry set
          */
@@ -772,13 +779,22 @@ public class JexlEngine {
     protected <K, V> Map<K, V> createCache(final int cacheSize) {
         return new java.util.LinkedHashMap<K, V>(cacheSize, LOAD_FACTOR, true) {
             /** Serial version UID. */
-            private static final long serialVersionUID = 3801124242820219131L;
+            private static final long serialVersionUID = 1L;
 
             @Override
             protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
                 return size() > cacheSize;
             }
         };
+    }
+
+    /**
+     * Clears the expression cache.
+     */
+    public void clearCache() {
+        synchronized(parser) {
+            cache.clear();
+        }
     }
 
     /**
@@ -868,7 +884,7 @@ public class JexlEngine {
      * @param str expression to clean
      * @return trimmed expression ending in a semi-colon
      */
-    public static final String cleanExpression(CharSequence str) {
+    public static String cleanExpression(CharSequence str) {
         if (str != null) {
             int start = 0;
             int end = str.length();
@@ -895,7 +911,7 @@ public class JexlEngine {
      * @return the contents of the reader as a String.
      * @throws IOException on any error reading the reader.
      */
-    public static final String readerToString(Reader scriptReader) throws IOException {
+    public static String readerToString(Reader scriptReader) throws IOException {
         StringBuilder buffer = new StringBuilder();
         BufferedReader reader;
         if (scriptReader instanceof BufferedReader) {

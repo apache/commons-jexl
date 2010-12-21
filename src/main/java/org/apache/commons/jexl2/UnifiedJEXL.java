@@ -192,6 +192,15 @@ public final class UnifiedJEXL {
     }
 
     /**
+     * Clears the cache.
+     */
+    public void clearCache() {
+        synchronized(cache) {
+            cache.clear();
+        }
+    }
+
+    /**
      * The sole type of (runtime) exception the UnifiedJEXL can throw.
      */
     public static class Exception extends RuntimeException {
