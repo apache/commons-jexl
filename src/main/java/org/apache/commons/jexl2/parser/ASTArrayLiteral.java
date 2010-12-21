@@ -19,6 +19,8 @@ package org.apache.commons.jexl2.parser;
 public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<Object> {
     /** The type literal value. */
     Object array = null;
+    /** Whether this array is constant or not. */
+    boolean constant = false;
 
     ASTArrayLiteral(int id) {
         super(id);
@@ -26,6 +28,13 @@ public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<
 
     ASTArrayLiteral(Parser p, int id) {
         super(p, id);
+    }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void jjtClose() {
+        constant = isConstant();
     }
 
     /**
@@ -37,15 +46,17 @@ public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<
     }
 
     /**
-     * Sets the literal value.
+     * Sets the literal value only if the descendants of this node compose a constant
      * @param literal the literal array value
      * @throws IllegalArgumentException if literal is not an array or null
      */
     public void setLiteral(Object literal) {
-        if (literal != null && !literal.getClass().isArray()) {
-            throw new IllegalArgumentException(literal.getClass() + " is not an array");
+        if (constant) {
+            if (literal != null && !literal.getClass().isArray()) {
+                throw new IllegalArgumentException(literal.getClass() + " is not an array");
+            }
+            this.array = literal;
         }
-        this.array = literal;
     }
 
     /** {@inheritDoc} */

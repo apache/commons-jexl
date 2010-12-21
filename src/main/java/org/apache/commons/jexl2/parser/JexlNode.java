@@ -58,4 +58,23 @@ public abstract class JexlNode extends SimpleNode implements JexlInfo {
         JexlInfo info = getInfo();
         return info != null? info.debugString() : "";
     }
+
+    /**
+     * Whether this node is a constant node
+     * Its value can not change after the first evaluation and can be cached indefinitely.
+     * @return true if constant, false otherwise
+     */
+    public boolean isConstant() {
+        if (this instanceof JexlNode.Literal<?>) {
+            if (children != null) {
+                for(JexlNode child : children) {
+                    if (!child.isConstant()) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 }
