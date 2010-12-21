@@ -162,7 +162,6 @@ public class IntrospectorBase {
      * Sets the class loader used to solve constructors.
      * <p>Also cleans the constructors and methods caches.</p>
      * @param cloader the class loader; if null, use this instance class loader
-     * @return true if class loader change had an effect, false otherwise
      */
     public void setLoader(ClassLoader cloader) {
         ClassLoader previous = loader;
