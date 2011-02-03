@@ -20,6 +20,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 
 /**
  * Perform arithmetic.
@@ -52,13 +53,25 @@ public class JexlArithmetic {
     protected static final BigInteger BIGI_LONG_MIN_VALUE = BigInteger.valueOf(Long.MIN_VALUE);
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
     private boolean strict;
+    /** The big decimal math context. */
+    protected final MathContext mathContext;
 
     /**
      * Creates a JexlArithmetic.
      * @param lenient whether this arithmetic is lenient or strict
      */
     public JexlArithmetic(boolean lenient) {
+        this(lenient, MathContext.DECIMAL128);
+    }
+
+    /**
+     * Creates a JexlArithmetic.
+     * @param lenient whether this arithmetic is lenient or strict
+     * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
+     */
+    public JexlArithmetic(boolean lenient, MathContext bigdContext) {
         this.strict = !lenient;
+        this.mathContext = bigdContext;
     }
 
     /**
@@ -81,6 +94,14 @@ public class JexlArithmetic {
      */
     public boolean isLenient() {
         return !this.strict;
+    }
+
+    /**
+     * The MathContext instance used for +,-,/,*,% operations on big decimals.
+     * @return the math context
+     */
+    public MathContext getMathContext() {
+        return mathContext;
     }
 
     /**
@@ -308,7 +329,7 @@ public class JexlArithmetic {
             if (left instanceof BigDecimal || right instanceof BigDecimal) {
                 BigDecimal l = toBigDecimal(left);
                 BigDecimal r = toBigDecimal(right);
-                return l.add(r);
+                return l.add(r, mathContext);
             }
             
             // otherwise treat as integers
@@ -355,7 +376,7 @@ public class JexlArithmetic {
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
-            BigDecimal d = l.divide(r);
+            BigDecimal d = l.divide(r, mathContext);
             return d;
         }
 
@@ -399,7 +420,7 @@ public class JexlArithmetic {
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
-            BigDecimal remainder = l.remainder(r);
+            BigDecimal remainder = l.remainder(r, mathContext);
             return remainder;
         }
 
@@ -439,7 +460,7 @@ public class JexlArithmetic {
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
-            return l.multiply(r);
+            return l.multiply(r, mathContext);
         }
 
         // otherwise treat as integers
@@ -478,7 +499,7 @@ public class JexlArithmetic {
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
-            return l.subtract(r);
+            return l.subtract(r, mathContext);
         }
 
         // otherwise treat as integers

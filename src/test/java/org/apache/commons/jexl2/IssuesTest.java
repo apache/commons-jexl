@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl2;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import org.apache.commons.jexl2.introspection.Uberspect;
 import org.apache.commons.jexl2.internal.Introspector;
 import java.util.HashMap;
@@ -418,7 +420,6 @@ public class IssuesTest extends JexlTestCase {
     }
 
     public void test105() throws Exception {
-
         JexlContext context = new MapContext();
         Expression selectExp = new JexlEngine().createExpression("[a.propA]");
         context.set("a", new A105("a1", "p1"));
@@ -429,5 +430,26 @@ public class IssuesTest extends JexlTestCase {
         context.set("a", new A105("a2", "p2"));
         r = (Object[]) selectExp.evaluate(context);
         assertEquals("p2", r[0]);
+    }
+
+    public void test106() throws Exception {
+        JexlContext context = new MapContext();
+        context.set("a", new BigDecimal(1));
+        context.set("b", new BigDecimal(3));
+        JexlEngine jexl = new JexlEngine();
+        try {
+            Object value = jexl.createExpression("a / b").evaluate(context);
+            assertNotNull(value);
+        } catch(JexlException xjexl) {
+            fail("should not occur");
+        }
+        JexlArithmetic arithmetic = new JexlArithmetic(false, MathContext.UNLIMITED);
+        JexlEngine jexlX = new JexlEngine(null, arithmetic, null, null);
+        try {
+            Object value = jexlX.createExpression("a / b").evaluate(context);
+            fail("should fail");
+        } catch(JexlException xjexl) {
+            //ok  to fail
+        }
     }
 }
