@@ -26,6 +26,9 @@
   </properties>
   <body>
     <release version="2.0.2" date="unreleased">
+        <action dev="henrib" type="add" issue="JEXL-106" due-to="Michal Sabol">
+            When divide two BigDecimal values in an expression it results in java.lang.ArithmeticException: Non-terminating decimal expansion; no exact representable decimal result.
+        </action>
         <action dev="henrib" type="add" issue="JEXL-105" due-to="Cary Thompson">Array literals are considered constant even when they are not.</action>
         <action dev="henrib" type="add" issue="JEXL-104" due-to="Andreas Haufler">NPE in JexlArithmetic when an Array-Expression containing a null is used.</action>
         <action dev="henrib" type="add" issue="JEXL-102" due-to="sebb">Add "jexl2" as a supported name</action>

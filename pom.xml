@@ -19,12 +19,12 @@
     <parent>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-parent</artifactId>
-        <version>15</version>
+        <version>17</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-jexl</artifactId>
-    <version>2.1-SNAPSHOT</version>
+    <version>2.0.2-SNAPSHOT</version>
     <name>Commons JEXL</name>
     <inceptionYear>2001</inceptionYear>
     <description>Jexl is an implementation of the JSTL Expression Language with extensions.</description>
@@ -123,9 +123,9 @@
         <maven.compile.source>1.5</maven.compile.source>
         <maven.compile.target>1.5</maven.compile.target>
         <commons.componentid>jexl</commons.componentid>
-        <commons.release.version>2.0.1</commons.release.version>
+        <commons.release.version>2.0.2</commons.release.version>
         <!-- The RC version used in the staging repository URL. -->
-        <commons.rc.version>RC2</commons.rc.version>
+        <commons.rc.version>RC1</commons.rc.version>
         <commons.release.2.version>1.1</commons.release.2.version>
         <commons.release.2.binary.suffix />
         <commons.jira.id>JEXL</commons.jira.id>
@@ -151,6 +151,10 @@
             </resource>
         </resources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+             </plugin>
             <!-- workaround MRELEASE-424 when publishing -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -250,7 +254,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.4</version>
                 <configuration>
                     <instrumentation>
                         <excludes>
@@ -274,7 +278,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.5</version>
                 <configuration>
                     <targetJdk>1.5</targetJdk>
                     <excludes>
