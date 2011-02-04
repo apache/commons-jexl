@@ -764,13 +764,13 @@ public class JexlArithmetic {
             controlNullOperand();
             return BigDecimal.ZERO;
         } else if (val instanceof String) {
-            String string = (String) val;
-            if ("".equals(string.trim())) {
+            String string = ((String) val).trim();
+            if ("".equals(string)) {
                 return BigDecimal.valueOf(0);
             }
-            return new BigDecimal(string);
+            return new BigDecimal(string, mathContext);
         } else if (val instanceof Number) {
-            return new BigDecimal(val.toString());
+            return new BigDecimal(val.toString(), mathContext);
         } else if (val instanceof Character) {
             int i = ((Character) val).charValue();
             return new BigDecimal(i);
