@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.apache.commons.jexl2.parser.ASTReferenceExpression;
 
 import org.apache.commons.jexl2.parser.SimpleNode;
 import org.apache.commons.logging.Log;
@@ -1066,6 +1067,10 @@ public class Interpreter implements ParserVisitor {
         return result;
     }
 
+    public Object visit(ASTReferenceExpression node, Object data) {
+        return node.jjtGetChild(0).jjtAccept(this, data);
+    }
+    
     /**
      * Check if a null evaluated expression is protected by a ternary expression.
      * The rationale is that the ternary / elvis expressions are meant for the user to explictly take
@@ -1364,4 +1369,5 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTAmbiguous node, Object data) {
         throw new UnsupportedOperationException("unexpected type of node");
     }
+
 }
