@@ -452,4 +452,33 @@ public class IssuesTest extends JexlTestCase {
             //ok  to fail
         }
     }
+
+    public void test107() throws Exception {
+        JexlContext context = new MapContext();
+        context.set("Q4", "Q4");
+        JexlEngine jexl = new JexlEngine();
+        Expression expr;
+        Object value;
+        expr = jexl.createExpression("'Q4'.toLowerCase()");
+        value = expr.evaluate(context);
+        assertEquals("q4", value);
+        expr = jexl.createExpression("(Q4).toLowerCase()");
+        value = expr.evaluate(context);
+        assertEquals("q4", value);
+        expr = jexl.createExpression("(4).toString()");
+        value = expr.evaluate(context);
+        assertEquals("4", value);
+        value = jexl.createExpression("(1 + 3).toString()");
+        value = expr.evaluate(context);
+        assertEquals("4", value);
+        expr = jexl.createExpression("({ 'Q4' : 'Q4'}).get('Q4').toLowerCase()");
+        value = expr.evaluate(context);
+        assertEquals("q4", value);
+        expr = jexl.createExpression("{ 'Q4' : 'Q4'}.get('Q4').toLowerCase()");
+        value = expr.evaluate(context);
+        assertEquals("q4", value);
+        expr = jexl.createExpression("({ 'Q4' : 'Q4'}).get('Q4').toLowerCase()");
+        value = expr.evaluate(context);
+        assertEquals("q4", value);
+    }
 }

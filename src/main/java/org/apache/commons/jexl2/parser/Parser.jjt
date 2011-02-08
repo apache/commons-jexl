@@ -130,7 +130,7 @@ PARSER_END(Parser)
     | < SEMICOL : ";" >
     | < COLON : ":" >
     | < COMMA : "," >
-    | <DOT : "." >
+    | < DOT : "." >
 }
 
 <*> TOKEN : { /* CONDITIONALS */
@@ -257,15 +257,12 @@ void ForeachStatement() : {}
 
 void Expression() #void : {}
 {
-    LOOKAHEAD( Reference() <assign> )  Assignment()
-|
-    ConditionalExpression()
+    ConditionalExpression() ( <assign> Expression() #Assignment(2) )?
 }
-
 
 void Assignment() #Assignment(2) : {}
 {
-    Reference() <assign> Expression()
+    ConditionalExpression() <assign> Expression()
 }
 
 /***************************************
@@ -528,11 +525,7 @@ void Constructor() #ConstructorNode() : {}
 
 void PrimaryExpression() #void : {}
 {
-  Literal()
-|
   LOOKAHEAD(3)  Reference()
-|
-  LOOKAHEAD( <LPAREN> ) <LPAREN> Expression() <RPAREN>
 |
   LOOKAHEAD( <EMPTY> ) EmptyFunction()
 |
@@ -543,8 +536,9 @@ void PrimaryExpression() #void : {}
   LOOKAHEAD( <LCURLY> MapEntry() ) MapLiteral()
 |
   LOOKAHEAD( <LBRACKET> Expression() ) ArrayLiteral()
+|
+  Literal()
 }
-
 
 void ArrayAccess() : {}
 {
@@ -570,7 +564,8 @@ void DotReference() #void : {}
 
 void Reference() : {}
 {
-  ( LOOKAHEAD(<NEW>) Constructor()
+  (
+   LOOKAHEAD(<NEW>) Constructor()
 |
    LOOKAHEAD(Identifier() <LBRACKET> ) ArrayAccess()
 |
@@ -578,10 +573,20 @@ void Reference() : {}
 |
    LOOKAHEAD(Identifier() <LPAREN>) Method()
 |
-   Identifier()
-|
    LOOKAHEAD(<LCURLY>) MapLiteral()
 |
-   LOOKAHEAD(<LBRACKET>) ArrayLiteral() ) DotReference()
+   LOOKAHEAD(<LBRACKET>) ArrayLiteral()
+|
+   LOOKAHEAD( <LPAREN> Expression() ) ReferenceExpression()
+|
+   StringLiteral()
+|
+   Identifier()
+  )  DotReference()
+}
+
+void ReferenceExpression() : {}
+{
+    <LPAREN> Expression() <RPAREN>
 }
 

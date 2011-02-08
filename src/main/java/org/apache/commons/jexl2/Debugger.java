@@ -56,6 +56,7 @@ import org.apache.commons.jexl2.parser.ASTNotNode;
 import org.apache.commons.jexl2.parser.ASTNullLiteral;
 import org.apache.commons.jexl2.parser.ASTOrNode;
 import org.apache.commons.jexl2.parser.ASTReference;
+import org.apache.commons.jexl2.parser.ASTReferenceExpression;
 import org.apache.commons.jexl2.parser.ASTSizeFunction;
 import org.apache.commons.jexl2.parser.ASTSizeMethod;
 import org.apache.commons.jexl2.parser.ASTStringLiteral;
@@ -637,5 +638,12 @@ final class Debugger implements ParserVisitor {
     /** {@inheritDoc} */
     public Object visit(ASTAmbiguous node, Object data) {
         throw new UnsupportedOperationException("unexpected type of node");
+    }
+
+    public Object visit(ASTReferenceExpression node, Object data) {
+        builder.append("(");
+        accept(node.jjtGetChild(0), data);
+        builder.append(")");
+        return data;
     }
 }
