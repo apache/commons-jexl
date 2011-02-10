@@ -825,9 +825,9 @@ public class JexlEngine {
                     cache.put(expr, tree);
                 }
             } catch (TokenMgrError xtme) {
-                throw new JexlException(info, "tokenization failed", xtme);
+                throw new JexlException(info, "!!! " +expression+ " !!!" + ", tokenization failed", xtme);
             } catch (ParseException xparse) {
-                throw new JexlException(info, "parsing failed", xparse);
+                throw new JexlException(info, "!!! " +expression+ " !!!" + ", parsing failed", xparse);
             }
         }
         return tree;

@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import org.apache.commons.jexl2.parser.ASTReferenceExpression;
 
 import org.apache.commons.jexl2.parser.SimpleNode;
 import org.apache.commons.logging.Log;
@@ -71,6 +70,7 @@ import org.apache.commons.jexl2.parser.ASTNotNode;
 import org.apache.commons.jexl2.parser.ASTNullLiteral;
 import org.apache.commons.jexl2.parser.ASTOrNode;
 import org.apache.commons.jexl2.parser.ASTReference;
+import org.apache.commons.jexl2.parser.ASTReferenceExpression;
 import org.apache.commons.jexl2.parser.ASTSizeFunction;
 import org.apache.commons.jexl2.parser.ASTSizeMethod;
 import org.apache.commons.jexl2.parser.ASTStringLiteral;
@@ -1068,7 +1068,8 @@ public class Interpreter implements ParserVisitor {
     }
 
     public Object visit(ASTReferenceExpression node, Object data) {
-        return node.jjtGetChild(0).jjtAccept(this, data);
+        ASTArrayAccess upper = (ASTArrayAccess) node;
+        return visit(upper, data);
     }
     
     /**

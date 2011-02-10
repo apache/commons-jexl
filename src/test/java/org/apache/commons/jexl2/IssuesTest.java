@@ -23,6 +23,7 @@ import org.apache.commons.jexl2.internal.Introspector;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.jexl2.introspection.UberspectImpl;
+import org.apache.commons.jexl2.parser.JexlNode;
 
 /**
  * Test cases for reported issues
@@ -454,31 +455,28 @@ public class IssuesTest extends JexlTestCase {
     }
 
     public void test107() throws Exception {
+        String[] exprs = {
+            "'Q4'.toLowerCase()", "q4",
+            "(Q4).toLowerCase()", "q4",
+            "(4).toString()", "4",
+            "(1 + 3).toString()", "4",
+            "({ 'q' : 'Q4'}).get('q').toLowerCase()", "q4",
+            "{ 'q' : 'Q4'}.get('q').toLowerCase()", "q4",
+            "({ 'q' : 'Q4'})['q'].toLowerCase()", "q4",
+            "(['Q4'])[0].toLowerCase()", "q4"
+        };
+
         JexlContext context = new MapContext();
         context.set("Q4", "Q4");
         JexlEngine jexl = new JexlEngine();
-        Expression expr;
-        Object value;
-        expr = jexl.createExpression("'Q4'.toLowerCase()");
-        value = expr.evaluate(context);
-        assertEquals("q4", value);
-        expr = jexl.createExpression("(Q4).toLowerCase()");
-        value = expr.evaluate(context);
-        assertEquals("q4", value);
-        expr = jexl.createExpression("(4).toString()");
-        value = expr.evaluate(context);
-        assertEquals("4", value);
-        value = jexl.createExpression("(1 + 3).toString()");
-        value = expr.evaluate(context);
-        assertEquals("4", value);
-        expr = jexl.createExpression("({ 'Q4' : 'Q4'}).get('Q4').toLowerCase()");
-        value = expr.evaluate(context);
-        assertEquals("q4", value);
-        expr = jexl.createExpression("{ 'Q4' : 'Q4'}.get('Q4').toLowerCase()");
-        value = expr.evaluate(context);
-        assertEquals("q4", value);
-        expr = jexl.createExpression("({ 'Q4' : 'Q4'}).get('Q4').toLowerCase()");
-        value = expr.evaluate(context);
-        assertEquals("q4", value);
+        for(int e = 0; e < exprs.length; e += 2) {
+            Expression expr = jexl.createExpression(exprs[e]);
+            Object expected = exprs[e + 1];
+            Object value = expr.evaluate(context);
+            assertEquals(expected, value);
+            expr = jexl.createExpression(expr.dump());
+            value = expr.evaluate(context);
+            assertEquals(expected, value);
+        }
     }
 }

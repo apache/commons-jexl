@@ -571,6 +571,21 @@ final class Debugger implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
+    public Object visit(ASTReferenceExpression node, Object data) {
+        JexlNode first = node.jjtGetChild(0);
+            builder.append('(');
+        accept(first, data);
+            builder.append(')');
+        int num = node.jjtGetNumChildren();
+        for (int i = 1; i < num; ++i) {
+            builder.append("[");
+            accept(node.jjtGetChild(i), data);
+            builder.append("]");
+        }
+        return data;
+    }
+
+    /** {@inheritDoc} */
     public Object visit(ASTSizeFunction node, Object data) {
         builder.append("size(");
         accept(node.jjtGetChild(0), data);
@@ -638,12 +653,5 @@ final class Debugger implements ParserVisitor {
     /** {@inheritDoc} */
     public Object visit(ASTAmbiguous node, Object data) {
         throw new UnsupportedOperationException("unexpected type of node");
-    }
-
-    public Object visit(ASTReferenceExpression node, Object data) {
-        builder.append("(");
-        accept(node.jjtGetChild(0), data);
-        builder.append(")");
-        return data;
     }
 }
