@@ -26,6 +26,9 @@
   </properties>
   <body>
     <release version="2.0.2" date="unreleased">
+        <action dev="henrib" type="add" issue="JEXL-107" due-to="henrib">
+            Literals and parenthesized expressions can not be used as references
+        </action>
         <action dev="henrib" type="add" issue="JEXL-106" due-to="Michal Sabol">
             When divide two BigDecimal values in an expression it results in java.lang.ArithmeticException: Non-terminating decimal expansion; no exact representable decimal result.
         </action>

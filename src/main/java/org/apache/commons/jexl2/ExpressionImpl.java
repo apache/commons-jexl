@@ -69,7 +69,8 @@ public class ExpressionImpl implements Expression, Script {
      */
     public String dump() {
         Debugger debug = new Debugger();
-        return debug.debug(script)? debug.toString() : "/*?*/";
+        boolean d = debug.debug(script);
+        return debug.data() + (d? " /*" + debug.start() + ":" + debug.end() + "*/" : "/*?:?*/ ");
     }
 
     /**

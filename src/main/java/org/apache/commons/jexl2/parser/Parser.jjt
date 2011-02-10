@@ -257,7 +257,7 @@ void ForeachStatement() : {}
 
 void Expression() #void : {}
 {
-    ConditionalExpression() ( <assign> Expression() #Assignment(2) )?
+    ConditionalExpression() (LOOKAHEAD(1) <assign> Expression() #Assignment(2) )?
 }
 
 void Assignment() #Assignment(2) : {}
@@ -525,7 +525,7 @@ void Constructor() #ConstructorNode() : {}
 
 void PrimaryExpression() #void : {}
 {
-  LOOKAHEAD(3)  Reference()
+  LOOKAHEAD(2) Reference()
 |
   LOOKAHEAD( <EMPTY> ) EmptyFunction()
 |
@@ -542,7 +542,7 @@ void PrimaryExpression() #void : {}
 
 void ArrayAccess() : {}
 {
-    Identifier() (LOOKAHEAD(2) <LBRACKET> Expression() <RBRACKET>)+
+    Identifier() (LOOKAHEAD(1) <LBRACKET> Expression() <RBRACKET>)+
 }
 
 void DotReference() #void : {}
@@ -551,14 +551,14 @@ void DotReference() #void : {}
      ( LOOKAHEAD(Identifier() <LBRACKET> )
          ArrayAccess()
        |
-       ( LOOKAHEAD(3)
+       ( LOOKAHEAD(2)
             AnyMethod()
           |
             Identifier()
           |
             IntegerLiteral()
-        )
-      )
+       )
+     )
   )*
 }
 
@@ -585,8 +585,11 @@ void Reference() : {}
   )  DotReference()
 }
 
+/**
+ * ReferenceExpression is a subclass of ArrayAccess
+ */
 void ReferenceExpression() : {}
 {
-    <LPAREN> Expression() <RPAREN>
+    <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) <LBRACKET> Expression() <RBRACKET>)*
 }
 
