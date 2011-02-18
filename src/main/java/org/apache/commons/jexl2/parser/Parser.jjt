@@ -460,12 +460,17 @@ void StringLiteral() :
 
 void ArrayLiteral() : {}
 {
-  <LBRACKET> Expression() ( <COMMA> Expression() )* <RBRACKET>
+  <LBRACKET> (Expression() ( <COMMA> Expression() )*)? <RBRACKET>
 }
 
 void MapLiteral() : {}
 {
-    <LCURLY>  MapEntry() ( <COMMA> MapEntry() )* <RCURLY>
+    <LCURLY>
+    (
+        MapEntry() ( <COMMA> MapEntry() )*
+    |
+        <COLON>
+    ) <RCURLY>
 }
 
 void MapEntry() : {}
@@ -533,9 +538,9 @@ void PrimaryExpression() #void : {}
 |
   LOOKAHEAD( <NEW> <LPAREN> ) Constructor()
 |
-  LOOKAHEAD( <LCURLY> MapEntry() ) MapLiteral()
+  LOOKAHEAD( <LCURLY> (Expression())? <COLON> ) MapLiteral()
 |
-  LOOKAHEAD( <LBRACKET> Expression() ) ArrayLiteral()
+  LOOKAHEAD( <LBRACKET> (Expression() | <RBRACKET>) ) ArrayLiteral()
 |
   Literal()
 }

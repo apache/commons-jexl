@@ -23,7 +23,6 @@ import org.apache.commons.jexl2.internal.Introspector;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.jexl2.introspection.UberspectImpl;
-import org.apache.commons.jexl2.parser.JexlNode;
 
 /**
  * Test cases for reported issues
@@ -478,5 +477,47 @@ public class IssuesTest extends JexlTestCase {
             value = expr.evaluate(context);
             assertEquals(expected, value);
         }
+    }
+
+    public void test108() throws Exception {
+        Expression expr;
+        Object value;
+        JexlEngine jexl = new JexlEngine();
+        expr = jexl.createExpression("size([])");
+        value = expr.evaluate(null);
+        assertEquals(0, value);
+        expr = jexl.createExpression(expr.dump());
+        value = expr.evaluate(null);
+        assertEquals(0, value);
+
+        expr = jexl.createExpression("if (true) { [] } else { {:} }");
+        value = expr.evaluate(null);
+        assertTrue(value.getClass().isArray());
+        expr = jexl.createExpression(expr.dump());
+        value = expr.evaluate(null);
+        assertTrue(value.getClass().isArray());
+
+        expr = jexl.createExpression("size({:})");
+        value = expr.evaluate(null);
+        assertEquals(0, value);
+        expr = jexl.createExpression(expr.dump());
+        value = expr.evaluate(null);
+        assertEquals(0, value);
+
+        expr = jexl.createExpression("if (false) { [] } else { {:} }");
+        value = expr.evaluate(null);
+        assertTrue(value instanceof Map<?,?>);
+        expr = jexl.createExpression(expr.dump());
+        value = expr.evaluate(null);
+        assertTrue(value instanceof Map<?,?>);
+    }
+
+    public void test109() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        Object value;
+        JexlContext context = new MapContext();
+        context.set("foo.bar", 40);
+        value = jexl.createExpression("foo.bar + 2").evaluate(context);
+        assertEquals(42, value);
     }
 }
