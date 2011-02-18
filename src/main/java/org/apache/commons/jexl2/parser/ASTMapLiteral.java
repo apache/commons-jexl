@@ -16,17 +16,20 @@
  */
 package org.apache.commons.jexl2.parser;
 
-public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<Object> {
+import java.util.Collections;
+import java.util.Map;
+
+public final class ASTMapLiteral extends JexlNode implements JexlNode.Literal<Object> {
     /** The type literal value. */
-    Object array = null;
+    Map<?,?> map = null;
     /** Whether this array is constant or not. */
     boolean constant = false;
 
-    ASTArrayLiteral(int id) {
+    ASTMapLiteral(int id) {
         super(id);
     }
 
-    ASTArrayLiteral(Parser p, int id) {
+    ASTMapLiteral(Parser p, int id) {
         super(p, id);
     }
 
@@ -35,7 +38,7 @@ public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<
     @Override
     public void jjtClose() {
         if (children == null || children.length == 0) {
-            array = new Object[0];
+            map = Collections.EMPTY_MAP;
             constant = true;
         } else {
             constant = isConstant();
@@ -47,7 +50,7 @@ public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<
      * @return the array literal
      */
     public Object getLiteral() {
-        return array;
+        return map;
     }
 
     /**
@@ -57,10 +60,10 @@ public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<
      */
     public void setLiteral(Object literal) {
         if (constant) {
-            if (literal != null && !literal.getClass().isArray()) {
+            if (!(literal instanceof Map<?,?>)) {
                 throw new IllegalArgumentException(literal.getClass() + " is not an array");
             }
-            this.array = literal;
+            this.map = (Map<?,?>) literal;
         }
     }
 

@@ -297,10 +297,12 @@ final class Debugger implements ParserVisitor {
     public Object visit(ASTArrayLiteral node, Object data) {
         int num = node.jjtGetNumChildren();
         builder.append("[ ");
-        accept(node.jjtGetChild(0), data);
-        for (int i = 1; i < num; ++i) {
-            builder.append(", ");
-            accept(node.jjtGetChild(i), data);
+        if (num > 0) {
+            accept(node.jjtGetChild(0), data);
+            for (int i = 1; i < num; ++i) {
+                builder.append(", ");
+                accept(node.jjtGetChild(i), data);
+            }
         }
         builder.append(" ]");
         return data;
@@ -464,10 +466,14 @@ final class Debugger implements ParserVisitor {
     public Object visit(ASTMapLiteral node, Object data) {
         int num = node.jjtGetNumChildren();
         builder.append("{ ");
-        accept(node.jjtGetChild(0), data);
-        for (int i = 1; i < num; ++i) {
-            builder.append(", ");
-            accept(node.jjtGetChild(i), data);
+        if (num > 0) {
+            accept(node.jjtGetChild(0), data);
+            for (int i = 1; i < num; ++i) {
+                builder.append(", ");
+                accept(node.jjtGetChild(i), data);
+            }
+        } else {
+            builder.append(':');
         }
         builder.append(" }");
         return data;
