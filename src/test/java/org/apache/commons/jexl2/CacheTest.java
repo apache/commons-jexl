@@ -31,11 +31,10 @@ public class CacheTest extends JexlTestCase {
     public CacheTest(String testName) {
         super(testName);
     }
-    private static final JexlEngine jexl = new JexlEngine();
+    private static final JexlEngine jexl = createEngine(false);
 
     static {
         jexl.setCache(512);
-        jexl.setLenient(false);
         jexl.setSilent(false);
     }
 

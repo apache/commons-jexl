@@ -216,6 +216,14 @@ public class JexlEngine {
     }
 
     /**
+     * Gets this engine underlying arithmetic.
+     * @return the arithmetic
+     */
+    public JexlArithmetic getArithmetic() {
+        return arithmetic;
+    }
+
+    /**
      * Sets whether this engine reports debugging information when error occurs.
      * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
      * initialization code before expression creation &amp; evaluation.</p>
@@ -265,7 +273,11 @@ public class JexlEngine {
      * @param flag true means no JexlException will occur, false allows them
      */
     public void setLenient(boolean flag) {
-        this.arithmetic.setLenient(flag);
+        if (arithmetic instanceof JexlThreadedArithmetic) {
+            ((JexlThreadedArithmetic) arithmetic).setLenient(flag);
+        } else if (flag != isLenient()) {
+            logger.warn("setLenient only has an effect when using a JexlThreadedArithmetic");
+        }
     }
 
     /**

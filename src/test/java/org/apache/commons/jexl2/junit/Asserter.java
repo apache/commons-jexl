@@ -27,6 +27,7 @@ import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.MapContext;
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.JexlException;
+import org.apache.commons.jexl2.JexlThreadedArithmetic;
 
 /**
  * A utility class for performing JUnit based assertions using Jexl
@@ -98,7 +99,9 @@ public class Asserter extends Assert {
     public void failExpression(String expression, String matchException) throws Exception {
         boolean[] flags = { engine.isLenient(), engine.isSilent() };
         try {
-            engine.setLenient(false);
+            if (engine.getArithmetic() instanceof JexlThreadedArithmetic) {
+                engine.setLenient(false);
+            }
             engine.setSilent(false);
             Expression exp = engine.createExpression(expression);
             exp.evaluate(context);
@@ -108,7 +111,9 @@ public class Asserter extends Assert {
                 fail("expression: " + expression + ", expected: " + matchException + ", got " + xjexl.getMessage());
             }
         } finally {
-            engine.setLenient(flags[0]);
+            if (engine.getArithmetic() instanceof JexlThreadedArithmetic) {
+                engine.setLenient(flags[0]);
+            }
             engine.setSilent(flags[1]);
         }
     }

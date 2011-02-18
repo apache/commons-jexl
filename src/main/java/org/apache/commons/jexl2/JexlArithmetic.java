@@ -52,7 +52,7 @@ public class JexlArithmetic {
     /** Long.MIN_VALUE as BigInteger. */
     protected static final BigInteger BIGI_LONG_MIN_VALUE = BigInteger.valueOf(Long.MIN_VALUE);
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
-    private boolean strict;
+    protected final boolean strict;
     /** The big decimal math context. */
     protected final MathContext mathContext;
 
@@ -72,19 +72,6 @@ public class JexlArithmetic {
     public JexlArithmetic(boolean lenient, MathContext bigdContext) {
         this.strict = !lenient;
         this.mathContext = bigdContext;
-    }
-
-    /**
-     * Sets whether this JexlArithmetic instance triggers errors during evaluation when
-     * null is used as an operand.
-     * <p>This method is <em>not</em> thread safe; it may be called as an optional step by the JexlEngine
-     * in its initialization code before expression creation &amp; evaluation.</p>
-     * @see JexlEngine#setSilent
-     * @see JexlEngine#setDebug
-     * @param flag true means no JexlException will occur, false allows them
-     */
-    void setLenient(boolean flag) {
-        this.strict = !flag;
     }
 
     /**
@@ -110,7 +97,7 @@ public class JexlArithmetic {
      * @throws NullPointerException if strict
      */
     protected Object controlNullNullOperands() {
-        if (strict) {
+        if (!isLenient()) {
             throw new NullPointerException(JexlException.NULL_OPERAND);
         }
         return Integer.valueOf(0);
@@ -121,7 +108,7 @@ public class JexlArithmetic {
      * @throws NullPointerException if strict
      */
     protected void controlNullOperand() {
-        if (strict) {
+        if (!isLenient()) {
             throw new NullPointerException(JexlException.NULL_OPERAND);
         }
     }

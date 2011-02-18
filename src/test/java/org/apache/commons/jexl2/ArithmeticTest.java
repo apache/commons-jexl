@@ -27,6 +27,10 @@ import org.apache.commons.jexl2.junit.Asserter;
 public class ArithmeticTest extends JexlTestCase {
     private Asserter asserter;
 
+    public ArithmeticTest() {
+        super(createThreadedArithmeticEngine(true));
+    }
+
     @Override
     public void setUp() {
         asserter = new Asserter(JEXL);
@@ -256,12 +260,13 @@ public class ArithmeticTest extends JexlTestCase {
         // number of permutations this will generate
         final int PERMS = tnames.length * tnames.length;
 
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = this.createThreadedArithmeticEngine(true);
+        JexlThreadedArithmetic arith = (JexlThreadedArithmetic) jexl.getArithmetic();
         jexl.setCache(128);
         jexl.setSilent(false);
         // for non-silent, silent...
         for (int s = 0; s < 2; ++s) {
-            jexl.setLenient(s == 0);
+            arith.setLenient(s == 0);
             int zthrow = 0;
             int zeval = 0;
             // for vars of all types...

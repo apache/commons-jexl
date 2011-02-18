@@ -45,7 +45,7 @@ public class PublicFieldsTest extends JexlTestCase {
     private JexlContext ctxt;
 
     public PublicFieldsTest() {
-        JEXL.setLenient(false);
+        super(createEngine(false));
     }
 
     @Override

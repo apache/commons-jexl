@@ -64,6 +64,14 @@ public class JexlTestCase extends TestCase {
     protected void tearDown() throws Exception {
         debuggerCheck(JEXL);
     }
+
+    public static JexlEngine createEngine(boolean lenient) {
+        return new JexlEngine(null, new JexlArithmetic(lenient), null, null);
+    }
+
+    public static JexlEngine createThreadedArithmeticEngine(boolean lenient) {
+        return new JexlEngine(null, new JexlThreadedArithmetic(lenient), null, null);
+    }
     
     /**
      * Will force testing the debugger for each derived test class by

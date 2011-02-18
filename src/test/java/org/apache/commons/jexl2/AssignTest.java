@@ -23,10 +23,10 @@ package org.apache.commons.jexl2;
  * @since 1.1
  */
 public class AssignTest extends JexlTestCase {
-    private static final JexlEngine ENGINE = new JexlEngine();
+    private static final JexlArithmetic ARITH = new JexlArithmetic(false);
+    private static final JexlEngine ENGINE = new JexlEngine(null, ARITH, null, null);
     static {
         ENGINE.setSilent(false);
-        ENGINE.setLenient(false);
     }
     
     public static class Froboz {
