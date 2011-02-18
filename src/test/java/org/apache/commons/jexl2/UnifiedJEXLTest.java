@@ -23,9 +23,8 @@ import org.apache.commons.logging.LogFactory;
  * Test cases for the UnifiedEL.
  */
 public class UnifiedJEXLTest extends JexlTestCase {
-    private static final JexlEngine ENGINE = new JexlEngine();
+    private static final JexlEngine ENGINE = createEngine(false);
     static {
-        ENGINE.setLenient(false);
         ENGINE.setSilent(false);
         ENGINE.setCache(128);
     }

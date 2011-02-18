@@ -150,7 +150,7 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-52: can be implemented by deriving Interpreter.{g,s}etAttribute; later
     public void test52base() throws Exception {
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = createEngine(false);
         Uberspect uber = jexl.getUberspect();
         // most likely, call will be in an Interpreter, getUberspect
         String[] names = ((Introspector) uber).getMethodNames(Another.class);
@@ -176,10 +176,9 @@ public class IssuesTest extends JexlTestCase {
 
     // JEXL-10/JEXL-11: variable checking, null operand is error
     public void test11() throws Exception {
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = createEngine(false);
         // ensure errors will throw
         jexl.setSilent(false);
-        jexl.setLenient(false);
         JexlContext ctxt = new MapContext();
         ctxt.set("a", null);
 
@@ -204,7 +203,7 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-62
     public void test62() throws Exception {
         JexlContext ctxt;
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = createEngine(false);
         jexl.setSilent(true); // to avoid throwing JexlException on null method call
 
         Script jscript;
@@ -235,9 +234,8 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-73
     public void test73() throws Exception {
         JexlContext ctxt = new MapContext();
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = createEngine(false);
         jexl.setSilent(false);
-        jexl.setLenient(false);
         Expression e;
         e = jexl.createExpression("c.e");
         try {
@@ -261,9 +259,8 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-87
     public void test87() throws Exception {
         JexlContext ctxt = new MapContext();
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = createEngine(false);
         jexl.setSilent(false);
-        jexl.setLenient(false);
         Expression divide = jexl.createExpression("l / r");
         Expression modulo = jexl.createExpression("l % r");
 
@@ -281,9 +278,8 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-90
     public void test90() throws Exception {
         JexlContext ctxt = new MapContext();
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = createEngine(false);
         jexl.setSilent(false);
-        jexl.setLenient(false);
         jexl.setCache(16);
         // ';' is necessary between expressions
         String[] fexprs = {
@@ -321,9 +317,8 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-44
     public void test44() throws Exception {
         JexlContext ctxt = new MapContext();
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = createEngine(false);
         jexl.setSilent(false);
-        jexl.setLenient(false);
         Script script;
         script = jexl.createScript("'hello world!'//commented");
         assertEquals("hello world!", script.execute(ctxt));

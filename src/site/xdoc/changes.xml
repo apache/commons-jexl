@@ -26,6 +26,12 @@
   </properties>
   <body>
     <release version="2.0.2" date="unreleased">
+        <action dev="henrib" type="add" issue="JEXL-83" due-to="sebb">
+            Make JexlArithmetic immutable (and threadsafe)
+        </action>
+        <action dev="henrib" type="add" issue="JEXL-108" due-to="Cristian Lorenzetto">
+            Parsing error if i define a empty literal array/map
+        </action>
         <action dev="henrib" type="add" issue="JEXL-107" due-to="henrib">
             Literals and parenthesized expressions can not be used as references
         </action>

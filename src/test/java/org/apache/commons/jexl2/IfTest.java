@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.jexl2;
-
 
 /**
  * Test cases for the if statement.
@@ -25,7 +23,6 @@ package org.apache.commons.jexl2;
  * @since 1.1
  */
 public class IfTest extends JexlTestCase {
-
     public IfTest(String testName) {
         super(testName);
     }
@@ -62,8 +59,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testSimpleElse() throws Exception {
-        Expression e = JEXL
-                .createExpression("if (false) 1 else 2;");
+        Expression e = JEXL.createExpression("if (false) 1 else 2;");
         JexlContext jc = new MapContext();
 
         Object o = e.evaluate(jc);
@@ -76,8 +72,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testBlockIfTrue() throws Exception {
-        Expression e = JEXL
-                .createExpression("if (true) { 'hello'; }");
+        Expression e = JEXL.createExpression("if (true) { 'hello'; }");
         JexlContext jc = new MapContext();
 
         Object o = e.evaluate(jc);
@@ -90,8 +85,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testBlockElse() throws Exception {
-        Expression e = JEXL
-                .createExpression("if (false) {1} else {2 ; 3}");
+        Expression e = JEXL.createExpression("if (false) {1} else {2 ; 3}");
         JexlContext jc = new MapContext();
 
         Object o = e.evaluate(jc);
@@ -104,8 +98,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testIfWithSimpleExpression() throws Exception {
-        Expression e = JEXL
-                .createExpression("if (x == 1) true;");
+        Expression e = JEXL.createExpression("if (x == 1) true;");
         JexlContext jc = new MapContext();
         jc.set("x", new Integer(1));
 
@@ -119,8 +112,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testIfWithArithmeticExpression() throws Exception {
-        Expression e = JEXL
-                .createExpression("if ((x * 2) + 1 == 5) true;");
+        Expression e = JEXL.createExpression("if ((x * 2) + 1 == 5) true;");
         JexlContext jc = new MapContext();
         jc.set("x", new Integer(2));
 
@@ -134,8 +126,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testIfWithDecimalArithmeticExpression() throws Exception {
-        Expression e = JEXL
-                .createExpression("if ((x * 2) == 5) true");
+        Expression e = JEXL.createExpression("if ((x * 2) == 5) true");
         JexlContext jc = new MapContext();
         jc.set("x", new Float(2.5f));
 
@@ -149,8 +140,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testIfWithAssignment() throws Exception {
-        Expression e = JEXL
-                .createExpression("if ((x * 2) == 5) {y = 1} else {y = 2;}");
+        Expression e = JEXL.createExpression("if ((x * 2) == 5) {y = 1} else {y = 2;}");
         JexlContext jc = new MapContext();
         jc.set("x", new Float(2.5f));
 
@@ -165,7 +155,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception
      */
     public void testTernary() throws Exception {
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = createThreadedArithmeticEngine(true);
         jexl.setCache(64);
         JexlContext jc = new MapContext();
         Expression e = jexl.createExpression("x.y.z = foo ?'bar':'quux'");
@@ -173,7 +163,7 @@ public class IfTest extends JexlTestCase {
 
         // undefined foo
 
-        for(int l = 0; l < 4; ++l) {
+        for (int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
@@ -184,7 +174,7 @@ public class IfTest extends JexlTestCase {
 
         jc.set("foo", null);
 
-        for(int l = 0; l < 4; ++l) {
+        for (int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
@@ -193,9 +183,9 @@ public class IfTest extends JexlTestCase {
             assertEquals("Should be quux", "quux", o);
         }
 
-        jc.set("foo",Boolean.FALSE);
+        jc.set("foo", Boolean.FALSE);
 
-        for(int l = 0; l < 4; ++l) {
+        for (int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
@@ -204,9 +194,9 @@ public class IfTest extends JexlTestCase {
             assertEquals("Should be quux", "quux", o);
         }
 
-        jc.set("foo",Boolean.TRUE);
+        jc.set("foo", Boolean.TRUE);
 
-        for(int l = 0; l < 4; ++l) {
+        for (int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
@@ -224,7 +214,7 @@ public class IfTest extends JexlTestCase {
      * @throws Exception
      */
     public void testTernaryShorthand() throws Exception {
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = createThreadedArithmeticEngine(true);
         jexl.setCache(64);
         JexlContext jc = new MapContext();
         Expression e = JEXL.createExpression("x.y.z = foo?:'quux'");
@@ -232,7 +222,7 @@ public class IfTest extends JexlTestCase {
 
         // undefined foo
 
-        for(int l = 0; l < 4; ++l) {
+        for (int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
@@ -243,7 +233,7 @@ public class IfTest extends JexlTestCase {
 
         jc.set("foo", null);
 
-        for(int l = 0; l < 4; ++l) {
+        for (int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
@@ -254,7 +244,7 @@ public class IfTest extends JexlTestCase {
 
         jc.set("foo", Boolean.FALSE);
 
-        for(int l = 0; l < 4; ++l) {
+        for (int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
@@ -263,9 +253,9 @@ public class IfTest extends JexlTestCase {
             assertEquals("Should be quux", "quux", o);
         }
 
-        jc.set("foo","bar");
-        
-        for(int l = 0; l < 4; ++l) {
+        jc.set("foo", "bar");
+
+        for (int l = 0; l < 4; ++l) {
             jexl.setLenient((l & 1) != 0);
             jexl.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
