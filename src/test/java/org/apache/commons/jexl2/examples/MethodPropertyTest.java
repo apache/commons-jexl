@@ -24,8 +24,6 @@ import junit.framework.TestCase;
  *  Simple example to show how to access method and properties.
  *
  *  @since 1.0
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id$
  */
 public class MethodPropertyTest extends TestCase {
     /**

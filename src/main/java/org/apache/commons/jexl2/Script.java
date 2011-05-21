@@ -37,6 +37,17 @@ public interface Script {
      *      the last statement.
      */
     Object execute(JexlContext context);
+    /**
+     * Executes the script with the variables contained in the
+     * supplied {@link JexlContext} and a set of arguments corresponding to the
+     * parameters used during parsing.
+     * 
+     * @param context A JexlContext containing variables.
+     * @param args the arguments
+     * @return The result of this script, usually the result of 
+     *      the last statement.
+     */
+    Object execute(JexlContext context, Object... args);
 
     /**
      * Returns the text of this Script.

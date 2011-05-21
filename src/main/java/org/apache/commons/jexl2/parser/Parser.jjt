@@ -60,25 +60,13 @@ public class Parser extends StringParser
          */
 
         ASTJexlScript tree = JexlScript();
+        if (namedRegisters != null) {
+            tree.setParameters(namedRegisters.keySet().toArray(new String[0]));
+        }
         tree.value = info;
         return tree;
     }
 
-    void jjtreeOpenNodeScope(Node n) {}
-    void jjtreeCloseNodeScope(Node n) throws ParseException {
-      if (n instanceof ASTAmbiguous && n.jjtGetNumChildren() > 0) {
-          Token tok = this.getToken(0);
-          StringBuilder strb = new StringBuilder("Ambiguous statement ");
-          if (tok != null) {
-              strb.append("@");
-              strb.append(tok.beginLine);
-              strb.append(":");
-              strb.append(tok.beginColumn);
-          }
-          strb.append(", missing ';' between expressions");
-         throw new ParseException(strb.toString());
-      }
-    }
 }
 
 PARSER_END(Parser)
@@ -392,12 +380,12 @@ void UnaryExpression() #void : {}
  *      Identifier & Literals
  ***************************************/
 
-void Identifier() :
+void Identifier(boolean top) :
 {
     Token t;
 }
 {
-    t=<IDENTIFIER> { jjtThis.image = t.image; }
+    t=<IDENTIFIER> { jjtThis.image = top? imageOf(jjtThis, t.image) : t.image; }
 |
     t=<REGISTER> { jjtThis.image = t.image; }
 }
@@ -586,7 +574,7 @@ void Reference() : {}
 |
    StringLiteral()
 |
-   Identifier()
+   Identifier(true)
   )  DotReference()
 }
 
