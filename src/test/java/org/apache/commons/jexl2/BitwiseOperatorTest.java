@@ -20,7 +20,6 @@ import org.apache.commons.jexl2.junit.Asserter;
 
 /**
  * Tests for the bitwise operators.
- * @author Dion Gillard
  * @since 1.1
  */
 public class BitwiseOperatorTest extends JexlTestCase {

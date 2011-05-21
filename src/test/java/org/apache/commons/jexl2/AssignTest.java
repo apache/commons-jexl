@@ -19,7 +19,6 @@ package org.apache.commons.jexl2;
 /**
  * Test cases for assignment.
  * 
- * @author Dion Gillard
  * @since 1.1
  */
 public class AssignTest extends JexlTestCase {

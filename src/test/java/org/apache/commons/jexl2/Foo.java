@@ -24,8 +24,6 @@ import java.util.List;
  * A simple bean used for testing purposes
  * 
  * @since 1.0
- * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Revision$
  */
 public class Foo {
     

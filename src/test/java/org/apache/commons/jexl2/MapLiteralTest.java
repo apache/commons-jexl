@@ -23,7 +23,6 @@ import java.util.Map;
 /**
  * Tests for map literals
  *
- * @author Peter Royal
  * @since 1.2
  */
 public class MapLiteralTest extends JexlTestCase {

@@ -25,7 +25,6 @@ import java.util.StringTokenizer;
 
 /**
  * Tests for the foreach statement
- * @author Dion Gillard
  * @since 1.1
  */
 public class ForEachTest extends JexlTestCase {

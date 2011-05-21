@@ -36,8 +36,6 @@ import org.apache.commons.jexl2.parser.Parser;
  *  Simple testcases
  *
  *  @since 1.0
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id$
  */
 public class JexlTest extends JexlTestCase
 {

@@ -19,7 +19,6 @@ package org.apache.commons.jexl2;
 /**
  * Test cases for the if statement.
  * 
- * @author Dion Gillard
  * @since 1.1
  */
 public class IfTest extends JexlTestCase {
