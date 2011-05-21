@@ -38,9 +38,6 @@ import org.apache.commons.logging.Log;
  * <p>This is the class to derive to customize introspection.</p>
  *
  * @since 1.0
- * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @author <a href="mailto:henning@apache.org">Henning P. Schmiedehausen</a>
- * @version $Id$
  */
 public class UberspectImpl extends Introspector implements Uberspect {
     /**

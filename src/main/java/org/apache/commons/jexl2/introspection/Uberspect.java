@@ -26,8 +26,6 @@ import org.apache.commons.jexl2.JexlInfo;
  * behavior in JEXL to be customized.
  * 
  * @since 1.0
- * @author <a href="mailto:geirm@apache.org">Geir Magusson Jr.</a>
- * @version $Id$
  */
 public interface Uberspect {
     /** Sets the class loader to use when getting a constructor with
