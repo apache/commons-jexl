@@ -16,13 +16,25 @@
  */
 package org.apache.commons.jexl2;
 
+import java.math.MathContext;
+
 /**
  * A derived arithmetic that allows different threads to operate with
- * different strict/lenient modes using the same JexlEngine.
+ * different strict/lenient/math modes using the same JexlEngine.
  */
 public class JexlThreadedArithmetic extends JexlArithmetic {
-    /** Whether this JexlArithmetic instance behaves in strict or lenient mode for this thread. */
-    protected static final ThreadLocal<Boolean> lenient = new ThreadLocal<Boolean>();
+    
+    /** Holds the threaded version of some arithmetic features. */
+    static class Features {
+        Features() {
+        }
+        /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
+        Boolean lenient = null;
+        /** The big decimal math context. */
+        MathContext mathContext = null;
+        /** The big decimal scale. */
+        Integer mathScale = null;
+    }
 
     /**
      * Standard ctor.
@@ -31,6 +43,24 @@ public class JexlThreadedArithmetic extends JexlArithmetic {
     public JexlThreadedArithmetic(boolean lenient) {
         super(lenient);
     }
+    
+    /**
+     * Creates a JexlThreadedArithmetic.
+     * @param lenient whether this arithmetic is lenient or strict
+     * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
+     */
+    public JexlThreadedArithmetic(boolean lenient, MathContext bigdContext, int bigdScale) {
+        super(lenient, bigdContext, bigdScale);
+    }
+    
+    /** Whether this JexlArithmetic instance behaves in strict or lenient mode for this thread. */
+    static final ThreadLocal<Features> features = new ThreadLocal<Features>() {
+        @Override
+        protected synchronized Features initialValue() {
+            return new Features();
+        }
+    };
+
 
     /**
      * Overrides the default behavior and sets whether this JexlArithmetic instance triggers errors
@@ -43,13 +73,43 @@ public class JexlThreadedArithmetic extends JexlArithmetic {
      * @param flag true means no JexlException will occur, false allows them, null reverts to default behavior
      */
     public static void setLenient(Boolean flag) {
-        lenient.set(flag);
+        features.get().lenient = flag == null? null : flag;
+    }
+    
+    /**
+     * Sets the math scale.
+     * <p>The goal and constraints are the same than for setLenient.</p>
+     * @param scale the scale
+     */
+    public static void setMathScale(Integer scale) {
+        features.get().mathScale = scale;
+    }
+    
+    /**
+     * Sets the math context.
+     * <p>The goal and constraints are the same than for setLenient.</p>
+     * @param mc the math context
+     */
+    public static void setMathContext(MathContext mc) {
+        features.get().mathContext = mc;
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean isLenient() {
-        Boolean tl = lenient.get();
-        return tl == null? super.isLenient() : tl.booleanValue();
+        Boolean lenient = features.get().lenient;
+        return lenient == null ? super.isLenient() : lenient.booleanValue();
+    }
+    
+    @Override
+    public int getMathScale() {
+        Integer scale = features.get().mathScale;
+        return scale == null ? super.getMathScale() : scale.intValue();
+    }
+    
+    @Override
+    public MathContext getMathContext() {
+        MathContext mc = features.get().mathContext;
+        return mc == null? super.getMathContext() : mc;
     }
 }
