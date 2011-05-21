@@ -25,8 +25,6 @@ package org.apache.commons.jexl2.introspection;
  * </code>
  * 
  * @since 1.0
- * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @version $Id$
  */
 public interface JexlMethod {
     /**
