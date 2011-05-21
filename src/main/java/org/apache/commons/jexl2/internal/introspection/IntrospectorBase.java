@@ -20,6 +20,7 @@ package org.apache.commons.jexl2.internal.introspection;
 import java.lang.reflect.Method;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,14 +47,7 @@ import org.apache.commons.logging.Log;
  *
  * "method" + "java.lang.String" + "java.lang.StringBuffer"
  *
- * This mapping is performed for all the methods in a class and stored for
- *
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
- * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
- * @author <a href="mailto:paulo.gaspar@krankikom.de">Paulo Gaspar</a>
- * @author <a href="mailto:henning@apache.org">Henning P. Schmiedehausen</a>
- * @version $Id$
+ * This mapping is performed for all the methods in a class and stored.
  * @since 1.0
  */
 public class IntrospectorBase {
@@ -259,10 +253,7 @@ public class IntrospectorBase {
                         // add it to list of known loaded classes
                         constructibleClasses.put(cname, clazz);
                     }
-                    List<Constructor<?>> l = new LinkedList<Constructor<?>>();
-                    for(Constructor<?> ictor : clazz.getConstructors()) {
-                        l.add(ictor);
-                    }
+                    List<Constructor<?>> l = new LinkedList<Constructor<?>>(Arrays.asList(clazz.getConstructors()));
                     // try to find one
                     ctor = key.getMostSpecificConstructor(l);
                     if (ctor != null) {
