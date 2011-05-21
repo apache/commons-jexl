@@ -31,8 +31,6 @@ package org.apache.commons.jexl2;
  * </p>
  *
  * @since 1.0
- * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Id$
  */
 public interface Expression {
     /**
