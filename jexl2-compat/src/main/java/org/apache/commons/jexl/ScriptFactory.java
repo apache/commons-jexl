@@ -39,7 +39,7 @@ import org.apache.commons.jexl2.JexlEngine;
  * that serves the same purpose with more control is recommended.
  * </p>
  * @since 1.1
- * @version $Id: ScriptFactory.java 884175 2009-11-25 16:23:41Z henrib $
+ * @version $Id$
  * @deprecated Create a JexlEngine and use the createScript method on that instead.
  */
 @Deprecated

@@ -26,20 +26,27 @@
   </properties>
   <body>
     <release version="2.0.2" date="unreleased">
-        <action dev="henrib" type="add" issue="JEXL-83" due-to="sebb">
-            Make JexlArithmetic immutable (and threadsafe)
+        <action dev="henrib" type="add">
+            Added ObjectContext that wraps an object as JexlContext and added JexlContext as source to solve
+            top-level namespace functions.
         </action>
-        <action dev="henrib" type="add" issue="JEXL-108" due-to="Cristian Lorenzetto">
+        <action dev="henrib" type="fix" issue="JEXL-111" due-to="freish">
+            expression execute error depending on numeric type
+        </action>
+        <action dev="henrib" type="add" issue="JEXL-83" due-to="sebb">
+            Make JexlArithmetic immutable (and threadsafe); also added a mutable JexlThreadedArithmetic.
+        </action>
+        <action dev="henrib" type="fix" issue="JEXL-108" due-to="Cristian Lorenzetto">
             Parsing error if i define a empty literal array/map
         </action>
-        <action dev="henrib" type="add" issue="JEXL-107" due-to="henrib">
+        <action dev="henrib" type="fix" issue="JEXL-107" due-to="henrib">
             Literals and parenthesized expressions can not be used as references
         </action>
-        <action dev="henrib" type="add" issue="JEXL-106" due-to="Michal Sabol">
+        <action dev="henrib" type="fix" issue="JEXL-106" due-to="Michal Sabol">
             When divide two BigDecimal values in an expression it results in java.lang.ArithmeticException: Non-terminating decimal expansion; no exact representable decimal result.
         </action>
         <action dev="henrib" type="add" issue="JEXL-105" due-to="Cary Thompson">Array literals are considered constant even when they are not.</action>
-        <action dev="henrib" type="add" issue="JEXL-104" due-to="Andreas Haufler">NPE in JexlArithmetic when an Array-Expression containing a null is used.</action>
+        <action dev="henrib" type="fix" issue="JEXL-104" due-to="Andreas Haufler">NPE in JexlArithmetic when an Array-Expression containing a null is used.</action>
         <action dev="henrib" type="add" issue="JEXL-102" due-to="sebb">Add "jexl2" as a supported name</action>
         <action dev="henrib" type="add" issue="JEXL-101" due-to="Tobias Shulte">
             Vararg methods where the first argument is no vararg can not be called with only the fixed parameters given

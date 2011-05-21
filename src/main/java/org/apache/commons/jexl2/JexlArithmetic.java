@@ -52,7 +52,7 @@ public class JexlArithmetic {
     /** Long.MIN_VALUE as BigInteger. */
     protected static final BigInteger BIGI_LONG_MIN_VALUE = BigInteger.valueOf(Long.MIN_VALUE);
     /** Default BigDecimal scale. */
-    protected static final int BIGD_SCALE = 5;
+    protected static final int BIGD_SCALE = -1;
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
     protected final boolean strict;
     /** The big decimal math context. */
@@ -72,6 +72,7 @@ public class JexlArithmetic {
      * Creates a JexlArithmetic.
      * @param lenient whether this arithmetic is lenient or strict
      * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
+     * @param bigdScale the scale used for big decimals.
      */
     public JexlArithmetic(boolean lenient, MathContext bigdContext, int bigdScale) {
         this.strict = !lenient;
@@ -95,7 +96,7 @@ public class JexlArithmetic {
     public MathContext getMathContext() {
         return mathContext;
     }
-    
+
     /**
      * The BigDecimal scale used for comparison and coericion operations.
      * @return the scale
@@ -103,14 +104,18 @@ public class JexlArithmetic {
     public int getMathScale() {
         return mathScale;
     }
-    
+
     /**
      * Ensure a big decimal is rounded by this arithmetic scale and rounding mode.
      * @param number the big decimal to round
      * @return the rounded big decimal
      */
     public BigDecimal roundBigDecimal(final BigDecimal number) {
-        return number.setScale(mathScale, mathContext.getRoundingMode());
+        if (mathScale >= 0) {
+            return number.setScale(mathScale, getMathContext().getRoundingMode());
+        } else {
+            return number;
+        }
     }
 
     /**
@@ -221,10 +226,10 @@ public class JexlArithmetic {
     /**
      * Given a BigDecimal, attempt to narrow it to an Integer or Long if it fits if
      * one of the arguments is a numberable.
-     * </p>
+     * 
      * @param lhs the left hand side operand that lead to the bigd result
      * @param rhs the right hand side operand that lead to the bigd result
-     * @param bigi the BigInteger to narrow
+     * @param bigd the BigDecimal to narrow
      * @return an Integer or Long if narrowing is possible, the original BigInteger otherwise
      */
     protected Number narrowBigDecimal(Object lhs, Object rhs, BigDecimal bigd) {
@@ -237,13 +242,13 @@ public class JexlArithmetic {
                 } else {
                     return Long.valueOf(l);
                 }
-            } catch(ArithmeticException xa) {
+            } catch (ArithmeticException xa) {
                 // ignore, no exact value possible
             }
         }
         return bigd;
     }
-    
+
     /**
      * Given an array of objects, attempt to type it more strictly.
      * <ul>
@@ -357,7 +362,7 @@ public class JexlArithmetic {
             if (left instanceof BigDecimal || right instanceof BigDecimal) {
                 BigDecimal l = toBigDecimal(left);
                 BigDecimal r = toBigDecimal(right);
-                BigDecimal result = l.add(r, mathContext);
+                BigDecimal result = l.add(r, getMathContext());
                 return narrowBigDecimal(left, right, result);
             }
 
@@ -398,7 +403,7 @@ public class JexlArithmetic {
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
-            BigDecimal result = l.divide(r, mathContext);
+            BigDecimal result = l.divide(r, getMathContext());
             return narrowBigDecimal(left, right, result);
         }
 
@@ -435,7 +440,7 @@ public class JexlArithmetic {
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
-            BigDecimal remainder = l.remainder(r, mathContext);
+            BigDecimal remainder = l.remainder(r, getMathContext());
             return narrowBigDecimal(left, right, remainder);
         }
 
@@ -468,7 +473,7 @@ public class JexlArithmetic {
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
-            BigDecimal result = l.multiply(r, mathContext);
+            BigDecimal result = l.multiply(r, getMathContext());
             return narrowBigDecimal(left, right, result);
         }
 
@@ -501,7 +506,7 @@ public class JexlArithmetic {
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
-            BigDecimal result = l.subtract(r, mathContext);
+            BigDecimal result = l.subtract(r, getMathContext());
             return narrowBigDecimal(left, right, result);
         }
 
@@ -769,9 +774,9 @@ public class JexlArithmetic {
             if ("".equals(string)) {
                 return BigDecimal.valueOf(0);
             }
-            return roundBigDecimal(new BigDecimal(string,  mathContext));
+            return roundBigDecimal(new BigDecimal(string, getMathContext()));
         } else if (val instanceof Number) {
-            return roundBigDecimal(new BigDecimal(val.toString(), mathContext));
+            return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
         } else if (val instanceof Character) {
             int i = ((Character) val).charValue();
             return new BigDecimal(i);
@@ -852,6 +857,18 @@ public class JexlArithmetic {
             // if it's bigger than a double it can't be narrowed
             if (bigd.compareTo(BIGD_DOUBLE_MAX_VALUE) > 0) {
                 return original;
+            } else {
+                try {
+                    long l = bigd.longValueExact();
+                    // coerce to int when possible (int being so often used in method parms)
+                    if (l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE) {
+                        return Integer.valueOf((int) l);
+                    } else {
+                        return Long.valueOf(l);
+                    }
+                } catch (ArithmeticException xa) {
+                    // ignore, no exact value possible
+                }
             }
         }
         if (original instanceof Double || original instanceof Float || original instanceof BigDecimal) {

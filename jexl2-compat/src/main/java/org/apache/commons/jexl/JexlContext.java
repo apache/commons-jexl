@@ -22,8 +22,8 @@ import java.util.Map;
  * Holds a Map of variables which are referenced in a JEXL expression.
  *
  *  @since 1.0
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id: JexlContext.java 480412 2006-11-29 05:11:23Z bayard $
+ *  
+ *  @version $Id$
  */
 public interface JexlContext {
     /**

@@ -48,13 +48,14 @@ public class JexlThreadedArithmetic extends JexlArithmetic {
      * Creates a JexlThreadedArithmetic.
      * @param lenient whether this arithmetic is lenient or strict
      * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
+     * @param bigdScale the scale used for big decimals.
      */
     public JexlThreadedArithmetic(boolean lenient, MathContext bigdContext, int bigdScale) {
         super(lenient, bigdContext, bigdScale);
     }
     
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode for this thread. */
-    static final ThreadLocal<Features> features = new ThreadLocal<Features>() {
+    static final ThreadLocal<Features> FEATURES = new ThreadLocal<Features>() {
         @Override
         protected synchronized Features initialValue() {
             return new Features();
@@ -73,7 +74,7 @@ public class JexlThreadedArithmetic extends JexlArithmetic {
      * @param flag true means no JexlException will occur, false allows them, null reverts to default behavior
      */
     public static void setLenient(Boolean flag) {
-        features.get().lenient = flag == null? null : flag;
+        FEATURES.get().lenient = flag == null? null : flag;
     }
     
     /**
@@ -82,7 +83,7 @@ public class JexlThreadedArithmetic extends JexlArithmetic {
      * @param scale the scale
      */
     public static void setMathScale(Integer scale) {
-        features.get().mathScale = scale;
+        FEATURES.get().mathScale = scale;
     }
     
     /**
@@ -91,25 +92,25 @@ public class JexlThreadedArithmetic extends JexlArithmetic {
      * @param mc the math context
      */
     public static void setMathContext(MathContext mc) {
-        features.get().mathContext = mc;
+        FEATURES.get().mathContext = mc;
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean isLenient() {
-        Boolean lenient = features.get().lenient;
+        Boolean lenient = FEATURES.get().lenient;
         return lenient == null ? super.isLenient() : lenient.booleanValue();
     }
     
     @Override
     public int getMathScale() {
-        Integer scale = features.get().mathScale;
+        Integer scale = FEATURES.get().mathScale;
         return scale == null ? super.getMathScale() : scale.intValue();
     }
     
     @Override
     public MathContext getMathContext() {
-        MathContext mc = features.get().mathContext;
+        MathContext mc = FEATURES.get().mathContext;
         return mc == null? super.getMathContext() : mc;
     }
 }
