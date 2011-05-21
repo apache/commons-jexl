@@ -30,6 +30,7 @@ import java.lang.reflect.Constructor;
 import java.util.Map;
 import java.util.Set;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -274,7 +275,7 @@ public class JexlEngine {
      */
     public void setLenient(boolean flag) {
         if (arithmetic instanceof JexlThreadedArithmetic) {
-            ((JexlThreadedArithmetic) arithmetic).setLenient(flag);
+            JexlThreadedArithmetic.setLenient(flag);
         } else if (flag != isLenient()) {
             logger.warn("setLenient only has an effect when using a JexlThreadedArithmetic");
         }
@@ -339,6 +340,8 @@ public class JexlEngine {
      * If the prefix is null, the namespace is the top-level namespace allowing to define
      * top-level user defined functions ( ie: myfunc(...) )
      * </p>
+     * <p>Note that the JexlContext is also used to try to solve top-level functions. This allows ObjectContext
+     * derived instances to call methods on the wrapped object.</p>
      * @param funcs the map of functions that should not mutate after the call; if null
      * is passed, the empty collection is used.
      */
@@ -410,24 +413,27 @@ public class JexlEngine {
      * @throws JexlException if there is a problem parsing the script.
      */
     public Script createScript(String scriptText) {
-        return createScript(scriptText, null);
+        return createScript(scriptText, null, null);
     }
 
     /**
      * Creates a Script from a String containing valid JEXL syntax.
      * This method parses the script which validates the syntax.
+     * It uses an array of parameter names that will be resolved during parsing;
+     * a corresponding array of arguments containing values should be used during evaluation.
      *
      * @param scriptText A String containing valid JEXL syntax
+     * @param names the parameter names
      * @param info An info structure to carry debugging information if needed
      * @return A {@link Script} which can be executed using a {@link JexlContext}.
      * @throws JexlException if there is a problem parsing the script.
      */
-    public Script createScript(String scriptText, JexlInfo info) {
+    public Script createScript(String scriptText, JexlInfo info, String[] names) {
         if (scriptText == null) {
             throw new NullPointerException("scriptText is null");
         }
         // Parse the expression
-        ASTJexlScript tree = parse(scriptText, info);
+        ASTJexlScript tree = parse(scriptText, info, names);
         return createScript(tree, scriptText);
     }
 
@@ -464,7 +470,7 @@ public class JexlEngine {
         if (debug) {
             info = createInfo(scriptFile.getName(), 0, 0);
         }
-        return createScript(readerToString(reader), info);
+        return createScript(readerToString(reader), info, null);
     }
 
     /**
@@ -490,7 +496,7 @@ public class JexlEngine {
         if (debug) {
             info = createInfo(scriptUrl.toString(), 0, 0);
         }
-        return createScript(readerToString(reader), info);
+        return createScript(readerToString(reader), info, null);
     }
 
     /**
@@ -817,6 +823,9 @@ public class JexlEngine {
      * @throws JexlException if any error occured during parsing
      */
     protected ASTJexlScript parse(CharSequence expression, JexlInfo info) {
+        return parse(expression, info, null);
+    }
+    protected ASTJexlScript parse(CharSequence expression, JexlInfo info, String[] names) {
         String expr = cleanExpression(expression);
         ASTJexlScript tree = null;
         synchronized (parser) {
@@ -832,6 +841,13 @@ public class JexlEngine {
                 if (info == null) {
                     info = debugInfo();
                 }
+                if (names != null) {
+                    Map<String, Integer> params = new HashMap<String, Integer>();
+                    for(int n = 0; n < names.length; ++n) {
+                        params.put(names[n], n);
+                    }
+                    parser.setNamedRegisters(params);
+                }
                 tree = parser.parse(reader, info);
                 if (cache != null) {
                     cache.put(expr, tree);
@@ -840,6 +856,8 @@ public class JexlEngine {
                 throw new JexlException(info, "!!! " +expression+ " !!!" + ", tokenization failed", xtme);
             } catch (ParseException xparse) {
                 throw new JexlException(info, "!!! " +expression+ " !!!" + ", parsing failed", xparse);
+            } finally {
+                parser.setNamedRegisters(null);
             }
         }
         return tree;

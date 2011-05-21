@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* $Id$ */
 package org.apache.commons.jexl2.junit;
 
 import junit.framework.AssertionFailedError;
@@ -26,8 +27,6 @@ import org.apache.commons.jexl2.Foo;
  *  Simple testcases
  *
  *  @since 1.0
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @version $Id$
  */
 public class AsserterTest extends JexlTestCase {
     public AsserterTest(String testName) {

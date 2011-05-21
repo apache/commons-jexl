@@ -14,15 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.jexl2.junit;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl2.JexlArithmetic;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.MapContext;
 import org.apache.commons.jexl2.JexlEngine;
@@ -35,15 +36,12 @@ import org.apache.commons.jexl2.JexlThreadedArithmetic;
  * Jexl navigation expressions.
  *
  * @since 1.0
- * @author <a href="mailto:jstrachan@apache.org">James Strachan</a>
- * @version $Revision$
  */
 public class Asserter extends Assert {
     /** variables used during asserts. */
     private final Map<String, Object> variables = new HashMap<String, Object>();
     /** context to use during asserts. */
     private final JexlContext context = new MapContext(variables);
-
     /** Jexl engine to use during Asserts. */
     private final JexlEngine engine;
 
@@ -84,8 +82,12 @@ public class Asserter extends Assert {
     public void assertExpression(String expression, Object expected) throws Exception {
         Expression exp = engine.createExpression(expression);
         Object value = exp.evaluate(context);
-
-        assertEquals("expression: " + expression, expected, value);
+        if (expected instanceof BigDecimal) {
+            JexlArithmetic jexla = engine.getArithmetic();
+            assertTrue("expression: " + expression, ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)) == 0);
+        } else {
+            assertEquals("expression: " + expression, expected, value);
+        }
     }
 
     /**
@@ -97,7 +99,7 @@ public class Asserter extends Assert {
      * @throws Exception if the expression did not fail or the exception did not match the expected pattern
      */
     public void failExpression(String expression, String matchException) throws Exception {
-        boolean[] flags = { engine.isLenient(), engine.isSilent() };
+        boolean[] flags = {engine.isLenient(), engine.isSilent()};
         try {
             if (engine.getArithmetic() instanceof JexlThreadedArithmetic) {
                 engine.setLenient(false);
@@ -106,7 +108,7 @@ public class Asserter extends Assert {
             Expression exp = engine.createExpression(expression);
             exp.evaluate(context);
             fail("expression: " + expression);
-        } catch(JexlException xjexl) {
+        } catch (JexlException xjexl) {
             if (matchException != null && !xjexl.getMessage().matches(matchException)) {
                 fail("expression: " + expression + ", expected: " + matchException + ", got " + xjexl.getMessage());
             }
@@ -137,5 +139,4 @@ public class Asserter extends Assert {
     public Object removeVariable(String name) {
         return variables.remove(name);
     }
-
 }

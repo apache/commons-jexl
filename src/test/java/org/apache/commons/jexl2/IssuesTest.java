@@ -266,13 +266,13 @@ public class IssuesTest extends JexlTestCase {
 
         ctxt.set("l", java.math.BigInteger.valueOf(7));
         ctxt.set("r", java.math.BigInteger.valueOf(2));
-        assertEquals("3", divide.evaluate(ctxt).toString());
-        assertEquals("1", modulo.evaluate(ctxt).toString());
+        assertEquals(java.math.BigInteger.valueOf(3), divide.evaluate(ctxt));
+        assertTrue(jexl.getArithmetic().equals(1, modulo.evaluate(ctxt)));
 
         ctxt.set("l", java.math.BigDecimal.valueOf(7));
         ctxt.set("r", java.math.BigDecimal.valueOf(2));
-        assertEquals("3.5", divide.evaluate(ctxt).toString());
-        assertEquals("1", modulo.evaluate(ctxt).toString());
+        assertEquals(java.math.BigDecimal.valueOf(3.5), divide.evaluate(ctxt));
+        assertTrue(jexl.getArithmetic().equals(1, modulo.evaluate(ctxt)));
     }
 
     // JEXL-90
@@ -435,15 +435,15 @@ public class IssuesTest extends JexlTestCase {
         try {
             Object value = jexl.createExpression("a / b").evaluate(context);
             assertNotNull(value);
-        } catch(JexlException xjexl) {
+        } catch (JexlException xjexl) {
             fail("should not occur");
         }
-        JexlArithmetic arithmetic = new JexlArithmetic(false, MathContext.UNLIMITED);
+        JexlArithmetic arithmetic = new JexlArithmetic(false, MathContext.UNLIMITED, 2);
         JexlEngine jexlX = new JexlEngine(null, arithmetic, null, null);
         try {
             Object value = jexlX.createExpression("a / b").evaluate(context);
             fail("should fail");
-        } catch(JexlException xjexl) {
+        } catch (JexlException xjexl) {
             //ok  to fail
         }
     }
@@ -463,7 +463,7 @@ public class IssuesTest extends JexlTestCase {
         JexlContext context = new MapContext();
         context.set("Q4", "Q4");
         JexlEngine jexl = new JexlEngine();
-        for(int e = 0; e < exprs.length; e += 2) {
+        for (int e = 0; e < exprs.length; e += 2) {
             Expression expr = jexl.createExpression(exprs[e]);
             Object expected = exprs[e + 1];
             Object value = expr.evaluate(context);
@@ -501,10 +501,10 @@ public class IssuesTest extends JexlTestCase {
 
         expr = jexl.createExpression("if (false) { [] } else { {:} }");
         value = expr.evaluate(null);
-        assertTrue(value instanceof Map<?,?>);
+        assertTrue(value instanceof Map<?, ?>);
         expr = jexl.createExpression(expr.dump());
         value = expr.evaluate(null);
-        assertTrue(value instanceof Map<?,?>);
+        assertTrue(value instanceof Map<?, ?>);
     }
 
     public void test109() throws Exception {
@@ -514,5 +514,104 @@ public class IssuesTest extends JexlTestCase {
         context.set("foo.bar", 40);
         value = jexl.createExpression("foo.bar + 2").evaluate(context);
         assertEquals(42, value);
+    }
+
+    public void test110() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        String[] names = {"foo"};
+        Object value;
+        JexlContext context = new MapContext();
+        value = jexl.createScript("foo + 2", null, names).execute(context, 40);
+        assertEquals(42, value);
+        context.set("frak.foo", -40);
+        value = jexl.createScript("frak.foo - 2", null, names).execute(context, 40);
+        assertEquals(-42, value);
+    }
+
+    static public class RichContext extends ObjectContext<A105> {
+        RichContext(JexlEngine jexl, A105 a105) {
+            super(jexl, a105);
+        }
+
+        public String uppercase(String str) {
+            return str.toUpperCase();
+        }
+    }
+
+    public void testRichContext() throws Exception {
+        A105 a105 = new A105("foo", "bar");
+        JexlEngine jexl = new JexlEngine();
+        Object value;
+        JexlContext context = new RichContext(jexl, a105);
+        value = jexl.createScript("uppercase(nameA + propA)").execute(context);
+        assertEquals("FOOBAR", value);
+    }
+
+    public void test111() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        Object value;
+        JexlContext context = new MapContext();
+        String strExpr = "((x>0)?\"FirstValue=\"+(y-x):\"SecondValue=\"+x)";
+        Expression expr = jexl.createExpression(strExpr);
+
+        context.set("x", 1);
+        context.set("y", 10);
+        value = expr.evaluate(context);
+        assertEquals("FirstValue=9", value);
+
+        context.set("x", 1.0d);
+        context.set("y", 10.0d);
+        value = expr.evaluate(context);
+        assertEquals("FirstValue=9.0", value);
+
+        context.set("x", 1);
+        context.set("y", 10.0d);
+        value = expr.evaluate(context);
+        assertEquals("FirstValue=9.0", value);
+
+        context.set("x", 1.0d);
+        context.set("y", 10);
+        value = expr.evaluate(context);
+        assertEquals("FirstValue=9.0", value);
+
+
+        context.set("x", -10);
+        context.set("y", 1);
+        value = expr.evaluate(context);
+        assertEquals("SecondValue=-10", value);
+
+        context.set("x", -10.0d);
+        context.set("y", 1.0d);
+        value = expr.evaluate(context);
+        assertEquals("SecondValue=-10.0", value);
+
+        context.set("x", -10);
+        context.set("y", 1.0d);
+        value = expr.evaluate(context);
+        assertEquals("SecondValue=-10", value);
+
+        context.set("x", -10.0d);
+        context.set("y", 1);
+        value = expr.evaluate(context);
+        assertEquals("SecondValue=-10.0", value);
+    }
+
+    public void test112() throws Exception {
+        JexlArithmetic arithmetic = new JexlThreadedArithmetic(false);
+        JexlEngine jexlX = new JexlEngine(null, arithmetic, null, null);
+        String expStr1 = "result == salary/month * work.percent/100.00";
+        Expression exp1 = jexlX.createExpression(expStr1);
+        JexlContext ctx = new MapContext();
+        ctx.set("result", new BigDecimal("9958.33"));
+        ctx.set("salary", new BigDecimal("119500.00"));
+        ctx.set("month", new BigDecimal("12.00"));
+        ctx.set("percent", new BigDecimal("100.00"));
+        
+        // will fail because default scale is 5
+        assertFalse((Boolean) exp1.evaluate(ctx));
+        
+        // will succeed with scale = 2
+        JexlThreadedArithmetic.setMathScale(2);
+        assertFalse((Boolean) exp1.evaluate(ctx));
     }
 }

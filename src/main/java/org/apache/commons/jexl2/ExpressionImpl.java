@@ -24,8 +24,6 @@ import org.apache.commons.jexl2.parser.ASTJexlScript;
  * and this is the default implementation of the {@link Expression} and
  * {@link Script} interface.
  * @since 1.0
- * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Id$
  */
 public class ExpressionImpl implements Expression, Script {
     /** The engine for this expression. */
@@ -103,6 +101,16 @@ public class ExpressionImpl implements Expression, Script {
      */
     public Object execute(JexlContext context) {
         Interpreter interpreter = jexl.createInterpreter(context);
+        interpreter.setArguments(script.getParameters(), null);
+        return interpreter.interpret(script);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public Object execute(JexlContext context, Object...args) {
+        Interpreter interpreter = jexl.createInterpreter(context);
+        interpreter.setArguments(script.getParameters(), args);
         return interpreter.interpret(script);
     }
 

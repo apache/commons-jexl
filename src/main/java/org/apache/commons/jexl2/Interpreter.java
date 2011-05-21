@@ -109,9 +109,11 @@ public class Interpreter implements ParserVisitor {
     /** Silent intepreter flag. */
     protected boolean silent;
     /** Cache executors. */
-    protected final boolean  cache;
-    /** Registers made of 2 pairs of {register-name, value}. */
+    protected final boolean cache;
+    /** Registers or arguments. */
     protected Object[] registers = null;
+    /** Parameter names if any. */
+    protected String[] parameters = null;
     /** Empty parameters for method matching. */
     protected static final Object[] EMPTY_PARAMS = new Object[0];
 
@@ -187,6 +189,16 @@ public class Interpreter implements ParserVisitor {
     }
 
     /**
+     * Sets this interpreter parameters and arguments.
+     * @param parameters the array of parameters
+     * @param arguments the array of arguments
+     */
+    protected void setArguments(String[] parameters, Object[] arguments) {
+        this.parameters = parameters;
+        this.registers = arguments;
+    }
+
+    /**
      * Finds the node causing a NPE for diadic operators.
      * @param xrt the RuntimeException
      * @param node the parent node
@@ -255,7 +267,7 @@ public class Interpreter implements ParserVisitor {
             }
         }
         namespace = functions.get(prefix);
-        if (namespace == null) {
+        if (prefix != null && namespace == null) {
             throw new JexlException(node, "no such function namespace " + prefix);
         }
         // allow namespace to be instantiated as functor with context if possible, not an error otherwise
@@ -680,8 +692,8 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTIdentifier node, Object data) {
         String name = node.image;
         if (data == null) {
-            if (registers != null) {
-                return registers[name.charAt(1) - '0'];
+            if (registers != null && name.charAt(0) == '#') {
+                return registers[Integer.parseInt(name.substring(1))];
             }
             Object value = context.get(name);
             if (value == null
@@ -793,7 +805,7 @@ public class Interpreter implements ParserVisitor {
             if (node.jjtGetParent().jjtGetChild(0) == node) {
                 data = resolveNamespace(null, node);
                 if (data == null) {
-                    throw new JexlException(node, "no default function namespace");
+                    data = context;
                 }
             } else {
                 throw new JexlException(node, "attempting to call method on null");

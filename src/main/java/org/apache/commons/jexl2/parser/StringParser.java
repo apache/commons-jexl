@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl2.parser;
 
+import java.util.Map;
+
 /**
  * Common constant strings utilities.
  * <p>
@@ -35,7 +37,57 @@ package org.apache.commons.jexl2.parser;
  */
 public class StringParser {
     /** Default constructor.  */
-    public StringParser() {}
+    public StringParser() {
+    }
+
+    /**
+     * The map of named registers aka script parameters.
+     */
+    protected Map<String, Integer> namedRegisters = null;
+
+    public void setNamedRegisters(Map<String, Integer> registers) {
+        namedRegisters = registers;
+    }
+
+    public String imageOf(JexlNode identifier, String image) {
+        if (namedRegisters != null && identifier instanceof ASTIdentifier) {
+            if (!(identifier.jjtGetParent() instanceof ASTIdentifier)) {
+                Integer register = namedRegisters.get(image);
+                if (register != null) {
+                    return '#' + register.toString();
+                }
+            }
+        }
+        return image;
+    }
+    
+    public Token getToken(int index) {
+        return null;
+    }
+    
+    public void Identifier(boolean top) throws ParseException {
+        // Overriden by generated code
+    }
+
+    final public void Identifier() throws ParseException {
+        Identifier(false);
+    }
+
+    void jjtreeOpenNodeScope(Node n) {}
+    void jjtreeCloseNodeScope(Node n) throws ParseException {
+      if (n instanceof ASTAmbiguous && n.jjtGetNumChildren() > 0) {
+          Token tok = this.getToken(0);
+          StringBuilder strb = new StringBuilder("Ambiguous statement ");
+          if (tok != null) {
+              strb.append("@");
+              strb.append(tok.beginLine);
+              strb.append(":");
+              strb.append(tok.beginColumn);
+          }
+          strb.append(", missing ';' between expressions");
+         throw new ParseException(strb.toString());
+      }
+    }
     
     /**
      * Builds a string, handles escaping through '\' syntax.
