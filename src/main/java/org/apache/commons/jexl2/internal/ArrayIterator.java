@@ -36,9 +36,6 @@ import java.lang.reflect.Array;
  *  </p>
  *
  * @since 1.0
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Id$
  */
 public class ArrayIterator implements Iterator<Object> {
     /** The objects to iterate over. */

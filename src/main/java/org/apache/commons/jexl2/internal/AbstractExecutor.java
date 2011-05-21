@@ -27,9 +27,6 @@ import java.lang.reflect.InvocationTargetException;
  * for all other AbstractExecutor classes.
  *
  * @since 1.0
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- * @version $Id$
  */
 public abstract class AbstractExecutor {
     /** A marker for invocation failures in tryInvoke. */

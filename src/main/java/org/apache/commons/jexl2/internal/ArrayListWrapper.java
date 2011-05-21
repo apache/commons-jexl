@@ -21,9 +21,6 @@ import java.util.AbstractList;
 
 /**
  * A class that wraps an array with a List interface.
- * 
- * @author Chris Schultz &lt;chris@christopherschultz.net$gt;
- * @version $Revision$ $Date: 2006-04-14 19:40:41 $
  */
 public class ArrayListWrapper extends AbstractList<Object> {
     /** the array to wrap. */
