@@ -19,7 +19,6 @@ package org.apache.commons.jexl2;
 
 /**
  * Tests for while statement.
- * @author Dion Gillard
  * @since 1.1
  */
 public class WhileTest extends JexlTestCase {

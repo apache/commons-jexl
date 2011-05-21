@@ -20,11 +20,11 @@ package org.apache.commons.jexl2;
 import java.util.Map;
 
 /**
- * @author Dion Gillard
- * @since 1.0
  * Command line interface for Jexl for use in testing
+ * @since 1.0
  */
 public class Jexl {
+    private Jexl() {}
 
     public static void main(String[] args) {
         final JexlEngine JEXL = new JexlEngine();
