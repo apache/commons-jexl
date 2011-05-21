@@ -112,7 +112,7 @@ public class JexlArithmetic {
      */
     public BigDecimal roundBigDecimal(final BigDecimal number) {
         if (mathScale >= 0) {
-            return number.setScale(mathScale, getMathContext().getRoundingMode());
+            return number.setScale(getMathScale(), getMathContext().getRoundingMode());
         } else {
             return number;
         }
