@@ -33,13 +33,6 @@ import org.apache.commons.logging.Log;
  * Originally taken from the Velocity tree so we can be self-sufficient.
  * </p>
  * @see MethodKey
- *
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
- * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
- * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @author <a href="mailto:henning@apache.org">Henning P. Schmiedehausen</a>
- * @version $Id$
  * @since 1.0
  */
 final class ClassMap {
@@ -195,9 +188,6 @@ final class ClassMap {
 
     /**
      * This is the cache to store and look up the method information.
-     *
-     * @author <a href="mailto:henning@apache.org">Henning P. Schmiedehausen</a>
-     * @version $Id$
      * <p>
      * It stores the association between:
      *  - a key made of a method name & an array of argument types.
@@ -208,7 +198,6 @@ final class ClassMap {
      * foo(int,int) & foo(Integer,Integer) since in practise, only the latter form will be used through a call.
      * This of course, applies to all 8 primitive types.
      * </p>
-     * @version $Id$
      */
     static final class MethodCache {
         /**

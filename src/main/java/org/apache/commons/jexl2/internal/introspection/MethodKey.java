@@ -40,14 +40,6 @@ import java.util.Arrays;
  * A key can be constructed either from arguments (array of objects) or from parameters
  * (array of class).
  * Roughly 3x faster than string key to access the map & uses less memory.
- *
- * For the parameters methods:
- * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
- * @author <a href="mailto:bob@werken.com">Bob McWhirter</a>
- * @author <a href="mailto:Christoph.Reck@dlr.de">Christoph Reck</a>
- * @author <a href="mailto:geirm@optonline.net">Geir Magnusson Jr.</a>
- * @author <a href="mailto:szegedia@freemail.hu">Attila Szegedi</a>
- * @author Nathan Bubna
  */
 public final class MethodKey {
     /** The hash code. */
@@ -221,8 +213,8 @@ public final class MethodKey {
      *         the formal type.
      */
     public static boolean isInvocationConvertible(Class<?> formal,
-                                                  Class<?> actual,
-                                                  boolean possibleVarArg) {
+            Class<?> actual,
+            boolean possibleVarArg) {
         /* if it's a null, it means the arg was null */
         if (actual == null && !formal.isPrimitive()) {
             return true;
@@ -233,39 +225,45 @@ public final class MethodKey {
             return true;
         }
 
-        // CSOFF: NeedBraces
         /* Check for boxing with widening primitive conversion. Note that
          * actual parameters are never primitives. */
         if (formal.isPrimitive()) {
-            if (formal == Boolean.TYPE && actual == Boolean.class)
+            if (formal == Boolean.TYPE && actual == Boolean.class) {
                 return true;
-            if (formal == Character.TYPE && actual == Character.class)
+            }
+            if (formal == Character.TYPE && actual == Character.class) {
                 return true;
-            if (formal == Byte.TYPE && actual == Byte.class)
+            }
+            if (formal == Byte.TYPE && actual == Byte.class) {
                 return true;
+            }
             if (formal == Short.TYPE
-                && (actual == Short.class || actual == Byte.class))
+                    && (actual == Short.class || actual == Byte.class)) {
                 return true;
+            }
             if (formal == Integer.TYPE
-                && (actual == Integer.class || actual == Short.class
-                    || actual == Byte.class))
+                    && (actual == Integer.class || actual == Short.class
+                    || actual == Byte.class)) {
                 return true;
+            }
             if (formal == Long.TYPE
-                && (actual == Long.class || actual == Integer.class
-                    || actual == Short.class || actual == Byte.class))
+                    && (actual == Long.class || actual == Integer.class
+                    || actual == Short.class || actual == Byte.class)) {
                 return true;
+            }
             if (formal == Float.TYPE
-                && (actual == Float.class || actual == Long.class
+                    && (actual == Float.class || actual == Long.class
                     || actual == Integer.class || actual == Short.class
-                    || actual == Byte.class))
+                    || actual == Byte.class)) {
                 return true;
+            }
             if (formal == Double.TYPE
-                && (actual == Double.class || actual == Float.class
+                    && (actual == Double.class || actual == Float.class
                     || actual == Long.class || actual == Integer.class
-                    || actual == Short.class || actual == Byte.class))
+                    || actual == Short.class || actual == Byte.class)) {
                 return true;
+            }
         }
-        // CSON: NeedBraces
 
         /* Check for vararg conversion. */
         if (possibleVarArg && formal.isArray()) {
@@ -295,8 +293,8 @@ public final class MethodKey {
      *         subject to widening conversion to formal.
      */
     public static boolean isStrictInvocationConvertible(Class<?> formal,
-                                                        Class<?> actual,
-                                                        boolean possibleVarArg) {
+            Class<?> actual,
+            boolean possibleVarArg) {
         /* we shouldn't get a null into, but if so */
         if (actual == null && !formal.isPrimitive()) {
             return true;
@@ -307,29 +305,32 @@ public final class MethodKey {
             return true;
         }
 
-        // CSOFF: NeedBraces
         /* Check for widening primitive conversion. */
         if (formal.isPrimitive()) {
-            if (formal == Short.TYPE && (actual == Byte.TYPE))
+            if (formal == Short.TYPE && (actual == Byte.TYPE)) {
                 return true;
+            }
             if (formal == Integer.TYPE
-                && (actual == Short.TYPE || actual == Byte.TYPE))
+                && (actual == Short.TYPE || actual == Byte.TYPE)) {
                 return true;
+            }
             if (formal == Long.TYPE
                 && (actual == Integer.TYPE || actual == Short.TYPE
-                    || actual == Byte.TYPE))
+                || actual == Byte.TYPE)) {
                 return true;
+            }
             if (formal == Float.TYPE
                 && (actual == Long.TYPE || actual == Integer.TYPE
-                    || actual == Short.TYPE || actual == Byte.TYPE))
+                || actual == Short.TYPE || actual == Byte.TYPE)) {
                 return true;
+            }
             if (formal == Double.TYPE
                 && (actual == Float.TYPE || actual == Long.TYPE
-                    || actual == Integer.TYPE || actual == Short.TYPE
-                    || actual == Byte.TYPE))
+                || actual == Integer.TYPE || actual == Short.TYPE
+                || actual == Byte.TYPE)) {
                 return true;
+            }
         }
-        // CSON: NeedBraces
 
         /* Check for vararg conversion. */
         if (possibleVarArg && formal.isArray()) {
