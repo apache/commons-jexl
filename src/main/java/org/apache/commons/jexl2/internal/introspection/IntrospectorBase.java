@@ -253,7 +253,10 @@ public class IntrospectorBase {
                         // add it to list of known loaded classes
                         constructibleClasses.put(cname, clazz);
                     }
-                    List<Constructor<?>> l = new LinkedList<Constructor<?>>(Arrays.asList(clazz.getConstructors()));
+                    List<Constructor<?>> l = new LinkedList<Constructor<?>>();
+                    for(Constructor<?> ictor : clazz.getConstructors()) {
+                        l.add(ictor);
+                    }
                     // try to find one
                     ctor = key.getMostSpecificConstructor(l);
                     if (ctor != null) {
