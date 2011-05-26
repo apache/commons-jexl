@@ -269,6 +269,7 @@ public class JexlEngine {
      * an operand.
      * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
      * initialization code before expression creation &amp; evaluation.</p>
+     * <p>As of 2.0.2, you need a JexlThreadedArithmetic instance for this call to succeed.</p>
      * @see JexlEngine#setSilent
      * @see JexlEngine#setDebug
      * @param flag true means no JexlException will occur, false allows them
