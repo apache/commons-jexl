@@ -348,7 +348,6 @@ public class IssuesTest extends JexlTestCase {
         Object value = script.evaluate(ctxt);
         assertEquals(Integer.valueOf(11), value);
         long end = System.nanoTime();
-        long millis=end-start;
         double millisec = (end - start) / 1e6;
         double limit = 100.0; // Allow plenty of slack
         assertTrue("Expected parse to take less than "+limit+"ms, actual "+millisec, millisec < limit);
@@ -446,7 +445,7 @@ public class IssuesTest extends JexlTestCase {
         JexlArithmetic arithmetic = new JexlArithmetic(false, MathContext.UNLIMITED, 2);
         JexlEngine jexlX = new JexlEngine(null, arithmetic, null, null);
         try {
-            Object value = jexlX.createExpression("a / b").evaluate(context);
+            jexlX.createExpression("a / b").evaluate(context);
             fail("should fail");
         } catch (JexlException xjexl) {
             //ok  to fail
