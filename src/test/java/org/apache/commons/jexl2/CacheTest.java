@@ -38,6 +38,12 @@ public class CacheTest extends JexlTestCase {
         jexl.setSilent(false);
     }
 
+    @Override
+    public void setUp() throws Exception {
+        // ensure jul logging is only error to avoid warning in silent mode
+        java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
+    }
+
     // LOOPS & THREADS
     private static final int LOOPS = 4096;
     private static final int NTHREADS = 4;
@@ -271,6 +277,7 @@ public class CacheTest extends JexlTestCase {
      * @param cache whether jexl cache is used or not
      * @throws Exception if anything goes wrong
      */
+    @SuppressWarnings("boxing")
     void runThreaded(Class<? extends Task> ctask, int loops, boolean cache) throws Exception {
         if (loops == 0) {
             loops = MIX.length;
