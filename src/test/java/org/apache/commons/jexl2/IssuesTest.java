@@ -27,11 +27,13 @@ import org.apache.commons.jexl2.introspection.UberspectImpl;
 /**
  * Test cases for reported issues
  */
+@SuppressWarnings("boxing")
 public class IssuesTest extends JexlTestCase {
+
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error to avoid warning in silent mode
-        //java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
+        java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
     }
 
     // JEXL-49: blocks not parsed (fixed)
@@ -346,7 +348,10 @@ public class IssuesTest extends JexlTestCase {
         Object value = script.evaluate(ctxt);
         assertEquals(Integer.valueOf(11), value);
         long end = System.nanoTime();
-        System.out.printf("Parse took %.3f seconds\n", (end - start) / 1e+9);
+        long millis=end-start;
+        double millisec = (end - start) / 1e6;
+        double limit = 100.0; // Allow plenty of slack
+        assertTrue("Expected parse to take less than "+limit+"ms, actual "+millisec, millisec < limit);
     }
 
     public static class fn98 {
