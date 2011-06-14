@@ -41,7 +41,7 @@ public class IssuesTest extends JexlTestCase {
     public void test24() throws Exception {
         Map<String, Object> vars = new HashMap<String, Object>();
         JexlContext ctxt = new MapContext(vars);
-        String stmt = "{a = 10L; b = 10l; c = 42.0D; d = 42.0d; e=56.3F; f=56.3f; g=63.5}";
+        String stmt = "{a = 10L; b = 10l; c = 42.0D; d = 42.0d; e=56.3F; f=56.3f; g=63.5; h=0x10; i=010; j=0x10L; k=010l}";
         Script expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         assertEquals(10L, vars.get("a"));
@@ -51,6 +51,10 @@ public class IssuesTest extends JexlTestCase {
         assertEquals(56.3f, vars.get("e"));
         assertEquals(56.3f, vars.get("f"));
         assertEquals(63.5f, vars.get("g"));
+        assertEquals(0x10, vars.get("h"));
+        assertEquals(010, vars.get("i"));
+        assertEquals(0x10L, vars.get("j"));
+        assertEquals(010l, vars.get("k"));
     }
 
     // JEXL-24: big integers and big decimals
