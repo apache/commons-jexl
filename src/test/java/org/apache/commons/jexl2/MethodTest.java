@@ -34,7 +34,7 @@ public class MethodTest extends JexlTestCase {
             int result = 0;
             if (args != null) {
                 for (int i = 0; i < args.length; i++) {
-                        result += args[i] != null ?args[i] : -100;
+                        result += args[i] != null ? args[i].intValue() : -100;
                 }
             } else {
                 result = -1000;
@@ -46,7 +46,7 @@ public class MethodTest extends JexlTestCase {
             int result = fixed.intValue();
             if (args != null) {
                 for (int i = 0; i < args.length; i++) {
-                    result += args[i] != null ?args[i] : -100;
+                    result += args[i] != null ? args[i].intValue() : -100;
                 }
             } else {
                 result -= 1000;
@@ -58,7 +58,7 @@ public class MethodTest extends JexlTestCase {
             int result = 0;
             if (args != null) {
                 for (int i = 0; i < args.length; i++) {
-                    result += args[i] != null ?args[i] : -100;
+                    result += args[i] != null ? args[i].intValue() : -100;
                 }
             } else {
                 result = -1000;
@@ -116,11 +116,11 @@ public class MethodTest extends JexlTestCase {
     public void testCallMixedVarArgMethod() throws Exception {
         VarArgs test = new VarArgs();
         asserter.setVariable("test", test);
-        assertEquals("Mixed:1", test.callMixed(1));
+        assertEquals("Mixed:1", test.callMixed(Integer.valueOf(1)));
         asserter.assertExpression("test.callMixed(1)", "Mixed:1");
         // Java and JEXL equivalent behavior: 'Mixed:-999' expected
         //{
-        assertEquals("Mixed:-999", test.callMixed(1, null));
+        assertEquals("Mixed:-999", test.callMixed(Integer.valueOf(1), (Integer[]) null));
         asserter.assertExpression("test.callMixed(1, null)", "Mixed:-999");
         //}
         asserter.assertExpression("test.callMixed(1,2)", "Mixed:3");
@@ -134,7 +134,7 @@ public class MethodTest extends JexlTestCase {
         asserter.assertExpression("test.callMixed('jexl')", "jexl:0");
         // Java and JEXL equivalent behavior: 'jexl:-1000' expected
         //{
-        assertEquals("jexl:-1000", test.callMixed("jexl", null));
+        assertEquals("jexl:-1000", test.callMixed("jexl", (Integer []) null));
         asserter.assertExpression("test.callMixed('jexl', null)", "jexl:-1000");
         //}
         asserter.assertExpression("test.callMixed('jexl', 2)", "jexl:2");

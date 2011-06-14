@@ -161,9 +161,9 @@ public class ArrayAccessTest extends JexlTestCase {
         foo[1] = i42;
         foo[2] = s42;
         asserter.setVariable("foo", foo);
-        asserter.setVariable("zero", 0);
-        asserter.setVariable("one", 1);
-        asserter.setVariable("two", 2);
+        asserter.setVariable("zero", Integer.valueOf(0));
+        asserter.setVariable("one", Integer.valueOf(1));
+        asserter.setVariable("two", Integer.valueOf(2));
         for(int l = 0; l < 2; ++l) {
             asserter.assertExpression("foo[0]", foo);
             asserter.assertExpression("foo[0][0]", foo);

@@ -42,7 +42,7 @@ public class ArithmeticTest extends JexlTestCase {
     
     public void testLeftNullOperand() throws Exception {
         asserter.setVariable("left", null);
-        asserter.setVariable("right", 8);
+        asserter.setVariable("right", Integer.valueOf(8));
         asserter.failExpression("left + right", ".*null.*");
         asserter.failExpression("left - right", ".*null.*");
         asserter.failExpression("left * right", ".*null.*");
@@ -54,7 +54,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     public void testRightNullOperand() throws Exception {
-        asserter.setVariable("left", 9);
+        asserter.setVariable("left", Integer.valueOf(9));
         asserter.setVariable("right", null);
         asserter.failExpression("left + right", ".*null.*");
         asserter.failExpression("left - right", ".*null.*");
@@ -260,13 +260,12 @@ public class ArithmeticTest extends JexlTestCase {
         // number of permutations this will generate
         final int PERMS = tnames.length * tnames.length;
 
-        JexlEngine jexl = this.createThreadedArithmeticEngine(true);
-        JexlThreadedArithmetic arith = (JexlThreadedArithmetic) jexl.getArithmetic();
+        JexlEngine jexl = createThreadedArithmeticEngine(true);
         jexl.setCache(128);
         jexl.setSilent(false);
         // for non-silent, silent...
         for (int s = 0; s < 2; ++s) {
-            arith.setLenient(s == 0);
+            JexlThreadedArithmetic.setLenient(Boolean.valueOf(s == 0));
             int zthrow = 0;
             int zeval = 0;
             // for vars of all types...
