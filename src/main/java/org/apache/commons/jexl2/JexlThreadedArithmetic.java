@@ -74,7 +74,7 @@ public class JexlThreadedArithmetic extends JexlArithmetic {
      * @param flag true means no JexlException will occur, false allows them, null reverts to default behavior
      */
     public static void setLenient(Boolean flag) {
-        FEATURES.get().lenient = flag == null? null : flag;
+        FEATURES.get().lenient = flag;
     }
     
     /**
