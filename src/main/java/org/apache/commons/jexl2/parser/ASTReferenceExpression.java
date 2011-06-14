@@ -26,6 +26,7 @@ public final class ASTReferenceExpression extends ASTArrayAccess {
     }
 
     /** Accept the visitor. **/
+    @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
