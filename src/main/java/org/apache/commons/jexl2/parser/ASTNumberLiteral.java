@@ -32,7 +32,7 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
     public ASTNumberLiteral(Parser p, int id) {
         super(p, id);
     }
-    
+
     /**
      * Gets the literal value.
      * @return the number literal
@@ -40,78 +40,109 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
     public Number getLiteral() {
         return literal;
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
-    
+
     public Class<?> getLiteralClass() {
         return clazz;
     }
-    
+
     public boolean isInteger() {
         return Integer.class.equals(clazz);
     }
-        
-    public boolean isDouble() {
-        return Double.class.equals(clazz);
-    }
-    
+
+    /**
+     * Sets this node as a natural literal.
+     * Originally from OGNL.
+     * @param s the natural as string
+     */
     public void setNatural(String s) {
         Number result;
         Class<?> rclass;
-        int last = s.length() - 1;
+        // determine the base
+        final int base;
+        if (s.charAt(0) == '0') {
+            if ((s.length() > 1 && (s.charAt(1) == 'x' || s.charAt(1) == 'X'))) {
+                base = 16;
+                s = s.substring(2); // Trim the 0x off the front
+            } else {
+                base = 8;
+            }
+        } else {
+            base = 10;
+        }
+        final int last = s.length() - 1;
         switch (s.charAt(last)) {
             case 'l':
-            case 'L':
-                result = Long.valueOf(s.substring(0, last));
+            case 'L': {
                 rclass = Long.class;
+                result = Long.valueOf(s.substring(0, last), base);
                 break;
+            }
             case 'h':
-            case 'H':
-                result = new BigInteger(s.substring(0, last));
+            case 'H': {
                 rclass = BigInteger.class;
+                result = new BigInteger(s.substring(0, last), base);
                 break;
-            default:
+            }
+            default: {
                 rclass = Integer.class;
                 try {
-                    result = Integer.valueOf(s);
-                } catch(NumberFormatException xnumber) {
-                    result = Long.valueOf(s);
+                    result = Integer.valueOf(s, base);
+                } catch (NumberFormatException take2) {
+                    try {
+                        result = Long.valueOf(s, base);
+                    } catch (NumberFormatException take3) {
+                        result = new BigInteger(s, base);
+                    }
                 }
-                break;
+            }
         }
         literal = result;
         clazz = rclass;
     }
 
+    /**
+     * Sets this node as a real literal.
+     * Originally from OGNL.
+     * @param s the real as string
+     */
     public void setReal(String s) {
         Number result;
         Class<?> rclass;
-        int last = s.length() - 1;
+        final int last = s.length() - 1;
         switch (s.charAt(last)) {
             case 'b':
-            case 'B':
+            case 'B': {
                 result = new BigDecimal(s.substring(0, last));
                 rclass = BigDecimal.class;
                 break;
+            }
             case 'd':
-            case 'D':
-                result = Double.valueOf(s);
+            case 'D': {
                 rclass = Double.class;
+                result = Double.valueOf(s);
                 break;
+            }
             case 'f':
             case 'F':
-            default:
+            default: {
                 rclass = Float.class;
                 try {
                     result = Float.valueOf(s);
-                } catch(NumberFormatException xnumber) {
-                    result = Double.valueOf(s);
+                } catch (NumberFormatException take2) {
+                    try {
+                        result = Double.valueOf(s);
+                    } catch (NumberFormatException take3) {
+                        result = new BigDecimal(s);
+                    }
                 }
                 break;
+            }
         }
         literal = result;
         clazz = rclass;

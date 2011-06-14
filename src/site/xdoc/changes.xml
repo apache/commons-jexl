@@ -26,6 +26,12 @@
   </properties>
   <body>
     <release version="2.0.2" date="unreleased">
+        <action dev="henrib" type="fix" issue="JEXL-112" due-to="sebb">
+            Cannot parse Integer.MIN_VALUE.
+        </action>
+        <action dev="henrib" type="fix" issue="JEXL-24" due-to="freish">
+            Support Long for integer literal instead of Integers.
+        </action>
         <action dev="henrib" type="add">
             Added ObjectContext that wraps an object as JexlContext and added JexlContext as source to solve
             top-level namespace functions.

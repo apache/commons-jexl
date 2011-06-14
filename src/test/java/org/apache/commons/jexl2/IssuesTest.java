@@ -64,7 +64,32 @@ public class IssuesTest extends JexlTestCase {
         assertEquals(new BigInteger("10"), vars.get("b"));
         assertEquals(new BigDecimal("42.0"), vars.get("c"));
         assertEquals(new BigDecimal("42.0"), vars.get("d"));
+    }
+    
+    // JEXL-24: big decimals with exponent
+    public void test24C() throws Exception {
+        Map<String, Object> vars = new HashMap<String, Object>();
+        JexlContext ctxt = new MapContext(vars);
+        String stmt = "{a = 42.0e1B; b = 42.0E+2B; c = 42.0e-1B; d = 42.0E-2b;}";
+        Script expr = JEXL.createScript(stmt);
+        /* Object value = */ expr.execute(ctxt);
+        assertEquals(new BigDecimal("42.0e+1"), vars.get("a"));
+        assertEquals(new BigDecimal("42.0e+2"), vars.get("b"));
+        assertEquals(new BigDecimal("42.0e-1"), vars.get("c"));
+        assertEquals(new BigDecimal("42.0e-2"), vars.get("d"));
+    }
         
+    // JEXL-24: doubles with exponent
+    public void test24D() throws Exception {
+        Map<String, Object> vars = new HashMap<String, Object>();
+        JexlContext ctxt = new MapContext(vars);
+        String stmt = "{a = 42.0e1D; b = 42.0E+2D; c = 42.0e-1d; d = 42.0E-2d;}";
+        Script expr = JEXL.createScript(stmt);
+        /* Object value = */ expr.execute(ctxt);
+        assertEquals(Double.valueOf("42.0e+1"), vars.get("a"));
+        assertEquals(Double.valueOf("42.0e+2"), vars.get("b"));
+        assertEquals(Double.valueOf("42.0e-1"), vars.get("c"));
+        assertEquals(Double.valueOf("42.0e-2"), vars.get("d"));
     }
 
     // JEXL-49: blocks not parsed (fixed)
