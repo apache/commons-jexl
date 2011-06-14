@@ -133,11 +133,36 @@
           <td>1 or more digits from <code>0</code> to <code>9</code></td>
         </tr>
         <tr>
+          <td>Long Literals</td>
+          <td>1 or more digits from <code>0</code> to <code>9</code>, followed by <code>l</code> or <code>L</code></td>
+        </tr>
+        <tr>
+          <td>BigInteger Literals</td>
+          <td>1 or more digits from <code>0</code> to <code>9</code>, followed by <code>h</code> or <code>H</code>.</td>
+        </tr>
+        <tr>
+          <td>BigDecimal Literals</td>
+          <td>
+            1 or more digits from <code>0</code> to <code>9</code>, followed
+            by a decimal point and then one or more digits from
+            <code>0</code> to <code>9</code>, followed by <code>b</code> or <code>B</code>.
+          </td>
+        </tr>
+        <tr>
           <td>Floating point Literals</td>
           <td>
             1 or more digits from <code>0</code> to <code>9</code>, followed
             by a decimal point and then one or more digits from
-            <code>0</code> to <code>9</code>.
+            <code>0</code> to <code>9</code>,
+            optionally followed by <code>f</code> or <code>F</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Double Literals</td>
+          <td>
+            1 or more digits from <code>0</code> to <code>9</code>, followed
+            by a decimal point and then one or more digits from
+            <code>0</code> to <code>9</code>, followed by <code>d</code> or <code>D</code>.
           </td>
         </tr>
         <tr>
