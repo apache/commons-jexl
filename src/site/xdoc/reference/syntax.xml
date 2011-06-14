@@ -130,31 +130,21 @@
         <tr><th width="15%">Item</th><th>Description</th></tr>
         <tr>
           <td>Integer Literals</td>
-          <td>1 or more digits from <code>0</code> to <code>9</code></td>
-        </tr>
-        <tr>
-          <td>Long Literals</td>
-          <td>1 or more digits from <code>0</code> to <code>9</code>, followed by <code>l</code> or <code>L</code></td>
-        </tr>
-        <tr>
-          <td>BigInteger Literals</td>
-          <td>1 or more digits from <code>0</code> to <code>9</code>, followed by <code>h</code> or <code>H</code>.</td>
-        </tr>
-        <tr>
-          <td>BigDecimal Literals</td>
-          <td>
-            1 or more digits from <code>0</code> to <code>9</code>, followed
-            by a decimal point and then one or more digits from
-            <code>0</code> to <code>9</code>, followed by <code>b</code> or <code>B</code>.
+          <td>1 or more digits from <code>0</code> to <code>9</code>, eg <code>42</code>.
           </td>
         </tr>
         <tr>
-          <td>Floating point Literals</td>
+          <td>Float Literals</td>
           <td>
             1 or more digits from <code>0</code> to <code>9</code>, followed
             by a decimal point and then one or more digits from
-            <code>0</code> to <code>9</code>,
-            optionally followed by <code>f</code> or <code>F</code>.
+            <code>0</code> to <code>9</code>, eg <code>42.0</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Long Literals</td>
+          <td>1 or more digits from <code>0</code> to <code>9</code> suffixed with <code>l</code> or <code>L</code>
+          , eg <code>42.0l</code>.
           </td>
         </tr>
         <tr>
@@ -162,7 +152,23 @@
           <td>
             1 or more digits from <code>0</code> to <code>9</code>, followed
             by a decimal point and then one or more digits from
-            <code>0</code> to <code>9</code>, followed by <code>d</code> or <code>D</code>.
+            <code>0</code> to <code>9</code> suffixed with <code>d</code> or <code>D</code>
+            , eg <code>42.0d</code>..
+          </td>
+        </tr>
+        <tr>
+          <td>Big Integer Literals</td>
+          <td>1 or more digits from <code>0</code> to <code>9</code> suffixed with <code>b</code> or <code>B</code>
+          , eg <code>42B</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Big Decimal Literals</td>
+          <td>
+            1 or more digits from <code>0</code> to <code>9</code>, followed
+            by a decimal point and then one or more digits from
+            <code>0</code> to <code>9</code> suffixed with <code>h</code> or <code>H</code> (for Huge ala OGNL))
+           , eg <code>42.0H</code>.
           </td>
         </tr>
         <tr>

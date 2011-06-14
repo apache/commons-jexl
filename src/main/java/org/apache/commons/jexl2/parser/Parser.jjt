@@ -170,7 +170,7 @@ PARSER_END(Parser)
         (["l","L","h","H"])?
     >
  |
-  < FLOAT_LITERAL: (<DIGIT>)+ "."(<DIGIT>)+ (["d","D","f","F","b","B"])? >
+  < FLOAT_LITERAL: (<DIGIT>)+ "." (<DIGIT>)+ ((["e","E"])(["+","-"])?(<DIGIT>)+)? (["d","D","f","F","b","B"])? >
 }
 
 <*> TOKEN :
