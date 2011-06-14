@@ -1069,7 +1069,7 @@ public class Interpreter implements ParserVisitor {
     }
 
     public Object visit(ASTReferenceExpression node, Object data) {
-        ASTArrayAccess upper = (ASTArrayAccess) node;
+        ASTArrayAccess upper = node;
         return visit(upper, data);
     }
 
