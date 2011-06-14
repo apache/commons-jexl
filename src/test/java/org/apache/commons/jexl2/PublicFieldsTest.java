@@ -19,6 +19,7 @@ package org.apache.commons.jexl2;
 /**
  * Tests public field set/get.
  */
+@SuppressWarnings("boxing")
 public class PublicFieldsTest extends JexlTestCase {
     // some constants
     private static final String LOWER42 = "fourty-two";
