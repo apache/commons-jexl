@@ -276,7 +276,7 @@ public class JexlEngine {
      */
     public void setLenient(boolean flag) {
         if (arithmetic instanceof JexlThreadedArithmetic) {
-            JexlThreadedArithmetic.setLenient(flag);
+            JexlThreadedArithmetic.setLenient(Boolean.valueOf(flag));
         } else if (flag != isLenient()) {
             logger.warn("setLenient only has an effect when using a JexlThreadedArithmetic");
         }
@@ -845,7 +845,7 @@ public class JexlEngine {
                 if (names != null) {
                     Map<String, Integer> params = new HashMap<String, Integer>();
                     for(int n = 0; n < names.length; ++n) {
-                        params.put(names[n], n);
+                        params.put(names[n], Integer.valueOf(n));
                     }
                     parser.setNamedRegisters(params);
                 }
