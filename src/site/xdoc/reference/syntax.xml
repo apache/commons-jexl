@@ -196,7 +196,7 @@
             Can start and end with either <code>'</code> or <code>"</code> delimiters, e.g.
             <source>"Hello world"</source> and
             <source>'Hello world'</source> are equivalent.
-            <p>The escape character is <code>\</code>; it only escapes the string delimiter</p>
+            <p>The escape character is <code>\</code> (backslash); it only escapes the string delimiter</p>
           </td>
         </tr>
         <tr>
