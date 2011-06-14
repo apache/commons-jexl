@@ -516,6 +516,40 @@ public class JexlArithmetic {
         BigInteger result = l.subtract(r);
         return narrowBigInteger(left, right, result);
     }
+    
+    /**
+     * Negates a value (unary minus for numbers).
+     * @param val the value to negate
+     * @return the negated value
+     */
+    public Object negate(Object val) {
+        if (val instanceof Byte) {
+            byte valueAsByte = ((Byte) val).byteValue();
+            return Byte.valueOf((byte) -valueAsByte);
+        } else if (val instanceof Short) {
+            short valueAsShort = ((Short) val).shortValue();
+            return Short.valueOf((short) -valueAsShort);
+        } else if (val instanceof Integer) {
+            int valueAsInt = ((Integer) val).intValue();
+            return Integer.valueOf(-valueAsInt);
+        } else if (val instanceof Long) {
+            long valueAsLong = -((Long) val).longValue();
+            return Long.valueOf(valueAsLong);
+        } else if (val instanceof Float) {
+            float valueAsFloat = ((Float) val).floatValue();
+            return new Float(-valueAsFloat);
+        } else if (val instanceof Double) {
+            double valueAsDouble = ((Double) val).doubleValue();
+            return new Double(-valueAsDouble);
+        } else if (val instanceof BigDecimal) {
+            BigDecimal valueAsBigD = (BigDecimal) val;
+            return valueAsBigD.negate();
+        } else if (val instanceof BigInteger) {
+            BigInteger valueAsBigI = (BigInteger) val;
+            return valueAsBigI.negate();
+        }
+        throw new IllegalArgumentException(val.toString() + ": negate can only be applied to a number");
+    }
 
     /**
      * Test if left regexp matches right.
@@ -848,6 +882,26 @@ public class JexlArithmetic {
      * @return a value of the smallest type the original number will fit into.
      */
     public Number narrow(Number original) {
+        return narrowNumber(original, null);
+    }
+    
+    /**
+     * Whether we consider the narrow class as a potential candidate for narrowing the source.
+     * @param narrow the target narrow class
+     * @param source the orginal source class
+     * @return 
+     */
+    protected boolean narrowAccept(Class<?> narrow, Class<?> source) {
+        return narrow == null || narrow.equals(source);
+    }
+    
+    /**
+     * Given a Number, return back the value attempting to narrow it to a target class.
+     * @param original the original number
+     * @param narrow the attempted target class
+     * @return  the narrowed number or the source if no narrowing was possible
+     */
+    protected Number narrowNumber(Number original, Class<?> narrow) {
         if (original == null) {
             return original;
         }
@@ -861,9 +915,9 @@ public class JexlArithmetic {
                 try {
                     long l = bigd.longValueExact();
                     // coerce to int when possible (int being so often used in method parms)
-                    if (l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE) {
+                    if (narrowAccept(narrow, Integer.class) && l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE) {
                         return Integer.valueOf((int) l);
-                    } else {
+                    } else if (narrowAccept(narrow, Long.class)) {
                         return Long.valueOf(l);
                     }
                 } catch (ArithmeticException xa) {
@@ -873,7 +927,7 @@ public class JexlArithmetic {
         }
         if (original instanceof Double || original instanceof Float || original instanceof BigDecimal) {
             double value = original.doubleValue();
-            if (value <= Float.MAX_VALUE && value >= Float.MIN_VALUE) {
+            if (narrowAccept(narrow, Float.class) && value <= Float.MAX_VALUE && value >= Float.MIN_VALUE) {
                 result = Float.valueOf(result.floatValue());
             }
             // else it fits in a double only
@@ -887,12 +941,12 @@ public class JexlArithmetic {
                 }
             }
             long value = original.longValue();
-            if (value <= Byte.MAX_VALUE && value >= Byte.MIN_VALUE) {
+            if (narrowAccept(narrow, Byte.class) && value <= Byte.MAX_VALUE && value >= Byte.MIN_VALUE) {
                 // it will fit in a byte
                 result = Byte.valueOf((byte) value);
-            } else if (value <= Short.MAX_VALUE && value >= Short.MIN_VALUE) {
+            } else if (narrowAccept(narrow, Short.class) && value <= Short.MAX_VALUE && value >= Short.MIN_VALUE) {
                 result = Short.valueOf((short) value);
-            } else if (value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE) {
+            } else if (narrowAccept(narrow, Integer.class) && value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE) {
                 result = Integer.valueOf((int) value);
             }
             // else it fits in a long

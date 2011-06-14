@@ -17,6 +17,7 @@
 package org.apache.commons.jexl2;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import org.apache.commons.jexl2.introspection.Uberspect;
 import org.apache.commons.jexl2.internal.Introspector;
@@ -34,6 +35,33 @@ public class IssuesTest extends JexlTestCase {
     public void setUp() throws Exception {
         // ensure jul logging is only error to avoid warning in silent mode
         java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
+    }
+    
+    // JEXL-24: long integers (and doubles)
+    public void test24() throws Exception {
+        Map<String, Object> vars = new HashMap<String, Object>();
+        JexlContext ctxt = new MapContext(vars);
+        String stmt = "{a = 10L; b = 10l; c = 42.0D; d = 42.0d;}";
+        Script expr = JEXL.createScript(stmt);
+        /* Object value = */ expr.execute(ctxt);
+        assertEquals(10L, vars.get("a"));
+        assertEquals(10l, vars.get("b"));
+        assertEquals(42.0D, vars.get("c"));
+        assertEquals(42.0d, vars.get("d"));
+        
+    }
+    // JEXL-24: big integers and big decimals
+    public void test24B() throws Exception {
+        Map<String, Object> vars = new HashMap<String, Object>();
+        JexlContext ctxt = new MapContext(vars);
+        String stmt = "{a = 10H; b = 10h; c = 42.0B; d = 42.0b;}";
+        Script expr = JEXL.createScript(stmt);
+        /* Object value = */ expr.execute(ctxt);
+        assertEquals(new BigInteger("10"), vars.get("a"));
+        assertEquals(new BigInteger("10"), vars.get("b"));
+        assertEquals(new BigDecimal("42.0"), vars.get("c"));
+        assertEquals(new BigDecimal("42.0"), vars.get("d"));
+        
     }
 
     // JEXL-49: blocks not parsed (fixed)
@@ -600,7 +628,7 @@ public class IssuesTest extends JexlTestCase {
         assertEquals("SecondValue=-10.0", value);
     }
 
-    public void test112() throws Exception {
+    public void testScaleIssue() throws Exception {
         JexlArithmetic arithmetic = new JexlThreadedArithmetic(false);
         JexlEngine jexlX = new JexlEngine(null, arithmetic, null, null);
         String expStr1 = "result == salary/month * work.percent/100.00";
@@ -618,4 +646,16 @@ public class IssuesTest extends JexlTestCase {
         JexlThreadedArithmetic.setMathScale(2);
         assertFalse((Boolean) exp1.evaluate(ctx));
     }
+    
+    public void test112() throws Exception {
+        Object result;
+        JexlEngine jexl = new JexlEngine();
+        result = jexl.createScript(Integer.toString(Integer.MAX_VALUE)).execute(null);
+        assertEquals(Integer.MAX_VALUE, result);
+        result = jexl.createScript(Integer.toString(Integer.MIN_VALUE+1)).execute(null); 
+        assertEquals(Integer.MIN_VALUE+1, result);
+        result = jexl.createScript(Integer.toString(Integer.MIN_VALUE)).execute(null);
+        assertEquals(Integer.MIN_VALUE, result);
+    }
+
 }

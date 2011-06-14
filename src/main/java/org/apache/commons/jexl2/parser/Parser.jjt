@@ -15,14 +15,6 @@
  * limitations under the License.
  */
 
-/**
- *  Jexl : Java Expression Language
- *
- *  @author <a href="mailto:geirm@apache.org">Geir Magnusson Jr.</a>
- *  @author <a href="mailto:mhw@kremvax.net">Mark H. Wilkinson</a>
- *
- *  @version $Id$
- */
 
 options
 {
@@ -173,9 +165,12 @@ PARSER_END(Parser)
 
 <*> TOKEN : /* LITERALS */
 {
-  < INTEGER_LITERAL: (<DIGIT>)+ >
-|
-  < FLOAT_LITERAL: (<DIGIT>)+ "."(<DIGIT>)+ >
+    < INTEGER_LITERAL:
+        ( "0" (["0"-"7"])* | ["1"-"9"] (["0"-"9"])* | "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ )
+        (["l","L","h","H"])?
+    >
+ |
+  < FLOAT_LITERAL: (<DIGIT>)+ "."(<DIGIT>)+ (["d","D","f","F","b","B"])? >
 }
 
 <*> TOKEN :
@@ -419,22 +414,23 @@ void BooleanLiteral() #void :
   <FALSE> #FalseNode
 }
 
-void IntegerLiteral() :
+void IntegerLiteral() #NumberLiteral :
 {
   Token t;
 }
 {
   t=<INTEGER_LITERAL>
-  { jjtThis.image = t.image; jjtThis.literal = Integer.valueOf(t.image); }
+  { jjtThis.image = t.image; jjtThis.setNatural(t.image); }
 }
 
-void FloatLiteral() :
+
+void FloatLiteral() #NumberLiteral:
 {
   Token t;
 }
 {
   t=<FLOAT_LITERAL>
-  { jjtThis.image = t.image; jjtThis.literal = Float.valueOf(t.image); }
+  { jjtThis.image = t.image; jjtThis.setReal(t.image); }
 }
 
 void StringLiteral() :

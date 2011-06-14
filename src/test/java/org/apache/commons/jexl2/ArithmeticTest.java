@@ -82,7 +82,7 @@ public class ArithmeticTest extends JexlTestCase {
     public void testNullOperand() throws Exception {
         asserter.setVariable("right", null);
         asserter.failExpression("~right", ".*null.*");
-        asserter.failExpression("-right", ".*number.*");
+        asserter.failExpression("-right", ".*arithmetic.*");
     }
 
     public void testBigDecimal() throws Exception {

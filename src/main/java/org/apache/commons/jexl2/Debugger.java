@@ -34,14 +34,12 @@ import org.apache.commons.jexl2.parser.ASTEQNode;
 import org.apache.commons.jexl2.parser.ASTERNode;
 import org.apache.commons.jexl2.parser.ASTEmptyFunction;
 import org.apache.commons.jexl2.parser.ASTFalseNode;
-import org.apache.commons.jexl2.parser.ASTFloatLiteral;
 import org.apache.commons.jexl2.parser.ASTForeachStatement;
 import org.apache.commons.jexl2.parser.ASTFunctionNode;
 import org.apache.commons.jexl2.parser.ASTGENode;
 import org.apache.commons.jexl2.parser.ASTGTNode;
 import org.apache.commons.jexl2.parser.ASTIdentifier;
 import org.apache.commons.jexl2.parser.ASTIfStatement;
-import org.apache.commons.jexl2.parser.ASTIntegerLiteral;
 import org.apache.commons.jexl2.parser.ASTJexlScript;
 import org.apache.commons.jexl2.parser.ASTLENode;
 import org.apache.commons.jexl2.parser.ASTLTNode;
@@ -53,6 +51,7 @@ import org.apache.commons.jexl2.parser.ASTMulNode;
 import org.apache.commons.jexl2.parser.ASTNENode;
 import org.apache.commons.jexl2.parser.ASTNRNode;
 import org.apache.commons.jexl2.parser.ASTNotNode;
+import org.apache.commons.jexl2.parser.ASTNumberLiteral;
 import org.apache.commons.jexl2.parser.ASTNullLiteral;
 import org.apache.commons.jexl2.parser.ASTOrNode;
 import org.apache.commons.jexl2.parser.ASTReference;
@@ -376,11 +375,6 @@ final class Debugger implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTFloatLiteral node, Object data) {
-        return check(node, node.image, data);
-    }
-
-    /** {@inheritDoc} */
     public Object visit(ASTForeachStatement node, Object data) {
         builder.append("for(");
         accept(node.jjtGetChild(0), data);
@@ -430,7 +424,7 @@ final class Debugger implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTIntegerLiteral node, Object data) {
+    public Object visit(ASTNumberLiteral node, Object data) {
         return check(node, node.image, data);
     }
 

@@ -19,8 +19,6 @@ package org.apache.commons.jexl2;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,13 +47,11 @@ import org.apache.commons.jexl2.parser.ASTERNode;
 import org.apache.commons.jexl2.parser.ASTEmptyFunction;
 import org.apache.commons.jexl2.parser.ASTFalseNode;
 import org.apache.commons.jexl2.parser.ASTFunctionNode;
-import org.apache.commons.jexl2.parser.ASTFloatLiteral;
 import org.apache.commons.jexl2.parser.ASTForeachStatement;
 import org.apache.commons.jexl2.parser.ASTGENode;
 import org.apache.commons.jexl2.parser.ASTGTNode;
 import org.apache.commons.jexl2.parser.ASTIdentifier;
 import org.apache.commons.jexl2.parser.ASTIfStatement;
-import org.apache.commons.jexl2.parser.ASTIntegerLiteral;
 import org.apache.commons.jexl2.parser.ASTJexlScript;
 import org.apache.commons.jexl2.parser.ASTLENode;
 import org.apache.commons.jexl2.parser.ASTLTNode;
@@ -68,6 +64,7 @@ import org.apache.commons.jexl2.parser.ASTNENode;
 import org.apache.commons.jexl2.parser.ASTNRNode;
 import org.apache.commons.jexl2.parser.ASTNotNode;
 import org.apache.commons.jexl2.parser.ASTNullLiteral;
+import org.apache.commons.jexl2.parser.ASTNumberLiteral;
 import org.apache.commons.jexl2.parser.ASTOrNode;
 import org.apache.commons.jexl2.parser.ASTReference;
 import org.apache.commons.jexl2.parser.ASTReferenceExpression;
@@ -273,7 +270,7 @@ public class Interpreter implements ParserVisitor {
         // allow namespace to be instantiated as functor with context if possible, not an error otherwise
         if (namespace instanceof Class<?>) {
             Object[] args = new Object[]{context};
-            Constructor<?> ctor = uberspect.getConstructor(namespace,args, node);
+            Constructor<?> ctor = uberspect.getConstructor(namespace, args, node);
             if (ctor != null) {
                 try {
                     namespace = ctor.newInstance(args);
@@ -299,7 +296,7 @@ public class Interpreter implements ParserVisitor {
          * be caught explicitly and rethrown.
          */
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
-        for(int c = 2, size = node.jjtGetNumChildren(); c < size; c += 2) {
+        for (int c = 2, size = node.jjtGetNumChildren(); c < size; c += 2) {
             Object right = node.jjtGetChild(c).jjtAccept(this, data);
             try {
                 JexlNode op = node.jjtGetChild(c - 1);
@@ -387,13 +384,13 @@ public class Interpreter implements ParserVisitor {
         }
         return literal;
     }
-    
+
     /** {@inheritDoc} */
     public Object visit(ASTAssignment node, Object data) {
         // left contains the reference to assign to
         JexlNode left = node.jjtGetChild(0);
         if (!(left instanceof ASTReference)) {
-            throw new JexlException(left, "illegal assignment form");
+            throw new JexlException(left, "illegal assignment form 0");
         }
         // right is the value expression to assign
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -422,7 +419,7 @@ public class Interpreter implements ParserVisitor {
                     variableName = new StringBuilder(left.jjtGetChild(0).image);
                     v = 1;
                 }
-                for(; v <= c; ++v) {
+                for (; v <= c; ++v) {
                     variableName.append('.');
                     variableName.append(left.jjtGetChild(v).image);
                 }
@@ -441,8 +438,8 @@ public class Interpreter implements ParserVisitor {
         if (propertyNode instanceof ASTIdentifier) {
             property = ((ASTIdentifier) propertyNode).image;
             antVar = true;
-        } else if (propertyNode instanceof ASTIntegerLiteral) {
-            property = ((ASTIntegerLiteral) propertyNode).getLiteral();
+        } else if (propertyNode instanceof ASTNumberLiteral && ((ASTNumberLiteral)propertyNode).isInteger()) {
+            property = ((ASTNumberLiteral)propertyNode).getLiteral();
             antVar = true;
         } else if (propertyNode instanceof ASTArrayAccess) {
             // first objectNode is the identifier
@@ -468,7 +465,7 @@ public class Interpreter implements ParserVisitor {
             }
             property = narray.jjtGetChild(last).jjtAccept(this, null);
         } else {
-            throw new JexlException(objectNode, "illegal assignment form");
+                throw new JexlException(objectNode, "illegal assignment form");
         }
         // deal with ant variable; set context
         if (antVar) {
@@ -594,11 +591,11 @@ public class Interpreter implements ParserVisitor {
             return Boolean.TRUE;
         }
         if (o instanceof Collection<?>) {
-            return ((Collection<?>) o).isEmpty()? Boolean.TRUE : Boolean.FALSE;
+            return ((Collection<?>) o).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
         }
         // Map isn't a collection
         if (o instanceof Map<?, ?>) {
-            return ((Map<?,?>) o).isEmpty()? Boolean.TRUE : Boolean.FALSE;
+            return ((Map<?, ?>) o).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
         }
         return Boolean.FALSE;
     }
@@ -617,14 +614,6 @@ public class Interpreter implements ParserVisitor {
     /** {@inheritDoc} */
     public Object visit(ASTFalseNode node, Object data) {
         return Boolean.FALSE;
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTFloatLiteral node, Object data) {
-        if (data != null) {
-            return getAttribute(data, node.getLiteral(), node);
-        }
-        return node.getLiteral();
     }
 
     /** {@inheritDoc} */
@@ -697,8 +686,8 @@ public class Interpreter implements ParserVisitor {
             }
             Object value = context.get(name);
             if (value == null
-                && !(node.jjtGetParent() instanceof ASTReference)
-                && !context.has(name)) {
+                    && !(node.jjtGetParent() instanceof ASTReference)
+                    && !context.has(name)) {
                 JexlException xjexl = new JexlException(node, "undefined variable " + name);
                 return unknownVariable(xjexl);
             }
@@ -736,8 +725,8 @@ public class Interpreter implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-    public Object visit(ASTIntegerLiteral node, Object data) {
-        if (data != null) {
+    public Object visit(ASTNumberLiteral node, Object data) {
+        if (data != null && node.isInteger()) {
             return getAttribute(data, node.getLiteral(), node);
         }
         return node.getLiteral();
@@ -1000,7 +989,7 @@ public class Interpreter implements ParserVisitor {
             throw new JexlException(node, "!~ error", xrt);
         }
     }
-    
+
     /** {@inheritDoc} */
     public Object visit(ASTNotNode node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
@@ -1051,7 +1040,7 @@ public class Interpreter implements ParserVisitor {
         for (int c = 0; c < numChildren; c++) {
             JexlNode theNode = node.jjtGetChild(c);
             // integer literals may be part of an antish var name only if no bean was found so far
-            if (result == null && theNode instanceof ASTIntegerLiteral) {
+            if (result == null && theNode instanceof ASTNumberLiteral && theNode.image.matches("\\d*")) {
                 isVariable &= v > 0;
             } else {
                 isVariable &= (theNode instanceof ASTIdentifier);
@@ -1083,7 +1072,7 @@ public class Interpreter implements ParserVisitor {
         ASTArrayAccess upper = (ASTArrayAccess) node;
         return visit(upper, data);
     }
-    
+
     /**
      * Check if a null evaluated expression is protected by a ternary expression.
      * The rationale is that the ternary / elvis expressions are meant for the user to explictly take
@@ -1093,7 +1082,7 @@ public class Interpreter implements ParserVisitor {
      * @return true if nullable variable, false otherwise
      */
     private boolean isTernaryProtected(JexlNode node) {
-        for(JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
+        for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
             if (walk instanceof ASTTernaryNode) {
                 return true;
             } else if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {
@@ -1148,37 +1137,21 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTTrueNode node, Object data) {
         return Boolean.TRUE;
     }
-
+    
     /** {@inheritDoc} */
     public Object visit(ASTUnaryMinusNode node, Object data) {
         JexlNode valNode = node.jjtGetChild(0);
         Object val = valNode.jjtAccept(this, data);
-        if (val instanceof Byte) {
-            byte valueAsByte = ((Byte) val).byteValue();
-            return Byte.valueOf((byte) -valueAsByte);
-        } else if (val instanceof Short) {
-            short valueAsShort = ((Short) val).shortValue();
-            return Short.valueOf((short) -valueAsShort);
-        } else if (val instanceof Integer) {
-            int valueAsInt = ((Integer) val).intValue();
-            return Integer.valueOf(-valueAsInt);
-        } else if (val instanceof Long) {
-            long valueAsLong = ((Long) val).longValue();
-            return Long.valueOf(-valueAsLong);
-        } else if (val instanceof Float) {
-            float valueAsFloat = ((Float) val).floatValue();
-            return new Float(-valueAsFloat);
-        } else if (val instanceof Double) {
-            double valueAsDouble = ((Double) val).doubleValue();
-            return new Double(-valueAsDouble);
-        } else if (val instanceof BigDecimal) {
-            BigDecimal valueAsBigD = (BigDecimal) val;
-            return valueAsBigD.negate();
-        } else if (val instanceof BigInteger) {
-            BigInteger valueAsBigI = (BigInteger) val;
-            return valueAsBigI.negate();
+        try {
+            Object number = arithmetic.negate(val);
+            // attempt to recoerce to literal class
+            if (valNode instanceof ASTNumberLiteral && number instanceof Number) {
+                number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
+            }
+            return number;
+        } catch (RuntimeException xrt) {
+            throw new JexlException(valNode, "arithmetic error", xrt);
         }
-        throw new JexlException(valNode, "not a number");
     }
 
     /** {@inheritDoc} */
@@ -1348,8 +1321,8 @@ public class Interpreter implements ParserVisitor {
         }
         if (xjexl == null) {
             String error = "unable to set object property"
-                           + ", class: " + object.getClass().getName()
-                           + ", property: " + attribute;
+                    + ", class: " + object.getClass().getName()
+                    + ", property: " + attribute;
             if (node == null) {
                 throw new UnsupportedOperationException(error);
             }
@@ -1382,5 +1355,4 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTAmbiguous node, Object data) {
         throw new UnsupportedOperationException("unexpected type of node");
     }
-
 }
