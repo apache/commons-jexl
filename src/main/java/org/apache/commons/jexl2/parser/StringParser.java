@@ -65,6 +65,11 @@ public class StringParser {
         return null;
     }
     
+    /**
+     * Default implementation does nothing.
+     *
+     * @throws ParseException subclasses may throw this 
+     */
     public void Identifier(boolean top) throws ParseException {
         // Overriden by generated code
     }
