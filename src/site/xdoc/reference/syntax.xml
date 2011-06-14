@@ -138,13 +138,15 @@
           <td>
             1 or more digits from <code>0</code> to <code>9</code>, followed
             by a decimal point and then one or more digits from
-            <code>0</code> to <code>9</code>, eg <code>42.0</code>.
+            <code>0</code> to <code>9</code>,
+            optionally followed by <code>f</code> or <code>F</code>,
+            eg <code>42.0</code> or <code>42.0f</code>.
           </td>
         </tr>
         <tr>
           <td>Long Literals</td>
           <td>1 or more digits from <code>0</code> to <code>9</code> suffixed with <code>l</code> or <code>L</code>
-          , eg <code>42.0l</code>.
+          , eg <code>42l</code>.
           </td>
         </tr>
         <tr>
@@ -153,7 +155,7 @@
             1 or more digits from <code>0</code> to <code>9</code>, followed
             by a decimal point and then one or more digits from
             <code>0</code> to <code>9</code> suffixed with <code>d</code> or <code>D</code>
-            , eg <code>42.0d</code>..
+            , eg <code>42.0d</code>.
           </td>
         </tr>
         <tr>
