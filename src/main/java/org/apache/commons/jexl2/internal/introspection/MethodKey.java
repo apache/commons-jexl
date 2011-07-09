@@ -367,7 +367,7 @@ public final class MethodKey {
          */
         private static final long serialVersionUID = -2314636505414551664L;
     }
-
+        
     /**
      * Utility for parameters matching.
      * @param <T> Method or Constructor
@@ -445,12 +445,10 @@ public final class MethodKey {
                     maximals.addLast(app);
                 }
             }
-
             if (maximals.size() > 1) {
                 // We have more than one maximally specific method
                 throw new AmbiguousException();
             }
-
             return maximals.getFirst();
         } // CSON: RedundantThrows
 
@@ -488,26 +486,34 @@ public final class MethodKey {
 
             if (c1MoreSpecific) {
                 if (c2MoreSpecific) {
-                    /*
-                     *  Incomparable due to cross-assignable arguments (i.e.
-                     * foo(String, Object) vs. foo(Object, String))
-                     */
-
+                    // Incomparable due to cross-assignable arguments (i.e. foo(String, Object) vs. foo(Object, String))
                     return INCOMPARABLE;
                 }
-
                 return MORE_SPECIFIC;
             }
-
             if (c2MoreSpecific) {
                 return LESS_SPECIFIC;
             }
 
+            // attempt to choose by picking the one with the greater number of primitives or latest primitive parameter
+            int primDiff = 0;
+            for(int c = 0; c < c1.length; ++c) {
+                if (c1[c].isPrimitive()) {
+                    primDiff += 1 << c;
+                }
+                if (c2[c].isPrimitive()) {
+                    primDiff -= 1 << c;
+                }
+            }
+            if (primDiff > 0) {
+                return MORE_SPECIFIC;
+            } else if (primDiff < 0) {
+                return LESS_SPECIFIC;
+            }
             /*
              * Incomparable due to non-related arguments (i.e.
              * foo(Runnable) vs. foo(Serializable))
              */
-
             return INCOMPARABLE;
         }
 
