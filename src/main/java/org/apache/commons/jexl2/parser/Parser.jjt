@@ -33,7 +33,7 @@ package org.apache.commons.jexl2.parser;
 import java.io.Reader;
 import org.apache.commons.jexl2.JexlInfo;
 
-public class Parser extends StringParser
+public class Parser extends JexlParser
 {
     public boolean ALLOW_REGISTERS = false;
 
@@ -52,9 +52,6 @@ public class Parser extends StringParser
          */
 
         ASTJexlScript tree = JexlScript();
-        if (namedRegisters != null) {
-            tree.setParameters(namedRegisters.keySet().toArray(new String[0]));
-        }
         tree.value = info;
         return tree;
     }
@@ -88,11 +85,13 @@ PARSER_END(Parser)
     | < FOREACH : "foreach" > : FOR_EACH_IN
     | < WHILE : "while" >
     | < NEW : "new" >
+    | < VAR : "var" >
     | < EMPTY : "empty" >
     | < SIZE : "size" >
     | < NULL : "null" >
     | < TRUE : "true" >
     | < FALSE : "false" >
+    | < RETURN : "return" >
 }
 
 <FOR_EACH_IN> TOKEN : /* foreach in */
@@ -160,7 +159,7 @@ PARSER_END(Parser)
 
 <REGISTERS> TOKEN : /* REGISTERS: parser.ALLOW_REGISTER must be set to true before calling parse */
 {
-  < REGISTER: "#" ["0"-"9"] >
+  < REGISTER: "#" (["0"-"9"])+ >
 }
 
 <*> TOKEN : /* LITERALS */
@@ -200,6 +199,8 @@ void Statement() #void : {}
     | ForeachStatement()
     | WhileStatement()
     | ExpressionStatement()
+    | ReturnStatement()
+    | Var()
 }
 
 void Block() #Block : {}
@@ -227,10 +228,15 @@ void WhileStatement() : {}
 
 
 void ForeachStatement() : {}
-{
-    <FOR> <LPAREN> Reference() <COLON>  Expression() <RPAREN> Statement()
+{  
+    <FOR> <LPAREN> LValueVar() <COLON>  Expression() <RPAREN> Statement()
 |
-    <FOREACH> <LPAREN> Reference() <IN>  Expression() <RPAREN> Statement()
+    <FOREACH> <LPAREN> LValueVar() <IN>  Expression() <RPAREN> Statement()
+}
+
+void ReturnStatement() : {}
+{
+    <RETURN> Expression()
 }
 
 
@@ -246,6 +252,26 @@ void Expression() #void : {}
 void Assignment() #Assignment(2) : {}
 {
     ConditionalExpression() <assign> Expression()
+}
+
+void Var() #void : {}
+{
+    <VAR> DeclareVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+}
+
+void DeclareVar() #Var :
+{
+    Token t;
+}
+{
+    t=<IDENTIFIER> { declareVariable(jjtThis, t.image); }
+}
+
+void LValueVar() #Reference : {}
+{   
+    LOOKAHEAD(1) <VAR> DeclareVar() DotReference() 
+|
+    LOOKAHEAD(1) Identifier(true) DotReference()
 }
 
 /***************************************
@@ -380,9 +406,9 @@ void Identifier(boolean top) :
     Token t;
 }
 {
-    t=<IDENTIFIER> { jjtThis.image = top? imageOf(jjtThis, t.image) : t.image; }
+    t=<IDENTIFIER> { jjtThis.image = top? checkVariable(jjtThis, t.image) : t.image; }
 |
-    t=<REGISTER> { jjtThis.image = t.image; }
+    t=<REGISTER> { jjtThis.image = t.image; jjtThis.setRegister(t.image); }
 }
 
 void Literal() #void :

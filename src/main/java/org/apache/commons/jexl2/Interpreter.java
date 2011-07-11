@@ -68,6 +68,7 @@ import org.apache.commons.jexl2.parser.ASTNumberLiteral;
 import org.apache.commons.jexl2.parser.ASTOrNode;
 import org.apache.commons.jexl2.parser.ASTReference;
 import org.apache.commons.jexl2.parser.ASTReferenceExpression;
+import org.apache.commons.jexl2.parser.ASTReturnStatement;
 import org.apache.commons.jexl2.parser.ASTSizeFunction;
 import org.apache.commons.jexl2.parser.ASTSizeMethod;
 import org.apache.commons.jexl2.parser.ASTStringLiteral;
@@ -82,6 +83,7 @@ import org.apache.commons.jexl2.introspection.Uberspect;
 import org.apache.commons.jexl2.introspection.JexlMethod;
 import org.apache.commons.jexl2.introspection.JexlPropertyGet;
 import org.apache.commons.jexl2.introspection.JexlPropertySet;
+import org.apache.commons.jexl2.parser.ASTVar;
 
 /**
  * An interpreter of JEXL syntax.
@@ -132,6 +134,22 @@ public class Interpreter implements ParserVisitor {
     }
 
     /**
+     * Copy constructor.
+     * @param base the base to copy
+     */
+    protected Interpreter(Interpreter base) {
+        this.logger = base.logger;
+        this.uberspect = base.uberspect;
+        this.arithmetic = base.arithmetic;
+        this.functions = base.functions;
+        this.strict = base.strict;
+        this.silent = base.silent;
+        this.cache = base.cache;
+        this.context = base.context;
+        this.functors = base.functors;
+    }
+
+    /**
      * Sets whether this interpreter throws JexlException during evaluation.
      * @param flag true means no JexlException will be thrown but will be logged
      *        as info through the Jexl engine logger, false allows them to be thrown.
@@ -160,12 +178,27 @@ public class Interpreter implements ParserVisitor {
     public Object interpret(JexlNode node) {
         try {
             return node.jjtAccept(this, null);
+        } catch (JexlException.Return xreturn) {
+            Object value = xreturn.getValue();
+            if (value instanceof JexlException.Return) {
+                if (silent) {
+                    logger.warn(xreturn.getMessage(), xreturn.getCause());
+                    return null;
+                }
+                throw xreturn;
+            } else {
+                return value;
+            }
         } catch (JexlException xjexl) {
             if (silent) {
                 logger.warn(xjexl.getMessage(), xjexl.getCause());
                 return null;
             }
             throw xjexl;
+        } finally {
+            functors = null;
+            parameters = null;
+            registers = null;
         }
     }
 
@@ -179,9 +212,18 @@ public class Interpreter implements ParserVisitor {
 
     /**
      * Sets this interpreter registers for bean access/assign expressions.
+     * <p>Use setArguments(...) instead.</p>
      * @param theRegisters the array of registers
      */
+    @Deprecated
     protected void setRegisters(Object... theRegisters) {
+        if (theRegisters != null) {
+            String[] regStrs = new String[theRegisters.length];
+            for (int r = 0; r < regStrs.length; ++r) {
+                regStrs[r] = "#" + r;
+            }
+            this.parameters = regStrs;
+        }
         this.registers = theRegisters;
     }
 
@@ -237,7 +279,7 @@ public class Interpreter implements ParserVisitor {
      * @return throws JexlException if strict, null otherwise
      */
     protected Object invocationFailed(JexlException xjexl) {
-        if (strict) {
+        if (strict || xjexl instanceof JexlException.Return) {
             throw xjexl;
         }
         if (!silent) {
@@ -255,7 +297,7 @@ public class Interpreter implements ParserVisitor {
      * @return the namespace instance
      */
     protected Object resolveNamespace(String prefix, JexlNode node) {
-        Object namespace;
+        Object namespace = null;
         // check whether this namespace is a functor
         if (functors != null) {
             namespace = functors.get(prefix);
@@ -263,9 +305,15 @@ public class Interpreter implements ParserVisitor {
                 return namespace;
             }
         }
-        namespace = functions.get(prefix);
-        if (prefix != null && namespace == null) {
-            throw new JexlException(node, "no such function namespace " + prefix);
+        // check if namespace if a resolver
+        if (context instanceof NamespaceResolver) {
+            namespace = ((NamespaceResolver) context).resolveNamespace(prefix);
+        }
+        if (namespace == null) {
+            namespace = functions.get(prefix);
+            if (prefix != null && namespace == null) {
+                throw new JexlException(node, "no such function namespace " + prefix);
+            }
         }
         // allow namespace to be instantiated as functor with context if possible, not an error otherwise
         if (namespace instanceof Class<?>) {
@@ -388,8 +436,15 @@ public class Interpreter implements ParserVisitor {
     /** {@inheritDoc} */
     public Object visit(ASTAssignment node, Object data) {
         // left contains the reference to assign to
+        int register = -1;
         JexlNode left = node.jjtGetChild(0);
-        if (!(left instanceof ASTReference)) {
+        if (left instanceof ASTIdentifier) {
+            ASTIdentifier var = (ASTIdentifier) left;
+            register = var.getRegister();
+            if (register < 0) {
+                throw new JexlException(left, "unknown variable " + left.image);
+            }
+        } else if (!(left instanceof ASTReference)) {
             throw new JexlException(left, "illegal assignment form 0");
         }
         // right is the value expression to assign
@@ -397,22 +452,26 @@ public class Interpreter implements ParserVisitor {
 
         // determine initial object & property:
         JexlNode objectNode = null;
-        Object object = null;
+        Object object = register >= 0 ? registers[register] : null;
         JexlNode propertyNode = null;
         Object property = null;
         boolean isVariable = true;
         int v = 0;
         StringBuilder variableName = null;
-        // 1: follow children till penultimate
+        // 1: follow children till penultimate, resolve dot/array
         int last = left.jjtGetNumChildren() - 1;
-        for (int c = 0; c < last; ++c) {
+        // check we are not assigning a register itself
+        boolean isRegister = last < 0 && register >= 0;
+        // start at 1 if register
+        for (int c = register >= 0 ? 1 : 0; c < last; ++c) {
             objectNode = left.jjtGetChild(c);
             // evaluate the property within the object
             object = objectNode.jjtAccept(this, object);
             if (object != null) {
                 continue;
             }
-            isVariable &= objectNode instanceof ASTIdentifier;
+            isVariable &= objectNode instanceof ASTIdentifier
+                    || (objectNode instanceof ASTNumberLiteral && ((ASTNumberLiteral) objectNode).isInteger());
             // if we get null back as a result, check for an ant variable
             if (isVariable) {
                 if (v == 0) {
@@ -433,13 +492,19 @@ public class Interpreter implements ParserVisitor {
             }
         }
         // 2: last objectNode will perform assignement in all cases
-        propertyNode = left.jjtGetChild(last);
+        propertyNode = isRegister ? null : left.jjtGetChild(last);
         boolean antVar = false;
         if (propertyNode instanceof ASTIdentifier) {
-            property = ((ASTIdentifier) propertyNode).image;
-            antVar = true;
-        } else if (propertyNode instanceof ASTNumberLiteral && ((ASTNumberLiteral)propertyNode).isInteger()) {
-            property = ((ASTNumberLiteral)propertyNode).getLiteral();
+            ASTIdentifier identifier = (ASTIdentifier) propertyNode;
+            register = identifier.getRegister();
+            if (register >= 0) {
+                isRegister = true;
+            } else {
+                property = identifier.image;
+                antVar = true;
+            }
+        } else if (propertyNode instanceof ASTNumberLiteral && ((ASTNumberLiteral) propertyNode).isInteger()) {
+            property = ((ASTNumberLiteral) propertyNode).getLiteral();
             antVar = true;
         } else if (propertyNode instanceof ASTArrayAccess) {
             // first objectNode is the identifier
@@ -464,11 +529,14 @@ public class Interpreter implements ParserVisitor {
                 }
             }
             property = narray.jjtGetChild(last).jjtAccept(this, null);
-        } else {
-                throw new JexlException(objectNode, "illegal assignment form");
+        } else if (!isRegister) {
+            throw new JexlException(objectNode, "illegal assignment form");
         }
         // deal with ant variable; set context
-        if (antVar) {
+        if (isRegister) {
+            registers[register] = right;
+            return right;
+        } else if (antVar) {
             if (isVariable && object == null) {
                 if (variableName != null) {
                     if (last > 0) {
@@ -622,6 +690,7 @@ public class Interpreter implements ParserVisitor {
         /* first objectNode is the loop variable */
         ASTReference loopReference = (ASTReference) node.jjtGetChild(0);
         ASTIdentifier loopVariable = (ASTIdentifier) loopReference.jjtGetChild(0);
+        int register = loopVariable.getRegister();
         /* second objectNode is the variable to iterate */
         Object iterableValue = node.jjtGetChild(1).jjtAccept(this, data);
         // make sure there is a value to iterate on and a statement to execute
@@ -635,7 +704,11 @@ public class Interpreter implements ParserVisitor {
                 while (itemsIterator.hasNext()) {
                     // set loopVariable to value of iterator
                     Object value = itemsIterator.next();
-                    context.set(loopVariable.image, value);
+                    if (register < 0) {
+                        context.set(loopVariable.image, value);
+                    } else {
+                        registers[register] = value;
+                    }
                     // execute statement
                     result = statement.jjtAccept(this, data);
                 }
@@ -681,8 +754,9 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTIdentifier node, Object data) {
         String name = node.image;
         if (data == null) {
-            if (registers != null && name.charAt(0) == '#') {
-                return registers[Integer.parseInt(name.substring(1))];
+            int register = node.getRegister();
+            if (register >= 0) {
+                return registers[register];
             }
             Object value = context.get(name);
             if (value == null
@@ -695,6 +769,11 @@ public class Interpreter implements ParserVisitor {
         } else {
             return getAttribute(data, name, node);
         }
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTVar node, Object data) {
+        return visit((ASTIdentifier) node, data);
     }
 
     /** {@inheritDoc} */
@@ -1040,7 +1119,7 @@ public class Interpreter implements ParserVisitor {
         for (int c = 0; c < numChildren; c++) {
             JexlNode theNode = node.jjtGetChild(c);
             // integer literals may be part of an antish var name only if no bean was found so far
-            if (result == null && theNode instanceof ASTNumberLiteral && theNode.image.matches("\\d*")) {
+            if (result == null && theNode instanceof ASTNumberLiteral && ((ASTNumberLiteral) theNode).isInteger()) {
                 isVariable &= v > 0;
             } else {
                 isVariable &= (theNode instanceof ASTIdentifier);
@@ -1067,10 +1146,17 @@ public class Interpreter implements ParserVisitor {
         }
         return result;
     }
-
+    
+    /** {@inheritDoc} */
     public Object visit(ASTReferenceExpression node, Object data) {
         ASTArrayAccess upper = node;
         return visit(upper, data);
+    }
+    
+    /** {@inheritDoc} */
+    public Object visit(ASTReturnStatement node, Object data) {
+        Object val = node.jjtGetChild(0).jjtAccept(this, data);
+        throw new JexlException.Return(node, null, val);
     }
 
     /**
@@ -1137,7 +1223,7 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTTrueNode node, Object data) {
         return Boolean.TRUE;
     }
-    
+
     /** {@inheritDoc} */
     public Object visit(ASTUnaryMinusNode node, Object data) {
         JexlNode valNode = node.jjtGetChild(0);
@@ -1299,6 +1385,14 @@ public class Interpreter implements ParserVisitor {
         }
         JexlException xjexl = null;
         JexlPropertySet vs = uberspect.getPropertySet(object, attribute, value, node);
+        // if we can't find an exact match, narrow the value argument and try again
+        if (vs == null) {
+            // replace all numbers with the smallest type that will fit
+            Object[] narrow = {value};
+            if (arithmetic.narrowArguments(narrow)) {
+                vs = uberspect.getPropertySet(object, attribute, narrow[0], node);
+            }
+        }
         if (vs != null) {
             try {
                 // cache executor in volatile JexlNode.value
@@ -1322,7 +1416,8 @@ public class Interpreter implements ParserVisitor {
         if (xjexl == null) {
             String error = "unable to set object property"
                     + ", class: " + object.getClass().getName()
-                    + ", property: " + attribute;
+                    + ", property: " + attribute
+                    + ", argument: " + value.getClass().getSimpleName();
             if (node == null) {
                 throw new UnsupportedOperationException(error);
             }

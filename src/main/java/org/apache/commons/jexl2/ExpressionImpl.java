@@ -59,6 +59,7 @@ public class ExpressionImpl implements Expression, Script {
             return null;
         }
         Interpreter interpreter = jexl.createInterpreter(context);
+        interpreter.setArguments(script.getRegisters(), script.createArguments((Object[]) null));
         return interpreter.interpret(script.jjtGetChild(0));
     }
 
@@ -76,6 +77,22 @@ public class ExpressionImpl implements Expression, Script {
      */
     public String getExpression() {
         return expression;
+    }
+    
+    /**
+     * Gets this script parameters.
+     * @return the parameters or null
+     */
+    public String[] getParameters() {
+        return script.getParameters();
+    }
+       
+    /**
+     * Gets this script local variables.
+     * @return the local variables or null
+     */
+    public String[] getLocalVariables() {
+        return script.getLocalVariables();
     }
 
     /**
@@ -101,7 +118,7 @@ public class ExpressionImpl implements Expression, Script {
      */
     public Object execute(JexlContext context) {
         Interpreter interpreter = jexl.createInterpreter(context);
-        interpreter.setArguments(script.getParameters(), null);
+        interpreter.setArguments(script.getRegisters(), script.createArguments((Object[]) null));
         return interpreter.interpret(script);
     }
     
@@ -110,7 +127,7 @@ public class ExpressionImpl implements Expression, Script {
      */
     public Object execute(JexlContext context, Object...args) {
         Interpreter interpreter = jexl.createInterpreter(context);
-        interpreter.setArguments(script.getParameters(), args);
+        interpreter.setArguments(script.getRegisters(), script.createArguments(args));
         return interpreter.interpret(script);
     }
 
