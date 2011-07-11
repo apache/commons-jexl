@@ -27,10 +27,13 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,6 +47,11 @@ import org.apache.commons.jexl2.parser.ASTJexlScript;
 import org.apache.commons.jexl2.introspection.Uberspect;
 import org.apache.commons.jexl2.introspection.UberspectImpl;
 import org.apache.commons.jexl2.introspection.JexlMethod;
+import org.apache.commons.jexl2.parser.ASTArrayAccess;
+import org.apache.commons.jexl2.parser.ASTIdentifier;
+import org.apache.commons.jexl2.parser.ASTNumberLiteral;
+import org.apache.commons.jexl2.parser.ASTReference;
+import org.apache.commons.jexl2.parser.ASTStringLiteral;
 
 /**
  * <p>
@@ -90,7 +98,7 @@ import org.apache.commons.jexl2.introspection.JexlMethod;
  * </p>
  * @since 2.0
  */
-public class JexlEngine {    
+public class JexlEngine {
     /**
      * An empty/static/non-mutable JexlContext used instead of null context.
      */
@@ -99,10 +107,12 @@ public class JexlEngine {
         public Object get(String name) {
             return null;
         }
+
         /** {@inheritDoc} */
         public boolean has(String name) {
             return false;
         }
+
         /** {@inheritDoc} */
         public void set(String name, Object value) {
             throw new UnsupportedOperationException("Not supported in void context.");
@@ -120,10 +130,11 @@ public class JexlEngine {
     private static final class UberspectHolder {
         /** The default uberspector that handles all introspection patterns. */
         private static final Uberspect UBERSPECT = new UberspectImpl(LogFactory.getLog(JexlEngine.class));
+
         /** Non-instantiable. */
-        private UberspectHolder() {}
+        private UberspectHolder() {
+        }
     }
-    
     /**
      * The Uberspect instance.
      */
@@ -190,7 +201,6 @@ public class JexlEngine {
             this.functions = theFunctions;
         }
     }
-
 
     /**
      *  Gets the default instance of Uberspect.
@@ -369,7 +379,7 @@ public class JexlEngine {
     protected Expression createExpression(ASTJexlScript tree, String text) {
         return new ExpressionImpl(this, text, tree);
     }
-    
+
     /**
      * Creates an Expression from a String containing valid
      * JEXL syntax.  This method parses the expression which
@@ -400,7 +410,7 @@ public class JexlEngine {
         ASTJexlScript tree = parse(expression, info);
         if (tree.jjtGetNumChildren() > 1) {
             logger.warn("The JEXL Expression created will be a reference"
-                      + " to the first expression from the supplied script: \"" + expression + "\" ");
+                    + " to the first expression from the supplied script: \"" + expression + "\" ");
         }
         return createExpression(tree, expression);
     }
@@ -424,8 +434,8 @@ public class JexlEngine {
      * a corresponding array of arguments containing values should be used during evaluation.
      *
      * @param scriptText A String containing valid JEXL syntax
-     * @param names the parameter names
      * @param info An info structure to carry debugging information if needed
+     * @param names the script parameter names
      * @return A {@link Script} which can be executed using a {@link JexlContext}.
      * @throws JexlException if there is a problem parsing the script.
      */
@@ -447,7 +457,7 @@ public class JexlEngine {
     protected Script createScript(ASTJexlScript tree, String text) {
         return new ExpressionImpl(this, text, tree);
     }
-    
+
     /**
      * Creates a Script from a {@link File} containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
@@ -537,11 +547,12 @@ public class JexlEngine {
         expr = "#0" + (expr.charAt(0) == '[' ? "" : ".") + expr + ";";
         try {
             parser.ALLOW_REGISTERS = true;
-            JexlNode tree = parse(expr, null);
-            JexlNode node = tree.jjtGetChild(0);
+            String[] regStrs = {"#0"};
+            ASTJexlScript script = parse(expr, null, regStrs);
+            JexlNode node = script.jjtGetChild(0);
             Interpreter interpreter = createInterpreter(context);
             // set register
-            interpreter.setRegisters(bean);
+            interpreter.setArguments(script.getParameters(), script.createArguments(bean));
             return node.jjtAccept(interpreter, null);
         } catch (JexlException xjexl) {
             if (silent) {
@@ -591,11 +602,12 @@ public class JexlEngine {
         expr = "#0" + (expr.charAt(0) == '[' ? "" : ".") + expr + "=" + "#1" + ";";
         try {
             parser.ALLOW_REGISTERS = true;
-            JexlNode tree = parse(expr, null);
-            JexlNode node = tree.jjtGetChild(0);
+            String[] regStrs = {"#0", "#1"};
+            ASTJexlScript script = parse(expr, null, regStrs);
+            JexlNode node = script.jjtGetChild(0);
             Interpreter interpreter = createInterpreter(context);
             // set the registers
-            interpreter.setRegisters(bean, value);
+            interpreter.setArguments(script.getParameters(), script.createArguments(bean, value));
             node.jjtAccept(interpreter, null);
         } catch (JexlException xjexl) {
             if (silent) {
@@ -652,7 +664,7 @@ public class JexlEngine {
      * @param args the constructor arguments
      * @return the created object instance or null on failure when silent
      */
-    public <T> T newInstance(Class<? extends T> clazz, Object...args) {
+    public <T> T newInstance(Class<? extends T> clazz, Object... args) {
         return clazz.cast(doCreateInstance(clazz, args));
     }
 
@@ -663,8 +675,8 @@ public class JexlEngine {
      * @param args the constructor arguments
      * @return the created object instance or null on failure when silent
      */
-    public Object newInstance(String clazz, Object...args) {
-       return doCreateInstance(clazz, args);
+    public Object newInstance(String clazz, Object... args) {
+        return doCreateInstance(clazz, args);
     }
 
     /**
@@ -674,7 +686,7 @@ public class JexlEngine {
      * @param args the constructor arguments
      * @return the created object instance or null on failure when silent
      */
-    protected Object doCreateInstance(Object clazz, Object...args) {
+    protected Object doCreateInstance(Object clazz, Object... args) {
         JexlException xjexl = null;
         Object result = null;
         JexlInfo info = debugInfo();
@@ -811,8 +823,106 @@ public class JexlEngine {
      * Clears the expression cache.
      */
     public void clearCache() {
-        synchronized(parser) {
+        synchronized (parser) {
             cache.clear();
+        }
+    }
+
+    /**
+     * Gets the list of variables accessed by a script.
+     * <p>This method will visit all nodes of a script and extract all variables whether they
+     * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
+     * @param script the script
+     * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
+     */
+    public Set<List<String>> getVariables(Script script) {
+        if (script instanceof ExpressionImpl) {
+            Set<List<String>> refs = new LinkedHashSet<List<String>>();
+            getVariables(((ExpressionImpl) script).script, refs, null);
+            return refs;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Fills up the list of variables accessed by a node.
+     * @param node the node
+     * @param refs the set of variable being filled
+     * @param ref the current variable being filled
+     */
+    protected void getVariables(JexlNode node, Set<List<String>> refs, List<String> ref) {
+        boolean array = node instanceof ASTArrayAccess;
+        boolean reference = node instanceof ASTReference;
+        int num = node.jjtGetNumChildren();
+        if (array || reference) {
+            List<String> var = ref != null ? ref : new ArrayList<String>();
+            boolean varf = true;
+            for (int i = 0; i < num; ++i) {
+                JexlNode child = node.jjtGetChild(i);
+                if (array) {
+                    if (child instanceof ASTReference && child.jjtGetNumChildren() == 1) {
+                        JexlNode desc = child.jjtGetChild(0);
+                        if (varf && desc.isConstant()) {
+                            var.add(desc.image);
+                        } else if (desc instanceof ASTIdentifier) {
+                            if (((ASTIdentifier)desc).getRegister() < 0) {
+                                List<String> di = new ArrayList<String>(1);
+                                di.add(desc.image);
+                                refs.add(di);
+                            }
+                            var = new ArrayList<String>();
+                            varf = false;
+                        }
+                        continue;
+                    } else if (child instanceof ASTIdentifier) {
+                        if (i == 0 && (((ASTIdentifier)child).getRegister() < 0)) {
+                            var.add(child.image);
+                        }
+                        continue;
+                    }
+                } else {//if (reference) {
+                    if (child instanceof ASTIdentifier ) {
+                        if (((ASTIdentifier)child).getRegister() < 0) {
+                            var.add(child.image);
+                        }
+                        continue;
+                    }
+                }
+                getVariables(child, refs, var);
+            }
+            if (!var.isEmpty() && var != ref) {
+                refs.add(var);
+            }
+        } else {
+            for (int i = 0; i < num; ++i) {
+                getVariables(node.jjtGetChild(i), refs, null);
+            }
+        }
+    }
+
+    /**
+     * Gets the array of parameters from a script.
+     * @param script the script
+     * @return the parameters
+     */
+    public String[] getParameters(Script script) {
+        if (script instanceof ExpressionImpl) {
+            return ((ExpressionImpl) script).getParameters();
+        } else {
+            return null;
+        }
+    }
+    /**
+     * Gets the array of local variable from a script.
+     * @param script the script
+     * @return the parameters
+     */
+    public String[] getLocalVariables(Script script) {
+        if (script instanceof ExpressionImpl) {
+            return ((ExpressionImpl) script).getLocalVariables();
+        } else {
+            return null;
         }
     }
 
@@ -826,14 +936,23 @@ public class JexlEngine {
     protected ASTJexlScript parse(CharSequence expression, JexlInfo info) {
         return parse(expression, info, null);
     }
+
+    /**
+     * Parses an expression.
+     * @param expression the expression to parse
+     * @param info debug information structure
+     * @param names the parameter names array
+     * @return the parsed tree
+     * @throws JexlException if any error occured during parsing
+     */
     protected ASTJexlScript parse(CharSequence expression, JexlInfo info, String[] names) {
         String expr = cleanExpression(expression);
-        ASTJexlScript tree = null;
+        ASTJexlScript script = null;
         synchronized (parser) {
             if (cache != null) {
-                tree = cache.get(expr);
-                if (tree != null) {
-                    return tree;
+                script = cache.get(expr);
+                if (script != null) {
+                    return script;
                 }
             }
             try {
@@ -842,26 +961,32 @@ public class JexlEngine {
                 if (info == null) {
                     info = debugInfo();
                 }
+                Map<String, Integer> params = null;
                 if (names != null) {
-                    Map<String, Integer> params = new HashMap<String, Integer>();
-                    for(int n = 0; n < names.length; ++n) {
+                    params = new LinkedHashMap<String, Integer>();
+                    for (int n = 0; n < names.length; ++n) {
                         params.put(names[n], Integer.valueOf(n));
                     }
                     parser.setNamedRegisters(params);
                 }
-                tree = parser.parse(reader, info);
+                script = parser.parse(reader, info);
+                params = parser.getNamedRegisters();
+                if (params != null) {
+                    String[] registers = (new ArrayList<String>(params.keySet())).toArray(new String[0]);
+                    script.setParameters(names!= null? names.length : 0, registers);
+                }
                 if (cache != null) {
-                    cache.put(expr, tree);
+                    cache.put(expr, script);
                 }
             } catch (TokenMgrError xtme) {
-                throw new JexlException(info, "!!! " +expression+ " !!!" + ", tokenization failed", xtme);
+                throw new JexlException(info, "!!! " + expression + " !!!" + ", tokenization failed", xtme);
             } catch (ParseException xparse) {
-                throw new JexlException(info, "!!! " +expression+ " !!!" + ", parsing failed", xparse);
+                throw new JexlException(info, "!!! " + expression + " !!!" + ", parsing failed", xparse);
             } finally {
                 parser.setNamedRegisters(null);
             }
         }
-        return tree;
+        return script;
     }
 
     /**
@@ -959,7 +1084,7 @@ public class JexlEngine {
         } finally {
             try {
                 reader.close();
-            } catch(IOException xio) {
+            } catch (IOException xio) {
                 // ignore
             }
         }

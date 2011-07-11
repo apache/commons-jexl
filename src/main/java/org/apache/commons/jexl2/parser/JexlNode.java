@@ -65,7 +65,10 @@ public abstract class JexlNode extends SimpleNode implements JexlInfo {
      * @return true if constant, false otherwise
      */
     public boolean isConstant() {
-        if (this instanceof JexlNode.Literal<?>) {
+        return isConstant(this instanceof JexlNode.Literal<?>);
+    }
+    public boolean isConstant(boolean literal) {
+        if (literal) {
             if (children != null) {
                 for(JexlNode child : children) {
                     if (!child.isConstant()) {

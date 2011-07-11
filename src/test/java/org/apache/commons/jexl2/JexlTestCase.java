@@ -96,7 +96,7 @@ public class JexlTestCase extends TestCase {
             dbg.debug(node);
             String expressiondbg = dbg.data();
             // recreate expr from string
-            Expression exprdbg = jdbg.createExpression(expressiondbg);
+            Script exprdbg = jdbg.createScript(expressiondbg);
             // make arg cause become the root cause
             JexlNode root = ((ExpressionImpl) exprdbg).script;
             while (root.jjtGetParent() != null) {
@@ -118,7 +118,7 @@ public class JexlTestCase extends TestCase {
      * @param script the script to flatten
      * @return the descendants-and-self list
      */
-    private static ArrayList<JexlNode> flatten(JexlNode node) {
+    protected static ArrayList<JexlNode> flatten(JexlNode node) {
         ArrayList<JexlNode> list = new ArrayList<JexlNode>();
         flatten(list, node);
         return list;
@@ -168,7 +168,40 @@ public class JexlTestCase extends TestCase {
         }
         return null;
     }
+    
+    /**
+     * A helper class to help debug AST problems.
+     * @param e the script
+     * @return an indented version of the AST
+     */
+    protected String flattenedStr(Script e) {
+        return e.getText() + "\n" + flattenedStr(((ExpressionImpl) e).script);
+    }
 
+    static private String indent(JexlNode node) {
+        StringBuilder strb = new StringBuilder();
+        while (node != null) {
+            strb.append("  ");
+            node = node.jjtGetParent();
+        }
+        return strb.toString();
+    }
+
+
+    private String flattenedStr(JexlNode node) {
+        ArrayList<JexlNode> flattened = flatten(node);
+        StringBuilder strb = new StringBuilder();
+        for (JexlNode flat : flattened) {
+            strb.append(indent(flat));
+            strb.append(flat.getClass().getSimpleName());
+            if (flat.image != null) {
+                strb.append(" = ");
+                strb.append(flat.image);
+            }
+            strb.append("\n");
+        }
+        return strb.toString();
+    }
     /**
      * Dynamically runs a test method.
      * @param name the test method to run

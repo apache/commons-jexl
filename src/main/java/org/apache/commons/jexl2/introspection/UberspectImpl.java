@@ -52,6 +52,14 @@ public class UberspectImpl extends Introspector implements Uberspect {
     public UberspectImpl(Log runtimeLogger) {
         super(runtimeLogger);
     }
+        
+    /**
+     * Resets this Uberspect class loader.
+     * @param cloader the class loader to use
+     */
+    public void setLoader(ClassLoader cloader) {
+        base().setLoader(cloader);
+    }
 
     /**
      * {@inheritDoc}

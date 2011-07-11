@@ -16,10 +16,14 @@
  */
 package org.apache.commons.jexl2;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.commons.jexl2.parser.ASTAdditiveNode;
 import org.apache.commons.jexl2.parser.ASTAdditiveOperator;
-import org.apache.commons.jexl2.parser.ASTAndNode;
 import org.apache.commons.jexl2.parser.ASTAmbiguous;
+import org.apache.commons.jexl2.parser.ASTAndNode;
 import org.apache.commons.jexl2.parser.ASTArrayAccess;
 import org.apache.commons.jexl2.parser.ASTArrayLiteral;
 import org.apache.commons.jexl2.parser.ASTAssignment;
@@ -51,22 +55,24 @@ import org.apache.commons.jexl2.parser.ASTMulNode;
 import org.apache.commons.jexl2.parser.ASTNENode;
 import org.apache.commons.jexl2.parser.ASTNRNode;
 import org.apache.commons.jexl2.parser.ASTNotNode;
-import org.apache.commons.jexl2.parser.ASTNumberLiteral;
 import org.apache.commons.jexl2.parser.ASTNullLiteral;
+import org.apache.commons.jexl2.parser.ASTNumberLiteral;
 import org.apache.commons.jexl2.parser.ASTOrNode;
 import org.apache.commons.jexl2.parser.ASTReference;
 import org.apache.commons.jexl2.parser.ASTReferenceExpression;
+import org.apache.commons.jexl2.parser.ASTReturnStatement;
 import org.apache.commons.jexl2.parser.ASTSizeFunction;
 import org.apache.commons.jexl2.parser.ASTSizeMethod;
 import org.apache.commons.jexl2.parser.ASTStringLiteral;
 import org.apache.commons.jexl2.parser.ASTTernaryNode;
 import org.apache.commons.jexl2.parser.ASTTrueNode;
 import org.apache.commons.jexl2.parser.ASTUnaryMinusNode;
+import org.apache.commons.jexl2.parser.ASTVar;
 import org.apache.commons.jexl2.parser.ASTWhileStatement;
 import org.apache.commons.jexl2.parser.JexlNode;
-import org.apache.commons.jexl2.parser.SimpleNode;
 
 import org.apache.commons.jexl2.parser.ParserVisitor;
+import org.apache.commons.jexl2.parser.SimpleNode;
 
 /**
  * Helps pinpoint the cause of problems in expressions that fail during evaluation.
@@ -168,9 +174,9 @@ final class Debugger implements ParserVisitor {
         Object value = accept(child, data);
         // blocks, if, for & while dont need a ';' at end
         if (child instanceof ASTBlock
-            || child instanceof ASTIfStatement
-            || child instanceof ASTForeachStatement
-            || child instanceof ASTWhileStatement) {
+                || child instanceof ASTIfStatement
+                || child instanceof ASTForeachStatement
+                || child instanceof ASTWhileStatement) {
             return value;
         }
         builder.append(";");
@@ -251,8 +257,8 @@ final class Debugger implements ParserVisitor {
     public Object visit(ASTAdditiveNode node, Object data) {
         // need parenthesis if not in operator precedence order
         boolean paren = node.jjtGetParent() instanceof ASTMulNode
-                        || node.jjtGetParent() instanceof ASTDivNode
-                        || node.jjtGetParent() instanceof ASTModNode;
+                || node.jjtGetParent() instanceof ASTDivNode
+                || node.jjtGetParent() instanceof ASTModNode;
         int num = node.jjtGetNumChildren(); //child.jjtGetNumChildren() > 1;
         if (paren) {
             builder.append("(");
@@ -306,7 +312,7 @@ final class Debugger implements ParserVisitor {
         builder.append(" ]");
         return data;
     }
-    
+
     /** {@inheritDoc} */
     public Object visit(ASTAssignment node, Object data) {
         return infixChildren(node, " = ", false, data);
@@ -474,7 +480,7 @@ final class Debugger implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-     public Object visit(ASTConstructorNode node, Object data) {
+    public Object visit(ASTConstructorNode node, Object data) {
         int num = node.jjtGetNumChildren();
         builder.append("new ");
         builder.append("(");
@@ -538,7 +544,7 @@ final class Debugger implements ParserVisitor {
     public Object visit(ASTNRNode node, Object data) {
         return infixChildren(node, " !~ ", false, data);
     }
-    
+
     /** {@inheritDoc} */
     public Object visit(ASTNotNode node, Object data) {
         builder.append("!");
@@ -553,7 +559,7 @@ final class Debugger implements ParserVisitor {
     }
 
     /** {@inheritDoc} */
-   public Object visit(ASTOrNode node, Object data) {
+    public Object visit(ASTOrNode node, Object data) {
         // need parenthesis if not in operator precedence order
         boolean paren = node.jjtGetParent() instanceof ASTAndNode;
         return infixChildren(node, " || ", paren, data);
@@ -573,15 +579,22 @@ final class Debugger implements ParserVisitor {
     /** {@inheritDoc} */
     public Object visit(ASTReferenceExpression node, Object data) {
         JexlNode first = node.jjtGetChild(0);
-            builder.append('(');
+        builder.append('(');
         accept(first, data);
-            builder.append(')');
+        builder.append(')');
         int num = node.jjtGetNumChildren();
         for (int i = 1; i < num; ++i) {
             builder.append("[");
             accept(node.jjtGetChild(i), data);
             builder.append("]");
         }
+        return data;
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTReturnStatement node, Object data) {
+        builder.append("return ");
+        accept(node.jjtGetChild(0), data);
         return data;
     }
 
@@ -598,7 +611,7 @@ final class Debugger implements ParserVisitor {
         check(node, "size()", data);
         return data;
     }
-    
+
     /** {@inheritDoc} */
     public Object visit(ASTStringLiteral node, Object data) {
         String img = node.image.replace("'", "\\'");
@@ -630,6 +643,12 @@ final class Debugger implements ParserVisitor {
     /** {@inheritDoc} */
     public Object visit(ASTUnaryMinusNode node, Object data) {
         return prefixChild(node, "-", data);
+    }
+
+    public Object visit(ASTVar node, Object data) {
+        builder.append("var ");
+        check(node, node.image, data);
+        return data;
     }
 
     /** {@inheritDoc} */

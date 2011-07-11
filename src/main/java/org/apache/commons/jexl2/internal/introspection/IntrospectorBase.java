@@ -77,13 +77,27 @@ public class IntrospectorBase {
         this.rlog = log;
         loader = getClass().getClassLoader();
     }
+    
+    /**
+     * Gets a class by name through this introspector class loader.
+     * @param className the class name
+     * @return the class instance or null if it could not be found
+     */
+    public Class<?> getClassByName(String className) {
+        try {
+            return Class.forName(className, false, loader);
+        } catch(ClassNotFoundException xignore) {
+            return null;
+        }
+    }
 
     /**
      * Gets the method defined by the <code>MethodKey</code> for the class <code>c</code>.
      *
      * @param c     Class in which the method search is taking place
      * @param key   Key of the method being searched for
-     * @return The desired method object or null if no unambiguous method could be found through introspection.
+     * @return The desired method object
+     * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
      */
     public Method getMethod(Class<?> c, MethodKey key) {
         try {
@@ -96,9 +110,8 @@ public class IntrospectorBase {
                            + c.getName() + "."
                            + key.debugString(), xambiguous);
             }
+            return null;
         }
-        return null;
-
     }
 
 
