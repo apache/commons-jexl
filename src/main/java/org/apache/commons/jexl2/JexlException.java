@@ -81,14 +81,23 @@ public class JexlException extends RuntimeException {
     /**
      * The class of exceptions that will force the interpreter to return, allways behaving in strict mode.
      */
-    public static class Return extends JexlException {   
+    protected static class Return extends JexlException {   
         private final Object result;
-        public Return(JexlNode node, String msg, Object result) {
+        protected Return(JexlNode node, String msg, Object result) {
             super(node, msg);
             this.result = result;
         }
         public Object getValue() {
             return result;
+        }
+    }
+    
+    /**
+     * The class of exceptions used when the interpreter cancels a script execution.
+     */
+    protected static class Cancel extends JexlException {
+        protected Cancel(JexlNode node) {
+            super(node, "execution cancelled", null);
         }
     }
     

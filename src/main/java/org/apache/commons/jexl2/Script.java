@@ -16,6 +16,10 @@
  */
 package org.apache.commons.jexl2;
 
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+
 /**
  * <p>A JEXL Script.</p>
  * <p>A script is some valid JEXL syntax to be executed with
@@ -37,6 +41,7 @@ public interface Script {
      *      the last statement.
      */
     Object execute(JexlContext context);
+
     /**
      * Executes the script with the variables contained in the
      * supplied {@link JexlContext} and a set of arguments corresponding to the
@@ -55,4 +60,38 @@ public interface Script {
      */
     String getText();
 
+    /**
+     * Gets this script parameters.
+     * @return the parameters or null
+     */
+    String[] getParameters();
+
+    /**
+     * Gets this script local variables.
+     * @return the local variables or null
+     */
+    String[] getLocalVariables();
+
+    /**
+     * Gets this script variables.
+     * <p>Note that since variables can be in an ant-ish form (ie foo.bar.quux), each variable is returned as 
+     * a list of strings where each entry is a fragment of the variable ({"foo", "bar", "quux"} in the example.</p>
+     * @return the variables or null
+     */
+    Set<List<String>> getVariables();
+
+    /**
+     * Creates a Callable from this script.
+     * @param context the context
+     * @return the callable
+     */
+    Callable<Object> callable(JexlContext context);
+
+    /**
+     * Creates a Callable from this script.
+     * @param context the context
+     * @param args the script arguments
+     * @return the callable
+     */
+    Callable<Object> callable(JexlContext context, Object... args);
 }
