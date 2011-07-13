@@ -14,8 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.jexl2;
+
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.jexl2.parser.ASTJexlScript;
 
@@ -36,7 +39,6 @@ public class ExpressionImpl implements Expression, Script {
      * The resulting AST we can interpret.
      */
     protected final ASTJexlScript script;
-
 
     /**
      * Do not let this be generally instantiated with a 'new'.
@@ -69,7 +71,7 @@ public class ExpressionImpl implements Expression, Script {
     public String dump() {
         Debugger debug = new Debugger();
         boolean d = debug.debug(script);
-        return debug.data() + (d? " /*" + debug.start() + ":" + debug.end() + "*/" : "/*?:?*/ ");
+        return debug.data() + (d ? " /*" + debug.start() + ":" + debug.end() + "*/" : "/*?:?*/ ");
     }
 
     /**
@@ -78,26 +80,9 @@ public class ExpressionImpl implements Expression, Script {
     public String getExpression() {
         return expression;
     }
-    
-    /**
-     * Gets this script parameters.
-     * @return the parameters or null
-     */
-    public String[] getParameters() {
-        return script.getParameters();
-    }
-       
-    /**
-     * Gets this script local variables.
-     * @return the local variables or null
-     */
-    public String[] getLocalVariables() {
-        return script.getLocalVariables();
-    }
 
     /**
-     * Provide a string representation of the expression.
-     *
+     * Provide a string representation of this expression.
      * @return the expression or blank if it's null.
      */
     @Override
@@ -121,14 +106,63 @@ public class ExpressionImpl implements Expression, Script {
         interpreter.setArguments(script.getRegisters(), script.createArguments((Object[]) null));
         return interpreter.interpret(script);
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    public Object execute(JexlContext context, Object...args) {
+    public Object execute(JexlContext context, Object... args) {
         Interpreter interpreter = jexl.createInterpreter(context);
         interpreter.setArguments(script.getRegisters(), script.createArguments(args));
         return interpreter.interpret(script);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String[] getParameters() {
+        return script.getParameters();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String[] getLocalVariables() {
+        return script.getLocalVariables();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<List<String>> getVariables() {
+        return jexl.getVariables(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Callable<Object> callable(JexlContext context) {
+        return callable(context, (Object[]) null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Callable<Object> callable(JexlContext context, Object... args) {
+        final Interpreter interpreter = jexl.createInterpreter(context);
+        interpreter.setArguments(script.getRegisters(), script.createArguments(args));
+
+        return new Callable<Object>() {
+            /** Use interpreter as marker for not having run. */
+            Object result = interpreter;
+
+            public Object call() throws Exception {
+                if (result == interpreter) {
+                    result = interpreter.interpret(script);
+                }
+                return result;
+            }
+
+        };
     }
 
 }

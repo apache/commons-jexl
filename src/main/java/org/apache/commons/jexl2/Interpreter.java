@@ -113,6 +113,8 @@ public class Interpreter implements ParserVisitor {
     protected Object[] registers = null;
     /** Parameter names if any. */
     protected String[] parameters = null;
+    /** Cancellation support. */
+    protected volatile boolean cancelled = false;
     /** Empty parameters for method matching. */
     protected static final Object[] EMPTY_PARAMS = new Object[0];
 
@@ -288,6 +290,14 @@ public class Interpreter implements ParserVisitor {
         return null;
     }
 
+    /**
+     * Checks whether this interpreter execution was cancelled due to thread interruption.
+     * @return true if cancelled, false otherwise
+     */
+    protected boolean isCancelled() {
+        return cancelled |= Thread.interrupted();
+    }
+    
     /**
      * Resolves a namespace, eventually allocating an instance using context as constructor argument.
      * The lifetime of such instances span the current expression or script evaluation.
@@ -702,6 +712,9 @@ public class Interpreter implements ParserVisitor {
             Iterator<?> itemsIterator = getUberspect().getIterator(iterableValue, node);
             if (itemsIterator != null) {
                 while (itemsIterator.hasNext()) {
+                    if (isCancelled()) {
+                        throw new JexlException.Cancel(node);
+                    }
                     // set loopVariable to value of iterator
                     Object value = itemsIterator.next();
                     if (register < 0) {
@@ -752,6 +765,9 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTIdentifier node, Object data) {
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
+        }
         String name = node.image;
         if (data == null) {
             int register = node.getRegister();
@@ -866,6 +882,9 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTMethodNode node, Object data) {
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
+        }
         // the object to invoke the method on should be in the data argument
         if (data == null) {
             // if the first child of the (ASTReference) parent,
@@ -930,6 +949,9 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTConstructorNode node, Object data) {
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
+        }
         // first child is class or class name
         Object cobject = node.jjtGetChild(0).jjtAccept(this, data);
         // get the ctor args
@@ -965,6 +987,9 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTFunctionNode node, Object data) {
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
+        }
         // objectNode 0 is the prefix
         String prefix = ((ASTIdentifier) node.jjtGetChild(0)).image;
         Object namespace = resolveNamespace(prefix, node);
@@ -1117,6 +1142,9 @@ public class Interpreter implements ParserVisitor {
         boolean isVariable = true;
         int v = 0;
         for (int c = 0; c < numChildren; c++) {
+            if (isCancelled()) {
+                throw new JexlException.Cancel(node);
+            }
             JexlNode theNode = node.jjtGetChild(c);
             // integer literals may be part of an antish var name only if no bean was found so far
             if (result == null && theNode instanceof ASTNumberLiteral && ((ASTNumberLiteral) theNode).isInteger()) {
@@ -1146,13 +1174,13 @@ public class Interpreter implements ParserVisitor {
         }
         return result;
     }
-    
+
     /** {@inheritDoc} */
     public Object visit(ASTReferenceExpression node, Object data) {
         ASTArrayAccess upper = node;
         return visit(upper, data);
     }
-    
+
     /** {@inheritDoc} */
     public Object visit(ASTReturnStatement node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
@@ -1246,10 +1274,14 @@ public class Interpreter implements ParserVisitor {
         /* first objectNode is the expression */
         Node expressionNode = node.jjtGetChild(0);
         while (arithmetic.toBoolean(expressionNode.jjtAccept(this, data))) {
+            if (isCancelled()) {
+                throw new JexlException.Cancel(node);
+            }
             // execute statement
-            result = node.jjtGetChild(1).jjtAccept(this, data);
+            if (node.jjtGetNumChildren() > 1) {
+                result = node.jjtGetChild(1).jjtAccept(this, data);
+            }
         }
-
         return result;
     }
 
@@ -1312,6 +1344,9 @@ public class Interpreter implements ParserVisitor {
         if (object == null) {
             throw new JexlException(node, "object is null");
         }
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
+        }
         // attempt to reuse last executor cached in volatile JexlNode.value
         if (node != null && cache) {
             Object cached = node.jjtGetValue();
@@ -1372,6 +1407,9 @@ public class Interpreter implements ParserVisitor {
      * @param node the node that evaluated as the object
      */
     protected void setAttribute(Object object, Object attribute, Object value, JexlNode node) {
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
+        }
         // attempt to reuse last executor cached in volatile JexlNode.value
         if (node != null && cache) {
             Object cached = node.jjtGetValue();
