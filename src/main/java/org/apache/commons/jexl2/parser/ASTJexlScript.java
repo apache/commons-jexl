@@ -105,7 +105,7 @@ public class ASTJexlScript extends JexlNode {
     public String[] getLocalVariables() {
         if (registers != null) {
             String[] pa = new String[registers.length - parms];
-            System.arraycopy(registers, 0, pa, 0, registers.length - parms);
+            System.arraycopy(registers, parms, pa, 0, registers.length - parms);
             return pa;
         } else {
             return null;
