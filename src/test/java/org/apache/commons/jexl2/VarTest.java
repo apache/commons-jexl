@@ -32,19 +32,19 @@ public class VarTest extends JexlTestCase {
         super(testName);
     }
 
-    public void testBasic() throws Exception {
+    public void testLocalBasic() throws Exception {
         Script e = JEXL.createScript("var x; x = 42");
         Object o = e.execute(null);
         assertEquals("Result is not 42", new Integer(42), o);
     }
 
-    public void testSimple() throws Exception {
+    public void testLocalSimple() throws Exception {
         Script e = JEXL.createScript("var x = 21; x + x");
         Object o = e.execute(null);
         assertEquals("Result is not 42", new Integer(42), o);
     }
 
-    public void testFor() throws Exception {
+    public void testLocalFor() throws Exception {
         Script e = JEXL.createScript("var y  = 0; for(var x : [5, 17, 20]) { y = y + x; } y;");
         Object o = e.execute(null);
         assertEquals("Result is not 42", new Integer(42), o);
@@ -60,22 +60,27 @@ public class VarTest extends JexlTestCase {
         }
     }
 
-    public void testForFunc() throws Exception {
+    public void testLocalForFunc() throws Exception {
         JexlContext jc = new NumbersContext();
         Script e = JEXL.createScript("var y  = 0; for(var x : numbers()) { y = y + x; } y;");
         Object o = e.execute(jc);
         assertEquals("Result is not 42", new Integer(42), o);
     }
 
-    public void testForFuncReturn() throws Exception {
+    public void testLocalForFuncReturn() throws Exception {
         JexlContext jc = new NumbersContext();
         Script e = JEXL.createScript("var y  = 42; for(var x : numbers()) { if (x > 10) return x } y;");
         Object o = e.execute(jc);
         assertEquals("Result is not 17", new Integer(17), o);
         
-        assertTrue(toString(JEXL.getVariables(e)), JEXL.getVariables(e).isEmpty());
+        assertTrue(toString(e.getVariables()), e.getVariables().isEmpty());
     }
 
+    /**
+     * Generate a string representation of Set&lt;List&t;String>>, useful to dump script variables
+     * @param refs the variable reference set
+     * @return  the string representation
+     */
     String toString(Set<List<String>> refs) {
         StringBuilder strb = new StringBuilder("{");
         int r = 0;
@@ -98,6 +103,11 @@ public class VarTest extends JexlTestCase {
         return strb.toString();
     }
     
+    /**
+     * Creates a variable reference set from an array of array of strings.
+     * @param refs the variable reference set
+     * @return the set of variables
+     */
     Set<List<String>> mkref(String[][] refs) {
         Set<List<String>> set = new HashSet<List<String>>();
         for(String[] ref : refs) {
@@ -106,6 +116,12 @@ public class VarTest extends JexlTestCase {
         return set;
     }
     
+    /**
+     * Checks that two sets of variable references are equal
+     * @param lhs the left set
+     * @param rhs the right set
+     * @return true if equal, false otherwise
+     */
     boolean eq(Set<List<String>> lhs, Set<List<String>> rhs) {
         if (lhs.size() != rhs.size()) {
             return false;
@@ -124,47 +140,60 @@ public class VarTest extends JexlTestCase {
         Set<List<String>> expect;
 
         e = JEXL.createScript("e[f]");
-        vars = JEXL.getVariables(e);
+        vars = e.getVariables();
         expect = mkref(new String[][]{{"e"},{"f"}});
         assertTrue(eq(expect, vars));
         
         
         e = JEXL.createScript("e[f][g]");
-        vars = JEXL.getVariables(e);
+        vars = e.getVariables();
         expect = mkref(new String[][]{{"e"},{"f"},{"g"}});
         assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e['f'].goo");
-        vars = JEXL.getVariables(e);
+        vars = e.getVariables();
         expect = mkref(new String[][]{{"e","f","goo"}});
         assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e['f']");
-        vars = JEXL.getVariables(e);
+        vars = e.getVariables();
         expect = mkref(new String[][]{{"e","f"}});
         assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e[f]['g']");
-        vars = JEXL.getVariables(e);
+        vars = e.getVariables();
         expect = mkref(new String[][]{{"e"},{"f"}});
         assertTrue(eq(expect, vars));
         
         e = JEXL.createScript("e['f']['g']");
-        vars = JEXL.getVariables(e);
+        vars = e.getVariables();
         expect = mkref(new String[][]{{"e","f","g"}});
         assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a['b'].c['d'].e");
-        vars = JEXL.getVariables(e);
+        vars = e.getVariables();
         expect = mkref(new String[][]{{"a", "b", "c", "d", "e"}});
         assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a + b.c + b.c.d + e['f']");
         //LOGGER.info(flattenedStr(e));
-        vars = JEXL.getVariables(e);
+        vars = e.getVariables();
         expect = mkref(new String[][]{{"a"}, {"b", "c"}, {"b", "c", "d"}, {"e", "f"}});
         assertTrue(eq(expect, vars));
     }
-
-
+    
+    public void testMix() throws Exception {
+        Script e;
+        // x is a parameter, y a context variable, z a local variable
+        e = JEXL.createScript("if (x) { y } else { var z = 2 * x}", "x");
+        Set<List<String>> vars = e.getVariables();
+        String[] parms = e.getParameters();
+        String[] locals = e.getLocalVariables();
+        
+        assertTrue(eq(mkref(new String[][]{{"y"}}), vars));
+        assertEquals(1, parms.length);
+        assertEquals("x", parms[0]);
+        assertEquals(1, locals.length);
+        assertEquals("z", locals[0]);
+    }
 }

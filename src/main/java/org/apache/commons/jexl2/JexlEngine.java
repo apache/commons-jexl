@@ -49,9 +49,7 @@ import org.apache.commons.jexl2.introspection.UberspectImpl;
 import org.apache.commons.jexl2.introspection.JexlMethod;
 import org.apache.commons.jexl2.parser.ASTArrayAccess;
 import org.apache.commons.jexl2.parser.ASTIdentifier;
-import org.apache.commons.jexl2.parser.ASTNumberLiteral;
 import org.apache.commons.jexl2.parser.ASTReference;
-import org.apache.commons.jexl2.parser.ASTStringLiteral;
 
 /**
  * <p>
@@ -426,7 +424,19 @@ public class JexlEngine {
     public Script createScript(String scriptText) {
         return createScript(scriptText, null, null);
     }
-
+    
+    /**
+     * Creates a Script from a String containing valid JEXL syntax.
+     * This method parses the script which validates the syntax.
+     *
+     * @param scriptText A String containing valid JEXL syntax
+     * @param names the script parameter names
+     * @return A {@link Script} which can be executed using a {@link JexlContext}.
+     * @throws JexlException if there is a problem parsing the script.
+     */
+    public Script createScript(String scriptText, String...names) {
+        return createScript(scriptText, null, names);
+    }
     /**
      * Creates a Script from a String containing valid JEXL syntax.
      * This method parses the script which validates the syntax.
@@ -834,6 +844,7 @@ public class JexlEngine {
      * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
      * @param script the script
      * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
+     *         or the empty set if no variables are used
      */
     public Set<List<String>> getVariables(Script script) {
         if (script instanceof ExpressionImpl) {
@@ -841,7 +852,7 @@ public class JexlEngine {
             getVariables(((ExpressionImpl) script).script, refs, null);
             return refs;
         } else {
-            return null;
+            return Collections.<List<String>>emptySet();
         }
     }
 
@@ -866,7 +877,7 @@ public class JexlEngine {
                         if (varf && desc.isConstant()) {
                             var.add(desc.image);
                         } else if (desc instanceof ASTIdentifier) {
-                            if (((ASTIdentifier)desc).getRegister() < 0) {
+                            if (((ASTIdentifier) desc).getRegister() < 0) {
                                 List<String> di = new ArrayList<String>(1);
                                 di.add(desc.image);
                                 refs.add(di);
@@ -876,14 +887,14 @@ public class JexlEngine {
                         }
                         continue;
                     } else if (child instanceof ASTIdentifier) {
-                        if (i == 0 && (((ASTIdentifier)child).getRegister() < 0)) {
+                        if (i == 0 && (((ASTIdentifier) child).getRegister() < 0)) {
                             var.add(child.image);
                         }
                         continue;
                     }
                 } else {//if (reference) {
-                    if (child instanceof ASTIdentifier ) {
-                        if (((ASTIdentifier)child).getRegister() < 0) {
+                    if (child instanceof ASTIdentifier) {
+                        if (((ASTIdentifier) child).getRegister() < 0) {
                             var.add(child.image);
                         }
                         continue;
@@ -904,25 +915,26 @@ public class JexlEngine {
     /**
      * Gets the array of parameters from a script.
      * @param script the script
-     * @return the parameters
+     * @return the parameters which may be empty (but not null) if no parameters were defined
      */
-    public String[] getParameters(Script script) {
+    protected String[] getParameters(Script script) {
         if (script instanceof ExpressionImpl) {
             return ((ExpressionImpl) script).getParameters();
         } else {
-            return null;
+            return new String[0];
         }
     }
+
     /**
      * Gets the array of local variable from a script.
      * @param script the script
-     * @return the parameters
+     * @return the local variables array which may be empty (but not null) if no local variables were defined
      */
-    public String[] getLocalVariables(Script script) {
+    protected String[] getLocalVariables(Script script) {
         if (script instanceof ExpressionImpl) {
             return ((ExpressionImpl) script).getLocalVariables();
         } else {
-            return null;
+            return new String[0];
         }
     }
 
@@ -973,7 +985,7 @@ public class JexlEngine {
                 params = parser.getNamedRegisters();
                 if (params != null) {
                     String[] registers = (new ArrayList<String>(params.keySet())).toArray(new String[0]);
-                    script.setParameters(names!= null? names.length : 0, registers);
+                    script.setParameters(names != null ? names.length : 0, registers);
                 }
                 if (cache != null) {
                     cache.put(expr, script);
