@@ -359,7 +359,7 @@ public class Interpreter implements ParserVisitor {
             try {
                 JexlNode op = node.jjtGetChild(c - 1);
                 if (op instanceof ASTAdditiveOperator) {
-                    String which = ((ASTAdditiveOperator) op).image;
+                    String which = op.image;
                     if ("+".equals(which)) {
                         left = arithmetic.add(left, right);
                         continue;
@@ -899,7 +899,7 @@ public class Interpreter implements ParserVisitor {
             }
         }
         // objectNode 0 is the identifier (method name), the others are parameters.
-        String methodName = ((ASTIdentifier) node.jjtGetChild(0)).image;
+        String methodName = node.jjtGetChild(0).image;
 
         // get our arguments
         int argc = node.jjtGetNumChildren() - 1;
@@ -991,10 +991,10 @@ public class Interpreter implements ParserVisitor {
             throw new JexlException.Cancel(node);
         }
         // objectNode 0 is the prefix
-        String prefix = ((ASTIdentifier) node.jjtGetChild(0)).image;
+        String prefix = node.jjtGetChild(0).image;
         Object namespace = resolveNamespace(prefix, node);
         // objectNode 1 is the identifier , the others are parameters.
-        String function = ((ASTIdentifier) node.jjtGetChild(1)).image;
+        String function = node.jjtGetChild(1).image;
 
         // get our args
         int argc = node.jjtGetNumChildren() - 2;
@@ -1209,11 +1209,9 @@ public class Interpreter implements ParserVisitor {
     /** {@inheritDoc} */
     public Object visit(ASTSizeFunction node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
-
         if (val == null) {
             throw new JexlException(node, "size() : argument is null", null);
         }
-
         return Integer.valueOf(sizeOf(node, val));
     }
 
