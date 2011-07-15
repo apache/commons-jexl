@@ -30,7 +30,6 @@ import org.apache.commons.jexl2.introspection.UberspectImpl;
  */
 @SuppressWarnings("boxing")
 public class IssuesTest extends JexlTestCase {
-
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error to avoid warning in silent mode
@@ -69,7 +68,7 @@ public class IssuesTest extends JexlTestCase {
         assertEquals(new BigDecimal("42.0"), vars.get("c"));
         assertEquals(new BigDecimal("42.0"), vars.get("d"));
     }
-    
+
     // JEXL-24: big decimals with exponent
     public void test24C() throws Exception {
         Map<String, Object> vars = new HashMap<String, Object>();
@@ -82,7 +81,7 @@ public class IssuesTest extends JexlTestCase {
         assertEquals(new BigDecimal("42.0e-1"), vars.get("c"));
         assertEquals(new BigDecimal("42.0e-2"), vars.get("d"));
     }
-        
+
     // JEXL-24: doubles with exponent
     public void test24D() throws Exception {
         Map<String, Object> vars = new HashMap<String, Object>();
@@ -410,7 +409,7 @@ public class IssuesTest extends JexlTestCase {
         long end = System.nanoTime();
         double millisec = (end - start) / 1e6;
         double limit = 100.0; // Allow plenty of slack
-        assertTrue("Expected parse to take less than "+limit+"ms, actual "+millisec, millisec < limit);
+        assertTrue("Expected parse to take less than " + limit + "ms, actual " + millisec, millisec < limit);
     }
 
     public static class fn98 {
@@ -670,24 +669,32 @@ public class IssuesTest extends JexlTestCase {
         ctx.set("salary", new BigDecimal("119500.00"));
         ctx.set("month", new BigDecimal("12.00"));
         ctx.set("percent", new BigDecimal("100.00"));
-        
+
         // will fail because default scale is 5
         assertFalse((Boolean) exp1.evaluate(ctx));
-        
+
         // will succeed with scale = 2
         JexlThreadedArithmetic.setMathScale(2);
         assertFalse((Boolean) exp1.evaluate(ctx));
     }
-    
+
     public void test112() throws Exception {
         Object result;
         JexlEngine jexl = new JexlEngine();
         result = jexl.createScript(Integer.toString(Integer.MAX_VALUE)).execute(null);
         assertEquals(Integer.MAX_VALUE, result);
-        result = jexl.createScript(Integer.toString(Integer.MIN_VALUE+1)).execute(null); 
-        assertEquals(Integer.MIN_VALUE+1, result);
+        result = jexl.createScript(Integer.toString(Integer.MIN_VALUE + 1)).execute(null);
+        assertEquals(Integer.MIN_VALUE + 1, result);
         result = jexl.createScript(Integer.toString(Integer.MIN_VALUE)).execute(null);
         assertEquals(Integer.MIN_VALUE, result);
     }
 
+    public void test117() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        Expression e = jexl.createExpression("TIMESTAMP > 20100102000000");
+        JexlContext ctx = new MapContext();
+        ctx.set("TIMESTAMP", new Long("20100103000000"));
+        Object result = e.evaluate(ctx);
+        assertTrue((Boolean) result);
+    }
 }
