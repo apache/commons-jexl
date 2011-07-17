@@ -29,11 +29,11 @@ public class JexlThreadedArithmetic extends JexlArithmetic {
         Features() {
         }
         /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
-        Boolean lenient = null;
+        private Boolean lenient = null;
         /** The big decimal math context. */
-        MathContext mathContext = null;
+        private MathContext mathContext = null;
         /** The big decimal scale. */
-        Integer mathScale = null;
+        private Integer mathScale = null;
     }
 
     /**
@@ -45,7 +45,7 @@ public class JexlThreadedArithmetic extends JexlArithmetic {
     }
     
     /**
-     * Creates a JexlThreadedArithmetic.
+     * Creates a JexlThreadedArithmetic instance.
      * @param lenient whether this arithmetic is lenient or strict
      * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
      * @param bigdScale the scale used for big decimals.
@@ -66,8 +66,8 @@ public class JexlThreadedArithmetic extends JexlArithmetic {
     /**
      * Overrides the default behavior and sets whether this JexlArithmetic instance triggers errors
      * during evaluation when null is used as an operand for the current thread.
-     * <p>It is advised to protect calls by either calling JexlThreadedArithmetic.setLenient explicitly before evaluation
-     * or add a try/finally clause resetting the flag to avoid unexpected reuse of the lenient
+     * <p>It is advised to protect calls by either calling JexlThreadedArithmetic.setLenient explicitly
+     * before evaluation or add a try/finally clause resetting the flag to avoid unexpected reuse of the lenient
      * flag value through thread pools side-effects.</p>
      * @see JexlEngine#setSilent
      * @see JexlEngine#setDebug

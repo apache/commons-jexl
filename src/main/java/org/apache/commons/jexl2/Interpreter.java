@@ -133,7 +133,7 @@ public class Interpreter implements ParserVisitor {
      * @param jexl the engine creating this interpreter
      * @param aContext the context to evaluate expression
      * @param strictFlag whether this interpreter runs in strict mode
-     * @param simentFlag whether this interpreter runs in silent mode
+     * @param silentFlag whether this interpreter runs in silent mode
      */
     public Interpreter(JexlEngine jexl, JexlContext aContext, boolean strictFlag, boolean silentFlag) {
         this.logger = jexl.logger;
@@ -242,12 +242,12 @@ public class Interpreter implements ParserVisitor {
 
     /**
      * Sets this interpreter parameters and arguments.
-     * @param parameters the array of parameters
-     * @param arguments the array of arguments
+     * @param theParms the array of parameters
+     * @param theArgs the array of arguments
      */
-    protected void setArguments(String[] parameters, Object[] arguments) {
-        this.parameters = parameters;
-        this.registers = arguments;
+    protected void setArguments(String[] theParms, Object[] theArgs) {
+        this.parameters = theParms;
+        this.registers = theArgs;
     }
 
     /**
@@ -306,7 +306,10 @@ public class Interpreter implements ParserVisitor {
      * @return true if cancelled, false otherwise
      */
     protected boolean isCancelled() {
-        return cancelled |= Thread.interrupted();
+        if (cancelled | Thread.interrupted()) {
+            cancelled = true;
+        }
+        return cancelled;
     }
     
     /**

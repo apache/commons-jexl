@@ -21,15 +21,19 @@ package org.apache.commons.jexl2;
  */
 public final class ReadonlyContext implements JexlContext {
     /** The wrapped context. */
-    private final JexlContext base;
+    private final JexlContext wrapped;
 
-    public ReadonlyContext(JexlContext theBase) {
-        base = theBase;
+    /**
+     * Creates a new readonly context.
+     * @param context the wrapped context
+     */
+    public ReadonlyContext(JexlContext context) {
+        wrapped = context;
     }
 
     /** {@inheritDoc} */
     public Object get(String name) {
-        return base.get(name);
+        return wrapped.get(name);
     }
 
     /** {@inheritDoc} */
@@ -39,6 +43,6 @@ public final class ReadonlyContext implements JexlContext {
 
     /** {@inheritDoc} */
     public boolean has(String name) {
-        return base.has(name);
+        return wrapped.has(name);
     }
 }

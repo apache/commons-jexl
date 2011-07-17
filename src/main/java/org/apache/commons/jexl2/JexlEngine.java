@@ -761,7 +761,7 @@ public class JexlEngine {
      * Creates an interpreter.
      * @param context a JexlContext; if null, the EMPTY_CONTEXT is used instead.
      * @param strictFlag whether the interpreter runs in strict mode
-     * @param simentFlag whether the interpreter runs in silent mode
+     * @param silentFlag whether the interpreter runs in silent mode
      * @return an Interpreter
      */
     protected Interpreter createInterpreter(JexlContext context, boolean strictFlag, boolean silentFlag) {
