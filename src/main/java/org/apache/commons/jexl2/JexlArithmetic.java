@@ -889,7 +889,7 @@ public class JexlArithmetic {
      * Whether we consider the narrow class as a potential candidate for narrowing the source.
      * @param narrow the target narrow class
      * @param source the orginal source class
-     * @return 
+     * @return true if attempt to narrow source to target is accepted
      */
     protected boolean narrowAccept(Class<?> narrow, Class<?> source) {
         return narrow == null || narrow.equals(source);
@@ -915,7 +915,9 @@ public class JexlArithmetic {
                 try {
                     long l = bigd.longValueExact();
                     // coerce to int when possible (int being so often used in method parms)
-                    if (narrowAccept(narrow, Integer.class) && l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE) {
+                    if (narrowAccept(narrow, Integer.class)
+                        && l <= Integer.MAX_VALUE
+                        && l >= Integer.MIN_VALUE) {
                         return Integer.valueOf((int) l);
                     } else if (narrowAccept(narrow, Long.class)) {
                         return Long.valueOf(l);
@@ -927,7 +929,9 @@ public class JexlArithmetic {
         }
         if (original instanceof Double || original instanceof Float || original instanceof BigDecimal) {
             double value = original.doubleValue();
-            if (narrowAccept(narrow, Float.class) && value <= Float.MAX_VALUE && value >= Float.MIN_VALUE) {
+            if (narrowAccept(narrow, Float.class)
+                             && value <= Float.MAX_VALUE
+                             && value >= Float.MIN_VALUE) {
                 result = Float.valueOf(result.floatValue());
             }
             // else it fits in a double only
@@ -936,17 +940,23 @@ public class JexlArithmetic {
                 BigInteger bigi = (BigInteger) original;
                 // if it's bigger than a Long it can't be narrowed
                 if (bigi.compareTo(BIGI_LONG_MAX_VALUE) > 0
-                        || bigi.compareTo(BIGI_LONG_MIN_VALUE) < 0) {
+                    || bigi.compareTo(BIGI_LONG_MIN_VALUE) < 0) {
                     return original;
                 }
             }
             long value = original.longValue();
-            if (narrowAccept(narrow, Byte.class) && value <= Byte.MAX_VALUE && value >= Byte.MIN_VALUE) {
+            if (narrowAccept(narrow, Byte.class)
+                             && value <= Byte.MAX_VALUE
+                             && value >= Byte.MIN_VALUE) {
                 // it will fit in a byte
                 result = Byte.valueOf((byte) value);
-            } else if (narrowAccept(narrow, Short.class) && value <= Short.MAX_VALUE && value >= Short.MIN_VALUE) {
+            } else if (narrowAccept(narrow, Short.class)
+                       && value <= Short.MAX_VALUE
+                       && value >= Short.MIN_VALUE) {
                 result = Short.valueOf((short) value);
-            } else if (narrowAccept(narrow, Integer.class) && value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE) {
+            } else if (narrowAccept(narrow, Integer.class)
+                       && value <= Integer.MAX_VALUE
+                       && value >= Integer.MIN_VALUE) {
                 result = Integer.valueOf((int) value);
             }
             // else it fits in a long

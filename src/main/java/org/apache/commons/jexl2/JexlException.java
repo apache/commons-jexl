@@ -95,6 +95,7 @@ public class JexlException extends RuntimeException {
          * Creates a new Tokenization exception instance.
          * @param node the location info
          * @param expr the expression
+         * @param cause the javacc cause
          */
         public Tokenization(JexlInfo node, CharSequence expr, Throwable cause) {
             super(node, expr.toString(), cause);
@@ -121,6 +122,7 @@ public class JexlException extends RuntimeException {
          * Creates a new Variable exception instance.
          * @param node the offending ASTnode
          * @param expr the unknown variable
+         * @param cause the javacc cause
          */
         public Parsing(JexlInfo node, CharSequence expr, Throwable cause) {
             super(node, expr.toString(), cause);
@@ -194,12 +196,22 @@ public class JexlException extends RuntimeException {
     /**
      * The class of exceptions that will force the interpreter to return, allways behaving in strict mode.
      */
-    protected static class Return extends JexlException {   
+    protected static class Return extends JexlException {  
+        /** The returned value. */
         private final Object result;
-        protected Return(JexlNode node, String msg, Object result) {
+        /**
+         * Creates a new instance of Return.
+         * @param node the return node
+         * @param msg the message
+         * @param value the returned value
+         */
+        protected Return(JexlNode node, String msg, Object value) {
             super(node, msg);
-            this.result = result;
+            this.result = value;
         }
+        /**
+         * @return the returned value
+         */
         public Object getValue() {
             return result;
         }
@@ -209,6 +221,10 @@ public class JexlException extends RuntimeException {
      * The class of exceptions used when the interpreter cancels a script execution.
      */
     protected static class Cancel extends JexlException {
+        /**
+         * Creates a new instance of Cancel.
+         * @param node the node where the interruption was detected
+         */
         protected Cancel(JexlNode node) {
             super(node, "execution cancelled", null);
         }

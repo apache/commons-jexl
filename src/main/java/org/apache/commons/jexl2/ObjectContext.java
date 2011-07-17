@@ -21,17 +21,19 @@ package org.apache.commons.jexl2;
  * @param <T> the wrapped object type to use
  */
 public class ObjectContext<T> implements JexlContext {
+    /** The property solving jexl engine. */
     private final JexlEngine jexl;
+    /** The object serving as context provider. */
     private final T object;
 
     /**
      * Creates a new ObjectContext.
-     * @param jexl the jexl engine to use to solve properties
-     * @param object the object to wrap in this context
+     * @param engine the jexl engine to use to solve properties
+     * @param wrapped the object to wrap in this context
      */
-    public ObjectContext(JexlEngine jexl, T object) {
-        this.jexl = jexl;
-        this.object = object;
+    public ObjectContext(JexlEngine engine, T wrapped) {
+        this.jexl = engine;
+        this.object = wrapped;
     }
 
     /** {@inheritDoc} */

@@ -641,6 +641,7 @@ final class Debugger implements ParserVisitor {
         return prefixChild(node, "-", data);
     }
 
+    /** {@inheritDoc} */
     public Object visit(ASTVar node, Object data) {
         builder.append("var ");
         check(node, node.image, data);

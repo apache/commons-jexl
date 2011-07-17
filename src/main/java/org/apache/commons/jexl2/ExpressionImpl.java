@@ -153,7 +153,7 @@ public class ExpressionImpl implements Expression, Script {
 
         return new Callable<Object>() {
             /** Use interpreter as marker for not having run. */
-            Object result = interpreter;
+            private Object result = interpreter;
 
             public Object call() throws Exception {
                 if (result == interpreter) {
