@@ -78,7 +78,7 @@
             </p>
             <p>
               <strong>N.B.</strong> the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
-              <code>or and eq ne lt gt le ge div mod not null true false new</code>
+              <code>or and eq ne lt gt le ge div mod not null true false new var return</code>
               For example, the following is invalid:
               <source>my.new.dotted.var // invalid ('new' is keyword)</source>
               In such cases, the [ ] operator can be used, for example:
@@ -90,6 +90,22 @@
           <td>Scripts</td>
           <td>
             A script in Jexl is made up of zero or more statements. Scripts can be read from a String, File or URL.
+            They can be created with named parameters which allow a later evaluation to be performed with arguments.
+            A script returns the last expression evaluated by default.
+            Using the <code>return</code> keyword, a script will return the expression that follows (or null).
+          </td>
+        </tr>
+        <tr>
+          <td>Local variables</td>
+          <td>Can be defined using the <code>var</code> keyword; their identifying rules are the same as contextual variables.
+            <ul>
+              <li>Basic declaration: <code>var x;</code></li>
+              <li>Declaration with assignment: <code>var theAnswer = 42;</code></li>
+              <li>Invalid declaration: <code>var x.y;</code></li>
+            </ul>
+            Their scope is the entire script scope and they take precedence in resolution over contextual variables.
+            When scripts are created with named parameters, those behave as local variables.
+            Local variables can not use <code>ant-style</code> naming, only one identifier.
           </td>
         </tr>
         <tr>
