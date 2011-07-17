@@ -26,6 +26,9 @@
   </properties>
   <body>
     <release version="2.1" date="unreleased">
+        <action dev="henrib" type="add" issue="JEXL-115" due-to="Sarel Botha">
+            Add support for asynchronous script execution and cancellation
+        </action>
         <action dev="henrib" type="add" issue="JEXL-114">
             Allow scripts to create local variables // Add return keyword
         </action>
