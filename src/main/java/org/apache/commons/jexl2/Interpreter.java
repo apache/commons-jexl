@@ -794,7 +794,7 @@ public class Interpreter implements ParserVisitor {
                     && !(node.jjtGetParent() instanceof ASTReference)
                     && !context.has(name)
                     && !isTernaryProtected(node)) {
-                JexlException xjexl = new JexlException(node, "undefined variable " + name);
+                JexlException xjexl = new JexlException.Variable(node, name);
                 return unknownVariable(xjexl);
             }
             return value;
@@ -944,7 +944,7 @@ public class Interpreter implements ParserVisitor {
                     vm = uberspect.getMethod(data, methodName, argv, node);
                 }
                 if (vm == null) {
-                    xjexl = new JexlException(node, "unknown or ambiguous method", null);
+                    xjexl = new JexlException.Method(node, methodName);
                 }
             }
             if (xjexl == null) {
@@ -987,7 +987,7 @@ public class Interpreter implements ParserVisitor {
                     ctor = uberspect.getConstructor(cobject, argv, node);
                 }
                 if (ctor == null) {
-                    xjexl = new JexlException(node, "unknown constructor", null);
+                    xjexl = new JexlException.Method(node, cobject.toString());
                 }
             }
             if (xjexl == null) {
@@ -1041,7 +1041,7 @@ public class Interpreter implements ParserVisitor {
                     vm = uberspect.getMethod(namespace, function, argv, node);
                 }
                 if (vm == null) {
-                    xjexl = new JexlException(node, "unknown function", null);
+                    xjexl = new JexlException.Method(node, function);
                 }
             }
             if (xjexl == null) {
@@ -1184,7 +1184,7 @@ public class Interpreter implements ParserVisitor {
         }
         if (result == null) {
             if (isVariable && !context.has(variableName.toString()) && !isTernaryProtected(node)) {
-                JexlException xjexl = new JexlException(node, "undefined variable " + variableName.toString());
+                JexlException xjexl = new JexlException.Variable(node, variableName.toString());
                 return unknownVariable(xjexl);
             }
         }

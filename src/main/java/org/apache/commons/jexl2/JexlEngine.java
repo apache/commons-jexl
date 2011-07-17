@@ -1023,9 +1023,9 @@ public class JexlEngine {
                     cache.put(expr, script);
                 }
             } catch (TokenMgrError xtme) {
-                throw new JexlException(info, "!!! " + expression + " !!!" + ", tokenization failed", xtme);
+                throw new JexlException.Tokenization(info, expression, xtme);
             } catch (ParseException xparse) {
-                throw new JexlException(info, "!!! " + expression + " !!!" + ", parsing failed", xparse);
+                throw new JexlException.Parsing(info, expression, xparse);
             } finally {
                 parser.setNamedRegisters(null);
             }
