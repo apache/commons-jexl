@@ -153,15 +153,19 @@ public class JexlEngine {
     protected final Parser parser = new Parser(new StringReader(";")); //$NON-NLS-1$
     /**
      * Whether expressions evaluated by this engine will throw exceptions (false) or 
-     * return null (true). Default is false.
+     * return null (true) on errors. Default is false.
      */
     protected boolean silent = false;
+    /**
+     * Whether this engine is in lenient or strict mode; if unspecified, use the arithmetic lenient property.
+     */
+    protected Boolean strict = null;
     /**
      * Whether error messages will carry debugging information.
      */
     protected boolean debug = true;
     /**
-     *  The map of 'prefix:function' to object implementing the function.
+     *  The map of 'prefix:function' to object implementing the functions.
      */
     protected Map<String, Object> functions = Collections.emptyMap();
     /**
@@ -273,11 +277,12 @@ public class JexlEngine {
     }
 
     /**
-     * Sets whether this engine triggers errors during evaluation when null is used as
-     * an operand.
+     * Sets whether this engine considers unknown variables, methods and constructors as errors or evaluates them
+     * as null.
      * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
      * initialization code before expression creation &amp; evaluation.</p>
-     * <p>As of 2.0.2, you need a JexlThreadedArithmetic instance for this call to succeed.</p>
+     * <p>As of 2.1, you need a JexlThreadedArithmetic instance for this call to also modify the JexlArithmetic
+     * leniency behavior.</p>
      * @see JexlEngine#setSilent
      * @see JexlEngine#setDebug
      * @param flag true means no JexlException will occur, false allows them
@@ -285,19 +290,38 @@ public class JexlEngine {
     public void setLenient(boolean flag) {
         if (arithmetic instanceof JexlThreadedArithmetic) {
             JexlThreadedArithmetic.setLenient(Boolean.valueOf(flag));
-        } else if (flag != isLenient()) {
-            logger.warn("setLenient only has an effect when using a JexlThreadedArithmetic");
+        } else {
+            strict = flag? Boolean.FALSE : Boolean.TRUE;
         }
     }
 
     /**
-     * Checks whether this engine triggers errors during evaluation when null is used as
-     * an operand.
+     * Checks whether this engine considers unknown variables, methods and constructors as errors.
+     * <p>If not explicitly set, the arithmetic leniency value applies.</p>
      * @return true if lenient, false if strict
      */
     public boolean isLenient() {
-        return this.arithmetic.isLenient();
+        return strict == null? arithmetic.isLenient() : !strict.booleanValue();
     }
+        
+    /**
+     * Sets whether this engine behaves in strict or lenient mode.
+     * Equivalent to setLenient(!flag).
+     * @param flag true for strict, false for lenient
+     */
+    public final void setStrict(boolean flag) {
+        setLenient(!flag);
+    }
+    
+    /**
+     * Checks whether this engine behaves in strict or lenient mode.
+     * Equivalent to !isLenient().
+     * @return true for strict, false for lenient
+     */
+    public final boolean isStrict() {
+        return !isLenient();
+    }
+
 
     /**
      * Sets the class loader used to discover classes in 'new' expressions.
@@ -730,10 +754,18 @@ public class JexlEngine {
      * @return an Interpreter
      */
     protected Interpreter createInterpreter(JexlContext context) {
-        if (context == null) {
-            context = EMPTY_CONTEXT;
-        }
-        return new Interpreter(this, context);
+        return createInterpreter(context, isStrict(), isSilent());
+    }
+    
+    /**
+     * Creates an interpreter.
+     * @param context a JexlContext; if null, the EMPTY_CONTEXT is used instead.
+     * @param strictFlag whether the interpreter runs in strict mode
+     * @param simentFlag whether the interpreter runs in silent mode
+     * @return an Interpreter
+     */
+    protected Interpreter createInterpreter(JexlContext context, boolean strictFlag, boolean silentFlag) {
+        return new Interpreter(this, context == null? EMPTY_CONTEXT : context, strictFlag, silentFlag);
     }
 
     /**

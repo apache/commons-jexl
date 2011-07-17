@@ -106,7 +106,7 @@ public class Interpreter implements ParserVisitor {
     /** Strict interpreter flag. */
     protected final boolean strict;
     /** Silent intepreter flag. */
-    protected boolean silent;
+    protected final boolean silent;
     /** Cache executors. */
     protected final boolean cache;
     /** Registers or arguments. */
@@ -122,14 +122,26 @@ public class Interpreter implements ParserVisitor {
      * Creates an interpreter.
      * @param jexl the engine creating this interpreter
      * @param aContext the context to evaluate expression
+     * @deprecated 
      */
     public Interpreter(JexlEngine jexl, JexlContext aContext) {
+        this(jexl, aContext, !jexl.isLenient(), jexl.isSilent());
+    }
+    
+    /**
+     * Creates an interpreter.
+     * @param jexl the engine creating this interpreter
+     * @param aContext the context to evaluate expression
+     * @param strictFlag whether this interpreter runs in strict mode
+     * @param simentFlag whether this interpreter runs in silent mode
+     */
+    public Interpreter(JexlEngine jexl, JexlContext aContext, boolean strictFlag, boolean silentFlag) {
         this.logger = jexl.logger;
         this.uberspect = jexl.uberspect;
         this.arithmetic = jexl.arithmetic;
         this.functions = jexl.functions;
-        this.strict = !this.arithmetic.isLenient();
-        this.silent = jexl.silent;
+        this.strict = strictFlag;
+        this.silent = silentFlag;
         this.cache = jexl.cache != null;
         this.context = aContext;
         this.functors = null;
@@ -152,16 +164,15 @@ public class Interpreter implements ParserVisitor {
     }
 
     /**
-     * Sets whether this interpreter throws JexlException during evaluation.
-     * @param flag true means no JexlException will be thrown but will be logged
-     *        as info through the Jexl engine logger, false allows them to be thrown.
+     * Checks whether this interpreter considers unknown variables, methods and constructors as errors.
+     * @return true if strict, false otherwise
      */
-    public void setSilent(boolean flag) {
-        this.silent = flag;
+    public boolean isStrict() {
+        return this.strict;
     }
-
+    
     /**
-     * Checks whether this interpreter throws JexlException during evaluation.
+     * Checks whether this interpreter throws JexlException when encountering errors.
      * @return true if silent, false otherwise
      */
     public boolean isSilent() {
@@ -249,7 +260,7 @@ public class Interpreter implements ParserVisitor {
      */
     protected JexlNode findNullOperand(RuntimeException xrt, JexlNode node, Object left, Object right) {
         if (xrt instanceof NullPointerException
-                && JexlException.NULL_OPERAND == xrt.getMessage()) {
+            && (Object) JexlException.NULL_OPERAND == xrt.getMessage()) {
             if (left == null) {
                 return node.jjtGetChild(0);
             }
@@ -555,7 +566,11 @@ public class Interpreter implements ParserVisitor {
                     variableName.append(property);
                     property = variableName.toString();
                 }
-                context.set(String.valueOf(property), right);
+                try {
+                    context.set(String.valueOf(property), right);
+                } catch(UnsupportedOperationException xsupport) {
+                    throw new JexlException(node, "context is readonly", xsupport);
+                }
                 return right;
             }
         }
@@ -777,7 +792,8 @@ public class Interpreter implements ParserVisitor {
             Object value = context.get(name);
             if (value == null
                     && !(node.jjtGetParent() instanceof ASTReference)
-                    && !context.has(name)) {
+                    && !context.has(name)
+                    && !isTernaryProtected(node)) {
                 JexlException xjexl = new JexlException(node, "undefined variable " + name);
                 return unknownVariable(xjexl);
             }

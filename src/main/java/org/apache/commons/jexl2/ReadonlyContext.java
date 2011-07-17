@@ -17,35 +17,28 @@
 package org.apache.commons.jexl2;
 
 /**
- * Wraps an Object as a Jexl context.
- * @param <T> the wrapped object type to use
+ * A readonly context wrapper.
  */
-public class ObjectContext<T> implements JexlContext {
-    private final JexlEngine jexl;
-    private final T object;
+public final class ReadonlyContext implements JexlContext {
+    /** The wrapped context. */
+    private final JexlContext base;
 
-    /**
-     * Creates a new ObjectContext.
-     * @param jexl the jexl engine to use to solve properties
-     * @param object the object to wrap in this context
-     */
-    public ObjectContext(JexlEngine jexl, T object) {
-        this.jexl = jexl;
-        this.object = object;
+    public ReadonlyContext(JexlContext theBase) {
+        base = theBase;
     }
 
     /** {@inheritDoc} */
     public Object get(String name) {
-        return jexl.getProperty(object, name);
+        return base.get(name);
     }
 
     /** {@inheritDoc} */
     public void set(String name, Object value) {
-        jexl.setProperty(object, name, value);
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     /** {@inheritDoc} */
     public boolean has(String name) {
-        return jexl.getUberspect().getPropertyGet(object, name, null) != null;
+        return base.has(name);
     }
 }
