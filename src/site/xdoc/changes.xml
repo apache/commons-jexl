@@ -25,7 +25,13 @@
     <author email="dev@commons.apache.org">Commons Developers</author>
   </properties>
   <body>
-    <release version="2.0.2" date="unreleased">
+    <release version="2.1" date="unreleased">
+        <action dev="henrib" type="add" issue="JEXL-114">
+            Allow scripts to create local variables // Add return keyword
+        </action>
+        <action dev="henrib" type="add" issue="JEXL-113" due-to="Max Tardiveau">
+            Add functions to extract which variables, parameters and local variables are used to evaluate a script
+        </action>
         <action dev="henrib" type="fix" issue="JEXL-112" due-to="sebb">
             Cannot parse Integer.MIN_VALUE.
         </action>
