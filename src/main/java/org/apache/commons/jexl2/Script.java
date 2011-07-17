@@ -23,7 +23,7 @@ import java.util.concurrent.Callable;
 /**
  * <p>A JEXL Script.</p>
  * <p>A script is some valid JEXL syntax to be executed with
- * a given set of {@link JexlContext} variabless.</p>
+ * a given set of {@link JexlContext} variables.</p>
  * <p>A script is a group of statements, separated by semicolons.</p>
  * <p>The statements can be <code>blocks</code> (curly braces containing code),
  * Control statements such as <code>if</code> and <code>while</code>
