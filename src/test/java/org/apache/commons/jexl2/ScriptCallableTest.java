@@ -73,6 +73,26 @@ public class ScriptCallableTest extends JexlTestCase {
             Thread.sleep(1000 * s);
             return s;
         }
+        
+        public int waitInterrupt(int s) {
+            try {
+                Thread.sleep(1000 * s);
+                return s;
+            } catch(InterruptedException xint) {
+                Thread.currentThread().interrupt();
+            }
+            return -1;
+        }
+        
+        public int runForever() {
+            boolean x = false;
+            while(true) {
+                if (x) {
+                   break;
+                }
+            }
+            return 1;
+        }
     }
 
     public void testWait() throws Exception {
@@ -87,6 +107,38 @@ public class ScriptCallableTest extends JexlTestCase {
 
     public void testCancelWait() throws Exception {
         Script e = JEXL.createScript("wait(10)");
+        Callable<Object> c = e.callable(new TestContext());
+
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Future<?> future = executor.submit(c);
+        try {
+            future.get(100, TimeUnit.MILLISECONDS);
+            fail("should have timed out");
+        } catch (TimeoutException xtimeout) {
+            // ok, ignore
+        }
+        future.cancel(true);
+        assertTrue(future.isCancelled());
+    }
+    
+    public void testCancelWaitInterrupt() throws Exception {
+        Script e = JEXL.createScript("waitInterrupt(42)");
+        Callable<Object> c = e.callable(new TestContext());
+
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Future<?> future = executor.submit(c);
+        try {
+            future.get(100, TimeUnit.MILLISECONDS);
+            fail("should have timed out");
+        } catch (TimeoutException xtimeout) {
+            // ok, ignore
+        }
+        future.cancel(true);
+        assertTrue(future.isCancelled());
+    }
+    
+    public void testCancelForever() throws Exception {
+        Script e = JEXL.createScript("runForever()");
         Callable<Object> c = e.callable(new TestContext());
 
         ExecutorService executor = Executors.newFixedThreadPool(1);
