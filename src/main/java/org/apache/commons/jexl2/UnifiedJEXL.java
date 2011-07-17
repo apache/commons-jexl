@@ -76,9 +76,10 @@ public final class UnifiedJEXL {
     /** The JEXL engine instance. */
     private final JexlEngine jexl;
     /** The expression cache. */
-    private final JexlEngine.SoftCache<String,Expression> cache;
+    private final JexlEngine.SoftCache<String, Expression> cache;
     /** The default cache size. */
     private static final int CACHE_SIZE = 256;
+
     /**
      * Creates a new instance of UnifiedJEXL with a default size cache.
      * @param aJexl the JexlEngine to use.
@@ -94,7 +95,7 @@ public final class UnifiedJEXL {
      */
     public UnifiedJEXL(JexlEngine aJexl, int cacheSize) {
         this.jexl = aJexl;
-        this.cache = aJexl.new SoftCache<String,Expression>(cacheSize);
+        this.cache = aJexl.new SoftCache<String, Expression>(cacheSize);
     }
 
     /**
@@ -115,6 +116,7 @@ public final class UnifiedJEXL {
         COMPOSITE(-1);
         /** The index in arrays of expression counters for composite expressions. */
         private final int index;
+
         /**
          * Creates an ExpressionType.
          * @param idx the index for this type in counters arrays.
@@ -195,7 +197,7 @@ public final class UnifiedJEXL {
      * Clears the cache.
      */
     public void clearCache() {
-        synchronized(cache) {
+        synchronized (cache) {
             cache.clear();
         }
     }
@@ -206,6 +208,7 @@ public final class UnifiedJEXL {
     public static class Exception extends RuntimeException {
         /** Serial version UID. */
         private static final long serialVersionUID = -8201402995815975726L;
+
         /**
          * Creates a UnifiedJEXL.Exception.
          * @param msg the exception message
@@ -222,6 +225,7 @@ public final class UnifiedJEXL {
     public abstract class Expression {
         /** The source of this expression (see {@link UnifiedJEXL.Expression#prepare}). */
         protected final Expression source;
+
         /**
          * Creates an expression.
          * @param src the source expression if any
@@ -345,11 +349,11 @@ public final class UnifiedJEXL {
         abstract Object evaluate(Interpreter interpreter);
     }
 
-
     /** A constant expression. */
     private class ConstantExpression extends Expression {
         /** The constant held by this expression. */
         private final Object value;
+
         /**
          * Creates a constant expression.
          * <p>
@@ -428,13 +432,13 @@ public final class UnifiedJEXL {
         }
     }
 
-
     /** The base for Jexl based expressions. */
     private abstract class JexlBasedExpression extends Expression {
         /** The JEXL string for this expression. */
         protected final CharSequence expr;
         /** The JEXL node for this expression. */
         protected final JexlNode node;
+
         /**
          * Creates a JEXL interpretable expression.
          * @param theExpr the expression as a string
@@ -498,7 +502,6 @@ public final class UnifiedJEXL {
             return interpreter.interpret(node);
         }
     }
-
 
     /** An immediate expression: ${jexl}. */
     private class ImmediateExpression extends JexlBasedExpression {
@@ -591,7 +594,7 @@ public final class UnifiedJEXL {
         @Override
         public Expression prepare(Interpreter interpreter) {
             String value = interpreter.interpret(node).toString();
-            JexlNode dnode = toNode(value, jexl.isDebug()? node.getInfo() : null);
+            JexlNode dnode = toNode(value, jexl.isDebug() ? node.getInfo() : null);
             return new DeferredExpression(value, dnode, this);
         }
 
@@ -602,13 +605,13 @@ public final class UnifiedJEXL {
         }
     }
 
-
     /** A composite expression: "... ${...} ... #{...} ...". */
     private class CompositeExpression extends Expression {
         /** Bit encoded (deferred count > 0) bit 1, (immediate count > 0) bit 0. */
         private final int meta;
         /** The list of sub-expression resulting from parsing. */
         private final Expression[] exprs;
+
         /**
          * Creates a composite expression.
          * @param counters counters of expression per type
@@ -619,7 +622,7 @@ public final class UnifiedJEXL {
             super(src);
             this.exprs = list.toArray(new Expression[list.size()]);
             this.meta = (counters[ExpressionType.DEFERRED.index] > 0 ? 2 : 0)
-                      | (counters[ExpressionType.IMMEDIATE.index] > 0 ? 1 : 0);
+                    | (counters[ExpressionType.IMMEDIATE.index] > 0 ? 1 : 0);
         }
 
         /** {@inheritDoc} */
@@ -756,8 +759,10 @@ public final class UnifiedJEXL {
      */
     Expression prepare(JexlContext context, Expression expr) {
         try {
-            Interpreter interpreter = jexl.createInterpreter(context);
-            interpreter.setSilent(false);
+            if (context == null) {
+                context = JexlEngine.EMPTY_CONTEXT;
+            }
+            Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), false);
             return expr.prepare(interpreter);
         } catch (JexlException xjexl) {
             Exception xuel = createException("prepare", expr, xjexl);
@@ -779,8 +784,7 @@ public final class UnifiedJEXL {
      */
     Object evaluate(JexlContext context, Expression expr) {
         try {
-            Interpreter interpreter = jexl.createInterpreter(context);
-            interpreter.setSilent(false);
+            Interpreter interpreter = jexl.createInterpreter(context, !jexl.isLenient(), false);
             return expr.evaluate(interpreter);
         } catch (JexlException xjexl) {
             Exception xuel = createException("evaluate", expr, xjexl);
@@ -801,7 +805,7 @@ public final class UnifiedJEXL {
     private JexlNode toNode(CharSequence expression) {
         return jexl.parse(expression, null);
     }
-    
+
     /**
      * Use the JEXL parser to create the AST for an expression.
      * @param expression the expression to parse
@@ -836,7 +840,6 @@ public final class UnifiedJEXL {
         }
         return new Exception(strb.toString(), xany);
     }
-
 
     /** The different parsing states. */
     private static enum ParseState {
