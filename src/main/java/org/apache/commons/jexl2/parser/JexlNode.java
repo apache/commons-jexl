@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl2.parser;
 
+import org.apache.commons.jexl2.DebugInfo;
 import org.apache.commons.jexl2.JexlInfo;
 
 /**
@@ -42,11 +43,11 @@ public abstract class JexlNode extends SimpleNode implements JexlInfo {
         super(p, id);
     }
 
-    public JexlInfo getInfo() {
+    public DebugInfo getInfo() {
         JexlNode node = this;
         while (node != null) {
-            if (node.value instanceof JexlInfo) {
-                return (JexlInfo) node.value;
+            if (node.value instanceof DebugInfo) {
+                return (DebugInfo) node.value;
             }
             node = node.jjtGetParent();
         }
@@ -55,9 +56,10 @@ public abstract class JexlNode extends SimpleNode implements JexlInfo {
     
     /** {@inheritDoc} */
     public String debugString() {
-        JexlInfo info = getInfo();
+        DebugInfo info = getInfo();
         return info != null? info.debugString() : "";
     }
+    
 
     /**
      * Whether this node is a constant node

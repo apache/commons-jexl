@@ -31,6 +31,7 @@ public class JexlException extends RuntimeException {
     protected final JexlInfo info;
     /** A marker to use in NPEs stating a null operand error. */
     public static final String NULL_OPERAND = "jexl.null";
+    
     /**
      * Creates a new JexlException.
      * @param node the node causing the error
@@ -77,6 +78,118 @@ public class JexlException extends RuntimeException {
         mark = null;
         info = dbg;
     }
+        
+    /**
+     * Accesses detailed message.
+     * @return  the message
+     */
+    protected String detailedMessage() {
+        return super.getMessage();
+    }
+    
+    /**
+     * The exception thrown when tokenization fails.
+     */
+    public static class Tokenization extends JexlException {
+        /**
+         * Creates a new Tokenization exception instance.
+         * @param node the location info
+         * @param expr the expression
+         */
+        public Tokenization(JexlInfo node, CharSequence expr, Throwable cause) {
+            super(node, expr.toString(), cause);
+        }
+                            
+        /**
+         * @return the expression
+         */ 
+        public String getExpression() {
+            return super.detailedMessage();
+        }
+        
+        @Override
+        protected String detailedMessage() {
+            return "!!! " + getExpression() + " !!!" + ", tokenization failed";
+        }
+    } 
+            
+    /**
+     * The exception thrown parsing fails.
+     */
+    public static class Parsing extends JexlException {
+        /**
+         * Creates a new Variable exception instance.
+         * @param node the offending ASTnode
+         * @param expr the unknown variable
+         */
+        public Parsing(JexlInfo node, CharSequence expr, Throwable cause) {
+            super(node, expr.toString(), cause);
+        }
+                    
+        /**
+         * @return the expression
+         */    
+        public String getExpression() {
+            return super.detailedMessage();
+        }
+        
+        @Override
+        protected String detailedMessage() {
+            return "!!! " + getExpression() + " !!!" + ", parsing failed";
+        }
+    }
+    
+    /**
+     * The exception thrown when a variable is unknown.
+     */
+    public static class Variable extends JexlException {
+        /**
+         * Creates a new Variable exception instance.
+         * @param node the offending ASTnode
+         * @param var the unknown variable
+         */
+        public Variable(JexlNode node, String var) {
+            super(node, var);
+        }
+        
+        /**
+         * @return the variable name
+         */
+        public String getVariable() {
+            return super.detailedMessage();
+        }
+        
+        @Override
+        protected String detailedMessage() {
+            return "undefined variable " + getVariable();
+        }
+    } 
+    
+    /**
+     * The exception thrown when a method or ctor is unknown, ambiguous or inaccessible.
+     */
+    public static class Method extends JexlException {
+        /**
+         * Creates a new Method exception instance.
+         * @param node the offending ASTnode
+         * @param name the unknown method
+         */
+        public Method(JexlNode node, String name) {
+            super(node, name);
+        }
+                      
+        /**
+         * @return the method name
+         */  
+        public String getMethod() {
+            return super.detailedMessage();
+        }
+        
+        @Override
+        protected String detailedMessage() {
+            return "unknown, ambiguous or inaccessible method " + getMethod();
+        }
+    }
     
     /**
      * The class of exceptions that will force the interpreter to return, allways behaving in strict mode.
@@ -122,7 +235,7 @@ public class JexlException extends RuntimeException {
         }
         return "";
     }
-    
+  
     /**
      * Detailed info message about this error.
      * Format is "debug![begin,end]: string \n msg" where:
@@ -149,9 +262,9 @@ public class JexlException extends RuntimeException {
             msg.append("'");
         }
         msg.append(' ');
-        msg.append(super.getMessage());
+        msg.append(detailedMessage());
         Throwable cause = getCause();
-        if (cause != null && NULL_OPERAND == cause.getMessage()) {
+        if (cause != null && (Object) NULL_OPERAND == cause.getMessage()) {
             msg.append(" caused by null operand");
         }
         return msg.toString();
