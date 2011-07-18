@@ -83,7 +83,7 @@ public class Introspector {
     protected final IntrospectorBase base() {
         IntrospectorBase intro = ref.get();
         if (intro == null) {
-            // double checked locking (fixed by Java 5 memory model).
+            // double checked locking is ok (fixed by Java 5 memory model).
             synchronized(this) {
                 intro = ref.get();
                 if (intro == null) {

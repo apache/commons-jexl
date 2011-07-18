@@ -429,7 +429,7 @@ public class JexlEngine {
      */
     public Expression createExpression(String expression, JexlInfo info) {
         // Parse the expression
-        ASTJexlScript tree = parse(expression, info);
+        ASTJexlScript tree = parse(expression, info, null);
         if (tree.jjtGetNumChildren() > 1) {
             logger.warn("The JEXL Expression created will be a reference"
                     + " to the first expression from the supplied script: \"" + expression + "\" ");
@@ -976,6 +976,7 @@ public class JexlEngine {
      * @param info debug information structure
      * @return the parsed tree
      * @throws JexlException if any error occured during parsing
+     * @deprecated 
      */
     protected ASTJexlScript parse(CharSequence expression, JexlInfo info) {
         return parse(expression, info, null);
@@ -992,6 +993,7 @@ public class JexlEngine {
     protected ASTJexlScript parse(CharSequence expression, JexlInfo info, String[] names) {
         String expr = cleanExpression(expression);
         ASTJexlScript script = null;
+        DebugInfo dbgInfo = null;
         synchronized (parser) {
             if (cache != null) {
                 script = cache.get(expr);
@@ -1003,7 +1005,11 @@ public class JexlEngine {
                 Reader reader = new StringReader(expr);
                 // use first calling method of JexlEngine as debug info
                 if (info == null) {
-                    info = debugInfo();
+                    dbgInfo = debugInfo();
+                } else if (info instanceof DebugInfo) {
+                    dbgInfo = (DebugInfo) info;
+                } else {
+                    dbgInfo = info.debugInfo();
                 }
                 Map<String, Integer> params = null;
                 if (names != null) {
@@ -1013,7 +1019,8 @@ public class JexlEngine {
                     }
                     parser.setNamedRegisters(params);
                 }
-                script = parser.parse(reader, info);
+                script = parser.parse(reader, dbgInfo);
+                // reaccess in case local variables have been declared
                 params = parser.getNamedRegisters();
                 if (params != null) {
                     String[] registers = (new ArrayList<String>(params.keySet())).toArray(new String[0]);
@@ -1023,9 +1030,9 @@ public class JexlEngine {
                     cache.put(expr, script);
                 }
             } catch (TokenMgrError xtme) {
-                throw new JexlException.Tokenization(info, expression, xtme);
+                throw new JexlException.Tokenization(dbgInfo, expression, xtme);
             } catch (ParseException xparse) {
-                throw new JexlException.Parsing(info, expression, xparse);
+                throw new JexlException.Parsing(dbgInfo, expression, xparse);
             } finally {
                 parser.setNamedRegisters(null);
             }
@@ -1040,7 +1047,7 @@ public class JexlEngine {
      * @param c column number
      * @return a JexlInfo instance
      */
-    protected JexlInfo createInfo(String fn, int l, int c) {
+    protected DebugInfo createInfo(String fn, int l, int c) {
         return new DebugInfo(fn, l, c);
     }
 
@@ -1050,8 +1057,8 @@ public class JexlEngine {
      * not owned by JexlEngine, UnifiedJEXL or {Script,Expression}Factory.</p>
      * @return an Info if debug is set, null otherwise
      */
-    protected JexlInfo debugInfo() {
-        JexlInfo info = null;
+    protected DebugInfo debugInfo() {
+        DebugInfo info = null;
         if (debug) {
             Throwable xinfo = new Throwable();
             xinfo.fillInStackTrace();

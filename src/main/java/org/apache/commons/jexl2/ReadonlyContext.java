@@ -36,7 +36,11 @@ public final class ReadonlyContext implements JexlContext {
         return wrapped.get(name);
     }
 
-    /** {@inheritDoc} */
+    /** 
+     * Will throw an UnsupportedOperationException when called; the JexlEngine deals with it appropriately.
+     * @param name the unused variable name
+     * @param value the unused variable value
+     */
     public void set(String name, Object value) {
         throw new UnsupportedOperationException("Not supported.");
     }

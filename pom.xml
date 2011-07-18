@@ -254,10 +254,14 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.5.1</version>
                 <configuration>
                     <instrumentation>
+                        <ignores>
+                            <ignore>**/generated-sources/**/*</ignore>
+                        </ignores>
                         <excludes>
+                            <exclude>**/generated-sources/**/*</exclude>
                             <exclude>org/apache/commons/jexl2/parser/*.class</exclude>
                             <exclude>org/apache/commons/jexl2/**/*Test.class</exclude>
                         </excludes>

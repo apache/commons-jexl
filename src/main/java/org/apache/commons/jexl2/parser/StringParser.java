@@ -37,7 +37,7 @@ public class StringParser {
     /** Default constructor.  */
     public StringParser() {
     }
-    
+
     /**
      * Builds a string, handles escaping through '\' syntax.
      * @param str the string to build from
@@ -65,7 +65,6 @@ public class StringParser {
     public static int readString(StringBuilder strb, CharSequence str, int index, char sep) {
         return read(strb, str, index, str.length(), sep);
     }
-
     /** The length of an escaped unicode sequence. */
     private static final int UCHAR_LEN = 4;
 
@@ -89,7 +88,7 @@ public class StringParser {
                     index += UCHAR_LEN;
                 } else {
                     // if c is not an escapable character, re-emmit the backslash before it
-                    boolean notSeparator = sep == 0? c != '\'' && c != '"' : c != sep;
+                    boolean notSeparator = sep == 0 ? c != '\'' && c != '"' : c != sep;
                     if (notSeparator && c != '\\') {
                         strb.append('\\');
                     }
@@ -109,11 +108,11 @@ public class StringParser {
         }
         return index;
     }
-
     /** Initial shift value for composing a Unicode char from 4 nibbles (16 - 4). */
     private static final int SHIFT = 12;
     /** The base 10 offset used to convert hexa characters to decimal. */
     private static final int BASE10 = 10;
+
     /**
      * Reads a Unicode escape character.
      * @param strb the builder to write the character to
@@ -125,12 +124,12 @@ public class StringParser {
         char xc = 0;
         int bits = SHIFT;
         int value = 0;
-        for(int offset = 0; offset < UCHAR_LEN; ++offset) {
+        for (int offset = 0; offset < UCHAR_LEN; ++offset) {
             char c = str.charAt(begin + offset);
             if (c >= '0' && c <= '9') {
                 value = (c - '0');
             } else if (c >= 'a' && c <= 'h') {
-               value = (c - 'a' + BASE10);
+                value = (c - 'a' + BASE10);
             } else if (c >= 'A' && c <= 'H') {
                 value = (c - 'A' + BASE10);
             } else {
@@ -142,9 +141,10 @@ public class StringParser {
         strb.append(xc);
         return UCHAR_LEN;
     }
-    
     /** The last 7bits ascii character. */
     private static final char LAST_ASCII = 127;
+    /** The first printable 7bits ascii character. */
+    private static final char FIRST_ASCII = 32;
 
     /**
      * Escapes a String representation, expand non-ASCII characters as Unicode escape sequence.
@@ -160,27 +160,46 @@ public class StringParser {
         strb.append('\'');
         for (int i = 0; i < length; ++i) {
             char c = str.charAt(i);
-            if (c < LAST_ASCII) {
-                if (c == '\'') {
-                    // escape quote
-                    strb.append('\\');
-                    strb.append('\'');
-                } else if (c == '\\') {
-                    // escape backslash
-                    strb.append('\\');
-                    strb.append('\\');
-                } else {
-                    strb.append(c);
-                }
-            } else {
-                // convert to Unicode escape sequence
-                strb.append('\\');
-                strb.append('u');
-                String hex = Integer.toHexString(c);
-                for (int h = hex.length(); h < UCHAR_LEN; ++h) {
-                    strb.append('0');
-                }
-                strb.append(hex);
+            switch (c) {
+                case 0:
+                    continue;
+                case '\b':
+                    strb.append("\\b");
+                    break;
+                case '\t':
+                    strb.append("\\t");
+                    break;
+                case '\n':
+                    strb.append("\\n");
+                    break;
+                case '\f':
+                    strb.append("\\f");
+                    break;
+                case '\r':
+                    strb.append("\\r");
+                    break;
+                case '\"':
+                    strb.append("\\\"");
+                    break;
+                case '\'':
+                    strb.append("\\\'");
+                    break;
+                case '\\':
+                    strb.append("\\\\");
+                    break;
+                default:
+                    if (c >= FIRST_ASCII && c <= LAST_ASCII) {
+                        strb.append(c);
+                    } else {
+                        // convert to Unicode escape sequence
+                        strb.append('\\');
+                        strb.append('u');
+                        String hex = Integer.toHexString(c);
+                        for (int h = hex.length(); h < UCHAR_LEN; ++h) {
+                            strb.append('0');
+                        }
+                        strb.append(hex);
+                    }
             }
         }
         strb.append('\'');

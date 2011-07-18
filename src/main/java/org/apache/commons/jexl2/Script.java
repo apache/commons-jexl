@@ -82,6 +82,8 @@ public interface Script {
 
     /**
      * Creates a Callable from this script.
+     * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
+     * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
      * @param context the context
      * @return the callable
      */
@@ -89,6 +91,8 @@ public interface Script {
 
     /**
      * Creates a Callable from this script.
+     * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
+     * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
      * @param context the context
      * @param args the script arguments
      * @return the callable

@@ -594,7 +594,7 @@ public final class UnifiedJEXL {
         @Override
         public Expression prepare(Interpreter interpreter) {
             String value = interpreter.interpret(node).toString();
-            JexlNode dnode = toNode(value, jexl.isDebug() ? node.getInfo() : null);
+            JexlNode dnode = toNode(value, jexl.isDebug() ? node.debugInfo() : null);
             return new DeferredExpression(value, dnode, this);
         }
 
@@ -803,7 +803,7 @@ public final class UnifiedJEXL {
      * @throws JexlException if an error occur during parsing
      */
     private JexlNode toNode(CharSequence expression) {
-        return jexl.parse(expression, null);
+        return jexl.parse(expression, null, null);
     }
 
     /**
@@ -814,7 +814,7 @@ public final class UnifiedJEXL {
      * @throws JexlException if an error occur during parsing
      */
     private JexlNode toNode(CharSequence expression, JexlInfo info) {
-        return jexl.parse(expression, info);
+        return jexl.parse(expression, info, null);
     }
 
     /**

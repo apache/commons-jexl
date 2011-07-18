@@ -127,7 +127,7 @@ public class Interpreter implements ParserVisitor {
     public Interpreter(JexlEngine jexl, JexlContext aContext) {
         this(jexl, aContext, !jexl.isLenient(), jexl.isSilent());
     }
-    
+
     /**
      * Creates an interpreter.
      * @param jexl the engine creating this interpreter
@@ -170,7 +170,7 @@ public class Interpreter implements ParserVisitor {
     public boolean isStrict() {
         return this.strict;
     }
-    
+
     /**
      * Checks whether this interpreter throws JexlException when encountering errors.
      * @return true if silent, false otherwise
@@ -260,7 +260,7 @@ public class Interpreter implements ParserVisitor {
      */
     protected JexlNode findNullOperand(RuntimeException xrt, JexlNode node, Object left, Object right) {
         if (xrt instanceof NullPointerException
-            && (Object) JexlException.NULL_OPERAND == xrt.getMessage()) {
+                && (Object) JexlException.NULL_OPERAND == xrt.getMessage()) {
             if (left == null) {
                 return node.jjtGetChild(0);
             }
@@ -311,7 +311,7 @@ public class Interpreter implements ParserVisitor {
         }
         return cancelled;
     }
-    
+
     /**
      * Resolves a namespace, eventually allocating an instance using context as constructor argument.
      * The lifetime of such instances span the current expression or script evaluation.
@@ -571,7 +571,7 @@ public class Interpreter implements ParserVisitor {
                 }
                 try {
                     context.set(String.valueOf(property), right);
-                } catch(UnsupportedOperationException xsupport) {
+                } catch (UnsupportedOperationException xsupport) {
                     throw new JexlException(node, "context is readonly", xsupport);
                 }
                 return right;
@@ -1388,7 +1388,7 @@ public class Interpreter implements ParserVisitor {
                 if (node == null) {
                     throw new RuntimeException(xany);
                 } else {
-                    JexlException xjexl = new JexlException(node, "get object property error", xany);
+                    JexlException xjexl = new JexlException.Variable(node, attribute.toString());
                     if (strict) {
                         throw xjexl;
                     }
@@ -1469,14 +1469,14 @@ public class Interpreter implements ParserVisitor {
             }
         }
         if (xjexl == null) {
-            String error = "unable to set object property"
-                    + ", class: " + object.getClass().getName()
-                    + ", property: " + attribute
-                    + ", argument: " + value.getClass().getSimpleName();
             if (node == null) {
+                String error = "unable to set object property"
+                        + ", class: " + object.getClass().getName()
+                        + ", property: " + attribute
+                        + ", argument: " + value.getClass().getSimpleName();
                 throw new UnsupportedOperationException(error);
             }
-            xjexl = new JexlException(node, error, null);
+            xjexl = new JexlException.Variable(node, attribute.toString());
         }
         if (strict) {
             throw xjexl;

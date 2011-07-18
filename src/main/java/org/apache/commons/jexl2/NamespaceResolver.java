@@ -17,11 +17,12 @@
 package org.apache.commons.jexl2;
 
 /**
- * In JEXL, a namespace is an object that serves the purpose of encapsulating functions; for instance,
- * the "math" namespace would be the proper object to expose functions like "log(...)", "sinus(...)", etc.
  * 
  * This interface declares how to resolve a namespace from its name; it is used by the interpreter during evalutation.
- *
+ * <p>
+ * In JEXL, a namespace is an object that serves the purpose of encapsulating functions; for instance,
+ * the "math" namespace would be the proper object to expose functions like "log(...)", "sinus(...)", etc.
+ * </p>
  * In expressions like "ns:function(...)", the resolver is called with resolveNamespace("ns").
  */
 public interface NamespaceResolver {
