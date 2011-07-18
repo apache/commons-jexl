@@ -26,4 +26,9 @@ public interface JexlInfo {
      * @return a human readable string.
      */
     String debugString();
+    /**
+     * Gets the underlying debugging information.
+     * @return a debug info instance
+     */
+    DebugInfo debugInfo();
 }

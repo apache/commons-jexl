@@ -26,8 +26,8 @@ public class JexlThreadedArithmetic extends JexlArithmetic {
     
     /** Holds the threaded version of some arithmetic features. */
     static class Features {
-        Features() {
-        }
+        /** Default ctor. */
+        Features() {}
         /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
         private Boolean lenient = null;
         /** The big decimal math context. */

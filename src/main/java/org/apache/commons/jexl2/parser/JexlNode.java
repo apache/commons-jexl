@@ -43,7 +43,8 @@ public abstract class JexlNode extends SimpleNode implements JexlInfo {
         super(p, id);
     }
 
-    public DebugInfo getInfo() {
+    /** {@inheritDoc} */
+    public DebugInfo debugInfo() {
         JexlNode node = this;
         while (node != null) {
             if (node.value instanceof DebugInfo) {
@@ -56,7 +57,7 @@ public abstract class JexlNode extends SimpleNode implements JexlInfo {
     
     /** {@inheritDoc} */
     public String debugString() {
-        DebugInfo info = getInfo();
+        DebugInfo info = debugInfo();
         return info != null? info.debugString() : "";
     }
     

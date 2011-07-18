@@ -18,9 +18,8 @@ package org.apache.commons.jexl2;
 
 
 /**
- * Little class to carry in info such as a url/file name, line and column for
- * information error reporting from the uberspector implementations.
- * @version $Id$
+ * Helper class to carry in info such as a url/file name, line and column for
+ * debugging information reporting.
  */
 public class DebugInfo implements JexlInfo {
     /** line number. */
@@ -62,6 +61,11 @@ public class DebugInfo implements JexlInfo {
     /** {@inheritDoc} */
     public String debugString() {
         return toString();
+    }
+    
+    /** {@inheritDoc} */
+    public DebugInfo debugInfo() {
+        return this;
     }
 
     /**

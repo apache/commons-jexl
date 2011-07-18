@@ -408,7 +408,7 @@ public class IssuesTest extends JexlTestCase {
         assertEquals(Integer.valueOf(11), value);
         long end = System.nanoTime();
         double millisec = (end - start) / 1e6;
-        double limit = 100.0; // Allow plenty of slack
+        double limit = 200.0; // Allow plenty of slack
         assertTrue("Expected parse to take less than " + limit + "ms, actual " + millisec, millisec < limit);
     }
 

@@ -40,7 +40,7 @@ public class JexlException extends RuntimeException {
     public JexlException(JexlNode node, String msg) {
         super(msg);
         mark = node;
-        info = node != null? node.getInfo() : null;
+        info = node != null? node.debugInfo() : null;
 
     }
 
@@ -53,7 +53,7 @@ public class JexlException extends RuntimeException {
     public JexlException(JexlNode node, String msg, Throwable cause) {
         super(msg, cause);
         mark = node;
-        info = node != null? node.getInfo() : null;
+        info = node != null? node.debugInfo() : null;
     }
     
     /**
@@ -88,7 +88,7 @@ public class JexlException extends RuntimeException {
     }
     
     /**
-     * The exception thrown when tokenization fails.
+     * Thrown when tokenization fails.
      */
     public static class Tokenization extends JexlException {
         /**
@@ -115,7 +115,7 @@ public class JexlException extends RuntimeException {
     } 
             
     /**
-     * The exception thrown parsing fails.
+     * Thrown when parsing fails.
      */
     public static class Parsing extends JexlException {
         /**
@@ -142,7 +142,7 @@ public class JexlException extends RuntimeException {
     }
     
     /**
-     * The exception thrown when a variable is unknown.
+     * Thrown when a variable is unknown.
      */
     public static class Variable extends JexlException {
         /**
@@ -168,7 +168,7 @@ public class JexlException extends RuntimeException {
     } 
     
     /**
-     * The exception thrown when a method or ctor is unknown, ambiguous or inaccessible.
+     * Thrown when a method or ctor is unknown, ambiguous or inaccessible.
      */
     public static class Method extends JexlException {
         /**
@@ -194,7 +194,7 @@ public class JexlException extends RuntimeException {
     }
     
     /**
-     * The class of exceptions that will force the interpreter to return, allways behaving in strict mode.
+     * Thrown to return a value.
      */
     protected static class Return extends JexlException {  
         /** The returned value. */
@@ -218,7 +218,7 @@ public class JexlException extends RuntimeException {
     }
     
     /**
-     * The class of exceptions used when the interpreter cancels a script execution.
+     * Thrown to cancel a script execution.
      */
     protected static class Cancel extends JexlException {
         /**

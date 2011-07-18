@@ -89,10 +89,18 @@
         <tr>
           <td>Scripts</td>
           <td>
+            <p>
             A script in Jexl is made up of zero or more statements. Scripts can be read from a String, File or URL.
+            </p>
+            <p>
             They can be created with named parameters which allow a later evaluation to be performed with arguments.
+            </p>
+            <p>
             A script returns the last expression evaluated by default.
+            </p>
+            <p>
             Using the <code>return</code> keyword, a script will return the expression that follows (or null).
+            </p>
           </td>
         </tr>
         <tr>

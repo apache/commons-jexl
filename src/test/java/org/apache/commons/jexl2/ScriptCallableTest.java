@@ -95,6 +95,17 @@ public class ScriptCallableTest extends JexlTestCase {
         }
     }
 
+    public void testNoWait() throws Exception {
+        Script e = JEXL.createScript("wait(0)");
+        Callable<Object> c = e.callable(new TestContext());
+
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Future<?> future = executor.submit(c);
+        Object t = future.get(2, TimeUnit.SECONDS);
+        assertTrue(future.isDone());
+        assertEquals(0, t);
+    }
+    
     public void testWait() throws Exception {
         Script e = JEXL.createScript("wait(1)");
         Callable<Object> c = e.callable(new TestContext());

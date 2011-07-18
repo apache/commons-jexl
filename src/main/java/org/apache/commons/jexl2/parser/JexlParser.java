@@ -18,13 +18,15 @@ package org.apache.commons.jexl2.parser;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.apache.commons.jexl2.DebugInfo;
+import org.apache.commons.jexl2.JexlException;
 
 /**
  *
  * @author henri
  */
 public class JexlParser extends StringParser {
-     /**
+    /**
      * The map of named registers aka script parameters.
      * Each parameter is associated to a register and is materialized as an offset in the registers array used
      * during evaluation.
@@ -41,7 +43,7 @@ public class JexlParser extends StringParser {
     public void setNamedRegisters(Map<String, Integer> registers) {
         namedRegisters = registers;
     }
-    
+
     /**
      * Gets the map of registers used by this parser.
      * <p>
@@ -56,7 +58,7 @@ public class JexlParser extends StringParser {
 
     /**
      * Checks whether an identifier is a local variable or argument, ie stored in a register. 
-     * @param node the identifier
+     * @param identifier the identifier
      * @param image the identifier image
      * @return the image
      */
@@ -69,7 +71,7 @@ public class JexlParser extends StringParser {
         }
         return image;
     }
-    
+
     /**
      * Declares a local variable.
      * <p>
@@ -91,7 +93,6 @@ public class JexlParser extends StringParser {
         identifier.image = image;
     }
 
-    
     /**
      * Default implementation does nothing but is overriden by generated code.
      * @param top whether the identifier is beginning an l/r value
@@ -100,34 +101,33 @@ public class JexlParser extends StringParser {
     public void Identifier(boolean top) throws ParseException {
         // Overriden by generated code
     }
-    
+
     final public void Identifier() throws ParseException {
         Identifier(false);
     }
-    
+
     public Token getToken(int index) {
         return null;
     }
-    
-    void jjtreeOpenNodeScope(Node n) {}
+
+    void jjtreeOpenNodeScope(JexlNode n) {
+    }
+
     /**
      * Ambiguous statement detector.
      * @param n the node
      * @throws ParseException 
      */
-    void jjtreeCloseNodeScope(Node n) throws ParseException {
-      if (n instanceof ASTAmbiguous && n.jjtGetNumChildren() > 0) {
-          Token tok = this.getToken(0);
-          StringBuilder strb = new StringBuilder("Ambiguous statement ");
-          if (tok != null) {
-              strb.append("@");
-              strb.append(tok.beginLine);
-              strb.append(":");
-              strb.append(tok.beginColumn);
-          }
-          strb.append(", missing ';' between expressions");
-         throw new ParseException(strb.toString());
-      }
+    void jjtreeCloseNodeScope(JexlNode n) throws ParseException {
+        if (n instanceof ASTAmbiguous && n.jjtGetNumChildren() > 0) {
+            DebugInfo dbgInfo = null;
+            Token tok = this.getToken(0);
+            if (tok != null) {
+                dbgInfo = new DebugInfo(tok.image, tok.beginLine, tok.beginColumn);
+            } else {
+                dbgInfo = n.debugInfo();
+            }
+            throw new JexlException.Parsing(dbgInfo, "Ambiguous statement, missing ';' between expressions", null);
+        }
     }
-    
 }
