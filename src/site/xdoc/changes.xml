@@ -26,6 +26,9 @@
   </properties>
   <body>
     <release version="2.1" date="unreleased">
+        <action dev="henrib" type="add" issue="JEXL-116" due-to="Sarel Botha">
+            Add control over classes, methods, constructors and properties allowed in scripts
+        </action>
         <action dev="henrib" type="add" issue="JEXL-115" due-to="Sarel Botha">
             Add support for asynchronous script execution and cancellation
         </action>
