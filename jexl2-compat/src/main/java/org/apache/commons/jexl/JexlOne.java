@@ -111,7 +111,7 @@ public class JexlOne {
          * @param aContext the jexl context
          */
         public JexlOneInterpreter(JexlEngine jexl, JexlContext aContext) {
-            super(jexl, ContextAdapter.adapt(aContext));
+            super(jexl, ContextAdapter.adapt(aContext), false, false);
         }
 
         /**{@inheritDoc}*/
