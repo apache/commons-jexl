@@ -20,13 +20,13 @@
     <parent>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-parent</artifactId>
-        <version>15</version>
+        <version>21</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-jexl-compat</artifactId>
     <name>Commons JEXL (1.x compatibility)</name>
-    <version>2.0.1</version>
+    <version>2.1-SNAPSHOT</version>
     <inceptionYear>2003</inceptionYear>
     <description>Jexl is an implementation of the JSTL Expression Language with extensions.</description>
     <url>http://commons.apache.org/jexl/</url>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-jexl</artifactId>
-            <version>2.0.1</version>
+            <version>2.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
