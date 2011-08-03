@@ -26,6 +26,9 @@
   </properties>
   <body>
     <release version="2.1" date="unreleased">
+        <action dev="henrib" type="add" issue="JEXL-118" due-to="Max Tardiveau">
+            Provide an IN operator: =~ / match operator extended to provide IN behavior (!~ as NOT IN)
+        </action>
         <action dev="henrib" type="add" issue="JEXL-116" due-to="Sarel Botha">
             Add control over classes, methods, constructors and properties allowed in scripts
         </action>

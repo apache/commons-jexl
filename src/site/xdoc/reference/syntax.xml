@@ -450,21 +450,29 @@
           </td>
         </tr>
         <tr>
-          <td>Regex match <code>=~</code></td>
+          <td>In or Match<code>=~</code></td>
           <td>
-            The Perl inspired <code>=~</code> operator can be used to check that a <code>string</code> matches
+            The syntactically Perl inspired <code>=~</code> operator can be used to check that a <code>string</code> matches
             a regular expression (expressed either a Java String or a java.util.regex.Pattern).
             For example
             <code>"abcdef" =~ "abc.*</code> returns <code>true</code>.
+            It also checks whether any collection, set or map (on keys) contains a value or not; in that case, it behaves
+            as an "in" operator. Note that it also applies to arrays as well as "duck-typed" collection, ie classes exposing a "contains"
+            method.
+            <code> "a" =~ ["a","b","c","d","e",f"]</code> returns <code>true</code>.
           </td>
         </tr>
         <tr>
-          <td>Regex no-match <code>!~</code></td>
+          <td>Not-In or Not-Match<code>!~</code></td>
           <td>
-            The Perl inspired <code>!~</code> operator can be used to check that a <code>string</code> does not
+            The syntactically Perl inspired <code>!~</code> operator can be used to check that a <code>string</code> does not
             match a regular expression (expressed either a Java String or a java.util.regex.Pattern).
             For example
             <code>"abcdef" !~ "abc.*</code> returns <code>false</code>.
+            It also checks whether any collection, set or map (on keys) does not contain a value; in that case, it behaves
+            as "not in" operator. Note that it also applies to arrays as well as "duck-typed" collection, ie classes exposing a "contains"
+            method.
+            <code> "a" !~ ["a","b","c","d","e",f"]</code> returns <code>true</code>.
           </td>
         </tr>
         <tr>
