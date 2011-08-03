@@ -21,6 +21,8 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Perform arithmetic.
@@ -599,8 +601,8 @@ public class JexlArithmetic {
             return left.equals(right);
         } else if (isFloatingPointType(left, right)) {
             return toDouble(left) == toDouble(right);
-        } else if (left instanceof Number || right instanceof Number || left instanceof Character
-                || right instanceof Character) {
+        } else if ((left instanceof Number || left instanceof Character)
+                && (right instanceof Character || right instanceof Number)) {
             return toLong(left) == toLong(right);
         } else if (left instanceof Boolean || right instanceof Boolean) {
             return toBoolean(left) == toBoolean(right);

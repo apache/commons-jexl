@@ -19,10 +19,13 @@ package org.apache.commons.jexl2;
 import java.util.Map;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.commons.jexl2.junit.Asserter;
-
 
 public class ArithmeticTest extends JexlTestCase {
     private Asserter asserter;
@@ -39,7 +42,7 @@ public class ArithmeticTest extends JexlTestCase {
     public void testUndefinedVar() throws Exception {
         asserter.failExpression("objects[1].status", ".* undefined variable objects.*");
     }
-    
+
     public void testLeftNullOperand() throws Exception {
         asserter.setVariable("left", null);
         asserter.setVariable("right", Integer.valueOf(8));
@@ -177,18 +180,18 @@ public class ArithmeticTest extends JexlTestCase {
     public void testCoercions() throws Exception {
         asserter.assertExpression("1", new Integer(1)); // numerics default to Integer
 //        asserter.assertExpression("5L", new Long(5)); // TODO when implemented
-        
+
         asserter.setVariable("I2", new Integer(2));
         asserter.setVariable("L2", new Long(2));
         asserter.setVariable("L3", new Long(3));
         asserter.setVariable("B10", BigInteger.TEN);
-        
+
         // Integer & Integer => Integer
         asserter.assertExpression("I2 + 2", new Integer(4));
         asserter.assertExpression("I2 * 2", new Integer(4));
         asserter.assertExpression("I2 - 2", new Integer(0));
         asserter.assertExpression("I2 / 2", new Integer(1));
-        
+
         // Integer & Long => Long
         asserter.assertExpression("I2 * L2", new Long(4));
         asserter.assertExpression("I2 / L2", new Long(1));
@@ -198,13 +201,27 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("L2 + L3", new Long(5));
         asserter.assertExpression("L2 / L2", new Long(1));
         asserter.assertExpression("L2 / 2", new Long(1));
-        
+
         // BigInteger
         asserter.assertExpression("B10 / 10", BigInteger.ONE);
         asserter.assertExpression("B10 / I2", new BigInteger("5"));
         asserter.assertExpression("B10 / L2", new BigInteger("5"));
     }
 
+    public static class MatchingContainer {
+        private final Set<Integer> values;
+
+        public MatchingContainer(int[] is) {
+            values = new HashSet<Integer>();
+            for (int value : is) {
+                values.add(value);
+            }
+        }
+
+        public boolean contains(int value) {
+            return values.contains(value);
+        }
+    }
 
     public void testRegexp() throws Exception {
         asserter.setVariable("str", "abc456");
@@ -222,6 +239,36 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("str !~ match", Boolean.FALSE);
         asserter.assertExpression("str !~ nomatch", Boolean.TRUE);
         asserter.assertExpression("str =~ nomatch", Boolean.FALSE);
+        // check the in/not-in variant
+        asserter.assertExpression("'a' =~ ['a','b','c','d','e','f']", Boolean.TRUE);
+        asserter.assertExpression("'a' !~ ['a','b','c','d','e','f']", Boolean.FALSE);
+        asserter.assertExpression("'z' =~ ['a','b','c','d','e','f']", Boolean.FALSE);
+        asserter.assertExpression("'z' !~ ['a','b','c','d','e','f']", Boolean.TRUE);
+        // check in/not-in on array, list, map, set and duck-type collection
+        int[] ai = {2, 4, 42, 54};
+        List<Integer> al = new ArrayList<Integer>();
+        for(int i : ai) {
+            al.add(i);
+        }
+        Map<Integer, String> am = new HashMap<Integer, String>();
+        am.put(2, "two");
+        am.put(4, "four");
+        am.put(42, "forty-two");
+        am.put(54, "fifty-four");
+        MatchingContainer ad = new MatchingContainer(ai);
+        Set<Integer> as = ad.values;
+        Object[] vars = { ai, al, am, ad, as };
+      
+        for(Object var : vars) {
+            asserter.setVariable("container", var);
+            for(int x : ai) {
+                asserter.setVariable("x", x);
+                asserter.assertExpression("x =~ container", Boolean.TRUE);
+            }
+            asserter.setVariable("x", 169);
+            asserter.assertExpression("x !~ container", Boolean.TRUE);
+        }
+
     }
 
     /**
@@ -231,7 +278,7 @@ public class ArithmeticTest extends JexlTestCase {
      * @throws Exception
      */
     public void testDivideByZero() throws Exception {
-        Map<String,Object> vars = new HashMap<String,Object>();
+        Map<String, Object> vars = new HashMap<String, Object>();
         JexlContext context = new MapContext(vars);
         vars.put("aByte", new Byte((byte) 1));
         vars.put("aShort", new Short((short) 2));
@@ -280,11 +327,11 @@ public class ArithmeticTest extends JexlTestCase {
                         // check we have a zero & incremement zero count
                         if (nan instanceof Number) {
                             double zero = ((Number) nan).doubleValue();
-                            if (zero == 0.0)
+                            if (zero == 0.0) {
                                 zeval += 1;
+                            }
                         }
-                    }
-                    catch (Exception any) {
+                    } catch (Exception any) {
                         // increment the exception count
                         zthrow += 1;
                     }
@@ -293,8 +340,7 @@ public class ArithmeticTest extends JexlTestCase {
             if (!jexl.isLenient()) {
                 assertTrue("All expressions should have thrown " + zthrow + "/" + PERMS,
                         zthrow == PERMS);
-            }
-            else {
+            } else {
                 assertTrue("All expressions should have zeroed " + zeval + "/" + PERMS,
                         zeval == PERMS);
             }

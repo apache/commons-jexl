@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.jexl2.parser.SimpleNode;
 import org.apache.commons.logging.Log;
@@ -727,7 +728,7 @@ public class Interpreter implements ParserVisitor {
             JexlNode statement = node.jjtGetChild(2);
             // get an iterator for the collection/array etc via the
             // introspector.
-            Iterator<?> itemsIterator = getUberspect().getIterator(iterableValue, node);
+            Iterator<?> itemsIterator = uberspect.getIterator(iterableValue, node);
             if (itemsIterator != null) {
                 while (itemsIterator.hasNext()) {
                     if (isCancelled()) {
@@ -775,7 +776,53 @@ public class Interpreter implements ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
-            return arithmetic.matches(left, right) ? Boolean.TRUE : Boolean.FALSE;
+            // use arithmetic / pattern matching ?
+            if (right instanceof java.util.regex.Pattern || right instanceof String) {
+                return arithmetic.matches(left, right) ? Boolean.TRUE : Boolean.FALSE;
+            }
+            // left in right ? <=> right.contains(left) ?
+            // try contains on collection
+            if (right instanceof Set<?>) {
+                return ((Set<?>) right).contains(left) ? Boolean.TRUE : Boolean.FALSE;
+            }
+            // try contains on map key
+            if (right instanceof Map<?,?>) {
+                return ((Map<?,?>) right).containsKey(left) ? Boolean.TRUE : Boolean.FALSE;
+            }
+            // try contains on collection
+            if (right instanceof Collection<?>) {
+                return ((Collection<?>) right).contains(left) ? Boolean.TRUE : Boolean.FALSE;
+            }
+            // try a contains method (duck type set)
+            try {
+                Object[] argv = {left};
+                JexlMethod vm = uberspect.getMethod(right, "contains", argv, node);
+                if (vm != null) {
+                    return arithmetic.toBoolean(vm.invoke(right, argv)) ? Boolean.TRUE : Boolean.FALSE;
+                } else if (arithmetic.narrowArguments(argv)) {
+                    vm = uberspect.getMethod(right, "contains", argv, node);
+                    if (vm != null) {
+                        return arithmetic.toBoolean(vm.invoke(right, argv)) ? Boolean.TRUE : Boolean.FALSE;
+                    }
+                }
+            } catch (InvocationTargetException e) {
+                throw new JexlException(node, "=~ invocation error", e.getCause());
+            } catch (Exception e) {
+                throw new JexlException(node, "=~ error", e);
+            }
+            // try iterative comparison
+            Iterator<?> it = uberspect.getIterator(right, node);
+            if (it != null) {
+                while (it.hasNext()) {
+                    Object next = it.next();
+                    if (next == left || (next != null && next.equals(left))) {
+                        return Boolean.TRUE;
+                    }
+                }
+                return Boolean.FALSE;
+            }
+            // defaults to equal
+            return arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
         } catch (RuntimeException xrt) {
             throw new JexlException(node, "=~ error", xrt);
         }
@@ -1107,7 +1154,52 @@ public class Interpreter implements ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
-            return arithmetic.matches(left, right) ? Boolean.FALSE : Boolean.TRUE;
+            if (right instanceof java.util.regex.Pattern || right instanceof String) {
+                // use arithmetic / pattern matching
+                return arithmetic.matches(left, right) ? Boolean.FALSE : Boolean.TRUE;
+            }
+            // try contains on collection
+            if (right instanceof Set<?>) {
+                return ((Set<?>) right).contains(left) ? Boolean.FALSE : Boolean.TRUE;
+            }
+            // try contains on map key
+            if (right instanceof Map<?,?>) {
+                return ((Map<?,?>) right).containsKey(left) ? Boolean.FALSE : Boolean.TRUE;
+            }
+            // try contains on collection
+            if (right instanceof Collection<?>) {
+                return ((Collection<?>) right).contains(left) ? Boolean.FALSE : Boolean.TRUE;
+            }
+            // try a contains method (duck type set)
+            try {
+                Object[] argv = {right};
+                JexlMethod vm = uberspect.getMethod(left, "contains", argv, node);
+                if (vm != null) {
+                    return arithmetic.toBoolean(vm.invoke(left, argv)) ? Boolean.FALSE : Boolean.TRUE;
+                } else if (arithmetic.narrowArguments(argv)) {
+                    vm = uberspect.getMethod(left, "contains", argv, node);
+                    if (vm != null) {
+                        return arithmetic.toBoolean(vm.invoke(left, argv)) ? Boolean.FALSE : Boolean.TRUE;
+                    }
+                }
+            } catch (InvocationTargetException e) {
+                throw new JexlException(node, "!~ invocation error", e.getCause());
+            } catch (Exception e) {
+                throw new JexlException(node, "!~ error", e);
+            }
+            // try iterative comparison
+            Iterator<?> it = uberspect.getIterator(right, node.jjtGetChild(1));
+            if (it != null) {
+                while (it.hasNext()) {
+                    Object next = it.next();
+                    if (next == left || (next != null && next.equals(left))) {
+                        return Boolean.FALSE;
+                    }
+                }
+                return Boolean.TRUE;
+            }
+            // defaults to not equal
+            return arithmetic.equals(left, right) ? Boolean.FALSE : Boolean.TRUE;
         } catch (RuntimeException xrt) {
             throw new JexlException(node, "!~ error", xrt);
         }
