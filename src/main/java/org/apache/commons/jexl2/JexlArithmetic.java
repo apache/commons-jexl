@@ -21,8 +21,6 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Perform arithmetic.

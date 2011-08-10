@@ -60,7 +60,7 @@
         <action dev="henrib" type="fix" issue="JEXL-108" due-to="Cristian Lorenzetto">
             Parsing error if i define a empty literal array/map
         </action>
-        <action dev="henrib" type="fix" issue="JEXL-107" due-to="henrib">
+        <action dev="henrib" type="fix" issue="JEXL-107">
             Literals and parenthesized expressions can not be used as references
         </action>
         <action dev="henrib" type="fix" issue="JEXL-106" due-to="Michal Sabol">
