@@ -23,8 +23,6 @@ import org.apache.commons.jexl2.parser.JexlNode;
  * @since 2.0
  */
 public class JexlException extends RuntimeException {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 2690666400232612395L;
     /** The point of origin for this exception. */
     protected final JexlNode mark;
     /** The debug info. */

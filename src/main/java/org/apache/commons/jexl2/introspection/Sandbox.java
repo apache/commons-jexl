@@ -46,11 +46,11 @@ import java.util.Set;
  * </li>
  * </ul>
  * <p>
- * Permissions are composed of three lists, read, write, execute, each being "white" or "black"; .
+ * Permissions are composed of three lists, read, write, execute, each being "white" or "black":
  * <ul>
  * <li><b>read</b> controls readable properties </li>
  * <li><b>write</b> controls writeable properties</li>
- * <li><b>execute</b> controls executable methods and constructor/<li>
+ * <li><b>execute</b> controls executable methods and constructor</li>
  * </ul>
  * </p>
  * 
