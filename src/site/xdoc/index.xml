@@ -24,8 +24,12 @@
     <body>
         <section name="Java Expression Language (JEXL)">
             <p>
-            JEXL is a library intended to facilitate the implementation of dynamic and scripting features in
-            applications and frameworks.
+JEXL is a library intended to facilitate the implementation of dynamic and scripting features in
+applications and frameworks written in Java.
+JEXL exposes an Expression Language supporting most of the constructs seen in shell-script or
+ECMAScript based on some extensions to the JSTL Expression Language.
+Its goal is to expose scripting features usable by technical operatives or consultants
+working with enterprise platforms.
             </p>
             <p>
             It is a small footprint "glueing" API
@@ -49,7 +53,7 @@
                             strongly depend upon.</li>
                         </ul>
                     </li>
-                    <li>Basic scripting features:
+                    <li>Scripting features:
                         <ul><li>Your application lets (advanced) users evaluate or define some simple expressions
                         like computation formulas.</li></ul>
                     </li>
@@ -60,10 +64,14 @@
                 </ul>
             </p>
             <p>
-            Its name stands for Java EXpression Language, a simple expression language inspired by Apache
+            JEXL name stands for Java EXpression Language, a simple expression language originally inspired by Apache
             Velocity and the Expression Language defined in the JavaServer Pages Standard Tag Library version 1.1 (JSTL)
-            and JavaServer Pages version 2.0 (JSP). JEXL 2.0 adds features inspired by
+            and JavaServer Pages version 2.0 (JSP).
+            JEXL 2.0 added features inspired by
             <a href="http://java.sun.com/products/jsp/reference/techart/unifiedEL.html">Unified EL</a>.
+            Overall, the syntax is now close to a mix of ECMAScript and "shell-script"
+            making it easy to master by technical operatives or consultants. The objects exposed and their behavior
+            obviously need to be documented though...
             </p>
             <p>
             The API and the expression language exploit Java-beans naming patterns through
