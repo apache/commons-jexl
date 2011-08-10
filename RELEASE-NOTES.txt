@@ -17,92 +17,54 @@
 $Id$
 
                             Commons JEXL Package
-                                Version 2.0
+                                Version 2.1
                                Release Notes
 
 
 INTRODUCTION:
 =============
 
-JEXL is an Expression Language supporting most of the constructs in the
-JSTL Expression Language, along with some additional extensions.
+JEXL is a library intended to facilitate the implementation of dynamic and scripting features in
+applications and frameworks.
+JEXL exposes an Expression Language supporting most of the constructs seen in shell-script and
+ECMAScript with syntactic rules based on some extensions to the JSTL Expression Language.
+Its goal is to ease the implementation of scripting features usable by technical operatives or consultants
+working with enterprise products or platforms.
+
 
   http://commons.apache.org/jexl/
 
-Changes in this version include:
 
-Incompatible Changes
-====================
+What's new in 2.1:
+==================
+* A more thorough arithmetic (JexlArithmetic) that allows fine control over decimals (scale and precision),a
+  new syntax for numeric literals (OGNL inspired Big and Huge notations) and a better handling of keeping the most
+  appropriate type in casual operations.
+* The introduction of script variables and parameters that reduce context dependencies and methods that allow some
+  checks performed after script creation (light static checking hints).
+* A sandoxing feature to restrict what JEXL can access from the environment allowing tighter control over security.
 
-Now requires Java 1.5 or later.
+New features in 2.1:
+====================	
+* JEXL-114:     Allow scripts to create local variables // Add return keyword
+* JEXL-113:     Add functions to extract which variables, parameters and local variables are used to evaluate a script
+* JEXL-118:     Provide an IN operator
+* JEXL-115:     Add support for asynchronous script execution and cancellation
+* JEXL-116:     Add control over classes, methods, constructors and properties allowed in scripts
+* JEXL-106:     When divide two BigDecimal values in an expression it results in java.lang.ArithmeticException
+* JEXL-102:     Add "jexl2" as a supported name
 
-Version 2.0 resides in the org.apache.commons.jexl2 package; part of the version 1.x API is reimplemented as an
-add-on source library in the jexl-compat directory; since it can not fully reimplement the original public 1.x, it may
-only be used to ease transition in strictly controlled deployments.
-
-The following classes are implemented through the jexl-compat source library:
-  * ExpressionFactory
-  * ScriptFactory
-  * Expression
-  * Script
-  * JexlContext
-  * JexlHelper
-
-Migration notes
-===============
-
-When migrating from jexl 1.x to jexl 2.0, the following hints may be helpfull.
-
-The following classes no longer exist:
-  * ExpressionFactory, ScriptFactory: create a JexlEngine and use createExpression() or createScript()
-  instead.
-
-The following classes have been renamed and replaced:
-
-  * VelMethod <=> JexlMethod
-  * VelPropertyGet <=> JexlPropertyGet
-  * VelPropertySet <=> JexlPropertySet
-
-The following methods have been removed:
-
-  * Info.getTemplateName() - use Info.getName() instead
-  * Expression.addPostResolver() / Expression.addPreResolver() - set ant-like variables in JexlContext, implement
-    a specific JexlContext or derive JexlcontextInterpreter/JexlEngine instead
-
-Behavior changes
-================
-
-* Public fields are considered when using JexlPropertyGet / JexlPropertySet: Jexl 1.x behavior can be reimplemented
-by subclassing UberspectImpl.
-
-*Division (/ operator) behavior change: division between integers no longer casts its operands to double; integer division
-    allways results in a integer. The 1.x behavior can be reimplemented by subclassing JexlArithmetic.
-
-New Features:
-=============
-
-Assignment expression: a = b (and a.b.c = d)
-   * Assigns a variable (ant-like variable or bean-property)
-
-Ternary operator expression: a ? b : c  (and a ?: c)
-   * The usual inline conditional shortcut and its 'Elvis' form (a ?: b evaluates as a ? a : b)
-
-Constructor call expression: new('my.class.name', arguments...)
-   * Creates a new instance of a class using the most appropriate constructor according
-     to the actual arguments
-
-Function namespace: ns:func(arguments...)
-   * A function namespace allows the use of class or instance methods in function calls
-
-UnifiedJEXL
-   * Adds ${...} and #{...} JSP/EL syntax support on top of the JexlEngine
-
-JSR-223 support
-   * Implement JSR-223 Scripting Engine for JEXL script (need BSF-3.0 on Java < 6)
-
-Error and exception handling
-   * Configuring the leniency and verbosity of the Jexl engine allows user control over the
-     error handling policy
+Bugs Fixed in 2.1:
+==================
+* JEXL-83:      Make JexlArithmetic immutable (and threadsafe)
+* JEXL-24:      Support Long for integer literal instead of Integers
+* JEXL-107:     literals and parenthesized expressions can not be used as references
+* JEXL-108:     parsing error if i define a empty literal array/map
+* JEXL-101:     Vararg methods where the first argument is no vararg can not be called with only the fixed parameters given
+* JEXL-105:     Array literals are considered constant even when they are not
+* JEXL-104:     NPE in JexlArithmetic when an Array-Expression containing a null is used.
+* JEXL-112:     Cannot parse Integer.MIN_VALUE	
+* JEXL-111:     expression execute error
 
 Bugs fixed in 2.0.1:
 ====================
@@ -110,6 +72,12 @@ Bugs fixed in 2.0.1:
 * JEXL-100:     Array access expressions fail when evaluated twice and cache is enabled
 * JEXL-99:      Documentation of Thread Safety / Invalid code examples on homepage
 * JEXL-98:      Quote escaping cannot be escaped
+
+
+
+Previous Releases:
+==================
+
 
 Bugs fixed in 2.0:
 ==================
@@ -181,3 +149,75 @@ Other Changes:
 
 o Add @since 2.0 tags to code so we can track API additions via Javadoc
 
+Upgrading from JEXL 1.x 
+=======================
+
+JEXL now requires Java 1.5 or later.
+
+Version 2.0 resides in the org.apache.commons.jexl2 package; part of the version 1.x API is reimplemented as an
+add-on source library in the jexl-compat directory; since it can not fully reimplement the original public 1.x, it may
+only be used to ease transition in strictly controlled deployments.
+
+The following classes are implemented through the jexl-compat source library:
+  * ExpressionFactory
+  * ScriptFactory
+  * Expression
+  * Script
+  * JexlContext
+  * JexlHelper
+
+Migration notes
+===============
+
+When migrating from jexl 1.x to jexl 2.0, the following hints may be helpfull.
+
+The following classes no longer exist:
+  * ExpressionFactory, ScriptFactory: create a JexlEngine and use createExpression() or createScript()
+  instead.
+
+The following classes have been renamed and replaced:
+
+  * VelMethod <=> JexlMethod
+  * VelPropertyGet <=> JexlPropertyGet
+  * VelPropertySet <=> JexlPropertySet
+
+The following methods have been removed:
+
+  * Info.getTemplateName() - use Info.getName() instead
+  * Expression.addPostResolver() / Expression.addPreResolver() - set ant-like variables in JexlContext, implement
+    a specific JexlContext or derive JexlcontextInterpreter/JexlEngine instead
+
+Behavior changes
+================
+
+* Public fields are considered when using JexlPropertyGet / JexlPropertySet: Jexl 1.x behavior can be reimplemented
+by subclassing UberspectImpl.
+
+*Division (/ operator) behavior change: division between integers no longer casts its operands to double; integer division
+    allways results in a integer. The 1.x behavior can be reimplemented by subclassing JexlArithmetic.
+
+New Features:
+=============
+
+Assignment expression: a = b (and a.b.c = d)
+   * Assigns a variable (ant-like variable or bean-property)
+
+Ternary operator expression: a ? b : c  (and a ?: c)
+   * The usual inline conditional shortcut and its 'Elvis' form (a ?: b evaluates as a ? a : b)
+
+Constructor call expression: new('my.class.name', arguments...)
+   * Creates a new instance of a class using the most appropriate constructor according
+     to the actual arguments
+
+Function namespace: ns:func(arguments...)
+   * A function namespace allows the use of class or instance methods in function calls
+
+UnifiedJEXL
+   * Adds ${...} and #{...} JSP/EL syntax support on top of the JexlEngine
+
+JSR-223 support
+   * Implement JSR-223 Scripting Engine for JEXL script (need BSF-3.0 on Java < 6)
+
+Error and exception handling
+   * Configuring the leniency and verbosity of the Jexl engine allows user control over the
+     error handling policy
