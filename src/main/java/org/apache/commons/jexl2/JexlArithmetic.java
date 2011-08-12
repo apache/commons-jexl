@@ -111,8 +111,9 @@ public class JexlArithmetic {
      * @return the rounded big decimal
      */
     public BigDecimal roundBigDecimal(final BigDecimal number) {
-        if (mathScale >= 0) {
-            return number.setScale(getMathScale(), getMathContext().getRoundingMode());
+        int mscale = getMathScale();
+        if (mscale >= 0) {
+            return number.setScale(mscale, getMathContext().getRoundingMode());
         } else {
             return number;
         }
@@ -594,7 +595,9 @@ public class JexlArithmetic {
              */
             return false;
         } else if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            return toBigDecimal(left).compareTo(toBigDecimal(right)) == 0;
+            BigDecimal lhs = toBigDecimal(left);
+            BigDecimal rhs = toBigDecimal(right);
+            return lhs.compareTo(rhs) == 0;
         } else if (left.getClass().equals(right.getClass())) {
             return left.equals(right);
         } else if (isFloatingPointType(left, right)) {
