@@ -194,15 +194,7 @@ public class Interpreter implements ParserVisitor {
             return node.jjtAccept(this, null);
         } catch (JexlException.Return xreturn) {
             Object value = xreturn.getValue();
-            if (value instanceof JexlException.Return) {
-                if (silent) {
-                    logger.warn(xreturn.getMessage(), xreturn.getCause());
-                    return null;
-                }
-                throw xreturn;
-            } else {
-                return value;
-            }
+            return value;
         } catch (JexlException xjexl) {
             if (silent) {
                 logger.warn(xjexl.getMessage(), xjexl.getCause());
@@ -786,8 +778,8 @@ public class Interpreter implements ParserVisitor {
                 return ((Set<?>) right).contains(left) ? Boolean.TRUE : Boolean.FALSE;
             }
             // try contains on map key
-            if (right instanceof Map<?,?>) {
-                return ((Map<?,?>) right).containsKey(left) ? Boolean.TRUE : Boolean.FALSE;
+            if (right instanceof Map<?, ?>) {
+                return ((Map<?, ?>) right).containsKey(left) ? Boolean.TRUE : Boolean.FALSE;
             }
             // try contains on collection
             if (right instanceof Collection<?>) {
@@ -946,14 +938,100 @@ public class Interpreter implements ParserVisitor {
         return map;
     }
 
-    /** {@inheritDoc} */
-    public Object visit(ASTMethodNode node, Object data) {
+    /**
+     * Calls a method (or function).
+     * <p>
+     * Method resolution is a follows:
+     * 1 - attempt to find a method in the bean passed as parameter;
+     * 2 - if this fails, narrow the arguments and try again
+     * 3 - if this still fails, seeks a Script or JexlMethod as a property of that bean.
+     * </p>
+     * @param node the method node
+     * @param bean the bean this method should be invoked upon
+     * @param methodNode the node carrying the method name
+     * @param argb the first argument index, child of the method node
+     * @return the result of the method invocation
+     */
+    private Object call(JexlNode node, Object bean, ASTIdentifier methodNode, int argb) {
         if (isCancelled()) {
             throw new JexlException.Cancel(node);
         }
+        String methodName = methodNode.image;
+        // evaluate the arguments
+        int argc = node.jjtGetNumChildren() - argb;
+        Object[] argv = new Object[argc];
+        for (int i = 0; i < argc; i++) {
+            argv[i] = node.jjtGetChild(i + argb).jjtAccept(this, null);
+        }
+
+        JexlException xjexl = null;
+        try {
+            // attempt to reuse last executor cached in volatile JexlNode.value
+            if (cache) {
+                Object cached = node.jjtGetValue();
+                if (cached instanceof JexlMethod) {
+                    JexlMethod me = (JexlMethod) cached;
+                    Object eval = me.tryInvoke(methodName, bean, argv);
+                    if (!me.tryFailed(eval)) {
+                        return eval;
+                    }
+                }
+            }
+            boolean cacheable = cache;
+            JexlMethod vm = uberspect.getMethod(bean, methodName, argv, node);
+            // DG: If we can't find an exact match, narrow the parameters and try again
+            if (vm == null) {
+                if (arithmetic.narrowArguments(argv)) {
+                    vm = uberspect.getMethod(bean, methodName, argv, node);
+                }
+                if (vm == null) {
+                    Object functor = null;
+                    // could not find a method, try as a var
+                    if (bean == context) {
+                        int register = methodNode.getRegister();
+                        if (register >= 0) {
+                            functor = registers[register];
+                        } else {
+                            functor = context.get(methodName);
+                        }
+                    } else {
+                        JexlPropertyGet gfunctor = uberspect.getPropertyGet(bean, methodName, node);
+                        if (gfunctor != null) {
+                            functor = gfunctor.tryInvoke(bean, methodName);
+                        }
+                    }
+                    // script of jexl method will do
+                    if (functor instanceof Script) {
+                        return ((Script) functor).execute(context, argv.length > 0 ? argv : null);
+                    } else if (functor instanceof JexlMethod) {
+                        vm = (JexlMethod) functor;
+                        cacheable = false;
+                    } else {
+                        xjexl = new JexlException.Method(node, methodName);
+                    }
+                }
+            }
+            if (xjexl == null) {
+                Object eval = vm.invoke(bean, argv); // vm cannot be null if xjexl is null
+                // cache executor in volatile JexlNode.value
+                if (cacheable && vm.isCacheable()) {
+                    node.jjtSetValue(vm);
+                }
+                return eval;
+            }
+        } catch (InvocationTargetException e) {
+            xjexl = new JexlException(node, "method invocation error", e.getCause());
+        } catch (Exception e) {
+            xjexl = new JexlException(node, "method error", e);
+        }
+        return invocationFailed(xjexl);
+    }
+
+    /** {@inheritDoc} */
+    public Object visit(ASTMethodNode node, Object data) {
         // the object to invoke the method on should be in the data argument
         if (data == null) {
-            // if the first child of the (ASTReference) parent,
+            // if the method node is the first child of the (ASTReference) parent,
             // it is considered as calling a 'top level' function
             if (node.jjtGetParent().jjtGetChild(0) == node) {
                 data = resolveNamespace(null, node);
@@ -965,52 +1043,18 @@ public class Interpreter implements ParserVisitor {
             }
         }
         // objectNode 0 is the identifier (method name), the others are parameters.
-        String methodName = node.jjtGetChild(0).image;
+        ASTIdentifier methodNode = (ASTIdentifier) node.jjtGetChild(0);
+        return call(node, data, methodNode, 1);
+    }
 
-        // get our arguments
-        int argc = node.jjtGetNumChildren() - 1;
-        Object[] argv = new Object[argc];
-        for (int i = 0; i < argc; i++) {
-            argv[i] = node.jjtGetChild(i + 1).jjtAccept(this, null);
-        }
-
-        JexlException xjexl = null;
-        try {
-            // attempt to reuse last executor cached in volatile JexlNode.value
-            if (cache) {
-                Object cached = node.jjtGetValue();
-                if (cached instanceof JexlMethod) {
-                    JexlMethod me = (JexlMethod) cached;
-                    Object eval = me.tryInvoke(methodName, data, argv);
-                    if (!me.tryFailed(eval)) {
-                        return eval;
-                    }
-                }
-            }
-            JexlMethod vm = uberspect.getMethod(data, methodName, argv, node);
-            // DG: If we can't find an exact match, narrow the parameters and try again!
-            if (vm == null) {
-                if (arithmetic.narrowArguments(argv)) {
-                    vm = uberspect.getMethod(data, methodName, argv, node);
-                }
-                if (vm == null) {
-                    xjexl = new JexlException.Method(node, methodName);
-                }
-            }
-            if (xjexl == null) {
-                Object eval = vm.invoke(data, argv); // vm cannot be null if xjexl is null
-                // cache executor in volatile JexlNode.value
-                if (cache && vm.isCacheable()) {
-                    node.jjtSetValue(vm);
-                }
-                return eval;
-            }
-        } catch (InvocationTargetException e) {
-            xjexl = new JexlException(node, "method invocation error", e.getCause());
-        } catch (Exception e) {
-            xjexl = new JexlException(node, "method error", e);
-        }
-        return invocationFailed(xjexl);
+    /** {@inheritDoc} */
+    public Object visit(ASTFunctionNode node, Object data) {
+        // objectNode 0 is the prefix
+        String prefix = node.jjtGetChild(0).image;
+        Object namespace = resolveNamespace(prefix, node);
+        // objectNode 1 is the identifier , the others are parameters.
+        ASTIdentifier functionNode = (ASTIdentifier) node.jjtGetChild(1);
+        return call(node, namespace, functionNode, 2);
     }
 
     /** {@inheritDoc} */
@@ -1047,65 +1091,6 @@ public class Interpreter implements ParserVisitor {
             xjexl = new JexlException(node, "constructor invocation error", e.getCause());
         } catch (Exception e) {
             xjexl = new JexlException(node, "constructor error", e);
-        }
-        return invocationFailed(xjexl);
-    }
-
-    /** {@inheritDoc} */
-    public Object visit(ASTFunctionNode node, Object data) {
-        if (isCancelled()) {
-            throw new JexlException.Cancel(node);
-        }
-        // objectNode 0 is the prefix
-        String prefix = node.jjtGetChild(0).image;
-        Object namespace = resolveNamespace(prefix, node);
-        // objectNode 1 is the identifier , the others are parameters.
-        String function = node.jjtGetChild(1).image;
-
-        // get our args
-        int argc = node.jjtGetNumChildren() - 2;
-        Object[] argv = new Object[argc];
-        for (int i = 0; i < argc; i++) {
-            argv[i] = node.jjtGetChild(i + 2).jjtAccept(this, null);
-        }
-
-        JexlException xjexl = null;
-        try {
-            // attempt to reuse last executor cached in volatile JexlNode.value
-            if (cache) {
-                Object cached = node.jjtGetValue();
-                if (cached instanceof JexlMethod) {
-                    JexlMethod me = (JexlMethod) cached;
-                    Object eval = me.tryInvoke(function, namespace, argv);
-                    if (!me.tryFailed(eval)) {
-                        return eval;
-                    }
-                }
-            }
-            JexlMethod vm = uberspect.getMethod(namespace, function, argv, node);
-            // DG: If we can't find an exact match, narrow the parameters and
-            // try again!
-            if (vm == null) {
-                // replace all numbers with the smallest type that will fit
-                if (arithmetic.narrowArguments(argv)) {
-                    vm = uberspect.getMethod(namespace, function, argv, node);
-                }
-                if (vm == null) {
-                    xjexl = new JexlException.Method(node, function);
-                }
-            }
-            if (xjexl == null) {
-                Object eval = vm.invoke(namespace, argv); // vm cannot be null if xjexl is null
-                // cache executor in volatile JexlNode.value
-                if (cache && vm.isCacheable()) {
-                    node.jjtSetValue(vm);
-                }
-                return eval;
-            }
-        } catch (InvocationTargetException e) {
-            xjexl = new JexlException(node, "function invocation error", e.getCause());
-        } catch (Exception e) {
-            xjexl = new JexlException(node, "function error", e);
         }
         return invocationFailed(xjexl);
     }
@@ -1163,8 +1148,8 @@ public class Interpreter implements ParserVisitor {
                 return ((Set<?>) right).contains(left) ? Boolean.FALSE : Boolean.TRUE;
             }
             // try contains on map key
-            if (right instanceof Map<?,?>) {
-                return ((Map<?,?>) right).containsKey(left) ? Boolean.FALSE : Boolean.TRUE;
+            if (right instanceof Map<?, ?>) {
+                return ((Map<?, ?>) right).containsKey(left) ? Boolean.FALSE : Boolean.TRUE;
             }
             // try contains on collection
             if (right instanceof Collection<?>) {

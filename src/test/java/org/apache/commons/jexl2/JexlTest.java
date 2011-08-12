@@ -497,7 +497,7 @@ public class JexlTest extends JexlTestCase
         jc.set("foo", foo );
         
         assertExpression(jc, "foo.bar", "123");
-    }
+    }  
 
     /**
      *  Tests string literals

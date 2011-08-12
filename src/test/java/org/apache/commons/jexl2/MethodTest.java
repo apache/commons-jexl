@@ -16,6 +16,9 @@
  */
 package org.apache.commons.jexl2;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.commons.jexl2.introspection.JexlMethod;
 import org.apache.commons.jexl2.junit.Asserter;
 
 /**
@@ -24,9 +27,7 @@ import org.apache.commons.jexl2.junit.Asserter;
  * @since 2.0
  */
 public class MethodTest extends JexlTestCase {
-
     private Asserter asserter;
-
     private static final String METHOD_STRING = "Method string";
 
     public static class VarArgs {
@@ -34,12 +35,12 @@ public class MethodTest extends JexlTestCase {
             int result = 0;
             if (args != null) {
                 for (int i = 0; i < args.length; i++) {
-                        result += args[i] != null ? args[i].intValue() : -100;
+                    result += args[i] != null ? args[i].intValue() : -100;
                 }
             } else {
                 result = -1000;
             }
-            return "Varargs:"+result;
+            return "Varargs:" + result;
         }
 
         public String callMixed(Integer fixed, Integer... args) {
@@ -51,9 +52,9 @@ public class MethodTest extends JexlTestCase {
             } else {
                 result -= 1000;
             }
-            return "Mixed:"+result;
+            return "Mixed:" + result;
         }
-        
+
         public String callMixed(String mixed, Integer... args) {
             int result = 0;
             if (args != null) {
@@ -63,7 +64,7 @@ public class MethodTest extends JexlTestCase {
             } else {
                 result = -1000;
             }
-            return mixed+":"+result;
+            return mixed + ":" + result;
         }
     }
 
@@ -71,29 +72,35 @@ public class MethodTest extends JexlTestCase {
         public int ten() {
             return 10;
         }
+
         public int plus10(int num) {
             return num + 10;
         }
+
         public static int TWENTY() {
             return 20;
         }
+
         public static int PLUS20(int num) {
             return num + 20;
         }
+
         public static Class<?> NPEIfNull(Object x) {
             return x.getClass();
         }
     }
-    
+
     public static class EnhancedContext extends MapContext {
         int factor = 6;
     }
 
     public static class ContextualFunctor {
         private final EnhancedContext context;
+
         public ContextualFunctor(EnhancedContext theContext) {
             context = theContext;
         }
+
         public int ratio(int n) {
             context.factor -= 1;
             return n / context.factor;
@@ -134,7 +141,7 @@ public class MethodTest extends JexlTestCase {
         asserter.assertExpression("test.callMixed('jexl')", "jexl:0");
         // Java and JEXL equivalent behavior: 'jexl:-1000' expected
         //{
-        assertEquals("jexl:-1000", test.callMixed("jexl", (Integer []) null));
+        assertEquals("jexl:-1000", test.callMixed("jexl", (Integer[]) null));
         asserter.assertExpression("test.callMixed('jexl', null)", "jexl:-1000");
         //}
         asserter.assertExpression("test.callMixed('jexl', 2)", "jexl:2");
@@ -148,13 +155,13 @@ public class MethodTest extends JexlTestCase {
         try {
             JEXL.invokeMethod(func, "nonExistentMethod");
             fail("method does not exist!");
-        } catch(Exception xj0) {
+        } catch (Exception xj0) {
             // ignore
         }
         try {
             JEXL.invokeMethod(func, "NPEIfNull", (Object[]) null);
             fail("method should have thrown!");
-        } catch(Exception xj0) {
+        } catch (Exception xj0) {
             // ignore
         }
     }
@@ -204,7 +211,7 @@ public class MethodTest extends JexlTestCase {
         }
     }
 
-   public void testTopLevelCall() throws Exception {
+    public void testTopLevelCall() throws Exception {
         java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
         funcs.put(null, new Functor());
         funcs.put("math", new MyMath());
@@ -228,11 +235,11 @@ public class MethodTest extends JexlTestCase {
         jc.set("pi", new Double(Math.PI));
         e = JEXL.createExpression("math:cos(pi)");
         o = e.evaluate(jc);
-        assertEquals(Double.valueOf(-1),o);
-      
+        assertEquals(Double.valueOf(-1), o);
+
         e = JEXL.createExpression("cx:ratio(10) + cx:ratio(20)");
         o = e.evaluate(jc);
-        assertEquals(Integer.valueOf(7),o);
+        assertEquals(Integer.valueOf(7), o);
     }
 
     public void testNamespaceCall() throws Exception {
@@ -267,4 +274,87 @@ public class MethodTest extends JexlTestCase {
         assertEquals("Result is not 40", new Integer(40), o);
     }
 
+    public static class ScriptContext extends MapContext implements NamespaceResolver {
+        Map<String, Object> nsScript;
+
+        ScriptContext(Map<String, Object> ns) {
+            nsScript = ns;
+        }
+
+        public Object resolveNamespace(String name) {
+            if (name == null) {
+                return this;
+            }
+            if ("script".equals(name)) {
+                return nsScript;
+            }
+            return null;
+        }
+    }
+
+    public void testScriptCall() throws Exception {
+        JexlContext context = new MapContext();
+        Script plus = JEXL.createScript("a + b", new String[]{"a", "b"});
+        context.set("plus", plus);
+        Script forty2 = JEXL.createScript("plus(4, 2) * plus(4, 3)");
+        Object o = forty2.execute(context);
+        assertEquals("Result is not 42", new Integer(42), o);
+
+        Map<String, Object> foo = new HashMap<String, Object>();
+        foo.put("plus", plus);
+        context.set("foo", foo);
+        forty2 = JEXL.createScript("foo.plus(4, 2) * foo.plus(4, 3)");
+        o = forty2.execute(context);
+        assertEquals("Result is not 42", new Integer(42), o);
+
+        context = new ScriptContext(foo);
+        forty2 = JEXL.createScript("script:plus(4, 2) * script:plus(4, 3)");
+        o = forty2.execute(context);
+        assertEquals("Result is not 42", new Integer(42), o);
+
+        final JexlArithmetic ja = JEXL.getArithmetic();
+        JexlMethod mplus = new JexlMethod() {
+            public Object invoke(Object obj, Object[] params) throws Exception {
+                if (obj instanceof Map<?,?>) {
+                    return ja.add(params[0], params[1]);
+                } else {
+                    throw new Exception("not a script context");
+                }
+            }
+
+            public Object tryInvoke(String name, Object obj, Object[] params) {
+                try {
+                    if ("plus".equals(name)) {
+                        return invoke(obj, params);
+                    }
+                } catch (Exception xany) {
+                    // ignore and fail by returning this
+                }
+                return this;
+            }
+
+            public boolean tryFailed(Object rval) {
+                // this is the marker for failure
+                return rval == this;
+            }
+
+            public boolean isCacheable() {
+                return true;
+            }
+
+            public Class<?> getReturnType() {
+                return Object.class;
+            }
+        };
+        
+        foo.put("PLUS", mplus);
+        forty2 = JEXL.createScript("script:PLUS(4, 2) * script:PLUS(4, 3)");
+        o = forty2.execute(context);
+        assertEquals("Result is not 42", new Integer(42), o);
+        
+        context.set("foo.bar", foo);
+        forty2 = JEXL.createScript("foo.'bar'.PLUS(4, 2) * foo.bar.PLUS(4, 3)");
+        o = forty2.execute(context);
+        assertEquals("Result is not 42", new Integer(42), o);
+    }
 }
