@@ -81,36 +81,62 @@ public class Sandbox {
      * A base set of names.
      */
     public abstract static class Names {
-        /** The set of controlled names. */
-        protected Set<String> names = null;
-
         /**
          * Adds a name to this set.
          * @param name the name to add
          * @return  true if the name was really added, false if it was already present
          */
-        private boolean add(String name) {
-            if (names == null) {
-                names = new HashSet<String>();
-            }
-            return names.add(name);
+        public abstract boolean add(String name);
+        
+        /**
+         * Adds an alias to a name to this set.
+         * <p>This only has an effect on white lists.</p>
+         * @param name the name to alias
+         * @param alias the alias
+         * @return  true if the alias was added, false if it was already present
+         */
+        public boolean alias(String name, String alias) {
+            return false;
         }
 
         /**
          * Whether a given name is allowed or not.
          * @param name the method/property name to check
-         * @return true if allowed, false if forbidden
+         * @return null if not allowed, the actual name to use otherwise
          */
-        public abstract boolean allows(String name);
+        public abstract String get(String name);
     }
 
     /**
      * A white set of names.
      */
     public static class WhiteSet extends Names {
+        /** The set of controlled names. */
+        protected Map<String,String> names = null;
+        
         @Override
-        public boolean allows(String name) {
-            return names == null || names.contains(name);
+        public boolean add(String name) {
+            if (names == null) {
+                names = new HashMap<String,String>();
+            }
+            return names.put(name,name) == null;
+        }
+        
+        @Override
+        public boolean alias(String name, String alias) {
+            if (names == null) {
+                names = new HashMap<String,String>();
+            }
+            return names.put(alias,name) == null;
+        }
+                
+        @Override
+        public String get(String name) {
+            if (names == null) {
+                return name;
+            } else {
+                return names.get(name);
+            }
         }
     }
 
@@ -118,9 +144,20 @@ public class Sandbox {
      * A black set of names.
      */
     public static class BlackSet extends Names {
+        /** The set of controlled names. */
+        protected Set<String> names = null;
+        
         @Override
-        public boolean allows(String name) {
-            return names != null && !names.contains(name);
+        public boolean add(String name) {
+            if (names == null) {
+                names = new HashSet<String>();
+            }
+            return names.add(name);
+        }
+
+        @Override
+        public String get(String name) {
+            return names != null && !names.contains(name)? name : null;
         }
     }
 
@@ -158,6 +195,7 @@ public class Sandbox {
             }
             return this;
         }
+        
         /**
          * Adds a list of writeable property names to these permissions.
          * @param pnames the property names
@@ -224,7 +262,7 @@ public class Sandbox {
     }
 
     /**
-     * Creates the set of permissions based on white lists for methods and properties for a given class.
+     * Creates a new set of permissions based on white lists for methods and properties for a given class.
      * @param clazz the whitened class name
      * @return the permissions instance
      */
@@ -233,7 +271,7 @@ public class Sandbox {
     }
 
     /**
-     * Creates the set of permissions based on black lists for methods and properties for a given class.
+     * Creates a new set of permissions based on black lists for methods and properties for a given class.
      * @param clazz the blackened class name
      * @return the permissions instance
      */

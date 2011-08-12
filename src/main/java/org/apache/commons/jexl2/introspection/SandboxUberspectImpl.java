@@ -65,7 +65,7 @@ public class SandboxUberspectImpl extends UberspectImpl {
             return null;
         }
         Sandbox.Permissions box = sandbox.get(className);
-        if (box == null || box.execute().allows("")) {
+        if (box == null || box.execute().get("") != null) {
             return getConstructor(className, args);
         }
         return null;
@@ -76,12 +76,15 @@ public class SandboxUberspectImpl extends UberspectImpl {
      */
     @Override
     public JexlMethod getMethod(Object obj, String method, Object[] args, JexlInfo info) {
-        if (obj != null) {
+        if (obj != null && method != null) {
             Sandbox.Permissions box = sandbox.get(obj.getClass().getName());
-            if (box == null || box.execute().allows(method)) {
-                return getMethodExecutor(obj, method, args);
+            String actual = method;
+            if (box != null) {
+                actual = box.execute().get(actual);
             }
-
+            if (actual != null) {
+                return getMethodExecutor(obj, actual, args);
+            }
         }
         return null;
     }
@@ -91,10 +94,14 @@ public class SandboxUberspectImpl extends UberspectImpl {
      */
     @Override
     public JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfo info) {
-        if (obj != null) {
+        if (obj != null && identifier != null) {
             Sandbox.Permissions box = sandbox.get(obj.getClass().getName());
-            if (box == null || box.read().allows(identifier.toString())) {
-                return super.getPropertyGet(obj, identifier, info);
+            String actual = identifier.toString();
+            if (box != null) {
+                actual = box.read().get(actual);
+            }
+            if (actual != null) {
+                return super.getPropertyGet(obj, actual, info);
             }
         }
         return null;
@@ -105,10 +112,14 @@ public class SandboxUberspectImpl extends UberspectImpl {
      */
     @Override
     public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, JexlInfo info) {
-        if (obj != null) {
+        if (obj != null && identifier != null) {
             Sandbox.Permissions box = sandbox.get(obj.getClass().getName());
-            if (box == null || box.write().allows(identifier.toString())) {
-                return super.getPropertySet(obj, identifier, arg, info);
+            String actual = identifier.toString();
+            if (box != null) {
+                actual = box.write().get(actual);
+            }
+            if (actual != null) {
+                return super.getPropertySet(obj, actual, arg, info);
             }
         }
         return null;
