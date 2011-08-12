@@ -675,7 +675,7 @@ public class IssuesTest extends JexlTestCase {
 
         // will succeed with scale = 2
         JexlThreadedArithmetic.setMathScale(2);
-        assertFalse((Boolean) exp1.evaluate(ctx));
+        assertTrue((Boolean) exp1.evaluate(ctx));
     }
 
     public void test112() throws Exception {
@@ -696,5 +696,26 @@ public class IssuesTest extends JexlTestCase {
         ctx.set("TIMESTAMP", new Long("20100103000000"));
         Object result = e.evaluate(ctx);
         assertTrue((Boolean) result);
+    }
+
+    public void testStringIdentifier() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        Map<String, String> foo = new HashMap<String, String>();
+
+        JexlContext jc = new MapContext();
+        jc.set("foo", foo);
+        foo.put("q u u x", "456");
+        Expression e = jexl.createExpression("foo.\"q u u x\"");
+        Object result = e.evaluate(jc);
+        assertEquals("456", result);
+        e = jexl.createExpression("foo.'q u u x'");
+        result = e.evaluate(jc);
+        assertEquals("456", result);
+        Script s = jexl.createScript("foo.\"q u u x\"");
+        result = s.execute(jc);
+        assertEquals("456", result);
+        s = jexl.createScript("foo.'q u u x'");
+        result = s.execute(jc);
+        assertEquals("456", result);
     }
 }
