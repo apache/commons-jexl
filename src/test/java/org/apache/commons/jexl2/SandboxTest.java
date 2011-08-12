@@ -185,11 +185,16 @@ public class SandboxTest extends JexlTestCase {
 
         Sandbox sandbox = new Sandbox();
         sandbox.white(Foo.class.getName()).read("alias");
+        sandbox.get(Foo.class.getName()).read().alias("alias", "ALIAS");
         Uberspect uber = new SandboxUberspectImpl(null, sandbox);
         JexlEngine sjexl = new JexlEngine(uber, null, null, null);
         sjexl.setStrict(true);
 
         script = sjexl.createScript(expr, "foo");
+        result = script.execute(null, foo);
+        assertEquals(foo.alias, result);
+        
+        script = sjexl.createScript("foo.ALIAS", "foo");
         result = script.execute(null, foo);
         assertEquals(foo.alias, result);
     }
