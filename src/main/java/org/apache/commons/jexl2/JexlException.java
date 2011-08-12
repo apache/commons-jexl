@@ -24,9 +24,9 @@ import org.apache.commons.jexl2.parser.JexlNode;
  */
 public class JexlException extends RuntimeException {
     /** The point of origin for this exception. */
-    protected final JexlNode mark;
+    protected transient final JexlNode mark;
     /** The debug info. */
-    protected final JexlInfo info;
+    protected transient final JexlInfo info;
     /** A marker to use in NPEs stating a null operand error. */
     public static final String NULL_OPERAND = "jexl.null";
     
