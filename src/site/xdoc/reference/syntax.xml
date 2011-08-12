@@ -81,7 +81,8 @@
               <code>or and eq ne lt gt le ge div mod not null true false new var return</code>
               For example, the following is invalid:
               <source>my.new.dotted.var // invalid ('new' is keyword)</source>
-              In such cases, the [ ] operator can be used, for example:
+              In such cases, quoted identifiers or the [ ] operator can be used, for example:
+              <source>my.'new'.dotted.var</source>
               <source>my['new'].dotted.var</source>
             </p>
           </td>
