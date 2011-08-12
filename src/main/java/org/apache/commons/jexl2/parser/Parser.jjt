@@ -152,7 +152,7 @@ PARSER_END(Parser)
 {
   < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
 |
-  < #LETTER: [ "a"-"z", "A"-"Z", "_", "$" ] >
+  < #LETTER: [ "a"-"z", "A"-"Z", "_", "$", "@" ] >
 |
   < #DIGIT: [ "0"-"9"] >
 }
@@ -411,6 +411,17 @@ void Identifier(boolean top) :
     t=<REGISTER> { jjtThis.image = t.image; jjtThis.setRegister(t.image); }
 }
 
+void StringIdentifier() #Identifier : 
+{
+    Token t;
+}
+{
+  t=<STRING_LITERAL>
+  {
+    jjtThis.image = Parser.buildString(t.image, true);
+  }
+}
+
 void Literal() #void :
 {
    Token t;
@@ -572,6 +583,8 @@ void DotReference() #void : {}
             Identifier()
           |
             IntegerLiteral()
+          |
+            StringIdentifier()
        )
      )
   )*
