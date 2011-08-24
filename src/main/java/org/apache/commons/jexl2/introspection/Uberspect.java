@@ -18,7 +18,6 @@
 package org.apache.commons.jexl2.introspection;
 
 import java.util.Iterator;
-import java.lang.reflect.Constructor;
 import org.apache.commons.jexl2.JexlInfo;
 
 /**
@@ -41,7 +40,7 @@ public interface Uberspect {
      * @param info contextual information
      * @return a {@link Constructor}
      */
-    Constructor<?> getConstructor(Object ctorHandle, Object[] args, JexlInfo info);
+    JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfo info);
     /**
      * Returns a JexlMethod.
      * @param obj the object

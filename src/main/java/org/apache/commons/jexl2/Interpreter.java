@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl2;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
@@ -335,10 +334,10 @@ public class Interpreter implements ParserVisitor {
         // allow namespace to be instantiated as functor with context if possible, not an error otherwise
         if (namespace instanceof Class<?>) {
             Object[] args = new Object[]{context};
-            Constructor<?> ctor = uberspect.getConstructor(namespace, args, node);
+            JexlMethod ctor = uberspect.getConstructor(namespace, args, node);
             if (ctor != null) {
                 try {
-                    namespace = ctor.newInstance(args);
+                    namespace = ctor.invoke(namespace, args);
                     if (functors == null) {
                         functors = new HashMap<String, Object>();
                     }
@@ -416,10 +415,9 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTArrayAccess node, Object data) {
-        // first objectNode is the identifier
+            // first objectNode is the identifier
         Object object = node.jjtGetChild(0).jjtAccept(this, data);
-        // can have multiple nodes - either an expression, integer literal or
-        // reference
+        // can have multiple nodes - either an expression, integer literal or reference
         int numChildren = node.jjtGetNumChildren();
         for (int i = 1; i < numChildren; i++) {
             JexlNode nindex = node.jjtGetChild(i);
@@ -855,7 +853,7 @@ public class Interpreter implements ParserVisitor {
         int n = 0;
         try {
             Object result = null;
-            /* first objectNode is the expression */
+            /* first objectNode is the condition */
             Object expression = node.jjtGetChild(0).jjtAccept(this, data);
             if (arithmetic.toBoolean(expression)) {
                 // first objectNode is true statement
@@ -1012,7 +1010,8 @@ public class Interpreter implements ParserVisitor {
                 }
             }
             if (xjexl == null) {
-                Object eval = vm.invoke(bean, argv); // vm cannot be null if xjexl is null
+                // vm cannot be null if xjexl is null
+                Object eval = vm.invoke(bean, argv);
                 // cache executor in volatile JexlNode.value
                 if (cacheable && vm.isCacheable()) {
                     node.jjtSetValue(vm);
@@ -1072,10 +1071,20 @@ public class Interpreter implements ParserVisitor {
         }
 
         JexlException xjexl = null;
-        try {
-            Constructor<?> ctor = uberspect.getConstructor(cobject, argv, node);
-            // DG: If we can't find an exact match, narrow the parameters and
-            // try again!
+        try { 
+            // attempt to reuse last constructor cached in volatile JexlNode.value
+            if (cache) {
+                Object cached = node.jjtGetValue();
+                if (cached instanceof JexlMethod) {
+                    JexlMethod mctor = (JexlMethod) cached;
+                    Object eval = mctor.tryInvoke(null, cobject, argv);
+                    if (!mctor.tryFailed(eval)) {
+                        return eval;
+                    }
+                }
+            }
+            JexlMethod ctor = uberspect.getConstructor(cobject, argv, node);
+            // DG: If we can't find an exact match, narrow the parameters and try again
             if (ctor == null) {
                 if (arithmetic.narrowArguments(argv)) {
                     ctor = uberspect.getConstructor(cobject, argv, node);
@@ -1085,7 +1094,12 @@ public class Interpreter implements ParserVisitor {
                 }
             }
             if (xjexl == null) {
-                return ctor.newInstance(argv);
+                Object instance = ctor.invoke(cobject, argv);
+                // cache executor in volatile JexlNode.value
+                if (cache && ctor.isCacheable()) {
+                    node.jjtSetValue(ctor);
+                }
+                return instance;
             }
         } catch (InvocationTargetException e) {
             xjexl = new JexlException(node, "constructor invocation error", e.getCause());

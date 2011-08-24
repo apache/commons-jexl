@@ -20,10 +20,12 @@ import org.apache.commons.jexl2.internal.Introspector;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.InvocationTargetException;
+
 import java.util.Enumeration;
 import java.util.Iterator;
-
 import java.util.Map;
+
 import org.apache.commons.jexl2.JexlInfo;
 import org.apache.commons.jexl2.JexlException;
 import org.apache.commons.jexl2.internal.AbstractExecutor;
@@ -44,7 +46,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
      * Publicly exposed special failure object returned by tryInvoke.
      */
     public static final Object TRY_FAILED = AbstractExecutor.TRY_FAILED;
-    
+
     /**
      * Creates a new UberspectImpl.
      * @param runtimeLogger the logger used for all logging needs
@@ -52,7 +54,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
     public UberspectImpl(Log runtimeLogger) {
         super(runtimeLogger);
     }
-        
+
     /**
      * Resets this Uberspect class loader.
      * @param cloader the class loader to use
@@ -72,8 +74,8 @@ public class UberspectImpl extends Introspector implements Uberspect {
         if (obj.getClass().isArray()) {
             return new ArrayIterator(obj);
         }
-        if (obj instanceof Map<?,?>) {
-            return ((Map<?,?>) obj).values().iterator();
+        if (obj instanceof Map<?, ?>) {
+            return ((Map<?, ?>) obj).values().iterator();
         }
         if (obj instanceof Enumeration<?>) {
             return new EnumerationIterator<Object>((Enumeration<Object>) obj);
@@ -89,7 +91,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
             if (it != null && Iterator.class.isAssignableFrom(it.getReturnType())) {
                 return (Iterator<Object>) it.execute(obj, null);
             }
-        } catch(Exception xany) {
+        } catch (Exception xany) {
             throw new JexlException(info, "unable to generate iterator()", xany);
         }
         return null;
@@ -102,7 +104,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
      * @param info debug info
      * @return a {@link Field}.
      */
-    public Field getField(Object obj, String name, JexlInfo info) {
+    protected Field getField(Object obj, String name, JexlInfo info) {
         final Class<?> clazz = obj instanceof Class<?> ? (Class<?>) obj : obj.getClass();
         return getField(clazz, name);
     }
@@ -110,8 +112,67 @@ public class UberspectImpl extends Introspector implements Uberspect {
     /**
      * {@inheritDoc}
      */
-    public Constructor<?> getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
-        return getConstructor(ctorHandle, args);
+    public JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
+        final Constructor<?> ctor = getConstructor(ctorHandle, args);
+        if (ctor != null) {
+            JexlMethod jctor = new JexlMethod() {
+                public Object invoke(Object obj, Object[] params) throws Exception {
+                    Class<?> clazz = null;
+                    if (obj instanceof Class<?>) {
+                        clazz = (Class<?>) obj;
+                    } else if (obj != null) {
+                        clazz = base().getClassByName(obj.toString());
+                    } else {
+                        clazz = ctor.getDeclaringClass();
+                    }
+                    if (clazz.equals(ctor.getDeclaringClass())) {
+                        return ctor.newInstance(params);
+                    } else {
+                        return null;
+                    }
+                }
+
+                public Object tryInvoke(String name, Object obj, Object[] params) {
+                    Class<?> clazz = null;
+                    if (obj instanceof Class<?>) {
+                        clazz = (Class<?>) obj;
+                    } else if (obj != null) {
+                        clazz = base().getClassByName(obj.toString());
+                    } else {
+                        clazz = ctor.getDeclaringClass();
+                    }
+                    if (clazz.equals(ctor.getDeclaringClass())
+                        && (name == null || name.equals(clazz.getName()))) {
+                        try {
+                            return ctor.newInstance(params);
+                        } catch (InstantiationException xinstance) {
+                            return TRY_FAILED;
+                        } catch (IllegalAccessException xaccess) {
+                            return TRY_FAILED;
+                        } catch (IllegalArgumentException xargument) {
+                            return TRY_FAILED;
+                        } catch (InvocationTargetException xinvoke) {
+                            return TRY_FAILED;
+                        }
+                    }
+                    return TRY_FAILED;
+                }
+
+                public boolean tryFailed(Object rval) {
+                    return rval == TRY_FAILED;
+                }
+
+                public boolean isCacheable() {
+                    return true;
+                }
+
+                public Class<?> getReturnType() {
+                    return ctor.getDeclaringClass();
+                }
+            };
+            return jctor;
+        }
+        return null;
     }
 
     /**
@@ -218,8 +279,8 @@ public class UberspectImpl extends Introspector implements Uberspect {
          */
         public Object tryInvoke(Object obj, Object key, Object value) {
             if (obj.getClass().equals(field.getDeclaringClass())
-                && key.equals(field.getName())
-                && (value == null || MethodKey.isInvocationConvertible(field.getType(), value.getClass(), false))) {
+                    && key.equals(field.getName())
+                    && (value == null || MethodKey.isInvocationConvertible(field.getType(), value.getClass(), false))) {
                 try {
                     field.set(obj, value);
                     return value;
@@ -253,8 +314,8 @@ public class UberspectImpl extends Introspector implements Uberspect {
         if (set == null && obj != null && identifier != null) {
             Field field = getField(obj, identifier.toString(), info);
             if (field != null
-                && !Modifier.isFinal(field.getModifiers())
-                && (arg == null || MethodKey.isInvocationConvertible(field.getType(), arg.getClass(), false))) {
+                    && !Modifier.isFinal(field.getModifiers())
+                    && (arg == null || MethodKey.isInvocationConvertible(field.getType(), arg.getClass(), false))) {
                 return new FieldPropertySet(field);
             }
         }
