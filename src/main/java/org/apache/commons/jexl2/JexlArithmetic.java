@@ -28,9 +28,9 @@ import java.math.MathContext;
  * All arithmetic operators (+, - , *, /, %) follow the same rules regarding their arguments.
  * <ol>
  * <li>If both are null, result is 0</li>
+ * <li>If either is a BigDecimal, coerce both to BigDecimal and and perform operation</li>
  * <li>If either is a floating point number, coerce both to Double and perform operation</li>
  * <li>If both are BigInteger, treat as BigInteger and perform operation</li>
- * <li>If either is a BigDecimal, coerce both to BigDecimal and and perform operation</li>
  * <li>Else treat as BigInteger, perform operation and attempt to narrow result:
  * <ol>
  * <li>if both arguments can be narrowed to Integer, narrow result to Integer</li>
@@ -517,7 +517,7 @@ public class JexlArithmetic {
         BigInteger result = l.subtract(r);
         return narrowBigInteger(left, right, result);
     }
-    
+
     /**
      * Negates a value (unary minus for numbers).
      * @param val the value to negate
@@ -703,6 +703,9 @@ public class JexlArithmetic {
             return false;
         } else if (val instanceof Boolean) {
             return ((Boolean) val).booleanValue();
+        } else if (val instanceof Number) {
+            double number = toDouble(val);
+            return !Double.isNaN(number) && number != 0.d;
         } else if (val instanceof String) {
             return Boolean.valueOf((String) val).booleanValue();
         }
@@ -720,17 +723,23 @@ public class JexlArithmetic {
         if (val == null) {
             controlNullOperand();
             return 0;
+        } else if (val instanceof Double) {
+            if (!Double.isNaN((Double) val)) {
+                return 0;
+            } else {
+                return ((Double) val).intValue();
+            }
+        }  else if (val instanceof Number) {
+            return ((Number) val).intValue();
         } else if (val instanceof String) {
             if ("".equals(val)) {
                 return 0;
             }
             return Integer.parseInt((String) val);
+        } else if (val instanceof Boolean) {
+            return ((Boolean) val).booleanValue() ? 1 : 0;
         } else if (val instanceof Character) {
             return ((Character) val).charValue();
-        } else if (val instanceof Boolean) {
-            throw new IllegalArgumentException("Boolean->Integer coercion exception");
-        } else if (val instanceof Number) {
-            return ((Number) val).intValue();
         }
 
         throw new IllegalArgumentException("Integer coercion exception. Can't coerce type: "
@@ -747,20 +756,27 @@ public class JexlArithmetic {
         if (val == null) {
             controlNullOperand();
             return 0L;
+        } else if (val instanceof Double) {
+            if (!Double.isNaN((Double) val)) {
+                return 0;
+            } else {
+                return ((Double) val).longValue();
+            }
+        } else if (val instanceof Number) {
+            return ((Number) val).longValue();
         } else if (val instanceof String) {
             if ("".equals(val)) {
                 return 0;
+            } else {
+                return Long.parseLong((String) val);
             }
-            return Long.parseLong((String) val);
+        } else if (val instanceof Boolean) {
+            return ((Boolean) val).booleanValue() ? 1L : 0L;
         } else if (val instanceof Character) {
             return ((Character) val).charValue();
-        } else if (val instanceof Boolean) {
-            throw new NumberFormatException("Boolean->Long coercion exception");
-        } else if (val instanceof Number) {
-            return ((Number) val).longValue();
         }
 
-        throw new NumberFormatException("Long coercion exception. Can't coerce type: " + val.getClass().getName());
+        throw new IllegalArgumentException("Long coercion exception. Can't coerce type: " + val.getClass().getName());
     }
 
     /**
@@ -771,20 +787,27 @@ public class JexlArithmetic {
      * @throws NullPointerException if val is null and mode is strict.
      */
     public BigInteger toBigInteger(Object val) {
-        if (val instanceof BigInteger) {
-            return (BigInteger) val;
-        } else if (val == null) {
+        if (val == null) {
             controlNullOperand();
-            return BigInteger.valueOf(0);
+            return BigInteger.ZERO;
+        } else if (val instanceof BigInteger) {
+            return (BigInteger) val;
+        } else if (val instanceof Double) {
+            if (!Double.isNaN((Double) val)) {
+                return new BigInteger(val.toString());
+            } else {
+                return BigInteger.ZERO;
+            }
+        } else if (val instanceof Number) {
+            return new BigInteger(val.toString());
         } else if (val instanceof String) {
             String string = (String) val;
             if ("".equals(string.trim())) {
                 return BigInteger.ZERO;
+            } else {
+                return new BigInteger(string);
             }
-            return new BigInteger(string);
-        } else if (val instanceof Number) {
-            return new BigInteger(val.toString());
-        } else if (val instanceof Character) {
+        }else if (val instanceof Character) {
             int i = ((Character) val).charValue();
             return BigInteger.valueOf(i);
         }
@@ -809,9 +832,15 @@ public class JexlArithmetic {
         } else if (val instanceof String) {
             String string = ((String) val).trim();
             if ("".equals(string)) {
-                return BigDecimal.valueOf(0);
+                return BigDecimal.ZERO;
             }
             return roundBigDecimal(new BigDecimal(string, getMathContext()));
+        } else if (val instanceof Double) {
+            if (!Double.isNaN((Double) val)) {
+                return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
+            } else {
+                return BigDecimal.ZERO;
+            }
         } else if (val instanceof Number) {
             return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
         } else if (val instanceof Character) {
@@ -834,17 +863,6 @@ public class JexlArithmetic {
         if (val == null) {
             controlNullOperand();
             return 0;
-        } else if (val instanceof String) {
-            String string = (String) val;
-            if ("".equals(string.trim())) {
-                return 0;
-            }
-            // the spec seems to be iffy about this.  Going to give it a wack anyway
-            return Double.parseDouble(string);
-        } else if (val instanceof Character) {
-            int i = ((Character) val).charValue();
-
-            return i;
         } else if (val instanceof Double) {
             return ((Double) val).doubleValue();
         } else if (val instanceof Number) {
@@ -852,7 +870,18 @@ public class JexlArithmetic {
             //equality between comparing new Double( 6.4 / 3 ) and the jexl expression of 6.4 / 3
             return Double.parseDouble(String.valueOf(val));
         } else if (val instanceof Boolean) {
-            throw new IllegalArgumentException("Boolean->Double coercion exception");
+            return ((Boolean) val).booleanValue() ? 1. : 0.;
+        } else if (val instanceof String) {
+            String string = ((String) val).trim();
+            if ("".equals(string)) {
+                return Double.NaN;
+            } else {
+                // the spec seems to be iffy about this.  Going to give it a wack anyway
+                return Double.parseDouble(string);
+            }
+        } else if (val instanceof Character) {
+            int i = ((Character) val).charValue();
+            return i;
         }
 
         throw new IllegalArgumentException("Double coercion exception. Can't coerce type: "
@@ -869,9 +898,17 @@ public class JexlArithmetic {
     public String toString(Object val) {
         if (val == null) {
             controlNullOperand();
-            val = "";
+            return "";
+        } else if (val instanceof Double) {
+            Double dval = (Double) val;
+            if (Double.isNaN(dval)) {
+                return "";
+            } else {
+                return dval.toString();
+            }
+        } else {
+            return val.toString();
         }
-        return val.toString();
     }
 
     /**
@@ -887,7 +924,7 @@ public class JexlArithmetic {
     public Number narrow(Number original) {
         return narrowNumber(original, null);
     }
-    
+
     /**
      * Whether we consider the narrow class as a potential candidate for narrowing the source.
      * @param narrow the target narrow class
@@ -897,7 +934,7 @@ public class JexlArithmetic {
     protected boolean narrowAccept(Class<?> narrow, Class<?> source) {
         return narrow == null || narrow.equals(source);
     }
-    
+
     /**
      * Given a Number, return back the value attempting to narrow it to a target class.
      * @param original the original number
@@ -919,8 +956,8 @@ public class JexlArithmetic {
                     long l = bigd.longValueExact();
                     // coerce to int when possible (int being so often used in method parms)
                     if (narrowAccept(narrow, Integer.class)
-                        && l <= Integer.MAX_VALUE
-                        && l >= Integer.MIN_VALUE) {
+                            && l <= Integer.MAX_VALUE
+                            && l >= Integer.MIN_VALUE) {
                         return Integer.valueOf((int) l);
                     } else if (narrowAccept(narrow, Long.class)) {
                         return Long.valueOf(l);
@@ -933,8 +970,8 @@ public class JexlArithmetic {
         if (original instanceof Double || original instanceof Float || original instanceof BigDecimal) {
             double value = original.doubleValue();
             if (narrowAccept(narrow, Float.class)
-                             && value <= Float.MAX_VALUE
-                             && value >= Float.MIN_VALUE) {
+                    && value <= Float.MAX_VALUE
+                    && value >= Float.MIN_VALUE) {
                 result = Float.valueOf(result.floatValue());
             }
             // else it fits in a double only
@@ -943,23 +980,23 @@ public class JexlArithmetic {
                 BigInteger bigi = (BigInteger) original;
                 // if it's bigger than a Long it can't be narrowed
                 if (bigi.compareTo(BIGI_LONG_MAX_VALUE) > 0
-                    || bigi.compareTo(BIGI_LONG_MIN_VALUE) < 0) {
+                        || bigi.compareTo(BIGI_LONG_MIN_VALUE) < 0) {
                     return original;
                 }
             }
             long value = original.longValue();
             if (narrowAccept(narrow, Byte.class)
-                             && value <= Byte.MAX_VALUE
-                             && value >= Byte.MIN_VALUE) {
+                    && value <= Byte.MAX_VALUE
+                    && value >= Byte.MIN_VALUE) {
                 // it will fit in a byte
                 result = Byte.valueOf((byte) value);
             } else if (narrowAccept(narrow, Short.class)
-                       && value <= Short.MAX_VALUE
-                       && value >= Short.MIN_VALUE) {
+                    && value <= Short.MAX_VALUE
+                    && value >= Short.MIN_VALUE) {
                 result = Short.valueOf((short) value);
             } else if (narrowAccept(narrow, Integer.class)
-                       && value <= Integer.MAX_VALUE
-                       && value >= Integer.MIN_VALUE) {
+                    && value <= Integer.MAX_VALUE
+                    && value >= Integer.MIN_VALUE) {
                 result = Integer.valueOf((int) value);
             }
             // else it fits in a long
