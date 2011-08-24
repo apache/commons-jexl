@@ -26,7 +26,6 @@ import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.lang.ref.SoftReference;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
@@ -725,12 +724,12 @@ public class JexlEngine {
         Object result = null;
         JexlInfo info = debugInfo();
         try {
-            Constructor<?> ctor = uberspect.getConstructor(clazz, args, info);
+            JexlMethod ctor = uberspect.getConstructor(clazz, args, info);
             if (ctor == null && arithmetic.narrowArguments(args)) {
                 ctor = uberspect.getConstructor(clazz, args, info);
             }
             if (ctor != null) {
-                result = ctor.newInstance(args);
+                result = ctor.invoke(clazz, args);
             } else {
                 xjexl = new JexlException(info, "failed finding constructor for " + clazz.toString());
             }
