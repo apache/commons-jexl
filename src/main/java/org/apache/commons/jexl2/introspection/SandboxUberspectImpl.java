@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl2.introspection;
 
-import java.lang.reflect.Constructor;
 import org.apache.commons.jexl2.JexlInfo;
 import org.apache.commons.logging.Log;
 
@@ -53,20 +52,18 @@ public class SandboxUberspectImpl extends UberspectImpl {
      * {@inheritDoc}
      */
     @Override
-    public Constructor<?> getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
+    public JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
         String className = null;
-        Class<?> clazz = null;
         if (ctorHandle instanceof Class<?>) {
-            clazz = (Class<?>) ctorHandle;
+            Class<?> clazz = (Class<?>) ctorHandle;
             className = clazz.getName();
         } else if (ctorHandle != null) {
             className = ctorHandle.toString();
         } else {
             return null;
         }
-        Sandbox.Permissions box = sandbox.get(className);
-        if (box == null || box.execute().get("") != null) {
-            return getConstructor(className, args);
+        if (sandbox.execute(className, "") != null) {
+            return super.getConstructor(className, args, info);
         }
         return null;
     }
@@ -77,11 +74,7 @@ public class SandboxUberspectImpl extends UberspectImpl {
     @Override
     public JexlMethod getMethod(Object obj, String method, Object[] args, JexlInfo info) {
         if (obj != null && method != null) {
-            Sandbox.Permissions box = sandbox.get(obj.getClass().getName());
-            String actual = method;
-            if (box != null) {
-                actual = box.execute().get(actual);
-            }
+            String actual = sandbox.execute(obj.getClass().getName(), method);
             if (actual != null) {
                 return getMethodExecutor(obj, actual, args);
             }
@@ -95,11 +88,7 @@ public class SandboxUberspectImpl extends UberspectImpl {
     @Override
     public JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfo info) {
         if (obj != null && identifier != null) {
-            Sandbox.Permissions box = sandbox.get(obj.getClass().getName());
-            String actual = identifier.toString();
-            if (box != null) {
-                actual = box.read().get(actual);
-            }
+            String actual = sandbox.read(obj.getClass().getName(), identifier.toString());
             if (actual != null) {
                 return super.getPropertyGet(obj, actual, info);
             }
@@ -113,11 +102,7 @@ public class SandboxUberspectImpl extends UberspectImpl {
     @Override
     public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, JexlInfo info) {
         if (obj != null && identifier != null) {
-            Sandbox.Permissions box = sandbox.get(obj.getClass().getName());
-            String actual = identifier.toString();
-            if (box != null) {
-                actual = box.write().get(actual);
-            }
+            String actual = sandbox.write(obj.getClass().getName(), identifier.toString());
             if (actual != null) {
                 return super.getPropertySet(obj, actual, arg, info);
             }
