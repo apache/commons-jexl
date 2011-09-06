@@ -1171,14 +1171,14 @@ public class Interpreter implements ParserVisitor {
             }
             // try a contains method (duck type set)
             try {
-                Object[] argv = {right};
-                JexlMethod vm = uberspect.getMethod(left, "contains", argv, node);
+                Object[] argv = {left};
+                JexlMethod vm = uberspect.getMethod(right, "contains", argv, node);
                 if (vm != null) {
-                    return arithmetic.toBoolean(vm.invoke(left, argv)) ? Boolean.FALSE : Boolean.TRUE;
+                    return arithmetic.toBoolean(vm.invoke(right, argv)) ? Boolean.FALSE : Boolean.TRUE;
                 } else if (arithmetic.narrowArguments(argv)) {
-                    vm = uberspect.getMethod(left, "contains", argv, node);
+                    vm = uberspect.getMethod(right, "contains", argv, node);
                     if (vm != null) {
-                        return arithmetic.toBoolean(vm.invoke(left, argv)) ? Boolean.FALSE : Boolean.TRUE;
+                        return arithmetic.toBoolean(vm.invoke(right, argv)) ? Boolean.FALSE : Boolean.TRUE;
                     }
                 }
             } catch (InvocationTargetException e) {
