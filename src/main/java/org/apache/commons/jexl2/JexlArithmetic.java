@@ -404,6 +404,9 @@ public class JexlArithmetic {
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
+            if (BigDecimal.ZERO.equals(r)) {
+                throw new ArithmeticException("/");
+            }
             BigDecimal result = l.divide(r, getMathContext());
             return narrowBigDecimal(left, right, result);
         }
@@ -411,6 +414,9 @@ public class JexlArithmetic {
         // otherwise treat as integers
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
+        if (BigInteger.ZERO.equals(r)) {
+            throw new ArithmeticException("/");
+        }
         BigInteger result = l.divide(r);
         return narrowBigInteger(left, right, result);
     }
@@ -441,6 +447,9 @@ public class JexlArithmetic {
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
+            if (BigDecimal.ZERO.equals(r)) {
+                throw new ArithmeticException("%");
+            }
             BigDecimal remainder = l.remainder(r, getMathContext());
             return narrowBigDecimal(left, right, remainder);
         }
@@ -449,6 +458,9 @@ public class JexlArithmetic {
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
         BigInteger result = l.mod(r);
+        if (BigInteger.ZERO.equals(r)) {
+            throw new ArithmeticException("%");
+        }
         return narrowBigInteger(left, right, result);
     }
 
@@ -524,32 +536,34 @@ public class JexlArithmetic {
      * @return the negated value
      */
     public Object negate(Object val) {
-        if (val instanceof Byte) {
-            byte valueAsByte = ((Byte) val).byteValue();
-            return Byte.valueOf((byte) -valueAsByte);
-        } else if (val instanceof Short) {
-            short valueAsShort = ((Short) val).shortValue();
-            return Short.valueOf((short) -valueAsShort);
-        } else if (val instanceof Integer) {
+        if (val instanceof Integer) {
             int valueAsInt = ((Integer) val).intValue();
             return Integer.valueOf(-valueAsInt);
-        } else if (val instanceof Long) {
-            long valueAsLong = -((Long) val).longValue();
-            return Long.valueOf(valueAsLong);
-        } else if (val instanceof Float) {
-            float valueAsFloat = ((Float) val).floatValue();
-            return new Float(-valueAsFloat);
         } else if (val instanceof Double) {
             double valueAsDouble = ((Double) val).doubleValue();
             return new Double(-valueAsDouble);
+        } else if (val instanceof Long) {
+            long valueAsLong = -((Long) val).longValue();
+            return Long.valueOf(valueAsLong);
         } else if (val instanceof BigDecimal) {
             BigDecimal valueAsBigD = (BigDecimal) val;
             return valueAsBigD.negate();
         } else if (val instanceof BigInteger) {
             BigInteger valueAsBigI = (BigInteger) val;
             return valueAsBigI.negate();
+        } else if (val instanceof Float) {
+            float valueAsFloat = ((Float) val).floatValue();
+            return new Float(-valueAsFloat);
+        } else if (val instanceof Short) {
+            short valueAsShort = ((Short) val).shortValue();
+            return Short.valueOf((short) -valueAsShort);
+        } else if (val instanceof Byte) {
+            byte valueAsByte = ((Byte) val).byteValue();
+            return Byte.valueOf((byte) -valueAsByte);
+        } else if (val instanceof Boolean) {
+            return ((Boolean) val).booleanValue()? Boolean.FALSE : Boolean.TRUE;
         }
-        throw new IllegalArgumentException(val.toString() + ": negate can only be applied to a number");
+        throw new ArithmeticException("Object negation:(" + val + ")");
     }
 
     /**
@@ -577,6 +591,60 @@ public class JexlArithmetic {
     }
 
     /**
+     * Performs a comparison.
+     * @param left the left operand
+     * @param right the right operator
+     * @param operator the operator
+     * @return -1 if left  &lt; right; +1 if left &gt > right; 0 if left == right
+     */
+    protected int compare(Object left, Object right, String operator) {
+        if (left != null && right != null) {
+            if (left instanceof BigDecimal || right instanceof BigDecimal) {
+                BigDecimal l = toBigDecimal(left);
+                BigDecimal r = toBigDecimal(right);
+                return l.compareTo(r);
+            } else if (left instanceof BigInteger || right instanceof BigInteger) {
+                BigInteger l = toBigInteger(left);
+                BigInteger r = toBigInteger(right);
+                return l.compareTo(r);
+            } else if (isFloatingPoint(left) || isFloatingPoint(right)) {
+                double lhs = toDouble(left);
+                double rhs = toDouble(right);
+                if (lhs < rhs) {
+                    return -1;
+                } else if (lhs > rhs) {
+                    return +1;
+                } else {
+                    return 0;
+                }
+            } else if (isNumberable(left) || isNumberable(right)) {
+                long lhs = toLong(left);
+                long rhs = toLong(right);
+                if (lhs < rhs) {
+                    return -1;
+                } else if (lhs > rhs) {
+                    return +1;
+                } else {
+                    return 0;
+                }
+            } else if (left instanceof String || right instanceof String) {
+                return toString(left).compareTo(toString(right));
+            } else if ("==".equals(operator)) {
+                return left.equals(right) ? 0 : -1;
+            } else if (left instanceof Comparable<?>) {
+                @SuppressWarnings("unchecked") // OK because of instanceof check above
+                final Comparable<Object> comparable = (Comparable<Object>) left;
+                return comparable.compareTo(right);
+            } else if (right instanceof Comparable<?>) {
+                @SuppressWarnings("unchecked") // OK because of instanceof check above
+                final Comparable<Object> comparable = (Comparable<Object>) right;
+                return comparable.compareTo(left);
+            }
+        }
+        throw new ArithmeticException("Object comparison:(" + left + " " + operator + " " + right + ")");
+    }
+
+    /**
      * Test if left and right are equal.
      *
      * @param left first value
@@ -584,34 +652,15 @@ public class JexlArithmetic {
      * @return test result.
      */
     public boolean equals(Object left, Object right) {
-        if (left == null && right == null) {
-            /*
-             * if both are null L == R
-             */
+        if (left == right) {
             return true;
         } else if (left == null || right == null) {
-            /*
-             * we know both aren't null, therefore L != R
-             */
             return false;
-        } else if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            BigDecimal lhs = toBigDecimal(left);
-            BigDecimal rhs = toBigDecimal(right);
-            return lhs.compareTo(rhs) == 0;
-        } else if (left.getClass().equals(right.getClass())) {
-            return left.equals(right);
-        } else if (isFloatingPointType(left, right)) {
-            return toDouble(left) == toDouble(right);
-        } else if ((left instanceof Number || left instanceof Character)
-                && (right instanceof Character || right instanceof Number)) {
-            return toLong(left) == toLong(right);
         } else if (left instanceof Boolean || right instanceof Boolean) {
             return toBoolean(left) == toBoolean(right);
-        } else if (left instanceof java.lang.String || right instanceof String) {
-            return left.toString().equals(right.toString());
+        } else {
+            return compare(left, right, "==") == 0;
         }
-
-        return left.equals(right);
     }
 
     /**
@@ -624,34 +673,9 @@ public class JexlArithmetic {
     public boolean lessThan(Object left, Object right) {
         if ((left == right) || (left == null) || (right == null)) {
             return false;
-        } else if (isFloatingPoint(left) || isFloatingPoint(right)) {
-            double leftDouble = toDouble(left);
-            double rightDouble = toDouble(right);
-            return leftDouble < rightDouble;
-        } else if (left instanceof BigDecimal || right instanceof BigDecimal) {
-            BigDecimal l = toBigDecimal(left);
-            BigDecimal r = toBigDecimal(right);
-            return l.compareTo(r) < 0;
-        } else if (isNumberable(left) || isNumberable(right)) {
-            long leftLong = toLong(left);
-            long rightLong = toLong(right);
-            return leftLong < rightLong;
-        } else if (left instanceof String || right instanceof String) {
-            String leftString = left.toString();
-            String rightString = right.toString();
-            return leftString.compareTo(rightString) < 0;
-        } else if (left instanceof Comparable<?>) {
-            @SuppressWarnings("unchecked") // OK because of instanceof check above
-            final Comparable<Object> comparable = (Comparable<Object>) left;
-            return comparable.compareTo(right) < 0;
-        } else if (right instanceof Comparable<?>) {
-            @SuppressWarnings("unchecked") // OK because of instanceof check above
-            final Comparable<Object> comparable = (Comparable<Object>) right;
-            return comparable.compareTo(left) > 0;
+        } else {
+            return compare(left, right, "<") < 0;
         }
-
-        throw new IllegalArgumentException("Invalid comparison : comparing cardinality for left: " + left
-                + " and right: " + right);
 
     }
 
@@ -663,10 +687,11 @@ public class JexlArithmetic {
      * @return test result.
      */
     public boolean greaterThan(Object left, Object right) {
-        if (left == null || right == null) {
+        if ((left == right) || left == null || right == null) {
             return false;
+        } else {
+            return compare(left, right, ">") > 0;
         }
-        return !equals(left, right) && !lessThan(left, right);
     }
 
     /**
@@ -677,7 +702,13 @@ public class JexlArithmetic {
      * @return test result.
      */
     public boolean lessThanOrEqual(Object left, Object right) {
-        return equals(left, right) || lessThan(left, right);
+        if (left == right) {
+            return true;
+        } else if (left == null || right == null) {
+            return false;
+        } else {
+            return compare(left, right, "<=") <= 0;
+        }
     }
 
     /**
@@ -688,7 +719,13 @@ public class JexlArithmetic {
      * @return test result.
      */
     public boolean greaterThanOrEqual(Object left, Object right) {
-        return equals(left, right) || greaterThan(left, right);
+        if (left == right) {
+            return true;
+        } else if (left == null || right == null) {
+            return false;
+        } else {
+            return compare(left, right, ">=") >= 0;
+        }
     }
 
     /**
@@ -729,7 +766,7 @@ public class JexlArithmetic {
             } else {
                 return ((Double) val).intValue();
             }
-        }  else if (val instanceof Number) {
+        } else if (val instanceof Number) {
             return ((Number) val).intValue();
         } else if (val instanceof String) {
             if ("".equals(val)) {
@@ -742,8 +779,8 @@ public class JexlArithmetic {
             return ((Character) val).charValue();
         }
 
-        throw new IllegalArgumentException("Integer coercion exception. Can't coerce type: "
-                + val.getClass().getName());
+        throw new ArithmeticException("Integer coercion: "
+                + val.getClass().getName() + ":(" +val+")");
     }
 
     /**
@@ -776,7 +813,8 @@ public class JexlArithmetic {
             return ((Character) val).charValue();
         }
 
-        throw new IllegalArgumentException("Long coercion exception. Can't coerce type: " + val.getClass().getName());
+        throw new ArithmeticException("Long coercion: "
+                + val.getClass().getName() + ":(" +val+")");
     }
 
     /**
@@ -807,13 +845,13 @@ public class JexlArithmetic {
             } else {
                 return new BigInteger(string);
             }
-        }else if (val instanceof Character) {
+        } else if (val instanceof Character) {
             int i = ((Character) val).charValue();
             return BigInteger.valueOf(i);
         }
 
-        throw new IllegalArgumentException("BigInteger coercion exception. Can't coerce type: "
-                + val.getClass().getName());
+        throw new ArithmeticException("BigInteger coercion: "
+                + val.getClass().getName() + ":(" +val+")");
     }
 
     /**
@@ -848,8 +886,8 @@ public class JexlArithmetic {
             return new BigDecimal(i);
         }
 
-        throw new IllegalArgumentException("BigDecimal coercion exception. Can't coerce type: "
-                + val.getClass().getName());
+        throw new ArithmeticException("BigDecimal coercion: "
+                + val.getClass().getName() + ":(" +val+")");
     }
 
     /**
@@ -884,8 +922,8 @@ public class JexlArithmetic {
             return i;
         }
 
-        throw new IllegalArgumentException("Double coercion exception. Can't coerce type: "
-                + val.getClass().getName());
+        throw new ArithmeticException("Double coercion: "
+                + val.getClass().getName() + ":(" +val+")");
     }
 
     /**
