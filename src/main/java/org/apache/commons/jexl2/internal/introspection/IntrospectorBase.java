@@ -180,7 +180,7 @@ public class IntrospectorBase {
                 Iterator<Map.Entry<MethodKey, Constructor<?>>> entries = constructorsMap.entrySet().iterator();
                 while(entries.hasNext()) {
                     Map.Entry<MethodKey, Constructor<?>> entry = entries.next();
-                    Class<?> clazz = entry.getValue().getClass();
+                    Class<?> clazz = entry.getValue().getDeclaringClass();
                     if (isLoadedBy(previous, clazz)) {
                         entries.remove();
                         // the method name is the name of the class
