@@ -744,7 +744,8 @@ public class JexlArithmetic {
             double number = toDouble(val);
             return !Double.isNaN(number) && number != 0.d;
         } else if (val instanceof String) {
-            return Boolean.valueOf((String) val).booleanValue();
+            String strval = val.toString();
+            return strval.length() > 0 && !"false".equals(strval);
         }
         // TODO: is this a reasonable default?
         return false;

@@ -1348,7 +1348,7 @@ public class Interpreter implements ParserVisitor {
                 return node.jjtGetChild(2).jjtAccept(this, data);
             }
         }
-        if (condition != null && !Boolean.FALSE.equals(condition)) {
+        if (condition != null && arithmetic.toBoolean(condition)) {
             return condition;
         } else {
             return node.jjtGetChild(1).jjtAccept(this, data);

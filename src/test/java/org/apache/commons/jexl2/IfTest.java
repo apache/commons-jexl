@@ -251,6 +251,62 @@ public class IfTest extends JexlTestCase {
             o = jc.get("x.y.z");
             assertEquals("Should be quux", "quux", o);
         }
+        
+        jc.set("foo", Double.NaN);
+
+        for (int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be quux", "quux", o);
+            o = jc.get("x.y.z");
+            assertEquals("Should be quux", "quux", o);
+        }
+                
+        jc.set("foo", "");
+
+        for (int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be quux", "quux", o);
+            o = jc.get("x.y.z");
+            assertEquals("Should be quux", "quux", o);
+        }
+                        
+        jc.set("foo", "false");
+
+        for (int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be quux", "quux", o);
+            o = jc.get("x.y.z");
+            assertEquals("Should be quux", "quux", o);
+        }               
+        
+        jc.set("foo", 0d);
+
+        for (int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be quux", "quux", o);
+            o = jc.get("x.y.z");
+            assertEquals("Should be quux", "quux", o);
+        }
+                
+        jc.set("foo", 0);
+
+        for (int l = 0; l < 4; ++l) {
+            jexl.setLenient((l & 1) != 0);
+            jexl.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            assertEquals("Should be quux", "quux", o);
+            o = jc.get("x.y.z");
+            assertEquals("Should be quux", "quux", o);
+        }
+
 
         jc.set("foo", "bar");
 
@@ -265,4 +321,5 @@ public class IfTest extends JexlTestCase {
 
         debuggerCheck(jexl);
     }
+
 }
