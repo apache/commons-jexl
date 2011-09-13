@@ -251,7 +251,7 @@ public class Interpreter implements ParserVisitor {
      * @return the left, right or parent node
      */
     protected JexlNode findNullOperand(RuntimeException xrt, JexlNode node, Object left, Object right) {
-        if (xrt instanceof NullPointerException
+        if (xrt instanceof ArithmeticException
                 && (Object) JexlException.NULL_OPERAND == xrt.getMessage()) {
             if (left == null) {
                 return node.jjtGetChild(0);
@@ -377,7 +377,7 @@ public class Interpreter implements ParserVisitor {
                     throw new UnsupportedOperationException("unknown operator " + which);
                 }
                 throw new IllegalArgumentException("unknown operator " + op);
-            } catch (RuntimeException xrt) {
+            } catch (ArithmeticException xrt) {
                 JexlNode xnode = findNullOperand(xrt, node, left, right);
                 throw new JexlException(xnode, "+/- error", xrt);
             }
@@ -407,7 +407,7 @@ public class Interpreter implements ParserVisitor {
             if (!rightValue) {
                 return Boolean.FALSE;
             }
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             throw new JexlException(node.jjtGetChild(1), "boolean coercion error", xrt);
         }
         return Boolean.TRUE;
@@ -585,15 +585,10 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTBitwiseAndNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        int n = 0;
-        // coerce these two values longs and 'and'.
         try {
-            long l = arithmetic.toLong(left);
-            n = 1;
-            long r = arithmetic.toLong(right);
-            return Long.valueOf(l & r);
-        } catch (RuntimeException xrt) {
-            throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
+            return arithmetic.bitwiseAnd(left, right);
+        } catch (ArithmeticException xrt) {
+            throw new JexlException(node, "& error", xrt);
         }
     }
 
@@ -601,10 +596,9 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTBitwiseComplNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         try {
-            long l = arithmetic.toLong(left);
-            return Long.valueOf(~l);
-        } catch (RuntimeException xrt) {
-            throw new JexlException(node.jjtGetChild(0), "long coercion error", xrt);
+            return arithmetic.bitwiseComplement(left);
+        } catch (ArithmeticException xrt) {
+            throw new JexlException(node, "~ error", xrt);
         }
     }
 
@@ -612,15 +606,10 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTBitwiseOrNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        int n = 0;
-        // coerce these two values longs and 'or'.
         try {
-            long l = arithmetic.toLong(left);
-            n = 1;
-            long r = arithmetic.toLong(right);
-            return Long.valueOf(l | r);
-        } catch (RuntimeException xrt) {
-            throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
+            return arithmetic.bitwiseOr(left, right);
+        } catch (ArithmeticException xrt) {
+            throw new JexlException(node, "| error", xrt);
         }
     }
 
@@ -628,15 +617,10 @@ public class Interpreter implements ParserVisitor {
     public Object visit(ASTBitwiseXorNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        int n = 0;
-        // coerce these two values longs and 'xor'.
         try {
-            long l = arithmetic.toLong(left);
-            n = 1;
-            long r = arithmetic.toLong(right);
-            return Long.valueOf(l ^ r);
-        } catch (RuntimeException xrt) {
-            throw new JexlException(node.jjtGetChild(n), "long coercion error", xrt);
+            return arithmetic.bitwiseXor(left, right);
+        } catch (ArithmeticException xrt) {
+            throw new JexlException(node, "^ error", xrt);
         }
     }
 
@@ -656,7 +640,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.divide(left, right);
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             if (!strict && xrt instanceof ArithmeticException) {
                 return new Double(0.0);
             }
@@ -693,7 +677,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             throw new JexlException(node, "== error", xrt);
         }
     }
@@ -745,7 +729,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.greaterThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             throw new JexlException(node, ">= error", xrt);
         }
     }
@@ -756,7 +740,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.greaterThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             throw new JexlException(node, "> error", xrt);
         }
     }
@@ -813,7 +797,7 @@ public class Interpreter implements ParserVisitor {
             }
             // defaults to equal
             return arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             throw new JexlException(node, "=~ error", xrt);
         }
     }
@@ -870,7 +854,7 @@ public class Interpreter implements ParserVisitor {
             return result;
         } catch (JexlException error) {
             throw error;
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             throw new JexlException(node.jjtGetChild(n), "if error", xrt);
         }
     }
@@ -900,7 +884,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.lessThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             throw new JexlException(node, "<= error", xrt);
         }
     }
@@ -911,7 +895,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.lessThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             throw new JexlException(node, "< error", xrt);
         }
     }
@@ -1115,8 +1099,8 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.mod(left, right);
-        } catch (RuntimeException xrt) {
-            if (!strict && xrt instanceof ArithmeticException) {
+        } catch (ArithmeticException xrt) {
+            if (!strict) {
                 return new Double(0.0);
             }
             JexlNode xnode = findNullOperand(xrt, node, left, right);
@@ -1130,7 +1114,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.multiply(left, right);
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             JexlNode xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "* error", xrt);
         }
@@ -1142,7 +1126,7 @@ public class Interpreter implements ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.equals(left, right) ? Boolean.FALSE : Boolean.TRUE;
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             JexlNode xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "!= error", xrt);
         }
@@ -1199,7 +1183,7 @@ public class Interpreter implements ParserVisitor {
             }
             // defaults to not equal
             return arithmetic.equals(left, right) ? Boolean.FALSE : Boolean.TRUE;
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             throw new JexlException(node, "!~ error", xrt);
         }
     }
@@ -1223,7 +1207,7 @@ public class Interpreter implements ParserVisitor {
             if (leftValue) {
                 return Boolean.TRUE;
             }
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             throw new JexlException(node.jjtGetChild(0), "boolean coercion error", xrt);
         }
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -1232,7 +1216,7 @@ public class Interpreter implements ParserVisitor {
             if (rightValue) {
                 return Boolean.TRUE;
             }
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             throw new JexlException(node.jjtGetChild(1), "boolean coercion error", xrt);
         }
         return Boolean.FALSE;
@@ -1243,9 +1227,7 @@ public class Interpreter implements ParserVisitor {
         // could be array access, identifier or map literal
         // followed by zero or more ("." and array access, method, size,
         // identifier or integer literal)
-
         int numChildren = node.jjtGetNumChildren();
-
         // pass first piece of data in and loop through children
         Object result = null;
         StringBuilder variableName = null;
@@ -1277,7 +1259,12 @@ public class Interpreter implements ParserVisitor {
             }
         }
         if (result == null) {
-            if (isVariable && !context.has(variableName.toString()) && !isTernaryProtected(node)) {
+            if (isVariable && !isTernaryProtected(node)
+                // variable unknow in context and not (from) a register
+                && !(context.has(variableName.toString())
+                     || (numChildren == 1
+                         && node.jjtGetChild(0) instanceof ASTIdentifier
+                         && ((ASTIdentifier) node.jjtGetChild(0)).getRegister() >= 0))) {
                 JexlException xjexl = new JexlException.Variable(node, variableName.toString());
                 return unknownVariable(xjexl);
             }
@@ -1371,7 +1358,7 @@ public class Interpreter implements ParserVisitor {
                 number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
             }
             return number;
-        } catch (RuntimeException xrt) {
+        } catch (ArithmeticException xrt) {
             throw new JexlException(valNode, "arithmetic error", xrt);
         }
     }

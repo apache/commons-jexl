@@ -717,5 +717,10 @@ public class IssuesTest extends JexlTestCase {
         s = jexl.createScript("foo.'q u u x'");
         result = s.execute(jc);
         assertEquals("456", result);
+        
+        Debugger dbg = new Debugger();
+        dbg.debug(((ExpressionImpl) s).script);
+        String dbgdata = dbg.data();
+        assertEquals("foo.'q u u x';", dbgdata);
     }
 }
