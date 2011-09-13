@@ -40,6 +40,7 @@ import java.math.MathContext;
  * </li>
  * </ol>
  * </p>
+ * Note that the only exception throw by JexlArithmetic is ArithmeticException.
  * @since 2.0
  */
 public class JexlArithmetic {
@@ -122,22 +123,22 @@ public class JexlArithmetic {
     /**
      * The result of +,/,-,*,% when both operands are null.
      * @return Integer(0) if lenient
-     * @throws NullPointerException if strict
+     * @throws ArithmeticException if strict
      */
     protected Object controlNullNullOperands() {
         if (!isLenient()) {
-            throw new NullPointerException(JexlException.NULL_OPERAND);
+            throw new ArithmeticException(JexlException.NULL_OPERAND);
         }
         return Integer.valueOf(0);
     }
 
     /**
      * Throw a NPE if arithmetic is strict.
-     * @throws NullPointerException if strict
+     * @throws ArithmeticException if strict
      */
     protected void controlNullOperand() {
         if (!isLenient()) {
-            throw new NullPointerException(JexlException.NULL_OPERAND);
+            throw new ArithmeticException(JexlException.NULL_OPERAND);
         }
     }
 
@@ -588,6 +589,53 @@ public class JexlArithmetic {
         } else {
             return arg.matches(right.toString());
         }
+    }
+
+    /**
+     * Performs a bitwise and.
+     * @param left the left operand
+     * @param right the right operator
+     * @return left & right
+     */
+    public Object bitwiseAnd(Object left, Object right) {
+        long l = toLong(left);
+        long r = toLong(right);
+        return Long.valueOf(l & r);
+    }
+    
+    /**
+     * Performs a bitwise or.
+     * @param left the left operand
+     * @param right the right operator
+     * @return left | right
+     */
+    public Object bitwiseOr(Object left, Object right) {
+        long l = toLong(left);
+        long r = toLong(right);
+        return Long.valueOf(l | r);
+    }
+      
+    
+    /**
+     * Performs a bitwise xor.
+     * @param left the left operand
+     * @param right the right operator
+     * @return left  right
+     */
+    public Object bitwiseXor(Object left, Object right) {
+        long l = toLong(left);
+        long r = toLong(right);
+        return Long.valueOf(l ^ r);
+    }
+   
+    /**
+     * Performs a bitwise complement.
+     * @param val the operand
+     * @return ~val
+     */
+    public Object bitwiseComplement(Object val) {
+        long l = toLong(val);
+        return Long.valueOf(~l);
     }
 
     /**

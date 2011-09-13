@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl2;
 
+import java.util.regex.Pattern;
 import org.apache.commons.jexl2.parser.ASTAdditiveNode;
 import org.apache.commons.jexl2.parser.ASTAdditiveOperator;
 import org.apache.commons.jexl2.parser.ASTAmbiguous;
@@ -401,9 +402,17 @@ final class Debugger implements ParserVisitor {
         return infixChildren(node, " > ", false, data);
     }
 
+    // check identifiers that contain space, quote, double-quotes or backspace
+    private static final Pattern QUOTED_IDENTIFIER = Pattern.compile("['\"\\s\\\\]");
+    
     /** {@inheritDoc} */
     public Object visit(ASTIdentifier node, Object data) {
-        return check(node, node.image, data);
+        String image = node.image;
+        if (QUOTED_IDENTIFIER.matcher(image).find()) {
+            // quote it
+            image = "'" + node.image.replace("'", "\\'") + "'";
+        }
+        return check(node, image, data);
     }
 
     /** {@inheritDoc} */
