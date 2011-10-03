@@ -977,6 +977,7 @@ public class JexlEngine {
      * @throws JexlException if any error occured during parsing
      * @deprecated 
      */
+    @Deprecated
     protected ASTJexlScript parse(CharSequence expression, JexlInfo info) {
         return parse(expression, info, null);
     }

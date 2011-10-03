@@ -124,6 +124,7 @@ public class Interpreter implements ParserVisitor {
      * @param aContext the context to evaluate expression
      * @deprecated 
      */
+    @Deprecated
     public Interpreter(JexlEngine jexl, JexlContext aContext) {
         this(jexl, aContext, !jexl.isLenient(), jexl.isSilent());
     }
