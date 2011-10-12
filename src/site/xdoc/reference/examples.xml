@@ -59,7 +59,7 @@
         </ul>
       </p>
       <p>
-        The common way of using a JEXL engine is to allocate it as a singleton and use this opportunity to taylor its
+        The common way of using a JEXL engine is to allocate it as a singleton and use this opportunity to tailor its
         behavior and cache.
         <source>
             private static final JexlEngine jexl = new JexlEngine();
