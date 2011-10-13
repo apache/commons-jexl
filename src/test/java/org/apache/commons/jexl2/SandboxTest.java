@@ -114,7 +114,7 @@ public class SandboxTest extends JexlTestCase {
         try {
             result = script.execute(null, foo);
             fail("alias should not be accessible");
-        } catch (JexlException.Variable xvar) {
+        } catch (JexlException.Property xvar) {
             // ok, alias should not have been accessible
             LOGGER.info(xvar.toString());
         }
@@ -138,7 +138,7 @@ public class SandboxTest extends JexlTestCase {
         try {
             result = script.execute(null, foo, "43");
             fail("alias should not be accessible");
-        } catch (JexlException.Variable xvar) {
+        } catch (JexlException.Property xvar) {
             // ok, alias should not have been accessible
             LOGGER.info(xvar.toString());
         }

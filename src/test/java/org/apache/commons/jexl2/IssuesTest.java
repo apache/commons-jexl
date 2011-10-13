@@ -301,18 +301,20 @@ public class IssuesTest extends JexlTestCase {
         e = jexl.createExpression("c.e");
         try {
             /* Object o = */ e.evaluate(ctxt);
-        } catch (JexlException xjexl) {
+            fail("c.e not declared as variable");
+        } catch (JexlException.Variable xjexl) {
             String msg = xjexl.getMessage();
-            assertTrue(msg.indexOf("variable c.e") > 0);
+            assertTrue(msg.indexOf("c.e") > 0);
         }
 
         ctxt.set("c", "{ 'a' : 3, 'b' : 5}");
         ctxt.set("e", Integer.valueOf(2));
         try {
             /* Object o = */ e.evaluate(ctxt);
-        } catch (JexlException xjexl) {
+            fail("c.e not accessible as property");
+        } catch (JexlException.Property xjexl) {
             String msg = xjexl.getMessage();
-            assertTrue(msg.indexOf("variable c.e") > 0);
+            assertTrue(msg.indexOf("c.e") > 0);
         }
 
     }

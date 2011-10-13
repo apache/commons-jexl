@@ -1232,6 +1232,7 @@ public class Interpreter implements ParserVisitor {
         // pass first piece of data in and loop through children
         Object result = null;
         StringBuilder variableName = null;
+        String propertyName = null;
         boolean isVariable = true;
         int v = 0;
         for (int c = 0; c < numChildren; c++) {
@@ -1257,6 +1258,8 @@ public class Interpreter implements ParserVisitor {
                     variableName.append(node.jjtGetChild(v).image);
                 }
                 result = context.get(variableName.toString());
+            } else {
+                propertyName = theNode.image;
             }
         }
         if (result == null) {
@@ -1266,7 +1269,9 @@ public class Interpreter implements ParserVisitor {
                      || (numChildren == 1
                          && node.jjtGetChild(0) instanceof ASTIdentifier
                          && ((ASTIdentifier) node.jjtGetChild(0)).getRegister() >= 0))) {
-                JexlException xjexl = new JexlException.Variable(node, variableName.toString());
+                JexlException xjexl = propertyName != null?
+                                      new JexlException.Property(node, propertyName):
+                                      new JexlException.Variable(node, variableName.toString());
                 return unknownVariable(xjexl);
             }
         }
@@ -1467,7 +1472,7 @@ public class Interpreter implements ParserVisitor {
                 if (node == null) {
                     throw new RuntimeException(xany);
                 } else {
-                    JexlException xjexl = new JexlException.Variable(node, attribute.toString());
+                    JexlException xjexl = new JexlException.Property(node, attribute.toString());
                     if (strict) {
                         throw xjexl;
                     }
@@ -1555,7 +1560,7 @@ public class Interpreter implements ParserVisitor {
                         + ", argument: " + value.getClass().getSimpleName();
                 throw new UnsupportedOperationException(error);
             }
-            xjexl = new JexlException.Variable(node, attribute.toString());
+            xjexl = new JexlException.Property(node, attribute.toString());
         }
         if (strict) {
             throw xjexl;

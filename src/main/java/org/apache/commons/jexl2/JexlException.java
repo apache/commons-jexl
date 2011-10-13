@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl2;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.UndeclaredThrowableException;
 import org.apache.commons.jexl2.parser.JexlNode;
 
 /**
@@ -49,7 +51,7 @@ public class JexlException extends RuntimeException {
      * @param cause the exception causing the error
      */
     public JexlException(JexlNode node, String msg, Throwable cause) {
-        super(msg, cause);
+        super(msg, unwrap(cause));
         mark = node;
         info = node != null? node.debugInfo() : null;
     }
@@ -72,9 +74,24 @@ public class JexlException extends RuntimeException {
      * @param cause the exception causing the error
      */
     public JexlException(JexlInfo dbg, String msg, Throwable cause) {
-        super(msg, cause);
+        super(msg, unwrap(cause));
         mark = null;
         info = dbg;
+    }
+    
+    /**
+     * Unwraps the cause of a throwable due to reflection. 
+     * @param xthrow the throwable
+     * @return the cause
+     */
+    private static Throwable unwrap(Throwable xthrow) {
+        if (xthrow instanceof InvocationTargetException) {
+            return ((InvocationTargetException) xthrow).getTargetException();
+        } else if (xthrow instanceof UndeclaredThrowableException) {
+            return ((UndeclaredThrowableException) xthrow).getUndeclaredThrowable();
+        } else{
+            return xthrow;
+        }
     }
         
     /**
@@ -162,6 +179,32 @@ public class JexlException extends RuntimeException {
         @Override
         protected String detailedMessage() {
             return "undefined variable " + getVariable();
+        }
+    } 
+        
+    /**
+     * Thrown when a property is unknown.
+     */
+    public static class Property extends JexlException {
+        /**
+         * Creates a new Property exception instance.
+         * @param node the offending ASTnode
+         * @param var the unknown variable
+         */
+        public Property(JexlNode node, String var) {
+            super(node, var);
+        }
+        
+        /**
+         * @return the property name
+         */
+        public String getProperty() {
+            return super.detailedMessage();
+        }
+        
+        @Override
+        protected String detailedMessage() {
+            return "inaccessible or unknown property " + getProperty();
         }
     } 
     
