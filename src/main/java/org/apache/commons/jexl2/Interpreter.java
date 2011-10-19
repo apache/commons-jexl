@@ -1269,9 +1269,9 @@ public class Interpreter implements ParserVisitor {
                      || (numChildren == 1
                          && node.jjtGetChild(0) instanceof ASTIdentifier
                          && ((ASTIdentifier) node.jjtGetChild(0)).getRegister() >= 0))) {
-                JexlException xjexl = propertyName != null?
-                                      new JexlException.Property(node, propertyName):
-                                      new JexlException.Variable(node, variableName.toString());
+                JexlException xjexl = propertyName != null
+                                      ? new JexlException.Property(node, propertyName)
+                                      : new JexlException.Variable(node, variableName.toString());
                 return unknownVariable(xjexl);
             }
         }
@@ -1482,7 +1482,6 @@ public class Interpreter implements ParserVisitor {
                 }
             }
         }
-
         return null;
     }
 

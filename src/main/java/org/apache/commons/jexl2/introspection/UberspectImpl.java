@@ -22,6 +22,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
@@ -96,7 +98,59 @@ public class UberspectImpl extends Introspector implements Uberspect {
         }
         return null;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public JexlMethod getMethod(Object obj, String method, Object[] args, JexlInfo info) {
+        return getMethodExecutor(obj, method, args);
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
+        final Constructor<?> ctor = getConstructor(ctorHandle, args);
+        if (ctor != null) {
+            return new ConstructorMethod(ctor);
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfo info) {
+        JexlPropertyGet get = getGetExecutor(obj, identifier);
+        if (get == null && obj != null && identifier != null) {
+            get = getIndexedGet(obj, identifier.toString());
+            if (get == null) {
+                Field field = getField(obj, identifier.toString(), info);
+                if (field != null) {
+                    return new FieldPropertyGet(field);
+                }
+            }
+        }
+        return get;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, JexlInfo info) {
+        JexlPropertySet set = getSetExecutor(obj, identifier, arg);
+        if (set == null && obj != null && identifier != null) {
+            Field field = getField(obj, identifier.toString(), info);
+            if (field != null
+                    && !Modifier.isFinal(field.getModifiers())
+                    && (arg == null || MethodKey.isInvocationConvertible(field.getType(), arg.getClass(), false))) {
+                return new FieldPropertySet(field);
+            }
+        }
+        return set;
+    }
+    
     /**
      * Returns a class field.
      * @param obj the object
@@ -109,83 +163,275 @@ public class UberspectImpl extends Introspector implements Uberspect {
         return getField(clazz, name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
-        final Constructor<?> ctor = getConstructor(ctorHandle, args);
-        if (ctor != null) {
-            JexlMethod jctor = new JexlMethod() {
-                public Object invoke(Object obj, Object[] params) throws Exception {
-                    Class<?> clazz = null;
-                    if (obj instanceof Class<?>) {
-                        clazz = (Class<?>) obj;
-                    } else if (obj != null) {
-                        clazz = base().getClassByName(obj.toString());
-                    } else {
-                        clazz = ctor.getDeclaringClass();
-                    }
-                    if (clazz.equals(ctor.getDeclaringClass())) {
-                        return ctor.newInstance(params);
-                    } else {
-                        return null;
-                    }
-                }
 
-                public Object tryInvoke(String name, Object obj, Object[] params) {
-                    Class<?> clazz = null;
-                    if (obj instanceof Class<?>) {
-                        clazz = (Class<?>) obj;
-                    } else if (obj != null) {
-                        clazz = base().getClassByName(obj.toString());
-                    } else {
-                        clazz = ctor.getDeclaringClass();
-                    }
-                    if (clazz.equals(ctor.getDeclaringClass())
-                        && (name == null || name.equals(clazz.getName()))) {
-                        try {
-                            return ctor.newInstance(params);
-                        } catch (InstantiationException xinstance) {
-                            return TRY_FAILED;
-                        } catch (IllegalAccessException xaccess) {
-                            return TRY_FAILED;
-                        } catch (IllegalArgumentException xargument) {
-                            return TRY_FAILED;
-                        } catch (InvocationTargetException xinvoke) {
-                            return TRY_FAILED;
-                        }
-                    }
+    /**
+     * Attempts to find an indexed-property getter in an object.
+     * The code attempts to find the list of methods getXXX() and setXXX().
+     * Note that this is not equivalent to the strict bean definition of indexed properties; the type of the key
+     * is not necessarily an int and the set/get arrays are not resolved.
+     * @param object the object
+     * @param name the container name
+     * @return a JexlPropertyGet is successfull, null otherwise
+     */
+    protected JexlPropertyGet getIndexedGet(Object object, String name) {
+        String base = name.substring(0, 1).toUpperCase() + name.substring(1);
+        final String container = name;
+        final Class<?> clazz = object.getClass();
+        final Method[] getters = getMethods(object.getClass(), "get" + base);
+        final Method[] setters = getMethods(object.getClass(), "set" + base);
+        if (getters != null) {
+            return new IndexedType(container, clazz, getters, setters);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Abstract an indexed property container.
+     * This stores the container name and owning class as well as the list of available getter and setter methods.
+     * It implements JexlPropertyGet since such a container can only be accessed from its owning instance (not set).
+     */
+    private static final class IndexedType implements JexlPropertyGet {
+        /** The container name. */
+        private final String container;
+        /** The owning class. */
+        private final Class<?> clazz;
+        /** The array of getter methods. */
+        private final Method[] getters;
+        /** The array of setter methods. */
+        private final Method[] setters;
+
+        /**
+         * Creates a new indexed type.
+         * @param name the container name
+         * @param c the owning class
+         * @param gets the array of getter methods
+         * @param sets the array of setter methods
+         */
+        IndexedType(String name, Class<?> c, Method[] gets, Method[] sets) {
+            this.container = name;
+            this.clazz = c;
+            this.getters = gets;
+            this.setters = sets;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Object invoke(Object obj) throws Exception {
+            if (clazz.equals(obj.getClass())) {
+                return new IndexedContainer(this, obj);
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Object tryInvoke(Object obj, Object key) {
+            if (clazz.equals(obj.getClass()) && container.equals(key.toString())) {
+                return new IndexedContainer(this, obj);
+            } else {
+                return TRY_FAILED;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean tryFailed(Object rval) {
+            return rval == TRY_FAILED;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean isCacheable() {
+            return true;
+        }
+
+        /**
+         * Gets the value of a property from a container.
+         * @param object the instance owning the container
+         * @param key the property key
+         * @return the property value
+         * @throws Exception if the property can not be resolved
+         */
+        private Object invokeGet(Object object, Object key) throws Exception {
+            if (getters != null) {
+                final Object[] args = {key};
+                final Method jm;
+                if (getters.length == 1) {
+                    jm = getters[0];
+                } else {
+                    jm = new MethodKey(getters[0].getName(), args).getMostSpecificMethod(Arrays.asList(getters));
+                }
+                if (jm != null) {
+                    return jm.invoke(object, args);
+                }
+            }
+            throw new Exception("property resolution error");
+        }
+
+        /**
+         * Sets the value of a property in a container.
+         * @param object the instance owning the container
+         * @param key the property key
+         * @param value the property value
+         * @return the result of the method invocation (frequently null)
+         * @throws Exception if the property can not be resolved
+         */
+        private Object invokeSet(Object object, Object key, Object value) throws Exception {
+            if (setters != null) {
+                final Object[] args = {key, value};
+                final Method jm;
+                if (setters.length == 1) {
+                    jm = setters[0];
+                } else {
+                    jm = new MethodKey(setters[0].getName(), args).getMostSpecificMethod(Arrays.asList(setters));
+                }
+                if (jm != null) {
+                    return jm.invoke(object, args);
+                }
+            }
+            throw new Exception("property resolution error");
+        }
+
+    }
+
+    /**
+     * A generic indexed property container, exposes get(key) and set(key, value) and solves method call dynamically
+     * based on arguments.
+     */
+    public static final class IndexedContainer {
+        /** The instance owning the container. */
+        private final Object object;
+        /** The container type instance. */
+        private final IndexedType type;
+
+        /**
+         * Creates a new duck container.
+         * @param theType the container type
+         * @param theObject the instance owning the container
+         */
+        private IndexedContainer(IndexedType theType, Object theObject) {
+            this.type = theType;
+            this.object = theObject;
+        }
+
+        /**
+         * Gets a property from a container.
+         * @param key the property key
+         * @return the property value
+         * @throws Exception if inner invocation fails
+         */
+        public Object get(Object key) throws Exception {
+            return type.invokeGet(object, key);
+        }
+
+        /**
+         * Sets a property in a container.
+         * @param key the property key
+         * @param value the property value
+         * @return the invocation result (frequently null)
+         * @throws Exception if inner invocation fails
+         */
+        public Object set(Object key, Object value) throws Exception {
+            return type.invokeSet(object, key, value);
+        }
+    }
+
+    /**
+     * A JexlMethod that wraps constructor.
+     */
+    private final class ConstructorMethod implements JexlMethod {
+        /** The wrapped constructor. */
+        private final Constructor<?> ctor;
+
+        /**
+         * Creates a constructor method.
+         * @param theCtor the constructor to wrap
+         */
+        private ConstructorMethod(Constructor<?> theCtor) {
+            this.ctor = theCtor;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Object invoke(Object obj, Object[] params) throws Exception {
+            Class<?> clazz = null;
+            if (obj instanceof Class<?>) {
+                clazz = (Class<?>) obj;
+            } else if (obj != null) {
+                clazz = getClassByName(obj.toString());
+            } else {
+                clazz = ctor.getDeclaringClass();
+            }
+            if (clazz.equals(ctor.getDeclaringClass())) {
+                return ctor.newInstance(params);
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Object tryInvoke(String name, Object obj, Object[] params) {
+            Class<?> clazz = null;
+            if (obj instanceof Class<?>) {
+                clazz = (Class<?>) obj;
+            } else if (obj != null) {
+                clazz = getClassByName(obj.toString());
+            } else {
+                clazz = ctor.getDeclaringClass();
+            }
+            if (clazz.equals(ctor.getDeclaringClass())
+                    && (name == null || name.equals(clazz.getName()))) {
+                try {
+                    return ctor.newInstance(params);
+                } catch (InstantiationException xinstance) {
+                    return TRY_FAILED;
+                } catch (IllegalAccessException xaccess) {
+                    return TRY_FAILED;
+                } catch (IllegalArgumentException xargument) {
+                    return TRY_FAILED;
+                } catch (InvocationTargetException xinvoke) {
                     return TRY_FAILED;
                 }
-
-                public boolean tryFailed(Object rval) {
-                    return rval == TRY_FAILED;
-                }
-
-                public boolean isCacheable() {
-                    return true;
-                }
-
-                public Class<?> getReturnType() {
-                    return ctor.getDeclaringClass();
-                }
-            };
-            return jctor;
+            }
+            return TRY_FAILED;
         }
-        return null;
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean tryFailed(Object rval) {
+            return rval == TRY_FAILED;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public boolean isCacheable() {
+            return true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public Class<?> getReturnType() {
+            return ctor.getDeclaringClass();
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public JexlMethod getMethod(Object obj, String method, Object[] args, JexlInfo info) {
-        return getMethodExecutor(obj, method, args);
-    }
 
     /**
      * A JexlPropertyGet for public fields.
      */
-    public static final class FieldPropertyGet implements JexlPropertyGet {
+    private static final class FieldPropertyGet implements JexlPropertyGet {
         /**
          * The public field.
          */
@@ -235,24 +481,11 @@ public class UberspectImpl extends Introspector implements Uberspect {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfo info) {
-        JexlPropertyGet get = getGetExecutor(obj, identifier);
-        if (get == null && obj != null && identifier != null) {
-            Field field = getField(obj, identifier.toString(), info);
-            if (field != null) {
-                return new FieldPropertyGet(field);
-            }
-        }
-        return get;
-    }
 
     /**
      * A JexlPropertySet for public fields.
      */
-    public static final class FieldPropertySet implements JexlPropertySet {
+    private static final class FieldPropertySet implements JexlPropertySet {
         /**
          * The public field.
          */
@@ -306,19 +539,4 @@ public class UberspectImpl extends Introspector implements Uberspect {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, JexlInfo info) {
-        JexlPropertySet set = getSetExecutor(obj, identifier, arg);
-        if (set == null && obj != null && identifier != null) {
-            Field field = getField(obj, identifier.toString(), info);
-            if (field != null
-                    && !Modifier.isFinal(field.getModifiers())
-                    && (arg == null || MethodKey.isInvocationConvertible(field.getType(), arg.getClass(), false))) {
-                return new FieldPropertySet(field);
-            }
-        }
-        return set;
-    }
 }

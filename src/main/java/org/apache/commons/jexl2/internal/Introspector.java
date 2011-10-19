@@ -104,7 +104,15 @@ public class Introspector {
         base().setLoader(loader);
     }
 
-
+    /**
+     * Gets a class by name through this introspector class loader.
+     * @param className the class name
+     * @return the class instance or null if it could not be found
+     */
+    public Class<?> getClassByName(String className) {
+        return base().getClassByName(className);
+    }
+    
     /**
      * Gets the field named by <code>key</code> for the class <code>c</code>.
      *
@@ -112,7 +120,7 @@ public class Introspector {
      * @param key   Name of the field being searched for
      * @return a {@link java.lang.reflect.Field} or null if it does not exist or is not accessible
      * */
-    protected final Field getField(Class<?> c, String key) {
+    public final Field getField(Class<?> c, String key) {
         return base().getField(c, key);
     }
 
@@ -137,7 +145,7 @@ public class Introspector {
      * @return a {@link java.lang.reflect.Method}
      *  or null if no unambiguous method could be found through introspection.
      */
-    protected final Method getMethod(Class<?> c, String name, Object[] params) {
+    public final Method getMethod(Class<?> c, String name, Object[] params) {
         return base().getMethod(c, new MethodKey(name, params));
     }
 
@@ -150,7 +158,7 @@ public class Introspector {
      * @return a {@link java.lang.reflect.Method}
      *  or null if no unambiguous method could be found through introspection.
      */
-    protected final Method getMethod(Class<?> c, MethodKey key) {
+    public final Method getMethod(Class<?> c, MethodKey key) {
         return base().getMethod(c, key);
     }
 
@@ -162,6 +170,16 @@ public class Introspector {
      */
     public final String[] getMethodNames(Class<?> c) {
         return base().getMethodNames(c);
+    }
+            
+    /**
+     * Gets all the methods with a given name from this map.
+     * @param c the class
+     * @param methodName the seeked methods name
+     * @return the array of methods
+     */
+    public final Method[] getMethods(Class<?> c, final String methodName) {
+        return base().getMethods(c, methodName);
     }
 
     /**
@@ -213,9 +231,9 @@ public class Introspector {
             if (executor.isAlive()) {
                 return executor;
             }
-        }
+        //}
         // look for boolean isFoo()
-        if (property != null) {
+        //if (property != null) {
             executor = new BooleanGetExecutor(this, claz, property);
             if (executor.isAlive()) {
                 return executor;
@@ -237,6 +255,11 @@ public class Introspector {
         }
         // if that didn't work, look for set("foo")
         executor = new DuckGetExecutor(this, claz, identifier);
+        if (executor.isAlive()) {
+            return executor;
+        }
+        // if that didn't work, look for set("foo")
+        executor = new DuckGetExecutor(this, claz, property);
         if (executor.isAlive()) {
             return executor;
         }
@@ -274,6 +297,11 @@ public class Introspector {
             if (executor.isAlive()) {
                 return executor;
             }
+        }
+        // if that didn't work, look for set(foo)
+        executor = new DuckSetExecutor(this, claz, identifier, arg);
+        if (executor.isAlive()) {
+            return executor;
         }
         // if that didn't work, look for set("foo")
         executor = new DuckSetExecutor(this, claz, property, arg);

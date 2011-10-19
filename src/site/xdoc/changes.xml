@@ -26,6 +26,9 @@
   </properties>
   <body>
     <release version="2.1" date="unreleased">
+        <action dev="henrib" type="add" issue="JEXL-119">
+            Allow indexed properties container resolution in expressions
+        </action>
         <action dev="henrib" type="add" issue="JEXL-118" due-to="Max Tardiveau">
             Provide an IN operator: =~ / match operator extended to provide IN behavior (!~ as NOT IN)
         </action>

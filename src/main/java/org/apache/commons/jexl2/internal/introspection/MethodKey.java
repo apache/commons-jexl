@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package org.apache.commons.jexl2.internal.introspection;
+
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Iterator;
@@ -79,7 +80,7 @@ public final class MethodKey {
         }
         this.hashCode = hash;
     }
-
+    
     /**
      * Creates a key from a method.
      * @param aMethod the method to generate the key from.
@@ -191,7 +192,7 @@ public final class MethodKey {
     public Constructor<?> getMostSpecificConstructor(List<Constructor<?>> methods) {
         return CONSTRUCTORS.getMostSpecific(methods, params);
     }
-
+    
     /**
      * Determines whether a type represented by a class object is
      * convertible to another type represented by a class object using a
@@ -311,23 +312,23 @@ public final class MethodKey {
                 return true;
             }
             if (formal == Integer.TYPE
-                && (actual == Short.TYPE || actual == Byte.TYPE)) {
+                    && (actual == Short.TYPE || actual == Byte.TYPE)) {
                 return true;
             }
             if (formal == Long.TYPE
-                && (actual == Integer.TYPE || actual == Short.TYPE
-                || actual == Byte.TYPE)) {
+                    && (actual == Integer.TYPE || actual == Short.TYPE
+                    || actual == Byte.TYPE)) {
                 return true;
             }
             if (formal == Float.TYPE
-                && (actual == Long.TYPE || actual == Integer.TYPE
-                || actual == Short.TYPE || actual == Byte.TYPE)) {
+                    && (actual == Long.TYPE || actual == Integer.TYPE
+                    || actual == Short.TYPE || actual == Byte.TYPE)) {
                 return true;
             }
             if (formal == Double.TYPE
-                && (actual == Float.TYPE || actual == Long.TYPE
-                || actual == Integer.TYPE || actual == Short.TYPE
-                || actual == Byte.TYPE)) {
+                    && (actual == Float.TYPE || actual == Long.TYPE
+                    || actual == Integer.TYPE || actual == Short.TYPE
+                    || actual == Byte.TYPE)) {
                 return true;
             }
         }
@@ -342,7 +343,7 @@ public final class MethodKey {
         }
         return false;
     }
-
+    
     /**
      * whether a method/ctor is more specific than a previously compared one.
      */
@@ -367,12 +368,12 @@ public final class MethodKey {
          */
         private static final long serialVersionUID = -2314636505414551664L;
     }
-        
+
     /**
      * Utility for parameters matching.
      * @param <T> Method or Constructor
      */
-     private abstract static class Parameters<T> {
+    private abstract static class Parameters<T> {
         /**
          * Extract the parameter types from its applicable argument.
          * @param app a method or constructor
@@ -497,7 +498,7 @@ public final class MethodKey {
 
             // attempt to choose by picking the one with the greater number of primitives or latest primitive parameter
             int primDiff = 0;
-            for(int c = 0; c < c1.length; ++c) {
+            for (int c = 0; c < c1.length; ++c) {
                 if (c1[c].isPrimitive()) {
                     primDiff += 1 << c;
                 }
@@ -553,7 +554,7 @@ public final class MethodKey {
             // there's just one more methodArg than class arg
             // and the last methodArg is an array, then treat it as a vararg
             if (methodArgs.length == classes.length
-                || methodArgs.length == classes.length + 1 && methodArgs[methodArgs.length - 1].isArray()) {
+                    || methodArgs.length == classes.length + 1 && methodArgs[methodArgs.length - 1].isArray()) {
                 // this will properly match when the last methodArg
                 // is an array/varargs and the last class is the type of array
                 // (e.g. String when the method is expecting String...)
@@ -610,7 +611,7 @@ public final class MethodKey {
         private boolean isConvertible(Class<?> formal, Class<?> actual,
                 boolean possibleVarArg) {
             // if we see Void.class, the argument was null
-            return isInvocationConvertible(formal, actual.equals(Void.class)? null : actual, possibleVarArg);
+            return isInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
         }
 
         /**
@@ -625,11 +626,10 @@ public final class MethodKey {
         private boolean isStrictConvertible(Class<?> formal, Class<?> actual,
                 boolean possibleVarArg) {
             // if we see Void.class, the argument was null
-            return isStrictInvocationConvertible(formal, actual.equals(Void.class)? null : actual, possibleVarArg);
+            return isStrictInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
         }
-
     }
-
+    
     /**
      * The parameter matching service for methods.
      */
@@ -639,8 +639,7 @@ public final class MethodKey {
             return app.getParameterTypes();
         }
     };
-
-
+    
     /**
      * The parameter matching service for constructors.
      */
