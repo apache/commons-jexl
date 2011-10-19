@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.jexl2.internal.introspection;
 
 import java.lang.reflect.Method;
@@ -77,7 +76,7 @@ public class IntrospectorBase {
         this.rlog = log;
         loader = getClass().getClassLoader();
     }
-    
+
     /**
      * Gets a class by name through this introspector class loader.
      * @param className the class name
@@ -86,7 +85,7 @@ public class IntrospectorBase {
     public Class<?> getClassByName(String className) {
         try {
             return Class.forName(className, false, loader);
-        } catch(ClassNotFoundException xignore) {
+        } catch (ClassNotFoundException xignore) {
             return null;
         }
     }
@@ -107,13 +106,12 @@ public class IntrospectorBase {
             // whoops.  Ambiguous.  Make a nice log message and return null...
             if (rlog != null && rlog.isInfoEnabled()) {
                 rlog.info("ambiguous method invocation: "
-                           + c.getName() + "."
-                           + key.debugString(), xambiguous);
+                        + c.getName() + "."
+                        + key.debugString(), xambiguous);
             }
             return null;
         }
     }
-
 
     /**
      * Gets the field named by <code>key</code> for the class <code>c</code>.
@@ -154,6 +152,20 @@ public class IntrospectorBase {
     }
 
     /**
+     * Gets the array of accessible method known for a given class.
+     * @param c the class
+     * @param methodName the method name
+     * @return the array of methods (null or not empty)
+     */
+    public Method[] getMethods(Class<?> c, String methodName) {
+        if (c == null) {
+            return null;
+        }
+        ClassMap classMap = getMap(c);
+        return classMap.get(methodName);
+    }
+
+    /**
      * A Constructor get cache-miss.
      */
     private static class CacheMiss {
@@ -161,9 +173,10 @@ public class IntrospectorBase {
         @SuppressWarnings("unused")
         public CacheMiss() {}
     }
+    
     /** The cache-miss marker for the constructors map. */
     private static final Constructor<?> CTOR_MISS = CacheMiss.class.getConstructors()[0];
-    
+
     /**
      * Sets the class loader used to solve constructors.
      * <p>Also cleans the constructors and methods caches.</p>
@@ -176,9 +189,9 @@ public class IntrospectorBase {
         }
         if (!cloader.equals(loader)) {
             // clean up constructor and class maps
-            synchronized(constructorsMap) {
+            synchronized (constructorsMap) {
                 Iterator<Map.Entry<MethodKey, Constructor<?>>> entries = constructorsMap.entrySet().iterator();
-                while(entries.hasNext()) {
+                while (entries.hasNext()) {
                     Map.Entry<MethodKey, Constructor<?>> entry = entries.next();
                     Class<?> clazz = entry.getValue().getDeclaringClass();
                     if (isLoadedBy(previous, clazz)) {
@@ -191,7 +204,7 @@ public class IntrospectorBase {
             // clean up method maps
             synchronized (classMethodMaps) {
                 Iterator<Map.Entry<Class<?>, ClassMap>> entries = classMethodMaps.entrySet().iterator();
-                while(entries.hasNext()) {
+                while (entries.hasNext()) {
                     Map.Entry<Class<?>, ClassMap> entry = entries.next();
                     Class<?> clazz = entry.getKey();
                     if (isLoadedBy(previous, clazz)) {
@@ -212,7 +225,7 @@ public class IntrospectorBase {
     private static boolean isLoadedBy(ClassLoader loader, Class<?> clazz) {
         if (loader != null) {
             ClassLoader cloader = clazz.getClassLoader();
-            while(cloader != null) {
+            while (cloader != null) {
                 if (cloader.equals(loader)) {
                     return true;
                 } else {
@@ -233,7 +246,7 @@ public class IntrospectorBase {
     public Constructor<?> getConstructor(final MethodKey key) {
         return getConstructor(null, key);
     }
-    
+
     /**
      * Gets the constructor defined by the <code>MethodKey</code>.
      * @param c the class we want to instantiate
@@ -243,7 +256,7 @@ public class IntrospectorBase {
      */
     public Constructor<?> getConstructor(final Class<?> c, final MethodKey key) {
         Constructor<?> ctor = null;
-        synchronized(constructorsMap) {
+        synchronized (constructorsMap) {
             ctor = constructorsMap.get(key);
             // that's a clear miss
             if (CTOR_MISS.equals(ctor)) {
@@ -266,7 +279,7 @@ public class IntrospectorBase {
                         constructibleClasses.put(cname, clazz);
                     }
                     List<Constructor<?>> l = new LinkedList<Constructor<?>>();
-                    for(Constructor<?> ictor : clazz.getConstructors()) {
+                    for (Constructor<?> ictor : clazz.getConstructors()) {
                         l.add(ictor);
                     }
                     // try to find one
@@ -305,7 +318,7 @@ public class IntrospectorBase {
         synchronized (classMethodMaps) {
             ClassMap classMap = classMethodMaps.get(c);
             if (classMap == null) {
-                classMap = new ClassMap(c,rlog);
+                classMap = new ClassMap(c, rlog);
                 classMethodMaps.put(c, classMap);
             }
             return classMap;

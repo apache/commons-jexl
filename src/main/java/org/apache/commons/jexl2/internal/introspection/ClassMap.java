@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -78,11 +79,11 @@ final class ClassMap {
      * @param clazz the class to introspect
      * @return the map of fields (may be the empty map, can not be null)
      */
-    private static Map<String,Field> createFieldCache(Class<?> clazz) {
+    private static Map<String, Field> createFieldCache(Class<?> clazz) {
         Field[] fields = clazz.getFields();
         if (fields.length > 0) {
             Map<String, Field> cache = new HashMap<String, Field>();
-            for(Field field : fields) {
+            for (Field field : fields) {
                 cache.put(field.getName(), field);
             }
             return cache;
@@ -91,13 +92,21 @@ final class ClassMap {
         }
     }
 
-
     /**
      * Gets the methods names cached by this map.
      * @return the array of method names
      */
     String[] getMethodNames() {
         return methodCache.names();
+    }
+
+    /**
+     * Gets all the methods with a given name from this map.
+     * @param methodName the seeked methods name
+     * @return the array of methods
+     */
+    Method[] get(final String methodName) {
+        return methodCache.get(methodName);
     }
 
     /**
@@ -135,7 +144,7 @@ final class ClassMap {
         //
         // Ah, the miracles of Java for(;;) ...
         MethodCache cache = new MethodCache();
-        for (;classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
+        for (; classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
             if (Modifier.isPublic(classToReflect.getModifiers())) {
                 populateMethodCacheWith(cache, classToReflect, log);
             }
@@ -219,6 +228,7 @@ final class ClassMap {
         private static final int PRIMITIVE_SIZE = 13;
         /** The primitive type to class conversion map. */
         private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES;
+
         static {
             PRIMITIVE_TYPES = new HashMap<Class<?>, Class<?>>(PRIMITIVE_SIZE);
             PRIMITIVE_TYPES.put(Boolean.TYPE, Boolean.class);
@@ -330,6 +340,22 @@ final class ClassMap {
         String[] names() {
             synchronized (methodMap) {
                 return methodMap.names();
+            }
+        }
+
+        /**
+         * Gets all the methods with a given name from this map.
+         * @param methodName the seeked methods name
+         * @return the array of methods (null or non-empty)
+         */
+        Method[] get(final String methodName) {
+            synchronized (methodMap) {
+                List<Method> lm = methodMap.get(methodName);
+                if (lm != null && !lm.isEmpty()) {
+                    return lm.toArray(new Method[lm.size()]);
+                } else {
+                    return null;
+                }
             }
         }
     }
