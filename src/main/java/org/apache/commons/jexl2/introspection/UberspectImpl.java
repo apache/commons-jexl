@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl2.introspection;
 
+import java.beans.IntrospectionException;
 import org.apache.commons.jexl2.internal.Introspector;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -98,7 +99,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -117,7 +118,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
             return null;
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -134,7 +135,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
         }
         return get;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -150,7 +151,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
         }
         return set;
     }
-    
+
     /**
      * Returns a class field.
      * @param obj the object
@@ -163,7 +164,6 @@ public class UberspectImpl extends Introspector implements Uberspect {
         return getField(clazz, name);
     }
 
-
     /**
      * Attempts to find an indexed-property getter in an object.
      * The code attempts to find the list of methods getXXX() and setXXX().
@@ -174,16 +174,17 @@ public class UberspectImpl extends Introspector implements Uberspect {
      * @return a JexlPropertyGet is successfull, null otherwise
      */
     protected JexlPropertyGet getIndexedGet(Object object, String name) {
-        String base = name.substring(0, 1).toUpperCase() + name.substring(1);
-        final String container = name;
-        final Class<?> clazz = object.getClass();
-        final Method[] getters = getMethods(object.getClass(), "get" + base);
-        final Method[] setters = getMethods(object.getClass(), "set" + base);
-        if (getters != null) {
-            return new IndexedType(container, clazz, getters, setters);
-        } else {
-            return null;
+        if (object != null && name != null) {
+            String base = name.substring(0, 1).toUpperCase() + name.substring(1);
+            final String container = name;
+            final Class<?> clazz = object.getClass();
+            final Method[] getters = getMethods(object.getClass(), "get" + base);
+            final Method[] setters = getMethods(object.getClass(), "set" + base);
+            if (getters != null) {
+                return new IndexedType(container, clazz, getters, setters);
+            }
         }
+        return null;
     }
 
     /**
@@ -219,10 +220,10 @@ public class UberspectImpl extends Introspector implements Uberspect {
          * {@inheritDoc}
          */
         public Object invoke(Object obj) throws Exception {
-            if (clazz.equals(obj.getClass())) {
+            if (obj != null && clazz.equals(obj.getClass())) {
                 return new IndexedContainer(this, obj);
             } else {
-                return null;
+                throw new IntrospectionException("property resolution error");
             }
         }
 
@@ -230,7 +231,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
          * {@inheritDoc}
          */
         public Object tryInvoke(Object obj, Object key) {
-            if (clazz.equals(obj.getClass()) && container.equals(key.toString())) {
+            if (obj != null && key != null && clazz.equals(obj.getClass()) && container.equals(key.toString())) {
                 return new IndexedContainer(this, obj);
             } else {
                 return TRY_FAILED;
@@ -253,10 +254,10 @@ public class UberspectImpl extends Introspector implements Uberspect {
 
         /**
          * Gets the value of a property from a container.
-         * @param object the instance owning the container
-         * @param key the property key
+         * @param object the instance owning the container (not null)
+         * @param key the property key (not null)
          * @return the property value
-         * @throws Exception if the property can not be resolved
+         * @throws IntrospectionException if a property getter can not be found
          */
         private Object invokeGet(Object object, Object key) throws Exception {
             if (getters != null) {
@@ -271,16 +272,17 @@ public class UberspectImpl extends Introspector implements Uberspect {
                     return jm.invoke(object, args);
                 }
             }
-            throw new Exception("property resolution error");
+            throw new IntrospectionException("property get error: "
+                    + object.getClass().toString() + "@" + key.toString());
         }
 
         /**
          * Sets the value of a property in a container.
-         * @param object the instance owning the container
-         * @param key the property key
-         * @param value the property value
+         * @param object the instance owning the container (not null)
+         * @param key the property key (not null)
+         * @param value the property value (not null)
          * @return the result of the method invocation (frequently null)
-         * @throws Exception if the property can not be resolved
+         * @throws IntrospectionException if a property getter can not be found
          */
         private Object invokeSet(Object object, Object key, Object value) throws Exception {
             if (setters != null) {
@@ -295,9 +297,9 @@ public class UberspectImpl extends Introspector implements Uberspect {
                     return jm.invoke(object, args);
                 }
             }
-            throw new Exception("property resolution error");
+            throw new IntrospectionException("property set error: "
+                    + object.getClass().toString() + "@" + key.toString());
         }
-
     }
 
     /**
@@ -372,7 +374,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
             if (clazz.equals(ctor.getDeclaringClass())) {
                 return ctor.newInstance(params);
             } else {
-                return null;
+                throw new IntrospectionException("constructor resolution error");
             }
         }
 
@@ -427,7 +429,6 @@ public class UberspectImpl extends Introspector implements Uberspect {
         }
     }
 
-
     /**
      * A JexlPropertyGet for public fields.
      */
@@ -480,7 +481,6 @@ public class UberspectImpl extends Introspector implements Uberspect {
             return true;
         }
     }
-
 
     /**
      * A JexlPropertySet for public fields.
@@ -538,5 +538,4 @@ public class UberspectImpl extends Introspector implements Uberspect {
             return true;
         }
     }
-
 }
