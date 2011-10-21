@@ -19,6 +19,8 @@ package org.apache.commons.jexl2;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import org.apache.commons.jexl2.parser.JexlNode;
+import org.apache.commons.jexl2.parser.ParseException;
+import org.apache.commons.jexl2.parser.TokenMgrError;
 
 /**
  * Wraps any error that might occur during interpretation of a script or expression.
@@ -112,8 +114,25 @@ public class JexlException extends RuntimeException {
          * @param expr the expression
          * @param cause the javacc cause
          */
-        public Tokenization(JexlInfo node, CharSequence expr, Throwable cause) {
-            super(node, expr.toString(), cause);
+        public Tokenization(JexlInfo node, CharSequence expr, TokenMgrError cause) {
+            super(merge(node, cause), expr.toString(), cause);
+        }
+                
+        /**
+         * Merge the node info and the cause info to obtain best possible location.
+         * @param node the node
+         * @param cause the cause
+         * @return the info to use
+         */
+        private static DebugInfo merge(JexlInfo node, TokenMgrError cause) {
+            DebugInfo dbgn = node != null? node.debugInfo() : null;
+            if (cause == null) {
+                return dbgn;
+            } else if (dbgn == null) {
+                return new DebugInfo("", cause.getLine(), cause.getColumn());
+            } else {
+                return new DebugInfo(dbgn.getName(), cause.getLine(), cause.getColumn());
+            }
         }
                             
         /**
@@ -122,10 +141,23 @@ public class JexlException extends RuntimeException {
         public String getExpression() {
             return super.detailedMessage();
         }
-        
+                
         @Override
         protected String detailedMessage() {
-            return "!!! " + getExpression() + " !!!" + ", tokenization failed";
+            int begin = info.debugInfo().getColumn();
+            int end = begin + 5;
+            begin -= 5;
+            if (begin < 0) {
+                end += 5;
+                begin = 0;
+            }
+            int length = getExpression().length();
+            if (length < 10) {
+                return "parsing error in '" + getExpression() + "'";
+            } else {
+                return "parsing error near '... "
+                       + getExpression().substring(begin, end > length? length : end) + " ...'";
+            }
         }
     } 
             
@@ -136,11 +168,28 @@ public class JexlException extends RuntimeException {
         /**
          * Creates a new Variable exception instance.
          * @param node the offending ASTnode
-         * @param expr the unknown variable
+         * @param expr the offending source
          * @param cause the javacc cause
          */
-        public Parsing(JexlInfo node, CharSequence expr, Throwable cause) {
-            super(node, expr.toString(), cause);
+        public Parsing(JexlInfo node, CharSequence expr, ParseException cause) {
+            super(merge(node, cause), expr.toString(), cause);
+        }
+                
+        /**
+         * Merge the node info and the cause info to obtain best possible location.
+         * @param node the node
+         * @param cause the cause
+         * @return the info to use
+         */
+        private static DebugInfo merge(JexlInfo node, ParseException cause) {
+            DebugInfo dbgn = node != null? node.debugInfo() : null;
+            if (cause == null) {
+                return dbgn;
+            } else if (dbgn == null) {
+                return new DebugInfo("", cause.getLine(), cause.getColumn());
+            } else {
+                return new DebugInfo(dbgn.getName(), cause.getLine(), cause.getColumn());
+            }
         }
                     
         /**
@@ -152,7 +201,20 @@ public class JexlException extends RuntimeException {
         
         @Override
         protected String detailedMessage() {
-            return "!!! " + getExpression() + " !!!" + ", parsing failed";
+            int begin = info.debugInfo().getColumn();
+            int end = begin + 5;
+            begin -= 5;
+            if (begin < 0) {
+                end += 5;
+                begin = 0;
+            }
+            int length = getExpression().length();
+            if (length < 10) {
+                return "parsing error in '" + getExpression() + "'";
+            } else {
+                return "parsing error near '... "
+                       + getExpression().substring(begin, end > length? length : end) + " ...'";
+            }
         }
     }
     

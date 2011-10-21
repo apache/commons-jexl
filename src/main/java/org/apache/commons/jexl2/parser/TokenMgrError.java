@@ -104,7 +104,7 @@ public class TokenMgrError extends Error {
      * Gets the last correct input.
      * @return the string after which the error occured
      */
-    public String getAfer() {
+    public String getAfter() {
         return after;
     }
  
