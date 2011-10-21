@@ -15,8 +15,11 @@
  * limitations under the License.
  */
 package org.apache.commons.jexl2;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 /**
@@ -74,6 +77,8 @@ public class UnifiedJEXLTest extends JexlTestCase {
         UnifiedJEXL.Expression check = EL.parse("${froboz.value = 32; froboz.plus10(); froboz.value}");
         Object o = check.evaluate(context);
         assertEquals("Result is not 42", new Integer(42), o);
+        Set<List<String>> evars = check.getVariables();
+        assertEquals(2, evars.size());
     }
 
     public void testAssign() throws Exception {
@@ -101,10 +106,17 @@ public class UnifiedJEXLTest extends JexlTestCase {
     public void testPrepareEvaluate() throws Exception {
         UnifiedJEXL.Expression expr = EL.parse("Dear #{p} ${name};");
         assertTrue("expression should be deferred", expr.isDeferred());
+        
+        Set<List<String>> evars = expr.getVariables();
+        assertEquals(1, evars.size());
+        assertTrue(evars.contains(Arrays.asList("name")));
         vars.put("name", "Doe");
         UnifiedJEXL.Expression  phase1 = expr.prepare(context);
-        String as = phase1.asString();
-        assertEquals("Dear #{p} Doe;", as);
+        String as = phase1.toString();
+        assertEquals("Dear ${p} Doe;", as);
+        Set<List<String>> evars1 = phase1.getVariables();
+        assertEquals(1, evars1.size());
+        assertTrue(evars1.contains(Arrays.asList("p")));
         vars.put("p", "Mr");
         vars.put("name", "Should not be used in 2nd phase");
         Object o = phase1.evaluate(context);
@@ -116,15 +128,16 @@ public class UnifiedJEXLTest extends JexlTestCase {
         vars.put("hi", "hello");
         vars.put("hello.world", "Hello World!");
         Object o = expr.evaluate(context);
-        assertTrue("source should not be expression", expr.getSource() != expr.prepare(context));
-        assertTrue("expression should be deferred", expr.isDeferred());
+        assertTrue("source should not same expression", expr.getSource() != expr.prepare(context));
+        assertTrue("expression should be immediate", expr.isImmediate());
         assertEquals("Hello World!", o);
     }
 
     public void testImmediate() throws Exception {
         JexlContext none = null;
         UnifiedJEXL.Expression expr = EL.parse("${'Hello ' + 'World!'}");
-        assertTrue("prepare should return same expression", expr.prepare(none) == expr);
+        UnifiedJEXL.Expression prepared = expr.prepare(none);
+        assertEquals("prepare should return same expression","Hello World!",prepared.toString());
         Object o = expr.evaluate(none);
         assertTrue("expression should be immediate", expr.isImmediate());
         assertEquals("Hello World!", o);
@@ -142,9 +155,10 @@ public class UnifiedJEXLTest extends JexlTestCase {
     public void testDeferred() throws Exception {
         JexlContext none = null;
         UnifiedJEXL.Expression expr = EL.parse("#{'world'}");
-        assertTrue("prepare should return same expression", expr.prepare(none) == expr);
+        String as = expr.prepare(none).asString();
+        assertEquals("prepare should return immediate version", "${'world'}", as);
         Object o = expr.evaluate(none);
-        assertTrue("expression should be deferred", expr.isDeferred());
+        assertTrue("expression should be immediate", expr.isImmediate());
         assertEquals("world", o);
     }
 
