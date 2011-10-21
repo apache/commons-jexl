@@ -17,6 +17,10 @@
 package org.apache.commons.jexl2;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.commons.jexl2.parser.JexlNode;
 import org.apache.commons.jexl2.parser.StringParser;
 
@@ -235,6 +239,28 @@ public final class UnifiedJEXL {
         }
 
         /**
+         * Checks whether this expression is immediate.
+         * @return true if immediate, false otherwise
+         */
+        public boolean isImmediate() {
+            return true;
+        }
+
+        /**
+         * Checks whether this expression is deferred.
+         * @return true if deferred, false otherwise
+         */
+        public final boolean isDeferred() {
+            return !isImmediate();
+        }
+
+        /**
+         * Gets this expression type.
+         * @return its type
+         */
+        abstract ExpressionType getType();
+
+        /**
          * Formats this expression, adding its source string representation in
          * comments if available: 'expression /*= source *\/'' .
          * @return the formatted expression string
@@ -267,7 +293,26 @@ public final class UnifiedJEXL {
          * Adds this expression's string representation to a StringBuilder.
          * @param strb the builder to fill
          */
-        abstract void asString(StringBuilder strb);
+        public abstract StringBuilder asString(StringBuilder strb);
+
+        /**
+         * Gets the list of variables accessed by this expression.
+         * <p>This method will visit all nodes of the sub-expressions and extract all variables whether they
+         * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
+         * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
+         *         or the empty set if no variables are used
+         */
+        public Set<List<String>> getVariables() {
+            return Collections.emptySet();
+        }
+
+        /**
+         * Fills up the list of variables accessed by this expression.
+         * @param refs the set of variable being filled
+         */
+        protected void getVariables(Set<List<String>> refs) {
+            // nothing to do
+        }
 
         /**
          * When the expression is dependant upon immediate and deferred sub-expressions,
@@ -285,7 +330,9 @@ public final class UnifiedJEXL {
          * @return  an expression or null if an error occurs and the {@link JexlEngine} is silent
          * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
          */
-        public abstract Expression prepare(JexlContext context);
+        public final Expression prepare(JexlContext context) {
+            return UnifiedJEXL.this.prepare(context, this);
+        }
 
         /**
          * Evaluates this expression.
@@ -297,22 +344,8 @@ public final class UnifiedJEXL {
          * silent
          * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
          */
-        public abstract Object evaluate(JexlContext context);
-
-        /**
-         * Checks whether this expression is immediate.
-         * @return true if immediate, false otherwise
-         */
-        public boolean isImmediate() {
-            return true;
-        }
-
-        /**
-         * Checks whether this expression is deferred.
-         * @return true if deferred, false otherwise
-         */
-        public final boolean isDeferred() {
-            return !isImmediate();
+        public final Object evaluate(JexlContext context) {
+            return UnifiedJEXL.this.evaluate(context, this);
         }
 
         /**
@@ -327,18 +360,14 @@ public final class UnifiedJEXL {
         }
 
         /**
-         * Gets this expression type.
-         * @return its type
-         */
-        abstract ExpressionType getType();
-
-        /**
          * Prepares a sub-expression for interpretation.
          * @param interpreter a JEXL interpreter
          * @return a prepared expression
          * @throws JexlException (only for nested & composite)
          */
-        abstract Expression prepare(Interpreter interpreter);
+        protected Expression prepare(Interpreter interpreter) {
+            return this;
+        }
 
         /**
          * Intreprets a sub-expression.
@@ -346,7 +375,7 @@ public final class UnifiedJEXL {
          * @return the result of interpretation
          * @throws JexlException (only for nested & composite)
          */
-        abstract Object evaluate(Interpreter interpreter);
+        protected abstract Object evaluate(Interpreter interpreter);
     }
 
     /** A constant expression. */
@@ -376,25 +405,22 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        public String asString() {
-            StringBuilder strb = new StringBuilder();
-            strb.append('"');
-            asString(strb);
-            strb.append('"');
-            return strb.toString();
-        }
-
-        /** {@inheritDoc} */
-        @Override
         ExpressionType getType() {
             return ExpressionType.CONSTANT;
         }
 
         /** {@inheritDoc} */
         @Override
-        void asString(StringBuilder strb) {
+        public String toString() {
+            return value.toString();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public StringBuilder asString(StringBuilder strb) {
             String str = value.toString();
             if (value instanceof String || value instanceof CharSequence) {
+                strb.append('"');
                 for (int i = 0, size = str.length(); i < size; ++i) {
                     char c = str.charAt(i);
                     if (c == '"' || c == '\\') {
@@ -402,32 +428,16 @@ public final class UnifiedJEXL {
                     }
                     strb.append(c);
                 }
+                strb.append('"');
             } else {
                 strb.append(str);
             }
+            return strb;
         }
 
         /** {@inheritDoc} */
         @Override
-        public Expression prepare(JexlContext context) {
-            return this;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        Expression prepare(Interpreter interpreter) {
-            return this;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Object evaluate(JexlContext context) {
-            return value;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        Object evaluate(Interpreter interpreter) {
+        protected Object evaluate(Interpreter interpreter) {
             return value;
         }
     }
@@ -454,52 +464,31 @@ public final class UnifiedJEXL {
         /** {@inheritDoc} */
         @Override
         public String toString() {
-            StringBuilder strb = new StringBuilder(expr.length() + 3);
-            if (source != this) {
-                strb.append(source.toString());
-                strb.append(" /*= ");
-            }
+            return asString();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public StringBuilder asString(StringBuilder strb) {
             strb.append(isImmediate() ? '$' : '#');
             strb.append("{");
             strb.append(expr);
             strb.append("}");
-            if (source != this) {
-                strb.append(" */");
-            }
-            return strb.toString();
+            return strb;
         }
 
         /** {@inheritDoc} */
         @Override
-        public void asString(StringBuilder strb) {
-            strb.append(isImmediate() ? '$' : '#');
-            strb.append("{");
-            strb.append(expr);
-            strb.append("}");
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Expression prepare(JexlContext context) {
-            return this;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        Expression prepare(Interpreter interpreter) {
-            return this;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Object evaluate(JexlContext context) {
-            return UnifiedJEXL.this.evaluate(context, this);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        Object evaluate(Interpreter interpreter) {
+        protected Object evaluate(Interpreter interpreter) {
             return interpreter.interpret(node);
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public Set<List<String>> getVariables() {
+            Set<List<String>> refs = new LinkedHashSet<List<String>>();
+            getVariables(refs);
+            return refs;
         }
     }
 
@@ -523,12 +512,21 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        public boolean isImmediate() {
-            return true;
+        protected void getVariables(Set<List<String>> refs) {
+            jexl.getVariables(node, refs, null);
+        }
+
+        /** {@inheritDoc} */
+        /** {@inheritDoc} */
+        @Override
+        protected Expression prepare(Interpreter interpreter) {
+            // evaluate immediate as constant
+            Object value = evaluate(interpreter);
+            return value == null ? null : new ConstantExpression(value, this);
         }
     }
 
-    /** An immediate expression: ${jexl}. */
+    /** A deferred expression: #{jexl}. */
     private class DeferredExpression extends JexlBasedExpression {
         /**
          * Creates a deferred expression.
@@ -542,14 +540,20 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
+        public boolean isImmediate() {
+            return true;
+        }
+
+        /** {@inheritDoc} */
+        @Override
         ExpressionType getType() {
             return ExpressionType.DEFERRED;
         }
 
         /** {@inheritDoc} */
         @Override
-        public boolean isImmediate() {
-            return false;
+        protected Expression prepare(Interpreter interpreter) {
+            return new ImmediateExpression(expr, node, source);
         }
     }
 
@@ -586,21 +590,15 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        public Expression prepare(JexlContext context) {
-            return UnifiedJEXL.this.prepare(context, this);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public Expression prepare(Interpreter interpreter) {
+        protected Expression prepare(Interpreter interpreter) {
             String value = interpreter.interpret(node).toString();
             JexlNode dnode = toNode(value, jexl.isDebug() ? node.debugInfo() : null);
-            return new DeferredExpression(value, dnode, this);
+            return new ImmediateExpression(value, dnode, this);
         }
 
         /** {@inheritDoc} */
         @Override
-        public Object evaluate(Interpreter interpreter) {
+        protected Object evaluate(Interpreter interpreter) {
             return prepare(interpreter).evaluate(interpreter);
         }
     }
@@ -627,12 +625,6 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        ExpressionType getType() {
-            return ExpressionType.COMPOSITE;
-        }
-
-        /** {@inheritDoc} */
-        @Override
         public boolean isImmediate() {
             // immediate if no deferred
             return (meta & 2) == 0;
@@ -640,28 +632,47 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        void asString(StringBuilder strb) {
+        ExpressionType getType() {
+            return ExpressionType.COMPOSITE;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public String toString() {
+            StringBuilder strb = new StringBuilder();
+            for (Expression e : exprs) {
+                strb.append(e.toString());
+            }
+            return strb.toString();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public StringBuilder asString(StringBuilder strb) {
             for (Expression e : exprs) {
                 e.asString(strb);
             }
+            return strb;
         }
 
         /** {@inheritDoc} */
         @Override
-        public Expression prepare(JexlContext context) {
-            return UnifiedJEXL.this.prepare(context, this);
+        public Set<List<String>> getVariables() {
+            Set<List<String>> refs = new LinkedHashSet<List<String>>();
+            for (Expression expr : exprs) {
+                expr.getVariables(refs);
+            }
+            return refs;
         }
 
         /** {@inheritDoc} */
         @Override
-        Expression prepare(Interpreter interpreter) {
+        protected Expression prepare(Interpreter interpreter) {
             // if this composite is not its own source, it is already prepared
             if (source != this) {
                 return this;
             }
-            // we need to eval immediate expressions if there are some deferred/nested
-            // ie both immediate & deferred counts > 0, bits 1 & 0 set, (1 << 1) & 1 == 3
-            final boolean evalImmediate = meta == 3;
+            // we need to prepare all sub-expressions
             final int size = exprs.length;
             final ExpressionBuilder builder = new ExpressionBuilder(size);
             // tracking whether prepare will return a different expression
@@ -669,11 +680,6 @@ public final class UnifiedJEXL {
             for (int e = 0; e < size; ++e) {
                 Expression expr = exprs[e];
                 Expression prepared = expr.prepare(interpreter);
-                if (evalImmediate && prepared instanceof ImmediateExpression) {
-                    // evaluate immediate as constant
-                    Object value = prepared.evaluate(interpreter);
-                    prepared = value == null ? null : new ConstantExpression(value, prepared);
-                }
                 // add it if not null
                 if (prepared != null) {
                     builder.add(prepared);
@@ -687,20 +693,16 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        public Object evaluate(JexlContext context) {
-            return UnifiedJEXL.this.evaluate(context, this);
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        Object evaluate(Interpreter interpreter) {
+        protected Object evaluate(Interpreter interpreter) {
             final int size = exprs.length;
             Object value = null;
             // common case: evaluate all expressions & concatenate them as a string
             StringBuilder strb = new StringBuilder();
             for (int e = 0; e < size; ++e) {
                 value = exprs[e].evaluate(interpreter);
-                if (value != null) {
+                if (value instanceof Expression) {
+                    ((Expression) value).asString(strb);
+                } else if (value != null) {
                     strb.append(value.toString());
                 }
             }
