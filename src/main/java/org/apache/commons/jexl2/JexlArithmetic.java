@@ -562,7 +562,7 @@ public class JexlArithmetic {
             byte valueAsByte = ((Byte) val).byteValue();
             return Byte.valueOf((byte) -valueAsByte);
         } else if (val instanceof Boolean) {
-            return ((Boolean) val).booleanValue()? Boolean.FALSE : Boolean.TRUE;
+            return ((Boolean) val).booleanValue() ? Boolean.FALSE : Boolean.TRUE;
         }
         throw new ArithmeticException("Object negation:(" + val + ")");
     }
@@ -602,7 +602,7 @@ public class JexlArithmetic {
         long r = toLong(right);
         return Long.valueOf(l & r);
     }
-    
+
     /**
      * Performs a bitwise or.
      * @param left the left operand
@@ -614,8 +614,7 @@ public class JexlArithmetic {
         long r = toLong(right);
         return Long.valueOf(l | r);
     }
-      
-    
+
     /**
      * Performs a bitwise xor.
      * @param left the left operand
@@ -627,7 +626,7 @@ public class JexlArithmetic {
         long r = toLong(right);
         return Long.valueOf(l ^ r);
     }
-   
+
     /**
      * Performs a bitwise complement.
      * @param val the operand
@@ -644,6 +643,7 @@ public class JexlArithmetic {
      * @param right the right operator
      * @param operator the operator
      * @return -1 if left  &lt; right; +1 if left &gt > right; 0 if left == right
+     * @throws ArithmeticException if either left or right is null
      */
     protected int compare(Object left, Object right, String operator) {
         if (left != null && right != null) {
@@ -658,7 +658,16 @@ public class JexlArithmetic {
             } else if (isFloatingPoint(left) || isFloatingPoint(right)) {
                 double lhs = toDouble(left);
                 double rhs = toDouble(right);
-                if (lhs < rhs) {
+                if (Double.isNaN(lhs)) {
+                    if (Double.isNaN(rhs)) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                } else if (Double.isNaN(rhs)) {
+                    // lhs is not NaN
+                    return +1;
+                } else if (lhs < rhs) {
                     return -1;
                 } else if (lhs > rhs) {
                     return +1;
@@ -829,7 +838,7 @@ public class JexlArithmetic {
         }
 
         throw new ArithmeticException("Integer coercion: "
-                + val.getClass().getName() + ":(" +val+")");
+                + val.getClass().getName() + ":(" + val + ")");
     }
 
     /**
@@ -863,7 +872,7 @@ public class JexlArithmetic {
         }
 
         throw new ArithmeticException("Long coercion: "
-                + val.getClass().getName() + ":(" +val+")");
+                + val.getClass().getName() + ":(" + val + ")");
     }
 
     /**
@@ -900,7 +909,7 @@ public class JexlArithmetic {
         }
 
         throw new ArithmeticException("BigInteger coercion: "
-                + val.getClass().getName() + ":(" +val+")");
+                + val.getClass().getName() + ":(" + val + ")");
     }
 
     /**
@@ -936,7 +945,7 @@ public class JexlArithmetic {
         }
 
         throw new ArithmeticException("BigDecimal coercion: "
-                + val.getClass().getName() + ":(" +val+")");
+                + val.getClass().getName() + ":(" + val + ")");
     }
 
     /**
@@ -972,7 +981,7 @@ public class JexlArithmetic {
         }
 
         throw new ArithmeticException("Double coercion: "
-                + val.getClass().getName() + ":(" +val+")");
+                + val.getClass().getName() + ":(" + val + ")");
     }
 
     /**
