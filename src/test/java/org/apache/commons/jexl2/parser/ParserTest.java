@@ -24,28 +24,22 @@ import junit.framework.TestCase;
  * @since 1.0
  *
  */
-public class ParserTest extends TestCase
-{
-    public ParserTest(String testName)
-    {
+public class ParserTest extends TestCase {
+    public ParserTest(String testName) {
         super(testName);
     }
 
     /**
-      *  parse test : see if we can parse a little script
-      */
-     public void testParse1()
-         throws Exception
-     {
-         Parser parser = new Parser(new StringReader(";"));
+     *  parse test : see if we can parse a little script
+     */
+    public void testParse1() throws Exception {
+        Parser parser = new Parser(new StringReader(";"));
 
-         SimpleNode sn = parser.parse(new StringReader("foo = 1;"), null);
-         assertNotNull("parsed node is null", sn);
-     }
+        SimpleNode sn = parser.parse(new StringReader("foo = 1;"), null);
+        assertNotNull("parsed node is null", sn);
+    }
 
-    public void testParse2()
-        throws Exception
-    {
+    public void testParse2() throws Exception {
         Parser parser = new Parser(new StringReader(";"));
 
         SimpleNode sn = parser.parse(new StringReader("foo = \"bar\";"), null);
@@ -53,5 +47,23 @@ public class ParserTest extends TestCase
 
         sn = parser.parse(new StringReader("foo = 'bar';"), null);
         assertNotNull("parsed node is null", sn);
+    }
+
+    public void testReadLines() throws Exception {
+        String input = "foo bar\n\rquux\n\r\npizza";
+        StringBuilder output = new StringBuilder(32);
+        int read = StringParser.readLines(output, input, 0, null);
+        assertEquals(input.length(), read);
+        String outstr = output.toString();
+        assertEquals("foo bar quux pizza ", outstr);
+    }
+
+    public void testReadLines$$() throws Exception {
+        String input = "$$foo bar\n\r$$quux\n\r\n$$pizza";
+        StringBuilder output = new StringBuilder(32);
+        int read = StringParser.readLines(output, input, 0, "$$");
+        assertEquals(input.length(), read);
+        String outstr = output.toString();
+        assertEquals("foo bar quux pizza ", outstr);
     }
 }
