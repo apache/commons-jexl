@@ -120,8 +120,8 @@ public class TokenMgrError extends Error {
                 + line + ", column "
                 + column + ".  Encountered: "
                 + (eof ? "<EOF> "
-                   : ("\"" + StringParser.escapeString(String.valueOf(current)) + "\"") + " (" + (int) current + "), ")
-                + "after : \"" + StringParser.escapeString(after) + "\"");
+                   : (StringParser.escapeString(String.valueOf(current), '"')) + " (" + (int) current + "), ")
+                + "after : " + StringParser.escapeString(after, '"'));
     }
 
 

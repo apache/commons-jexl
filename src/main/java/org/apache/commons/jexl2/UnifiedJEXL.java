@@ -16,11 +16,20 @@
  */
 package org.apache.commons.jexl2;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.jexl2.introspection.JexlMethod;
+import org.apache.commons.jexl2.introspection.Uberspect;
+import org.apache.commons.jexl2.parser.ASTJexlScript;
 import org.apache.commons.jexl2.parser.JexlNode;
 import org.apache.commons.jexl2.parser.StringParser;
 
@@ -70,7 +79,7 @@ import org.apache.commons.jexl2.parser.StringParser;
  * The most common mistake leading to an invalid expression being the following:
  * <code>"#{${bar}charAt(2)}"</code>
  * </p>
- * <p>Also note that methods that parse evaluate expressions may throw <em>unchecked</em> ecxeptions;
+ * <p>Also note that methods that parse evaluate expressions may throw <em>unchecked</em> exceptions;
  * The {@link UnifiedJEXL.Exception} are thrown when the engine instance is in "non-silent" mode
  * but since these are RuntimeException, user-code <em>should</em> catch them where appropriate.
  * </p>
@@ -83,7 +92,10 @@ public final class UnifiedJEXL {
     private final JexlEngine.SoftCache<String, Expression> cache;
     /** The default cache size. */
     private static final int CACHE_SIZE = 256;
-
+    /** The first character for immediate expressions. */
+    private static final char IMM_CHAR = '$';
+    /** The first character for deferred expressions. */
+    private static final char DEF_CHAR = '#';
     /**
      * Creates a new instance of UnifiedJEXL with a default size cache.
      * @param aJexl the JexlEngine to use.
@@ -266,14 +278,12 @@ public final class UnifiedJEXL {
          * @return the formatted expression string
          */
         @Override
-        public String toString() {
+        public final String toString() {
             StringBuilder strb = new StringBuilder();
-            if (source != this) {
-                strb.append(source.toString());
-                strb.append(" /*= ");
-            }
             asString(strb);
             if (source != this) {
+                strb.append(" /*= ");
+                strb.append(source.toString());
                 strb.append(" */");
             }
             return strb.toString();
@@ -292,6 +302,7 @@ public final class UnifiedJEXL {
         /**
          * Adds this expression's string representation to a StringBuilder.
          * @param strb the builder to fill
+         * @return the builder argument
          */
         public abstract StringBuilder asString(StringBuilder strb);
 
@@ -331,7 +342,20 @@ public final class UnifiedJEXL {
          * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
          */
         public final Expression prepare(JexlContext context) {
-            return UnifiedJEXL.this.prepare(context, this);
+            try {
+                Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), false);
+                if (context instanceof TemplateContext) {
+                    interpreter.setFrame(((TemplateContext) context).getFrame());
+                }
+                return prepare(interpreter);
+            } catch (JexlException xjexl) {
+                Exception xuel = createException("prepare", this, xjexl);
+                if (jexl.isSilent()) {
+                    jexl.logger.warn(xuel.getMessage(), xuel.getCause());
+                    return null;
+                }
+                throw xuel;
+            }
         }
 
         /**
@@ -345,7 +369,20 @@ public final class UnifiedJEXL {
          * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
          */
         public final Object evaluate(JexlContext context) {
-            return UnifiedJEXL.this.evaluate(context, this);
+            try {
+                Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), false);
+                if (context instanceof TemplateContext) {
+                    interpreter.setFrame(((TemplateContext) context).getFrame());
+                }
+                return evaluate(interpreter);
+            } catch (JexlException xjexl) {
+                Exception xuel = createException("prepare", this, xjexl);
+                if (jexl.isSilent()) {
+                    jexl.logger.warn(xuel.getMessage(), xuel.getCause());
+                    return null;
+                }
+                throw xuel;
+            }
         }
 
         /**
@@ -411,26 +448,9 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        public String toString() {
-            return value.toString();
-        }
-
-        /** {@inheritDoc} */
-        @Override
         public StringBuilder asString(StringBuilder strb) {
-            String str = value.toString();
-            if (value instanceof String || value instanceof CharSequence) {
-                strb.append('"');
-                for (int i = 0, size = str.length(); i < size; ++i) {
-                    char c = str.charAt(i);
-                    if (c == '"' || c == '\\') {
-                        strb.append('\\');
-                    }
-                    strb.append(c);
-                }
-                strb.append('"');
-            } else {
-                strb.append(str);
+            if (value != null) {
+                strb.append(value.toString());
             }
             return strb;
         }
@@ -463,14 +483,8 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        public String toString() {
-            return asString();
-        }
-
-        /** {@inheritDoc} */
-        @Override
         public StringBuilder asString(StringBuilder strb) {
-            strb.append(isImmediate() ? '$' : '#');
+            strb.append(isImmediate() ? IMM_CHAR : DEF_CHAR);
             strb.append("{");
             strb.append(expr);
             strb.append("}");
@@ -489,6 +503,12 @@ public final class UnifiedJEXL {
             Set<List<String>> refs = new LinkedHashSet<List<String>>();
             getVariables(refs);
             return refs;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void getVariables(Set<List<String>> refs) {
+            jexl.getVariables(node, refs, null);
         }
     }
 
@@ -512,17 +532,10 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        protected void getVariables(Set<List<String>> refs) {
-            jexl.getVariables(node, refs, null);
-        }
-
-        /** {@inheritDoc} */
-        /** {@inheritDoc} */
-        @Override
         protected Expression prepare(Interpreter interpreter) {
             // evaluate immediate as constant
             Object value = evaluate(interpreter);
-            return value == null ? null : new ConstantExpression(value, this);
+            return value != null ? new ConstantExpression(value, source) : null;
         }
     }
 
@@ -541,7 +554,7 @@ public final class UnifiedJEXL {
         /** {@inheritDoc} */
         @Override
         public boolean isImmediate() {
-            return true;
+            return false;
         }
 
         /** {@inheritDoc} */
@@ -555,14 +568,20 @@ public final class UnifiedJEXL {
         protected Expression prepare(Interpreter interpreter) {
             return new ImmediateExpression(expr, node, source);
         }
+
+        /** {@inheritDoc} */
+        @Override
+        protected void getVariables(Set<List<String>> refs) {
+            // noop
+        }
     }
 
     /**
-     * A deferred expression that nests an immediate expression.
+     * An immediate expression nested into a deferred expression.
      * #{...${jexl}...}
      * Note that the deferred syntax is JEXL's, not UnifiedJEXL.
      */
-    private class NestedExpression extends DeferredExpression {
+    private class NestedExpression extends JexlBasedExpression {
         /**
          * Creates a nested expression.
          * @param expr the expression as a string
@@ -575,6 +594,18 @@ public final class UnifiedJEXL {
                 throw new IllegalArgumentException("Nested expression can not have a source");
             }
         }
+        
+        @Override
+        public StringBuilder asString(StringBuilder strb) {
+            strb.append(expr);
+            return strb;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean isImmediate() {
+            return false;
+        }
 
         /** {@inheritDoc} */
         @Override
@@ -584,15 +615,9 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         @Override
-        public String toString() {
-            return expr.toString();
-        }
-
-        /** {@inheritDoc} */
-        @Override
         protected Expression prepare(Interpreter interpreter) {
             String value = interpreter.interpret(node).toString();
-            JexlNode dnode = toNode(value, jexl.isDebug() ? node.debugInfo() : null);
+            JexlNode dnode = jexl.parse(value, jexl.isDebug() ? node.debugInfo() : null, null);
             return new ImmediateExpression(value, dnode, this);
         }
 
@@ -608,7 +633,7 @@ public final class UnifiedJEXL {
         /** Bit encoded (deferred count > 0) bit 1, (immediate count > 0) bit 0. */
         private final int meta;
         /** The list of sub-expression resulting from parsing. */
-        private final Expression[] exprs;
+        protected final Expression[] exprs;
 
         /**
          * Creates a composite expression.
@@ -634,16 +659,6 @@ public final class UnifiedJEXL {
         @Override
         ExpressionType getType() {
             return ExpressionType.COMPOSITE;
-        }
-
-        /** {@inheritDoc} */
-        @Override
-        public String toString() {
-            StringBuilder strb = new StringBuilder();
-            for (Expression e : exprs) {
-                strb.append(e.toString());
-            }
-            return strb.toString();
         }
 
         /** {@inheritDoc} */
@@ -700,9 +715,7 @@ public final class UnifiedJEXL {
             StringBuilder strb = new StringBuilder();
             for (int e = 0; e < size; ++e) {
                 value = exprs[e].evaluate(interpreter);
-                if (value instanceof Expression) {
-                    ((Expression) value).asString(strb);
-                } else if (value != null) {
+                if (value != null) {
                     strb.append(value.toString());
                 }
             }
@@ -725,12 +738,12 @@ public final class UnifiedJEXL {
         Expression stmt = null;
         try {
             if (cache == null) {
-                stmt = parseExpression(expression);
+                stmt = parseExpression(expression, null);
             } else {
                 synchronized (cache) {
                     stmt = cache.get(expression);
                     if (stmt == null) {
-                        stmt = parseExpression(expression);
+                        stmt = parseExpression(expression, null);
                         cache.put(expression, stmt);
                     }
                 }
@@ -752,74 +765,6 @@ public final class UnifiedJEXL {
     }
 
     /**
-     * Prepares an expression (nested & composites), handles exception reporting.
-     *
-     * @param context the JEXL context to use
-     * @param expr the expression to prepare
-     * @return a prepared expression
-     * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
-     */
-    Expression prepare(JexlContext context, Expression expr) {
-        try {
-            if (context == null) {
-                context = JexlEngine.EMPTY_CONTEXT;
-            }
-            Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), false);
-            return expr.prepare(interpreter);
-        } catch (JexlException xjexl) {
-            Exception xuel = createException("prepare", expr, xjexl);
-            if (jexl.isSilent()) {
-                jexl.logger.warn(xuel.getMessage(), xuel.getCause());
-                return null;
-            }
-            throw xuel;
-        }
-    }
-
-    /**
-     * Evaluates an expression (nested & composites), handles exception reporting.
-     *
-     * @param context the JEXL context to use
-     * @param expr the expression to prepare
-     * @return the result of the evaluation
-     * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
-     */
-    Object evaluate(JexlContext context, Expression expr) {
-        try {
-            Interpreter interpreter = jexl.createInterpreter(context, !jexl.isLenient(), false);
-            return expr.evaluate(interpreter);
-        } catch (JexlException xjexl) {
-            Exception xuel = createException("evaluate", expr, xjexl);
-            if (jexl.isSilent()) {
-                jexl.logger.warn(xuel.getMessage(), xuel.getCause());
-                return null;
-            }
-            throw xuel;
-        }
-    }
-
-    /**
-     * Use the JEXL parser to create the AST for an expression.
-     * @param expression the expression to parse
-     * @return the AST
-     * @throws JexlException if an error occur during parsing
-     */
-    private JexlNode toNode(CharSequence expression) {
-        return jexl.parse(expression, null, null);
-    }
-
-    /**
-     * Use the JEXL parser to create the AST for an expression.
-     * @param expression the expression to parse
-     * @param info debug information
-     * @return the AST
-     * @throws JexlException if an error occur during parsing
-     */
-    private JexlNode toNode(CharSequence expression, JexlInfo info) {
-        return jexl.parse(expression, info, null);
-    }
-
-    /**
      * Creates a UnifiedJEXL.Exception from a JexlException.
      * @param action parse, prepare, evaluate
      * @param expr the expression
@@ -829,9 +774,11 @@ public final class UnifiedJEXL {
     private Exception createException(String action, Expression expr, java.lang.Exception xany) {
         StringBuilder strb = new StringBuilder("failed to ");
         strb.append(action);
-        strb.append(" '");
-        strb.append(expr.toString());
-        strb.append("'");
+        if (expr != null) {
+            strb.append(" '");
+            strb.append(expr.toString());
+            strb.append("'");
+        }
         Throwable cause = xany.getCause();
         if (cause != null) {
             String causeMsg = cause.getMessage();
@@ -862,10 +809,11 @@ public final class UnifiedJEXL {
     /**
      * Parses a unified expression.
      * @param expr the string expression
+     * @param scope the expression scope
      * @return the expression instance
      * @throws JexlException if an error occur during parsing
      */
-    private Expression parseExpression(String expr) {
+    private Expression parseExpression(String expr, JexlEngine.Scope scope) {
         final int size = expr.length();
         ExpressionBuilder builder = new ExpressionBuilder(0);
         StringBuilder strb = new StringBuilder(size);
@@ -879,9 +827,9 @@ public final class UnifiedJEXL {
                 default: // in case we ever add new expression type
                     throw new UnsupportedOperationException("unexpected expression type");
                 case CONST:
-                    if (c == '$') {
+                    if (c == IMM_CHAR) {
                         state = ParseState.IMMEDIATE0;
-                    } else if (c == '#') {
+                    } else if (c == DEF_CHAR) {
                         inested = i;
                         state = ParseState.DEFERRED0;
                     } else if (c == '\\') {
@@ -902,7 +850,7 @@ public final class UnifiedJEXL {
                         }
                     } else {
                         // revert to CONST
-                        strb.append('$');
+                        strb.append(IMM_CHAR);
                         strb.append(c);
                         state = ParseState.CONST;
                     }
@@ -918,7 +866,7 @@ public final class UnifiedJEXL {
                         }
                     } else {
                         // revert to CONST
-                        strb.append('#');
+                        strb.append(DEF_CHAR);
                         strb.append(c);
                         state = ParseState.CONST;
                     }
@@ -926,7 +874,10 @@ public final class UnifiedJEXL {
                 case IMMEDIATE1: // ${...
                     if (c == '}') {
                         // materialize the immediate expr
-                        Expression iexpr = new ImmediateExpression(strb.toString(), toNode(strb), null);
+                        Expression iexpr = new ImmediateExpression(
+                                strb.toString(),
+                                jexl.parse(strb, null, scope),
+                                null);
                         builder.add(iexpr);
                         strb.delete(0, Integer.MAX_VALUE);
                         state = ParseState.CONST;
@@ -944,7 +895,7 @@ public final class UnifiedJEXL {
                     }
                     // nested immediate in deferred; need to balance count of '{' & '}'
                     if (c == '{') {
-                        if (expr.charAt(i - 1) == '$') {
+                        if (expr.charAt(i - 1) == IMM_CHAR) {
                             inner += 1;
                             strb.deleteCharAt(strb.length() - 1);
                             nested = true;
@@ -960,9 +911,15 @@ public final class UnifiedJEXL {
                             // materialize the nested/deferred expr
                             Expression dexpr = null;
                             if (nested) {
-                                dexpr = new NestedExpression(expr.substring(inested, i + 1), toNode(strb), null);
+                                dexpr = new NestedExpression(
+                                        expr.substring(inested, i + 1),
+                                        jexl.parse(strb, null, scope),
+                                        null);
                             } else {
-                                dexpr = new DeferredExpression(strb.toString(), toNode(strb), null);
+                                dexpr = new DeferredExpression(
+                                        strb.toString(),
+                                        jexl.parse(strb, null, scope),
+                                        null);
                             }
                             builder.add(dexpr);
                             strb.delete(0, Integer.MAX_VALUE);
@@ -975,10 +932,10 @@ public final class UnifiedJEXL {
                     }
                     break;
                 case ESCAPE:
-                    if (c == '#') {
-                        strb.append('#');
-                    } else if (c == '$') {
-                        strb.append('$');
+                    if (c == DEF_CHAR) {
+                        strb.append(DEF_CHAR);
+                    } else if (c == IMM_CHAR) {
+                        strb.append(IMM_CHAR);
                     } else {
                         strb.append('\\');
                         strb.append(c);
@@ -997,4 +954,485 @@ public final class UnifiedJEXL {
         }
         return builder.build(this, null);
     }
+
+    /**
+     * The enum capturing the difference between verbatim and code source fragments.
+     */
+    private static enum BlockType {
+        /** Block is to be output "as is". */
+        VERBATIM,
+        /** Block is a directive, ie a fragment of code. */
+        DIRECTIVE;
+    }
+
+    /**
+     * Abstract the source fragments, verbatim or immediate typed text blocks.
+     */
+    private static final class TemplateBlock {
+        /** The type of block, verbatim or directive. */
+        private final BlockType type;
+        /** The actual contexnt. */
+        private final String body;
+
+        /**
+         * Creates a new block. 
+         * @param theType the type
+         * @param theBlock the content
+         */
+        TemplateBlock(BlockType theType, String theBlock) {
+            type = theType;
+            body = theBlock;
+        }
+
+        @Override
+        public String toString() {
+            return body;
+        }
+    }
+
+    /**
+     * A Template is a script that evaluates by writing its content through a Writer.
+     * This is a simplified replacement for Velocity that uses JEXL (instead of OGNL/VTL) as the scripting
+     * language.
+     * <p>
+     * The source text is parsed considering each line beginning with '$$' (as default pattern) as JEXL script code
+     * and all others as Unified JEXL expressions; those expressions will be invoked from the script during
+     * evaluation and their output gathered through a writer. 
+     * It is thus possible to use looping or conditional construct "around" expressions generating output.
+     * </p>
+     * For instance:
+     * <p><blockquote><pre>
+     * $$ for(var x : [1, 3, 5, 42, 169]) {
+     * $$   if (x == 42) {
+     * Life, the universe, and everything
+     * $$   } else if (x > 42) {
+     * The value $(x} is over fourty-two
+     * $$   } else {
+     * The value ${x} is under fourty-two
+     * $$   }
+     * $$ }
+     * </pre></blockquote>
+     * Will evaluate as:
+     * <p><blockquote><pre>
+     * The value 1 is under fourty-two
+     * The value 3 is under fourty-two
+     * The value 5 is under fourty-two
+     * Life, the universe, and everything
+     * The value 169 is over fourty-two
+     * </pre></blockquote>
+     * <p>
+     * A template is expanded as one JEXL script and a list of UnifiedJEXL expressions; each UnifiedJEXL expression
+     * being replace in the script by a call to jexl:print(expr) (the expr is in fact the expr number in the template).
+     * This integration uses a specialized JexlContext (TemplateContext) that serves as a namespace (for jexl:)
+     * and stores the expression array and the writer (java.io.Writer) that the 'jexl:print(...)'
+     * delegates the output generation to.
+     * </p>
+     */
+    public final class Template {
+        /** The prefix marker. */
+        private final String prefix;
+        /** The array of source blocks. */
+        private final TemplateBlock[] source;
+        /** The resulting script. */
+        private final ASTJexlScript script;
+        /** The UnifiedJEXL expressions called by the script. */
+        private final Expression[] exprs;
+
+        /**
+         * Creates a new template from an input.
+         * @param directive the prefix for lines of code; can not be "$", "${", "#" or "#{"
+         * since this would preclude being able to differentiate directives and UnifiedJEXL expressions
+         * @param reader the input reader
+         * @param parms the parameter names
+         * @throws NullPointerException if either the directive prefix or input is null
+         * @throws IllegalArgumentException if the directive prefix is invalid
+         */
+        public Template(String directive, Reader reader, String... parms) {
+            if (directive == null) {
+                throw new NullPointerException("null prefix");
+            }
+            if ("$".equals(directive)
+                    || "${".equals(directive)
+                    || "#".equals(directive)
+                    || "#{".equals(directive)) {
+                throw new IllegalArgumentException(directive + ": is not a valid directive pattern");
+            }
+            if (reader == null) {
+                throw new NullPointerException("null input");
+            }
+            JexlEngine.Scope scope = new JexlEngine.Scope(parms);
+            prefix = directive;
+            List<TemplateBlock> blocks = readTemplate(prefix, reader);
+            List<Expression> uexprs = new ArrayList<Expression>();
+            StringBuilder strb = new StringBuilder();
+            int nuexpr = 0;
+            int codeStart = -1;
+            for (int b = 0; b < blocks.size(); ++b) {
+                TemplateBlock block = blocks.get(b);
+                if (block.type == BlockType.VERBATIM) {
+                    strb.append("jexl:print(");
+                    strb.append(nuexpr++);
+                    strb.append(");");
+                } else {
+                    // keep track of first block of code, the frame creator
+                    if (codeStart < 0) {
+                        codeStart = b;
+                    }
+                    strb.append(block.body);
+                }
+            }
+            // parse the script
+            script = getEngine().parse(strb.toString(), null, scope);
+            scope = script.getScope();
+            // parse the exprs using the code frame for those appearing after the first block of code
+            for (int b = 0; b < blocks.size(); ++b) {
+                TemplateBlock block = blocks.get(b);
+                if (block.type == BlockType.VERBATIM) {
+                    uexprs.add(UnifiedJEXL.this.parseExpression(block.body, b > codeStart ? scope : null));
+                }
+            }
+            source = blocks.toArray(new TemplateBlock[blocks.size()]);
+            exprs = uexprs.toArray(new Expression[uexprs.size()]);
+        }
+
+        /**
+         * Private ctor used to expand deferred expressions during prepare.
+         * @param thePrefix the directive prefix
+         * @param theSource the source
+         * @param theScript the script
+         * @param theExprs the expressions
+         */
+        private Template(String thePrefix, TemplateBlock[] theSource, ASTJexlScript theScript, Expression[] theExprs) {
+            prefix = thePrefix;
+            source = theSource;
+            script = theScript;
+            exprs = theExprs;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder strb = new StringBuilder();
+            for (TemplateBlock block : source) {
+                if (block.type == BlockType.DIRECTIVE) {
+                    strb.append(prefix);
+                }
+                strb.append(block.toString());
+                strb.append('\n');
+            }
+            return strb.toString();
+        }
+        
+        /**
+         * Recreate the template source from its inner components.
+         * @return the template source rewritten
+         */
+        public String asString() {
+            StringBuilder strb = new StringBuilder();
+            int e = 0;
+            for (int b = 0; b < source.length; ++b) {
+                TemplateBlock block = source[b];
+                if (block.type == BlockType.DIRECTIVE) {
+                    strb.append(prefix);
+                } else {
+                    exprs[e++].asString(strb);
+                }
+            }
+            return strb.toString();
+        }
+
+        /**
+         * Prepares this template by expanding any contained deferred expression.
+         * @param context the context to prepare against
+         * @return the prepared version of the template
+         */
+        public Template prepare(JexlContext context) {
+            JexlEngine.Frame frame = script.createFrame((Object[])null);
+            TemplateContext tcontext = new TemplateContext(context, frame, exprs, null);
+            Expression[] immediates = new Expression[exprs.length];
+            for (int e = 0; e < exprs.length; ++e) {
+                immediates[e] = exprs[e].prepare(tcontext);
+            }
+            return new Template(prefix, source, script, immediates);
+        }
+
+        /**
+         * Evaluates this template.
+         * @param context the context to use during evaluation
+         * @param writer the writer to use for output
+         */
+        public void evaluate(JexlContext context, Writer writer) {
+            evaluate(context, writer, (Object[]) null);
+        }
+
+        /**
+         * Evaluates this template.
+         * @param context the context to use during evaluation
+         * @param writer the writer to use for output
+         * @param args the arguments
+         */
+        public void evaluate(JexlContext context, Writer writer, Object... args) {
+            JexlEngine.Frame frame = script.createFrame(args);
+            TemplateContext tcontext = new TemplateContext(context, frame, exprs, writer);
+            Interpreter interpreter = jexl.createInterpreter(tcontext, !jexl.isLenient(), false);
+            interpreter.setFrame(frame);
+            interpreter.interpret(script);
+        }
+    }
+
+    /**
+     * The type of context to use during evaluation of templates.
+     * <p>public for introspection purpose.</p>
+     */
+    public final class TemplateContext implements JexlContext, NamespaceResolver {
+        /** The wrapped context. */
+        private final JexlContext wrap;
+        /** The array of UnifiedJEXL expressions. */
+        private final Expression[] exprs;
+        /** The writer used to output. */
+        private final PrintWriter writer;
+        /** The call frame. */
+        private final JexlEngine.Frame frame;
+
+        /**
+         * Creates a template context instance.
+         * @param jcontext the base context
+         * @param jframe the calling frame
+         * @param expressions the list of expression from the template to evaluate
+         * @param out the output writer
+         */
+        protected TemplateContext(JexlContext jcontext, JexlEngine.Frame jframe, Expression[] expressions, Writer out) {
+            wrap = jcontext;
+            frame = jframe;
+            exprs = expressions;
+            if (out == null) {
+                writer = null;
+            } else if (out instanceof PrintWriter) {
+                writer = (PrintWriter) out;
+            } else {
+                writer = new PrintWriter(out);
+            }
+        }
+
+        /**
+         * Gets this context calling frame.
+         * @return the engine frame
+         */
+        public JexlEngine.Frame getFrame() {
+            return frame;
+        }
+
+        /** {@inheritDoc} */
+        public Object get(String name) {
+            return wrap.get(name);
+        }
+
+        /** {@inheritDoc} */
+        public void set(String name, Object value) {
+            wrap.set(name, value);
+        }
+
+        /** {@inheritDoc} */
+        public boolean has(String name) {
+            return wrap.has(name);
+        }
+
+        /** {@inheritDoc} */
+        public Object resolveNamespace(String ns) {
+            if ("jexl".equals(ns)) {
+                return this;
+            } else if (wrap instanceof NamespaceResolver) {
+                return ((NamespaceResolver) wrap).resolveNamespace(ns);
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * Includes a call to another template.
+         * <p>Evaluates a template using this template initial context and writer.</p>
+         * @param template the template to evaluate
+         * @param args the arguments
+         */
+        public void include(Template template, Object... args) {
+            template.evaluate(wrap, writer, args);
+        }
+
+        /**
+         * Prints an expression result.
+         * @param e the expression number
+         */
+        public void print(int e) {
+            Expression expr = exprs[e];
+            if (expr.isDeferred()) {
+                expr = expr.prepare(wrap);
+            }
+            if (expr instanceof CompositeExpression) {
+                printComposite((CompositeExpression) expr);
+            } else {
+                print(expr.evaluate(this));
+            }
+        }
+
+        /**
+         * Prints to output.
+         * <p>This will dynamically try to find the best suitable method in the writer through uberspection.
+         * Subclassing Writer should be the preferred way to specialize output.
+         * </p>
+         * @param arg the argument to print out
+         */
+        protected void print(Object arg) {
+            if (arg instanceof CharSequence) {
+                writer.print(arg.toString());
+            } else if (arg != null) {
+                Object[] value = {arg};
+                Uberspect uber = getEngine().getUberspect();
+                JexlMethod method = uber.getMethod(writer, "print", value, null);
+                if (method != null) {
+                    try {
+                        method.invoke(writer, value);
+                    } catch (java.lang.Exception xany) {
+                        throw createException("invoke print", null, xany);
+                    }
+                } else {
+                    writer.print(arg.toString());
+                }
+            }
+        }
+
+        /**
+         * Prints a composite expression.
+         * @param composite the composite expression
+         */
+        protected void printComposite(CompositeExpression composite) {
+            Expression[] cexprs = composite.exprs;
+            final int size = cexprs.length;
+            Object value = null;
+            for (int e = 0; e < size; ++e) {
+                value = cexprs[e].evaluate(this);
+                print(value);
+            }
+        }
+    }
+
+    /**
+     * Whether a sequence starts with a given set of characters (following spaces).
+     * <p>Space characters at beginning of line before the pattern are discarded.</p>
+     * @param sequence the sequence
+     * @param pattern the pattern to match at start of sequence
+     * @return the first position after end of pattern if it matches, -1 otherwise
+     */
+    protected int startsWith(CharSequence sequence, CharSequence pattern) {
+        int s = 0;
+        while (Character.isSpaceChar(sequence.charAt(s))) {
+            s += 1;
+        }
+        sequence = sequence.subSequence(s, sequence.length());
+        if (pattern.length() <= sequence.length()
+                && sequence.subSequence(0, pattern.length()).equals(pattern)) {
+            return s + pattern.length();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Reads lines of a template grouping them by typed blocks.
+     * @param prefix the directive prefix
+     * @param source the source reader
+     * @return the list of blocks
+     */
+    protected List<TemplateBlock> readTemplate(final String prefix, Reader source) {
+        try {
+            int prefixLen = prefix.length();
+            List<TemplateBlock> blocks = new ArrayList<TemplateBlock>();
+            BufferedReader reader;
+            if (source instanceof BufferedReader) {
+                reader = (BufferedReader) source;
+            } else {
+                reader = new BufferedReader(source);
+            }
+            StringBuilder strb = new StringBuilder();
+            BlockType type = null;
+            while (true) {
+                CharSequence line = reader.readLine();
+                if (line == null) {
+                    // at end
+                    TemplateBlock block = new TemplateBlock(type, strb.toString());
+                    blocks.add(block);
+                    break;
+                } else if (type == null) {
+                    // determine starting type if not known yet
+                    prefixLen = startsWith(line, prefix);
+                    if (prefixLen >= 0) {
+                        type = BlockType.DIRECTIVE;
+                        strb.append(line.subSequence(prefixLen, line.length()));
+                    } else {
+                        type = BlockType.VERBATIM;
+                        strb.append(line.subSequence(0, line.length()));
+                        strb.append('\n');
+                    }
+                } else if (type == BlockType.DIRECTIVE) {
+                    // switch to verbatim if necessary
+                    prefixLen = startsWith(line, prefix);
+                    if (prefixLen < 0) {
+                        TemplateBlock code = new TemplateBlock(BlockType.DIRECTIVE, strb.toString());
+                        strb.delete(0, Integer.MAX_VALUE);
+                        blocks.add(code);
+                        type = BlockType.VERBATIM;
+                        strb.append(line.subSequence(0, line.length()));
+                    } else {
+                        strb.append(line.subSequence(prefixLen, line.length()));
+                    }
+                } else if (type == BlockType.VERBATIM) {
+                    // switch to code if necessary(
+                    prefixLen = startsWith(line, prefix);
+                    if (prefixLen >= 0) {
+                        strb.append('\n');
+                        TemplateBlock verbatim = new TemplateBlock(BlockType.VERBATIM, strb.toString());
+                        strb.delete(0, Integer.MAX_VALUE);
+                        blocks.add(verbatim);
+                        type = BlockType.DIRECTIVE;
+                        strb.append(line.subSequence(prefixLen, line.length()));
+                    } else {
+                        strb.append(line.subSequence(0, line.length()));
+                    }
+                }
+            }
+            return blocks;
+        } catch (IOException xio) {
+            return null;
+        }
+    }
+
+    /**
+     * Creates a new template.
+     * @param prefix the directive prefix
+     * @param source the source
+     * @param parms the parameter names
+     * @return the template
+     */
+    public Template createTemplate(String prefix, Reader source, String... parms) {
+        return new Template(prefix, source, parms);
+    }
+
+    
+    /**
+     * Creates a new template.
+     * @param source the source
+     * @param parms the parameter names
+     * @return the template
+     */
+    public Template createTemplate(String source, String... parms) {
+        return new Template("$$", new StringReader(source), parms);
+    }
+
+    /**
+     * Creates a new template.
+     * @param source the source
+     * @return the template
+     */
+    public Template createTemplate(String source) {
+        return new Template("$$", new StringReader(source), (String[]) null);
+    }
+
 }

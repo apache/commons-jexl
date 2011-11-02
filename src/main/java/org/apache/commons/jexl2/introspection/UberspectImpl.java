@@ -257,7 +257,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
          * @param object the instance owning the container (not null)
          * @param key the property key (not null)
          * @return the property value
-         * @throws IntrospectionException if a property getter can not be found
+         * @throws Exception if invocation failed; IntrospectionException if a property getter could not be found
          */
         private Object invokeGet(Object object, Object key) throws Exception {
             if (getters != null) {
@@ -282,7 +282,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
          * @param key the property key (not null)
          * @param value the property value (not null)
          * @return the result of the method invocation (frequently null)
-         * @throws IntrospectionException if a property getter can not be found
+         * @throws Exception if invocation failed; IntrospectionException if a property setter could not be found
          */
         private Object invokeSet(Object object, Object key, Object value) throws Exception {
             if (setters != null) {

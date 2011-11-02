@@ -402,7 +402,7 @@ final class Debugger implements ParserVisitor {
         return infixChildren(node, " > ", false, data);
     }
 
-    // check identifiers that contain space, quote, double-quotes or backspace
+    /** Checks identifiers that contain space, quote, double-quotes or backspace. */
     private static final Pattern QUOTED_IDENTIFIER = Pattern.compile("['\"\\s\\\\]");
     
     /** {@inheritDoc} */

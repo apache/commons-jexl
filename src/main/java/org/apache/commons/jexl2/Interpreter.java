@@ -144,7 +144,7 @@ public class Interpreter implements ParserVisitor {
         this.strict = strictFlag;
         this.silent = silentFlag;
         this.cache = jexl.cache != null;
-        this.context = aContext;
+        this.context = aContext != null? aContext : JexlEngine.EMPTY_CONTEXT;
         this.functors = null;
     }
 
@@ -207,6 +207,14 @@ public class Interpreter implements ParserVisitor {
             registers = null;
         }
     }
+    
+    /**
+     * Gets the context.
+     * @return the {@link JexlContext} used for evaluation.
+     */
+    protected JexlContext getContext() {
+        return context;
+    }
 
     /**
      * Gets the uberspect.
@@ -218,7 +226,7 @@ public class Interpreter implements ParserVisitor {
 
     /**
      * Sets this interpreter registers for bean access/assign expressions.
-     * <p>Use setArguments(...) instead.</p>
+     * <p>Use setFrame(...) instead.</p>
      * @param theRegisters the array of registers
      */
     @Deprecated
@@ -235,12 +243,16 @@ public class Interpreter implements ParserVisitor {
 
     /**
      * Sets this interpreter parameters and arguments.
-     * @param theParms the array of parameters
-     * @param theArgs the array of arguments
+     * @param frame the calling frame
      */
-    protected void setArguments(String[] theParms, Object[] theArgs) {
-        this.parameters = theParms;
-        this.registers = theArgs;
+    protected void setFrame(JexlEngine.Frame frame) {
+        if (frame != null) {
+            this.parameters = frame.getParameters();
+            this.registers = frame.getRegisters();
+        } else {
+            this.parameters = null;
+            this.registers = null;
+        }
     }
 
     /**
@@ -416,7 +428,7 @@ public class Interpreter implements ParserVisitor {
 
     /** {@inheritDoc} */
     public Object visit(ASTArrayAccess node, Object data) {
-            // first objectNode is the identifier
+        // first objectNode is the identifier
         Object object = node.jjtGetChild(0).jjtAccept(this, data);
         // can have multiple nodes - either an expression, integer literal or reference
         int numChildren = node.jjtGetNumChildren();
@@ -1056,7 +1068,7 @@ public class Interpreter implements ParserVisitor {
         }
 
         JexlException xjexl = null;
-        try { 
+        try {
             // attempt to reuse last constructor cached in volatile JexlNode.value
             if (cache) {
                 Object cached = node.jjtGetValue();
@@ -1264,11 +1276,11 @@ public class Interpreter implements ParserVisitor {
         }
         if (result == null) {
             if (isVariable && !isTernaryProtected(node)
-                // variable unknow in context and not (from) a register
-                && !(context.has(variableName.toString())
-                     || (numChildren == 1
-                         && node.jjtGetChild(0) instanceof ASTIdentifier
-                         && ((ASTIdentifier) node.jjtGetChild(0)).getRegister() >= 0))) {
+                    // variable unknow in context and not (from) a register
+                    && !(context.has(variableName.toString())
+                    || (numChildren == 1
+                    && node.jjtGetChild(0) instanceof ASTIdentifier
+                    && ((ASTIdentifier) node.jjtGetChild(0)).getRegister() >= 0))) {
                 JexlException xjexl = propertyName != null
                                       ? new JexlException.Property(node, propertyName)
                                       : new JexlException.Variable(node, variableName.toString());

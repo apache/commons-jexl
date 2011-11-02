@@ -53,7 +53,7 @@ public class SandboxUberspectImpl extends UberspectImpl {
      */
     @Override
     public JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
-        String className = null;
+        final String className;
         if (ctorHandle instanceof Class<?>) {
             Class<?> clazz = (Class<?>) ctorHandle;
             className = clazz.getName();

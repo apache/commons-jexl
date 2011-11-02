@@ -16,14 +16,14 @@
  */
 package org.apache.commons.jexl2.parser;
 
+import org.apache.commons.jexl2.JexlEngine;
+
 /**
  * Enhanced script to allow parameters declaration.
  */
 public class ASTJexlScript extends JexlNode {
-    /** The number of parameters defined. */
-    private int parms = 0;
-    /** Each parameter will use a register but so do local script variables. */
-    private String[] registers = null;
+    /** The script scope. */
+    private JexlEngine.Scope scope = null;
 
     public ASTJexlScript(int id) {
         super(id);
@@ -40,32 +40,26 @@ public class ASTJexlScript extends JexlNode {
 
     /**
      * Sets the parameters and registers
-     * @param parms the number of parameters
-     * @param registers the array of register names
+     * @param theScope the scope
      */
-    public void setParameters(int parms, String[] registers) {
-        if (parms > registers.length) {
-            throw new IllegalArgumentException();
-        }
-        this.parms = parms;
-        this.registers = registers;
+    public void setScope(JexlEngine.Scope theScope) {
+        this.scope = theScope;
     }
     
     /**
-     * Creates an array of arguments by copying values up to the number of parameters 
+     * Gets this script scope.
+     */
+    public JexlEngine.Scope getScope() {
+        return scope;
+    }
+    
+    /**
+     * Creates an array of arguments by copying values up to the number of parameters.
      * @param values the argument values
      * @return the arguments array
      */
-    public Object[] createArguments(Object... values) {
-        if (registers != null) {
-            Object[] frame = new Object[registers.length];
-            if (values != null) {
-                System.arraycopy(values, 0, frame, 0, Math.min(parms, values.length));
-            }
-            return frame;
-        } else {
-            return null;
-        }
+    public JexlEngine.Frame createFrame(Object... values) {
+        return scope != null? scope.createFrame(values) : null;
     }
     
     /**
@@ -73,7 +67,7 @@ public class ASTJexlScript extends JexlNode {
      * @return the number of parameters
      */
     public int getArgCount() {
-        return parms;
+        return scope != null? scope.getArgCount() : 0;
     }
     
     /**
@@ -81,7 +75,7 @@ public class ASTJexlScript extends JexlNode {
      * @return the register names
      */
     public String[] getRegisters() {
-        return registers;
+        return scope != null? scope.getRegisters() : null;
     }
 
     /**
@@ -89,13 +83,7 @@ public class ASTJexlScript extends JexlNode {
      * @return the parameter names
      */
     public String[] getParameters() {
-        if (registers != null && parms > 0) {
-            String[] pa = new String[parms];
-            System.arraycopy(registers, 0, pa, 0, parms);
-            return pa;
-        } else {
-            return null;
-        }
+        return scope != null? scope.getParameters() : null;
     }
 
     /**
@@ -103,12 +91,6 @@ public class ASTJexlScript extends JexlNode {
      * @return the parameter names
      */
     public String[] getLocalVariables() {
-        if (registers != null) {
-            String[] pa = new String[registers.length - parms];
-            System.arraycopy(registers, parms, pa, 0, registers.length - parms);
-            return pa;
-        } else {
-            return null;
-        }
+        return scope != null? scope.getLocalVariables() : null;
     }
 }

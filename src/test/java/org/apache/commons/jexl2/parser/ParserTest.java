@@ -49,21 +49,4 @@ public class ParserTest extends TestCase {
         assertNotNull("parsed node is null", sn);
     }
 
-    public void testReadLines() throws Exception {
-        String input = "foo bar\n\rquux\n\r\npizza";
-        StringBuilder output = new StringBuilder(32);
-        int read = StringParser.readLines(output, input, 0, null);
-        assertEquals(input.length(), read);
-        String outstr = output.toString();
-        assertEquals("foo bar quux pizza ", outstr);
-    }
-
-    public void testReadLines$$() throws Exception {
-        String input = "$$foo bar\n\r$$quux\n\r\n$$pizza";
-        StringBuilder output = new StringBuilder(32);
-        int read = StringParser.readLines(output, input, 0, "$$");
-        assertEquals(input.length(), read);
-        String outstr = output.toString();
-        assertEquals("foo bar quux pizza ", outstr);
-    }
 }
