@@ -33,6 +33,10 @@ public class JexlException extends RuntimeException {
     protected final transient JexlInfo info;
     /** A marker to use in NPEs stating a null operand error. */
     public static final String NULL_OPERAND = "jexl.null";
+    /** Minimum number of characters around exception location. */
+    private static final int MIN_EXCHARLOC = 5;
+    /** Maximum number of characters around exception location. */
+    private static final int MAX_EXCHARLOC = 10;
     
     /**
      * Creates a new JexlException.
@@ -145,14 +149,14 @@ public class JexlException extends RuntimeException {
         @Override
         protected String detailedMessage() {
             int begin = info.debugInfo().getColumn();
-            int end = begin + 5;
-            begin -= 5;
+            int end = begin + MIN_EXCHARLOC;
+            begin -= MIN_EXCHARLOC;
             if (begin < 0) {
-                end += 5;
+                end += MIN_EXCHARLOC;
                 begin = 0;
             }
             int length = getExpression().length();
-            if (length < 10) {
+            if (length < MAX_EXCHARLOC) {
                 return "parsing error in '" + getExpression() + "'";
             } else {
                 return "parsing error near '... "
@@ -202,14 +206,14 @@ public class JexlException extends RuntimeException {
         @Override
         protected String detailedMessage() {
             int begin = info.debugInfo().getColumn();
-            int end = begin + 5;
-            begin -= 5;
+            int end = begin + MIN_EXCHARLOC;
+            begin -= MIN_EXCHARLOC;
             if (begin < 0) {
-                end += 5;
+                end += MIN_EXCHARLOC;
                 begin = 0;
             }
             int length = getExpression().length();
-            if (length < 10) {
+            if (length < MAX_EXCHARLOC) {
                 return "parsing error in '" + getExpression() + "'";
             } else {
                 return "parsing error near '... "

@@ -290,7 +290,7 @@ public class JexlEngine {
         if (arithmetic instanceof JexlThreadedArithmetic) {
             JexlThreadedArithmetic.setLenient(Boolean.valueOf(flag));
         } else {
-            strict = flag? Boolean.FALSE : Boolean.TRUE;
+            strict = flag ? Boolean.FALSE : Boolean.TRUE;
         }
     }
 
@@ -300,9 +300,9 @@ public class JexlEngine {
      * @return true if lenient, false if strict
      */
     public boolean isLenient() {
-        return strict == null? arithmetic.isLenient() : !strict.booleanValue();
+        return strict == null ? arithmetic.isLenient() : !strict.booleanValue();
     }
-        
+
     /**
      * Sets whether this engine behaves in strict or lenient mode.
      * Equivalent to setLenient(!flag).
@@ -311,7 +311,7 @@ public class JexlEngine {
     public final void setStrict(boolean flag) {
         setLenient(!flag);
     }
-    
+
     /**
      * Checks whether this engine behaves in strict or lenient mode.
      * Equivalent to !isLenient().
@@ -320,7 +320,6 @@ public class JexlEngine {
     public final boolean isStrict() {
         return !isLenient();
     }
-
 
     /**
      * Sets the class loader used to discover classes in 'new' expressions.
@@ -447,7 +446,7 @@ public class JexlEngine {
     public Script createScript(String scriptText) {
         return createScript(scriptText, null, null);
     }
-    
+
     /**
      * Creates a Script from a String containing valid JEXL syntax.
      * This method parses the script which validates the syntax.
@@ -457,9 +456,10 @@ public class JexlEngine {
      * @return A {@link Script} which can be executed using a {@link JexlContext}.
      * @throws JexlException if there is a problem parsing the script.
      */
-    public Script createScript(String scriptText, String...names) {
+    public Script createScript(String scriptText, String... names) {
         return createScript(scriptText, null, names);
     }
+
     /**
      * Creates a Script from a String containing valid JEXL syntax.
      * This method parses the script which validates the syntax.
@@ -477,7 +477,7 @@ public class JexlEngine {
             throw new NullPointerException("scriptText is null");
         }
         // Parse the expression
-        ASTJexlScript tree = parse(scriptText, info, names);
+        ASTJexlScript tree = parse(scriptText, info, new Scope(names));
         return createScript(tree, scriptText);
     }
 
@@ -580,12 +580,12 @@ public class JexlEngine {
         expr = "#0" + (expr.charAt(0) == '[' ? "" : ".") + expr + ";";
         try {
             parser.ALLOW_REGISTERS = true;
-            String[] regStrs = {"#0"};
-            ASTJexlScript script = parse(expr, null, regStrs);
+            Scope frame = new Scope("#0");
+            ASTJexlScript script = parse(expr, null, frame);
             JexlNode node = script.jjtGetChild(0);
             Interpreter interpreter = createInterpreter(context);
-            // set register
-            interpreter.setArguments(script.getParameters(), script.createArguments(bean));
+            // set frame
+            interpreter.setFrame(script.createFrame(bean));
             return node.jjtAccept(interpreter, null);
         } catch (JexlException xjexl) {
             if (silent) {
@@ -635,12 +635,12 @@ public class JexlEngine {
         expr = "#0" + (expr.charAt(0) == '[' ? "" : ".") + expr + "=" + "#1" + ";";
         try {
             parser.ALLOW_REGISTERS = true;
-            String[] regStrs = {"#0", "#1"};
-            ASTJexlScript script = parse(expr, null, regStrs);
+            Scope frame = new Scope("#0", "#1");
+            ASTJexlScript script = parse(expr, null, frame);
             JexlNode node = script.jjtGetChild(0);
             Interpreter interpreter = createInterpreter(context);
             // set the registers
-            interpreter.setArguments(script.getParameters(), script.createArguments(bean, value));
+            interpreter.setFrame(script.createFrame(bean, value));
             node.jjtAccept(interpreter, null);
         } catch (JexlException xjexl) {
             if (silent) {
@@ -755,7 +755,7 @@ public class JexlEngine {
     protected Interpreter createInterpreter(JexlContext context) {
         return createInterpreter(context, isStrict(), isSilent());
     }
-    
+
     /**
      * Creates an interpreter.
      * @param context a JexlContext; if null, the EMPTY_CONTEXT is used instead.
@@ -764,7 +764,7 @@ public class JexlEngine {
      * @return an Interpreter
      */
     protected Interpreter createInterpreter(JexlContext context, boolean strictFlag, boolean silentFlag) {
-        return new Interpreter(this, context == null? EMPTY_CONTEXT : context, strictFlag, silentFlag);
+        return new Interpreter(this, context == null ? EMPTY_CONTEXT : context, strictFlag, silentFlag);
     }
 
     /**
@@ -970,27 +970,201 @@ public class JexlEngine {
     }
 
     /**
-     * Parses an expression.
-     * @param expression the expression to parse
-     * @param info debug information structure
-     * @return the parsed tree
-     * @throws JexlException if any error occured during parsing
-     * @deprecated 
+     * A script scope, stores the declaration of parameters and local variables.
      */
-    @Deprecated
-    protected ASTJexlScript parse(CharSequence expression, JexlInfo info) {
-        return parse(expression, info, null);
+    public static final class Scope {
+        /**
+         * The number of parameters.
+         */
+        protected final int parms;
+        /**
+         * The map of named registers aka script parameters.
+         * Each parameter is associated to a register and is materialized as an offset in the registers array used
+         * during evaluation.
+         */
+        protected Map<String, Integer> namedRegisters = null;
+
+        /**
+         * Creates a new scope with a list of parameters.
+         * @param parameters the list of parameters
+         */
+        public Scope(String... parameters) {
+            if (parameters != null) {
+                parms = parameters.length;
+                namedRegisters = new LinkedHashMap<String, Integer>();
+                for (int p = 0; p < parms; ++p) {
+                    namedRegisters.put(parameters[p], p);
+                }
+            } else {
+                parms = 0;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return namedRegisters == null ? 0 : parms ^ namedRegisters.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof Scope && equals((Scope) o);
+        }
+
+        /**
+         * Whether this frame is equal to another.
+         * @param frame the frame to compare to
+         * @return true if equal, false otherwise
+         */
+        public boolean equals(Scope frame) {
+            return this == frame
+                    || parms == frame.parms
+                    && namedRegisters.equals(frame.namedRegisters);
+        }
+
+        /**
+         * Checks whether an identifier is a local variable or argument, ie stored in a register. 
+         * @param name the register name
+         * @return the register index
+         */
+        public Integer getRegister(String name) {
+            return namedRegisters != null ? namedRegisters.get(name) : null;
+        }
+
+        /**
+         * Declares a local variable.
+         * <p>
+         * This method creates an new entry in the named register map.
+         * </p>
+         * @param name the variable name
+         * @return the register index storing this variable
+         */
+        public Integer declareVariable(String name) {
+            if (namedRegisters == null) {
+                namedRegisters = new LinkedHashMap<String, Integer>();
+            }
+            Integer register = namedRegisters.get(name);
+            if (register == null) {
+                register = Integer.valueOf(namedRegisters.size());
+                namedRegisters.put(name, register);
+            }
+            return register;
+        }
+
+        /**
+         * Creates a frame by copying values up to the number of parameters.
+         * @param values the argument values
+         * @return the arguments array
+         */
+        public Frame createFrame(Object... values) {
+            if (namedRegisters != null) {
+                Object[] arguments = new Object[namedRegisters.size()];
+                if (values != null) {
+                    System.arraycopy(values, 0, arguments, 0, Math.min(parms, values.length));
+                }
+                return new Frame(arguments, namedRegisters.keySet().toArray(new String[0]));
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * Gets the (maximum) number of arguments this script expects.
+         * @return the number of parameters
+         */
+        public int getArgCount() {
+            return parms;
+        }
+
+        /**
+         * Gets this script registers, i.e. parameters and local variables.
+         * @return the register names
+         */
+        public String[] getRegisters() {
+            return namedRegisters != null ? namedRegisters.keySet().toArray(new String[0]) : new String[0];
+        }
+
+        /**
+         * Gets this script parameters, i.e. registers assigned before creating local variables.
+         * @return the parameter names
+         */
+        public String[] getParameters() {
+            if (namedRegisters != null && parms > 0) {
+                String[] pa = new String[parms];
+                int p = 0;
+                for (Map.Entry<String, Integer> entry : namedRegisters.entrySet()) {
+                    if (entry.getValue() < parms) {
+                        pa[p++] = entry.getKey();
+                    }
+                }
+                return pa;
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * Gets this script local variable, i.e. registers assigned to local variables.
+         * @return the parameter names
+         */
+        public String[] getLocalVariables() {
+            if (namedRegisters != null && parms > 0) {
+                String[] pa = new String[parms];
+                int p = 0;
+                for (Map.Entry<String, Integer> entry : namedRegisters.entrySet()) {
+                    if (entry.getValue() >= parms) {
+                        pa[p++] = entry.getKey();
+                    }
+                }
+                return pa;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * A call frame, created from a scope, stores the arguments and local variables as "registers".
+     */
+    public static final class Frame {
+        /** Registers or arguments. */
+        protected Object[] registers = null;
+        /** Parameter and argument names if any. */
+        protected String[] parameters = null;
+        
+        /**
+         * Creates a new frame.
+         * @param r the registers
+         * @param p the parameters
+         */
+        Frame(Object[] r, String[] p) {
+            registers = r;
+            parameters = p;
+        }
+        
+        /**
+         * @return the registers
+         */
+        public Object[] getRegisters() {
+            return registers;
+        }
+                
+        /**
+         * @return the parameters
+         */
+        public String[] getParameters() {
+            return parameters;
+        }
     }
 
     /**
      * Parses an expression.
      * @param expression the expression to parse
      * @param info debug information structure
-     * @param names the parameter names array
+     * @param frame the script frame to use
      * @return the parsed tree
      * @throws JexlException if any error occured during parsing
      */
-    protected ASTJexlScript parse(CharSequence expression, JexlInfo info, String[] names) {
+    protected ASTJexlScript parse(CharSequence expression, JexlInfo info, Scope frame) {
         String expr = cleanExpression(expression);
         ASTJexlScript script = null;
         DebugInfo dbgInfo = null;
@@ -998,7 +1172,10 @@ public class JexlEngine {
             if (cache != null) {
                 script = cache.get(expr);
                 if (script != null) {
-                    return script;
+                    Scope f = script.getScope();
+                    if ((f == null && frame == null) || (f != null && f.equals(frame))) {
+                        return script;
+                    }
                 }
             }
             try {
@@ -1011,20 +1188,12 @@ public class JexlEngine {
                 } else {
                     dbgInfo = info.debugInfo();
                 }
-                Map<String, Integer> params = null;
-                if (names != null) {
-                    params = new LinkedHashMap<String, Integer>();
-                    for (int n = 0; n < names.length; ++n) {
-                        params.put(names[n], Integer.valueOf(n));
-                    }
-                    parser.setNamedRegisters(params);
-                }
+                parser.setFrame(frame);
                 script = parser.parse(reader, dbgInfo);
                 // reaccess in case local variables have been declared
-                params = parser.getNamedRegisters();
-                if (params != null) {
-                    String[] registers = (new ArrayList<String>(params.keySet())).toArray(new String[0]);
-                    script.setParameters(names != null ? names.length : 0, registers);
+                frame = parser.getFrame();
+                if (frame != null) {
+                    script.setScope(frame);
                 }
                 if (cache != null) {
                     cache.put(expr, script);
@@ -1034,7 +1203,7 @@ public class JexlEngine {
             } catch (ParseException xparse) {
                 throw new JexlException.Parsing(dbgInfo, expression, xparse);
             } finally {
-                parser.setNamedRegisters(null);
+                parser.setFrame(null);
             }
         }
         return script;

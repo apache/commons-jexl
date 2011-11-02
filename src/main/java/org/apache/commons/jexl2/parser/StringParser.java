@@ -54,28 +54,6 @@ public class StringParser {
     }
 
     /**
-     * Reads lines beginning with a given prefix and append them to a StringBuilder without the prefix.
-     * @param strb the string builder to append to
-     * @param str the input char sequence
-     * @param index the beginning offset in the input char sequence
-     * @param prefix the prefix to use
-     * @return the number of characters read from the input sequence
-     */
-    public static int readLines(StringBuilder strb, CharSequence str, int index, String prefix) {
-        CharSequenceReader csr = new CharSequenceReader(str.subSequence(index, str.length()));
-        while (true) {
-            CharSequence line = csr.readLine();
-            if (line != null && (prefix == null || line.toString().startsWith(prefix))) {
-                strb.append(prefix == null? line.toString() : line.subSequence(prefix.length(), line.length()));
-                strb.append(' ');
-            } else {
-                break;
-            }
-        }
-        return csr.position();
-    }
-
-    /**
      * Read the remainder of a string till a given separator,
      * handles escaping through '\' syntax.
      * @param strb the destination buffer to copy characters into
@@ -173,13 +151,13 @@ public class StringParser {
      * @param str the string to escape
      * @return the escaped representation
      */
-    public static String escapeString(String str) {
+    public static String escapeString(String str, char delim) {
         if (str == null) {
             return null;
         }
         final int length = str.length();
         StringBuilder strb = new StringBuilder(length + 2);
-        strb.append('\'');
+        strb.append(delim);
         for (int i = 0; i < length; ++i) {
             char c = str.charAt(i);
             switch (c) {
@@ -224,7 +202,7 @@ public class StringParser {
                     }
             }
         }
-        strb.append('\'');
+        strb.append(delim);
         return strb.toString();
     }
 }

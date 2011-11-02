@@ -31,7 +31,6 @@ public abstract class JexlNode extends SimpleNode implements JexlInfo {
     public interface Literal<T> {
         T getLiteral();
     }
-
     /** token value. */
     public String image;
 
@@ -54,26 +53,26 @@ public abstract class JexlNode extends SimpleNode implements JexlInfo {
         }
         return null;
     }
-    
+
     /** {@inheritDoc} */
     public String debugString() {
         DebugInfo info = debugInfo();
-        return info != null? info.debugString() : "";
+        return info != null ? info.debugString() : "";
     }
-    
 
     /**
      * Whether this node is a constant node
      * Its value can not change after the first evaluation and can be cached indefinitely.
      * @return true if constant, false otherwise
      */
-    public boolean isConstant() {
+    public final boolean isConstant() {
         return isConstant(this instanceof JexlNode.Literal<?>);
     }
-    public boolean isConstant(boolean literal) {
+
+    private boolean isConstant(boolean literal) {
         if (literal) {
             if (children != null) {
-                for(JexlNode child : children) {
+                for (JexlNode child : children) {
                     if (!child.isConstant()) {
                         return false;
                     }

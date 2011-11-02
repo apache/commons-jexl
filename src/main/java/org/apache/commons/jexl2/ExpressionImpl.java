@@ -61,7 +61,7 @@ public class ExpressionImpl implements Expression, Script {
             return null;
         }
         Interpreter interpreter = jexl.createInterpreter(context);
-        interpreter.setArguments(script.getRegisters(), script.createArguments((Object[]) null));
+        interpreter.setFrame(script.createFrame((Object[]) null));
         return interpreter.interpret(script.jjtGetChild(0));
     }
 
@@ -103,7 +103,7 @@ public class ExpressionImpl implements Expression, Script {
      */
     public Object execute(JexlContext context) {
         Interpreter interpreter = jexl.createInterpreter(context);
-        interpreter.setArguments(script.getRegisters(), script.createArguments((Object[]) null));
+        interpreter.setFrame(script.createFrame((Object[]) null));
         return interpreter.interpret(script);
     }
 
@@ -112,7 +112,7 @@ public class ExpressionImpl implements Expression, Script {
      */
     public Object execute(JexlContext context, Object... args) {
         Interpreter interpreter = jexl.createInterpreter(context);
-        interpreter.setArguments(script.getRegisters(), script.createArguments(args));
+        interpreter.setFrame(script.createFrame(args));
         return interpreter.interpret(script);
     }
 
@@ -149,7 +149,7 @@ public class ExpressionImpl implements Expression, Script {
      */
     public Callable<Object> callable(JexlContext context, Object... args) {
         final Interpreter interpreter = jexl.createInterpreter(context);
-        interpreter.setArguments(script.getRegisters(), script.createArguments(args));
+        interpreter.setFrame(script.createFrame(args));
 
         return new Callable<Object>() {
             /** Use interpreter as marker for not having run. */

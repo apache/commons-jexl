@@ -16,13 +16,12 @@
  */
 package org.apache.commons.jexl2.parser;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import org.apache.commons.jexl2.DebugInfo;
+import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.JexlException;
 
 /**
- *
+ * The base class for parsing, manages the parameter/local variable frame.
  * @author henri
  */
 public class JexlParser extends StringParser {
@@ -31,30 +30,31 @@ public class JexlParser extends StringParser {
      * Each parameter is associated to a register and is materialized as an offset in the registers array used
      * during evaluation.
      */
-    protected Map<String, Integer> namedRegisters = null;
+    protected JexlEngine.Scope frame;
 
     /**
-     * Sets the map of named registers in this parser.
+     * Sets the frame to use bythis parser.
      * <p>
      * This is used to allow parameters to be declared before parsing.
      * </p>
      * @param registers the register map
      */
-    public void setNamedRegisters(Map<String, Integer> registers) {
-        namedRegisters = registers;
+    public void setFrame(JexlEngine.Scope theFrame) {
+        frame = theFrame;
     }
-
+    
     /**
-     * Gets the map of registers used by this parser.
+     * Gets the frame used by this parser.
      * <p>
      * Since local variables create new named registers, it is important to regain access after
      * parsing to known which / how-many registers are needed.
      * </p>
      * @return the named register map
      */
-    public Map<String, Integer> getNamedRegisters() {
-        return namedRegisters;
+    public JexlEngine.Scope getFrame() {
+        return frame;
     }
+    
 
     /**
      * Checks whether an identifier is a local variable or argument, ie stored in a register. 
@@ -63,8 +63,8 @@ public class JexlParser extends StringParser {
      * @return the image
      */
     public String checkVariable(ASTIdentifier identifier, String image) {
-        if (namedRegisters != null) {
-            Integer register = namedRegisters.get(image);
+        if (frame != null) {
+            Integer register = frame.getRegister(image);
             if (register != null) {
                 identifier.setRegister(register);
             }
@@ -81,14 +81,10 @@ public class JexlParser extends StringParser {
      * @param image the variable name
      */
     public void declareVariable(ASTVar identifier, String image) {
-        if (namedRegisters == null) {
-            namedRegisters = new LinkedHashMap<String, Integer>();
+        if (frame == null) {
+            frame = new JexlEngine.Scope((String[])null);
         }
-        Integer register = namedRegisters.get(image);
-        if (register == null) {
-            register = Integer.valueOf(namedRegisters.size());
-            namedRegisters.put(image, register);
-        }
+        Integer register = frame.declareVariable(image);
         identifier.setRegister(register);
         identifier.image = image;
     }
