@@ -41,9 +41,10 @@ What's new in 2.1:
 * A more thorough arithmetic (JexlArithmetic) that allows fine control over decimals (scale and precision), a
   new syntax for numeric literals (OGNL inspired Big and Huge notations) and a better type handling keeping the most
   appropriate representation in casual operations.
-* The introduction of script variables and parameters that reduce context dependencies and methods that allow some
-  checks performed after script creation (light static checking hints). Plus the ability to call script from scripts.
+* The introduction of script variables and parameters that reduce context dependencies and methods; this allows to
+  perform checks after script creation (light static checking hints). Plus the ability to call script from scripts.
 * A sandoxing feature to restrict and rename what JEXL can access from the environment allowing tighter control over security.
+* Extensions to UnifiedJEXL that allow the creation of templates.
 
 New features in 2.1:
 ====================	
@@ -52,6 +53,8 @@ New features in 2.1:
 * JEXL-118:     Provide an IN operator
 * JEXL-115:     Add support for asynchronous script execution and cancellation
 * JEXL-116:     Add control over classes, methods, constructors and properties allowed in scripts
+* JEXL-120:     Add simple template features
+* JEXL-119:     Allow indexed properties container resolution in expressions
 * JEXL-106:     When divide two BigDecimal values in an expression it results in java.lang.ArithmeticException
 * JEXL-102:     Add "jexl2" as a supported name
 

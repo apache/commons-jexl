@@ -193,7 +193,7 @@ public class SandboxTest extends JexlTestCase {
         script = sjexl.createScript(expr, "foo");
         result = script.execute(null, foo);
         assertEquals(foo.alias, result);
-        
+
         script = sjexl.createScript("foo.ALIAS", "foo");
         result = script.execute(null, foo);
         assertEquals(foo.alias, result);
@@ -215,5 +215,44 @@ public class SandboxTest extends JexlTestCase {
         result = script.execute(null, foo, "43");
         assertEquals("43", result);
         assertEquals("43", foo.alias);
+    }
+
+    public void testRestrict() throws Exception {
+        JexlContext context = new MapContext();
+        context.set("System", System.class);
+        Sandbox sandbox = new Sandbox();
+        // only allow call to currentTimeMillis (avoid exit, gc, loadLibrary, etc)
+        sandbox.white(System.class.getName()).execute("currentTimeMillis");
+        // can not create a new file
+        sandbox.black(java.io.File.class.getName()).execute("");
+
+        Uberspect uber = new SandboxUberspectImpl(null, sandbox);
+        JexlEngine sjexl = new JexlEngine(uber, null, null, null);
+        sjexl.setStrict(true);
+
+        String expr;
+        Script script;
+        Object result;
+        
+        script = sjexl.createScript("System.exit()");
+        try {
+            result = script.execute(context);
+            fail("should not allow calling exit!");
+        } catch (JexlException xjexl) {
+            LOGGER.info(xjexl.toString());
+        }
+                
+        script = sjexl.createScript("new('java.io.File', '/tmp/should-not-be-created')");
+        try {
+            result = script.execute(context);
+            fail("should not allow creating a file");
+        } catch (JexlException xjexl) {
+            LOGGER.info(xjexl.toString());
+        }
+        
+        expr = "System.currentTimeMillis()";
+        script = sjexl.createScript("System.currentTimeMillis()");
+        result = script.execute(context);
+        assertNotNull(result);
     }
 }
