@@ -26,6 +26,12 @@
   </properties>
   <body>
     <release version="2.1" date="unreleased">
+        <action dev="henrib" type="add" issue="JEXL-121">
+            Add simple template features
+        </action>
+        <action dev="henrib" type="fix" issue="JEXL-120" due-to="Lukas Krecan">
+            Make ParseException work in sandboxed environment
+        </action>
         <action dev="henrib" type="add" issue="JEXL-119">
             Allow indexed properties container resolution in expressions
         </action>
