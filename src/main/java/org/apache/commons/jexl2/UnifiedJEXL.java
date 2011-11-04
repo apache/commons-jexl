@@ -18,7 +18,6 @@ package org.apache.commons.jexl2;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
@@ -96,6 +95,7 @@ public final class UnifiedJEXL {
     private static final char IMM_CHAR = '$';
     /** The first character for deferred expressions. */
     private static final char DEF_CHAR = '#';
+
     /**
      * Creates a new instance of UnifiedJEXL with a default size cache.
      * @param aJexl the JexlEngine to use.
@@ -594,7 +594,7 @@ public final class UnifiedJEXL {
                 throw new IllegalArgumentException("Nested expression can not have a source");
             }
         }
-        
+
         @Override
         public StringBuilder asString(StringBuilder strb) {
             strb.append(expr);
@@ -1121,7 +1121,7 @@ public final class UnifiedJEXL {
             }
             return strb.toString();
         }
-        
+
         /**
          * Recreate the template source from its inner components.
          * @return the template source rewritten
@@ -1146,7 +1146,7 @@ public final class UnifiedJEXL {
          * @return the prepared version of the template
          */
         public Template prepare(JexlContext context) {
-            JexlEngine.Frame frame = script.createFrame((Object[])null);
+            JexlEngine.Frame frame = script.createFrame((Object[]) null);
             TemplateContext tcontext = new TemplateContext(context, frame, exprs, null);
             Expression[] immediates = new Expression[exprs.length];
             for (int e = 0; e < exprs.length; ++e) {
@@ -1189,7 +1189,7 @@ public final class UnifiedJEXL {
         /** The array of UnifiedJEXL expressions. */
         private final Expression[] exprs;
         /** The writer used to output. */
-        private final PrintWriter writer;
+        private final Writer writer;
         /** The call frame. */
         private final JexlEngine.Frame frame;
 
@@ -1204,13 +1204,7 @@ public final class UnifiedJEXL {
             wrap = jcontext;
             frame = jframe;
             exprs = expressions;
-            if (out == null) {
-                writer = null;
-            } else if (out instanceof PrintWriter) {
-                writer = (PrintWriter) out;
-            } else {
-                writer = new PrintWriter(out);
-            }
+            writer = out;
         }
 
         /**
@@ -1256,12 +1250,31 @@ public final class UnifiedJEXL {
         public void include(Template template, Object... args) {
             template.evaluate(wrap, writer, args);
         }
+        
+        /**
+         * Prints an expression result.
+         * @param e the expression number
+         */
+        public void print(String cs) {
+            Expression expr = UnifiedJEXL.this.parse(cs);
+            if (expr.isDeferred()) {
+                expr = expr.prepare(wrap);
+            }
+            if (expr instanceof CompositeExpression) {
+                printComposite((CompositeExpression) expr);
+            } else {
+                doPrint(expr.evaluate(this));
+            }
+        }
 
         /**
          * Prints an expression result.
          * @param e the expression number
          */
         public void print(int e) {
+            if (e < 0 || e >= exprs.length) {
+                return;
+            }
             Expression expr = exprs[e];
             if (expr.isDeferred()) {
                 expr = expr.prepare(wrap);
@@ -1269,33 +1282,7 @@ public final class UnifiedJEXL {
             if (expr instanceof CompositeExpression) {
                 printComposite((CompositeExpression) expr);
             } else {
-                print(expr.evaluate(this));
-            }
-        }
-
-        /**
-         * Prints to output.
-         * <p>This will dynamically try to find the best suitable method in the writer through uberspection.
-         * Subclassing Writer should be the preferred way to specialize output.
-         * </p>
-         * @param arg the argument to print out
-         */
-        protected void print(Object arg) {
-            if (arg instanceof CharSequence) {
-                writer.print(arg.toString());
-            } else if (arg != null) {
-                Object[] value = {arg};
-                Uberspect uber = getEngine().getUberspect();
-                JexlMethod method = uber.getMethod(writer, "print", value, null);
-                if (method != null) {
-                    try {
-                        method.invoke(writer, value);
-                    } catch (java.lang.Exception xany) {
-                        throw createException("invoke print", null, xany);
-                    }
-                } else {
-                    writer.print(arg.toString());
-                }
+                doPrint(expr.evaluate(this));
             }
         }
 
@@ -1309,7 +1296,35 @@ public final class UnifiedJEXL {
             Object value = null;
             for (int e = 0; e < size; ++e) {
                 value = cexprs[e].evaluate(this);
-                print(value);
+                doPrint(value);
+            }
+        }
+        
+        /**
+         * Prints to output.
+         * <p>This will dynamically try to find the best suitable method in the writer through uberspection.
+         * Subclassing Writer by adding 'print' methods should be the preferred way to specialize output.
+         * </p>
+         * @param arg the argument to print out
+         */
+        private void doPrint(Object arg) {
+            try {
+                if (arg instanceof CharSequence) {
+                    writer.write(arg.toString());
+                } else if (arg != null) {
+                    Object[] value = {arg};
+                    Uberspect uber = getEngine().getUberspect();
+                    JexlMethod method = uber.getMethod(writer, "print", value, null);
+                    if (method != null) {
+                        method.invoke(writer, value);
+                    } else {
+                        writer.write(arg.toString());
+                    }
+                }
+            } catch (java.io.IOException xio) {
+                throw createException("call print", null, xio);
+            } catch (java.lang.Exception xany) {
+                throw createException("invoke print", null, xany);
             }
         }
     }
@@ -1415,7 +1430,6 @@ public final class UnifiedJEXL {
         return new Template(prefix, source, parms);
     }
 
-    
     /**
      * Creates a new template.
      * @param source the source
@@ -1434,5 +1448,4 @@ public final class UnifiedJEXL {
     public Template createTemplate(String source) {
         return new Template("$$", new StringReader(source), (String[]) null);
     }
-
 }
