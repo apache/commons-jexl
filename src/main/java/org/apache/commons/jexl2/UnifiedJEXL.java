@@ -1021,6 +1021,13 @@ public final class UnifiedJEXL {
      * The value 169 is over fourty-two
      * </pre></blockquote>
      * <p>
+     * During evaluation, the template context exposes its writer as '$jexl' which is safe to use in this case.
+     * This allows writing directly through the writer without adding new-lines as in:
+     * <p><blockquote><pre>
+     * $$ for(var cell : cells) { $jexl.print(cell); $jexl.print(';') }
+     * </pre></blockquote>
+     * </p>
+     * <p>
      * A template is expanded as one JEXL script and a list of UnifiedJEXL expressions; each UnifiedJEXL expression
      * being replace in the script by a call to jexl:print(expr) (the expr is in fact the expr number in the template).
      * This integration uses a specialized JexlContext (TemplateContext) that serves as a namespace (for jexl:)
@@ -1181,6 +1188,7 @@ public final class UnifiedJEXL {
 
     /**
      * The type of context to use during evaluation of templates.
+     * <p>This context exposes its writer as '$jexl' to the scripts.</p>
      * <p>public for introspection purpose.</p>
      */
     public final class TemplateContext implements JexlContext, NamespaceResolver {
@@ -1217,7 +1225,11 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         public Object get(String name) {
-            return wrap.get(name);
+            if ("$jexl".equals(name)) {
+                return writer;
+            } else {
+                return wrap.get(name);
+            }
         }
 
         /** {@inheritDoc} */
@@ -1249,22 +1261,6 @@ public final class UnifiedJEXL {
          */
         public void include(Template template, Object... args) {
             template.evaluate(wrap, writer, args);
-        }
-        
-        /**
-         * Prints an expression result.
-         * @param e the expression number
-         */
-        public void print(String cs) {
-            Expression expr = UnifiedJEXL.this.parse(cs);
-            if (expr.isDeferred()) {
-                expr = expr.prepare(wrap);
-            }
-            if (expr instanceof CompositeExpression) {
-                printComposite((CompositeExpression) expr);
-            } else {
-                doPrint(expr.evaluate(this));
-            }
         }
 
         /**
