@@ -326,9 +326,12 @@ public final class UnifiedJEXL {
         }
 
         /**
+         * Evaluates the immediate sub-expressions.
+         * <p>
          * When the expression is dependant upon immediate and deferred sub-expressions,
          * evaluates the immediate sub-expressions with the context passed as parameter
          * and returns this expression deferred form.
+         * </p>
          * <p>
          * In effect, this binds the result of the immediate sub-expressions evaluation in the
          * context, allowing to differ evaluation of the remaining (deferred) expression within another context.
@@ -338,12 +341,12 @@ public final class UnifiedJEXL {
          * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
          * </p>
          * @param context the context to use for immediate expression evaluations
-         * @return  an expression or null if an error occurs and the {@link JexlEngine} is silent
-         * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
+         * @return an expression or null if an error occurs and the {@link JexlEngine} is running in silent mode
+         * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not in silent mode
          */
         public final Expression prepare(JexlContext context) {
             try {
-                Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), false);
+                Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), jexl.isSilent());
                 if (context instanceof TemplateContext) {
                     interpreter.setFrame(((TemplateContext) context).getFrame());
                 }
@@ -365,12 +368,12 @@ public final class UnifiedJEXL {
          * </p>
          * @param context the variable context
          * @return the result of this expression evaluation or null if an error occurs and the {@link JexlEngine} is
-         * silent
+         * running in silent mode
          * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
          */
         public final Object evaluate(JexlContext context) {
             try {
-                Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), false);
+                Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), jexl.isSilent());
                 if (context instanceof TemplateContext) {
                     interpreter.setFrame(((TemplateContext) context).getFrame());
                 }
@@ -1295,7 +1298,7 @@ public final class UnifiedJEXL {
                 doPrint(value);
             }
         }
-        
+
         /**
          * Prints to output.
          * <p>This will dynamically try to find the best suitable method in the writer through uberspection.
