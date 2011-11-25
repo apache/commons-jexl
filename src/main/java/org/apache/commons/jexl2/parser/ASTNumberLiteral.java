@@ -40,6 +40,12 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
     public Number getLiteral() {
         return literal;
     }
+    
+    /** {@inheritDoc} */
+    @Override
+    protected boolean isConstant(boolean literal) {
+        return true;
+    }
 
     /** {@inheritDoc} */
     @Override

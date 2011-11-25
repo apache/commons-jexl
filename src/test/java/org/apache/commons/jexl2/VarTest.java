@@ -16,8 +16,11 @@
  */
 package org.apache.commons.jexl2;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -157,12 +160,30 @@ public class VarTest extends JexlTestCase {
         if (lhs.size() != rhs.size()) {
             return false;
         }
-        for(List<String> ref : lhs) {
-            if (!rhs.contains(ref)) {
+        List<String> llhs = stringify(lhs);
+        List<String> lrhs = stringify(rhs);
+        for(int s = 0; s < llhs.size(); ++s) {
+            String l = llhs.get(s);
+            String r = lrhs.get(s);
+            if (!l.equals(r)) {
                 return false;
             }
         }
         return true;
+    }
+    
+    List<String> stringify(Set<List<String>> sls) {
+        List<String> ls = new ArrayList<String>();
+        for(List<String> l : sls) {
+        StringBuilder strb = new StringBuilder();
+        for(String s : l) {
+            strb.append(s);
+            strb.append('|');
+        }
+            ls.add(strb.toString());
+        }
+        Collections.sort(ls);
+        return ls;
     }
 
     public void testRefs() throws Exception {
@@ -226,5 +247,21 @@ public class VarTest extends JexlTestCase {
         assertEquals("x", parms[0]);
         assertEquals(1, locals.length);
         assertEquals("z", locals[0]);
+    }
+    
+    public void testLiteral() throws Exception {
+        Script e = JEXL.createScript("x.y[['z', 't']]");
+        Set<List<String>> vars = e.getVariables();
+        assertEquals(1, vars.size());
+        assertTrue(eq(mkref(new String[][]{{"x", "y", "[ 'z', 't' ]"}}), vars));
+        
+        e = JEXL.createScript("x.y[{'z': 't'}]");
+        vars = e.getVariables();
+        assertEquals(1, vars.size());
+        assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
+        e = JEXL.createScript("x.y.'{ \\'z\\' : \\'t\\' }'");
+        vars = e.getVariables();
+        assertEquals(1, vars.size());
+        assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
     }
 }

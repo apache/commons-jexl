@@ -906,7 +906,12 @@ public class JexlEngine {
                     if (child instanceof ASTReference && child.jjtGetNumChildren() == 1) {
                         JexlNode desc = child.jjtGetChild(0);
                         if (varf && desc.isConstant()) {
-                            var.add(desc.image);
+                            String image = desc.image;
+                            if (image == null) {
+                                var.add(new Debugger().data(desc));
+                            } else {
+                                var.add(image); 
+                            }
                         } else if (desc instanceof ASTIdentifier) {
                             if (((ASTIdentifier) desc).getRegister() < 0) {
                                 List<String> di = new ArrayList<String>(1);
