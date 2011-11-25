@@ -33,7 +33,13 @@ public final class ASTStringLiteral extends JexlNode implements JexlNode.Literal
     public String getLiteral() {
         return image;
     }
-
+    
+    /** {@inheritDoc} */
+    @Override
+    protected boolean isConstant(boolean literal) {
+        return true;
+    }
+    
     /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
