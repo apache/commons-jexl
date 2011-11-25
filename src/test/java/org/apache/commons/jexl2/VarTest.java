@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -29,7 +28,7 @@ import java.util.logging.Logger;
  * Tests local variables.
  */
 public class VarTest extends JexlTestCase {
-    Logger LOGGER = Logger.getLogger(VarTest.class.getName());
+    static final Logger LOGGER = Logger.getLogger(VarTest.class.getName());
 
     public VarTest(String testName) {
         super(testName);
