@@ -24,7 +24,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-jexl</artifactId>
-    <version>2.1</version>
+    <version>2.2-SNAPSHOT</version>
     <name>Commons JEXL</name>
     <inceptionYear>2001</inceptionYear>
     <description>Jexl is an implementation of the JSTL Expression Language with extensions.</description>
@@ -36,9 +36,9 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/commons/proper/jexl/tags/COMMONS_JEXL_2_1_RC1</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/commons/proper/jexl/tags/COMMONS_JEXL_2_1_RC1</developerConnection>
-        <url>http://svn.apache.org/viewvc/commons/proper/jexl/tags/COMMONS_JEXL_2_1_RC1</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/commons/proper/jexl/trunk</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/commons/proper/jexl/trunk</developerConnection>
+        <url>http://svn.apache.org/viewvc/commons/proper/jexl/trunk</url>
     </scm>
 
     <distributionManagement>
