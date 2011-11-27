@@ -16,8 +16,10 @@
  */
 package org.apache.commons.jexl2;
 
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -392,5 +394,30 @@ public class UnifiedJEXLTest extends JexlTestCase {
         
         String dstr = t.asString();
         assertNotNull(dstr);
+    }
+    
+    public static class FrobozWriter extends PrintWriter {
+        public FrobozWriter(Writer w) {
+            super(w);
+        }
+        
+        public void print(Froboz froboz) {
+            super.print("froboz{");
+            super.print(froboz.value);
+            super.print("}");
+        }
+        
+        @Override
+        public String toString() {
+            return out.toString();
+        }
+    }
+    
+    public void testWriter() throws Exception {
+        Froboz froboz = new Froboz(42);
+        Writer writer = new FrobozWriter(new StringWriter());
+        UnifiedJEXL.Template t = EL.createTemplate("$$", new StringReader("$$$jexl.print(froboz)"), "froboz");
+        t.evaluate(context, writer, froboz);
+        assertEquals("froboz{42}", writer.toString());
     }
 }

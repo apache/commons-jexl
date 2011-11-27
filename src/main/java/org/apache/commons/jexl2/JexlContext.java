@@ -18,7 +18,8 @@ package org.apache.commons.jexl2;
 
 /**
  * Manages variables which can be referenced in a JEXL expression.
- *
+ * <p>Note that JEXL may use '$jexl' and '$ujexl' variables for internal purpose; setting or getting those
+ * variables may lead to unexpected results unless specified otherwise.</p>
  *  @since 1.0
  *  @version $Id$
  */

@@ -906,7 +906,12 @@ public class JexlEngine {
                     if (child instanceof ASTReference && child.jjtGetNumChildren() == 1) {
                         JexlNode desc = child.jjtGetChild(0);
                         if (varf && desc.isConstant()) {
-                            var.add(desc.image);
+                            String image = desc.image;
+                            if (image == null) {
+                                var.add(new Debugger().data(desc));
+                            } else {
+                                var.add(image); 
+                            }
                         } else if (desc instanceof ASTIdentifier) {
                             if (((ASTIdentifier) desc).getRegister() < 0) {
                                 List<String> di = new ArrayList<String>(1);
@@ -1016,9 +1021,15 @@ public class JexlEngine {
          * @return true if equal, false otherwise
          */
         public boolean equals(Scope frame) {
-            return this == frame
-                    || parms == frame.parms
-                    && namedRegisters.equals(frame.namedRegisters);
+            if (this == frame) {
+                return true;
+            } else if (frame == null || parms != frame.parms) {
+                return false;
+            } else if (namedRegisters == null) {
+                return frame.namedRegisters == null;
+            } else {
+                return namedRegisters.equals(frame.namedRegisters);
+            }
         }
 
         /**

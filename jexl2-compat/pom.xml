@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-parent</artifactId>
-        <version>21</version>
+        <version>22</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.commons</groupId>
@@ -88,9 +88,9 @@
         <maven.compile.source>1.5</maven.compile.source>
         <maven.compile.target>1.5</maven.compile.target>
         <commons.componentid>jexl-compat</commons.componentid>
-        <commons.release.version>2.0.1</commons.release.version>
+        <commons.release.version>2.1</commons.release.version>
         <!-- The RC version used in the staging repository URL. -->
-        <commons.rc.version>RC2</commons.rc.version>
+        <commons.rc.version>RC1</commons.rc.version>
         <commons.binary.suffix />
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>

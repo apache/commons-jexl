@@ -69,11 +69,21 @@ public abstract class JexlNode extends SimpleNode implements JexlInfo {
         return isConstant(this instanceof JexlNode.Literal<?>);
     }
 
-    private boolean isConstant(boolean literal) {
+    protected boolean isConstant(boolean literal) {
         if (literal) {
             if (children != null) {
                 for (JexlNode child : children) {
-                    if (!child.isConstant()) {
+                    if (child instanceof ASTReference) {
+                        boolean is = child.isConstant(true);
+                        if (!is) {
+                            return false;
+                        }
+                    } else if (child instanceof ASTMapEntry) {
+                        boolean is = child.isConstant(true);
+                        if (!is) {
+                            return false;
+                        }
+                    } else if (!child.isConstant()) {
                         return false;
                     }
                 }

@@ -18,7 +18,6 @@ package org.apache.commons.jexl2;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
@@ -96,6 +95,7 @@ public final class UnifiedJEXL {
     private static final char IMM_CHAR = '$';
     /** The first character for deferred expressions. */
     private static final char DEF_CHAR = '#';
+
     /**
      * Creates a new instance of UnifiedJEXL with a default size cache.
      * @param aJexl the JexlEngine to use.
@@ -326,9 +326,12 @@ public final class UnifiedJEXL {
         }
 
         /**
+         * Evaluates the immediate sub-expressions.
+         * <p>
          * When the expression is dependant upon immediate and deferred sub-expressions,
          * evaluates the immediate sub-expressions with the context passed as parameter
          * and returns this expression deferred form.
+         * </p>
          * <p>
          * In effect, this binds the result of the immediate sub-expressions evaluation in the
          * context, allowing to differ evaluation of the remaining (deferred) expression within another context.
@@ -338,12 +341,12 @@ public final class UnifiedJEXL {
          * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
          * </p>
          * @param context the context to use for immediate expression evaluations
-         * @return  an expression or null if an error occurs and the {@link JexlEngine} is silent
-         * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
+         * @return an expression or null if an error occurs and the {@link JexlEngine} is running in silent mode
+         * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not in silent mode
          */
         public final Expression prepare(JexlContext context) {
             try {
-                Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), false);
+                Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), jexl.isSilent());
                 if (context instanceof TemplateContext) {
                     interpreter.setFrame(((TemplateContext) context).getFrame());
                 }
@@ -365,12 +368,12 @@ public final class UnifiedJEXL {
          * </p>
          * @param context the variable context
          * @return the result of this expression evaluation or null if an error occurs and the {@link JexlEngine} is
-         * silent
+         * running in silent mode
          * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
          */
         public final Object evaluate(JexlContext context) {
             try {
-                Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), false);
+                Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), jexl.isSilent());
                 if (context instanceof TemplateContext) {
                     interpreter.setFrame(((TemplateContext) context).getFrame());
                 }
@@ -594,7 +597,7 @@ public final class UnifiedJEXL {
                 throw new IllegalArgumentException("Nested expression can not have a source");
             }
         }
-        
+
         @Override
         public StringBuilder asString(StringBuilder strb) {
             strb.append(expr);
@@ -1021,6 +1024,13 @@ public final class UnifiedJEXL {
      * The value 169 is over fourty-two
      * </pre></blockquote>
      * <p>
+     * During evaluation, the template context exposes its writer as '$jexl' which is safe to use in this case.
+     * This allows writing directly through the writer without adding new-lines as in:
+     * <p><blockquote><pre>
+     * $$ for(var cell : cells) { $jexl.print(cell); $jexl.print(';') }
+     * </pre></blockquote>
+     * </p>
+     * <p>
      * A template is expanded as one JEXL script and a list of UnifiedJEXL expressions; each UnifiedJEXL expression
      * being replace in the script by a call to jexl:print(expr) (the expr is in fact the expr number in the template).
      * This integration uses a specialized JexlContext (TemplateContext) that serves as a namespace (for jexl:)
@@ -1121,7 +1131,7 @@ public final class UnifiedJEXL {
             }
             return strb.toString();
         }
-        
+
         /**
          * Recreate the template source from its inner components.
          * @return the template source rewritten
@@ -1146,7 +1156,7 @@ public final class UnifiedJEXL {
          * @return the prepared version of the template
          */
         public Template prepare(JexlContext context) {
-            JexlEngine.Frame frame = script.createFrame((Object[])null);
+            JexlEngine.Frame frame = script.createFrame((Object[]) null);
             TemplateContext tcontext = new TemplateContext(context, frame, exprs, null);
             Expression[] immediates = new Expression[exprs.length];
             for (int e = 0; e < exprs.length; ++e) {
@@ -1181,6 +1191,7 @@ public final class UnifiedJEXL {
 
     /**
      * The type of context to use during evaluation of templates.
+     * <p>This context exposes its writer as '$jexl' to the scripts.</p>
      * <p>public for introspection purpose.</p>
      */
     public final class TemplateContext implements JexlContext, NamespaceResolver {
@@ -1189,7 +1200,7 @@ public final class UnifiedJEXL {
         /** The array of UnifiedJEXL expressions. */
         private final Expression[] exprs;
         /** The writer used to output. */
-        private final PrintWriter writer;
+        private final Writer writer;
         /** The call frame. */
         private final JexlEngine.Frame frame;
 
@@ -1204,13 +1215,7 @@ public final class UnifiedJEXL {
             wrap = jcontext;
             frame = jframe;
             exprs = expressions;
-            if (out == null) {
-                writer = null;
-            } else if (out instanceof PrintWriter) {
-                writer = (PrintWriter) out;
-            } else {
-                writer = new PrintWriter(out);
-            }
+            writer = out;
         }
 
         /**
@@ -1223,7 +1228,11 @@ public final class UnifiedJEXL {
 
         /** {@inheritDoc} */
         public Object get(String name) {
-            return wrap.get(name);
+            if ("$jexl".equals(name)) {
+                return writer;
+            } else {
+                return wrap.get(name);
+            }
         }
 
         /** {@inheritDoc} */
@@ -1262,6 +1271,9 @@ public final class UnifiedJEXL {
          * @param e the expression number
          */
         public void print(int e) {
+            if (e < 0 || e >= exprs.length) {
+                return;
+            }
             Expression expr = exprs[e];
             if (expr.isDeferred()) {
                 expr = expr.prepare(wrap);
@@ -1269,33 +1281,7 @@ public final class UnifiedJEXL {
             if (expr instanceof CompositeExpression) {
                 printComposite((CompositeExpression) expr);
             } else {
-                print(expr.evaluate(this));
-            }
-        }
-
-        /**
-         * Prints to output.
-         * <p>This will dynamically try to find the best suitable method in the writer through uberspection.
-         * Subclassing Writer should be the preferred way to specialize output.
-         * </p>
-         * @param arg the argument to print out
-         */
-        protected void print(Object arg) {
-            if (arg instanceof CharSequence) {
-                writer.print(arg.toString());
-            } else if (arg != null) {
-                Object[] value = {arg};
-                Uberspect uber = getEngine().getUberspect();
-                JexlMethod method = uber.getMethod(writer, "print", value, null);
-                if (method != null) {
-                    try {
-                        method.invoke(writer, value);
-                    } catch (java.lang.Exception xany) {
-                        throw createException("invoke print", null, xany);
-                    }
-                } else {
-                    writer.print(arg.toString());
-                }
+                doPrint(expr.evaluate(this));
             }
         }
 
@@ -1309,7 +1295,35 @@ public final class UnifiedJEXL {
             Object value = null;
             for (int e = 0; e < size; ++e) {
                 value = cexprs[e].evaluate(this);
-                print(value);
+                doPrint(value);
+            }
+        }
+
+        /**
+         * Prints to output.
+         * <p>This will dynamically try to find the best suitable method in the writer through uberspection.
+         * Subclassing Writer by adding 'print' methods should be the preferred way to specialize output.
+         * </p>
+         * @param arg the argument to print out
+         */
+        private void doPrint(Object arg) {
+            try {
+                if (arg instanceof CharSequence) {
+                    writer.write(arg.toString());
+                } else if (arg != null) {
+                    Object[] value = {arg};
+                    Uberspect uber = getEngine().getUberspect();
+                    JexlMethod method = uber.getMethod(writer, "print", value, null);
+                    if (method != null) {
+                        method.invoke(writer, value);
+                    } else {
+                        writer.write(arg.toString());
+                    }
+                }
+            } catch (java.io.IOException xio) {
+                throw createException("call print", null, xio);
+            } catch (java.lang.Exception xany) {
+                throw createException("invoke print", null, xany);
             }
         }
     }
@@ -1415,7 +1429,6 @@ public final class UnifiedJEXL {
         return new Template(prefix, source, parms);
     }
 
-    
     /**
      * Creates a new template.
      * @param source the source
@@ -1434,5 +1447,4 @@ public final class UnifiedJEXL {
     public Template createTemplate(String source) {
         return new Template("$$", new StringReader(source), (String[]) null);
     }
-
 }

@@ -128,6 +128,23 @@ final class Debugger implements ParserVisitor {
     public String data() {
         return builder.toString();
     }
+    
+    
+    /**
+     * Rebuilds an expression from a Jexl node.
+     * @param node the node to rebuilt from
+     * @return the rebuilt expression
+     */
+    public String data(JexlNode node) {
+        start = 0;
+        end = 0;
+        if (node != null) {
+            builder.setLength(0);
+            this.cause = node;
+            node.jjtAccept(this, null);
+        }
+        return builder.toString();
+    }
 
     /**
      * @return The starting offset location of the cause in the expression

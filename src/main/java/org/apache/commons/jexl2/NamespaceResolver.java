@@ -24,6 +24,10 @@ package org.apache.commons.jexl2;
  * the "math" namespace would be the proper object to expose functions like "log(...)", "sinus(...)", etc.
  * </p>
  * In expressions like "ns:function(...)", the resolver is called with resolveNamespace("ns").
+ * <p>
+ * JEXL itself reserves 'jexl' and 'ujexl' as namespaces for internal purpose; resolving those may lead to unexpected
+ * results.
+ * </p>
  */
 public interface NamespaceResolver {
     /**

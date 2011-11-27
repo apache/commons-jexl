@@ -37,7 +37,7 @@ public class JexlException extends RuntimeException {
     private static final int MIN_EXCHARLOC = 5;
     /** Maximum number of characters around exception location. */
     private static final int MAX_EXCHARLOC = 10;
-    
+
     /**
      * Creates a new JexlException.
      * @param node the node causing the error
@@ -46,7 +46,7 @@ public class JexlException extends RuntimeException {
     public JexlException(JexlNode node, String msg) {
         super(msg);
         mark = node;
-        info = node != null? node.debugInfo() : null;
+        info = node != null ? node.debugInfo() : null;
 
     }
 
@@ -59,9 +59,9 @@ public class JexlException extends RuntimeException {
     public JexlException(JexlNode node, String msg, Throwable cause) {
         super(msg, unwrap(cause));
         mark = node;
-        info = node != null? node.debugInfo() : null;
+        info = node != null ? node.debugInfo() : null;
     }
-    
+
     /**
      * Creates a new JexlException.
      * @param dbg the debugging information associated
@@ -84,7 +84,7 @@ public class JexlException extends RuntimeException {
         mark = null;
         info = dbg;
     }
-    
+
     /**
      * Unwraps the cause of a throwable due to reflection. 
      * @param xthrow the throwable
@@ -95,11 +95,11 @@ public class JexlException extends RuntimeException {
             return ((InvocationTargetException) xthrow).getTargetException();
         } else if (xthrow instanceof UndeclaredThrowableException) {
             return ((UndeclaredThrowableException) xthrow).getUndeclaredThrowable();
-        } else{
+        } else {
             return xthrow;
         }
     }
-        
+
     /**
      * Accesses detailed message.
      * @return  the message
@@ -107,7 +107,30 @@ public class JexlException extends RuntimeException {
     protected String detailedMessage() {
         return super.getMessage();
     }
-    
+
+    /**
+     * Formats an error message from the parser.
+     * @param prefix the prefix to the message
+     * @param expr the expression in error
+     * @return the formatted message
+     */
+    protected String parserError(String prefix, String expr) {
+        int begin = info.debugInfo().getColumn();
+        int end = begin + MIN_EXCHARLOC;
+        begin -= MIN_EXCHARLOC;
+        if (begin < 0) {
+            end += MIN_EXCHARLOC;
+            begin = 0;
+        }
+        int length = expr.length();
+        if (length < MAX_EXCHARLOC) {
+            return prefix + " error in '" + expr + "'";
+        } else {
+            return prefix + " error near '... "
+                    + expr.substring(begin, end > length ? length : end) + " ...'";
+        }
+    }
+
     /**
      * Thrown when tokenization fails.
      */
@@ -121,7 +144,7 @@ public class JexlException extends RuntimeException {
         public Tokenization(JexlInfo node, CharSequence expr, TokenMgrError cause) {
             super(merge(node, cause), expr.toString(), cause);
         }
-                
+
         /**
          * Merge the node info and the cause info to obtain best possible location.
          * @param node the node
@@ -129,7 +152,7 @@ public class JexlException extends RuntimeException {
          * @return the info to use
          */
         private static DebugInfo merge(JexlInfo node, TokenMgrError cause) {
-            DebugInfo dbgn = node != null? node.debugInfo() : null;
+            DebugInfo dbgn = node != null ? node.debugInfo() : null;
             if (cause == null) {
                 return dbgn;
             } else if (dbgn == null) {
@@ -138,33 +161,20 @@ public class JexlException extends RuntimeException {
                 return new DebugInfo(dbgn.getName(), cause.getLine(), cause.getColumn());
             }
         }
-                            
+
         /**
          * @return the expression
-         */ 
+         */
         public String getExpression() {
             return super.detailedMessage();
         }
-                
+
         @Override
         protected String detailedMessage() {
-            int begin = info.debugInfo().getColumn();
-            int end = begin + MIN_EXCHARLOC;
-            begin -= MIN_EXCHARLOC;
-            if (begin < 0) {
-                end += MIN_EXCHARLOC;
-                begin = 0;
-            }
-            int length = getExpression().length();
-            if (length < MAX_EXCHARLOC) {
-                return "parsing error in '" + getExpression() + "'";
-            } else {
-                return "parsing error near '... "
-                       + getExpression().substring(begin, end > length? length : end) + " ...'";
-            }
+            return parserError("tokenization", getExpression());
         }
-    } 
-            
+    }
+
     /**
      * Thrown when parsing fails.
      */
@@ -178,7 +188,7 @@ public class JexlException extends RuntimeException {
         public Parsing(JexlInfo node, CharSequence expr, ParseException cause) {
             super(merge(node, cause), expr.toString(), cause);
         }
-                
+
         /**
          * Merge the node info and the cause info to obtain best possible location.
          * @param node the node
@@ -186,7 +196,7 @@ public class JexlException extends RuntimeException {
          * @return the info to use
          */
         private static DebugInfo merge(JexlInfo node, ParseException cause) {
-            DebugInfo dbgn = node != null? node.debugInfo() : null;
+            DebugInfo dbgn = node != null ? node.debugInfo() : null;
             if (cause == null) {
                 return dbgn;
             } else if (dbgn == null) {
@@ -195,33 +205,20 @@ public class JexlException extends RuntimeException {
                 return new DebugInfo(dbgn.getName(), cause.getLine(), cause.getColumn());
             }
         }
-                    
+
         /**
          * @return the expression
-         */    
+         */
         public String getExpression() {
             return super.detailedMessage();
         }
-        
+
         @Override
         protected String detailedMessage() {
-            int begin = info.debugInfo().getColumn();
-            int end = begin + MIN_EXCHARLOC;
-            begin -= MIN_EXCHARLOC;
-            if (begin < 0) {
-                end += MIN_EXCHARLOC;
-                begin = 0;
-            }
-            int length = getExpression().length();
-            if (length < MAX_EXCHARLOC) {
-                return "parsing error in '" + getExpression() + "'";
-            } else {
-                return "parsing error near '... "
-                       + getExpression().substring(begin, end > length? length : end) + " ...'";
-            }
+            return parserError("parsing", getExpression());
         }
     }
-    
+
     /**
      * Thrown when a variable is unknown.
      */
@@ -234,20 +231,20 @@ public class JexlException extends RuntimeException {
         public Variable(JexlNode node, String var) {
             super(node, var);
         }
-        
+
         /**
          * @return the variable name
          */
         public String getVariable() {
             return super.detailedMessage();
         }
-        
+
         @Override
         protected String detailedMessage() {
             return "undefined variable " + getVariable();
         }
-    } 
-        
+    }
+
     /**
      * Thrown when a property is unknown.
      */
@@ -260,20 +257,20 @@ public class JexlException extends RuntimeException {
         public Property(JexlNode node, String var) {
             super(node, var);
         }
-        
+
         /**
          * @return the property name
          */
         public String getProperty() {
             return super.detailedMessage();
         }
-        
+
         @Override
         protected String detailedMessage() {
             return "inaccessible or unknown property " + getProperty();
         }
-    } 
-    
+    }
+
     /**
      * Thrown when a method or ctor is unknown, ambiguous or inaccessible.
      */
@@ -286,26 +283,27 @@ public class JexlException extends RuntimeException {
         public Method(JexlNode node, String name) {
             super(node, name);
         }
-                      
+
         /**
          * @return the method name
-         */  
+         */
         public String getMethod() {
             return super.detailedMessage();
         }
-        
+
         @Override
         protected String detailedMessage() {
             return "unknown, ambiguous or inaccessible method " + getMethod();
         }
     }
-    
+
     /**
      * Thrown to return a value.
      */
-    protected static class Return extends JexlException {  
+    protected static class Return extends JexlException {
         /** The returned value. */
         private final Object result;
+
         /**
          * Creates a new instance of Return.
          * @param node the return node
@@ -316,6 +314,7 @@ public class JexlException extends RuntimeException {
             super(node, msg);
             this.result = value;
         }
+
         /**
          * @return the returned value
          */
@@ -323,7 +322,7 @@ public class JexlException extends RuntimeException {
             return result;
         }
     }
-    
+
     /**
      * Thrown to cancel a script execution.
      */
@@ -336,7 +335,7 @@ public class JexlException extends RuntimeException {
             super(node, "execution cancelled", null);
         }
     }
-    
+
     /**
      * Gets information about the cause of this error.
      * <p>
@@ -358,7 +357,7 @@ public class JexlException extends RuntimeException {
         }
         return "";
     }
-  
+
     /**
      * Detailed info message about this error.
      * Format is "debug![begin,end]: string \n msg" where:
