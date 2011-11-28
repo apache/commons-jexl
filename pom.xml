@@ -290,6 +290,7 @@
                 <configuration>
                     <excludes>
                       <exclude>org/apache/commons/jexl2/parser/**</exclude>
+                      <exclude>org/apache/commons/jexl2/internal/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
