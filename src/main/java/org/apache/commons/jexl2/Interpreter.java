@@ -285,7 +285,7 @@ public class Interpreter implements ParserVisitor {
      */
     protected JexlNode findNullOperand(RuntimeException xrt, JexlNode node, Object left, Object right) {
         if (xrt instanceof ArithmeticException
-                && (Object) JexlException.NULL_OPERAND == xrt.getMessage()) {
+                && JexlException.NULL_OPERAND == xrt.getMessage()) {
             if (left == null) {
                 return node.jjtGetChild(0);
             }

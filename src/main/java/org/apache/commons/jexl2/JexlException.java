@@ -393,7 +393,7 @@ public class JexlException extends RuntimeException {
         msg.append(' ');
         msg.append(detailedMessage());
         Throwable cause = getCause();
-        if (cause != null && (Object) NULL_OPERAND == cause.getMessage()) {
+        if (cause != null && NULL_OPERAND == cause.getMessage()) {
             msg.append(" caused by null operand");
         }
         return msg.toString();
