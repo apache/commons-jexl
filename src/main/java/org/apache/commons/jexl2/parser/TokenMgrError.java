@@ -54,6 +54,7 @@ public class TokenMgrError extends Error {
     /**
      * The lexer state.
      */
+    @SuppressWarnings("unused") // not read currently
     private int state;
     /**
      * The current character.
