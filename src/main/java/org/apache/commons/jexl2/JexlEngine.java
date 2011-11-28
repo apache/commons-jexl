@@ -998,7 +998,7 @@ public class JexlEngine {
                 parms = parameters.length;
                 namedRegisters = new LinkedHashMap<String, Integer>();
                 for (int p = 0; p < parms; ++p) {
-                    namedRegisters.put(parameters[p], p);
+                    namedRegisters.put(parameters[p], Integer.valueOf(p));
                 }
             } else {
                 parms = 0;
@@ -1103,7 +1103,7 @@ public class JexlEngine {
                 String[] pa = new String[parms];
                 int p = 0;
                 for (Map.Entry<String, Integer> entry : namedRegisters.entrySet()) {
-                    if (entry.getValue() < parms) {
+                    if (entry.getValue().intValue() < parms) {
                         pa[p++] = entry.getKey();
                     }
                 }
@@ -1122,7 +1122,7 @@ public class JexlEngine {
                 String[] pa = new String[parms];
                 int p = 0;
                 for (Map.Entry<String, Integer> entry : namedRegisters.entrySet()) {
-                    if (entry.getValue() >= parms) {
+                    if (entry.getValue().intValue() >= parms) {
                         pa[p++] = entry.getKey();
                     }
                 }
