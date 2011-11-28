@@ -18,6 +18,7 @@ package org.apache.commons.jexl2;
 
 /**
  * A readonly context wrapper.
+ * @since 2.1
  */
 public final class ReadonlyContext implements JexlContext {
     /** The wrapped context. */

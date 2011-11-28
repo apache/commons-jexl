@@ -133,6 +133,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when tokenization fails.
+     * @since 2.1
      */
     public static class Tokenization extends JexlException {
         /**
@@ -177,6 +178,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when parsing fails.
+     * @since 2.1
      */
     public static class Parsing extends JexlException {
         /**
@@ -221,6 +223,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when a variable is unknown.
+     * @since 2.1
      */
     public static class Variable extends JexlException {
         /**
@@ -247,6 +250,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when a property is unknown.
+     * @since 2.1
      */
     public static class Property extends JexlException {
         /**
@@ -273,6 +277,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when a method or ctor is unknown, ambiguous or inaccessible.
+     * @since 2.1
      */
     public static class Method extends JexlException {
         /**
@@ -299,6 +304,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown to return a value.
+     * @since 2.1
      */
     protected static class Return extends JexlException {
         /** The returned value. */
@@ -325,6 +331,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown to cancel a script execution.
+     * @since 2.1
      */
     protected static class Cancel extends JexlException {
         /**

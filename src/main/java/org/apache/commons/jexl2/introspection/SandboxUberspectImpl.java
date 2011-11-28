@@ -52,7 +52,7 @@ public class SandboxUberspectImpl extends UberspectImpl {
      * {@inheritDoc}
      */
     @Override
-    public JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
+    public JexlMethod getConstructorMethod(Object ctorHandle, Object[] args, JexlInfo info) {
         final String className;
         if (ctorHandle instanceof Class<?>) {
             Class<?> clazz = (Class<?>) ctorHandle;
@@ -63,7 +63,7 @@ public class SandboxUberspectImpl extends UberspectImpl {
             return null;
         }
         if (sandbox.execute(className, "") != null) {
-            return super.getConstructor(className, args, info);
+            return super.getConstructorMethod(className, args, info);
         }
         return null;
     }

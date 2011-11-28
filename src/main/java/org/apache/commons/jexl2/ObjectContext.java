@@ -19,6 +19,7 @@ package org.apache.commons.jexl2;
 /**
  * Wraps an Object as a Jexl context.
  * @param <T> the wrapped object type to use
+ * @since 2.1
  */
 public class ObjectContext<T> implements JexlContext {
     /** The property solving jexl engine. */

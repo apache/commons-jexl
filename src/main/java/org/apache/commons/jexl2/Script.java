@@ -51,6 +51,7 @@ public interface Script {
      * @param args the arguments
      * @return The result of this script, usually the result of 
      *      the last statement.
+     * @since 2.1
      */
     Object execute(JexlContext context, Object... args);
 
@@ -63,12 +64,14 @@ public interface Script {
     /**
      * Gets this script parameters.
      * @return the parameters or null
+     * @since 2.1
      */
     String[] getParameters();
 
     /**
      * Gets this script local variables.
      * @return the local variables or null
+     * @since 2.1
      */
     String[] getLocalVariables();
 
@@ -77,6 +80,7 @@ public interface Script {
      * <p>Note that since variables can be in an ant-ish form (ie foo.bar.quux), each variable is returned as 
      * a list of strings where each entry is a fragment of the variable ({"foo", "bar", "quux"} in the example.</p>
      * @return the variables or null
+     * @since 2.1
      */
     Set<List<String>> getVariables();
 
@@ -86,6 +90,7 @@ public interface Script {
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
      * @param context the context
      * @return the callable
+     * @since 2.1
      */
     Callable<Object> callable(JexlContext context);
 
@@ -96,6 +101,7 @@ public interface Script {
      * @param context the context
      * @param args the script arguments
      * @return the callable
+     * @since 2.1
      */
     Callable<Object> callable(JexlContext context, Object... args);
 }

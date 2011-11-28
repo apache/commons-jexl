@@ -110,7 +110,15 @@ public class UberspectImpl extends Introspector implements Uberspect {
     /**
      * {@inheritDoc}
      */
-    public JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
+    @Deprecated
+    public Constructor<?> getConstructor(Object ctorHandle, Object[] args, JexlInfo info) {
+        return getConstructor(ctorHandle, args);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public JexlMethod getConstructorMethod(Object ctorHandle, Object[] args, JexlInfo info) {
         final Constructor<?> ctor = getConstructor(ctorHandle, args);
         if (ctor != null) {
             return new ConstructorMethod(ctor);
@@ -191,6 +199,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
      * Abstract an indexed property container.
      * This stores the container name and owning class as well as the list of available getter and setter methods.
      * It implements JexlPropertyGet since such a container can only be accessed from its owning instance (not set).
+     * @since 2.1
      */
     private static final class IndexedType implements JexlPropertyGet {
         /** The container name. */
@@ -305,6 +314,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
     /**
      * A generic indexed property container, exposes get(key) and set(key, value) and solves method call dynamically
      * based on arguments.
+     * @since 2.1
      */
     public static final class IndexedContainer {
         /** The instance owning the container. */
@@ -346,6 +356,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
 
     /**
      * A JexlMethod that wraps constructor.
+     * @since 2.1
      */
     private final class ConstructorMethod implements JexlMethod {
         /** The wrapped constructor. */
