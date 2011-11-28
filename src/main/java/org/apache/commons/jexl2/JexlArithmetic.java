@@ -829,7 +829,7 @@ public class JexlArithmetic {
             controlNullOperand();
             return 0;
         } else if (val instanceof Double) {
-            if (!Double.isNaN((Double) val)) {
+            if (!Double.isNaN(((Double) val).doubleValue())) {
                 return 0;
             } else {
                 return ((Double) val).intValue();
@@ -862,7 +862,7 @@ public class JexlArithmetic {
             controlNullOperand();
             return 0L;
         } else if (val instanceof Double) {
-            if (!Double.isNaN((Double) val)) {
+            if (!Double.isNaN(((Double) val).doubleValue())) {
                 return 0;
             } else {
                 return ((Double) val).longValue();
@@ -899,7 +899,7 @@ public class JexlArithmetic {
         } else if (val instanceof BigInteger) {
             return (BigInteger) val;
         } else if (val instanceof Double) {
-            if (!Double.isNaN((Double) val)) {
+            if (!Double.isNaN(((Double) val).doubleValue())) {
                 return new BigInteger(val.toString());
             } else {
                 return BigInteger.ZERO;
@@ -942,7 +942,7 @@ public class JexlArithmetic {
             }
             return roundBigDecimal(new BigDecimal(string, getMathContext()));
         } else if (val instanceof Double) {
-            if (!Double.isNaN((Double) val)) {
+            if (!Double.isNaN(((Double) val).doubleValue())) {
                 return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
             } else {
                 return BigDecimal.ZERO;
@@ -1007,7 +1007,7 @@ public class JexlArithmetic {
             return "";
         } else if (val instanceof Double) {
             Double dval = (Double) val;
-            if (Double.isNaN(dval)) {
+            if (Double.isNaN(dval.doubleValue())) {
                 return "";
             } else {
                 return dval.toString();
