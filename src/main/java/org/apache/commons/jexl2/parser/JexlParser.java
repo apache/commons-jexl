@@ -37,7 +37,7 @@ public class JexlParser extends StringParser {
      * <p>
      * This is used to allow parameters to be declared before parsing.
      * </p>
-     * @param registers the register map
+     * @param theFrame the register map
      */
     public void setFrame(JexlEngine.Scope theFrame) {
         frame = theFrame;
@@ -66,7 +66,7 @@ public class JexlParser extends StringParser {
         if (frame != null) {
             Integer register = frame.getRegister(image);
             if (register != null) {
-                identifier.setRegister(register);
+                identifier.setRegister(register.intValue());
             }
         }
         return image;
@@ -85,7 +85,7 @@ public class JexlParser extends StringParser {
             frame = new JexlEngine.Scope((String[])null);
         }
         Integer register = frame.declareVariable(image);
-        identifier.setRegister(register);
+        identifier.setRegister(register.intValue());
         identifier.image = image;
     }
 
