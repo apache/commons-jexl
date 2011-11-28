@@ -675,7 +675,7 @@ public class Interpreter implements ParserVisitor {
         try {
             return arithmetic.divide(left, right);
         } catch (ArithmeticException xrt) {
-            if (!strict && xrt instanceof ArithmeticException) {
+            if (!strict) {
                 return new Double(0.0);
             }
             JexlNode xnode = findNullOperand(xrt, node, left, right);
