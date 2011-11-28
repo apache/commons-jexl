@@ -103,9 +103,9 @@ public class Interpreter implements ParserVisitor {
     protected Map<String, Object> functors;
     /** The context to store/retrieve variables. */
     protected final JexlContext context;
-    /** Strict interpreter flag. */
+    /** Strict interpreter flag. Do not modify; will be made final in a later version. */
     protected boolean strict;
-    /** Silent intepreter flag. */
+    /** Silent intepreter flag.  Do not modify; will be made final in a later version. */
     protected boolean silent;
     /** Cache executors. */
     protected final boolean cache;
@@ -167,6 +167,7 @@ public class Interpreter implements ParserVisitor {
     /**
      * Sets whether this interpreter considers unknown variables, methods and constructors as errors.
      * @param flag true for strict, false for lenient
+     * @deprecated Do not use; will be removed in a later version
      */
     @Deprecated
     public void setStrict(boolean flag) {
@@ -176,6 +177,7 @@ public class Interpreter implements ParserVisitor {
     /**
      * Sets whether this interpreter throws JexlException when encountering errors.
      * @param flag true for silent, false for verbose
+     * @deprecated Do not use; will be removed in a later version
      */
     @Deprecated
     public void setSilent(boolean flag) {
