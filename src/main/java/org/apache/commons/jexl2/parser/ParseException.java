@@ -67,7 +67,7 @@ public class ParseException extends Exception {
      * in the generated parser.  Calling this constructor generates
      * a new object of this type with the fields "currentToken",
      * "expectedTokenSequences", and "tokenImage" set.
-     * @param cuurentToken This is the last token that has been consumed successfully.  If
+     * @param currentToken This is the last token that has been consumed successfully.  If
      * this object has been created due to a parse error, the token
      * followng this token will (therefore) be the first error token.
      * @param expectedTokenSequences Each entry in this array is an array of integers.  Each array
