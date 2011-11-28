@@ -21,6 +21,7 @@ import java.math.MathContext;
 /**
  * A derived arithmetic that allows different threads to operate with
  * different strict/lenient/math modes using the same JexlEngine.
+ * @since 2.1
  */
 public class JexlThreadedArithmetic extends JexlArithmetic {
     

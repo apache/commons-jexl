@@ -74,6 +74,7 @@ public class JexlArithmetic {
      * @param lenient whether this arithmetic is lenient or strict
      * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
      * @param bigdScale the scale used for big decimals.
+     * @since 2.1
      */
     public JexlArithmetic(boolean lenient, MathContext bigdContext, int bigdScale) {
         this.strict = !lenient;
@@ -93,6 +94,7 @@ public class JexlArithmetic {
     /**
      * The MathContext instance used for +,-,/,*,% operations on big decimals.
      * @return the math context
+     * @since 2.1
      */
     public MathContext getMathContext() {
         return mathContext;
@@ -101,6 +103,7 @@ public class JexlArithmetic {
     /**
      * The BigDecimal scale used for comparison and coericion operations.
      * @return the scale
+     * @since 2.1
      */
     public int getMathScale() {
         return mathScale;
@@ -110,6 +113,7 @@ public class JexlArithmetic {
      * Ensure a big decimal is rounded by this arithmetic scale and rounding mode.
      * @param number the big decimal to round
      * @return the rounded big decimal
+     * @since 2.1
      */
     public BigDecimal roundBigDecimal(final BigDecimal number) {
         int mscale = getMathScale();
@@ -573,6 +577,7 @@ public class JexlArithmetic {
      * @param left first value
      * @param right second value
      * @return test result.
+     * @since 2.1
      */
     public boolean matches(Object left, Object right) {
         if (left == null && right == null) {
@@ -596,6 +601,7 @@ public class JexlArithmetic {
      * @param left the left operand
      * @param right the right operator
      * @return left & right
+     * @since 2.1
      */
     public Object bitwiseAnd(Object left, Object right) {
         long l = toLong(left);
@@ -608,6 +614,7 @@ public class JexlArithmetic {
      * @param left the left operand
      * @param right the right operator
      * @return left | right
+     * @since 2.1
      */
     public Object bitwiseOr(Object left, Object right) {
         long l = toLong(left);
@@ -620,6 +627,7 @@ public class JexlArithmetic {
      * @param left the left operand
      * @param right the right operator
      * @return left  right
+     * @since 2.1
      */
     public Object bitwiseXor(Object left, Object right) {
         long l = toLong(left);
@@ -631,6 +639,7 @@ public class JexlArithmetic {
      * Performs a bitwise complement.
      * @param val the operand
      * @return ~val
+     * @since 2.1
      */
     public Object bitwiseComplement(Object val) {
         long l = toLong(val);
@@ -644,6 +653,7 @@ public class JexlArithmetic {
      * @param operator the operator
      * @return -1 if left  &lt; right; +1 if left &gt > right; 0 if left == right
      * @throws ArithmeticException if either left or right is null
+     * @since 2.1
      */
     protected int compare(Object left, Object right, String operator) {
         if (left != null && right != null) {

@@ -970,6 +970,7 @@ public final class UnifiedJEXL {
 
     /**
      * Abstract the source fragments, verbatim or immediate typed text blocks.
+     * @since 2.1
      */
     private static final class TemplateBlock {
         /** The type of block, verbatim or directive. */
@@ -1037,6 +1038,7 @@ public final class UnifiedJEXL {
      * and stores the expression array and the writer (java.io.Writer) that the 'jexl:print(...)'
      * delegates the output generation to.
      * </p>
+     * @since 2.1
      */
     public final class Template {
         /** The prefix marker. */
@@ -1193,6 +1195,7 @@ public final class UnifiedJEXL {
      * The type of context to use during evaluation of templates.
      * <p>This context exposes its writer as '$jexl' to the scripts.</p>
      * <p>public for introspection purpose.</p>
+     * @since 2.1
      */
     public final class TemplateContext implements JexlContext, NamespaceResolver {
         /** The wrapped context. */
@@ -1354,6 +1357,7 @@ public final class UnifiedJEXL {
      * @param prefix the directive prefix
      * @param source the source reader
      * @return the list of blocks
+     * @since 2.1
      */
     protected List<TemplateBlock> readTemplate(final String prefix, Reader source) {
         try {
@@ -1424,6 +1428,7 @@ public final class UnifiedJEXL {
      * @param source the source
      * @param parms the parameter names
      * @return the template
+     * @since 2.1
      */
     public Template createTemplate(String prefix, Reader source, String... parms) {
         return new Template(prefix, source, parms);
@@ -1434,6 +1439,7 @@ public final class UnifiedJEXL {
      * @param source the source
      * @param parms the parameter names
      * @return the template
+     * @since 2.1
      */
     public Template createTemplate(String source, String... parms) {
         return new Template("$$", new StringReader(source), parms);
@@ -1443,6 +1449,7 @@ public final class UnifiedJEXL {
      * Creates a new template.
      * @param source the source
      * @return the template
+     * @since 2.1
      */
     public Template createTemplate(String source) {
         return new Template("$$", new StringReader(source), (String[]) null);

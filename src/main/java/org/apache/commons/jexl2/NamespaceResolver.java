@@ -28,6 +28,7 @@ package org.apache.commons.jexl2;
  * JEXL itself reserves 'jexl' and 'ujexl' as namespaces for internal purpose; resolving those may lead to unexpected
  * results.
  * </p>
+ * @since 2.1
  */
 public interface NamespaceResolver {
     /**

@@ -104,9 +104,9 @@ public class Interpreter implements ParserVisitor {
     /** The context to store/retrieve variables. */
     protected final JexlContext context;
     /** Strict interpreter flag. */
-    protected final boolean strict;
+    protected boolean strict;
     /** Silent intepreter flag. */
-    protected final boolean silent;
+    protected boolean silent;
     /** Cache executors. */
     protected final boolean cache;
     /** Registers or arguments. */
@@ -162,6 +162,24 @@ public class Interpreter implements ParserVisitor {
         this.cache = base.cache;
         this.context = base.context;
         this.functors = base.functors;
+    }
+    
+    /**
+     * Sets whether this interpreter considers unknown variables, methods and constructors as errors.
+     * @param flag true for strict, false for lenient
+     */
+    @Deprecated
+    public void setStrict(boolean flag) {
+        this.strict = flag;
+    }
+
+    /**
+     * Sets whether this interpreter throws JexlException when encountering errors.
+     * @param flag true for silent, false for verbose
+     */
+    @Deprecated
+    public void setSilent(boolean flag) {
+        this.silent = flag;
     }
 
     /**
@@ -309,6 +327,7 @@ public class Interpreter implements ParserVisitor {
     /**
      * Checks whether this interpreter execution was cancelled due to thread interruption.
      * @return true if cancelled, false otherwise
+     * @since 2.1
      */
     protected boolean isCancelled() {
         if (cancelled | Thread.interrupted()) {
@@ -347,7 +366,7 @@ public class Interpreter implements ParserVisitor {
         // allow namespace to be instantiated as functor with context if possible, not an error otherwise
         if (namespace instanceof Class<?>) {
             Object[] args = new Object[]{context};
-            JexlMethod ctor = uberspect.getConstructor(namespace, args, node);
+            JexlMethod ctor = uberspect.getConstructorMethod(namespace, args, node);
             if (ctor != null) {
                 try {
                     namespace = ctor.invoke(namespace, args);
@@ -1080,11 +1099,11 @@ public class Interpreter implements ParserVisitor {
                     }
                 }
             }
-            JexlMethod ctor = uberspect.getConstructor(cobject, argv, node);
+            JexlMethod ctor = uberspect.getConstructorMethod(cobject, argv, node);
             // DG: If we can't find an exact match, narrow the parameters and try again
             if (ctor == null) {
                 if (arithmetic.narrowArguments(argv)) {
-                    ctor = uberspect.getConstructor(cobject, argv, node);
+                    ctor = uberspect.getConstructorMethod(cobject, argv, node);
                 }
                 if (ctor == null) {
                     xjexl = new JexlException.Method(node, cobject.toString());

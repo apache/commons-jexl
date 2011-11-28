@@ -134,6 +134,7 @@ final class Debugger implements ParserVisitor {
      * Rebuilds an expression from a Jexl node.
      * @param node the node to rebuilt from
      * @return the rebuilt expression
+     * @since 2.1
      */
     public String data(JexlNode node) {
         start = 0;

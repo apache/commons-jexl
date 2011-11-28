@@ -724,9 +724,9 @@ public class JexlEngine {
         Object result = null;
         JexlInfo info = debugInfo();
         try {
-            JexlMethod ctor = uberspect.getConstructor(clazz, args, info);
+            JexlMethod ctor = uberspect.getConstructorMethod(clazz, args, info);
             if (ctor == null && arithmetic.narrowArguments(args)) {
-                ctor = uberspect.getConstructor(clazz, args, info);
+                ctor = uberspect.getConstructorMethod(clazz, args, info);
             }
             if (ctor != null) {
                 result = ctor.invoke(clazz, args);
