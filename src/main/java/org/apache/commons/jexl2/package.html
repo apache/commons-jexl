@@ -1,0 +1,299 @@
+<html>
+    <!--
+       Licensed to the Apache Software Foundation (ASF) under one or more
+       contributor license agreements.  See the NOTICE file distributed with
+       this work for additional information regarding copyright ownership.
+       The ASF licenses this file to You under the Apache License, Version 2.0
+       (the "License"); you may not use this file except in compliance with
+       the License.  You may obtain a copy of the License at
+
+           http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+    -->
+    <head>
+        <title>Package Documentation for org.apache.commons.jexl2 Package</title>
+    </head>
+    <body bgcolor="white">
+        Provides a framework for evaluating JEXL expressions.
+        <br/><br/>
+        <ul>
+            <li><a href="#intro">Introduction</a></li>
+            <li><a href="#example">Brief Example</a></li>
+            <li><a href="#usage">Using JEXL</a></li>
+            <li><a href="#configuration">Configuring JEXL</a></li>
+            <li><a href="#customization">Customizing JEXL</a></li>
+        </ul>
+
+        <h2><a name="intro">Introduction</a></h2>
+        <p>
+            JEXL is a library intended to facilitate the implementation of dynamic and scripting features in applications
+            and frameworks.
+        </p>
+
+        <h2><a name="example">A Brief Example</a></h2>
+        <p>
+            When evaluating expressions, JEXL merges an
+            {@link org.apache.commons.jexl2.Expression}
+            with a
+            {@link org.apache.commons.jexl2.JexlContext}.
+            An Expression is created using
+            {@link org.apache.commons.jexl2.JexlEngine#createExpression(java.lang.String)},
+            passing a String containing valid JEXL syntax.  A simple JexlContext can be created using
+            a {@link org.apache.commons.jexl2.MapContext} instance;
+            a map of variables that will be internally wrapped can be optionally provided through its constructor.
+            The following example, takes a variable named foo, and
+            invokes the bar() method on the property innerFoo:
+        </p>
+        <pre>
+            // Create a JexlEngine (could reuse one instead)
+            JexlEngine jexl = new JexlEngine();
+            // Create an expression object
+            String jexlExp = "foo.innerFoo.bar()";
+            Expression e = jexl.createExpression( jexlExp );
+
+            // Create a context and add data
+            JexlContext jc = new MapContext();
+            jc.set("foo", new Foo() );
+
+            // Now evaluate the expression, getting the result
+            Object o = e.evaluate(jc);
+        </pre>
+
+
+        <h2><a name="usage">Using JEXL</a></h2>
+        The API is composed of three levels addressing different functional needs:
+        <ul>
+            <li>Dynamic invocation of setters, getters, methods and constructors</li>
+            <li>Script expressions known as JEXL expressions</li>
+            <li>JSP/JSF like expression known as UnifiedJEXL expressions</li>
+        </ul>
+
+        <h3><a name="usage_note">Important note</a></h3>
+        The only public packages you should use are:
+        <ul>
+            <li>org.apache.commons.jexl2</li>
+            <li>org.apache.commons.jexl2.introspection</li>
+        </ul>
+        The following packages follow a "use at your own maintenance cost" policy.
+        Their classes and methods are not guaranteed to remain compatible in subsequent versions.
+        If you think you need to use some of their features, it might be a good idea to check with
+        the community through the mailing list first.
+        <ul>
+            <li>org.apache.commons.jexl2.parser</li>
+            <li>org.apache.commons.jexl2.scripting</li>
+            <li>org.apache.commons.jexl2.internal</li>
+            <li>org.apache.commons.jexl2.internal.introspection</li>
+        </ul>
+
+        <h3><a name="usage_api">Dynamic invocation</a></h3>
+        <p>
+            These functionalities are close to the core level utilities found in
+            <a href="http://commons.apache.org/beanutils/">BeanUtils</a>.
+            For basic dynamic property manipulations and method invocation, you can use the following
+            set of methods:
+        </p>
+        <ul>
+            <li>{@link org.apache.commons.jexl2.JexlEngine#newInstance}</li>
+            <li>{@link org.apache.commons.jexl2.JexlEngine#setProperty}</li>
+            <li>{@link org.apache.commons.jexl2.JexlEngine#getProperty}</li>
+            <li>{@link org.apache.commons.jexl2.JexlEngine#invokeMethod}</li>
+        </ul>
+        The following example illustrate their usage:
+        <pre>
+            // test outer class
+            public static class Froboz {
+                int value;
+                public Froboz(int v) { value = v; }
+                public void setValue(int v) { value = v; }
+                public int getValue() { return value; }
+            }
+            // test inner class
+            public static class Quux {
+                String str;
+                Froboz froboz;
+                public Quux(String str, int fro) {
+                    this.str = str;
+                    froboz = new Froboz(fro);
+                }
+                public Froboz getFroboz() { return froboz; }
+                public void setFroboz(Froboz froboz) { this.froboz = froboz; }
+                public String getStr() { return str; }
+                public void setStr(String str) { this.str = str; }
+            }
+            // test API
+            JexlEngine jexl = nex JexlEngine();
+            Quux quux = jexl.newInstance(Quux.class, "xuuq", 100);
+            jexl.setProperty(quux, "froboz.value", Integer.valueOf(100));
+            Object o = jexl.getProperty(quux, "froboz.value");
+            assertEquals("Result is not 100", new Integer(100), o);
+            jexl.setProperty(quux, "['froboz'].value", Integer.valueOf(1000));
+            o = jexl.getProperty(quux, "['froboz']['value']");
+            assertEquals("Result is not 1000", new Integer(1000), o);
+        </pre>
+
+        <h3><a name="usage_jexl">JEXL script expression</a></h3>
+        <p>
+            If your needs require simple expression evaluation capabilities, the core JEXL features
+            will most likely fit.
+            The main methods are:
+        </p>
+        <ul>
+            <li>{@link org.apache.commons.jexl2.JexlEngine#createExpression}</li>
+            <li>{@link org.apache.commons.jexl2.JexlEngine#createScript}</li>
+            <li>{@link org.apache.commons.jexl2.Expression#evaluate}</li>
+        </ul>
+        The following example illustrates their usage:
+        <pre>
+            JexlEngine jexl = nex JexlEngine();
+
+            JexlContext jc = new MapContext();
+            jc.set("quuxClass", quux.class);
+
+            Expression create = jexl.createExpression("quux = new(quuxClass, 'xuuq', 100)");
+            Expression assign = jexl.createExpression("quux.froboz.value = 10");
+            Expression check = jexl.createExpression("quux[\"froboz\"].value");
+            Quux quux = (Quux) create.evaluate(jc);
+            Object o = assign.evaluate(jc);
+            assertEquals("Result is not 10", new Integer(10), o);
+            o = check.evaluate(jc);
+            assertEquals("Result is not 10", new Integer(10), o);
+        </pre>
+
+        <h3><a name="usage_ujexl">UnifiedJEXL script expressions</a></h3>
+        <p>
+            If you are looking for JSP-EL like and basic templating features, you can
+            use UnifiedJEXL.
+        </p>
+        The main methods are:
+        <ul>
+            <li>{@link org.apache.commons.jexl2.UnifiedJEXL#parse}</li>
+            <li>{@link org.apache.commons.jexl2.UnifiedJEXL.Expression#evaluate}</li>
+            <li>{@link org.apache.commons.jexl2.UnifiedJEXL.Expression#prepare}</li>
+        </ul>
+        The following example illustrates their usage:
+        <pre>
+            JexlEngine jexl = new JexlEngine();
+            UnifiedJEXL ujexl = new UnifiedJEXL(jexl);
+            UnifiedJEXL.Expression expr = ujexl.parse("Hello ${user}");
+            String hello = expr.evaluate(context, expr).toString();
+        </pre>
+        <h3>Expressions Script and UnifiedJEXL.Expression: differences</h3>
+        <h4>Expression</h4>
+        <p>
+        This only allows for a single command to be executed and the result from 
+        that is returned. If you try to use multiple commands it ignores 
+        everything after the first semi-colon and just returns the result from 
+        the first command. 
+        </p>
+        <h4>Script</h4>
+        <p>
+        This allows you to put multiple commands in the expression and you can 
+        use variable assignments, loops, calculations, etc. The result from the 
+        last command is returned from the script.
+        </p>
+        <h4>UnifiedJEXL.Expression</h4> 
+        <p>
+        This is ideal to produce text. To get a calculation you use the EL-like syntax 
+        as in ${someVariable}. The expression that goes between the brackets 
+        behaves like a script, not an expression. You can use semi-colons to 
+        execute multiple commands and the result from the last command is 
+        returned from the script. You also have the ability to use a 2-pass evaluation using
+        the #{someScript} syntax.
+        </p>
+
+        <h2><a name="configuration">JEXL Configuration</a></h2>
+        <p>
+            The JexlEngine can be configured through a few parameters that will drive how it reacts
+            in case of errors. These configuration methods are best called at JEXL engine initialization time; it
+            is recommended to derive from JexlEngine to call those in a constructor.
+        </p>
+        <p>
+            {@link org.apache.commons.jexl2.JexlEngine#setLenient} configures when JEXL considers 'null' as an error or not in various situations;
+            when facing an unreferenceable variable, using null as an argument to an arithmetic operator or failing to call
+            a method or constructor. The lenient mode is close to JEXL-1.1 behavior.
+        </p>
+        <p>
+            {@link org.apache.commons.jexl2.JexlEngine#setSilent} configures how JEXL reacts to errors; if silent, the engine will not throw exceptions
+            but will warn through loggers and return null in case of errors. Note that when non-silent, JEXL throws
+            JexlException which are unchecked exception.
+        </p>
+        <p>
+            {@link org.apache.commons.jexl2.JexlEngine#setDebug} makes stacktraces carried by JExlException more meaningfull; in particular, these
+            traces will carry the exact caller location the Expression was created from.
+        </p>
+        <p>
+            {@link org.apache.commons.jexl2.JexlEngine#setClassLoader} indicates to a JexlEngine which class loader to use to solve a class name; this affects
+            how JexlEngine.newInstance and the 'new' script method operates. This is mostly usefull in cases where
+            you rely on JEXL to dynamically load and call plugins for your application.
+        </p>
+        <p>
+            JexlEngine and UnifiedJEXL expression caches can be configured as well. If you intend to use JEXL
+            repeatedly in your application, these are worth configuring since expression parsing is quite heavy.
+            Note that all caches created by JEXL are held through SoftReference; under high memory pressure, the GC will be able
+            to reclaim those caches and JEXL will rebuild them if needed. By default, a JexlEngine does not create a cache
+            whilst UnifiedJEXL does.
+        </p>
+        <p>Both JexlEngine and UnifiedJEXL are thread-safe; the same instance can be shared between different
+            threads and proper synchronization is enforced in critical areas.</p>
+        <p>{@link org.apache.commons.jexl2.JexlEngine#setCache} will set how many expressions can be simultaneously cached by the
+            JEXL engine. UnifiedJEXL allows to define the cache size through its constructor.</p>
+        <p>
+            {@link org.apache.commons.jexl2.JexlEngine#setFunctions} extends JEXL scripting by registering functions in
+            namespaces.
+        </p>
+        This can be used as in:
+        <pre><code>
+            public static MyMath {
+                public double cos(double x) {
+                    return Math.cos(x);
+                }
+            }
+            Map&lt;String, Object> funcs = new HashMap&lt;String, Object>();
+            funcs.put("math", new MyMath());
+            JexlEngine jexl = new JexlEngine();
+            jexl.setFunctions(funcs);
+
+            JexlContext jc = new MapContext();
+            jc.set("pi", Math.PI);
+
+            e = JEXL.createExpression("math:cos(pi)");
+            o = e.evaluate(jc);
+            assertEquals(Double.valueOf(-1),o);
+        </code></pre>
+        If the <i>namespace</i> is a Class and that class declares a constructor that takes a JexlContext (or
+        a class extending JexlContext), one <i>namespace</i> instance is created on first usage in an
+        expression; this instance lifetime is limited to the expression evaluation.
+
+        <h2><a name="customization">JEXL Customization</a></h2>
+        If you need to make JEXL treat some objects in a specialized manner or tweak how it
+        reacts to some settings, you can derive most of its inner-workings.
+        <p>
+            {@link org.apache.commons.jexl2.JexlEngine} is meant to be
+            extended and lets you capture your own configuration defaults wrt cache sizes and various flags.
+            Implementing your own cache - instead of the basic LinkedHashMap based one - would be
+            another possible extension.
+        </p>
+        <p>
+            {@link org.apache.commons.jexl2.JexlArithmetic}
+            is the class to derive if you need to change how operators behave. For example, this would
+            be the case if you wanted '+' to operate on arrays; you'd need to derive JexlArithmetic and
+            implement your own version of Add.
+        </p>
+        <p>
+            {@link org.apache.commons.jexl2.Interpreter}
+            is the class to derive if you need to add more features to the evaluation
+            itself; for instance, you want pre- and post- resolvers for variables or nested scopes for
+            for variable contexts or add factory based support to the 'new' operator.
+        </p>
+        <p>
+            {@link org.apache.commons.jexl2.introspection.UberspectImpl}
+            is the class to derive if you need to add introspection or reflection capabilities for some objects.
+            The code already reflects public fields as properties on top of Java-beans conventions.
+        </p>
+    </body>
+</html>

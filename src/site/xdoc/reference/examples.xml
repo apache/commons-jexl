@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+  
+        http://www.apache.org/licenses/LICENSE-2.0
+  
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<document>
+  <properties>
+    <title>Commons JEXL Examples</title>
+  </properties>
+
+  <body>
+    <section name="Overview">
+      <p>
+        In this reference you will find the following topics to help with your use of JEXL.
+        <ul>
+          <li><a href="#Evaluating Expressions">Evaluating Expressions</a></li>
+          <li><a href="#Custom Contexts">Custom Contexts</a></li>
+          <li><a href="#Example Expressions">Example Expressions</a></li>
+        </ul>
+      </p>
+      <p>
+        You can find two sample programs in JEXL's CVS repository:
+        <ul>
+          <li><a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/java/org/apache/commons/jexl2/examples/ArrayTest.java?view=markup">Using arrays</a></li>
+          <li><a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/java/org/apache/commons/jexl2/examples/MethodPropertyTest.java?view=markup">Accessing Properties and invoking methods</a></li>
+        </ul>
+      </p>
+      <p>
+        As well, <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl2/JexlTest.java?view=markup">JEXL's Unit Tests</a>
+        provide handy examples of expressions. The test code also contains a
+        <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl2/Jexl.java?view=markup">simple class</a>
+        that evaluates its command line arguments as JEXL expressions when run.
+      </p>
+      <p>
+          The <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/package-summary.html#intro">
+          package javadoc</a> also contains useful information.
+      </p>
+    </section>
+    <section name="Evaluating Expressions">
+      <p>
+        To evaluate expressions using JEXL, you need three things:
+        <ul>
+          <li>An <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/JexlEngine.html">engine</a> to create expressions,</li>
+          <li>A <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/JexlContext.html">context</a> containing any variables, and</li>
+          <li>An <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/Expression.html">expression</a></li>
+        </ul>
+      </p>
+      <p>
+        The common way of using a JEXL engine is to allocate it as a singleton and use this opportunity to tailor its
+        behavior and cache.
+        <source>
+            private static final JexlEngine jexl = new JexlEngine();
+            static {
+               jexl.setCache(512);
+               jexl.setLenient(false);
+               jexl.setSilent(false);
+            }
+        </source>
+      </p>
+      <p>
+        The easiest way of obtaining a a context is to use the
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/MapContext.html#MapContext()">new MapContext()</a>
+        statement. This creates a context implemented using an underlying
+        <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/HashMap.html">HashMap</a>
+      </p>
+      <p>
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/Expression.html">Expressions</a> are
+        created using the <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/JexlEngine.html#createExpression(java.lang.String)">JexlEngine.createExpression(String)</a>
+        method. 
+      </p>
+      <p>
+        Once you have your expression, you can then use use the
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/Expression.html#evaluate(org.apache.commons.jexl2.JexlContext)">evaluate</a>
+        to execute it and obtain a result.
+      </p>
+      <p>
+        Here's a typical scenario:
+      </p>
+      <source>
+    // Assuming we have a JexlEngine instance initialized in our class named 'jexl':
+    // Create an expression object for our calculation
+    String calculateTax = taxManager.getTaxCalc(); //e.g. "((G1 + G2 + G3) * 0.1) + G4";
+    Expression e = jexl.createExpression( calculateTax );
+
+    // populate the context
+    JexlContext context = new MapContext();
+    context.set("G1", businessObject.getTotalSales());
+    context.set("G2", taxManager.getTaxCredit(businessObject.getYear()));
+    context.set("G3", businessObject.getIntercompanyPayments());
+    context.set("G4", -taxManager.getAllowances());
+    // ...
+    
+    // work it out
+    Float result = (Float)e.evaluate(context);
+      </source>
+    </section>
+    <section name="Custom Contexts">
+      <p>
+        Often you have the objects and values that are needed in the context available
+        elsewhere. If those are already in a Map, instead of creating the default context and populating it
+        manually in the code, you can wrap a MapContext around your own map using
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/MapContext.html#MapContext()">new MapContext(yourOwnMap)</a>
+      </p>
+      <p>
+        In edge cases, it may be simpler to create a context implementation of your
+        own.
+        The <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/JexlContext.html">JexlContext</a>
+        interface is very simple with only three methods, to set, get and check the existence of variables.
+      </p>
+    </section>
+    <section name="Example Expressions">
+      <!--  invoking methods, property access, array access, empty, size etc... -->
+      <subsection name="Arithmetic">
+        <p>Most valid arithmetic expressions in Java are also valid in Jexl.</p>
+        <source>
+1 + 2
+12.0 - 5.2
+6 * 12 + 5 / 2.6
+12 % 2
+6 / 4
+-12 + 77.2
+x * 1.1 + y
+        </source>
+        <p>Arithmetic expressions can use variables. <code>null</code> can be treated as a zero for arithmetic;
+        if you need stricter semantics and consider <code>null</code> as an erroneous operand for arithmetic and
+        comparisons operations, you should initialize your JEXL engine using
+        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl2/JexlEngine.html#setLenient(boolean)">JexlEngine.setLenient(false)</a>.
+        </p>
+      </subsection>
+      <subsection name="Calling methods">
+        <p>
+          JEXL allows you to call any method on a Java object using the same syntax.
+          If you have a string in the context under the name <code>aString</code>,
+          you could call it's <code>length</code> 
+          method like this:
+          <source>
+aString.length()
+aString.substring(6)
+          </source>
+        </p>
+        <p>
+          Often the values you want to pass to a method are other variables or expressions.
+          If you have a number in the context, named <code>i</code>, you could use it
+          in a method call:
+          <source>aString.substring(i)</source>
+        </p>
+      </subsection>
+      <subsection name="Accessing properties">
+        <p>
+          JEXL provides a shorthand syntax to access methods that
+          follow the JavaBean naming convention for properties, i.e.
+          setters and getters.
+        </p>
+        <p>
+          If you have some object foo in the context and it has a
+          method <code>getBar()</code>, you can call that method using
+          the following syntax:
+          <source>foo.bar</source>
+        </p>
+        <p>
+          Since <code>java.lang.Object</code> has a <code>getClass()</code> method
+          that returns a <code>java.lang.Class</code> object, and the
+          class has a <code>getName()</code> method, the following is a shorthand
+          for obtaining the class name of an object <code>foo</code> in the context: 
+          <source>foo.class.name</source>
+        </p>
+      </subsection>
+      <subsection name="Arrays, Lists and Maps">
+        <p>
+          Array elements can be accessed using either square brackets or a dotted
+          index notation, e.g. the following are equivalent
+          <source>arr[0]
+arr.0</source>
+          The same holds true for lists.
+        </p>
+        <p>
+          For a map, the syntax is very similar, except the 'index' is an object, e.g.
+          the following are equivalent.
+          <source>aMap['key']
+aMap.get('key')</source>
+          Please note that the index does not have to be a string, and
+          that the string usage above is just one possible option.
+        </p>
+      </subsection>
+    </section>
+  </body>
+</document>

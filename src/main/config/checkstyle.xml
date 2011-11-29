@@ -18,9 +18,8 @@
  */
  -->
 
-<!DOCTYPE module PUBLIC
-    "-//Puppy Crawl//DTD Check Configuration 1.1//EN"
-    "http://www.puppycrawl.com/dtds/configuration_1_1.dtd">
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+                        "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 
 <!--
 
@@ -53,7 +52,9 @@
 
     <!-- Checks that a package.html file exists for each package.     -->
     <!-- See http://checkstyle.sf.net/config_javadoc.html#PackageHtml -->
-    <module name="PackageHtml"/>
+    <module name="JavadocPackage">
+        <property name="allowLegacy" value="true"/>
+    </module>
 
     <!-- Checks whether files end with a new line.                        -->
     <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
@@ -67,6 +68,25 @@
     <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
     <module name="Translation"/>
 
+
+    <!-- Checks for Headers                              -->
+    <!-- See http://checkstyle.sf.net/config_header.html -->
+    <module name="Header">
+        <!-- The follow property value demonstrates the ability     -->
+        <!-- to have access to ANT properties. In this case it uses -->
+        <!-- the ${basedir} property to allow Checkstyle to be run  -->
+        <!-- from any directory within a project. See property      -->
+        <!-- expansion,                                             -->
+        <!-- http://checkstyle.sf.net/config.html#properties        -->
+        <!-- <property                                              -->
+        <!--     name="headerFile"                                  -->
+        <!--     value="${basedir}/java.header"/>                   -->
+        <property name="headerFile" value="${checkstyle.header.file}"/>
+        <property name="ignoreLines" value="2"/>
+    </module>
+               
+    <!-- See http://checkstyle.sf.net/config_sizes.html -->
+    <module name="FileLength"/>
 
     <module name="TreeWalker">
 
@@ -94,28 +114,7 @@
         <module name="ParameterName"/>
         <module name="StaticVariableName"/>
         <module name="TypeName"/>
-
-
-        <!-- Checks for Headers                              -->
-        <!-- See http://checkstyle.sf.net/config_header.html -->
-        <module name="Header">
-            <!-- The follow property value demonstrates the ability     -->
-            <!-- to have access to ANT properties. In this case it uses -->
-            <!-- the ${basedir} property to allow Checkstyle to be run  -->
-            <!-- from any directory within a project. See property      -->
-            <!-- expansion,                                             -->
-            <!-- http://checkstyle.sf.net/config.html#properties        -->
-            <!-- <property                                              -->
-            <!--     name="headerFile"                                  -->
-            <!--     value="${basedir}/java.header"/>                   -->
-            <property name="headerFile" value="${checkstyle.header.file}"/>
-            <property name="ignoreLines" value="2"/>
-        </module>
-
-        <!-- Following interprets the header file as regular expressions. -->
-        <!-- <module name="RegexpHeader"/>                                -->
-
-
+        
         <!-- Checks for imports                              -->
         <!-- See http://checkstyle.sf.net/config_import.html -->
         <module name="AvoidStarImport"/>
@@ -126,7 +125,6 @@
 
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
-        <module name="FileLength"/>
         <module name="LineLength">
             <!--  JEXL: added max, ignore @version and @see -->
             <property name="max" value="120"/>
@@ -140,8 +138,7 @@
         <!-- Checks for whitespace                               -->
         <!-- See http://checkstyle.sf.net/config_whitespace.html -->
         <module name="EmptyForIteratorPad"/>
-        <!-- <module name="GenericWhitespace"/> -->
-        <!-- JEXL-20: because the above is not yet supported through Maven plugin, disable others-->
+        <module name="GenericWhitespace"/>
         <!-- <module name="NoWhitespaceAfter"/> -->
         <!-- <module name="NoWhitespaceBefore"/> -->
         <!-- <module name="WhitespaceAfter"/> -->
@@ -149,7 +146,6 @@
         <module name="OperatorWrap"/>
         <module name="ParenPad"/>
         <module name="TypecastParenPad"/>
-        <module name="TabCharacter"/>
 
 
         <!-- Modifier Checks                                    -->

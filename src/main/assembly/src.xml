@@ -20,14 +20,14 @@
         <format>tar.gz</format>
         <format>zip</format>
     </formats>
-    <baseDirectory>${artifactId}-${version}-src</baseDirectory>
+    <baseDirectory>${artifactId}-${commons.release.version}-src</baseDirectory>
     <fileSets>
         <fileSet>
             <includes>
+                <include>BUILDING.txt</include>
                 <include>LICENSE.txt</include>
                 <include>NOTICE.txt</include>
                 <include>pom.xml</include>
-                <include>PROPOSAL.html</include>
                 <include>RELEASE-NOTES.txt</include>
             </includes>
         </fileSet>
@@ -35,7 +35,10 @@
             <directory>src</directory>
         </fileSet>
         <fileSet>
-            <directory>xdocs</directory>
+            <directory>jexl2-compat</directory>
+            <excludes>
+                <exclude>target/**</exclude>
+            </excludes>
         </fileSet>
     </fileSets>
 </assembly>
