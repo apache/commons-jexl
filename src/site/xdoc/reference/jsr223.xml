@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+  
+        http://www.apache.org/licenses/LICENSE-2.0
+  
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<document>
+  <properties>
+    <title>Commons JEXL JSR-223 (scripting) Reference</title>
+  </properties>
+
+  <body>
+    <section name="Overview">
+      <p>
+      Commons JEXL includes JSR-223 (javax.script) support.
+      The binary jar includes the scripting factory
+      and the services definition javax.script.ScriptEngineFactory, 
+      so no special configuration is needed.
+      </p>
+    </section>
+    <section name="Script engine support">
+      <p>
+      The provided script engine implements the following (engineVersion="1.0"):
+      <ul>
+      <li>Language names: "JEXL", "Jexl", "jexl"</li>
+      <li>Extensions: ".jexl"</li>
+      <li>Mime-types: "application/x-jexl"</li>
+      </ul>
+      Script Engine versions from "2.0" also implement the following:
+      <ul>
+      <li>Language names: "JEXL2", "Jexl2", "jexl2"</li>
+      <li>Extensions: ".jexl2"</li>
+      <li>Mime-types: "application/x-jexl2"</li>
+      </ul>
+      The implementation adds an instance of 
+      <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/scripting/JexlScriptObject.html">JexlScriptObject</a>
+      to the engine context as the variable "JEXL". 
+      This gives scripts easier access to various items such as System.out and a logger.
+      </p>
+    </section>
+    <section name="Using the JSR-223 JEXL test application">
+        <p>
+        The binary release includes a command-line application which can be used to exercise the JSR-223 script engine.
+        For example:
+        <source>java -cp commons-jexl-2.0.1.jar;commons-logging-1.1.1.jar[;bsf-api-3.0.jar] org.apache.commons.jexl2.scripting.Main script.jexl</source>
+        If a single argument is provided, then that is assumed to be the name of a script file;
+        otherwise, the application prompts for script input to be evaluated.
+        In both cases, the variable "args" contains the command-line arguments.
+        [Note that Java 1.5 does not include javax.script support; you will need to use the Apache BSF API jar as indicated.]
+        </p>
+    </section>
+    <section name="Using JEXL with JSR-223 on Java 1.5">
+      <p>
+      In order to use JEXL via JSR-223 on Java 1.5, you need to add Apache BSF-API 3.0 jar to the classpath.
+      JEXL also requires Commons Logging on the classpath.
+      </p>
+    </section>
+    <section name="Using JEXL with JSR-223 on Java 1.6+">
+      <p>
+      JSR-223 support is included with Java 1.6+. 
+      JEXL requires Commons Logging, which needs to be included in the path.
+      </p>
+    </section>
+    <section name="JSR-223 support classes">
+      <p>
+        The classes used to support JSR-223 scripting access are:
+        <ul>
+        <li>org.apache.commons.jexl2.scripting.JexlScriptEngineFactory - the factory</li>
+        <li>org.apache.commons.jexl2.scripting.JexlScriptEngine - the engine</li>
+        <li>org.apache.commons.jexl2.scripting.JexlScriptObject - class used to give scripts access to JEXL objects</li>
+        </ul>
+      </p>
+    </section>
+  </body>
+</document>
+    

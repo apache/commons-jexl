@@ -1,0 +1,588 @@
+<?xml version="1.0"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<document>
+  <properties>
+    <title>Commons JEXL Syntax</title>
+  </properties>
+
+  <body>
+    <section name="Overview">
+      <p>
+        This reference is split up into the following sections:
+        <ol>
+          <li><a href="#Language Elements">Language Elements</a></li>
+          <li><a href="#Literals">Literals</a></li>
+          <li><a href="#Functions">Functions</a></li>
+          <li><a href="#Operators">Operators</a></li>
+          <li><a href="#Conditional">Conditional Statements</a></li>
+        </ol>
+      </p>
+      <p>
+        For more technical information about the JEXL Grammar, you can find the
+        <a href="https://javacc.dev.java.net/">JavaCC</a> grammar for JEXL
+        here: <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/main/java/org/apache/commons/jexl2/parser/Parser.jjt?view=markup">Parser.jjt</a>
+      </p>
+    </section>
+    <section name="Language Elements">
+      <table>
+        <tr><th width="15%">Item</th><th>Description</th></tr>
+        <tr>
+          <td>Comments</td>
+          <td>
+            Specified using <code>##</code> or <code>//</code>and extend to the end of line, e.g.
+            <source>## This is a comment</source>
+            Also specified using <code>//</code>, e.g.
+            <source>// This is a comment</source>
+            Multiple lines comments are specified using <code>/*...*/</code>, e.g.
+            <source>/* This is a
+            multi-line comment */</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Identifiers / variables</td>
+          <td>
+            Must start with <code>a-z</code>, <code>A-Z</code>, <code>_</code> or <code>$</code>.
+            Can then be followed by <code>0-9</code>, <code>a-z</code>, <code>A-Z</code>, <code>_</code> or <code>$</code>.
+            e.g.
+            <ul>
+              <li>Valid: <code>var1</code>,<code>_a99</code>,<code>$1</code></li>
+              <li>Invalid: <code>9v</code>,<code>!a99</code>,<code>1$</code></li>
+            </ul>
+            <p>
+            Variable names are <strong>case-sensitive</strong>, e.g. <code>var1</code> and <code>Var1</code> are different variables.
+            </p>
+            <p>
+              <strong>NOTE:</strong> JEXL does not support variables with hyphens in them, e.g.
+              <source>commons-logging // invalid variable name (hyphenated)</source> is not a valid variable, but instead is treated as a
+              subtraction of the variable <code>logging</code> from the variable <code>commons</code>
+            </p>
+            <p>
+              JEXL also supports <code>ant-style</code> variables, the following is a valid variable name:
+              <source>my.dotted.var</source>
+            </p>
+            <p>
+              <strong>N.B.</strong> the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
+              <code>or and eq ne lt gt le ge div mod not null true false new var return</code>
+              For example, the following is invalid:
+              <source>my.new.dotted.var // invalid ('new' is keyword)</source>
+              In such cases, quoted identifiers or the [ ] operator can be used, for example:
+              <source>my.'new'.dotted.var</source>
+              <source>my['new'].dotted.var</source>
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td>Scripts</td>
+          <td>
+            <p>
+            A script in Jexl is made up of zero or more statements. Scripts can be read from a String, File or URL.
+            </p>
+            <p>
+            They can be created with named parameters which allow a later evaluation to be performed with arguments.
+            </p>
+            <p>
+            A script returns the last expression evaluated by default.
+            </p>
+            <p>
+            Using the <code>return</code> keyword, a script will return the expression that follows (or null).
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td>Local variables</td>
+          <td>Can be defined using the <code>var</code> keyword; their identifying rules are the same as contextual variables.
+            <ul>
+              <li>Basic declaration: <code>var x;</code></li>
+              <li>Declaration with assignment: <code>var theAnswer = 42;</code></li>
+              <li>Invalid declaration: <code>var x.y;</code></li>
+            </ul>
+            Their scope is the entire script scope and they take precedence in resolution over contextual variables.
+            When scripts are created with named parameters, those behave as local variables.
+            Local variables can not use <code>ant-style</code> naming, only one identifier.
+          </td>
+        </tr>
+        <tr>
+          <td>Statements</td>
+          <td>
+            A statement can be the empty statement, the semicolon (<code>;</code>) ,  block, assignment or an expression.
+            Statements are optionally terminated with a semicolon.
+          </td>
+        </tr>
+        <tr>
+          <td>Block</td>
+          <td>
+            A block is simply multiple statements inside curly braces (<code>{, }</code>).
+          </td>
+        </tr>
+        <tr>
+          <td>Assignment</td>
+          <td>
+            Assigns the value of a variable  (<code>my.var = 'a value'</code>) using a
+            <code>JexlContext</code> as initial resolver. Both <em>beans</em> and <em>ant-ish</em>
+            variables assignment are supported.
+          </td>
+        </tr>
+        <tr>
+          <td>Method calls</td>
+          <td>
+            Calls a method of an object, e.g.
+            <source>"hello world".hashCode()</source> will call the <code>hashCode</code> method
+            of the <code>"hello world"</code> String.
+            <p>In case of multiple arguments and overloading, Jexl will make the best effort to find
+            the most appropriate non ambiguous method to call.</p>
+          </td>
+        </tr>
+      </table>
+    </section>
+    <section name="Literals">
+      <table>
+        <tr><th width="15%">Item</th><th>Description</th></tr>
+        <tr>
+          <td>Integer Literals</td>
+          <td>1 or more digits from <code>0</code> to <code>9</code>, eg <code>42</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Float Literals</td>
+          <td>
+            1 or more digits from <code>0</code> to <code>9</code>, followed
+            by a decimal point and then one or more digits from
+            <code>0</code> to <code>9</code>,
+            optionally followed by <code>f</code> or <code>F</code>,
+            eg <code>42.0</code> or <code>42.0f</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Long Literals</td>
+          <td>1 or more digits from <code>0</code> to <code>9</code> suffixed with <code>l</code> or <code>L</code>
+          , eg <code>42l</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Double Literals</td>
+          <td>
+            1 or more digits from <code>0</code> to <code>9</code>, followed
+            by a decimal point and then one or more digits from
+            <code>0</code> to <code>9</code> suffixed with <code>d</code> or <code>D</code>
+            , eg <code>42.0d</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Big Integer Literals</td>
+          <td>1 or more digits from <code>0</code> to <code>9</code> suffixed with <code>b</code> or <code>B</code>
+          , eg <code>42B</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Big Decimal Literals</td>
+          <td>
+            1 or more digits from <code>0</code> to <code>9</code>, followed
+            by a decimal point and then one or more digits from
+            <code>0</code> to <code>9</code> suffixed with <code>h</code> or <code>H</code> (for Huge ala OGNL))
+           , eg <code>42.0H</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Natural literals - octal and hex support</td>
+          <td>
+          Natural numbers (i.e. Integer, Long, BigInteger) can also be expressed as octal or hexadecimal using the same format as Java.
+          i.e. prefix the number with <code>0</code> for octal, and prefix with <code>0x</code> or <code>0X</code> for hexadecimal.
+          For example <code>010</code> or <code>0x10</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Real literals - exponent support</td>
+          <td>
+          Real numbers (i.e. Float, Double, BigDecimal) can also be expressed using standard Java exponent notation.
+          i.e. suffix the number with <code>e</code> or <code>E</code> followed by the sign <code>+</code> or <code>-</code>
+          followed by one or more decimal digits.
+          For example <code>42.0E-1D</code> or <code>42.0E+3B</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>String literals</td>
+          <td>
+            Can start and end with either <code>'</code> or <code>"</code> delimiters, e.g.
+            <source>"Hello world"</source> and
+            <source>'Hello world'</source> are equivalent.
+            <p>The escape character is <code>\</code> (backslash); it only escapes the string delimiter</p>
+          </td>
+        </tr>
+        <tr>
+          <td>Boolean literals</td>
+          <td>
+            The literals <code>true</code> and <code>false</code> can be used, e.g.
+            <source>val1 == true</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Null literal</td>
+          <td>
+            The null value is represented as in java using the literal <code>null</code>, e.g.
+            <source>val1 == null</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Array literal</td>
+          <td>
+            A <code>[</code> followed by one or more expressions separated by <code>,</code> and ending
+            with <code>]</code>, e.g.
+            <source>[ 1, 2, "three" ]</source>
+            <p>This syntax creates an <code>Object[]</code>.</p>
+            <p>
+            JEXL will attempt to strongly type the array; if all entries are of the same class or if all
+            entries are Number instance, the array literal will be an <code>MyClass[]</code> in the former
+            case, a <code>Number[]</code> in the latter case.</p>
+            <p>Furthermore, if all entries in the array literal are of the same class
+            and that class has an equivalent primitive type, the array returned will be a primitive array. e.g.
+            <code>[1, 2, 3]</code> will be interpreted as <code>int[]</code>.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>Map literal</td>
+          <td>
+            A <code>{</code> followed by one or more sets of <code>key : value</code> pairs separated by <code>,</code> and ending
+            with <code>}</code>, e.g.
+            <source>{ "one" : 1, "two" : 2, "three" : 3, "more": "many more" }</source>
+            <p>This syntax creates a <code>HashMap&lt;Object,Object&gt;</code>.</p>
+          </td>
+        </tr>
+      </table>
+    </section>
+    <section name="Functions">
+      <table>
+        <tr><th width="15%">Function</th><th>Description</th></tr>
+        <tr>
+          <td>empty</td>
+          <td>
+            Returns true if the expression following is either:
+            <ol>
+              <li><code>null</code></li>
+              <li>An empty string</li>
+              <li>An array of length zero</li>
+              <li>A collection of size zero</li>
+              <li>An empty map</li>
+            </ol>
+            <source>empty(var1)</source>
+          </td>
+        </tr>
+        <tr>
+          <td>size</td>
+          <td>
+            Returns the information about the expression:
+            <ol>
+              <li>Length of an array</li>
+              <li>Size of a List</li>
+              <li>Size of a Map</li>
+              <li>Size of a Set</li>
+              <li>Length of a string</li>
+            </ol>
+            <source>size("Hello")</source> returns 5.
+          </td>
+        </tr>
+        <tr>
+          <td>new</td>
+          <td>
+            Creates a new instance using a fully-qualified class name or Class:
+            <source>new("java.lang.Double", 10)</source> returns 10.0.
+            <p>Note that the first argument of <code>new</code> can be a variable or any
+            expression evaluating as a String or Class; the rest of the arguments are used
+            as arguments to the constructor for the class considered.</p>
+            <p>In case of multiple constructors, Jexl will make the best effort to find
+            the most appropriate non ambiguous constructor to call.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>ns:function</td>
+          <td>
+            A <code>JexlEngine</code> can register objects or classes used as function namespaces.
+            This can allow expressions like:
+            <source>math:cosinus(23.0)</source>
+          </td>
+        </tr>
+      </table>
+    </section>
+    <section name="Operators">
+      <table>
+        <tr><th width="15%">Operator</th><th>Description</th></tr>
+        <tr>
+          <td>Boolean <code>and</code></td>
+          <td>
+            The usual <code>&amp;&amp;</code> operator can be used as well as the word <code>and</code>, e.g.
+            <source>cond1 and cond2</source> and
+            <source>cond1 &amp;&amp; cond2</source> are equivalent
+          </td>
+        </tr>
+        <tr>
+          <td>Boolean <code>or</code></td>
+          <td>
+            The usual <code>||</code> operator can be used as well as the word <code>or</code>, e.g.
+            <source>cond1 or cond2</source> and
+            <source>cond1 || cond2</source> are equivalent
+          </td>
+        </tr>
+        <tr>
+          <td>Boolean <code>not</code></td>
+          <td>
+            The usual <code>!</code> operator can be used as well as the word <code>not</code>, e.g.
+            <source>!cond1</source> and
+            <source>not cond1</source> are equivalent
+          </td>
+        </tr>
+        <tr>
+          <td>Bitwise <code>and</code></td>
+          <td>
+            The usual <code>&amp;</code> operator is used, e.g.
+            <source>33 &amp; 4</source>, 0010 0001 &amp; 0000 0100 = 0.
+          </td>
+        </tr>
+        <tr>
+          <td>Bitwise <code>or</code></td>
+          <td>
+            The usual <code>|</code> operator is used, e.g.
+            <source>33 | 4</source>, 0010 0001 | 0000 0100 = 0010 0101 = 37.
+          </td>
+        </tr>
+        <tr>
+          <td>Bitwise <code>xor</code></td>
+          <td>
+            The usual <code>^</code> operator is used, e.g.
+            <source>33 ^ 4</source>, 0010 0001 ^ 0000 0100 = 0010 0100 = 37.
+          </td>
+        </tr>
+        <tr>
+          <td>Bitwise <code>complement</code></td>
+          <td>
+            The usual <code>~</code> operator is used, e.g.
+            <source>~33</source>, ~0010 0001 = 1101 1110 = -34.
+          </td>
+        </tr>
+        <tr>
+          <td>Ternary conditional <code>?:</code> </td>
+          <td>
+            The usual ternary conditional operator <code>condition ? if_true : if_false</code> operator can be
+            used as well as the abbreviation <code>value ?: if_false</code> which returns the <code>value</code> if
+            its evaluation is defined, non-null and non-false, e.g.
+            <source>val1 ? val1 : val2</source> and
+            <source>val1 ?: val2 </source> are equivalent.
+            <p>
+              <strong>NOTE:</strong> The condition will evaluate to <code>false</code> when it
+              refers to an undefined variable or <code>null</code> for all <code>JexlEngine</code>
+              flag combinations. This allows explicit syntactic leniency and treats the condition
+              'if undefined or null or false' the same way in all cases.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td>Equality</td>
+          <td>
+            The usual <code>==</code> operator can be used as well as the abbreviation <code>eq</code>.
+            For example
+            <source>val1 == val2</source> and
+            <source>val1 eq val2</source> are equivalent.
+            <ol>
+              <li>
+                <code>null</code> is only ever equal to null, that is if you compare null
+                to any non-null value, the result is false.
+              </li>
+              <li>Equality uses the java <code>equals</code> method</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td>Inequality</td>
+          <td>
+            The usual <code>!=</code> operator can be used as well as the abbreviation <code>ne</code>.
+            For example
+            <source>val1 != val2</source> and
+            <source>val1 ne val2</source> are equivalent.
+          </td>
+        </tr>
+        <tr>
+          <td>Less Than</td>
+          <td>
+            The usual <code>&lt;</code> operator can be used as well as the abbreviation <code>lt</code>.
+            For example
+            <source>val1 &lt; val2</source> and
+            <source>val1 lt val2</source> are equivalent.
+          </td>
+        </tr>
+        <tr>
+          <td>Less Than Or Equal To</td>
+          <td>
+            The usual <code>&lt;=</code> operator can be used as well as the abbreviation <code>le</code>.
+            For example
+            <source>val1 &lt;= val2</source> and
+            <source>val1 le val2</source> are equivalent.
+          </td>
+        </tr>
+        <tr>
+          <td>Greater Than</td>
+          <td>
+            The usual <code>&gt;</code> operator can be used as well as the abbreviation <code>gt</code>.
+            For example
+            <source>val1 &gt; val2</source> and
+            <source>val1 gt val2</source> are equivalent.
+          </td>
+        </tr>
+        <tr>
+          <td>Greater Than Or Equal To</td>
+          <td>
+            The usual <code>&gt;=</code> operator can be used as well as the abbreviation <code>ge</code>.
+            For example
+            <source>val1 &gt;= val2</source> and
+            <source>val1 ge val2</source> are equivalent.
+          </td>
+        </tr>
+        <tr>
+          <td>In or Match<code>=~</code></td>
+          <td>
+            The syntactically Perl inspired <code>=~</code> operator can be used to check that a <code>string</code> matches
+            a regular expression (expressed either a Java String or a java.util.regex.Pattern).
+            For example
+            <code>"abcdef" =~ "abc.*</code> returns <code>true</code>.
+            It also checks whether any collection, set or map (on keys) contains a value or not; in that case, it behaves
+            as an "in" operator. Note that it also applies to arrays as well as "duck-typed" collection, ie classes exposing a "contains"
+            method.
+            <code> "a" =~ ["a","b","c","d","e",f"]</code> returns <code>true</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Not-In or Not-Match<code>!~</code></td>
+          <td>
+            The syntactically Perl inspired <code>!~</code> operator can be used to check that a <code>string</code> does not
+            match a regular expression (expressed either a Java String or a java.util.regex.Pattern).
+            For example
+            <code>"abcdef" !~ "abc.*</code> returns <code>false</code>.
+            It also checks whether any collection, set or map (on keys) does not contain a value; in that case, it behaves
+            as "not in" operator. Note that it also applies to arrays as well as "duck-typed" collection, ie classes exposing a "contains"
+            method.
+            <code> "a" !~ ["a","b","c","d","e",f"]</code> returns <code>true</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Addition</td>
+          <td>
+            The usual <code>+</code> operator is used.
+            For example
+            <source>val1 + val2</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Subtraction</td>
+          <td>
+            The usual <code>-</code> operator is used.
+            For example
+            <source>val1 - val2</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Multiplication</td>
+          <td>
+            The usual <code>*</code> operator is used.
+            For example
+            <source>val1 * val2</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Division</td>
+          <td>
+            The usual <code>/</code> operator is used, or one can use the <code>div</code> operator.
+            For example
+            <source>val1 / val2</source>
+            or
+            <source>val1 div val2</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Modulus (or remainder)</td>
+          <td>
+            The <code>%</code> operator is used. An alternative is the <code>mod</code>
+            operator.
+            For example
+            <source>5 mod 2</source> gives 1 and is equivalent to <source>5 % 2</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Negation</td>
+          <td>
+            The unary <code>-</code> operator is used.
+            For example
+            <source>-12</source>
+          </td>
+        </tr>
+        <tr>
+          <td>Array access</td>
+          <td>
+            Array elements may be accessed using either square brackets or a dotted numeral, e.g.
+            <source>arr1[0]</source> and <source>arr1.0</source> are equivalent
+          </td>
+        </tr>
+        <tr>
+          <td>HashMap access</td>
+          <td>
+            Map elements are accessed using square brackets, e.g.
+            <source>map[0]; map['name']; map[var];</source>
+            Note that <source>map['7']</source> and <source>map[7]</source> refer to different elements.
+            Map elements with a numeric key may also be accessed using a dotted numeral, e.g.
+            <source>map[0]</source> and <source>map.0</source> are equivalent.
+          </td>
+        </tr>
+      </table>
+    </section>
+    <section name="Conditional">
+      <table>
+        <tr><th width="15%">Operator</th><th>Description</th></tr>
+        <tr>
+          <td>if</td>
+          <td>
+            Classic, if/else statement, e.g.
+            <source>if ((x * 2) == 5) {
+    y = 1;
+} else {
+    y = 2;
+}</source>
+          </td>
+        </tr>
+        <tr>
+          <td>for</td>
+          <td>
+            Loop through items of an Array, Collection, Map, Iterator or Enumeration, e.g.
+            <source>for(item : list) {
+    x = x + item; 
+}</source>
+            Where <code>item</code> and <code>list</code> are variables.
+            The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>deprecated</strong>.
+          </td>
+        </tr>
+        <tr>
+          <td>while</td>
+          <td>
+            Loop until a condition is satisfied, e.g.
+            <source>while (x lt 10) {
+    x = x + 2; 
+}</source>
+          </td>
+        </tr>
+      </table>
+    </section>
+
+  </body>
+</document>
+

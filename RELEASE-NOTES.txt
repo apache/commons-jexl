@@ -17,46 +17,188 @@
 $Id$
 
                             Commons JEXL Package
-                                Version 2.0
+                                Version 2.1
                                Release Notes
 
 
 INTRODUCTION:
 =============
 
-JEXL is an Expression Language supporting most of the constructs in the
-JSTL Expression Language, along with some additional extensions.
+JEXL is a library intended to facilitate the implementation of dynamic and scripting features in
+applications and frameworks written in Java.
+
+JEXL implements an Expression Language based on some extensions to the JSTL Expression Language supporting most of the
+constructs seen in shell-script or ECMAScript.
+
+Its goal is to expose scripting features usable by technical operatives or consultants working with enterprise platforms.
+
 
   http://commons.apache.org/jexl/
 
-Changes in this version include:
 
-Incompatible Changes
+What's new in 2.1:
+==================
+* A more thorough arithmetic (JexlArithmetic) that allows fine control over decimals (scale and precision), a
+  new syntax for numeric literals (OGNL inspired Big and Huge notations) and a better type handling keeping the most
+  appropriate representation in casual operations.
+* The introduction of script variables and parameters that reduce context dependencies and methods; this allows to
+  perform checks after script creation (light static checking hints). Plus the ability to call script from scripts.
+* A sandoxing feature to restrict and rename what JEXL can access from the environment allowing tighter control over security.
+* Extensions to UnifiedJEXL that allow the creation of templates.
+
+New features in 2.1:
+====================	
+* JEXL-114:     Allow scripts to create local variables // Add return keyword
+* JEXL-113:     Add functions to extract which variables, parameters and local variables are used to evaluate a script
+* JEXL-118:     Provide an IN operator
+* JEXL-115:     Add support for asynchronous script execution and cancellation
+* JEXL-116:     Add control over classes, methods, constructors and properties allowed in scripts
+* JEXL-120:     Add simple template features
+* JEXL-119:     Allow indexed properties container resolution in expressions
+* JEXL-106:     When divide two BigDecimal values in an expression it results in java.lang.ArithmeticException
+* JEXL-102:     Add "jexl2" as a supported name
+
+Bugs Fixed in 2.1:
+==================
+* JEXL-83:      Make JexlArithmetic immutable (and threadsafe)
+* JEXL-24:      Support Long for integer literal instead of Integers
+* JEXL-107:     literals and parenthesized expressions can not be used as references
+* JEXL-108:     parsing error if i define a empty literal array/map
+* JEXL-101:     Vararg methods where the first argument is no vararg can not be called with only the fixed parameters given
+* JEXL-105:     Array literals are considered constant even when they are not
+* JEXL-104:     NPE in JexlArithmetic when an Array-Expression containing a null is used.
+* JEXL-112:     Cannot parse Integer.MIN_VALUE	
+* JEXL-111:     expression execute error
+
+Bugs fixed in 2.0.1:
 ====================
 
-Now requires Java 1.5 or later.
+* JEXL-100:     Array access expressions fail when evaluated twice and cache is enabled
+* JEXL-99:      Documentation of Thread Safety / Invalid code examples on homepage
+* JEXL-98:      Quote escaping cannot be escaped
 
-The following classes have been removed:
 
+
+Previous Releases:
+==================
+
+
+Bugs fixed in 2.0:
+==================
+
+* JEXL-90:	Jexl parser allows invalid expressions, e.g. "a=1 b=2 3"
+* JEXL-88:	MethodKey.java - name clash getMostSpecific() with Java 1.5.0
+* JEXL-87:	Inconsistent behaviour of arithmetical operations
+* JEXL-81:	Introspector does not use ListGetExecutor for List
+* JEXL-80:	Lenient mode should not throw exception when {g,s}etting an undefined property
+* JEXL-78:	Ternary operator throws Exception when JexlEngine in strict mode
+* JEXL-76:	Remove unnecessary class VisitorAdapter
+* JEXL-71:	Parsing errors?
+* JEXL-67:	Potential NPE in util.introspection.MethodKey
+* JEXL-66:	testDottedNames expects map enumeration order
+* JEXL-64:	Inconsistent behaviour of dotted names
+* JEXL-62:	NPE in Interpreter
+* JEXL-59:	ClassMap holds a reference to class
+* JEXL-56:	Logging wrongly uses java.util.logging
+* JEXL-50:	Div operator does not do integer division
+* JEXL-49:	Block statements aren't parsed
+* JEXL-48:	NPE during expression evaluation
+* JEXL-45:	Unhandled division by zero
+* JEXL-42:	NullPointerException evaluating an expression
+* JEXL-40:	JEXL fails to find abstract public methods in the base class if overridden by non-public derived types
+* JEXL-32:	BigDecimal values are treated as Long values which results in loss of precision
+* JEXL-30:	ASTAddNode does not add BigDecimal objects correctly
+* JEXL-27:	Cannot assign a value to the property of an object, such as object.prop = value.
+* JEXL-26:	ASTArrayAccess messes up on fallback to JexlContext
+* JEXL-19:	Ternary conditional not supported
+* JEXL-3 :	Static method resolution and changes to context
+
+Other issues fixed (Improvements/New Features):
+===============================================
+
+* JEXL-95:	Enhance JSR-223 implementation
+* JEXL-94:	Allow stateful namespaces (ns:function)
+* JEXL-93:	Add public fields as targets of set/get property
+* JEXL-92:	JexlContext API should be more flexible
+* JEXL-89:	Drop main() and suite() methods from Test cases
+* JEXL-85:	2.0 grammar finishing touches & debugger update
+* JEXL-82:	Change foreach syntax
+* JEXL-77:	Rename last Velocity originated classes
+* JEXL-72:	Remove deprecated classes and methods entirely
+* JEXL-70:	Add main class to allow scripts etc to be tested
+* JEXL-63:	JSR-223 support
+* JEXL-61:	Usage of strong references on Method/Constructor & WeakHashMap usage
+* JEXL-60:	Refactor o.a.c.jexl.util and o.a.c.jexl.util.introspection
+* JEXL-58:	UnifiedJEXL
+* JEXL-57:	Change pom.xml to make it Netbeans Maven2 plugin friendly
+* JEXL-55:	JEXL 2.0 redux, attempting to restart the effort to release 2.0
+* JEXL-54:	Light performance enhancements
+* JEXL-47:	Allow single-line comments with //
+* JEXL-43:	Website overview does not mention method calls and new 2.0 features
+* JEXL-41:	Allow nested ${} evaluation
+* JEXL-35:	Final API requirements
+* JEXL-34:	Remove pre and post resolution of variables via the JexlExprResolver classes.
+* JEXL-33:	Remove unnecessary throws Exception from various classes
+* JEXL-29:	Support non-object-level functions/methods, as size and empty function
+* JEXL-25:	Call method with varargs
+* JEXL-24:	Support Long for integer literal instead of Integers
+* JEXL-21:	operator overloading / hooks on operator processing
+* JEXL-16:	allowing quote escaping
+* JEXL-15:	Needs definable functions
+* JEXL-11:	Don't make null convertible into anything
+* JEXL-10:	Make possible checking for unresolved variables
+
+Other Changes:
+==============
+
+o Add @since 2.0 tags to code so we can track API additions via Javadoc
+
+Upgrading from JEXL 1.x 
+=======================
+
+JEXL now requires Java 1.5 or later.
+
+Version 2.0 resides in the org.apache.commons.jexl2 package; part of the version 1.x API is reimplemented as an
+add-on source library in the jexl-compat directory; since it can not fully reimplement the original public 1.x, it may
+only be used to ease transition in strictly controlled deployments.
+
+The following classes are implemented through the jexl-compat source library:
   * ExpressionFactory
   * ScriptFactory
+  * Expression
+  * Script
+  * JexlContext
+  * JexlHelper
 
-  Please create a JexlEngine and use createExpression() or createScript()
+Migration notes
+===============
+
+When migrating from jexl 1.x to jexl 2.0, the following hints may be helpfull.
+
+The following classes no longer exist:
+  * ExpressionFactory, ScriptFactory: create a JexlEngine and use createExpression() or createScript()
   instead.
 
-  * VelMethod
-  * VelPropertyGet
-  * VelPropertySet
+The following classes have been renamed and replaced:
 
-  Please use JexlMethod, JexlPropertyGet and JexlPropertySet instead.
+  * VelMethod <=> JexlMethod
+  * VelPropertyGet <=> JexlPropertyGet
+  * VelPropertySet <=> JexlPropertySet
 
 The following methods have been removed:
 
   * Info.getTemplateName() - use Info.getName() instead
+  * Expression.addPostResolver() / Expression.addPreResolver() - set ant-like variables in JexlContext, implement
+    a specific JexlContext or derive JexlcontextInterpreter/JexlEngine instead
 
-Division (/ operator) behavior change:
-  * Division between integers no longer casts its operands to double; integer division
-    allways results in a integer.
+Behavior changes
+================
+
+* Public fields are considered when using JexlPropertyGet / JexlPropertySet: Jexl 1.x behavior can be reimplemented
+by subclassing UberspectImpl.
+
+*Division (/ operator) behavior change: division between integers no longer casts its operands to double; integer division
+    allways results in a integer. The 1.x behavior can be reimplemented by subclassing JexlArithmetic.
 
 New Features:
 =============
@@ -72,7 +214,7 @@ Constructor call expression: new('my.class.name', arguments...)
      to the actual arguments
 
 Function namespace: ns:func(arguments...)
-   * A function namespaces allows to use a class or instance methods in function calls
+   * A function namespace allows the use of class or instance methods in function calls
 
 UnifiedJEXL
    * Adds ${...} and #{...} JSP/EL syntax support on top of the JexlEngine
@@ -83,13 +225,3 @@ JSR-223 support
 Error and exception handling
    * Configuring the leniency and verbosity of the Jexl engine allows user control over the
      error handling policy
-
-Bugs fixed:
-===========
-
-
-Other Changes:
-==============
-
-o Add @since 2.0 tags to code so we can track API additions via Javadoc
-
