@@ -22,21 +22,21 @@
 -->
 <FindBugsFilter>
     <Match>
-        <Class name="org.apache.commons.jexl2.parser.ParseException"/>
+        <Class name="org.apache.commons.jexl3.parser.ParseException"/>
     </Match>
     <Match>
-        <Class name="org.apache.commons.jexl2.parser.Parser"/>
+        <Class name="org.apache.commons.jexl3.parser.Parser"/>
     </Match>
     <Match>
-        <Class name="org.apache.commons.jexl2.parser.ParserConstants"/>
+        <Class name="org.apache.commons.jexl3.parser.ParserConstants"/>
     </Match>
     <Match>
-        <Class name="org.apache.commons.jexl2.parser.ParserTokenManager"/>
+        <Class name="org.apache.commons.jexl3.parser.ParserTokenManager"/>
     </Match>
     <Match>
-        <Class name="org.apache.commons.jexl2.parser.ParserTreeConstants"/>
+        <Class name="org.apache.commons.jexl3.parser.ParserTreeConstants"/>
     </Match>
     <Match>
-        <Class name="org.apache.commons.jexl2.parser.TokenMgrError"/>
+        <Class name="org.apache.commons.jexl3.parser.TokenMgrError"/>
     </Match>
 </FindBugsFilter>

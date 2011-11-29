@@ -35,7 +35,7 @@
             <directory>src</directory>
         </fileSet>
         <fileSet>
-            <directory>jexl2-compat</directory>
+            <directory>jexl-compat</directory>
             <excludes>
                 <exclude>target/**</exclude>
             </excludes>
