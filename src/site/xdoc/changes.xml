@@ -25,7 +25,10 @@
     <author email="dev@commons.apache.org">Commons Developers</author>
   </properties>
   <body>
-    <release version="2.1" date="unreleased">
+    <release version="3.0" date="unreleased">
+        <action dev="henrib" type="add" issue="JEXL-122">
+            Move JEXL from org.apache.comms.jexl2 to org.apache.commons.jexl3
+        </action>
         <action dev="henrib" type="add" issue="JEXL-121">
             Add simple template features
         </action>
