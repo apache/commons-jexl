@@ -1,0 +1,111 @@
+ERROR: 7006: org.apache.commons.jexl2.JexlEngine: Return type of method 'protected org.apache.commons.jexl2.JexlInfo createInfo(java.lang.String, int, int)' has been changed to org.apache.commons.jexl2.DebugInfo
+ERROR: 7006: org.apache.commons.jexl2.JexlEngine: Return type of method 'protected org.apache.commons.jexl2.JexlInfo debugInfo()' has been changed to org.apache.commons.jexl2.DebugInfo
+ERROR: 7012: org.apache.commons.jexl2.introspection.Uberspect: Method 'public org.apache.commons.jexl2.introspection.JexlMethod getConstructorMethod(java.lang.Object, java.lang.Object[], org.apache.commons.jexl2.JexlInfo)' has been added to an interface
+ERROR: 7012: org.apache.commons.jexl2.JexlInfo: Method 'public org.apache.commons.jexl2.DebugInfo debugInfo()' has been added to an interface
+ERROR: 7012: org.apache.commons.jexl2.Script: Method 'public java.lang.Object execute(org.apache.commons.jexl2.JexlContext, java.lang.Object[])' has been added to an interface
+ERROR: 7012: org.apache.commons.jexl2.Script: Method 'public java.lang.String[] getLocalVariables()' has been added to an interface
+ERROR: 7012: org.apache.commons.jexl2.Script: Method 'public java.lang.String[] getParameters()' has been added to an interface
+ERROR: 7012: org.apache.commons.jexl2.Script: Method 'public java.util.concurrent.Callable callable(org.apache.commons.jexl2.JexlContext)' has been added to an interface
+ERROR: 7012: org.apache.commons.jexl2.Script: Method 'public java.util.concurrent.Callable callable(org.apache.commons.jexl2.JexlContext, java.lang.Object[])' has been added to an interface
+ERROR: 7012: org.apache.commons.jexl2.Script: Method 'public java.util.Set getVariables()' has been added to an interface
+INFO: 6000: org.apache.commons.jexl2.Interpreter: Added protected field cancelled
+INFO: 6000: org.apache.commons.jexl2.Interpreter: Added protected field parameters
+INFO: 6000: org.apache.commons.jexl2.JexlArithmetic: Added protected field BIGD_SCALE
+INFO: 6000: org.apache.commons.jexl2.JexlArithmetic: Added protected field mathContext
+INFO: 6000: org.apache.commons.jexl2.JexlArithmetic: Added protected field mathScale
+INFO: 6000: org.apache.commons.jexl2.JexlEngine: Added protected field strict
+INFO: 6005: org.apache.commons.jexl2.Interpreter: Field strict is now non-final
+INFO: 6009: org.apache.commons.jexl2.JexlArithmetic: Accessibility of field strict has been increased from private to protected
+INFO: 7006: org.apache.commons.jexl2.UnifiedJEXL$Expression: Return type of method 'void asString(java.lang.StringBuilder)' has been changed to java.lang.StringBuilder
+INFO: 7007: org.apache.commons.jexl2.Interpreter: Method 'protected void setRegisters(java.lang.Object[])' has been deprecated
+INFO: 7007: org.apache.commons.jexl2.Interpreter: Method 'public Interpreter(org.apache.commons.jexl2.JexlEngine, org.apache.commons.jexl2.JexlContext)' has been deprecated
+INFO: 7007: org.apache.commons.jexl2.Interpreter: Method 'public java.lang.Object visit(org.apache.commons.jexl2.parser.ASTFloatLiteral, java.lang.Object)' has been deprecated
+INFO: 7007: org.apache.commons.jexl2.Interpreter: Method 'public java.lang.Object visit(org.apache.commons.jexl2.parser.ASTIntegerLiteral, java.lang.Object)' has been deprecated
+INFO: 7007: org.apache.commons.jexl2.Interpreter: Method 'public void setSilent(boolean)' has been deprecated
+INFO: 7007: org.apache.commons.jexl2.introspection.Uberspect: Method 'public java.lang.reflect.Constructor getConstructor(java.lang.Object, java.lang.Object[], org.apache.commons.jexl2.JexlInfo)' has been deprecated
+INFO: 7007: org.apache.commons.jexl2.introspection.UberspectImpl: Method 'public java.lang.reflect.Constructor getConstructor(java.lang.Object, java.lang.Object[], org.apache.commons.jexl2.JexlInfo)' has been deprecated
+INFO: 7007: org.apache.commons.jexl2.JexlEngine: Method 'protected org.apache.commons.jexl2.parser.ASTJexlScript parse(java.lang.CharSequence, org.apache.commons.jexl2.JexlInfo)' has been deprecated
+INFO: 7007: org.apache.commons.jexl2.JexlEngine: Method 'public org.apache.commons.jexl2.Script createScript(java.lang.String, org.apache.commons.jexl2.JexlInfo)' has been deprecated
+INFO: 7010: org.apache.commons.jexl2.UnifiedJEXL$Expression: Accessibility of method 'java.lang.Object evaluate(org.apache.commons.jexl2.Interpreter)' has been increased from package to protected
+INFO: 7010: org.apache.commons.jexl2.UnifiedJEXL$Expression: Accessibility of method 'org.apache.commons.jexl2.UnifiedJEXL$Expression prepare(org.apache.commons.jexl2.Interpreter)' has been increased from package to protected
+INFO: 7010: org.apache.commons.jexl2.UnifiedJEXL$Expression: Accessibility of method 'void asString(java.lang.StringBuilder)' has been increased from package to public
+INFO: 7011: org.apache.commons.jexl2.DebugInfo: Method 'public org.apache.commons.jexl2.DebugInfo debugInfo()' has been added
+INFO: 7011: org.apache.commons.jexl2.ExpressionImpl: Method 'public java.lang.Object execute(org.apache.commons.jexl2.JexlContext, java.lang.Object[])' has been added
+INFO: 7011: org.apache.commons.jexl2.ExpressionImpl: Method 'public java.lang.String[] getLocalVariables()' has been added
+INFO: 7011: org.apache.commons.jexl2.ExpressionImpl: Method 'public java.lang.String[] getParameters()' has been added
+INFO: 7011: org.apache.commons.jexl2.ExpressionImpl: Method 'public java.util.concurrent.Callable callable(org.apache.commons.jexl2.JexlContext)' has been added
+INFO: 7011: org.apache.commons.jexl2.ExpressionImpl: Method 'public java.util.concurrent.Callable callable(org.apache.commons.jexl2.JexlContext, java.lang.Object[])' has been added
+INFO: 7011: org.apache.commons.jexl2.ExpressionImpl: Method 'public java.util.Set getVariables()' has been added
+INFO: 7011: org.apache.commons.jexl2.Interpreter: Method 'protected boolean isCancelled()' has been added
+INFO: 7011: org.apache.commons.jexl2.Interpreter: Method 'protected Interpreter(org.apache.commons.jexl2.Interpreter)' has been added
+INFO: 7011: org.apache.commons.jexl2.Interpreter: Method 'protected org.apache.commons.jexl2.JexlContext getContext()' has been added
+INFO: 7011: org.apache.commons.jexl2.Interpreter: Method 'protected void setFrame(org.apache.commons.jexl2.JexlEngine$Frame)' has been added
+INFO: 7011: org.apache.commons.jexl2.Interpreter: Method 'public boolean isStrict()' has been added
+INFO: 7011: org.apache.commons.jexl2.Interpreter: Method 'public Interpreter(org.apache.commons.jexl2.JexlEngine, org.apache.commons.jexl2.JexlContext, boolean, boolean)' has been added
+INFO: 7011: org.apache.commons.jexl2.Interpreter: Method 'public java.lang.Object visit(org.apache.commons.jexl2.parser.ASTNumberLiteral, java.lang.Object)' has been added
+INFO: 7011: org.apache.commons.jexl2.Interpreter: Method 'public java.lang.Object visit(org.apache.commons.jexl2.parser.ASTReferenceExpression, java.lang.Object)' has been added
+INFO: 7011: org.apache.commons.jexl2.Interpreter: Method 'public java.lang.Object visit(org.apache.commons.jexl2.parser.ASTReturnStatement, java.lang.Object)' has been added
+INFO: 7011: org.apache.commons.jexl2.Interpreter: Method 'public java.lang.Object visit(org.apache.commons.jexl2.parser.ASTVar, java.lang.Object)' has been added
+INFO: 7011: org.apache.commons.jexl2.Interpreter: Method 'public void setStrict(boolean)' has been added
+INFO: 7011: org.apache.commons.jexl2.introspection.UberspectImpl: Method 'protected org.apache.commons.jexl2.introspection.JexlPropertyGet getIndexedGet(java.lang.Object, java.lang.String)' has been added
+INFO: 7011: org.apache.commons.jexl2.introspection.UberspectImpl: Method 'public org.apache.commons.jexl2.introspection.JexlMethod getConstructorMethod(java.lang.Object, java.lang.Object[], org.apache.commons.jexl2.JexlInfo)' has been added
+INFO: 7011: org.apache.commons.jexl2.introspection.UberspectImpl: Method 'public void setLoader(java.lang.ClassLoader)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'protected boolean narrowAccept(java.lang.Class, java.lang.Class)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'protected int compare(java.lang.Object, java.lang.Object, java.lang.String)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'protected java.lang.Number narrowBigDecimal(java.lang.Object, java.lang.Object, java.math.BigDecimal)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'protected java.lang.Number narrowNumber(java.lang.Number, java.lang.Class)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'public int getMathScale()' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'public java.lang.Object bitwiseAnd(java.lang.Object, java.lang.Object)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'public java.lang.Object bitwiseComplement(java.lang.Object)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'public java.lang.Object bitwiseOr(java.lang.Object, java.lang.Object)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'public java.lang.Object bitwiseXor(java.lang.Object, java.lang.Object)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'public java.lang.Object negate(java.lang.Object)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'public java.math.BigDecimal roundBigDecimal(java.math.BigDecimal)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'public java.math.MathContext getMathContext()' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlArithmetic: Method 'public JexlArithmetic(boolean, java.math.MathContext, int)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlEngine: Method 'protected java.lang.String[] getLocalVariables(org.apache.commons.jexl2.Script)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlEngine: Method 'protected java.lang.String[] getParameters(org.apache.commons.jexl2.Script)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlEngine: Method 'protected org.apache.commons.jexl2.Interpreter createInterpreter(org.apache.commons.jexl2.JexlContext, boolean, boolean)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlEngine: Method 'protected org.apache.commons.jexl2.parser.ASTJexlScript parse(java.lang.CharSequence, org.apache.commons.jexl2.JexlInfo, org.apache.commons.jexl2.JexlEngine$Scope)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlEngine: Method 'protected void getVariables(org.apache.commons.jexl2.parser.JexlNode, java.util.Set, java.util.List)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlEngine: Method 'public boolean isStrict()' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlEngine: Method 'public java.util.Set getVariables(org.apache.commons.jexl2.Script)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlEngine: Method 'public org.apache.commons.jexl2.JexlArithmetic getArithmetic()' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlEngine: Method 'public org.apache.commons.jexl2.Script createScript(java.lang.String, java.lang.String[])' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlEngine: Method 'public org.apache.commons.jexl2.Script createScript(java.lang.String, org.apache.commons.jexl2.JexlInfo, java.lang.String[])' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlEngine: Method 'public void clearCache()' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlEngine: Method 'public void setStrict(boolean)' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlException: Method 'protected java.lang.String detailedMessage()' has been added
+INFO: 7011: org.apache.commons.jexl2.JexlException: Method 'protected java.lang.String parserError(java.lang.String, java.lang.String)' has been added
+INFO: 7011: org.apache.commons.jexl2.UnifiedJEXL$Expression: Method 'protected void getVariables(java.util.Set)' has been added
+INFO: 7011: org.apache.commons.jexl2.UnifiedJEXL$Expression: Method 'public java.util.Set getVariables()' has been added
+INFO: 7011: org.apache.commons.jexl2.UnifiedJEXL: Method 'protected int startsWith(java.lang.CharSequence, java.lang.CharSequence)' has been added
+INFO: 7011: org.apache.commons.jexl2.UnifiedJEXL: Method 'protected java.util.List readTemplate(java.lang.String, java.io.Reader)' has been added
+INFO: 7011: org.apache.commons.jexl2.UnifiedJEXL: Method 'public org.apache.commons.jexl2.UnifiedJEXL$Template createTemplate(java.lang.String)' has been added
+INFO: 7011: org.apache.commons.jexl2.UnifiedJEXL: Method 'public org.apache.commons.jexl2.UnifiedJEXL$Template createTemplate(java.lang.String, java.io.Reader, java.lang.String[])' has been added
+INFO: 7011: org.apache.commons.jexl2.UnifiedJEXL: Method 'public org.apache.commons.jexl2.UnifiedJEXL$Template createTemplate(java.lang.String, java.lang.String[])' has been added
+INFO: 7011: org.apache.commons.jexl2.UnifiedJEXL: Method 'public void clearCache()' has been added
+INFO: 7015: org.apache.commons.jexl2.JexlEngine: Method 'public java.lang.String cleanExpression(java.lang.CharSequence)' is no longer final
+INFO: 7015: org.apache.commons.jexl2.JexlEngine: Method 'public java.lang.String readerToString(java.io.Reader)' is no longer final
+INFO: 8000: org.apache.commons.jexl2.introspection.Sandbox$BlackSet: Class org.apache.commons.jexl2.introspection.Sandbox$BlackSet added
+INFO: 8000: org.apache.commons.jexl2.introspection.Sandbox$Names: Class org.apache.commons.jexl2.introspection.Sandbox$Names added
+INFO: 8000: org.apache.commons.jexl2.introspection.Sandbox$Permissions: Class org.apache.commons.jexl2.introspection.Sandbox$Permissions added
+INFO: 8000: org.apache.commons.jexl2.introspection.Sandbox$WhiteSet: Class org.apache.commons.jexl2.introspection.Sandbox$WhiteSet added
+INFO: 8000: org.apache.commons.jexl2.introspection.Sandbox: Class org.apache.commons.jexl2.introspection.Sandbox added
+INFO: 8000: org.apache.commons.jexl2.introspection.SandboxUberspectImpl: Class org.apache.commons.jexl2.introspection.SandboxUberspectImpl added
+INFO: 8000: org.apache.commons.jexl2.introspection.UberspectImpl$IndexedContainer: Class org.apache.commons.jexl2.introspection.UberspectImpl$IndexedContainer added
+INFO: 8000: org.apache.commons.jexl2.JexlEngine$Frame: Class org.apache.commons.jexl2.JexlEngine$Frame added
+INFO: 8000: org.apache.commons.jexl2.JexlEngine$Scope: Class org.apache.commons.jexl2.JexlEngine$Scope added
+INFO: 8000: org.apache.commons.jexl2.JexlException$Cancel: Class org.apache.commons.jexl2.JexlException$Cancel added
+INFO: 8000: org.apache.commons.jexl2.JexlException$Method: Class org.apache.commons.jexl2.JexlException$Method added
+INFO: 8000: org.apache.commons.jexl2.JexlException$Parsing: Class org.apache.commons.jexl2.JexlException$Parsing added
+INFO: 8000: org.apache.commons.jexl2.JexlException$Property: Class org.apache.commons.jexl2.JexlException$Property added
+INFO: 8000: org.apache.commons.jexl2.JexlException$Return: Class org.apache.commons.jexl2.JexlException$Return added
+INFO: 8000: org.apache.commons.jexl2.JexlException$Tokenization: Class org.apache.commons.jexl2.JexlException$Tokenization added
+INFO: 8000: org.apache.commons.jexl2.JexlException$Variable: Class org.apache.commons.jexl2.JexlException$Variable added
+INFO: 8000: org.apache.commons.jexl2.JexlThreadedArithmetic: Class org.apache.commons.jexl2.JexlThreadedArithmetic added
+INFO: 8000: org.apache.commons.jexl2.NamespaceResolver: Class org.apache.commons.jexl2.NamespaceResolver added
+INFO: 8000: org.apache.commons.jexl2.ObjectContext: Class org.apache.commons.jexl2.ObjectContext added
+INFO: 8000: org.apache.commons.jexl2.ReadonlyContext: Class org.apache.commons.jexl2.ReadonlyContext added
+INFO: 8000: org.apache.commons.jexl2.UnifiedJEXL$Template: Class org.apache.commons.jexl2.UnifiedJEXL$Template added
+INFO: 8000: org.apache.commons.jexl2.UnifiedJEXL$TemplateContext: Class org.apache.commons.jexl2.UnifiedJEXL$TemplateContext added
