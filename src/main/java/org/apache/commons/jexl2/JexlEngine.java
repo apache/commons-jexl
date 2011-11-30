@@ -157,8 +157,9 @@ public class JexlEngine {
     protected boolean silent = false;
     /**
      * Whether this engine is in lenient or strict mode; if unspecified, use the arithmetic lenient property.
+     * Provision for version after 2.1.
      */
-    protected Boolean strict = null;
+    // protected Boolean strict = null;
     /**
      * Whether error messages will carry debugging information.
      */
@@ -274,23 +275,25 @@ public class JexlEngine {
     public boolean isSilent() {
         return this.silent;
     }
-
+    
     /**
      * Sets whether this engine considers unknown variables, methods and constructors as errors or evaluates them
      * as null.
      * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
      * initialization code before expression creation &amp; evaluation.</p>
-     * <p>As of 2.1, you need a JexlThreadedArithmetic instance for this call to also modify the JexlArithmetic
+     * <p>After 2.1, you will need a JexlThreadedArithmetic instance for this call to also modify the JexlArithmetic
      * leniency behavior.</p>
      * @see JexlEngine#setSilent
      * @see JexlEngine#setDebug
      * @param flag true means no JexlException will occur, false allows them
      */
+    @SuppressWarnings("deprecation")
     public void setLenient(boolean flag) {
         if (arithmetic instanceof JexlThreadedArithmetic) {
             JexlThreadedArithmetic.setLenient(Boolean.valueOf(flag));
         } else {
-            strict = flag ? Boolean.FALSE : Boolean.TRUE;
+            //strict = flag ? Boolean.FALSE : Boolean.TRUE;
+            this.arithmetic.setLenient(flag);
         }
     }
 
@@ -300,7 +303,8 @@ public class JexlEngine {
      * @return true if lenient, false if strict
      */
     public boolean isLenient() {
-        return strict == null ? arithmetic.isLenient() : !strict.booleanValue();
+        //return strict == null ? arithmetic.isLenient() : !strict.booleanValue();
+        return this.arithmetic.isLenient();
     }
 
     /**
