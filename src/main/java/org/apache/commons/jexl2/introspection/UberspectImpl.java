@@ -162,12 +162,13 @@ public class UberspectImpl extends Introspector implements Uberspect {
 
     /**
      * Returns a class field.
+     * Only for use by sub-classes, will be made protected in a later version
      * @param obj the object
      * @param name the field name
      * @param info debug info
      * @return a {@link Field}.
      */
-    protected Field getField(Object obj, String name, JexlInfo info) {
+    public Field getField(Object obj, String name, JexlInfo info) {
         final Class<?> clazz = obj instanceof Class<?> ? (Class<?>) obj : obj.getClass();
         return getField(clazz, name);
     }
@@ -442,8 +443,10 @@ public class UberspectImpl extends Introspector implements Uberspect {
 
     /**
      * A JexlPropertyGet for public fields.
+     * @deprecated Do not use externally - will be made private in a later version
      */
-    private static final class FieldPropertyGet implements JexlPropertyGet {
+    @Deprecated
+    public static final class FieldPropertyGet implements JexlPropertyGet {
         /**
          * The public field.
          */
@@ -495,8 +498,10 @@ public class UberspectImpl extends Introspector implements Uberspect {
 
     /**
      * A JexlPropertySet for public fields.
+    * @deprecated Do not use externally - will be made private in a later version
      */
-    private static final class FieldPropertySet implements JexlPropertySet {
+    @Deprecated
+    public static final class FieldPropertySet implements JexlPropertySet {
         /**
          * The public field.
          */
