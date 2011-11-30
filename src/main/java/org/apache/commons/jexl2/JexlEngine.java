@@ -156,10 +156,6 @@ public class JexlEngine {
      */
     protected boolean silent = false;
     /**
-     * Whether this engine is in lenient or strict mode; if unspecified, use the arithmetic lenient property.
-     */
-    protected Boolean strict = null;
-    /**
      * Whether error messages will carry debugging information.
      */
     protected boolean debug = true;
@@ -277,11 +273,12 @@ public class JexlEngine {
 
     /**
      * Sets whether this engine considers unknown variables, methods and constructors as errors or evaluates them
-     * as null.
-     * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
-     * initialization code before expression creation &amp; evaluation.</p>
-     * <p>As of 2.1, you need a JexlThreadedArithmetic instance for this call to also modify the JexlArithmetic
-     * leniency behavior.</p>
+     * as null or zero.
+     * <p>This method is <em>conditionally</em> thread safe.
+     * If a single JexlEngine is to be shared between threads, 
+     * it should only be called when the engine is not being used.</p>
+     * <p>As of 2.1, you can use JexlThreadedArithmetic instance to allow the JexlArithmetic
+     * leniency behavior to be independently specified per thread, whilst still using a single engine</p>
      * @see JexlEngine#setSilent
      * @see JexlEngine#setDebug
      * @param flag true means no JexlException will occur, false allows them
@@ -290,17 +287,16 @@ public class JexlEngine {
         if (arithmetic instanceof JexlThreadedArithmetic) {
             JexlThreadedArithmetic.setLenient(Boolean.valueOf(flag));
         } else {
-            strict = flag ? Boolean.FALSE : Boolean.TRUE;
+            arithmetic.setLenient(flag);
         }
     }
 
     /**
      * Checks whether this engine considers unknown variables, methods and constructors as errors.
-     * <p>If not explicitly set, the arithmetic leniency value applies.</p>
      * @return true if lenient, false if strict
      */
     public boolean isLenient() {
-        return strict == null ? arithmetic.isLenient() : !strict.booleanValue();
+        return arithmetic.isLenient();
     }
 
     /**
