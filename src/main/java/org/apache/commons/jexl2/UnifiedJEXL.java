@@ -275,10 +275,11 @@ public final class UnifiedJEXL {
         /**
          * Formats this expression, adding its source string representation in
          * comments if available: 'expression /*= source *\/'' .
+         * <b>Note:</b> do not override; will be made final in a future release.
          * @return the formatted expression string
          */
         @Override
-        public final String toString() {
+        public String toString() {
             StringBuilder strb = new StringBuilder();
             asString(strb);
             if (source != this) {
@@ -340,11 +341,12 @@ public final class UnifiedJEXL {
          * <p>
          * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
          * </p>
+         * <b>Note:</b> do not override; will be made final in a future release.
          * @param context the context to use for immediate expression evaluations
          * @return an expression or null if an error occurs and the {@link JexlEngine} is running in silent mode
          * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not in silent mode
          */
-        public final Expression prepare(JexlContext context) {
+        public Expression prepare(JexlContext context) {
             try {
                 Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), jexl.isSilent());
                 if (context instanceof TemplateContext) {
@@ -366,12 +368,13 @@ public final class UnifiedJEXL {
          * <p>
          * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
          * </p>
+         * <b>Note:</b> do not override; will be made final in a future release.
          * @param context the variable context
          * @return the result of this expression evaluation or null if an error occurs and the {@link JexlEngine} is
          * running in silent mode
          * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
          */
-        public final Object evaluate(JexlContext context) {
+        public Object evaluate(JexlContext context) {
             try {
                 Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), jexl.isSilent());
                 if (context instanceof TemplateContext) {

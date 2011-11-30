@@ -54,8 +54,9 @@ public class JexlArithmetic {
     protected static final BigInteger BIGI_LONG_MIN_VALUE = BigInteger.valueOf(Long.MIN_VALUE);
     /** Default BigDecimal scale. */
     protected static final int BIGD_SCALE = -1;
-    /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
-    protected final boolean strict;
+    /** Whether this JexlArithmetic instance behaves in strict or lenient mode. 
+     * DO NOT MODIFY - will be made final. */
+    protected boolean strict;
     /** The big decimal math context. */
     protected final MathContext mathContext;
     /** The big decimal scale. */

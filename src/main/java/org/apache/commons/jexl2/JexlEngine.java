@@ -452,6 +452,26 @@ public class JexlEngine {
      * This method parses the script which validates the syntax.
      *
      * @param scriptText A String containing valid JEXL syntax
+     * @param info An info structure to carry debugging information if needed
+     * @return A {@link Script} which can be executed using a {@link JexlContext}.
+     * @throws JexlException if there is a problem parsing the script.
+     * @deprecated Use {@link #createScript(String, JexlInfo, String[])}
+     */
+    @Deprecated
+    public Script createScript(String scriptText, JexlInfo info) {
+        if (scriptText == null) {
+            throw new NullPointerException("scriptText is null");
+        }
+        // Parse the expression
+        ASTJexlScript tree = parse(scriptText, info);
+        return createScript(tree, scriptText);
+    }
+
+    /**
+     * Creates a Script from a String containing valid JEXL syntax.
+     * This method parses the script which validates the syntax.
+     *
+     * @param scriptText A String containing valid JEXL syntax
      * @param names the script parameter names
      * @return A {@link Script} which can be executed using a {@link JexlContext}.
      * @throws JexlException if there is a problem parsing the script.
@@ -1165,6 +1185,19 @@ public class JexlEngine {
         public String[] getParameters() {
             return parameters;
         }
+    }
+
+    /**
+     * Parses an expression.
+     * @param expression the expression to parse
+     * @param info debug information structure
+     * @return the parsed tree
+     * @throws JexlException if any error occured during parsing
+     * @deprecated Use {@link #parse(CharSequence, JexlInfo, Scope)} instead
+     */
+    @Deprecated
+    protected ASTJexlScript parse(CharSequence expression, JexlInfo info) {
+        return parse(expression, info, null);
     }
 
     /**

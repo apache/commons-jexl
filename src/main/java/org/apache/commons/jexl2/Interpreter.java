@@ -27,6 +27,8 @@ import java.util.Set;
 import org.apache.commons.jexl2.parser.SimpleNode;
 import org.apache.commons.logging.Log;
 
+import org.apache.commons.jexl2.parser.ASTFloatLiteral;
+import org.apache.commons.jexl2.parser.ASTIntegerLiteral;
 import org.apache.commons.jexl2.parser.JexlNode;
 import org.apache.commons.jexl2.parser.ASTAdditiveNode;
 import org.apache.commons.jexl2.parser.ASTAdditiveOperator;
@@ -859,6 +861,22 @@ public class Interpreter implements ParserVisitor {
         } else {
             return getAttribute(data, name, node);
         }
+    }
+
+    /**
+     * @deprecated Do not use
+     */
+    @Deprecated
+    public Object visit(ASTFloatLiteral node, Object data) {
+        throw new UnsupportedOperationException("Method should not be called; only present for API compatibiltiy");
+    }
+
+    /**
+     * @deprecated Do not use
+     */
+    @Deprecated
+    public Object visit(ASTIntegerLiteral node, Object data) {
+        throw new UnsupportedOperationException("Method should not be called; only present for API compatibiltiy");
     }
 
     /** {@inheritDoc} */
