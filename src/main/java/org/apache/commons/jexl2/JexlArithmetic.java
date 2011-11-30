@@ -55,7 +55,8 @@ public class JexlArithmetic {
     /** Default BigDecimal scale. */
     protected static final int BIGD_SCALE = -1;
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
-    protected final boolean strict;
+    /** @deprecated : will become final in next version. */
+    protected boolean strict;
     /** The big decimal math context. */
     protected final MathContext mathContext;
     /** The big decimal scale. */
@@ -81,6 +82,22 @@ public class JexlArithmetic {
         this.mathContext = bigdContext;
         this.mathScale = bigdScale;
     }
+    
+    
+    /**
+     * Sets whether this JexlArithmetic instance triggers errors during evaluation when
+     * null is used as an operand.
+     * <p>This method is <em>not</em> thread safe; it may be called as an optional step by the JexlEngine
+     * in its initialization code before expression creation &amp; evaluation.</p>
+     * @see JexlEngine#setSilent
+     * @see JexlEngine#setDebug
+     * @param flag true means no JexlException will occur, false allows them
+     * @deprecated as of 2.1
+     */
+    @Deprecated
+    void setLenient(boolean flag) {
+        this.strict = !flag;
+    }
 
     /**
      * Checks whether this JexlArithmetic instance triggers errors during evaluation
@@ -101,7 +118,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * The BigDecimal scale used for comparison and coericion operations.
+     * The BigDecimal scale used for comparison and coercion operations.
      * @return the scale
      * @since 2.1
      */
