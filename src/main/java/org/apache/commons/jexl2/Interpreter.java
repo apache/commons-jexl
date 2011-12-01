@@ -113,14 +113,19 @@ public class Interpreter implements ParserVisitor {
     protected Object[] registers = null;
     /**
      * Parameter names if any.
+     * Intended for use in debugging; not currently used externally.
      * @since 2.1 
      */
-    protected String[] parameters = null;
+    @SuppressWarnings("unused")
+    private String[] parameters = null;
+
     /** 
      * Cancellation support.
+     * @see #isCancelled()
      * @since 2.1
      */
-    protected volatile boolean cancelled = false;
+    private volatile boolean cancelled = false;
+
     /** Empty parameters for method matching. */
     protected static final Object[] EMPTY_PARAMS = new Object[0];
 
