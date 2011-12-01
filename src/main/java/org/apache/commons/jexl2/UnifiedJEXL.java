@@ -211,6 +211,7 @@ public final class UnifiedJEXL {
 
     /**
      * Clears the cache.
+     * @since 2.1
      */
     public void clearCache() {
         synchronized (cache) {
@@ -312,6 +313,7 @@ public final class UnifiedJEXL {
          * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
          * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
          *         or the empty set if no variables are used
+         * @since 2.1
          */
         public Set<List<String>> getVariables() {
             return Collections.emptySet();
@@ -320,6 +322,7 @@ public final class UnifiedJEXL {
         /**
          * Fills up the list of variables accessed by this expression.
          * @param refs the set of variable being filled
+         * @since 2.1
          */
         protected void getVariables(Set<List<String>> refs) {
             // nothing to do
@@ -1337,6 +1340,7 @@ public final class UnifiedJEXL {
      * @param sequence the sequence
      * @param pattern the pattern to match at start of sequence
      * @return the first position after end of pattern if it matches, -1 otherwise
+     * @since 2.1
      */
     protected int startsWith(CharSequence sequence, CharSequence pattern) {
         int s = 0;

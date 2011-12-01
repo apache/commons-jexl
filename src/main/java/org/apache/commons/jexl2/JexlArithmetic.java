@@ -52,14 +52,23 @@ public class JexlArithmetic {
     protected static final BigInteger BIGI_LONG_MAX_VALUE = BigInteger.valueOf(Long.MAX_VALUE);
     /** Long.MIN_VALUE as BigInteger. */
     protected static final BigInteger BIGI_LONG_MIN_VALUE = BigInteger.valueOf(Long.MIN_VALUE);
-    /** Default BigDecimal scale. */
+    /** 
+     * Default BigDecimal scale. 
+     * @since 2.1 
+     */
     protected static final int BIGD_SCALE = -1;
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
     /** @deprecated : will become final in next version. */
     protected boolean strict;
-    /** The big decimal math context. */
+    /** 
+     * The big decimal math context.
+     * @since 2.1 
+     */
     protected final MathContext mathContext;
-    /** The big decimal scale. */
+    /** 
+     * The big decimal scale.
+     * @since 2.1
+     */
     protected final int mathScale;
 
     /**
@@ -254,6 +263,7 @@ public class JexlArithmetic {
      * @param rhs the right hand side operand that lead to the bigd result
      * @param bigd the BigDecimal to narrow
      * @return an Integer or Long if narrowing is possible, the original BigInteger otherwise
+     * @since 2.1
      */
     protected Number narrowBigDecimal(Object lhs, Object rhs, BigDecimal bigd) {
         if (isNumberable(lhs) || isNumberable(rhs)) {
@@ -556,6 +566,7 @@ public class JexlArithmetic {
      * Negates a value (unary minus for numbers).
      * @param val the value to negate
      * @return the negated value
+     * @since 2.1
      */
     public Object negate(Object val) {
         if (val instanceof Integer) {
@@ -1053,6 +1064,7 @@ public class JexlArithmetic {
      * @param narrow the target narrow class
      * @param source the orginal source class
      * @return true if attempt to narrow source to target is accepted
+     * @since 2.1
      */
     protected boolean narrowAccept(Class<?> narrow, Class<?> source) {
         return narrow == null || narrow.equals(source);
@@ -1063,6 +1075,7 @@ public class JexlArithmetic {
      * @param original the original number
      * @param narrow the attempted target class
      * @return  the narrowed number or the source if no narrowing was possible
+     * @since 2.1
      */
     protected Number narrowNumber(Number original, Class<?> narrow) {
         if (original == null) {

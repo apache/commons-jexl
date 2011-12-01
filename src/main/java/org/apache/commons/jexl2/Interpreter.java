@@ -111,9 +111,15 @@ public class Interpreter implements ParserVisitor {
     protected final boolean cache;
     /** Registers or arguments. */
     protected Object[] registers = null;
-    /** Parameter names if any. */
+    /**
+     * Parameter names if any.
+     * @since 2.1 
+     */
     protected String[] parameters = null;
-    /** Cancellation support. */
+    /** 
+     * Cancellation support.
+     * @since 2.1
+     */
     protected volatile boolean cancelled = false;
     /** Empty parameters for method matching. */
     protected static final Object[] EMPTY_PARAMS = new Object[0];
@@ -135,6 +141,7 @@ public class Interpreter implements ParserVisitor {
      * @param aContext the context to evaluate expression
      * @param strictFlag whether this interpreter runs in strict mode
      * @param silentFlag whether this interpreter runs in silent mode
+     * @since 2.1
      */
     public Interpreter(JexlEngine jexl, JexlContext aContext, boolean strictFlag, boolean silentFlag) {
         this.logger = jexl.logger;
@@ -151,6 +158,7 @@ public class Interpreter implements ParserVisitor {
     /**
      * Copy constructor.
      * @param base the base to copy
+     * @since 2.1
      */
     protected Interpreter(Interpreter base) {
         this.logger = base.logger;
@@ -168,7 +176,9 @@ public class Interpreter implements ParserVisitor {
      * Sets whether this interpreter considers unknown variables, methods and constructors as errors.
      * @param flag true for strict, false for lenient
      * @deprecated Do not use; will be removed in a later version
+     * @since 2.1 
      */
+    // TODO why add a method and then deprecate it?
     @Deprecated
     public void setStrict(boolean flag) {
         this.strict = flag;
@@ -187,6 +197,7 @@ public class Interpreter implements ParserVisitor {
     /**
      * Checks whether this interpreter considers unknown variables, methods and constructors as errors.
      * @return true if strict, false otherwise
+     * @since 2.1
      */
     public boolean isStrict() {
         return this.strict;
@@ -231,6 +242,7 @@ public class Interpreter implements ParserVisitor {
     /**
      * Gets the context.
      * @return the {@link JexlContext} used for evaluation.
+     * @since 2.1
      */
     protected JexlContext getContext() {
         return context;
@@ -264,6 +276,7 @@ public class Interpreter implements ParserVisitor {
     /**
      * Sets this interpreter parameters and arguments.
      * @param frame the calling frame
+     * @since 2.1
      */
     protected void setFrame(JexlEngine.Frame frame) {
         if (frame != null) {
@@ -1311,13 +1324,19 @@ public class Interpreter implements ParserVisitor {
         return result;
     }
 
-    /** {@inheritDoc} */
+    /** 
+     * {@inheritDoc}
+     * @since 2.1 
+     */
     public Object visit(ASTReferenceExpression node, Object data) {
         ASTArrayAccess upper = node;
         return visit(upper, data);
     }
 
-    /** {@inheritDoc} */
+    /** 
+     * {@inheritDoc}
+     * @since 2.1 
+     */
     public Object visit(ASTReturnStatement node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
         throw new JexlException.Return(node, null, val);
