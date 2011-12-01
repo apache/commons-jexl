@@ -996,13 +996,13 @@ public class JexlEngine {
         /**
          * The number of parameters.
          */
-        protected final int parms;
+        private final int parms;
         /**
          * The map of named registers aka script parameters.
          * Each parameter is associated to a register and is materialized as an offset in the registers array used
          * during evaluation.
          */
-        protected Map<String, Integer> namedRegisters = null;
+        private Map<String, Integer> namedRegisters = null;
 
         /**
          * Creates a new scope with a list of parameters.
@@ -1154,9 +1154,9 @@ public class JexlEngine {
      */
     public static final class Frame {
         /** Registers or arguments. */
-        protected Object[] registers = null;
+        private Object[] registers = null;
         /** Parameter and argument names if any. */
-        protected String[] parameters = null;
+        private String[] parameters = null;
         
         /**
          * Creates a new frame.
