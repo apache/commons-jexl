@@ -103,6 +103,7 @@ public class JexlException extends RuntimeException {
     /**
      * Accesses detailed message.
      * @return  the message
+     * @since 2.1
      */
     protected String detailedMessage() {
         return super.getMessage();
@@ -113,6 +114,7 @@ public class JexlException extends RuntimeException {
      * @param prefix the prefix to the message
      * @param expr the expression in error
      * @return the formatted message
+     * @since 2.1
      */
     protected String parserError(String prefix, String expr) {
         int begin = info.debugInfo().getColumn();

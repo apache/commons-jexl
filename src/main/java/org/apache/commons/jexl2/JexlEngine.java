@@ -231,6 +231,7 @@ public class JexlEngine {
     /**
      * Gets this engine underlying arithmetic.
      * @return the arithmetic
+     * @since 2.1
      */
     public JexlArithmetic getArithmetic() {
         return arithmetic;
@@ -311,6 +312,7 @@ public class JexlEngine {
      * Sets whether this engine behaves in strict or lenient mode.
      * Equivalent to setLenient(!flag).
      * @param flag true for strict, false for lenient
+     * @since 2.1
      */
     public final void setStrict(boolean flag) {
         setLenient(!flag);
@@ -320,6 +322,7 @@ public class JexlEngine {
      * Checks whether this engine behaves in strict or lenient mode.
      * Equivalent to !isLenient().
      * @return true for strict, false for lenient
+     * @since 2.1
      */
     public final boolean isStrict() {
         return !isLenient();
@@ -475,6 +478,7 @@ public class JexlEngine {
      * @param names the script parameter names
      * @return A {@link Script} which can be executed using a {@link JexlContext}.
      * @throws JexlException if there is a problem parsing the script.
+     * @since 2.1
      */
     public Script createScript(String scriptText, JexlInfo info, String[] names) {
         if (scriptText == null) {
@@ -766,6 +770,7 @@ public class JexlEngine {
      * @param strictFlag whether the interpreter runs in strict mode
      * @param silentFlag whether the interpreter runs in silent mode
      * @return an Interpreter
+     * @since 2.1
      */
     protected Interpreter createInterpreter(JexlContext context, boolean strictFlag, boolean silentFlag) {
         return new Interpreter(this, context == null ? EMPTY_CONTEXT : context, strictFlag, silentFlag);
@@ -866,6 +871,7 @@ public class JexlEngine {
 
     /**
      * Clears the expression cache.
+     * @since 2.1
      */
     public void clearCache() {
         synchronized (parser) {
@@ -880,6 +886,7 @@ public class JexlEngine {
      * @param script the script
      * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
      *         or the empty set if no variables are used
+     * @since 2.1
      */
     public Set<List<String>> getVariables(Script script) {
         if (script instanceof ExpressionImpl) {
@@ -896,6 +903,7 @@ public class JexlEngine {
      * @param node the node
      * @param refs the set of variable being filled
      * @param ref the current variable being filled
+     * @since 2.1
      */
     protected void getVariables(JexlNode node, Set<List<String>> refs, List<String> ref) {
         boolean array = node instanceof ASTArrayAccess;
@@ -956,6 +964,7 @@ public class JexlEngine {
      * Gets the array of parameters from a script.
      * @param script the script
      * @return the parameters which may be empty (but not null) if no parameters were defined
+     * @since 2.1
      */
     protected String[] getParameters(Script script) {
         if (script instanceof ExpressionImpl) {
@@ -969,6 +978,7 @@ public class JexlEngine {
      * Gets the array of local variable from a script.
      * @param script the script
      * @return the local variables array which may be empty (but not null) if no local variables were defined
+     * @since 2.1
      */
     protected String[] getLocalVariables(Script script) {
         if (script instanceof ExpressionImpl) {
@@ -980,6 +990,7 @@ public class JexlEngine {
 
     /**
      * A script scope, stores the declaration of parameters and local variables.
+     * @since 2.1
      */
     public static final class Scope {
         /**
@@ -1139,6 +1150,7 @@ public class JexlEngine {
 
     /**
      * A call frame, created from a scope, stores the arguments and local variables as "registers".
+     * @since 2.1
      */
     public static final class Frame {
         /** Registers or arguments. */

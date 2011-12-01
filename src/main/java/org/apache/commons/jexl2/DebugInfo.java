@@ -63,7 +63,9 @@ public class DebugInfo implements JexlInfo {
         return toString();
     }
     
-    /** {@inheritDoc} */
+    /** {@inheritDoc} 
+     * @since 2.1 
+     */
     public DebugInfo debugInfo() {
         return this;
     }
