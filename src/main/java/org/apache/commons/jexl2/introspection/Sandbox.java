@@ -197,7 +197,7 @@ public final class Sandbox {
      */
     public static final class WhiteSet extends Names {
         /** The map of controlled names and aliases. */
-        protected Map<String, String> names = null;
+        private Map<String, String> names = null;
 
         @Override
         public boolean add(String name) {
@@ -230,7 +230,7 @@ public final class Sandbox {
      */
     public static final class BlackSet extends Names {
         /** The set of controlled names. */
-        protected Set<String> names = null;
+        private Set<String> names = null;
 
         @Override
         public boolean add(String name) {
