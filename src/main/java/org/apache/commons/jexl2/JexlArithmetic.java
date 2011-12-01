@@ -55,10 +55,8 @@ public class JexlArithmetic {
     /** Default BigDecimal scale. */
     protected static final int BIGD_SCALE = -1;
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode. 
-     * @deprecated - do not access directly, may be made private later 
      */
-    @Deprecated
-    protected volatile boolean strict;
+    private volatile boolean strict;
     /** The big decimal math context. */
     protected final MathContext mathContext;
     /** The big decimal scale. */
