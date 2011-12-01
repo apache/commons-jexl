@@ -154,18 +154,22 @@ public class JexlEngine {
      * Whether expressions evaluated by this engine will throw exceptions (false) or 
      * return null (true) on errors. Default is false.
      */
-    protected boolean silent = false;
+    // TODO could this be private?
+    protected volatile boolean silent = false;
     /**
      * Whether error messages will carry debugging information.
      */
-    protected boolean debug = true;
+    // TODO could be made private
+    protected volatile boolean debug = true;
     /**
      *  The map of 'prefix:function' to object implementing the functions.
      */
+    // TODO this could probably be private; is it threadsafe?
     protected Map<String, Object> functions = Collections.emptyMap();
     /**
      * The expression cache.
      */
+    // TODO is this thread-safe? Could it be made private?
     protected SoftCache<String, ASTJexlScript> cache = null;
     /**
      * The default cache load factor.
@@ -233,8 +237,9 @@ public class JexlEngine {
 
     /**
      * Sets whether this engine reports debugging information when error occurs.
-     * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
-     * initialization code before expression creation &amp; evaluation.</p>
+     * <p>This method is <em>conditionally</em> thread safe.
+     * If a single JexlEngine is shared between threads, 
+     * it should only be called when the engine is not being used.</p>
      * @see JexlEngine#setSilent
      * @see JexlEngine#setLenient
      * @param flag true implies debug is on, false implies debug is off.
@@ -253,8 +258,9 @@ public class JexlEngine {
 
     /**
      * Sets whether this engine throws JexlException during evaluation when an error is triggered.
-     * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
-     * initialization code before expression creation &amp; evaluation.</p>
+     * <p>This method is <em>conditionally</em> thread safe.
+     * If a single JexlEngine is shared between threads, 
+     * it should only be called when the engine is not being used.</p>
      * @see JexlEngine#setDebug
      * @see JexlEngine#setLenient
      * @param flag true means no JexlException will occur, false allows them
@@ -275,7 +281,7 @@ public class JexlEngine {
      * Sets whether this engine considers unknown variables, methods and constructors as errors or evaluates them
      * as null or zero.
      * <p>This method is <em>conditionally</em> thread safe.
-     * If a single JexlEngine is to be shared between threads, 
+     * If a single JexlEngine is shared between threads, 
      * it should only be called when the engine is not being used.</p>
      * <p>As of 2.1, you can use JexlThreadedArithmetic instance to allow the JexlArithmetic
      * leniency behavior to be independently specified per thread, whilst still using a single engine</p>
@@ -302,6 +308,9 @@ public class JexlEngine {
     /**
      * Sets whether this engine behaves in strict or lenient mode.
      * Equivalent to setLenient(!flag).
+     * <p>This method is <em>conditionally</em> thread safe.
+     * If a single JexlEngine is shared between threads, 
+     * it should only be called when the engine is not being used.</p>
      * @param flag true for strict, false for lenient
      */
     public final void setStrict(boolean flag) {
