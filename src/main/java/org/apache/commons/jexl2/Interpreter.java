@@ -114,9 +114,9 @@ public class Interpreter implements ParserVisitor {
     /** Registers or arguments. */
     protected Object[] registers = null;
     /** Parameter names if any. */
-    protected String[] parameters = null;
+    protected String[] parameters = null; // TODO does not appear to be read
     /** Cancellation support. */
-    protected volatile boolean cancelled = false;
+    protected volatile boolean cancelled = false; // TODO could this be private?
     /** Empty parameters for method matching. */
     protected static final Object[] EMPTY_PARAMS = new Object[0];
 
