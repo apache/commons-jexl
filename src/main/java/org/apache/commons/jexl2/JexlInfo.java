@@ -29,6 +29,7 @@ public interface JexlInfo {
     /**
      * Gets the underlying debugging information.
      * @return a debug info instance
+     * @since 2.1
      */
     DebugInfo debugInfo();
 }

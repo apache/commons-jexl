@@ -109,6 +109,7 @@ public class ExpressionImpl implements Expression, Script {
 
     /**
      * {@inheritDoc}
+     * @since 2.1
      */
     public Object execute(JexlContext context, Object... args) {
         Interpreter interpreter = jexl.createInterpreter(context);
@@ -118,6 +119,7 @@ public class ExpressionImpl implements Expression, Script {
 
     /**
      * {@inheritDoc}
+     * @since 2.1
      */
     public String[] getParameters() {
         return script.getParameters();
@@ -125,6 +127,7 @@ public class ExpressionImpl implements Expression, Script {
 
     /**
      * {@inheritDoc}
+     * @since 2.1
      */
     public String[] getLocalVariables() {
         return script.getLocalVariables();
@@ -132,6 +135,7 @@ public class ExpressionImpl implements Expression, Script {
 
     /**
      * {@inheritDoc}
+     * @since 2.1
      */
     public Set<List<String>> getVariables() {
         return jexl.getVariables(this);
@@ -139,6 +143,7 @@ public class ExpressionImpl implements Expression, Script {
 
     /**
      * {@inheritDoc}
+     * @since 2.1
      */
     public Callable<Object> callable(JexlContext context) {
         return callable(context, (Object[]) null);
@@ -146,6 +151,7 @@ public class ExpressionImpl implements Expression, Script {
 
     /**
      * {@inheritDoc}
+     * @since 2.1
      */
     public Callable<Object> callable(JexlContext context, Object... args) {
         final Interpreter interpreter = jexl.createInterpreter(context);

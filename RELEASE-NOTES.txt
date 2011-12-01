@@ -24,7 +24,7 @@ $Id$
 INTRODUCTION:
 =============
 
-JEXL is a library intended to facilitate the implementation of dynamic and scripting features in
+The Apache Commons JEXL library facilitates the implementation of dynamic and scripting features in
 applications and frameworks written in Java.
 
 JEXL implements an Expression Language based on some extensions to the JSTL Expression Language supporting most of the

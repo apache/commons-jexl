@@ -61,6 +61,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
     /**
      * Resets this Uberspect class loader.
      * @param cloader the class loader to use
+     * @since 2.1
      */
     public void setLoader(ClassLoader cloader) {
         base().setLoader(cloader);
@@ -117,6 +118,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
     
     /**
      * {@inheritDoc}
+     * @since 2.1
      */
     public JexlMethod getConstructorMethod(Object ctorHandle, Object[] args, JexlInfo info) {
         final Constructor<?> ctor = getConstructor(ctorHandle, args);
@@ -181,6 +183,7 @@ public class UberspectImpl extends Introspector implements Uberspect {
      * @param object the object
      * @param name the container name
      * @return a JexlPropertyGet is successfull, null otherwise
+     * @since 2.1
      */
     protected JexlPropertyGet getIndexedGet(Object object, String name) {
         if (object != null && name != null) {
