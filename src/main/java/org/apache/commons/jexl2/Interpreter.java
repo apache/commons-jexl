@@ -105,9 +105,9 @@ public class Interpreter implements ParserVisitor {
     protected Map<String, Object> functors;
     /** The context to store/retrieve variables. */
     protected final JexlContext context;
-    /** Strict interpreter flag. Do not modify; will be made final in a later version. */
+    /** Strict interpreter flag. Do not modify; will be made final/private in a later version. */
     protected boolean strict;
-    /** Silent intepreter flag.  Do not modify; will be made final in a later version. */
+    /** Silent intepreter flag.  Do not modify; will be made final/private in a later version. */
     protected boolean silent;
     /** Cache executors. */
     protected final boolean cache;
