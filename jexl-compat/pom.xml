@@ -79,7 +79,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
-            <artifactId>commons-jexl</artifactId>
+            <artifactId>commons-jexl3</artifactId>
             <version>3.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
