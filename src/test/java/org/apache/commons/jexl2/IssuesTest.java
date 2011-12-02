@@ -250,7 +250,7 @@ public class IssuesTest extends JexlTestCase {
             /* Object o = */ e.evaluate(ctxt);
         } catch (JexlException xjexl) {
             String msg = xjexl.getMessage();
-            assertTrue(msg.indexOf("variable c.e") > 0);
+            assertTrue("Unexpected: '"+msg+"'", msg.indexOf("c.e") > 0); // 2.1 - new message
         }
 
     }
