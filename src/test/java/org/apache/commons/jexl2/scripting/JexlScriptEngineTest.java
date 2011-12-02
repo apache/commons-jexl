@@ -31,14 +31,14 @@ public class JexlScriptEngineTest extends TestCase {
     public void testScriptEngineFactory() throws Exception {
         JexlScriptEngineFactory factory = new JexlScriptEngineFactory();
         assertEquals("JEXL Engine", factory.getParameter(ScriptEngine.ENGINE));
-        assertEquals("1.0", factory.getParameter(ScriptEngine.ENGINE_VERSION));
+        assertEquals("2.0", factory.getParameter(ScriptEngine.ENGINE_VERSION)); // 2.1 ; version 2.0 supports jexl2
         assertEquals("JEXL", factory.getParameter(ScriptEngine.LANGUAGE));
         assertEquals("2.0", factory.getParameter(ScriptEngine.LANGUAGE_VERSION));
-        assertEquals(Arrays.asList("JEXL", "Jexl", "jexl"), factory.getParameter(ScriptEngine.NAME));
+        assertEquals(Arrays.asList("JEXL", "Jexl", "jexl", "JEXL2", "Jexl2", "jexl2"), factory.getParameter(ScriptEngine.NAME));
         assertNull(factory.getParameter("THREADING"));
 
-        assertEquals(Arrays.asList("jexl"), factory.getExtensions());
-        assertEquals(Arrays.asList("application/x-jexl"), factory.getMimeTypes());
+        assertEquals(Arrays.asList("jexl", "jexl2"), factory.getExtensions());
+        assertEquals(Arrays.asList("application/x-jexl", "application/x-jexl2"), factory.getMimeTypes());
 
         assertEquals("42;", factory.getProgram(new String[]{"42"}));
         assertEquals("str.substring(3,4)", factory.getMethodCallSyntax("str", "substring", new String[]{"3", "4"}));
