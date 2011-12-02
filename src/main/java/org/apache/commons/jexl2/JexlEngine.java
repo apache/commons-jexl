@@ -154,23 +154,22 @@ public class JexlEngine {
      * Whether expressions evaluated by this engine will throw exceptions (false) or 
      * return null (true) on errors. Default is false.
      */
-    protected boolean silent = false;
-    /**
-     * Whether this engine is in lenient or strict mode; if unspecified, use the arithmetic lenient property.
-     * Provision for version after 2.1.
-     */
-    // protected Boolean strict = null;
+    // TODO could this be private?
+    protected volatile boolean silent = false;
     /**
      * Whether error messages will carry debugging information.
      */
-    protected boolean debug = true;
+    // TODO could this be private?
+    protected volatile boolean debug = true;
     /**
      *  The map of 'prefix:function' to object implementing the functions.
      */
+    // TODO this could probably be private; is it threadsafe?
     protected Map<String, Object> functions = Collections.emptyMap();
     /**
      * The expression cache.
      */
+    // TODO is this thread-safe? Could it be made private?
     protected SoftCache<String, ASTJexlScript> cache = null;
     /**
      * The default cache load factor.
@@ -279,11 +278,11 @@ public class JexlEngine {
     
     /**
      * Sets whether this engine considers unknown variables, methods and constructors as errors or evaluates them
-     * as null.
+     * as null or zero.
      * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
      * initialization code before expression creation &amp; evaluation.</p>
-     * <p>After 2.1, you will need a JexlThreadedArithmetic instance for this call to also modify the JexlArithmetic
-     * leniency behavior.</p>
+     * <p>As of 2.1, you can use a JexlThreadedArithmetic instance to allow the JexlArithmetic
+     * leniency behavior to be independently specified per thread, whilst still using a single engine.</p>
      * @see JexlEngine#setSilent
      * @see JexlEngine#setDebug
      * @param flag true means no JexlException will occur, false allows them
@@ -293,24 +292,23 @@ public class JexlEngine {
         if (arithmetic instanceof JexlThreadedArithmetic) {
             JexlThreadedArithmetic.setLenient(Boolean.valueOf(flag));
         } else {
-            //strict = flag ? Boolean.FALSE : Boolean.TRUE;
             this.arithmetic.setLenient(flag);
         }
     }
 
     /**
      * Checks whether this engine considers unknown variables, methods and constructors as errors.
-     * <p>If not explicitly set, the arithmetic leniency value applies.</p>
      * @return true if lenient, false if strict
      */
     public boolean isLenient() {
-        //return strict == null ? arithmetic.isLenient() : !strict.booleanValue();
-        return this.arithmetic.isLenient();
+        return arithmetic.isLenient();
     }
 
     /**
      * Sets whether this engine behaves in strict or lenient mode.
      * Equivalent to setLenient(!flag).
+     * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
+     * initialization code before expression creation &amp; evaluation.</p>
      * @param flag true for strict, false for lenient
      * @since 2.1
      */
@@ -452,6 +450,26 @@ public class JexlEngine {
      */
     public Script createScript(String scriptText) {
         return createScript(scriptText, null, null);
+    }
+
+    /**
+     * Creates a Script from a String containing valid JEXL syntax.
+     * This method parses the script which validates the syntax.
+     *
+     * @param scriptText A String containing valid JEXL syntax
+     * @param info An info structure to carry debugging information if needed
+     * @return A {@link Script} which can be executed using a {@link JexlContext}.
+     * @throws JexlException if there is a problem parsing the script.
+     * @deprecated Use {@link #createScript(String, JexlInfo, String[])}
+     */
+    @Deprecated
+    public Script createScript(String scriptText, JexlInfo info) {
+        if (scriptText == null) {
+            throw new NullPointerException("scriptText is null");
+        }
+        // Parse the expression
+        ASTJexlScript tree = parse(scriptText, info);
+        return createScript(tree, scriptText);
     }
 
     /**
@@ -1181,6 +1199,19 @@ public class JexlEngine {
         public String[] getParameters() {
             return parameters;
         }
+    }
+
+    /**
+     * Parses an expression.
+     * @param expression the expression to parse
+     * @param info debug information structure
+     * @return the parsed tree
+     * @throws JexlException if any error occured during parsing
+     * @deprecated Use {@link #parse(CharSequence, JexlInfo, Scope)} instead
+     */
+    @Deprecated
+    protected ASTJexlScript parse(CharSequence expression, JexlInfo info) {
+        return parse(expression, info, null);
     }
 
     /**

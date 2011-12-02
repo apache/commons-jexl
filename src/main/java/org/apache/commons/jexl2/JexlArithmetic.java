@@ -57,9 +57,10 @@ public class JexlArithmetic {
      * @since 2.1 
      */
     protected static final int BIGD_SCALE = -1;
-    /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
-    /** @deprecated : will become final in next version. */
-    protected boolean strict;
+    /** Whether this JexlArithmetic instance behaves in strict or lenient mode.
+     * May be made final in a later version.
+     */
+    private volatile boolean strict;
     /** 
      * The big decimal math context.
      * @since 2.1 
@@ -98,10 +99,11 @@ public class JexlArithmetic {
      * null is used as an operand.
      * <p>This method is <em>not</em> thread safe; it may be called as an optional step by the JexlEngine
      * in its initialization code before expression creation &amp; evaluation.</p>
+     * @see JexlEngine#setLenient
      * @see JexlEngine#setSilent
      * @see JexlEngine#setDebug
      * @param flag true means no JexlException will occur, false allows them
-     * @deprecated as of 2.1
+     * @deprecated as of 2.1 - may be removed in a later release
      */
     @Deprecated
     void setLenient(boolean flag) {
