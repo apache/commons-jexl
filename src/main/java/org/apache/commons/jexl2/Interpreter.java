@@ -27,6 +27,8 @@ import java.util.Set;
 import org.apache.commons.jexl2.parser.SimpleNode;
 import org.apache.commons.logging.Log;
 
+import org.apache.commons.jexl2.parser.ASTFloatLiteral;
+import org.apache.commons.jexl2.parser.ASTIntegerLiteral;
 import org.apache.commons.jexl2.parser.JexlNode;
 import org.apache.commons.jexl2.parser.ASTAdditiveNode;
 import org.apache.commons.jexl2.parser.ASTAdditiveOperator;
@@ -103,9 +105,9 @@ public class Interpreter implements ParserVisitor {
     protected Map<String, Object> functors;
     /** The context to store/retrieve variables. */
     protected final JexlContext context;
-    /** Strict interpreter flag. Do not modify; will be made final in a later version. */
+    /** Strict interpreter flag. Do not modify; will be made final/private in a later version. */
     protected boolean strict;
-    /** Silent intepreter flag.  Do not modify; will be made final in a later version. */
+    /** Silent intepreter flag.  Do not modify; will be made final/private in a later version. */
     protected boolean silent;
     /** Cache executors. */
     protected final boolean cache;
@@ -877,6 +879,22 @@ public class Interpreter implements ParserVisitor {
         } else {
             return getAttribute(data, name, node);
         }
+    }
+
+    /**
+     * @deprecated Do not use
+     */
+    @Deprecated
+    public Object visit(ASTFloatLiteral node, Object data) {
+        throw new UnsupportedOperationException("Method should not be called; only present for API compatibiltiy");
+    }
+
+    /**
+     * @deprecated Do not use
+     */
+    @Deprecated
+    public Object visit(ASTIntegerLiteral node, Object data) {
+        throw new UnsupportedOperationException("Method should not be called; only present for API compatibiltiy");
     }
 
     /** {@inheritDoc} */
