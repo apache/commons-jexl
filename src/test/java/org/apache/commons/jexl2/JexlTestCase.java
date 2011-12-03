@@ -24,8 +24,11 @@ import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 
+import javax.script.ScriptEngine;
+
 import org.apache.commons.jexl2.parser.JexlNode;
 import org.apache.commons.jexl2.parser.ASTJexlScript;
+import org.apache.commons.jexl2.scripting.JexlScriptEngineFactory;
 
 import junit.framework.TestCase;
 
@@ -39,6 +42,18 @@ public class JexlTestCase extends TestCase {
     private static final Class<?>[] noParms = {};
     /** String parameter signature for test run. */
     private static final Class<?>[] stringParm = {String.class};
+
+    protected static final boolean testing21; // are we testing 2.1?
+
+    static {
+        JexlScriptEngineFactory factory = new JexlScriptEngineFactory();
+        Object parameter = factory.getParameter(ScriptEngine.ENGINE_VERSION);
+        if ("2.0".equals(parameter)) {
+            testing21 = true;
+        } else {
+            testing21 = false;
+        }
+    }
 
     /** A default Jexl engine instance. */
     protected final JexlEngine JEXL;

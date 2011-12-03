@@ -17,6 +17,7 @@
 package org.apache.commons.jexl2;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URL;
 
 /**
@@ -99,4 +100,28 @@ public class ScriptTest extends JexlTestCase {
         assertEquals("OK", resultatJexl.getCode());
     }
 
+    public void testScriptInterfaceBinaryCompat() {
+        Script impl = new Script() {
+
+            public Object execute(JexlContext context) {
+                return context != null ? context : Boolean.FALSE;
+            }
+
+            public String getText() {
+                return "Text";
+            }
+            
+        };
+        assertNotNull(impl);
+        assertEquals(Boolean.FALSE, impl.execute(null));
+        assertEquals("Text", impl.getText());
+        Method[] methods = impl.getClass().getDeclaredMethods();
+        assertEquals("We implemented 2 methods", 2, methods.length);
+        methods = Script.class.getDeclaredMethods();
+        if (testing21) {
+            assertEquals("There are now more", 8, methods.length);
+        } else {
+            assertEquals("There are only 2", 2, methods.length);
+        }
+    }
 }

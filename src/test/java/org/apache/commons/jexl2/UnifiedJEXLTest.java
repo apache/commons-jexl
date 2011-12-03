@@ -105,7 +105,11 @@ public class UnifiedJEXLTest extends JexlTestCase {
         vars.put("name", "Doe");
         UnifiedJEXL.Expression  phase1 = expr.prepare(context);
         String as = phase1.asString();
-        assertEquals("Dear ${p} Doe;", as); // 2.1 deferred expressions are resolved in prepare phase
+        if (testing21) {
+            assertEquals("Dear ${p} Doe;", as); // 2.1 deferred expressions are resolved in prepare phase
+        } else {
+            assertEquals("Dear #{p} Doe;", as);
+        }
         vars.put("p", "Mr");
         vars.put("name", "Should not be used in 2nd phase");
         Object o = phase1.evaluate(context);
@@ -125,7 +129,11 @@ public class UnifiedJEXLTest extends JexlTestCase {
     public void testImmediate() throws Exception {
         JexlContext none = null;
         UnifiedJEXL.Expression expr = EL.parse("${'Hello ' + 'World!'}");
-        assertEquals("prepare should return immediate expression", "Hello World!", expr.prepare(none).asString());
+        if (testing21){
+            assertEquals("prepare should return immediate expression", "Hello World!", expr.prepare(none).asString());
+        } else {
+            assertEquals("prepare should return same expression", expr, expr.prepare(none));
+        }
         Object o = expr.evaluate(none);
         assertTrue("expression should be immediate", expr.isImmediate());
         assertEquals("Hello World!", o);
@@ -143,7 +151,11 @@ public class UnifiedJEXLTest extends JexlTestCase {
     public void testDeferred() throws Exception {
         JexlContext none = null;
         UnifiedJEXL.Expression expr = EL.parse("#{'world'}");
-        assertEquals("prepare should return immediate expression", "${'world'}", expr.prepare(none).asString());
+        if (testing21) {
+            assertEquals("prepare should return immediate expression", "${'world'}", expr.prepare(none).asString());
+        } else {
+            assertEquals("prepare should return same expression", expr, expr.prepare(none));
+        }
         Object o = expr.evaluate(none);
         assertTrue("expression should be deferred", expr.isDeferred());
         assertEquals("world", o);
