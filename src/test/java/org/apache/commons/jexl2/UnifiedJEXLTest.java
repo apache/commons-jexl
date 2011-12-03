@@ -125,7 +125,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
     public void testImmediate() throws Exception {
         JexlContext none = null;
         UnifiedJEXL.Expression expr = EL.parse("${'Hello ' + 'World!'}");
-        assertSame("prepare should return same expression", expr, expr.prepare(none)); // 2.1 currently fails
+        assertEquals("prepare should return immediate expression", "Hello World!", expr.prepare(none).asString());
         Object o = expr.evaluate(none);
         assertTrue("expression should be immediate", expr.isImmediate());
         assertEquals("Hello World!", o);
@@ -143,7 +143,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
     public void testDeferred() throws Exception {
         JexlContext none = null;
         UnifiedJEXL.Expression expr = EL.parse("#{'world'}");
-        assertSame("prepare should return same expression", expr, expr.prepare(none)); // 2.1 currently fails
+        assertEquals("prepare should return immediate expression", "${'world'}", expr.prepare(none).asString());
         Object o = expr.evaluate(none);
         assertTrue("expression should be deferred", expr.isDeferred());
         assertEquals("world", o);
