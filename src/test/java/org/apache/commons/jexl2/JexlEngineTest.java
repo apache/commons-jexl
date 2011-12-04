@@ -26,7 +26,7 @@ public class JexlEngineTest extends TestCase {
         JexlEngine je;
         je = new JexlEngine();
         assertNotNull(je);
-        je.createInfo("test", 1, 2); // fails with NoSuchMethodError on 2.1 currently
+        je.createInfo("test", 1, 2);
     }
     
     public void testExtend() {
@@ -39,7 +39,7 @@ public class JexlEngineTest extends TestCase {
             }
         };
         assertNotNull(je);
-        je.createInfo("test", 1, 2); // fails with NoSuchMethodError on 2.1 currently
+        je.createInfo("test", 1, 2);
     }
 
 }
