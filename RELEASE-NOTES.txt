@@ -35,6 +35,13 @@ Its goal is to expose scripting features usable by technical operatives or consu
 
   http://commons.apache.org/jexl/
 
+Compatibility with previous releases
+====================================
+Version 2.1 is binary compatible with 2.0.1.
+
+However it is not source compatible.
+New methods have been added to the org.apache.commons.jexl2.Script and org.apache.commons.jexl2.JexlInfo interfaces.
+Any source code that implements these interfaces will need to be updated.
 
 What's new in 2.1:
 ==================
