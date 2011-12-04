@@ -1225,7 +1225,7 @@ public class JexlEngine {
     protected ASTJexlScript parse(CharSequence expression, JexlInfo info, Scope frame) {
         String expr = cleanExpression(expression);
         ASTJexlScript script = null;
-        DebugInfo dbgInfo = null;
+        JexlInfo dbgInfo = null;
         synchronized (parser) {
             if (cache != null) {
                 script = cache.get(expr);
@@ -1241,8 +1241,6 @@ public class JexlEngine {
                 // use first calling method of JexlEngine as debug info
                 if (info == null) {
                     dbgInfo = debugInfo();
-                } else if (info instanceof DebugInfo) {
-                    dbgInfo = (DebugInfo) info;
                 } else {
                     dbgInfo = info.debugInfo();
                 }
@@ -1274,7 +1272,7 @@ public class JexlEngine {
      * @param c column number
      * @return a JexlInfo instance
      */
-    protected DebugInfo createInfo(String fn, int l, int c) {
+    protected JexlInfo createInfo(String fn, int l, int c) {
         return new DebugInfo(fn, l, c);
     }
 
@@ -1284,7 +1282,7 @@ public class JexlEngine {
      * not owned by JexlEngine, UnifiedJEXL or {Script,Expression}Factory.</p>
      * @return an Info if debug is set, null otherwise
      */
-    protected DebugInfo debugInfo() {
+    protected JexlInfo debugInfo() {
         DebugInfo info = null;
         if (debug) {
             Throwable xinfo = new Throwable();
@@ -1307,7 +1305,7 @@ public class JexlEngine {
                 }
             }
             if (se != null) {
-                info = createInfo(se.getClassName() + "." + se.getMethodName(), se.getLineNumber(), 0);
+                info = createInfo(se.getClassName() + "." + se.getMethodName(), se.getLineNumber(), 0).debugInfo();
             }
         }
         return info;
