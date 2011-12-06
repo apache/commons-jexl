@@ -44,6 +44,10 @@ public class ArrayAccessTest extends JexlTestCase {
     static final String[][] GET_METHOD_ARRAY2 =
         new String[][] { {"One", "Two", "Three"},{"Four", "Five", "Six"} };
 
+    public ArrayAccessTest() {
+        super("ArrayAccessTest");
+    }
+    
     @Override
     public void setUp() {
         asserter = new Asserter(JEXL);

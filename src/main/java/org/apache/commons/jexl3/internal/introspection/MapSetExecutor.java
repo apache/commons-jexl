@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.commons.jexl3.internal;
+package org.apache.commons.jexl3.internal.introspection;
 import java.util.Map;
 import java.lang.reflect.InvocationTargetException;
+
 /**
  * Specialized executor to set a property in a Map.
  * @since 2.0

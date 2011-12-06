@@ -19,13 +19,29 @@ package org.apache.commons.jexl3.parser;
  * Fully abstract to avoid public interface exposition.
  */
 public abstract class ParserVisitor {
-    protected abstract Object visit(SimpleNode node, Object data);
+    /**
+     * Unused, satisfy ParserVisitor interface.
+     * @param node a node
+     * @param data the data
+     * @return does not return
+     */
+    protected final Object visit(SimpleNode node, Object data) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    /**
+     * Unused, should throw in Parser.
+     * @param node a node
+     * @param data the data
+     * @return does not return
+     */
+    protected final Object visit(ASTAmbiguous node, Object data) {
+        throw new UnsupportedOperationException("unexpected type of node");
+    }
 
     protected abstract Object visit(ASTJexlScript node, Object data);
 
     protected abstract Object visit(ASTBlock node, Object data);
-
-    protected abstract Object visit(ASTAmbiguous node, Object data);
 
     protected abstract Object visit(ASTIfStatement node, Object data);
 

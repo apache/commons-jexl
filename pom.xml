@@ -25,7 +25,7 @@
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-jexl3</artifactId>
     <version>3.0-SNAPSHOT</version>
-    <name>Commons JEXL</name>
+    <name>Commons JEXL3</name>
     <inceptionYear>2001</inceptionYear>
     <description>The Commons Jexl library is an implementation of the JSTL Expression Language with extensions.</description>
     <url>http://commons.apache.org/jexl/</url>
@@ -107,7 +107,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.2</version>
+            <version>4.10</version>
             <scope>test</scope>
         </dependency>
         <!-- For JSR-223 API -->
@@ -120,8 +120,8 @@
     </dependencies>
 
     <properties>
-        <maven.compile.source>1.5</maven.compile.source>
-        <maven.compile.target>1.5</maven.compile.target>
+        <maven.compile.source>1.6</maven.compile.source>
+        <maven.compile.target>1.6</maven.compile.target>
         <commons.componentid>jexl</commons.componentid>
         <commons.release.version>3.0</commons.release.version>
         <!-- The RC version used in the staging repository URL. -->
@@ -227,12 +227,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.5</version>
+                <version>2.8</version>
                 <configuration>
                     <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
                     <excludes>org/apache/commons/jexl3/parser/*.java</excludes>
                     <headerLocation>${basedir}/src/main/config/header.txt</headerLocation>
                     <enableRulesSummary>false</enableRulesSummary>
+                    <inherited>false</inherited>
                 </configuration>
             </plugin>
             <plugin>
@@ -291,8 +292,6 @@
                     <excludes>
                       <exclude>org/apache/commons/jexl3/parser/**</exclude>
                       <exclude>org/apache/commons/jexl3/internal/**</exclude>
-                      <exclude>org/apache/commons/jexl2/parser/**</exclude>
-                      <exclude>org/apache/commons/jexl2/internal/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>

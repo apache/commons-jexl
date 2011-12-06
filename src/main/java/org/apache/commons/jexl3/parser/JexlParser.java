@@ -16,7 +16,7 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlInfo;
 
@@ -30,7 +30,7 @@ public class JexlParser extends StringParser {
      * Each parameter is associated to a register and is materialized as an offset in the registers array used
      * during evaluation.
      */
-    protected JexlEngine.Scope frame;
+    protected Engine.Scope frame;
 
     /**
      * Sets the frame to use bythis parser.
@@ -39,7 +39,7 @@ public class JexlParser extends StringParser {
      * </p>
      * @param theFrame the register map
      */
-    public void setFrame(JexlEngine.Scope theFrame) {
+    public void setFrame(Engine.Scope theFrame) {
         frame = theFrame;
     }
     
@@ -51,7 +51,7 @@ public class JexlParser extends StringParser {
      * </p>
      * @return the named register map
      */
-    public JexlEngine.Scope getFrame() {
+    public Engine.Scope getFrame() {
         return frame;
     }
     
@@ -82,7 +82,7 @@ public class JexlParser extends StringParser {
      */
     public void declareVariable(ASTVar identifier, String image) {
         if (frame == null) {
-            frame = new JexlEngine.Scope((String[])null);
+            frame = new Engine.Scope((String[])null);
         }
         Integer register = frame.declareVariable(image);
         identifier.setRegister(register.intValue());

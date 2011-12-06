@@ -18,7 +18,7 @@
 package org.apache.commons.jexl3.introspection;
 
 import java.util.Iterator;
-import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.JexlInfoHandle;
 
 /**
  * 'Federated' introspection/reflection interface to allow the introspection
@@ -26,7 +26,7 @@ import org.apache.commons.jexl3.JexlInfo;
  * 
  * @since 1.0
  */
-public interface Uberspect {
+public interface JexlUberspect {
     /** Sets the class loader to use when getting a constructor with
      * a class name parameter.
      * @param loader the class loader
@@ -41,7 +41,7 @@ public interface Uberspect {
      * @return a {@link JexlMethod}
      * @since 3.0
      */
-    JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfo.Handle info);
+    JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfoHandle info);
     /**
      * Returns a JexlMethod.
      * @param obj the object
@@ -50,7 +50,7 @@ public interface Uberspect {
      * @param info contextual information
      * @return a {@link JexlMethod}
      */
-    JexlMethod getMethod(Object obj, String method, Object[] args, JexlInfo.Handle info);
+    JexlMethod getMethod(Object obj, String method, Object[] args, JexlInfoHandle info);
 
     /**
      * Property getter.
@@ -60,7 +60,7 @@ public interface Uberspect {
      * @param info contextual information
      * @return a {@link JexlPropertyGet}
      */
-    JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfo.Handle info);
+    JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfoHandle info);
 
     /**
      * Property setter.
@@ -71,7 +71,7 @@ public interface Uberspect {
      * @param info contextual information
      * @return a {@link JexlPropertySet}.
      */
-    JexlPropertySet getPropertySet(Object obj, Object identifier, Object arg, JexlInfo.Handle info);
+    JexlPropertySet getPropertySet(Object obj, Object identifier, Object arg, JexlInfoHandle info);
 
     /**
      * Gets an iterator from an object.
@@ -79,6 +79,6 @@ public interface Uberspect {
      * @param info contextual information
      * @return an iterator over obj
      */
-    Iterator<?> getIterator(Object obj, JexlInfo.Handle info);
+    Iterator<?> getIterator(Object obj, JexlInfoHandle info);
 
 }

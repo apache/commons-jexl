@@ -17,6 +17,7 @@
 
 package org.apache.commons.jexl3;
 
+import org.apache.commons.jexl3.internal.Engine;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -42,11 +43,11 @@ public class Main {
      * @throws Exception if parsing or IO fail
      */
     public static void main(String[] args) throws Exception {
-        JexlEngine engine = new JexlEngine();
+        JexlEngine engine = new Engine();
         JexlContext context = new MapContext();
         context.set("args", args);
         if (args.length == 1) {
-            Script script = engine.createScript(new File(args[0]));
+            JexlScript script = engine.createScript(new File(args[0]));
             Object value = script.execute(context);
             System.out.println("Return value: " + value);
         } else {
@@ -55,7 +56,7 @@ public class Main {
             System.out.print("> ");
             while (null != (line = console.readLine())) {
                 try {
-                    Expression expression = engine.createExpression(line);
+                    JexlExpression expression = engine.createExpression(line);
                     Object value = expression.evaluate(context);
                     System.out.println("Return value: " + value);
                 } catch (JexlException e) {

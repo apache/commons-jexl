@@ -31,12 +31,12 @@ public class ArithmeticTest extends JexlTestCase {
     private Asserter asserter;
 
     public ArithmeticTest() {
-        super(createThreadedArithmeticEngine(true));
+        super("ArithmeticTest");
+        asserter = new Asserter(JEXL);
     }
 
     @Override
     public void setUp() {
-        asserter = new Asserter(JEXL);
     }
 
     public void testUndefinedVar() throws Exception {
@@ -46,6 +46,7 @@ public class ArithmeticTest extends JexlTestCase {
     public void testLeftNullOperand() throws Exception {
         asserter.setVariable("left", null);
         asserter.setVariable("right", Integer.valueOf(8));
+        asserter.setStrict(true);
         asserter.failExpression("left + right", ".*null.*");
         asserter.failExpression("left - right", ".*null.*");
         asserter.failExpression("left * right", ".*null.*");
@@ -137,7 +138,13 @@ public class ArithmeticTest extends JexlTestCase {
      * test some simple mathematical calculations
      */
     public void testCalculations() throws Exception {
-
+        asserter.setStrict(true, false);
+        /*
+         * test new null coersion
+         */
+        asserter.setVariable("imanull", null);
+        asserter.assertExpression("imanull + 2", new Integer(2));
+        asserter.assertExpression("imanull + imanull", new Integer(0));
         asserter.setVariable("foo", new Integer(2));
 
         asserter.assertExpression("foo + 2", new Integer(4));
@@ -162,6 +169,7 @@ public class ArithmeticTest extends JexlTestCase {
         /*
          * test / and %
          */
+        asserter.setStrict(false, false);
         asserter.assertExpression("6 / 3", new Integer(6 / 3));
         asserter.assertExpression("6.4 / 3", new Double(6.4 / 3));
         asserter.assertExpression("0 / 3", new Integer(0 / 3));
@@ -169,17 +177,11 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("4 % 3", new Integer(1));
         asserter.assertExpression("4.8 % 3", new Double(4.8 % 3));
 
-        /*
-         * test new null coersion
-         */
-        asserter.setVariable("imanull", null);
-        asserter.assertExpression("imanull + 2", new Integer(2));
-        asserter.assertExpression("imanull + imanull", new Integer(0));
     }
 
     public void testCoercions() throws Exception {
         asserter.assertExpression("1", new Integer(1)); // numerics default to Integer
-//        asserter.assertExpression("5L", new Long(5)); // TODO when implemented
+        asserter.assertExpression("5L", new Long(5)); 
 
         asserter.setVariable("I2", new Integer(2));
         asserter.setVariable("L2", new Long(2));
@@ -279,7 +281,7 @@ public class ArithmeticTest extends JexlTestCase {
      */
     public void testDivideByZero() throws Exception {
         Map<String, Object> vars = new HashMap<String, Object>();
-        JexlContext context = new MapContext(vars);
+        JexlEvalContext context = new JexlEvalContext(vars);
         vars.put("aByte", new Byte((byte) 1));
         vars.put("aShort", new Short((short) 2));
         vars.put("aInteger", new Integer(3));
@@ -307,12 +309,11 @@ public class ArithmeticTest extends JexlTestCase {
         // number of permutations this will generate
         final int PERMS = tnames.length * tnames.length;
 
-        JexlEngine jexl = createThreadedArithmeticEngine(true);
-        jexl.setCache(128);
-        jexl.setSilent(false);
+        JexlEngine jexl = JEXL;
         // for non-silent, silent...
         for (int s = 0; s < 2; ++s) {
-            JexlThreadedArithmetic.setLenient(Boolean.valueOf(s == 0));
+            boolean strict = Boolean.valueOf(s != 0);
+            context.setStrict(true, strict);
             int zthrow = 0;
             int zeval = 0;
             // for vars of all types...
@@ -322,7 +323,7 @@ public class ArithmeticTest extends JexlTestCase {
                     // divide var by zero
                     String expr = "a" + vname + " / " + "z" + zname;
                     try {
-                        Expression zexpr = jexl.createExpression(expr);
+                        JexlExpression zexpr = jexl.createExpression(expr);
                         Object nan = zexpr.evaluate(context);
                         // check we have a zero & incremement zero count
                         if (nan instanceof Number) {
@@ -337,7 +338,7 @@ public class ArithmeticTest extends JexlTestCase {
                     }
                 }
             }
-            if (!jexl.isLenient()) {
+            if (strict) {
                 assertTrue("All expressions should have thrown " + zthrow + "/" + PERMS,
                         zthrow == PERMS);
             } else {

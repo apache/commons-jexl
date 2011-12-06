@@ -16,25 +16,14 @@
  */
 package org.apache.commons.jexl3;
 
-
-import org.apache.commons.jexl3.parser.ASTJexlScript;
-
 /**
- * Intended for backwards compatibility with jexl2 in case of derivation.
- * @since 1.0
- * @deprecated
+ * Denotes objects that can expose a JexlInfo instance.
+ * @since 3.0
  */
-public class ExpressionImpl extends JexlScript {
+public interface JexlInfoHandle {
     /**
-     * Do not let this be generally instantiated with a 'new'.
-     *
-     * @param engine the interpreter to evaluate the expression
-     * @param expr the expression.
-     * @param ref the parsed expression.
+     * Gets the associated JexlInfo instance.
+     * @return the info
      */
-    protected ExpressionImpl(JexlEngine engine, String expr, ASTJexlScript ref) {
-        super(engine, expr, ref);
-    }
-
-
+    JexlInfo jexlInfo();
 }

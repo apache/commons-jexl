@@ -20,9 +20,7 @@ package org.apache.commons.jexl3.junit;
 import junit.framework.AssertionFailedError;
 
 import org.apache.commons.jexl3.Foo;
-import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlTestCase;
-import org.apache.commons.jexl3.JexlEngine;
 
 /**
  *  Simple testcases
@@ -50,9 +48,8 @@ public class AsserterTest extends JexlTestCase {
     }
 
     public void testVariable() throws Exception {
-        JexlEngine jexl = new JexlEngine();
-        jexl.setSilent(true);
-        Asserter asserter = new Asserter(jexl);
+        Asserter asserter = new Asserter(JEXL);
+        asserter.setSilent(true);
         asserter.setVariable("foo", new Foo());
         asserter.setVariable("person", "James");
 

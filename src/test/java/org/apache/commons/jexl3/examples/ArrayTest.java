@@ -18,13 +18,14 @@
 package org.apache.commons.jexl3.examples;
 
 import junit.framework.TestCase;
-import org.apache.commons.jexl3.Expression;
+import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.MapContext;
 
 import java.util.List;
 import java.util.ArrayList;
+import org.apache.commons.jexl3.JexlBuilder;
 
 /**
  *  Simple example to show how to access arrays.
@@ -40,7 +41,7 @@ public class ArrayTest extends TestCase {
          * First step is to retrieve an instance of a JexlEngine;
          * it might be already existing and shared or created anew.
          */
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = new JexlBuilder().create();
         /*
          *  Second make a jexlContext and put stuff in it
          */
@@ -52,7 +53,7 @@ public class ArrayTest extends TestCase {
         l.add(two);
         jc.set("array", l);
 
-        Expression e = jexl.createExpression("array[1]");
+        JexlExpression e = jexl.createExpression("array[1]");
         Object o = e.evaluate(jc);
         out.print("Object @ location 1 = ", o, two);
 

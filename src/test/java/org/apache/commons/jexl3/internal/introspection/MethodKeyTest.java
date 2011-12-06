@@ -38,7 +38,7 @@ public class MethodKeyTest extends TestCase {
     
     // A set of instances corresponding to the classes
     private static final Object[] ARGS = {
-        new Boolean(true),
+        Boolean.TRUE,
         new Byte((byte) 1),
         new Character('2'),
         new Double(4d),

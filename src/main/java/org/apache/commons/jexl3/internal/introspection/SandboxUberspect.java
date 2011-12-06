@@ -16,7 +16,7 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.JexlInfoHandle;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
@@ -27,9 +27,9 @@ import org.apache.commons.logging.Log;
  * An uberspect that controls usage of properties, methods and contructors through a sandbox.
  * @since 3.0
  */
-public class SandboxUberspect extends Uberspect {
+public final class SandboxUberspect extends Uberspect {
     /**  The sandbox. */
-    protected final Sandbox sandbox;
+    private final Sandbox sandbox;
 
     /**
      * A constructor for Sandbox uberspect.
@@ -56,7 +56,7 @@ public class SandboxUberspect extends Uberspect {
      * {@inheritDoc}
      */
     @Override
-    public JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfo.Handle info) {
+    public JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfoHandle info) {
         final String className;
         if (ctorHandle instanceof Class<?>) {
             Class<?> clazz = (Class<?>) ctorHandle;
@@ -76,7 +76,7 @@ public class SandboxUberspect extends Uberspect {
      * {@inheritDoc}
      */
     @Override
-    public JexlMethod getMethod(Object obj, String method, Object[] args, JexlInfo.Handle info) {
+    public JexlMethod getMethod(Object obj, String method, Object[] args, JexlInfoHandle info) {
         if (obj != null && method != null) {
             String actual = sandbox.execute(obj.getClass().getName(), method);
             if (actual != null) {
@@ -90,7 +90,7 @@ public class SandboxUberspect extends Uberspect {
      * {@inheritDoc}
      */
     @Override
-    public JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfo.Handle info) {
+    public JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfoHandle info) {
         if (obj != null && identifier != null) {
             String actual = sandbox.read(obj.getClass().getName(), identifier.toString());
             if (actual != null) {
@@ -104,7 +104,7 @@ public class SandboxUberspect extends Uberspect {
      * {@inheritDoc}
      */
     @Override
-    public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, JexlInfo.Handle info) {
+    public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, JexlInfoHandle info) {
         if (obj != null && identifier != null) {
             String actual = sandbox.write(obj.getClass().getName(), identifier.toString());
             if (actual != null) {

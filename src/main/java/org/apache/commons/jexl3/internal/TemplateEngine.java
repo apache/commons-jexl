@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl3;
+package org.apache.commons.jexl3.internal;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,69 +26,26 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JxltEngine;
+import org.apache.commons.jexl3.NamespaceResolver;
 import org.apache.commons.jexl3.introspection.JexlMethod;
-import org.apache.commons.jexl3.introspection.Uberspect;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.StringParser;
 
 /**
- * An evaluator similar to the Unified EL evaluator used in JSP/JSF based on JEXL.
- * It is intended to be used in configuration modules, XML based frameworks or JSP taglibs
- * and facilitate the implementation of expression evaluation.
- * <p>
- * An expression can mix immediate, deferred and nested sub-expressions as well as string constants;
- * <ul>
- * <li>The "immediate" syntax is of the form <code>"...${jexl-expr}..."</code></li>
- * <li>The "deferred" syntax is of the form <code>"...#{jexl-expr}..."</code></li>
- * <li>The "nested" syntax is of the form <code>"...#{...${jexl-expr0}...}..."</code></li>
- * <li>The "composite" syntax is of the form <code>"...${jexl-expr0}... #{jexl-expr1}..."</code></li>
- * </ul>
- * </p>
- * <p>
- * Deferred & immediate expression carry different intentions:
- * <ul>
- * <li>An immediate expression indicate that evaluation is intended to be performed close to
- * the definition/parsing point.</li>
- * <li>A deferred expression indicate that evaluation is intended to occur at a later stage.</li>
- * </ul>
- * </p>
- * <p>
- * For instance: <code>"Hello ${name}, now is #{time}"</code> is a composite "deferred" expression since one
- * of its subexpressions is deferred. Furthermore, this (composite) expression intent is
- * to perform two evaluations; one close to its definition and another one in a later
- * phase.
- * </p>
- * <p>
- * The API reflects this feature in 2 methods, prepare and evaluate. The prepare method
- * will evaluate the immediate subexpression and return an expression that contains only
- * the deferred subexpressions (& constants), a prepared expression. Such a prepared expression
- * is suitable for a later phase evaluation that may occur with a different JexlContext.
- * Note that it is valid to call evaluate without prepare in which case the same JexlContext
- * is used for the 2 evaluation phases.
- * </p>
- * <p>
- * In the most common use-case where deferred expressions are to be kept around as properties of objects,
- * one should parse & prepare an expression before storing it and evaluate it each time
- * the property storing it is accessed.
- * </p>
- * <p>
- * Note that nested expression use the JEXL syntax as in:
- * <code>"#{${bar}+'.charAt(2)'}"</code>
- * The most common mistake leading to an invalid expression being the following:
- * <code>"#{${bar}charAt(2)}"</code>
- * </p>
- * <p>Also note that methods that parse evaluate expressions may throw <em>unchecked</em> exceptions;
- * The {@link UnifiedJEXL.Exception} are thrown when the engine instance is in "non-silent" mode
- * but since these are RuntimeException, user-code <em>should</em> catch them where appropriate.
- * </p>
- * @since 2.0
+ * A JxltEngine implementation.
+ * @since 3.0
  */
-public final class UnifiedJEXL {
+public final class TemplateEngine extends JxltEngine {
     /** The JEXL engine instance. */
-    private final JexlEngine jexl;
-    /** The expression cache. */
-    private final JexlEngine.SoftCache<String, Expression> cache;
+    private final Engine jexl;
+    /** The TemplateExpression cache. */
+    private final Engine.SoftCache<String, TemplateExpression> cache;
     /** The default cache size. */
     private static final int CACHE_SIZE = 256;
     /** The first character for immediate expressions. */
@@ -97,53 +54,53 @@ public final class UnifiedJEXL {
     private final char deferredChar;
 
     /**
-     * Creates a new instance of UnifiedJEXL with a default size cache.
+     * Creates a new instance of {@link JxltEngine} with a default cache size.
      * @param aJexl the JexlEngine to use.
      */
-    public UnifiedJEXL(JexlEngine aJexl) {
+    public TemplateEngine(Engine aJexl) {
         this(aJexl, CACHE_SIZE);
     }
 
     /**
-     * Creates a new instance of UnifiedJEXL creating a local cache.
+     * Creates a new instance of {@link JxltEngine} creating a local cache.
      * @param aJexl the JexlEngine to use.
      * @param cacheSize the number of expressions in this cache
      */
-    public UnifiedJEXL(JexlEngine aJexl, int cacheSize) {
+    public TemplateEngine(Engine aJexl, int cacheSize) {
         this(aJexl, cacheSize, '$', '#');
     }
     
     /**
-     * Creates a new instance of UnifiedJEXL creating a local cache.
+     * Creates a new instance of {@link JxltEngine} creating a local cache.
      * @param aJexl the JexlEngine to use.
      * @param cacheSize the number of expressions in this cache
-     * @param immediate the immediate expression character, default is '$'
-     * @param deferred the deferred expression character, default is '#'
+     * @param immediate the immediate template expression character, default is '$'
+     * @param deferred the deferred template expression character, default is '#'
      */
-    public UnifiedJEXL(JexlEngine aJexl, int cacheSize, char immediate, char deferred) {
+    public TemplateEngine(Engine aJexl, int cacheSize, char immediate, char deferred) {
         this.jexl = aJexl;
-        this.cache = aJexl.new SoftCache<String, Expression>(cacheSize);
+        this.cache = aJexl.new SoftCache<String, TemplateExpression>(cacheSize);
         immediateChar = immediate;
         deferredChar = deferred;
     }
 
     /**
      * Types of expressions.
-     * Each instance carries a counter index per (composite sub-) expression type.
+     * Each instance carries a counter index per (composite sub-) template expression type.
      * @see ExpressionBuilder
      */
     private static enum ExpressionType {
-        /** Constant expression, count index 0. */
+        /** Constant TemplateExpression, count index 0. */
         CONSTANT(0),
-        /** Immediate expression, count index 1. */
+        /** Immediate TemplateExpression, count index 1. */
         IMMEDIATE(1),
-        /** Deferred expression, count index 2. */
+        /** Deferred TemplateExpression, count index 2. */
         DEFERRED(2),
         /** Nested (which are deferred) expressions, count index 2. */
         NESTED(2),
         /** Composite expressions are not counted, index -1. */
         COMPOSITE(-1);
-        /** The index in arrays of expression counters for composite expressions. */
+        /** The index in arrays of TemplateExpression counters for composite expressions. */
         private final int index;
 
         /**
@@ -160,36 +117,36 @@ public final class UnifiedJEXL {
      * Keeps count of sub-expressions by type.
      */
     private static class ExpressionBuilder {
-        /** Per expression type counters. */
+        /** Per TemplateExpression type counters. */
         private final int[] counts;
         /** The list of expressions. */
-        private final ArrayList<Expression> expressions;
+        private final ArrayList<TemplateExpression> expressions;
 
         /**
          * Creates a builder.
-         * @param size the initial expression array size
+         * @param size the initial TemplateExpression array size
          */
         ExpressionBuilder(int size) {
             counts = new int[]{0, 0, 0};
-            expressions = new ArrayList<Expression>(size <= 0 ? 3 : size);
+            expressions = new ArrayList<TemplateExpression>(size <= 0 ? 3 : size);
         }
 
         /**
-         * Adds an expression to the list of expressions, maintain per-type counts.
-         * @param expr the expression to add
+         * Adds an TemplateExpression to the list of expressions, maintain per-type counts.
+         * @param expr the TemplateExpression to add
          */
-        void add(Expression expr) {
+        void add(TemplateExpression expr) {
             counts[expr.getType().index] += 1;
             expressions.add(expr);
         }
 
         /**
-         * Builds an expression from a source, performs checks.
+         * Builds an TemplateExpression from a source, performs checks.
          * @param el the unified el instance
-         * @param source the source expression
-         * @return an expression
+         * @param source the source TemplateExpression
+         * @return an TemplateExpression
          */
-        Expression build(UnifiedJEXL el, Expression source) {
+        TemplateExpression build(TemplateEngine el, TemplateExpression source) {
             int sum = 0;
             for (int count : counts) {
                 sum += count;
@@ -215,9 +172,10 @@ public final class UnifiedJEXL {
     }
 
     /**
-     * Gets the JexlEngine underlying the UnifiedJEXL.
+     * Gets the JexlEngine underlying this JxltEngine.
      * @return the JexlEngine
      */
+    @Override
     public JexlEngine getEngine() {
         return jexl;
     }
@@ -225,6 +183,7 @@ public final class UnifiedJEXL {
     /**
      * Clears the cache.
      */
+    @Override
     public void clearCache() {
         synchronized (cache) {
             cache.clear();
@@ -232,64 +191,36 @@ public final class UnifiedJEXL {
     }
 
     /**
-     * The sole type of (runtime) exception the UnifiedJEXL can throw.
+     * The abstract base class for all unified expressions, immediate '${...}' and deferred '#{...}'.
      */
-    public static class Exception extends RuntimeException {
-        /** Serial version UID. */
-        private static final long serialVersionUID = -8201402995815975726L;
+   private abstract class TemplateExpression implements UnifiedExpression {
+        /** The source of this  template expression(see {@link TemplateEngine.TemplateExpression#prepare}). */
+        protected final TemplateExpression source;
 
         /**
-         * Creates a UnifiedJEXL.Exception.
-         * @param msg the exception message
-         * @param cause the exception cause
+         * Creates an TemplateExpression.
+         * @param src the source TemplateExpression if any
          */
-        public Exception(String msg, Throwable cause) {
-            super(msg, cause);
-        }
-    }
-
-    /**
-     * The abstract base class for all expressions, immediate '${...}' and deferred '#{...}'.
-     */
-    public abstract class Expression {
-        /** The source of this expression (see {@link UnifiedJEXL.Expression#prepare}). */
-        protected final Expression source;
-
-        /**
-         * Creates an expression.
-         * @param src the source expression if any
-         */
-        Expression(Expression src) {
+        TemplateExpression(TemplateExpression src) {
             this.source = src != null ? src : this;
         }
 
-        /**
-         * Checks whether this expression is immediate.
-         * @return true if immediate, false otherwise
-         */
+        @Override
         public boolean isImmediate() {
             return true;
         }
 
-        /**
-         * Checks whether this expression is deferred.
-         * @return true if deferred, false otherwise
-         */
+        @Override
         public final boolean isDeferred() {
             return !isImmediate();
         }
 
         /**
-         * Gets this expression type.
+         * Gets this TemplateExpression type.
          * @return its type
          */
         abstract ExpressionType getType();
 
-        /**
-         * Formats this expression, adding its source string representation in
-         * comments if available: 'expression /*= source *\/'' .
-         * @return the formatted expression string
-         */
         @Override
         public final String toString() {
             StringBuilder strb = new StringBuilder();
@@ -302,67 +233,33 @@ public final class UnifiedJEXL {
             return strb.toString();
         }
 
-        /**
-         * Generates this expression's string representation.
-         * @return the string representation
-         */
+        @Override
         public String asString() {
             StringBuilder strb = new StringBuilder();
             asString(strb);
             return strb.toString();
         }
 
-        /**
-         * Adds this expression's string representation to a StringBuilder.
-         * @param strb the builder to fill
-         * @return the builder argument
-         */
-        public abstract StringBuilder asString(StringBuilder strb);
-
-        /**
-         * Gets the list of variables accessed by this expression.
-         * <p>This method will visit all nodes of the sub-expressions and extract all variables whether they
-         * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
-         * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
-         *         or the empty set if no variables are used
-         */
+        @Override
         public Set<List<String>> getVariables() {
             return Collections.emptySet();
         }
 
         /**
-         * Fills up the list of variables accessed by this expression.
+         * Fills up the list of variables accessed by this unified expression.
          * @param refs the set of variable being filled
          */
         protected void getVariables(Set<List<String>> refs) {
             // nothing to do
         }
 
-        /**
-         * Evaluates the immediate sub-expressions.
-         * <p>
-         * When the expression is dependant upon immediate and deferred sub-expressions,
-         * evaluates the immediate sub-expressions with the context passed as parameter
-         * and returns this expression deferred form.
-         * </p>
-         * <p>
-         * In effect, this binds the result of the immediate sub-expressions evaluation in the
-         * context, allowing to differ evaluation of the remaining (deferred) expression within another context.
-         * This only has an effect to nested & composite expressions that contain differed & immediate sub-expressions.
-         * </p>
-         * <p>
-         * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
-         * </p>
-         * @param context the context to use for immediate expression evaluations
-         * @return an expression or null if an error occurs and the {@link JexlEngine} is running in silent mode
-         * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not in silent mode
-         */
-        public final Expression prepare(JexlContext context) {
+        @Override
+        public final TemplateExpression prepare(JexlContext context) {
             try {
-                Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), jexl.isSilent());
-                if (context instanceof TemplateContext) {
-                    interpreter.setFrame(((TemplateContext) context).getFrame());
-                }
+                Engine.Frame frame = context instanceof TemplateContext
+                                     ? ((TemplateContext) context).getFrame()
+                                     : null;
+                Interpreter interpreter = jexl.createInterpreter(context, frame);
                 return prepare(interpreter);
             } catch (JexlException xjexl) {
                 Exception xuel = createException("prepare", this, xjexl);
@@ -374,22 +271,13 @@ public final class UnifiedJEXL {
             }
         }
 
-        /**
-         * Evaluates this expression.
-         * <p>
-         * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
-         * </p>
-         * @param context the variable context
-         * @return the result of this expression evaluation or null if an error occurs and the {@link JexlEngine} is
-         * running in silent mode
-         * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
-         */
+        @Override
         public final Object evaluate(JexlContext context) {
             try {
-                Interpreter interpreter = new Interpreter(jexl, context, !jexl.isLenient(), jexl.isSilent());
-                if (context instanceof TemplateContext) {
-                    interpreter.setFrame(((TemplateContext) context).getFrame());
-                }
+                Engine.Frame frame = context instanceof TemplateContext
+                                     ? ((TemplateContext) context).getFrame()
+                                     : null;
+                Interpreter interpreter = jexl.createInterpreter(context, frame);
                 return evaluate(interpreter);
             } catch (JexlException xjexl) {
                 Exception xuel = createException("prepare", this, xjexl);
@@ -401,24 +289,18 @@ public final class UnifiedJEXL {
             }
         }
 
-        /**
-         * Retrieves this expression's source expression.
-         * If this expression was prepared, this allows to retrieve the
-         * original expression that lead to it.
-         * Other expressions return themselves.
-         * @return the source expression
-         */
-        public final Expression getSource() {
+        @Override
+        public final TemplateExpression getSource() {
             return source;
         }
 
         /**
          * Prepares a sub-expression for interpretation.
          * @param interpreter a JEXL interpreter
-         * @return a prepared expression
+         * @return a prepared unified expression
          * @throws JexlException (only for nested & composite)
          */
-        protected Expression prepare(Interpreter interpreter) {
+        protected TemplateExpression prepare(Interpreter interpreter) {
             return this;
         }
 
@@ -431,21 +313,21 @@ public final class UnifiedJEXL {
         protected abstract Object evaluate(Interpreter interpreter);
     }
 
-    /** A constant expression. */
-    private class ConstantExpression extends Expression {
-        /** The constant held by this expression. */
+    /** A constant unified expression. */
+    private class ConstantExpression extends TemplateExpression {
+        /** The constant held by this unified expression. */
         private final Object value;
 
         /**
-         * Creates a constant expression.
+         * Creates a constant unified expression.
          * <p>
          * If the wrapped constant is a string, it is treated
          * as a JEXL strings with respect to escaping.
          * </p>
          * @param val the constant value
-         * @param source the source expression if any
+         * @param source the source TemplateExpression if any
          */
-        ConstantExpression(Object val, Expression source) {
+        ConstantExpression(Object val, TemplateExpression source) {
             super(source);
             if (val == null) {
                 throw new NullPointerException("constant can not be null");
@@ -456,13 +338,11 @@ public final class UnifiedJEXL {
             this.value = val;
         }
 
-        /** {@inheritDoc} */
         @Override
         ExpressionType getType() {
             return ExpressionType.CONSTANT;
         }
 
-        /** {@inheritDoc} */
         @Override
         public StringBuilder asString(StringBuilder strb) {
             if (value != null) {
@@ -471,33 +351,31 @@ public final class UnifiedJEXL {
             return strb;
         }
 
-        /** {@inheritDoc} */
         @Override
         protected Object evaluate(Interpreter interpreter) {
             return value;
         }
     }
 
-    /** The base for Jexl based expressions. */
-    private abstract class JexlBasedExpression extends Expression {
-        /** The JEXL string for this expression. */
+    /** The base for Jexl based unified expressions. */
+    private abstract class JexlBasedExpression extends TemplateExpression {
+        /** The JEXL string for this unified expression. */
         protected final CharSequence expr;
-        /** The JEXL node for this expression. */
+        /** The JEXL node for this unified expression. */
         protected final JexlNode node;
 
         /**
-         * Creates a JEXL interpretable expression.
-         * @param theExpr the expression as a string
-         * @param theNode the expression as an AST
-         * @param theSource the source expression if any
+         * Creates a JEXL interpretable unified expression.
+         * @param theExpr the unified expression as a string
+         * @param theNode the unified expression as an AST
+         * @param theSource the source unified expression if any
          */
-        protected JexlBasedExpression(CharSequence theExpr, JexlNode theNode, Expression theSource) {
+        protected JexlBasedExpression(CharSequence theExpr, JexlNode theNode, TemplateExpression theSource) {
             super(theSource);
             this.expr = theExpr;
             this.node = theNode;
         }
 
-        /** {@inheritDoc} */
         @Override
         public StringBuilder asString(StringBuilder strb) {
             strb.append(isImmediate() ? immediateChar : deferredChar);
@@ -507,13 +385,11 @@ public final class UnifiedJEXL {
             return strb;
         }
 
-        /** {@inheritDoc} */
         @Override
         protected Object evaluate(Interpreter interpreter) {
             return interpreter.interpret(node);
         }
 
-        /** {@inheritDoc} */
         @Override
         public Set<List<String>> getVariables() {
             Set<List<String>> refs = new LinkedHashSet<List<String>>();
@@ -521,71 +397,64 @@ public final class UnifiedJEXL {
             return refs;
         }
 
-        /** {@inheritDoc} */
         @Override
         protected void getVariables(Set<List<String>> refs) {
             jexl.getVariables(node, refs, null);
         }
     }
 
-    /** An immediate expression: ${jexl}. */
+    /** An immediate unified expression: ${jexl}. */
     private class ImmediateExpression extends JexlBasedExpression {
         /**
-         * Creates an immediate expression.
-         * @param expr the expression as a string
-         * @param node the expression as an AST
-         * @param source the source expression if any
+         * Creates an immediate unified expression.
+         * @param expr the unified expression as a string
+         * @param node the unified expression as an AST
+         * @param source the source unified expression if any
          */
-        ImmediateExpression(CharSequence expr, JexlNode node, Expression source) {
+        ImmediateExpression(CharSequence expr, JexlNode node, TemplateExpression source) {
             super(expr, node, source);
         }
 
-        /** {@inheritDoc} */
         @Override
         ExpressionType getType() {
             return ExpressionType.IMMEDIATE;
         }
 
-        /** {@inheritDoc} */
         @Override
-        protected Expression prepare(Interpreter interpreter) {
+        protected TemplateExpression prepare(Interpreter interpreter) {
             // evaluate immediate as constant
             Object value = evaluate(interpreter);
             return value != null ? new ConstantExpression(value, source) : null;
         }
     }
 
-    /** A deferred expression: #{jexl}. */
+    /** A deferred unified expression: #{jexl}. */
     private class DeferredExpression extends JexlBasedExpression {
         /**
-         * Creates a deferred expression.
-         * @param expr the expression as a string
-         * @param node the expression as an AST
-         * @param source the source expression if any
+         * Creates a deferred unified expression.
+         * @param expr the unified expression as a string
+         * @param node the unified expression as an AST
+         * @param source the source unified expression if any
          */
-        DeferredExpression(CharSequence expr, JexlNode node, Expression source) {
+        DeferredExpression(CharSequence expr, JexlNode node, TemplateExpression source) {
             super(expr, node, source);
         }
 
-        /** {@inheritDoc} */
         @Override
         public boolean isImmediate() {
             return false;
         }
 
-        /** {@inheritDoc} */
         @Override
         ExpressionType getType() {
             return ExpressionType.DEFERRED;
         }
 
-        /** {@inheritDoc} */
         @Override
-        protected Expression prepare(Interpreter interpreter) {
+        protected TemplateExpression prepare(Interpreter interpreter) {
             return new ImmediateExpression(expr, node, source);
         }
 
-        /** {@inheritDoc} */
         @Override
         protected void getVariables(Set<List<String>> refs) {
             // noop
@@ -593,21 +462,21 @@ public final class UnifiedJEXL {
     }
 
     /**
-     * An immediate expression nested into a deferred expression.
+     * An immediate unified expression nested into a deferred unified expression.
      * #{...${jexl}...}
-     * Note that the deferred syntax is JEXL's, not UnifiedJEXL.
+     * Note that the deferred syntax is JEXL's.
      */
     private class NestedExpression extends JexlBasedExpression {
         /**
-         * Creates a nested expression.
-         * @param expr the expression as a string
-         * @param node the expression as an AST
-         * @param source the source expression if any
+         * Creates a nested unified expression.
+         * @param expr the unified expression as a string
+         * @param node the unified expression as an AST
+         * @param source the source unified expression if any
          */
-        NestedExpression(CharSequence expr, JexlNode node, Expression source) {
+        NestedExpression(CharSequence expr, JexlNode node, TemplateExpression source) {
             super(expr, node, source);
             if (this.source != this) {
-                throw new IllegalArgumentException("Nested expression can not have a source");
+                throw new IllegalArgumentException("Nested TemplateExpression can not have a source");
             }
         }
 
@@ -617,88 +486,79 @@ public final class UnifiedJEXL {
             return strb;
         }
 
-        /** {@inheritDoc} */
         @Override
         public boolean isImmediate() {
             return false;
         }
 
-        /** {@inheritDoc} */
         @Override
         ExpressionType getType() {
             return ExpressionType.NESTED;
         }
 
-        /** {@inheritDoc} */
         @Override
-        protected Expression prepare(Interpreter interpreter) {
+        protected TemplateExpression prepare(Interpreter interpreter) {
             String value = interpreter.interpret(node).toString();
             JexlNode dnode = jexl.parse(value, jexl.isDebug() ? node.jexlInfo() : null, null);
             return new ImmediateExpression(value, dnode, this);
         }
 
-        /** {@inheritDoc} */
         @Override
         protected Object evaluate(Interpreter interpreter) {
             return prepare(interpreter).evaluate(interpreter);
         }
     }
 
-    /** A composite expression: "... ${...} ... #{...} ...". */
-    private class CompositeExpression extends Expression {
+    /** A composite unified expression: "... ${...} ... #{...} ...". */
+    private class CompositeExpression extends TemplateExpression {
         /** Bit encoded (deferred count > 0) bit 1, (immediate count > 0) bit 0. */
         private final int meta;
         /** The list of sub-expression resulting from parsing. */
-        protected final Expression[] exprs;
+        protected final TemplateExpression[] exprs;
 
         /**
          * Creates a composite expression.
-         * @param counters counters of expression per type
+         * @param counters counters of expressions per type
          * @param list the sub-expressions
          * @param src the source for this expresion if any
          */
-        CompositeExpression(int[] counters, ArrayList<Expression> list, Expression src) {
+        CompositeExpression(int[] counters, ArrayList<TemplateExpression> list, TemplateExpression src) {
             super(src);
-            this.exprs = list.toArray(new Expression[list.size()]);
+            this.exprs = list.toArray(new TemplateExpression[list.size()]);
             this.meta = (counters[ExpressionType.DEFERRED.index] > 0 ? 2 : 0)
                     | (counters[ExpressionType.IMMEDIATE.index] > 0 ? 1 : 0);
         }
 
-        /** {@inheritDoc} */
         @Override
         public boolean isImmediate() {
             // immediate if no deferred
             return (meta & 2) == 0;
         }
 
-        /** {@inheritDoc} */
         @Override
         ExpressionType getType() {
             return ExpressionType.COMPOSITE;
         }
 
-        /** {@inheritDoc} */
         @Override
         public StringBuilder asString(StringBuilder strb) {
-            for (Expression e : exprs) {
+            for (TemplateExpression e : exprs) {
                 e.asString(strb);
             }
             return strb;
         }
 
-        /** {@inheritDoc} */
         @Override
         public Set<List<String>> getVariables() {
             Set<List<String>> refs = new LinkedHashSet<List<String>>();
-            for (Expression expr : exprs) {
+            for (TemplateExpression expr : exprs) {
                 expr.getVariables(refs);
             }
             return refs;
         }
 
-        /** {@inheritDoc} */
         @Override
-        protected Expression prepare(Interpreter interpreter) {
+        protected TemplateExpression prepare(Interpreter interpreter) {
             // if this composite is not its own source, it is already prepared
             if (source != this) {
                 return this;
@@ -709,20 +569,19 @@ public final class UnifiedJEXL {
             // tracking whether prepare will return a different expression
             boolean eq = true;
             for (int e = 0; e < size; ++e) {
-                Expression expr = exprs[e];
-                Expression prepared = expr.prepare(interpreter);
+                TemplateExpression expr = exprs[e];
+                TemplateExpression prepared = expr.prepare(interpreter);
                 // add it if not null
                 if (prepared != null) {
                     builder.add(prepared);
                 }
-                // keep track of expression equivalence
+                // keep track of TemplateExpression equivalence
                 eq &= expr == prepared;
             }
-            Expression ready = eq ? this : builder.build(UnifiedJEXL.this, this);
+            TemplateExpression ready = eq ? this : builder.build(TemplateEngine.this, this);
             return ready;
         }
 
-        /** {@inheritDoc} */
         @Override
         protected Object evaluate(Interpreter interpreter) {
             final int size = exprs.length;
@@ -740,18 +599,10 @@ public final class UnifiedJEXL {
         }
     }
 
-    /** Creates a a {@link UnifiedJEXL.Expression} from an expression string.
-     *  Uses & fills up the expression cache if any.
-     * <p>
-     * If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.
-     * </p>
-     * @param expression the UnifiedJEXL string expression
-     * @return the UnifiedJEXL object expression, null if silent and an error occured
-     * @throws UnifiedJEXL.Exception if an error occurs and the {@link JexlEngine} is not silent
-     */
-    public Expression parse(String expression) {
+    @Override
+    public JxltEngine.UnifiedExpression createExpression(String expression) {
         Exception xuel = null;
-        Expression stmt = null;
+        TemplateExpression stmt = null;
         try {
             if (cache == null) {
                 stmt = parseExpression(expression, null);
@@ -781,13 +632,13 @@ public final class UnifiedJEXL {
     }
 
     /**
-     * Creates a UnifiedJEXL.Exception from a JexlException.
-     * @param action parse, prepare, evaluate
-     * @param expr the expression
+     * Creates a JxltEngine.Exception from a JexlException.
+     * @param action createExpression, prepare, evaluate
+     * @param expr the template expression
      * @param xany the exception
      * @return an exception containing an explicit error message
      */
-    private Exception createException(String action, Expression expr, java.lang.Exception xany) {
+    private Exception createException(String action, TemplateExpression expr, java.lang.Exception xany) {
         StringBuilder strb = new StringBuilder("failed to ");
         strb.append(action);
         if (expr != null) {
@@ -825,11 +676,11 @@ public final class UnifiedJEXL {
     /**
      * Parses a unified expression.
      * @param expr the string expression
-     * @param scope the expression scope
-     * @return the expression instance
+     * @param scope the template scope
+     * @return the unified expression instance
      * @throws JexlException if an error occur during parsing
      */
-    private Expression parseExpression(String expr, JexlEngine.Scope scope) {
+    private TemplateExpression parseExpression(String expr, Engine.Scope scope) {
         final int size = expr.length();
         ExpressionBuilder builder = new ExpressionBuilder(0);
         StringBuilder strb = new StringBuilder(size);
@@ -840,8 +691,8 @@ public final class UnifiedJEXL {
         for (int i = 0; i < size; ++i) {
             char c = expr.charAt(i);
             switch (state) {
-                default: // in case we ever add new expression type
-                    throw new UnsupportedOperationException("unexpected expression type");
+                default: // in case we ever add new unified expresssion type
+                    throw new UnsupportedOperationException("unexpected unified expression type");
                 case CONST:
                     if (c == immediateChar) {
                         state = ParseState.IMMEDIATE0;
@@ -860,7 +711,7 @@ public final class UnifiedJEXL {
                         state = ParseState.IMMEDIATE1;
                         // if chars in buffer, create constant
                         if (strb.length() > 0) {
-                            Expression cexpr = new ConstantExpression(strb.toString(), null);
+                            TemplateExpression cexpr = new ConstantExpression(strb.toString(), null);
                             builder.add(cexpr);
                             strb.delete(0, Integer.MAX_VALUE);
                         }
@@ -876,7 +727,7 @@ public final class UnifiedJEXL {
                         state = ParseState.DEFERRED1;
                         // if chars in buffer, create constant
                         if (strb.length() > 0) {
-                            Expression cexpr = new ConstantExpression(strb.toString(), null);
+                            TemplateExpression cexpr = new ConstantExpression(strb.toString(), null);
                             builder.add(cexpr);
                             strb.delete(0, Integer.MAX_VALUE);
                         }
@@ -890,7 +741,7 @@ public final class UnifiedJEXL {
                 case IMMEDIATE1: // ${...
                     if (c == '}') {
                         // materialize the immediate expr
-                        Expression iexpr = new ImmediateExpression(
+                        TemplateExpression iexpr = new ImmediateExpression(
                                 strb.toString(),
                                 jexl.parse(strb, null, scope),
                                 null);
@@ -925,7 +776,7 @@ public final class UnifiedJEXL {
                             inner -= 1;
                         } else {
                             // materialize the nested/deferred expr
-                            Expression dexpr = null;
+                            TemplateExpression dexpr = null;
                             if (nested) {
                                 dexpr = new NestedExpression(
                                         expr.substring(inested, i + 1),
@@ -965,7 +816,7 @@ public final class UnifiedJEXL {
         }
         // if any chars were buffered, add them as a constant
         if (strb.length() > 0) {
-            Expression cexpr = new ConstantExpression(strb.toString(), null);
+            TemplateExpression cexpr = new ConstantExpression(strb.toString(), null);
             builder.add(cexpr);
         }
         return builder.build(this, null);
@@ -975,16 +826,16 @@ public final class UnifiedJEXL {
      * The enum capturing the difference between verbatim and code source fragments.
      */
     private static enum BlockType {
-        /** Block is to be output "as is". */
+        /** Block is to be output "as is" but may be a unified expression. */
         VERBATIM,
-        /** Block is a directive, ie a fragment of code. */
+        /** Block is a directive, ie a fragment of JEXL code. */
         DIRECTIVE;
     }
 
     /**
      * Abstract the source fragments, verbatim or immediate typed text blocks.
      */
-    private static final class TemplateBlock {
+    private static final class Block {
         /** The type of block, verbatim or directive. */
         private final BlockType type;
         /** The actual contexnt. */
@@ -995,7 +846,7 @@ public final class UnifiedJEXL {
          * @param theType the type
          * @param theBlock the content
          */
-        TemplateBlock(BlockType theType, String theBlock) {
+        Block(BlockType theType, String theBlock) {
             type = theType;
             body = theBlock;
         }
@@ -1007,70 +858,28 @@ public final class UnifiedJEXL {
     }
 
     /**
-     * A Template is a script that evaluates by writing its content through a Writer.
-     * This is a simplified replacement for Velocity that uses JEXL (instead of OGNL/VTL) as the scripting
-     * language.
-     * <p>
-     * The source text is parsed considering each line beginning with '$$' (as default pattern) as JEXL script code
-     * and all others as Unified JEXL expressions; those expressions will be invoked from the script during
-     * evaluation and their output gathered through a writer. 
-     * It is thus possible to use looping or conditional construct "around" expressions generating output.
-     * </p>
-     * For instance:
-     * <p><blockquote><pre>
-     * $$ for(var x : [1, 3, 5, 42, 169]) {
-     * $$   if (x == 42) {
-     * Life, the universe, and everything
-     * $$   } else if (x > 42) {
-     * The value $(x} is over fourty-two
-     * $$   } else {
-     * The value ${x} is under fourty-two
-     * $$   }
-     * $$ }
-     * </pre></blockquote>
-     * Will evaluate as:
-     * <p><blockquote><pre>
-     * The value 1 is under fourty-two
-     * The value 3 is under fourty-two
-     * The value 5 is under fourty-two
-     * Life, the universe, and everything
-     * The value 169 is over fourty-two
-     * </pre></blockquote>
-     * <p>
-     * During evaluation, the template context exposes its writer as '$jexl' which is safe to use in this case.
-     * This allows writing directly through the writer without adding new-lines as in:
-     * <p><blockquote><pre>
-     * $$ for(var cell : cells) { $jexl.print(cell); $jexl.print(';') }
-     * </pre></blockquote>
-     * </p>
-     * <p>
-     * A template is expanded as one JEXL script and a list of UnifiedJEXL expressions; each UnifiedJEXL expression
-     * being replace in the script by a call to jexl:print(expr) (the expr is in fact the expr number in the template).
-     * This integration uses a specialized JexlContext (TemplateContext) that serves as a namespace (for jexl:)
-     * and stores the expression array and the writer (java.io.Writer) that the 'jexl:print(...)'
-     * delegates the output generation to.
-     * </p>
+     * A Template instance.
      */
-    public final class Template {
+    public final class TemplateScript implements Template {
         /** The prefix marker. */
         private final String prefix;
         /** The array of source blocks. */
-        private final TemplateBlock[] source;
+        private final Block[] source;
         /** The resulting script. */
         private final ASTJexlScript script;
-        /** The UnifiedJEXL expressions called by the script. */
-        private final Expression[] exprs;
+        /** The TemplateEngine expressions called by the script. */
+        private final TemplateExpression[] exprs;
 
         /**
-         * Creates a new template from an input.
+         * Creates a new template from an character input.
          * @param directive the prefix for lines of code; can not be "$", "${", "#" or "#{"
-         * since this would preclude being able to differentiate directives and UnifiedJEXL expressions
+         * since this would preclude being able to differentiate directives and template expressions
          * @param reader the input reader
          * @param parms the parameter names
          * @throws NullPointerException if either the directive prefix or input is null
          * @throws IllegalArgumentException if the directive prefix is invalid
          */
-        public Template(String directive, Reader reader, String... parms) {
+        public TemplateScript(String directive, Reader reader, String... parms) {
             if (directive == null) {
                 throw new NullPointerException("null prefix");
             }
@@ -1083,15 +892,15 @@ public final class UnifiedJEXL {
             if (reader == null) {
                 throw new NullPointerException("null input");
             }
-            JexlEngine.Scope scope = new JexlEngine.Scope(parms);
+            Engine.Scope scope = new Engine.Scope(parms);
             prefix = directive;
-            List<TemplateBlock> blocks = readTemplate(prefix, reader);
-            List<Expression> uexprs = new ArrayList<Expression>();
+            List<Block> blocks = readTemplate(prefix, reader);
+            List<TemplateExpression> uexprs = new ArrayList<TemplateExpression>();
             StringBuilder strb = new StringBuilder();
             int nuexpr = 0;
             int codeStart = -1;
             for (int b = 0; b < blocks.size(); ++b) {
-                TemplateBlock block = blocks.get(b);
+                Block block = blocks.get(b);
                 if (block.type == BlockType.VERBATIM) {
                     strb.append("jexl:print(");
                     strb.append(nuexpr++);
@@ -1104,18 +913,18 @@ public final class UnifiedJEXL {
                     strb.append(block.body);
                 }
             }
-            // parse the script
-            script = getEngine().parse(strb.toString(), null, scope);
+            // createExpression the script
+            script = jexl.parse(strb.toString(), null, scope);
             scope = script.getScope();
-            // parse the exprs using the code frame for those appearing after the first block of code
+            // createExpression the exprs using the code frame for those appearing after the first block of code
             for (int b = 0; b < blocks.size(); ++b) {
-                TemplateBlock block = blocks.get(b);
+                Block block = blocks.get(b);
                 if (block.type == BlockType.VERBATIM) {
-                    uexprs.add(UnifiedJEXL.this.parseExpression(block.body, b > codeStart ? scope : null));
+                    uexprs.add(TemplateEngine.this.parseExpression(block.body, b > codeStart ? scope : null));
                 }
             }
-            source = blocks.toArray(new TemplateBlock[blocks.size()]);
-            exprs = uexprs.toArray(new Expression[uexprs.size()]);
+            source = blocks.toArray(new Block[blocks.size()]);
+            exprs = uexprs.toArray(new TemplateExpression[uexprs.size()]);
         }
 
         /**
@@ -1125,7 +934,8 @@ public final class UnifiedJEXL {
          * @param theScript the script
          * @param theExprs the expressions
          */
-        private Template(String thePrefix, TemplateBlock[] theSource, ASTJexlScript theScript, Expression[] theExprs) {
+        private TemplateScript(String thePrefix, Block[] theSource,
+                               ASTJexlScript theScript, TemplateExpression[] theExprs) {
             prefix = thePrefix;
             source = theSource;
             script = theScript;
@@ -1135,7 +945,7 @@ public final class UnifiedJEXL {
         @Override
         public String toString() {
             StringBuilder strb = new StringBuilder();
-            for (TemplateBlock block : source) {
+            for (Block block : source) {
                 if (block.type == BlockType.DIRECTIVE) {
                     strb.append(prefix);
                 }
@@ -1145,15 +955,12 @@ public final class UnifiedJEXL {
             return strb.toString();
         }
 
-        /**
-         * Recreate the template source from its inner components.
-         * @return the template source rewritten
-         */
+        @Override
         public String asString() {
             StringBuilder strb = new StringBuilder();
             int e = 0;
             for (int b = 0; b < source.length; ++b) {
-                TemplateBlock block = source[b];
+                Block block = source[b];
                 if (block.type == BlockType.DIRECTIVE) {
                     strb.append(prefix);
                 } else {
@@ -1163,41 +970,27 @@ public final class UnifiedJEXL {
             return strb.toString();
         }
 
-        /**
-         * Prepares this template by expanding any contained deferred expression.
-         * @param context the context to prepare against
-         * @return the prepared version of the template
-         */
-        public Template prepare(JexlContext context) {
-            JexlEngine.Frame frame = script.createFrame((Object[]) null);
+        @Override
+        public TemplateScript prepare(JexlContext context) {
+            Engine.Frame frame = script.createFrame((Object[]) null);
             TemplateContext tcontext = new TemplateContext(context, frame, exprs, null);
-            Expression[] immediates = new Expression[exprs.length];
+            TemplateExpression[] immediates = new TemplateExpression[exprs.length];
             for (int e = 0; e < exprs.length; ++e) {
                 immediates[e] = exprs[e].prepare(tcontext);
             }
-            return new Template(prefix, source, script, immediates);
+            return new TemplateScript(prefix, source, script, immediates);
         }
 
-        /**
-         * Evaluates this template.
-         * @param context the context to use during evaluation
-         * @param writer the writer to use for output
-         */
+        @Override
         public void evaluate(JexlContext context, Writer writer) {
             evaluate(context, writer, (Object[]) null);
         }
 
-        /**
-         * Evaluates this template.
-         * @param context the context to use during evaluation
-         * @param writer the writer to use for output
-         * @param args the arguments
-         */
+        @Override
         public void evaluate(JexlContext context, Writer writer, Object... args) {
-            JexlEngine.Frame frame = script.createFrame(args);
+            Engine.Frame frame = script.createFrame(args);
             TemplateContext tcontext = new TemplateContext(context, frame, exprs, writer);
-            Interpreter interpreter = jexl.createInterpreter(tcontext, !jexl.isLenient(), false);
-            interpreter.setFrame(frame);
+            Interpreter interpreter = jexl.createInterpreter(tcontext, frame);
             interpreter.interpret(script);
         }
     }
@@ -1210,21 +1003,22 @@ public final class UnifiedJEXL {
     public final class TemplateContext implements JexlContext, NamespaceResolver {
         /** The wrapped context. */
         private final JexlContext wrap;
-        /** The array of UnifiedJEXL expressions. */
-        private final Expression[] exprs;
+        /** The array of TemplateEngine expressions. */
+        private final UnifiedExpression[] exprs;
         /** The writer used to output. */
         private final Writer writer;
         /** The call frame. */
-        private final JexlEngine.Frame frame;
+        private final Engine.Frame frame;
 
         /**
-         * Creates a template context instance.
+         * Creates a TemplateScript context instance.
          * @param jcontext the base context
          * @param jframe the calling frame
-         * @param expressions the list of expression from the template to evaluate
+         * @param expressions the list of TemplateExpression from the TemplateScript to evaluate
          * @param out the output writer
          */
-        protected TemplateContext(JexlContext jcontext, JexlEngine.Frame jframe, Expression[] expressions, Writer out) {
+        protected TemplateContext(JexlContext jcontext, Engine.Frame jframe,
+                                  UnifiedExpression[] expressions, Writer out) {
             wrap = jcontext;
             frame = jframe;
             exprs = expressions;
@@ -1235,11 +1029,11 @@ public final class UnifiedJEXL {
          * Gets this context calling frame.
          * @return the engine frame
          */
-        public JexlEngine.Frame getFrame() {
+        public Engine.Frame getFrame() {
             return frame;
         }
 
-        /** {@inheritDoc} */
+        @Override
         public Object get(String name) {
             if ("$jexl".equals(name)) {
                 return writer;
@@ -1248,17 +1042,17 @@ public final class UnifiedJEXL {
             }
         }
 
-        /** {@inheritDoc} */
+        @Override
         public void set(String name, Object value) {
             wrap.set(name, value);
         }
 
-        /** {@inheritDoc} */
+        @Override
         public boolean has(String name) {
             return wrap.has(name);
         }
 
-        /** {@inheritDoc} */
+        @Override
         public Object resolveNamespace(String ns) {
             if ("jexl".equals(ns)) {
                 return this;
@@ -1271,23 +1065,23 @@ public final class UnifiedJEXL {
 
         /**
          * Includes a call to another template.
-         * <p>Evaluates a template using this template initial context and writer.</p>
-         * @param template the template to evaluate
+         * <p>Includes another template using this template initial context and writer.</p>
+         * @param script the TemplateScript to evaluate
          * @param args the arguments
          */
-        public void include(Template template, Object... args) {
-            template.evaluate(wrap, writer, args);
+        public void include(TemplateScript script, Object... args) {
+            script.evaluate(wrap, writer, args);
         }
 
         /**
-         * Prints an expression result.
+         * Prints a unified expression evaluation result.
          * @param e the expression number
          */
         public void print(int e) {
             if (e < 0 || e >= exprs.length) {
                 return;
             }
-            Expression expr = exprs[e];
+            UnifiedExpression expr = exprs[e];
             if (expr.isDeferred()) {
                 expr = expr.prepare(wrap);
             }
@@ -1303,7 +1097,7 @@ public final class UnifiedJEXL {
          * @param composite the composite expression
          */
         protected void printComposite(CompositeExpression composite) {
-            Expression[] cexprs = composite.exprs;
+            TemplateExpression[] cexprs = composite.exprs;
             final int size = cexprs.length;
             Object value = null;
             for (int e = 0; e < size; ++e) {
@@ -1325,7 +1119,7 @@ public final class UnifiedJEXL {
                     writer.write(arg.toString());
                 } else if (arg != null) {
                     Object[] value = {arg};
-                    Uberspect uber = getEngine().getUberspect();
+                    JexlUberspect uber = getEngine().getUberspect();
                     JexlMethod method = uber.getMethod(writer, "print", value, null);
                     if (method != null) {
                         method.invoke(writer, value);
@@ -1368,10 +1162,10 @@ public final class UnifiedJEXL {
      * @param source the source reader
      * @return the list of blocks
      */
-    protected List<TemplateBlock> readTemplate(final String prefix, Reader source) {
+    protected List<Block> readTemplate(final String prefix, Reader source) {
         try {
             int prefixLen = prefix.length();
-            List<TemplateBlock> blocks = new ArrayList<TemplateBlock>();
+            List<Block> blocks = new ArrayList<Block>();
             BufferedReader reader;
             if (source instanceof BufferedReader) {
                 reader = (BufferedReader) source;
@@ -1384,7 +1178,7 @@ public final class UnifiedJEXL {
                 CharSequence line = reader.readLine();
                 if (line == null) {
                     // at end
-                    TemplateBlock block = new TemplateBlock(type, strb.toString());
+                    Block block = new Block(type, strb.toString());
                     blocks.add(block);
                     break;
                 } else if (type == null) {
@@ -1402,7 +1196,7 @@ public final class UnifiedJEXL {
                     // switch to verbatim if necessary
                     prefixLen = startsWith(line, prefix);
                     if (prefixLen < 0) {
-                        TemplateBlock code = new TemplateBlock(BlockType.DIRECTIVE, strb.toString());
+                        Block code = new Block(BlockType.DIRECTIVE, strb.toString());
                         strb.delete(0, Integer.MAX_VALUE);
                         blocks.add(code);
                         type = BlockType.VERBATIM;
@@ -1415,7 +1209,7 @@ public final class UnifiedJEXL {
                     prefixLen = startsWith(line, prefix);
                     if (prefixLen >= 0) {
                         strb.append('\n');
-                        TemplateBlock verbatim = new TemplateBlock(BlockType.VERBATIM, strb.toString());
+                        Block verbatim = new Block(BlockType.VERBATIM, strb.toString());
                         strb.delete(0, Integer.MAX_VALUE);
                         blocks.add(verbatim);
                         type = BlockType.DIRECTIVE;
@@ -1431,33 +1225,18 @@ public final class UnifiedJEXL {
         }
     }
 
-    /**
-     * Creates a new template.
-     * @param prefix the directive prefix
-     * @param source the source
-     * @param parms the parameter names
-     * @return the template
-     */
-    public Template createTemplate(String prefix, Reader source, String... parms) {
-        return new Template(prefix, source, parms);
+    @Override
+    public TemplateScript createTemplate(String prefix, Reader source, String... parms) {
+        return new TemplateScript(prefix, source, parms);
     }
 
-    /**
-     * Creates a new template.
-     * @param source the source
-     * @param parms the parameter names
-     * @return the template
-     */
-    public Template createTemplate(String source, String... parms) {
-        return new Template("$$", new StringReader(source), parms);
+    @Override
+    public TemplateScript createTemplate(String source, String... parms) {
+        return new TemplateScript("$$", new StringReader(source), parms);
     }
 
-    /**
-     * Creates a new template.
-     * @param source the source
-     * @return the template
-     */
-    public Template createTemplate(String source) {
-        return new Template("$$", new StringReader(source), (String[]) null);
+    @Override
+    public TemplateScript createTemplate(String source) {
+        return new TemplateScript("$$", new StringReader(source), (String[]) null);
     }
 }

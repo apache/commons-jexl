@@ -22,23 +22,25 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Tests local variables.
  */
 public class VarTest extends JexlTestCase {
-    static final Logger LOGGER = Logger.getLogger(VarTest.class.getName());
+    static final Log LOGGER = LogFactory.getLog(VarTest.class.getName());
 
     public VarTest(String testName) {
         super(testName);
     }
     
     public void testStrict() throws Exception {
-        JexlContext map = new MapContext();
-        JexlContext ctxt = new ReadonlyContext(new MapContext());
-        JEXL.setStrict(true);
-        Script e;
+        JexlEvalContext map = new JexlEvalContext();
+        JexlContext ctxt = new ReadonlyContext(map, map);
+        map.setStrict(true);
+        map.setSilent(false);
+        JexlScript e;
         
         e = JEXL.createScript("x");
         try {
@@ -66,24 +68,25 @@ public class VarTest extends JexlTestCase {
     }
 
     public void testLocalBasic() throws Exception {
-        Script e = JEXL.createScript("var x; x = 42");
+        JexlScript e = JEXL.createScript("var x; x = 42");
         Object o = e.execute(null);
         assertEquals("Result is not 42", new Integer(42), o);
     }
 
     public void testLocalSimple() throws Exception {
-        Script e = JEXL.createScript("var x = 21; x + x");
+        JexlScript e = JEXL.createScript("var x = 21; x + x");
         Object o = e.execute(null);
         assertEquals("Result is not 42", new Integer(42), o);
     }
 
     public void testLocalFor() throws Exception {
-        Script e = JEXL.createScript("var y  = 0; for(var x : [5, 17, 20]) { y = y + x; } y;");
+        JexlScript e = JEXL.createScript("var y  = 0; for(var x : [5, 17, 20]) { y = y + x; } y;");
         Object o = e.execute(null);
         assertEquals("Result is not 42", new Integer(42), o);
     }
 
     public static class NumbersContext extends MapContext implements NamespaceResolver {
+        @Override
         public Object resolveNamespace(String name) {
             return name == null ? this : null;
         }
@@ -95,7 +98,7 @@ public class VarTest extends JexlTestCase {
 
     public void testLocalForFunc() throws Exception {
         JexlContext jc = new NumbersContext();
-        Script e = JEXL.createScript("var y  = 0; for(var x : numbers()) { y = y + x; } y;");
+        JexlScript e = JEXL.createScript("var y  = 0; for(var x : numbers()) { y = y + x; } y;");
         Object o = e.execute(jc);
         assertEquals("Result is not 42", new Integer(42), o);
     }

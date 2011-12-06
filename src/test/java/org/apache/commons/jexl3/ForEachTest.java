@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -35,23 +36,25 @@ public class ForEachTest extends JexlTestCase {
     }
 
     public void testForEachWithEmptyStatement() throws Exception {
-        Expression e = JEXL.createExpression("for(item : list) ;");
+        JexlExpression e = JEXL.createExpression("for(item : list) ;");
         JexlContext jc = new MapContext();
+        jc.set("list", Collections.emptyList());
 
         Object o = e.evaluate(jc);
         assertNull("Result is not null", o);
     }
 
     public void testForEachWithEmptyList() throws Exception {
-        Expression e = JEXL.createExpression("for(item : list) 1+1");
+        JexlExpression e = JEXL.createExpression("for(item : list) 1+1");
         JexlContext jc = new MapContext();
+        jc.set("list", Collections.emptyList());
 
         Object o = e.evaluate(jc);
         assertNull("Result is not null", o);
     }
 
     public void testForEachWithArray() throws Exception {
-        Expression e = JEXL.createExpression("for(item : list) item");
+        JexlExpression e = JEXL.createExpression("for(item : list) item");
         JexlContext jc = new MapContext();
         jc.set("list", new Object[] {"Hello", "World"});
         Object o = e.evaluate(jc);
@@ -59,7 +62,7 @@ public class ForEachTest extends JexlTestCase {
     }
 
     public void testForEachWithCollection() throws Exception {
-        Expression e = JEXL.createExpression("for(item : list) item");
+        JexlExpression e = JEXL.createExpression("for(item : list) item");
         JexlContext jc = new MapContext();
         jc.set("list", Arrays.asList(new Object[] {"Hello", "World"}));
         Object o = e.evaluate(jc);
@@ -67,7 +70,7 @@ public class ForEachTest extends JexlTestCase {
     }
 
     public void testForEachWithEnumeration() throws Exception {
-        Expression e = JEXL.createExpression("for(item : list) item");
+        JexlExpression e = JEXL.createExpression("for(item : list) item");
         JexlContext jc = new MapContext();
         jc.set("list", new StringTokenizer("Hello,World", ","));
         Object o = e.evaluate(jc);
@@ -75,7 +78,7 @@ public class ForEachTest extends JexlTestCase {
     }
 
     public void testForEachWithIterator() throws Exception {
-        Expression e = JEXL.createExpression("for(item : list) item");
+        JexlExpression e = JEXL.createExpression("for(item : list) item");
         JexlContext jc = new MapContext();
         jc.set("list", Arrays.asList(new Object[] {"Hello", "World"}).iterator());
         Object o = e.evaluate(jc);
@@ -83,7 +86,7 @@ public class ForEachTest extends JexlTestCase {
     }
 
     public void testForEachWithMap() throws Exception {
-        Expression e = JEXL.createExpression("for(item : list) item");
+        JexlExpression e = JEXL.createExpression("for(item : list) item");
         JexlContext jc = new MapContext();
         Map<?, ?> map = System.getProperties();
         String lastProperty = (String) new ArrayList<Object>(map.values()).get(System.getProperties().size() - 1);
@@ -93,9 +96,9 @@ public class ForEachTest extends JexlTestCase {
     }
 
     public void testForEachWithBlock() throws Exception {
-        Expression exs0 = JEXL.createExpression("for(in : list) { x = x + in; }");
-        Expression exs1 = JEXL.createExpression("foreach(item in list) { x = x + item; }");
-        Expression []exs = { exs0, exs1 };
+        JexlExpression exs0 = JEXL.createExpression("for(in : list) { x = x + in; }");
+        JexlExpression exs1 = JEXL.createExpression("foreach(item in list) { x = x + item; }");
+        JexlExpression []exs = { exs0, exs1 };
         JexlContext jc = new MapContext();
         jc.set("list", new Object[] {"2", "3"});
         for(int ex = 0; ex < exs.length; ++ex) {
@@ -107,7 +110,7 @@ public class ForEachTest extends JexlTestCase {
     }
 
     public void testForEachWithListExpression() throws Exception {
-        Expression e = JEXL.createExpression("for(item : list.keySet()) item");
+        JexlExpression e = JEXL.createExpression("for(item : list.keySet()) item");
         JexlContext jc = new MapContext();
         Map<?, ?> map = System.getProperties();
         String lastKey = (String) new ArrayList<Object>(map.keySet()).get(System.getProperties().size() - 1);
@@ -117,7 +120,7 @@ public class ForEachTest extends JexlTestCase {
     }
     
     public void testForEachWithProperty() throws Exception {
-        Expression e = JEXL.createExpression("for(item : list.cheeseList) item");
+        JexlExpression e = JEXL.createExpression("for(item : list.cheeseList) item");
         JexlContext jc = new MapContext();
         jc.set("list", new Foo());
         Object o = e.evaluate(jc);
@@ -125,7 +128,7 @@ public class ForEachTest extends JexlTestCase {
     }
     
     public void testForEachWithIteratorMethod() throws Exception {
-        Expression e = JEXL.createExpression("for(item : list.cheezy) item");
+        JexlExpression e = JEXL.createExpression("for(item : list.cheezy) item");
         JexlContext jc = new MapContext();
         jc.set("list", new Foo());
         Object o = e.evaluate(jc);

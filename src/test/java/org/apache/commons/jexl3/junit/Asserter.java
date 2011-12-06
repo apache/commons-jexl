@@ -22,13 +22,12 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.apache.commons.jexl3.Expression;
+import org.apache.commons.jexl3.JexlEvalContext;
+import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
-import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
-import org.apache.commons.jexl3.JexlThreadedArithmetic;
 
 /**
  * A utility class for performing JUnit based assertions using Jexl
@@ -41,7 +40,7 @@ public class Asserter extends Assert {
     /** variables used during asserts. */
     private final Map<String, Object> variables = new HashMap<String, Object>();
     /** context to use during asserts. */
-    private final JexlContext context = new MapContext(variables);
+    private final JexlEvalContext context = new JexlEvalContext(variables);
     /** Jexl engine to use during Asserts. */
     private final JexlEngine engine;
 
@@ -69,6 +68,22 @@ public class Asserter extends Assert {
     public JexlContext getContext() {
         return context;
     }
+    
+    public void setStrict(boolean s) {
+        context.setStrict(s, s);
+    }
+    
+    public void setStrict(boolean es, boolean as) {
+        context.setStrict(es, as);
+    }
+    
+    public void setSilent(boolean silent) {
+        context.setSilent(silent);
+    }
+    
+    public void clearOptions() {
+        context.clearOptions();
+    }
 
     /**
      * Performs an assertion that the value of the given Jexl expression 
@@ -80,7 +95,7 @@ public class Asserter extends Assert {
      * fails
      */
     public void assertExpression(String expression, Object expected) throws Exception {
-        Expression exp = engine.createExpression(expression);
+        JexlExpression exp = engine.createExpression(expression);
         Object value = exp.evaluate(context);
         if (expected instanceof BigDecimal) {
             JexlArithmetic jexla = engine.getArithmetic();
@@ -99,24 +114,14 @@ public class Asserter extends Assert {
      * @throws Exception if the expression did not fail or the exception did not match the expected pattern
      */
     public void failExpression(String expression, String matchException) throws Exception {
-        boolean[] flags = {engine.isLenient(), engine.isSilent()};
         try {
-            if (engine.getArithmetic() instanceof JexlThreadedArithmetic) {
-                engine.setLenient(false);
-            }
-            engine.setSilent(false);
-            Expression exp = engine.createExpression(expression);
+            JexlExpression exp = engine.createExpression(expression);
             exp.evaluate(context);
             fail("expression: " + expression);
         } catch (JexlException xjexl) {
             if (matchException != null && !xjexl.getMessage().matches(matchException)) {
                 fail("expression: " + expression + ", expected: " + matchException + ", got " + xjexl.getMessage());
             }
-        } finally {
-            if (engine.getArithmetic() instanceof JexlThreadedArithmetic) {
-                engine.setLenient(flags[0]);
-            }
-            engine.setSilent(flags[1]);
         }
     }
 

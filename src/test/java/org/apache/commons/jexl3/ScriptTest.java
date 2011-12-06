@@ -16,16 +16,16 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.Expression;
+import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.MapContext;
-import org.apache.commons.jexl3.Script;
+import org.apache.commons.jexl3.JexlScript;
 
 import java.io.File;
 import java.net.URL;
 
 /**
- * Tests for Script
+ * Tests for JexlScript
  * @since 1.1
  */
 public class ScriptTest extends JexlTestCase {
@@ -58,7 +58,7 @@ public class ScriptTest extends JexlTestCase {
      */
     public void testSimpleScript() throws Exception {
         String code = "while (x < 10) x = x + 1;";
-        Script s = JEXL.createScript(code);
+        JexlScript s = JEXL.createScript(code);
         JexlContext jc = new MapContext();
         jc.set("x", new Integer(1));
     
@@ -69,7 +69,7 @@ public class ScriptTest extends JexlTestCase {
 
     public void testScriptFromFile() throws Exception {
         File testScript = new File(TEST1);
-        Script s = JEXL.createScript(testScript);
+        JexlScript s = JEXL.createScript(testScript);
         JexlContext jc = new MapContext();
         jc.set("out", System.out);
         Object result = s.execute(jc);
@@ -79,7 +79,7 @@ public class ScriptTest extends JexlTestCase {
 
     public void testScriptFromURL() throws Exception {
         URL testUrl = new File("src/test/scripts/test1.jexl").toURI().toURL();
-        Script s = JEXL.createScript(testUrl);
+        JexlScript s = JEXL.createScript(testUrl);
         JexlContext jc = new MapContext();
         jc.set("out", System.out);
         Object result = s.execute(jc);
@@ -89,8 +89,8 @@ public class ScriptTest extends JexlTestCase {
 
     public void testScriptUpdatesContext() throws Exception {
         String jexlCode = "resultat.setCode('OK')";
-        Expression e = JEXL.createExpression(jexlCode);
-        Script s = JEXL.createScript(jexlCode);
+        JexlExpression e = JEXL.createExpression(jexlCode);
+        JexlScript s = JEXL.createScript(jexlCode);
 
         Tester resultatJexl = new Tester();
         JexlContext jc = new MapContext();

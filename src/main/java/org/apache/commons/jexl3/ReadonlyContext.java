@@ -16,23 +16,30 @@
  */
 package org.apache.commons.jexl3;
 
+import java.math.MathContext;
+import java.util.Map;
+
 /**
  * A readonly context wrapper.
  * @since 3.0
  */
-public final class ReadonlyContext implements JexlContext {
+public final class ReadonlyContext implements JexlContext, JexlEngine.Options {
     /** The wrapped context. */
     private final JexlContext wrapped;
+    /** The wrapped engine options. */
+    private final JexlEngine.Options options;
 
     /**
      * Creates a new readonly context.
      * @param context the wrapped context
+     * @param eopts the engine evaluation options
      */
-    public ReadonlyContext(JexlContext context) {
+    public ReadonlyContext(JexlContext context, JexlEngine.Options eopts) {
         wrapped = context;
+        options = eopts;
     }
 
-    /** {@inheritDoc} */
+    @Override
     public Object get(String name) {
         return wrapped.get(name);
     }
@@ -42,12 +49,44 @@ public final class ReadonlyContext implements JexlContext {
      * @param name the unused variable name
      * @param value the unused variable value
      */
+    @Override
     public void set(String name, Object value) {
         throw new UnsupportedOperationException("Not supported.");
     }
 
-    /** {@inheritDoc} */
+    @Override
     public boolean has(String name) {
         return wrapped.has(name);
+    }
+
+    @Override
+    public Boolean isSilent() {
+        return options == null? null : options.isSilent();
+    }
+
+    @Override
+    public Boolean isStrict() {
+        // egnie
+        return options == null? null : options.isStrict();
+    }
+    
+    @Override
+    public Boolean isStrictArithmetic() {
+        return options == null? null : options.isStrict();
+    }
+
+    @Override
+    public MathContext getArithmeticMathContext() {
+        return options == null? null : options.getArithmeticMathContext();
+    }
+
+    @Override
+    public int getArithmeticMathScale() {
+        return options == null? -1 : options.getArithmeticMathScale();
+    }
+
+    @Override
+    public Map<String, Object> getNamespaces() {
+        return options == null? null : options.getNamespaces();
     }
 }

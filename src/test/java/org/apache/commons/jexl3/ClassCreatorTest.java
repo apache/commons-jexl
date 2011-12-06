@@ -24,10 +24,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.jexl3.Expression;
-import org.apache.commons.jexl3.JexlContext;
-import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,11 +36,14 @@ public class ClassCreatorTest extends JexlTestCase {
     private File base = null;
     private JexlEngine jexl = null;
 
+    public ClassCreatorTest() {
+        super("ClassCreatorTest");
+    }
+    
     @Override
     public void setUp() throws Exception {
         base = new File(System.getProperty("java.io.tmpdir") + File.pathSeparator + "jexl" + System.currentTimeMillis());
-        jexl = new JexlEngine();
-        jexl.setCache(512);
+        jexl = JEXL;
 
     }
 
@@ -116,9 +115,11 @@ public class ClassCreatorTest extends JexlTestCase {
         List<Reference<?>> stuff = new ArrayList<Reference<?>>();
         // keeping a reference on methods prevent classes from being GCed
 //        List<Object> mm = new ArrayList<Object>();
-        Expression expr = jexl.createExpression("foo.value");
-        Expression newx = jexl.createExpression("foo = new(clazz)");
-        JexlContext context = new MapContext();
+        JexlExpression expr = jexl.createExpression("foo.value");
+        JexlExpression newx = jexl.createExpression("foo = new(clazz)");
+        JexlEvalContext context = new JexlEvalContext();
+        context.setStrict(false);
+        context.setSilent(true);
 
         ClassCreator cctor = new ClassCreator(jexl, base);
         for (int i = 0; i < LOOPS && gced < 0; ++i) {
