@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.junit.Asserter;
-import org.apache.commons.jexl3.junit.Asserter;
 
 /**
  * Tests for calling methods on objects
@@ -30,7 +29,11 @@ import org.apache.commons.jexl3.junit.Asserter;
 public class MethodTest extends JexlTestCase {
     private Asserter asserter;
     private static final String METHOD_STRING = "Method string";
-
+    
+    public MethodTest() {
+        super("MethodTest");
+    }
+    
     public static class VarArgs {
         public String callInts(Integer... args) {
             int result = 0;
@@ -91,7 +94,7 @@ public class MethodTest extends JexlTestCase {
         }
     }
 
-    public static class EnhancedContext extends MapContext {
+    public static class EnhancedContext extends JexlEvalContext {
         int factor = 6;
     }
 
@@ -217,11 +220,11 @@ public class MethodTest extends JexlTestCase {
         funcs.put(null, new Functor());
         funcs.put("math", new MyMath());
         funcs.put("cx", ContextualFunctor.class);
-        JEXL.setFunctions(funcs);
 
-        JexlContext jc = new EnhancedContext();
+        EnhancedContext jc = new EnhancedContext();
+        jc.setNamespaces(funcs);
 
-        Expression e = JEXL.createExpression("ten()");
+        JexlExpression e = JEXL.createExpression("ten()");
         Object o = e.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
 
@@ -247,30 +250,26 @@ public class MethodTest extends JexlTestCase {
         java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
         funcs.put("func", new Functor());
         funcs.put("FUNC", Functor.class);
-        JEXL.setFunctions(funcs);
 
-        Expression e = JEXL.createExpression("func:ten()");
-        JexlContext jc = new MapContext();
+        JexlExpression e = JEXL.createExpression("func:ten()");
+        JexlEvalContext jc = new JexlEvalContext();
+        jc.setNamespaces(funcs);
         Object o = e.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
 
         e = JEXL.createExpression("func:plus10(10)");
-        jc = new MapContext();
         o = e.evaluate(jc);
         assertEquals("Result is not 20", new Integer(20), o);
 
         e = JEXL.createExpression("func:plus10(func:ten())");
-        jc = new MapContext();
         o = e.evaluate(jc);
         assertEquals("Result is not 20", new Integer(20), o);
 
         e = JEXL.createExpression("FUNC:PLUS20(10)");
-        jc = new MapContext();
         o = e.evaluate(jc);
         assertEquals("Result is not 30", new Integer(30), o);
 
         e = JEXL.createExpression("FUNC:PLUS20(FUNC:TWENTY())");
-        jc = new MapContext();
         o = e.evaluate(jc);
         assertEquals("Result is not 40", new Integer(40), o);
     }
@@ -295,9 +294,9 @@ public class MethodTest extends JexlTestCase {
 
     public void testScriptCall() throws Exception {
         JexlContext context = new MapContext();
-        Script plus = JEXL.createScript("a + b", new String[]{"a", "b"});
+        JexlScript plus = JEXL.createScript("a + b", new String[]{"a", "b"});
         context.set("plus", plus);
-        Script forty2 = JEXL.createScript("plus(4, 2) * plus(4, 3)");
+        JexlScript forty2 = JEXL.createScript("plus(4, 2) * plus(4, 3)");
         Object o = forty2.execute(context);
         assertEquals("Result is not 42", new Integer(42), o);
 
@@ -315,6 +314,7 @@ public class MethodTest extends JexlTestCase {
 
         final JexlArithmetic ja = JEXL.getArithmetic();
         JexlMethod mplus = new JexlMethod() {
+            @Override
             public Object invoke(Object obj, Object[] params) throws Exception {
                 if (obj instanceof Map<?,?>) {
                     return ja.add(params[0], params[1]);
@@ -323,6 +323,7 @@ public class MethodTest extends JexlTestCase {
                 }
             }
 
+            @Override
             public Object tryInvoke(String name, Object obj, Object[] params) {
                 try {
                     if ("plus".equals(name)) {
@@ -334,15 +335,18 @@ public class MethodTest extends JexlTestCase {
                 return this;
             }
 
+            @Override
             public boolean tryFailed(Object rval) {
                 // this is the marker for failure
                 return rval == this;
             }
 
+            @Override
             public boolean isCacheable() {
                 return true;
             }
 
+            @Override
             public Class<?> getReturnType() {
                 return Object.class;
             }

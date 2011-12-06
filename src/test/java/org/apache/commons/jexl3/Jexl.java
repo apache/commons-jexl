@@ -17,6 +17,7 @@
 
 package org.apache.commons.jexl3;
 
+import org.apache.commons.jexl3.internal.Engine;
 import java.util.Map;
 
 /**
@@ -27,7 +28,7 @@ public class Jexl {
     private Jexl() {}
 
     public static void main(String[] args) {
-        final JexlEngine JEXL = new JexlEngine();
+        final JexlEngine JEXL = new Engine();
         Map<Object,Object> m = System.getProperties();
         // dummy context to get variables
         JexlContext context = new MapContext();
@@ -36,7 +37,7 @@ public class Jexl {
         }
         try {
             for (int i = 0; i < args.length; i++) {
-                Expression e = JEXL.createExpression(args[i]);
+                JexlExpression e = JEXL.createExpression(args[i]);
                 System.out.println("evaluate(" + args[i] + ") = '" + e.evaluate(context) + "'");
             }
         } catch (Exception e) {

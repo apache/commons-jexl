@@ -16,6 +16,9 @@
  */
 package org.apache.commons.jexl3;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Tests for malformed expressions and scripts.
  * ({@link org.apache.commons.jexl3.JexlEngine#createExpression(String)} and
@@ -26,14 +29,14 @@ package org.apache.commons.jexl3;
  */
 public class ParseFailuresTest extends JexlTestCase {
 
+    static final Log LOGGER = LogFactory.getLog(ParseFailuresTest.class.getName());
     /**
      * Create the test.
      *
      * @param testName name of the test
      */
-    public ParseFailuresTest(String testName) {
-        super(testName);
-        JEXL.setSilent(false);
+    public ParseFailuresTest() {
+        super("ParseFailuresTest");
     }
 
     public void testMalformedExpression1() throws Exception {
@@ -45,7 +48,7 @@ public class ParseFailuresTest extends JexlTestCase {
                 + "\" should result in a JexlException");
         } catch (JexlException pe) {
             // expected
-            JEXL.logger.error(pe);
+            LOGGER.info(pe);
         }
     }
 
@@ -58,7 +61,7 @@ public class ParseFailuresTest extends JexlTestCase {
                 + "\" should result in a JexlException");
         } catch (JexlException pe) {
             // expected
-            JEXL.logger.error(pe);
+            LOGGER.info(pe);
         }
     }
 
@@ -71,7 +74,7 @@ public class ParseFailuresTest extends JexlTestCase {
                 + "\" should result in a JexlException");
         } catch (JexlException pe) {
             // expected
-            JEXL.logger.error(pe);
+            LOGGER.info(pe);
         }
     }
 
@@ -85,7 +88,7 @@ public class ParseFailuresTest extends JexlTestCase {
                 + "\" should result in a JexlException");
         } catch (JexlException pe) {
             // expected
-            JEXL.logger.error(pe);
+            LOGGER.info(pe);
         }
     }
 
@@ -98,7 +101,7 @@ public class ParseFailuresTest extends JexlTestCase {
                 + "\" should result in a JexlException");
         } catch (JexlException pe) {
             // expected
-            JEXL.logger.error(pe);
+            LOGGER.error(pe);
         }
     }
 

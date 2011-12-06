@@ -16,16 +16,21 @@
  */
 package org.apache.commons.jexl3;
 
-import java.util.logging.Logger;
 import org.apache.commons.jexl3.introspection.Sandbox;
 import org.apache.commons.jexl3.internal.introspection.SandboxUberspect;
-import org.apache.commons.jexl3.introspection.Uberspect;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Tests sandbox features.
  */
 public class SandboxTest extends JexlTestCase {
-    static final Logger LOGGER = Logger.getLogger(VarTest.class.getName());
+    static final Log LOGGER = LogFactory.getLog(SandboxTest.class.getName());
+    
+    public SandboxTest() {
+        super("SandboxTest");
+    }
 
     public static class Foo {
         String name;
@@ -51,16 +56,15 @@ public class SandboxTest extends JexlTestCase {
 
     public void testCtorBlack() throws Exception {
         String expr = "new('" + Foo.class.getName() + "', '42')";
-        Script script = JEXL.createScript(expr);
+        JexlScript script = JEXL.createScript(expr);
         Object result;
         result = script.execute(null);
         assertEquals("42", ((Foo) result).getName());
 
         Sandbox sandbox = new Sandbox();
         sandbox.black(Foo.class.getName()).execute("");
-        Uberspect uber = new SandboxUberspect(null, sandbox);
-        JexlEngine sjexl = new JexlEngine(uber, null, null, null);
-        sjexl.setStrict(true);
+        JexlUberspect uber = new SandboxUberspect(null, sandbox);
+        JexlEngine sjexl = new JexlBuilder().uberspect(uber).strict(true).create();
 
         script = sjexl.createScript(expr);
         try {
@@ -74,7 +78,7 @@ public class SandboxTest extends JexlTestCase {
 
     public void testMethodBlack() throws Exception {
         String expr = "foo.Quux()";
-        Script script = JEXL.createScript(expr, "foo");
+        JexlScript script = JEXL.createScript(expr, "foo");
         Foo foo = new Foo("42");
         Object result;
         result = script.execute(null, foo);
@@ -82,9 +86,8 @@ public class SandboxTest extends JexlTestCase {
 
         Sandbox sandbox = new Sandbox();
         sandbox.black(Foo.class.getName()).execute("Quux");
-        Uberspect uber = new SandboxUberspect(null, sandbox);
-        JexlEngine sjexl = new JexlEngine(uber, null, null, null);
-        sjexl.setStrict(true);
+        JexlUberspect uber = new SandboxUberspect(null, sandbox);
+        JexlEngine sjexl = new JexlBuilder().uberspect(uber).strict(true).create();
 
         script = sjexl.createScript(expr, "foo");
         try {
@@ -98,7 +101,7 @@ public class SandboxTest extends JexlTestCase {
 
     public void testGetBlack() throws Exception {
         String expr = "foo.alias";
-        Script script = JEXL.createScript(expr, "foo");
+        JexlScript script = JEXL.createScript(expr, "foo");
         Foo foo = new Foo("42");
         Object result;
         result = script.execute(null, foo);
@@ -106,9 +109,8 @@ public class SandboxTest extends JexlTestCase {
 
         Sandbox sandbox = new Sandbox();
         sandbox.black(Foo.class.getName()).read("alias");
-        Uberspect uber = new SandboxUberspect(null, sandbox);
-        JexlEngine sjexl = new JexlEngine(uber, null, null, null);
-        sjexl.setStrict(true);
+        JexlUberspect uber = new SandboxUberspect(null, sandbox);
+        JexlEngine sjexl = new JexlBuilder().uberspect(uber).strict(true).create();
 
         script = sjexl.createScript(expr, "foo");
         try {
@@ -122,7 +124,7 @@ public class SandboxTest extends JexlTestCase {
 
     public void testSetBlack() throws Exception {
         String expr = "foo.alias = $0";
-        Script script = JEXL.createScript(expr, "foo", "$0");
+        JexlScript script = JEXL.createScript(expr, "foo", "$0");
         Foo foo = new Foo("42");
         Object result;
         result = script.execute(null, foo, "43");
@@ -130,9 +132,8 @@ public class SandboxTest extends JexlTestCase {
 
         Sandbox sandbox = new Sandbox();
         sandbox.black(Foo.class.getName()).write("alias");
-        Uberspect uber = new SandboxUberspect(null, sandbox);
-        JexlEngine sjexl = new JexlEngine(uber, null, null, null);
-        sjexl.setStrict(true);
+        JexlUberspect uber = new SandboxUberspect(null, sandbox);
+        JexlEngine sjexl = new JexlBuilder().uberspect(uber).strict(true).create();
 
         script = sjexl.createScript(expr, "foo", "$0");
         try {
@@ -146,14 +147,13 @@ public class SandboxTest extends JexlTestCase {
 
     public void testCtorWhite() throws Exception {
         String expr = "new('" + Foo.class.getName() + "', '42')";
-        Script script;
+        JexlScript script;
         Object result;
 
         Sandbox sandbox = new Sandbox();
         sandbox.white(Foo.class.getName()).execute("");
-        Uberspect uber = new SandboxUberspect(null, sandbox);
-        JexlEngine sjexl = new JexlEngine(uber, null, null, null);
-        sjexl.setStrict(true);
+        JexlUberspect uber = new SandboxUberspect(null, sandbox);
+        JexlEngine sjexl = new JexlBuilder().uberspect(uber).strict(true).create();
 
         script = sjexl.createScript(expr);
         result = script.execute(null);
@@ -163,14 +163,13 @@ public class SandboxTest extends JexlTestCase {
     public void testMethodWhite() throws Exception {
         Foo foo = new Foo("42");
         String expr = "foo.Quux()";
-        Script script;
+        JexlScript script;
         Object result;
 
         Sandbox sandbox = new Sandbox();
         sandbox.white(Foo.class.getName()).execute("Quux");
-        Uberspect uber = new SandboxUberspect(null, sandbox);
-        JexlEngine sjexl = new JexlEngine(uber, null, null, null);
-        sjexl.setStrict(true);
+        JexlUberspect uber = new SandboxUberspect(null, sandbox);
+        JexlEngine sjexl = new JexlBuilder().uberspect(uber).strict(true).create();
 
         script = sjexl.createScript(expr, "foo");
         result = script.execute(null, foo);
@@ -180,15 +179,14 @@ public class SandboxTest extends JexlTestCase {
     public void testGetWhite() throws Exception {
         Foo foo = new Foo("42");
         String expr = "foo.alias";
-        Script script;
+        JexlScript script;
         Object result;
 
         Sandbox sandbox = new Sandbox();
         sandbox.white(Foo.class.getName()).read("alias");
         sandbox.get(Foo.class.getName()).read().alias("alias", "ALIAS");
-        Uberspect uber = new SandboxUberspect(null, sandbox);
-        JexlEngine sjexl = new JexlEngine(uber, null, null, null);
-        sjexl.setStrict(true);
+        JexlUberspect uber = new SandboxUberspect(null, sandbox);
+        JexlEngine sjexl = new JexlBuilder().uberspect(uber).strict(true).create();
 
         script = sjexl.createScript(expr, "foo");
         result = script.execute(null, foo);
@@ -202,14 +200,13 @@ public class SandboxTest extends JexlTestCase {
     public void testSetWhite() throws Exception {
         Foo foo = new Foo("42");
         String expr = "foo.alias = $0";
-        Script script;
+        JexlScript script;
         Object result;
 
         Sandbox sandbox = new Sandbox();
         sandbox.white(Foo.class.getName()).write("alias");
-        Uberspect uber = new SandboxUberspect(null, sandbox);
-        JexlEngine sjexl = new JexlEngine(uber, null, null, null);
-        sjexl.setStrict(true);
+        JexlUberspect uber = new SandboxUberspect(null, sandbox);
+        JexlEngine sjexl = new JexlBuilder().uberspect(uber).strict(true).create();
 
         script = sjexl.createScript(expr, "foo", "$0");
         result = script.execute(null, foo, "43");
@@ -226,12 +223,11 @@ public class SandboxTest extends JexlTestCase {
         // can not create a new file
         sandbox.black(java.io.File.class.getName()).execute("");
 
-        Uberspect uber = new SandboxUberspect(null, sandbox);
-        JexlEngine sjexl = new JexlEngine(uber, null, null, null);
-        sjexl.setStrict(true);
+        JexlUberspect uber = new SandboxUberspect(null, sandbox);
+        JexlEngine sjexl = new JexlBuilder().uberspect(uber).strict(true).create();
 
         String expr;
-        Script script;
+        JexlScript script;
         Object result;
         
         script = sjexl.createScript("System.exit()");

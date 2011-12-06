@@ -14,12 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl3;
+package org.apache.commons.jexl3.internal;
 
 import java.util.regex.Pattern;
+import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.ASTAdditiveNode;
 import org.apache.commons.jexl3.parser.ASTAdditiveOperator;
-import org.apache.commons.jexl3.parser.ASTAmbiguous;
 import org.apache.commons.jexl3.parser.ASTAndNode;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
 import org.apache.commons.jexl3.parser.ASTArrayLiteral;
@@ -69,7 +69,6 @@ import org.apache.commons.jexl3.parser.ASTWhileStatement;
 import org.apache.commons.jexl3.parser.JexlNode;
 
 import org.apache.commons.jexl3.parser.ParserVisitor;
-import org.apache.commons.jexl3.parser.SimpleNode;
 
 /**
  * Helps pinpoint the cause of problems in expressions that fail during evaluation.
@@ -81,7 +80,7 @@ import org.apache.commons.jexl3.parser.SimpleNode;
  * the error.
  * @since 2.0
  */
-final class Debugger extends ParserVisitor {
+public final class Debugger extends ParserVisitor {
     /** The builder to compose messages. */
     private final StringBuilder builder;
     /** The cause of the issue to debug. */
@@ -94,11 +93,24 @@ final class Debugger extends ParserVisitor {
     /**
      * Creates a Debugger.
      */
-    Debugger() {
+    public Debugger() {
         builder = new StringBuilder();
         cause = null;
         start = 0;
         end = 0;
+    }
+    
+    /**
+     * Position the debugger on the root of a script.
+     * @param jscript the script
+     * @return true if the script was a {@link Script} instance, false otherwise
+     */
+    public boolean debug(JexlScript jscript) {
+        if (jscript instanceof Script) {
+            return debug(((Script) jscript).script);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -268,7 +280,7 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTAdditiveNode node, Object data) {
         // need parenthesis if not in operator precedence order
         boolean paren = node.jjtGetParent() instanceof ASTMulNode
@@ -288,7 +300,7 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTAdditiveOperator node, Object data) {
         builder.append(' ');
         builder.append(node.image);
@@ -296,12 +308,12 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTAndNode node, Object data) {
         return infixChildren(node, " && ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTArrayAccess node, Object data) {
         accept(node.jjtGetChild(0), data);
         int num = node.jjtGetNumChildren();
@@ -313,7 +325,7 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTArrayLiteral node, Object data) {
         int num = node.jjtGetNumChildren();
         builder.append("[ ");
@@ -328,34 +340,34 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTAssignment node, Object data) {
         return infixChildren(node, " = ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTBitwiseAndNode node, Object data) {
         return infixChildren(node, " & ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTBitwiseComplNode node, Object data) {
         return prefixChild(node, "~", data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTBitwiseOrNode node, Object data) {
         boolean paren = node.jjtGetParent() instanceof ASTBitwiseAndNode;
         return infixChildren(node, " | ", paren, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTBitwiseXorNode node, Object data) {
         boolean paren = node.jjtGetParent() instanceof ASTBitwiseAndNode;
         return infixChildren(node, " ^ ", paren, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTBlock node, Object data) {
         builder.append("{ ");
         int num = node.jjtGetNumChildren();
@@ -367,12 +379,12 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTDivNode node, Object data) {
         return infixChildren(node, " / ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTEmptyFunction node, Object data) {
         builder.append("empty(");
         accept(node.jjtGetChild(0), data);
@@ -380,22 +392,22 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTEQNode node, Object data) {
         return infixChildren(node, " == ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTERNode node, Object data) {
         return infixChildren(node, " =~ ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTFalseNode node, Object data) {
         return check(node, "false", data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTForeachStatement node, Object data) {
         builder.append("for(");
         accept(node.jjtGetChild(0), data);
@@ -410,12 +422,12 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTGENode node, Object data) {
         return infixChildren(node, " >= ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTGTNode node, Object data) {
         return infixChildren(node, " > ", false, data);
     }
@@ -423,7 +435,7 @@ final class Debugger extends ParserVisitor {
     /** Checks identifiers that contain space, quote, double-quotes or backspace. */
     private static final Pattern QUOTED_IDENTIFIER = Pattern.compile("['\"\\s\\\\]");
     
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTIdentifier node, Object data) {
         String image = node.image;
         if (QUOTED_IDENTIFIER.matcher(image).find()) {
@@ -433,7 +445,7 @@ final class Debugger extends ParserVisitor {
         return check(node, image, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTIfStatement node, Object data) {
         builder.append("if (");
         accept(node.jjtGetChild(0), data);
@@ -452,12 +464,12 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTNumberLiteral node, Object data) {
         return check(node, node.image, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTJexlScript node, Object data) {
         int num = node.jjtGetNumChildren();
         for (int i = 0; i < num; ++i) {
@@ -467,17 +479,17 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTLENode node, Object data) {
         return infixChildren(node, " <= ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTLTNode node, Object data) {
         return infixChildren(node, " < ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTMapEntry node, Object data) {
         accept(node.jjtGetChild(0), data);
         builder.append(" : ");
@@ -485,7 +497,7 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTMapLiteral node, Object data) {
         int num = node.jjtGetNumChildren();
         builder.append("{ ");
@@ -502,7 +514,7 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTConstructorNode node, Object data) {
         int num = node.jjtGetNumChildren();
         builder.append("new ");
@@ -516,7 +528,7 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTFunctionNode node, Object data) {
         int num = node.jjtGetNumChildren();
         accept(node.jjtGetChild(0), data);
@@ -533,7 +545,7 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTMethodNode node, Object data) {
         int num = node.jjtGetNumChildren();
         accept(node.jjtGetChild(0), data);
@@ -548,47 +560,47 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTModNode node, Object data) {
         return infixChildren(node, " % ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTMulNode node, Object data) {
         return infixChildren(node, " * ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTNENode node, Object data) {
         return infixChildren(node, " != ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTNRNode node, Object data) {
         return infixChildren(node, " !~ ", false, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTNotNode node, Object data) {
         builder.append("!");
         accept(node.jjtGetChild(0), data);
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTNullLiteral node, Object data) {
         check(node, "null", data);
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTOrNode node, Object data) {
         // need parenthesis if not in operator precedence order
         boolean paren = node.jjtGetParent() instanceof ASTAndNode;
         return infixChildren(node, " || ", paren, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTReference node, Object data) {
         int num = node.jjtGetNumChildren();
         accept(node.jjtGetChild(0), data);
@@ -599,7 +611,7 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTReferenceExpression node, Object data) {
         JexlNode first = node.jjtGetChild(0);
         builder.append('(');
@@ -614,14 +626,14 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTReturnStatement node, Object data) {
         builder.append("return ");
         accept(node.jjtGetChild(0), data);
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTSizeFunction node, Object data) {
         builder.append("size(");
         accept(node.jjtGetChild(0), data);
@@ -629,19 +641,19 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTSizeMethod node, Object data) {
         check(node, "size()", data);
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTStringLiteral node, Object data) {
         String img = node.image.replace("'", "\\'");
         return check(node, "'" + img + "'", data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTTernaryNode node, Object data) {
         accept(node.jjtGetChild(0), data);
         if (node.jjtGetNumChildren() > 2) {
@@ -657,25 +669,25 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTTrueNode node, Object data) {
         check(node, "true", data);
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTUnaryMinusNode node, Object data) {
         return prefixChild(node, "-", data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTVar node, Object data) {
         builder.append("var ");
         check(node, node.image, data);
         return data;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTWhileStatement node, Object data) {
         builder.append("while (");
         accept(node.jjtGetChild(0), data);
@@ -688,13 +700,4 @@ final class Debugger extends ParserVisitor {
         return data;
     }
 
-    /** {@inheritDoc} */
-    protected Object visit(SimpleNode node, Object data) {
-        throw new UnsupportedOperationException("unexpected type of node");
-    }
-
-    /** {@inheritDoc} */
-    protected Object visit(ASTAmbiguous node, Object data) {
-        throw new UnsupportedOperationException("unexpected type of node");
-    }
 }

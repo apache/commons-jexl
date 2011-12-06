@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.commons.jexl3.internal;
+package org.apache.commons.jexl3.internal.introspection;
 import java.util.List;
 import java.lang.reflect.Array;
+
 /**
  * Specialized executor to set a property in a List or array.
  * @since 2.0

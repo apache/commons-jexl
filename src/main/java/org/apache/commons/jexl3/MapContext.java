@@ -45,17 +45,17 @@ public class MapContext implements JexlContext {
         map = vars == null ? new HashMap<String, Object>() : vars;
     }
 
-    /** {@inheritDoc} */
+    @Override
     public boolean has(String name) {
         return map.containsKey(name);
     }
 
-    /** {@inheritDoc} */
+    @Override
     public Object get(String name) {
         return map.get(name);
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void set(String name, Object value) {
         map.put(name, value);
     }

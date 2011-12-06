@@ -14,8 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl3.internal;
-import org.apache.commons.jexl3.internal.introspection.MethodKey;
+package org.apache.commons.jexl3.internal.introspection;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
@@ -191,12 +190,12 @@ public abstract class AbstractExecutor {
             super(theClass, theMethod);
         }
 
-        /** {@inheritDoc} */
+        @Override
         public final Object invoke(Object obj) throws Exception {
             return execute(obj);
         }
         
-        /** {@inheritDoc} */
+        @Override
         public final Object tryInvoke(Object obj, Object key) {
             return tryExecute(obj, key);
         }
@@ -243,12 +242,12 @@ public abstract class AbstractExecutor {
             super(theClass, theMethod);
         }
 
-        /** {@inheritDoc} */
+        @Override
         public final Object invoke(Object obj, Object arg) throws Exception {
             return execute(obj, arg);
         }
 
-        /** {@inheritDoc} */
+        @Override
         public final Object tryInvoke(Object obj, Object key, Object value) {
             return tryExecute(obj, key, value);
         }
@@ -322,12 +321,12 @@ public abstract class AbstractExecutor {
             key = km.key;
         }
 
-        /** {@inheritDoc} */
+        @Override
         public final Object invoke(Object obj, Object[] params) throws Exception {
             return execute(obj, params);
         }
 
-        /** {@inheritDoc} */
+        @Override
         public final Object tryInvoke(String name, Object obj, Object[] params) {
             return tryExecute(name, obj, params);
         }
@@ -338,10 +337,7 @@ public abstract class AbstractExecutor {
             return key;
         }
         
-        /**
-         * Returns the return type of the method invoked.
-         * @return return type
-         */
+        @Override
         public final Class<?> getReturnType() {
             return method.getReturnType();
         }

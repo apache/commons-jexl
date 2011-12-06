@@ -16,29 +16,25 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
-import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.JexlTestCase;
-import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.JexlTestCase;
-import org.apache.commons.jexl3.introspection.Uberspect;
 
-import org.apache.commons.jexl3.internal.AbstractExecutor;
-import org.apache.commons.jexl3.internal.PropertyGetExecutor;
-import org.apache.commons.jexl3.internal.PropertySetExecutor;
-import org.apache.commons.jexl3.internal.DuckGetExecutor;
-import org.apache.commons.jexl3.internal.DuckSetExecutor;
-import org.apache.commons.jexl3.internal.ListGetExecutor;
-import org.apache.commons.jexl3.internal.Introspector;
-import org.apache.commons.jexl3.internal.MapGetExecutor;
-import org.apache.commons.jexl3.internal.MapSetExecutor;
-import org.apache.commons.jexl3.internal.ListSetExecutor;
-import org.apache.commons.jexl3.introspection.Uberspect;
+import org.apache.commons.jexl3.internal.introspection.AbstractExecutor;
+import org.apache.commons.jexl3.internal.introspection.PropertyGetExecutor;
+import org.apache.commons.jexl3.internal.introspection.PropertySetExecutor;
+import org.apache.commons.jexl3.internal.introspection.DuckGetExecutor;
+import org.apache.commons.jexl3.internal.introspection.DuckSetExecutor;
+import org.apache.commons.jexl3.internal.introspection.ListGetExecutor;
+import org.apache.commons.jexl3.internal.introspection.MapGetExecutor;
+import org.apache.commons.jexl3.internal.introspection.MapSetExecutor;
+import org.apache.commons.jexl3.internal.introspection.ListSetExecutor;
 
 /**
  * Tests for checking introspection discovery.
@@ -46,6 +42,9 @@ import org.apache.commons.jexl3.introspection.Uberspect;
  * @since 2.0
  */
 public class DiscoveryTest extends JexlTestCase {
+    public DiscoveryTest() {
+        super("DiscoveryTest");
+    }
 
     public static class Duck {
         private String value;
@@ -103,20 +102,19 @@ public class DiscoveryTest extends JexlTestCase {
 
 
     public void testBeanIntrospection() throws Exception {
-        Uberspect uber = JexlEngine.getUberspect(null);
-        Introspector intro = (Introspector) uber;
+        Uberspect uber = Engine.getUberspect(null);
         Bean bean = new Bean("JEXL", "LXEJ");
 
-        AbstractExecutor.Get get = intro.getGetExecutor(bean, "value");
-        AbstractExecutor.Set set  = intro.getSetExecutor(bean, "value", "foo");
+        AbstractExecutor.Get get = uber.getGetExecutor(bean, "value");
+        AbstractExecutor.Set set  = uber.getSetExecutor(bean, "value", "foo");
         assertTrue("bean property getter", get instanceof PropertyGetExecutor);
         assertTrue("bean property setter", set instanceof PropertySetExecutor);
         // introspector and uberspect should return same result
         assertEquals(get, uber.getPropertyGet(bean, "value", null));
         assertEquals(set, uber.getPropertySet(bean, "value", "foo", null));
         // different property should return different setter/getter
-        assertFalse(get.equals(intro.getGetExecutor(bean, "eulav")));
-        assertFalse(set.equals(intro.getSetExecutor(bean, "eulav", "foo")));
+        assertFalse(get.equals(uber.getGetExecutor(bean, "eulav")));
+        assertFalse(set.equals(uber.getSetExecutor(bean, "eulav", "foo")));
         // setter returns argument
         Object bar = set.execute(bean, "bar");
         assertEquals("bar", bar);
@@ -132,20 +130,19 @@ public class DiscoveryTest extends JexlTestCase {
     }
 
     public void testDuckIntrospection() throws Exception {
-        Uberspect uber = JexlEngine.getUberspect(null);
-        Introspector intro = (Introspector) uber;
+        Uberspect uber = Engine.getUberspect(null);
         Duck duck = new Duck("JEXL", "LXEJ");
 
-        AbstractExecutor.Get get = intro.getGetExecutor(duck, "value");
-        AbstractExecutor.Set set  = intro.getSetExecutor(duck, "value", "foo");
+        AbstractExecutor.Get get = uber.getGetExecutor(duck, "value");
+        AbstractExecutor.Set set  = uber.getSetExecutor(duck, "value", "foo");
         assertTrue("duck property getter", get instanceof DuckGetExecutor);
         assertTrue("duck property setter", set instanceof DuckSetExecutor);
         // introspector and uberspect should return same result
         assertEquals(get, uber.getPropertyGet(duck, "value", null));
         assertEquals(set, uber.getPropertySet(duck, "value", "foo", null));
         // different property should return different setter/getter
-        assertFalse(get.equals(intro.getGetExecutor(duck, "eulav")));
-        assertFalse(set.equals(intro.getSetExecutor(duck, "eulav", "foo")));
+        assertFalse(get.equals(uber.getGetExecutor(duck, "eulav")));
+        assertFalse(set.equals(uber.getSetExecutor(duck, "eulav", "foo")));
         // setter returns argument
         Object bar = set.execute(duck, "bar");
         assertEquals("bar", bar);
@@ -160,22 +157,21 @@ public class DiscoveryTest extends JexlTestCase {
     }
 
     public void testListIntrospection() throws Exception {
-        Uberspect uber = JexlEngine.getUberspect(null);
-        Introspector intro = (Introspector) uber;
+        Uberspect uber = Engine.getUberspect(null);
         List<Object> list = new ArrayList<Object>();
         list.add("LIST");
         list.add("TSIL");
 
-        AbstractExecutor.Get get = intro.getGetExecutor(list, Integer.valueOf(1));
-        AbstractExecutor.Set set  = intro.getSetExecutor(list, Integer.valueOf(1), "foo");
+        AbstractExecutor.Get get = uber.getGetExecutor(list, Integer.valueOf(1));
+        AbstractExecutor.Set set  = uber.getSetExecutor(list, Integer.valueOf(1), "foo");
         assertTrue("list property getter", get instanceof ListGetExecutor);
         assertTrue("list property setter", set instanceof ListSetExecutor);
         // introspector and uberspect should return same result
         assertEquals(get, uber.getPropertyGet(list, Integer.valueOf(1), null));
         assertEquals(set, uber.getPropertySet(list, Integer.valueOf(1), "foo", null));
         // different property should return different setter/getter
-        assertFalse(get.equals(intro.getGetExecutor(list, Integer.valueOf(0))));
-        assertFalse(get.equals(intro.getSetExecutor(list, Integer.valueOf(0), "foo")));
+        assertFalse(get.equals(uber.getGetExecutor(list, Integer.valueOf(0))));
+        assertFalse(get.equals(uber.getSetExecutor(list, Integer.valueOf(0), "foo")));
         // setter returns argument
         Object bar = set.execute(list, "bar");
         assertEquals("bar", bar);
@@ -191,22 +187,21 @@ public class DiscoveryTest extends JexlTestCase {
     }
 
     public void testMapIntrospection() throws Exception {
-        Uberspect uber = JexlEngine.getUberspect(null);
-        Introspector intro = (Introspector) uber;
+        Uberspect uber = Engine.getUberspect(null);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("value", "MAP");
         map.put("eulav", "PAM");
 
-        AbstractExecutor.Get get = intro.getGetExecutor(map, "value");
-        AbstractExecutor.Set set  = intro.getSetExecutor(map, "value", "foo");
+        AbstractExecutor.Get get = uber.getGetExecutor(map, "value");
+        AbstractExecutor.Set set  = uber.getSetExecutor(map, "value", "foo");
         assertTrue("map property getter", get instanceof MapGetExecutor);
         assertTrue("map property setter", set instanceof MapSetExecutor);
         // introspector and uberspect should return same result
         assertEquals(get, uber.getPropertyGet(map, "value", null));
         assertEquals(set, uber.getPropertySet(map, "value", "foo", null));
         // different property should return different setter/getter
-        assertFalse(get.equals(intro.getGetExecutor(map, "eulav")));
-        assertFalse(get.equals(intro.getSetExecutor(map, "eulav", "foo")));
+        assertFalse(get.equals(uber.getGetExecutor(map, "eulav")));
+        assertFalse(get.equals(uber.getSetExecutor(map, "eulav", "foo")));
         // setter returns argument
         Object bar = set.execute(map, "bar");
         assertEquals("bar", bar);

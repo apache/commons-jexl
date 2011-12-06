@@ -17,7 +17,6 @@
 
 package org.apache.commons.jexl3;
 import org.apache.commons.jexl3.junit.Asserter;
-import org.apache.commons.jexl3.junit.Asserter;
 
 /**
  * Tests for the bitwise operators.
@@ -29,6 +28,7 @@ public class BitwiseOperatorTest extends JexlTestCase {
     @Override
     public void setUp() {
         asserter = new Asserter(JEXL);
+        asserter.setStrict(false);
     }
 
     /**

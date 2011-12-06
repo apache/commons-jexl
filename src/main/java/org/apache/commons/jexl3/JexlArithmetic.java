@@ -63,31 +63,57 @@ public class JexlArithmetic {
 
     /**
      * Creates a JexlArithmetic.
-     * @param lenient whether this arithmetic is lenient or strict
+     * @param astrict whether this arithmetic is strict or lenient
      */
-    public JexlArithmetic(boolean lenient) {
-        this(lenient, MathContext.DECIMAL128, BIGD_SCALE);
+    public JexlArithmetic(boolean astrict) {
+        this(astrict, null, Integer.MIN_VALUE);
     }
 
     /**
      * Creates a JexlArithmetic.
-     * @param lenient whether this arithmetic is lenient or strict
+     * @param astrict whether this arithmetic is lenient or strict
      * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
      * @param bigdScale the scale used for big decimals.
      */
-    public JexlArithmetic(boolean lenient, MathContext bigdContext, int bigdScale) {
-        this.strict = !lenient;
-        this.mathContext = bigdContext;
-        this.mathScale = bigdScale;
+    public JexlArithmetic(boolean astrict, MathContext bigdContext, int bigdScale) {
+        this.strict = astrict;
+        this.mathContext = bigdContext == null? MathContext.DECIMAL128 : bigdContext;
+        this.mathScale = bigdScale == Integer.MIN_VALUE? BIGD_SCALE : bigdScale;
     }
 
     /**
-     * Checks whether this JexlArithmetic instance triggers errors during evaluation
-     * when null is used as an operand.
-     * @return true if lenient, false if strict
+     * Apply options to this arithmetic which eventually may create another instance.
+     * @param options the {@link JexlEngine.Options} to use
+     * @return an arithmetic with those options set
      */
-    public boolean isLenient() {
-        return !this.strict;
+    public JexlArithmetic options(JexlEngine.Options options) {
+        boolean ostrict = options.isStrictArithmetic() == null
+                          ? this.strict
+                          : options.isStrictArithmetic().booleanValue();
+        MathContext bigdContext = options.getArithmeticMathContext();
+        if (bigdContext == null) {
+            bigdContext = mathContext;
+        }
+        int bigdScale = options.getArithmeticMathScale();
+        if (bigdScale == Integer.MIN_VALUE) {
+            bigdScale = mathScale;
+        }
+        if ((ostrict != this.strict)
+             || bigdScale != this.mathScale
+             || bigdContext != this.mathContext) {
+            return new JexlArithmetic(ostrict, bigdContext, bigdScale);
+        } else {
+            return this;
+        }
+    }
+
+    /**
+     * Checks whether this JexlArithmetic instance
+     * strictly considers null as an error when used as operand unexpectedly.
+     * @return true if strict, false if lenient
+     */
+    public boolean isStrict() {
+        return this.strict;
     }
 
     /**
@@ -126,7 +152,7 @@ public class JexlArithmetic {
      * @throws ArithmeticException if strict
      */
     protected Object controlNullNullOperands() {
-        if (!isLenient()) {
+        if (isStrict()) {
             throw new ArithmeticException(JexlException.NULL_OPERAND);
         }
         return Integer.valueOf(0);
@@ -137,7 +163,7 @@ public class JexlArithmetic {
      * @throws ArithmeticException if strict
      */
     protected void controlNullOperand() {
-        if (!isLenient()) {
+        if (isStrict()) {
             throw new ArithmeticException(JexlException.NULL_OPERAND);
         }
     }
@@ -193,7 +219,7 @@ public class JexlArithmetic {
                 || o instanceof Short
                 || o instanceof Character;
     }
-    
+
     /**
      * Whether we consider the narrow class as a potential candidate for narrowing the source.
      * @param narrow the target narrow class
@@ -210,7 +236,7 @@ public class JexlArithmetic {
      * @param narrow the attempted target class
      * @return  the narrowed number or the source if no narrowing was possible
      */
-    protected Number narrowNumber(Number original, Class<?> narrow) {
+    public Number narrowNumber(Number original, Class<?> narrow) {
         if (original == null) {
             return original;
         }
@@ -341,7 +367,7 @@ public class JexlArithmetic {
      * @param untyped an untyped array
      * @return the original array if the attempt to strictly type the array fails, a typed array otherwise
      */
-    protected Object narrowArrayType(Object[] untyped) {
+    public Object narrowArrayType(Object[] untyped) {
         final int size = untyped.length;
         Class<?> commonClass = null;
         if (size > 0) {
@@ -401,7 +427,7 @@ public class JexlArithmetic {
      * @return true if some arguments were narrowed and args array is modified,
      *         false if no narrowing occured and args array has not been modified
      */
-    protected boolean narrowArguments(Object[] args) {
+    public boolean narrowArguments(Object[] args) {
         boolean narrowed = false;
         for (int a = 0; a < args.length; ++a) {
             Object arg = args[a];
@@ -454,6 +480,9 @@ public class JexlArithmetic {
             return narrowBigInteger(left, right, result);
         } catch (java.lang.NumberFormatException nfe) {
             // Well, use strings!
+            if (left == null || right == null) {
+                controlNullOperand();
+            }
             return toString(left).concat(toString(right));
         }
     }
@@ -1099,5 +1128,4 @@ public class JexlArithmetic {
     public Number narrow(Number original) {
         return narrowNumber(original, null);
     }
-
 }

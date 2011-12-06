@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.JexlEngine;
 
 import java.io.File;
 import java.io.FileWriter;

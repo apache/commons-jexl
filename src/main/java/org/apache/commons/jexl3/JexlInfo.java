@@ -18,7 +18,7 @@ package org.apache.commons.jexl3;
 
 
 /**
- * Helper class to carry in info such as a url/file name, line and column for
+ * Helper class to carry information such as a url/file name, line and column for
  * debugging information reporting.
  */
 public class JexlInfo {
@@ -40,20 +40,9 @@ public class JexlInfo {
         line = l;
         column = c;
     }
-    
-    /**
-     * Denotes objects that can expose a JexlInfo instance.
-     */
-    public interface Handle {
-        /**
-         * Gets the associated JexlInfo instance.
-         * @return the info
-         */
-        JexlInfo jexlInfo();
-    }
 
     /**
-     * Formats this info in the form 'name&#064;line:column'.
+     * Formats this info in the form 'name&#064line:column'.
      * @return the formatted info
      */
     @Override
@@ -74,7 +63,7 @@ public class JexlInfo {
      * Gets the file/script/url name.
      * @return template name
      */
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
@@ -82,7 +71,7 @@ public class JexlInfo {
      * Gets the line number.
      * @return line number.
      */
-    public int getLine() {
+    public final int getLine() {
         return line;
     }
 
@@ -90,7 +79,7 @@ public class JexlInfo {
      * Gets the column number.
      * @return the column.
      */
-    public int getColumn() {
+    public final int getColumn() {
         return column;
     }
 }

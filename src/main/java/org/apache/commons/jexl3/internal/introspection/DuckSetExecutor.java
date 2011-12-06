@@ -14,34 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl3.internal;
+package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Specialized executor to get a property from an object.
+ * Specialized executor to set a property of an object.
  * <p>Duck as in duck-typing for an interface like:
  * <code>
- * interface Get {
- *      Object get(Object key);
+ * interface Set {
+ *      Object set(Object property, Object value);
  * }
  * </code>
  * </p>
  * @since 2.0
  */
-public final class DuckGetExecutor extends AbstractExecutor.Get {
+public final class DuckSetExecutor extends AbstractExecutor.Set {
     /** The property. */
     private final Object property;
-
+    
     /**
-     * Creates an instance by attempting discovery of the get method.
-     * @param is the introspector
-     * @param clazz the class to introspect
-     * @param identifier the property to get
+     * Creates an instance.
+     *@param is the introspector
+     *@param clazz the class to find the set method from
+     *@param key the key to use as 1st argument to the set method
+     *@param value the value to use as 2nd argument to the set method
      */
-    public DuckGetExecutor(Introspector is, Class<?> clazz, Object identifier) {
-        super(clazz, discover(is, clazz, identifier));
-        property = identifier;
+    public DuckSetExecutor(Introspector is, Class<?> clazz, Object key, Object value) {
+        super(clazz, discover(is, clazz, key, value));
+        property = key;
     }
 
     /** {@inheritDoc} */
@@ -50,30 +51,28 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
         return property;
     }
 
-    /**
-     * Get the property from the object.
-     * @param obj the object.
-     * @return object.get(property)
-     * @throws IllegalAccessException Method is inaccessible.
-     * @throws InvocationTargetException Method body throws an exception.
-     */
+    /** {@inheritDoc} */
     @Override
-    public Object execute(Object obj)
+    public Object execute(Object obj, Object value)
             throws IllegalAccessException, InvocationTargetException {
-        Object[] args = {property};
-        return method == null ? null : method.invoke(obj, args);
+        Object[] pargs = {property, value};
+        if (method != null) {
+            method.invoke(obj, pargs);
+        }
+        return value;
     }
 
     /** {@inheritDoc} */
     @Override
-    public Object tryExecute(Object obj, Object key) {
+    public Object tryExecute(Object obj, Object key, Object value) {
         if (obj != null && method !=  null
             // ensure method name matches the property name
             && property.equals(key)
             && objectClass.equals(obj.getClass())) {
             try {
-                Object[] args = {property};
-                return method.invoke(obj, args);
+                Object[] args = {property, value};
+                method.invoke(obj, args);
+                return value;
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
@@ -84,14 +83,15 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
     }
 
     /**
-     * Discovers a method for a {@link GetExecutor.DuckGet}.
+     * Discovers the method for a {@link DuckSet}.
      *@param is the introspector
-     *@param clazz the class to find the get method from
-     *@param identifier the key to use as an argument to the get method
+     *@param clazz the class to find the set method from
+     *@param key the key to use as 1st argument to the set method
+     *@param value the value to use as 2nd argument to the set method
      *@return the method if found, null otherwise
      */
     private static java.lang.reflect.Method discover(Introspector is,
-            final Class<?> clazz, Object identifier) {
-        return is.getMethod(clazz, "get", makeArgs(identifier));
+            Class<?> clazz, Object key, Object value) {
+        return is.getMethod(clazz, "set", makeArgs(key, value));
     }
 }

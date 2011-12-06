@@ -14,25 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.commons.jexl3.internal.introspection;
 
-package org.apache.commons.jexl3.internal;
 import java.lang.reflect.InvocationTargetException;
+
 /**
- * Specialized executor to get a boolean property from an object.
+ * Specialized executor to get a property from an object.
+ * <p>Duck as in duck-typing for an interface like:
+ * <code>
+ * interface Get {
+ *      Object get(Object key);
+ * }
+ * </code>
+ * </p>
  * @since 2.0
  */
-public final class BooleanGetExecutor extends AbstractExecutor.Get {
+public final class DuckGetExecutor extends AbstractExecutor.Get {
     /** The property. */
-    private final String property;
+    private final Object property;
+
     /**
      * Creates an instance by attempting discovery of the get method.
      * @param is the introspector
      * @param clazz the class to introspect
-     * @param key the property to get
+     * @param identifier the property to get
      */
-    public BooleanGetExecutor(Introspector is, Class<?> clazz, String key) {
-        super(clazz, discover(is, clazz, key));
-        property = key;
+    public DuckGetExecutor(Introspector is, Class<?> clazz, Object identifier) {
+        super(clazz, discover(is, clazz, identifier));
+        property = identifier;
     }
 
     /** {@inheritDoc} */
@@ -41,13 +50,20 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
         return property;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Get the property from the object.
+     * @param obj the object.
+     * @return object.get(property)
+     * @throws IllegalAccessException Method is inaccessible.
+     * @throws InvocationTargetException Method body throws an exception.
+     */
     @Override
     public Object execute(Object obj)
-        throws IllegalAccessException, InvocationTargetException {
-        return method == null ? null : method.invoke(obj, (Object[]) null);
+            throws IllegalAccessException, InvocationTargetException {
+        Object[] args = {property};
+        return method == null ? null : method.invoke(obj, args);
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public Object tryExecute(Object obj, Object key) {
@@ -56,7 +72,8 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
             && property.equals(key)
             && objectClass.equals(obj.getClass())) {
             try {
-                return method.invoke(obj, (Object[]) null);
+                Object[] args = {property};
+                return method.invoke(obj, args);
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
@@ -67,16 +84,14 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
     }
 
     /**
-     * Discovers the method for a {@link BooleanGet}.
-     * <p>The method to be found should be named "is{P,p}property and return a boolean.</p>
+     * Discovers a method for a {@link GetExecutor.DuckGet}.
      *@param is the introspector
      *@param clazz the class to find the get method from
-     *@param property the the property name
+     *@param identifier the key to use as an argument to the get method
      *@return the method if found, null otherwise
      */
-    static java.lang.reflect.Method discover(Introspector is, final Class<?> clazz, String property) {
-        java.lang.reflect.Method m = PropertyGetExecutor.discoverGet(is, "is", clazz, property);
-        return (m != null && m.getReturnType() == Boolean.TYPE) ? m : null;
+    private static java.lang.reflect.Method discover(Introspector is,
+            final Class<?> clazz, Object identifier) {
+        return is.getMethod(clazz, "get", makeArgs(identifier));
     }
-
 }

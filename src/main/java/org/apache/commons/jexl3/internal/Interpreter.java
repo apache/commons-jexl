@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl3;
+package org.apache.commons.jexl3.internal;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -24,14 +24,18 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.jexl3.parser.SimpleNode;
+import org.apache.commons.jexl3.JexlArithmetic;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.NamespaceResolver;
 import org.apache.commons.logging.Log;
 
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ASTAdditiveNode;
 import org.apache.commons.jexl3.parser.ASTAdditiveOperator;
 import org.apache.commons.jexl3.parser.ASTAndNode;
-import org.apache.commons.jexl3.parser.ASTAmbiguous;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
 import org.apache.commons.jexl3.parser.ASTArrayLiteral;
 import org.apache.commons.jexl3.parser.ASTAssignment;
@@ -79,7 +83,7 @@ import org.apache.commons.jexl3.parser.ASTWhileStatement;
 import org.apache.commons.jexl3.parser.Node;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
-import org.apache.commons.jexl3.introspection.Uberspect;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
@@ -94,7 +98,7 @@ public class Interpreter extends ParserVisitor {
     /** The logger. */
     protected final Log logger;
     /** The uberspect. */
-    protected final Uberspect uberspect;
+    protected final JexlUberspect uberspect;
     /** The arithmetic handler. */
     protected final JexlArithmetic arithmetic;
     /** The map of registered functions. */
@@ -104,15 +108,17 @@ public class Interpreter extends ParserVisitor {
     /** The context to store/retrieve variables. */
     protected final JexlContext context;
     /** Strict interpreter flag. */
-    protected final boolean strict;
+    protected final boolean strictEngine;
+    /** Strict interpreter flag. */
+    protected final boolean strictArithmetic;
     /** Silent intepreter flag. */
     protected final boolean silent;
     /** Cache executors. */
     protected final boolean cache;
     /** Registers or arguments. */
-    protected Object[] registers = null;
+    protected final Object[] registers;
     /** Parameter names if any. */
-    protected String[] parameters = null;
+    protected final String[] parameters;
     /** Cancellation support. */
     protected volatile boolean cancelled = false;
     /** Empty parameters for method matching. */
@@ -122,63 +128,49 @@ public class Interpreter extends ParserVisitor {
      * Creates an interpreter.
      * @param jexl the engine creating this interpreter
      * @param aContext the context to evaluate expression
-     * @deprecated 
+     * @param frame the engine evaluation frame
      */
-    @Deprecated
-    public Interpreter(JexlEngine jexl, JexlContext aContext) {
-        this(jexl, aContext, !jexl.isLenient(), jexl.isSilent());
-    }
-
-    /**
-     * Creates an interpreter.
-     * @param jexl the engine creating this interpreter
-     * @param aContext the context to evaluate expression
-     * @param strictFlag whether this interpreter runs in strict mode
-     * @param silentFlag whether this interpreter runs in silent mode
-     */
-    public Interpreter(JexlEngine jexl, JexlContext aContext, boolean strictFlag, boolean silentFlag) {
+    protected Interpreter(Engine jexl, JexlContext aContext, Engine.Frame frame) {
         this.logger = jexl.logger;
         this.uberspect = jexl.uberspect;
-        this.arithmetic = jexl.arithmetic;
-        this.functions = jexl.functions;
-        this.strict = strictFlag;
-        this.silent = silentFlag;
+        this.context = aContext != null? aContext : Engine.EMPTY_CONTEXT;
+        if (this.context instanceof JexlEngine.Options) {
+            JexlEngine.Options opts = (JexlEngine.Options) context;
+            Boolean ostrict = opts.isStrict();
+            Boolean osilent = opts.isSilent();
+            Map<String,Object> ofunction = opts.getNamespaces();
+            this.strictEngine = ostrict == null? jexl.isStrict() : ostrict.booleanValue();
+            this.silent = osilent == null? jexl.isSilent() : osilent.booleanValue();
+            this.functions = ofunction == null? jexl.functions : ofunction;
+            this.arithmetic = jexl.arithmetic.options(opts);
+        } else {
+            this.strictEngine = jexl.isStrict();
+            this.silent = jexl.isSilent();
+            this.functions = jexl.functions;
+            this.arithmetic = jexl.arithmetic;
+        }
+        this.strictArithmetic = this.arithmetic.isStrict();
         this.cache = jexl.cache != null;
-        this.context = aContext != null? aContext : JexlEngine.EMPTY_CONTEXT;
+        if (frame != null) {
+            this.parameters = frame.getParameters();
+            this.registers = frame.getRegisters();
+        } else {
+            this.parameters = null;
+            this.registers = null;
+        }
         this.functors = null;
     }
 
     /**
-     * Copy constructor.
-     * @param base the base to copy
-     */
-    protected Interpreter(Interpreter base) {
-        this.logger = base.logger;
-        this.uberspect = base.uberspect;
-        this.arithmetic = base.arithmetic;
-        this.functions = base.functions;
-        this.strict = base.strict;
-        this.silent = base.silent;
-        this.cache = base.cache;
-        this.context = base.context;
-        this.functors = base.functors;
-    }
-
-    /**
      * Checks whether this interpreter considers unknown variables, methods and constructors as errors.
-     * @return true if strict, false otherwise
+     * @return true if isStrict, false otherwise
      */
-    public boolean isStrict() {
-        return this.strict;
-    }
 
     /**
      * Checks whether this interpreter throws JexlException when encountering errors.
      * @return true if silent, false otherwise
      */
-    public boolean isSilent() {
-        return this.silent;
-    }
+
 
     /**
      * Interpret the given script/expression.
@@ -203,55 +195,6 @@ public class Interpreter extends ParserVisitor {
             throw xjexl;
         } finally {
             functors = null;
-            parameters = null;
-            registers = null;
-        }
-    }
-    
-    /**
-     * Gets the context.
-     * @return the {@link JexlContext} used for evaluation.
-     */
-    protected JexlContext getContext() {
-        return context;
-    }
-
-    /**
-     * Gets the uberspect.
-     * @return an {@link Uberspect}
-     */
-    protected Uberspect getUberspect() {
-        return uberspect;
-    }
-
-    /**
-     * Sets this interpreter registers for bean access/assign expressions.
-     * <p>Use setFrame(...) instead.</p>
-     * @param theRegisters the array of registers
-     */
-    @Deprecated
-    protected void setRegisters(Object... theRegisters) {
-        if (theRegisters != null) {
-            String[] regStrs = new String[theRegisters.length];
-            for (int r = 0; r < regStrs.length; ++r) {
-                regStrs[r] = "#" + r;
-            }
-            this.parameters = regStrs;
-        }
-        this.registers = theRegisters;
-    }
-
-    /**
-     * Sets this interpreter parameters and arguments.
-     * @param frame the calling frame
-     */
-    protected void setFrame(JexlEngine.Frame frame) {
-        if (frame != null) {
-            this.parameters = frame.getParameters();
-            this.registers = frame.getRegisters();
-        } else {
-            this.parameters = null;
-            this.registers = null;
         }
     }
 
@@ -279,10 +222,10 @@ public class Interpreter extends ParserVisitor {
     /**
      * Triggered when variable can not be resolved.
      * @param xjexl the JexlException ("undefined variable " + variable)
-     * @return throws JexlException if strict, null otherwise
+     * @return throws JexlException if isStrict, null otherwise
      */
     protected Object unknownVariable(JexlException xjexl) {
-        if (strict) {
+        if (strictEngine) {
             throw xjexl;
         }
         if (!silent) {
@@ -294,10 +237,10 @@ public class Interpreter extends ParserVisitor {
     /**
      * Triggered when method, function or constructor invocation fails.
      * @param xjexl the JexlException wrapping the original error
-     * @return throws JexlException if strict, null otherwise
+     * @return throws JexlException if isStrict, null otherwise
      */
     protected Object invocationFailed(JexlException xjexl) {
-        if (strict || xjexl instanceof JexlException.Return) {
+        if (strictEngine || xjexl instanceof JexlException.Return) {
             throw xjexl;
         }
         if (!silent) {
@@ -363,7 +306,7 @@ public class Interpreter extends ParserVisitor {
         return namespace;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTAdditiveNode node, Object data) {
         /**
          * The pattern for exception mgmt is to let the child*.jjtAccept
@@ -398,12 +341,12 @@ public class Interpreter extends ParserVisitor {
         return left;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTAdditiveOperator node, Object data) {
         throw new UnsupportedOperationException("Shoud not be called.");
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTAndNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         try {
@@ -426,7 +369,7 @@ public class Interpreter extends ParserVisitor {
         return Boolean.TRUE;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTArrayAccess node, Object data) {
         // first objectNode is the identifier
         Object object = node.jjtGetChild(0).jjtAccept(this, data);
@@ -445,7 +388,7 @@ public class Interpreter extends ParserVisitor {
         return object;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTArrayLiteral node, Object data) {
         Object literal = node.getLiteral();
         if (literal == null) {
@@ -461,7 +404,7 @@ public class Interpreter extends ParserVisitor {
         return literal;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTAssignment node, Object data) {
         // left contains the reference to assign to
         int register = -1;
@@ -594,7 +537,7 @@ public class Interpreter extends ParserVisitor {
         return right;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTBitwiseAndNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -605,7 +548,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTBitwiseComplNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         try {
@@ -615,7 +558,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTBitwiseOrNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -626,7 +569,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTBitwiseXorNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -637,7 +580,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTBlock node, Object data) {
         int numChildren = node.jjtGetNumChildren();
         Object result = null;
@@ -647,14 +590,14 @@ public class Interpreter extends ParserVisitor {
         return result;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTDivNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.divide(left, right);
         } catch (ArithmeticException xrt) {
-            if (!strict) {
+            if (!strictArithmetic) {
                 return new Double(0.0);
             }
             JexlNode xnode = findNullOperand(xrt, node, left, right);
@@ -662,7 +605,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTEmptyFunction node, Object data) {
         Object o = node.jjtGetChild(0).jjtAccept(this, data);
         if (o == null) {
@@ -684,7 +627,7 @@ public class Interpreter extends ParserVisitor {
         return Boolean.FALSE;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTEQNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -695,12 +638,12 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTFalseNode node, Object data) {
         return Boolean.FALSE;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTForeachStatement node, Object data) {
         Object result = null;
         /* first objectNode is the loop variable */
@@ -736,7 +679,7 @@ public class Interpreter extends ParserVisitor {
         return result;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTGENode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -747,7 +690,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTGTNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -758,7 +701,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTERNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -815,7 +758,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTIdentifier node, Object data) {
         if (isCancelled()) {
             throw new JexlException.Cancel(node);
@@ -840,12 +783,12 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTVar node, Object data) {
         return visit((ASTIdentifier) node, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTIfStatement node, Object data) {
         int n = 0;
         try {
@@ -872,7 +815,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTNumberLiteral node, Object data) {
         if (data != null && node.isInteger()) {
             return getAttribute(data, node.getLiteral(), node);
@@ -880,7 +823,7 @@ public class Interpreter extends ParserVisitor {
         return node.getLiteral();
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTJexlScript node, Object data) {
         int numChildren = node.jjtGetNumChildren();
         Object result = null;
@@ -891,7 +834,7 @@ public class Interpreter extends ParserVisitor {
         return result;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTLENode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -902,7 +845,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTLTNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -913,14 +856,14 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTMapEntry node, Object data) {
         Object key = node.jjtGetChild(0).jjtAccept(this, data);
         Object value = node.jjtGetChild(1).jjtAccept(this, data);
         return new Object[]{key, value};
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTMapLiteral node, Object data) {
         int childCount = node.jjtGetNumChildren();
         Map<Object, Object> map = new HashMap<Object, Object>();
@@ -939,7 +882,7 @@ public class Interpreter extends ParserVisitor {
      * Method resolution is a follows:
      * 1 - attempt to find a method in the bean passed as parameter;
      * 2 - if this fails, narrow the arguments and try again
-     * 3 - if this still fails, seeks a Script or JexlMethod as a property of that bean.
+     * 3 - if this still fails, seeks a JexlScript or JexlMethod as a property of that bean.
      * </p>
      * @param node the method node
      * @param bean the bean this method should be invoked upon
@@ -996,8 +939,8 @@ public class Interpreter extends ParserVisitor {
                         }
                     }
                     // script of jexl method will do
-                    if (functor instanceof Script) {
-                        return ((Script) functor).execute(context, argv.length > 0 ? argv : null);
+                    if (functor instanceof JexlScript) {
+                        return ((JexlScript) functor).execute(context, argv.length > 0 ? argv : null);
                     } else if (functor instanceof JexlMethod) {
                         vm = (JexlMethod) functor;
                         cacheable = false;
@@ -1023,7 +966,7 @@ public class Interpreter extends ParserVisitor {
         return invocationFailed(xjexl);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTMethodNode node, Object data) {
         // the object to invoke the method on should be in the data argument
         if (data == null) {
@@ -1043,7 +986,7 @@ public class Interpreter extends ParserVisitor {
         return call(node, data, methodNode, 1);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTFunctionNode node, Object data) {
         // objectNode 0 is the prefix
         String prefix = node.jjtGetChild(0).image;
@@ -1053,7 +996,7 @@ public class Interpreter extends ParserVisitor {
         return call(node, namespace, functionNode, 2);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTConstructorNode node, Object data) {
         if (isCancelled()) {
             throw new JexlException.Cancel(node);
@@ -1106,14 +1049,14 @@ public class Interpreter extends ParserVisitor {
         return invocationFailed(xjexl);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTModNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             return arithmetic.mod(left, right);
         } catch (ArithmeticException xrt) {
-            if (!strict) {
+            if (!strictArithmetic) {
                 return new Double(0.0);
             }
             JexlNode xnode = findNullOperand(xrt, node, left, right);
@@ -1121,7 +1064,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTMulNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -1133,7 +1076,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTNENode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -1145,7 +1088,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTNRNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -1201,18 +1144,18 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTNotNode node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
         return arithmetic.toBoolean(val) ? Boolean.FALSE : Boolean.TRUE;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTNullLiteral node, Object data) {
         return null;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTOrNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         try {
@@ -1235,7 +1178,7 @@ public class Interpreter extends ParserVisitor {
         return Boolean.FALSE;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTReference node, Object data) {
         // could be array access, identifier or map literal
         // followed by zero or more ("." and array access, method, size,
@@ -1290,13 +1233,13 @@ public class Interpreter extends ParserVisitor {
         return result;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTReferenceExpression node, Object data) {
         ASTArrayAccess upper = node;
         return visit(upper, data);
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTReturnStatement node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
         throw new JexlException.Return(node, null, val);
@@ -1305,7 +1248,7 @@ public class Interpreter extends ParserVisitor {
     /**
      * Check if a null evaluated expression is protected by a ternary expression.
      * The rationale is that the ternary / elvis expressions are meant for the user to explictly take
-     * control over the error generation; ie, ternaries can return null even if the engine in strict mode
+     * control over the error generation; ie, ternaries can return null even if the engine in isStrict mode
      * would normally throw an exception.
      * @param node the expression node
      * @return true if nullable variable, false otherwise
@@ -1321,7 +1264,7 @@ public class Interpreter extends ParserVisitor {
         return false;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTSizeFunction node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
         if (val == null) {
@@ -1330,12 +1273,12 @@ public class Interpreter extends ParserVisitor {
         return Integer.valueOf(sizeOf(node, val));
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTSizeMethod node, Object data) {
         return Integer.valueOf(sizeOf(node, data));
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTStringLiteral node, Object data) {
         if (data != null) {
             return getAttribute(data, node.getLiteral(), node);
@@ -1343,7 +1286,7 @@ public class Interpreter extends ParserVisitor {
         return node.image;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTTernaryNode node, Object data) {
         Object condition = node.jjtGetChild(0).jjtAccept(this, data);
         if (node.jjtGetNumChildren() == 3) {
@@ -1360,12 +1303,12 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTTrueNode node, Object data) {
         return Boolean.TRUE;
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTUnaryMinusNode node, Object data) {
         JexlNode valNode = node.jjtGetChild(0);
         Object val = valNode.jjtAccept(this, data);
@@ -1381,7 +1324,7 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     protected Object visit(ASTWhileStatement node, Object data) {
         Object result = null;
         /* first objectNode is the expression */
@@ -1485,7 +1428,7 @@ public class Interpreter extends ParserVisitor {
                     throw new RuntimeException(xany);
                 } else {
                     JexlException xjexl = new JexlException.Property(node, attribute.toString());
-                    if (strict) {
+                    if (strictArithmetic) {
                         throw xjexl;
                     }
                     if (!silent) {
@@ -1573,31 +1516,11 @@ public class Interpreter extends ParserVisitor {
             }
             xjexl = new JexlException.Property(node, attribute.toString());
         }
-        if (strict) {
+        if (strictArithmetic) {
             throw xjexl;
         }
         if (!silent) {
             logger.warn(xjexl.getMessage());
         }
-    }
-
-    /**
-     * Unused, satisfy ParserVisitor interface.
-     * @param node a node
-     * @param data the data
-     * @return does not return
-     */
-    protected Object visit(SimpleNode node, Object data) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    /**
-     * Unused, should throw in Parser.
-     * @param node a node
-     * @param data the data
-     * @return does not return
-     */
-    protected Object visit(ASTAmbiguous node, Object data) {
-        throw new UnsupportedOperationException("unexpected type of node");
     }
 }

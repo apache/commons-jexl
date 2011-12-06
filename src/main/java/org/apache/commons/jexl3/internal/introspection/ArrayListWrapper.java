@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl3.internal;
+package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.Array;
 import java.util.AbstractList;

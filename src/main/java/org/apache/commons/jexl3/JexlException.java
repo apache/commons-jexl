@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+import org.apache.commons.jexl3.internal.Debugger;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import org.apache.commons.jexl3.parser.JexlNode;
@@ -28,9 +29,9 @@ import org.apache.commons.jexl3.parser.TokenMgrError;
  */
 public class JexlException extends RuntimeException {
     /** The point of origin for this exception. */
-    protected final transient JexlNode mark;
+    private final transient JexlNode mark;
     /** The debug info. */
-    protected final transient JexlInfo info;
+    private final transient JexlInfo info;
     /** A marker to use in NPEs stating a null operand error. */
     public static final String NULL_OPERAND = "jexl.null";
     /** Minimum number of characters around exception location. */
@@ -306,7 +307,7 @@ public class JexlException extends RuntimeException {
      * Thrown to return a value.
      * @since 3.0
      */
-    protected static class Return extends JexlException {
+    public static class Return extends JexlException {
         /** The returned value. */
         private final Object result;
 
@@ -316,7 +317,7 @@ public class JexlException extends RuntimeException {
          * @param msg the message
          * @param value the returned value
          */
-        protected Return(JexlNode node, String msg, Object value) {
+        public Return(JexlNode node, String msg, Object value) {
             super(node, msg);
             this.result = value;
         }
@@ -333,12 +334,12 @@ public class JexlException extends RuntimeException {
      * Thrown to cancel a script execution.
      * @since 3.0
      */
-    protected static class Cancel extends JexlException {
+    public static class Cancel extends JexlException {
         /**
          * Creates a new instance of Cancel.
          * @param node the node where the interruption was detected
          */
-        protected Cancel(JexlNode node) {
+        public Cancel(JexlNode node) {
             super(node, "execution cancelled", null);
         }
     }

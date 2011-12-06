@@ -37,17 +37,17 @@ public class ObjectContext<T> implements JexlContext {
         this.object = wrapped;
     }
 
-    /** {@inheritDoc} */
+    @Override
     public Object get(String name) {
         return jexl.getProperty(object, name);
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void set(String name, Object value) {
         jexl.setProperty(object, name, value);
     }
 
-    /** {@inheritDoc} */
+    @Override
     public boolean has(String name) {
         return jexl.getUberspect().getPropertyGet(object, name, null) != null;
     }

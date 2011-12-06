@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.commons.jexl3.internal;
+package org.apache.commons.jexl3.internal.introspection;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

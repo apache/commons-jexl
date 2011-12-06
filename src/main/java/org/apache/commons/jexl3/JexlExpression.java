@@ -21,18 +21,18 @@ package org.apache.commons.jexl3;
 /**
  * Represents a single JEXL expression.
  * <p>
- * This simple interface provides access to the underlying expression through
- * {@link Expression#getExpression()}.
+ * This simple interface provides access to the underlying textual expression through
+ * {@link JexlExpression#getExpression()}.
  * </p>
  *
  * <p>
- * An expression is different than a script - it is simply a reference of
- * an expression.
+ * An expression is different than a script - it is simply a reference to
+ * a single expression.
  * </p>
  *
  * @since 1.0
  */
-public interface Expression {
+public interface JexlExpression {
     /**
      * Evaluates the expression with the variables contained in the
      * supplied {@link JexlContext}.
@@ -44,8 +44,7 @@ public interface Expression {
     Object evaluate(JexlContext context);
 
     /**
-     * Returns the JEXL expression this Expression was created with.
-     *
+     * Returns the JEXL expression this JexlExpression was created with.
      * @return The JEXL expression to be evaluated
      */
     String getExpression();

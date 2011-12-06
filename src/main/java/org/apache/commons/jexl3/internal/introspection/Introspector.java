@@ -48,7 +48,7 @@ import org.apache.commons.logging.Log;
  * This mapping is performed for all the methods in a class and stored.
  * @since 1.0
  */
-public class IntrospectorBase {
+public final class Introspector {
     /** the logger. */
     protected final Log rlog;
     /**
@@ -72,7 +72,7 @@ public class IntrospectorBase {
      * Create the introspector.
      * @param log the logger to use
      */
-    public IntrospectorBase(Log log) {
+    public Introspector(Log log) {
         this.rlog = log;
         loader = getClass().getClassLoader();
     }
@@ -89,7 +89,18 @@ public class IntrospectorBase {
             return null;
         }
     }
-
+    
+    /**
+     * Gets a method defined by a class, a name and a set of parameters.
+     * @param c the class
+     * @param name the method name
+     * @param params the method parameters
+     * @return the desired method object
+     * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
+     */
+    public Method getMethod(Class<?> c, String name, Object[] params) {
+        return getMethod(c, new MethodKey(name, params));
+    }
     /**
      * Gets the method defined by the <code>MethodKey</code> for the class <code>c</code>.
      *

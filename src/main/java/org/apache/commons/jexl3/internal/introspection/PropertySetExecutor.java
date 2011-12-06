@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.commons.jexl3.internal;
+package org.apache.commons.jexl3.internal.introspection;
 import java.lang.reflect.InvocationTargetException;
+
 /**
  * Specialized executor to set a property in an object.
  * @since 2.0

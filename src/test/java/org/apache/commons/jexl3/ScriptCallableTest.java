@@ -29,6 +29,9 @@ import java.util.concurrent.TimeoutException;
  */
 public class ScriptCallableTest extends JexlTestCase {
     //Logger LOGGER = Logger.getLogger(VarTest.class.getName());
+    public ScriptCallableTest() {
+        super("ScriptCallableTest");
+    }
 
     public void testFuture() throws Exception {
         JexlScript e = JEXL.createScript("while(true);");

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.commons.jexl3.internal;
+package org.apache.commons.jexl3.internal.introspection;
 
 
 import java.util.Iterator;
@@ -42,27 +42,17 @@ public class EnumerationIterator<T> implements Iterator<T> {
         enumeration = enumer;
     }
 
-    /**
-     * Move to next element in the array.
-     *
-     * @return The next object in the array.
-     */
+    @Override
     public T next() {
         return enumeration.nextElement();
     }
     
-    /**
-     * Check to see if there is another element in the array.
-     *
-     * @return Whether there is another element.
-     */
+    @Override
     public boolean hasNext() {
         return enumeration.hasMoreElements();
     }
 
-    /**
-     *  Unimplemented.  No analogy in Enumeration
-     */
+    @Override
     public void remove() {
         // not implemented
     }
