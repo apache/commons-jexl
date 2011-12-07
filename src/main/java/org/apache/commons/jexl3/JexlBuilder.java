@@ -85,6 +85,10 @@ public class JexlBuilder {
      * The cache size.
      */
     protected int cache = -1;
+    /**
+     * The class loader.
+     */
+    protected ClassLoader loader = null;
 
     /**
      * Sets the JexlUberspect instance the engine will use.
@@ -129,6 +133,21 @@ public class JexlBuilder {
     /** @return the logger */
     public Log logger() {
         return this.logger;
+    }
+    
+    /**
+     * Sets the class loader to use.
+     * @param l the class loader
+     * @return this builder
+     */
+    public JexlBuilder loader(ClassLoader l) {
+        this.loader = l;
+        return this;
+    }
+    
+    /** @return the class loader */
+    public ClassLoader loader() {
+        return loader;
     }
 
     /**

@@ -84,7 +84,9 @@ final class ClassMap {
         if (fields.length > 0) {
             Map<String, Field> cache = new HashMap<String, Field>();
             for (Field field : fields) {
-                cache.put(field.getName(), field);
+                if (Modifier.isPublic(field.getModifiers()) && Permissions.allow(field)) {
+                    cache.put(field.getName(), field);
+                }
             }
             return cache;
         } else {
@@ -182,8 +184,8 @@ final class ClassMap {
         try {
             Method[] methods = clazz.getDeclaredMethods();
             for (int i = 0; i < methods.length; i++) {
-                int modifiers = methods[i].getModifiers();
-                if (Modifier.isPublic(modifiers)) {
+                Method mi = methods[i];
+                if (Modifier.isPublic(mi.getModifiers()) && Permissions.allow(mi)) {
                     cache.put(methods[i]);
                 }
             }

@@ -16,24 +16,7 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.io.Reader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.lang.ref.SoftReference;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map.Entry;
+
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
@@ -43,21 +26,41 @@ import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlInfoHandle;
 import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.internal.introspection.Uberspect;
+import org.apache.commons.jexl3.introspection.JexlMethod;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTIdentifier;
+import org.apache.commons.jexl3.parser.ASTJexlScript;
+import org.apache.commons.jexl3.parser.ASTReference;
+import org.apache.commons.jexl3.parser.JexlNode;
+import org.apache.commons.jexl3.parser.ParseException;
+import org.apache.commons.jexl3.parser.Parser;
+import org.apache.commons.jexl3.parser.TokenMgrError;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.commons.jexl3.parser.ParseException;
-import org.apache.commons.jexl3.parser.Parser;
-import org.apache.commons.jexl3.parser.JexlNode;
-import org.apache.commons.jexl3.parser.TokenMgrError;
-import org.apache.commons.jexl3.parser.ASTJexlScript;
-import org.apache.commons.jexl3.parser.ASTArrayAccess;
-import org.apache.commons.jexl3.parser.ASTIdentifier;
-import org.apache.commons.jexl3.parser.ASTReference;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 
-import org.apache.commons.jexl3.introspection.JexlUberspect;
-import org.apache.commons.jexl3.introspection.JexlMethod;
-import org.apache.commons.jexl3.internal.introspection.Uberspect;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import java.lang.ref.SoftReference;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * A JexlEngine implementation.
@@ -168,6 +171,10 @@ public class Engine extends JexlEngine {
      */
     public Engine(JexlBuilder conf) {
         this.uberspect = conf.uberspect() == null ? getUberspect(conf.logger()) : conf.uberspect();
+        ClassLoader loader = conf.loader();
+        if (loader != null) {
+            uberspect.setClassLoader(loader);
+        }
         this.logger = conf.logger() == null ? LogFactory.getLog(JexlEngine.class) : conf.logger();
         this.functions = conf.namespaces() == null ? Collections.<String, Object>emptyMap() : conf.namespaces();
         this.silent = conf.silent() == null ? false : conf.silent().booleanValue();

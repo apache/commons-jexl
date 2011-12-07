@@ -16,9 +16,11 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.introspection.Sandbox;
+import org.apache.commons.jexl3.annotations.NoJexl;
 import org.apache.commons.jexl3.internal.introspection.SandboxUberspect;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.apache.commons.jexl3.introspection.Sandbox;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,15 +29,39 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SandboxTest extends JexlTestCase {
     static final Log LOGGER = LogFactory.getLog(SandboxTest.class.getName());
-    
+
     public SandboxTest() {
         super("SandboxTest");
     }
 
-    public static class Foo {
+    @NoJexl
+    public interface CantCallMe {
+        void tryMe();
+    }
+
+    public interface TryCallMe {
+        @NoJexl
+        void tryMeARiver();
+    }
+
+    public static abstract class CallMeNot {
+        public @NoJexl
+        String NONO = "should not be accessible!";
+
+        @NoJexl
+        public void callMeNot() {
+            throw new RuntimeException("should not be callable!");
+        }
+    }
+
+    public static class Foo extends CallMeNot implements CantCallMe, TryCallMe {
         String name;
         public String alias;
 
+        public @NoJexl Foo(String name, String notcallable) {
+            throw new RuntimeException("should not be callable!");
+        }
+        
         public Foo(String name) {
             this.name = name;
             this.alias = name + "-alias";
@@ -51,6 +77,21 @@ public class SandboxTest extends JexlTestCase {
 
         public String Quux() {
             return name + "-quux";
+        }
+
+        @NoJexl
+        public String cantCallMe() {
+            throw new RuntimeException("should not be callable!");
+        }
+
+        @Override
+        public void tryMe() {
+            throw new RuntimeException("should not be callable!");
+        }
+
+        @Override
+        public void tryMeARiver() {
+            throw new RuntimeException("should not be callable!");
         }
     }
 
@@ -176,6 +217,35 @@ public class SandboxTest extends JexlTestCase {
         assertEquals(foo.Quux(), result);
     }
 
+    public void testMethodNoJexl() throws Exception {
+        Foo foo = new Foo("42");
+        String[] exprs = {
+            "foo.cantCallMe()",
+            "foo.tryMe()",
+            "foo.tryMeARiver()",
+            "foo.callMeNot()",
+            "foo.NONO",
+            "new('org.apache.commons.jexl3.SandboxTest$Foo', 'one', 'two')"
+        };
+        JexlScript script;
+        Object result;
+
+        JexlEngine sjexl = new JexlBuilder().loader(Foo.class.getClassLoader()).strict(true).create();
+        for (String expr : exprs) {
+            script = sjexl.createScript(expr, "foo");
+            try {
+                result = script.execute(null, foo);
+                fail("should have not been possible");
+            } catch (JexlException.Method xjm) {
+                // ok
+                LOGGER.info(xjm.toString());
+            } catch (JexlException.Property xjm) {
+                // ok
+                LOGGER.info(xjm.toString());
+            }
+        }
+    }
+
     public void testGetWhite() throws Exception {
         Foo foo = new Foo("42");
         String expr = "foo.alias";
@@ -229,7 +299,7 @@ public class SandboxTest extends JexlTestCase {
         String expr;
         JexlScript script;
         Object result;
-        
+
         script = sjexl.createScript("System.exit()");
         try {
             result = script.execute(context);
@@ -237,7 +307,7 @@ public class SandboxTest extends JexlTestCase {
         } catch (JexlException xjexl) {
             LOGGER.info(xjexl.toString());
         }
-                
+
         script = sjexl.createScript("new('java.io.File', '/tmp/should-not-be-created')");
         try {
             result = script.execute(context);
@@ -245,7 +315,7 @@ public class SandboxTest extends JexlTestCase {
         } catch (JexlException xjexl) {
             LOGGER.info(xjexl.toString());
         }
-        
+
         expr = "System.currentTimeMillis()";
         script = sjexl.createScript("System.currentTimeMillis()");
         result = script.execute(context);

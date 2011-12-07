@@ -111,12 +111,14 @@
             <scope>test</scope>
         </dependency>
         <!-- For JSR-223 API -->
+        <!--
         <dependency>
             <groupId>org.apache.bsf</groupId>
             <artifactId>bsf-api</artifactId>
             <version>3.1</version>
             <scope>provided</scope>
         </dependency>
+        -->
     </dependencies>
 
     <properties>

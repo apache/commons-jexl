@@ -17,9 +17,9 @@
 
 package org.apache.commons.jexl3.internal.introspection;
 
+import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.lang.reflect.Array;
 
 /**
  *  <p>
