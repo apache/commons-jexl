@@ -53,10 +53,10 @@ public class JexlEvalContext implements JexlContext, JexlEngine.Options {
      * Creates a MapContext wrapping an existing user provided vars.
      * <p>The supplied vars should be null only in derived classes that override the get/set/has methods.
      * For a default vars context with a code supplied vars, use the default no-parameter contructor.</p>
-     * @param vars the variable vars
+     * @param map the variables map
      */
-    public JexlEvalContext(Map<String, Object> vars) { 
-        this.vars = vars == EMPTY_MAP ? new HashMap<String, Object>() : vars;
+    public JexlEvalContext(Map<String, Object> map) { 
+        this.vars = map == EMPTY_MAP ? new HashMap<String, Object>() : map;
     }
 
     @Override

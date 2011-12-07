@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A simple JEXL Template engine.
+ * A simple "JeXL Template" engine.
  * <p>
  * At the base is an evaluator similar to the Unified EL evaluator used in JSP/JSF based on JEXL.
- * At the top is a template engine that uses JEXL (instead of OGNL/VTL) as the scripting
+ * At the top is a template engine inspired by Velocity that uses JEXL (instead of OGNL/VTL) as the scripting
   * language.
  * </p>
  * <p>
@@ -33,9 +33,9 @@ import java.util.Set;
  * and facilitate the implementation of expression evaluation.
  * </p>
  * <p>
- * The template engine is intended to output text, html, XML.
+ * The template engine is intended to output any form of text; html, XML, CSV...
  * </p>
- * @since 2.0
+ * @since 3.0
  */
 public abstract class JxltEngine {
     /**
@@ -124,7 +124,8 @@ public abstract class JxltEngine {
          * @param context the variable context
          * @return the result of this expression evaluation or null if an error occurs and the {@link JexlEngine} is
          * running in silent mode
-         * @throws {@link JxltEngine$Exception} if an error occurs and the {@link JexlEngine} is not silent
+         * @throws Exception if an error occurs and the {@link JexlEngine}
+         * is not silent
          */
         Object evaluate(JexlContext context);
 
@@ -177,7 +178,7 @@ public abstract class JxltEngine {
          * @param context the context to use for immediate expression evaluations
          * @return an {@link UnifiedExpression} or null if an error occurs and the {@link JexlEngine} is running
          * in silent mode
-         * @throws {@link JxltEngine.Exception} if an error occurs and the {@link JexlEngine}
+         * @throws Exception if an error occurs and the {@link JexlEngine}
          * is not in silent mode
          */
         UnifiedExpression prepare(JexlContext context);
@@ -199,7 +200,8 @@ public abstract class JxltEngine {
      * </p>
      * @param expression the {@link Template} string expression
      * @return the {@link UnifiedExpression}, null if silent and an error occured
-     * @throws {@link JxltEngine.Exception} if an error occurs and the {@link JexlEngine} is not silent
+     * @throws Exception if an error occurs and the {@link JexlEngine}
+     * is not silent
      */
     public abstract UnifiedExpression createExpression(String expression);
 
@@ -245,6 +247,7 @@ public abstract class JxltEngine {
      * and stores the template expression array and the writer (java.io.Writer) that the 'jexl:print(...)'
      * delegates the output generation to.
      * </p>
+     * @since 3.0
      */
     public interface Template {
         /**

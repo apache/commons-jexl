@@ -16,19 +16,17 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.internal.Engine;
-import org.apache.commons.jexl3.internal.TemplateEngine;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Test cases for the UnifiedEL.
@@ -36,17 +34,15 @@ import org.apache.commons.logging.LogFactory;
 public class UnifiedJEXLTest extends JexlTestCase {
     private static final JexlEngine ENGINE = new JexlBuilder().silent(false).cache(128).strict(true).create();
 
-    private static final TemplateEngine EL = new TemplateEngine((Engine)ENGINE);
+    private static final JxltEngine JXLT = ENGINE.jxlt();
     private static final Log LOG = LogFactory.getLog(JxltEngine.class);
     private JexlEvalContext context = null;
-    private Map<String, Object> vars = null;
 
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error
         java.util.logging.Logger.getLogger(org.apache.commons.jexl3.JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
-        vars = new HashMap<String, Object>();
-        context = new JexlEvalContext(vars);
+        context = new JexlEvalContext();
     }
 
     @Override
@@ -98,8 +94,8 @@ public class UnifiedJEXLTest extends JexlTestCase {
     }
 
     public void testStatement() throws Exception {
-        vars.put("froboz", new Froboz(123));
-        JxltEngine.UnifiedExpression check = EL.createExpression("${froboz.value = 32; froboz.plus10(); froboz.value}");
+        context.set("froboz", new Froboz(123));
+        JxltEngine.UnifiedExpression check = JXLT.createExpression("${froboz.value = 32; froboz.plus10(); froboz.value}");
         Object o = check.evaluate(context);
         assertEquals("Result is not 42", new Integer(42), o);
         Set<List<String>> evars = check.getVariables();
@@ -107,8 +103,8 @@ public class UnifiedJEXLTest extends JexlTestCase {
     }
 
     public void testAssign() throws Exception {
-        JxltEngine.UnifiedExpression assign = EL.createExpression("${froboz.value = 10}");
-        JxltEngine.UnifiedExpression check = EL.createExpression("${froboz.value}");
+        JxltEngine.UnifiedExpression assign = JXLT.createExpression("${froboz.value = 10}");
+        JxltEngine.UnifiedExpression check = JXLT.createExpression("${froboz.value}");
         Object o = assign.evaluate(context);
         assertEquals("Result is not 10", new Integer(10), o);
         o = check.evaluate(context);
@@ -117,14 +113,14 @@ public class UnifiedJEXLTest extends JexlTestCase {
 
     public void testComposite() throws Exception {
         String source = "Dear ${p} ${name};";
-        JxltEngine.UnifiedExpression expr = EL.createExpression(source);
-        vars.put("p", "Mr");
-        vars.put("name", "Doe");
+        JxltEngine.UnifiedExpression expr = JXLT.createExpression(source);
+        context.set("p", "Mr");
+        context.set("name", "Doe");
         assertTrue("expression should be immediate", expr.isImmediate());
         Object o = expr.evaluate(context);
         assertEquals("Dear Mr Doe;", o);
-        vars.put("p", "Ms");
-        vars.put("name", "Jones");
+        context.set("p", "Ms");
+        context.set("name", "Jones");
         o = expr.evaluate(context);
         assertEquals("Dear Ms Jones;", o);
         assertEquals(source, getSource(expr.toString()));
@@ -132,21 +128,22 @@ public class UnifiedJEXLTest extends JexlTestCase {
 
     public void testPrepareEvaluate() throws Exception {
         final String source = "Dear #{p} ${name};";
-        JxltEngine.UnifiedExpression expr = EL.createExpression("Dear #{p} ${name};");
+        JxltEngine.UnifiedExpression expr = JXLT.createExpression("Dear #{p} ${name};");
         assertTrue("expression should be deferred", expr.isDeferred());
 
         Set<List<String>> evars = expr.getVariables();
         assertEquals(1, evars.size());
         assertTrue(evars.contains(Arrays.asList("name")));
-        vars.put("name", "Doe");
+        context.set("name", "Doe");
         JxltEngine.UnifiedExpression phase1 = expr.prepare(context);
         String as = phase1.asString();
         assertEquals("Dear ${p} Doe;", as);
         Set<List<String>> evars1 = phase1.getVariables();
         assertEquals(1, evars1.size());
         assertTrue(evars1.contains(Arrays.asList("p")));
-        vars.put("p", "Mr");
-        vars.put("name", "Should not be used in 2nd phase");
+        context.clearVariables();
+        context.set("p", "Mr");
+        context.set("name", "Should not be used in 2nd phase");
         Object o = phase1.evaluate(context);
         assertEquals("Dear Mr Doe;", o);
         
@@ -157,14 +154,14 @@ public class UnifiedJEXLTest extends JexlTestCase {
 
     public void testNested() throws Exception {
         final String source = "#{${hi}+'.world'}";
-        JxltEngine.UnifiedExpression expr = EL.createExpression(source);
+        JxltEngine.UnifiedExpression expr = JXLT.createExpression(source);
 
         Set<List<String>> evars = expr.getVariables();
         assertEquals(1, evars.size());
         assertTrue(evars.contains(Arrays.asList("hi")));
 
-        vars.put("hi", "greeting");
-        vars.put("greeting.world", "Hello World!");
+        context.set("hi", "greeting");
+        context.set("greeting.world", "Hello World!");
         assertTrue("expression should be deferred", expr.isDeferred());
         Object o = expr.evaluate(context);
         assertEquals("Hello World!", o);
@@ -175,7 +172,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
     public void testImmediate() throws Exception {
         JexlContext none = null;
         final String source = "${'Hello ' + 'World!'}";
-        JxltEngine.UnifiedExpression expr = EL.createExpression(source);
+        JxltEngine.UnifiedExpression expr = JXLT.createExpression(source);
         JxltEngine.UnifiedExpression prepared = expr.prepare(none);
         assertEquals("prepare should return same expression", "Hello World!", prepared.asString());
         Object o = expr.evaluate(none);
@@ -188,7 +185,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
     public void testConstant() throws Exception {
         JexlContext none = null;
         final String source = "Hello World!";
-        JxltEngine.UnifiedExpression expr = EL.createExpression(source);
+        JxltEngine.UnifiedExpression expr = JXLT.createExpression(source);
         assertTrue("prepare should return same expression", expr.prepare(none) == expr);
         Object o = expr.evaluate(none);
         assertTrue("expression should be immediate", expr.isImmediate());
@@ -200,7 +197,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
     public void testDeferred() throws Exception {
         JexlContext none = null;
         final String source = "#{'world'}";
-        JxltEngine.UnifiedExpression expr = EL.createExpression(source);
+        JxltEngine.UnifiedExpression expr = JXLT.createExpression(source);
         assertTrue("expression should be deferred", expr.isDeferred());
         String as = expr.prepare(none).asString();
         assertEquals("prepare should return immediate version", "${'world'}", as);
@@ -215,23 +212,23 @@ public class UnifiedJEXLTest extends JexlTestCase {
         JxltEngine.UnifiedExpression expr;
         Object o;
         // $ and # are escapable in TemplateEngine
-        expr = EL.createExpression("\\#{'world'}");
+        expr = JXLT.createExpression("\\#{'world'}");
         o = expr.evaluate(none);
         assertEquals("#{'world'}", o);
-        expr = EL.createExpression("\\${'world'}");
+        expr = JXLT.createExpression("\\${'world'}");
         o = expr.evaluate(none);
         assertEquals("${'world'}", o);
     }
 
     public void testEscapeString() throws Exception {
-        JxltEngine.UnifiedExpression expr = EL.createExpression("\\\"${'world\\'s finest'}\\\"");
+        JxltEngine.UnifiedExpression expr = JXLT.createExpression("\\\"${'world\\'s finest'}\\\"");
         JexlContext none = null;
         Object o = expr.evaluate(none);
         assertEquals("\"world's finest\"", o);
     }
 
     public void testNonEscapeString() throws Exception {
-        JxltEngine.UnifiedExpression expr = EL.createExpression("c:\\some\\windows\\path");
+        JxltEngine.UnifiedExpression expr = JXLT.createExpression("c:\\some\\windows\\path");
         JexlContext none = null;
         Object o = expr.evaluate(none);
         assertEquals("c:\\some\\windows\\path", o);
@@ -239,7 +236,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
 
     public void testMalformed() throws Exception {
         try {
-            JxltEngine.UnifiedExpression expr = EL.createExpression("${'world'");
+            JxltEngine.UnifiedExpression expr = JXLT.createExpression("${'world'");
             JexlContext none = null;
             expr.evaluate(none);
             fail("should be malformed");
@@ -252,7 +249,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
 
     public void testMalformedNested() throws Exception {
         try {
-            JxltEngine.UnifiedExpression expr = EL.createExpression("#{${hi} world}");
+            JxltEngine.UnifiedExpression expr = JXLT.createExpression("#{${hi} world}");
             JexlContext none = null;
             expr.evaluate(none);
             fail("should be malformed");
@@ -265,7 +262,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
 
     public void testBadContextNested() throws Exception {
         try {
-            JxltEngine.UnifiedExpression expr = EL.createExpression("#{${hi}+'.world'}");
+            JxltEngine.UnifiedExpression expr = JXLT.createExpression("#{${hi}+'.world'}");
             JexlContext none = null;
             expr.evaluate(none);
             fail("should be malformed");
@@ -277,15 +274,15 @@ public class UnifiedJEXLTest extends JexlTestCase {
     }
 
     public void testCharAtBug() throws Exception {
-        vars.put("foo", "abcdef");
-        JxltEngine.UnifiedExpression expr = EL.createExpression("${foo.substring(2,4)/*comment*/}");
+        context.set("foo", "abcdef");
+        JxltEngine.UnifiedExpression expr = JXLT.createExpression("${foo.substring(2,4)/*comment*/}");
         Object o = expr.evaluate(context);
         assertEquals("cd", o);
 
-        vars.put("bar", "foo");
+        context.set("bar", "foo");
         try {
             context.setSilent(true);
-            expr = EL.createExpression("#{${bar}+'.charAt(-2)'}");
+            expr = JXLT.createExpression("#{${bar}+'.charAt(-2)'}");
             expr = expr.prepare(context);
             o = expr.evaluate(context);
             assertEquals(null, o);
@@ -300,16 +297,16 @@ public class UnifiedJEXLTest extends JexlTestCase {
         StringWriter strw;
         String output;
 
-        JxltEngine.Template t = EL.createTemplate(source);
+        JxltEngine.Template t = JXLT.createTemplate(source);
 
-        vars.put("x", 42);
+        context.set("x", 42);
         strw = new StringWriter();
         t.evaluate(context, strw);
         output = strw.toString();
         assertEquals("x is 42\n", output);
 
         strw = new StringWriter();
-        vars.put("x", "");
+        context.set("x", "");
         t.evaluate(context, strw);
         output = strw.toString();
         assertEquals("no x\n", output);
@@ -323,7 +320,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         StringWriter strw;
         String output;
 
-        JxltEngine.Template t = EL.createTemplate("$$", new StringReader(source), "x");
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(source), "x");
         String dstr = t.asString();
         assertNotNull(dstr);
 
@@ -344,7 +341,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
                + "${l10n}=#{x}\n"
                + "$$ }\n";
         int[] args = { 42 };
-        JxltEngine.Template tl10n = EL.createTemplate(source, "list");
+        JxltEngine.Template tl10n = JXLT.createTemplate(source, "list");
         String dstr = tl10n.asString();
         assertNotNull(dstr);
         context.set("l10n", "valeur");
@@ -377,7 +374,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
                 + "The value ${x} is under fourty-two\n"
                 + "$$   }\n"
                 + "$$ }\n";
-        JxltEngine.Template t = EL.createTemplate("$$", new StringReader(test42), "list");
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(test42), "list");
         StringWriter strw = new StringWriter();
         int[] list = {1, 3, 5, 42, 169};
         t.evaluate(context, strw, list);
@@ -414,7 +411,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
     public void testWriter() throws Exception {
         Froboz froboz = new Froboz(42);
         Writer writer = new FrobozWriter(new StringWriter());
-        JxltEngine.Template t = EL.createTemplate("$$", new StringReader("$$$jexl.print(froboz)"), "froboz");
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader("$$$jexl.print(froboz)"), "froboz");
         t.evaluate(context, writer, froboz);
         assertEquals("froboz{42}", writer.toString());
     }

@@ -16,16 +16,18 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import java.lang.reflect.Method;
+import org.apache.commons.logging.Log;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.Map;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.commons.logging.Log;
+import java.util.Map;
 
 /**
  * This basic function of this class is to return a Method object for a
@@ -111,8 +113,7 @@ public final class Introspector {
      */
     public Method getMethod(Class<?> c, MethodKey key) {
         try {
-            ClassMap classMap = getMap(c);
-            return classMap.findMethod(key);
+            return getMap(c).findMethod(key);
         } catch (MethodKey.AmbiguousException xambiguous) {
             // whoops.  Ambiguous.  Make a nice log message and return null...
             if (rlog != null && rlog.isInfoEnabled()) {
@@ -132,8 +133,7 @@ public final class Introspector {
      * @return the desired field or null if it does not exist or is not accessible
      * */
     public Field getField(Class<?> c, String key) {
-        ClassMap classMap = getMap(c);
-        return classMap.findField(c, key);
+        return getMap(c).findField(c, key);
     }
 
     /**
@@ -291,7 +291,9 @@ public final class Introspector {
                     }
                     List<Constructor<?>> l = new LinkedList<Constructor<?>>();
                     for (Constructor<?> ictor : clazz.getConstructors()) {
-                        l.add(ictor);
+                        if (Modifier.isPublic(ictor.getModifiers()) && Permissions.allow(ictor)) {
+                            l.add(ictor);
+                        }
                     }
                     // try to find one
                     ctor = key.getMostSpecificConstructor(l);

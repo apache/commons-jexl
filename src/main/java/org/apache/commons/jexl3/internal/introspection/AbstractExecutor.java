@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 package org.apache.commons.jexl3.internal.introspection;
+
 import org.apache.commons.jexl3.introspection.JexlMethod;
-import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
+import org.apache.commons.jexl3.introspection.JexlPropertySet;
+
 import java.lang.reflect.InvocationTargetException;
 
 /**
