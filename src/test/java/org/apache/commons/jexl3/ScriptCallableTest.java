@@ -67,7 +67,7 @@ public class ScriptCallableTest extends JexlTestCase {
         assertTrue(future.isCancelled());
     }
 
-    public static class TestContext extends MapContext implements NamespaceResolver {
+    public static class TestContext extends MapContext implements JexlContext.NamespaceResolver {
         public Object resolveNamespace(String name) {
             return name == null ? this : null;
         }

@@ -26,9 +26,13 @@ import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlInfoHandle;
 import org.apache.commons.jexl3.JexlScript;
+
+import org.apache.commons.jexl3.internal.introspection.SandboxUberspect;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.apache.commons.jexl3.introspection.JexlMethod;
+import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
+
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
@@ -59,6 +63,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import java.lang.ref.SoftReference;
+
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -154,26 +159,20 @@ public class Engine extends JexlEngine {
     }
 
     /**
-     * Creates a JEXL engine using the provided {@link Uberspect}, (@link JexlArithmetic),
-     * a function map and logger.
-     * @param anUberspect to allow different introspection behaviour
-     * @param anArithmetic to allow different arithmetic behaviour
-     * @param theFunctions an optional map of namespaces (@link setFunctions)
-     * @param log the logger for various messages
-     */
-    public Engine(JexlUberspect anUberspect, JexlArithmetic anArithmetic, Map<String, Object> theFunctions, Log log) {
-        this(new JexlBuilder().uberspect(anUberspect).arithmetic(anArithmetic).namespaces(theFunctions).logger(log));
-    }
-
-    /**
      * Creates a JEXL engine using the provided {@link JexlBuilder}.
      * @param conf the builder
      */
     public Engine(JexlBuilder conf) {
-        this.uberspect = conf.uberspect() == null ? getUberspect(conf.logger()) : conf.uberspect();
+        JexlSandbox sandbox = conf.sandbox();
+        JexlUberspect uber = conf.uberspect() == null ? getUberspect(conf.logger()) : conf.uberspect();
         ClassLoader loader = conf.loader();
         if (loader != null) {
-            uberspect.setClassLoader(loader);
+            uber.setClassLoader(loader);
+        }
+        if (sandbox == null) {
+            this.uberspect = uber;
+        } else {
+            this.uberspect = new SandboxUberspect(uber, sandbox);
         }
         this.logger = conf.logger() == null ? LogFactory.getLog(JexlEngine.class) : conf.logger();
         this.functions = conf.namespaces() == null ? Collections.<String, Object>emptyMap() : conf.namespaces();
@@ -211,7 +210,7 @@ public class Engine extends JexlEngine {
     }
     
     @Override
-    public TemplateEngine jxlt() {
+    public TemplateEngine createJxltEngine() {
         return new TemplateEngine(this);
     }
 
@@ -253,17 +252,6 @@ public class Engine extends JexlEngine {
     @Override
     public void setClassLoader(ClassLoader loader) {
         uberspect.setClassLoader(loader);
-    }
-
-    /**
-     * Retrieves the map of function namespaces.
-     *
-     * @return the map passed in setFunctions or the empty map if the
-     * original was null.
-     */
-    @Override
-    public Map<String, Object> getFunctions() {
-        return functions;
     }
 
     /**

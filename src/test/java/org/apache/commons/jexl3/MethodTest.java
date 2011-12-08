@@ -29,11 +29,11 @@ import org.apache.commons.jexl3.junit.Asserter;
 public class MethodTest extends JexlTestCase {
     private Asserter asserter;
     private static final String METHOD_STRING = "Method string";
-    
+
     public MethodTest() {
         super("MethodTest");
     }
-    
+
     public static class VarArgs {
         public String callInts(Integer... args) {
             int result = 0;
@@ -94,8 +94,19 @@ public class MethodTest extends JexlTestCase {
         }
     }
 
-    public static class EnhancedContext extends JexlEvalContext {
+    public static class EnhancedContext extends JexlEvalContext implements JexlContext.NamespaceResolver {
         int factor = 6;
+        final Map<String, Object> funcs;
+
+        EnhancedContext(Map<String, Object> funcs) {
+            super();
+            this.funcs = funcs;
+        }
+
+        @Override
+        public Object resolveNamespace(String name) {
+            return funcs.get(name);
+        }
     }
 
     public static class ContextualFunctor {
@@ -221,8 +232,7 @@ public class MethodTest extends JexlTestCase {
         funcs.put("math", new MyMath());
         funcs.put("cx", ContextualFunctor.class);
 
-        EnhancedContext jc = new EnhancedContext();
-        jc.setNamespaces(funcs);
+        EnhancedContext jc = new EnhancedContext(funcs);
 
         JexlExpression e = JEXL.createExpression("ten()");
         Object o = e.evaluate(jc);
@@ -252,8 +262,8 @@ public class MethodTest extends JexlTestCase {
         funcs.put("FUNC", Functor.class);
 
         JexlExpression e = JEXL.createExpression("func:ten()");
-        JexlEvalContext jc = new JexlEvalContext();
-        jc.setNamespaces(funcs);
+        JexlEvalContext jc = new EnhancedContext(funcs);
+        
         Object o = e.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
 
@@ -274,7 +284,7 @@ public class MethodTest extends JexlTestCase {
         assertEquals("Result is not 40", new Integer(40), o);
     }
 
-    public static class ScriptContext extends MapContext implements NamespaceResolver {
+    public static class ScriptContext extends MapContext implements JexlContext.NamespaceResolver {
         Map<String, Object> nsScript;
 
         ScriptContext(Map<String, Object> ns) {
@@ -316,7 +326,7 @@ public class MethodTest extends JexlTestCase {
         JexlMethod mplus = new JexlMethod() {
             @Override
             public Object invoke(Object obj, Object[] params) throws Exception {
-                if (obj instanceof Map<?,?>) {
+                if (obj instanceof Map<?, ?>) {
                     return ja.add(params[0], params[1]);
                 } else {
                     throw new Exception("not a script context");
@@ -351,12 +361,12 @@ public class MethodTest extends JexlTestCase {
                 return Object.class;
             }
         };
-        
+
         foo.put("PLUS", mplus);
         forty2 = JEXL.createScript("script:PLUS(4, 2) * script:PLUS(4, 3)");
         o = forty2.execute(context);
         assertEquals("Result is not 42", new Integer(42), o);
-        
+
         context.set("foo.bar", foo);
         forty2 = JEXL.createScript("foo.'bar'.PLUS(4, 2) * foo.bar.PLUS(4, 3)");
         o = forty2.execute(context);

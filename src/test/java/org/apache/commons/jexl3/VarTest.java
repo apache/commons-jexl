@@ -85,7 +85,7 @@ public class VarTest extends JexlTestCase {
         assertEquals("Result is not 42", new Integer(42), o);
     }
 
-    public static class NumbersContext extends MapContext implements NamespaceResolver {
+    public static class NumbersContext extends MapContext implements JexlContext.NamespaceResolver {
         @Override
         public Object resolveNamespace(String name) {
             return name == null ? this : null;

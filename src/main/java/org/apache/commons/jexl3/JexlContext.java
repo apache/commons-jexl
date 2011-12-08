@@ -46,4 +46,28 @@ public interface JexlContext {
      * @return true if it exists, false otherwise
      */
     boolean has(String name);
+
+    /**
+     * 
+     * This interface declares how to resolve a namespace from its name; it is used by the interpreter during
+     * evalutation.
+     * <p>
+     * In JEXL, a namespace is an object that serves the purpose of encapsulating functions; for instance,
+     * the "math" namespace would be the proper object to expose functions like "log(...)", "sinus(...)", etc.
+     * </p>
+     * In expressions like "ns:function(...)", the resolver is called with resolveNamespace("ns").
+     * <p>
+     * JEXL itself reserves 'jexl' and 'ujexl' as namespaces for internal purpose; resolving those may lead to
+     * unexpected results.
+     * </p>
+     * @since 3.0
+     */
+    public interface NamespaceResolver {
+        /**
+         * Resolves a namespace by its name.
+         * @param name the name
+         * @return the namespace object
+         */
+        Object resolveNamespace(String name);
+    }
 }

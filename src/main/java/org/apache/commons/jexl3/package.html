@@ -93,7 +93,7 @@
             <li>org.apache.commons.jexl3.internal.introspection</li>
         </ul>
 
-        <h3><a name="usage_api">Dynamic invocation</a></h3>
+        <h3><a name="usage_api">Dynamic Invocation</a></h3>
         <p>
             These functionalities are close to the core level utilities found in
             <a href="http://commons.apache.org/beanutils/">BeanUtils</a>.
@@ -139,7 +139,7 @@
             assertEquals("Result is not 1000", new Integer(1000), o);
         </pre>
 
-        <h3><a name="usage_jexl">JEXL script expression</a></h3>
+        <h3><a name="usage_jexl">Expressions and Scripts</a></h3>
         <p>
             If your needs require simple expression evaluation capabilities, the core JEXL features
             will most likely fit.
@@ -189,53 +189,54 @@
             JxltEngine.UnifiedExpression expr = jxlt.createExpression("Hello ${user}");
             String hello = jxlt.evaluate(context, jxlt).toString();
         </pre>
-        <h3>JexlExpression, JexlScript, UnifiedExpression and Template: differences</h3>
+
+        <h3>JexlExpression, JexlScript, UnifiedExpression and Template: summary</h3>
         <h4>JexlExpression </h4>
         <p>
-        These are the most basic form of JexlEngine expressions and only allows for a single command
-        to be executed and its result returned. If you try to use multiple commands it ignores 
-        everything after the first semi-colon and just returns the result from 
-        the first command. 
+            These are the most basic form of JexlEngine expressions and only allow for a single command
+            to be executed and its result returned. If you try to use multiple commands, it ignores 
+            everything after the first semi-colon and just returns the result from 
+            the first command. 
         </p>
         <h4>JexlScript</h4>
         <p>
-        This allows you to put multiple commands in the expression and you can 
-        use variable assignments, loops, calculations, etc. More or less what can be achieved in Shell or
-        JavaScript at its basic level. The result from the last command is returned from the script.
+            This allows you to put multiple commands in the expression and you can 
+            use variable assignments, loops, calculations, etc. More or less what can be achieved in Shell or
+            JavaScript at its basic level. The result from the last command is returned from the script.
         </p>
         <h4>JxltEngine.UnifiedExpression</h4> 
         <p>
-        These are ideal to produce "one-liner" text, like a 'toString()' on steroids.
-        To get a calculation you use the EL-like syntax 
-        as in ${someVariable}. The expression that goes between the brackets 
-        behaves like a JexlScript, not an expression. You can use semi-colons to 
-        execute multiple commands and the result from the last command is 
-        returned from the script. You also have the ability to use a 2-pass evaluation using
-        the #{someScript} syntax.
+            These are ideal to produce "one-liner" text, like a 'toString()' on steroids.
+            To get a calculation you use the EL-like syntax 
+            as in ${someVariable}. The expression that goes between the brackets 
+            behaves like a JexlScript, not an expression. You can use semi-colons to 
+            execute multiple commands and the result from the last command is 
+            returned from the script. You also have the ability to use a 2-pass evaluation using
+            the #{someScript} syntax.
         </p>
         <h4>JxltEngine.Template</h4> 
         <p>
-        These produce text documents. Each line beginning with '$$' (as a default) is
-        considered JEXL code and all others considered as JxltEngine.UnifiedExpression.
-        Think of those as simple Velocity templates. A rewritten MudStore initial Velocity sample looks like this:
+            These produce text documents. Each line beginning with '$$' (as a default) is
+            considered JEXL code and all others considered as JxltEngine.UnifiedExpression.
+            Think of those as simple Velocity templates. A rewritten MudStore initial Velocity sample looks like this:
         </p>
         <pre><code>
         &lt;html&gt;
-&lt;body&gt;
-Hello ${customer.name}!
-&lt;table>
-$$for(var mud : mudsOnSpecial ) {
-$$   if (customer.hasPurchased(mud) ) {
-      &lt;tr&gt;
-        &lt;td&gt;
-          ${flogger.getPromo( mud )}
-        &lt;/td&gt;
-      &lt;/tr&gt;
-$$    }
-$$}
-&lt;/table&gt;
-&lt;/body&gt;
-&lt;/html&gt;
+            &lt;body&gt;
+                Hello ${customer.name}!
+                &lt;table&gt;
+        $$      for(var mud : mudsOnSpecial ) {
+        $$          if (customer.hasPurchased(mud) ) {
+                    &lt;tr&gt;
+                        &lt;td&gt;
+                            ${flogger.getPromo( mud )}
+                        &lt;/td&gt;
+                    &lt;/tr&gt;
+        $$          }
+        $$      }
+        &lt;/table&gt;
+        &lt;/body&gt;
+        &lt;/html&gt;
         </code></pre>
 
         <h2><a name="configuration">JEXL Configuration</a></h2>
@@ -243,43 +244,27 @@ $$}
             The JexlEngine can be configured through a few parameters that will drive how it reacts
             in case of errors.
             These configuration methods are embedded through a {@link org.apache.commons.jexl3.JexlBuilder}.
+        </p>
+        <h3><a name="static_configuration">Static Configuration</a></h3>
         <p>
-            Most configuration options can be overriden during evaluation by using a {@link org.apache.commons.jexl3.JexlEvalContext}
-            which merges both a {@link org.apache.commons.jexl3.JexlContext} to expose variables and a
-{@link org.apache.commons.jexl3.JexlEngine$Options} to carry evaluation options.
+            Both JexlEngine and JxltEngine are thread-safe, all their inner fields are final; the same instance can be shared between different
+            threads and proper synchronization is enforced in critical areas (introspection caches).
+            The following properties can only be set during JexlEngine creation.
         </p>
         <p>
-            {@link org.apache.commons.jexl3.JexlBuilder#strict} configures when JEXL considers 'null' as an error or not in various situations;
-            when facing an unreferenceable variable, using null as an argument to an arithmetic operator or failing to call
-            a method or constructor. The lenient mode is close to JEXL-1.1 behavior.
+            {@link org.apache.commons.jexl3.JexlBuilder#loader} indicates to the JexlEngine being built which class loader
+            to use to solve a class name; this affects how JexlEngine.newInstance and the 'new' script method operates.
+            This is mostly useful in cases where you rely on JEXL to dynamically load and call plugins for your application.
         </p>
         <p>
-            {@link org.apache.commons.jexl3.JexlBuilder#silent} configures how JEXL reacts to errors; if silent, the engine will not throw exceptions
-            but will warn through loggers and return null in case of errors. Note that when non-silent, JEXL throws
-            JexlException which are unchecked exception.
+            You can state what can be manipulated through scripting by the {@link org.apache.commons.jexl3.annotations.NoJexl}
+            annotation that completely shield classes and methods from JEXL introspection.
+            The other configurable way to restrict JEXL is by using a
+            {@link org.apache.commons.jexl3.introspection.JexlSandbox} which allows finer control over what is exposed; the sandbox
+            can be set through {@link org.apache.commons.jexl3.JexlBuilder#sandbox}.
         </p>
         <p>
-            {@link org.apache.commons.jexl3.JexlBuilder#debug} makes stacktraces carried by JExlException more meaningfull; in particular, these
-            traces will carry the exact caller location the Expression was created from.
-        </p>
-        <p>
-            {@link org.apache.commons.jexl3.JexlBuilder#loader} indicates to a JexlEngine which class loader to use to solve a class name; this affects
-            how JexlEngine.newInstance and the 'new' script method operates. This is mostly useful in cases where
-            you rely on JEXL to dynamically load and call plugins for your application.
-        </p>
-        <p>
-            JexlEngine and JxltEngine expression caches can be configured as well. If you intend to use JEXL
-            repeatedly in your application, these are worth configuring since expression parsing is quite heavy.
-            Note that all caches created by JEXL are held through SoftReference; under high memory pressure, the GC will be able
-            to reclaim those caches and JEXL will rebuild them if needed. By default, a JexlEngine does not create a cache
-            whilst JxltEngine does.
-        </p>
-        <p>Both JexlEngine and JxltEngine are thread-safe, all their inner fields are final; the same instance can be shared between different
-            threads and proper synchronization is enforced in critical areas.</p>
-        <p>{@link org.apache.commons.jexl3.JexlBuilder#cache} will set how many expressions can be simultaneously cached by the
-            JEXL engine. UnifiedJEXL allows to define the cache size through its constructor.</p>
-        <p>
-            {@link org.apache.commons.jexl3.JexlEngine#namespaces} extends JEXL scripting by registering your own classes as
+            {@link org.apache.commons.jexl3.JexlBuilder#namespaces} extends JEXL scripting by registering your own classes as
             namespaces allowing your own functions to be exposed at will.
         </p>
         This can be used as in:
@@ -289,7 +274,7 @@ $$}
                     return Math.cos(x);
                 }
             }
-            Map&lt;String, Object> funcs = new HashMap&lt;String, Object>();
+            Map&lt;String, Object> funcs = new HashMap&lt;String, Object&gt;();
             funcs.put("math", new MyMath());
             JexlEngine jexl = new JexlBuilder().namespaces(funcs).create();
 
@@ -300,22 +285,59 @@ $$}
             o = e.evaluate(jc);
             assertEquals(Double.valueOf(-1),o);
         </code></pre>
-        If the <i>namespace</i> is a Class and that class declares a constructor that takes a JexlContext (or
-        a class extending JexlContext), one <i>namespace</i> instance is created on first usage in an
-        expression; this instance lifetime is limited to the expression evaluation.
+        <p>
+            If the <i>namespace</i> is a Class and that class declares a constructor that takes a JexlContext (or
+            a class extending JexlContext), one <i>namespace</i> instance is created on first usage in an
+            expression; this instance lifetime is limited to the expression evaluation.
+        </p>
+        <p>
+            JexlEngine and JxltEngine expression caches can be configured as well. If you intend to use JEXL
+            repeatedly in your application, these are worth configuring since expression parsing is quite heavy.
+            Note that all caches created by JEXL are held through SoftReference; under high memory pressure, the GC will be able
+            to reclaim those caches and JEXL will rebuild them if needed. By default, a JexlEngine does not create a cache
+            whilst JxltEngine does.
+        </p>
+        <p>{@link org.apache.commons.jexl3.JexlBuilder#cache} will set how many expressions can be simultaneously cached by the
+            JEXL engine. UnifiedJEXL allows to define the cache size through its constructor.
+        </p>
+        <p>
+            {@link org.apache.commons.jexl3.JexlBuilder#debug}
+            makes stacktraces carried by JExlException more meaningful; in particular, these
+            traces will carry the exact caller location the Expression was created from.
+        </p>
+
+        <h3><a name="dynamic_configuration">Dynamic Configuration</a></h3>
+        <p>
+            Those configuration options can be overriden during evaluation by using a {@link org.apache.commons.jexl3.JexlEvalContext}
+            which merges both a {@link org.apache.commons.jexl3.JexlContext} to expose variables and a
+            {@link org.apache.commons.jexl3.JexlEngine$Options} to carry evaluation options.
+        </p>
+        <p>
+            {@link org.apache.commons.jexl3.JexlBuilder#strict} or {@link org.apache.commons.jexl3.JexlEvalContext#setStrict}
+            configures when JEXL considers 'null' as an error or not in various situations;
+            when facing an unreferenceable variable, using null as an argument to an arithmetic operator or failing to call
+            a method or constructor. The lenient mode is close to JEXL-1.1 behavior.
+        </p>
+        <p>
+            {@link org.apache.commons.jexl3.JexlBuilder#silent} or {@link org.apache.commons.jexl3.JexlEvalContext#setSilent}
+            configures how JEXL reacts to errors; if silent, the engine will not throw exceptions
+            but will warn through loggers and return null in case of errors. Note that when non-silent, JEXL throws
+            JexlException which are unchecked exception.
+        </p>
+        <p>
+            Implementing a {@link org.apache.commons.jexl3.JexlContext$NamespaceResolver} through a JexlContext - by deriving
+            JexlEvalContext for instance - allows to override the namespace resolution and the default namespace map defined
+            through {@link org.apache.commons.jexl3.JexlBuilder#namespaces}.
+        </p>
+
 
         <h2><a name="customization">JEXL Customization</a></h2>
-        
         <p>
             The {@link org.apache.commons.jexl3.JexlContext}, {@link org.apache.commons.jexl3.JexlBuilder} and
             {@link org.apache.commons.jexl3.JexlEngine$Options} are
             the most likely interfaces you'll want to implement for customization. Since they expose variables and options,
             they are the primary targets. Before you do so, have a look at {@link org.apache.commons.jexl3.JexlEvalContext}
             and {@link org.apache.commons.jexl3.ObjectContext} which may already cover some of your needs.
-        </p>
-        <p>
-            The {@link org.apache.commons.jexl3.NamespaceResolver} may also be of interest since it allows resolving namespaces (sic)
-            without having to store them in a map.
         </p>
         <p>
             {@link org.apache.commons.jexl3.JexlArithmetic}
@@ -326,7 +348,7 @@ $$}
             Note however that you can not change the operator precedence.
         </p>
 
-        <h2><a name="extension">JEXL Extending</a></h2>
+        <h2><a name="extension">Extending JEXL</a></h2>
         If you need to make JEXL treat some objects in a specialized manner or tweak how it
         reacts to some settings, you can derive most of its inner-workings. The classes and methods are rarely private or
         final - only when the inner contract really requires it. However, using the protected methods

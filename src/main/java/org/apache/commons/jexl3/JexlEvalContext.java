@@ -176,16 +176,4 @@ public class JexlEvalContext implements JexlContext, JexlEngine.Options {
         mathScale = scale;
     }
 
-    @Override
-    public Map<String, Object> getNamespaces() {
-        return namespaces;
-    }
-
-    /**
-     * Sets the namespaces vars to use during evaluation.
-     * @param funcs the namespaces
-     */
-    public void setNamespaces(Map<String, Object> funcs) {
-        namespaces = funcs;
-    }
 }

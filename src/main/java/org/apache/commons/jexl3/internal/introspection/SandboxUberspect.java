@@ -16,40 +16,38 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import java.util.Iterator;
 import org.apache.commons.jexl3.JexlInfoHandle;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
-import org.apache.commons.jexl3.introspection.Sandbox;
-import org.apache.commons.logging.Log;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.apache.commons.jexl3.introspection.JexlSandbox;
 
 /**
  * An uberspect that controls usage of properties, methods and contructors through a sandbox.
  * @since 3.0
  */
-public final class SandboxUberspect extends Uberspect {
+public final class SandboxUberspect implements JexlUberspect {
+    /** The base uberspect. */
+    protected final JexlUberspect uberspect;
     /**  The sandbox. */
-    private final Sandbox sandbox;
+    protected final JexlSandbox sandbox;
 
     /**
-     * A constructor for Sandbox uberspect.
-     * @param runtimeLogger the logger to use or null to use default
-     * @param theSandbox the sandbox instance to use
+     * A constructor for JexlSandbox uberspect.
+     * @param theUberspect the JexlUberspect to sandbox
+     * @param theSandbox the sandbox which is copied to avoid changes at runtime
      */
-    public SandboxUberspect(Log runtimeLogger, Sandbox theSandbox) {
-        super(runtimeLogger);
+    public SandboxUberspect(JexlUberspect theUberspect, JexlSandbox theSandbox) {
         if (theSandbox == null) {
             throw new NullPointerException("sandbox can not be null");
         }
-        this.sandbox = theSandbox;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setLoader(ClassLoader cloader) {
-        base().setLoader(cloader);
+        if (theUberspect == null) {
+            throw new NullPointerException("uberspect can not be null");
+        }
+        this.uberspect = theUberspect;
+        this.sandbox = theSandbox.copy();
     }
 
     /**
@@ -67,7 +65,7 @@ public final class SandboxUberspect extends Uberspect {
             return null;
         }
         if (sandbox.execute(className, "") != null) {
-            return super.getConstructor(className, args, info);
+            return uberspect.getConstructor(className, args, info);
         }
         return null;
     }
@@ -80,7 +78,7 @@ public final class SandboxUberspect extends Uberspect {
         if (obj != null && method != null) {
             String actual = sandbox.execute(obj.getClass().getName(), method);
             if (actual != null) {
-                return getMethodExecutor(obj, actual, args);
+                return uberspect.getMethod(obj, actual, args, info);
             }
         }
         return null;
@@ -94,7 +92,7 @@ public final class SandboxUberspect extends Uberspect {
         if (obj != null && identifier != null) {
             String actual = sandbox.read(obj.getClass().getName(), identifier.toString());
             if (actual != null) {
-                return super.getPropertyGet(obj, actual, info);
+                return uberspect.getPropertyGet(obj, actual, info);
             }
         }
         return null;
@@ -108,10 +106,20 @@ public final class SandboxUberspect extends Uberspect {
         if (obj != null && identifier != null) {
             String actual = sandbox.write(obj.getClass().getName(), identifier.toString());
             if (actual != null) {
-                return super.getPropertySet(obj, actual, arg, info);
+                return uberspect.getPropertySet(obj, actual, arg, info);
             }
         }
         return null;
 
+    }
+
+    @Override
+    public void setClassLoader(ClassLoader loader) {
+        uberspect.setClassLoader(loader);
+    }
+
+    @Override
+    public Iterator<?> getIterator(Object obj, JexlInfoHandle info) {
+        return uberspect.getIterator(obj, info);
     }
 }
