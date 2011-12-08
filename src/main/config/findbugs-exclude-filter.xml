@@ -16,11 +16,8 @@
    limitations under the License.
 -->
 
-<!--
-  This file removes JavaCC generated classes from being analyzed by findbugs.
-  Having no way to influence their generation, instructing findbugs to ignore them reduces clutter.
--->
 <FindBugsFilter>
+    <!-- Ignore JavaCC generated classes -->
     <Match>
         <Class name="org.apache.commons.jexl2.parser.ParseException"/>
     </Match>
@@ -38,5 +35,17 @@
     </Match>
     <Match>
         <Class name="org.apache.commons.jexl2.parser.TokenMgrError"/>
+    </Match>
+    <!-- Ignore deliberately unused field -->
+    <Match>
+        <Class name="org.apache.commons.jexl2.Interpreter"/>
+        <Field name="parameters"/>
+    </Match>
+    <!-- Deprecated and unused, included for binary compat only -->
+    <Match>
+        <Class name="org.apache.commons.jexl2.parser.ASTFloatLiteral"/>
+    </Match>
+    <Match>
+        <Class name="org.apache.commons.jexl2.parser.ASTIntegerLiteral"/>
     </Match>
 </FindBugsFilter>
