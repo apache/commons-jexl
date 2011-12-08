@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URL;
-import java.util.Map;
 import java.math.MathContext;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
@@ -30,7 +29,7 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  * Creates and evaluates JexlExpression and JexlScript objects.
  * Determines the behavior of expressions & scripts during their evaluation with respect to:
  * <ul>
- *  <li>Introspection, see {@link Uberspect}</li>
+ *  <li>Introspection, see {@link JexlUberspect}</li>
  *  <li>Arithmetic & comparison, see {@link JexlArithmetic}</li>
  *  <li>Error reporting</li>
  *  <li>Logging</li>
@@ -62,12 +61,6 @@ public abstract class JexlEngine {
         Boolean isStrict();
         
         /**
-         * The namespaces to use for evaluation.
-         * @return the map of namespaces
-         */
-        Map<String, Object> getNamespaces();
-        
-        /**
          * Checks whether the arithmetic triggers errors during evaluation when null is used as an operand.
          * @return true if strict, false otherwise
          */
@@ -87,29 +80,17 @@ public abstract class JexlEngine {
     }
     
     /**
-     * Gets this engine underlying uberspect.
+     * Gets this engine underlying {@link JexlUberspect}.
      * @return the uberspect
      */
     public abstract JexlUberspect getUberspect();
     
     /**
-     * Gets this engine underlying arithmetic.
+     * Gets this engine underlying {@link JexlArithmetic}.
      * @return the arithmetic
      */
     public abstract JexlArithmetic getArithmetic();
     
-    /**
-     * Gets a Jexl Template engine instance.
-     * @return a Jexl Template engine
-     */
-    public abstract JxltEngine jxlt();
-
-    /**
-     * Retrieves the map of function namespaces.
-     * @return the map passed in setFunctions or the empty map if the
-     * original was null.
-     */
-    public abstract Map<String, Object> getFunctions();
     /**
      * Checks whether this engine is in debug mode.
      * @return true if debug is on, false otherwise
@@ -137,6 +118,12 @@ public abstract class JexlEngine {
     public abstract void setClassLoader(ClassLoader loader);
     
     /**
+     * Creates a new {@link JxltEngine} instance using this engine.
+     * @return a Jexl Template engine
+     */
+    public abstract JxltEngine createJxltEngine();
+    
+    /**
      * Clears the expression cache.
      */
     public abstract void clearCache();
@@ -146,7 +133,7 @@ public abstract class JexlEngine {
      * JEXL syntax.  This method parses the expression which
      * must contain either a reference or an expression.
      * @param expression A String containing valid JEXL syntax
-     * @return An JexlExpression object which can be evaluated with a JexlContext
+     * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
      * @throws JexlException An exception can be thrown if there is a problem
      * parsing this expression, or if the expression is neither an
      * expression nor a reference.
@@ -158,7 +145,7 @@ public abstract class JexlEngine {
      * JEXL syntax.  This method parses the expression which
      * must contain either a reference or an expression.
      * @param expression A String containing valid JEXL syntax
-     * @return An JexlExpression object which can be evaluated with a JexlContext
+     * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
      * @param info An info structure to carry debugging information if needed
      * @throws JexlException An exception can be thrown if there is a problem
      * parsing this expression, or if the expression is neither an
@@ -171,7 +158,7 @@ public abstract class JexlEngine {
      * This method parses the script which validates the syntax.
      *
      * @param scriptText A String containing valid JEXL syntax
-     * @return A {@link Script} which can be executed using a {@link JexlContext}.
+     * @return A {@link JexlScript} which can be executed using a {@link JexlContext}
      * @throws JexlException if there is a problem parsing the script.
      */
     public abstract JexlScript createScript(String scriptText);
@@ -182,7 +169,7 @@ public abstract class JexlEngine {
      *
      * @param scriptText A String containing valid JEXL syntax
      * @param names the script parameter names
-     * @return A {@link Script} which can be executed using a {@link JexlContext}.
+     * @return A {@link JexlScript} which can be executed using a {@link JexlContext}
      * @throws JexlException if there is a problem parsing the script.
      */
     public abstract JexlScript createScript(String scriptText, String... names);
@@ -196,7 +183,7 @@ public abstract class JexlEngine {
      * @param scriptText A String containing valid JEXL syntax
      * @param info An info structure to carry debugging information if needed
      * @param names the script parameter names
-     * @return A {@link Script} which can be executed using a {@link JexlContext}.
+     * @return A {@link JexlScript} which can be executed using a {@link JexlContext}
      * @throws JexlException if there is a problem parsing the script.
      */
     public abstract JexlScript createScript(String scriptText, JexlInfo info, String[] names);
@@ -207,7 +194,7 @@ public abstract class JexlEngine {
      *
      * @param scriptFile A {@link File} containing valid JEXL syntax.
      * Must not be null. Must be a readable file.
-     * @return A {@link Script} which can be executed with a
+     * @return A {@link JexlScript} which can be executed with a
      * {@link JexlContext}.
      * @throws IOException if there is a problem reading the script.
      * @throws JexlException if there is a problem parsing the script.
@@ -220,7 +207,7 @@ public abstract class JexlEngine {
      *
      * @param scriptUrl A {@link URL} containing valid JEXL syntax.
      * Must not be null. Must be a readable file.
-     * @return A {@link Script} which can be executed with a
+     * @return A {@link JexlScript} which can be executed with a
      * {@link JexlContext}.
      * @throws IOException if there is a problem reading the script.
      * @throws JexlException if there is a problem parsing the script.

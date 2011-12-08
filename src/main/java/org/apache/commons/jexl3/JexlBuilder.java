@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import org.apache.commons.jexl3.internal.Engine;
 import java.util.Map;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.logging.Log;
 
 /**
@@ -56,6 +57,10 @@ public class JexlBuilder {
      * The JexlUberspect instance.
      */
     protected JexlUberspect uberspect = null;
+    /**
+     * The sandbox.
+     */
+    protected JexlSandbox sandbox = null;
     /**
      * The Log to which all JexlEngine messages will be logged.
      */
@@ -118,6 +123,21 @@ public class JexlBuilder {
     /** @return the arithmetic */
     public JexlArithmetic arithmetic() {
         return this.arithmetic;
+    }
+    
+    /**
+     * Sets the sandbox the engine will use.
+     * @param box the sandbox
+     * @return this builder
+     */
+    public JexlBuilder sandbox(JexlSandbox box) {
+        this.sandbox = box;
+        return this;
+    }
+    
+    /** @return the sandbox */
+    public JexlSandbox sandbox() {
+        return this.sandbox;
     }
 
     /**
@@ -197,7 +217,7 @@ public class JexlBuilder {
     }
 
     /**
-     * Sets the map of function namespaces the engine will use.
+     * Sets the default namespaces map the engine will use.
      * <p>
      * Each entry key is used as a prefix, each entry value used as a bean implementing
      * methods; an expression like 'nsx:method(123)' will thus be solved by looking at

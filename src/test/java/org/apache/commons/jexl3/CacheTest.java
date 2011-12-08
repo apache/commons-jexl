@@ -31,7 +31,9 @@ public class CacheTest extends JexlTestCase {
     public CacheTest() {
         super("CacheTest", null);
     }
-    private static final JexlEngine jexl = new JexlBuilder().cache(512).debug(true).strict(true).create();
+    private static final JexlEngine jexlCache = new JexlBuilder().cache(1024).debug(true).strict(true).create();
+    private static final JexlEngine jexlNoCache = new JexlBuilder().cache(0).debug(true).strict(true).create();
+    private static JexlEngine jexl = jexlCache;
 
     @Override
     public void setUp() throws Exception {
@@ -278,7 +280,9 @@ public class CacheTest extends JexlTestCase {
             loops = MIX.length;
         }
         if (!cache) {
-            jexl.clearCache();
+            jexl = jexlNoCache;
+        } else {
+            jexl = jexlCache;
         }
         java.util.concurrent.ExecutorService execs = java.util.concurrent.Executors.newFixedThreadPool(NTHREADS);
         List<Callable<Integer>> tasks = new ArrayList<Callable<Integer>>(NTHREADS);
@@ -584,6 +588,19 @@ public class CacheTest extends JexlTestCase {
     public void testComputeCache() throws Exception {
             runThreaded(ComputeTask.class, LOOPS, true);
     }
+    
+    public static class JexlContextNS extends JexlEvalContext implements JexlContext.NamespaceResolver {
+        final Map<String, Object> funcs;
+        JexlContextNS(Map<String, Object> vars, Map<String, Object> funcs) {
+            super(vars);
+            this.funcs = funcs;
+        }
+        @Override
+        public Object resolveNamespace(String name) {
+            return funcs.get(name);
+        }
+        
+    }
 
     /**
      * The remaining tests exercise the namespaced namespaces; not MT.
@@ -600,9 +617,8 @@ public class CacheTest extends JexlTestCase {
             jexl.clearCache();
         }
         Map<String, Object> vars = new HashMap<String, Object>();
-        JexlEvalContext jc = new JexlEvalContext(vars);
         java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
-        jc.setNamespaces(funcs);
+        JexlEvalContext jc = new JexlContextNS(vars, funcs);
         JexlExpression compute2 = jexl.createExpression("cached:COMPUTE(a0, a1)");
         JexlExpression compute1 = jexl.createExpression("cached:COMPUTE(a0)");
         Object result = null;

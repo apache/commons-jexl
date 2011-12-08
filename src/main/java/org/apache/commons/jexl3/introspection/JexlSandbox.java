@@ -53,10 +53,13 @@ import java.util.Set;
  * <li><b>execute</b> controls executable methods and constructor</li>
  * </ul>
  * </p>
- * 
+ * <p>
+ * Note that a JexlUberspect allways uses a copy of a JexlSandbox when built to avoid synchronization and/or
+ * concurrent modifications at runtime.
+ * </p>
  * @since 3.0
  */
-public final class Sandbox {
+public final class JexlSandbox {
     /**
      * The map from class names to permissions.
      */
@@ -65,7 +68,7 @@ public final class Sandbox {
     /**
      * Creates a new default sandbox.
      */
-    public Sandbox() {
+    public JexlSandbox() {
         this(new HashMap<String, Permissions>());
     }
 
@@ -73,8 +76,19 @@ public final class Sandbox {
      * Creates a sandbox based on an existing permissions map.
      * @param map the permissions map
      */
-    protected Sandbox(Map<String, Permissions> map) {
+    protected JexlSandbox(Map<String, Permissions> map) {
         sandbox = map;
+    }
+
+    /**
+     * @return a copy of this sandbox
+     */
+    public JexlSandbox copy() {
+        Map<String, Permissions> map = new HashMap<String, Permissions>();
+        for (Map.Entry<String, Permissions> entry : sandbox.entrySet()) {
+            map.put(entry.getKey(), entry.getValue().copy());
+        }
+        return new JexlSandbox(map);
     }
 
     /**
@@ -182,6 +196,13 @@ public final class Sandbox {
         public String get(String name) {
             return name;
         }
+
+        /**
+         * @return a copy of these Names
+         */
+        protected Names copy() {
+            return this;
+        }
     }
     /**
      * The pass-thru name set.
@@ -191,6 +212,11 @@ public final class Sandbox {
         public boolean add(String name) {
             return false;
         }
+
+        @Override
+        protected Names copy() {
+            return this;
+        }
     };
 
     /**
@@ -199,6 +225,13 @@ public final class Sandbox {
     public static final class WhiteSet extends Names {
         /** The map of controlled names and aliases. */
         private Map<String, String> names = null;
+
+        @Override
+        protected Names copy() {
+            WhiteSet copy = new WhiteSet();
+            copy.names = names == null ? null : new HashMap<String, String>(names);
+            return copy;
+        }
 
         @Override
         public boolean add(String name) {
@@ -232,6 +265,13 @@ public final class Sandbox {
     public static final class BlackSet extends Names {
         /** The set of controlled names. */
         private Set<String> names = null;
+
+        @Override
+        protected Names copy() {
+            BlackSet copy = new BlackSet();
+            copy.names = names == null ? null : new HashSet<String>(names);
+            return copy;
+        }
 
         @Override
         public boolean add(String name) {
@@ -280,6 +320,13 @@ public final class Sandbox {
             this.read = nread != null ? nread : WHITE_NAMES;
             this.write = nwrite != null ? nwrite : WHITE_NAMES;
             this.execute = nexecute != null ? nexecute : WHITE_NAMES;
+        }
+
+        /**
+         * @return a copy of these permissions
+         */
+        Permissions copy() {
+            return new Permissions(read.copy(), write.copy(), execute.copy());
         }
 
         /**
@@ -343,7 +390,6 @@ public final class Sandbox {
             return execute;
         }
     }
-    
     /**
      * The pass-thru permissions.
      */

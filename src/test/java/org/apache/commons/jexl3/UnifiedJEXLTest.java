@@ -34,7 +34,7 @@ import java.util.Set;
 public class UnifiedJEXLTest extends JexlTestCase {
     private static final JexlEngine ENGINE = new JexlBuilder().silent(false).cache(128).strict(true).create();
 
-    private static final JxltEngine JXLT = ENGINE.jxlt();
+    private static final JxltEngine JXLT = ENGINE.createJxltEngine();
     private static final Log LOG = LogFactory.getLog(JxltEngine.class);
     private JexlEvalContext context = null;
 

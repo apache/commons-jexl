@@ -20,7 +20,6 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JxltEngine;
-import org.apache.commons.jexl3.NamespaceResolver;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
@@ -1002,7 +1001,7 @@ public final class TemplateEngine extends JxltEngine {
      * <p>This context exposes its writer as '$jexl' to the scripts.</p>
      * <p>public for introspection purpose.</p>
      */
-    public final class TemplateContext implements JexlContext, NamespaceResolver {
+    public final class TemplateContext implements JexlContext, JexlContext.NamespaceResolver {
         /** The wrapped context. */
         private final JexlContext wrap;
         /** The array of TemplateEngine expressions. */

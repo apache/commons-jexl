@@ -16,23 +16,17 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
-import org.apache.commons.jexl3.NamespaceResolver;
-import org.apache.commons.logging.Log;
 
-import org.apache.commons.jexl3.parser.JexlNode;
+import org.apache.commons.jexl3.introspection.JexlMethod;
+import org.apache.commons.jexl3.introspection.JexlPropertyGet;
+import org.apache.commons.jexl3.introspection.JexlPropertySet;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
+
 import org.apache.commons.jexl3.parser.ASTAdditiveNode;
 import org.apache.commons.jexl3.parser.ASTAdditiveOperator;
 import org.apache.commons.jexl3.parser.ASTAndNode;
@@ -50,8 +44,8 @@ import org.apache.commons.jexl3.parser.ASTEQNode;
 import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
-import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
+import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTGENode;
 import org.apache.commons.jexl3.parser.ASTGTNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
@@ -79,15 +73,22 @@ import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
+import org.apache.commons.jexl3.parser.ASTVar;
 import org.apache.commons.jexl3.parser.ASTWhileStatement;
+import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.Node;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
-import org.apache.commons.jexl3.introspection.JexlUberspect;
-import org.apache.commons.jexl3.introspection.JexlMethod;
-import org.apache.commons.jexl3.introspection.JexlPropertyGet;
-import org.apache.commons.jexl3.introspection.JexlPropertySet;
-import org.apache.commons.jexl3.parser.ASTVar;
+import org.apache.commons.logging.Log;
+
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An interpreter of JEXL syntax.
@@ -138,17 +139,15 @@ public class Interpreter extends ParserVisitor {
             JexlEngine.Options opts = (JexlEngine.Options) context;
             Boolean ostrict = opts.isStrict();
             Boolean osilent = opts.isSilent();
-            Map<String,Object> ofunction = opts.getNamespaces();
             this.strictEngine = ostrict == null? jexl.isStrict() : ostrict.booleanValue();
             this.silent = osilent == null? jexl.isSilent() : osilent.booleanValue();
-            this.functions = ofunction == null? jexl.functions : ofunction;
             this.arithmetic = jexl.arithmetic.options(opts);
         } else {
             this.strictEngine = jexl.isStrict();
             this.silent = jexl.isSilent();
-            this.functions = jexl.functions;
             this.arithmetic = jexl.arithmetic;
         }
+        this.functions = jexl.functions;
         this.strictArithmetic = this.arithmetic.isStrict();
         this.cache = jexl.cache != null;
         if (frame != null) {
@@ -278,8 +277,8 @@ public class Interpreter extends ParserVisitor {
             }
         }
         // check if namespace if a resolver
-        if (context instanceof NamespaceResolver) {
-            namespace = ((NamespaceResolver) context).resolveNamespace(prefix);
+        if (context instanceof JexlContext.NamespaceResolver) {
+            namespace = ((JexlContext.NamespaceResolver) context).resolveNamespace(prefix);
         }
         if (namespace == null) {
             namespace = functions.get(prefix);

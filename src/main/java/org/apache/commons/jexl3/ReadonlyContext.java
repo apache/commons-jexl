@@ -17,7 +17,6 @@
 package org.apache.commons.jexl3;
 
 import java.math.MathContext;
-import java.util.Map;
 
 /**
  * A readonly context wrapper.
@@ -83,10 +82,5 @@ public final class ReadonlyContext implements JexlContext, JexlEngine.Options {
     @Override
     public int getArithmeticMathScale() {
         return options == null? -1 : options.getArithmeticMathScale();
-    }
-
-    @Override
-    public Map<String, Object> getNamespaces() {
-        return options == null? null : options.getNamespaces();
     }
 }
