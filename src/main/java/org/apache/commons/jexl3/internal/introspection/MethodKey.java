@@ -16,12 +16,15 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Iterator;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A method key usable by the introspector cache.
@@ -43,6 +46,40 @@ import java.util.Arrays;
  * Roughly 3x faster than string key to access the map & uses less memory.
  */
 public final class MethodKey {
+    /** The initial size of the primitive conversion map. */
+    private static final int PRIMITIVE_SIZE = 13;
+    /** The primitive type to class conversion map. */
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES;
+
+    static {
+        PRIMITIVE_TYPES = new HashMap<Class<?>, Class<?>>(PRIMITIVE_SIZE);
+        PRIMITIVE_TYPES.put(Boolean.TYPE, Boolean.class);
+        PRIMITIVE_TYPES.put(Byte.TYPE, Byte.class);
+        PRIMITIVE_TYPES.put(Character.TYPE, Character.class);
+        PRIMITIVE_TYPES.put(Double.TYPE, Double.class);
+        PRIMITIVE_TYPES.put(Float.TYPE, Float.class);
+        PRIMITIVE_TYPES.put(Integer.TYPE, Integer.class);
+        PRIMITIVE_TYPES.put(Long.TYPE, Long.class);
+        PRIMITIVE_TYPES.put(Short.TYPE, Short.class);
+    }
+
+    /** Converts a primitive type to its corresponding class.
+     * <p>
+     * If the argument type is primitive then we want to convert our
+     * primitive type signature to the corresponding Object type so
+     * introspection for methods with primitive types will work
+     * correctly.
+     * </p>
+     * @param parm a may-be primitive type class
+     * @return the equivalent object class 
+     */
+    static Class<?> primitiveClass(Class<?> parm) {
+        // it is marginally faster to get from the map than call isPrimitive...
+        //if (!parm.isPrimitive()) return parm;
+        Class<?> prim = PRIMITIVE_TYPES.get(parm);
+        return prim == null ? parm : prim;
+    }
+    
     /** The hash code. */
     private final int hashCode;
     /** The method name. */
@@ -80,13 +117,21 @@ public final class MethodKey {
         }
         this.hashCode = hash;
     }
-    
+
     /**
      * Creates a key from a method.
      * @param aMethod the method to generate the key from.
      */
     MethodKey(Method aMethod) {
         this(aMethod.getName(), aMethod.getParameterTypes());
+    }
+
+    /**
+     * Creates a key from a constructor.
+     * @param aCtor the constructor to generate the key from.
+     */
+    MethodKey(Constructor<?> aCtor) {
+        this(aCtor.getDeclaringClass().getName(), aCtor.getParameterTypes());
     }
 
     /**
@@ -104,7 +149,7 @@ public final class MethodKey {
         if (args != null && (size = args.length) > 0) {
             this.params = new Class<?>[size];
             for (int p = 0; p < size; ++p) {
-                Class<?> parm = ClassMap.MethodCache.primitiveClass(args[p]);
+                Class<?> parm = primitiveClass(args[p]);
                 hash = (HASH * hash) + parm.hashCode();
                 this.params[p] = parm;
             }
@@ -192,7 +237,7 @@ public final class MethodKey {
     public Constructor<?> getMostSpecificConstructor(List<Constructor<?>> methods) {
         return CONSTRUCTORS.getMostSpecific(methods, params);
     }
-    
+
     /**
      * Determines whether a type represented by a class object is
      * convertible to another type represented by a class object using a
@@ -343,7 +388,6 @@ public final class MethodKey {
         }
         return false;
     }
-    
     /**
      * whether a method/ctor is more specific than a previously compared one.
      */
@@ -383,7 +427,19 @@ public final class MethodKey {
 
         // CSOFF: RedundantThrows
         /**
-         * Gets the most specific method that is applicable to actual argument types.
+         * Gets the most specific method that is applicable to actual argument types.<p>
+         * Attempts to find the most specific applicable method using the
+         * algorithm described in the JLS section 15.12.2 (with the exception that it can't
+         * distinguish a primitive type argument from an object type argument, since in reflection
+         * primitive type arguments are represented by their object counterparts, so for an argument of
+         * type (say) java.lang.Integer, it will not be able to decide between a method that takes int and a
+         * method that takes java.lang.Integer as a parameter.
+         * </p>
+         * <p>
+         * This turns out to be a relatively rare case where this is needed - however, functionality
+         * like this is needed.
+         * </p>
+         *
          * @param methods a list of methods.
          * @param classes list of argument types.
          * @return the most specific method.
@@ -629,7 +685,6 @@ public final class MethodKey {
             return isStrictInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
         }
     }
-    
     /**
      * The parameter matching service for methods.
      */
@@ -639,7 +694,6 @@ public final class MethodKey {
             return app.getParameterTypes();
         }
     };
-    
     /**
      * The parameter matching service for constructors.
      */
