@@ -29,6 +29,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 /**
  * This basic function of this class is to return a Method object for a
  * particular class given the name of a method and the parameters to the method
@@ -51,16 +54,32 @@ import java.util.Map;
  * @since 1.0
  */
 public final class Introspector {
+    /**
+     * A Constructor get cache-miss.
+     */
+    private static class CacheMiss {
+        /** The constructor used as cache-miss. */
+        @SuppressWarnings("unused")
+        public CacheMiss() {
+        }
+    }
+    /** The cache-miss marker for the constructors map. */
+    private static final Constructor<?> CTOR_MISS = CacheMiss.class.getConstructors()[0];
+    
     /** the logger. */
     protected final Log rlog;
-    /**
-     * Holds the method maps for the classes we know about, keyed by Class.
-     */
-    private final Map<Class<?>, ClassMap> classMethodMaps = new HashMap<Class<?>, ClassMap>();
     /**
      * The class loader used to solve constructors if needed.
      */
     private ClassLoader loader;
+    /**
+     * The read/write lock.
+     */
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    /**
+     * Holds the method maps for the classes we know about, keyed by Class.
+     */
+    private final Map<Class<?>, ClassMap> classMethodMaps = new HashMap<Class<?>, ClassMap>();
     /**
      * Holds the map of classes ctors we know about as well as unknown ones.
      */
@@ -91,7 +110,7 @@ public final class Introspector {
             return null;
         }
     }
-    
+
     /**
      * Gets a method defined by a class, a name and a set of parameters.
      * @param c the class
@@ -103,6 +122,7 @@ public final class Introspector {
     public Method getMethod(Class<?> c, String name, Object[] params) {
         return getMethod(c, new MethodKey(name, params));
     }
+
     /**
      * Gets the method defined by the <code>MethodKey</code> for the class <code>c</code>.
      *
@@ -113,7 +133,7 @@ public final class Introspector {
      */
     public Method getMethod(Class<?> c, MethodKey key) {
         try {
-            return getMap(c).findMethod(key);
+            return getMap(c).getMethod(key);
         } catch (MethodKey.AmbiguousException xambiguous) {
             // whoops.  Ambiguous.  Make a nice log message and return null...
             if (rlog != null && rlog.isInfoEnabled()) {
@@ -133,7 +153,7 @@ public final class Introspector {
      * @return the desired field or null if it does not exist or is not accessible
      * */
     public Field getField(Class<?> c, String key) {
-        return getMap(c).findField(c, key);
+        return getMap(c).getField(key);
     }
 
     /**
@@ -173,21 +193,131 @@ public final class Introspector {
             return null;
         }
         ClassMap classMap = getMap(c);
-        return classMap.get(methodName);
+        return classMap.getMethods(methodName);
+    }
+
+
+
+    /**
+     * Gets the constructor defined by the <code>MethodKey</code>.
+     *
+     * @param key   Key of the constructor being searched for
+     * @return The desired constructor object
+     * or null if no unambiguous constructor could be found through introspection.
+     */
+    public Constructor<?> getConstructor(final MethodKey key) {
+        return getConstructor(null, key);
     }
 
     /**
-     * A Constructor get cache-miss.
+     * Gets the constructor defined by the <code>MethodKey</code>.
+     * @param c the class we want to instantiate
+     * @param key   Key of the constructor being searched for
+     * @return The desired constructor object
+     * or null if no unambiguous constructor could be found through introspection.
      */
-    private static class CacheMiss {
-        /** The constructor used as cache-miss. */
-        @SuppressWarnings("unused")
-        public CacheMiss() {}
+    public Constructor<?> getConstructor(final Class<?> c, final MethodKey key) {
+        Constructor<?> ctor = null;
+        try {
+            lock.readLock().lock();
+            ctor = constructorsMap.get(key);
+            if (ctor != null) {
+                // miss or not?
+                return CTOR_MISS.equals(ctor) ? null : ctor;
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
+        // let's introspect...
+        try {
+            lock.writeLock().lock();
+            // again for kicks
+            ctor = constructorsMap.get(key);
+            if (ctor != null) {
+                // miss or not?
+                return CTOR_MISS.equals(ctor) ? null : ctor;
+            }
+            final String cname = key.getMethod();
+            // do we know about this class?
+            Class<?> clazz = constructibleClasses.get(cname);
+            try {
+                // do find the most specific ctor
+                if (clazz == null) {
+                    if (c != null && c.getName().equals(key.getMethod())) {
+                        clazz = c;
+                    } else {
+                        clazz = loader.loadClass(cname);
+                    }
+                    // add it to list of known loaded classes
+                    constructibleClasses.put(cname, clazz);
+                }
+                List<Constructor<?>> l = new LinkedList<Constructor<?>>();
+                for (Constructor<?> ictor : clazz.getConstructors()) {
+                    if (Modifier.isPublic(ictor.getModifiers()) && Permissions.allow(ictor)) {
+                        l.add(ictor);
+                    }
+                }
+                // try to find one
+                ctor = key.getMostSpecificConstructor(l);
+                if (ctor != null) {
+                    constructorsMap.put(key, ctor);
+                } else {
+                    constructorsMap.put(key, CTOR_MISS);
+                }
+            } catch (ClassNotFoundException xnotfound) {
+                if (rlog != null && rlog.isInfoEnabled()) {
+                    rlog.info("unable to find class: "
+                            + cname + "."
+                            + key.debugString(), xnotfound);
+                }
+                ctor = null;
+            } catch (MethodKey.AmbiguousException xambiguous) {
+                if (rlog != null && rlog.isInfoEnabled()) {
+                    rlog.info("ambiguous constructor invocation: "
+                            + cname + "."
+                            + key.debugString(), xambiguous);
+                }
+                ctor = null;
+            }
+            return ctor;
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * Gets the ClassMap for a given class.
+     * @param c the class
+     * @return the class map
+     */
+    private ClassMap getMap(Class<?> c) {
+        ClassMap classMap;
+        try {
+            lock.readLock().lock();
+            classMap = classMethodMaps.get(c);
+        } finally {
+            lock.readLock().unlock();
+        }
+        if (classMap == null) {
+            try {
+                lock.writeLock().lock();
+                // try again
+                classMap = classMethodMaps.get(c);
+                if (classMap == null) {
+                    classMap = classMethodMaps.get(c);
+                    if (classMap == null) {
+                        classMap = new ClassMap(c, rlog);
+                        classMethodMaps.put(c, classMap);
+                    }
+                }
+            } finally {
+                lock.writeLock().unlock();
+            }
+
+        }
+        return classMap;
     }
     
-    /** The cache-miss marker for the constructors map. */
-    private static final Constructor<?> CTOR_MISS = CacheMiss.class.getConstructors()[0];
-
     /**
      * Sets the class loader used to solve constructors.
      * <p>Also cleans the constructors and methods caches.</p>
@@ -245,96 +375,5 @@ public final class Introspector {
             }
         }
         return false;
-    }
-
-    /**
-     * Gets the constructor defined by the <code>MethodKey</code>.
-     *
-     * @param key   Key of the constructor being searched for
-     * @return The desired constructor object
-     * or null if no unambiguous constructor could be found through introspection.
-     */
-    public Constructor<?> getConstructor(final MethodKey key) {
-        return getConstructor(null, key);
-    }
-
-    /**
-     * Gets the constructor defined by the <code>MethodKey</code>.
-     * @param c the class we want to instantiate
-     * @param key   Key of the constructor being searched for
-     * @return The desired constructor object
-     * or null if no unambiguous constructor could be found through introspection.
-     */
-    public Constructor<?> getConstructor(final Class<?> c, final MethodKey key) {
-        Constructor<?> ctor = null;
-        synchronized (constructorsMap) {
-            ctor = constructorsMap.get(key);
-            // that's a clear miss
-            if (CTOR_MISS.equals(ctor)) {
-                return null;
-            }
-            // let's introspect...
-            if (ctor == null) {
-                final String cname = key.getMethod();
-                // do we know about this class?
-                Class<?> clazz = constructibleClasses.get(cname);
-                try {
-                    // do find the most specific ctor
-                    if (clazz == null) {
-                        if (c != null && c.getName().equals(key.getMethod())) {
-                            clazz = c;
-                        } else {
-                            clazz = loader.loadClass(cname);
-                        }
-                        // add it to list of known loaded classes
-                        constructibleClasses.put(cname, clazz);
-                    }
-                    List<Constructor<?>> l = new LinkedList<Constructor<?>>();
-                    for (Constructor<?> ictor : clazz.getConstructors()) {
-                        if (Modifier.isPublic(ictor.getModifiers()) && Permissions.allow(ictor)) {
-                            l.add(ictor);
-                        }
-                    }
-                    // try to find one
-                    ctor = key.getMostSpecificConstructor(l);
-                    if (ctor != null) {
-                        constructorsMap.put(key, ctor);
-                    } else {
-                        constructorsMap.put(key, CTOR_MISS);
-                    }
-                } catch (ClassNotFoundException xnotfound) {
-                    if (rlog != null && rlog.isInfoEnabled()) {
-                        rlog.info("unable to find class: "
-                                + cname + "."
-                                + key.debugString(), xnotfound);
-                    }
-                    ctor = null;
-                } catch (MethodKey.AmbiguousException xambiguous) {
-                    if (rlog != null && rlog.isInfoEnabled()) {
-                        rlog.info("ambiguous constructor invocation: "
-                                + cname + "."
-                                + key.debugString(), xambiguous);
-                    }
-                    ctor = null;
-                }
-            }
-            return ctor;
-        }
-    }
-
-    /**
-     * Gets the ClassMap for a given class.
-     * @param c the class
-     * @return the class map
-     */
-    private ClassMap getMap(Class<?> c) {
-        synchronized (classMethodMaps) {
-            ClassMap classMap = classMethodMaps.get(c);
-            if (classMap == null) {
-                classMap = new ClassMap(c, rlog);
-                classMethodMaps.put(c, classMap);
-            }
-            return classMap;
-        }
     }
 }
