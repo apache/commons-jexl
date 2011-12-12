@@ -25,7 +25,7 @@
     <author email="dev@commons.apache.org">Commons Developers</author>
   </properties>
   <body>
-    <release version="2.1" date="unreleased">
+    <release version="2.1" date="2011-12-12">
         <action dev="henrib" type="add" issue="JEXL-121">
             Add simple template features
         </action>
