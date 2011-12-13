@@ -35,17 +35,17 @@
     </repository>
     <release>
       <version>
-        <name>commons-jexl</name>
-        <created>2011-12-01</created>
-        <revision>3.0</revision>
+        <name>commons-jexl2</name>
+        <created>2011-12-12</created>
+        <revision>2.1</revision>
       </version>
       <version>
-        <name>commons-jexl</name>
+        <name>commons-jexl2</name>
         <created>2010-04-07</created>
         <revision>2.0.1</revision>
       </version>
       <version>
-        <name>commons-jexl</name>
+        <name>commons-jexl2</name>
         <created>2010-02-23</created>
         <revision>2.0</revision>
       </version>
