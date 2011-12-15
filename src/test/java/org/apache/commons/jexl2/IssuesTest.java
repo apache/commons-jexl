@@ -827,4 +827,27 @@ public class IssuesTest extends JexlTestCase {
         result = get1.execute(null, quux);
         assertEquals(24, result);
     }
+    
+    public static class Jeff {
+        public String concat(String... strs) {
+            if (strs.length > 0) {
+                StringBuilder strb = new StringBuilder(strs[0]);
+                for(int s = 1; s < strs.length; ++s) {
+                    strb.append(", ");
+                    strb.append(strs[s]);
+                }
+                return strb.toString();
+            } else {
+                return "";
+            }
+            
+        }
+    }
+    
+    public void test124() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        Script script = jexl.createScript("jeff.concat(['1', '2', '3'])", "jeff");
+        Object res = script.execute(null, new Jeff());
+        assertEquals("1, 2, 3", res);
+    }
 }

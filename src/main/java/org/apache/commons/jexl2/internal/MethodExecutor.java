@@ -27,6 +27,7 @@ import org.apache.commons.jexl2.internal.introspection.MethodKey;
 public final class MethodExecutor extends AbstractExecutor.Method {
     /** Whether this method handles varargs. */
     private final boolean isVarArgs;
+
     /**
      * Creates a new instance.
      * @param is the introspector used to discover the method
@@ -49,7 +50,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
      */
     @Override
     public Object execute(Object o, Object[] args)
-        throws IllegalAccessException, InvocationTargetException  {
+            throws IllegalAccessException, InvocationTargetException {
         if (isVarArgs) {
             Class<?>[] formal = method.getParameterTypes();
             int index = formal.length - 1;
@@ -82,7 +83,6 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         }
         return TRY_FAILED;
     }
-
 
     /**
      * Discovers a method for a {@link MethodExecutor}.
@@ -131,12 +131,16 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         // if no values are being passed into the vararg, size == 0
         if (size == 1) {
             // if one non-null value is being passed into the vararg,
+            // and that arg is not the sole argument and not an array of the expected type,
             // make the last arg an array of the expected type
             if (actual[index] != null) {
-                // create a 1-length array to hold and replace the last argument
-                Object lastActual = Array.newInstance(type, 1);
-                Array.set(lastActual, 0, actual[index]);
-                actual[index] = lastActual;
+                Class<?> aclazz = actual[index].getClass();
+                if (!aclazz.isArray() || !aclazz.getComponentType().equals(type)) {
+                    // create a 1-length array to hold and replace the last argument
+                    Object lastActual = Array.newInstance(type, 1);
+                    Array.set(lastActual, 0, actual[index]);
+                    actual[index] = lastActual;
+                }
             }
             // else, the vararg is null and used as is, considered as T[]
         } else {
@@ -158,7 +162,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         return actual;
     }
 
-   /**
+    /**
      * Determines if a method can accept a variable number of arguments.
      * @param m a the method to check
      * @return true if method is vararg, false otherwise
@@ -175,5 +179,3 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         }
     }
 }
-
-
