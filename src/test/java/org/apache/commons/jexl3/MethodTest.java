@@ -70,6 +70,20 @@ public class MethodTest extends JexlTestCase {
             }
             return mixed + ":" + result;
         }
+        
+        public String concat(String... strs) {
+            if (strs.length > 0) {
+                StringBuilder strb = new StringBuilder(strs[0]);
+                for(int s = 1; s < strs.length; ++s) {
+                    strb.append(", ");
+                    strb.append(strs[s]);
+                }
+                return strb.toString();
+            } else {
+                return "";
+            }
+            
+        }
     }
 
     public static class Functor {
@@ -133,6 +147,9 @@ public class MethodTest extends JexlTestCase {
         asserter.assertExpression("test.callInts()", "Varargs:0");
         asserter.assertExpression("test.callInts(1)", "Varargs:1");
         asserter.assertExpression("test.callInts(1,2,3,4,5)", "Varargs:15");
+        asserter.assertExpression("test.concat(['1', '2', '3'])", "1, 2, 3");
+        asserter.assertExpression("test.concat('1', '2', '3')", "1, 2, 3");
+        
     }
 
     public void testCallMixedVarArgMethod() throws Exception {
