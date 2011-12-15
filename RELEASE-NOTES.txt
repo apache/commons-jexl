@@ -54,7 +54,8 @@ What's new in 2.1:
 * Extensions to UnifiedJEXL that allow the creation of templates.
 
 New features in 2.1:
-====================	
+====================
+* JEXL-121:     Add simple template features [this was missing from the previous edition of these notes]
 * JEXL-114:     Allow scripts to create local variables // Add return keyword
 * JEXL-113:     Add functions to extract which variables, parameters and local variables are used to evaluate a script
 * JEXL-118:     Provide an IN operator
