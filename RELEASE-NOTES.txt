@@ -17,7 +17,7 @@
 $Id$
 
                             Commons JEXL Package
-                                Version 2.1
+                                Version 2.1.1
                                Release Notes
 
 
@@ -34,6 +34,14 @@ Its goal is to expose scripting features usable by technical operatives or consu
 
 
   http://commons.apache.org/jexl/
+
+What's new in 2.1.1
+===================
+Version 2.1.1 is a bugfix release to address a regression in 2.1:
+
+* JEXL-124:  Array parameters to methods don't work anymore
+
+There are no other changes
 
 Compatibility with previous releases
 ====================================
