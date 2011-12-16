@@ -719,21 +719,22 @@ public class IssuesTest extends JexlTestCase {
         s = jexl.createScript("foo.'q u u x'");
         result = s.execute(jc);
         assertEquals("456", result);
-        
+
         Debugger dbg = new Debugger();
         dbg.debug(((ExpressionImpl) s).script);
         String dbgdata = dbg.data();
         assertEquals("foo.'q u u x';", dbgdata);
     }
-        
+
     public static class Container {
         String value0;
         int value1;
+
         public Container(String name, int number) {
             value0 = name;
             value1 = number;
         }
-        
+
         public Object getProperty(String name) {
             if ("name".equals(name)) {
                 return value0;
@@ -743,6 +744,7 @@ public class IssuesTest extends JexlTestCase {
                 return null;
             }
         }
+
         public Object getProperty(int ref) {
             if (0 == ref) {
                 return value0;
@@ -752,24 +754,25 @@ public class IssuesTest extends JexlTestCase {
                 return null;
             }
         }
-        
+
         public void setProperty(String name, String value) {
             if ("name".equals(name)) {
                 this.value0 = value;
             }
-        }  
-        
+        }
+
         public void setProperty(String name, int value) {
             if ("number".equals(name)) {
                 this.value1 = value;
             }
-        }        
+        }
+
         public void setProperty(int ref, String value) {
             if (0 == ref) {
                 this.value0 = value;
             }
-        }  
-        
+        }
+
         public void setProperty(int ref, int value) {
             if (1 == ref) {
                 this.value1 = value;
@@ -782,44 +785,44 @@ public class IssuesTest extends JexlTestCase {
         Container quux = new Container("quux", 42);
         Script get;
         Object result;
-        
+
         Script getName = jexl.createScript("foo.property.name", "foo");
         result = getName.execute(null, quux);
         assertEquals("quux", result);
-        
+
         Script get0 = jexl.createScript("foo.property.0", "foo");
         result = get0.execute(null, quux);
         assertEquals("quux", result);
-        
+
         Script getNumber = jexl.createScript("foo.property.number", "foo");
         result = getNumber.execute(null, quux);
         assertEquals(42, result);
-        
+
         Script get1 = jexl.createScript("foo.property.1", "foo");
         result = get1.execute(null, quux);
         assertEquals(42, result);
-        
+
         Script setName = jexl.createScript("foo.property.name = $0", "foo", "$0");
         setName.execute(null, quux, "QUUX");
         result = getName.execute(null, quux);
         assertEquals("QUUX", result);
         result = get0.execute(null, quux);
         assertEquals("QUUX", result);
-        
+
         Script set0 = jexl.createScript("foo.property.0 = $0", "foo", "$0");
         set0.execute(null, quux, "BAR");
         result = getName.execute(null, quux);
         assertEquals("BAR", result);
         result = get0.execute(null, quux);
         assertEquals("BAR", result);
-        
+
         Script setNumber = jexl.createScript("foo.property.number = $0", "foo", "$0");
         setNumber.execute(null, quux, -42);
         result = getNumber.execute(null, quux);
         assertEquals(-42, result);
         result = get1.execute(null, quux);
         assertEquals(-42, result);
-        
+
         Script set1 = jexl.createScript("foo.property.1 = $0", "foo", "$0");
         set1.execute(null, quux, 24);
         result = getNumber.execute(null, quux);
@@ -827,27 +830,5 @@ public class IssuesTest extends JexlTestCase {
         result = get1.execute(null, quux);
         assertEquals(24, result);
     }
-    
-    public static class Jeff {
-        public String concat(String... strs) {
-            if (strs.length > 0) {
-                StringBuilder strb = new StringBuilder(strs[0]);
-                for(int s = 1; s < strs.length; ++s) {
-                    strb.append(", ");
-                    strb.append(strs[s]);
-                }
-                return strb.toString();
-            } else {
-                return "";
-            }
-            
-        }
-    }
-    
-    public void test124() throws Exception {
-        JexlEngine jexl = new JexlEngine();
-        Script script = jexl.createScript("jeff.concat(['1', '2', '3'])", "jeff");
-        Object res = script.execute(null, new Jeff());
-        assertEquals("1, 2, 3", res);
-    }
+
 }

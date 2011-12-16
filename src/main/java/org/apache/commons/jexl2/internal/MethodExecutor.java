@@ -134,13 +134,10 @@ public final class MethodExecutor extends AbstractExecutor.Method {
             // and that arg is not the sole argument and not an array of the expected type,
             // make the last arg an array of the expected type
             if (actual[index] != null) {
-                Class<?> aclazz = actual[index].getClass();
-                if (!aclazz.isArray() || !aclazz.getComponentType().equals(type)) {
-                    // create a 1-length array to hold and replace the last argument
-                    Object lastActual = Array.newInstance(type, 1);
-                    Array.set(lastActual, 0, actual[index]);
-                    actual[index] = lastActual;
-                }
+                // create a 1-length array to hold and replace the last argument
+                Object lastActual = Array.newInstance(type, 1);
+                Array.set(lastActual, 0, actual[index]);
+                actual[index] = lastActual;
             }
             // else, the vararg is null and used as is, considered as T[]
         } else {
@@ -179,3 +176,4 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         }
     }
 }
+
