@@ -24,7 +24,6 @@ import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlInfo;
-import org.apache.commons.jexl3.JexlInfoHandle;
 import org.apache.commons.jexl3.JexlScript;
 
 import org.apache.commons.jexl3.internal.introspection.SandboxUberspect;
@@ -214,41 +213,21 @@ public class Engine extends JexlEngine {
         return new TemplateEngine(this);
     }
 
-    /**
-     * Checks whether this engine is in debug mode.
-     * @return true if debug is on, false otherwise
-     */
     @Override
     public boolean isDebug() {
         return this.debug;
     }
 
-    /**
-     * Checks whether this engine throws JexlException during evaluation.
-     * @return true if silent, false (default) otherwise
-     */
     @Override
     public boolean isSilent() {
         return this.silent;
     }
 
-
-    /**
-     * Checks whether this engine behaves in strict or lenient mode.
-     * Equivalent to !isLenient().
-     * @return true for strict, false for lenient
-     */
     @Override
     public final boolean isStrict() {
         return strict;
     }
 
-    /**
-     * Sets the class loader used to discover classes in 'new' expressions.
-     * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
-     * initialization code before expression creation &amp; evaluation.</p>
-     * @param loader the class loader to use
-     */
     @Override
     public void setClassLoader(ClassLoader loader) {
         uberspect.setClassLoader(loader);
@@ -264,32 +243,11 @@ public class Engine extends JexlEngine {
         return new Script(this, text, tree);
     }
 
-    /**
-     * Creates an JexlExpression from a String containing valid
-     * JEXL syntax.  This method parses the expression which
-     * must contain either a reference or an expression.
-     * @param expression A String containing valid JEXL syntax
-     * @return An JexlExpression object which can be evaluated with a JexlContext
-     * @throws JexlException An exception can be thrown if there is a problem
-     *      parsing this expression, or if the expression is neither an
-     *      expression nor a reference.
-     */
     @Override
     public JexlExpression createExpression(String expression) {
         return createExpression(expression, null);
     }
 
-    /**
-     * Creates an JexlExpression from a String containing valid
-     * JEXL syntax.  This method parses the expression which
-     * must contain either a reference or an expression.
-     * @param expression A String containing valid JEXL syntax
-     * @return An JexlExpression object which can be evaluated with a JexlContext
-     * @param info An info structure to carry debugging information if needed
-     * @throws JexlException An exception can be thrown if there is a problem
-     *      parsing this expression, or if the expression is neither an
-     *      expression or a reference.
-     */
     @Override
     public JexlExpression createExpression(String expression, JexlInfo info) {
         // Parse the expression
@@ -301,45 +259,16 @@ public class Engine extends JexlEngine {
         return createExpression(tree, expression);
     }
 
-    /**
-     * Creates a Script from a String containing valid JEXL syntax.
-     * This method parses the script which validates the syntax.
-     *
-     * @param scriptText A String containing valid JEXL syntax
-     * @return A {@link Script} which can be executed using a {@link JexlContext}.
-     * @throws JexlException if there is a problem parsing the script.
-     */
     @Override
     public Script createScript(String scriptText) {
         return createScript(scriptText, null, null);
     }
-
-    /**
-     * Creates a Script from a String containing valid JEXL syntax.
-     * This method parses the script which validates the syntax.
-     *
-     * @param scriptText A String containing valid JEXL syntax
-     * @param names the script parameter names
-     * @return A {@link Script} which can be executed using a {@link JexlContext}.
-     * @throws JexlException if there is a problem parsing the script.
-     */
+    
     @Override
     public Script createScript(String scriptText, String... names) {
         return createScript(scriptText, null, names);
     }
 
-    /**
-     * Creates a Script from a String containing valid JEXL syntax.
-     * This method parses the script which validates the syntax.
-     * It uses an array of parameter names that will be resolved during parsing;
-     * a corresponding array of arguments containing values should be used during evaluation.
-     *
-     * @param scriptText A String containing valid JEXL syntax
-     * @param info An info structure to carry debugging information if needed
-     * @param names the script parameter names
-     * @return A {@link Script} which can be executed using a {@link JexlContext}.
-     * @throws JexlException if there is a problem parsing the script.
-     */
     @Override
     public Script createScript(String scriptText, JexlInfo info, String[] names) {
         if (scriptText == null) {
@@ -360,17 +289,6 @@ public class Engine extends JexlEngine {
         return new Script(this, text, tree);
     }
 
-    /**
-     * Creates a Script from a {@link File} containing valid JEXL syntax.
-     * This method parses the script and validates the syntax.
-     *
-     * @param scriptFile A {@link File} containing valid JEXL syntax.
-     *      Must not be null. Must be a readable file.
-     * @return A {@link Script} which can be executed with a
-     *      {@link JexlContext}.
-     * @throws IOException if there is a problem reading the script.
-     * @throws JexlException if there is a problem parsing the script.
-     */
     @Override
     public Script createScript(File scriptFile) throws IOException {
         if (scriptFile == null) {
@@ -387,17 +305,6 @@ public class Engine extends JexlEngine {
         return createScript(readerToString(reader), info, null);
     }
 
-    /**
-     * Creates a Script from a {@link URL} containing valid JEXL syntax.
-     * This method parses the script and validates the syntax.
-     *
-     * @param scriptUrl A {@link URL} containing valid JEXL syntax.
-     *      Must not be null. Must be a readable file.
-     * @return A {@link Script} which can be executed with a
-     *      {@link JexlContext}.
-     * @throws IOException if there is a problem reading the script.
-     * @throws JexlException if there is a problem parsing the script.
-     */
     @Override
     public JexlScript createScript(URL scriptUrl) throws IOException {
         if (scriptUrl == null) {
@@ -413,36 +320,11 @@ public class Engine extends JexlEngine {
         return createScript(readerToString(reader), info, null);
     }
 
-    /**
-     * Accesses properties of a bean using an expression.
-     * <p>
-     * jexl.get(myobject, "foo.bar"); should equate to
-     * myobject.getFoo().getBar(); (or myobject.getFoo().get("bar"))
-     * </p>
-     * <p>
-     * If the JEXL engine is silent, errors will be logged through its logger as warning.
-     * </p>
-     * @param bean the bean to get properties from
-     * @param expr the property expression
-     * @return the value of the property
-     * @throws JexlException if there is an error parsing the expression or during evaluation
-     */
     @Override
     public Object getProperty(Object bean, String expr) {
         return getProperty(null, bean, expr);
     }
 
-    /**
-     * Accesses properties of a bean using an expression.
-     * <p>
-     * If the JEXL engine is silent, errors will be logged through its logger as warning.
-     * </p>
-     * @param context the evaluation context
-     * @param bean the bean to get properties from
-     * @param expr the property expression
-     * @return the value of the property
-     * @throws JexlException if there is an error parsing the expression or during evaluation
-     */
     @Override
     public Object getProperty(JexlContext context, Object bean, String expr) {
         if (context == null) {
@@ -469,36 +351,11 @@ public class Engine extends JexlEngine {
         }
     }
 
-    /**
-     * Assign properties of a bean using an expression.
-     * <p>
-     * jexl.set(myobject, "foo.bar", 10); should equate to
-     * myobject.getFoo().setBar(10); (or myobject.getFoo().put("bar", 10) )
-     * </p>
-     * <p>
-     * If the JEXL engine is silent, errors will be logged through its logger as warning.
-     * </p>
-     * @param bean the bean to set properties in
-     * @param expr the property expression
-     * @param value the value of the property
-     * @throws JexlException if there is an error parsing the expression or during evaluation
-     */
     @Override
     public void setProperty(Object bean, String expr, Object value) {
         setProperty(null, bean, expr, value);
     }
 
-    /**
-     * Assign properties of a bean using an expression.
-     * <p>
-     * If the JEXL engine is silent, errors will be logged through its logger as warning.
-     * </p>
-     * @param context the evaluation context
-     * @param bean the bean to set properties in
-     * @param expr the property expression
-     * @param value the value of the property
-     * @throws JexlException if there is an error parsing the expression or during evaluation
-     */
     @Override
     public void setProperty(JexlContext context, Object bean, String expr, Object value) {
         if (context == null) {
@@ -525,29 +382,15 @@ public class Engine extends JexlEngine {
         }
     }
 
-    /**
-     * Invokes an object's method by name and arguments.
-     * @param obj the method's invoker object
-     * @param meth the method's name
-     * @param args the method's arguments
-     * @return the method returned value or null if it failed and engine is silent
-     * @throws JexlException if method could not be found or failed and engine is not silent
-     */
     @Override
     public Object invokeMethod(Object obj, String meth, Object... args) {
         JexlException xjexl = null;
         Object result = null;
         final JexlInfo info = jexlInfo();
-        JexlInfoHandle handle = new JexlInfoHandle() {
-            @Override
-            public JexlInfo jexlInfo() {
-                return info;
-            }
-        };
         try {
-            JexlMethod method = uberspect.getMethod(obj, meth, args, handle);
+            JexlMethod method = uberspect.getMethod(obj, meth, args);
             if (method == null && arithmetic.narrowArguments(args)) {
-                method = uberspect.getMethod(obj, meth, args, handle);
+                method = uberspect.getMethod(obj, meth, args);
             }
             if (method != null) {
                 result = method.invoke(obj, args);
@@ -568,26 +411,11 @@ public class Engine extends JexlEngine {
         return result;
     }
 
-    /**
-     * Creates a new instance of an object using the most appropriate constructor
-     * based on the arguments.
-     * @param <T> the type of object
-     * @param clazz the class to instantiate
-     * @param args the constructor arguments
-     * @return the created object instance or null on failure when silent
-     */
     @Override
     public <T> T newInstance(Class<? extends T> clazz, Object... args) {
         return clazz.cast(doCreateInstance(clazz, args));
     }
 
-    /**
-     * Creates a new instance of an object using the most appropriate constructor
-     * based on the arguments.
-     * @param clazz the name of the class to instantiate resolved through this engine's class loader
-     * @param args the constructor arguments
-     * @return the created object instance or null on failure when silent
-     */
     @Override
     public Object newInstance(String clazz, Object... args) {
         return doCreateInstance(clazz, args);
@@ -604,16 +432,10 @@ public class Engine extends JexlEngine {
         JexlException xjexl = null;
         Object result = null;
         final JexlInfo info = jexlInfo();
-        JexlInfoHandle handle = new JexlInfoHandle() {
-            @Override
-            public JexlInfo jexlInfo() {
-                return info;
-            }
-        };
         try {
-            JexlMethod ctor = uberspect.getConstructor(clazz, args, handle);
+            JexlMethod ctor = uberspect.getConstructor(clazz, args);
             if (ctor == null && arithmetic.narrowArguments(args)) {
-                ctor = uberspect.getConstructor(clazz, args, handle);
+                ctor = uberspect.getConstructor(clazz, args);
             }
             if (ctor != null) {
                 result = ctor.invoke(clazz, args);
@@ -737,9 +559,6 @@ public class Engine extends JexlEngine {
         };
     }
 
-    /**
-     * Clears the expression cache.
-     */
     @Override
     public void clearCache() {
         synchronized (parser) {

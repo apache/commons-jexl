@@ -26,29 +26,51 @@ import java.lang.reflect.InvocationTargetException;
 public final class MethodExecutor extends AbstractExecutor.Method {
     /** Whether this method handles varargs. */
     private final boolean isVarArgs;
+    
+    
     /**
-     * Creates a new instance.
+     * Discovers a {@link MethodExecutor}.
+     * <p>
+     * If the object is an array, an attempt will be made to find the
+     * method in a List (see {@link ArrayListWrapper})
+     * </p>
+     * <p>
+     * If the object is a class, an attempt will be made to find the
+     * method as a static method of that class.
+     * </p>
      * @param is the introspector used to discover the method
-     * @param obj the object to find the method in
-     * @param name the method name
+     * @param obj the object to introspect
+     * @param method the name of the method to find
      * @param args the method arguments
+     * @return a filled up parameter (may contain a null method)
      */
-    public MethodExecutor(Introspector is, Object obj, String name, Object[] args) {
-        super(obj.getClass(), discover(is, obj, name, args));
-        isVarArgs = method != null && isVarArgMethod(method);
+    public static MethodExecutor discover(Introspector is, Object obj, String method, Object[] args) {
+        final Class<?> clazz = obj.getClass();
+        final MethodKey key = new MethodKey(method, args);
+        java.lang.reflect.Method m = is.getMethod(clazz, key);
+        if (m == null && clazz.isArray()) {
+            // check for support via our array->list wrapper
+            m = is.getMethod(ArrayListWrapper.class, key);
+        }
+        if (m == null && obj instanceof Class<?>) {
+            m = is.getMethod((Class<?>) obj, key);
+        }
+        return m == null? null : new MethodExecutor(clazz, m, key);
     }
 
     /**
-     * Invokes the method to be executed.
-     * @param o the object to invoke the method upon
-     * @param args the method arguments
-     * @return the result of the method invocation
-     * @throws IllegalAccessException Method is inaccessible.
-     * @throws InvocationTargetException Method body throws an exception.
+     * Creates a new instance.
+     * @param c the class this executor applies to
+     * @param m the method
+     * @param k the MethodKey
      */
+    private MethodExecutor(Class<?> c, java.lang.reflect.Method m, MethodKey k) {
+        super(c, m, k);
+        isVarArgs = method != null && isVarArgMethod(method);
+    }
+
     @Override
-    public Object execute(Object o, Object[] args)
-        throws IllegalAccessException, InvocationTargetException  {
+    public Object invoke(Object o, Object[] args) throws IllegalAccessException, InvocationTargetException  {
         if (isVarArgs) {
             Class<?>[] formal = method.getParameterTypes();
             int index = formal.length - 1;
@@ -64,15 +86,14 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Object tryExecute(String name, Object obj, Object[] args) {
+    public Object tryInvoke(String name, Object obj, Object[] args) {
         MethodKey tkey = new MethodKey(name, args);
         // let's assume that invocation will fly if the declaring class is the
         // same and arguments have the same type
         if (objectClass.equals(obj.getClass()) && tkey.equals(key)) {
             try {
-                return execute(obj, args);
+                return invoke(obj, args);
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
@@ -82,37 +103,6 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         return TRY_FAILED;
     }
 
-
-    /**
-     * Discovers a method for a {@link MethodExecutor}.
-     * <p>
-     * If the object is an array, an attempt will be made to find the
-     * method in a List (see {@link ArrayListWrapper})
-     * </p>
-     * <p>
-     * If the object is a class, an attempt will be made to find the
-     * method as a static method of that class.
-     * </p>
-     * @param is the introspector used to discover the method
-     * @param obj the object to introspect
-     * @param method the name of the method to find
-     * @param args the method arguments
-     * @return a filled up parameter (may contain a null method)
-     */
-    private static Parameter discover(Introspector is,
-            Object obj, String method, Object[] args) {
-        final Class<?> clazz = obj.getClass();
-        final MethodKey key = new MethodKey(method, args);
-        java.lang.reflect.Method m = is.getMethod(clazz, key);
-        if (m == null && clazz.isArray()) {
-            // check for support via our array->list wrapper
-            m = is.getMethod(ArrayListWrapper.class, key);
-        }
-        if (m == null && obj instanceof Class<?>) {
-            m = is.getMethod((Class<?>) obj, key);
-        }
-        return new Parameter(m, key);
-    }
 
     /**
      * Reassembles arguments if the method is a vararg method.
@@ -125,7 +115,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
      * @return The actual parameters adjusted for the varargs in order
      * to fit the method declaration.
      */
-    protected Object[] handleVarArg(Class<?> type, int index, Object[] actual) {
+    private Object[] handleVarArg(Class<?> type, int index, Object[] actual) {
         final int size = actual.length - index;
         // if no values are being passed into the vararg, size == 0
         if (size == 1) {

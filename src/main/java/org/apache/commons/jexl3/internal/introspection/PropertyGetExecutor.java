@@ -29,34 +29,45 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
     private final String property;
     
     /**
-     * Creates an instance by attempting discovery of the get method.
+     * Discovers a PropertyGetExecutor.
+     * <p>The method to be found should be named "get{P,p}property.</p>
+     * 
      * @param is the introspector
-     * @param clazz the class to introspect
+     * @param clazz the class to find the get method from
+     * @param property the property name to find
+     * @return the executor if found, null otherwise
+     */
+    public static PropertyGetExecutor discover(Introspector is, Class<?> clazz, String property) {
+        java.lang.reflect.Method method = discoverGet(is, "get", clazz, property);
+        return method == null? null : new PropertyGetExecutor(clazz, method, property);
+    }
+    
+    /**
+     * Creates an instance.
+     * @param clazz he class the get method applies to
+     * @param method the method held by this executor
      * @param identifier the property to get
      */
-    public PropertyGetExecutor(Introspector is, Class<?> clazz, String identifier) {
-        super(clazz, discover(is, clazz, identifier));
+    private PropertyGetExecutor(Class<?> clazz, java.lang.reflect.Method method, String identifier) {
+        super(clazz, method);
         property = identifier;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object getTargetProperty() {
         return property;
     }
     
-    /** {@inheritDoc} */
     @Override
-    public Object execute(Object o)
+    public Object invoke(Object o)
         throws IllegalAccessException, InvocationTargetException {
         return method == null ? null : method.invoke(o, (Object[]) null);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Object tryExecute(Object o, Object identifier) {
+    public Object tryInvoke(Object o, Object identifier) {
         if (o != null && method !=  null
-            && property.equals(identifier)
+            && property.equals(toString(identifier))
             && objectClass.equals(o.getClass())) {
             try {
                 return method.invoke(o, (Object[]) null);
@@ -70,20 +81,6 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
     }
 
     /**
-     * Discovers the method for a {@link PropertyGet}.
-     * <p>The method to be found should be named "get{P,p}property.</p>
-     *@param is the introspector
-     *@param clazz the class to find the get method from
-     *@param property the property name to find
-     *@return the method if found, null otherwise
-     */
-    static java.lang.reflect.Method discover(Introspector is,
-            final Class<?> clazz, String property) {
-        return discoverGet(is, "get", clazz, property);
-    }
-
-
-    /**
      * Base method for boolean & object property get.
      * @param is the introspector
      * @param which "is" or "get" for boolean or object
@@ -91,8 +88,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
      * @param property The property being addressed.
      * @return The {get,is}{p,P}roperty method if one exists, null otherwise.
      */
-    static java.lang.reflect.Method discoverGet(Introspector is,
-            String which, Class<?> clazz, String property) {
+    static java.lang.reflect.Method discoverGet(Introspector is, String which, Class<?> clazz, String property) {
         //  this is gross and linear, but it keeps it straightforward.
         java.lang.reflect.Method method = null;
         final int start = which.length(); // "get" or "is" so 3 or 2 for char case switch

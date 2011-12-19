@@ -269,7 +269,6 @@
                         <ruleset>/rulesets/braces.xml</ruleset>
                         <ruleset>/rulesets/unusedcode.xml</ruleset>
                         <ruleset>/rulesets/imports.xml</ruleset>
-                        <ruleset>/rulesets/codesize.xml</ruleset>
                         <ruleset>/rulesets/coupling.xml</ruleset>
                         <ruleset>/rulesets/design.xml</ruleset>
                         <ruleset>/rulesets/strings.xml</ruleset>

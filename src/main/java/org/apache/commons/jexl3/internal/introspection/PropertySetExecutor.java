@@ -27,30 +27,41 @@ public final class PropertySetExecutor extends AbstractExecutor.Set {
     private static final int SET_START_INDEX = 3;
     /** The property. */
     private final String property;
-
+    
     /**
-     * Creates an instance by attempting discovery of the set method.
+     * Discovers a PropertySetExecutor.
+     * <p>The method to be found should be named "set{P,p}property.</p>
+     * 
      * @param is the introspector
-     * @param clazz the class to introspect
-     * @param identifier the property to set
-     * @param arg the value to set into the property
+     * @param clazz the class to find the get method from
+     * @param property the property name to find
+     * @param arg the value to assign to the property
+     * @return the executor if found, null otherwise
      */
-    public PropertySetExecutor(Introspector is, Class<?> clazz, String identifier, Object arg) {
-        super(clazz, discover(is, clazz, identifier, arg));
-        property = identifier;
+    public static PropertySetExecutor discover(Introspector is, Class<?> clazz, String property, Object arg) {
+        java.lang.reflect.Method method = discoverSet(is, clazz, property, arg);
+        return method == null? null : new PropertySetExecutor(clazz, method, property);
+    }
+    
+    /**
+     * Creates an instance.
+     * @param clazz the class the set method applies to
+     * @param method the method called through this executor
+     * @param key the key to use as 1st argument to the set method
+     */
+    private PropertySetExecutor(Class<?> clazz, java.lang.reflect.Method method, String key) {
+        super(clazz, method);
+        property = key;
 
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object getTargetProperty() {
         return property;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Object execute(Object o, Object arg)
-            throws IllegalAccessException, InvocationTargetException {
+    public Object invoke(Object o, Object arg) throws IllegalAccessException, InvocationTargetException {
         Object[] pargs = {arg};
         if (method != null) {
             method.invoke(o, pargs);
@@ -58,18 +69,17 @@ public final class PropertySetExecutor extends AbstractExecutor.Set {
         return arg;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Object tryExecute(Object o, Object identifier, Object arg) {
+    public Object tryInvoke(Object o, Object identifier, Object arg) {
         if (o != null && method != null
             // ensure method name matches the property name
-            && property.equals(identifier)
+            && property.equals(toString(identifier))
             // object class should be same as executor's method declaring class
             && objectClass.equals(o.getClass())
             // we are guaranteed the method has one parameter since it is a set(x)
             && (arg == null || method.getParameterTypes()[0].equals(arg.getClass()))) {
             try {
-                return execute(o, arg);
+                return invoke(o, arg);
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
@@ -83,14 +93,14 @@ public final class PropertySetExecutor extends AbstractExecutor.Set {
     /**
      * Discovers the method for a {@link PropertySet}.
      * <p>The method to be found should be named "set{P,p}property.</p>
-     *@param is the introspector
-     *@param clazz the class to find the get method from
-     *@param property the name of the property to set
-     *@param arg the value to assign to the property
-     *@return the method if found, null otherwise
+     * 
+     * @param is the introspector
+     * @param clazz the class to find the get method from
+     * @param property the name of the property to set
+     * @param arg the value to assign to the property
+     * @return the method if found, null otherwise
      */
-    private static java.lang.reflect.Method discover(Introspector is,
-            final Class<?> clazz, String property, Object arg) {
+    private static java.lang.reflect.Method discoverSet(Introspector is, Class<?> clazz, String property, Object arg) {
         // first, we introspect for the set<identifier> setter method
         Object[] params = {arg};
         StringBuilder sb = new StringBuilder("set");
@@ -104,7 +114,6 @@ public final class PropertySetExecutor extends AbstractExecutor.Set {
             sb.setCharAt(SET_START_INDEX, Character.toLowerCase(c));
             method = is.getMethod(clazz, sb.toString(), params);
         }
-
         return method;
     }
 }

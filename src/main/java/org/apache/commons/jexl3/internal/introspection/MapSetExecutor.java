@@ -30,36 +30,48 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     private final Object property;
 
     /**
-     * Creates an instance checking for the Map interface.
-     *@param is the introspector
-     *@param clazz the class that might implement the map interface
-     *@param key the key to use as argument in map.put(key,value)
-     *@param value the value to use as argument in map.put(key,value)
-    */
-    public MapSetExecutor(Introspector is, Class<?> clazz, Object key, Object value) {
-        super(clazz, discover(clazz));
+     * Attempts to discover a MapSetExecutor.
+     * 
+     * @param is the introspector
+     * @param clazz the class to find the set method from
+     * @param identifier the key to use as an argument to the get method
+     * @param value the value to use as argument in map.put(key,value)
+     * @return the executor if found, null otherwise
+     */
+    public static MapSetExecutor discover(Introspector is, Class<?> clazz, Object identifier, Object value) {
+        if (Map.class.isAssignableFrom(clazz)) {
+            return new MapSetExecutor(clazz, MAP_SET, identifier);
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Creates an instance.
+     * @param clazz the class the set method applies to
+     * @param method the method called through this executor
+     * @param key the key to use as 1st argument to the set method
+     */
+    private MapSetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object key) {
+        super(clazz, method);
         property = key;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object getTargetProperty() {
         return property;
     }
     
-    /** {@inheritDoc} */
     @Override
-    public Object execute(final Object obj, Object value)
-    throws IllegalAccessException, InvocationTargetException {
+    public Object invoke(final Object obj, Object value) throws IllegalAccessException, InvocationTargetException {
         @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
         final Map<Object,Object> map = ((Map<Object, Object>) obj);
         map.put(property, value);
         return value;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Object tryExecute(final Object obj, Object key, Object value) {
+    public Object tryInvoke(final Object obj, Object key, Object value) {
         if (obj != null && method != null
             && objectClass.equals(obj.getClass())
             && (key == null || property.getClass().equals(key.getClass()))) {
@@ -69,14 +81,5 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
             return value;
         }
         return TRY_FAILED;
-    }
-
-    /**
-     * Finds the method to perform 'set' on a map.
-     * @param clazz the class to introspect
-     * @return a marker method, map.get
-     */
-    static java.lang.reflect.Method discover(Class<?> clazz) {
-        return (Map.class.isAssignableFrom(clazz))? MAP_SET : null;
     }
 }

@@ -34,43 +34,45 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
     private final Object property;
 
     /**
-     * Creates an instance by attempting discovery of the get method.
+     * Attempts to discover a DuckGetExecutor.
      * @param is the introspector
-     * @param clazz the class to introspect
+     * @param clazz the class to find the get method from
+     * @param identifier the key to use as an argument to the get method
+     * @return the executor if found, null otherwise
+     */
+    public static DuckGetExecutor discover(Introspector is, Class<?> clazz, Object identifier) {
+        java.lang.reflect.Method method = is.getMethod(clazz, "get", makeArgs(identifier));
+        return method == null? null : new DuckGetExecutor(clazz, method, identifier);
+    }
+
+    /**
+     * Creates an instance.
+     * @param clazz he class the get method applies to
+     * @param method the method held by this executor
      * @param identifier the property to get
      */
-    public DuckGetExecutor(Introspector is, Class<?> clazz, Object identifier) {
-        super(clazz, discover(is, clazz, identifier));
+    private DuckGetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object identifier) {
+        super(clazz, method);
         property = identifier;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object getTargetProperty() {
         return property;
     }
 
-    /**
-     * Get the property from the object.
-     * @param obj the object.
-     * @return object.get(property)
-     * @throws IllegalAccessException Method is inaccessible.
-     * @throws InvocationTargetException Method body throws an exception.
-     */
     @Override
-    public Object execute(Object obj)
-            throws IllegalAccessException, InvocationTargetException {
+    public Object invoke(Object obj) throws IllegalAccessException, InvocationTargetException {
         Object[] args = {property};
         return method == null ? null : method.invoke(obj, args);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Object tryExecute(Object obj, Object key) {
-        if (obj != null && method !=  null
-            // ensure method name matches the property name
-            && property.equals(key)
-            && objectClass.equals(obj.getClass())) {
+    public Object tryInvoke(Object obj, Object key) {
+        if (obj != null && method != null
+                // ensure method name matches the property name
+                && property.equals(key)
+                && objectClass.equals(obj.getClass())) {
             try {
                 Object[] args = {property};
                 return method.invoke(obj, args);
@@ -81,17 +83,5 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
             }
         }
         return TRY_FAILED;
-    }
-
-    /**
-     * Discovers a method for a {@link GetExecutor.DuckGet}.
-     *@param is the introspector
-     *@param clazz the class to find the get method from
-     *@param identifier the key to use as an argument to the get method
-     *@return the method if found, null otherwise
-     */
-    private static java.lang.reflect.Method discover(Introspector is,
-            final Class<?> clazz, Object identifier) {
-        return is.getMethod(clazz, "get", makeArgs(identifier));
     }
 }
