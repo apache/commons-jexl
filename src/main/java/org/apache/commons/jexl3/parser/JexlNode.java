@@ -17,14 +17,13 @@
 package org.apache.commons.jexl3.parser;
 
 import org.apache.commons.jexl3.JexlInfo;
-import org.apache.commons.jexl3.JexlInfoHandle;
 
 /**
  * Base class for parser nodes - holds an 'image' of the token for later use.
  *
  * @since 2.0
  */
-public abstract class JexlNode extends SimpleNode implements JexlInfoHandle {
+public abstract class JexlNode extends SimpleNode {
     /** A marker interface for literals.
      * @param <T> the literal type
      */
@@ -42,7 +41,10 @@ public abstract class JexlNode extends SimpleNode implements JexlInfoHandle {
         super(p, id);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Gets the associated JexlInfo instance.
+     * @return the info
+     */
     public JexlInfo jexlInfo() {
         JexlNode node = this;
         while (node != null) {

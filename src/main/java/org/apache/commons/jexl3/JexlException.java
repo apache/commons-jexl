@@ -17,11 +17,12 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Debugger;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.UndeclaredThrowableException;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParseException;
 import org.apache.commons.jexl3.parser.TokenMgrError;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.UndeclaredThrowableException;
 
 /**
  * Wraps any error that might occur during interpretation of a script or expression.
@@ -35,9 +36,9 @@ public class JexlException extends RuntimeException {
     /** A marker to use in NPEs stating a null operand error. */
     public static final String NULL_OPERAND = "jexl.null";
     /** Minimum number of characters around exception location. */
-    private static final int MIN_EXCHARLOC = 5;
+    private static final int MIN_EXCHARLOC = 10;
     /** Maximum number of characters around exception location. */
-    private static final int MAX_EXCHARLOC = 10;
+    private static final int MAX_EXCHARLOC = 15;
 
     /**
      * Creates a new JexlException.

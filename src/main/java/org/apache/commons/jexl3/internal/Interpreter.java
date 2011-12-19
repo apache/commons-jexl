@@ -289,7 +289,7 @@ public class Interpreter extends ParserVisitor {
         // allow namespace to be instantiated as functor with context if possible, not an error otherwise
         if (namespace instanceof Class<?>) {
             Object[] args = new Object[]{context};
-            JexlMethod ctor = uberspect.getConstructor(namespace, args, node);
+            JexlMethod ctor = uberspect.getConstructor(namespace, args);
             if (ctor != null) {
                 try {
                     namespace = ctor.invoke(namespace, args);
@@ -657,7 +657,7 @@ public class Interpreter extends ParserVisitor {
             JexlNode statement = node.jjtGetChild(2);
             // get an iterator for the collection/array etc via the
             // introspector.
-            Iterator<?> itemsIterator = uberspect.getIterator(iterableValue, node);
+            Iterator<?> itemsIterator = uberspect.getIterator(iterableValue);
             if (itemsIterator != null) {
                 while (itemsIterator.hasNext()) {
                     if (isCancelled()) {
@@ -725,11 +725,11 @@ public class Interpreter extends ParserVisitor {
             // try a contains method (duck type set)
             try {
                 Object[] argv = {left};
-                JexlMethod vm = uberspect.getMethod(right, "contains", argv, node);
+                JexlMethod vm = uberspect.getMethod(right, "contains", argv);
                 if (vm != null) {
                     return arithmetic.toBoolean(vm.invoke(right, argv)) ? Boolean.TRUE : Boolean.FALSE;
                 } else if (arithmetic.narrowArguments(argv)) {
-                    vm = uberspect.getMethod(right, "contains", argv, node);
+                    vm = uberspect.getMethod(right, "contains", argv);
                     if (vm != null) {
                         return arithmetic.toBoolean(vm.invoke(right, argv)) ? Boolean.TRUE : Boolean.FALSE;
                     }
@@ -740,7 +740,7 @@ public class Interpreter extends ParserVisitor {
                 throw new JexlException(node, "=~ error", e);
             }
             // try iterative comparison
-            Iterator<?> it = uberspect.getIterator(right, node);
+            Iterator<?> it = uberspect.getIterator(right);
             if (it != null) {
                 while (it.hasNext()) {
                     Object next = it.next();
@@ -915,11 +915,11 @@ public class Interpreter extends ParserVisitor {
                 }
             }
             boolean cacheable = cache;
-            JexlMethod vm = uberspect.getMethod(bean, methodName, argv, node);
+            JexlMethod vm = uberspect.getMethod(bean, methodName, argv);
             // DG: If we can't find an exact match, narrow the parameters and try again
             if (vm == null) {
                 if (arithmetic.narrowArguments(argv)) {
-                    vm = uberspect.getMethod(bean, methodName, argv, node);
+                    vm = uberspect.getMethod(bean, methodName, argv);
                 }
                 if (vm == null) {
                     Object functor = null;
@@ -932,7 +932,7 @@ public class Interpreter extends ParserVisitor {
                             functor = context.get(methodName);
                         }
                     } else {
-                        JexlPropertyGet gfunctor = uberspect.getPropertyGet(bean, methodName, node);
+                        JexlPropertyGet gfunctor = uberspect.getPropertyGet(bean, methodName);
                         if (gfunctor != null) {
                             functor = gfunctor.tryInvoke(bean, methodName);
                         }
@@ -1022,11 +1022,11 @@ public class Interpreter extends ParserVisitor {
                     }
                 }
             }
-            JexlMethod ctor = uberspect.getConstructor(cobject, argv, node);
+            JexlMethod ctor = uberspect.getConstructor(cobject, argv);
             // DG: If we can't find an exact match, narrow the parameters and try again
             if (ctor == null) {
                 if (arithmetic.narrowArguments(argv)) {
-                    ctor = uberspect.getConstructor(cobject, argv, node);
+                    ctor = uberspect.getConstructor(cobject, argv);
                 }
                 if (ctor == null) {
                     xjexl = new JexlException.Method(node, cobject.toString());
@@ -1111,11 +1111,11 @@ public class Interpreter extends ParserVisitor {
             // try a contains method (duck type set)
             try {
                 Object[] argv = {left};
-                JexlMethod vm = uberspect.getMethod(right, "contains", argv, node);
+                JexlMethod vm = uberspect.getMethod(right, "contains", argv);
                 if (vm != null) {
                     return arithmetic.toBoolean(vm.invoke(right, argv)) ? Boolean.FALSE : Boolean.TRUE;
                 } else if (arithmetic.narrowArguments(argv)) {
-                    vm = uberspect.getMethod(right, "contains", argv, node);
+                    vm = uberspect.getMethod(right, "contains", argv);
                     if (vm != null) {
                         return arithmetic.toBoolean(vm.invoke(right, argv)) ? Boolean.FALSE : Boolean.TRUE;
                     }
@@ -1126,7 +1126,7 @@ public class Interpreter extends ParserVisitor {
                 throw new JexlException(node, "!~ error", e);
             }
             // try iterative comparison
-            Iterator<?> it = uberspect.getIterator(right, node.jjtGetChild(1));
+            Iterator<?> it = uberspect.getIterator(right);//, node.jjtGetChild(1));
             if (it != null) {
                 while (it.hasNext()) {
                     Object next = it.next();
@@ -1360,7 +1360,7 @@ public class Interpreter extends ParserVisitor {
             // check if there is a size method on the object that returns an
             // integer and if so, just use it
             Object[] params = new Object[0];
-            JexlMethod vm = uberspect.getMethod(val, "size", EMPTY_PARAMS, node);
+            JexlMethod vm = uberspect.getMethod(val, "size", EMPTY_PARAMS);
             if (vm != null && vm.getReturnType() == Integer.TYPE) {
                 Integer result;
                 try {
@@ -1413,7 +1413,7 @@ public class Interpreter extends ParserVisitor {
                 }
             }
         }
-        JexlPropertyGet vg = uberspect.getPropertyGet(object, attribute, node);
+        JexlPropertyGet vg = uberspect.getPropertyGet(object, attribute);
         if (vg != null) {
             try {
                 Object value = vg.invoke(object);
@@ -1476,13 +1476,13 @@ public class Interpreter extends ParserVisitor {
             }
         }
         JexlException xjexl = null;
-        JexlPropertySet vs = uberspect.getPropertySet(object, attribute, value, node);
+        JexlPropertySet vs = uberspect.getPropertySet(object, attribute, value);
         // if we can't find an exact match, narrow the value argument and try again
         if (vs == null) {
             // replace all numbers with the smallest type that will fit
             Object[] narrow = {value};
             if (arithmetic.narrowArguments(narrow)) {
-                vs = uberspect.getPropertySet(object, attribute, narrow[0], node);
+                vs = uberspect.getPropertySet(object, attribute, narrow[0]);
             }
         }
         if (vs != null) {

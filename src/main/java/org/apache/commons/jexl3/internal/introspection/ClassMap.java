@@ -77,7 +77,7 @@ final class ClassMap {
     /**
      * Keep track of all methods with the same name; this is not modified after creation.
      */
-    private final Map<String, List<Method>> byName = new HashMap<String, List<Method>>();
+    private final Map<String, Method[]> byName = new HashMap<String, Method[]>();
     /** 
      * Cache of fields.
      */
@@ -130,8 +130,7 @@ final class ClassMap {
      * @return the array of method names
      */
     String[] getMethodNames() {
-        java.util.Set<String> set = byName.keySet();
-        return set.toArray(new String[set.size()]);
+        return byName.keySet().toArray(new String[byName.size()]);
     }
 
     /**
@@ -140,9 +139,9 @@ final class ClassMap {
      * @return the array of methods (null or non-empty)
      */
     Method[] getMethods(final String methodName) {
-        List<Method> lm = byName.get(methodName);
-        if (lm != null && !lm.isEmpty()) {
-            return lm.toArray(new Method[lm.size()]);
+        Method[] lm = byName.get(methodName);
+        if (lm != null && lm.length > 0) {
+            return lm.clone();
         } else {
             return null;
         }
@@ -173,7 +172,7 @@ final class ClassMap {
         } else if (cacheEntry == null) {
             try {
                 // That one is expensive...
-                List<Method> methodList = byName.get(methodKey.getMethod());
+                Method[] methodList = byName.get(methodKey.getMethod());
                 if (methodList != null) {
                     cacheEntry = methodKey.getMostSpecificMethod(methodList);
                 }
@@ -244,7 +243,7 @@ final class ClassMap {
                         break;
                     }
                 }
-                List<Method> lmn = lm.subList(start, end);
+                Method[] lmn = lm.subList(start, end).toArray(new Method[end - start]);
                 cache.byName.put(name, lmn);
                 start = end;
             }

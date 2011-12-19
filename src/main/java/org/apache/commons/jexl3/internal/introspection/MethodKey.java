@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -224,7 +223,7 @@ public final class MethodKey {
      * @return the most specific method.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
-    public Method getMostSpecificMethod(List<Method> methods) {
+    public Method getMostSpecificMethod(Method[] methods) {
         return METHODS.getMostSpecific(methods, params);
     }
 
@@ -234,7 +233,7 @@ public final class MethodKey {
      * @return the most specific constructor.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
-    public Constructor<?> getMostSpecificConstructor(List<Constructor<?>> methods) {
+    public Constructor<?> getMostSpecificConstructor(Constructor<?>[] methods) {
         return CONSTRUCTORS.getMostSpecific(methods, params);
     }
 
@@ -445,7 +444,7 @@ public final class MethodKey {
          * @return the most specific method.
          * @throws MethodKey.AmbiguousException if there is more than one.
          */
-        private T getMostSpecific(List<T> methods, Class<?>[] classes) {
+        private T getMostSpecific(T[] methods, Class<?>[] classes) {
             LinkedList<T> applicables = getApplicables(methods, classes);
 
             if (applicables.isEmpty()) {
@@ -583,11 +582,9 @@ public final class MethodKey {
          *         formal and actual arguments matches, and argument types are assignable
          *         to formal types through a method invocation conversion).
          */
-        private LinkedList<T> getApplicables(List<T> methods, Class<?>[] classes) {
+        private LinkedList<T> getApplicables(T[] methods, Class<?>[] classes) {
             LinkedList<T> list = new LinkedList<T>();
-
-            for (Iterator<T> imethod = methods.iterator(); imethod.hasNext();) {
-                T method = imethod.next();
+            for (T method : methods) {
                 if (isApplicable(method, classes)) {
                     list.add(method);
                 }

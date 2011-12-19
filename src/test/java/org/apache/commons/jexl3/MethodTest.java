@@ -82,7 +82,6 @@ public class MethodTest extends JexlTestCase {
             } else {
                 return "";
             }
-            
         }
     }
 

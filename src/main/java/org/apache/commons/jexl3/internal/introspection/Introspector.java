@@ -23,9 +23,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -251,14 +251,14 @@ public final class Introspector {
                     // add it to list of known loaded classes
                     constructibleClasses.put(cname, clazz);
                 }
-                List<Constructor<?>> l = new LinkedList<Constructor<?>>();
+                List<Constructor<?>> l = new ArrayList<Constructor<?>>();
                 for (Constructor<?> ictor : clazz.getConstructors()) {
                     if (Modifier.isPublic(ictor.getModifiers()) && Permissions.allow(ictor)) {
                         l.add(ictor);
                     }
                 }
                 // try to find one
-                ctor = key.getMostSpecificConstructor(l);
+                ctor = key.getMostSpecificConstructor(l.toArray(new Constructor<?>[l.size()]));
                 if (ctor != null) {
                     constructorsMap.put(key, ctor);
                 } else {

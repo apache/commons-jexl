@@ -1121,7 +1121,7 @@ public final class TemplateEngine extends JxltEngine {
                 } else if (arg != null) {
                     Object[] value = {arg};
                     JexlUberspect uber = getEngine().getUberspect();
-                    JexlMethod method = uber.getMethod(writer, "print", value, null);
+                    JexlMethod method = uber.getMethod(writer, "print", value);
                     if (method != null) {
                         method.invoke(writer, value);
                     } else {

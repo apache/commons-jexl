@@ -20,8 +20,6 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * Abstract class that is used to execute an arbitrary
  * method that is introspected. This is the superclass
@@ -29,7 +27,7 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @since 1.0
  */
-public abstract class AbstractExecutor {
+abstract class AbstractExecutor {
     /** A marker for invocation failures in tryInvoke. */
     public static final Object TRY_FAILED = new Object() {
         @Override
@@ -54,6 +52,34 @@ public abstract class AbstractExecutor {
     }
 
     /**
+     * Coerce an Object  to an Integer.
+     * @param arg the Object to coerce
+     * @return an Integer if it can be converted, null otherwise
+     */
+    static Integer toInteger(Object arg) {
+        if (arg == null) {
+            return null;
+        } else if (arg instanceof Number) {
+            return Integer.valueOf(((Number) arg).intValue());
+        } else {
+            try {
+                return Integer.valueOf(arg.toString());
+            } catch (NumberFormatException xnumber) {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * Coerce an Object to a String.
+     * @param arg the Object to coerce
+     * @return a String if it can be converted, null otherwise
+     */
+    static String toString(Object arg) {
+        return arg == null ? null : arg.toString();
+    }
+
+    /**
      * Creates an arguments array.
      * @param args the list of arguments
      * @return the arguments array
@@ -61,7 +87,7 @@ public abstract class AbstractExecutor {
     static Object[] makeArgs(Object... args) {
         return args;
     }
-
+    
     /** The class this executor applies to. */
     protected final Class<?> objectClass;
     /** Method to be executed. */
@@ -152,7 +178,7 @@ public abstract class AbstractExecutor {
     public final Class<?> getTargetClass() {
         return objectClass;
     }
-    
+
     /**
      * Gets the property targeted by this executor.
      * @return the target property
@@ -168,7 +194,6 @@ public abstract class AbstractExecutor {
     public final String getMethodName() {
         return method.getName();
     }
-
 
     /**
      * Checks whether a tryExecute failed or not.
@@ -191,46 +216,8 @@ public abstract class AbstractExecutor {
         protected Get(Class<?> theClass, java.lang.reflect.Method theMethod) {
             super(theClass, theMethod);
         }
-
-        @Override
-        public final Object invoke(Object obj) throws Exception {
-            return execute(obj);
-        }
-        
-        @Override
-        public final Object tryInvoke(Object obj, Object key) {
-            return tryExecute(obj, key);
-        }
-
-        /**
-         * Gets the property value from an object.
-         *
-         * @param obj The object to get the property from.
-         * @return The property value.
-         * @throws IllegalAccessException Method is inaccessible.
-         * @throws InvocationTargetException Method body throws an exception.
-         */
-        public abstract Object execute(Object obj)
-                throws IllegalAccessException, InvocationTargetException;
-
-        /**
-         * Tries to reuse this executor, checking that it is compatible with
-         * the actual set of arguments.
-         * <p>Compatibility means that:
-         * <code>o</code> must be of the same class as this executor's
-         * target class and
-         * <code>property</code> must be of the same class as this
-         * executor's target property (for list and map based executors) and have the same
-         * value (for other types).</p>
-         * @param obj The object to get the property from.
-         * @param key The property to get from the object.
-         * @return The property value or TRY_FAILED if checking failed.
-         */
-        public Object tryExecute(Object obj, Object key) {
-            return TRY_FAILED;
-        }
     }
-    
+
     /**
      * Abstract class that is used to execute an arbitrary 'set' method.
      */
@@ -243,94 +230,24 @@ public abstract class AbstractExecutor {
         protected Set(Class<?> theClass, java.lang.reflect.Method theMethod) {
             super(theClass, theMethod);
         }
-
-        @Override
-        public final Object invoke(Object obj, Object arg) throws Exception {
-            return execute(obj, arg);
-        }
-
-        @Override
-        public final Object tryInvoke(Object obj, Object key, Object value) {
-            return tryExecute(obj, key, value);
-        }
-
-        /**
-         * Sets the property value of an object.
-         *
-         * @param obj The object to set the property in.
-         * @param value The value.
-         * @return The return value.
-         * @throws IllegalAccessException Method is inaccessible.
-         * @throws InvocationTargetException Method body throws an exception.
-         */
-        public abstract Object execute(Object obj, Object value)
-                throws IllegalAccessException, InvocationTargetException;
-
-        /**
-         * Tries to reuse this executor, checking that it is compatible with
-         * the actual set of arguments.
-         * <p>Compatibility means that:
-         * <code>o</code> must be of the same class as this executor's
-         * target class,
-         * <code>property</code> must be of the same class as this
-         * executor's target property (for list and map based executors) and have the same
-         * value (for other types)
-         * and that <code>arg</code> must be a valid argument for this
-         * executor underlying method.</p>
-         * @param obj The object to invoke the method from.
-         * @param key The property to set in the object.
-         * @param value The value to use as the property value.
-         * @return The return value or TRY_FAILED if checking failed.
-         */
-        public Object tryExecute(Object obj, Object key, Object value) {
-            return TRY_FAILED;
-        }
-        
     }
-
-
 
     /**
      * Abstract class that is used to execute an arbitrary method.
      */
     public abstract static class Method extends AbstractExecutor implements JexlMethod {
-        /**
-         * A helper class to pass the method &amp; parameters.
-         */
-        protected static final class Parameter {
-            /** The method. */
-            private final java.lang.reflect.Method method;
-            /** The method key. */
-            private final MethodKey key;
-            /** Creates an instance.
-             * @param m the method
-             * @param k the method key
-             */
-            public Parameter(java.lang.reflect.Method m, MethodKey k) {
-                method = m;
-                key = k;
-            }
-        }
         /** The method key discovered from the arguments. */
         protected final MethodKey key;
+
         /**
          * Creates a new instance.
          * @param c the class this executor applies to
-         * @param km the method and MethodKey to encapsulate.
+         * @param m the method
+         * @param k the MethodKey
          */
-        protected Method(Class<?> c, Parameter km) {
-            super(c, km.method);
-            key = km.key;
-        }
-
-        @Override
-        public final Object invoke(Object obj, Object[] params) throws Exception {
-            return execute(obj, params);
-        }
-
-        @Override
-        public final Object tryInvoke(String name, Object obj, Object[] params) {
-            return tryExecute(name, obj, params);
+        protected Method(Class<?> c, java.lang.reflect.Method m, MethodKey k) {
+            super(c, m);
+            key = k;
         }
 
         /** {@inheritDoc} */
@@ -338,36 +255,10 @@ public abstract class AbstractExecutor {
         public Object getTargetProperty() {
             return key;
         }
-        
+
         @Override
         public final Class<?> getReturnType() {
             return method.getReturnType();
         }
-
-        /**
-         * Invokes the method to be executed.
-         *
-         * @param obj the object to invoke the method upon
-         * @param args the method arguments
-         * @return the result of the method invocation
-         * @throws IllegalAccessException Method is inaccessible.
-         * @throws InvocationTargetException Method body throws an exception.
-         */
-        public abstract Object execute(Object obj, Object[] args)
-                throws IllegalAccessException, InvocationTargetException;
-
-        /**
-         * Tries to reuse this executor, checking that it is compatible with
-         * the actual set of arguments.
-         * @param obj the object to invoke the method upon
-         * @param name the method name
-         * @param args the method arguments
-         * @return the result of the method invocation or TRY_FAILED if checking failed.
-         */
-        public Object tryExecute(String name, Object obj, Object[] args){
-            return TRY_FAILED;
-        }
-
     }
-
 }

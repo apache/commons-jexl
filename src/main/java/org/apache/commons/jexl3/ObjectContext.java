@@ -49,6 +49,6 @@ public class ObjectContext<T> implements JexlContext {
 
     @Override
     public boolean has(String name) {
-        return jexl.getUberspect().getPropertyGet(object, name, null) != null;
+        return jexl.getUberspect().getPropertyGet(object, name) != null;
     }
 }

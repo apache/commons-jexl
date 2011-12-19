@@ -34,9 +34,7 @@ public class JexlEvalContext implements JexlContext, JexlEngine.Options {
     /** Whether the engine should be strict. */
     private Boolean strict = null;
     /** Whether the arithmetic should be strict. */
-    private Boolean astrict = null;
-    /** The namespaces vars the engine should use. */
-    private Map<String, Object> namespaces = null;
+    private Boolean mathStrict = null;
     /** The math scale the arithmetic should use. */
     private int mathScale = Integer.MIN_VALUE;
     /** The math context the arithmetic should use. */
@@ -87,7 +85,6 @@ public class JexlEvalContext implements JexlContext, JexlEngine.Options {
     public void clearOptions() {
         silent = null;
         strict = null;
-        namespaces = null;
         mathScale = -1;
         mathContext = null;
     }
@@ -112,7 +109,7 @@ public class JexlEvalContext implements JexlContext, JexlEngine.Options {
      */
     public void setStrict(boolean se, boolean sa) {
         this.strict = se ? Boolean.TRUE : Boolean.FALSE;
-        this.astrict = sa ? Boolean.TRUE : Boolean.FALSE;
+        this.mathStrict = sa ? Boolean.TRUE : Boolean.FALSE;
     }
 
     /**
@@ -138,15 +135,15 @@ public class JexlEvalContext implements JexlContext, JexlEngine.Options {
      * @param s true means strict error reporting, false allows mentioned conditions to be evaluated as 0
      */
     public void setStrictArithmetic(boolean s) {
-        this.astrict = s ? Boolean.TRUE : Boolean.FALSE;
+        this.mathStrict = s ? Boolean.TRUE : Boolean.FALSE;
     }
 
     @Override
     public Boolean isStrictArithmetic() {
-        if (astrict == null) {
+        if (mathStrict == null) {
             return null;
         } else {
-            return astrict.booleanValue() ? Boolean.TRUE : Boolean.FALSE;
+            return mathStrict.booleanValue() ? Boolean.TRUE : Boolean.FALSE;
         }
     }
 

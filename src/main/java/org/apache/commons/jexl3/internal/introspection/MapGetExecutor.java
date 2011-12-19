@@ -19,9 +19,9 @@ package org.apache.commons.jexl3.internal.introspection;
 
 import java.util.Map;
 
- /**
+/**
  * Specialized executor to get a property from a Map.
-  * @since 2.0
+ * @since 2.0
  */
 public final class MapGetExecutor extends AbstractExecutor.Get {
     /** The java.util.map.get method used as an active marker in MapGet. */
@@ -31,53 +31,54 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
     private final Object property;
 
     /**
-     * Creates an instance checking for the Map interface.
+     * Attempts to discover a MapGetExecutor.
+     * 
      * @param is the introspector
-     * @param clazz the class that might implement the map interface
-     * @param key the key to use in map.get(key)
+     * @param clazz the class to find the get method from
+     * @param identifier the key to use as an argument to the get method
+     * @return the executor if found, null otherwise
      */
-    public MapGetExecutor(Introspector is, Class<?> clazz, Object key) {
-        super(clazz, discover(clazz));
+    public static MapGetExecutor discover(Introspector is, Class<?> clazz, Object identifier) {
+        if (Map.class.isAssignableFrom(clazz)) {
+            return new MapGetExecutor(clazz, MAP_GET, identifier);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Creates an instance.
+     * @param clazz he class the get method applies to
+     * @param method the method held by this executor
+     * @param key the property to get
+     */
+    private MapGetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object key) {
+        super(clazz, method);
         property = key;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object getTargetProperty() {
         return property;
     }
-    
-    /**
-     * Get the property from the map.
-     * @param obj the map.
-     * @return map.get(property)
-     */
+
+
     @Override
-    public Object execute(final Object obj) {
+    public Object invoke(final Object obj) {
         @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
-        final Map<Object,?> map = (Map<Object, ?>) obj;
+        final Map<Object, ?> map = (Map<Object, ?>) obj;
         return map.get(property);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Object tryExecute(final Object obj, Object key) {
-        if (obj != null &&  method != null
-            && objectClass.equals(obj.getClass())
-            && (key == null || property.getClass().equals(key.getClass()))) {
+    public Object tryInvoke(final Object obj, Object key) {
+        if (obj != null && method != null
+                && objectClass.equals(obj.getClass())
+                && (key == null || property.getClass().equals(key.getClass()))) {
             @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
-            final Map<Object,?> map = (Map<Object, ?>) obj;
+            final Map<Object, ?> map = (Map<Object, ?>) obj;
             return map.get(key);
         }
         return TRY_FAILED;
-    }
-
-    /**
-     * Finds the method to perform 'get' on a map.
-     * @param clazz the class to introspect
-     * @return a marker method, map.get
-     */
-    static java.lang.reflect.Method discover(Class<?> clazz) {
-        return (Map.class.isAssignableFrom(clazz))? MAP_GET : null;
     }
 }

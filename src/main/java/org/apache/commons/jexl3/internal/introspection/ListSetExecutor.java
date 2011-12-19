@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.jexl3.internal.introspection;
+
 import java.util.List;
 import java.lang.reflect.Array;
 
@@ -24,7 +24,7 @@ import java.lang.reflect.Array;
  * @since 2.0
  */
 public final class ListSetExecutor extends AbstractExecutor.Set {
-        /** The java.lang.reflect.Array.get method used as an active marker in ListGet. */
+    /** The java.lang.reflect.Array.get method used as an active marker in ListGet. */
     private static final java.lang.reflect.Method ARRAY_SET =
             initMarker(Array.class, "set", Object.class, Integer.TYPE, Object.class);
     /** The java.util.obj.set method used as an active marker in ListSet. */
@@ -34,26 +34,52 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
     private final Integer property;
 
     /**
-     * Creates an instance checking for the List interface or Array capability.
+     * Attempts to discover a ListSetExecutor.
+     * 
      * @param is the introspector
-     * @param clazz the class that might implement the map interface
-     * @param key the key to use in obj.set(key,value)
-     * @param value the value to use in obj.set(key,value)
+     * @param clazz the class to find the get method from
+     * @param identifier the key to use as an argument to the get method
+     * @param value the value to use as argument in list.put(key,value)
+     * @return the executor if found, null otherwise
      */
-    public ListSetExecutor(Introspector is, Class<?> clazz, Integer key, Object value) {
-        super(clazz, discover(clazz));
+    public static ListSetExecutor discover(Introspector is, Class<?> clazz, Object identifier, Object value) {
+        Integer index = toInteger(identifier);
+        java.lang.reflect.Method method = null;
+        if (index != null) {
+            if (clazz.isArray()) {
+                // we could verify if the call can be performed but it does not change
+                // the fact we would fail...
+                // Class<?> formal = clazz.getComponentType();
+                // Class<?> actual = value == null? Object.class : value.getClass();
+                // if (IntrospectionUtils.isMethodInvocationConvertible(formal, actual, false)) {
+                method = ARRAY_SET;
+                // }
+            } else if (List.class.isAssignableFrom(clazz)) {
+                method = LIST_SET;
+            }
+        }
+        return method == null ? null : new ListSetExecutor(clazz, method, index);
+    }
+
+    /**
+     * Creates an instance.
+     * 
+     * @param clazz the class the set method applies to
+     * @param method the method called through this executor
+     * @param key the key to use as 1st argument to the set method
+     */
+    private ListSetExecutor(Class<?> clazz, java.lang.reflect.Method method, Integer key) {
+        super(clazz, method);
         property = key;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object getTargetProperty() {
         return property;
     }
-    
-    /** {@inheritDoc} */
+
     @Override
-    public Object execute(final Object obj, Object value) {
+    public Object invoke(final Object obj, Object value) {
         if (method == ARRAY_SET) {
             java.lang.reflect.Array.set(obj, property.intValue(), value);
         } else {
@@ -64,43 +90,21 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
         return value;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public Object tryExecute(final Object obj, Object key, Object value) {
+    public Object tryInvoke(final Object obj, Object key, Object value) {
+        Integer index = toInteger(key);
         if (obj != null && method != null
-            && objectClass.equals(obj.getClass())
-            && key instanceof Integer) {
+                && objectClass.equals(obj.getClass())
+                && index != null) {
             if (method == ARRAY_SET) {
-                Array.set(obj, ((Integer) key).intValue(), value);
+                Array.set(obj, index.intValue(), value);
             } else {
                 @SuppressWarnings("unchecked")  // LSE should only be created for array or list types
                 final List<Object> list = (List<Object>) obj;
-                list.set(((Integer) key).intValue(), value);
+                list.set(index.intValue(), value);
             }
             return value;
         }
         return TRY_FAILED;
-    }
-
-
-    /**
-     * Finds the method to perform 'set' on a obj of array.
-     * @param clazz the class to introspect
-     * @return a marker method, obj.set or array.set
-     */
-    static java.lang.reflect.Method discover(Class<?> clazz) {
-        if (clazz.isArray()) {
-            // we could verify if the call can be performed but it does not change
-            // the fact we would fail...
-            // Class<?> formal = clazz.getComponentType();
-            // Class<?> actual = value == null? Object.class : value.getClass();
-            // if (IntrospectionUtils.isMethodInvocationConvertible(formal, actual, false)) {
-                return ARRAY_SET;
-            // }
-        }
-        if (List.class.isAssignableFrom(clazz)) {
-            return LIST_SET;
-        }
-        return null;
     }
 }

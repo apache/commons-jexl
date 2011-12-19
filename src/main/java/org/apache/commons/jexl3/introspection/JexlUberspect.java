@@ -18,7 +18,6 @@
 package org.apache.commons.jexl3.introspection;
 
 import java.util.Iterator;
-import org.apache.commons.jexl3.JexlInfoHandle;
 
 /**
  * 'Federated' introspection/reflection interface to allow the introspection
@@ -37,30 +36,28 @@ public interface JexlUberspect {
      * Returns a class constructor.
      * @param ctorHandle a class or class name
      * @param args constructor arguments
-     * @param info contextual information
      * @return a {@link JexlMethod}
      * @since 3.0
      */
-    JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfoHandle info);
+    JexlMethod getConstructor(Object ctorHandle, Object[] args);
+    
     /**
      * Returns a JexlMethod.
      * @param obj the object
      * @param method the method name
      * @param args method arguments
-     * @param info contextual information
      * @return a {@link JexlMethod}
      */
-    JexlMethod getMethod(Object obj, String method, Object[] args, JexlInfoHandle info);
+    JexlMethod getMethod(Object obj, String method, Object[] args);
 
     /**
      * Property getter.
      * <p>Returns JexlPropertyGet appropos for ${bar.woogie}.
      * @param obj the object to get the property from
      * @param identifier property name
-     * @param info contextual information
      * @return a {@link JexlPropertyGet}
      */
-    JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfoHandle info);
+    JexlPropertyGet getPropertyGet(Object obj, Object identifier);
 
     /**
      * Property setter.
@@ -68,17 +65,15 @@ public interface JexlUberspect {
      * @param obj the object to get the property from.
      * @param identifier property name
      * @param arg value to set
-     * @param info contextual information
      * @return a {@link JexlPropertySet}.
      */
-    JexlPropertySet getPropertySet(Object obj, Object identifier, Object arg, JexlInfoHandle info);
+    JexlPropertySet getPropertySet(Object obj, Object identifier, Object arg);
 
     /**
      * Gets an iterator from an object.
-     * @param obj to get the iterator for
-     * @param info contextual information
+     * @param obj to get the iterator from
      * @return an iterator over obj
      */
-    Iterator<?> getIterator(Object obj, JexlInfoHandle info);
+    Iterator<?> getIterator(Object obj);
 
 }
