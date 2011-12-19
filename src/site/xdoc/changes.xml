@@ -25,6 +25,11 @@
     <author email="dev@commons.apache.org">Commons Developers</author>
   </properties>
   <body>
+    <release version="2.1.1" date="2011-12-??">
+        <action dev="henrib" type="fix" issue="JEXL-124">
+            Array parameters to methods don't work anymore (regression)
+        </action>
+    </release>
     <release version="2.1" date="2011-12-12">
         <action dev="henrib" type="add" issue="JEXL-121">
             Add simple template features
