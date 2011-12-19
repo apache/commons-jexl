@@ -25,7 +25,7 @@
     <body>
         <menu name="Commons Jexl">
             <item name="Overview"                href="index.html" />
-            <item name="2.1 Javadoc"             href="apidocs/index.html"/>
+            <item name="2.1.1 Javadoc"           href="apidocs/index.html"/>
             <item name="1.1 Javadoc"             href="apidocs-1.1/index.html"/>
             <item name="Download"                href="download_jexl.cgi"/>
             <item name="Reference"               href="reference/index.html"/>
