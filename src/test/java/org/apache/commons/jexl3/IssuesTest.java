@@ -17,7 +17,6 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine;
-import org.apache.commons.jexl3.internal.Script;
 import org.apache.commons.jexl3.internal.TemplateEngine;
 import org.apache.commons.jexl3.internal.Debugger;
 import java.math.BigDecimal;
@@ -35,7 +34,7 @@ public class IssuesTest extends JexlTestCase {
     public IssuesTest() {
         super("IssuesTest", null);
     }
-    
+
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error to avoid warning in silent mode
@@ -56,7 +55,7 @@ public class IssuesTest extends JexlTestCase {
         assertEquals(42.0d, vars.get("d"));
         assertEquals(56.3f, vars.get("e"));
         assertEquals(56.3f, vars.get("f"));
-        assertEquals(63.5f, vars.get("g"));
+        assertEquals(63.5d, vars.get("g"));
         assertEquals(0x10, vars.get("h"));
         assertEquals(010, vars.get("i"));
         assertEquals(0x10L, vars.get("j"));
@@ -496,6 +495,10 @@ public class IssuesTest extends JexlTestCase {
         public String getPropA() {
             return propA;
         }
+        
+        public String uppercase(String str) {
+            return str.toUpperCase();
+        }
     }
 
     public void test105() throws Exception {
@@ -617,10 +620,6 @@ public class IssuesTest extends JexlTestCase {
         RichContext(JexlEngine jexl, A105 a105) {
             super(jexl, a105);
         }
-
-        public String uppercase(String str) {
-            return str.toUpperCase();
-        }
     }
 
     public void testRichContext() throws Exception {
@@ -719,131 +718,25 @@ public class IssuesTest extends JexlTestCase {
         assertTrue((Boolean) result);
     }
 
-    public void testStringIdentifier() throws Exception {
-        JexlEngine jexl = new Engine();
-        Map<String, String> foo = new HashMap<String, String>();
 
-        JexlContext jc = new MapContext();
-        jc.set("foo", foo);
-        foo.put("q u u x", "456");
-        JexlExpression e = jexl.createExpression("foo.\"q u u x\"");
-        Object result = e.evaluate(jc);
-        assertEquals("456", result);
-        e = jexl.createExpression("foo.'q u u x'");
-        result = e.evaluate(jc);
-        assertEquals("456", result);
-        JexlScript s = jexl.createScript("foo.\"q u u x\"");
-        result = s.execute(jc);
-        assertEquals("456", result);
-        s = jexl.createScript("foo.'q u u x'");
-        result = s.execute(jc);
-        assertEquals("456", result);
-        
-        Debugger dbg = new Debugger();
-//        dbg.debug(((Script)s).script);
-//        String dbgdata = dbg.data();
-//        assertEquals("foo.'q u u x';", dbgdata);
-    }
-        
-    public static class Container {
-        String value0;
-        int value1;
-        public Container(String name, int number) {
-            value0 = name;
-            value1 = number;
-        }
-        
-        public Object getProperty(String name) {
-            if ("name".equals(name)) {
-                return value0;
-            } else if ("number".equals(name)) {
-                return value1;
-            } else {
-                return null;
-            }
-        }
-        public Object getProperty(int ref) {
-            if (0 == ref) {
-                return value0;
-            } else if (1 == ref) {
-                return value1;
-            } else {
-                return null;
-            }
-        }
-        
-        public void setProperty(String name, String value) {
-            if ("name".equals(name)) {
-                this.value0 = value;
-            }
-        }  
-        
-        public void setProperty(String name, int value) {
-            if ("number".equals(name)) {
-                this.value1 = value;
-            }
-        }        
-        public void setProperty(int ref, String value) {
-            if (0 == ref) {
-                this.value0 = value;
-            }
-        }  
-        
-        public void setProperty(int ref, int value) {
-            if (1 == ref) {
-                this.value1 = value;
-            }
+
+
+    public static class Foo125 {
+        public String method() {
+            return "OK";
         }
     }
 
-    public void test119() throws Exception {
+    public static class Foo125Context extends ObjectContext<Foo125> {
+        public Foo125Context(JexlEngine engine, Foo125 wrapped) {
+            super(engine, wrapped);
+        }
+    }
+
+    public void test125() throws Exception {
         JexlEngine jexl = new Engine();
-        Container quux = new Container("quux", 42);
-        JexlScript get;
-        Object result;
-        
-        JexlScript getName = jexl.createScript("foo.property.name", "foo");
-        result = getName.execute(null, quux);
-        assertEquals("quux", result);
-        
-        JexlScript get0 = jexl.createScript("foo.property.0", "foo");
-        result = get0.execute(null, quux);
-        assertEquals("quux", result);
-        
-        JexlScript getNumber = jexl.createScript("foo.property.number", "foo");
-        result = getNumber.execute(null, quux);
-        assertEquals(42, result);
-        
-        JexlScript get1 = jexl.createScript("foo.property.1", "foo");
-        result = get1.execute(null, quux);
-        assertEquals(42, result);
-        
-        JexlScript setName = jexl.createScript("foo.property.name = $0", "foo", "$0");
-        setName.execute(null, quux, "QUUX");
-        result = getName.execute(null, quux);
-        assertEquals("QUUX", result);
-        result = get0.execute(null, quux);
-        assertEquals("QUUX", result);
-        
-        JexlScript set0 = jexl.createScript("foo.property.0 = $0", "foo", "$0");
-        set0.execute(null, quux, "BAR");
-        result = getName.execute(null, quux);
-        assertEquals("BAR", result);
-        result = get0.execute(null, quux);
-        assertEquals("BAR", result);
-        
-        JexlScript setNumber = jexl.createScript("foo.property.number = $0", "foo", "$0");
-        setNumber.execute(null, quux, -42);
-        result = getNumber.execute(null, quux);
-        assertEquals(-42, result);
-        result = get1.execute(null, quux);
-        assertEquals(-42, result);
-        
-        JexlScript set1 = jexl.createScript("foo.property.1 = $0", "foo", "$0");
-        set1.execute(null, quux, 24);
-        result = getNumber.execute(null, quux);
-        assertEquals(24, result);
-        result = get1.execute(null, quux);
-        assertEquals(24, result);
+        JexlExpression e = jexl.createExpression("method()");
+        JexlContext jc = new Foo125Context(jexl, new Foo125());
+        assertEquals("OK", e.evaluate(jc));
     }
 }

@@ -123,7 +123,7 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.setVariable("aBigDecimal", new BigDecimal("8.8"));
 
         asserter.assertExpression("-3", new Integer("-3"));
-        asserter.assertExpression("-3.0", new Float("-3.0"));
+        asserter.assertExpression("-3.0", new Double("-3.0"));
         asserter.assertExpression("-aByte", new Byte((byte) -1));
         asserter.assertExpression("-aShort", new Short((short) -2));
         asserter.assertExpression("-anInteger", new Integer(-3));

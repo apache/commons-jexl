@@ -46,10 +46,7 @@ public class JexlException extends RuntimeException {
      * @param msg the error message
      */
     public JexlException(JexlNode node, String msg) {
-        super(msg);
-        mark = node;
-        info = node != null ? node.jexlInfo() : null;
-
+        this(node, msg, null);
     }
 
     /**
@@ -59,32 +56,19 @@ public class JexlException extends RuntimeException {
      * @param cause the exception causing the error
      */
     public JexlException(JexlNode node, String msg, Throwable cause) {
-        super(msg, unwrap(cause));
-        mark = node;
-        info = node != null ? node.jexlInfo() : null;
+        this(node != null ? node.jexlInfo() : null, msg, cause);
     }
 
     /**
      * Creates a new JexlException.
-     * @param dbg the debugging information associated
-     * @param msg the error message
-     */
-    public JexlException(JexlInfo dbg, String msg) {
-        super(msg);
-        mark = null;
-        info = dbg;
-    }
-
-    /**
-     * Creates a new JexlException.
-     * @param dbg the debugging information associated
+     * @param jinfo the debugging information associated
      * @param msg the error message
      * @param cause the exception causing the error
      */
-    public JexlException(JexlInfo dbg, String msg, Throwable cause) {
+    public JexlException(JexlInfo jinfo, String msg, Throwable cause) {
         super(msg, unwrap(cause));
         mark = null;
-        info = dbg;
+        info = jinfo;
     }
 
     /**
@@ -140,22 +124,22 @@ public class JexlException extends RuntimeException {
     public static class Tokenization extends JexlException {
         /**
          * Creates a new Tokenization exception instance.
-         * @param node the location info
+         * @param info the location info
          * @param expr the expression
          * @param cause the javacc cause
          */
-        public Tokenization(JexlInfo node, CharSequence expr, TokenMgrError cause) {
-            super(merge(node, cause), expr.toString(), cause);
+        public Tokenization(JexlInfo info, CharSequence expr, TokenMgrError cause) {
+            super(merge(info, cause), expr.toString(), cause);
         }
 
         /**
          * Merge the node info and the cause info to obtain best possible location.
-         * @param node the node
+         * @param info the node
          * @param cause the cause
          * @return the info to use
          */
-        private static JexlInfo merge(JexlInfo node, TokenMgrError cause) {
-            JexlInfo dbgn = node != null ? node : null;
+        private static JexlInfo merge(JexlInfo info, TokenMgrError cause) {
+            JexlInfo dbgn = info != null ? info : null;
             if (cause == null) {
                 return dbgn;
             } else if (dbgn == null) {
@@ -185,22 +169,22 @@ public class JexlException extends RuntimeException {
     public static class Parsing extends JexlException {
         /**
          * Creates a new Variable exception instance.
-         * @param node the offending ASTnode
+         * @param info the location information
          * @param expr the offending source
          * @param cause the javacc cause
          */
-        public Parsing(JexlInfo node, CharSequence expr, ParseException cause) {
-            super(merge(node, cause), expr.toString(), cause);
+        public Parsing(JexlInfo info, CharSequence expr, ParseException cause) {
+            super(merge(info, cause), expr.toString(), cause);
         }
 
         /**
          * Merge the node info and the cause info to obtain best possible location.
-         * @param node the node
+         * @param info the location information
          * @param cause the cause
          * @return the info to use
          */
-        private static JexlInfo merge(JexlInfo node, ParseException cause) {
-            JexlInfo dbgn = node != null ? node : null;
+        private static JexlInfo merge(JexlInfo info, ParseException cause) {
+            JexlInfo dbgn = info != null ? info : null;
             if (cause == null) {
                 return dbgn;
             } else if (dbgn == null) {
@@ -232,9 +216,10 @@ public class JexlException extends RuntimeException {
          * Creates a new Variable exception instance.
          * @param node the offending ASTnode
          * @param var the unknown variable
+         * @param cause the exception causing the error
          */
         public Variable(JexlNode node, String var) {
-            super(node, var);
+            super(node, var, null);
         }
 
         /**
@@ -261,7 +246,17 @@ public class JexlException extends RuntimeException {
          * @param var the unknown variable
          */
         public Property(JexlNode node, String var) {
-            super(node, var);
+            this(node, var, null);
+        }
+
+        /**
+         * Creates a new Property exception instance.
+         * @param node the offending ASTnode
+         * @param var the unknown variable
+         * @param cause the exception causing the error
+         */
+        public Property(JexlNode node, String var, Throwable cause) {
+            super(node, var, cause);
         }
 
         /**
@@ -286,9 +281,20 @@ public class JexlException extends RuntimeException {
          * Creates a new Method exception instance.
          * @param node the offending ASTnode
          * @param name the unknown method
+         * @param cause the exception causing the error
          */
-        public Method(JexlNode node, String name) {
-            super(node, name);
+        public Method(JexlNode node, String name, Throwable cause) {
+            super(node, name, cause);
+        }
+
+        /**
+         * Creates a new Method exception instance.
+         * @param info the location information
+         * @param name the unknown method
+         * @param cause the exception causing the error
+         */
+        public Method(JexlInfo info, String name, Throwable cause) {
+            super(info, name, cause);
         }
 
         /**
@@ -319,7 +325,7 @@ public class JexlException extends RuntimeException {
          * @param value the returned value
          */
         public Return(JexlNode node, String msg, Object value) {
-            super(node, msg);
+            super(node, msg, null);
             this.result = value;
         }
 

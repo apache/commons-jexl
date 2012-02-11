@@ -32,12 +32,14 @@ package org.apache.commons.jexl3.parser;
 
 import java.io.Reader;
 import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.internal.Engine;
+import org.apache.commons.jexl3.internal.Scope;
 
 public class Parser extends JexlParser
 {
     public boolean ALLOW_REGISTERS = false;
 
-    public ASTJexlScript parse(Reader reader, JexlInfo info)
+    public ASTJexlScript parse(Reader reader, Scope scope, JexlInfo info)
         throws ParseException {
         /*
          * If registers are allowed, the default parser state has to be REGISTERS.
@@ -51,9 +53,10 @@ public class Parser extends JexlParser
          *  safe - it's a pain to remember
          */
 
-        ASTJexlScript tree = JexlScript();
-        tree.value = info;
-        return tree;
+        frame = scope;
+        ASTJexlScript script = JexlScript(scope);
+        script.value = info;
+        return script;
     }
 
 }
@@ -92,6 +95,7 @@ PARSER_END(Parser)
     | < TRUE : "true" >
     | < FALSE : "false" >
     | < RETURN : "return" >
+    | < FUNCTION : "function" >
 }
 
 <FOR_EACH_IN> TOKEN : /* foreach in */
@@ -110,6 +114,7 @@ PARSER_END(Parser)
     | < COLON : ":" >
     | < COMMA : "," >
     | < DOT : "." >
+    | < LAMBDA : "->" >
 }
 
 <*> TOKEN : { /* CONDITIONALS */
@@ -185,7 +190,9 @@ PARSER_END(Parser)
  *      Statements
  ***************************************/
 
-ASTJexlScript JexlScript() : {}
+ASTJexlScript JexlScript(Scope frame) : {
+    jjtThis.setScope(frame);
+}
 {
    ( Statement() )* <EOF>
    { return jjtThis;}
@@ -519,12 +526,12 @@ void SizeFunction() : {}
 void Function() #FunctionNode: {}
 {
 
-   Identifier() <COLON> Identifier() <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+   Identifier(true) <COLON> Identifier() <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
 }
 
 void Method() #MethodNode: {}
 {
-   Identifier() <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+   Identifier(true) <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
 }
 
 void AnyMethod() #void : {}
@@ -543,6 +550,22 @@ void Constructor() #ConstructorNode() : {}
 {
   <NEW> <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
 }
+
+void DeclareParm() #void :
+{
+    Token t;
+}
+{
+    t=<IDENTIFIER> { declareParameter(t.image); }
+}
+
+void Lambda() #JexlLambda() : {
+   pushFrame();
+}
+{
+  <FUNCTION> <LPAREN>[ DeclareParm() ( <COMMA> DeclareParm() )* ] <RPAREN> Block()
+}
+
 
 
 /***************************************
@@ -564,6 +587,7 @@ void PrimaryExpression() #void : {}
   LOOKAHEAD( <LBRACKET> (Expression() | <RBRACKET>) ) ArrayLiteral()
 |
   Literal()
+| Lambda()
 }
 
 void ArrayAccess() : {}

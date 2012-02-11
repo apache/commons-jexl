@@ -17,13 +17,15 @@
 package org.apache.commons.jexl3.parser;
 
 import org.apache.commons.jexl3.internal.Engine;
+import org.apache.commons.jexl3.internal.Frame;
+import org.apache.commons.jexl3.internal.Scope;
 
 /**
  * Enhanced script to allow parameters declaration.
  */
 public class ASTJexlScript extends JexlNode {
     /** The script scope. */
-    private Engine.Scope scope = null;
+    protected Scope scope = null;
 
     public ASTJexlScript(int id) {
         super(id);
@@ -42,14 +44,14 @@ public class ASTJexlScript extends JexlNode {
      * Sets the parameters and registers
      * @param theScope the scope
      */
-    public void setScope(Engine.Scope theScope) {
+    public void setScope(Scope theScope) {
         this.scope = theScope;
     }
     
     /**
      * Gets this script scope.
      */
-    public Engine.Scope getScope() {
+    public Scope getScope() {
         return scope;
     }
     
@@ -58,8 +60,13 @@ public class ASTJexlScript extends JexlNode {
      * @param values the argument values
      * @return the arguments array
      */
-    public Engine.Frame createFrame(Object... values) {
-        return scope != null? scope.createFrame(values) : null;
+    public Frame createFrame(Object... values) {
+        if (scope != null) {
+            Frame frame = scope.createFrame(null);
+            return frame != null? frame.assign(values) : null;
+        } else {
+            return null;
+        }
     }
     
     /**

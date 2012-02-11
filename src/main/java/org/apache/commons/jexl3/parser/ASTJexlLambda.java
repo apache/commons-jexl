@@ -16,37 +16,32 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import java.io.StringReader;
-
-import junit.framework.TestCase;
+import org.apache.commons.jexl3.internal.Frame;
 
 /**
- * @since 1.0
- *
+ * Enhanced script to allow parameters declaration.
  */
-public class ParserTest extends TestCase {
-    public ParserTest(String testName) {
-        super(testName);
+public class ASTJexlLambda extends ASTJexlScript {
+    public ASTJexlLambda(int id) {
+        super(id);
     }
 
+    public ASTJexlLambda(Parser p, int id) {
+        super(p, id);
+    }
+        
     /**
-     *  parse test : see if we can parse a little script
+     * Creates an array of arguments by copying values up to the number of parameters.
+     * @param values the argument values
+     * @return the arguments array
      */
-    public void testParse1() throws Exception {
-        Parser parser = new Parser(new StringReader(";"));
-
-        SimpleNode sn = parser.parse(new StringReader("foo = 1;"), null, null);
-        assertNotNull("parsed node is null", sn);
+    public Frame createFrame(Frame frame, Object... values) {
+        if (scope != null) {
+            Frame cframe = scope.createFrame(frame);
+            if (cframe != null) {
+                return cframe.assign(values);
+            }
+        }
+        return null;
     }
-
-    public void testParse2() throws Exception {
-        Parser parser = new Parser(new StringReader(";"));
-
-        SimpleNode sn = parser.parse(new StringReader("foo = \"bar\";"), null, null);
-        assertNotNull("parsed node is null", sn);
-
-        sn = parser.parse(new StringReader("foo = 'bar';"), null, null);
-        assertNotNull("parsed node is null", sn);
-    }
-
 }
