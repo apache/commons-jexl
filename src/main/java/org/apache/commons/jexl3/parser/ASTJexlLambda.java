@@ -16,7 +16,7 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.internal.Frame;
+import org.apache.commons.jexl3.internal.Scope;
 
 /**
  * Enhanced script to allow parameters declaration.
@@ -35,9 +35,9 @@ public class ASTJexlLambda extends ASTJexlScript {
      * @param values the argument values
      * @return the arguments array
      */
-    public Frame createFrame(Frame frame, Object... values) {
+    public Scope.Frame createFrame(Scope.Frame frame, Object... values) {
         if (scope != null) {
-            Frame cframe = scope.createFrame(frame);
+            Scope.Frame cframe = scope.createFrame(frame);
             if (cframe != null) {
                 return cframe.assign(values);
             }

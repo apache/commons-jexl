@@ -201,7 +201,7 @@ public class Uberspect implements JexlUberspect {
         }
         // last, look for get("foo") if we did not try yet
         if (property != null && !(identifier instanceof String)) {
-            // if that didn't work, look for set("foo")
+            // if that didn't work, look for get("foo")
             executor = DuckGetExecutor.discover(is, claz, property);
             if (executor != null) {
                 return executor;

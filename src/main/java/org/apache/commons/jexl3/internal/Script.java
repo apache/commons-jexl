@@ -57,7 +57,7 @@ public class Script implements JexlScript {
         if (script.jjtGetNumChildren() < 1) {
             return null;
         }
-        Frame frame = script.createFrame((Object[]) null);
+        Scope.Frame frame = script.createFrame((Object[]) null);
         Interpreter interpreter = jexl.createInterpreter(context, frame);
         return interpreter.interpret(script.jjtGetChild(0));
     }
@@ -94,7 +94,7 @@ public class Script implements JexlScript {
      */
     @Override
     public Object execute(JexlContext context) {
-        Frame frame = script.createFrame((Object[]) null);
+        Scope.Frame frame = script.createFrame((Object[]) null);
         Interpreter interpreter = jexl.createInterpreter(context, frame);
         return interpreter.interpret(script);
     }
@@ -104,7 +104,7 @@ public class Script implements JexlScript {
      */
     @Override
     public Object execute(JexlContext context, Object... args) {
-        Frame frame = script.createFrame(args != null && args.length > 0? args : null);
+        Scope.Frame frame = script.createFrame(args != null && args.length > 0? args : null);
         Interpreter interpreter = jexl.createInterpreter(context, frame);
         return interpreter.interpret(script);
     }

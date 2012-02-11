@@ -16,12 +16,11 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import java.io.Reader;
-import java.util.Stack;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlInfo;
-import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.internal.Scope;
+
+import java.util.Stack;
 
 /**
  * The base class for parsing, manages the parameter/local variable frame.
