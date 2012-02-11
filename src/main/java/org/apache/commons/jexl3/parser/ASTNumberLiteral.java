@@ -33,10 +33,7 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
         super(p, id);
     }
 
-    /**
-     * Gets the literal value.
-     * @return the number literal
-     */
+    @Override
     public Number getLiteral() {
         return literal;
     }
@@ -129,14 +126,14 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
                 break;
             }
             case 'd':
-            case 'D': {
+            case 'D':
+            default : {
                 rclass = Double.class;
                 result = Double.valueOf(s);
                 break;
             }
             case 'f':
-            case 'F':
-            default: {
+            case 'F': {
                 rclass = Float.class;
                 try {
                     result = Float.valueOf(s);
