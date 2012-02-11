@@ -37,42 +37,38 @@ public final class Scope {
      */
     private int vars;
     /**
-     * The number of hoisted variables.
-     */
-    private int hoisted;
-    /**
-     * The map of named registers aka script parameters.
-     * Each parameter is associated to a register and is materialized as an offset in the registers array used
+     * The map of named varialbes aka script parameters and local variables.
+     * Each parameter is associated to a register and is materialized as an offset in the stacked array used
      * during evaluation.
      */
-    private Map<String, Integer> namedRegisters = null;
+    private Map<String, Integer> namedVariables = null;
     /**
-     * The map of registers to parent registers when hoisted by closure.
+     * The map of local hoisted variables to parent scope variables, ie closure.
      */
-    private Map<Integer, Integer> hoistedRegisters = null;
+    private Map<Integer, Integer> hoistedVariables = null;
 
     /**
      * Creates a new scope with a list of parameters.
+     * @param scope the parent scope if any
      * @param parameters the list of parameters
      */
     public Scope(Scope scope, String... parameters) {
         if (parameters != null) {
             parms = parameters.length;
-            namedRegisters = new LinkedHashMap<String, Integer>();
+            namedVariables = new LinkedHashMap<String, Integer>();
             for (int p = 0; p < parms; ++p) {
-                namedRegisters.put(parameters[p], p);
+                namedVariables.put(parameters[p], p);
             }
         } else {
             parms = 0;
         }
         vars = 0;
-        hoisted = 0;
         parent = scope;
     }
 
     @Override
     public int hashCode() {
-        return namedRegisters == null ? 0 : parms ^ namedRegisters.hashCode();
+        return namedVariables == null ? 0 : parms ^ namedVariables.hashCode();
     }
 
     @Override
@@ -90,16 +86,16 @@ public final class Scope {
             return true;
         } else if (frame == null || parms != frame.parms) {
             return false;
-        } else if (namedRegisters == null) {
-            return frame.namedRegisters == null;
+        } else if (namedVariables == null) {
+            return frame.namedVariables == null;
         } else {
-            return namedRegisters.equals(frame.namedRegisters);
+            return namedVariables.equals(frame.namedVariables);
         }
     }
 
     /**
      * Checks whether an identifier is a local variable or argument, ie stored in a register.
-     * If this fails, attempt to solve by hoisting parent registers.
+     * If this fails, attempt to solve by hoisting parent stacked.
      * @param name the register name
      * @return the register index
      */
@@ -110,24 +106,23 @@ public final class Scope {
     /**
      * Checks whether an identifier is a local variable or argument, ie stored in a register.
      * @param name the register name
-     * @param hoist whether solving by hoisting parent registers is allowed
+     * @param hoist whether solving by hoisting parent stacked is allowed
      * @return the register index
      */
     private Integer getRegister(String name, boolean hoist) {
-        Integer register = namedRegisters != null ? namedRegisters.get(name) : null;
+        Integer register = namedVariables != null ? namedVariables.get(name) : null;
         if (register == null && hoist && parent != null) {
             Integer pr = parent.getRegister(name, false);
             if (pr != null) {
-                if (hoistedRegisters == null) {
-                    hoistedRegisters = new LinkedHashMap<Integer, Integer>();
+                if (hoistedVariables == null) {
+                    hoistedVariables = new LinkedHashMap<Integer, Integer>();
                 }
-                register = Integer.valueOf(namedRegisters.size());
-                if (namedRegisters == null) {
-                    namedRegisters = new LinkedHashMap<String, Integer>();
+                if (namedVariables == null) {
+                    namedVariables = new LinkedHashMap<String, Integer>();
                 }
-                namedRegisters.put(name, register);
-                hoistedRegisters.put(register, pr);
-                hoisted += 1;
+                register = Integer.valueOf(namedVariables.size());
+                namedVariables.put(name, register);
+                hoistedVariables.put(register, pr);
             }
         }
         return register;
@@ -141,15 +136,15 @@ public final class Scope {
      * @param name the parameter name
      */
     public void declareParameter(String name) {
-        if (namedRegisters == null) {
-            namedRegisters = new LinkedHashMap<String, Integer>();
+        if (namedVariables == null) {
+            namedVariables = new LinkedHashMap<String, Integer>();
         } else if (vars > 0) {
             throw new IllegalStateException("cant declare parameters after variables");
         }
-        Integer register = namedRegisters.get(name);
+        Integer register = namedVariables.get(name);
         if (register == null) {
-            register = Integer.valueOf(namedRegisters.size());
-            namedRegisters.put(name, register);
+            register = Integer.valueOf(namedVariables.size());
+            namedVariables.put(name, register);
             parms += 1;
         }
     }
@@ -163,13 +158,13 @@ public final class Scope {
      * @return the register index storing this variable
      */
     public Integer declareVariable(String name) {
-        if (namedRegisters == null) {
-            namedRegisters = new LinkedHashMap<String, Integer>();
+        if (namedVariables == null) {
+            namedVariables = new LinkedHashMap<String, Integer>();
         }
-        Integer register = namedRegisters.get(name);
+        Integer register = namedVariables.get(name);
         if (register == null) {
-            register = Integer.valueOf(namedRegisters.size());
-            namedRegisters.put(name, register);
+            register = Integer.valueOf(namedVariables.size());
+            namedVariables.put(name, register);
             vars += 1;
         }
         return register;
@@ -177,21 +172,22 @@ public final class Scope {
 
     /**
      * Creates a frame by copying values up to the number of parameters.
-     * @param values the argument values
+     * <p>This captures the hoisted variables values.</p>
+     * @param frame the caller frame
      * @return the arguments array
      */
-    public Frame createFrame(Frame caller) {
-        if (namedRegisters != null) {
-            Object[] arguments = new Object[namedRegisters.size()];
-            if (caller != null && hoistedRegisters != null && parent != null) {
-                for (Map.Entry<Integer, Integer> hoist : hoistedRegisters.entrySet()) {
+    public Frame createFrame(Frame frame) {
+        if (namedVariables != null) {
+            Object[] arguments = new Object[namedVariables.size()];
+            if (frame != null && hoistedVariables != null && parent != null) {
+                for (Map.Entry<Integer, Integer> hoist : hoistedVariables.entrySet()) {
                     Integer target = hoist.getKey();
                     Integer source = hoist.getValue();
-                    Object arg = caller.registers[source.intValue()];
+                    Object arg = frame.get(source.intValue());
                     arguments[target.intValue()] = arg;
                 }
             }
-            return new Frame(arguments, namedRegisters.keySet().toArray(new String[namedRegisters.size()]));
+            return new Frame(arguments);
         } else {
             return null;
         }
@@ -206,22 +202,22 @@ public final class Scope {
     }
 
     /**
-     * Gets this script registers, i.e. parameters and local variables.
+     * Gets this script stacked, i.e. parameters and local variables.
      * @return the register names
      */
     public String[] getRegisters() {
-        return namedRegisters != null ? namedRegisters.keySet().toArray(new String[0]) : new String[0];
+        return namedVariables != null ? namedVariables.keySet().toArray(new String[0]) : new String[0];
     }
 
     /**
-     * Gets this script parameters, i.e. registers assigned before creating local variables.
+     * Gets this script parameters, i.e. stacked assigned before creating local variables.
      * @return the parameter names
      */
     public String[] getParameters() {
-        if (namedRegisters != null && parms > 0) {
+        if (namedVariables != null && parms > 0) {
             String[] pa = new String[parms];
             int p = 0;
-            for (Map.Entry<String, Integer> entry : namedRegisters.entrySet()) {
+            for (Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
                 if (entry.getValue().intValue() < parms) {
                     pa[p++] = entry.getKey();
                 }
@@ -233,14 +229,14 @@ public final class Scope {
     }
 
     /**
-     * Gets this script local variable, i.e. registers assigned to local variables.
+     * Gets this script local variable, i.e. stacked assigned to local variables.
      * @return the parameter names
      */
     public String[] getLocalVariables() {
-        if (namedRegisters != null && vars > 0) {
+        if (namedVariables != null && vars > 0) {
             String[] pa = new String[parms];
             int p = 0;
-            for (Map.Entry<String, Integer> entry : namedRegisters.entrySet()) {
+            for (Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
                 if (entry.getValue().intValue() >= parms) {
                     pa[p++] = entry.getKey();
                 }
@@ -250,5 +246,51 @@ public final class Scope {
             return null;
         }
     }
-    
+
+    /**
+     * A call frame, created from a scope, stores the arguments and local variables in a "stack frame" (sic).
+     * @since 3.0
+     */
+    public static final class Frame {
+        /** The actual stack frame. */
+        private final Object[] stack;
+
+        /**
+         * Creates a new frame.
+         * @param r the stack frame
+         */
+        public Frame(Object[] r) {
+            stack = r;
+        }
+
+        /**
+         * Gets a value.
+         * @param s the offset in this frame
+         * @return the stacked value
+         */
+        public Object get(int s) {
+            return stack[s];
+        }
+
+        /**
+         * Sets a value.
+         * @param r the offset in this frame
+         * @param value the value to set in this frame
+         */
+        public void set(int r, Object value) {
+            stack[r] = value;
+        }
+
+        /**
+         * Assign values to this frame.
+         * @param values the values
+         * @return this frame
+         */
+        public Frame assign(Object... values) {
+            if (stack != null && values != null && values.length > 0) {
+                System.arraycopy(values, 0, stack, 0, Math.min(stack.length, values.length));
+            }
+            return this;
+        }
+    }
 }

@@ -114,7 +114,6 @@ PARSER_END(Parser)
     | < COLON : ":" >
     | < COMMA : "," >
     | < DOT : "." >
-    | < LAMBDA : "->" >
 }
 
 <*> TOKEN : { /* CONDITIONALS */

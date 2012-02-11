@@ -335,7 +335,7 @@ public class Engine extends JexlEngine {
             Scope scope = new Scope(null, "#0");
             ASTJexlScript script = parse(expr, null, scope);
             JexlNode node = script.jjtGetChild(0);
-            Frame frame = script.createFrame(bean);
+            Scope.Frame frame = script.createFrame(bean);
             Interpreter interpreter = createInterpreter(context, frame);
             return node.jjtAccept(interpreter, null);
         } catch (JexlException xjexl) {
@@ -343,7 +343,7 @@ public class Engine extends JexlEngine {
                 logger.warn(xjexl.getMessage(), xjexl.getCause());
                 return null;
             }
-            throw xjexl;
+            throw xjexl.clean();
         } finally {
             parser.ALLOW_REGISTERS = false;
         }
@@ -366,7 +366,7 @@ public class Engine extends JexlEngine {
             Scope scope = new Scope(null, "#0", "#1");
             ASTJexlScript script = parse(expr, null, scope);
             JexlNode node = script.jjtGetChild(0);
-            Frame frame = script.createFrame(bean, value);
+            Scope.Frame frame = script.createFrame(bean, value);
             Interpreter interpreter = createInterpreter(context, frame);
             node.jjtAccept(interpreter, null);
         } catch (JexlException xjexl) {
@@ -374,7 +374,7 @@ public class Engine extends JexlEngine {
                 logger.warn(xjexl.getMessage(), xjexl.getCause());
                 return;
             }
-            throw xjexl;
+            throw xjexl.clean();
         } finally {
             parser.ALLOW_REGISTERS = false;
         }
@@ -403,7 +403,7 @@ public class Engine extends JexlEngine {
                     logger.warn(xjexl.getMessage(), xjexl.getCause());
                     return null;
                 }
-                throw xjexl;
+                throw xjexl.clean();
             }
         }
         return result;
@@ -448,7 +448,7 @@ public class Engine extends JexlEngine {
                     logger.warn(xjexl.getMessage(), xjexl.getCause());
                     return null;
                 }
-                throw xjexl;
+                throw xjexl.clean();
             }
         }
         return result;
@@ -460,7 +460,7 @@ public class Engine extends JexlEngine {
      * @param frame the interpreter frame
      * @return an Interpreter
      */
-    protected Interpreter createInterpreter(JexlContext context, Frame frame) {
+    protected Interpreter createInterpreter(JexlContext context, Scope.Frame frame) {
         return new Interpreter(this, context == null ? EMPTY_CONTEXT : context, frame);
     }
 
@@ -694,9 +694,9 @@ public class Engine extends JexlEngine {
                     cache.put(expr, script);
                 }
             } catch (TokenMgrError xtme) {
-                throw new JexlException.Tokenization(jexlInfo, expression, xtme);
+                throw new JexlException.Tokenization(jexlInfo, expression, xtme).clean();
             } catch (ParseException xparse) {
-                throw new JexlException.Parsing(jexlInfo, expression, xparse);
+                throw new JexlException.Parsing(jexlInfo, expression, xparse).clean();
             } finally {
                 parser.setFrame(null);
             }
@@ -729,7 +729,7 @@ public class Engine extends JexlEngine {
             StackTraceElement[] stack = xinfo.getStackTrace();
             StackTraceElement se = null;
             Class<?> clazz = getClass();
-            for (int s = 1; s < stack.length; ++s, se = null) {
+            for (int s = 1; s < stack.length; ++s) {
                 se = stack[s];
                 String className = se.getClassName();
                 if (!className.equals(clazz.getName())) {

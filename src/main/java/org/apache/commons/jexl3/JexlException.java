@@ -23,6 +23,8 @@ import org.apache.commons.jexl3.parser.TokenMgrError;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Wraps any error that might occur during interpretation of a script or expression.
@@ -66,9 +68,41 @@ public class JexlException extends RuntimeException {
      * @param cause the exception causing the error
      */
     public JexlException(JexlInfo jinfo, String msg, Throwable cause) {
-        super(msg, unwrap(cause));
+        super(msg, clean(unwrap(cause)));
         mark = null;
         info = jinfo;
+    }
+
+    /**
+     * Cleans a JexlException from any org.apache.commons.jexl3 stack trace element.
+     * @return this exception
+     */
+    public JexlException clean() {
+        return clean(this);
+    }
+
+    /**
+     * Cleans a Throwable from any org.apache.commons.jexl3 stack trace element.
+     * @param <X> the throwable type
+     * @param xthrow the thowable
+     * @return the throwable
+     */
+    private static <X extends Throwable> X clean(X xthrow) {
+        if (xthrow != null) {
+            StackTraceElement[] stack = xthrow.getStackTrace();
+            StackTraceElement se = null;
+            List<StackTraceElement> stackJexl = new ArrayList<StackTraceElement>();
+            stackJexl.add(stack[0]);
+            for (int s = 1; s < stack.length; ++s) {
+                se = stack[s];
+                String className = se.getClassName();
+                if (!className.startsWith("org.apache.commons.jexl3")) {
+                    stackJexl.add(se);
+                }
+            }
+            xthrow.setStackTrace(stackJexl.toArray(new StackTraceElement[stackJexl.size()]));
+        }
+        return xthrow;
     }
 
     /**
@@ -216,7 +250,6 @@ public class JexlException extends RuntimeException {
          * Creates a new Variable exception instance.
          * @param node the offending ASTnode
          * @param var the unknown variable
-         * @param cause the exception causing the error
          */
         public Variable(JexlNode node, String var) {
             super(node, var, null);

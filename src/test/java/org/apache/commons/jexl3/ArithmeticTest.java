@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.jexl3.junit.Asserter;
@@ -181,7 +182,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     public void testCoercions() throws Exception {
         asserter.assertExpression("1", new Integer(1)); // numerics default to Integer
-        asserter.assertExpression("5L", new Long(5)); 
+        asserter.assertExpression("5L", new Long(5));
 
         asserter.setVariable("I2", new Integer(2));
         asserter.setVariable("L2", new Long(2));
@@ -225,6 +226,22 @@ public class ArithmeticTest extends JexlTestCase {
         }
     }
 
+    public static class IterableContainer implements Iterable<Integer> {
+        private final Set<Integer> values;
+
+        public IterableContainer(int[] is) {
+            values = new HashSet<Integer>();
+            for (int value : is) {
+                values.add(value);
+            }
+        }
+
+        @Override
+        public Iterator<Integer> iterator() {
+            return values.iterator();
+        }
+    }
+
     public void testRegexp() throws Exception {
         asserter.setVariable("str", "abc456");
         asserter.assertExpression("str =~ '.*456'", Boolean.TRUE);
@@ -249,7 +266,7 @@ public class ArithmeticTest extends JexlTestCase {
         // check in/not-in on array, list, map, set and duck-type collection
         int[] ai = {2, 4, 42, 54};
         List<Integer> al = new ArrayList<Integer>();
-        for(int i : ai) {
+        for (int i : ai) {
             al.add(i);
         }
         Map<Integer, String> am = new HashMap<Integer, String>();
@@ -258,19 +275,19 @@ public class ArithmeticTest extends JexlTestCase {
         am.put(42, "forty-two");
         am.put(54, "fifty-four");
         MatchingContainer ad = new MatchingContainer(ai);
+        IterableContainer ic = new IterableContainer(ai);
         Set<Integer> as = ad.values;
-        Object[] vars = { ai, al, am, ad, as };
-      
-        for(Object var : vars) {
+        Object[] vars = {ai, al, am, ad, as, ic};
+
+        for (Object var : vars) {
             asserter.setVariable("container", var);
-            for(int x : ai) {
+            for (int x : ai) {
                 asserter.setVariable("x", x);
                 asserter.assertExpression("x =~ container", Boolean.TRUE);
             }
             asserter.setVariable("x", 169);
             asserter.assertExpression("x !~ container", Boolean.TRUE);
         }
-
     }
 
     /**

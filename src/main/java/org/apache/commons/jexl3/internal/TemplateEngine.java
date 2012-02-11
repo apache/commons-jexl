@@ -257,7 +257,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         public final TemplateExpression prepare(JexlContext context) {
             try {
-                Frame frame = context instanceof TemplateContext
+                Scope.Frame frame = context instanceof TemplateContext
                                      ? ((TemplateContext) context).getFrame()
                                      : null;
                 Interpreter interpreter = jexl.createInterpreter(context, frame);
@@ -275,7 +275,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         public final Object evaluate(JexlContext context) {
             try {
-                Frame frame = context instanceof TemplateContext
+                Scope.Frame frame = context instanceof TemplateContext
                                      ? ((TemplateContext) context).getFrame()
                                      : null;
                 Interpreter interpreter = jexl.createInterpreter(context, frame);
@@ -973,7 +973,7 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public TemplateScript prepare(JexlContext context) {
-            Frame frame = script.createFrame((Object[]) null);
+            Scope.Frame frame = script.createFrame((Object[]) null);
             TemplateContext tcontext = new TemplateContext(context, frame, exprs, null);
             TemplateExpression[] immediates = new TemplateExpression[exprs.length];
             for (int e = 0; e < exprs.length; ++e) {
@@ -989,7 +989,7 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public void evaluate(JexlContext context, Writer writer, Object... args) {
-            Frame frame = script.createFrame(args);
+            Scope.Frame frame = script.createFrame(args);
             TemplateContext tcontext = new TemplateContext(context, frame, exprs, writer);
             Interpreter interpreter = jexl.createInterpreter(tcontext, frame);
             interpreter.interpret(script);
@@ -1009,7 +1009,7 @@ public final class TemplateEngine extends JxltEngine {
         /** The writer used to output. */
         private final Writer writer;
         /** The call frame. */
-        private final Frame frame;
+        private final Scope.Frame frame;
 
         /**
          * Creates a TemplateScript context instance.
@@ -1018,7 +1018,7 @@ public final class TemplateEngine extends JxltEngine {
          * @param expressions the list of TemplateExpression from the TemplateScript to evaluate
          * @param out the output writer
          */
-        protected TemplateContext(JexlContext jcontext, Frame jframe,
+        protected TemplateContext(JexlContext jcontext, Scope.Frame jframe,
                                   UnifiedExpression[] expressions, Writer out) {
             wrap = jcontext;
             frame = jframe;
@@ -1030,7 +1030,7 @@ public final class TemplateEngine extends JxltEngine {
          * Gets this context calling frame.
          * @return the engine frame
          */
-        public Frame getFrame() {
+        public Scope.Frame getFrame() {
             return frame;
         }
 

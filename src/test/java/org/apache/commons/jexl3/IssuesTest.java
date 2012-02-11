@@ -495,7 +495,7 @@ public class IssuesTest extends JexlTestCase {
         public String getPropA() {
             return propA;
         }
-        
+
         public String uppercase(String str) {
             return str.toUpperCase();
         }
@@ -718,9 +718,6 @@ public class IssuesTest extends JexlTestCase {
         assertTrue((Boolean) result);
     }
 
-
-
-
     public static class Foo125 {
         public String method() {
             return "OK";
@@ -738,5 +735,24 @@ public class IssuesTest extends JexlTestCase {
         JexlExpression e = jexl.createExpression("method()");
         JexlContext jc = new Foo125Context(jexl, new Foo125());
         assertEquals("OK", e.evaluate(jc));
+    }
+
+    public static class ThrowNPE {
+        public String method() {
+            throw new NullPointerException("ThrowNPE");
+        }
+    }
+
+    public void test126() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlExpression e = jexl.createExpression("method()");
+        JexlContext jc = new ObjectContext<ThrowNPE>(jexl, new ThrowNPE());
+        try {
+        e.evaluate(jc);
+        fail("Should have thrown NPE");
+        } catch(JexlException xany) {
+            Throwable xth = xany.getCause();
+            assertEquals(NullPointerException.class, xth.getClass());
+        }
     }
 }

@@ -120,7 +120,7 @@ public class Interpreter extends ParserVisitor {
     /** Cache executors. */
     protected final boolean cache;
     /** Registers or arguments. */
-    protected final Frame frame;
+    protected final Scope.Frame frame;
     /** Cancellation support. */
     protected volatile boolean cancelled = false;
     /** Empty parameters for method matching. */
@@ -130,9 +130,9 @@ public class Interpreter extends ParserVisitor {
      * Creates an interpreter.
      * @param engine the engine creating this interpreter
      * @param aContext the context to evaluate expression
-     * @param frame the engine evaluation frame
+     * @param eFrame the interpreter evaluation frame
      */
-    protected Interpreter(Engine engine, JexlContext aContext, Frame eFrame) {
+    protected Interpreter(Engine engine, JexlContext aContext, Scope.Frame eFrame) {
         this.jexl = engine;
         this.logger = jexl.logger;
         this.uberspect = jexl.uberspect;
@@ -155,8 +155,13 @@ public class Interpreter extends ParserVisitor {
         this.frame = eFrame;
         this.functors = null;
     }
-
-    protected Interpreter(Interpreter copy, Frame eFrame) {
+    
+    /**
+     * Creates a copy of an interpreter, used for function/lambda evaluation.
+     * @param copy the interpreter to copy
+     * @param eFrame the interpreter evaluation frame
+     */
+    protected Interpreter(Interpreter copy, Scope.Frame eFrame) {
         this.jexl = copy.jexl;
         this.logger = copy.logger;
         this.uberspect = copy.uberspect;
@@ -167,8 +172,8 @@ public class Interpreter extends ParserVisitor {
         this.strictEngine = copy.strictEngine;
         this.strictArithmetic = copy.strictArithmetic;
         this.cache = copy.cache;
+        this.functors = copy.functors;
         this.frame = eFrame;
-        this.functors = null;
     }
 
     /**
@@ -191,7 +196,7 @@ public class Interpreter extends ParserVisitor {
                 logger.warn(xjexl.getMessage(), xjexl.getCause());
                 return null;
             }
-            throw xjexl;
+            throw xjexl.clean();
         } finally {
             functors = null;
         }
@@ -422,7 +427,7 @@ public class Interpreter extends ParserVisitor {
 
         // determine initial object & property:
         JexlNode objectNode = null;
-        Object object = register >= 0 ? frame.registers[register] : null;
+        Object object = register >= 0 ? frame.get(register) : null;
         JexlNode propertyNode = null;
         Object property = null;
         boolean isVariable = true;
@@ -504,7 +509,7 @@ public class Interpreter extends ParserVisitor {
         }
         // deal with ant variable; set context
         if (isRegister) {
-            frame.registers[register] = right;
+            frame.set(register, right);
             return right;
         } else if (antVar) {
             if (isVariable && object == null) {
@@ -668,7 +673,7 @@ public class Interpreter extends ParserVisitor {
                     if (register < 0) {
                         context.set(loopVariable.image, value);
                     } else {
-                        frame.registers[register] = value;
+                        frame.set(register, value);
                     }
                     // execute statement
                     result = statement.jjtAccept(this, data);
@@ -766,7 +771,7 @@ public class Interpreter extends ParserVisitor {
         if (data == null) {
             int register = node.getRegister();
             if (register >= 0) {
-                return frame.registers[register];
+                return frame.get(register);
             }
             Object value = context.get(name);
             if (value == null
@@ -837,17 +842,32 @@ public class Interpreter extends ParserVisitor {
         }
     }
     
+    /**
+     * A function closure.
+     */
     private static final class Closure {
-        Frame frame;
-        ASTJexlLambda lambda;
-        Closure(ASTJexlLambda l, Frame f) {
+        /** The frame. */
+        private final Scope.Frame frame;
+        /** The actual lambda. */
+        private final ASTJexlLambda lambda;
+        /** Creates a closure.
+         * @param l the lambda
+         * @param f the interpreter frame
+         */
+        Closure(ASTJexlLambda l, Scope.Frame f) {
             lambda = l;
             frame = lambda.createFrame(f);
         }
     }
     
+    /**
+     * Evaluates a closure.
+     * @param closure the closure
+     * @param argv the arguments
+     * @return the result of evaluation
+     */
     private Object call(Closure closure, Object[] argv) {
-        Frame cframe = closure.frame;
+        Scope.Frame cframe = closure.frame;
         if (cframe != null) {
             cframe.assign(argv);
         }
@@ -952,7 +972,7 @@ public class Interpreter extends ParserVisitor {
                 if (bean == context) {
                     int register = methodNode.getRegister();
                     if (register >= 0) {
-                        functor = frame.registers[register];
+                        functor = frame.get(register);
                     } else {
                         functor = context.get(methodName);
                     }

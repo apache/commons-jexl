@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.internal.Engine;
-import org.apache.commons.jexl3.internal.Frame;
 import org.apache.commons.jexl3.internal.Scope;
 
 /**
@@ -60,13 +58,14 @@ public class ASTJexlScript extends JexlNode {
      * @param values the argument values
      * @return the arguments array
      */
-    public Frame createFrame(Object... values) {
+    public Scope.Frame createFrame(Object... values) {
         if (scope != null) {
-            Frame frame = scope.createFrame(null);
-            return frame != null? frame.assign(values) : null;
-        } else {
-            return null;
-        }
+            Scope.Frame frame = scope.createFrame(null);
+            if (frame != null) {
+                return frame.assign(values);
+            }
+        } 
+        return null;
     }
     
     /**
