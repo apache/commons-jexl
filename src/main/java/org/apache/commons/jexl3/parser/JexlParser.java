@@ -16,21 +16,25 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.internal.Engine;
+import java.io.Reader;
+import java.util.Stack;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.internal.Engine;
+import org.apache.commons.jexl3.internal.Scope;
 
 /**
  * The base class for parsing, manages the parameter/local variable frame.
  * @author henri
  */
-public class JexlParser extends StringParser {
+public abstract class JexlParser extends StringParser {
     /**
      * The map of named registers aka script parameters.
      * Each parameter is associated to a register and is materialized as an offset in the registers array used
      * during evaluation.
      */
-    protected Engine.Scope frame;
+    protected Scope frame = null;
+    protected Stack<Scope> frames = new Stack<Scope>();
 
     /**
      * Sets the frame to use bythis parser.
@@ -39,7 +43,7 @@ public class JexlParser extends StringParser {
      * </p>
      * @param theFrame the register map
      */
-    public void setFrame(Engine.Scope theFrame) {
+    public void setFrame(Scope theFrame) {
         frame = theFrame;
     }
     
@@ -51,8 +55,29 @@ public class JexlParser extends StringParser {
      * </p>
      * @return the named register map
      */
-    public Engine.Scope getFrame() {
+    public Scope getFrame() {
         return frame;
+    }
+    
+    /**
+     * Create a new local variable frame and push it as current scope.
+     */
+    public void pushFrame() {
+        if (frame != null) {
+            frames.push(frame);
+        }
+        frame = new Scope(frame, (String[])null);
+    }
+    
+    /**
+     * Pops back to previous local variable frame.
+     */
+    public void popFrame() {
+        if (!frames.isEmpty()) {
+            frame = frames.pop();
+        } else {
+            frame = null;
+        }
     }
     
 
@@ -82,11 +107,26 @@ public class JexlParser extends StringParser {
      */
     public void declareVariable(ASTVar identifier, String image) {
         if (frame == null) {
-            frame = new Engine.Scope((String[])null);
+            frame = new Scope(null, (String[])null);
         }
         Integer register = frame.declareVariable(image);
         identifier.setRegister(register.intValue());
         identifier.image = image;
+    }
+    
+    /**
+     * Declares a local parameter.
+     * <p>
+     * This method creates an new entry in the named register map.
+     * </p>
+     * @param identifier the identifier used to declare
+     * @param image the variable name
+     */
+    public void declareParameter(String image) {
+        if (frame == null) {
+            frame = new Scope(null, (String[])null);
+        }
+        frame.declareParameter(image);
     }
 
     /**
@@ -124,6 +164,14 @@ public class JexlParser extends StringParser {
                 dbgInfo = n.jexlInfo();
             }
             throw new JexlException.Parsing(dbgInfo, "Ambiguous statement, missing ';' between expressions", null);
+        }
+        if (n instanceof ASTJexlScript) {
+            ASTJexlScript script = (ASTJexlScript) n;
+            // reaccess in case local variables have been declared
+            if (script.getScope() != frame) {
+                script.setScope(frame);
+            }
+            popFrame();
         }
     }
 }

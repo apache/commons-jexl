@@ -157,6 +157,4 @@ public class AssignTest extends JexlTestCase {
         o = JEXL.getProperty(quux, "['froboz']['value']");
         assertEquals("Result is not 1000", new Integer(1000), o);
     }
-
-
 }

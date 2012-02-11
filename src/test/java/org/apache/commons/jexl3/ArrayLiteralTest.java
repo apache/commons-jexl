@@ -51,7 +51,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         JexlContext jc = new MapContext();
 
         Object o = e.evaluate( jc );
-        Object[] check = { new Float(5), new Integer(10) };
+        Object[] check = { new Double(5), new Integer(10) };
         assertTrue( Arrays.equals(check, (Object[])o) );
         assertTrue (o.getClass().isArray() && o.getClass().getComponentType().equals(Number.class));
     }

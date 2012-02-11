@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal;
 
 import java.util.regex.Pattern;
+import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.ASTAdditiveNode;
 import org.apache.commons.jexl3.parser.ASTAdditiveOperator;
@@ -41,6 +42,7 @@ import org.apache.commons.jexl3.parser.ASTGENode;
 import org.apache.commons.jexl3.parser.ASTGTNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
+import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.ASTLENode;
 import org.apache.commons.jexl3.parser.ASTLTNode;
@@ -101,6 +103,19 @@ public final class Debugger extends ParserVisitor {
     }
     
     /**
+     * Position the debugger on the root of an expression.
+     * @param jscript the expression
+     * @return true if the expression was a {@link Script} instance, false otherwise
+     */
+    public boolean debug(JexlExpression jscript) {
+        if (jscript instanceof Script) {
+            return debug(((Script) jscript).script);
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Position the debugger on the root of a script.
      * @param jscript the script
      * @return true if the script was a {@link Script} instance, false otherwise
@@ -140,8 +155,7 @@ public final class Debugger extends ParserVisitor {
     public String data() {
         return builder.toString();
     }
-    
-    
+
     /**
      * Rebuilds an expression from a Jexl node.
      * @param node the node to rebuilt from
@@ -431,14 +445,15 @@ public final class Debugger extends ParserVisitor {
     protected Object visit(ASTGTNode node, Object data) {
         return infixChildren(node, " > ", false, data);
     }
-
     /** Checks identifiers that contain space, quote, double-quotes or backspace. */
     private static final Pattern QUOTED_IDENTIFIER = Pattern.compile("['\"\\s\\\\]");
+    /** Checks number used as identifiers. */
+    private static final Pattern NUMBER_IDENTIFIER = Pattern.compile("^\\d*$");
     
     @Override
     protected Object visit(ASTIdentifier node, Object data) {
         String image = node.image;
-        if (QUOTED_IDENTIFIER.matcher(image).find()) {
+        if (QUOTED_IDENTIFIER.matcher(image).find() || NUMBER_IDENTIFIER.matcher(image).find()) {
             // quote it
             image = "'" + node.image.replace("'", "\\'") + "'";
         }
@@ -471,6 +486,18 @@ public final class Debugger extends ParserVisitor {
 
     @Override
     protected Object visit(ASTJexlScript node, Object data) {
+        if (node instanceof ASTJexlLambda) {
+            builder.append("function(");
+            String[] params = node.getParameters();
+            if (params != null && params.length > 0) {
+                builder.append(params[0]);
+                for (int p = 1; p < params.length; ++p) {
+                    builder.append(", ");
+                    builder.append(params[p]);
+                }
+            }
+            builder.append(")");
+        }
         int num = node.jjtGetNumChildren();
         for (int i = 0; i < num; ++i) {
             JexlNode child = node.jjtGetChild(i);
@@ -699,5 +726,4 @@ public final class Debugger extends ParserVisitor {
         }
         return data;
     }
-
 }

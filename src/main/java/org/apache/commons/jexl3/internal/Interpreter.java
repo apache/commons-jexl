@@ -89,6 +89,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.jexl3.parser.ASTJexlLambda;
 
 /**
  * An interpreter of JEXL syntax.
@@ -96,6 +97,8 @@ import java.util.Set;
  * @since 2.0
  */
 public class Interpreter extends ParserVisitor {
+    /** The JEXL engine. */
+    protected final Engine jexl;
     /** The logger. */
     protected final Log logger;
     /** The uberspect. */
@@ -117,9 +120,7 @@ public class Interpreter extends ParserVisitor {
     /** Cache executors. */
     protected final boolean cache;
     /** Registers or arguments. */
-    protected final Object[] registers;
-    /** Parameter names if any. */
-    protected final String[] parameters;
+    protected final Frame frame;
     /** Cancellation support. */
     protected volatile boolean cancelled = false;
     /** Empty parameters for method matching. */
@@ -127,20 +128,21 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * Creates an interpreter.
-     * @param jexl the engine creating this interpreter
+     * @param engine the engine creating this interpreter
      * @param aContext the context to evaluate expression
      * @param frame the engine evaluation frame
      */
-    protected Interpreter(Engine jexl, JexlContext aContext, Engine.Frame frame) {
+    protected Interpreter(Engine engine, JexlContext aContext, Frame eFrame) {
+        this.jexl = engine;
         this.logger = jexl.logger;
         this.uberspect = jexl.uberspect;
-        this.context = aContext != null? aContext : Engine.EMPTY_CONTEXT;
+        this.context = aContext != null ? aContext : Engine.EMPTY_CONTEXT;
         if (this.context instanceof JexlEngine.Options) {
             JexlEngine.Options opts = (JexlEngine.Options) context;
             Boolean ostrict = opts.isStrict();
             Boolean osilent = opts.isSilent();
-            this.strictEngine = ostrict == null? jexl.isStrict() : ostrict.booleanValue();
-            this.silent = osilent == null? jexl.isSilent() : osilent.booleanValue();
+            this.strictEngine = ostrict == null ? jexl.isStrict() : ostrict.booleanValue();
+            this.silent = osilent == null ? jexl.isSilent() : osilent.booleanValue();
             this.arithmetic = jexl.arithmetic.options(opts);
         } else {
             this.strictEngine = jexl.isStrict();
@@ -150,26 +152,24 @@ public class Interpreter extends ParserVisitor {
         this.functions = jexl.functions;
         this.strictArithmetic = this.arithmetic.isStrict();
         this.cache = jexl.cache != null;
-        if (frame != null) {
-            this.parameters = frame.getParameters();
-            this.registers = frame.getRegisters();
-        } else {
-            this.parameters = null;
-            this.registers = null;
-        }
+        this.frame = eFrame;
         this.functors = null;
     }
 
-    /**
-     * Checks whether this interpreter considers unknown variables, methods and constructors as errors.
-     * @return true if isStrict, false otherwise
-     */
-
-    /**
-     * Checks whether this interpreter throws JexlException when encountering errors.
-     * @return true if silent, false otherwise
-     */
-
+    protected Interpreter(Interpreter copy, Frame eFrame) {
+        this.jexl = copy.jexl;
+        this.logger = copy.logger;
+        this.uberspect = copy.uberspect;
+        this.context = copy.context;
+        this.arithmetic = copy.arithmetic;
+        this.silent = copy.silent;
+        this.functions = copy.functions;
+        this.strictEngine = copy.strictEngine;
+        this.strictArithmetic = copy.strictArithmetic;
+        this.cache = copy.cache;
+        this.frame = eFrame;
+        this.functors = null;
+    }
 
     /**
      * Interpret the given script/expression.
@@ -207,7 +207,7 @@ public class Interpreter extends ParserVisitor {
      */
     protected JexlNode findNullOperand(RuntimeException xrt, JexlNode node, Object left, Object right) {
         if (xrt instanceof ArithmeticException
-            && (Object) JexlException.NULL_OPERAND == xrt.getMessage()) {
+                && (Object) JexlException.NULL_OPERAND == xrt.getMessage()) {
             if (left == null) {
                 return node.jjtGetChild(0);
             }
@@ -283,7 +283,7 @@ public class Interpreter extends ParserVisitor {
         if (namespace == null) {
             namespace = functions.get(prefix);
             if (prefix != null && namespace == null) {
-                throw new JexlException(node, "no such function namespace " + prefix);
+                throw new JexlException(node, "no such function namespace " + prefix, null);
             }
         }
         // allow namespace to be instantiated as functor with context if possible, not an error otherwise
@@ -422,7 +422,7 @@ public class Interpreter extends ParserVisitor {
 
         // determine initial object & property:
         JexlNode objectNode = null;
-        Object object = register >= 0 ? registers[register] : null;
+        Object object = register >= 0 ? frame.registers[register] : null;
         JexlNode propertyNode = null;
         Object property = null;
         boolean isVariable = true;
@@ -504,7 +504,7 @@ public class Interpreter extends ParserVisitor {
         }
         // deal with ant variable; set context
         if (isRegister) {
-            registers[register] = right;
+            frame.registers[register] = right;
             return right;
         } else if (antVar) {
             if (isVariable && object == null) {
@@ -668,7 +668,7 @@ public class Interpreter extends ParserVisitor {
                     if (register < 0) {
                         context.set(loopVariable.image, value);
                     } else {
-                        registers[register] = value;
+                        frame.registers[register] = value;
                     }
                     // execute statement
                     result = statement.jjtAccept(this, data);
@@ -766,7 +766,7 @@ public class Interpreter extends ParserVisitor {
         if (data == null) {
             int register = node.getRegister();
             if (register >= 0) {
-                return registers[register];
+                return frame.registers[register];
             }
             Object value = context.get(name);
             if (value == null
@@ -824,13 +824,37 @@ public class Interpreter extends ParserVisitor {
 
     @Override
     protected Object visit(ASTJexlScript node, Object data) {
-        int numChildren = node.jjtGetNumChildren();
-        Object result = null;
-        for (int i = 0; i < numChildren; i++) {
-            JexlNode child = node.jjtGetChild(i);
-            result = child.jjtAccept(this, data);
+        if (node instanceof ASTJexlLambda) {
+            return new Closure((ASTJexlLambda) node, frame);
+        } else {
+            final int numChildren = node.jjtGetNumChildren();
+            Object result = null;
+            for (int i = 0; i < numChildren; i++) {
+                JexlNode child = node.jjtGetChild(i);
+                result = child.jjtAccept(this, data);
+            }
+            return result;
         }
-        return result;
+    }
+    
+    private static final class Closure {
+        Frame frame;
+        ASTJexlLambda lambda;
+        Closure(ASTJexlLambda l, Frame f) {
+            lambda = l;
+            frame = lambda.createFrame(f);
+        }
+    }
+    
+    private Object call(Closure closure, Object[] argv) {
+        Frame cframe = closure.frame;
+        if (cframe != null) {
+            cframe.assign(argv);
+        }
+        ASTJexlLambda lambda = closure.lambda;
+        JexlNode block = lambda.jjtGetChild(lambda.jjtGetNumChildren() - 1);
+        Interpreter interpreter = new Interpreter(this, cframe);
+        return interpreter.interpret(block);
     }
 
     @Override
@@ -915,40 +939,49 @@ public class Interpreter extends ParserVisitor {
                 }
             }
             boolean cacheable = cache;
-            JexlMethod vm = uberspect.getMethod(bean, methodName, argv);
-            // DG: If we can't find an exact match, narrow the parameters and try again
-            if (vm == null) {
-                if (arithmetic.narrowArguments(argv)) {
-                    vm = uberspect.getMethod(bean, methodName, argv);
+            boolean narrow = true;
+            JexlMethod vm = null;
+            // pseudo loop
+            while (true) {
+                vm = uberspect.getMethod(bean, methodName, argv);
+                if (vm != null) {
+                    break;
                 }
-                if (vm == null) {
-                    Object functor = null;
-                    // could not find a method, try as a var
-                    if (bean == context) {
-                        int register = methodNode.getRegister();
-                        if (register >= 0) {
-                            functor = registers[register];
-                        } else {
-                            functor = context.get(methodName);
-                        }
+                Object functor = null;
+                // could not find a method, try as a var
+                if (bean == context) {
+                    int register = methodNode.getRegister();
+                    if (register >= 0) {
+                        functor = frame.registers[register];
                     } else {
-                        JexlPropertyGet gfunctor = uberspect.getPropertyGet(bean, methodName);
-                        if (gfunctor != null) {
-                            functor = gfunctor.tryInvoke(bean, methodName);
-                        }
+                        functor = context.get(methodName);
                     }
-                    // script of jexl method will do
-                    if (functor instanceof JexlScript) {
-                        return ((JexlScript) functor).execute(context, argv.length > 0 ? argv : null);
-                    } else if (functor instanceof JexlMethod) {
-                        vm = (JexlMethod) functor;
-                        cacheable = false;
-                    } else {
-                        xjexl = new JexlException.Method(node, methodName);
+                } else {
+                    JexlPropertyGet gfunctor = uberspect.getPropertyGet(bean, methodName);
+                    if (gfunctor != null) {
+                        functor = gfunctor.tryInvoke(bean, methodName);
                     }
+                }
+                // lambda, script or jexl method will do
+                if (functor instanceof Closure) {
+                    return call((Closure) functor, argv);
+                }
+                if (functor instanceof JexlScript) {
+                    return ((JexlScript) functor).execute(context, argv);
+                }
+                if (functor instanceof JexlMethod) {
+                    return ((JexlMethod) functor).invoke(bean, argv);
+                }
+                // if we did not find an exact match and we haven't tried yet,
+                // attempt to narrow the parameters and if this succeeds, try again
+                if (narrow && arithmetic.narrowArguments(argv)) {
+                    narrow = false;
+                } else {
+                    break;
                 }
             }
-            if (xjexl == null) {
+            // we have either evaluated and returned or might have found a method
+            if (vm != null) {
                 // vm cannot be null if xjexl is null
                 Object eval = vm.invoke(bean, argv);
                 // cache executor in volatile JexlNode.value
@@ -956,11 +989,11 @@ public class Interpreter extends ParserVisitor {
                     node.jjtSetValue(vm);
                 }
                 return eval;
+            } else {
+                xjexl = new JexlException.Method(node, methodName, null);
             }
-        } catch (InvocationTargetException e) {
-            xjexl = new JexlException(node, "method invocation error", e.getCause());
-        } catch (Exception e) {
-            xjexl = new JexlException(node, "method error", e);
+        } catch (Exception xany) {
+            xjexl = new JexlException(node, methodName, xany);
         }
         return invocationFailed(xjexl);
     }
@@ -1029,7 +1062,8 @@ public class Interpreter extends ParserVisitor {
                     ctor = uberspect.getConstructor(cobject, argv);
                 }
                 if (ctor == null) {
-                    xjexl = new JexlException.Method(node, cobject.toString());
+                    String dbgStr = cobject != null ? cobject.toString() : null;
+                    xjexl = new JexlException.Method(node, dbgStr, null);
                 }
             }
             if (xjexl == null) {
@@ -1040,10 +1074,9 @@ public class Interpreter extends ParserVisitor {
                 }
                 return instance;
             }
-        } catch (InvocationTargetException e) {
-            xjexl = new JexlException(node, "constructor invocation error", e.getCause());
-        } catch (Exception e) {
-            xjexl = new JexlException(node, "constructor error", e);
+        } catch (Exception xany) {
+            String dbgStr = cobject != null ? cobject.toString() : null;
+            xjexl = new JexlException(node, dbgStr, xany);
         }
         return invocationFailed(xjexl);
     }
@@ -1221,10 +1254,10 @@ public class Interpreter extends ParserVisitor {
                     // variable unknow in context and not (from) a register
                     && !(context.has(variableName.toString())
                     || (numChildren == 1
-                    && node.jjtGetChild(0) instanceof ASTIdentifier
-                    && ((ASTIdentifier) node.jjtGetChild(0)).getRegister() >= 0))) {
+                        && node.jjtGetChild(0) instanceof ASTIdentifier
+                        && ((ASTIdentifier) node.jjtGetChild(0)).getRegister() >= 0))) {
                 JexlException xjexl = propertyName != null
-                                      ? new JexlException.Property(node, propertyName)
+                                      ? new JexlException.Property(node, variableName.toString())
                                       : new JexlException.Variable(node, variableName.toString());
                 return unknownVariable(xjexl);
             }
@@ -1423,16 +1456,13 @@ public class Interpreter extends ParserVisitor {
                 }
                 return value;
             } catch (Exception xany) {
-                if (node == null) {
-                    throw new RuntimeException(xany);
-                } else {
-                    JexlException xjexl = new JexlException.Property(node, attribute.toString());
-                    if (strictArithmetic) {
-                        throw xjexl;
-                    }
-                    if (!silent) {
-                        logger.warn(xjexl.getMessage());
-                    }
+                String attrStr = attribute != null ? attribute.toString() : null;
+                JexlException xjexl = new JexlException.Property(node, attrStr, xany);
+                if (strictArithmetic) {
+                    throw xjexl;
+                }
+                if (!silent) {
+                    logger.warn(xjexl.getMessage());
                 }
             }
         }

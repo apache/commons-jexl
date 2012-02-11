@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3.internal;
 
-
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
@@ -54,7 +53,6 @@ import java.io.StringReader;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -207,7 +205,7 @@ public class Engine extends JexlEngine {
     public JexlArithmetic getArithmetic() {
         return arithmetic;
     }
-    
+
     @Override
     public TemplateEngine createJxltEngine() {
         return new TemplateEngine(this);
@@ -263,7 +261,7 @@ public class Engine extends JexlEngine {
     public Script createScript(String scriptText) {
         return createScript(scriptText, null, null);
     }
-    
+
     @Override
     public Script createScript(String scriptText, String... names) {
         return createScript(scriptText, null, names);
@@ -275,7 +273,7 @@ public class Engine extends JexlEngine {
             throw new NullPointerException("scriptText is null");
         }
         // Parse the expression
-        ASTJexlScript tree = parse(scriptText, info, new Scope(names));
+        ASTJexlScript tree = parse(scriptText, info, new Scope(null, names));
         return createScript(tree, scriptText);
     }
 
@@ -334,7 +332,7 @@ public class Engine extends JexlEngine {
         expr = "#0" + (expr.charAt(0) == '[' ? "" : ".") + expr + ";";
         try {
             parser.ALLOW_REGISTERS = true;
-            Scope scope = new Scope("#0");
+            Scope scope = new Scope(null, "#0");
             ASTJexlScript script = parse(expr, null, scope);
             JexlNode node = script.jjtGetChild(0);
             Frame frame = script.createFrame(bean);
@@ -365,7 +363,7 @@ public class Engine extends JexlEngine {
         expr = "#0" + (expr.charAt(0) == '[' ? "" : ".") + expr + "=" + "#1" + ";";
         try {
             parser.ALLOW_REGISTERS = true;
-            Scope scope = new Scope("#0", "#1");
+            Scope scope = new Scope(null, "#0", "#1");
             ASTJexlScript script = parse(expr, null, scope);
             JexlNode node = script.jjtGetChild(0);
             Frame frame = script.createFrame(bean, value);
@@ -395,10 +393,10 @@ public class Engine extends JexlEngine {
             if (method != null) {
                 result = method.invoke(obj, args);
             } else {
-                xjexl = new JexlException(info, "failed finding method " + meth);
+                xjexl = new JexlException.Method(info, meth, null);
             }
         } catch (Exception xany) {
-            xjexl = new JexlException(info, "failed executing method " + meth, xany);
+            xjexl = new JexlException.Method(info, meth, xany);
         } finally {
             if (xjexl != null) {
                 if (silent) {
@@ -440,10 +438,10 @@ public class Engine extends JexlEngine {
             if (ctor != null) {
                 result = ctor.invoke(clazz, args);
             } else {
-                xjexl = new JexlException(info, "failed finding constructor for " + clazz.toString());
+                xjexl = new JexlException.Method(info, clazz.toString(), null);
             }
         } catch (Exception xany) {
-            xjexl = new JexlException(info, "failed executing constructor for " + clazz.toString(), xany);
+            xjexl = new JexlException.Method(info, clazz.toString(), xany);
         } finally {
             if (xjexl != null) {
                 if (silent) {
@@ -462,7 +460,7 @@ public class Engine extends JexlEngine {
      * @param frame the interpreter frame
      * @return an Interpreter
      */
-    protected Interpreter createInterpreter(JexlContext context, Engine.Frame frame) {
+    protected Interpreter createInterpreter(JexlContext context, Frame frame) {
         return new Interpreter(this, context == null ? EMPTY_CONTEXT : context, frame);
     }
 
@@ -662,201 +660,6 @@ public class Engine extends JexlEngine {
     }
 
     /**
-     * A script scope, stores the declaration of parameters and local variables.
-     * @since 3.0
-     */
-    public static final class Scope {
-        /**
-         * The number of parameters.
-         */
-        private final int parms;
-        /**
-         * The map of named registers aka script parameters.
-         * Each parameter is associated to a register and is materialized as an offset in the registers array used
-         * during evaluation.
-         */
-        private Map<String, Integer> namedRegisters = null;
-
-        /**
-         * Creates a new scope with a list of parameters.
-         * @param parameters the list of parameters
-         */
-        public Scope(String... parameters) {
-            if (parameters != null) {
-                parms = parameters.length;
-                namedRegisters = new LinkedHashMap<String, Integer>();
-                for (int p = 0; p < parms; ++p) {
-                    namedRegisters.put(parameters[p], p);
-                }
-            } else {
-                parms = 0;
-            }
-        }
-
-        @Override
-        public int hashCode() {
-            return namedRegisters == null ? 0 : parms ^ namedRegisters.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof Scope && equals((Scope) o);
-        }
-
-        /**
-         * Whether this frame is equal to another.
-         * @param frame the frame to compare to
-         * @return true if equal, false otherwise
-         */
-        public boolean equals(Scope frame) {
-            if (this == frame) {
-                return true;
-            } else if (frame == null || parms != frame.parms) {
-                return false;
-            } else if (namedRegisters == null) {
-                return frame.namedRegisters == null;
-            } else {
-                return namedRegisters.equals(frame.namedRegisters);
-            }
-        }
-
-        /**
-         * Checks whether an identifier is a local variable or argument, ie stored in a register. 
-         * @param name the register name
-         * @return the register index
-         */
-        public Integer getRegister(String name) {
-            return namedRegisters != null ? namedRegisters.get(name) : null;
-        }
-
-        /**
-         * Declares a local variable.
-         * <p>
-         * This method creates an new entry in the named register map.
-         * </p>
-         * @param name the variable name
-         * @return the register index storing this variable
-         */
-        public Integer declareVariable(String name) {
-            if (namedRegisters == null) {
-                namedRegisters = new LinkedHashMap<String, Integer>();
-            }
-            Integer register = namedRegisters.get(name);
-            if (register == null) {
-                register = Integer.valueOf(namedRegisters.size());
-                namedRegisters.put(name, register);
-            }
-            return register;
-        }
-
-        /**
-         * Creates a frame by copying values up to the number of parameters.
-         * @param values the argument values
-         * @return the arguments array
-         */
-        public Frame createFrame(Object... values) {
-            if (namedRegisters != null) {
-                Object[] arguments = new Object[namedRegisters.size()];
-                if (values != null) {
-                    System.arraycopy(values, 0, arguments, 0, Math.min(parms, values.length));
-                }
-                return new Frame(arguments, namedRegisters.keySet().toArray(new String[0]));
-            } else {
-                return null;
-            }
-        }
-
-        /**
-         * Gets the (maximum) number of arguments this script expects.
-         * @return the number of parameters
-         */
-        public int getArgCount() {
-            return parms;
-        }
-
-        /**
-         * Gets this script registers, i.e. parameters and local variables.
-         * @return the register names
-         */
-        public String[] getRegisters() {
-            return namedRegisters != null ? namedRegisters.keySet().toArray(new String[0]) : new String[0];
-        }
-
-        /**
-         * Gets this script parameters, i.e. registers assigned before creating local variables.
-         * @return the parameter names
-         */
-        public String[] getParameters() {
-            if (namedRegisters != null && parms > 0) {
-                String[] pa = new String[parms];
-                int p = 0;
-                for (Map.Entry<String, Integer> entry : namedRegisters.entrySet()) {
-                    if (entry.getValue().intValue() < parms) {
-                        pa[p++] = entry.getKey();
-                    }
-                }
-                return pa;
-            } else {
-                return null;
-            }
-        }
-
-        /**
-         * Gets this script local variable, i.e. registers assigned to local variables.
-         * @return the parameter names
-         */
-        public String[] getLocalVariables() {
-            if (namedRegisters != null && parms > 0) {
-                String[] pa = new String[parms];
-                int p = 0;
-                for (Map.Entry<String, Integer> entry : namedRegisters.entrySet()) {
-                    if (entry.getValue().intValue() >= parms) {
-                        pa[p++] = entry.getKey();
-                    }
-                }
-                return pa;
-            } else {
-                return null;
-            }
-        }
-    }
-
-    /**
-     * A call frame, created from a scope, stores the arguments and local variables as "registers".
-     * @since 3.0
-     */
-    public static final class Frame {
-        /** Registers or arguments. */
-        private final Object[] registers;
-        /** Parameter and argument names if any. */
-        private final String[] parameters;
-
-        /**
-         * Creates a new frame.
-         * @param r the registers
-         * @param p the parameters
-         */
-        Frame(Object[] r, String[] p) {
-            registers = r;
-            parameters = p;
-        }
-
-        /**
-         * @return the registers
-         */
-        public Object[] getRegisters() {
-            return registers;
-        }
-
-        /**
-         * @return the parameters
-         */
-        public String[] getParameters() {
-            return parameters;
-        }
-    }
-
-    /**
      * Parses an expression.
      * @param expression the expression to parse
      * @param info debug information structure
@@ -886,13 +689,7 @@ public class Engine extends JexlEngine {
                 } else {
                     jexlInfo = info;
                 }
-                parser.setFrame(frame);
-                script = parser.parse(reader, jexlInfo);
-                // reaccess in case local variables have been declared
-                frame = parser.getFrame();
-                if (frame != null) {
-                    script.setScope(frame);
-                }
+                script = parser.parse(reader, frame, jexlInfo);
                 if (cache != null) {
                     cache.put(expr, script);
                 }
@@ -952,5 +749,4 @@ public class Engine extends JexlEngine {
         }
         return info;
     }
-
 }

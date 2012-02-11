@@ -257,7 +257,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         public final TemplateExpression prepare(JexlContext context) {
             try {
-                Engine.Frame frame = context instanceof TemplateContext
+                Frame frame = context instanceof TemplateContext
                                      ? ((TemplateContext) context).getFrame()
                                      : null;
                 Interpreter interpreter = jexl.createInterpreter(context, frame);
@@ -275,7 +275,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         public final Object evaluate(JexlContext context) {
             try {
-                Engine.Frame frame = context instanceof TemplateContext
+                Frame frame = context instanceof TemplateContext
                                      ? ((TemplateContext) context).getFrame()
                                      : null;
                 Interpreter interpreter = jexl.createInterpreter(context, frame);
@@ -681,7 +681,7 @@ public final class TemplateEngine extends JxltEngine {
      * @return the unified expression instance
      * @throws JexlException if an error occur during parsing
      */
-    private TemplateExpression parseExpression(String expr, Engine.Scope scope) {
+    private TemplateExpression parseExpression(String expr, Scope scope) {
         final int size = expr.length();
         ExpressionBuilder builder = new ExpressionBuilder(0);
         StringBuilder strb = new StringBuilder(size);
@@ -893,7 +893,7 @@ public final class TemplateEngine extends JxltEngine {
             if (reader == null) {
                 throw new NullPointerException("null input");
             }
-            Engine.Scope scope = new Engine.Scope(parms);
+            Scope scope = new Scope(null, parms);
             prefix = directive;
             List<Block> blocks = readTemplate(prefix, reader);
             List<TemplateExpression> uexprs = new ArrayList<TemplateExpression>();
@@ -973,7 +973,7 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public TemplateScript prepare(JexlContext context) {
-            Engine.Frame frame = script.createFrame((Object[]) null);
+            Frame frame = script.createFrame((Object[]) null);
             TemplateContext tcontext = new TemplateContext(context, frame, exprs, null);
             TemplateExpression[] immediates = new TemplateExpression[exprs.length];
             for (int e = 0; e < exprs.length; ++e) {
@@ -989,7 +989,7 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public void evaluate(JexlContext context, Writer writer, Object... args) {
-            Engine.Frame frame = script.createFrame(args);
+            Frame frame = script.createFrame(args);
             TemplateContext tcontext = new TemplateContext(context, frame, exprs, writer);
             Interpreter interpreter = jexl.createInterpreter(tcontext, frame);
             interpreter.interpret(script);
@@ -1009,7 +1009,7 @@ public final class TemplateEngine extends JxltEngine {
         /** The writer used to output. */
         private final Writer writer;
         /** The call frame. */
-        private final Engine.Frame frame;
+        private final Frame frame;
 
         /**
          * Creates a TemplateScript context instance.
@@ -1018,7 +1018,7 @@ public final class TemplateEngine extends JxltEngine {
          * @param expressions the list of TemplateExpression from the TemplateScript to evaluate
          * @param out the output writer
          */
-        protected TemplateContext(JexlContext jcontext, Engine.Frame jframe,
+        protected TemplateContext(JexlContext jcontext, Frame jframe,
                                   UnifiedExpression[] expressions, Writer out) {
             wrap = jcontext;
             frame = jframe;
@@ -1030,7 +1030,7 @@ public final class TemplateEngine extends JxltEngine {
          * Gets this context calling frame.
          * @return the engine frame
          */
-        public Engine.Frame getFrame() {
+        public Frame getFrame() {
             return frame;
         }
 
