@@ -316,6 +316,20 @@
             <source>math:cosinus(23.0)</source>
           </td>
         </tr>
+        <tr>
+          <td>function</td>
+          <td>
+            Defines a function within the script, usually associated with a local variable assignment.
+            <code>var fun = function(x, y) { x + y }</code>
+            Calling a function follows the usual convention:
+            <code>fun(17, 25)</code>
+            <p>Note that functions can use local variables and parameters from their declaring script.
+            Those variables values are bound in the function environment at definition time.</p>
+            <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
+            The function closure hoists 't' when defined; the result of the evaluation will
+            lead to <code>15 +7 + 20 = 42</code>. 
+          </td>
+        </tr>
       </table>
     </section>
     <section name="Operators">
