@@ -496,7 +496,7 @@ public final class Debugger extends ParserVisitor {
                     builder.append(params[p]);
                 }
             }
-            builder.append(")");
+            builder.append(") ");
         }
         int num = node.jjtGetNumChildren();
         for (int i = 0; i < num; ++i) {
