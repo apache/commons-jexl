@@ -20,125 +20,144 @@
  -->
 
 <document>
-  <properties>
-    <title>Changes</title>
-    <author email="dev@commons.apache.org">Commons Developers</author>
-  </properties>
-  <body>
-    <release version="3.0" date="unreleased">
-        <action dev="henrib" type="add" issue="JEXL-122">
+    <properties>
+        <title>Changes</title>
+        <author email="dev@commons.apache.org">Commons Developers</author>
+    </properties>
+    <body>
+        <release version="3.0" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-128" due-to="Matteo Trotta">
+            ObjectContext&lt;&gt; should implement NamespaceResolver
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-127">
+            Allow the creation of functions
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-126">
+            Decimal numbers literals should be 'double' by default (instead of 'float')
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-123">
+            Redesign API for stability
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-122">
             Move JEXL from org.apache.comms.jexl2 to org.apache.commons.jexl3
-        </action>
-        <action dev="henrib" type="add" issue="JEXL-121">
+            </action>
+        </release>
+        <release version="2.1.1" date="2011-11-24">
+            <action dev="henrib" type="fix" issue="JEXL-121">
+            Array parameters to methods don't work anymore
+            </action>
+        </release>
+        <release version="2.1" date="2011-13-11">
+            <action dev="henrib" type="add" issue="JEXL-121">
             Add simple template features
-        </action>
-        <action dev="henrib" type="fix" issue="JEXL-120" due-to="Lukas Krecan">
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-120" due-to="Lukas Krecan">
             Make ParseException work in sandboxed environment
-        </action>
-        <action dev="henrib" type="add" issue="JEXL-119">
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-119">
             Allow indexed properties container resolution in expressions
-        </action>
-        <action dev="henrib" type="add" issue="JEXL-118" due-to="Max Tardiveau">
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-118" due-to="Max Tardiveau">
             Provide an IN operator: =~ / match operator extended to provide IN behavior (!~ as NOT IN)
-        </action>
-        <action dev="henrib" type="add" issue="JEXL-116" due-to="Sarel Botha">
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-116" due-to="Sarel Botha">
             Add control over classes, methods, constructors and properties allowed in scripts
-        </action>
-        <action dev="henrib" type="add" issue="JEXL-115" due-to="Sarel Botha">
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-115" due-to="Sarel Botha">
             Add support for asynchronous script execution and cancellation
-        </action>
-        <action dev="henrib" type="add" issue="JEXL-114">
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-114">
             Allow scripts to create local variables // Add return keyword
-        </action>
-        <action dev="henrib" type="add" issue="JEXL-113" due-to="Max Tardiveau">
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-113" due-to="Max Tardiveau">
             Add functions to extract which variables, parameters and local variables are used to evaluate a script
-        </action>
-        <action dev="henrib" type="fix" issue="JEXL-112" due-to="sebb">
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-112" due-to="sebb">
             Cannot parse Integer.MIN_VALUE.
-        </action>
-        <action dev="henrib" type="fix" issue="JEXL-24" due-to="freish">
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-24" due-to="freish">
             Support Long for integer literal instead of Integers.
-        </action>
-        <action dev="henrib" type="add">
+            </action>
+            <action dev="henrib" type="add">
             Added ObjectContext that wraps an object as JexlContext and added JexlContext as source to solve
             top-level namespace functions.
-        </action>
-        <action dev="henrib" type="fix" issue="JEXL-111" due-to="freish">
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-111" due-to="freish">
             expression execute error depending on numeric type
-        </action>
-        <action dev="henrib" type="add" issue="JEXL-83" due-to="sebb">
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-83" due-to="sebb">
             Make JexlArithmetic immutable (and threadsafe); also added a mutable JexlThreadedArithmetic.
-        </action>
-        <action dev="henrib" type="fix" issue="JEXL-108" due-to="Cristian Lorenzetto">
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-108" due-to="Cristian Lorenzetto">
             Parsing error if i define a empty literal array/map
-        </action>
-        <action dev="henrib" type="fix" issue="JEXL-107">
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-107">
             Literals and parenthesized expressions can not be used as references
-        </action>
-        <action dev="henrib" type="fix" issue="JEXL-106" due-to="Michal Sabol">
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-106" due-to="Michal Sabol">
             When divide two BigDecimal values in an expression it results in java.lang.ArithmeticException: Non-terminating decimal expansion; no exact representable decimal result.
-        </action>
-        <action dev="henrib" type="add" issue="JEXL-105" due-to="Cary Thompson">Array literals are considered constant even when they are not.</action>
-        <action dev="henrib" type="fix" issue="JEXL-104" due-to="Andreas Haufler">NPE in JexlArithmetic when an Array-Expression containing a null is used.</action>
-        <action dev="henrib" type="add" issue="JEXL-102" due-to="sebb">Add "jexl2" as a supported name</action>
-        <action dev="henrib" type="add" issue="JEXL-101" due-to="Tobias Shulte">
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-105" due-to="Cary Thompson">Array literals are considered constant even when they are not.</action>
+            <action dev="henrib" type="fix" issue="JEXL-104" due-to="Andreas Haufler">NPE in JexlArithmetic when an Array-Expression containing a null is used.</action>
+            <action dev="henrib" type="add" issue="JEXL-102" due-to="sebb">Add "jexl2" as a supported name</action>
+            <action dev="henrib" type="add" issue="JEXL-101" due-to="Tobias Shulte">
             Vararg methods where the first argument is no vararg can not be called with only the fixed parameters given
-        </action>
-    </release>
-    <release version="2.0.1" date="2010-03-28">
-        <action dev="henrib" type="add" issue="JEXL-100">Array access expressions fail when evaluated twice and cache is enabled</action>
-        <action dev="henrib" type="add" issue="JEXL-99" due-to="Marcel Schoen">Documentation of Thread Safety / Invalid code examples on homepage</action>
-        <action dev="henrib" type="add" issue="JEXL-98" due-to="Marcel Schoen">Quote escaping cannot be escaped</action>
-    </release>
-    <release version="2.0" date="2010-02-02">
-        <action dev="henrib" type="add" issue="JEXL-27" due-to="Weikuo Liaw">Bean-ish &amp; ant-ish like assignment</action>
-        <action dev="henrib" type="add" issue="JEXL-19" due-to="Jesse Glick">Ternary operator support</action>
-        <action dev="henrib" type="add" issue="JEXL-46" due-to="Alfred Reibenschuh">adding Perl-like regular-expression operators</action>
-        <action dev="henrib" type="add" issue="JEXL-41" due-to="Alejandro Torras">Support for ${...} and #{...} expressions</action>
-        <action dev="henrib" type="add" issue="JEXL-15" due-to="Paul Libbrecht">User definable functions</action>
-        <action dev="sebb" type="add" issue="JEXL-63">JSR-223 support</action>
-        <action dev="henrib" type="update" issue="JEXL-10" due-to="Paul Libbrecht">Make possible checking for unresolved variables</action>
-        <action dev="henrib" type="update" issue="JEXL-11" due-to="Paul Libbrecht">Don&quot;t make null convertible into anything</action>
-        <action dev="henrib" type="fix" issue="JEXL-47" due-to="sebb">Allow single-line comments with //</action>
-        <action dev="henrib" type="fix" issue="JEXL-44" due-to="sebb">Comments don&quot;t allow double-quotes</action>
-        <action dev="henrib" type="add" issue="JEXL-71" due-to="sebb">Array literal syntax is not supported</action>
-        <action dev="dion" type="fix" issue="JEXL-17" due-to="Nestor Urquiza">allowing quote escaping</action>
-        <action dev="dion" type="fix" issue="JEXL-25" due-to="Marek Lewczuk">Call method with varargs</action>
-        <action dev="dion" type="fix" issue="JEXL-32" due-to="Kedar Dave">BigDecimal values are treated as Long values which results in loss of precision</action>
-        <action dev="dion" type="fix" issue="JEXL-33">Remove unnecessary throws Exception from various classes</action>
-        <action dev="henrib" type="fix" issue="JEXL-50" due-to="sebb">Div operator does not do integer division</action>
-        <action dev="henrib" type="fix" issue="JEXL-87" due-to="sebb">Inconsistent behaviour of arithmetical operations</action>
-        <action dev="henrib" type="fix" issue="JEXL-21" due-to="AC">operator overloading / hooks on operator processing</action>
-        <action dev="henrib" type="add">&quot;new&quot; operator support</action>
-        <action dev="henrib" type="add">Support Unicode escapes in string literals</action>
-        <action dev="henrib" type="update">Various performance enhancements &amp; caches</action>
-    </release>
-    <release version="1.1.1-SNAPSHOT" date="unreleased">
-      <action dev="dion" type="update" issue="JEXL-23">Fix jdk1.3 only code that has crept into Jexl tests</action>
-      <action dev="dion" type="update" issue="JEXL-22" due-to="Randy H.">Allow unicode literals to be used</action>
-    </release>
-    <release version="1.1" date="2006-09-10">
-      <action dev="rahul" type="fix" issue="JEXL-17" due-to="Kohsuke Kawaguchi">Consistently throw ParseException in case of a parsing failure, not an Error.</action>
-      <action dev="dion" type="fix" issue="JEXL-3" due-to="Guido Anzuoni">Allow for static methods to be called on classes and not just objects.</action>
-      <action dev="dion" type="add">Added Script and ScriptFactory to allow scripts to be executed from text, files or a URL.</action>
-      <action dev="dion" type="add">Added implementation for bitwise operators: and, complement, or, xor.</action>
-      <action dev="dion" type="add">Added implementation for the foreach statement.</action>
-      <action dev="dion" type="add">Added implementation for the while statement.</action>
-      <action dev="dion" type="add">Added implementation for block statements, e.g. curly braces containing multiple statements.</action>
-      <action dev="dion" type="add">Added implementation for the if statement.</action>
-      <action dev="dion" type="fix" issue="JEXL-6">Unary minus was only working for integer values.</action>
-      <action dev="dion" type="update">Add @since tags to code so we can track API additions via javadoc</action>
-      <action dev="dion" type="add" issue="JEXL-4" due-to="Barry Lagerweij">Support assignment to variables</action>
-      <action dev="dion" type="fix" issue="JEXL-5">'abc'.substring(0,1+1) is empty (method matching problem)</action>
-    </release>
-    <release version="1.0" date="2004-09-07">
-      <action dev="dion" type="fix">Support ant-style properties</action>
-    </release>
-    <release version="1.0-RC1" date="2004-08-26">
-      <action dev="dion" type="fix" due-to="Geoff Waggott">Fix string concatenation broken for variables</action>
-      <action dev="dion" type="fix" issue="JEXL-12">Implement short circuit logic for boolean and/or</action>
-      <action dev="dion" type="add">Handle any size() method that returns an int</action>
-      <action dev="dion" type="fix" issue="JEXL-9">Can't issue .size() on java.util.Set</action>
-    </release>
-  </body>
+            </action>
+        </release>
+        <release version="2.0.1" date="2010-03-28">
+            <action dev="henrib" type="add" issue="JEXL-100">Array access expressions fail when evaluated twice and cache is enabled</action>
+            <action dev="henrib" type="add" issue="JEXL-99" due-to="Marcel Schoen">Documentation of Thread Safety / Invalid code examples on homepage</action>
+            <action dev="henrib" type="add" issue="JEXL-98" due-to="Marcel Schoen">Quote escaping cannot be escaped</action>
+        </release>
+        <release version="2.0" date="2010-02-02">
+            <action dev="henrib" type="add" issue="JEXL-27" due-to="Weikuo Liaw">Bean-ish &amp; ant-ish like assignment</action>
+            <action dev="henrib" type="add" issue="JEXL-19" due-to="Jesse Glick">Ternary operator support</action>
+            <action dev="henrib" type="add" issue="JEXL-46" due-to="Alfred Reibenschuh">adding Perl-like regular-expression operators</action>
+            <action dev="henrib" type="add" issue="JEXL-41" due-to="Alejandro Torras">Support for ${...} and #{...} expressions</action>
+            <action dev="henrib" type="add" issue="JEXL-15" due-to="Paul Libbrecht">User definable functions</action>
+            <action dev="sebb" type="add" issue="JEXL-63">JSR-223 support</action>
+            <action dev="henrib" type="update" issue="JEXL-10" due-to="Paul Libbrecht">Make possible checking for unresolved variables</action>
+            <action dev="henrib" type="update" issue="JEXL-11" due-to="Paul Libbrecht">Don&quot;t make null convertible into anything</action>
+            <action dev="henrib" type="fix" issue="JEXL-47" due-to="sebb">Allow single-line comments with //</action>
+            <action dev="henrib" type="fix" issue="JEXL-44" due-to="sebb">Comments don&quot;t allow double-quotes</action>
+            <action dev="henrib" type="add" issue="JEXL-71" due-to="sebb">Array literal syntax is not supported</action>
+            <action dev="dion" type="fix" issue="JEXL-17" due-to="Nestor Urquiza">allowing quote escaping</action>
+            <action dev="dion" type="fix" issue="JEXL-25" due-to="Marek Lewczuk">Call method with varargs</action>
+            <action dev="dion" type="fix" issue="JEXL-32" due-to="Kedar Dave">BigDecimal values are treated as Long values which results in loss of precision</action>
+            <action dev="dion" type="fix" issue="JEXL-33">Remove unnecessary throws Exception from various classes</action>
+            <action dev="henrib" type="fix" issue="JEXL-50" due-to="sebb">Div operator does not do integer division</action>
+            <action dev="henrib" type="fix" issue="JEXL-87" due-to="sebb">Inconsistent behaviour of arithmetical operations</action>
+            <action dev="henrib" type="fix" issue="JEXL-21" due-to="AC">operator overloading / hooks on operator processing</action>
+            <action dev="henrib" type="add">&quot;new&quot; operator support</action>
+            <action dev="henrib" type="add">Support Unicode escapes in string literals</action>
+            <action dev="henrib" type="update">Various performance enhancements &amp; caches</action>
+        </release>
+        <release version="1.1.1-SNAPSHOT" date="unreleased">
+            <action dev="dion" type="update" issue="JEXL-23">Fix jdk1.3 only code that has crept into Jexl tests</action>
+            <action dev="dion" type="update" issue="JEXL-22" due-to="Randy H.">Allow unicode literals to be used</action>
+        </release>
+        <release version="1.1" date="2006-09-10">
+            <action dev="rahul" type="fix" issue="JEXL-17" due-to="Kohsuke Kawaguchi">Consistently throw ParseException in case of a parsing failure, not an Error.</action>
+            <action dev="dion" type="fix" issue="JEXL-3" due-to="Guido Anzuoni">Allow for static methods to be called on classes and not just objects.</action>
+            <action dev="dion" type="add">Added Script and ScriptFactory to allow scripts to be executed from text, files or a URL.</action>
+            <action dev="dion" type="add">Added implementation for bitwise operators: and, complement, or, xor.</action>
+            <action dev="dion" type="add">Added implementation for the foreach statement.</action>
+            <action dev="dion" type="add">Added implementation for the while statement.</action>
+            <action dev="dion" type="add">Added implementation for block statements, e.g. curly braces containing multiple statements.</action>
+            <action dev="dion" type="add">Added implementation for the if statement.</action>
+            <action dev="dion" type="fix" issue="JEXL-6">Unary minus was only working for integer values.</action>
+            <action dev="dion" type="update">Add @since tags to code so we can track API additions via javadoc</action>
+            <action dev="dion" type="add" issue="JEXL-4" due-to="Barry Lagerweij">Support assignment to variables</action>
+            <action dev="dion" type="fix" issue="JEXL-5">'abc'.substring(0,1+1) is empty (method matching problem)</action>
+        </release>
+        <release version="1.0" date="2004-09-07">
+            <action dev="dion" type="fix">Support ant-style properties</action>
+        </release>
+        <release version="1.0-RC1" date="2004-08-26">
+            <action dev="dion" type="fix" due-to="Geoff Waggott">Fix string concatenation broken for variables</action>
+            <action dev="dion" type="fix" issue="JEXL-12">Implement short circuit logic for boolean and/or</action>
+            <action dev="dion" type="add">Handle any size() method that returns an int</action>
+            <action dev="dion" type="fix" issue="JEXL-9">Can't issue .size() on java.util.Set</action>
+        </release>
+    </body>
 </document>
