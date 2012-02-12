@@ -66,8 +66,26 @@ public class ScriptCallableTest extends JexlTestCase {
         future.cancel(true);
         assertTrue(future.isCancelled());
     }
+    
+    public void testCallableClosure() throws Exception {
+        JexlScript e = JEXL.createScript("function(t) {while(t);}");
+        e = (JexlScript) e.execute(null);
+        Callable<Object> c = e.callable(null, Boolean.TRUE);
+
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Future<?> future = executor.submit(c);
+        try {
+            future.get(100, TimeUnit.MILLISECONDS);
+            fail("should have timed out");
+        } catch (TimeoutException xtimeout) {
+            // ok, ignore
+        }
+        future.cancel(true);
+        assertTrue(future.isCancelled());
+    }
 
     public static class TestContext extends MapContext implements JexlContext.NamespaceResolver {
+        @Override
         public Object resolveNamespace(String name) {
             return name == null ? this : null;
         }

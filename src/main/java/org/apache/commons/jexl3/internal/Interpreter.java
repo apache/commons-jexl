@@ -21,12 +21,10 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
-
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
-
 import org.apache.commons.jexl3.parser.ASTAdditiveNode;
 import org.apache.commons.jexl3.parser.ASTAdditiveOperator;
 import org.apache.commons.jexl3.parser.ASTAndNode;
@@ -50,6 +48,7 @@ import org.apache.commons.jexl3.parser.ASTGENode;
 import org.apache.commons.jexl3.parser.ASTGTNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
+import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.ASTLENode;
 import org.apache.commons.jexl3.parser.ASTLTNode;
@@ -89,7 +88,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.jexl3.parser.ASTJexlLambda;
 
 /**
  * An interpreter of JEXL syntax.
@@ -155,17 +153,18 @@ public class Interpreter extends ParserVisitor {
         this.frame = eFrame;
         this.functors = null;
     }
-    
+
     /**
      * Creates a copy of an interpreter, used for function/lambda evaluation.
      * @param copy the interpreter to copy
+     * @param eContext the global variables context
      * @param eFrame the interpreter evaluation frame
      */
-    protected Interpreter(Interpreter copy, Scope.Frame eFrame) {
+    protected Interpreter(Interpreter copy, JexlContext eContext, Scope.Frame eFrame) {
         this.jexl = copy.jexl;
         this.logger = copy.logger;
         this.uberspect = copy.uberspect;
-        this.context = copy.context;
+        this.context = eContext;
         this.arithmetic = copy.arithmetic;
         this.silent = copy.silent;
         this.functions = copy.functions;
@@ -830,7 +829,7 @@ public class Interpreter extends ParserVisitor {
     @Override
     protected Object visit(ASTJexlScript node, Object data) {
         if (node instanceof ASTJexlLambda) {
-            return new Closure((ASTJexlLambda) node, frame);
+            return new Closure(this, (ASTJexlLambda) node);
         } else {
             final int numChildren = node.jjtGetNumChildren();
             Object result = null;
@@ -840,41 +839,6 @@ public class Interpreter extends ParserVisitor {
             }
             return result;
         }
-    }
-    
-    /**
-     * A function closure.
-     */
-    private static final class Closure {
-        /** The frame. */
-        private final Scope.Frame frame;
-        /** The actual lambda. */
-        private final ASTJexlLambda lambda;
-        /** Creates a closure.
-         * @param l the lambda
-         * @param f the interpreter frame
-         */
-        Closure(ASTJexlLambda l, Scope.Frame f) {
-            lambda = l;
-            frame = lambda.createFrame(f);
-        }
-    }
-    
-    /**
-     * Evaluates a closure.
-     * @param closure the closure
-     * @param argv the arguments
-     * @return the result of evaluation
-     */
-    private Object call(Closure closure, Object[] argv) {
-        Scope.Frame cframe = closure.frame;
-        if (cframe != null) {
-            cframe.assign(argv);
-        }
-        ASTJexlLambda lambda = closure.lambda;
-        JexlNode block = lambda.jjtGetChild(lambda.jjtGetNumChildren() - 1);
-        Interpreter interpreter = new Interpreter(this, cframe);
-        return interpreter.interpret(block);
     }
 
     @Override
@@ -983,9 +947,6 @@ public class Interpreter extends ParserVisitor {
                     }
                 }
                 // lambda, script or jexl method will do
-                if (functor instanceof Closure) {
-                    return call((Closure) functor, argv);
-                }
                 if (functor instanceof JexlScript) {
                     return ((JexlScript) functor).execute(context, argv);
                 }
@@ -1274,8 +1235,8 @@ public class Interpreter extends ParserVisitor {
                     // variable unknow in context and not (from) a register
                     && !(context.has(variableName.toString())
                     || (numChildren == 1
-                        && node.jjtGetChild(0) instanceof ASTIdentifier
-                        && ((ASTIdentifier) node.jjtGetChild(0)).getRegister() >= 0))) {
+                    && node.jjtGetChild(0) instanceof ASTIdentifier
+                    && ((ASTIdentifier) node.jjtGetChild(0)).getRegister() >= 0))) {
                 JexlException xjexl = propertyName != null
                                       ? new JexlException.Property(node, variableName.toString())
                                       : new JexlException.Variable(node, variableName.toString());

@@ -30,12 +30,27 @@ public class LambdaTest extends JexlTestCase {
     public void testScriptArguments() throws Exception {
         JexlEngine jexl = new Engine();
         JexlScript s = jexl.createScript("{ x + x }", "x");
-        String strs = "s(21)";
         JexlScript s42 = jexl.createScript("s(21)", "s");
         Object result = s42.execute(null, s);
         assertEquals(42, result);
     }
-
+    
+    public void testScriptContext() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlScript s = jexl.createScript("function(x) { x + x }");
+        JexlScript fs = (JexlScript) s.execute(null);
+        String fsstr = fs.getExpression();
+        assertEquals("function(x) { x + x; };", fsstr);
+        assertEquals(42, fs.execute(null, 21));
+        JexlScript s42 = jexl.createScript("s(21)");
+        JexlEvalContext ctxt = new JexlEvalContext();
+        ctxt.set("s", fs);
+        Object result = s42.execute(ctxt);
+        assertEquals(42, result);
+        result = s42.evaluate(ctxt);
+        assertEquals(42, result);
+    }
+    
     public void testLambda() throws Exception {
         JexlEngine jexl = new Engine();
         String strs = "var s = function(x) { x + x }; s(21)";
