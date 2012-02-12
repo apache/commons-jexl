@@ -39,7 +39,7 @@ Its goal is to expose scripting features usable by technical operatives or consu
 Due to binary and source incompatibilities and the scope of modifications, JEXL has moved to the org.apache.commons.jexl3
 package.
 Also note that JEXL now requires Java 6.
-However, this is a drop-in replacement through JSF-223 and casual code usage should find easy equivalence between
+However, this is a drop-in replacement through JSR-223 and casual code usage should find easy equivalence between
 jexl-2.x and 3.x (besides the package name).
 
 
