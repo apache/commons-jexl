@@ -16,28 +16,30 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import java.util.concurrent.Callable;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.JexlNode;
 
+import java.util.Map;
+import java.util.concurrent.Callable;
+
 /**
  * A Script closure.
  */
-final class Closure extends Script {
+public class Closure extends Script {
     /** The frame. */
-    private final Scope.Frame frame;
-    /** The caller, kept to copy options, flags and functors. */
-    private final Interpreter caller;
+    protected final Scope.Frame frame;
+    /** The map of registered functions. */
+    protected final Map<String, Object> functors;
 
     /**
      * Creates a closure.
      * @param theCaller the calling interpreter
      * @param lambda the lambda
      */
-    Closure(Interpreter theCaller, ASTJexlLambda lambda) {
+    protected Closure(Interpreter theCaller, ASTJexlLambda lambda) {
         super(theCaller.jexl, null, lambda);
-        caller = theCaller;
+        functors = theCaller.functors;
         frame = lambda.createFrame(theCaller.frame);
     }
 
@@ -63,7 +65,8 @@ final class Closure extends Script {
         if (frame != null) {
             frame.assign(args);
         }
-        Interpreter interpreter = new Interpreter(caller, context, frame);
+        Interpreter interpreter = jexl.createInterpreter(context, frame);
+        interpreter.functors = functors;
         JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
         return interpreter.interpret(block);
     }
@@ -73,7 +76,8 @@ final class Closure extends Script {
         if (frame != null) {
             frame.assign(args);
         }
-        final Interpreter interpreter = new Interpreter(caller, context, frame);
+        final Interpreter interpreter = jexl.createInterpreter(context, frame);
+        interpreter.functors = functors;
         return new Callable<Object>() {
             /** Use interpreter as marker for not having run. */
             private Object result = interpreter;

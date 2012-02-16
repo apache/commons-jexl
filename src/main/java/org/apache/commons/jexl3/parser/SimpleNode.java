@@ -58,11 +58,11 @@ public class SimpleNode implements Node {
         this(i);
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void jjtOpen() {
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void jjtClose() {
     }
 
@@ -70,6 +70,7 @@ public class SimpleNode implements Node {
      * Sets this node's parent.
      * @param n the parent
      */
+    @Override
     public void jjtSetParent(Node n) {
         parent = (JexlNode) n;
     }
@@ -78,6 +79,7 @@ public class SimpleNode implements Node {
      * Gets this node's parent.
      * @return the parent node
      */
+    @Override
     public JexlNode jjtGetParent() {
         return parent;
     }
@@ -86,6 +88,7 @@ public class SimpleNode implements Node {
      * @param n the child node
      * @param i the child offset
      */
+    @Override
     public void jjtAddChild(Node n, int i) {
         if (children == null) {
             children = new JexlNode[i + 1];
@@ -102,6 +105,7 @@ public class SimpleNode implements Node {
      * @param i the child offset
      * @return the child node
      */
+    @Override
     public JexlNode jjtGetChild(int i) {
         return children[i];
     }
@@ -110,6 +114,7 @@ public class SimpleNode implements Node {
      * Gets this node number of children.
      * @return the number of children
      */
+    @Override
     public int jjtGetNumChildren() {
         return (children == null) ? 0 : children.length;
     }
@@ -134,6 +139,7 @@ public class SimpleNode implements Node {
      * @param data contextual data
      * @return result of visit
      **/
+    @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
