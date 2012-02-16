@@ -237,7 +237,11 @@ public class JexlException extends RuntimeException {
 
         @Override
         protected String detailedMessage() {
-            return parserError("parsing", getExpression());
+            if (getCause() == null) {
+                return getExpression();
+            } else {
+                return parserError("parsing", getExpression());
+            }
         }
     }
 

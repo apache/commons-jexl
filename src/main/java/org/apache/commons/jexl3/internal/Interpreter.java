@@ -155,27 +155,6 @@ public class Interpreter extends ParserVisitor {
     }
 
     /**
-     * Creates a copy of an interpreter, used for function/lambda evaluation.
-     * @param copy the interpreter to copy
-     * @param eContext the global variables context
-     * @param eFrame the interpreter evaluation frame
-     */
-    protected Interpreter(Interpreter copy, JexlContext eContext, Scope.Frame eFrame) {
-        this.jexl = copy.jexl;
-        this.logger = copy.logger;
-        this.uberspect = copy.uberspect;
-        this.context = eContext;
-        this.arithmetic = copy.arithmetic;
-        this.silent = copy.silent;
-        this.functions = copy.functions;
-        this.strictEngine = copy.strictEngine;
-        this.strictArithmetic = copy.strictArithmetic;
-        this.cache = copy.cache;
-        this.functors = copy.functors;
-        this.frame = eFrame;
-    }
-
-    /**
      * Interpret the given script/expression.
      * <p>
      * If the underlying JEXL engine is silent, errors will be logged through its logger as info.
