@@ -52,21 +52,21 @@ public class JexlArithmetic {
     protected static final BigInteger BIGI_LONG_MAX_VALUE = BigInteger.valueOf(Long.MAX_VALUE);
     /** Long.MIN_VALUE as BigInteger. */
     protected static final BigInteger BIGI_LONG_MIN_VALUE = BigInteger.valueOf(Long.MIN_VALUE);
-    /** 
-     * Default BigDecimal scale. 
-     * @since 2.1 
+    /**
+     * Default BigDecimal scale.
+     * @since 2.1
      */
     protected static final int BIGD_SCALE = -1;
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode.
      * May be made final in a later version.
      */
     private volatile boolean strict;
-    /** 
+    /**
      * The big decimal math context.
-     * @since 2.1 
+     * @since 2.1
      */
     protected final MathContext mathContext;
-    /** 
+    /**
      * The big decimal scale.
      * @since 2.1
      */
@@ -92,8 +92,8 @@ public class JexlArithmetic {
         this.mathContext = bigdContext;
         this.mathScale = bigdScale;
     }
-    
-    
+
+
     /**
      * Sets whether this JexlArithmetic instance triggers errors during evaluation when
      * null is used as an operand.
@@ -260,7 +260,7 @@ public class JexlArithmetic {
     /**
      * Given a BigDecimal, attempt to narrow it to an Integer or Long if it fits if
      * one of the arguments is a numberable.
-     * 
+     *
      * @param lhs the left hand side operand that lead to the bigd result
      * @param rhs the right hand side operand that lead to the bigd result
      * @param bigd the BigDecimal to narrow
@@ -393,7 +393,7 @@ public class JexlArithmetic {
                 return new Double(l + r);
             }
 
-            // if either are bigdecimal use that type 
+            // if either are bigdecimal use that type
             if (left instanceof BigDecimal || right instanceof BigDecimal) {
                 BigDecimal l = toBigDecimal(left);
                 BigDecimal r = toBigDecimal(right);
@@ -477,7 +477,7 @@ public class JexlArithmetic {
             return new Double(l % r);
         }
 
-        // if either are bigdecimal use that type 
+        // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
@@ -516,7 +516,7 @@ public class JexlArithmetic {
             return new Double(l * r);
         }
 
-        // if either are bigdecimal use that type 
+        // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
@@ -549,7 +549,7 @@ public class JexlArithmetic {
             return new Double(l - r);
         }
 
-        // if either are bigdecimal use that type 
+        // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
@@ -829,7 +829,7 @@ public class JexlArithmetic {
      * Coerce to a boolean (not a java.lang.Boolean).
      *
      * @param val Object to be coerced.
-     * @return The boolean coerced value, or false if none possible.
+     * @return the coerced value if coercion is possible, true if no available coercion and val is not null
      */
     public boolean toBoolean(Object val) {
         if (val == null) {
@@ -844,8 +844,8 @@ public class JexlArithmetic {
             String strval = val.toString();
             return strval.length() > 0 && !"false".equals(strval);
         }
-        // TODO: is this a reasonable default?
-        return false;
+        // non null value is true
+        return true;
     }
 
     /**
