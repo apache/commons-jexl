@@ -42,10 +42,7 @@ public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<
         }
     }
 
-    /**
-     *  Gets the literal value.
-     * @return the array literal
-     */
+    @Override
     public Object getLiteral() {
         return array;
     }
