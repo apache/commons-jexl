@@ -20,12 +20,12 @@ package org.apache.commons.jexl3.internal.introspection;
 import org.apache.commons.jexl3.JexlTestCase;
 import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
+import org.apache.commons.jexl3.introspection.JexlPropertySet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.jexl3.introspection.JexlPropertySet;
 
 /**
  * Tests for checking introspection discovery.
