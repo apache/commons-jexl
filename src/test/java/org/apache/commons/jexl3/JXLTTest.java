@@ -31,18 +31,19 @@ import java.util.Set;
 /**
  * Test cases for the UnifiedEL.
  */
-public class UnifiedJEXLTest extends JexlTestCase {
+public class JXLTTest extends JexlTestCase {
     private static final JexlEngine ENGINE = new JexlBuilder().silent(false).cache(128).strict(true).create();
 
     private static final JxltEngine JXLT = ENGINE.createJxltEngine();
     private static final Log LOG = LogFactory.getLog(JxltEngine.class);
+    private MapContext vars = new MapContext();
     private JexlEvalContext context = null;
 
     @Override
     public void setUp() throws Exception {
         // ensure jul logging is only error
         java.util.logging.Logger.getLogger(org.apache.commons.jexl3.JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
-        context = new JexlEvalContext();
+        context = new JexlEvalContext(vars);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         debuggerCheck(ENGINE);
         super.tearDown();
     }
-    
+
     /** Extract the source from a toString-ed expression. */
     private String getSource(String tostring) {
         int len = tostring.length();
@@ -89,7 +90,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         }
     }
 
-    public UnifiedJEXLTest(String testName) {
+    public JXLTTest(String testName) {
         super(testName);
     }
 
@@ -126,6 +127,15 @@ public class UnifiedJEXLTest extends JexlTestCase {
         assertEquals(source, getSource(expr.toString()));
     }
 
+    boolean contains(Set<List<String>> set, List<String> list) {
+        for(List<String> sl : set) {
+            if (sl.equals(list)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void testPrepareEvaluate() throws Exception {
         final String source = "Dear #{p} ${name};";
         JxltEngine.UnifiedExpression expr = JXLT.createExpression("Dear #{p} ${name};");
@@ -133,20 +143,20 @@ public class UnifiedJEXLTest extends JexlTestCase {
 
         Set<List<String>> evars = expr.getVariables();
         assertEquals(1, evars.size());
-        assertTrue(evars.contains(Arrays.asList("name")));
+        assertTrue(contains(evars, Arrays.asList("name")));
         context.set("name", "Doe");
         JxltEngine.UnifiedExpression phase1 = expr.prepare(context);
         String as = phase1.asString();
         assertEquals("Dear ${p} Doe;", as);
         Set<List<String>> evars1 = phase1.getVariables();
         assertEquals(1, evars1.size());
-        assertTrue(evars1.contains(Arrays.asList("p")));
-        context.clearVariables();
+        assertTrue(contains(evars1, Arrays.asList("p")));
+        vars.clear();
         context.set("p", "Mr");
         context.set("name", "Should not be used in 2nd phase");
         Object o = phase1.evaluate(context);
         assertEquals("Dear Mr Doe;", o);
-        
+
         String p1 = getSource(phase1.toString());
         assertEquals(source, getSource(phase1.toString()));
         assertEquals(source, getSource(expr.toString()));
@@ -158,14 +168,14 @@ public class UnifiedJEXLTest extends JexlTestCase {
 
         Set<List<String>> evars = expr.getVariables();
         assertEquals(1, evars.size());
-        assertTrue(evars.contains(Arrays.asList("hi")));
+        assertTrue(contains(evars, Arrays.asList("hi")));
 
         context.set("hi", "greeting");
         context.set("greeting.world", "Hello World!");
         assertTrue("expression should be deferred", expr.isDeferred());
         Object o = expr.evaluate(context);
         assertEquals("Hello World!", o);
-        
+
         assertEquals(source, getSource(expr.toString()));
     }
 
@@ -178,7 +188,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         Object o = expr.evaluate(none);
         assertTrue("expression should be immediate", expr.isImmediate());
         assertEquals("Hello World!", o);
-        
+
         assertEquals(source, getSource(expr.toString()));
     }
 
@@ -190,7 +200,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         Object o = expr.evaluate(none);
         assertTrue("expression should be immediate", expr.isImmediate());
         assertEquals("Hello World!", o);
-        
+
         assertEquals(source, getSource(expr.toString()));
     }
 
@@ -203,7 +213,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         assertEquals("prepare should return immediate version", "${'world'}", as);
         Object o = expr.evaluate(none);
         assertEquals("world", o);
-        
+
         assertEquals(source, getSource(expr.toString()));
     }
 
@@ -310,7 +320,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         t.evaluate(context, strw);
         output = strw.toString();
         assertEquals("no x\n", output);
-        
+
         String dstr = t.toString();
         assertNotNull(dstr);
     }
@@ -334,7 +344,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         output = strw.toString();
         assertEquals("no x\n", output);
     }
-    
+
     public void testPrepareTemplate() throws Exception {
         String source =
                  "$$ for(var x : list) {\n"
@@ -349,13 +359,13 @@ public class UnifiedJEXLTest extends JexlTestCase {
         context.set("l10n", "value");
         JxltEngine.Template tpEN = tl10n.prepare(context);
         context.set("l10n", null);
-        
+
         StringWriter strw;
         strw = new StringWriter();
         tpFR.evaluate(context, strw, args);
         String outFR = strw.toString();
         assertEquals("valeur=42\n", outFR);
-        
+
         context.set("l10n", null);
         strw = new StringWriter();
         tpEN.evaluate(context, strw, args);
@@ -386,28 +396,28 @@ public class UnifiedJEXLTest extends JexlTestCase {
                 + "Life, the universe, and everything\n"
                 + "The value 169 is over fourty-two\n";
         assertEquals(out42, output);
-        
+
         String dstr = t.asString();
         assertNotNull(dstr);
     }
-    
+
     public static class FrobozWriter extends PrintWriter {
         public FrobozWriter(Writer w) {
             super(w);
         }
-        
+
         public void print(Froboz froboz) {
             super.print("froboz{");
             super.print(froboz.value);
             super.print("}");
         }
-        
+
         @Override
         public String toString() {
             return out.toString();
         }
     }
-    
+
     public void testWriter() throws Exception {
         Froboz froboz = new Froboz(42);
         Writer writer = new FrobozWriter(new StringWriter());

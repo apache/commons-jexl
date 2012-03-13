@@ -45,7 +45,7 @@ public class Asserter extends Assert {
     private final JexlEngine engine;
 
     /**
-     * 
+     *
      * Create an asserter.
      * @param jexl the JEXL engine to use
      */
@@ -68,34 +68,34 @@ public class Asserter extends Assert {
     public JexlContext getContext() {
         return context;
     }
-    
+
     public void setStrict(boolean s) {
         context.setStrict(s, s);
     }
-    
+
     public void setStrict(boolean es, boolean as) {
         context.setStrict(es, as);
     }
-    
+
     public void setSilent(boolean silent) {
         context.setSilent(silent);
     }
-    
+
     public void clearOptions() {
         context.clearOptions();
     }
 
     /**
-     * Performs an assertion that the value of the given Jexl expression 
+     * Performs an assertion that the value of the given Jexl expression
      * evaluates to the given expected value.
-     * 
+     *
      * @param expression is the Jexl expression to evaluate
      * @param expected is the expected value of the expression
      * @throws Exception if the expression could not be evaluationed or an assertion
      * fails
      */
     public void assertExpression(String expression, Object expected) throws Exception {
-        JexlExpression exp = engine.createExpression(expression);
+        JexlExpression exp = engine.createScript(expression);
         Object value = exp.evaluate(context);
         if (expected instanceof BigDecimal) {
             JexlArithmetic jexla = engine.getArithmetic();
@@ -115,7 +115,7 @@ public class Asserter extends Assert {
      */
     public void failExpression(String expression, String matchException) throws Exception {
         try {
-            JexlExpression exp = engine.createExpression(expression);
+            JexlExpression exp = engine.createScript(expression);
             exp.evaluate(context);
             fail("expression: " + expression);
         } catch (JexlException xjexl) {
@@ -128,7 +128,7 @@ public class Asserter extends Assert {
     /**
      * Puts a variable of a certain name in the context so that it can be used from
      * assertion expressions.
-     * 
+     *
      * @param name variable name
      * @param value variable value
      */

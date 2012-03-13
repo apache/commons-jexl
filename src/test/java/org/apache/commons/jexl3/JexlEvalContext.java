@@ -18,17 +18,19 @@ package org.apache.commons.jexl3;
 
 import java.math.MathContext;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.jexl3.internal.Engine;
 
 /**
- * A JEXL evaluation context wrapping variables and options.
+ * A JEXL evaluation environment wrapping variables, namespace and options.
  */
-public class JexlEvalContext implements JexlContext, JexlEngine.Options {
+public class JexlEvalContext implements JexlContext, JexlContext.NamespaceResolver, JexlEngine.Options {
     /** The marker for the empty vars. */
-    protected static final Map<String,Object> EMPTY_MAP = Collections.<String,Object>emptyMap();
-    /** The wrapped variable vars (if any).*/
-    protected final Map<String, Object> vars;
+    private static final Map<String,Object> EMPTY_MAP = Collections.<String,Object>emptyMap();
+    /** The variables.*/
+    private final JexlContext vars;
+    /** The namespace. */
+    private final JexlContext.NamespaceResolver ns;
     /** Whether the engine should be silent. */
     private Boolean silent = null;
     /** Whether the engine should be strict. */
@@ -48,18 +50,37 @@ public class JexlEvalContext implements JexlContext, JexlEngine.Options {
     }
 
     /**
-     * Creates a MapContext wrapping an existing user provided vars.
+     * Creates an evaluation environment wrapping an existing user provided vars.
      * <p>The supplied vars should be null only in derived classes that override the get/set/has methods.
      * For a default vars context with a code supplied vars, use the default no-parameter contructor.</p>
      * @param map the variables map
      */
-    public JexlEvalContext(Map<String, Object> map) { 
-        this.vars = map == EMPTY_MAP ? new HashMap<String, Object>() : map;
+    public JexlEvalContext(Map<String, Object> map) {
+        this.vars = map == EMPTY_MAP ? new MapContext() : new MapContext(map);
+        this.ns = null;
+    }
+
+    /**
+     * Creates an evaluation environment from a context.
+     * @param context the context (may be null, implies readonly)
+     */
+    public JexlEvalContext(JexlContext context) {
+        this(context, context instanceof JexlContext.NamespaceResolver? (JexlContext.NamespaceResolver) context : null);
+    }
+
+    /**
+     * Creates an evaluation environment from a context and a namespace.
+     * @param context the context (may be null, implies readonly)
+     * @param namespace the namespace (may be null, implies empty namespace)
+     */
+    public JexlEvalContext(JexlContext context, JexlContext.NamespaceResolver namespace) {
+        this.vars = context != null? context : Engine.EMPTY_CONTEXT;
+        this.ns = namespace != null? namespace : Engine.EMPTY_NS;
     }
 
     @Override
     public boolean has(String name) {
-        return vars.containsKey(name);
+        return vars.has(name);
     }
 
     @Override
@@ -69,14 +90,12 @@ public class JexlEvalContext implements JexlContext, JexlEngine.Options {
 
     @Override
     public void set(String name, Object value) {
-        vars.put(name, value);
+        vars.set(name, value);
     }
 
-    /**
-     * Clears the variable vars.
-     */
-    public void clearVariables() {
-        vars.clear();
+    @Override
+    public Object resolveNamespace(String name) {
+        return ns != null? ns.resolveNamespace(name) : null;
     }
 
     /**

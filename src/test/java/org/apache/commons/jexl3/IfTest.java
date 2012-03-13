@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@ package org.apache.commons.jexl3;
 
 /**
  * Test cases for the if statement.
- * 
+ *
  * @since 1.1
  */
 public class IfTest extends JexlTestCase {
@@ -28,7 +28,7 @@ public class IfTest extends JexlTestCase {
 
     /**
      * Make sure if true executes the true statement
-     * 
+     *
      * @throws Exception on any error
      */
     public void testSimpleIfTrue() throws Exception {
@@ -41,7 +41,7 @@ public class IfTest extends JexlTestCase {
 
     /**
      * Make sure if false doesn't execute the true statement
-     * 
+     *
      * @throws Exception on any error
      */
     public void testSimpleIfFalse() throws Exception {
@@ -54,7 +54,7 @@ public class IfTest extends JexlTestCase {
 
     /**
      * Make sure if false executes the false statement
-     * 
+     *
      * @throws Exception on any error
      */
     public void testSimpleElse() throws Exception {
@@ -67,7 +67,7 @@ public class IfTest extends JexlTestCase {
 
     /**
      * Test the if statement handles blocks correctly
-     * 
+     *
      * @throws Exception on any error
      */
     public void testBlockIfTrue() throws Exception {
@@ -80,7 +80,7 @@ public class IfTest extends JexlTestCase {
 
     /**
      * Test the if statement handles blocks in the else statement correctly
-     * 
+     *
      * @throws Exception on any error
      */
     public void testBlockElse() throws Exception {
@@ -93,7 +93,7 @@ public class IfTest extends JexlTestCase {
 
     /**
      * Test the if statement evaluates expressions correctly
-     * 
+     *
      * @throws Exception on any error
      */
     public void testIfWithSimpleExpression() throws Exception {
@@ -107,7 +107,7 @@ public class IfTest extends JexlTestCase {
 
     /**
      * Test the if statement evaluates arithmetic expressions correctly
-     * 
+     *
      * @throws Exception on any error
      */
     public void testIfWithArithmeticExpression() throws Exception {
@@ -121,7 +121,7 @@ public class IfTest extends JexlTestCase {
 
     /**
      * Test the if statement evaluates decimal arithmetic expressions correctly
-     * 
+     *
      * @throws Exception on any error
      */
     public void testIfWithDecimalArithmeticExpression() throws Exception {
@@ -135,7 +135,7 @@ public class IfTest extends JexlTestCase {
 
     /**
      * Test the if statement works with assignment
-     * 
+     *
      * @throws Exception on any error
      */
     public void testIfWithAssignment() throws Exception {
@@ -155,7 +155,7 @@ public class IfTest extends JexlTestCase {
      */
     public void testTernary() throws Exception {
         JexlEngine jexl = JEXL;
-        
+
         JexlEvalContext jc = new JexlEvalContext();
         JexlExpression e = jexl.createExpression("x.y.z = foo ?'bar':'quux'");
         Object o;
@@ -249,7 +249,7 @@ public class IfTest extends JexlTestCase {
             o = jc.get("x.y.z");
             assertEquals("Should be quux", "quux", o);
         }
-        
+
         jc.set("foo", Double.NaN);
 
         for (int l = 0; l < 4; ++l) {
@@ -260,7 +260,7 @@ public class IfTest extends JexlTestCase {
             o = jc.get("x.y.z");
             assertEquals("Should be quux", "quux", o);
         }
-                
+
         jc.set("foo", "");
 
         for (int l = 0; l < 4; ++l) {
@@ -271,7 +271,7 @@ public class IfTest extends JexlTestCase {
             o = jc.get("x.y.z");
             assertEquals("Should be quux", "quux", o);
         }
-                        
+
         jc.set("foo", "false");
 
         for (int l = 0; l < 4; ++l) {
@@ -281,8 +281,8 @@ public class IfTest extends JexlTestCase {
             assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
             assertEquals("Should be quux", "quux", o);
-        }               
-        
+        }
+
         jc.set("foo", 0d);
 
         for (int l = 0; l < 4; ++l) {
@@ -293,7 +293,7 @@ public class IfTest extends JexlTestCase {
             o = jc.get("x.y.z");
             assertEquals("Should be quux", "quux", o);
         }
-                
+
         jc.set("foo", 0);
 
         for (int l = 0; l < 4; ++l) {

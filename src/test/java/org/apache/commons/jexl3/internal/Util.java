@@ -29,7 +29,7 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * @author henri
  */
 public class Util {
-    
+
     /**
      * Will force testing the debugger for each derived test class by
      * recreating each expression from the JexlNode in the JexlEngine cache &
@@ -126,7 +126,7 @@ public class Util {
         }
         return null;
     }
-    
+
     /**
      * A helper class to help debug AST problems.
      * @param e the script

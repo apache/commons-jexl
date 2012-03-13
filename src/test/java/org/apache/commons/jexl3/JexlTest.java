@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -117,7 +117,7 @@ public class JexlTest extends JexlTestCase {
         assertExpression(jc, "num <= 2.5", Boolean.FALSE);
         assertExpression(jc, "now2 <= now", Boolean.FALSE); // test comparable
 
-//        
+//
         assertExpression(jc, "'6' >= '5'", Boolean.TRUE);
         assertExpression(jc, "num >= 5", Boolean.TRUE);
         assertExpression(jc, "num >= num", Boolean.TRUE);
@@ -229,7 +229,7 @@ public class JexlTest extends JexlTestCase {
         jc.set("foo", new Foo());
 
         assertExpression(jc, "map['size']", "cheese");
-// PR - unsure whether or not we should support map.size or force usage of the above 'escaped' version        
+// PR - unsure whether or not we should support map.size or force usage of the above 'escaped' version
 //        assertExpression(jc, "map.size", "cheese");
         assertExpression(jc, "foo.getSize()", new Integer(22));
         // failing assertion for size property
@@ -355,7 +355,7 @@ public class JexlTest extends JexlTestCase {
         assertExpression(jc, "not empty(string)", Boolean.FALSE);
         assertExpression(jc, "! empty string", Boolean.FALSE);
         assertExpression(jc, "!(empty string)", Boolean.FALSE);
-        assertExpression(jc, "!empty(string)", Boolean.FALSE);
+        assertExpression(jc, "! empty(string)", Boolean.FALSE);
 
     }
 
@@ -402,8 +402,8 @@ public class JexlTest extends JexlTestCase {
         assertExpression(jc, "empty(foo)", Boolean.TRUE);
     }
 
-    /** 
-     * test quoting in strings 
+    /**
+     * test quoting in strings
      */
     public void testStringQuoting() throws Exception {
         JexlContext jc = new MapContext();
@@ -572,7 +572,7 @@ public class JexlTest extends JexlTestCase {
         JexlExpression expr = JEXL.createExpression("first and foo.trueAndModify");
         expr.evaluate(jc);
         assertTrue("Short circuit failure: rhs evaluated when lhs FALSE", !tester.getModified());
-        // handle true for the left arg of 'and' 
+        // handle true for the left arg of 'and'
         tester = new Foo();
         jc.set("first", Boolean.TRUE);
         jc.set("foo", tester);
@@ -593,7 +593,7 @@ public class JexlTest extends JexlTestCase {
         JexlExpression expr = JEXL.createExpression("first or foo.trueAndModify");
         expr.evaluate(jc);
         assertTrue("Short circuit failure: rhs not evaluated when lhs FALSE", tester.getModified());
-        // handle true for the left arg of 'or' 
+        // handle true for the left arg of 'or'
         tester = new Foo();
         jc.set("first", Boolean.TRUE);
         jc.set("foo", tester);
@@ -677,7 +677,7 @@ public class JexlTest extends JexlTestCase {
 
     public void testUnicodeSupport() throws Exception {
         JexlContext jc = new MapContext();
-        assertExpression(jc, "'x' == 'U≈ºytkownik'", Boolean.FALSE);
+        assertExpression(jc, "'x' == 'UÅ?ytkownik'", Boolean.FALSE);
         assertExpression(jc, "'c:\\some\\windows\\path'", "c:\\some\\windows\\path");
         assertExpression(jc, "'foo\\u0020bar'", "foo\u0020bar");
         assertExpression(jc, "'foo\\u0020\\u0020bar'", "foo\u0020\u0020bar");
@@ -736,6 +736,7 @@ public class JexlTest extends JexlTestCase {
         assertEquals(expr.toString(), 20, result);
         expr = jexl.createExpression("duck.user = 'zero'");
         result = expr.evaluate(jc);
+        assertEquals(expr.toString(), "zero", result);
         expr = jexl.createExpression("duck.user");
         result = expr.evaluate(jc);
         assertEquals(expr.toString(), 0, result);

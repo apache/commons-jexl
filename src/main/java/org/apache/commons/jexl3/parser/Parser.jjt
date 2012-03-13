@@ -24,6 +24,7 @@ options
    NODE_SCOPE_HOOK=true;
    NODE_CLASS="JexlNode";
    UNICODE_INPUT=true;
+   //DEBUG_PARSER=true;
 }
 
 PARSER_BEGIN(Parser)
@@ -96,6 +97,7 @@ PARSER_END(Parser)
     | < FALSE : "false" >
     | < RETURN : "return" >
     | < FUNCTION : "function" >
+    | < LAMBDA : "->" >
 }
 
 <FOR_EACH_IN> TOKEN : /* foreach in */
@@ -232,32 +234,23 @@ void WhileStatement() : {}
     <WHILE> <LPAREN> Expression() <RPAREN> Statement()
 }
 
-
-void ForeachStatement() : {}
-{  
-    <FOR> <LPAREN> LValueVar() <COLON>  Expression() <RPAREN> Statement()
-|
-    <FOREACH> <LPAREN> LValueVar() <IN>  Expression() <RPAREN> Statement()
-}
-
 void ReturnStatement() : {}
 {
     <RETURN> Expression()
 }
 
-
-/***************************************
- *      Expression syntax
- ***************************************/
-
-void Expression() #void : {}
+void ForeachStatement() : {}
 {
-    ConditionalExpression() (LOOKAHEAD(1) <assign> Expression() #Assignment(2) )?
+    <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> Statement()
+|
+    <FOREACH> <LPAREN> ForEachVar() <IN>  Expression() <RPAREN> Statement()
 }
 
-void Assignment() #Assignment(2) : {}
+void ForEachVar() #Reference : {}
 {
-    ConditionalExpression() <assign> Expression()
+    <VAR> DeclareVar()
+|
+    Identifier()
 }
 
 void Var() #void : {}
@@ -273,11 +266,18 @@ void DeclareVar() #Var :
     t=<IDENTIFIER> { declareVariable(jjtThis, t.image); }
 }
 
-void LValueVar() #Reference : {}
-{   
-    LOOKAHEAD(1) <VAR> DeclareVar() DotReference() 
-|
-    LOOKAHEAD(1) Identifier(true) DotReference()
+/***************************************
+ *      Expression syntax
+ ***************************************/
+
+void Expression() #void : {}
+{
+      AssignmentExpression()
+}
+
+void AssignmentExpression() #void : {}
+{
+    ConditionalExpression() [ LOOKAHEAD( <assign> ) <assign> Expression() #Assignment(2) ]
 }
 
 /***************************************
@@ -294,58 +294,47 @@ void ConditionalExpression() #void : {}
   )?
 }
 
-void ConditionalOrExpression() #void :
-{}
+void ConditionalOrExpression() #void : {}
 {
   ConditionalAndExpression()
-  (
-    <OR> ConditionalAndExpression() #OrNode(2)
-  )*
+  ( <OR> ConditionalAndExpression() #OrNode(2) )*
 }
 
-void ConditionalAndExpression() #void :
-{}
+void ConditionalAndExpression() #void : {}
 {
   InclusiveOrExpression()
-  (
-    <AND> InclusiveOrExpression() #AndNode(2)
-  )*
+  ( <AND> InclusiveOrExpression() #AndNode(2) )*
 }
 
-void InclusiveOrExpression() #void :
-{}
+void InclusiveOrExpression() #void : {}
 {
   ExclusiveOrExpression()
   ( <or> ExclusiveOrExpression() #BitwiseOrNode(2) )*
 }
 
-void ExclusiveOrExpression() #void :
-{}
+void ExclusiveOrExpression() #void : {}
 {
   AndExpression()
   ( <xor> AndExpression() #BitwiseXorNode(2) )*
 }
 
-void AndExpression() #void :
-{}
+void AndExpression() #void : {}
 {
   EqualityExpression()
   ( <and> EqualityExpression() #BitwiseAndNode(2) )*
 }
 
-void EqualityExpression() #void :
-{}
+void EqualityExpression() #void : {}
 {
   RelationalExpression()
   (
      <eq> RelationalExpression() #EQNode(2)
-   |
+|
      <ne> RelationalExpression() #NENode(2)
   )?
 }
 
-void RelationalExpression() #void :
-{}
+void RelationalExpression() #void : {}
 {
   AdditiveExpression()
   (
@@ -367,16 +356,14 @@ void RelationalExpression() #void :
  *      Arithmetic
  ***************************************/
 
-void AdditiveExpression() #AdditiveNode(>1) : {}
+void AdditiveExpression() #void : {}
 {
-    MultiplicativeExpression() ( LOOKAHEAD(1) AdditiveOperator() MultiplicativeExpression())*
-}
-
-void AdditiveOperator() : {}
-{
-    <plus> { jjtThis.image = "+"; }
-|
-    <minus> { jjtThis.image = "-"; }
+  MultiplicativeExpression()
+  ( LOOKAHEAD(2) (
+    <plus> MultiplicativeExpression() #AddNode(2)
+  |
+    <minus> MultiplicativeExpression() #SubNode(2)
+  ) )*
 }
 
 void MultiplicativeExpression() #void : {}
@@ -384,9 +371,9 @@ void MultiplicativeExpression() #void : {}
   UnaryExpression()
   (
     <mult> UnaryExpression() #MulNode(2)
-   |
+  |
     <div> UnaryExpression() #DivNode(2)
-   |
+  |
     <mod> UnaryExpression() #ModNode(2)
   )*
 }
@@ -399,7 +386,11 @@ void UnaryExpression() #void : {}
 |
   <not> UnaryExpression() #NotNode(1)
 |
-  PrimaryExpression()
+  <EMPTY> UnaryExpression() #EmptyFunction(1)
+|
+  <SIZE> UnaryExpression() #SizeFunction(1)
+|
+  ValueExpression()
 }
 
 
@@ -414,10 +405,10 @@ void Identifier(boolean top) :
 {
     t=<IDENTIFIER> { jjtThis.image = top? checkVariable(jjtThis, t.image) : t.image; }
 |
-    t=<REGISTER> { jjtThis.image = t.image; jjtThis.setRegister(t.image); }
+    t=<REGISTER> { jjtThis.image = t.image; jjtThis.setSymbol(t.image); }
 }
 
-void StringIdentifier() #Identifier : 
+void StringIdentifier() #Identifier :
 {
     Token t;
 }
@@ -510,47 +501,34 @@ void MapEntry() : {}
  *      Functions & Methods
  ***************************************/
 
-void EmptyFunction() : {}
+void EmptyMethod() #EmptyMethod() : {}
 {
-    LOOKAHEAD(3) <EMPTY> <LPAREN> Expression() <RPAREN>
-|
-    <EMPTY> Reference()
+    <EMPTY> <LPAREN> <RPAREN>
 }
 
-void SizeFunction() : {}
-{
-    <SIZE> <LPAREN> Expression() <RPAREN>
-}
-
-void Function() #FunctionNode: {}
-{
-
-   Identifier(true) <COLON> Identifier() <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
-}
-
-void Method() #MethodNode: {}
-{
-   Identifier(true) <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
-}
-
-void AnyMethod() #void : {}
-{
-    LOOKAHEAD(<SIZE>) SizeMethod()
-  |
-    LOOKAHEAD(Identifier() <LPAREN>) Method()
-}
-
-void SizeMethod() : {}
+void SizeMethod() #SizeMethod() : {}
 {
     <SIZE> <LPAREN> <RPAREN>
 }
 
-void Constructor() #ConstructorNode() : {}
+void Arguments() #Arguments : {}
 {
-  <NEW> <LPAREN>[ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+     <LPAREN> (Expression() (<COMMA> Expression())* )? <RPAREN>
 }
 
-void DeclareParm() #void :
+void FunctionCall() #void : {}
+{
+      LOOKAHEAD(2) Identifier() <COLON> Identifier() Arguments() #FunctionNode(3)
+    |
+      LOOKAHEAD(2) Identifier(true) Arguments() #FunctionNode(2)
+}
+
+void Constructor() #ConstructorNode() : {}
+{
+  <NEW> <LPAREN> [ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+}
+
+void Parameter() #void :
 {
     Token t;
 }
@@ -558,11 +536,27 @@ void DeclareParm() #void :
     t=<IDENTIFIER> { declareParameter(t.image); }
 }
 
-void Lambda() #JexlLambda() : {
+void Parameters() #void : {}
+{
+     <LPAREN> [Parameter() (<COMMA> Parameter())* ] <RPAREN>
+}
+
+
+void LambdaLookahead() #void() : {}
+{
+  <FUNCTION> Parameters()
+  |
+  Parameters() <LAMBDA>
+}
+
+void Lambda() #JexlLambda() :
+{
    pushFrame();
 }
 {
-  <FUNCTION> <LPAREN>[ DeclareParm() ( <COMMA> DeclareParm() )* ] <RPAREN> Block()
+  <FUNCTION> Parameters() Block()
+  |
+  Parameters() <LAMBDA> Block()
 }
 
 
@@ -571,76 +565,77 @@ void Lambda() #JexlLambda() : {
  *     References
  ***************************************/
 
-void PrimaryExpression() #void : {}
+void IdentifierAccess() :
 {
-  LOOKAHEAD(2) Reference()
-|
-  LOOKAHEAD( <EMPTY> ) EmptyFunction()
-|
-  LOOKAHEAD( <SIZE> ) SizeFunction()
-|
-  LOOKAHEAD( <NEW> <LPAREN> ) Constructor()
-|
-  LOOKAHEAD( <LCURLY> (Expression())? <COLON> ) MapLiteral()
-|
-  LOOKAHEAD( <LBRACKET> (Expression() | <RBRACKET>) ) ArrayLiteral()
-|
-  Literal()
-| Lambda()
+    Token t;
+}
+{
+    <DOT> (
+        t=<IDENTIFIER> { jjtThis.setIdentifier(t.image);}
+    |
+        t=<INTEGER_LITERAL> { jjtThis.setIdentifier(t.image); }
+    |
+        t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); }
+    )
 }
 
 void ArrayAccess() : {}
 {
-    Identifier() (LOOKAHEAD(1) <LBRACKET> Expression() <RBRACKET>)+
+    (LOOKAHEAD(1) <LBRACKET> Expression() <RBRACKET>)+
 }
 
-void DotReference() #void : {}
+void MemberAccess() #void : {}
 {
-  (<DOT>
-     ( LOOKAHEAD(Identifier() <LBRACKET> )
-         ArrayAccess()
-       |
-       ( LOOKAHEAD(2)
-            AnyMethod()
-          |
-            Identifier()
-          |
-            IntegerLiteral()
-          |
-            StringIdentifier()
-       )
-     )
-  )*
+    LOOKAHEAD(<LBRACKET>) ArrayAccess()
+    |
+    LOOKAHEAD(<DOT>) IdentifierAccess()
 }
 
-void Reference() : {}
+void ReferenceExpression() #MethodNode(>1) : {}
 {
-  (
-   LOOKAHEAD(<NEW>) Constructor()
-|
-   LOOKAHEAD(Identifier() <LBRACKET> ) ArrayAccess()
-|
-   LOOKAHEAD(Identifier() <COLON> Identifier() <LPAREN>) Function()
-|
-   LOOKAHEAD(Identifier() <LPAREN>) Method()
-|
-   LOOKAHEAD(<LCURLY>) MapLiteral()
-|
-   LOOKAHEAD(<LBRACKET>) ArrayLiteral()
-|
-   LOOKAHEAD( <LPAREN> Expression() ) ReferenceExpression()
-|
-   StringLiteral()
-|
-   Identifier(true)
-  )  DotReference()
+    ( <LPAREN> Expression() <RPAREN> #ReferenceExpression(1) ) ( LOOKAHEAD(<LPAREN>) Arguments() )*
 }
 
-/**
- * ReferenceExpression is a subclass of ArrayAccess
- */
-void ReferenceExpression() : {}
+void PrimaryExpression() #void : {}
 {
-    <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) <LBRACKET> Expression() <RBRACKET>)*
+       LOOKAHEAD( LambdaLookahead() ) Lambda()
+    |
+       LOOKAHEAD( <LPAREN> ) ReferenceExpression()
+    |
+       LOOKAHEAD( <LCURLY> ) MapLiteral()
+    |
+       LOOKAHEAD( <LBRACKET> ) ArrayLiteral()
+    |
+       LOOKAHEAD( <NEW> ) Constructor()
+    |
+       LOOKAHEAD(2) FunctionCall()
+    |
+       Identifier(true)
+    |
+       Literal()
 }
+
+void MethodCall() #void : {}
+{
+    LOOKAHEAD(<DOT> <SIZE>) (<DOT> <SIZE> <LPAREN> <RPAREN>) #SizeMethod(1)
+    |
+    LOOKAHEAD(<DOT> <EMPTY>) ( <DOT> <SIZE> <LPAREN> <RPAREN>) #EmptyMethod(1)
+    |
+    (MemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
+}
+
+
+void MemberExpression() #void : {}
+{
+    LOOKAHEAD(MethodCall()) MethodCall() | MemberAccess()
+}
+
+void ValueExpression() #void : {}
+{
+    ( PrimaryExpression() ( LOOKAHEAD(2) MemberExpression() )*) #Reference(>1)
+}
+
+
+
+
 

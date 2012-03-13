@@ -24,13 +24,17 @@ import org.apache.commons.jexl3.JexlInfo;
  * @since 2.0
  */
 public abstract class JexlNode extends SimpleNode {
-    /** A marker interface for literals.
+    /**
+     * A marker interface for literals.
+     *
      * @param <T> the literal type
      */
     public interface Literal<T> {
         T getLiteral();
     }
-    /** token value. */
+    /**
+     * token value.
+     */
     public String image;
 
     public JexlNode(int id) {
@@ -43,6 +47,7 @@ public abstract class JexlNode extends SimpleNode {
 
     /**
      * Gets the associated JexlInfo instance.
+     *
      * @return the info
      */
     public JexlInfo jexlInfo() {
@@ -56,9 +61,19 @@ public abstract class JexlNode extends SimpleNode {
         return null;
     }
 
+    @Override
+    public String toString() {
+        if (image != null) {
+            return super.toString() + ":{" + image + "}";
+        } else {
+            return super.toString();
+        }
+    }
+
     /**
-     * Whether this node is a constant node
-     * Its value can not change after the first evaluation and can be cached indefinitely.
+     * Whether this node is a constant node Its value can not change after the first evaluation and can be cached
+     * indefinitely.
+     *
      * @return true if constant, false otherwise
      */
     public final boolean isConstant() {
@@ -84,6 +99,25 @@ public abstract class JexlNode extends SimpleNode {
                     }
                 }
             }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Whether this node is a left value.
+     * @return true if node is assignable, false otherwise
+     */
+    public boolean isLeftValue() {
+        if (this instanceof ASTIdentifier || this instanceof ASTIdentifierAccess) {
+            return true;
+        }
+        int nc = this.jjtGetNumChildren() - 1;
+        if (nc >= 0) {
+           JexlNode last = this.jjtGetChild(this.jjtGetNumChildren() - 1);
+           return last.isLeftValue();
+        }
+        if (parent instanceof ASTReference || parent instanceof ASTArrayAccess) {
             return true;
         }
         return false;

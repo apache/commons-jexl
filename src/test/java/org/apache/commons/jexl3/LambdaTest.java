@@ -26,7 +26,7 @@ public class LambdaTest extends JexlTestCase {
     public LambdaTest(String testName) {
         super(testName);
     }
-    
+
     public void testScriptArguments() throws Exception {
         JexlEngine jexl = new Engine();
         JexlScript s = jexl.createScript("{ x + x }", "x");
@@ -34,13 +34,13 @@ public class LambdaTest extends JexlTestCase {
         Object result = s42.execute(null, s);
         assertEquals(42, result);
     }
-    
+
     public void testScriptContext() throws Exception {
         JexlEngine jexl = new Engine();
         JexlScript s = jexl.createScript("function(x) { x + x }");
         JexlScript fs = (JexlScript) s.execute(null);
         String fsstr = fs.getExpression();
-        assertEquals("function(x) { x + x; };", fsstr);
+        assertEquals("(x)->{ x + x; };", fsstr);
         assertEquals(42, fs.execute(null, 21));
         JexlScript s42 = jexl.createScript("s(21)");
         JexlEvalContext ctxt = new JexlEvalContext();
@@ -50,7 +50,7 @@ public class LambdaTest extends JexlTestCase {
         result = s42.evaluate(ctxt);
         assertEquals(42, result);
     }
-    
+
     public void testLambda() throws Exception {
         JexlEngine jexl = new Engine();
         String strs = "var s = function(x) { x + x }; s(21)";
@@ -62,7 +62,7 @@ public class LambdaTest extends JexlTestCase {
         result = s42.execute(null);
         assertEquals(42, result);
     }
-    
+
     public void testLambdaClosure() throws Exception {
         JexlEngine jexl = new Engine();
         String strs = "var t = 20; var s = function(x, y) { x + y + t}; s(15, 7)";
@@ -80,6 +80,32 @@ public class LambdaTest extends JexlTestCase {
         strs = "var t = 19; var s = function(x, y) { var t = 20; x + y + t}; t = 54; s(15, 7)";
         s42 = jexl.createScript(strs);
         result = s42.execute(null);
+        assertEquals(42, result);
+    }
+
+    public void testLambdaLambda() throws Exception {
+        JexlEngine jexl = new Engine();
+        String strs = "var t = 19; ( (x, y)->{ var t = 20; x + y + t} )(15, 7);";
+        JexlScript s42 = jexl.createScript(strs);
+        Object result = s42.execute(null);
+        assertEquals(42, result);
+
+        strs = "( (x, y)->{ ( (xx, yy)->{xx + yy } )(x, y) } )(15, 27)";
+        s42 = jexl.createScript(strs);
+        result = s42.execute(null);
+        assertEquals(42, result);
+
+        strs = "var t = 19; var s = (x, y)->{ var t = 20; x + y + t}; t = 54; s(15, 7)";
+        s42 = jexl.createScript(strs);
+        result = s42.execute(null);
+        assertEquals(42, result);
+    }
+
+    public void testNestLambda() throws Exception {
+        JexlEngine jexl = new Engine();
+        String strs = "( (x)->{ (y)->{ x + y } })(15)(27)";
+        JexlScript s42 = jexl.createScript(strs);
+        Object result = s42.execute(null);
         assertEquals(42, result);
     }
 }

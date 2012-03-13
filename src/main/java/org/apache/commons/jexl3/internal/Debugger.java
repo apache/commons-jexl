@@ -16,12 +16,12 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import java.util.regex.Pattern;
+
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlScript;
-import org.apache.commons.jexl3.parser.ASTAdditiveNode;
-import org.apache.commons.jexl3.parser.ASTAdditiveOperator;
+import org.apache.commons.jexl3.parser.ASTAddNode;
 import org.apache.commons.jexl3.parser.ASTAndNode;
+import org.apache.commons.jexl3.parser.ASTArguments;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
 import org.apache.commons.jexl3.parser.ASTArrayLiteral;
 import org.apache.commons.jexl3.parser.ASTAssignment;
@@ -35,12 +35,14 @@ import org.apache.commons.jexl3.parser.ASTDivNode;
 import org.apache.commons.jexl3.parser.ASTEQNode;
 import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
+import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTGENode;
 import org.apache.commons.jexl3.parser.ASTGTNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
+import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
@@ -63,23 +65,23 @@ import org.apache.commons.jexl3.parser.ASTReturnStatement;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
 import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
+import org.apache.commons.jexl3.parser.ASTSubNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
 import org.apache.commons.jexl3.parser.ASTWhileStatement;
 import org.apache.commons.jexl3.parser.JexlNode;
-
 import org.apache.commons.jexl3.parser.ParserVisitor;
+
+import java.util.regex.Pattern;
 
 /**
  * Helps pinpoint the cause of problems in expressions that fail during evaluation.
  * <p>
- * It rebuilds an expression string from the tree and the start/end offsets of the cause
- * in that string.
+ * It rebuilds an expression string from the tree and the start/end offsets of the cause in that string.
+ * This implies that exceptions during evaluation do allways carry the node that's causing the error.
  * </p>
- * This implies that exceptions during evaluation do allways carry the node that's causing
- * the error.
  * @since 2.0
  */
 public final class Debugger extends ParserVisitor {
@@ -101,7 +103,7 @@ public final class Debugger extends ParserVisitor {
         start = 0;
         end = 0;
     }
-    
+
     /**
      * Position the debugger on the root of an expression.
      * @param jscript the expression
@@ -188,8 +190,7 @@ public final class Debugger extends ParserVisitor {
     }
 
     /**
-     * Checks if a child node is the cause to debug &amp; adds its representation
-     * to the rebuilt expression.
+     * Checks if a child node is the cause to debug &amp; adds its representation to the rebuilt expression.
      * @param node the child node
      * @param data visitor pattern argument
      * @return visitor pattern value
@@ -225,8 +226,7 @@ public final class Debugger extends ParserVisitor {
     }
 
     /**
-     * Checks if a terminal node is the the cause to debug &amp; adds its
-     * representation to the rebuilt expression.
+     * Checks if a terminal node is the the cause to debug &amp; adds its representation to the rebuilt expression.
      * @param node the child node
      * @param image the child node token image (may be null)
      * @param data visitor pattern argument
@@ -248,8 +248,8 @@ public final class Debugger extends ParserVisitor {
     }
 
     /**
-     * Checks if the children of a node using infix notation is the cause to debug,
-     * adds their representation to the rebuilt expression.
+     * Checks if the children of a node using infix notation is the cause to debug, adds their representation to the
+     * rebuilt expression.
      * @param node the child node
      * @param infix the child node token
      * @param paren whether the child should be parenthesized
@@ -274,8 +274,8 @@ public final class Debugger extends ParserVisitor {
     }
 
     /**
-     * Checks if the child of a node using prefix notation is the cause to debug,
-     * adds their representation to the rebuilt expression.
+     * Checks if the child of a node using prefix notation is the cause to debug, adds their representation to the
+     * rebuilt expression.
      * @param node the node
      * @param prefix the node token
      * @param data visitor pattern argument
@@ -295,30 +295,39 @@ public final class Debugger extends ParserVisitor {
     }
 
     @Override
-    protected Object visit(ASTAdditiveNode node, Object data) {
+    protected Object visit(ASTAddNode node, Object data) {
+        return additiveNode(node, " + ", data);
+    }
+
+    @Override
+    protected Object visit(ASTSubNode node, Object data) {
+        return additiveNode(node, " - ", data);
+    }
+
+    /**
+     * Rebuilds an additive expression.
+     * @param node the node
+     * @param op the operator
+     * @param data visitor pattern argument
+     * @return visitor pattern value
+     */
+    private Object additiveNode(JexlNode node, String op, Object data) {
         // need parenthesis if not in operator precedence order
         boolean paren = node.jjtGetParent() instanceof ASTMulNode
                 || node.jjtGetParent() instanceof ASTDivNode
                 || node.jjtGetParent() instanceof ASTModNode;
-        int num = node.jjtGetNumChildren(); //child.jjtGetNumChildren() > 1;
+        int num = node.jjtGetNumChildren();
         if (paren) {
             builder.append("(");
         }
         accept(node.jjtGetChild(0), data);
         for (int i = 1; i < num; ++i) {
+            builder.append(op);
             accept(node.jjtGetChild(i), data);
         }
         if (paren) {
             builder.append(")");
         }
-        return data;
-    }
-
-    @Override
-    protected Object visit(ASTAdditiveOperator node, Object data) {
-        builder.append(' ');
-        builder.append(node.image);
-        builder.append(' ');
         return data;
     }
 
@@ -329,9 +338,8 @@ public final class Debugger extends ParserVisitor {
 
     @Override
     protected Object visit(ASTArrayAccess node, Object data) {
-        accept(node.jjtGetChild(0), data);
         int num = node.jjtGetNumChildren();
-        for (int i = 1; i < num; ++i) {
+        for (int i = 0; i < num; ++i) {
             builder.append("[");
             accept(node.jjtGetChild(i), data);
             builder.append("]");
@@ -400,9 +408,15 @@ public final class Debugger extends ParserVisitor {
 
     @Override
     protected Object visit(ASTEmptyFunction node, Object data) {
-        builder.append("empty(");
+        builder.append("empty ");
         accept(node.jjtGetChild(0), data);
-        builder.append(")");
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTEmptyMethod node, Object data) {
+        accept(node.jjtGetChild(0), data);
+        check(node, ".empty()", data);
         return data;
     }
 
@@ -449,7 +463,7 @@ public final class Debugger extends ParserVisitor {
     private static final Pattern QUOTED_IDENTIFIER = Pattern.compile("['\"\\s\\\\]");
     /** Checks number used as identifiers. */
     private static final Pattern NUMBER_IDENTIFIER = Pattern.compile("^\\d*$");
-    
+
     @Override
     protected Object visit(ASTIdentifier node, Object data) {
         String image = node.image;
@@ -458,6 +472,18 @@ public final class Debugger extends ParserVisitor {
             image = "'" + node.image.replace("'", "\\'") + "'";
         }
         return check(node, image, data);
+    }
+
+    @Override
+    protected Object visit(ASTIdentifierAccess node, Object data) {
+        builder.append(".");
+        String image = node.image;
+        if (QUOTED_IDENTIFIER.matcher(image).find() || NUMBER_IDENTIFIER.matcher(image).find()) {
+            // quote it
+            image = "'" + node.image.replace("'", "\\'") + "'";
+        }
+        builder.append(image);
+        return data;
     }
 
     @Override
@@ -487,7 +513,13 @@ public final class Debugger extends ParserVisitor {
     @Override
     protected Object visit(ASTJexlScript node, Object data) {
         if (node instanceof ASTJexlLambda) {
-            builder.append("function(");
+            JexlNode parent = node.jjtGetParent();
+            // use lambda syntax if not assigned
+            boolean named = parent instanceof ASTAssignment;
+            if (named) {
+                builder.append("function");
+            }
+            builder.append('(');
             String[] params = node.getParameters();
             if (params != null && params.length > 0) {
                 builder.append(params[0]);
@@ -496,7 +528,12 @@ public final class Debugger extends ParserVisitor {
                     builder.append(params[p]);
                 }
             }
-            builder.append(") ");
+            builder.append(')');
+            if (named) {
+                builder.append(' ');
+            } else {
+                builder.append("->");
+            }
         }
         int num = node.jjtGetNumChildren();
         for (int i = 0; i < num; ++i) {
@@ -558,30 +595,38 @@ public final class Debugger extends ParserVisitor {
     @Override
     protected Object visit(ASTFunctionNode node, Object data) {
         int num = node.jjtGetNumChildren();
-        accept(node.jjtGetChild(0), data);
-        builder.append(":");
-        accept(node.jjtGetChild(1), data);
-        builder.append("(");
-        for (int i = 2; i < num; ++i) {
-            if (i > 2) {
-                builder.append(", ");
-            }
-            accept(node.jjtGetChild(i), data);
+        if (num == 3) {
+            accept(node.jjtGetChild(0), data);
+            builder.append(":");
+            accept(node.jjtGetChild(1), data);
+            accept(node.jjtGetChild(2), data);
+        } else {
+            accept(node.jjtGetChild(0), data);
+            accept(node.jjtGetChild(1), data);
         }
-        builder.append(")");
         return data;
     }
 
     @Override
     protected Object visit(ASTMethodNode node, Object data) {
         int num = node.jjtGetNumChildren();
-        accept(node.jjtGetChild(0), data);
+        if (num == 2) {
+            accept(node.jjtGetChild(0), data);
+            accept(node.jjtGetChild(1), data);
+        }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTArguments node, Object data) {
+        int num = node.jjtGetNumChildren();
         builder.append("(");
-        for (int i = 1; i < num; ++i) {
-            if (i > 1) {
+        if (num > 0) {
+            accept(node.jjtGetChild(0), data);
+            for (int i = 1; i < num; ++i) {
                 builder.append(", ");
+                accept(node.jjtGetChild(i), data);
             }
-            accept(node.jjtGetChild(i), data);
         }
         builder.append(")");
         return data;
@@ -630,9 +675,7 @@ public final class Debugger extends ParserVisitor {
     @Override
     protected Object visit(ASTReference node, Object data) {
         int num = node.jjtGetNumChildren();
-        accept(node.jjtGetChild(0), data);
-        for (int i = 1; i < num; ++i) {
-            builder.append(".");
+        for (int i = 0; i < num; ++i) {
             accept(node.jjtGetChild(i), data);
         }
         return data;
@@ -662,15 +705,15 @@ public final class Debugger extends ParserVisitor {
 
     @Override
     protected Object visit(ASTSizeFunction node, Object data) {
-        builder.append("size(");
+        builder.append("size ");
         accept(node.jjtGetChild(0), data);
-        builder.append(")");
         return data;
     }
 
     @Override
     protected Object visit(ASTSizeMethod node, Object data) {
-        check(node, "size()", data);
+        accept(node.jjtGetChild(0), data);
+        check(node, ".size()", data);
         return data;
     }
 

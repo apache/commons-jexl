@@ -20,7 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * A script scope, stores the declaration of parameters and local variables.
+ * A script scope, stores the declaration of parameters and local variables as symbols.
  * @since 3.0
  */
 public final class Scope {
@@ -37,8 +37,8 @@ public final class Scope {
      */
     private int vars;
     /**
-     * The map of named varialbes aka script parameters and local variables.
-     * Each parameter is associated to a register and is materialized as an offset in the stacked array used
+     * The map of named variables aka script parameters and local variables.
+     * Each parameter is associated to a symbol and is materialized as an offset in the stacked array used
      * during evaluation.
      */
     private Map<String, Integer> namedVariables = null;
@@ -94,25 +94,25 @@ public final class Scope {
     }
 
     /**
-     * Checks whether an identifier is a local variable or argument, ie stored in a register.
+     * Checks whether an identifier is a local variable or argument, ie a symbol.
      * If this fails, attempt to solve by hoisting parent stacked.
-     * @param name the register name
-     * @return the register index
+     * @param name the symbol name
+     * @return the symbol index
      */
-    public Integer getRegister(String name) {
-        return getRegister(name, true);
+    public Integer getSymbol(String name) {
+        return getSymbol(name, true);
     }
 
     /**
-     * Checks whether an identifier is a local variable or argument, ie stored in a register.
-     * @param name the register name
+     * Checks whether an identifier is a local variable or argument, ie a symbol.
+     * @param name the symbol name
      * @param hoist whether solving by hoisting parent stacked is allowed
-     * @return the register index
+     * @return the symbol index
      */
-    private Integer getRegister(String name, boolean hoist) {
+    private Integer getSymbol(String name, boolean hoist) {
         Integer register = namedVariables != null ? namedVariables.get(name) : null;
         if (register == null && hoist && parent != null) {
-            Integer pr = parent.getRegister(name, false);
+            Integer pr = parent.getSymbol(name, false);
             if (pr != null) {
                 if (hoistedVariables == null) {
                     hoistedVariables = new LinkedHashMap<Integer, Integer>();
@@ -131,7 +131,7 @@ public final class Scope {
     /**
      * Declares a parameter.
      * <p>
-     * This method creates an new entry in the named register map.
+     * This method creates an new entry in the symbol map.
      * </p>
      * @param name the parameter name
      */
@@ -152,7 +152,7 @@ public final class Scope {
     /**
      * Declares a local variable.
      * <p>
-     * This method creates an new entry in the named register map.
+     * This method creates an new entry in the symbol map.
      * </p>
      * @param name the variable name
      * @return the register index storing this variable
@@ -202,15 +202,15 @@ public final class Scope {
     }
 
     /**
-     * Gets this script stacked, i.e. parameters and local variables.
-     * @return the register names
+     * Gets this script symbols names, i.e. parameters and local variables.
+     * @return the symbol names
      */
-    public String[] getRegisters() {
+    public String[] getSymbols() {
         return namedVariables != null ? namedVariables.keySet().toArray(new String[0]) : new String[0];
     }
 
     /**
-     * Gets this script parameters, i.e. stacked assigned before creating local variables.
+     * Gets this script parameters, i.e. symbols assigned before creating local variables.
      * @return the parameter names
      */
     public String[] getParameters() {
@@ -229,8 +229,8 @@ public final class Scope {
     }
 
     /**
-     * Gets this script local variable, i.e. stacked assigned to local variables.
-     * @return the parameter names
+     * Gets this script local variable, i.e. symbols assigned to local variables.
+     * @return the local variable names
      */
     public String[] getLocalVariables() {
         if (namedVariables != null && vars > 0) {

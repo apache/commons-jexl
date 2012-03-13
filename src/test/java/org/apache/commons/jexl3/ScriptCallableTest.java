@@ -66,7 +66,7 @@ public class ScriptCallableTest extends JexlTestCase {
         future.cancel(true);
         assertTrue(future.isCancelled());
     }
-    
+
     public void testCallableClosure() throws Exception {
         JexlScript e = JEXL.createScript("function(t) {while(t);}");
         e = (JexlScript) e.execute(null);
@@ -94,7 +94,7 @@ public class ScriptCallableTest extends JexlTestCase {
             Thread.sleep(1000 * s);
             return s;
         }
-        
+
         public int waitInterrupt(int s) {
             try {
                 Thread.sleep(1000 * s);
@@ -104,7 +104,7 @@ public class ScriptCallableTest extends JexlTestCase {
             }
             return -1;
         }
-        
+
         public int runForever() {
             boolean x = false;
             while(true) {
@@ -126,7 +126,7 @@ public class ScriptCallableTest extends JexlTestCase {
         assertTrue(future.isDone());
         assertEquals(0, t);
     }
-    
+
     public void testWait() throws Exception {
         JexlScript e = JEXL.createScript("wait(1)");
         Callable<Object> c = e.callable(new TestContext());
@@ -152,7 +152,7 @@ public class ScriptCallableTest extends JexlTestCase {
         future.cancel(true);
         assertTrue(future.isCancelled());
     }
-    
+
     public void testCancelWaitInterrupt() throws Exception {
         JexlScript e = JEXL.createScript("waitInterrupt(42)");
         Callable<Object> c = e.callable(new TestContext());
@@ -168,7 +168,7 @@ public class ScriptCallableTest extends JexlTestCase {
         future.cancel(true);
         assertTrue(future.isCancelled());
     }
-    
+
     public void testCancelForever() throws Exception {
         JexlScript e = JEXL.createScript("runForever()");
         Callable<Object> c = e.callable(new TestContext());
@@ -184,7 +184,7 @@ public class ScriptCallableTest extends JexlTestCase {
         future.cancel(true);
         assertTrue(future.isCancelled());
     }
-    
+
     public void testCancelLoopWait() throws Exception {
         JexlScript e = JEXL.createScript("while (true) { wait(10) }");
         Callable<Object> c = e.callable(new TestContext());

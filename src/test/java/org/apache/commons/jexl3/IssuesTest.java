@@ -18,7 +18,6 @@ package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.internal.TemplateEngine;
-import org.apache.commons.jexl3.internal.Debugger;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -147,15 +146,16 @@ public class IssuesTest extends JexlTestCase {
         // ensure errors will throw
         jc.setStrict(true);
         jc.setSilent(false);
-        String jexlExp = "(foo.getInner().foo() eq true) and (foo.getInner().goo() = (foo.getInner().goo()+1-1))";
-        JexlExpression e = jexl.createExpression(jexlExp);
-        jc.set("foo", new Foo());
-
         try {
+            String jexlExp = "(foo.getInner().foo() eq true) and (foo.getInner().goo() = (foo.getInner().goo()+1-1))";
+            JexlExpression e = jexl.createExpression(jexlExp);
+            jc.set("foo", new Foo());
             /* Object o = */ e.evaluate(jc);
             fail("Should have failed due to invalid assignment");
+        } catch (JexlException.Parsing xparse) {
+            String dbg = xparse.toString();
         } catch (JexlException xjexl) {
-            // expected
+            fail("Should have thrown a parse exception");
         }
     }
 
@@ -279,7 +279,8 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-62
     public void test62() throws Exception {
         JexlEngine jexl = createEngine(false);
-        JexlEvalContext ctxt = new JexlEvalContext();
+        MapContext vars = new MapContext();
+        JexlEvalContext ctxt = new JexlEvalContext(vars);
         ctxt.setStrict(true);
         ctxt.setSilent(true);// to avoid throwing JexlException on null method call
 
@@ -295,7 +296,7 @@ public class IssuesTest extends JexlTestCase {
         assertEquals(jscript.getText(), null, jscript.execute(ctxt)); // OK
 
         JexlExpression jexpr;
-        ctxt.clearVariables();
+        vars.clear();
         jexpr = jexl.createExpression("dummy.hashCode()");
         assertEquals(jexpr.getExpression(), null, jexpr.evaluate(ctxt)); // OK
 
@@ -330,7 +331,7 @@ public class IssuesTest extends JexlTestCase {
             fail("c.e not accessible as property");
         } catch (JexlException.Property xjexl) {
             String msg = xjexl.getMessage();
-            assertTrue(msg.indexOf("c.e") > 0);
+            assertTrue(msg.indexOf("e") > 0);
         }
 
     }
@@ -473,7 +474,7 @@ public class IssuesTest extends JexlTestCase {
         }
     }
 
-// A's class definition 
+// A's class definition
     public static class A105 {
         String nameA;
         String propA;
@@ -688,7 +689,7 @@ public class IssuesTest extends JexlTestCase {
         ctx.set("result", new BigDecimal("9958.33"));
         ctx.set("salary", new BigDecimal("119500.00"));
         ctx.set("month", new BigDecimal("12.00"));
-        ctx.set("percent", new BigDecimal("100.00"));
+        ctx.set("work.percent", new BigDecimal("100.00"));
 
         // will fail because default scale is 5
         assertFalse((Boolean) exp1.evaluate(ctx));
@@ -748,11 +749,40 @@ public class IssuesTest extends JexlTestCase {
         JexlExpression e = jexl.createExpression("method()");
         JexlContext jc = new ObjectContext<ThrowNPE>(jexl, new ThrowNPE());
         try {
-        e.evaluate(jc);
-        fail("Should have thrown NPE");
-        } catch(JexlException xany) {
+            e.evaluate(jc);
+            fail("Should have thrown NPE");
+        } catch (JexlException xany) {
             Throwable xth = xany.getCause();
             assertEquals(NullPointerException.class, xth.getClass());
         }
+    }
+
+    public void test130a() throws Exception {
+        String myName = "Test.Name";
+        Object myValue = "Test.Value";
+
+        JexlEngine myJexlEngine = new Engine();
+        MapContext myMapContext = new MapContext();
+        myMapContext.set(myName, myValue);
+
+        Object myObjectWithTernaryConditional = myJexlEngine.createScript(myName + "?:null").execute(myMapContext);
+        assertEquals(myValue, myObjectWithTernaryConditional);
+    }
+
+    public void test130b() throws Exception {
+        String myName = "Test.Name";
+        Object myValue = new Object() {
+            @Override
+            public String toString() {
+                return "Test.Value";
+            }
+        };
+
+        JexlEngine myJexlEngine = new Engine();
+        MapContext myMapContext = new MapContext();
+        myMapContext.set(myName, myValue);
+
+        Object myObjectWithTernaryConditional = myJexlEngine.createScript(myName + "?:null").execute(myMapContext);
+        assertEquals(myValue, myObjectWithTernaryConditional);
     }
 }

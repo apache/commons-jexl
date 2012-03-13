@@ -588,8 +588,8 @@ public class CacheTest extends JexlTestCase {
     public void testComputeCache() throws Exception {
             runThreaded(ComputeTask.class, LOOPS, true);
     }
-    
-    public static class JexlContextNS extends JexlEvalContext implements JexlContext.NamespaceResolver {
+
+    public static class JexlContextNS extends JexlEvalContext {
         final Map<String, Object> funcs;
         JexlContextNS(Map<String, Object> vars, Map<String, Object> funcs) {
             super(vars);
@@ -599,7 +599,7 @@ public class CacheTest extends JexlTestCase {
         public Object resolveNamespace(String name) {
             return funcs.get(name);
         }
-        
+
     }
 
     /**
