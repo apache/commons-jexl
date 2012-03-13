@@ -59,4 +59,11 @@ public class MapContext implements JexlContext {
     public void set(String name, Object value) {
         map.put(name, value);
     }
+
+    /**
+     * Clears all variables.
+     */
+    public void clear() {
+        map.clear();
+    }
 }
