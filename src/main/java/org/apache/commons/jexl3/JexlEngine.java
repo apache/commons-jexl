@@ -33,7 +33,6 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
  *  <li>Error reporting</li>
  *  <li>Logging</li>
  * </ul>
- * </p>
  * <p>
  * Note that methods that evaluate expressions may throw <em>unchecked</em> exceptions;
  * The {@link JexlException} are thrown in "non-silent" mode but since these are

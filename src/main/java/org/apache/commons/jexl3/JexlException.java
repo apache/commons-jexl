@@ -90,11 +90,10 @@ public class JexlException extends RuntimeException {
     private static <X extends Throwable> X clean(X xthrow) {
         if (xthrow != null) {
             StackTraceElement[] stack = xthrow.getStackTrace();
-            StackTraceElement se = null;
             List<StackTraceElement> stackJexl = new ArrayList<StackTraceElement>();
             stackJexl.add(stack[0]);
             for (int s = 1; s < stack.length; ++s) {
-                se = stack[s];
+                StackTraceElement se = stack[s];
                 String className = se.getClassName();
                 if (!className.startsWith("org.apache.commons.jexl3")) {
                     stackJexl.add(se);
@@ -106,7 +105,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Unwraps the cause of a throwable due to reflection. 
+     * Unwraps the cause of a throwable due to reflection.
      * @param xthrow the throwable
      * @return the cause
      */
