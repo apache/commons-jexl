@@ -24,16 +24,17 @@ import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlScript;
-
 import org.apache.commons.jexl3.internal.introspection.SandboxUberspect;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
-
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
+import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
+import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParseException;
@@ -60,7 +61,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import java.lang.ref.SoftReference;
-
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -86,6 +86,15 @@ public class Engine extends JexlEngine {
         @Override
         public void set(String name, Object value) {
             throw new UnsupportedOperationException("Not supported in void context.");
+        }
+    };
+    /**
+     * An empty/static/non-mutable JexlNamesapce used instead of null namespace.
+     */
+    public static final JexlContext.NamespaceResolver EMPTY_NS = new JexlContext.NamespaceResolver() {
+        @Override
+        public Object resolveNamespace(String name) {
+            return null;
         }
     };
 
@@ -127,8 +136,8 @@ public class Engine extends JexlEngine {
      */
     protected final boolean strict;
     /**
-     * Whether expressions evaluated by this engine will throw exceptions (false) or 
-     * return null (true) on errors. Default is false.
+     * Whether expressions evaluated by this engine will throw exceptions (false) or return null (true) on errors.
+     * Default is false.
      */
     protected final boolean silent;
     /**
@@ -136,7 +145,7 @@ public class Engine extends JexlEngine {
      */
     protected final boolean debug;
     /**
-     *  The map of 'prefix:function' to object implementing the namespaces.
+     * The map of 'prefix:function' to object implementing the namespaces.
      */
     protected final Map<String, Object> functions;
     /**
@@ -585,28 +594,41 @@ public class Engine extends JexlEngine {
      * @param ref the current variable being filled
      */
     protected void getVariables(JexlNode node, Set<List<String>> refs, List<String> ref) {
-        boolean array = node instanceof ASTArrayAccess;
-        boolean reference = node instanceof ASTReference;
-        int num = node.jjtGetNumChildren();
-        if (array || reference) {
-            List<String> var = ref != null ? ref : new ArrayList<String>();
-            boolean varf = true;
-            for (int i = 0; i < num; ++i) {
-                JexlNode child = node.jjtGetChild(i);
-                if (array) {
-                    if (child instanceof ASTReference && child.jjtGetNumChildren() == 1) {
-                        JexlNode desc = child.jjtGetChild(0);
-                        if (varf && desc.isConstant()) {
-                            String image = desc.image;
+        if (node instanceof ASTIdentifier) {
+            JexlNode parent = node.jjtGetParent();
+            if (parent instanceof ASTMethodNode || parent instanceof ASTFunctionNode) {
+                // skip identifiers for methods and functions
+                return;
+            }
+            ASTIdentifier identifier = (ASTIdentifier) node;
+            if (identifier.getSymbol() < 0) {
+                if (ref == null) {
+                    ref = new ArrayList<String>();
+                    refs.add(ref);
+                }
+                ref.add(identifier.image);
+            }
+        } else {
+            int num = node.jjtGetNumChildren();
+            boolean array = node instanceof ASTArrayAccess;
+            boolean reference = node instanceof ASTReference;
+            if (array || reference) {
+                List<String> var = ref != null ? ref : new ArrayList<String>();
+                boolean varf = true;
+                for (int i = 0; i < num; ++i) {
+                    JexlNode child = node.jjtGetChild(i);
+                    if (array) {
+                        if (varf && child.isConstant()) {
+                            String image = child.image;
                             if (image == null) {
-                                var.add(new Debugger().data(desc));
+                                var.add(new Debugger().data(child));
                             } else {
                                 var.add(image);
                             }
-                        } else if (desc instanceof ASTIdentifier) {
-                            if (((ASTIdentifier) desc).getRegister() < 0) {
+                        } else if (child instanceof ASTIdentifier) {
+                            if (((ASTIdentifier) child).getSymbol() < 0) {
                                 List<String> di = new ArrayList<String>(1);
-                                di.add(desc.image);
+                                di.add(child.image);
                                 refs.add(di);
                             }
                             var = new ArrayList<String>();
@@ -614,27 +636,25 @@ public class Engine extends JexlEngine {
                         }
                         continue;
                     } else if (child instanceof ASTIdentifier) {
-                        if (i == 0 && (((ASTIdentifier) child).getRegister() < 0)) {
+                        if (i == 0 && (((ASTIdentifier) child).getSymbol() < 0)) {
                             var.add(child.image);
                         }
+                        varf = false;
+                        continue;
+                    } else if (child instanceof ASTIdentifierAccess) {
+                        var.add(child.image);
+                        varf = false;
                         continue;
                     }
-                } else {//if (reference) {
-                    if (child instanceof ASTIdentifier) {
-                        if (((ASTIdentifier) child).getRegister() < 0) {
-                            var.add(child.image);
-                        }
-                        continue;
-                    }
+                    getVariables(child, refs, var);
                 }
-                getVariables(child, refs, var);
-            }
-            if (!var.isEmpty() && var != ref) {
-                refs.add(var);
-            }
-        } else {
-            for (int i = 0; i < num; ++i) {
-                getVariables(node.jjtGetChild(i), refs, null);
+                if (!var.isEmpty() && var != ref) {
+                    refs.add(var);
+                }
+            } else {
+                for (int i = 0; i < num; ++i) {
+                    getVariables(node.jjtGetChild(i), refs, null);
+                }
             }
         }
     }

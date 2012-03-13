@@ -18,7 +18,7 @@ package org.apache.commons.jexl3;
 
 /**
  * Test cases for assignment.
- * 
+ *
  * @since 1.1
  */
 public class AssignTest extends JexlTestCase {
@@ -35,7 +35,7 @@ public class AssignTest extends JexlTestCase {
             return value;
         }
     }
-    
+
     public static class Quux {
         String str;
         Froboz froboz;
@@ -43,19 +43,19 @@ public class AssignTest extends JexlTestCase {
             this.str = str;
             froboz = new Froboz(fro);
         }
-        
+
         public Froboz getFroboz() {
             return froboz;
         }
-        
+
         public void setFroboz(Froboz froboz) {
             this.froboz = froboz;
         }
-        
+
         public String getStr() {
             return str;
         }
-        
+
         public void setStr(String str) {
             this.str = str;
         }
@@ -67,7 +67,7 @@ public class AssignTest extends JexlTestCase {
 
     /**
      * Make sure bean assignment works
-     * 
+     *
      * @throws Exception on any error
      */
     public void testAntish() throws Exception {
@@ -89,7 +89,7 @@ public class AssignTest extends JexlTestCase {
         o = check.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
     }
-    
+
     public void testBeanish() throws Exception {
         JexlExpression assign = JEXL.createExpression("froboz.value = 10");
         JexlExpression check = JEXL.createExpression("froboz.value");
@@ -101,7 +101,7 @@ public class AssignTest extends JexlTestCase {
         o = check.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
     }
-    
+
     public void testAmbiguous() throws Exception {
         JexlExpression assign = JEXL.createExpression("froboz.nosuchbean = 10");
         JexlContext jc = new MapContext();
@@ -114,13 +114,12 @@ public class AssignTest extends JexlTestCase {
         catch(RuntimeException xrt) {
             String str = xrt.toString();
             assertTrue(str.contains("nosuchbean"));
-            return;
         }
         finally {
             assertEquals("Should have failed", null, o);
         }
     }
-        
+
     public void testArray() throws Exception {
         JexlExpression assign = JEXL.createExpression("froboz[\"value\"] = 10");
         JexlExpression check = JEXL.createExpression("froboz[\"value\"]");
@@ -132,7 +131,14 @@ public class AssignTest extends JexlTestCase {
         o = check.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
     }
-    
+
+    public void testMini() throws Exception {
+        JexlContext jc = new MapContext();
+        JexlExpression assign = JEXL.createExpression("quux = 10");
+        Object o = assign.evaluate(jc);
+        assertEquals("Result is not 10", new Integer(10), o);
+
+    }
     public void testMore() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("quuxClass", Quux.class);

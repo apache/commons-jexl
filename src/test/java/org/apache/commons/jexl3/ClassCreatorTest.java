@@ -39,7 +39,7 @@ public class ClassCreatorTest extends JexlTestCase {
     public ClassCreatorTest() {
         super("ClassCreatorTest");
     }
-    
+
     @Override
     public void setUp() throws Exception {
         base = new File(System.getProperty("java.io.tmpdir") + File.pathSeparator + "jexl" + System.currentTimeMillis());

@@ -39,20 +39,20 @@ public class ASTJexlScript extends JexlNode {
     }
 
     /**
-     * Sets the parameters and registers
+     * Sets this script scope.
      * @param theScope the scope
      */
     public void setScope(Scope theScope) {
         this.scope = theScope;
     }
-    
+
     /**
      * Gets this script scope.
      */
     public Scope getScope() {
         return scope;
     }
-    
+
     /**
      * Creates an array of arguments by copying values up to the number of parameters.
      * @param values the argument values
@@ -64,10 +64,10 @@ public class ASTJexlScript extends JexlNode {
             if (frame != null) {
                 return frame.assign(values);
             }
-        } 
+        }
         return null;
     }
-    
+
     /**
      * Gets the (maximum) number of arguments this script expects.
      * @return the number of parameters
@@ -75,17 +75,17 @@ public class ASTJexlScript extends JexlNode {
     public int getArgCount() {
         return scope != null? scope.getArgCount() : 0;
     }
-    
+
     /**
-     * Gets this script registers, i.e. parameters and local variables.
-     * @return the register names
+     * Gets this script symbols, i.e. parameters and local variables.
+     * @return the symbol names
      */
-    public String[] getRegisters() {
-        return scope != null? scope.getRegisters() : null;
+    public String[] getSymbols() {
+        return scope != null? scope.getSymbols() : null;
     }
 
     /**
-     * Gets this script parameters, i.e. registers assigned before creating local variables.
+     * Gets this script parameters, i.e. symbols assigned before creating local variables.
      * @return the parameter names
      */
     public String[] getParameters() {
@@ -93,8 +93,8 @@ public class ASTJexlScript extends JexlNode {
     }
 
     /**
-     * Gets this script local variable, i.e. registers assigned to local variables.
-     * @return the parameter names
+     * Gets this script local variable, i.e. symbols assigned to local variables.
+     * @return the local variable names
      */
     public String[] getLocalVariables() {
         return scope != null? scope.getLocalVariables() : null;

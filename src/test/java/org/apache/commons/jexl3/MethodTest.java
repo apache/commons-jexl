@@ -23,7 +23,7 @@ import org.apache.commons.jexl3.junit.Asserter;
 
 /**
  * Tests for calling methods on objects
- * 
+ *
  * @since 2.0
  */
 public class MethodTest extends JexlTestCase {
@@ -70,7 +70,7 @@ public class MethodTest extends JexlTestCase {
             }
             return mixed + ":" + result;
         }
-        
+
         public String concat(String... strs) {
             if (strs.length > 0) {
                 StringBuilder strb = new StringBuilder(strs[0]);
@@ -107,7 +107,7 @@ public class MethodTest extends JexlTestCase {
         }
     }
 
-    public static class EnhancedContext extends JexlEvalContext implements JexlContext.NamespaceResolver {
+    public static class EnhancedContext extends JexlEvalContext {
         int factor = 6;
         final Map<String, Object> funcs;
 
@@ -148,7 +148,7 @@ public class MethodTest extends JexlTestCase {
         asserter.assertExpression("test.callInts(1,2,3,4,5)", "Varargs:15");
         asserter.assertExpression("test.concat(['1', '2', '3'])", "1, 2, 3");
         asserter.assertExpression("test.concat('1', '2', '3')", "1, 2, 3");
-        
+
     }
 
     public void testCallMixedVarArgMethod() throws Exception {
@@ -279,7 +279,7 @@ public class MethodTest extends JexlTestCase {
 
         JexlExpression e = JEXL.createExpression("func:ten()");
         JexlEvalContext jc = new EnhancedContext(funcs);
-        
+
         Object o = e.evaluate(jc);
         assertEquals("Result is not 10", new Integer(10), o);
 
@@ -307,6 +307,7 @@ public class MethodTest extends JexlTestCase {
             nsScript = ns;
         }
 
+        @Override
         public Object resolveNamespace(String name) {
             if (name == null) {
                 return this;

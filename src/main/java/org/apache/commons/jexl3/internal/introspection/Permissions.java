@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-      
+
 package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.Constructor;
@@ -42,8 +42,7 @@ public class Permissions {
     }
 
     /**
-     * Checks whether a constructor
-     * explicitly disallows JEXL introspection.
+     * Checks whether a constructor explicitly disallows JEXL introspection.
      * @param ctor the constructor to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
@@ -64,8 +63,7 @@ public class Permissions {
     }
 
     /**
-     * Checks whether a field
-     * explicitly disallows JEXL introspection.
+     * Checks whether a field explicitly disallows JEXL introspection.
      * @param field the field to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */

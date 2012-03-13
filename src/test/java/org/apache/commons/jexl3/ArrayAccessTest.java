@@ -21,13 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.junit.Asserter;
 
 
 /**
  * Tests for array access operator []
- * 
+ *
  * @since 2.0
  */
 public class ArrayAccessTest extends JexlTestCase {
@@ -35,7 +34,7 @@ public class ArrayAccessTest extends JexlTestCase {
     private Asserter asserter;
 
     private static final String GET_METHOD_STRING = "GetMethod string";
-    
+
     // Needs to be accessible by Foo.class
     static final String[] GET_METHOD_ARRAY =
         new String[] { "One", "Two", "Three" };
@@ -47,7 +46,7 @@ public class ArrayAccessTest extends JexlTestCase {
     public ArrayAccessTest() {
         super("ArrayAccessTest");
     }
-    
+
     @Override
     public void setUp() {
         asserter = new Asserter(JEXL);
@@ -116,8 +115,9 @@ public class ArrayAccessTest extends JexlTestCase {
         foo[0][1] = "two";
 
         asserter.setVariable("foo", foo);
-
         asserter.assertExpression("foo[0][1]", "two");
+        asserter.assertExpression("foo[0][1] = 'three'", "three");
+        asserter.assertExpression("foo[0][1]", "three");
     }
 
     public void testArrayProperty() throws Exception {
@@ -130,16 +130,17 @@ public class ArrayAccessTest extends JexlTestCase {
         asserter.assertExpression("foo.array2[1][1]", GET_METHOD_ARRAY2[1][1]);
         asserter.assertExpression("foo.array2[1].1", GET_METHOD_ARRAY2[1][1]);
     }
-    
+
     // This is JEXL-26
     public void testArrayAndDottedConflict() throws Exception {
         Object[] objects = new Object[] {"an", "array", new Long(0)};
-        
+        asserter.setStrict(false);
+        asserter.setSilent(true);
         asserter.setVariable("objects", objects);
         asserter.setVariable("status", "Enabled");
         asserter.assertExpression("objects[1].status", null);
         asserter.assertExpression("objects.1.status", null);
-        
+
         asserter.setVariable("base.status", "Ok");
         asserter.assertExpression("base.objects[1].status", null);
         asserter.assertExpression("base.objects.1.status", null);
@@ -147,7 +148,7 @@ public class ArrayAccessTest extends JexlTestCase {
 
     public void testArrayMethods() throws Exception {
         Object[] objects = new Object[] {"an", "array", new Long(0)};
-        
+
         asserter.setVariable("objects", objects);
         asserter.assertExpression("objects.get(1)", "array");
         asserter.assertExpression("objects.size()", new Integer(3));
