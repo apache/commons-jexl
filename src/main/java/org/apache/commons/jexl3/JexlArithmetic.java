@@ -333,7 +333,7 @@ public class JexlArithmetic {
     /**
      * Given a BigDecimal, attempt to narrow it to an Integer or Long if it fits if
      * one of the arguments is a numberable.
-     * 
+     *
      * @param lhs the left hand side operand that lead to the bigd result
      * @param rhs the right hand side operand that lead to the bigd result
      * @param bigd the BigDecimal to narrow
@@ -465,7 +465,7 @@ public class JexlArithmetic {
                 return new Double(l + r);
             }
 
-            // if either are bigdecimal use that type 
+            // if either are bigdecimal use that type
             if (left instanceof BigDecimal || right instanceof BigDecimal) {
                 BigDecimal l = toBigDecimal(left);
                 BigDecimal r = toBigDecimal(right);
@@ -552,7 +552,7 @@ public class JexlArithmetic {
             return new Double(l % r);
         }
 
-        // if either are bigdecimal use that type 
+        // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
@@ -591,7 +591,7 @@ public class JexlArithmetic {
             return new Double(l * r);
         }
 
-        // if either are bigdecimal use that type 
+        // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
@@ -624,7 +624,7 @@ public class JexlArithmetic {
             return new Double(l - r);
         }
 
-        // if either are bigdecimal use that type 
+        // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
             BigDecimal r = toBigDecimal(right);
@@ -897,7 +897,7 @@ public class JexlArithmetic {
      * Coerce to a boolean (not a java.lang.Boolean).
      *
      * @param val Object to be coerced.
-     * @return The boolean coerced value, or false if none possible.
+     * @return the boolean value if coercion is possible, true if value was not null.
      */
     public boolean toBoolean(Object val) {
         if (val == null) {
@@ -911,9 +911,10 @@ public class JexlArithmetic {
         } else if (val instanceof String) {
             String strval = val.toString();
             return strval.length() > 0 && !"false".equals(strval);
+        } else {
+            // non null value is true
+            return true;
         }
-        // TODO: is this a reasonable default?
-        return false;
     }
 
     /**
