@@ -21,7 +21,6 @@ package org.apache.commons.jexl3;
  * <p>Note that JEXL may use '$jexl' and '$ujexl' variables for internal purpose; setting or getting those
  * variables may lead to unexpected results unless specified otherwise.</p>
  *  @since 1.0
- *  @version $Id$
  */
 public interface JexlContext {
     /**
@@ -48,7 +47,7 @@ public interface JexlContext {
     boolean has(String name);
 
     /**
-     * 
+     *
      * This interface declares how to resolve a namespace from its name; it is used by the interpreter during
      * evalutation.
      * <p>
