@@ -70,7 +70,7 @@ public final class TemplateEngine extends JxltEngine {
     public TemplateEngine(Engine aJexl, int cacheSize) {
         this(aJexl, cacheSize, '$', '#');
     }
-    
+
     /**
      * Creates a new instance of {@link JxltEngine} creating a local cache.
      * @param aJexl the JexlEngine to use.
@@ -586,7 +586,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         protected Object evaluate(Interpreter interpreter) {
             final int size = exprs.length;
-            Object value = null;
+            Object value;
             // common case: evaluate all expressions & concatenate them as a string
             StringBuilder strb = new StringBuilder();
             for (int e = 0; e < size; ++e) {
@@ -777,7 +777,7 @@ public final class TemplateEngine extends JxltEngine {
                             inner -= 1;
                         } else {
                             // materialize the nested/deferred expr
-                            TemplateExpression dexpr = null;
+                            TemplateExpression dexpr;
                             if (nested) {
                                 dexpr = new NestedExpression(
                                         expr.substring(inested, i + 1),
@@ -843,7 +843,7 @@ public final class TemplateEngine extends JxltEngine {
         private final String body;
 
         /**
-         * Creates a new block. 
+         * Creates a new block.
          * @param theType the type
          * @param theBlock the content
          */
@@ -1057,8 +1057,8 @@ public final class TemplateEngine extends JxltEngine {
         public Object resolveNamespace(String ns) {
             if ("jexl".equals(ns)) {
                 return this;
-            } else if (wrap instanceof NamespaceResolver) {
-                return ((NamespaceResolver) wrap).resolveNamespace(ns);
+            } else if (wrap instanceof JexlContext.NamespaceResolver) {
+                return ((JexlContext.NamespaceResolver) wrap).resolveNamespace(ns);
             } else {
                 return null;
             }
@@ -1100,7 +1100,7 @@ public final class TemplateEngine extends JxltEngine {
         protected void printComposite(CompositeExpression composite) {
             TemplateExpression[] cexprs = composite.exprs;
             final int size = cexprs.length;
-            Object value = null;
+            Object value;
             for (int e = 0; e < size; ++e) {
                 value = cexprs[e].evaluate(this);
                 doPrint(value);
@@ -1165,7 +1165,7 @@ public final class TemplateEngine extends JxltEngine {
      */
     protected List<Block> readTemplate(final String prefix, Reader source) {
         try {
-            int prefixLen = prefix.length();
+            int prefixLen;
             List<Block> blocks = new ArrayList<Block>();
             BufferedReader reader;
             if (source instanceof BufferedReader) {
