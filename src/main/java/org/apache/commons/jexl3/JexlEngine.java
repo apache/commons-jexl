@@ -25,7 +25,6 @@ import java.math.MathContext;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 /**
- * <p>
  * Creates and evaluates JexlExpression and JexlScript objects.
  * Determines the behavior of expressions & scripts during their evaluation with respect to:
  * <ul>
@@ -45,6 +44,7 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
 public abstract class JexlEngine {
     /**
      * Script evaluation options.
+     * <p>The JexlContext used for evaluation can implement this interface to alter behavior.</p>
      */
     public interface Options {
         /**
@@ -59,7 +59,7 @@ public abstract class JexlEngine {
          * @return true if strict, false otherwise
          */
         Boolean isStrict();
-        
+
         /**
          * Checks whether the arithmetic triggers errors during evaluation when null is used as an operand.
          * @return true if strict, false otherwise
@@ -78,19 +78,19 @@ public abstract class JexlEngine {
          */
         int getArithmeticMathScale();
     }
-    
+
     /**
      * Gets this engine underlying {@link JexlUberspect}.
      * @return the uberspect
      */
     public abstract JexlUberspect getUberspect();
-    
+
     /**
      * Gets this engine underlying {@link JexlArithmetic}.
      * @return the arithmetic
      */
     public abstract JexlArithmetic getArithmetic();
-    
+
     /**
      * Checks whether this engine is in debug mode.
      * @return true if debug is on, false otherwise
@@ -108,7 +108,7 @@ public abstract class JexlEngine {
      * @return true if strict, false otherwise
      */
     public abstract boolean isStrict();
-    
+
     /**
      * Sets the class loader used to discover classes in 'new' expressions.
      * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
@@ -116,40 +116,38 @@ public abstract class JexlEngine {
      * @param loader the class loader to use
      */
     public abstract void setClassLoader(ClassLoader loader);
-    
+
     /**
      * Creates a new {@link JxltEngine} instance using this engine.
      * @return a Jexl Template engine
      */
     public abstract JxltEngine createJxltEngine();
-    
+
     /**
      * Clears the expression cache.
      */
     public abstract void clearCache();
 
     /**
-     * Creates an JexlExpression from a String containing valid
-     * JEXL syntax.  This method parses the expression which
-     * must contain either a reference or an expression.
+     * Creates an JexlExpression from a String containing valid JEXL syntax.
+     * This method parses the expression which must contain either a reference or an expression.
+     *
      * @param expression A String containing valid JEXL syntax
      * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
-     * @throws JexlException An exception can be thrown if there is a problem
-     * parsing this expression, or if the expression is neither an
-     * expression nor a reference.
+     * @throws JexlException An exception can be thrown if there is a problem parsing this expression, or if the
+     * expression is neither an expression nor a reference.
      */
     public abstract JexlExpression createExpression(String expression);
 
     /**
-     * Creates an JexlExpression from a String containing valid
-     * JEXL syntax.  This method parses the expression which
-     * must contain either a reference or an expression.
+     * Creates an JexlExpression from a String containing valid JEXL syntax.
+     * This method parses the expression which  must contain either a reference or an expression.
+     *
      * @param expression A String containing valid JEXL syntax
-     * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
      * @param info An info structure to carry debugging information if needed
-     * @throws JexlException An exception can be thrown if there is a problem
-     * parsing this expression, or if the expression is neither an
-     * expression or a reference.
+     * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
+     * @throws JexlException An exception can be thrown if there is a problem parsing this expression, or if the
+     * expression is neither an expression or a reference.
      */
     public abstract JexlExpression createExpression(String expression, JexlInfo info);
 
@@ -192,8 +190,7 @@ public abstract class JexlEngine {
      * Creates a Script from a {@link File} containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
      *
-     * @param scriptFile A {@link File} containing valid JEXL syntax.
-     * Must not be null. Must be a readable file.
+     * @param scriptFile A {@link File} containing valid JEXL syntax. Must not be null. Must be a readable file.
      * @return A {@link JexlScript} which can be executed with a
      * {@link JexlContext}.
      * @throws IOException if there is a problem reading the script.
@@ -205,15 +202,13 @@ public abstract class JexlEngine {
      * Creates a Script from a {@link URL} containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
      *
-     * @param scriptUrl A {@link URL} containing valid JEXL syntax.
-     * Must not be null. Must be a readable file.
+     * @param scriptUrl A {@link URL} containing valid JEXL syntax. Must not be null. Must be a readable file.
      * @return A {@link JexlScript} which can be executed with a
      * {@link JexlContext}.
      * @throws IOException if there is a problem reading the script.
      * @throws JexlException if there is a problem parsing the script.
      */
     public abstract JexlScript createScript(URL scriptUrl) throws IOException;
-
 
     /**
      * Accesses properties of a bean using an expression.
@@ -224,6 +219,7 @@ public abstract class JexlEngine {
      * <p>
      * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
+     *
      * @param bean the bean to get properties from
      * @param expr the property expression
      * @return the value of the property
@@ -236,6 +232,7 @@ public abstract class JexlEngine {
      * <p>
      * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
+     *
      * @param context the evaluation context
      * @param bean the bean to get properties from
      * @param expr the property expression
@@ -253,6 +250,7 @@ public abstract class JexlEngine {
      * <p>
      * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
+     *
      * @param bean the bean to set properties in
      * @param expr the property expression
      * @param value the value of the property
@@ -261,10 +259,9 @@ public abstract class JexlEngine {
     public abstract void setProperty(Object bean, String expr, Object value);
 
     /**
-     * Assign properties of a bean using an expression.
-     * <p>
-     * If the JEXL engine is silent, errors will be logged through its logger as warning.
-     * </p>
+     * Assign properties of a bean using an expression. <p> If the JEXL engine is silent, errors will be logged through
+     * its logger as warning. </p>
+     *
      * @param context the evaluation context
      * @param bean the bean to set properties in
      * @param expr the property expression
@@ -272,6 +269,7 @@ public abstract class JexlEngine {
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
     public abstract void setProperty(JexlContext context, Object bean, String expr, Object value);
+
     /**
      * Invokes an object's method by name and arguments.
      * @param obj the method's invoker object
@@ -283,8 +281,7 @@ public abstract class JexlEngine {
     public abstract Object invokeMethod(Object obj, String meth, Object... args);
 
     /**
-     * Creates a new instance of an object using the most appropriate constructor
-     * based on the arguments.
+     * Creates a new instance of an object using the most appropriate constructor based on the arguments.
      * @param <T> the type of object
      * @param clazz the class to instantiate
      * @param args the constructor arguments
@@ -293,14 +290,13 @@ public abstract class JexlEngine {
     public abstract <T> T newInstance(Class<? extends T> clazz, Object... args);
 
     /**
-     * Creates a new instance of an object using the most appropriate constructor
-     * based on the arguments.
+     * Creates a new instance of an object using the most appropriate constructor based on the arguments.
      * @param clazz the name of the class to instantiate resolved through this engine's class loader
      * @param args the constructor arguments
      * @return the created object instance or null on failure when silent
      */
     public abstract Object newInstance(String clazz, Object... args);
-    
+
     /**
      * Trims the expression from front & ending spaces.
      * @param str expression to clean
@@ -327,8 +323,7 @@ public abstract class JexlEngine {
     }
 
     /**
-     * Read from a reader into a local buffer and return a String with
-     * the contents of the reader.
+     * Read from a reader into a local buffer and return a String with the contents of the reader.
      * @param scriptReader to be read.
      * @return the contents of the reader as a String.
      * @throws IOException on any error reading the reader.
