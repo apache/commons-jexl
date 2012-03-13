@@ -23,7 +23,7 @@ package org.apache.commons.jexl3;
  */
 public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResolver {
     /** The property solving jexl engine. */
-    private final JexlEngine jexl;
+    protected final JexlEngine jexl;
     /** The object serving as context provider. */
     protected final T object;
 
