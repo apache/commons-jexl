@@ -25,12 +25,11 @@ import java.math.MathContext;
 /**
  * Perform arithmetic.
  * <p>
- * All arithmetic operators (+, - , *, /, %) follow the same rules regarding their arguments.
+ * The 5 arithmetic operators (+, - , *, /, %) follow the same evaluation rules regarding their arguments.
  * <ol>
  * <li>If both are null, result is 0</li>
- * <li>If either is a BigDecimal, coerce both to BigDecimal and and perform operation</li>
+ * <li>If either is a BigDecimal, coerce both to BigDecimal and  perform operation</li>
  * <li>If either is a floating point number, coerce both to Double and perform operation</li>
- * <li>If both are BigInteger, treat as BigInteger and perform operation</li>
  * <li>Else treat as BigInteger, perform operation and attempt to narrow result:
  * <ol>
  * <li>if both arguments can be narrowed to Integer, narrow result to Integer</li>
@@ -40,7 +39,7 @@ import java.math.MathContext;
  * </li>
  * </ol>
  * </p>
- * Note that the only exception throw by JexlArithmetic is ArithmeticException.
+ * Note that the only exception thrown by JexlArithmetic is ArithmeticException.
  * @since 2.0
  */
 public class JexlArithmetic {
@@ -166,16 +165,6 @@ public class JexlArithmetic {
         if (isStrict()) {
             throw new ArithmeticException(JexlException.NULL_OPERAND);
         }
-    }
-
-    /**
-     * Test if either left or right are either a Float or Double.
-     * @param left one object to test
-     * @param right the other
-     * @return the result of the test.
-     */
-    protected boolean isFloatingPointType(Object left, Object right) {
-        return left instanceof Float || left instanceof Double || right instanceof Float || right instanceof Double;
     }
 
     /**
@@ -452,40 +441,37 @@ public class JexlArithmetic {
      * @param right second value
      * @return left + right.
      */
-    public Object add(Object left, Object right) {
-        if (left == null && right == null) {
-            return controlNullNullOperands();
+        public Object add(Object left, Object right) {
+            if (left == null && right == null) {
+                return controlNullNullOperands();
+            }
+            try {
+                // if either are bigdecimal use that type
+                if (left instanceof BigDecimal || right instanceof BigDecimal) {
+                    BigDecimal l = toBigDecimal(left);
+                    BigDecimal r = toBigDecimal(right);
+                    BigDecimal result = l.add(r, getMathContext());
+                    return narrowBigDecimal(left, right, result);
+                }
+                // if either are floating point (double or float) use double
+                if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
+                    double l = toDouble(left);
+                    double r = toDouble(right);
+                    return new Double(l + r);
+                }
+                // otherwise treat as integers
+                BigInteger l = toBigInteger(left);
+                BigInteger r = toBigInteger(right);
+                BigInteger result = l.add(r);
+                return narrowBigInteger(left, right, result);
+            } catch (java.lang.NumberFormatException nfe) {
+                // Well, use strings!
+                if (left == null || right == null) {
+                    controlNullOperand();
+                }
+                return toString(left).concat(toString(right));
+            }
         }
-
-        try {
-            // if either are floating point (double or float) use double
-            if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-                double l = toDouble(left);
-                double r = toDouble(right);
-                return new Double(l + r);
-            }
-
-            // if either are bigdecimal use that type
-            if (left instanceof BigDecimal || right instanceof BigDecimal) {
-                BigDecimal l = toBigDecimal(left);
-                BigDecimal r = toBigDecimal(right);
-                BigDecimal result = l.add(r, getMathContext());
-                return narrowBigDecimal(left, right, result);
-            }
-
-            // otherwise treat as integers
-            BigInteger l = toBigInteger(left);
-            BigInteger r = toBigInteger(right);
-            BigInteger result = l.add(r);
-            return narrowBigInteger(left, right, result);
-        } catch (java.lang.NumberFormatException nfe) {
-            // Well, use strings!
-            if (left == null || right == null) {
-                controlNullOperand();
-            }
-            return toString(left).concat(toString(right));
-        }
-    }
 
     /**
      * Divide the left value by the right.
@@ -498,17 +484,6 @@ public class JexlArithmetic {
         if (left == null && right == null) {
             return controlNullNullOperands();
         }
-
-        // if either are floating point (double or float) use double
-        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            double l = toDouble(left);
-            double r = toDouble(right);
-            if (r == 0.0) {
-                throw new ArithmeticException("/");
-            }
-            return new Double(l / r);
-        }
-
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
@@ -519,7 +494,15 @@ public class JexlArithmetic {
             BigDecimal result = l.divide(r, getMathContext());
             return narrowBigDecimal(left, right, result);
         }
-
+        // if either are floating point (double or float) use double
+        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
+            double l = toDouble(left);
+            double r = toDouble(right);
+            if (r == 0.0) {
+                throw new ArithmeticException("/");
+            }
+            return new Double(l / r);
+        }
         // otherwise treat as integers
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
@@ -541,17 +524,6 @@ public class JexlArithmetic {
         if (left == null && right == null) {
             return controlNullNullOperands();
         }
-
-        // if either are floating point (double or float) use double
-        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            double l = toDouble(left);
-            double r = toDouble(right);
-            if (r == 0.0) {
-                throw new ArithmeticException("%");
-            }
-            return new Double(l % r);
-        }
-
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
@@ -562,7 +534,15 @@ public class JexlArithmetic {
             BigDecimal remainder = l.remainder(r, getMathContext());
             return narrowBigDecimal(left, right, remainder);
         }
-
+        // if either are floating point (double or float) use double
+        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
+            double l = toDouble(left);
+            double r = toDouble(right);
+            if (r == 0.0) {
+                throw new ArithmeticException("%");
+            }
+            return new Double(l % r);
+        }
         // otherwise treat as integers
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
@@ -583,14 +563,6 @@ public class JexlArithmetic {
         if (left == null && right == null) {
             return controlNullNullOperands();
         }
-
-        // if either are floating point (double or float) use double
-        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            double l = toDouble(left);
-            double r = toDouble(right);
-            return new Double(l * r);
-        }
-
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
@@ -598,7 +570,12 @@ public class JexlArithmetic {
             BigDecimal result = l.multiply(r, getMathContext());
             return narrowBigDecimal(left, right, result);
         }
-
+        // if either are floating point (double or float) use double
+        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
+            double l = toDouble(left);
+            double r = toDouble(right);
+            return new Double(l * r);
+        }
         // otherwise treat as integers
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
@@ -616,14 +593,6 @@ public class JexlArithmetic {
         if (left == null && right == null) {
             return controlNullNullOperands();
         }
-
-        // if either are floating point (double or float) use double
-        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-            double l = toDouble(left);
-            double r = toDouble(right);
-            return new Double(l - r);
-        }
-
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
@@ -631,7 +600,12 @@ public class JexlArithmetic {
             BigDecimal result = l.subtract(r, getMathContext());
             return narrowBigDecimal(left, right, result);
         }
-
+        // if either are floating point (double or float) use double
+        if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
+            double l = toDouble(left);
+            double r = toDouble(right);
+            return new Double(l - r);
+        }
         // otherwise treat as integers
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
