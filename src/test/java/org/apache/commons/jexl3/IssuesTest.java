@@ -785,4 +785,18 @@ public class IssuesTest extends JexlTestCase {
         Object myObjectWithTernaryConditional = myJexlEngine.createScript(myName + "?:null").execute(myMapContext);
         assertEquals(myValue, myObjectWithTernaryConditional);
     }
+
+    public void test131() throws Exception {
+        BigDecimal sevendot475 = new BigDecimal("7.475");
+        BigDecimal SO = new BigDecimal("325");
+        JexlContext jc = new MapContext();
+        jc.set("SO", SO);
+
+        JexlEngine jexl = new Engine();
+        String expr = "2.3*SO/100";
+
+        Object evaluate = jexl.createExpression(expr).evaluate(jc);
+        assertEquals(sevendot475, (BigDecimal) evaluate);
+    }
+
 }
