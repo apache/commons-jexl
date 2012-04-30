@@ -33,7 +33,6 @@ import java.util.Set;
  */
 public class JXLTTest extends JexlTestCase {
     private static final JexlEngine ENGINE = new JexlBuilder().silent(false).cache(128).strict(true).create();
-
     private static final JxltEngine JXLT = ENGINE.createJxltEngine();
     private static final Log LOG = LogFactory.getLog(JxltEngine.class);
     private MapContext vars = new MapContext();
@@ -56,7 +55,7 @@ public class JXLTTest extends JexlTestCase {
     private String getSource(String tostring) {
         int len = tostring.length();
         int sc = tostring.lastIndexOf(" /*= ");
-        if (sc >= 0)  {
+        if (sc >= 0) {
             sc += " /*= ".length();
         }
         int ec = tostring.lastIndexOf(" */");
@@ -128,7 +127,7 @@ public class JXLTTest extends JexlTestCase {
     }
 
     boolean contains(Set<List<String>> set, List<String> list) {
-        for(List<String> sl : set) {
+        for (List<String> sl : set) {
             if (sl.equals(list)) {
                 return true;
             }
@@ -347,10 +346,10 @@ public class JXLTTest extends JexlTestCase {
 
     public void testPrepareTemplate() throws Exception {
         String source =
-                 "$$ for(var x : list) {\n"
-               + "${l10n}=#{x}\n"
-               + "$$ }\n";
-        int[] args = { 42 };
+                "$$ for(var x : list) {\n"
+                + "${l10n}=#{x}\n"
+                + "$$ }\n";
+        int[] args = {42};
         JxltEngine.Template tl10n = JXLT.createTemplate(source, "list");
         String dstr = tl10n.asString();
         assertNotNull(dstr);
@@ -375,7 +374,7 @@ public class JXLTTest extends JexlTestCase {
 
     public void test42() throws Exception {
         String test42 =
-                  "$$ for(var x : list) {\n"
+                "$$ for(var x : list) {\n"
                 + "$$   if (x == 42) {\n"
                 + "Life, the universe, and everything\n"
                 + "$$   } else if (x > 42) {\n"
@@ -390,7 +389,7 @@ public class JXLTTest extends JexlTestCase {
         t.evaluate(context, strw, list);
         String output = strw.toString();
         String out42 =
-                  "The value 1 is under fourty-two\n"
+                "The value 1 is under fourty-two\n"
                 + "The value 3 is under fourty-two\n"
                 + "The value 5 is under fourty-two\n"
                 + "Life, the universe, and everything\n"
@@ -424,5 +423,23 @@ public class JXLTTest extends JexlTestCase {
         JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader("$$$jexl.print(froboz)"), "froboz");
         t.evaluate(context, writer, froboz);
         assertEquals("froboz{42}", writer.toString());
+    }
+
+    public void testReport() throws Exception {
+        String rpt =
+                "<report>\n"
+                + "\n"
+                + "\n$$ var x = 2;"
+                + "\n"
+                + "\n     $$ var y = 9;"
+                + "\n"
+                + "\n        ${x + y}"
+                + "\n</report>\n";
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
+        StringWriter strw = new StringWriter();
+        t.evaluate(context, strw);
+        String output = strw.toString();
+        String ctl = "<report>\n\n\n        11</report>";
+        assertEquals(ctl, output);
     }
 }
