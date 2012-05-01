@@ -40,7 +40,7 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
     public Number getLiteral() {
         return literal;
     }
-    
+
     /** {@inheritDoc} */
     @Override
     protected boolean isConstant(boolean literal) {
@@ -124,28 +124,27 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
         switch (s.charAt(last)) {
             case 'b':
             case 'B': {
-                result = new BigDecimal(s.substring(0, last));
                 rclass = BigDecimal.class;
-                break;
-            }
-            case 'd':
-            case 'D': {
-                rclass = Double.class;
-                result = Double.valueOf(s);
+                result = new BigDecimal(s.substring(0, last));
                 break;
             }
             case 'f':
-            case 'F':
-            default: {
+            case 'F': {
                 rclass = Float.class;
+                result = Float.valueOf(s.substring(0, last));
+                break;
+            }
+            case 'd':
+            case 'D':
+                rclass = Double.class;
+                result = Double.valueOf(s.substring(0, last));
+                break;
+            default: {
+                rclass = Double.class;
                 try {
-                    result = Float.valueOf(s);
-                } catch (NumberFormatException take2) {
-                    try {
-                        result = Double.valueOf(s);
-                    } catch (NumberFormatException take3) {
-                        result = new BigDecimal(s);
-                    }
+                    result = Double.valueOf(s);
+                } catch (NumberFormatException take3) {
+                    result = new BigDecimal(s);
                 }
                 break;
             }

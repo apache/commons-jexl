@@ -49,7 +49,7 @@ public class IssuesTest extends JexlTestCase {
         assertEquals(42.0d, vars.get("d"));
         assertEquals(56.3f, vars.get("e"));
         assertEquals(56.3f, vars.get("f"));
-        assertEquals(63.5f, vars.get("g"));
+        assertEquals(63.5, vars.get("g"));
         assertEquals(0x10, vars.get("h"));
         assertEquals(010, vars.get("i"));
         assertEquals(0x10L, vars.get("j"));
@@ -455,7 +455,7 @@ public class IssuesTest extends JexlTestCase {
         }
     }
 
-// A's class definition 
+// A's class definition
     public static class A105 {
         String nameA;
         String propA;
@@ -719,21 +719,22 @@ public class IssuesTest extends JexlTestCase {
         s = jexl.createScript("foo.'q u u x'");
         result = s.execute(jc);
         assertEquals("456", result);
-        
+
         Debugger dbg = new Debugger();
         dbg.debug(((ExpressionImpl) s).script);
         String dbgdata = dbg.data();
         assertEquals("foo.'q u u x';", dbgdata);
     }
-        
+
     public static class Container {
         String value0;
         int value1;
+
         public Container(String name, int number) {
             value0 = name;
             value1 = number;
         }
-        
+
         public Object getProperty(String name) {
             if ("name".equals(name)) {
                 return value0;
@@ -743,6 +744,7 @@ public class IssuesTest extends JexlTestCase {
                 return null;
             }
         }
+
         public Object getProperty(int ref) {
             if (0 == ref) {
                 return value0;
@@ -752,24 +754,25 @@ public class IssuesTest extends JexlTestCase {
                 return null;
             }
         }
-        
+
         public void setProperty(String name, String value) {
             if ("name".equals(name)) {
                 this.value0 = value;
             }
-        }  
-        
+        }
+
         public void setProperty(String name, int value) {
             if ("number".equals(name)) {
                 this.value1 = value;
             }
-        }        
+        }
+
         public void setProperty(int ref, String value) {
             if (0 == ref) {
                 this.value0 = value;
             }
-        }  
-        
+        }
+
         public void setProperty(int ref, int value) {
             if (1 == ref) {
                 this.value1 = value;
@@ -782,49 +785,141 @@ public class IssuesTest extends JexlTestCase {
         Container quux = new Container("quux", 42);
         Script get;
         Object result;
-        
+
         Script getName = jexl.createScript("foo.property.name", "foo");
         result = getName.execute(null, quux);
         assertEquals("quux", result);
-        
+
         Script get0 = jexl.createScript("foo.property.0", "foo");
         result = get0.execute(null, quux);
         assertEquals("quux", result);
-        
+
         Script getNumber = jexl.createScript("foo.property.number", "foo");
         result = getNumber.execute(null, quux);
         assertEquals(42, result);
-        
+
         Script get1 = jexl.createScript("foo.property.1", "foo");
         result = get1.execute(null, quux);
         assertEquals(42, result);
-        
+
         Script setName = jexl.createScript("foo.property.name = $0", "foo", "$0");
         setName.execute(null, quux, "QUUX");
         result = getName.execute(null, quux);
         assertEquals("QUUX", result);
         result = get0.execute(null, quux);
         assertEquals("QUUX", result);
-        
+
         Script set0 = jexl.createScript("foo.property.0 = $0", "foo", "$0");
         set0.execute(null, quux, "BAR");
         result = getName.execute(null, quux);
         assertEquals("BAR", result);
         result = get0.execute(null, quux);
         assertEquals("BAR", result);
-        
+
         Script setNumber = jexl.createScript("foo.property.number = $0", "foo", "$0");
         setNumber.execute(null, quux, -42);
         result = getNumber.execute(null, quux);
         assertEquals(-42, result);
         result = get1.execute(null, quux);
         assertEquals(-42, result);
-        
+
         Script set1 = jexl.createScript("foo.property.1 = $0", "foo", "$0");
         set1.execute(null, quux, 24);
         result = getNumber.execute(null, quux);
         assertEquals(24, result);
         result = get1.execute(null, quux);
         assertEquals(24, result);
+    }
+
+    public static class Foo125 {
+        public String method() {
+            return "OK";
+        }
+    }
+
+    public static class Foo125Context implements JexlContext, NamespaceResolver {
+        private final JexlEngine jexl;
+        private final Foo125 object;
+
+        @Override
+        public Object resolveNamespace(String name) {
+            if (name == null) {
+                return object;
+            } else {
+                return null;
+            }
+        }
+
+        public Foo125Context(JexlEngine engine, Foo125 wrapped) {
+            this.jexl = engine;
+            this.object = wrapped;
+        }
+
+        public Object get(String name) {
+            return jexl.getProperty(object, name);
+        }
+
+        public void set(String name, Object value) {
+            jexl.setProperty(object, name, value);
+        }
+
+        public boolean has(String name) {
+            return jexl.getUberspect().getPropertyGet(object, name, null) != null;
+        }
+    }
+
+    public void test125() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        Expression e = jexl.createExpression("method()");
+        JexlContext jc = new Foo125Context(jexl, new Foo125());
+        assertEquals("OK", e.evaluate(jc));
+    }
+
+    public void testReturnIssue() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        String[] items = {"foo", "bar", "quux"};
+        Script s = jexl.createScript("for(var x : items) { if(x.equals(y)) { return true; } }", "items", "y");
+        Object r = s.execute(null, items, "bar");
+        assertEquals(true, r);
+        r = s.execute(null, items, "froboz");
+        assertNull(r);
+        JexlContext ctxt = new MapContext();
+        ctxt.set("items", items);
+        ctxt.set("y", "bar");
+        s = jexl.createScript("for(x : items) { if(x.equals(y)) { return true; } }");
+        r = s.execute(ctxt);
+        assertEquals(true, r);
+        ctxt.set("y", "froboz");
+        r = s.execute(ctxt);
+        assertNull(r);
+    }
+
+    public void test130a() throws Exception {
+        String myName = "Test.Name";
+        Object myValue = "Test.Value";
+
+        JexlEngine myJexlEngine = new JexlEngine();
+        MapContext myMapContext = new MapContext();
+        myMapContext.set(myName, myValue);
+
+        Object myObjectWithTernaryConditional = myJexlEngine.createScript(myName + "?:null").execute(myMapContext);
+        assertEquals(myValue, myObjectWithTernaryConditional);
+    }
+
+    public void test130b() throws Exception {
+        String myName = "Test.Name";
+        Object myValue = new Object() {
+            @Override
+            public String toString() {
+                return "Test.Value";
+            }
+        };
+
+        JexlEngine myJexlEngine = new JexlEngine();
+        MapContext myMapContext = new MapContext();
+        myMapContext.set(myName, myValue);
+
+        Object myObjectWithTernaryConditional = myJexlEngine.createScript(myName + "?:null").execute(myMapContext);
+        assertEquals(myValue, myObjectWithTernaryConditional);
     }
 }

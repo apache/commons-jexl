@@ -985,7 +985,7 @@ public final class UnifiedJEXL {
         private final String body;
 
         /**
-         * Creates a new block. 
+         * Creates a new block.
          * @param theType the type
          * @param theBlock the content
          */
@@ -1007,7 +1007,7 @@ public final class UnifiedJEXL {
      * <p>
      * The source text is parsed considering each line beginning with '$$' (as default pattern) as JEXL script code
      * and all others as Unified JEXL expressions; those expressions will be invoked from the script during
-     * evaluation and their output gathered through a writer. 
+     * evaluation and their output gathered through a writer.
      * It is thus possible to use looping or conditional construct "around" expressions generating output.
      * </p>
      * For instance:
@@ -1341,22 +1341,22 @@ public final class UnifiedJEXL {
      * Whether a sequence starts with a given set of characters (following spaces).
      * <p>Space characters at beginning of line before the pattern are discarded.</p>
      * @param sequence the sequence
-     * @param pattern the pattern to match at start of sequence
+     * @param pattern  the pattern to match at start of sequence
      * @return the first position after end of pattern if it matches, -1 otherwise
-     * @since 2.1
      */
     protected int startsWith(CharSequence sequence, CharSequence pattern) {
+        int length = sequence.length();
         int s = 0;
-        while (Character.isSpaceChar(sequence.charAt(s))) {
+        while (s < length && Character.isSpaceChar(sequence.charAt(s))) {
             s += 1;
         }
-        sequence = sequence.subSequence(s, sequence.length());
-        if (pattern.length() <= sequence.length()
-                && sequence.subSequence(0, pattern.length()).equals(pattern)) {
-            return s + pattern.length();
-        } else {
-            return -1;
+        if (s < length && pattern.length() <= (length - s)) {
+            sequence = sequence.subSequence(s, length);
+            if (sequence.subSequence(0, pattern.length()).equals(pattern)) {
+                return s + pattern.length();
+            }
         }
+        return -1;
     }
 
     /**
@@ -1368,7 +1368,7 @@ public final class UnifiedJEXL {
      */
     protected List<TemplateBlock> readTemplate(final String prefix, Reader source) {
         try {
-            int prefixLen = prefix.length();
+            int prefixLen;
             List<TemplateBlock> blocks = new ArrayList<TemplateBlock>();
             BufferedReader reader;
             if (source instanceof BufferedReader) {

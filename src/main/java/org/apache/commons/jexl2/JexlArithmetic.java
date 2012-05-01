@@ -57,7 +57,8 @@ public class JexlArithmetic {
      * @since 2.1
      */
     protected static final int BIGD_SCALE = -1;
-    /** Whether this JexlArithmetic instance behaves in strict or lenient mode.
+    /**
+     * Whether this JexlArithmetic instance behaves in strict or lenient mode.
      * May be made final in a later version.
      */
     private volatile boolean strict;

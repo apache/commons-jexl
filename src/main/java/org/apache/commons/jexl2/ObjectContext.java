@@ -23,9 +23,9 @@ package org.apache.commons.jexl2;
  */
 public class ObjectContext<T> implements JexlContext {
     /** The property solving jexl engine. */
-    private final JexlEngine jexl;
+    protected final JexlEngine jexl;
     /** The object serving as context provider. */
-    private final T object;
+    protected final T object;
 
     /**
      * Creates a new ObjectContext.

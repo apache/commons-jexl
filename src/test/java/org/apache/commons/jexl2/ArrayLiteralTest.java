@@ -47,7 +47,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         JexlContext jc = new MapContext();
 
         Object o = e.evaluate( jc );
-        Object[] check = { new Float(5), new Integer(10) };
+        Object[] check = { new Double(5), new Integer(10) };
         assertTrue( Arrays.equals(check, (Object[])o) );
         assertTrue (o.getClass().isArray() && o.getClass().getComponentType().equals(Number.class));
     }
@@ -59,7 +59,7 @@ public class ArrayLiteralTest extends JexlTestCase {
             "[ 10 , null , 10]",
             "[ '10' , null ]",
             "[ null, '10' , null ]"
-        }; 
+        };
         Object [][]checks = {
             {null, new Integer(10)},
             {new Integer(10), null},

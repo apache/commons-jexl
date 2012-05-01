@@ -86,7 +86,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Unwraps the cause of a throwable due to reflection. 
+     * Unwraps the cause of a throwable due to reflection.
      * @param xthrow the throwable
      * @return the cause
      */
@@ -260,8 +260,8 @@ public class JexlException extends RuntimeException {
          * @param node the offending ASTnode
          * @param var the unknown variable
          */
-        public Property(JexlNode node, String var) {
-            super(node, var);
+        public Property(JexlNode node, String var, Throwable cause) {
+            super(node, var, cause);
         }
 
         /**
@@ -287,8 +287,8 @@ public class JexlException extends RuntimeException {
          * @param node the offending ASTnode
          * @param name the unknown method
          */
-        public Method(JexlNode node, String name) {
-            super(node, name);
+        public Method(JexlNode node, String name, Throwable cause) {
+            super(node, name, cause);
         }
 
         /**

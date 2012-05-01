@@ -151,7 +151,7 @@ public class JexlEngine {
      */
     protected final Parser parser = new Parser(new StringReader(";")); //$NON-NLS-1$
     /**
-     * Whether expressions evaluated by this engine will throw exceptions (false) or 
+     * Whether expressions evaluated by this engine will throw exceptions (false) or
      * return null (true) on errors. Default is false.
      */
     // TODO could this be private?
@@ -161,6 +161,10 @@ public class JexlEngine {
      */
     // TODO could this be private?
     protected volatile boolean debug = true;
+    /**
+     * Whether this engine baehaves in strict mode.
+     */
+    private volatile boolean strict = false;
     /**
      *  The map of 'prefix:function' to object implementing the functions.
      */
@@ -201,6 +205,7 @@ public class JexlEngine {
         if (theFunctions != null) {
             this.functions = theFunctions;
         }
+        this.strict = !this.arithmetic.isLenient();
     }
 
     /**
@@ -275,7 +280,7 @@ public class JexlEngine {
     public boolean isSilent() {
         return this.silent;
     }
-    
+
     /**
      * Sets whether this engine considers unknown variables, methods and constructors as errors or evaluates them
      * as null or zero.
@@ -289,6 +294,7 @@ public class JexlEngine {
      */
     @SuppressWarnings("deprecation")
     public void setLenient(boolean flag) {
+        strict = !flag;
         if (arithmetic instanceof JexlThreadedArithmetic) {
             JexlThreadedArithmetic.setLenient(Boolean.valueOf(flag));
         } else {
@@ -301,7 +307,7 @@ public class JexlEngine {
      * @return true if lenient, false if strict
      */
     public boolean isLenient() {
-        return arithmetic.isLenient();
+        return !strict;
     }
 
     /**
@@ -940,7 +946,7 @@ public class JexlEngine {
                             if (image == null) {
                                 var.add(new Debugger().data(desc));
                             } else {
-                                var.add(image); 
+                                var.add(image);
                             }
                         } else if (desc instanceof ASTIdentifier) {
                             if (((ASTIdentifier) desc).getRegister() < 0) {
@@ -1066,7 +1072,7 @@ public class JexlEngine {
         }
 
         /**
-         * Checks whether an identifier is a local variable or argument, ie stored in a register. 
+         * Checks whether an identifier is a local variable or argument, ie stored in a register.
          * @param name the register name
          * @return the register index
          */
@@ -1175,7 +1181,7 @@ public class JexlEngine {
         private Object[] registers = null;
         /** Parameter and argument names if any. */
         private String[] parameters = null;
-        
+
         /**
          * Creates a new frame.
          * @param r the registers
@@ -1185,14 +1191,14 @@ public class JexlEngine {
             registers = r;
             parameters = p;
         }
-        
+
         /**
          * @return the registers
          */
         public Object[] getRegisters() {
             return registers;
         }
-                
+
         /**
          * @return the parameters
          */

@@ -107,7 +107,7 @@ public class Interpreter implements ParserVisitor {
     protected final JexlContext context;
     /** Strict interpreter flag. Do not modify; will be made final/private in a later version. */
     protected boolean strict;
-    /** Silent intepreter flag.  Do not modify; will be made final/private in a later version. */
+    /** Silent intepreter flag. Do not modify; will be made final/private in a later version. */
     protected boolean silent;
     /** Cache executors. */
     protected final boolean cache;
@@ -116,26 +116,24 @@ public class Interpreter implements ParserVisitor {
     /**
      * Parameter names if any.
      * Intended for use in debugging; not currently used externally.
-     * @since 2.1 
+     * @since 2.1
      */
     @SuppressWarnings("unused")
     private String[] parameters = null;
-
-    /** 
+    /**
      * Cancellation support.
      * @see #isCancelled()
      * @since 2.1
      */
     private volatile boolean cancelled = false;
-
     /** Empty parameters for method matching. */
     protected static final Object[] EMPTY_PARAMS = new Object[0];
 
     /**
      * Creates an interpreter.
-     * @param jexl the engine creating this interpreter
+     * @param jexl     the engine creating this interpreter
      * @param aContext the context to evaluate expression
-     * @deprecated 
+     * @deprecated
      */
     @Deprecated
     public Interpreter(JexlEngine jexl, JexlContext aContext) {
@@ -144,8 +142,8 @@ public class Interpreter implements ParserVisitor {
 
     /**
      * Creates an interpreter.
-     * @param jexl the engine creating this interpreter
-     * @param aContext the context to evaluate expression
+     * @param jexl       the engine creating this interpreter
+     * @param aContext   the context to evaluate expression
      * @param strictFlag whether this interpreter runs in strict mode
      * @param silentFlag whether this interpreter runs in silent mode
      * @since 2.1
@@ -158,7 +156,7 @@ public class Interpreter implements ParserVisitor {
         this.strict = strictFlag;
         this.silent = silentFlag;
         this.cache = jexl.cache != null;
-        this.context = aContext != null? aContext : JexlEngine.EMPTY_CONTEXT;
+        this.context = aContext != null ? aContext : JexlEngine.EMPTY_CONTEXT;
         this.functors = null;
     }
 
@@ -178,12 +176,12 @@ public class Interpreter implements ParserVisitor {
         this.context = base.context;
         this.functors = base.functors;
     }
-    
+
     /**
      * Sets whether this interpreter considers unknown variables, methods and constructors as errors.
      * @param flag true for strict, false for lenient
      * @deprecated Do not use; will be removed in a later version
-     * @since 2.1 
+     * @since 2.1
      */
     // TODO why add a method and then deprecate it?
     @Deprecated
@@ -245,7 +243,7 @@ public class Interpreter implements ParserVisitor {
             registers = null;
         }
     }
-    
+
     /**
      * Gets the context.
      * @return the {@link JexlContext} used for evaluation.
@@ -297,9 +295,9 @@ public class Interpreter implements ParserVisitor {
 
     /**
      * Finds the node causing a NPE for diadic operators.
-     * @param xrt the RuntimeException
-     * @param node the parent node
-     * @param left the left argument
+     * @param xrt   the RuntimeException
+     * @param node  the parent node
+     * @param left  the left argument
      * @param right the right argument
      * @return the left, right or parent node
      */
@@ -363,7 +361,7 @@ public class Interpreter implements ParserVisitor {
      * The lifetime of such instances span the current expression or script evaluation.
      *
      * @param prefix the prefix name (may be null for global namespace)
-     * @param node the AST node
+     * @param node   the AST node
      * @return the namespace instance
      */
     protected Object resolveNamespace(String prefix, JexlNode node) {
@@ -998,10 +996,10 @@ public class Interpreter implements ParserVisitor {
      * 2 - if this fails, narrow the arguments and try again
      * 3 - if this still fails, seeks a Script or JexlMethod as a property of that bean.
      * </p>
-     * @param node the method node
-     * @param bean the bean this method should be invoked upon
+     * @param node       the method node
+     * @param bean       the bean this method should be invoked upon
      * @param methodNode the node carrying the method name
-     * @param argb the first argument index, child of the method node
+     * @param argb       the first argument index, child of the method node
      * @return the result of the method invocation
      */
     private Object call(JexlNode node, Object bean, ASTIdentifier methodNode, int argb) {
@@ -1059,7 +1057,7 @@ public class Interpreter implements ParserVisitor {
                         vm = (JexlMethod) functor;
                         cacheable = false;
                     } else {
-                        xjexl = new JexlException.Method(node, methodName);
+                        xjexl = new JexlException.Method(node, methodName, null);
                     }
                 }
             }
@@ -1072,10 +1070,10 @@ public class Interpreter implements ParserVisitor {
                 }
                 return eval;
             }
-        } catch (InvocationTargetException e) {
-            xjexl = new JexlException(node, "method invocation error", e.getCause());
-        } catch (Exception e) {
-            xjexl = new JexlException(node, "method error", e);
+        } catch (JexlException xany) {
+            xjexl = xany;
+        } catch (Exception xany) {
+            xjexl = new JexlException.Method(node, methodName, xany);
         }
         return invocationFailed(xjexl);
     }
@@ -1144,7 +1142,7 @@ public class Interpreter implements ParserVisitor {
                     ctor = uberspect.getConstructorMethod(cobject, argv, node);
                 }
                 if (ctor == null) {
-                    xjexl = new JexlException.Method(node, cobject.toString());
+                    xjexl = new JexlException.Method(node, cobject.toString(), null);
                 }
             }
             if (xjexl == null) {
@@ -1156,9 +1154,11 @@ public class Interpreter implements ParserVisitor {
                 return instance;
             }
         } catch (InvocationTargetException e) {
-            xjexl = new JexlException(node, "constructor invocation error", e.getCause());
+            xjexl = new JexlException.Method(node, cobject.toString(), e.getCause());
+        } catch (JexlException xany) {
+            xjexl = xany;
         } catch (Exception e) {
-            xjexl = new JexlException(node, "constructor error", e);
+            xjexl = new JexlException.Method(node, cobject.toString(), e);
         }
         return invocationFailed(xjexl);
     }
@@ -1292,6 +1292,18 @@ public class Interpreter implements ParserVisitor {
         return Boolean.FALSE;
     }
 
+    /**
+     * Checks whether a reference child node holds a local variable reference.
+     * @param node  the reference node
+     * @param which the child we are checking
+     * @return true if child is local variable, false otherwise
+     */
+    private boolean isLocalVariable(ASTReference node, int which) {
+        return (node.jjtGetNumChildren() > which
+                && node.jjtGetChild(which) instanceof ASTIdentifier
+                && ((ASTIdentifier) node.jjtGetChild(which)).getRegister() >= 0);
+    }
+
     /** {@inheritDoc} */
     public Object visit(ASTReference node, Object data) {
         // could be array access, identifier or map literal
@@ -1330,35 +1342,29 @@ public class Interpreter implements ParserVisitor {
             } else {
                 propertyName = theNode.image;
             }
+            isVariable &= result == null;
         }
-        if (result == null) {
-            if (isVariable && !isTernaryProtected(node)
-                    // variable unknow in context and not (from) a register
-                    && !(context.has(variableName.toString())
-                    || (numChildren == 1
-                    && node.jjtGetChild(0) instanceof ASTIdentifier
-                    && ((ASTIdentifier) node.jjtGetChild(0)).getRegister() >= 0))) {
-                JexlException xjexl = propertyName != null
-                                      ? new JexlException.Property(node, propertyName)
-                                      : new JexlException.Variable(node, variableName.toString());
-                return unknownVariable(xjexl);
-            }
+        if (result == null && isVariable && variableName != null
+                && !isTernaryProtected(node) && !(context.has(variableName.toString()) || isLocalVariable(node, 0))) {
+            JexlException xjexl = new JexlException.Variable(node, variableName.toString());
+            // variable unknown in context and not a local
+            return unknownVariable(xjexl);
         }
         return result;
     }
 
-    /** 
+    /**
      * {@inheritDoc}
-     * @since 2.1 
+     * @since 2.1
      */
     public Object visit(ASTReferenceExpression node, Object data) {
         ASTArrayAccess upper = node;
         return visit(upper, data);
     }
 
-    /** 
+    /**
      * {@inheritDoc}
-     * @since 2.1 
+     * @since 2.1
      */
     public Object visit(ASTReturnStatement node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
@@ -1465,7 +1471,7 @@ public class Interpreter implements ParserVisitor {
      * Calculate the <code>size</code> of various types: Collection, Array,
      * Map, String, and anything that has a int size() method.
      * @param node the node that gave the value to size
-     * @param val the object to get the size of.
+     * @param val  the object to get the size of.
      * @return the size of val
      */
     private int sizeOf(JexlNode node, Object val) {
@@ -1498,9 +1504,9 @@ public class Interpreter implements ParserVisitor {
     /**
      * Gets an attribute of an object.
      *
-     * @param object to retrieve value from
+     * @param object    to retrieve value from
      * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or
-     *            key for a map
+     * key for a map
      * @return the attribute value
      */
     public Object getAttribute(Object object, Object attribute) {
@@ -1510,10 +1516,9 @@ public class Interpreter implements ParserVisitor {
     /**
      * Gets an attribute of an object.
      *
-     * @param object to retrieve value from
-     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or
-     *            key for a map
-     * @param node the node that evaluated as the object
+     * @param object    to retrieve value from
+     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
+     * @param node      the node that evaluated as the object
      * @return the attribute value
      */
     protected Object getAttribute(Object object, Object attribute, JexlNode node) {
@@ -1534,6 +1539,7 @@ public class Interpreter implements ParserVisitor {
                 }
             }
         }
+        JexlException xjexl = null;
         JexlPropertyGet vg = uberspect.getPropertyGet(object, attribute, node);
         if (vg != null) {
             try {
@@ -1544,18 +1550,25 @@ public class Interpreter implements ParserVisitor {
                 }
                 return value;
             } catch (Exception xany) {
-                if (node == null) {
-                    throw new RuntimeException(xany);
-                } else {
-                    JexlException xjexl = new JexlException.Property(node, attribute.toString());
-                    if (strict) {
-                        throw xjexl;
-                    }
-                    if (!silent) {
-                        logger.warn(xjexl.getMessage());
-                    }
-                }
+                String attrStr = attribute != null ? attribute.toString() : null;
+                xjexl = new JexlException.Property(node, attrStr, xany);
             }
+        }
+        if (xjexl == null) {
+            if (node == null) {
+                String error = "unable to get object property"
+                        + ", class: " + object.getClass().getName()
+                        + ", property: " + attribute;
+                throw new UnsupportedOperationException(error);
+            }
+            String attrStr = attribute != null ? attribute.toString() : null;
+            xjexl = new JexlException.Property(node, attrStr, null);
+        }
+        if (strict) {
+            throw xjexl;
+        }
+        if (!silent) {
+            logger.warn(xjexl.getMessage());
         }
         return null;
     }
@@ -1563,10 +1576,9 @@ public class Interpreter implements ParserVisitor {
     /**
      * Sets an attribute of an object.
      *
-     * @param object to set the value to
-     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or
-     *            key for a map
-     * @param value the value to assign to the object's attribute
+     * @param object    to set the value to
+     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
+     * @param value     the value to assign to the object's attribute
      */
     public void setAttribute(Object object, Object attribute, Object value) {
         setAttribute(object, attribute, value, null);
@@ -1575,11 +1587,10 @@ public class Interpreter implements ParserVisitor {
     /**
      * Sets an attribute of an object.
      *
-     * @param object to set the value to
-     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or
-     *            key for a map
-     * @param value the value to assign to the object's attribute
-     * @param node the node that evaluated as the object
+     * @param object    to set the value to
+     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
+     * @param value     the value to assign to the object's attribute
+     * @param node      the node that evaluated as the object
      */
     protected void setAttribute(Object object, Object attribute, Object value, JexlNode node) {
         if (isCancelled()) {
@@ -1614,16 +1625,16 @@ public class Interpreter implements ParserVisitor {
                     node.jjtSetValue(vs);
                 }
                 return;
-            } catch (RuntimeException xrt) {
-                if (node == null) {
-                    throw xrt;
-                }
-                xjexl = new JexlException(node, "set object property error", xrt);
             } catch (Exception xany) {
                 if (node == null) {
-                    throw new RuntimeException(xany);
+                    if (xany instanceof RuntimeException) {
+                        throw (RuntimeException) xany;
+                    } else {
+                        throw new RuntimeException(xany);
+                    }
                 }
-                xjexl = new JexlException(node, "set object property error", xany);
+                String attrStr = attribute != null ? attribute.toString() : null;
+                xjexl = new JexlException.Property(node, attrStr, xany);
             }
         }
         if (xjexl == null) {
@@ -1634,7 +1645,8 @@ public class Interpreter implements ParserVisitor {
                         + ", argument: " + value.getClass().getSimpleName();
                 throw new UnsupportedOperationException(error);
             }
-            xjexl = new JexlException.Property(node, attribute.toString());
+            String attrStr = attribute != null ? attribute.toString() : null;
+            xjexl = new JexlException.Property(node, attrStr, null);
         }
         if (strict) {
             throw xjexl;
