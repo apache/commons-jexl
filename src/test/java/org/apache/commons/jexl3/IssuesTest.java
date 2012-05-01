@@ -738,25 +738,6 @@ public class IssuesTest extends JexlTestCase {
         assertEquals("OK", e.evaluate(jc));
     }
 
-    public static class ThrowNPE {
-        public String method() {
-            throw new NullPointerException("ThrowNPE");
-        }
-    }
-
-    public void test126() throws Exception {
-        JexlEngine jexl = new Engine();
-        JexlExpression e = jexl.createExpression("method()");
-        JexlContext jc = new ObjectContext<ThrowNPE>(jexl, new ThrowNPE());
-        try {
-            e.evaluate(jc);
-            fail("Should have thrown NPE");
-        } catch (JexlException xany) {
-            Throwable xth = xany.getCause();
-            assertEquals(NullPointerException.class, xth.getClass());
-        }
-    }
-
     public void test130a() throws Exception {
         String myName = "Test.Name";
         Object myValue = "Test.Value";
@@ -786,7 +767,7 @@ public class IssuesTest extends JexlTestCase {
         assertEquals(myValue, myObjectWithTernaryConditional);
     }
 
-    public void test131() throws Exception {
+    public void testBigdOp() throws Exception {
         BigDecimal sevendot475 = new BigDecimal("7.475");
         BigDecimal SO = new BigDecimal("325");
         JexlContext jc = new MapContext();

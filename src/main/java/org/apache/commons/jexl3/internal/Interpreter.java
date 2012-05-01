@@ -131,9 +131,9 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * Creates an interpreter.
-     * @param engine the engine creating this interpreter
+     * @param engine   the engine creating this interpreter
      * @param aContext the context to evaluate expression
-     * @param eFrame the interpreter evaluation frame
+     * @param eFrame   the interpreter evaluation frame
      */
     protected Interpreter(Engine engine, JexlContext aContext, Scope.Frame eFrame) {
         this.jexl = engine;
@@ -190,9 +190,9 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * Finds the node causing a NPE for diadic operators.
-     * @param xrt the RuntimeException
-     * @param node the parent node
-     * @param left the left argument
+     * @param xrt   the RuntimeException
+     * @param node  the parent node
+     * @param left  the left argument
      * @param right the right argument
      * @return the left, right or parent node
      */
@@ -254,7 +254,7 @@ public class Interpreter extends ParserVisitor {
      * Resolves a namespace, eventually allocating an instance using context as constructor argument. <p>The lifetime of
      * such instances span the current expression or script evaluation.</p>
      * @param prefix the prefix name (may be null for global namespace)
-     * @param node the AST node
+     * @param node   the AST node
      * @return the namespace instance
      */
     protected Object resolveNamespace(String prefix, JexlNode node) {
@@ -868,7 +868,7 @@ public class Interpreter extends ParserVisitor {
      * Check for emptyness of various types: Collection, Array, Map, String, and anything that has a boolean isEmpty()
      * method.
      *
-     * @param node the node holding the object
+     * @param node   the node holding the object
      * @param object the object to check the rmptyness of.
      * @return the boolean
      */
@@ -913,7 +913,7 @@ public class Interpreter extends ParserVisitor {
      * Calculate the
      * <code>size</code> of various types: Collection, Array, Map, String, and anything that has a int size() method.
      *
-     * @param node the node that gave the value to size
+     * @param node   the node that gave the value to size
      * @param object the object to get the size of.
      * @return the size of val
      */
@@ -1037,7 +1037,7 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * Checks whether a reference child node holds a local variable reference.
-     * @param node the reference node
+     * @param node  the reference node
      * @param which the child we are checking
      * @return true if child is local variable, false otherwise
      */
@@ -1091,7 +1091,7 @@ public class Interpreter extends ParserVisitor {
             isVariable &= object == null;
         }
         if (object == null && isVariable && variableName != null
-            && !isTernaryProtected(node) && !(context.has(variableName.toString()) || isLocalVariable(node, 0))) {
+                && !isTernaryProtected(node) && !(context.has(variableName.toString()) || isLocalVariable(node, 0))) {
             JexlException xjexl = new JexlException.Variable(node, variableName.toString());
             // variable unknown in context and not a local
             return unknownVariable(xjexl);
@@ -1272,8 +1272,8 @@ public class Interpreter extends ParserVisitor {
      * 2 - if this fails, narrow the arguments and try again
      * </p>
      *
-     * @param node the method node
-     * @param bean the bean this method should be invoked upon
+     * @param node    the method node
+     * @param bean    the bean this method should be invoked upon
      * @param functor the object carrying the method or function
      * @return the result of the method invocation
      */
@@ -1446,7 +1446,7 @@ public class Interpreter extends ParserVisitor {
     /**
      * Gets an attribute of an object.
      *
-     * @param object to retrieve value from
+     * @param object    to retrieve value from
      * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
      * @return the attribute value
      */
@@ -1457,9 +1457,9 @@ public class Interpreter extends ParserVisitor {
     /**
      * Gets an attribute of an object.
      *
-     * @param object to retrieve value from
+     * @param object    to retrieve value from
      * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
-     * @param node the node that evaluated as the object
+     * @param node      the node that evaluated as the object
      * @return the attribute value
      */
     protected Object getAttribute(Object object, Object attribute, JexlNode node) {
@@ -1517,9 +1517,9 @@ public class Interpreter extends ParserVisitor {
     /**
      * Sets an attribute of an object.
      *
-     * @param object to set the value to
+     * @param object    to set the value to
      * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
-     * @param value the value to assign to the object's attribute
+     * @param value     the value to assign to the object's attribute
      */
     public void setAttribute(Object object, Object attribute, Object value) {
         setAttribute(object, attribute, value, null);
@@ -1528,10 +1528,10 @@ public class Interpreter extends ParserVisitor {
     /**
      * Sets an attribute of an object.
      *
-     * @param object to set the value to
+     * @param object    to set the value to
      * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
-     * @param value the value to assign to the object's attribute
-     * @param node the node that evaluated as the object
+     * @param value     the value to assign to the object's attribute
+     * @param node      the node that evaluated as the object
      */
     protected void setAttribute(Object object, Object attribute, Object value, JexlNode node) {
         if (isCancelled()) {
