@@ -28,14 +28,16 @@ import java.util.Stack;
  */
 public abstract class JexlParser extends StringParser {
     /**
-     * The map of named registers aka script parameters. Each parameter is associated to a register and is materialized
-     * as an offset in the registers array used during evaluation.
+     * The map of named registers aka script parameters.
+     * <p>Each parameter is associated to a register and is materialized
+     * as an offset in the registers array used during evaluation.</p>
      */
     protected Scope frame = null;
     protected Stack<Scope> frames = new Stack<Scope>();
 
     /**
-     * Sets the frame to use bythis parser. <p> This is used to allow parameters to be declared before parsing. </p>
+     * Sets the frame to use by this parser.
+     * <p> This is used to allow parameters to be declared before parsing. </p>
      * @param theFrame the register map
      */
     public void setFrame(Scope theFrame) {
@@ -43,7 +45,8 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
-     * Gets the frame used by this parser. <p> Since local variables create new named registers, it is important to
+     * Gets the frame used by this parser.
+     * <p> Since local variables create new symbols, it is important to
      * regain access after parsing to known which / how-many registers are needed. </p>
      * @return the named register map
      */
@@ -73,7 +76,7 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
-     * Checks whether an identifier is a local variable or argument, ie stored in a register.
+     * Checks whether an identifier is a local variable or argument, ie a symbol, stored in a register.
      * @param identifier the identifier
      * @param image the identifier image
      * @return the image
@@ -89,7 +92,8 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
-     * Declares a local variable. <p> This method creates an new entry in the named register map. </p>
+     * Declares a local variable.
+     * <p> This method creates an new entry in the symbol map. </p>
      * @param identifier the identifier used to declare
      * @param image the variable name
      */
@@ -103,7 +107,8 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
-     * Declares a local parameter. <p> This method creates an new entry in the named register map. </p>
+     * Declares a local parameter.
+     * <p> This method creates an new entry in the symbol map. </p>
      * @param identifier the identifier used to declare
      * @param image the variable name
      */
