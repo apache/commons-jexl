@@ -841,7 +841,6 @@ public class IssuesTest extends JexlTestCase {
         private final JexlEngine jexl;
         private final Foo125 object;
 
-        @Override
         public Object resolveNamespace(String name) {
             if (name == null) {
                 return object;
@@ -921,5 +920,135 @@ public class IssuesTest extends JexlTestCase {
 
         Object myObjectWithTernaryConditional = myJexlEngine.createScript(myName + "?:null").execute(myMapContext);
         assertEquals(myValue, myObjectWithTernaryConditional);
+    }
+
+    public static class Arithmetic132 extends JexlArithmetic {
+        public Arithmetic132() {
+            super(false);
+        }
+
+        protected double divideZero(BigDecimal x) {
+            int ls = x.signum();
+            if (ls < 0) {
+                return Double.NEGATIVE_INFINITY;
+            } else if (ls > 0) {
+                return Double.POSITIVE_INFINITY;
+            } else {
+                return Double.NaN;
+            }
+        }
+
+        protected double divideZero(BigInteger x) {
+            int ls = x.signum();
+            if (ls < 0) {
+                return Double.NEGATIVE_INFINITY;
+            } else if (ls > 0) {
+                return Double.POSITIVE_INFINITY;
+            } else {
+                return Double.NaN;
+            }
+        }
+
+        @Override
+        public Object divide(Object left, Object right) {
+            if (left == null && right == null) {
+                return controlNullNullOperands();
+            }
+            // if either are bigdecimal use that type
+            if (left instanceof BigDecimal || right instanceof BigDecimal) {
+                BigDecimal l = toBigDecimal(left);
+                BigDecimal r = toBigDecimal(right);
+                if (BigDecimal.ZERO.equals(r)) {
+                    return divideZero(l);
+                }
+                BigDecimal result = l.divide(r, getMathContext());
+                return narrowBigDecimal(left, right, result);
+            }
+            // if either are floating point (double or float) use double
+            if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
+                double l = toDouble(left);
+                double r = toDouble(right);
+                return new Double(l / r);
+            }
+            // otherwise treat as integers
+            BigInteger l = toBigInteger(left);
+            BigInteger r = toBigInteger(right);
+            if (BigInteger.ZERO.equals(r)) {
+                return divideZero(l);
+            }
+            BigInteger result = l.divide(r);
+            return narrowBigInteger(left, right, result);
+        }
+
+        @Override
+        public Object mod(Object left, Object right) {
+            if (left == null && right == null) {
+                return controlNullNullOperands();
+            }
+            // if either are bigdecimal use that type
+            if (left instanceof BigDecimal || right instanceof BigDecimal) {
+                BigDecimal l = toBigDecimal(left);
+                BigDecimal r = toBigDecimal(right);
+                if (BigDecimal.ZERO.equals(r)) {
+                    return divideZero(l);
+                }
+                BigDecimal remainder = l.remainder(r, getMathContext());
+                return narrowBigDecimal(left, right, remainder);
+            }
+            // if either are floating point (double or float) use double
+            if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
+                double l = toDouble(left);
+                double r = toDouble(right);
+                return new Double(l % r);
+            }
+            // otherwise treat as integers
+            BigInteger l = toBigInteger(left);
+            BigInteger r = toBigInteger(right);
+            BigInteger result = l.mod(r);
+            if (BigInteger.ZERO.equals(r)) {
+                return divideZero(l);
+            }
+            return narrowBigInteger(left, right, result);
+        }
+    }
+
+    JexlEngine createJexl132() {
+        Map<String, Object> ns = new HashMap<String, Object>();
+        ns.put("math", Math.class);
+        return new JexlEngine(null, new Arithmetic132(), ns, null);
+
+    }
+
+    public void test132a() throws Exception {
+        JexlEngine jexl = createJexl132();
+        String expr = "1/0";
+
+        Object evaluate = jexl.createExpression(expr).evaluate(null);
+        assertTrue(Double.isInfinite((Double) evaluate));
+
+        expr = "-1/0";
+        evaluate = jexl.createExpression(expr).evaluate(null);
+        assertTrue(Double.isInfinite((Double) evaluate));
+    }
+
+    public void test132b() throws Exception {
+        JexlEngine jexl = createJexl132();
+        String expr = "1.0/0.0";
+
+        Object evaluate = jexl.createExpression(expr).evaluate(null);
+        assertTrue(Double.isInfinite((Double) evaluate));
+
+        expr = "-1.0/0";
+        evaluate = jexl.createExpression(expr).evaluate(null);
+        assertTrue(Double.isInfinite((Double) evaluate));
+    }
+
+    public void test132c() throws Exception {
+        JexlEngine jexl = createJexl132();
+
+        String expr = "math:abs(-42)";
+
+        Object evaluate = jexl.createExpression(expr).evaluate(null);
+        assertEquals(42, evaluate);
     }
 }

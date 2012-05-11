@@ -880,7 +880,10 @@ public class Interpreter implements ParserVisitor {
     }
 
     /**
-     * @deprecated Do not use
+     * @deprecated. Do not use.
+     * @param node that can no longer be produced by the grammar
+     * @param data that will not be used
+     * @return throws UnsupportedOperationException
      */
     @Deprecated
     public Object visit(ASTFloatLiteral node, Object data) {
@@ -888,7 +891,10 @@ public class Interpreter implements ParserVisitor {
     }
 
     /**
-     * @deprecated Do not use
+     * @deprecated. Do not use.
+     * @param node that can no longer be produced by the grammar
+     * @param data that will not be used
+     * @return throws UnsupportedOperationException
      */
     @Deprecated
     public Object visit(ASTIntegerLiteral node, Object data) {

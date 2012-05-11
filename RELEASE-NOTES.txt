@@ -17,7 +17,7 @@
 $Id$
 
                             Commons JEXL Package
-                                Version 2.1.1
+                               Version 2.1.2
                                Release Notes
 
 
@@ -35,13 +35,36 @@ Its goal is to expose scripting features usable by technical operatives or consu
 
   http://commons.apache.org/jexl/
 
-What's new in 2.1.1
-===================
-Version 2.1.1 is a bugfix release to address a regression in 2.1:
 
-* JEXL-124:  Array parameters to methods don't work anymore
+========================================================================================================================
+Release 2.1.2:
+========================================================================================================================
 
-There are no other changes
+Version 2.1.2 is a micro release to fix bugs reported since 2.1.1:
+
+* JEXL-131:     UnifiedJexl parsing may fail with NPE
+* JEXL-130:     Ternary Conditional fails for Object values
+* JEXL-126:     Decimal numbers literals should be 'double' by default (instead of 'float')
+
+There are no other changes.
+
+
+========================================================================================================================
+Release 2.1.1
+========================================================================================================================
+
+Version 2.1.2 is a micro release to fix a regression detected in 2.1:
+
+* JEXL-124:     Array parameters to methods don't work anymore (Jexl 2.1.1)
+
+There are no other changes.
+
+
+========================================================================================================================
+Release 2.1
+========================================================================================================================
+
+Version 2.1 is a minor release adding new features and fixing known issues detected in 2.0.
 
 Compatibility with previous releases
 ====================================
@@ -76,6 +99,7 @@ New features in 2.1:
 
 Bugs Fixed in 2.1:
 ==================
+* JEXL-124:     Array parameters to methods don't work anymore (Jexl 2.1.1)
 * JEXL-83:      Make JexlArithmetic immutable (and threadsafe)
 * JEXL-24:      Support Long for integer literal instead of Integers
 * JEXL-107:     literals and parenthesized expressions can not be used as references
@@ -83,7 +107,7 @@ Bugs Fixed in 2.1:
 * JEXL-101:     Vararg methods where the first argument is no vararg can not be called with only the fixed parameters given
 * JEXL-105:     Array literals are considered constant even when they are not
 * JEXL-104:     NPE in JexlArithmetic when an Array-Expression containing a null is used.
-* JEXL-112:     Cannot parse Integer.MIN_VALUE	
+* JEXL-112:     Cannot parse Integer.MIN_VALUE
 * JEXL-111:     expression execute error
 
 Bugs fixed in 2.0.1:
@@ -95,9 +119,9 @@ Bugs fixed in 2.0.1:
 
 
 
-Previous Releases:
-==================
-
+========================================================================================================================
+Release 2.0:
+========================================================================================================================
 
 Bugs fixed in 2.0:
 ==================
@@ -169,7 +193,7 @@ Other Changes:
 
 o Add @since 2.0 tags to code so we can track API additions via Javadoc
 
-Upgrading from JEXL 1.x 
+Upgrading from JEXL 1.x
 =======================
 
 JEXL now requires Java 1.5 or later.
