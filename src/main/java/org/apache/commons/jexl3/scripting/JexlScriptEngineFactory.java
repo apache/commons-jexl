@@ -23,7 +23,6 @@ import java.util.List;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
-import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.parser.StringParser;
 
 /**
@@ -137,7 +136,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     public String getProgram(String... statements) {
         StringBuilder sb = new StringBuilder();
         for(String statement : statements){
-            sb.append(Engine.cleanExpression(statement));
+            sb.append(statement.trim());
             if (!statement.endsWith(";")){
                 sb.append(';');
             }

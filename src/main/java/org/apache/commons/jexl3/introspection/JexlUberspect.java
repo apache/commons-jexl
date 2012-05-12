@@ -20,17 +20,24 @@ package org.apache.commons.jexl3.introspection;
 import java.util.Iterator;
 
 /**
- * 'Federated' introspection/reflection interface to allow the introspection
- * behavior in JEXL to be customized.
- * 
+ * 'Federated' introspection/reflection interface to allow JEXL introspection
+ *  behavior to be customized.
+ *
  * @since 1.0
  */
 public interface JexlUberspect {
-    /** Sets the class loader to use when getting a constructor with
-     * a class name parameter.
+    /**
+     * Sets the class loader to use.
+     * <p>This increments the version.</p>
      * @param loader the class loader
      */
     void setClassLoader(ClassLoader loader);
+
+    /**
+     * Gets this uberspect version.
+     * @return the class loader modification count
+     */
+    int getVersion();
 
     /**
      * Returns a class constructor.
@@ -40,7 +47,7 @@ public interface JexlUberspect {
      * @since 3.0
      */
     JexlMethod getConstructor(Object ctorHandle, Object[] args);
-    
+
     /**
      * Returns a JexlMethod.
      * @param obj the object

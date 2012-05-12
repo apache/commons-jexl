@@ -16,22 +16,24 @@
  */
 package org.apache.commons.jexl3;
 
+import org.apache.commons.jexl3.introspection.JexlUberspect;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.net.URL;
+import java.io.InputStreamReader;
 import java.math.MathContext;
-import org.apache.commons.jexl3.introspection.JexlUberspect;
+import java.net.URL;
 
 /**
  * Creates and evaluates JexlExpression and JexlScript objects.
  * Determines the behavior of expressions & scripts during their evaluation with respect to:
  * <ul>
- *  <li>Introspection, see {@link JexlUberspect}</li>
- *  <li>Arithmetic & comparison, see {@link JexlArithmetic}</li>
- *  <li>Error reporting</li>
- *  <li>Logging</li>
+ * <li>Introspection, see {@link JexlUberspect}</li>
+ * <li>Arithmetic & comparison, see {@link JexlArithmetic}</li>
+ * <li>Error reporting</li>
+ * <li>Logging</li>
  * </ul>
  * <p>
  * Note that methods that evaluate expressions may throw <em>unchecked</em> exceptions;
@@ -131,83 +133,145 @@ public abstract class JexlEngine {
      * Creates an JexlExpression from a String containing valid JEXL syntax.
      * This method parses the expression which must contain either a reference or an expression.
      *
+     * @param info       An info structure to carry debugging information if needed
      * @param expression A String containing valid JEXL syntax
      * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
-     * @throws JexlException An exception can be thrown if there is a problem parsing this expression, or if the
-     * expression is neither an expression nor a reference.
+     * @throws JexlException if there is a problem parsing the script
      */
-    public abstract JexlExpression createExpression(String expression);
+    public abstract JexlExpression createExpression(JexlInfo info, String expression);
 
     /**
-     * Creates an JexlExpression from a String containing valid JEXL syntax.
-     * This method parses the expression which  must contain either a reference or an expression.
+     * Creates a JexlScript from a String containing valid JEXL syntax.
+     * This method parses the script and validates the syntax.
+     *
+     * @param info   An info structure to carry debugging information if needed
+     * @param source A string containing valid JEXL syntax
+     * @param names  The script parameter names used during parsing; a corresponding array of arguments containing
+     * values should be used during evaluation
+     * @return A {@link JexlScript} which can be executed using a {@link JexlContext}
+     * @throws JexlException if there is a problem parsing the script
+     */
+    public abstract JexlScript createScript(JexlInfo info, String source, String[] names);
+
+    /**
+     * Creates a JexlExpression from a String containing valid JEXL syntax.
+     * This method parses the expression which must contain either a reference or an expression.
      *
      * @param expression A String containing valid JEXL syntax
-     * @param info An info structure to carry debugging information if needed
      * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
-     * @throws JexlException An exception can be thrown if there is a problem parsing this expression, or if the
-     * expression is neither an expression or a reference.
+     * @throws JexlException if there is a problem parsing the script
      */
-    public abstract JexlExpression createExpression(String expression, JexlInfo info);
+    public final JexlExpression createExpression(String expression) {
+        return createExpression(null, expression);
+    }
 
     /**
      * Creates a Script from a String containing valid JEXL syntax.
-     * This method parses the script which validates the syntax.
+     * This method parses the script and validates the syntax.
      *
      * @param scriptText A String containing valid JEXL syntax
      * @return A {@link JexlScript} which can be executed using a {@link JexlContext}
      * @throws JexlException if there is a problem parsing the script.
      */
-    public abstract JexlScript createScript(String scriptText);
+    public final JexlScript createScript(String scriptText) {
+        return createScript(null, scriptText, null);
+    }
 
     /**
      * Creates a Script from a String containing valid JEXL syntax.
-     * This method parses the script which validates the syntax.
+     * This method parses the script and validates the syntax.
      *
      * @param scriptText A String containing valid JEXL syntax
-     * @param names the script parameter names
+     * @param names      The script parameter names used during parsing; a corresponding array of arguments containing
+     * values should be used during evaluation
      * @return A {@link JexlScript} which can be executed using a {@link JexlContext}
-     * @throws JexlException if there is a problem parsing the script.
+     * @throws JexlException if there is a problem parsing the script
      */
-    public abstract JexlScript createScript(String scriptText, String... names);
-
-    /**
-     * Creates a Script from a String containing valid JEXL syntax.
-     * This method parses the script which validates the syntax.
-     * It uses an array of parameter names that will be resolved during parsing;
-     * a corresponding array of arguments containing values should be used during evaluation.
-     *
-     * @param scriptText A String containing valid JEXL syntax
-     * @param info An info structure to carry debugging information if needed
-     * @param names the script parameter names
-     * @return A {@link JexlScript} which can be executed using a {@link JexlContext}
-     * @throws JexlException if there is a problem parsing the script.
-     */
-    public abstract JexlScript createScript(String scriptText, JexlInfo info, String[] names);
+    public final JexlScript createScript(String scriptText, String... names) {
+        return createScript(null, scriptText, names);
+    }
 
     /**
      * Creates a Script from a {@link File} containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
      *
      * @param scriptFile A {@link File} containing valid JEXL syntax. Must not be null. Must be a readable file.
-     * @return A {@link JexlScript} which can be executed with a
-     * {@link JexlContext}.
-     * @throws IOException if there is a problem reading the script.
-     * @throws JexlException if there is a problem parsing the script.
+     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
+     * @throws JexlException if there is a problem reading or parsing the script.
      */
-    public abstract JexlScript createScript(File scriptFile) throws IOException;
+    public final JexlScript createScript(File scriptFile) {
+        return createScript(null, readSource(scriptFile), null);
+    }
+
+    /**
+     * Creates a Script from a {@link File} containing valid JEXL syntax.
+     * This method parses the script and validates the syntax.
+     *
+     * @param scriptFile A {@link File} containing valid JEXL syntax. Must not be null. Must be a readable file.
+     * @param names      The script parameter names used during parsing; a corresponding array of arguments containing
+     * values should be used during evaluation.
+     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
+     * @throws JexlException if there is a problem reading or parsing the script.
+     */
+    public final JexlScript createScript(File scriptFile, String... names) {
+        return createScript(null, readSource(scriptFile), names);
+    }
+
+    /**
+     * Creates a Script from a {@link File} containing valid JEXL syntax.
+     * This method parses the script and validates the syntax.
+     *
+     * @param info       An info structure to carry debugging information if needed
+     * @param scriptFile A {@link File} containing valid JEXL syntax. Must not be null. Must be a readable file.
+     * @param names      The script parameter names used during parsing; a corresponding array of arguments containing
+     * values should be used during evaluation.
+     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
+     * @throws JexlException if there is a problem reading or parsing the script.
+     */
+    public final JexlScript createScript(JexlInfo info, File scriptFile, String[] names) {
+        return createScript(info, readSource(scriptFile), names);
+    }
 
     /**
      * Creates a Script from a {@link URL} containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
      *
-     * @param scriptUrl A {@link URL} containing valid JEXL syntax. Must not be null. Must be a readable file.
-     * @return A {@link JexlScript} which can be executed with a
-     * {@link JexlContext}.
-     * @throws IOException if there is a problem reading the script.
-     * @throws JexlException if there is a problem parsing the script.
+     * @param scriptUrl A {@link URL} containing valid JEXL syntax. Must not be null.
+     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
+     * @throws JexlException if there is a problem reading or parsing the script.
      */
-    public abstract JexlScript createScript(URL scriptUrl) throws IOException;
+    public final JexlScript createScript(URL scriptUrl) {
+        return createScript(null, readSource(scriptUrl), null);
+    }
+
+    /**
+     * Creates a Script from a {@link URL} containing valid JEXL syntax.
+     * This method parses the script and validates the syntax.
+     *
+     * @param scriptUrl A {@link URL} containing valid JEXL syntax. Must not be null.
+     * @param names     The script parameter names used during parsing; a corresponding array of arguments containing
+     * values should be used during evaluation.
+     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
+     * @throws JexlException if there is a problem reading or parsing the script.
+     */
+    public final JexlScript createScript(URL scriptUrl, String[] names) {
+        return createScript(null, readSource(scriptUrl), names);
+    }
+
+    /**
+     * Creates a Script from a {@link URL} containing valid JEXL syntax.
+     * This method parses the script and validates the syntax.
+     *
+     * @param info      An info structure to carry debugging information if needed
+     * @param scriptUrl A {@link URL} containing valid JEXL syntax. Must not be null.
+     * @param names     The script parameter names used during parsing; a corresponding array of arguments containing
+     * values should be used during evaluation.
+     * @return A {@link JexlScript} which can be executed with a {@link JexlContext}.
+     * @throws JexlException if there is a problem reading or parsing the script.
+     */
+    public final JexlScript createScript(JexlInfo info, URL scriptUrl, String[] names) {
+        return createScript(info, readSource(scriptUrl), names);
+    }
 
     /**
      * Accesses properties of a bean using an expression.
@@ -233,8 +297,8 @@ public abstract class JexlEngine {
      * </p>
      *
      * @param context the evaluation context
-     * @param bean the bean to get properties from
-     * @param expr the property expression
+     * @param bean    the bean to get properties from
+     * @param expr    the property expression
      * @return the value of the property
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
@@ -250,8 +314,8 @@ public abstract class JexlEngine {
      * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
      *
-     * @param bean the bean to set properties in
-     * @param expr the property expression
+     * @param bean  the bean to set properties in
+     * @param expr  the property expression
      * @param value the value of the property
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
@@ -262,16 +326,16 @@ public abstract class JexlEngine {
      * its logger as warning. </p>
      *
      * @param context the evaluation context
-     * @param bean the bean to set properties in
-     * @param expr the property expression
-     * @param value the value of the property
+     * @param bean    the bean to set properties in
+     * @param expr    the property expression
+     * @param value   the value of the property
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
     public abstract void setProperty(JexlContext context, Object bean, String expr, Object value);
 
     /**
      * Invokes an object's method by name and arguments.
-     * @param obj the method's invoker object
+     * @param obj  the method's invoker object
      * @param meth the method's name
      * @param args the method's arguments
      * @return the method returned value or null if it failed and engine is silent
@@ -281,9 +345,9 @@ public abstract class JexlEngine {
 
     /**
      * Creates a new instance of an object using the most appropriate constructor based on the arguments.
-     * @param <T> the type of object
+     * @param <T>   the type of object
      * @param clazz the class to instantiate
-     * @param args the constructor arguments
+     * @param args  the constructor arguments
      * @return the created object instance or null on failure when silent
      */
     public abstract <T> T newInstance(Class<? extends T> clazz, Object... args);
@@ -291,63 +355,118 @@ public abstract class JexlEngine {
     /**
      * Creates a new instance of an object using the most appropriate constructor based on the arguments.
      * @param clazz the name of the class to instantiate resolved through this engine's class loader
-     * @param args the constructor arguments
+     * @param args  the constructor arguments
      * @return the created object instance or null on failure when silent
      */
     public abstract Object newInstance(String clazz, Object... args);
 
     /**
-     * Trims the expression from front & ending spaces.
-     * @param str expression to clean
-     * @return trimmed expression ending in a semi-colon
+     * Creates a JexlInfo instance.
+     * @param fn url/file/template/script user given name
+     * @param l  line number
+     * @param c  column number
+     * @return a JexlInfo instance
      */
-    public static String cleanExpression(CharSequence str) {
-        if (str != null) {
-            int start = 0;
-            int end = str.length();
-            if (end > 0) {
-                // trim front spaces
-                while (start < end && str.charAt(start) == ' ') {
-                    ++start;
-                }
-                // trim ending spaces
-                while (end > 0 && str.charAt(end - 1) == ' ') {
-                    --end;
-                }
-                return str.subSequence(start, end).toString();
-            }
-            return "";
-        }
-        return null;
+    protected JexlInfo createInfo(String fn, int l, int c) {
+        return new JexlInfo(fn, l, c);
     }
 
     /**
-     * Read from a reader into a local buffer and return a String with the contents of the reader.
-     * @param scriptReader to be read.
+     * Create an information structure for dynamic set/get/invoke/new.
+     * <p>This gathers the class, method and line number of the first calling method
+     * outside of o.a.c.jexl3.</p>
+     * @return a JexlInfo instance
+     */
+    protected JexlInfo createInfo() {
+        JexlInfo info = null;
+        Throwable xinfo = new Throwable();
+        xinfo.fillInStackTrace();
+        StackTraceElement[] stack = xinfo.getStackTrace();
+        StackTraceElement se = null;
+        String name = getClass().getName();
+        for (int s = 1; s < stack.length; ++s) {
+            se = stack[s];
+            String className = se.getClassName();
+            if (!className.equals(name)) {
+                // go deeper if called from jexl3 implementation classes
+                if (className.startsWith("org.apache.commons.jexl3.internal.")
+                    || className.startsWith("org.apache.commons.jexl3.J")) {
+                    name = className;
+                } else {
+                    break;
+                }
+            }
+        }
+        if (se != null) {
+            info = createInfo(se.getClassName() + "." + se.getMethodName(), se.getLineNumber(), 0);
+        }
+        return info;
+    }
+
+    /**
+     * Creates a string from a reader.
+     * @param reader to be read.
      * @return the contents of the reader as a String.
      * @throws IOException on any error reading the reader.
      */
-    public static String readerToString(Reader scriptReader) throws IOException {
+    protected static String toString(BufferedReader reader) throws IOException {
         StringBuilder buffer = new StringBuilder();
-        BufferedReader reader;
-        if (scriptReader instanceof BufferedReader) {
-            reader = (BufferedReader) scriptReader;
-        } else {
-            reader = new BufferedReader(scriptReader);
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line).append('\n');
         }
-        try {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line).append('\n');
-            }
-            return buffer.toString();
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException xio) {
-                // ignore
-            }
-        }
+        return buffer.toString();
+    }
 
+    /**
+     * Reads a Jexl source from a File.
+     * @param file the script file
+     * @return the source
+     */
+    protected String readSource(final File file) {
+        if (file == null) {
+            throw new NullPointerException("source file is null");
+        }
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            return toString(reader);
+        } catch (IOException xio) {
+            throw new JexlException(createInfo(file.toString(), 1, 1), "could not read source File", xio);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException xignore) {
+                    // cant to much
+                }
+            }
+        }
+    }
+
+    /**
+     * Reads a Jexl source from an URL.
+     * @param url the script url
+     * @return the source
+     */
+    protected String readSource(final URL url) {
+        if (url == null) {
+            throw new NullPointerException("source URL is null");
+        }
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            return toString(reader);
+        } catch (IOException xio) {
+            throw new JexlException(createInfo(url.toString(), 1, 1), "could not read source URL", xio);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException xignore) {
+                    // cant to much
+                }
+            }
+        }
     }
 }

@@ -28,16 +28,16 @@ import java.util.concurrent.Callable;
  * <p>The statements can be <code>blocks</code> (curly braces containing code),
  * Control statements such as <code>if</code> and <code>while</code>
  * as well as expressions and assignment statements.</p>
- *  
+ *
  * @since 1.1
  */
 public interface JexlScript extends JexlExpression {
     /**
      * Executes the script with the variables contained in the
-     * supplied {@link JexlContext}. 
-     * 
+     * supplied {@link JexlContext}.
+     *
      * @param context A JexlContext containing variables.
-     * @return The result of this script, usually the result of 
+     * @return The result of this script, usually the result of
      *      the last statement.
      */
     Object execute(JexlContext context);
@@ -46,10 +46,10 @@ public interface JexlScript extends JexlExpression {
      * Executes the script with the variables contained in the
      * supplied {@link JexlContext} and a set of arguments corresponding to the
      * parameters used during parsing.
-     * 
+     *
      * @param context A JexlContext containing variables.
      * @param args the arguments
-     * @return The result of this script, usually the result of 
+     * @return The result of this script, usually the result of
      *      the last statement.
      * @since 2.1
      */
@@ -59,7 +59,7 @@ public interface JexlScript extends JexlExpression {
      * Returns the text of this Script.
      * @return The script to be executed.
      */
-    String getText();
+    String getSourceText();
 
     /**
      * Gets this script parameters.
@@ -77,7 +77,7 @@ public interface JexlScript extends JexlExpression {
 
     /**
      * Gets this script variables.
-     * <p>Note that since variables can be in an ant-ish form (ie foo.bar.quux), each variable is returned as 
+     * <p>Note that since variables can be in an ant-ish form (ie foo.bar.quux), each variable is returned as
      * a list of strings where each entry is a fragment of the variable ({"foo", "bar", "quux"} in the example.</p>
      * @return the variables or null
      * @since 2.1

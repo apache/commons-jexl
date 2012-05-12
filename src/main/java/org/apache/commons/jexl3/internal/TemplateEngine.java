@@ -500,7 +500,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         protected TemplateExpression prepare(Interpreter interpreter) {
             String value = interpreter.interpret(node).toString();
-            JexlNode dnode = jexl.parse(value, jexl.isDebug() ? node.jexlInfo() : null, null);
+            JexlNode dnode = jexl.parse(jexl.isDebug() ? node.jexlInfo() : null, value, null, false);
             return new ImmediateExpression(value, dnode, this);
         }
 
@@ -742,9 +742,10 @@ public final class TemplateEngine extends JxltEngine {
                 case IMMEDIATE1: // ${...
                     if (c == '}') {
                         // materialize the immediate expr
+                        String src = strb.toString();
                         TemplateExpression iexpr = new ImmediateExpression(
-                                strb.toString(),
-                                jexl.parse(strb, null, scope),
+                                src,
+                                jexl.parse(null, src, scope, false),
                                 null);
                         builder.add(iexpr);
                         strb.delete(0, Integer.MAX_VALUE);
@@ -777,16 +778,17 @@ public final class TemplateEngine extends JxltEngine {
                             inner -= 1;
                         } else {
                             // materialize the nested/deferred expr
+                            String src = strb.toString();
                             TemplateExpression dexpr;
                             if (nested) {
                                 dexpr = new NestedExpression(
                                         expr.substring(inested, i + 1),
-                                        jexl.parse(strb, null, scope),
+                                        jexl.parse(null, src, scope, false),
                                         null);
                             } else {
                                 dexpr = new DeferredExpression(
                                         strb.toString(),
-                                        jexl.parse(strb, null, scope),
+                                        jexl.parse(null, src, scope, false),
                                         null);
                             }
                             builder.add(dexpr);
@@ -915,7 +917,7 @@ public final class TemplateEngine extends JxltEngine {
                 }
             }
             // createExpression the script
-            script = jexl.parse(strb.toString(), null, scope);
+            script = jexl.parse(null, strb.toString(), scope, false);
             scope = script.getScope();
             // createExpression the exprs using the code frame for those appearing after the first block of code
             for (int b = 0; b < blocks.size(); ++b) {

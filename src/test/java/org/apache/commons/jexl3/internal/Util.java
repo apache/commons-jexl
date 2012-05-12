@@ -43,7 +43,7 @@ public class Util {
             return;
         }
         Engine jdbg = new Engine();
-        jdbg.parser.ALLOW_REGISTERS = true;
+        jdbg.parser.allowRegisters(true);
         Debugger dbg = new Debugger();
         // iterate over all expression in cache
         Iterator<Map.Entry<String,ASTJexlScript>> inodes = jexl.cache.entrySet().iterator();
@@ -52,9 +52,9 @@ public class Util {
             JexlNode node = entry.getValue();
             // recreate expr string from AST
             dbg.debug(node);
-            String expressiondbg = dbg.data();
+            String expressiondbg = dbg.toString();
             // recreate expr from string
-            Script exprdbg = jdbg.createScript(expressiondbg);
+            Script exprdbg = (Script) jdbg.createScript(null, expressiondbg, null);
             // make arg cause become the root cause
             JexlNode root = exprdbg.script;
             while (root.jjtGetParent() != null) {

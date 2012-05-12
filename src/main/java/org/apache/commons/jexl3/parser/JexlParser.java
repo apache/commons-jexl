@@ -161,7 +161,7 @@ public abstract class JexlParser extends StringParser {
             } else {
                 dbgInfo = node.jexlInfo();
             }
-            throw new JexlException.Parsing(dbgInfo, "Ambiguous statement, missing ';' between expressions", null);
+            throw new JexlException.Parsing(dbgInfo, "Ambiguous statement, missing ';' between expressions");
         } else if (node instanceof ASTAssignment) {
             JexlNode lv = node.jjtGetChild(0);
             if (!lv.isLeftValue()) {
@@ -172,7 +172,7 @@ public abstract class JexlParser extends StringParser {
                 } else {
                     dbgInfo = node.jexlInfo();
                 }
-                throw new JexlException.Parsing(dbgInfo, "Invalid assignment expression", null);
+                throw new JexlException.Parsing(dbgInfo, "Invalid assignment expression");
             }
         }
     }

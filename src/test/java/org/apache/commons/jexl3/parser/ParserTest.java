@@ -35,17 +35,17 @@ public class ParserTest extends TestCase {
     public void testParse1() throws Exception {
         Parser parser = new Parser(new StringReader(";"));
 
-        SimpleNode sn = parser.parse(new StringReader("foo = 1;"), null, null);
+        SimpleNode sn = parser.parse(null, new StringReader("foo = 1;"), null, false);
         assertNotNull("parsed node is null", sn);
     }
 
     public void testParse2() throws Exception {
         Parser parser = new Parser(new StringReader(";"));
 
-        SimpleNode sn = parser.parse(new StringReader("foo = \"bar\";"), null, null);
+        SimpleNode sn = parser.parse(null, new StringReader("foo = \"bar\";"), null, false);
         assertNotNull("parsed node is null", sn);
 
-        sn = parser.parse(new StringReader("foo = 'bar';"), null, null);
+        sn = parser.parse(null, new StringReader("foo = 'bar';"), null, false);
         assertNotNull("parsed node is null", sn);
     }
 

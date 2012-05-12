@@ -30,16 +30,16 @@ import java.io.InputStreamReader;
 public class Main {
     /**
      * Test application for JEXL
-     * 
+     *
      * If a single argument is present, it is treated as a filename of a JEXL
      * script to be executed as a script. Any exceptions terminate the application.
-     * 
+     *
      * Otherwise, lines are read from standard input and evaluated.
      * ParseExceptions and JexlExceptions are logged, and do not cause the application to exit.
      * This is done so that interactive testing is easier.
-     * 
+     *
      * @param args (optional) filename to execute. Stored in the args variable.
-     * 
+     *
      * @throws Exception if parsing or IO fail
      */
     public static void main(String[] args) throws Exception {

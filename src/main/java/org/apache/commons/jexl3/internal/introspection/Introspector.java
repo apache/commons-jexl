@@ -65,7 +65,7 @@ public final class Introspector {
     }
     /** The cache-miss marker for the constructors map. */
     private static final Constructor<?> CTOR_MISS = CacheMiss.class.getConstructors()[0];
-    
+
     /** the logger. */
     protected final Log rlog;
     /**
@@ -92,10 +92,11 @@ public final class Introspector {
     /**
      * Create the introspector.
      * @param log the logger to use
+     * @param cloader the class loader
      */
-    public Introspector(Log log) {
+    public Introspector(Log log, ClassLoader cloader) {
         this.rlog = log;
-        loader = getClass().getClassLoader();
+        loader = cloader;
     }
 
     /**
@@ -196,8 +197,6 @@ public final class Introspector {
         return classMap.getMethods(methodName);
     }
 
-
-
     /**
      * Gets the constructor defined by the <code>MethodKey</code>.
      *
@@ -217,7 +216,7 @@ public final class Introspector {
      * or null if no unambiguous constructor could be found through introspection.
      */
     public Constructor<?> getConstructor(final Class<?> c, final MethodKey key) {
-        Constructor<?> ctor = null;
+        Constructor<?> ctor;
         try {
             lock.readLock().lock();
             ctor = constructorsMap.get(key);
@@ -317,7 +316,7 @@ public final class Introspector {
         }
         return classMap;
     }
-    
+
     /**
      * Sets the class loader used to solve constructors.
      * <p>Also cleans the constructors and methods caches.</p>

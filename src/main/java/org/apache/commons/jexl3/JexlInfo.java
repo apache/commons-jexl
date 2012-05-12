@@ -28,12 +28,12 @@ public class JexlInfo {
     protected final int column;
     /** name. */
     protected final String name;
-    
-    /** 
+
+    /**
      * Create info.
      * @param tn template name
      * @param l line number
-     * @param c column
+     * @param c column number
      */
     public JexlInfo(String tn, int l, int c) {
         name = tn;

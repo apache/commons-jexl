@@ -44,10 +44,10 @@ public class Closure extends Script {
     }
 
     @Override
-    public String getExpression() {
+    public String getParsedText() {
         Debugger debug = new Debugger();
         boolean d = debug.debug(script);
-        return debug.data();
+        return debug.toString();
     }
 
     @Override
@@ -92,5 +92,5 @@ public class Closure extends Script {
             }
         };
     }
-    
+
 }

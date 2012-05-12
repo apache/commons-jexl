@@ -53,6 +53,22 @@ public final class SandboxUberspect implements JexlUberspect {
      * {@inheritDoc}
      */
     @Override
+    public void setClassLoader(ClassLoader loader) {
+        uberspect.setClassLoader(loader);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getVersion() {
+        return uberspect.getVersion();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public JexlMethod getConstructor(Object ctorHandle, Object[] args) {
         final String className;
         if (ctorHandle instanceof Class<?>) {
@@ -111,12 +127,10 @@ public final class SandboxUberspect implements JexlUberspect {
         return null;
 
     }
-
-    @Override
-    public void setClassLoader(ClassLoader loader) {
-        uberspect.setClassLoader(loader);
-    }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterator<?> getIterator(Object obj) {
         return uberspect.getIterator(obj);

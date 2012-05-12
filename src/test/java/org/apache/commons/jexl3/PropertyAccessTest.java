@@ -34,7 +34,7 @@ public class PropertyAccessTest extends JexlTestCase {
     public PropertyAccessTest() {
         super("PropertyAccessTest");
     }
-    
+
     @Override
     public void setUp() {
         asserter = new Asserter(JEXL);
@@ -65,7 +65,7 @@ public class PropertyAccessTest extends JexlTestCase {
             asserter.assertExpression("foo.0.'1'", i42);
         }
     }
-    
+
     public static class Container {
         String value0;
         int value1;
@@ -169,7 +169,7 @@ public class PropertyAccessTest extends JexlTestCase {
         result = get1.execute(null, quux);
         assertEquals(24, result);
     }
-    
+
 
     public void testStringIdentifier() throws Exception {
         Map<String, String> foo = new HashMap<String, String>();
@@ -192,7 +192,7 @@ public class PropertyAccessTest extends JexlTestCase {
 
         Debugger dbg = new Debugger();
         dbg.debug(e);
-        String dbgdata = dbg.data();
-        assertEquals("foo.'q u u x';", dbgdata);
+        String dbgdata = dbg.toString();
+        assertEquals("foo.'q u u x'", dbgdata);
     }
 }
