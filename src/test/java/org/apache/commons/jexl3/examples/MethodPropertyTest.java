@@ -65,15 +65,15 @@ public class MethodPropertyTest extends TestCase {
          */
         e = jexl.createExpression("foo.convert(1)");
         o = e.evaluate(jc);
-        out.print("value of " + e.getExpression() + " is : ", o, foo.convert(1));
+        out.print("value of " + e.getParsedText() + " is : ", o, foo.convert(1));
 
         e = jexl.createExpression("foo.convert(1+7)");
         o = e.evaluate(jc);
-        out.print("value of " + e.getExpression() + " is : ", o, foo.convert(1+7));
+        out.print("value of " + e.getParsedText() + " is : ", o, foo.convert(1+7));
 
         e = jexl.createExpression("foo.convert(1+number)");
         o = e.evaluate(jc);
-        out.print("value of " + e.getExpression() + " is : ", o, foo.convert(1+number.intValue()));
+        out.print("value of " + e.getParsedText() + " is : ", o, foo.convert(1+number.intValue()));
 
         /*
          * access a property

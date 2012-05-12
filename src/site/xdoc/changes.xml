@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- 
+<!--
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -8,9 +8,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,83 +25,91 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.0" date="unreleased">
+        <release version="3.0" date="2012-06-01">
             <action dev="henrib" type="add" issue="JEXL-128" due-to="Matteo Trotta">
-            ObjectContext&lt;&gt; should implement NamespaceResolver
+                ObjectContext should implement NamespaceResolver
             </action>
             <action dev="henrib" type="add" issue="JEXL-127">
-            Allow the creation of functions
-            </action>
-            <action dev="henrib" type="add" issue="JEXL-126">
-            Decimal numbers literals should be 'double' by default (instead of 'float')
+                Allow the creation of functions
             </action>
             <action dev="henrib" type="add" issue="JEXL-123">
-            Redesign API for stability
+                Redesign API for stability
             </action>
             <action dev="henrib" type="add" issue="JEXL-122">
-            Move JEXL from org.apache.comms.jexl2 to org.apache.commons.jexl3
+                Move JEXL from org.apache.comms.jexl2 to org.apache.commons.jexl3
             </action>
         </release>
-        <release version="2.1.1" date="2011-11-24">
-            <action dev="henrib" type="fix" issue="JEXL-121">
-            Array parameters to methods don't work anymore
+        <release version="2.1.2" date="2012-05-30">
+            <action dev="henrib" type="fix" issue="JEXL-131" due-to="Clay Bruce">
+                UnifiedJexl parsing may fail with NPE
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-130" due-to="William Bakker">
+                Ternary Conditional fails for Object values
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-126" due-to="Grace">
+                Decimal numbers literals should be 'double' by default (instead of 'float')
+            </action>
+        </release>
+        <release version="2.1.1" date="2011-12-24">
+            <action dev="henrib" type="fix" issue="JEXL-124">
+                Array parameters to methods don't work anymore (regression)
             </action>
         </release>
         <release version="2.1" date="2011-13-11">
             <action dev="henrib" type="add" issue="JEXL-121">
-            Add simple template features
+                Add simple template features
             </action>
             <action dev="henrib" type="fix" issue="JEXL-120" due-to="Lukas Krecan">
-            Make ParseException work in sandboxed environment
+                Make ParseException work in sandboxed environment
             </action>
             <action dev="henrib" type="add" issue="JEXL-119">
-            Allow indexed properties container resolution in expressions
+                Allow indexed properties container resolution in expressions
             </action>
             <action dev="henrib" type="add" issue="JEXL-118" due-to="Max Tardiveau">
-            Provide an IN operator: =~ / match operator extended to provide IN behavior (!~ as NOT IN)
+                Provide an IN operator: =~ / match operator extended to provide IN behavior (!~ as NOT IN)
             </action>
             <action dev="henrib" type="add" issue="JEXL-116" due-to="Sarel Botha">
-            Add control over classes, methods, constructors and properties allowed in scripts
+                Add control over classes, methods, constructors and properties allowed in scripts
             </action>
             <action dev="henrib" type="add" issue="JEXL-115" due-to="Sarel Botha">
-            Add support for asynchronous script execution and cancellation
+                Add support for asynchronous script execution and cancellation
             </action>
             <action dev="henrib" type="add" issue="JEXL-114">
-            Allow scripts to create local variables // Add return keyword
+                Allow scripts to create local variables // Add return keyword
             </action>
             <action dev="henrib" type="add" issue="JEXL-113" due-to="Max Tardiveau">
-            Add functions to extract which variables, parameters and local variables are used to evaluate a script
+                Add functions to extract which variables, parameters and local variables are used to evaluate a script
             </action>
             <action dev="henrib" type="fix" issue="JEXL-112" due-to="sebb">
-            Cannot parse Integer.MIN_VALUE.
+                Cannot parse Integer.MIN_VALUE.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-24" due-to="freish">
-            Support Long for integer literal instead of Integers.
+                Support Long for integer literal instead of Integers.
             </action>
             <action dev="henrib" type="add">
-            Added ObjectContext that wraps an object as JexlContext and added JexlContext as source to solve
-            top-level namespace functions.
+                Added ObjectContext that wraps an object as JexlContext and added JexlContext as source to solve
+                top-level namespace functions.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-111" due-to="freish">
-            expression execute error depending on numeric type
+                expression execute error depending on numeric type
             </action>
             <action dev="henrib" type="add" issue="JEXL-83" due-to="sebb">
-            Make JexlArithmetic immutable (and threadsafe); also added a mutable JexlThreadedArithmetic.
+                Make JexlArithmetic immutable (and threadsafe); also added a mutable JexlThreadedArithmetic.
             </action>
             <action dev="henrib" type="fix" issue="JEXL-108" due-to="Cristian Lorenzetto">
-            Parsing error if i define a empty literal array/map
+                Parsing error if i define a empty literal array/map
             </action>
             <action dev="henrib" type="fix" issue="JEXL-107">
-            Literals and parenthesized expressions can not be used as references
+                Literals and parenthesized expressions can not be used as references
             </action>
             <action dev="henrib" type="fix" issue="JEXL-106" due-to="Michal Sabol">
-            When divide two BigDecimal values in an expression it results in java.lang.ArithmeticException: Non-terminating decimal expansion; no exact representable decimal result.
+                When divide two BigDecimal values in an expression it results in java.lang.ArithmeticException: Non-terminating decimal expansion; no exact representable decimal result.
             </action>
             <action dev="henrib" type="add" issue="JEXL-105" due-to="Cary Thompson">Array literals are considered constant even when they are not.</action>
             <action dev="henrib" type="fix" issue="JEXL-104" due-to="Andreas Haufler">NPE in JexlArithmetic when an Array-Expression containing a null is used.</action>
             <action dev="henrib" type="add" issue="JEXL-102" due-to="sebb">Add "jexl2" as a supported name</action>
             <action dev="henrib" type="add" issue="JEXL-101" due-to="Tobias Shulte">
-            Vararg methods where the first argument is no vararg can not be called with only the fixed parameters given
+                Vararg methods where the first argument is no vararg can not be called with only the fixed parameters given
             </action>
         </release>
         <release version="2.0.1" date="2010-03-28">

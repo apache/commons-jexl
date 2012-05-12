@@ -156,6 +156,7 @@ public class AssignTest extends JexlTestCase {
 
     public void testUtil() throws Exception {
         Quux quux = JEXL.newInstance(Quux.class, "xuuq", Integer.valueOf(100));
+        assertNotNull(quux);
         JEXL.setProperty(quux, "froboz.value", Integer.valueOf(100));
         Object o = JEXL.getProperty(quux, "froboz.value");
         assertEquals("Result is not 100", new Integer(100), o);

@@ -194,27 +194,27 @@
         <h4>JexlExpression </h4>
         <p>
             These are the most basic form of JexlEngine expressions and only allow for a single command
-            to be executed and its result returned. If you try to use multiple commands, it ignores 
-            everything after the first semi-colon and just returns the result from 
-            the first command. 
+            to be executed and its result returned. If you try to use multiple commands, it ignores
+            everything after the first semi-colon and just returns the result from
+            the first command.
         </p>
         <h4>JexlScript</h4>
         <p>
-            This allows you to put multiple commands in the expression and you can 
+            This allows you to put multiple commands in the expression and you can
             use variable assignments, loops, calculations, etc. More or less what can be achieved in Shell or
             JavaScript at its basic level. The result from the last command is returned from the script.
         </p>
-        <h4>JxltEngine.UnifiedExpression</h4> 
+        <h4>JxltEngine.UnifiedExpression</h4>
         <p>
             These are ideal to produce "one-liner" text, like a 'toString()' on steroids.
-            To get a calculation you use the EL-like syntax 
-            as in ${someVariable}. The expression that goes between the brackets 
-            behaves like a JexlScript, not an expression. You can use semi-colons to 
-            execute multiple commands and the result from the last command is 
+            To get a calculation you use the EL-like syntax
+            as in ${someVariable}. The expression that goes between the brackets
+            behaves like a JexlScript, not an expression. You can use semi-colons to
+            execute multiple commands and the result from the last command is
             returned from the script. You also have the ability to use a 2-pass evaluation using
             the #{someScript} syntax.
         </p>
-        <h4>JxltEngine.Template</h4> 
+        <h4>JxltEngine.Template</h4>
         <p>
             These produce text documents. Each line beginning with '$$' (as a default) is
             considered JEXL code and all others considered as JxltEngine.UnifiedExpression.
@@ -346,6 +346,8 @@
             be the case if you wanted '+' to operate on arrays; you'd need to derive JexlArithmetic and
             implement your own version of Add.
             Note however that you can not change the operator precedence.
+
+
         </p>
 
         <h2><a name="extension">Extending JEXL</a></h2>

@@ -36,15 +36,18 @@ Its goal is to expose scripting features usable by technical operatives or consu
   http://commons.apache.org/jexl/
 
 
-Due to binary and source incompatibilities and the scope of modifications, JEXL has moved to the org.apache.commons.jexl3
-package.
-Also note that JEXL now requires Java 6.
+========================================================================================================================
+Release 3.0
+========================================================================================================================
+
+Version 3.0 is a major release changing the public JEXL API.
+
+Due to binary and source incompatibilities and the scope of modifications, JEXL has moved to the
+org.apache.commons.jexl3 package.
 However, this is a drop-in replacement through JSR-223 and casual code usage should find easy equivalence between
 jexl-2.x and 3.x (besides the package name).
+Also note that JEXL 3.0 now requires Java 6.
 
-
-3.0
-==================
 
 What's new in 3.0:
 ==================
@@ -52,19 +55,50 @@ What's new in 3.0:
 * The ability to create JEXL functions in script, closure/variables hoisting included.
 
 New features in 3.0:
-====================	
+====================
 * JEXL-128:     ObjectContext<> should implement NamespaceResolver
 * JEXL-127:     Allow the creation of functions
-* JEXL-126:     Decimal numbers literals should be 'double' by default (instead of 'float')
 * JEXL-123:     Redesign API for stability
 * JEXL-122:     Move JEXL from org.apache.comms.jexl2 to org.apache.commons.jexl3
 
 
-Previous Releases:
-==================
+========================================================================================================================
+Release 2.1.2:
+========================================================================================================================
 
-2.1
-==================
+Version 2.1.2 is a micro release to fix few issues detected in 2.1.1:
+
+* JEXL-131:     UnifiedJexl parsing may fail with NPE
+* JEXL-130:     Ternary Conditional fails for Object values
+* JEXL-126:     Decimal numbers literals should be 'double' by default (instead of 'float')
+
+There are no other changes.
+
+
+========================================================================================================================
+Release 2.1.1
+========================================================================================================================
+
+Version 2.1.2 is a micro release to fix a regression detected in 2.1:
+
+* JEXL-124:     Array parameters to methods don't work anymore (Jexl 2.1.1)
+
+There are no other changes.
+
+
+========================================================================================================================
+Release 2.1
+========================================================================================================================
+
+Version 2.1 is a minor release adding new features and fixing known issues detected in 2.0.
+
+Compatibility with previous releases
+====================================
+Version 2.1 is binary compatible with 2.0.1.
+
+However it is not source compatible.
+New methods have been added to the org.apache.commons.jexl2.Script and org.apache.commons.jexl2.JexlInfo interfaces.
+Any source code that implements these interfaces will need to be updated.
 
 What's new in 2.1:
 ==================
@@ -77,7 +111,7 @@ What's new in 2.1:
 * Extensions to UnifiedJEXL that allow the creation of templates.
 
 New features in 2.1:
-====================	
+====================
 * JEXL-114:     Allow scripts to create local variables // Add return keyword
 * JEXL-113:     Add functions to extract which variables, parameters and local variables are used to evaluate a script
 * JEXL-118:     Provide an IN operator
@@ -97,7 +131,7 @@ Bugs Fixed in 2.1:
 * JEXL-101:     Vararg methods where the first argument is no vararg can not be called with only the fixed parameters given
 * JEXL-105:     Array literals are considered constant even when they are not
 * JEXL-104:     NPE in JexlArithmetic when an Array-Expression containing a null is used.
-* JEXL-112:     Cannot parse Integer.MIN_VALUE	
+* JEXL-112:     Cannot parse Integer.MIN_VALUE
 * JEXL-111:     expression execute error
 
 Bugs fixed in 2.0.1:
@@ -181,7 +215,7 @@ Other Changes:
 
 o Add @since 2.0 tags to code so we can track API additions via Javadoc
 
-Upgrading from JEXL 1.x 
+Upgrading from JEXL 1.x
 =======================
 
 JEXL now requires Java 1.5 or later.

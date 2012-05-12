@@ -17,6 +17,9 @@
 package org.apache.commons.jexl3.parser;
 
 import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.introspection.JexlMethod;
+import org.apache.commons.jexl3.introspection.JexlPropertyGet;
+import org.apache.commons.jexl3.introspection.JexlPropertySet;
 
 /**
  * Base class for parser nodes - holds an 'image' of the token for later use.
@@ -71,6 +74,24 @@ public abstract class JexlNode extends SimpleNode {
     }
 
     /**
+     * Clears any cached value of type JexlProperty{G,S}et or JexlMethod.
+     * <p>This is called when the engine detects the evaluation of a script occurs with a class loader
+     * different that the one that created it.</p>
+     */
+    public void clearCache() {
+        if (value instanceof JexlPropertyGet
+                || value instanceof JexlPropertySet
+                || value instanceof JexlMethod) {
+            value = null;
+        }
+        if (children != null) {
+            for (int n = 0; n < children.length; ++n) {
+                children[n].clearCache();
+            }
+        }
+    }
+
+    /**
      * Whether this node is a constant node Its value can not change after the first evaluation and can be cached
      * indefinitely.
      *
@@ -114,8 +135,8 @@ public abstract class JexlNode extends SimpleNode {
         }
         int nc = this.jjtGetNumChildren() - 1;
         if (nc >= 0) {
-           JexlNode last = this.jjtGetChild(this.jjtGetNumChildren() - 1);
-           return last.isLeftValue();
+            JexlNode last = this.jjtGetChild(this.jjtGetNumChildren() - 1);
+            return last.isLeftValue();
         }
         if (parent instanceof ASTReference || parent instanceof ASTArrayAccess) {
             return true;

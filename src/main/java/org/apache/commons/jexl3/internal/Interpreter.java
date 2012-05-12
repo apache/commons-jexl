@@ -197,8 +197,7 @@ public class Interpreter extends ParserVisitor {
      * @return the left, right or parent node
      */
     protected JexlNode findNullOperand(RuntimeException xrt, JexlNode node, Object left, Object right) {
-        if (xrt instanceof ArithmeticException
-                && (Object) JexlException.NULL_OPERAND == xrt.getMessage()) {
+        if (xrt instanceof JexlArithmetic.NullOperand) {
             if (left == null) {
                 return node.jjtGetChild(0);
             }
@@ -578,8 +577,6 @@ public class Interpreter extends ParserVisitor {
                 }
             }
             return result;
-        } catch (JexlException error) {
-            throw error;
         } catch (ArithmeticException xrt) {
             throw new JexlException(node.jjtGetChild(n), "if error", xrt);
         }
@@ -1275,6 +1272,7 @@ public class Interpreter extends ParserVisitor {
      * @param node    the method node
      * @param bean    the bean this method should be invoked upon
      * @param functor the object carrying the method or function
+     * @param argNode the node carrying the arguments
      * @return the result of the method invocation
      */
     private Object call(JexlNode node, Object bean, Object functor, ASTArguments argNode) {

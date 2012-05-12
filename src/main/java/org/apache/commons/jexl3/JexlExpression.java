@@ -47,7 +47,7 @@ public interface JexlExpression {
      * Returns the JEXL expression this JexlExpression was created with.
      * @return The JEXL expression to be evaluated
      */
-    String getExpression();
+    CharSequence getParsedText();
 
     /**
      * Returns the JEXL expression by reconstructing it from the parsed tree.

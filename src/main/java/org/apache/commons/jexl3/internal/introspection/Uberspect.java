@@ -16,7 +16,9 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 
 import java.lang.reflect.Method;
@@ -46,7 +48,11 @@ public class Uberspect implements JexlUberspect {
     /** The logger to use for all warnings & errors. */
     protected final Log rlog;
     /** The soft reference to the introspector currently in use. */
-    private volatile SoftReference<Introspector> ref;
+    private volatile Reference<Introspector> ref;
+    /** The introspector version. */
+    private volatile int version;
+    /** The class loader weak reference; used to recreate the Introspector when necessary. */
+    private volatile Reference<ClassLoader> loader = null;
 
     /**
      * Creates a new Uberspect.
@@ -55,8 +61,10 @@ public class Uberspect implements JexlUberspect {
     public Uberspect(Log runtimeLogger) {
         rlog = runtimeLogger;
         ref = new SoftReference<Introspector>(null);
+        version = 0;
+        loader = new WeakReference<ClassLoader>(getClass().getClassLoader());
     }
-    
+
     /**
      * Gets the current introspector base.
      * <p>If the reference has been collected, this method will recreate the underlying introspector.</p>
@@ -70,8 +78,15 @@ public class Uberspect implements JexlUberspect {
             synchronized (this) {
                 intro = ref.get();
                 if (intro == null) {
-                    intro = new Introspector(rlog);
+                    ClassLoader cloader = loader.get();
+                    if (cloader == null) {
+                        // that would be really odd though...
+                        cloader = getClass().getClassLoader();
+                        loader = new WeakReference<ClassLoader>(cloader);
+                    }
+                    intro = new Introspector(rlog, cloader);
                     ref = new SoftReference<Introspector>(intro);
+                    version += 1;
                 }
             }
         }
@@ -80,8 +95,24 @@ public class Uberspect implements JexlUberspect {
     // CSON: DoubleCheckedLocking
 
     @Override
-    public void setClassLoader(ClassLoader loader) {
-        base().setLoader(loader);
+    public void setClassLoader(ClassLoader nloader) {
+        synchronized (this) {
+            if (nloader == null) {
+                nloader = getClass().getClassLoader();
+            }
+            ClassLoader cloader = loader.get();
+            if (!nloader.equals(cloader)) {
+                Introspector intro = new Introspector(rlog, nloader);
+                loader = new WeakReference<ClassLoader>(nloader);
+                ref = new SoftReference<Introspector>(intro);
+                version += 1;
+            }
+        }
+    }
+
+    @Override
+    public int getVersion() {
+        return version;
     }
 
     /**
@@ -96,8 +127,8 @@ public class Uberspect implements JexlUberspect {
     /**
      * Gets the field named by <code>key</code> for the class <code>c</code>.
      *
-     * @param c     Class in which the field search is taking place
-     * @param key   Name of the field being searched for
+     * @param c   Class in which the field search is taking place
+     * @param key Name of the field being searched for
      * @return a {@link java.lang.reflect.Field} or null if it does not exist or is not accessible
      * */
     public final Field getField(Class<?> c, String key) {
@@ -117,13 +148,13 @@ public class Uberspect implements JexlUberspect {
      * Gets the method defined by <code>name</code> and
      * <code>params</code> for the Class <code>c</code>.
      *
-     * @param c Class in which the method search is taking place
-     * @param name Name of the method being searched for
+     * @param c      Class in which the method search is taking place
+     * @param name   Name of the method being searched for
      * @param params An array of Objects (not Classes) that describe the
-     *               the parameters
+     * the parameters
      *
      * @return a {@link java.lang.reflect.Method}
-     *  or null if no unambiguous method could be found through introspection.
+     * or null if no unambiguous method could be found through introspection.
      */
     public final Method getMethod(Class<?> c, String name, Object[] params) {
         return base().getMethod(c, new MethodKey(name, params));
@@ -132,11 +163,11 @@ public class Uberspect implements JexlUberspect {
     /**
      * Gets the method defined by <code>key</code> and for the Class <code>c</code>.
      *
-     * @param c Class in which the method search is taking place
+     * @param c   Class in which the method search is taking place
      * @param key MethodKey of the method being searched for
      *
      * @return a {@link java.lang.reflect.Method}
-     *  or null if no unambiguous method could be found through introspection.
+     * or null if no unambiguous method could be found through introspection.
      */
     public final Method getMethod(Class<?> c, MethodKey key) {
         return base().getMethod(c, key);
@@ -153,7 +184,7 @@ public class Uberspect implements JexlUberspect {
 
     /**
      * Gets all the methods with a given name from this map.
-     * @param c the class
+     * @param c          the class
      * @param methodName the seeked methods name
      * @return the array of methods
      */

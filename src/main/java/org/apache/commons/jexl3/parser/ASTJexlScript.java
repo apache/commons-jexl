@@ -39,6 +39,19 @@ public class ASTJexlScript extends JexlNode {
     }
 
     /**
+     * Coerce this script as an expression (ie only one child) if necessary.
+     * @return true if the script was coerced, false otherwise
+     */
+    public boolean toExpression() {
+        if (children.length > 1) {
+            children = new JexlNode[]{children[0]};
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Sets this script scope.
      * @param theScope the scope
      */

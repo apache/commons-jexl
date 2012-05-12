@@ -17,6 +17,7 @@
 
 package org.apache.commons.jexl3.scripting;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -32,7 +33,6 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
-import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -47,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  * This implementation gives access to both ENGINE_SCOPE and GLOBAL_SCOPE bindings.
  * When a JEXL script accesses a variable for read or write,
  * this implementation checks first ENGINE and then GLOBAL scope.
- * The first one found is used. 
+ * The first one found is used.
  * If no variable is found, and the JEXL script is writing to a variable,
  * it will be stored in the ENGINE scope.
  * </p>
@@ -78,10 +78,10 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
     /** The factory which created this instance. */
     private final ScriptEngineFactory parentFactory;
-    
+
     /** The JEXL EL engine. */
     private final JexlEngine jexlEngine;
-    
+
     /**
      * Default constructor.
      * <p>
@@ -177,7 +177,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
     /**
      * Create a scripting engine using the supplied factory.
-     * 
+     *
      * @param factory the factory which created this instance.
      * @throws NullPointerException if factory is null
      */
@@ -222,6 +222,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     }
 
     /** {@inheritDoc} */
+    @Override
     public ScriptEngineFactory getFactory() {
         return parentFactory;
     }
@@ -250,21 +251,33 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     }
 
     /**
-     * Reads a script.
-     * @param script the script reader
-     * @return the script as a string
-     * @throws ScriptException if an exception occurs during read
+     * Read from a reader into a local buffer and return a String with
+     * the contents of the reader.
+     * @param scriptReader to be read.
+     * @return the contents of the reader as a String.
+     * @throws ScriptException on any error reading the reader.
      */
-    private String readerToString(final Reader script) throws ScriptException {
+    private static String readerToString(Reader scriptReader) throws ScriptException {
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader;
+        if (scriptReader instanceof BufferedReader) {
+            reader = (BufferedReader) scriptReader;
+        } else {
+            reader = new BufferedReader(scriptReader);
+        }
         try {
-           return Engine.readerToString(script);
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line).append('\n');
+            }
+            return buffer.toString();
         } catch (IOException e) {
             throw new ScriptException(e);
         }
     }
 
     /**
-     * Holds singleton JexlScriptEngineFactory (IODH). 
+     * Holds singleton JexlScriptEngineFactory (IODH).
      */
     private static class FactorySingletonHolder {
         /** non instantiable. */
@@ -347,9 +360,9 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         /** {@inheritDoc} */
         @Override
         public String toString() {
-            return script.getText();
+            return script.getSourceText();
         }
-        
+
         /** {@inheritDoc} */
         @Override
         public Object eval(final ScriptContext context) throws ScriptException {
@@ -362,7 +375,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
                 throw new ScriptException(e.toString());
             }
         }
-        
+
         /** {@inheritDoc} */
         @Override
         public ScriptEngine getEngine() {

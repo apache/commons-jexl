@@ -33,31 +33,40 @@ package org.apache.commons.jexl3.parser;
 
 import java.io.Reader;
 import org.apache.commons.jexl3.JexlInfo;
-import org.apache.commons.jexl3.internal.Engine;
+import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.internal.Scope;
 
-public class Parser extends JexlParser
+public final class Parser extends JexlParser
 {
-    public boolean ALLOW_REGISTERS = false;
+    private boolean ALLOW_REGISTERS = false;
 
-    public ASTJexlScript parse(Reader reader, Scope scope, JexlInfo info)
-        throws ParseException {
-        /*
-         * If registers are allowed, the default parser state has to be REGISTERS.
-         */
-        if (ALLOW_REGISTERS) {
-            token_source.defaultLexState = REGISTERS;
+    public ASTJexlScript parse(JexlInfo info, Reader reader, Scope scope, boolean registers) {
+        try {
+            // If registers are allowed, the default parser state has to be REGISTERS.
+            if (registers || ALLOW_REGISTERS) {
+                token_source.defaultLexState = REGISTERS;
+            }
+            // lets do the 'Unique Init' in here to be safe - it's a pain to remember
+            ReInit(reader);
+            frame = scope;
+            ASTJexlScript script = JexlScript(scope);
+            script.value = info;
+            return script;
+        } catch (TokenMgrError xtme) {
+            throw new JexlException.Tokenization(info, xtme).clean();
+        } catch (ParseException xparse) {
+            throw new JexlException.Parsing(info, xparse).clean();
+        } finally {
+            frame = null;
+            token_source.defaultLexState = DEFAULT;
         }
-        ReInit(reader);
-        /*
-         *  lets do the 'Unique Init' in here to be
-         *  safe - it's a pain to remember
-         */
+    }
 
-        frame = scope;
-        ASTJexlScript script = JexlScript(scope);
-        script.value = info;
-        return script;
+    /**
+     * Internal, for debug purpose only.
+     */
+    public void allowRegisters(boolean registers) {
+        ALLOW_REGISTERS = registers;
     }
 
 }

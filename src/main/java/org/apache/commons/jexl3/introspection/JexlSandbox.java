@@ -54,7 +54,7 @@ import java.util.Set;
  * </ul>
  * </p>
  * <p>
- * Note that a JexlUberspect allways uses a copy of a JexlSandbox when built to avoid synchronization and/or
+ * Note that a JexlUberspect allways uses a copy of the JexlSandbox used to built it to avoid synchronization and/or
  * concurrent modifications at runtime.
  * </p>
  * @since 3.0
@@ -314,7 +314,7 @@ public final class JexlSandbox {
          * Creates a new permissions instance.
          * @param nread the read set
          * @param nwrite the write set
-         * @param nexecute the method set 
+         * @param nexecute the method set
          */
         Permissions(Names nread, Names nwrite, Names nexecute) {
             this.read = nread != null ? nread : WHITE_NAMES;

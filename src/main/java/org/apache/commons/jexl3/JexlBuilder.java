@@ -54,6 +54,10 @@ import org.apache.commons.logging.Log;
  */
 public class JexlBuilder {
     /**
+     * The default maximum expression length to hit the expression cache.
+     */
+    protected static final int CACHE_THRESHOLD = 64;
+    /**
      * The JexlUberspect instance.
      */
     protected JexlUberspect uberspect = null;
@@ -91,6 +95,10 @@ public class JexlBuilder {
      */
     protected int cache = -1;
     /**
+     * The maximum expression length to hit the expression cache.
+     */
+    protected int cacheThreshold = CACHE_THRESHOLD;
+    /**
      * The class loader.
      */
     protected ClassLoader loader = null;
@@ -124,7 +132,7 @@ public class JexlBuilder {
     public JexlArithmetic arithmetic() {
         return this.arithmetic;
     }
-    
+
     /**
      * Sets the sandbox the engine will use.
      * @param box the sandbox
@@ -134,7 +142,7 @@ public class JexlBuilder {
         this.sandbox = box;
         return this;
     }
-    
+
     /** @return the sandbox */
     public JexlSandbox sandbox() {
         return this.sandbox;
@@ -154,7 +162,7 @@ public class JexlBuilder {
     public Log logger() {
         return this.logger;
     }
-    
+
     /**
      * Sets the class loader to use.
      * @param l the class loader
@@ -164,7 +172,7 @@ public class JexlBuilder {
         this.loader = l;
         return this;
     }
-    
+
     /** @return the class loader */
     public ClassLoader loader() {
         return loader;
@@ -254,8 +262,8 @@ public class JexlBuilder {
 
     /**
      * Sets the expression cache size the engine will use.
-     * <p>The cache will contain at most <code>size</code> expressions. Note that
-     * all JEXL caches are held through SoftReferences and may be garbage-collected.</p>
+     * <p>The cache will contain at most <code>size</code> expressions of at most <code>cacheThreshold</code> length.
+     * Note that all JEXL caches are held through SoftReferences and may be garbage-collected.</p>
      * @param size if not strictly positive, no cache is used.
      * @return this builder
      */
@@ -267,6 +275,25 @@ public class JexlBuilder {
     /**@return the cache size */
     public int cache() {
         return cache;
+    }
+
+    /**
+     * Sets the maximum length for an expression to be cached.
+     * <p>Expression whose length is greater than this expression cache length threshold will
+     * bypass the cache.</p>
+     * <p>It is expected that a "long" script will be parsed once and its reference kept
+     * around in user-space structures; the jexl expression cache has no added-value in this case.</p>
+     * @param length if not strictly positive, the value is silently replaced by the default value (64).
+     * @return this builder
+     */
+    public JexlBuilder cacheThreshold(int length) {
+        this.cacheThreshold = length > 0? length : CACHE_THRESHOLD;
+        return this;
+    }
+
+    /**@return the cache threshold */
+    public int cacheThreshold() {
+        return cacheThreshold;
     }
 
     /**

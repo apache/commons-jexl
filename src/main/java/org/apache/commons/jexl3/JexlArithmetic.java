@@ -28,7 +28,7 @@ import java.math.MathContext;
  * The 5 arithmetic operators (+, - , *, /, %) follow the same evaluation rules regarding their arguments.
  * <ol>
  * <li>If both are null, result is 0</li>
- * <li>If either is a BigDecimal, coerce both to BigDecimal and  perform operation</li>
+ * <li>If either is a BigDecimal, coerce both to BigDecimal and perform operation</li>
  * <li>If either is a floating point number, coerce both to Double and perform operation</li>
  * <li>Else treat as BigInteger, perform operation and attempt to narrow result:
  * <ol>
@@ -43,6 +43,9 @@ import java.math.MathContext;
  * @since 2.0
  */
 public class JexlArithmetic {
+    /** Maker class for null operand exceptions. */
+    public static class NullOperand extends ArithmeticException {
+    }
     /** Double.MAX_VALUE as BigDecimal. */
     protected static final BigDecimal BIGD_DOUBLE_MAX_VALUE = BigDecimal.valueOf(Double.MAX_VALUE);
     /** Double.MIN_VALUE as BigDecimal. */
@@ -70,14 +73,14 @@ public class JexlArithmetic {
 
     /**
      * Creates a JexlArithmetic.
-     * @param astrict whether this arithmetic is lenient or strict
+     * @param astrict     whether this arithmetic is lenient or strict
      * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
-     * @param bigdScale the scale used for big decimals.
+     * @param bigdScale   the scale used for big decimals.
      */
     public JexlArithmetic(boolean astrict, MathContext bigdContext, int bigdScale) {
         this.strict = astrict;
-        this.mathContext = bigdContext == null? MathContext.DECIMAL128 : bigdContext;
-        this.mathScale = bigdScale == Integer.MIN_VALUE? BIGD_SCALE : bigdScale;
+        this.mathContext = bigdContext == null ? MathContext.DECIMAL128 : bigdContext;
+        this.mathScale = bigdScale == Integer.MIN_VALUE ? BIGD_SCALE : bigdScale;
     }
 
     /**
@@ -98,8 +101,8 @@ public class JexlArithmetic {
             bigdScale = mathScale;
         }
         if ((ostrict != this.strict)
-             || bigdScale != this.mathScale
-             || bigdContext != this.mathContext) {
+                || bigdScale != this.mathScale
+                || bigdContext != this.mathContext) {
             return new JexlArithmetic(ostrict, bigdContext, bigdScale);
         } else {
             return this;
@@ -152,7 +155,7 @@ public class JexlArithmetic {
      */
     protected Object controlNullNullOperands() {
         if (isStrict()) {
-            throw new ArithmeticException(JexlException.NULL_OPERAND);
+            throw new NullOperand();
         }
         return Integer.valueOf(0);
     }
@@ -163,7 +166,7 @@ public class JexlArithmetic {
      */
     protected void controlNullOperand() {
         if (isStrict()) {
-            throw new ArithmeticException(JexlException.NULL_OPERAND);
+            throw new NullOperand();
         }
     }
 
@@ -210,6 +213,21 @@ public class JexlArithmetic {
     }
 
     /**
+     * Given a Number, return back the value using the smallest type the result
+     * will fit into.
+     * <p>This works hand in hand with parameter 'widening' in java
+     * method calls, e.g. a call to substring(int,int) with an int and a long
+     * will fail, but a call to substring(int,int) with an int and a short will
+     * succeed.</p>
+     *
+     * @param original the original number.
+     * @return a value of the smallest type the original number will fit into.
+     */
+    public Number narrow(Number original) {
+        return narrowNumber(original, null);
+    }
+
+    /**
      * Whether we consider the narrow class as a potential candidate for narrowing the source.
      * @param narrow the target narrow class
      * @param source the orginal source class
@@ -222,8 +240,8 @@ public class JexlArithmetic {
     /**
      * Given a Number, return back the value attempting to narrow it to a target class.
      * @param original the original number
-     * @param narrow the attempted target class
-     * @return  the narrowed number or the source if no narrowing was possible
+     * @param narrow   the attempted target class
+     * @return the narrowed number or the source if no narrowing was possible
      */
     public Number narrowNumber(Number original, Class<?> narrow) {
         if (original == null) {
@@ -233,7 +251,8 @@ public class JexlArithmetic {
         if (original instanceof BigDecimal) {
             BigDecimal bigd = (BigDecimal) original;
             // if it's bigger than a double it can't be narrowed
-            if (bigd.compareTo(BIGD_DOUBLE_MAX_VALUE) > 0) {
+            if (bigd.compareTo(BIGD_DOUBLE_MAX_VALUE) > 0
+                    || bigd.compareTo(BIGD_DOUBLE_MIN_VALUE) < 0) {
                 return original;
             } else {
                 try {
@@ -251,7 +270,7 @@ public class JexlArithmetic {
                 }
             }
         }
-        if (original instanceof Double || original instanceof Float || original instanceof BigDecimal) {
+        if (original instanceof Double || original instanceof Float) {
             double value = original.doubleValue();
             if (narrowAccept(narrow, Float.class)
                     && value <= Float.MAX_VALUE
@@ -296,8 +315,8 @@ public class JexlArithmetic {
      * if either arguments is a BigInteger, no narrowing will occur
      * if either arguments is a Long, no narrowing to Integer will occur
      * </p>
-     * @param lhs the left hand side operand that lead to the bigi result
-     * @param rhs the right hand side operand that lead to the bigi result
+     * @param lhs  the left hand side operand that lead to the bigi result
+     * @param rhs  the right hand side operand that lead to the bigi result
      * @param bigi the BigInteger to narrow
      * @return an Integer or Long if narrowing is possible, the original BigInteger otherwise
      */
@@ -323,8 +342,8 @@ public class JexlArithmetic {
      * Given a BigDecimal, attempt to narrow it to an Integer or Long if it fits if
      * one of the arguments is a numberable.
      *
-     * @param lhs the left hand side operand that lead to the bigd result
-     * @param rhs the right hand side operand that lead to the bigd result
+     * @param lhs  the left hand side operand that lead to the bigd result
+     * @param rhs  the right hand side operand that lead to the bigd result
      * @param bigd the BigDecimal to narrow
      * @return an Integer or Long if narrowing is possible, the original BigInteger otherwise
      */
@@ -414,7 +433,7 @@ public class JexlArithmetic {
      * Replace all numbers in an arguments array with the smallest type that will fit.
      * @param args the argument array
      * @return true if some arguments were narrowed and args array is modified,
-     *         false if no narrowing occured and args array has not been modified
+     * false if no narrowing occured and args array has not been modified
      */
     public boolean narrowArguments(Object[] args) {
         boolean narrowed = false;
@@ -437,45 +456,45 @@ public class JexlArithmetic {
      * If any numeric add fails on coercion to the appropriate type,
      * treat as Strings and do concatenation.
      * </p>
-     * @param left first value
+     * @param left  first value
      * @param right second value
      * @return left + right.
      */
-        public Object add(Object left, Object right) {
-            if (left == null && right == null) {
-                return controlNullNullOperands();
-            }
-            try {
-                // if either are bigdecimal use that type
-                if (left instanceof BigDecimal || right instanceof BigDecimal) {
-                    BigDecimal l = toBigDecimal(left);
-                    BigDecimal r = toBigDecimal(right);
-                    BigDecimal result = l.add(r, getMathContext());
-                    return narrowBigDecimal(left, right, result);
-                }
-                // if either are floating point (double or float) use double
-                if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-                    double l = toDouble(left);
-                    double r = toDouble(right);
-                    return new Double(l + r);
-                }
-                // otherwise treat as integers
-                BigInteger l = toBigInteger(left);
-                BigInteger r = toBigInteger(right);
-                BigInteger result = l.add(r);
-                return narrowBigInteger(left, right, result);
-            } catch (java.lang.NumberFormatException nfe) {
-                // Well, use strings!
-                if (left == null || right == null) {
-                    controlNullOperand();
-                }
-                return toString(left).concat(toString(right));
-            }
+    public Object add(Object left, Object right) {
+        if (left == null && right == null) {
+            return controlNullNullOperands();
         }
+        try {
+            // if either are bigdecimal use that type
+            if (left instanceof BigDecimal || right instanceof BigDecimal) {
+                BigDecimal l = toBigDecimal(left);
+                BigDecimal r = toBigDecimal(right);
+                BigDecimal result = l.add(r, getMathContext());
+                return narrowBigDecimal(left, right, result);
+            }
+            // if either are floating point (double or float) use double
+            if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
+                double l = toDouble(left);
+                double r = toDouble(right);
+                return new Double(l + r);
+            }
+            // otherwise treat as integers
+            BigInteger l = toBigInteger(left);
+            BigInteger r = toBigInteger(right);
+            BigInteger result = l.add(r);
+            return narrowBigInteger(left, right, result);
+        } catch (java.lang.NumberFormatException nfe) {
+            // Well, use strings!
+            if (left == null || right == null) {
+                controlNullOperand();
+            }
+            return toString(left).concat(toString(right));
+        }
+    }
 
     /**
      * Divide the left value by the right.
-     * @param left first value
+     * @param left  first value
      * @param right second value
      * @return left / right
      * @throws ArithmeticException if right == 0
@@ -490,7 +509,7 @@ public class JexlArithmetic {
             BigDecimal r = toBigDecimal(right);
             if (BigDecimal.ZERO.equals(r)) {
                 throw new ArithmeticException("/");
-            }
+                }
             BigDecimal result = l.divide(r, getMathContext());
             return narrowBigDecimal(left, right, result);
         }
@@ -508,14 +527,14 @@ public class JexlArithmetic {
         BigInteger r = toBigInteger(right);
         if (BigInteger.ZERO.equals(r)) {
             throw new ArithmeticException("/");
-        }
+            }
         BigInteger result = l.divide(r);
         return narrowBigInteger(left, right, result);
     }
 
     /**
      * left value mod right.
-     * @param left first value
+     * @param left  first value
      * @param right second value
      * @return left mod right
      * @throws ArithmeticException if right == 0.0
@@ -530,7 +549,7 @@ public class JexlArithmetic {
             BigDecimal r = toBigDecimal(right);
             if (BigDecimal.ZERO.equals(r)) {
                 throw new ArithmeticException("%");
-            }
+                }
             BigDecimal remainder = l.remainder(r, getMathContext());
             return narrowBigDecimal(left, right, remainder);
         }
@@ -549,13 +568,13 @@ public class JexlArithmetic {
         BigInteger result = l.mod(r);
         if (BigInteger.ZERO.equals(r)) {
             throw new ArithmeticException("%");
-        }
+            }
         return narrowBigInteger(left, right, result);
     }
 
     /**
      * Multiply the left value by the right.
-     * @param left first value
+     * @param left  first value
      * @param right second value
      * @return left * right.
      */
@@ -585,7 +604,7 @@ public class JexlArithmetic {
 
     /**
      * Subtract the right value from the left.
-     * @param left first value
+     * @param left  first value
      * @param right second value
      * @return left - right.
      */
@@ -652,7 +671,7 @@ public class JexlArithmetic {
     /**
      * Test if left regexp matches right.
      *
-     * @param left first value
+     * @param left  first value
      * @param right second value
      * @return test result.
      */
@@ -675,7 +694,7 @@ public class JexlArithmetic {
 
     /**
      * Performs a bitwise and.
-     * @param left the left operand
+     * @param left  the left operand
      * @param right the right operator
      * @return left & right
      */
@@ -687,7 +706,7 @@ public class JexlArithmetic {
 
     /**
      * Performs a bitwise or.
-     * @param left the left operand
+     * @param left  the left operand
      * @param right the right operator
      * @return left | right
      */
@@ -699,9 +718,9 @@ public class JexlArithmetic {
 
     /**
      * Performs a bitwise xor.
-     * @param left the left operand
+     * @param left  the left operand
      * @param right the right operator
-     * @return left  right
+     * @return left right
      */
     public Object bitwiseXor(Object left, Object right) {
         long l = toLong(left);
@@ -721,10 +740,10 @@ public class JexlArithmetic {
 
     /**
      * Performs a comparison.
-     * @param left the left operand
-     * @param right the right operator
+     * @param left     the left operand
+     * @param right    the right operator
      * @param operator the operator
-     * @return -1 if left  &lt; right; +1 if left &gt > right; 0 if left == right
+     * @return -1 if left &lt; right; +1 if left &gt > right; 0 if left == right
      * @throws ArithmeticException if either left or right is null
      */
     protected int compare(Object left, Object right, String operator) {
@@ -786,7 +805,7 @@ public class JexlArithmetic {
     /**
      * Test if left and right are equal.
      *
-     * @param left first value
+     * @param left  first value
      * @param right second value
      * @return test result.
      */
@@ -803,9 +822,9 @@ public class JexlArithmetic {
     }
 
     /**
-     * Test if left < right.
+     * Test if left &lt; right.
      *
-     * @param left first value
+     * @param left  first value
      * @param right second value
      * @return test result.
      */
@@ -819,9 +838,9 @@ public class JexlArithmetic {
     }
 
     /**
-     * Test if left > right.
+     * Test if left &gt; right.
      *
-     * @param left first value
+     * @param left  first value
      * @param right second value
      * @return test result.
      */
@@ -834,9 +853,9 @@ public class JexlArithmetic {
     }
 
     /**
-     * Test if left <= right.
+     * Test if left &lt;= right.
      *
-     * @param left first value
+     * @param left  first value
      * @param right second value
      * @return test result.
      */
@@ -851,9 +870,9 @@ public class JexlArithmetic {
     }
 
     /**
-     * Test if left >= right.
+     * Test if left &gt;= right.
      *
-     * @param left first value
+     * @param left  first value
      * @param right second value
      * @return test result.
      */
@@ -868,7 +887,8 @@ public class JexlArithmetic {
     }
 
     /**
-     * Coerce to a boolean (not a java.lang.Boolean).
+     * Coerce to a primitive boolean.
+     * <p>Double.NaN, null, "false" and empty string coerce to false.</p>
      *
      * @param val Object to be coerced.
      * @return the boolean value if coercion is possible, true if value was not null.
@@ -892,20 +912,24 @@ public class JexlArithmetic {
     }
 
     /**
-     * Coerce to a int.
+     * Coerce to a primitive int.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
      *
      * @param val Object to be coerced.
      * @return The int coerced value.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible.
      */
     public int toInteger(Object val) {
         if (val == null) {
             controlNullOperand();
             return 0;
         } else if (val instanceof Double) {
-            if (!Double.isNaN(((Double) val).doubleValue())) {
+            Double dval = (Double) val;
+            if (Double.isNaN(dval.doubleValue())) {
                 return 0;
             } else {
-                return ((Double) val).intValue();
+                return dval.intValue();
             }
         } else if (val instanceof Number) {
             return ((Number) val).intValue();
@@ -925,26 +949,30 @@ public class JexlArithmetic {
     }
 
     /**
-     * Coerce to a long (not a java.lang.Long).
+     * Coerce to a primitive long.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
      *
      * @param val Object to be coerced.
      * @return The long coerced value.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible.
      */
     public long toLong(Object val) {
         if (val == null) {
             controlNullOperand();
             return 0L;
         } else if (val instanceof Double) {
-            if (!Double.isNaN(((Double) val).doubleValue())) {
-                return 0;
+            Double dval = (Double) val;
+            if (Double.isNaN(dval.doubleValue())) {
+                return 0L;
             } else {
-                return ((Double) val).longValue();
+                return dval.longValue();
             }
         } else if (val instanceof Number) {
             return ((Number) val).longValue();
         } else if (val instanceof String) {
             if ("".equals(val)) {
-                return 0;
+                return 0L;
             } else {
                 return Long.parseLong((String) val);
             }
@@ -959,11 +987,13 @@ public class JexlArithmetic {
     }
 
     /**
-     * Get a BigInteger from the object passed.
-     * Null and empty string maps to zero.
+     * Coerce to a BigInteger.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
      * @param val the object to be coerced.
      * @return a BigDecimal.
-     * @throws NullPointerException if val is null and mode is strict.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible.
      */
     public BigInteger toBigInteger(Object val) {
         if (val == null) {
@@ -972,10 +1002,11 @@ public class JexlArithmetic {
         } else if (val instanceof BigInteger) {
             return (BigInteger) val;
         } else if (val instanceof Double) {
-            if (!Double.isNaN(((Double) val).doubleValue())) {
-                return new BigInteger(val.toString());
-            } else {
+            Double dval = (Double) val;
+            if (Double.isNaN(dval.doubleValue())) {
                 return BigInteger.ZERO;
+            } else {
+                return new BigInteger(dval.toString());
             }
         } else if (val instanceof Number) {
             return new BigInteger(val.toString());
@@ -996,11 +1027,13 @@ public class JexlArithmetic {
     }
 
     /**
-     * Get a BigDecimal from the object passed.
-     * Null and empty string maps to zero.
+     * Coerce to a BigDecimal.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
      * @param val the object to be coerced.
      * @return a BigDecimal.
-     * @throws NullPointerException if val is null and mode is strict.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible.
      */
     public BigDecimal toBigDecimal(Object val) {
         if (val instanceof BigDecimal) {
@@ -1015,10 +1048,10 @@ public class JexlArithmetic {
             }
             return roundBigDecimal(new BigDecimal(string, getMathContext()));
         } else if (val instanceof Double) {
-            if (!Double.isNaN(((Double) val).doubleValue())) {
-                return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
-            } else {
+            if (Double.isNaN(((Double) val).doubleValue())) {
                 return BigDecimal.ZERO;
+            } else {
+                return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
             }
         } else if (val instanceof Number) {
             return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
@@ -1026,17 +1059,17 @@ public class JexlArithmetic {
             int i = ((Character) val).charValue();
             return new BigDecimal(i);
         }
-
         throw new ArithmeticException("BigDecimal coercion: "
                 + val.getClass().getName() + ":(" + val + ")");
     }
 
     /**
-     * Coerce to a double.
-     *
+     * Coerce to a primitive double.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
      * @param val Object to be coerced.
      * @return The double coerced value.
-     * @throws NullPointerException if val is null and mode is strict.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible.
      */
     public double toDouble(Object val) {
         if (val == null) {
@@ -1062,17 +1095,17 @@ public class JexlArithmetic {
             int i = ((Character) val).charValue();
             return i;
         }
-
         throw new ArithmeticException("Double coercion: "
                 + val.getClass().getName() + ":(" + val + ")");
     }
 
     /**
      * Coerce to a string.
+     * <p>Double.NaN coerce to the empty string.</p>
      *
      * @param val Object to be coerced.
      * @return The String coerced value.
-     * @throws NullPointerException if val is null and mode is strict.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible.
      */
     public String toString(Object val) {
         if (val == null) {
@@ -1088,19 +1121,5 @@ public class JexlArithmetic {
         } else {
             return val.toString();
         }
-    }
-
-    /**
-     * Given a Number, return back the value using the smallest type the result
-     * will fit into. This works hand in hand with parameter 'widening' in java
-     * method calls, e.g. a call to substring(int,int) with an int and a long
-     * will fail, but a call to substring(int,int) with an int and a short will
-     * succeed.
-     *
-     * @param original the original number.
-     * @return a value of the smallest type the original number will fit into.
-     */
-    public Number narrow(Number original) {
-        return narrowNumber(original, null);
     }
 }

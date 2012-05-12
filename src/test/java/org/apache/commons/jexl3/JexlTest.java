@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.Parser;
 
 /**
@@ -649,7 +650,7 @@ public class JexlTest extends JexlTestCase {
         Foo foo = new Foo();
         jc.set("foo", foo);
         Parser parser = new Parser(new StringReader(";"));
-        parser.parse(new StringReader("aString = 'World';"), null, null);
+        parser.parse(null, new StringReader("aString = 'World';"), null, false);
 
         assertExpression(jc, "hello = 'world'", "world");
         assertEquals("hello variable not changed", "world", jc.get("hello"));
