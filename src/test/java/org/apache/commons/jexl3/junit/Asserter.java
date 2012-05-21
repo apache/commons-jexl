@@ -100,6 +100,13 @@ public class Asserter extends Assert {
         if (expected instanceof BigDecimal) {
             JexlArithmetic jexla = engine.getArithmetic();
             assertTrue("expression: " + expression, ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)) == 0);
+        }
+        if (expected != null && value != null) {
+            assertEquals("expression: " + expression + ", "
+                    + expected.getClass().getSimpleName()
+                    + " ?= "
+                    + value.getClass().getSimpleName(),
+                    expected, value);
         } else {
             assertEquals("expression: " + expression, expected, value);
         }

@@ -60,35 +60,6 @@ import java.lang.ref.SoftReference;
  */
 public class Engine extends JexlEngine {
     /**
-     * An empty/static/non-mutable JexlContext used instead of null context.
-     */
-    public static final JexlContext EMPTY_CONTEXT = new JexlContext() {
-        @Override
-        public Object get(String name) {
-            return null;
-        }
-
-        @Override
-        public boolean has(String name) {
-            return false;
-        }
-
-        @Override
-        public void set(String name, Object value) {
-            throw new UnsupportedOperationException("Not supported in void context.");
-        }
-    };
-    /**
-     * An empty/static/non-mutable JexlNamesapce used instead of null namespace.
-     */
-    public static final JexlContext.NamespaceResolver EMPTY_NS = new JexlContext.NamespaceResolver() {
-        @Override
-        public Object resolveNamespace(String name) {
-            return null;
-        }
-    };
-
-    /**
      * Gets the default instance of Uberspect.
      * <p>This is lazily initialized to avoid building a default instance if there
      * is no use for it. The main reason for not using the default Uberspect instance is to
@@ -211,11 +182,6 @@ public class Engine extends JexlEngine {
     }
 
     @Override
-    public TemplateEngine createJxltEngine() {
-        return new TemplateEngine(this);
-    }
-
-    @Override
     public boolean isDebug() {
         return this.debug;
     }
@@ -233,6 +199,11 @@ public class Engine extends JexlEngine {
     @Override
     public void setClassLoader(ClassLoader loader) {
         uberspect.setClassLoader(loader);
+    }
+
+    @Override
+    public TemplateEngine createJxltEngine(int cacheSize, char immediate, char deferred) {
+        return new TemplateEngine(this, cacheSize, immediate, deferred);
     }
 
     /**
@@ -549,7 +520,7 @@ public class Engine extends JexlEngine {
                     ref = new ArrayList<String>();
                     refs.add(ref);
                 }
-                ref.add(identifier.image);
+                ref.add(identifier.getName());
             }
         } else {
             int num = node.jjtGetNumChildren();
@@ -562,16 +533,17 @@ public class Engine extends JexlEngine {
                     JexlNode child = node.jjtGetChild(i);
                     if (array) {
                         if (varf && child.isConstant()) {
-                            String image = child.image;
+                            String image = child.toString();
                             if (image == null) {
                                 var.add(new Debugger().data(child));
                             } else {
                                 var.add(image);
                             }
                         } else if (child instanceof ASTIdentifier) {
-                            if (((ASTIdentifier) child).getSymbol() < 0) {
+                            ASTIdentifier ichild = (ASTIdentifier) child;
+                            if (ichild.getSymbol() < 0) {
                                 List<String> di = new ArrayList<String>(1);
-                                di.add(child.image);
+                                di.add(ichild.getName());
                                 refs.add(di);
                             }
                             var = new ArrayList<String>();
@@ -579,13 +551,14 @@ public class Engine extends JexlEngine {
                         }
                         continue;
                     } else if (child instanceof ASTIdentifier) {
-                        if (i == 0 && (((ASTIdentifier) child).getSymbol() < 0)) {
-                            var.add(child.image);
+                        ASTIdentifier ichild = (ASTIdentifier) child;
+                        if (i == 0 && ichild.getSymbol() < 0) {
+                            var.add(ichild.getName());
                         }
                         varf = false;
                         continue;
                     } else if (child instanceof ASTIdentifierAccess) {
-                        var.add(child.image);
+                        var.add(((ASTIdentifierAccess) child).getName());
                         varf = false;
                         continue;
                     }

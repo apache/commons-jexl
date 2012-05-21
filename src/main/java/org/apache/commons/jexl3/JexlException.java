@@ -17,12 +17,14 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Debugger;
+import org.apache.commons.jexl3.parser.JavaccError;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParseException;
 import org.apache.commons.jexl3.parser.TokenMgrError;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +56,14 @@ public class JexlException extends RuntimeException {
      * @param cause the exception causing the error
      */
     public JexlException(JexlNode node, String msg, Throwable cause) {
-        this(node != null ? node.jexlInfo() : null, msg != null ? msg : "", cause);
+        super(msg != null ? msg : "", unwrap(cause));
+        if (node != null) {
+            mark = node;
+            info = node.jexlInfo();
+        } else {
+            mark = null;
+            info = null;
+        }
     }
 
     /**
@@ -67,6 +76,14 @@ public class JexlException extends RuntimeException {
         super(msg, unwrap(cause));
         mark = null;
         info = jinfo;
+    }
+
+    /**
+     * Gets the specific information for this exception.
+     * @return the information
+     */
+    public JexlInfo getInfo() {
+        return info;
     }
 
     /**
@@ -91,7 +108,7 @@ public class JexlException extends RuntimeException {
                 StackTraceElement se = stack[s];
                 String className = se.getClassName();
                 if (!className.startsWith("org.apache.commons.jexl3.internal")
-                    && !className.startsWith("org.apache.commons.jexl3.parser")) {
+                        && !className.startsWith("org.apache.commons.jexl3.parser")) {
                     stackJexl.add(se);
                 }
             }
@@ -112,6 +129,23 @@ public class JexlException extends RuntimeException {
             return ((UndeclaredThrowableException) xthrow).getUndeclaredThrowable();
         } else {
             return xthrow;
+        }
+    }
+
+    /**
+     * Merge the node info and the cause info to obtain best possible location.
+     * @param info  the node
+     * @param cause the cause
+     * @return the info to use
+     */
+    private static JexlInfo merge(JexlInfo info, JavaccError cause) {
+        JexlInfo dbgn = info != null ? info : null;
+        if (cause == null) {
+            return dbgn;
+        } else if (dbgn == null) {
+            return new JexlInfo("", cause.getLine(), cause.getColumn());
+        } else {
+            return new JexlInfo(dbgn.getName(), cause.getLine(), cause.getColumn());
         }
     }
 
@@ -161,24 +195,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
-         * Merge the node info and the cause info to obtain best possible location.
-         * @param info  the node
-         * @param cause the cause
-         * @return the info to use
-         */
-        private static JexlInfo merge(JexlInfo info, TokenMgrError cause) {
-            JexlInfo dbgn = info != null ? info : null;
-            if (cause == null) {
-                return dbgn;
-            } else if (dbgn == null) {
-                return new JexlInfo("", cause.getLine(), cause.getColumn());
-            } else {
-                return new JexlInfo(dbgn.getName(), cause.getLine(), cause.getColumn());
-            }
-        }
-
-        /**
-         * @return the last good token
+         * @return the specific detailed message
          */
         public String getDetail() {
             return super.detailedMessage();
@@ -214,24 +231,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
-         * Merge the node info and the cause info to obtain best possible location.
-         * @param info  the location information
-         * @param cause the cause
-         * @return the info to use
-         */
-        private static JexlInfo merge(JexlInfo info, ParseException cause) {
-            JexlInfo dbgn = info != null ? info : null;
-            if (cause == null) {
-                return dbgn;
-            } else if (dbgn == null) {
-                return new JexlInfo("", cause.getLine(), cause.getColumn());
-            } else {
-                return new JexlInfo(dbgn.getName(), cause.getLine(), cause.getColumn());
-            }
-        }
-
-        /**
-         * @return the last good token
+         * @return the specific detailed message
          */
         public String getDetail() {
             return super.detailedMessage();
@@ -387,28 +387,6 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Gets information about the cause of this error.
-     * <p>
-     * The returned string represents the outermost expression in error.
-     * The info parameter, an int[2] optionally provided by the caller, will be filled with the begin/end offset
-     * characters of the precise error's trigger.
-     * </p>
-     * @param offsets character offset interval of the precise node triggering the error
-     * @return a string representation of the offending expression, the empty string if it could not be determined
-     */
-    public String getInfo(int[] offsets) {
-        Debugger dbg = new Debugger();
-        if (dbg.debug(mark)) {
-            if (offsets != null && offsets.length >= 2) {
-                offsets[0] = dbg.start();
-                offsets[1] = dbg.end();
-            }
-            return dbg.toString();
-        }
-        return "";
-    }
-
-    /**
      * Detailed info message about this error.
      * Format is "debug![begin,end]: string \n msg" where:
      * - debug is the debugging information if it exists (@link JexlEngine.setDebug)
@@ -419,19 +397,23 @@ public class JexlException extends RuntimeException {
      */
     @Override
     public String getMessage() {
-        Debugger dbg = new Debugger();
         StringBuilder msg = new StringBuilder();
         if (info != null) {
             msg.append(info.toString());
+        } else {
+            msg.append('?');
         }
-        if (dbg.debug(mark)) {
-            msg.append("![");
-            msg.append(dbg.start());
-            msg.append(",");
-            msg.append(dbg.end());
-            msg.append("]: '");
-            msg.append(dbg.toString());
-            msg.append("'");
+        if (mark != null) {
+            Debugger dbg = new Debugger();
+            if (dbg.debug(mark)) {
+                msg.append("![");
+                msg.append(dbg.start());
+                msg.append(",");
+                msg.append(dbg.end());
+                msg.append("]: '");
+                msg.append(dbg.toString());
+                msg.append("'");
+            }
         }
         msg.append(' ');
         msg.append(detailedMessage());

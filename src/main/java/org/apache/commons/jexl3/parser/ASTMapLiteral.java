@@ -18,12 +18,13 @@ package org.apache.commons.jexl3.parser;
 
 import java.util.Collections;
 import java.util.Map;
+import org.apache.commons.jexl3.internal.Debugger;
 
 public final class ASTMapLiteral extends JexlNode implements JexlNode.Literal<Object> {
     /** The type literal value. */
-    Map<?,?> map = null;
+    private Map<?,?> map = null;
     /** Whether this array is constant or not. */
-    boolean constant = false;
+    private boolean constant = false;
 
     ASTMapLiteral(int id) {
         super(id);
@@ -34,34 +35,26 @@ public final class ASTMapLiteral extends JexlNode implements JexlNode.Literal<Ob
     }
 
 
-    /** {@inheritDoc} */
     @Override
-    public void jjtClose() {
-        if (children == null || children.length == 0) {
-            map = Collections.EMPTY_MAP;
-            constant = true;
-        } else {
-            constant = isConstant();
-        }
+    public String toString() {
+        Debugger dbg = new Debugger();
+        return dbg.data(this);
     }
 
-    /**
-     *  Gets the literal value.
-     * @return the array literal
-     */
-    public Object getLiteral() {
+    @Override
+    public Map<?,?> getLiteral() {
         return map;
     }
 
     /**
-     * Sets the literal value only if the descendants of this node compose a constant
+     * Sets the literal value only if the descendants of this node compose a constant.
      * @param literal the literal array value
      * @throws IllegalArgumentException if literal is not an array or null
      */
-    public void setLiteral(Object literal) {
+    void setLiteral(Object literal) {
         if (constant) {
             if (!(literal instanceof Map<?,?>)) {
-                throw new IllegalArgumentException(literal.getClass() + " is not an array");
+                throw new IllegalArgumentException(literal.getClass() + " is not a map");
             }
             this.map = (Map<?,?>) literal;
         }
@@ -71,5 +64,16 @@ public final class ASTMapLiteral extends JexlNode implements JexlNode.Literal<Ob
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void jjtClose() {
+        if (children == null || children.length == 0) {
+            map = Collections.EMPTY_MAP;
+            constant = true;
+        } else {
+            constant = isConstant();
+        }
     }
 }

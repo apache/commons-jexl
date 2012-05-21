@@ -17,7 +17,6 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine;
-import org.apache.commons.jexl3.internal.TemplateEngine;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -183,8 +182,8 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-42: NullPointerException evaluating an expression
     // fixed in JexlArithmetic by allowing add operator to deal with string, null
     public void test42() throws Exception {
-        Engine jexl = new Engine();
-        JxltEngine uel = new TemplateEngine(jexl);
+        JexlEngine jexl = new JexlBuilder().create();
+        JxltEngine uel = jexl.createJxltEngine();
         // ensure errors will throw
         //jexl.setSilent(false);
         JexlEvalContext ctxt = new JexlEvalContext();
@@ -557,7 +556,7 @@ public class IssuesTest extends JexlTestCase {
             Object expected = exprs[e + 1];
             Object value = expr.evaluate(context);
             assertEquals(expected, value);
-            expr = jexl.createExpression(expr.dump());
+            expr = jexl.createExpression(expr.getParsedText());
             value = expr.evaluate(context);
             assertEquals(expected, value);
         }
@@ -570,28 +569,28 @@ public class IssuesTest extends JexlTestCase {
         expr = jexl.createExpression("size([])");
         value = expr.evaluate(null);
         assertEquals(0, value);
-        expr = jexl.createExpression(expr.dump());
+        expr = jexl.createExpression(expr.getParsedText());
         value = expr.evaluate(null);
         assertEquals(0, value);
 
         expr = jexl.createExpression("if (true) { [] } else { {:} }");
         value = expr.evaluate(null);
         assertTrue(value.getClass().isArray());
-        expr = jexl.createExpression(expr.dump());
+        expr = jexl.createExpression(expr.getParsedText());
         value = expr.evaluate(null);
         assertTrue(value.getClass().isArray());
 
         expr = jexl.createExpression("size({:})");
         value = expr.evaluate(null);
         assertEquals(0, value);
-        expr = jexl.createExpression(expr.dump());
+        expr = jexl.createExpression(expr.getParsedText());
         value = expr.evaluate(null);
         assertEquals(0, value);
 
         expr = jexl.createExpression("if (false) { [] } else { {:} }");
         value = expr.evaluate(null);
         assertTrue(value instanceof Map<?, ?>);
-        expr = jexl.createExpression(expr.dump());
+        expr = jexl.createExpression(expr.getParsedText());
         value = expr.evaluate(null);
         assertTrue(value instanceof Map<?, ?>);
     }
@@ -905,7 +904,7 @@ public class IssuesTest extends JexlTestCase {
     public void test132c() throws Exception {
         JexlEngine jexl = createJexl132();
         String expr = "math:abs(-42)";
-        
+
         Object evaluate = jexl.createExpression(expr).evaluate(null);
         assertEquals(42, evaluate);
     }

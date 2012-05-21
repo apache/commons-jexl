@@ -81,6 +81,39 @@ public abstract class JexlEngine {
     }
 
     /**
+     * An empty/static/non-mutable JexlContext used instead of null context.
+     */
+    public static final JexlContext EMPTY_CONTEXT = new JexlContext() {
+        @Override
+        public Object get(String name) {
+            return null;
+        }
+
+        @Override
+        public boolean has(String name) {
+            return false;
+        }
+
+        @Override
+        public void set(String name, Object value) {
+            throw new UnsupportedOperationException("Not supported in void context.");
+        }
+    };
+
+    /**
+     * An empty/static/non-mutable JexlNamesapce used instead of null namespace.
+     */
+    public static final JexlContext.NamespaceResolver EMPTY_NS = new JexlContext.NamespaceResolver() {
+        @Override
+        public Object resolveNamespace(String name) {
+            return null;
+        }
+    };
+
+    /** The default Jxlt cache size. */
+    private static final int JXLT_CACHE_SIZE = 256;
+
+    /**
      * Gets this engine underlying {@link JexlUberspect}.
      * @return the uberspect
      */
@@ -122,7 +155,18 @@ public abstract class JexlEngine {
      * Creates a new {@link JxltEngine} instance using this engine.
      * @return a Jexl Template engine
      */
-    public abstract JxltEngine createJxltEngine();
+    public JxltEngine createJxltEngine() {
+        return createJxltEngine(JXLT_CACHE_SIZE, '$', '#');
+    }
+
+    /**
+     * Creates a new instance of {@link JxltEngine} using this engine.
+     * @param cacheSize the number of expressions in this cache, default is 256
+     * @param immediate the immediate template expression character, default is '$'
+     * @param deferred  the deferred template expression character, default is '#'
+     * @return a Jexl Template engine
+     */
+    public abstract JxltEngine createJxltEngine(int cacheSize, char immediate, char deferred);
 
     /**
      * Clears the expression cache.

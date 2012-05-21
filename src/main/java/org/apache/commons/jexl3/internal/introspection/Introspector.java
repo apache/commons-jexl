@@ -63,10 +63,13 @@ public final class Introspector {
         public CacheMiss() {
         }
     }
-    /** The cache-miss marker for the constructors map. */
+    /**
+     * The cache-miss marker for the constructors map.
+     */
     private static final Constructor<?> CTOR_MISS = CacheMiss.class.getConstructors()[0];
-
-    /** the logger. */
+    /**
+     * the logger.
+     */
     protected final Log rlog;
     /**
      * The class loader used to solve constructors if needed.
@@ -91,7 +94,7 @@ public final class Introspector {
 
     /**
      * Create the introspector.
-     * @param log the logger to use
+     * @param log     the logger to use
      * @param cloader the class loader
      */
     public Introspector(Log log, ClassLoader cloader) {
@@ -114,8 +117,8 @@ public final class Introspector {
 
     /**
      * Gets a method defined by a class, a name and a set of parameters.
-     * @param c the class
-     * @param name the method name
+     * @param c      the class
+     * @param name   the method name
      * @param params the method parameters
      * @return the desired method object
      * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
@@ -127,8 +130,8 @@ public final class Introspector {
     /**
      * Gets the method defined by the <code>MethodKey</code> for the class <code>c</code>.
      *
-     * @param c     Class in which the method search is taking place
-     * @param key   Key of the method being searched for
+     * @param c   Class in which the method search is taking place
+     * @param key Key of the method being searched for
      * @return The desired method object
      * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
      */
@@ -149,8 +152,8 @@ public final class Introspector {
     /**
      * Gets the field named by <code>key</code> for the class <code>c</code>.
      *
-     * @param c     Class in which the field search is taking place
-     * @param key   Name of the field being searched for
+     * @param c   Class in which the field search is taking place
+     * @param key Name of the field being searched for
      * @return the desired field or null if it does not exist or is not accessible
      * */
     public Field getField(Class<?> c, String key) {
@@ -185,7 +188,7 @@ public final class Introspector {
 
     /**
      * Gets the array of accessible method known for a given class.
-     * @param c the class
+     * @param c          the class
      * @param methodName the method name
      * @return the array of methods (null or not empty)
      */
@@ -200,7 +203,7 @@ public final class Introspector {
     /**
      * Gets the constructor defined by the <code>MethodKey</code>.
      *
-     * @param key   Key of the constructor being searched for
+     * @param key Key of the constructor being searched for
      * @return The desired constructor object
      * or null if no unambiguous constructor could be found through introspection.
      */
@@ -210,8 +213,8 @@ public final class Introspector {
 
     /**
      * Gets the constructor defined by the <code>MethodKey</code>.
-     * @param c the class we want to instantiate
-     * @param key   Key of the constructor being searched for
+     * @param c   the class we want to instantiate
+     * @param key Key of the constructor being searched for
      * @return The desired constructor object
      * or null if no unambiguous constructor could be found through introspection.
      */
@@ -303,11 +306,8 @@ public final class Introspector {
                 // try again
                 classMap = classMethodMaps.get(c);
                 if (classMap == null) {
-                    classMap = classMethodMaps.get(c);
-                    if (classMap == null) {
-                        classMap = new ClassMap(c, rlog);
-                        classMethodMaps.put(c, classMap);
-                    }
+                    classMap = new ClassMap(c, rlog);
+                    classMethodMaps.put(c, classMap);
                 }
             } finally {
                 lock.writeLock().unlock();
@@ -328,38 +328,47 @@ public final class Introspector {
             cloader = getClass().getClassLoader();
         }
         if (!cloader.equals(loader)) {
-            // clean up constructor and class maps
-            synchronized (constructorsMap) {
-                Iterator<Map.Entry<MethodKey, Constructor<?>>> entries = constructorsMap.entrySet().iterator();
-                while (entries.hasNext()) {
-                    Map.Entry<MethodKey, Constructor<?>> entry = entries.next();
+            try {
+                lock.writeLock().lock();
+                // clean up constructor and class maps
+                Iterator<Map.Entry<MethodKey, Constructor<?>>> mentries = constructorsMap.entrySet().iterator();
+                while (mentries.hasNext()) {
+                    Map.Entry<MethodKey, Constructor<?>> entry = mentries.next();
                     Class<?> clazz = entry.getValue().getDeclaringClass();
                     if (isLoadedBy(previous, clazz)) {
-                        entries.remove();
+                        mentries.remove();
                         // the method name is the name of the class
                         constructibleClasses.remove(entry.getKey().getMethod());
                     }
                 }
-            }
-            // clean up method maps
-            synchronized (classMethodMaps) {
-                Iterator<Map.Entry<Class<?>, ClassMap>> entries = classMethodMaps.entrySet().iterator();
-                while (entries.hasNext()) {
-                    Map.Entry<Class<?>, ClassMap> entry = entries.next();
+                // clean up method maps
+                Iterator<Map.Entry<Class<?>, ClassMap>> centries = classMethodMaps.entrySet().iterator();
+                while (centries.hasNext()) {
+                    Map.Entry<Class<?>, ClassMap> entry = centries.next();
                     Class<?> clazz = entry.getKey();
                     if (isLoadedBy(previous, clazz)) {
-                        entries.remove();
+                        centries.remove();
                     }
                 }
+                loader = cloader;
+            } finally {
+                lock.writeLock().unlock();
             }
-            loader = cloader;
         }
+    }
+
+    /**
+     * Gets the class loader used by this introspector.
+     * @return the class loader
+     */
+    public ClassLoader getLoader() {
+        return loader;
     }
 
     /**
      * Checks whether a class is loaded through a given class loader or one of its ascendants.
      * @param loader the class loader
-     * @param clazz the class to check
+     * @param clazz  the class to check
      * @return true if clazz was loaded through the loader, false otherwise
      */
     private static boolean isLoadedBy(ClassLoader loader, Class<?> clazz) {

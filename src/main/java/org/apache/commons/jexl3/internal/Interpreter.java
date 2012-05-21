@@ -331,7 +331,6 @@ public class Interpreter extends ParserVisitor {
                 array[i] = entry;
             }
             literal = arithmetic.narrowArrayType(array);
-            node.setLiteral(literal);
         }
         return literal;
     }
@@ -466,7 +465,7 @@ public class Interpreter extends ParserVisitor {
                     // set loopVariable to value of iterator
                     Object value = itemsIterator.next();
                     if (symbol < 0) {
-                        context.set(loopVariable.image, value);
+                        context.set(loopVariable.getName(), value);
                     } else {
                         frame.set(symbol, value);
                     }
@@ -777,7 +776,7 @@ public class Interpreter extends ParserVisitor {
         if (data != null) {
             return getAttribute(data, node.getLiteral(), node);
         }
-        return node.image;
+        return node.getLiteral();
     }
 
     @Override
@@ -963,7 +962,7 @@ public class Interpreter extends ParserVisitor {
         if (isCancelled()) {
             throw new JexlException.Cancel(node);
         }
-        String name = node.image;
+        String name = node.getName();
         if (data == null) {
             int symbol = node.getSymbol();
             if (symbol >= 0) {
@@ -1067,7 +1066,7 @@ public class Interpreter extends ParserVisitor {
                 if (v == 0) {
                     // first node must be an Identifier
                     if (objectNode instanceof ASTIdentifier) {
-                        variableName = new StringBuilder(objectNode.image);
+                        variableName = new StringBuilder(((ASTIdentifier) objectNode).getName());
                         v = 1;
                     } else {
                         break main;
@@ -1078,7 +1077,7 @@ public class Interpreter extends ParserVisitor {
                     objectNode = node.jjtGetChild(v);
                     if (objectNode instanceof ASTIdentifierAccess) {
                         variableName.append('.');
-                        variableName.append(objectNode.image);
+                        variableName.append(((ASTIdentifierAccess) objectNode).getName());
                     } else {
                         break main;
                     }
@@ -1120,13 +1119,13 @@ public class Interpreter extends ParserVisitor {
                 // check we are not assigning direct global
                 if (last < 0) {
                     try {
-                        context.set(var.image, right);
+                        context.set(var.getName(), right);
                     } catch (UnsupportedOperationException xsupport) {
                         throw new JexlException(node, "context is readonly", xsupport);
                     }
                     return right;
                 }
-                object = context.get(var.image);
+                object = context.get(var.getName());
             }
         } else if (!(left instanceof ASTReference)) {
             throw new JexlException(left, "illegal assignment form 0");
@@ -1152,7 +1151,7 @@ public class Interpreter extends ParserVisitor {
             if (isVariable) {
                 if (v == 0) {
                     if (objectNode instanceof ASTIdentifier) {
-                        variableName = new StringBuilder(objectNode.image);
+                        variableName = new StringBuilder(((ASTIdentifier) objectNode).getName());
                         v = 1;
                     } else {
                         isVariable = false;
@@ -1162,7 +1161,7 @@ public class Interpreter extends ParserVisitor {
                     JexlNode child = left.jjtGetChild(v);
                     if (child instanceof ASTIdentifierAccess) {
                         variableName.append('.');
-                        variableName.append(child.image);
+                        variableName.append(((ASTIdentifierAccess) objectNode).getName());
                     } else {
                         isVariable = false;
                     }
@@ -1290,11 +1289,11 @@ public class Interpreter extends ParserVisitor {
             ASTIdentifier methodIdentifier = (ASTIdentifier) functor;
             symbol = methodIdentifier.getSymbol();
             if (symbol < 0) {
-                methodName = methodIdentifier.image;
+                methodName = methodIdentifier.getName();
             }
             functor = null;
         } else if (functor instanceof ASTIdentifierAccess) {
-            methodName = ((ASTIdentifierAccess) functor).image;
+            methodName = ((ASTIdentifierAccess) functor).getName();
             functor = null;
         }
         try {
@@ -1379,7 +1378,7 @@ public class Interpreter extends ParserVisitor {
             return call(node, namespace, functionNode, argNode);
         } else {
             // objectNode 0 is the prefix
-            String prefix = node.jjtGetChild(0).image;
+            String prefix = ((ASTIdentifier) node.jjtGetChild(0)).getName();
             Object namespace = resolveNamespace(prefix, node);
             // objectNode 1 is the identifier , the others are parameters.
             ASTIdentifier functionNode = (ASTIdentifier) node.jjtGetChild(1);

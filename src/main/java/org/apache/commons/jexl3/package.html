@@ -52,7 +52,7 @@
         </p>
         <pre>
             // Create a JexlEngine (could reuse one instead)
-            JexlEngine jexl = new JexlEngine();
+            JexlEngine jexl = new JexlBuilder().create();
             // Create an expression object equivalent to 'car.getEngine().checkStatus()':
             String jexlExp = "car.engine.checkStatus()";
             Expression e = jexl.createExpression( jexlExp );
@@ -75,8 +75,7 @@
         </ul>
 
         <h3><a name="usage_note">Important note</a></h3>
-        The public API classes start with 'Jexl*' or 'Jxl*'.
-        The only public packages you should use are:
+        The public API classes reside in the 2 packages:
         <ul>
             <li>org.apache.commons.jexl3</li>
             <li>org.apache.commons.jexl3.introspection</li>
@@ -129,7 +128,7 @@
                 public void setStr(String str) { this.str = str; }
             }
             // test API
-            JexlEngine jexl = nex JexlEngine();
+            JexlEngine jexl = new JexlBuilder().create();
             Quux quux = jexl.newInstance(Quux.class, "xuuq", 100);
             jexl.setProperty(quux, "froboz.value", Integer.valueOf(100));
             Object o = jexl.getProperty(quux, "froboz.value");
@@ -153,7 +152,7 @@
         </ul>
         The following example illustrates their usage:
         <pre>
-            JexlEngine jexl = nex JexlEngine();
+            JexlEngine jexl = new JexlBuilder().create();
 
             JexlContext jc = new MapContext();
             jc.set("quuxClass", quux.class);
@@ -184,7 +183,7 @@
         </ul>
         The following example illustrates their usage:
         <pre>
-            JexlEngine jexl = new JexlEngine();
+            JexlEngine jexl = new JexlBuilder().create();
             JxltEngine jxlt = jexl.jxlt();
             JxltEngine.UnifiedExpression expr = jxlt.createExpression("Hello ${user}");
             String hello = jxlt.evaluate(context, jxlt).toString();
@@ -245,16 +244,20 @@
             in case of errors.
             These configuration methods are embedded through a {@link org.apache.commons.jexl3.JexlBuilder}.
         </p>
-        <h3><a name="static_configuration">Static Configuration</a></h3>
+        <h3><a name="static_configuration">Static &amp; Shared Configuration</a></h3>
         <p>
-            Both JexlEngine and JxltEngine are thread-safe, all their inner fields are final; the same instance can be shared between different
+            Both JexlEngine and JxltEngine are thread-safe, most of their inner fields are final; the same instance can be shared between different
             threads and proper synchronization is enforced in critical areas (introspection caches).
-            The following properties can only be set during JexlEngine creation.
         </p>
         <p>
-            {@link org.apache.commons.jexl3.JexlBuilder#loader} indicates to the JexlEngine being built which class loader
-            to use to solve a class name; this affects how JexlEngine.newInstance and the 'new' script method operates.
-            This is mostly useful in cases where you rely on JEXL to dynamically load and call plugins for your application.
+            Of particular importance is {@link org.apache.commons.jexl3.JexlBuilder#loader} which indicates to the JexlEngine
+            being built which class loader to use to solve a class name; this directly affects how JexlEngine.newInstance and the 'new' script method operates.
+        </p>
+        <p>
+            This can also be very useful in cases where you rely on JEXL to dynamically load and call plugins for your application.
+            To avoid having to restart the server in case of a plugin implementation change, you can call
+            {@link org.apache.commons.jexl3.JexlEngine#setClassLoader} and all the scripts created through this engine instance
+            will automatically point to the newly loaded classes.
         </p>
         <p>
             You can state what can be manipulated through scripting by the {@link org.apache.commons.jexl3.annotations.NoJexl}
@@ -294,11 +297,11 @@
             JexlEngine and JxltEngine expression caches can be configured as well. If you intend to use JEXL
             repeatedly in your application, these are worth configuring since expression parsing is quite heavy.
             Note that all caches created by JEXL are held through SoftReference; under high memory pressure, the GC will be able
-            to reclaim those caches and JEXL will rebuild them if needed. By default, a JexlEngine does not create a cache
-            whilst JxltEngine does.
+            to reclaim those caches and JEXL will rebuild them if needed. By default, a JexlEngine does create a cache for "small" expressions
+            and a JxltEngine does create one for UnifiedExpression .
         </p>
         <p>{@link org.apache.commons.jexl3.JexlBuilder#cache} will set how many expressions can be simultaneously cached by the
-            JEXL engine. UnifiedJEXL allows to define the cache size through its constructor.
+            JEXL engine. JxltEngine allows to define the cache size through its constructor.
         </p>
         <p>
             {@link org.apache.commons.jexl3.JexlBuilder#debug}
@@ -308,25 +311,26 @@
 
         <h3><a name="dynamic_configuration">Dynamic Configuration</a></h3>
         <p>
-            Those configuration options can be overriden during evaluation by using a {@link org.apache.commons.jexl3.JexlEvalContext}
-            which merges both a {@link org.apache.commons.jexl3.JexlContext} to expose variables and a
-            {@link org.apache.commons.jexl3.JexlEngine$Options} to carry evaluation options.
+            Those configuration options can be overriden during evaluation by implementing a {@link org.apache.commons.jexl3.JexlContext}
+            that also implements {@link org.apache.commons.jexl3.JexlEngine$Options} to carry evaluation options.
+            An example of such a class exists in the test package.
         </p>
         <p>
-            {@link org.apache.commons.jexl3.JexlBuilder#strict} or {@link org.apache.commons.jexl3.JexlEvalContext#setStrict}
+            {@link org.apache.commons.jexl3.JexlBuilder#strict} or {@link org.apache.commons.jexl3.JexlEngine$Options#isStrict}
             configures when JEXL considers 'null' as an error or not in various situations;
             when facing an unreferenceable variable, using null as an argument to an arithmetic operator or failing to call
             a method or constructor. The lenient mode is close to JEXL-1.1 behavior.
         </p>
         <p>
-            {@link org.apache.commons.jexl3.JexlBuilder#silent} or {@link org.apache.commons.jexl3.JexlEvalContext#setSilent}
+            {@link org.apache.commons.jexl3.JexlBuilder#silent} or {@link org.apache.commons.jexl3.JexlEngine$Options#isSilent}
             configures how JEXL reacts to errors; if silent, the engine will not throw exceptions
             but will warn through loggers and return null in case of errors. Note that when non-silent, JEXL throws
             JexlException which are unchecked exception.
         </p>
         <p>
-            Implementing a {@link org.apache.commons.jexl3.JexlContext$NamespaceResolver} through a JexlContext - by deriving
-            JexlEvalContext for instance - allows to override the namespace resolution and the default namespace map defined
+            Implementing a {@link org.apache.commons.jexl3.JexlContext$NamespaceResolver} through a JexlContext - look at
+            <a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/org/apache/commons/jexl3/JexlEvalContext.java?view=markup">JexlEvalContext</a>
+            as an example - allows to override the namespace resolution and the default namespace map defined
             through {@link org.apache.commons.jexl3.JexlBuilder#namespaces}.
         </p>
 
@@ -336,7 +340,7 @@
             The {@link org.apache.commons.jexl3.JexlContext}, {@link org.apache.commons.jexl3.JexlBuilder} and
             {@link org.apache.commons.jexl3.JexlEngine$Options} are
             the most likely interfaces you'll want to implement for customization. Since they expose variables and options,
-            they are the primary targets. Before you do so, have a look at {@link org.apache.commons.jexl3.JexlEvalContext}
+            they are the primary targets. Before you do so, have a look at JexlEvalContext in the test directory
             and {@link org.apache.commons.jexl3.ObjectContext} which may already cover some of your needs.
         </p>
         <p>

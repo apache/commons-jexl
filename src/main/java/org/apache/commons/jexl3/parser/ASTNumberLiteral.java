@@ -19,18 +19,37 @@ package org.apache.commons.jexl3.parser;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Number> {
+public final class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Number> {
     /** The type literal value. */
-    Number literal = null;
+    private Number literal = null;
     /** The expected class. */
-    Class<?> clazz = null;
+    private Class<?> clazz = null;
 
-    public ASTNumberLiteral(int id) {
+    ASTNumberLiteral(int id) {
         super(id);
     }
 
-    public ASTNumberLiteral(Parser p, int id) {
+    ASTNumberLiteral(Parser p, int id) {
         super(p, id);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder strb = new StringBuilder(literal.toString());
+        if (clazz != null) {
+            if (Float.class.equals(clazz)) {
+                strb.append('f');
+            } else if (Double.class.equals(clazz)) {
+                strb.append('d');
+            } else if (BigDecimal.class.equals(clazz)) {
+                strb.append('b');
+            } else if (BigInteger.class.equals(clazz)) {
+                strb.append('h');
+            } else if (Long.class.equals(clazz)) {
+                strb.append('l');
+            }
+        }
+        return strb.toString();
     }
 
     @Override
@@ -42,12 +61,6 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
     @Override
     protected boolean isConstant(boolean literal) {
         return true;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
-        return visitor.visit(this, data);
     }
 
     public Class<?> getLiteralClass() {
@@ -63,7 +76,7 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
      * Originally from OGNL.
      * @param s the natural as string
      */
-    public void setNatural(String s) {
+    void setNatural(String s) {
         Number result;
         Class<?> rclass;
         // determine the base
@@ -114,7 +127,7 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
      * Originally from OGNL.
      * @param s the real as string
      */
-    public void setReal(String s) {
+     void setReal(String s) {
         Number result;
         Class<?> rclass;
         final int last = s.length() - 1;
@@ -148,5 +161,11 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
         }
         literal = result;
         clazz = rclass;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
+        return visitor.visit(this, data);
     }
 }
