@@ -366,6 +366,16 @@ public class JexlArithmetic {
 
     /**
      * Given an array of objects, attempt to type it more strictly.
+     * <p>This is a placeholder for derivation that calls the static typeArray method.</p>
+     * @param untyped an untyped array
+     * @return the original array if the attempt to strictly type the array fails, a typed array otherwise
+     */
+    public Object narrowArrayType(Object[] untyped) {
+        return typeArray(untyped);
+    }
+
+    /**
+     * Given an array of objects, attempt to type it more strictly.
      * <ul>
      * <li>If all objects are of the same type, the array returned will be an array of that same type</li>
      * <li>If all objects are Numbers, the array returned will be an array of Numbers</li>
@@ -375,7 +385,7 @@ public class JexlArithmetic {
      * @param untyped an untyped array
      * @return the original array if the attempt to strictly type the array fails, a typed array otherwise
      */
-    public Object narrowArrayType(Object[] untyped) {
+    public static Object typeArray(Object[] untyped) {
         final int size = untyped.length;
         Class<?> commonClass = null;
         if (size > 0) {

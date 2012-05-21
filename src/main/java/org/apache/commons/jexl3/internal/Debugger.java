@@ -487,10 +487,10 @@ public final class Debugger extends ParserVisitor {
 
     @Override
     protected Object visit(ASTIdentifier node, Object data) {
-        String image = node.image;
+        String image = node.getName();
         if (QUOTED_IDENTIFIER.matcher(image).find() || NUMBER_IDENTIFIER.matcher(image).find()) {
             // quote it
-            image = "'" + node.image.replace("'", "\\'") + "'";
+            image = "'" + image.replace("'", "\\'") + "'";
         }
         return check(node, image, data);
     }
@@ -498,10 +498,10 @@ public final class Debugger extends ParserVisitor {
     @Override
     protected Object visit(ASTIdentifierAccess node, Object data) {
         builder.append(".");
-        String image = node.image;
+        String image = node.getName();
         if (QUOTED_IDENTIFIER.matcher(image).find() || NUMBER_IDENTIFIER.matcher(image).find()) {
             // quote it
-            image = "'" + node.image.replace("'", "\\'") + "'";
+            image = "'" + image.replace("'", "\\'") + "'";
         }
         builder.append(image);
         return data;
@@ -526,7 +526,7 @@ public final class Debugger extends ParserVisitor {
 
     @Override
     protected Object visit(ASTNumberLiteral node, Object data) {
-        return check(node, node.image, data);
+        return check(node, node.toString(), data);
     }
 
     @Override
@@ -750,7 +750,7 @@ public final class Debugger extends ParserVisitor {
 
     @Override
     protected Object visit(ASTStringLiteral node, Object data) {
-        String img = node.image.replace("'", "\\'");
+        String img = node.getLiteral().replace("'", "\\'");
         return check(node, "'" + img + "'", data);
     }
 
@@ -784,7 +784,7 @@ public final class Debugger extends ParserVisitor {
     @Override
     protected Object visit(ASTVar node, Object data) {
         builder.append("var ");
-        check(node, node.image, data);
+        check(node, node.getName(), data);
         return data;
     }
 

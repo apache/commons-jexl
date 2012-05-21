@@ -21,15 +21,15 @@ import org.apache.commons.jexl3.internal.Scope;
 /**
  * Enhanced script to allow parameters declaration.
  */
-public class ASTJexlLambda extends ASTJexlScript {
-    public ASTJexlLambda(int id) {
+public final class ASTJexlLambda extends ASTJexlScript {
+    ASTJexlLambda(int id) {
         super(id);
     }
 
-    public ASTJexlLambda(Parser p, int id) {
+    ASTJexlLambda(Parser p, int id) {
         super(p, id);
     }
-        
+
     /**
      * Creates an array of arguments by copying values up to the number of parameters.
      * @param values the argument values

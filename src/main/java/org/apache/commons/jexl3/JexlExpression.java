@@ -22,12 +22,12 @@ package org.apache.commons.jexl3;
  * Represents a single JEXL expression.
  * <p>
  * This simple interface provides access to the underlying textual expression through
- * {@link JexlExpression#getExpression()}.
+ * {@link JexlExpression#getSourceText()}.
  * </p>
  *
  * <p>
  * An expression is different than a script - it is simply a reference to
- * a single expression.
+ * a single expression, not to multiple statements.
  * </p>
  *
  * @since 1.0
@@ -44,14 +44,14 @@ public interface JexlExpression {
     Object evaluate(JexlContext context);
 
     /**
-     * Returns the JEXL expression this JexlExpression was created with.
-     * @return The JEXL expression to be evaluated
+     * Returns the source text of this expression.
+     * @return the source text
      */
-    CharSequence getParsedText();
+    String getSourceText();
 
     /**
-     * Returns the JEXL expression by reconstructing it from the parsed tree.
-     * @return the JEXL expression
+     * Recreates the source text of this expression from the internal synactic tree.
+     * @return the source text
      */
-    String dump();
+    String getParsedText();
 }

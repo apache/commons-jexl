@@ -87,13 +87,6 @@ public class Script implements JexlScript {
         return interpreter.interpret(script.jjtGetChild(0));
     }
 
-    @Override
-    public String dump() {
-        Debugger debug = new Debugger();
-        boolean d = debug.debug(script);
-        return debug.toString() + (d ? " /*" + debug.start() + ":" + debug.end() + "*/" : "/*?:?*/ ");
-    }
-
     /**
      * Gets this script original script source.
      * @return the contents of the input source as a String.

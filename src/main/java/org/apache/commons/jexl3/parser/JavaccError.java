@@ -16,18 +16,26 @@
  */
 package org.apache.commons.jexl3.parser;
 
-public final class ASTReferenceExpression extends JexlNode {
-    ASTReferenceExpression(int id) {
-        super(id);
-    }
+/**
+ * The common info provided by Javacc errors.
+ */
+public interface JavaccError {
 
-    ASTReferenceExpression(Parser p, int id) {
-        super(p, id);
-    }
+    /**
+     * Gets the line number.
+     * @return line number.
+     */
+    int getLine();
 
-    /** Accept the visitor. **/
-    @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
-        return visitor.visit(this, data);
-    }
+    /**
+     * Gets the column number.
+     * @return the column.
+     */
+    int getColumn();
+
+    /**
+     * Gets the last correct input.
+     * @return the string after which the error occured
+     */
+    String getAfter();
 }

@@ -19,7 +19,7 @@ package org.apache.commons.jexl3.parser;
 /**
  * Token Manager Error.
  */
-public class TokenMgrError extends Error {
+public class TokenMgrError extends Error implements JavaccError {
     /**
      * The version identifier for this Serializable class.
      * Increment only if the <i>serialized</i> form of the
@@ -65,7 +65,7 @@ public class TokenMgrError extends Error {
      */
     private String after;
     /**
-     * 
+     * Whether eof was reached whilst expecting more input.
      */
     private boolean eof;
     /**
@@ -76,39 +76,6 @@ public class TokenMgrError extends Error {
      * Error column.
      */
     private int column;
-    
-    /**
-     * Gets the reason why the exception is thrown.
-     * @return one of the 4 lexical error codes
-     */
-    public int getErrorCode() {
-        return errorCode;
-    }
-
-    /**
-     * Gets the line number.
-     * @return line number.
-     */
-    public int getLine() {
-        return line;
-    }
-
-    /**
-     * Gets the column number.
-     * @return the column.
-     */
-    public int getColumn() {
-        return column;
-    }
-    
-    /**
-     * Gets the last correct input.
-     * @return the string after which the error occured
-     */
-    public String getAfter() {
-        return after;
-    }
- 
 
     /**
      * Returns a detailed message for the Error when it is thrown by the
@@ -141,5 +108,28 @@ public class TokenMgrError extends Error {
         after = errorAfter;
         current = curChar;
         errorCode = reason;
+    }
+
+    /**
+     * Gets the reason why the exception is thrown.
+     * @return one of the 4 lexical error codes
+     */
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
+    public int getColumn() {
+        return column;
+    }
+
+    @Override
+    public String getAfter() {
+        return after;
     }
 }

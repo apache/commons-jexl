@@ -26,14 +26,14 @@ import java.lang.annotation.Target;
 /**
  * Indicates JEXL Introspection should not see this element.
  * <p>
- * This allows to completely hide a package, class, interface, constructor, method or field from 
+ * This allows to completely hide a package, class, interface, constructor, method or field from
  * JEXL; a NoJexl annotated element will not be usable through any kind of JEXL expression or script.
  * </p>
- * <p>See {@link org.apache.commons.jexl3.JexlSandbox} for another way to restrict JEXL access.
+ * See {@link org.apache.commons.jexl3.introspection.JexlSandbox} for another way to restrict JEXL access.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.FIELD, ElementType.PACKAGE})
 public @interface NoJexl {
-    
+
 }

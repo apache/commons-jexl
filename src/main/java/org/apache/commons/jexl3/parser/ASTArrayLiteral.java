@@ -16,11 +16,14 @@
  */
 package org.apache.commons.jexl3.parser;
 
+import org.apache.commons.jexl3.JexlArithmetic;
+import org.apache.commons.jexl3.internal.Debugger;
+
 public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<Object> {
     /** The type literal value. */
-    Object array = null;
+    private Object array = null;
     /** Whether this array is constant or not. */
-    boolean constant = false;
+    private boolean constant = false;
 
     ASTArrayLiteral(int id) {
         super(id);
@@ -30,6 +33,16 @@ public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<
         super(p, id);
     }
 
+    @Override
+    public String toString() {
+        Debugger dbg = new Debugger();
+        return dbg.data(this);
+    }
+
+    @Override
+    public Object getLiteral() {
+        return array;
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -39,25 +52,15 @@ public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<
             constant = true;
         } else {
             constant = isConstant();
-        }
-    }
-
-    @Override
-    public Object getLiteral() {
-        return array;
-    }
-
-    /**
-     * Sets the literal value only if the descendants of this node compose a constant
-     * @param literal the literal array value
-     * @throws IllegalArgumentException if literal is not an array or null
-     */
-    public void setLiteral(Object literal) {
-        if (constant) {
-            if (literal != null && !literal.getClass().isArray()) {
-                throw new IllegalArgumentException(literal.getClass() + " is not an array");
+            if (constant) {
+                Object[] cc = new Object[children.length];
+                for(int c = 0; c < children.length; ++c) {
+                    cc[c] = ((JexlNode.Literal<?>) children[c]).getLiteral();
+                }
+                array = JexlArithmetic.typeArray(cc);
+            } else {
+                array = null;
             }
-            this.array = literal;
         }
     }
 

@@ -24,7 +24,6 @@ import java.util.Stack;
 
 /**
  * The base class for parsing, manages the parameter/local variable frame.
- * @author henri
  */
 public abstract class JexlParser extends StringParser {
     /**
@@ -85,7 +84,7 @@ public abstract class JexlParser extends StringParser {
         if (frame != null) {
             Integer register = frame.getSymbol(image);
             if (register != null) {
-                identifier.setSymbol(register.intValue());
+                identifier.setSymbol(register.intValue(), image);
             }
         }
         return image;
@@ -102,21 +101,19 @@ public abstract class JexlParser extends StringParser {
             frame = new Scope(null, (String[]) null);
         }
         Integer register = frame.declareVariable(image);
-        identifier.setSymbol(register.intValue());
-        identifier.image = image;
+        identifier.setSymbol(register.intValue(), image);
     }
 
     /**
      * Declares a local parameter.
      * <p> This method creates an new entry in the symbol map. </p>
-     * @param identifier the identifier used to declare
-     * @param image the variable name
+     * @param identifier the parameter name
      */
-    public void declareParameter(String image) {
+    public void declareParameter(String identifier) {
         if (frame == null) {
             frame = new Scope(null, (String[]) null);
         }
-        frame.declareParameter(image);
+        frame.declareParameter(identifier);
     }
 
     /**

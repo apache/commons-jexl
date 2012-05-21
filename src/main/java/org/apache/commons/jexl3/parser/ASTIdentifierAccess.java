@@ -19,32 +19,37 @@ package org.apache.commons.jexl3.parser;
 /**
  * Identifiers, variables and registers.
  */
-public class ASTIdentifierAccess extends JexlNode {
+public final class ASTIdentifierAccess extends JexlNode {
+    private String name = null;
     private Integer identifier = null;
-    
-    public ASTIdentifierAccess(int id) {
+
+    ASTIdentifierAccess(int id) {
         super(id);
     }
 
-    public ASTIdentifierAccess(Parser p, int id) {
+    ASTIdentifierAccess(Parser p, int id) {
         super(p, id);
     }
 
-    @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
-        return visitor.visit(this, data);
-    }
-    
-    public void setIdentifier(String id) {
-        image = id;
+    void setIdentifier(String id) {
+        name = id;
         try {
             identifier = Integer.valueOf(id);
         } catch(NumberFormatException xnumber) {
             identifier = null;
         }
     }
-    
+
     public Object getIdentifier() {
-        return identifier != null? identifier : image;
+        return identifier != null? identifier : name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
+        return visitor.visit(this, data);
     }
 }

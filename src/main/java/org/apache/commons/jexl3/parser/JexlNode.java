@@ -35,10 +35,6 @@ public abstract class JexlNode extends SimpleNode {
     public interface Literal<T> {
         T getLiteral();
     }
-    /**
-     * token value.
-     */
-    public String image;
 
     public JexlNode(int id) {
         super(id);
@@ -62,15 +58,6 @@ public abstract class JexlNode extends SimpleNode {
             node = node.jjtGetParent();
         }
         return null;
-    }
-
-    @Override
-    public String toString() {
-        if (image != null) {
-            return super.toString() + ":{" + image + "}";
-        } else {
-            return super.toString();
-        }
     }
 
     /**

@@ -19,7 +19,6 @@ package org.apache.commons.jexl3;
 import java.math.MathContext;
 import java.util.Collections;
 import java.util.Map;
-import org.apache.commons.jexl3.internal.Engine;
 
 /**
  * A JEXL evaluation environment wrapping variables, namespace and options.
@@ -74,8 +73,8 @@ public class JexlEvalContext implements JexlContext, JexlContext.NamespaceResolv
      * @param namespace the namespace (may be null, implies empty namespace)
      */
     public JexlEvalContext(JexlContext context, JexlContext.NamespaceResolver namespace) {
-        this.vars = context != null? context : Engine.EMPTY_CONTEXT;
-        this.ns = namespace != null? namespace : Engine.EMPTY_NS;
+        this.vars = context != null? context : JexlEngine.EMPTY_CONTEXT;
+        this.ns = namespace != null? namespace : JexlEngine.EMPTY_NS;
     }
 
     @Override

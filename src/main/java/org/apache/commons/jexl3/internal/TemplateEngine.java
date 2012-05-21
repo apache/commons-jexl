@@ -47,34 +47,15 @@ public final class TemplateEngine extends JxltEngine {
     private final Engine jexl;
     /** The TemplateExpression cache. */
     private final Engine.SoftCache<String, TemplateExpression> cache;
-    /** The default cache size. */
-    private static final int CACHE_SIZE = 256;
     /** The first character for immediate expressions. */
     private final char immediateChar;
     /** The first character for deferred expressions. */
     private final char deferredChar;
 
     /**
-     * Creates a new instance of {@link JxltEngine} with a default cache size.
-     * @param aJexl the JexlEngine to use.
-     */
-    public TemplateEngine(Engine aJexl) {
-        this(aJexl, CACHE_SIZE);
-    }
-
-    /**
      * Creates a new instance of {@link JxltEngine} creating a local cache.
      * @param aJexl     the JexlEngine to use.
-     * @param cacheSize the number of expressions in this cache
-     */
-    public TemplateEngine(Engine aJexl, int cacheSize) {
-        this(aJexl, cacheSize, '$', '#');
-    }
-
-    /**
-     * Creates a new instance of {@link JxltEngine} creating a local cache.
-     * @param aJexl     the JexlEngine to use.
-     * @param cacheSize the number of expressions in this cache
+     * @param cacheSize the number of expressions in this cache, default is 256
      * @param immediate the immediate template expression character, default is '$'
      * @param deferred  the deferred template expression character, default is '#'
      */

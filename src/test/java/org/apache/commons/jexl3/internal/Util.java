@@ -115,12 +115,14 @@ public class Util {
                 if (lhs.getClass() != rhs.getClass()) {
                     return "class: " + lhs.getClass() + " != " + rhs.getClass();
                 }
-                if ((lhs.image == null && rhs.image != null)
-                    || (lhs.image != null && rhs.image == null)) {
-                    return "image: " + lhs.image + " != " + rhs.image;
+                String lhss = lhs.toString();
+                String rhss = rhs.toString();
+                if ((lhss == null && rhss != null)
+                    || (lhss != null && rhss == null)) {
+                    return "image: " + lhss + " != " + rhss;
                 }
-                if (lhs.image != null && !lhs.image.equals(rhs.image)) {
-                    return "image: " + lhs.image + " != " + rhs.image;
+                if (lhss != null && !lhss.equals(rhss)) {
+                    return "image: " + lhss + " != " + rhss;
                 }
             }
         }
@@ -152,9 +154,10 @@ public class Util {
         for (JexlNode flat : flattened) {
             strb.append(indent(flat));
             strb.append(flat.getClass().getSimpleName());
-            if (flat.image != null) {
+            String sflat = flat.toString();
+            if (sflat != null) {
                 strb.append(" = ");
-                strb.append(flat.image);
+                strb.append(sflat);
             }
             strb.append("\n");
         }

@@ -412,9 +412,9 @@ void Identifier(boolean top) :
     Token t;
 }
 {
-    t=<IDENTIFIER> { jjtThis.image = top? checkVariable(jjtThis, t.image) : t.image; }
+    t=<IDENTIFIER> { jjtThis.setSymbol(top? checkVariable(jjtThis, t.image) : t.image); }
 |
-    t=<REGISTER> { jjtThis.image = t.image; jjtThis.setSymbol(t.image); }
+    t=<REGISTER> { jjtThis.setSymbol(t.image); }
 }
 
 void StringIdentifier() #Identifier :
@@ -424,7 +424,7 @@ void StringIdentifier() #Identifier :
 {
   t=<STRING_LITERAL>
   {
-    jjtThis.image = Parser.buildString(t.image, true);
+    jjtThis.setSymbol(Parser.buildString(t.image, true));
   }
 }
 
@@ -463,7 +463,7 @@ void IntegerLiteral() #NumberLiteral :
 }
 {
   t=<INTEGER_LITERAL>
-  { jjtThis.image = t.image; jjtThis.setNatural(t.image); }
+  { jjtThis.setNatural(t.image); }
 }
 
 
@@ -473,7 +473,7 @@ void FloatLiteral() #NumberLiteral:
 }
 {
   t=<FLOAT_LITERAL>
-  { jjtThis.image = t.image; jjtThis.setReal(t.image); }
+  { jjtThis.setReal(t.image); }
 }
 
 void StringLiteral() :
@@ -482,7 +482,7 @@ void StringLiteral() :
 }
 {
   t=<STRING_LITERAL>
-  { jjtThis.image = Parser.buildString(t.image, true); }
+  { jjtThis.setLiteral(Parser.buildString(t.image, true)); }
 }
 
 void ArrayLiteral() : {}

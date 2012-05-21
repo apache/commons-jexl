@@ -79,13 +79,13 @@ public class ClassCreatorTest extends JexlTestCase {
         }
     }
 
-    // A soft reference on class
+    // A weak reference on class
     static final class ClassReference extends WeakReference<Class<?>> {
         ClassReference(Class<?> clazz, ReferenceQueue<Object> queue) {
             super(clazz, queue);
         }
     }
-    // A weak reference on instance
+    // A soft reference on instance
     static final class InstanceReference extends SoftReference<Object> {
         InstanceReference(Object obj, ReferenceQueue<Object> queue) {
             super(obj, queue);
