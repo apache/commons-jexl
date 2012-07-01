@@ -25,7 +25,10 @@
     <author email="dev@commons.apache.org">Commons Developers</author>
   </properties>
   <body>
-    <release version="2.1.2" date="2012-05-30">
+    <release version="2.1.2" date="2012-07-30">
+        <action dev="henrib" type="fix" issue="JEXL-134" due-to="Manoj Mokashi">
+            Issue with evaluation of concat of variables : \r + \n gives 0
+        </action>
         <action dev="henrib" type="fix" issue="JEXL-131" due-to="Clay Bruce">
             UnifiedJexl (2.1.x) parsing may fail with NPE
         </action>
