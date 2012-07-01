@@ -1029,7 +1029,7 @@ public class JexlArithmetic {
             return new BigInteger(val.toString());
         } else if (val instanceof String) {
             String string = (String) val;
-            if ("".equals(string.trim())) {
+            if ("".equals(string)) {
                 return BigInteger.ZERO;
             } else {
                 return new BigInteger(string);
@@ -1059,7 +1059,7 @@ public class JexlArithmetic {
             controlNullOperand();
             return BigDecimal.ZERO;
         } else if (val instanceof String) {
-            String string = ((String) val).trim();
+            String string = (String) val;
             if ("".equals(string)) {
                 return BigDecimal.ZERO;
             }
@@ -1101,7 +1101,7 @@ public class JexlArithmetic {
         } else if (val instanceof Boolean) {
             return ((Boolean) val).booleanValue() ? 1. : 0.;
         } else if (val instanceof String) {
-            String string = ((String) val).trim();
+            String string = (String) val;
             if ("".equals(string)) {
                 return Double.NaN;
             } else {

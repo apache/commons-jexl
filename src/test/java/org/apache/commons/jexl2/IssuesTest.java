@@ -24,6 +24,7 @@ import org.apache.commons.jexl2.internal.Introspector;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.jexl2.introspection.UberspectImpl;
+import org.junit.Test;
 
 /**
  * Test cases for reported issues
@@ -1050,5 +1051,18 @@ public class IssuesTest extends JexlTestCase {
 
         Object evaluate = jexl.createExpression(expr).evaluate(null);
         assertEquals(42, evaluate);
+    }
+
+    public void test134() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        String jexlExp = "$$__INPUT + nl";
+        Expression e = jexl.createExpression( jexlExp );
+        // Create a context and add data
+        JexlContext jc = new MapContext();
+        jc.set("$$__INPUT", "\r" );
+        jc.set("nl", "\n");
+        // Now evaluate the expression, getting the result
+        Object o = e.evaluate(jc);
+        assertEquals("\r\n", o);
     }
 }
