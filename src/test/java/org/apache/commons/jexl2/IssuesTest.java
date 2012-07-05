@@ -1065,4 +1065,50 @@ public class IssuesTest extends JexlTestCase {
         Object o = e.evaluate(jc);
         assertEquals("\r\n", o);
     }
+
+    public void test135() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        JexlContext jc = new MapContext();
+        Script script;
+        Object result;
+        Map<Integer, Object> foo = new HashMap<Integer, Object>();
+        foo.put(3, 42);
+        jc.set("state", foo);
+
+        script = jexl.createScript("var y = state[3]; y");
+        result = script.execute(jc, foo);
+        assertEquals(42, result);
+
+        jc.set("a", 3);
+        script = jexl.createScript("var y = state[a]; y");
+        result = script.execute(jc, foo);
+        assertEquals(42, result);
+
+        jc.set("a", 2);
+        script = jexl.createScript("var y = state[a + 1]; y");
+        result = script.execute(jc, foo);
+        assertEquals(42, result);
+
+        jc.set("a", 2);
+        jc.set("b", 1);
+        script = jexl.createScript("var y = state[a + b]; y");
+        result = script.execute(jc, foo);
+        assertEquals(42, result);
+
+        script = jexl.createScript("var y = state[3]; y", "state");
+        result = script.execute(null, foo, 3);
+        assertEquals(42, result);
+
+        script = jexl.createScript("var y = state[a]; y", "state", "a");
+        result = script.execute(null, foo, 3);
+        assertEquals(42, result);
+
+        script = jexl.createScript("var y = state[a + 1]; y", "state", "a");
+        result = script.execute(null, foo, 2);
+        assertEquals(42, result);
+
+        script = jexl.createScript("var y = state[a + b]; y", "state", "a", "b");
+        result = script.execute(null, foo, 2, 1);
+        assertEquals(42, result);
+    }
 }

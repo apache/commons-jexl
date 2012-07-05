@@ -228,7 +228,7 @@ void WhileStatement() : {}
 
 
 void ForeachStatement() : {}
-{  
+{
     <FOR> <LPAREN> LValueVar() <COLON>  Expression() <RPAREN> Statement()
 |
     <FOREACH> <LPAREN> LValueVar() <IN>  Expression() <RPAREN> Statement()
@@ -268,8 +268,8 @@ void DeclareVar() #Var :
 }
 
 void LValueVar() #Reference : {}
-{   
-    LOOKAHEAD(1) <VAR> DeclareVar() DotReference() 
+{
+    LOOKAHEAD(1) <VAR> DeclareVar() DotReference()
 |
     LOOKAHEAD(1) Identifier(true) DotReference()
 }
@@ -411,7 +411,7 @@ void Identifier(boolean top) :
     t=<REGISTER> { jjtThis.image = t.image; jjtThis.setRegister(t.image); }
 }
 
-void StringIdentifier() #Identifier : 
+void StringIdentifier() #Identifier :
 {
     Token t;
 }
@@ -568,7 +568,7 @@ void PrimaryExpression() #void : {}
 
 void ArrayAccess() : {}
 {
-    Identifier() (LOOKAHEAD(1) <LBRACKET> Expression() <RBRACKET>)+
+    Identifier(true) (LOOKAHEAD(1) <LBRACKET> Expression() <RBRACKET>)+
 }
 
 void DotReference() #void : {}
