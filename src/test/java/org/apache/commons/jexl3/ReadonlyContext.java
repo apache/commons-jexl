@@ -17,6 +17,9 @@
 package org.apache.commons.jexl3;
 
 import java.math.MathContext;
+import java.nio.charset.Charset;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
 
 /**
  * A readonly context wrapper.
@@ -43,7 +46,7 @@ public final class ReadonlyContext implements JexlContext, JexlEngine.Options {
         return wrapped.get(name);
     }
 
-    /** 
+    /**
      * Will throw an UnsupportedOperationException when called; the JexlEngine deals with it appropriately.
      * @param name the unused variable name
      * @param value the unused variable value
@@ -68,7 +71,7 @@ public final class ReadonlyContext implements JexlContext, JexlEngine.Options {
         // egnie
         return options == null? null : options.isStrict();
     }
-    
+
     @Override
     public Boolean isStrictArithmetic() {
         return options == null? null : options.isStrict();
@@ -82,5 +85,10 @@ public final class ReadonlyContext implements JexlContext, JexlEngine.Options {
     @Override
     public int getArithmeticMathScale() {
         return options == null? -1 : options.getArithmeticMathScale();
+    }
+
+    @Override
+    public Charset getCharset() {
+        return options == null? Charset.defaultCharset() : options.getCharset();
     }
 }

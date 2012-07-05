@@ -41,8 +41,6 @@ import org.apache.commons.jexl3.parser.Parser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.Reader;
-
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,6 +51,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import java.lang.ref.SoftReference;
+import java.nio.charset.Charset;
 
 /**
  * A JexlEngine implementation.
@@ -118,6 +117,11 @@ public class Engine extends JexlEngine {
      */
     protected final int cacheThreshold;
     /**
+     * The default charset.
+     */
+    protected final Charset charset;
+
+    /**
      * The default cache load factor.
      */
     private static final float LOAD_FACTOR = 0.75f;
@@ -153,6 +157,7 @@ public class Engine extends JexlEngine {
         this.arithmetic = conf.arithmetic() == null ? new JexlArithmetic(this.strict) : conf.arithmetic();
         this.cache = conf.cache() <= 0 ? null : new SoftCache<String, ASTJexlScript>(conf.cache());
         this.cacheThreshold = conf.cacheThreshold();
+        this.charset = conf.charset();
     }
 
     /**
@@ -192,13 +197,18 @@ public class Engine extends JexlEngine {
     }
 
     @Override
-    public final boolean isStrict() {
+    public boolean isStrict() {
         return strict;
     }
 
     @Override
     public void setClassLoader(ClassLoader loader) {
         uberspect.setClassLoader(loader);
+    }
+
+    @Override
+    public Charset getCharset() {
+        return charset;
     }
 
     @Override
@@ -618,8 +628,7 @@ public class Engine extends JexlEngine {
                     }
                 }
             }
-            Reader reader = new StringReader(expr);
-            script = parser.parse(info, reader, scope, registers);
+            script = parser.parse(info, expr, scope, registers);
             if (cached) {
                 cache.put(expr, script);
             }

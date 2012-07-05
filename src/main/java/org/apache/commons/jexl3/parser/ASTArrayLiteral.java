@@ -16,12 +16,9 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.internal.Debugger;
 
-public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<Object> {
-    /** The type literal value. */
-    private Object array = null;
+public final class ASTArrayLiteral extends JexlNode {
     /** Whether this array is constant or not. */
     private boolean constant = false;
 
@@ -40,31 +37,29 @@ public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<
     }
 
     @Override
-    public Object getLiteral() {
-        return array;
+    protected boolean isConstant(boolean literal) {
+        return constant;
     }
 
-    /** {@inheritDoc} */
+    /** {
+     * @inheritDoc} */
     @Override
     public void jjtClose() {
-        if (children == null || children.length == 0) {
-            array = new Object[0];
-            constant = true;
-        } else {
-            constant = isConstant();
-            if (constant) {
-                Object[] cc = new Object[children.length];
-                for(int c = 0; c < children.length; ++c) {
-                    cc[c] = ((JexlNode.Literal<?>) children[c]).getLiteral();
+        constant = true;
+        if (children != null) {
+            for (int c = 0; c < children.length && constant; ++c) {
+                JexlNode child = children[c];
+                if (child instanceof ASTReference) {
+                    constant = child.isConstant(true);
+                } else if (!child.isConstant()) {
+                    constant = false;
                 }
-                array = JexlArithmetic.typeArray(cc);
-            } else {
-                array = null;
             }
         }
     }
 
-    /** {@inheritDoc} */
+    /** {
+     * @inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);

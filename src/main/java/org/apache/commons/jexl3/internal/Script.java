@@ -103,7 +103,7 @@ public class Script implements JexlScript {
     @Override
     public String getParsedText() {
         Debugger debug = new Debugger();
-        boolean d = debug.debug(script);
+        debug.debug(script);
         return debug.toString();
     }
 
@@ -112,7 +112,7 @@ public class Script implements JexlScript {
         CharSequence src = source;
         if (src == null) {
             Debugger debug = new Debugger();
-            boolean d = debug.debug(script);
+            debug.debug(script);
             src = debug.toString();
         }
         return src == null ? "/*no source*/" : src.toString();

@@ -54,10 +54,13 @@ import org.apache.commons.jexl3.parser.ASTModNode;
 import org.apache.commons.jexl3.parser.ASTMulNode;
 import org.apache.commons.jexl3.parser.ASTNENode;
 import org.apache.commons.jexl3.parser.ASTNRNode;
+import org.apache.commons.jexl3.parser.ASTEWNode;
+import org.apache.commons.jexl3.parser.ASTSWNode;
 import org.apache.commons.jexl3.parser.ASTNotNode;
 import org.apache.commons.jexl3.parser.ASTNullLiteral;
 import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
+import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
@@ -377,6 +380,11 @@ public final class Debugger extends ParserVisitor {
     }
 
     @Override
+    protected Object visit(ASTRangeNode node, Object data) {
+        return infixChildren(node, " .. ", false, data);
+    }
+
+    @Override
     protected Object visit(ASTAssignment node, Object data) {
         return infixChildren(node, " = ", false, data);
     }
@@ -449,6 +457,16 @@ public final class Debugger extends ParserVisitor {
     @Override
     protected Object visit(ASTERNode node, Object data) {
         return infixChildren(node, " =~ ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTSWNode node, Object data) {
+        return infixChildren(node, " =^ ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTEWNode node, Object data) {
+        return infixChildren(node, " =$ ", false, data);
     }
 
     @Override

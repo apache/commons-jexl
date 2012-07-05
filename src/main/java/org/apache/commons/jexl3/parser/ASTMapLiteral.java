@@ -16,13 +16,9 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import java.util.Collections;
-import java.util.Map;
 import org.apache.commons.jexl3.internal.Debugger;
 
-public final class ASTMapLiteral extends JexlNode implements JexlNode.Literal<Object> {
-    /** The type literal value. */
-    private Map<?,?> map = null;
+public final class ASTMapLiteral extends JexlNode {
     /** Whether this array is constant or not. */
     private boolean constant = false;
 
@@ -34,7 +30,6 @@ public final class ASTMapLiteral extends JexlNode implements JexlNode.Literal<Ob
         super(p, id);
     }
 
-
     @Override
     public String toString() {
         Debugger dbg = new Debugger();
@@ -42,21 +37,23 @@ public final class ASTMapLiteral extends JexlNode implements JexlNode.Literal<Ob
     }
 
     @Override
-    public Map<?,?> getLiteral() {
-        return map;
+    protected boolean isConstant(boolean literal) {
+        return constant;
     }
 
-    /**
-     * Sets the literal value only if the descendants of this node compose a constant.
-     * @param literal the literal array value
-     * @throws IllegalArgumentException if literal is not an array or null
-     */
-    void setLiteral(Object literal) {
-        if (constant) {
-            if (!(literal instanceof Map<?,?>)) {
-                throw new IllegalArgumentException(literal.getClass() + " is not a map");
+    /** {@inheritDoc} */
+    @Override
+    public void jjtClose() {
+        constant = true;
+        if (children != null) {
+            for (int c = 0; c < children.length && constant; ++c) {
+                JexlNode child = children[c];
+                if (child instanceof ASTMapEntry) {
+                    constant = child.isConstant(true);
+                } else if (!child.isConstant()) {
+                    constant = false;
+                }
             }
-            this.map = (Map<?,?>) literal;
         }
     }
 
@@ -66,14 +63,4 @@ public final class ASTMapLiteral extends JexlNode implements JexlNode.Literal<Ob
         return visitor.visit(this, data);
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void jjtClose() {
-        if (children == null || children.length == 0) {
-            map = Collections.EMPTY_MAP;
-            constant = true;
-        } else {
-            constant = isConstant();
-        }
-    }
 }

@@ -46,7 +46,7 @@ public class Closure extends Script {
     @Override
     public String getParsedText() {
         Debugger debug = new Debugger();
-        boolean d = debug.debug(script);
+        debug.debug(script);
         return debug.toString();
     }
 

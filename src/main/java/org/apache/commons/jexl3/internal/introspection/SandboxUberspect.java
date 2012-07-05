@@ -29,9 +29,9 @@ import org.apache.commons.jexl3.introspection.JexlSandbox;
  */
 public final class SandboxUberspect implements JexlUberspect {
     /** The base uberspect. */
-    protected final JexlUberspect uberspect;
+    private final JexlUberspect uberspect;
     /**  The sandbox. */
-    protected final JexlSandbox sandbox;
+    private final JexlSandbox sandbox;
 
     /**
      * A constructor for JexlSandbox uberspect.
@@ -127,7 +127,7 @@ public final class SandboxUberspect implements JexlUberspect {
         return null;
 
     }
-    
+
     /**
      * {@inheritDoc}
      */

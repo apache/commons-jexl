@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import java.math.MathContext;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Map;
 
@@ -46,6 +47,11 @@ public class JexlEvalContext implements JexlContext, JexlContext.NamespaceResolv
      */
     public JexlEvalContext() {
         this(EMPTY_MAP);
+    }
+
+    @Override
+    public Charset getCharset() {
+        return Charset.defaultCharset();
     }
 
     /**

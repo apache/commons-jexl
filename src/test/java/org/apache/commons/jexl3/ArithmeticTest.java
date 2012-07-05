@@ -16,17 +16,13 @@
  */
 package org.apache.commons.jexl3;
 
-import java.util.Map;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
+import org.apache.commons.jexl3.junit.Asserter;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import org.apache.commons.jexl3.junit.Asserter;
+import java.util.Map;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 public class ArithmeticTest extends JexlTestCase {
     private Asserter asserter;
@@ -211,83 +207,64 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("B10 / L2", new BigInteger("5"));
     }
 
-    public static class MatchingContainer {
-        private final Set<Integer> values;
-
-        public MatchingContainer(int[] is) {
-            values = new HashSet<Integer>();
-            for (int value : is) {
-                values.add(value);
-            }
-        }
-
-        public boolean contains(int value) {
-            return values.contains(value);
-        }
+    // JEXL-24: long integers (and doubles)
+    public void testLongLiterals() throws Exception {
+        JexlEvalContext ctxt = new JexlEvalContext();
+        ctxt.setStrictArithmetic(true);
+        String stmt = "{a = 10L; b = 10l; c = 42.0D; d = 42.0d; e=56.3F; f=56.3f; g=63.5; h=0x10; i=010; j=0x10L; k=010l}";
+        JexlScript expr = JEXL.createScript(stmt);
+        /* Object value = */ expr.execute(ctxt);
+        assertEquals(10L, ctxt.get("a"));
+        assertEquals(10l, ctxt.get("b"));
+        assertEquals(42.0D, ctxt.get("c"));
+        assertEquals(42.0d, ctxt.get("d"));
+        assertEquals(56.3f, ctxt.get("e"));
+        assertEquals(56.3f, ctxt.get("f"));
+        assertEquals(63.5d, ctxt.get("g"));
+        assertEquals(0x10, ctxt.get("h"));
+        assertEquals(010, ctxt.get("i"));
+        assertEquals(0x10L, ctxt.get("j"));
+        assertEquals(010l, ctxt.get("k"));
     }
 
-    public static class IterableContainer implements Iterable<Integer> {
-        private final Set<Integer> values;
-
-        public IterableContainer(int[] is) {
-            values = new HashSet<Integer>();
-            for (int value : is) {
-                values.add(value);
-            }
-        }
-
-        @Override
-        public Iterator<Integer> iterator() {
-            return values.iterator();
-        }
+    // JEXL-24: big integers and big decimals
+    public void testBigLiterals() throws Exception {
+        JexlEvalContext ctxt = new JexlEvalContext();
+        ctxt.setStrictArithmetic(true);
+        String stmt = "{a = 10H; b = 10h; c = 42.0B; d = 42.0b;}";
+        JexlScript expr = JEXL.createScript(stmt);
+        /* Object value = */ expr.execute(ctxt);
+        assertEquals(new BigInteger("10"), ctxt.get("a"));
+        assertEquals(new BigInteger("10"), ctxt.get("b"));
+        assertEquals(new BigDecimal("42.0"), ctxt.get("c"));
+        assertEquals(new BigDecimal("42.0"), ctxt.get("d"));
     }
 
-    public void testRegexp() throws Exception {
-        asserter.setVariable("str", "abc456");
-        asserter.assertExpression("str =~ '.*456'", Boolean.TRUE);
-        asserter.assertExpression("str !~ 'ABC.*'", Boolean.TRUE);
-        asserter.setVariable("match", "abc.*");
-        asserter.setVariable("nomatch", ".*123");
-        asserter.assertExpression("str =~ match", Boolean.TRUE);
-        asserter.assertExpression("str !~ match", Boolean.FALSE);
-        asserter.assertExpression("str !~ nomatch", Boolean.TRUE);
-        asserter.assertExpression("str =~ nomatch", Boolean.FALSE);
-        asserter.setVariable("match", java.util.regex.Pattern.compile("abc.*"));
-        asserter.setVariable("nomatch", java.util.regex.Pattern.compile(".*123"));
-        asserter.assertExpression("str =~ match", Boolean.TRUE);
-        asserter.assertExpression("str !~ match", Boolean.FALSE);
-        asserter.assertExpression("str !~ nomatch", Boolean.TRUE);
-        asserter.assertExpression("str =~ nomatch", Boolean.FALSE);
-        // check the in/not-in variant
-        asserter.assertExpression("'a' =~ ['a','b','c','d','e','f']", Boolean.TRUE);
-        asserter.assertExpression("'a' !~ ['a','b','c','d','e','f']", Boolean.FALSE);
-        asserter.assertExpression("'z' =~ ['a','b','c','d','e','f']", Boolean.FALSE);
-        asserter.assertExpression("'z' !~ ['a','b','c','d','e','f']", Boolean.TRUE);
-        // check in/not-in on array, list, map, set and duck-type collection
-        int[] ai = {2, 4, 42, 54};
-        List<Integer> al = new ArrayList<Integer>();
-        for (int i : ai) {
-            al.add(i);
-        }
-        Map<Integer, String> am = new HashMap<Integer, String>();
-        am.put(2, "two");
-        am.put(4, "four");
-        am.put(42, "forty-two");
-        am.put(54, "fifty-four");
-        MatchingContainer ad = new MatchingContainer(ai);
-        IterableContainer ic = new IterableContainer(ai);
-        Set<Integer> as = ad.values;
-        Object[] vars = {ai, al, am, ad, as, ic};
+    // JEXL-24: big decimals with exponent
+    public void testBigExponentLiterals() throws Exception {
+        JexlEvalContext ctxt = new JexlEvalContext();
+        ctxt.setStrictArithmetic(true);
+        String stmt = "{a = 42.0e1B; b = 42.0E+2B; c = 42.0e-1B; d = 42.0E-2b; e=4242.4242e1b}";
+        JexlScript expr = JEXL.createScript(stmt);
+        /* Object value = */ expr.execute(ctxt);
+        assertEquals(new BigDecimal("42.0e+1"), ctxt.get("a"));
+        assertEquals(new BigDecimal("42.0e+2"), ctxt.get("b"));
+        assertEquals(new BigDecimal("42.0e-1"), ctxt.get("c"));
+        assertEquals(new BigDecimal("42.0e-2"), ctxt.get("d"));
+        assertEquals(new BigDecimal("4242.4242e1"), ctxt.get("e"));
+    }
 
-        for (Object var : vars) {
-            asserter.setVariable("container", var);
-            for (int x : ai) {
-                asserter.setVariable("x", x);
-                asserter.assertExpression("x =~ container", Boolean.TRUE);
-            }
-            asserter.setVariable("x", 169);
-            asserter.assertExpression("x !~ container", Boolean.TRUE);
-        }
+    // JEXL-24: doubles with exponent
+    public void test2DoubleLiterals() throws Exception {
+        JexlEvalContext ctxt = new JexlEvalContext();
+        ctxt.setStrictArithmetic(true);
+        String stmt = "{a = 42.0e1D; b = 42.0E+2D; c = 42.0e-1d; d = 42.0E-2d;}";
+        JexlScript expr = JEXL.createScript(stmt);
+        /* Object value = */ expr.execute(ctxt);
+        assertEquals(Double.valueOf("42.0e+1"), ctxt.get("a"));
+        assertEquals(Double.valueOf("42.0e+2"), ctxt.get("b"));
+        assertEquals(Double.valueOf("42.0e-1"), ctxt.get("c"));
+        assertEquals(Double.valueOf("42.0e-2"), ctxt.get("d"));
     }
 
     /**
@@ -364,5 +341,19 @@ public class ArithmeticTest extends JexlTestCase {
             }
         }
         debuggerCheck(jexl);
+    }
+
+    public void testNaN() throws Exception {
+        Map<String, Object> ns = new HashMap<String, Object>();
+        ns.put("double", Double.class);
+        JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript("#NaN");
+        result = script.execute(null);
+        assertTrue(Double.isNaN((Double) result));
+        script = jexl.createScript("double:isNaN(#NaN)");
+        result = script.execute(null);
+        assertTrue((Boolean) result);
     }
 }

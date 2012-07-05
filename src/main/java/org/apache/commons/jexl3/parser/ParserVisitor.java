@@ -85,6 +85,10 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTNRNode node, Object data);
 
+    protected abstract Object visit(ASTSWNode node, Object data);
+
+    protected abstract Object visit(ASTEWNode node, Object data);
+
     protected abstract Object visit(ASTAddNode node, Object data);
 
     protected abstract Object visit(ASTSubNode node, Object data);
@@ -114,6 +118,8 @@ public abstract class ParserVisitor {
     protected abstract Object visit(ASTStringLiteral node, Object data);
 
     protected abstract Object visit(ASTArrayLiteral node, Object data);
+
+    protected abstract Object visit(ASTRangeNode node, Object data);
 
     protected abstract Object visit(ASTMapLiteral node, Object data);
 

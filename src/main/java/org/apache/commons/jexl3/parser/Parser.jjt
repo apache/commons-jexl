@@ -38,16 +38,15 @@ import org.apache.commons.jexl3.internal.Scope;
 
 public final class Parser extends JexlParser
 {
-    private boolean ALLOW_REGISTERS = false;
-
-    public ASTJexlScript parse(JexlInfo info, Reader reader, Scope scope, boolean registers) {
+    public ASTJexlScript parse(JexlInfo info, String jexlSrc, Scope scope, boolean registers) {
         try {
             // If registers are allowed, the default parser state has to be REGISTERS.
             if (registers || ALLOW_REGISTERS) {
                 token_source.defaultLexState = REGISTERS;
             }
             // lets do the 'Unique Init' in here to be safe - it's a pain to remember
-            ReInit(reader);
+            source = jexlSrc;
+            ReInit(new java.io.StringReader(jexlSrc));
             frame = scope;
             ASTJexlScript script = JexlScript(scope);
             script.value = info;
@@ -57,18 +56,11 @@ public final class Parser extends JexlParser
         } catch (ParseException xparse) {
             throw new JexlException.Parsing(info, xparse).clean();
         } finally {
+            source = null;
             frame = null;
             token_source.defaultLexState = DEFAULT;
         }
     }
-
-    /**
-     * Internal, for debug purpose only.
-     */
-    public void allowRegisters(boolean registers) {
-        ALLOW_REGISTERS = registers;
-    }
-
 }
 
 PARSER_END(Parser)
@@ -139,6 +131,8 @@ PARSER_END(Parser)
     | < ne : "!=" | "ne" >
     | < req : "=~" >
     | < rne : "!~" >
+    | < sw : "=^" >
+    | < ew : "=$" >
     | < gt : ">" | "gt" >
     | < ge : ">=" | "ge" >
     | < lt : "<" | "lt" >
@@ -157,6 +151,7 @@ PARSER_END(Parser)
     | < and : "&" >
     | < or : "|" >
     | < xor : "^" >
+    | < range : ".." >
 }
 
 /***************************************
@@ -184,7 +179,10 @@ PARSER_END(Parser)
         (["l","L","h","H"])?
     >
  |
-  < FLOAT_LITERAL: (<DIGIT>)+ "." (<DIGIT>)+ ((["e","E"])(["+","-"])?(<DIGIT>)+)? (["d","D","f","F","b","B"])? >
+  < FLOAT_LITERAL:
+    "#NaN"
+    |
+    (<DIGIT>)+ "." (<DIGIT>)+ ((["e","E"])(["+","-"])?(<DIGIT>)+)? (["d","D","f","F","b","B"])? >
 }
 
 <*> TOKEN :
@@ -338,8 +336,10 @@ void EqualityExpression() #void : {}
   RelationalExpression()
   (
      <eq> RelationalExpression() #EQNode(2)
-|
+   |
      <ne> RelationalExpression() #NENode(2)
+   |
+     <range> RelationalExpression() #RangeNode(2) // range
   )?
 }
 
@@ -358,6 +358,10 @@ void RelationalExpression() #void : {}
     <req> AdditiveExpression() #ERNode(2) // equals regexp
    |
     <rne> AdditiveExpression() #NRNode(2) // not equals regexp
+   |
+    <sw> AdditiveExpression() #SWNode(2) // starts with
+   |
+    <ew> AdditiveExpression() #EWNode(2) // ends with
   )?
 }
 

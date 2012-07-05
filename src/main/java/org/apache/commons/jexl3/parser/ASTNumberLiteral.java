@@ -18,8 +18,9 @@ package org.apache.commons.jexl3.parser;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DecimalFormat;
 
-public final class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Number> {
+public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constant<Number> {
     /** The type literal value. */
     private Number literal = null;
     /** The expected class. */
@@ -33,23 +34,29 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Literal
         super(p, id);
     }
 
+    static final DecimalFormat BIGDF = new DecimalFormat("0.0b");
+
     @Override
     public String toString() {
-        StringBuilder strb = new StringBuilder(literal.toString());
-        if (clazz != null) {
-            if (Float.class.equals(clazz)) {
-                strb.append('f');
-            } else if (Double.class.equals(clazz)) {
-                strb.append('d');
-            } else if (BigDecimal.class.equals(clazz)) {
-                strb.append('b');
-            } else if (BigInteger.class.equals(clazz)) {
-                strb.append('h');
-            } else if (Long.class.equals(clazz)) {
-                strb.append('l');
+        if (BigDecimal.class.equals(clazz)) {
+              return BIGDF.format(literal);
+        } else {
+            StringBuilder strb = new StringBuilder(literal.toString());
+            if (clazz != null) {
+                if (Float.class.equals(clazz)) {
+                    strb.append('f');
+                } else if (Double.class.equals(clazz)) {
+                    strb.append('d');
+                } else if (BigDecimal.class.equals(clazz)) {
+                    strb.append('b');
+                } else if (BigInteger.class.equals(clazz)) {
+                    strb.append('h');
+                } else if (Long.class.equals(clazz)) {
+                    strb.append('l');
+                }
             }
+            return strb.toString();
         }
-        return strb.toString();
     }
 
     @Override
@@ -57,7 +64,6 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Literal
         return literal;
     }
 
-    /** {@inheritDoc} */
     @Override
     protected boolean isConstant(boolean literal) {
         return true;
@@ -127,43 +133,47 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Literal
      * Originally from OGNL.
      * @param s the real as string
      */
-     void setReal(String s) {
+    void setReal(String s) {
         Number result;
         Class<?> rclass;
-        final int last = s.length() - 1;
-        switch (s.charAt(last)) {
-            case 'b':
-            case 'B': {
-                rclass = BigDecimal.class;
-                result = new BigDecimal(s.substring(0, last));
-                break;
-            }
-            case 'f':
-            case 'F': {
-                rclass = Float.class;
-                result = Float.valueOf(s.substring(0, last));
-                break;
-            }
-            case 'd':
-            case 'D':
-                rclass = Double.class;
-                result = Double.valueOf(s.substring(0, last));
-                break;
-            default: {
-                rclass = Double.class;
-                try {
-                    result = Double.valueOf(s);
-                } catch (NumberFormatException take3) {
-                    result = new BigDecimal(s);
+        if ("#NaN".equals(s)) {
+            result = Double.NaN;
+            rclass = Double.class;
+        } else {
+            final int last = s.length() - 1;
+            switch (s.charAt(last)) {
+                case 'b':
+                case 'B': {
+                    rclass = BigDecimal.class;
+                    result = new BigDecimal(s.substring(0, last));
+                    break;
                 }
-                break;
+                case 'f':
+                case 'F': {
+                    rclass = Float.class;
+                    result = Float.valueOf(s.substring(0, last));
+                    break;
+                }
+                case 'd':
+                case 'D':
+                    rclass = Double.class;
+                    result = Double.valueOf(s.substring(0, last));
+                    break;
+                default: {
+                    rclass = Double.class;
+                    try {
+                        result = Double.valueOf(s);
+                    } catch (NumberFormatException take3) {
+                        result = new BigDecimal(s);
+                    }
+                    break;
+                }
             }
         }
         literal = result;
         clazz = rclass;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
