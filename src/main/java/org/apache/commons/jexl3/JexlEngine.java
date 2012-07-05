@@ -20,11 +20,12 @@ import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.MathContext;
 import java.net.URL;
+import java.nio.charset.Charset;
 
 /**
  * Creates and evaluates JexlExpression and JexlScript objects.
@@ -48,6 +49,11 @@ public abstract class JexlEngine {
      * <p>The JexlContext used for evaluation can implement this interface to alter behavior.</p>
      */
     public interface Options {
+        /**
+         * The charset used for parsing.
+         * @return the charset
+         */
+        Charset getCharset();
         /**
          * Sets whether the engine will throw a {@link JexlException} when an error is encountered during evaluation.
          * @return true if silent, false otherwise
@@ -112,6 +118,12 @@ public abstract class JexlEngine {
 
     /** The default Jxlt cache size. */
     private static final int JXLT_CACHE_SIZE = 256;
+
+    /**
+     * Gets the charset used for parsing.
+     * @return the charset
+     */
+    public abstract Charset getCharset();
 
     /**
      * Gets this engine underlying {@link JexlUberspect}.
@@ -473,7 +485,7 @@ public abstract class JexlEngine {
         }
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(file));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), getCharset()));
             return toString(reader);
         } catch (IOException xio) {
             throw new JexlException(createInfo(file.toString(), 1, 1), "could not read source File", xio);
@@ -482,7 +494,7 @@ public abstract class JexlEngine {
                 try {
                     reader.close();
                 } catch (IOException xignore) {
-                    // cant to much
+                    // cant do much
                 }
             }
         }
@@ -499,7 +511,7 @@ public abstract class JexlEngine {
         }
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            reader = new BufferedReader(new InputStreamReader(url.openStream(), getCharset()));
             return toString(reader);
         } catch (IOException xio) {
             throw new JexlException(createInfo(url.toString(), 1, 1), "could not read source URL", xio);
@@ -508,7 +520,7 @@ public abstract class JexlEngine {
                 try {
                     reader.close();
                 } catch (IOException xignore) {
-                    // cant to much
+                    // cant do much
                 }
             }
         }

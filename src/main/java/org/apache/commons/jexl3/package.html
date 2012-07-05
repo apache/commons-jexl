@@ -311,7 +311,8 @@
 
         <h3><a name="dynamic_configuration">Dynamic Configuration</a></h3>
         <p>
-            Those configuration options can be overriden during evaluation by implementing a {@link org.apache.commons.jexl3.JexlContext}
+            Those configuration options can be overriden during evaluation by implementing a
+            {@link org.apache.commons.jexl3.JexlContext}
             that also implements {@link org.apache.commons.jexl3.JexlEngine$Options} to carry evaluation options.
             An example of such a class exists in the test package.
         </p>
@@ -346,12 +347,16 @@
         <p>
             {@link org.apache.commons.jexl3.JexlArithmetic}
             is the class to derive if you need to change how operators behave or add types upon which they
-            operate. For example, this would
-            be the case if you wanted '+' to operate on arrays; you'd need to derive JexlArithmetic and
-            implement your own version of Add.
-            Note however that you can not change the operator precedence.
+            operate.
+            For example, this would be the case if you wanted '+' to operate on arrays; you'd need to derive
+            JexlArithmetic and implement your own version of Add.
 
+            There are 3 entry points that allow customizing the type of objects created for respectively
+            array literals {@link org.apache.commons.jexl3.JexlArithmetic#arrayBuilder},
+            map literals {@link org.apache.commons.jexl3.JexlArithmetic#mapBuilder}
+            and range objects {@link org.apache.commons.jexl3.JexlArithmetic#createRange}.
 
+            Note however that you can <em>not</em> change the operator precedence.
         </p>
 
         <h2><a name="extension">Extending JEXL</a></h2>

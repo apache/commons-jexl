@@ -39,68 +39,6 @@ public class IssuesTest extends JexlTestCase {
         java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
     }
 
-    // JEXL-24: long integers (and doubles)
-    public void test24() throws Exception {
-        JexlEngine jexl = new Engine();
-        Map<String, Object> vars = new HashMap<String, Object>();
-        JexlContext ctxt = new MapContext(vars);
-        String stmt = "{a = 10L; b = 10l; c = 42.0D; d = 42.0d; e=56.3F; f=56.3f; g=63.5; h=0x10; i=010; j=0x10L; k=010l}";
-        JexlScript expr = jexl.createScript(stmt);
-        /* Object value = */ expr.execute(ctxt);
-        assertEquals(10L, vars.get("a"));
-        assertEquals(10l, vars.get("b"));
-        assertEquals(42.0D, vars.get("c"));
-        assertEquals(42.0d, vars.get("d"));
-        assertEquals(56.3f, vars.get("e"));
-        assertEquals(56.3f, vars.get("f"));
-        assertEquals(63.5d, vars.get("g"));
-        assertEquals(0x10, vars.get("h"));
-        assertEquals(010, vars.get("i"));
-        assertEquals(0x10L, vars.get("j"));
-        assertEquals(010l, vars.get("k"));
-    }
-
-    // JEXL-24: big integers and big decimals
-    public void test24B() throws Exception {
-        JexlEngine jexl = new Engine();
-        Map<String, Object> vars = new HashMap<String, Object>();
-        JexlContext ctxt = new MapContext(vars);
-        String stmt = "{a = 10H; b = 10h; c = 42.0B; d = 42.0b;}";
-        JexlScript expr = jexl.createScript(stmt);
-        /* Object value = */ expr.execute(ctxt);
-        assertEquals(new BigInteger("10"), vars.get("a"));
-        assertEquals(new BigInteger("10"), vars.get("b"));
-        assertEquals(new BigDecimal("42.0"), vars.get("c"));
-        assertEquals(new BigDecimal("42.0"), vars.get("d"));
-    }
-
-    // JEXL-24: big decimals with exponent
-    public void test24C() throws Exception {
-        JexlEngine jexl = new Engine();
-        Map<String, Object> vars = new HashMap<String, Object>();
-        JexlContext ctxt = new MapContext(vars);
-        String stmt = "{a = 42.0e1B; b = 42.0E+2B; c = 42.0e-1B; d = 42.0E-2b;}";
-        JexlScript expr = jexl.createScript(stmt);
-        /* Object value = */ expr.execute(ctxt);
-        assertEquals(new BigDecimal("42.0e+1"), vars.get("a"));
-        assertEquals(new BigDecimal("42.0e+2"), vars.get("b"));
-        assertEquals(new BigDecimal("42.0e-1"), vars.get("c"));
-        assertEquals(new BigDecimal("42.0e-2"), vars.get("d"));
-    }
-
-    // JEXL-24: doubles with exponent
-    public void test24D() throws Exception {
-        JexlEngine jexl = new Engine();
-        Map<String, Object> vars = new HashMap<String, Object>();
-        JexlContext ctxt = new MapContext(vars);
-        String stmt = "{a = 42.0e1D; b = 42.0E+2D; c = 42.0e-1d; d = 42.0E-2d;}";
-        JexlScript expr = jexl.createScript(stmt);
-        /* Object value = */ expr.execute(ctxt);
-        assertEquals(Double.valueOf("42.0e+1"), vars.get("a"));
-        assertEquals(Double.valueOf("42.0e+2"), vars.get("b"));
-        assertEquals(Double.valueOf("42.0e-1"), vars.get("c"));
-        assertEquals(Double.valueOf("42.0e-2"), vars.get("d"));
-    }
 
     // JEXL-49: blocks not parsed (fixed)
     public void test49() throws Exception {
@@ -151,7 +89,7 @@ public class IssuesTest extends JexlTestCase {
             jc.set("foo", new Foo());
             /* Object o = */ e.evaluate(jc);
             fail("Should have failed due to invalid assignment");
-        } catch (JexlException.Parsing xparse) {
+        } catch (JexlException.Assignment xparse) {
             String dbg = xparse.toString();
         } catch (JexlException xjexl) {
             fail("Should have thrown a parse exception");
@@ -869,44 +807,38 @@ public class IssuesTest extends JexlTestCase {
         }
     }
 
-    JexlEngine createJexl132() {
+    public void test132a() throws Exception {
         Map<String, Object> ns = new HashMap<String, Object>();
         ns.put("math", Math.class);
-        return new JexlBuilder().arithmetic(new Arithmetic132()).namespaces(ns).create();
+        JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic132()).namespaces(ns).create();
 
-    }
-
-    public void test132a() throws Exception {
-        JexlEngine jexl = createJexl132();
-        String expr = "1/0";
-
-        Object evaluate = jexl.createExpression(expr).evaluate(null);
+        Object evaluate = jexl.createExpression("1/0").evaluate(null);
         assertTrue(Double.isInfinite((Double)evaluate));
 
-        expr = "-1/0";
-        evaluate = jexl.createExpression(expr).evaluate(null);
-        assertTrue(Double.isInfinite((Double)evaluate));
-    }
-
-
-    public void test132b() throws Exception {
-        JexlEngine jexl = createJexl132();
-        String expr = "1.0/0.0";
-
-        Object evaluate = jexl.createExpression(expr).evaluate(null);
+        evaluate = jexl.createExpression("-1/0").evaluate(null);
         assertTrue(Double.isInfinite((Double)evaluate));
 
-        expr = "-1.0/0";
-        evaluate = jexl.createExpression(expr).evaluate(null);
+        evaluate = jexl.createExpression("1.0/0.0").evaluate(null);
         assertTrue(Double.isInfinite((Double)evaluate));
-    }
 
-    public void test132c() throws Exception {
-        JexlEngine jexl = createJexl132();
-        String expr = "math:abs(-42)";
+        evaluate = jexl.createExpression("-1.0/0.0").evaluate(null);
+        assertTrue(Double.isInfinite((Double)evaluate));
 
-        Object evaluate = jexl.createExpression(expr).evaluate(null);
+        evaluate = jexl.createExpression("math:abs(-42)").evaluate(null);
         assertEquals(42, evaluate);
     }
 
+    public void test135() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlScript script;
+        Object result;
+        Map<Integer, Object> foo = new HashMap<Integer, Object>();
+        foo.put(3, 42);
+        script = jexl.createScript("var y = state[3]; y", "state");
+        result = script.execute(null, foo);
+        assertEquals(42, result);
+        script = jexl.createScript("var y = state[1 + 1 + 1]; y", "state");
+        result = script.execute(null, foo);
+        assertEquals(42, result);
+    }
 }

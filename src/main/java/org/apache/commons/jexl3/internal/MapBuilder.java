@@ -14,47 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl3.parser;
+package org.apache.commons.jexl3.internal;
 
-public final class ASTStringLiteral extends JexlNode implements JexlNode.Constant<String> {
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.commons.jexl3.JexlArithmetic;
 
-    ASTStringLiteral(int id) {
-        super(id);
-    }
-
-    ASTStringLiteral(Parser p, int id) {
-        super(p, id);
-    }
-
-    @Override
-    public String toString() {
-        return value.toString();
-    }
+/**
+ * Helper class to create map literals.
+ */
+public class MapBuilder implements JexlArithmetic.MapBuilder {
+    /** The map being created. */
+    private final Map<Object, Object> map;
 
     /**
-     * Gets the literal value.
-     * @return the string literal
+     * Creates a new builder.
+     * @param size the expected map size
      */
+    public MapBuilder(int size) {
+        map = new HashMap<Object, Object>(size);
+    }
+
     @Override
-    public String getLiteral() {
-        return value.toString();
+    public void put(Object key, Object value) {
+        map.put(key, value);
     }
 
-
-    /** {@inheritDoc} */
     @Override
-    protected boolean isConstant(boolean literal) {
-        return true;
+    public Object create() {
+        return map;
     }
 
-    void setLiteral(String literal) {
-        value = literal;
-    }
-
-
-    /** {@inheritDoc} */
-    @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
-        return visitor.visit(this, data);
-    }
 }

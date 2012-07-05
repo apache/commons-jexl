@@ -649,7 +649,7 @@ public class JexlTest extends JexlTestCase {
         Foo foo = new Foo();
         jc.set("foo", foo);
         Parser parser = new Parser(new StringReader(";"));
-        parser.parse(null, new StringReader("aString = 'World';"), null, false);
+        parser.parse(null, "aString = 'World';", null, false);
 
         assertExpression(jc, "hello = 'world'", "world");
         assertEquals("hello variable not changed", "world", jc.get("hello"));

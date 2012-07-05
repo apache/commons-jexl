@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlNode;
@@ -29,7 +30,6 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * @author henri
  */
 public class Util {
-
     /**
      * Will force testing the debugger for each derived test class by
      * recreating each expression from the JexlNode in the JexlEngine cache &
@@ -37,7 +37,7 @@ public class Util {
      * @throws Exception
      */
     public static void debuggerCheck(JexlEngine ijexl) throws Exception {
-        Engine  jexl = (Engine) ijexl;
+        Engine jexl = (Engine) ijexl;
         // without a cache, nothing to check
         if (jexl == null || jexl.cache == null) {
             return;
@@ -46,27 +46,35 @@ public class Util {
         jdbg.parser.allowRegisters(true);
         Debugger dbg = new Debugger();
         // iterate over all expression in cache
-        Iterator<Map.Entry<String,ASTJexlScript>> inodes = jexl.cache.entrySet().iterator();
+        Iterator<Map.Entry<String, ASTJexlScript>> inodes = jexl.cache.entrySet().iterator();
         while (inodes.hasNext()) {
-            Map.Entry<String,ASTJexlScript> entry = inodes.next();
+            Map.Entry<String, ASTJexlScript> entry = inodes.next();
             JexlNode node = entry.getValue();
             // recreate expr string from AST
             dbg.debug(node);
             String expressiondbg = dbg.toString();
             // recreate expr from string
-            Script exprdbg = (Script) jdbg.createScript(null, expressiondbg, null);
-            // make arg cause become the root cause
-            JexlNode root = exprdbg.script;
-            while (root.jjtGetParent() != null) {
-                root = root.jjtGetParent();
-            }
-            // test equality
-            String reason = checkEquals(root, node);
-            if (reason != null) {
-                throw new RuntimeException("debugger equal failed: "
-                                           + expressiondbg
-                                           +" /**** "  +reason+" **** */ "
-                                           + entry.getKey());
+            try {
+                Script exprdbg = jdbg.createScript(null, expressiondbg, null);
+                // make arg cause become the root cause
+                JexlNode root = exprdbg.script;
+                while (root.jjtGetParent() != null) {
+                    root = root.jjtGetParent();
+                }
+                // test equality
+                String reason = checkEquals(root, node);
+                if (reason != null) {
+                    throw new RuntimeException("check equal failed: "
+                            + expressiondbg
+                            + " /**** " + reason + " **** */ "
+                            + entry.getKey());
+                }
+            } catch (JexlException xjexl) {
+                throw new RuntimeException("check parse failed: "
+                        + expressiondbg
+                        + " /******** */ "
+                        + entry.getKey(), xjexl);
+
             }
         }
     }
@@ -84,13 +92,13 @@ public class Util {
 
     /**
      * Recursively adds all children of a script to the list of descendants.
-     * @param list the list of descendants to add to
+     * @param list   the list of descendants to add to
      * @param script the script & descendants to add
      */
     private static void flatten(List<JexlNode> list, JexlNode node) {
         int nc = node.jjtGetNumChildren();
         list.add(node);
-        for(int c = 0; c < nc; ++c) {
+        for (int c = 0; c < nc; ++c) {
             flatten(list, node.jjtGetChild(c));
         }
     }
@@ -107,9 +115,9 @@ public class Util {
             ArrayList<JexlNode> lhsl = flatten(lhs);
             ArrayList<JexlNode> rhsl = flatten(rhs);
             if (lhsl.size() != rhsl.size()) {
-                 return "size: " + lhsl.size() + " != " + rhsl.size();
+                return "size: " + lhsl.size() + " != " + rhsl.size();
             }
-            for(int n = 0; n < lhsl.size(); ++n) {
+            for (int n = 0; n < lhsl.size(); ++n) {
                 lhs = lhsl.get(n);
                 rhs = rhsl.get(n);
                 if (lhs.getClass() != rhs.getClass()) {
@@ -118,7 +126,7 @@ public class Util {
                 String lhss = lhs.toString();
                 String rhss = rhs.toString();
                 if ((lhss == null && rhss != null)
-                    || (lhss != null && rhss == null)) {
+                        || (lhss != null && rhss == null)) {
                     return "image: " + lhss + " != " + rhss;
                 }
                 if (lhss != null && !lhss.equals(rhss)) {
@@ -146,7 +154,6 @@ public class Util {
         }
         return strb.toString();
     }
-
 
     private String flattenedStr(JexlNode node) {
         ArrayList<JexlNode> flattened = flatten(node);

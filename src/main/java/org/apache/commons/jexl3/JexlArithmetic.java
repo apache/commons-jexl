@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -107,6 +105,82 @@ public class JexlArithmetic {
         } else {
             return this;
         }
+    }
+
+    /**
+     * Helper interface used when creating an array literal.
+     * <p>The default implementation creates an array and attempts to type it strictly.
+     * <ul>
+     * <li>If all objects are of the same type, the array returned will be an array of that same type</li>
+     * <li>If all objects are Numbers, the array returned will be an array of Numbers</li>
+     * <li>If all objects are convertible to a primitive type, the array returned will be an array
+     * of the primitive type</li>
+     * </ul>
+     * </p>
+     */
+    public interface ArrayBuilder {
+        /**
+         * Adds a literal to the array.
+         * @param value the item to add
+         */
+        void add(Object value);
+
+        /**
+         * Creates the actual "array" instance.
+         * @return the array
+         */
+        Object create();
+    }
+
+    /**
+     * Called by the interpreter when evaluating a literal array.
+     * @param size the number of elements in the array
+     * @return the array builder
+     */
+    public ArrayBuilder arrayBuilder(int size) {
+        return new org.apache.commons.jexl3.internal.ArrayBuilder(size);
+    }
+
+    /**
+     * Helper interface used when creating a map literal.
+     * <p>The default implementation creates a java.util.HashMap.</p>
+     */
+    public interface MapBuilder {
+        /**
+         * Adds a new entry to the map.
+         * @param key   the map entry key
+         * @param value the map entry value
+         */
+        void put(Object key, Object value);
+
+        /**
+         * Creates the actual "map" instance.
+         * @return the map
+         */
+        Object create();
+    }
+
+    /**
+     * Called by the interpreter when evaluating a literal map.
+     * @param size the number of elements in the map
+     * @return the map builder
+     */
+    public MapBuilder mapBuilder(int size) {
+        return new org.apache.commons.jexl3.internal.MapBuilder(size);
+    }
+
+    /**
+     * Creates a literal range.
+     * <p>The default implementation only accepts integers.</p>
+     * @param from the included lower bound value (null if none)
+     * @param to   the included upper bound value (null if none)
+     * @return the range as an iterable
+     * @throws ArithmeticException as an option if creation fails
+     */
+    public Iterable<?> createRange(Object from, Object to) throws ArithmeticException {
+        final int ifrom = toInteger(from);
+        final int ito = toInteger(to);
+        return new org.apache.commons.jexl3.internal.IntegerRange(ifrom, ito);
     }
 
     /**
@@ -365,96 +439,22 @@ public class JexlArithmetic {
     }
 
     /**
-     * Given an array of objects, attempt to type it more strictly.
-     * <p>This is a placeholder for derivation that calls the static typeArray method.</p>
-     * @param untyped an untyped array
-     * @return the original array if the attempt to strictly type the array fails, a typed array otherwise
-     */
-    public Object narrowArrayType(Object[] untyped) {
-        return typeArray(untyped);
-    }
-
-    /**
-     * Given an array of objects, attempt to type it more strictly.
-     * <ul>
-     * <li>If all objects are of the same type, the array returned will be an array of that same type</li>
-     * <li>If all objects are Numbers, the array returned will be an array of Numbers</li>
-     * <li>If all objects are convertible to a primitive type, the array returned will be an array
-     * of the primitive type</li>
-     * </ul>
-     * @param untyped an untyped array
-     * @return the original array if the attempt to strictly type the array fails, a typed array otherwise
-     */
-    public static Object typeArray(Object[] untyped) {
-        final int size = untyped.length;
-        Class<?> commonClass = null;
-        if (size > 0) {
-            boolean isNumber = true;
-            // for all children after first...
-            for (int u = 0; u < size && !Object.class.equals(commonClass); ++u) {
-                if (untyped[u] != null) {
-                    Class<?> eclass = untyped[u].getClass();
-                    // base common class on first non-null entry
-                    if (commonClass == null) {
-                        commonClass = eclass;
-                        isNumber &= Number.class.isAssignableFrom(commonClass);
-                    } else if (!commonClass.equals(eclass)) {
-                        // if both are numbers...
-                        if (isNumber && Number.class.isAssignableFrom(eclass)) {
-                            commonClass = Number.class;
-                        } else {
-                            // attempt to find valid superclass
-                            do {
-                                eclass = eclass.getSuperclass();
-                                if (eclass == null) {
-                                    commonClass = Object.class;
-                                    break;
-                                }
-                            } while (!commonClass.isAssignableFrom(eclass));
-                        }
-                    }
-                } else {
-                    isNumber = false;
-                }
-            }
-            // convert array to the common class if not Object.class
-            if (commonClass != null && !Object.class.equals(commonClass)) {
-                // if the commonClass has an equivalent primitive type, get it
-                if (isNumber) {
-                    try {
-                        final Field type = commonClass.getField("TYPE");
-                        commonClass = (Class<?>) type.get(null);
-                    } catch (Exception xany) {
-                        // ignore
-                    }
-                }
-                // allocate and fill up the typed array
-                Object typed = Array.newInstance(commonClass, size);
-                for (int i = 0; i < size; ++i) {
-                    Array.set(typed, i, untyped[i]);
-                }
-                return typed;
-            }
-        }
-        return untyped;
-    }
-
-    /**
      * Replace all numbers in an arguments array with the smallest type that will fit.
      * @param args the argument array
      * @return true if some arguments were narrowed and args array is modified,
-     * false if no narrowing occured and args array has not been modified
+     *         false if no narrowing occured and args array has not been modified
      */
     public boolean narrowArguments(Object[] args) {
         boolean narrowed = false;
         for (int a = 0; a < args.length; ++a) {
             Object arg = args[a];
             if (arg instanceof Number) {
-                Object narg = narrow((Number) arg);
-                if (narg != arg) {
+                Number narg = (Number) arg;
+                Number narrow = narrow(narg);
+                if (!narg.equals(narrow)) {
                     narrowed = true;
                 }
-                args[a] = narg;
+                args[a] = narrow;
             }
         }
         return narrowed;
@@ -519,7 +519,7 @@ public class JexlArithmetic {
             BigDecimal r = toBigDecimal(right);
             if (BigDecimal.ZERO.equals(r)) {
                 throw new ArithmeticException("/");
-                }
+            }
             BigDecimal result = l.divide(r, getMathContext());
             return narrowBigDecimal(left, right, result);
         }
@@ -537,7 +537,7 @@ public class JexlArithmetic {
         BigInteger r = toBigInteger(right);
         if (BigInteger.ZERO.equals(r)) {
             throw new ArithmeticException("/");
-            }
+        }
         BigInteger result = l.divide(r);
         return narrowBigInteger(left, right, result);
     }
@@ -559,7 +559,7 @@ public class JexlArithmetic {
             BigDecimal r = toBigDecimal(right);
             if (BigDecimal.ZERO.equals(r)) {
                 throw new ArithmeticException("%");
-                }
+            }
             BigDecimal remainder = l.remainder(r, getMathContext());
             return narrowBigDecimal(left, right, remainder);
         }
@@ -578,7 +578,7 @@ public class JexlArithmetic {
         BigInteger result = l.mod(r);
         if (BigInteger.ZERO.equals(r)) {
             throw new ArithmeticException("%");
-            }
+        }
         return narrowBigInteger(left, right, result);
     }
 
@@ -1022,7 +1022,7 @@ public class JexlArithmetic {
             return new BigInteger(val.toString());
         } else if (val instanceof String) {
             String string = (String) val;
-            if ("".equals(string.trim())) {
+            if ("".equals(string)) {
                 return BigInteger.ZERO;
             } else {
                 return new BigInteger(string);
@@ -1052,7 +1052,7 @@ public class JexlArithmetic {
             controlNullOperand();
             return BigDecimal.ZERO;
         } else if (val instanceof String) {
-            String string = ((String) val).trim();
+            String string = (String) val;
             if ("".equals(string)) {
                 return BigDecimal.ZERO;
             }
@@ -1094,7 +1094,7 @@ public class JexlArithmetic {
         } else if (val instanceof Boolean) {
             return ((Boolean) val).booleanValue() ? 1. : 0.;
         } else if (val instanceof String) {
-            String string = ((String) val).trim();
+            String string = (String) val;
             if ("".equals(string)) {
                 return Double.NaN;
             } else {

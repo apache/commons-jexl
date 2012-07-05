@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.RandomAccess;
 
 /**
  * A class that wraps an array within an AbstractList.
@@ -30,7 +31,7 @@ import java.util.ListIterator;
  * for any method is thus always ArrayListWrapper.
  * </p>
  */
-public class ArrayListWrapper extends AbstractList<Object> {
+public class ArrayListWrapper extends AbstractList<Object> implements RandomAccess {
     /** the array to wrap. */
     private final Object array;
 
@@ -115,7 +116,7 @@ public class ArrayListWrapper extends AbstractList<Object> {
     public boolean contains(Object o) {
         return indexOf(o) != -1;
     }
-    
+
     @Override
     public boolean isEmpty() {
         return super.isEmpty();
@@ -125,7 +126,7 @@ public class ArrayListWrapper extends AbstractList<Object> {
     public Iterator<Object> iterator() {
         return super.iterator();
     }
-    
+
     @Override
     public boolean containsAll(Collection<?> c) {
         return super.containsAll(c);
@@ -150,7 +151,7 @@ public class ArrayListWrapper extends AbstractList<Object> {
     public List<Object> subList(int fromIndex, int toIndex) {
         return super.subList(fromIndex, toIndex);
     }
-    
+
     @Override
     public boolean add(Object o) {
         throw new UnsupportedOperationException("Not supported.");

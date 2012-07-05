@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+import java.nio.charset.Charset;
 import org.apache.commons.jexl3.internal.Engine;
 import java.util.Map;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
@@ -99,6 +100,10 @@ public class JexlBuilder {
      */
     protected int cacheThreshold = CACHE_THRESHOLD;
     /**
+     * The charset.
+     */
+    protected Charset charset = Charset.defaultCharset();
+    /**
      * The class loader.
      */
     protected ClassLoader loader = null;
@@ -176,6 +181,21 @@ public class JexlBuilder {
     /** @return the class loader */
     public ClassLoader loader() {
         return loader;
+    }
+
+    /**
+     * Sets the charset to use.
+     * @param arg the charset
+     * @return this builder
+     */
+    public JexlBuilder loader(Charset arg) {
+        this.charset = arg;
+        return this;
+    }
+
+    /** @return the charset */
+    public Charset charset() {
+        return charset;
     }
 
     /**

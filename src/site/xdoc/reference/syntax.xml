@@ -327,7 +327,7 @@
             Those variables values are bound in the function environment at definition time.</p>
             <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
             The function closure hoists 't' when defined; the result of the evaluation will
-            lead to <code>15 +7 + 20 = 42</code>. 
+            lead to <code>15 +7 + 20 = 42</code>.
           </td>
         </tr>
       </table>
@@ -485,10 +485,38 @@
             For example
             <code>"abcdef" !~ "abc.*</code> returns <code>false</code>.
             It also checks whether any collection, set or map (on keys) does not contain a value; in that case, it behaves
-            as "not in" operator. Note that it also applies to arrays as well as "duck-typed" collection, ie classes exposing a "contains"
-            method.
+            as "not in" operator.
             <code> "a" !~ ["a","b","c","d","e",f"]</code> returns <code>true</code>.
+            Note that through duck-typing, user classes exposing a public 'contains' method will allow their instances
+            to behave has right-hand-size operands of this operator.
           </td>
+        </tr>
+        <tr>
+          <td>Starts With<code>=^</code></td>
+          <td>
+            The syntactically CSS3 inspired <code>=^</code> operator is a short-hand for the 'startsWith' method.
+            For example,
+            <code> "abcdef" ^= "abc" </code> returns <code>true</code>.
+            Note that through duck-typing, user classes exposing a public 'startsWith' method will allow their instances
+            to behave has left-hand-size operands of this operator.
+          </td>
+        </tr>
+        <tr>
+          <td>Ends With<code>=$</code></td>
+          <td>The syntactically CSS3 inspired <code>=$</code> operator is a short-hand for the 'endsWith' method.
+            For example,
+            <code> "abcdef" $= "def" </code> returns <code>true</code>.
+            Note that through duck-typing, user classes exposing an 'endsWith' method will allow their instances
+            to behave has left-hand-size operands of this operator.
+          </td>
+        </tr>
+        <tr>
+            <td>Range<code>..</code></td>
+            <td>
+                This operator creates a 'range' of values (in the form of a java iterable).
+                For example,
+                <code>for(var x: 1 .. 3) {}</code> will loop 3 times with the value of 'x' being 1, 2 and 3.
+            </td>
         </tr>
         <tr>
           <td>Addition</td>
@@ -579,7 +607,7 @@
           <td>
             Loop through items of an Array, Collection, Map, Iterator or Enumeration, e.g.
             <source>for(item : list) {
-    x = x + item; 
+    x = x + item;
 }</source>
             Where <code>item</code> and <code>list</code> are variables.
             The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>deprecated</strong>.
@@ -590,7 +618,7 @@
           <td>
             Loop until a condition is satisfied, e.g.
             <source>while (x lt 10) {
-    x = x + 2; 
+    x = x + 2;
 }</source>
           </td>
         </tr>

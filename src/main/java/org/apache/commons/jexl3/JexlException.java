@@ -73,7 +73,7 @@ public class JexlException extends RuntimeException {
      * @param cause the exception causing the error
      */
     public JexlException(JexlInfo jinfo, String msg, Throwable cause) {
-        super(msg, unwrap(cause));
+        super(msg != null ? msg : "", unwrap(cause));
         mark = null;
         info = jinfo;
     }
@@ -213,7 +213,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Parsing extends JexlException {
         /**
-         * Creates a new Variable exception instance.
+         * Creates a new Parsing exception instance.
          * @param info  the location information
          * @param cause the javacc cause
          */
@@ -222,7 +222,7 @@ public class JexlException extends RuntimeException {
         }
 
         /**
-         * Creates a new Variable exception instance.
+         * Creates a new Parsing exception instance.
          * @param info the location information
          * @param msg  the message
          */
@@ -240,6 +240,46 @@ public class JexlException extends RuntimeException {
         @Override
         protected String detailedMessage() {
             return parserError("parsing", getDetail());
+        }
+    }
+
+    /**
+     * Thrown when parsing fails due to an ambiguous statement.
+     * @since 3.0
+     */
+    public static class Ambiguous extends Parsing {
+        /**
+         * Creates a new Ambiguous statement exception instance.
+         * @param info  the location information
+         * @param expr  the source expression line
+         */
+        public Ambiguous(JexlInfo info, String expr) {
+            super(info, expr);
+        }
+
+        @Override
+        protected String detailedMessage() {
+            return parserError("ambiguous statement", getDetail());
+        }
+    }
+
+    /**
+     * Thrown when parsing fails due to an invalid assigment.
+     * @since 3.0
+     */
+    public static class Assignment extends Parsing {
+        /**
+         * Creates a new Assignment statement exception instance.
+         * @param info  the location information
+         * @param expr  the source expression line
+         */
+        public Assignment(JexlInfo info, String expr) {
+            super(info, expr);
+        }
+
+        @Override
+        protected String detailedMessage() {
+            return parserError("assignement", getDetail());
         }
     }
 

@@ -16,6 +16,9 @@
  */
 package org.apache.commons.jexl3.parser;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.internal.Scope;
@@ -26,6 +29,10 @@ import java.util.Stack;
  * The base class for parsing, manages the parameter/local variable frame.
  */
 public abstract class JexlParser extends StringParser {
+    /** Whether the parser will allow user-named registers (aka #0 syntax). */
+    protected boolean ALLOW_REGISTERS = false;
+    /** The source being processed. */
+    protected String source = null;
     /**
      * The map of named registers aka script parameters.
      * <p>Each parameter is associated to a register and is materialized
@@ -34,6 +41,14 @@ public abstract class JexlParser extends StringParser {
     protected Scope frame = null;
     protected Stack<Scope> frames = new Stack<Scope>();
 
+
+    /**
+     * Internal, for debug purpose only.
+     */
+    public void allowRegisters(boolean registers) {
+        ALLOW_REGISTERS = registers;
+    }
+    
     /**
      * Sets the frame to use by this parser.
      * <p> This is used to allow parameters to be declared before parsing. </p>
@@ -77,7 +92,7 @@ public abstract class JexlParser extends StringParser {
     /**
      * Checks whether an identifier is a local variable or argument, ie a symbol, stored in a register.
      * @param identifier the identifier
-     * @param image the identifier image
+     * @param image      the identifier image
      * @return the image
      */
     public String checkVariable(ASTIdentifier identifier, String image) {
@@ -94,7 +109,7 @@ public abstract class JexlParser extends StringParser {
      * Declares a local variable.
      * <p> This method creates an new entry in the symbol map. </p>
      * @param identifier the identifier used to declare
-     * @param image the variable name
+     * @param image      the variable name
      */
     public void declareVariable(ASTVar identifier, String image) {
         if (frame == null) {
@@ -150,27 +165,48 @@ public abstract class JexlParser extends StringParser {
                 script.setScope(frame);
             }
             popFrame();
-        } else if (node instanceof ASTAmbiguous && node.jjtGetNumChildren() > 0) {
-            final JexlInfo dbgInfo;
-            Token tok = this.getToken(0);
-            if (tok != null) {
-                dbgInfo = new JexlInfo(tok.image, tok.beginLine, tok.beginColumn);
-            } else {
-                dbgInfo = node.jexlInfo();
-            }
-            throw new JexlException.Parsing(dbgInfo, "Ambiguous statement, missing ';' between expressions");
+        } else if (node instanceof ASTAmbiguous) {
+            throwParsingException(JexlException.Ambiguous.class, node);
         } else if (node instanceof ASTAssignment) {
             JexlNode lv = node.jjtGetChild(0);
             if (!lv.isLeftValue()) {
-                final JexlInfo dbgInfo;
-                Token tok = this.getToken(0);
-                if (tok != null) {
-                    dbgInfo = new JexlInfo(tok.image, tok.beginLine, tok.beginColumn);
-                } else {
-                    dbgInfo = node.jexlInfo();
-                }
-                throw new JexlException.Parsing(dbgInfo, "Invalid assignment expression");
+                throwParsingException(JexlException.Assignment.class, lv);
             }
         }
+    }
+
+    /**
+     * Throws a parsing exception.
+     * @param xclazz the class of exception
+     * @param node the node that provoqued it
+     */
+    private void throwParsingException(Class<? extends JexlException> xclazz, JexlNode node) {
+        final JexlInfo dbgInfo;
+        Token tok = this.getToken(0);
+        if (tok != null) {
+            dbgInfo = new JexlInfo(tok.image, tok.beginLine, tok.beginColumn);
+        } else {
+            dbgInfo = node.jexlInfo();
+        }
+        String msg = null;
+        try {
+            if (source != null) {
+                BufferedReader reader = new BufferedReader(new StringReader(source));
+                for (int l = 0; l < dbgInfo.getLine(); ++l) {
+                    msg = reader.readLine();
+                }
+            } else {
+                msg = "";
+            }
+        } catch (IOException xio) {
+            // ignore
+        }
+        if (JexlException.Ambiguous.class.equals(xclazz)) {
+            throw new JexlException.Ambiguous(dbgInfo, msg);
+        }
+        if (JexlException.Assignment.class.equals(xclazz)) {
+            throw new JexlException.Assignment(dbgInfo, msg);
+        }
+        throw new JexlException.Parsing(dbgInfo, msg);
     }
 }
