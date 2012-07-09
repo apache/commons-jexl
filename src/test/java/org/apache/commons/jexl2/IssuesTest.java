@@ -1111,4 +1111,23 @@ public class IssuesTest extends JexlTestCase {
         result = script.execute(null, foo, 2, 1);
         assertEquals(42, result);
     }
+
+    @Test
+    public void test136() throws Exception {
+        JexlEngine jexl = new JexlEngine();
+        JexlContext jc = new MapContext();
+        Script script;
+        Expression expr;
+        Object result;
+
+        script = jexl.createScript("var x = $TAB[idx]; return x;", "idx");
+        jc.set("fn01", script);
+
+        script = jexl.createScript("$TAB = { 1:11, 2:22, 3:33}; IDX=2;");
+        script.execute(jc);
+
+        expr = jexl.createExpression("fn01(IDX)");
+        result = expr.evaluate(jc);
+        assertEquals("EXPR01 result", 22, result);
+    }
 }

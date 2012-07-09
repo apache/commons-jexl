@@ -1021,52 +1021,51 @@ public class Interpreter implements ParserVisitor {
         }
 
         JexlException xjexl = null;
+        JexlMethod vm = null;
         try {
             // attempt to reuse last executor cached in volatile JexlNode.value
             if (cache) {
                 Object cached = node.jjtGetValue();
                 if (cached instanceof JexlMethod) {
-                    JexlMethod me = (JexlMethod) cached;
-                    Object eval = me.tryInvoke(methodName, bean, argv);
-                    if (!me.tryFailed(eval)) {
+                    vm = (JexlMethod) cached;
+                    Object eval = vm.tryInvoke(methodName, bean, argv);
+                    if (!vm.tryFailed(eval)) {
                         return eval;
                     }
                 }
             }
             boolean cacheable = cache;
-            JexlMethod vm = uberspect.getMethod(bean, methodName, argv, node);
-            // DG: If we can't find an exact match, narrow the parameters and try again
+            vm = uberspect.getMethod(bean, methodName, argv, node);
             if (vm == null) {
-                if (arithmetic.narrowArguments(argv)) {
-                    vm = uberspect.getMethod(bean, methodName, argv, node);
+                Object functor = null;
+                // could not find a method, try as a var
+                if (bean == context) {
+                    int register = methodNode.getRegister();
+                    if (register >= 0) {
+                        functor = registers[register];
+                    } else {
+                        functor = context.get(methodName);
+                    }
+                } else {
+                    JexlPropertyGet gfunctor = uberspect.getPropertyGet(bean, methodName, node);
+                    if (gfunctor != null) {
+                        functor = gfunctor.tryInvoke(bean, methodName);
+                    }
                 }
-                if (vm == null) {
-                    Object functor = null;
-                    // could not find a method, try as a var
-                    if (bean == context) {
-                        int register = methodNode.getRegister();
-                        if (register >= 0) {
-                            functor = registers[register];
-                        } else {
-                            functor = context.get(methodName);
-                        }
-                    } else {
-                        JexlPropertyGet gfunctor = uberspect.getPropertyGet(bean, methodName, node);
-                        if (gfunctor != null) {
-                            functor = gfunctor.tryInvoke(bean, methodName);
-                        }
-                    }
-                    // script of jexl method will do
-                    if (functor instanceof Script) {
-                        return ((Script) functor).execute(context, argv.length > 0 ? argv : null);
-                    } else if (functor instanceof JexlMethod) {
-                        vm = (JexlMethod) functor;
-                        cacheable = false;
-                    } else {
-                        xjexl = new JexlException.Method(node, methodName, null);
-                    }
+                // script or JexlMethod will do
+                if (functor instanceof Script) {
+                    return ((Script) functor).execute(context, argv.length > 0 ? argv : null);
+                } else if (functor instanceof JexlMethod) {
+                    vm = (JexlMethod) functor;
+                    cacheable = false;
+                // DG: If we can't find an exact match, narrow the parameters and try again
+                } else if (arithmetic.narrowArguments(argv)) {
+                    vm = uberspect.getMethod(bean, methodName, argv, node);
+                } else {
+                    xjexl = new JexlException.Method(node, methodName, null);
                 }
             }
+
             if (xjexl == null) {
                 // vm cannot be null if xjexl is null
                 Object eval = vm.invoke(bean, argv);
