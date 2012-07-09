@@ -23,6 +23,7 @@ import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
+import org.junit.Test;
 
 /**
  * Test cases for reported issues
@@ -872,5 +873,25 @@ public class IssuesTest extends JexlTestCase {
         script = jexl.createScript("var y = state[a + b]; y", "state", "a", "b");
         result = script.execute(null, foo, 2, 1);
         assertEquals(42, result);
+    }
+
+
+    @Test
+    public void test136() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlContext jc = new MapContext();
+        JexlScript script;
+        JexlExpression expr;
+        Object result;
+
+        script = jexl.createScript("var x = $TAB[idx]; return x;", "idx");
+        jc.set("fn01", script);
+
+        script = jexl.createScript("$TAB = { 1:11, 2:22, 3:33}; IDX=2;");
+        script.execute(jc);
+
+        expr = jexl.createExpression("fn01(IDX)");
+        result = expr.evaluate(jc);
+        assertEquals("EXPR01 result", 22, result);
     }
 }
