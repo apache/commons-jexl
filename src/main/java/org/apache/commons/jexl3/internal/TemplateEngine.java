@@ -34,7 +34,6 @@ import java.io.Writer;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -78,7 +77,8 @@ public final class TemplateEngine extends JxltEngine {
         IMMEDIATE(1),
         /** Deferred TemplateExpression, count index 2. */
         DEFERRED(2),
-        /** Nested (which are deferred) expressions, count index 2. */
+        /** Nested (which are deferred) expressions, count
+         * index 2. */
         NESTED(2),
         /** Composite expressions are not counted, index -1. */
         COMPOSITE(-1);
@@ -229,9 +229,9 @@ public final class TemplateEngine extends JxltEngine {
 
         /**
          * Fills up the list of variables accessed by this unified expression.
-         * @param refs the set of variable being filled
+         * @param collector the variable collector
          */
-        protected void getVariables(Set<List<String>> refs) {
+        protected void getVariables(Engine.VarCollector collector) {
             // nothing to do
         }
 
@@ -374,14 +374,14 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public Set<List<String>> getVariables() {
-            Set<List<String>> refs = new LinkedHashSet<List<String>>();
-            getVariables(refs);
-            return refs;
+            Engine.VarCollector collector = new Engine.VarCollector();
+            getVariables(collector);
+            return collector.collected();
         }
 
         @Override
-        protected void getVariables(Set<List<String>> refs) {
-            jexl.getVariables(node, refs, null);
+        protected void getVariables(Engine.VarCollector collector) {
+            jexl.getVariables(node, collector);
         }
     }
 
@@ -438,7 +438,7 @@ public final class TemplateEngine extends JxltEngine {
         }
 
         @Override
-        protected void getVariables(Set<List<String>> refs) {
+        protected void getVariables(Engine.VarCollector collector) {
             // noop
         }
     }
@@ -532,11 +532,11 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public Set<List<String>> getVariables() {
-            Set<List<String>> refs = new LinkedHashSet<List<String>>();
+            Engine.VarCollector collector = new Engine.VarCollector();
             for (TemplateExpression expr : exprs) {
-                expr.getVariables(refs);
+                expr.getVariables(collector);
             }
-            return refs;
+            return collector.collected();
         }
 
         @Override
@@ -857,7 +857,7 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Creates a new template from an character input.
          * @param directive the prefix for lines of code; can not be "$", "${", "#" or "#{"
-         * since this would preclude being able to differentiate directives and template expressions
+         *                  since this would preclude being able to differentiate directives and template expressions
          * @param reader    the input reader
          * @param parms     the parameter names
          * @throws NullPointerException     if either the directive prefix or input is null
