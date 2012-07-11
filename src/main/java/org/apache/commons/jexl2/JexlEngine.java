@@ -55,10 +55,10 @@ import org.apache.commons.jexl2.parser.ASTReference;
  * Creates and evaluates Expression and Script objects.
  * Determines the behavior of Expressions & Scripts during their evaluation with respect to:
  * <ul>
- *  <li>Introspection, see {@link Uberspect}</li>
- *  <li>Arithmetic & comparison, see {@link JexlArithmetic}</li>
- *  <li>Error reporting</li>
- *  <li>Logging</li>
+ * <li>Introspection, see {@link Uberspect}</li>
+ * <li>Arithmetic & comparison, see {@link JexlArithmetic}</li>
+ * <li>Error reporting</li>
+ * <li>Logging</li>
  * </ul>
  * </p>
  * <p>The <code>setSilent</code> and <code>setLenient</code> methods allow to fine-tune an engine instance behavior
@@ -117,7 +117,7 @@ public class JexlEngine {
     };
 
     /**
-     *  Gets the default instance of Uberspect.
+     * Gets the default instance of Uberspect.
      * <p>This is lazily initialized to avoid building a default instance if there
      * is no use for it. The main reason for not using the default Uberspect instance is to
      * be able to use a (low level) introspector created with a given logger
@@ -166,7 +166,7 @@ public class JexlEngine {
      */
     private volatile boolean strict = false;
     /**
-     *  The map of 'prefix:function' to object implementing the functions.
+     * The map of 'prefix:function' to object implementing the functions.
      */
     // TODO this could probably be private; is it threadsafe?
     protected Map<String, Object> functions = Collections.emptyMap();
@@ -190,10 +190,10 @@ public class JexlEngine {
     /**
      * Creates a JEXL engine using the provided {@link Uberspect}, (@link JexlArithmetic),
      * a function map and logger.
-     * @param anUberspect to allow different introspection behaviour
+     * @param anUberspect  to allow different introspection behaviour
      * @param anArithmetic to allow different arithmetic behaviour
      * @param theFunctions an optional map of functions (@link setFunctions)
-     * @param log the logger for various messages
+     * @param log          the logger for various messages
      */
     public JexlEngine(Uberspect anUberspect, JexlArithmetic anArithmetic, Map<String, Object> theFunctions, Log log) {
         this.uberspect = anUberspect == null ? getUberspect(log) : anUberspect;
@@ -209,7 +209,7 @@ public class JexlEngine {
     }
 
     /**
-     *  Gets the default instance of Uberspect.
+     * Gets the default instance of Uberspect.
      * <p>This is lazily initialized to avoid building a default instance if there
      * is no use for it. The main reason for not using the default Uberspect instance is to
      * be able to use a (low level) introspector created with a given logger
@@ -385,7 +385,7 @@ public class JexlEngine {
      * <p>Note that the JexlContext is also used to try to solve top-level functions. This allows ObjectContext
      * derived instances to call methods on the wrapped object.</p>
      * @param funcs the map of functions that should not mutate after the call; if null
-     * is passed, the empty collection is used.
+     *              is passed, the empty collection is used.
      */
     public void setFunctions(Map<String, Object> funcs) {
         functions = funcs != null ? funcs : Collections.<String, Object>emptyMap();
@@ -395,7 +395,7 @@ public class JexlEngine {
      * Retrieves the map of function namespaces.
      *
      * @return the map passed in setFunctions or the empty map if the
-     * original was null.
+     *         original was null.
      */
     public Map<String, Object> getFunctions() {
         return functions;
@@ -413,13 +413,13 @@ public class JexlEngine {
 
     /**
      * Creates an Expression from a String containing valid
-     * JEXL syntax.  This method parses the expression which
+     * JEXL syntax. This method parses the expression which
      * must contain either a reference or an expression.
      * @param expression A String containing valid JEXL syntax
      * @return An Expression object which can be evaluated with a JexlContext
      * @throws JexlException An exception can be thrown if there is a problem
-     *      parsing this expression, or if the expression is neither an
-     *      expression nor a reference.
+     *                       parsing this expression, or if the expression is neither an
+     *                       expression nor a reference.
      */
     public Expression createExpression(String expression) {
         return createExpression(expression, null);
@@ -427,14 +427,14 @@ public class JexlEngine {
 
     /**
      * Creates an Expression from a String containing valid
-     * JEXL syntax.  This method parses the expression which
+     * JEXL syntax. This method parses the expression which
      * must contain either a reference or an expression.
      * @param expression A String containing valid JEXL syntax
      * @return An Expression object which can be evaluated with a JexlContext
-     * @param info An info structure to carry debugging information if needed
+     * @param info       An info structure to carry debugging information if needed
      * @throws JexlException An exception can be thrown if there is a problem
-     *      parsing this expression, or if the expression is neither an
-     *      expression or a reference.
+     *                       parsing this expression, or if the expression is neither an
+     *                       expression or a reference.
      */
     public Expression createExpression(String expression, JexlInfo info) {
         // Parse the expression
@@ -463,7 +463,7 @@ public class JexlEngine {
      * This method parses the script which validates the syntax.
      *
      * @param scriptText A String containing valid JEXL syntax
-     * @param info An info structure to carry debugging information if needed
+     * @param info       An info structure to carry debugging information if needed
      * @return A {@link Script} which can be executed using a {@link JexlContext}.
      * @throws JexlException if there is a problem parsing the script.
      * @deprecated Use {@link #createScript(String, JexlInfo, String[])}
@@ -483,7 +483,7 @@ public class JexlEngine {
      * This method parses the script which validates the syntax.
      *
      * @param scriptText A String containing valid JEXL syntax
-     * @param names the script parameter names
+     * @param names      the script parameter names
      * @return A {@link Script} which can be executed using a {@link JexlContext}.
      * @throws JexlException if there is a problem parsing the script.
      */
@@ -498,8 +498,8 @@ public class JexlEngine {
      * a corresponding array of arguments containing values should be used during evaluation.
      *
      * @param scriptText A String containing valid JEXL syntax
-     * @param info An info structure to carry debugging information if needed
-     * @param names the script parameter names
+     * @param info       An info structure to carry debugging information if needed
+     * @param names      the script parameter names
      * @return A {@link Script} which can be executed using a {@link JexlContext}.
      * @throws JexlException if there is a problem parsing the script.
      * @since 2.1
@@ -528,10 +528,10 @@ public class JexlEngine {
      * This method parses the script and validates the syntax.
      *
      * @param scriptFile A {@link File} containing valid JEXL syntax.
-     *      Must not be null. Must be a readable file.
+     *                   Must not be null. Must be a readable file.
      * @return A {@link Script} which can be executed with a
-     *      {@link JexlContext}.
-     * @throws IOException if there is a problem reading the script.
+     *         {@link JexlContext}.
+     * @throws IOException   if there is a problem reading the script.
      * @throws JexlException if there is a problem parsing the script.
      */
     public Script createScript(File scriptFile) throws IOException {
@@ -554,10 +554,10 @@ public class JexlEngine {
      * This method parses the script and validates the syntax.
      *
      * @param scriptUrl A {@link URL} containing valid JEXL syntax.
-     *      Must not be null. Must be a readable file.
+     *                  Must not be null. Must be a readable file.
      * @return A {@link Script} which can be executed with a
-     *      {@link JexlContext}.
-     * @throws IOException if there is a problem reading the script.
+     *         {@link JexlContext}.
+     * @throws IOException   if there is a problem reading the script.
      * @throws JexlException if there is a problem parsing the script.
      */
     public Script createScript(URL scriptUrl) throws IOException {
@@ -599,8 +599,8 @@ public class JexlEngine {
      * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
      * @param context the evaluation context
-     * @param bean the bean to get properties from
-     * @param expr the property expression
+     * @param bean    the bean to get properties from
+     * @param expr    the property expression
      * @return the value of the property
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
@@ -639,8 +639,8 @@ public class JexlEngine {
      * <p>
      * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
-     * @param bean the bean to set properties in
-     * @param expr the property expression
+     * @param bean  the bean to set properties in
+     * @param expr  the property expression
      * @param value the value of the property
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
@@ -654,9 +654,9 @@ public class JexlEngine {
      * If the JEXL engine is silent, errors will be logged through its logger as warning.
      * </p>
      * @param context the evaluation context
-     * @param bean the bean to set properties in
-     * @param expr the property expression
-     * @param value the value of the property
+     * @param bean    the bean to set properties in
+     * @param expr    the property expression
+     * @param value   the value of the property
      * @throws JexlException if there is an error parsing the expression or during evaluation
      */
     public void setProperty(JexlContext context, Object bean, String expr, Object value) {
@@ -687,7 +687,7 @@ public class JexlEngine {
 
     /**
      * Invokes an object's method by name and arguments.
-     * @param obj the method's invoker object
+     * @param obj  the method's invoker object
      * @param meth the method's name
      * @param args the method's arguments
      * @return the method returned value or null if it failed and engine is silent
@@ -724,9 +724,9 @@ public class JexlEngine {
     /**
      * Creates a new instance of an object using the most appropriate constructor
      * based on the arguments.
-     * @param <T> the type of object
+     * @param <T>   the type of object
      * @param clazz the class to instantiate
-     * @param args the constructor arguments
+     * @param args  the constructor arguments
      * @return the created object instance or null on failure when silent
      */
     public <T> T newInstance(Class<? extends T> clazz, Object... args) {
@@ -737,7 +737,7 @@ public class JexlEngine {
      * Creates a new instance of an object using the most appropriate constructor
      * based on the arguments.
      * @param clazz the name of the class to instantiate resolved through this engine's class loader
-     * @param args the constructor arguments
+     * @param args  the constructor arguments
      * @return the created object instance or null on failure when silent
      */
     public Object newInstance(String clazz, Object... args) {
@@ -748,7 +748,7 @@ public class JexlEngine {
      * Creates a new instance of an object using the most appropriate constructor
      * based on the arguments.
      * @param clazz the class to instantiate
-     * @param args the constructor arguments
+     * @param args  the constructor arguments
      * @return the created object instance or null on failure when silent
      */
     protected Object doCreateInstance(Object clazz, Object... args) {
@@ -790,7 +790,7 @@ public class JexlEngine {
 
     /**
      * Creates an interpreter.
-     * @param context a JexlContext; if null, the EMPTY_CONTEXT is used instead.
+     * @param context    a JexlContext; if null, the EMPTY_CONTEXT is used instead.
      * @param strictFlag whether the interpreter runs in strict mode
      * @param silentFlag whether the interpreter runs in silent mode
      * @return an Interpreter
@@ -861,7 +861,7 @@ public class JexlEngine {
 
         /**
          * Puts a value in cache.
-         * @param key the cache entry key
+         * @param key    the cache entry key
          * @param script the cache entry value
          */
         void put(K key, V script) {
@@ -876,8 +876,8 @@ public class JexlEngine {
 
     /**
      * Creates a cache.
-     * @param <K> the key type
-     * @param <V> the value type
+     * @param <K>       the key type
+     * @param <V>       the value type
      * @param cacheSize the cache size, must be > 0
      * @return a Map usable as a cache bounded to the given size
      */
@@ -926,7 +926,7 @@ public class JexlEngine {
      * Fills up the list of variables accessed by a node.
      * @param node the node
      * @param refs the set of variable being filled
-     * @param ref the current variable being filled
+     * @param ref  the current variable being filled
      * @since 2.1
      */
     protected void getVariables(JexlNode node, Set<List<String>> refs, List<String> ref) {
@@ -939,25 +939,42 @@ public class JexlEngine {
             for (int i = 0; i < num; ++i) {
                 JexlNode child = node.jjtGetChild(i);
                 if (array) {
-                    if (child instanceof ASTReference && child.jjtGetNumChildren() == 1) {
-                        JexlNode desc = child.jjtGetChild(0);
-                        if (varf && desc.isConstant()) {
-                            String image = desc.image;
-                            if (image == null) {
-                                var.add(new Debugger().data(desc));
+                    if (child instanceof ASTReference) {
+                        if (child.jjtGetNumChildren() == 1) {
+                            JexlNode desc = child.jjtGetChild(0);
+                            if (varf && desc.isConstant()) {
+                                String image = desc.image;
+                                if (image == null) {
+                                    var.add(new Debugger().data(desc));
+                                } else {
+                                    var.add(image);
+                                }
+                            } else if (desc instanceof ASTIdentifier) {
+                                if (((ASTIdentifier) desc).getRegister() < 0) {
+                                    List<String> di = new ArrayList<String>(1);
+                                    di.add(desc.image);
+                                    refs.add(di);
+                                }
+                                var = new ArrayList<String>();
+                                varf = false;
                             } else {
-                                var.add(image);
+                                varf = false;
+                                if (!var.isEmpty()) {
+                                    refs.add(var);
+                                    var = new ArrayList<String>();
+                                }
+                                getVariables(child, refs, null);
                             }
-                        } else if (desc instanceof ASTIdentifier) {
-                            if (((ASTIdentifier) desc).getRegister() < 0) {
-                                List<String> di = new ArrayList<String>(1);
-                                di.add(desc.image);
-                                refs.add(di);
-                            }
-                            var = new ArrayList<String>();
+                            continue;
+                        } else {
                             varf = false;
+                            if (!var.isEmpty()) {
+                                refs.add(var);
+                                var = new ArrayList<String>();
+                            }
+                            getVariables(child, refs, null);
+                            continue;
                         }
-                        continue;
                     } else if (child instanceof ASTIdentifier) {
                         if (i == 0 && (((ASTIdentifier) child).getRegister() < 0)) {
                             var.add(child.image);
@@ -1210,7 +1227,7 @@ public class JexlEngine {
     /**
      * Parses an expression.
      * @param expression the expression to parse
-     * @param info debug information structure
+     * @param info       debug information structure
      * @return the parsed tree
      * @throws JexlException if any error occured during parsing
      * @deprecated Use {@link #parse(CharSequence, JexlInfo, Scope)} instead
@@ -1223,8 +1240,8 @@ public class JexlEngine {
     /**
      * Parses an expression.
      * @param expression the expression to parse
-     * @param info debug information structure
-     * @param frame the script frame to use
+     * @param info       debug information structure
+     * @param frame      the script frame to use
      * @return the parsed tree
      * @throws JexlException if any error occured during parsing
      */
@@ -1274,8 +1291,8 @@ public class JexlEngine {
     /**
      * Creates a JexlInfo instance.
      * @param fn url/file name
-     * @param l line number
-     * @param c column number
+     * @param l  line number
+     * @param c  column number
      * @return a JexlInfo instance
      */
     protected JexlInfo createInfo(String fn, int l, int c) {
