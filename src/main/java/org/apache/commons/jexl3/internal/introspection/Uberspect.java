@@ -16,21 +16,23 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
-import java.lang.reflect.Field;
-
-import java.lang.reflect.Method;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 import org.apache.commons.logging.Log;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 
 /**
  * Implementation of Uberspect to provide the default introspective
@@ -46,10 +48,10 @@ public class Uberspect implements JexlUberspect {
     public static final Object TRY_FAILED = AbstractExecutor.TRY_FAILED;
     /** The logger to use for all warnings & errors. */
     protected final Log rlog;
+    /** The introspector version. */
+    private final AtomicInteger version;
     /** The soft reference to the introspector currently in use. */
     private volatile Reference<Introspector> ref;
-    /** The introspector version. */
-    private volatile int version;
     /** The class loader reference; used to recreate the Introspector when necessary. */
     private volatile Reference<ClassLoader> loader;
 
@@ -61,7 +63,7 @@ public class Uberspect implements JexlUberspect {
         rlog = runtimeLogger;
         ref = new SoftReference<Introspector>(null);
         loader = new SoftReference<ClassLoader>(getClass().getClassLoader());
-        version = 0;
+        version = new AtomicInteger(0);
     }
 
     /**
@@ -80,7 +82,7 @@ public class Uberspect implements JexlUberspect {
                     intro = new Introspector(rlog, loader.get());
                     ref = new SoftReference<Introspector>(intro);
                     loader = new SoftReference<ClassLoader>(intro.getLoader());
-                    version += 1;
+                    version.incrementAndGet();
                 }
             }
         }
@@ -99,15 +101,13 @@ public class Uberspect implements JexlUberspect {
                 ref = new SoftReference<Introspector>(intro);
             }
             loader = new SoftReference<ClassLoader>(intro.getLoader());
-            version += 1;
+            version.incrementAndGet();
         }
     }
 
     @Override
     public int getVersion() {
-        synchronized(this) {
-            return version;
-        }
+        return version.intValue();
     }
 
     /**
