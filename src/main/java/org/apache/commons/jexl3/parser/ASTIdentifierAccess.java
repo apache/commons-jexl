@@ -52,4 +52,9 @@ public final class ASTIdentifierAccess extends JexlNode {
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

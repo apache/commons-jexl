@@ -34,7 +34,6 @@ import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.ASTMethodNode;
-import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.Parser;
 
@@ -120,7 +119,6 @@ public class Engine extends JexlEngine {
      * The default charset.
      */
     protected final Charset charset;
-
     /**
      * The default cache load factor.
      */
@@ -503,85 +501,116 @@ public class Engine extends JexlEngine {
      * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
      * @param script the script
      * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
-     * or the empty set if no variables are used
+     *         or the empty set if no variables are used
      */
     protected Set<List<String>> getVariables(JexlNode script) {
-        Set<List<String>> refs = new LinkedHashSet<List<String>>();
-        getVariables(script, refs, null);
-        return refs;
+        VarCollector collector = new VarCollector();
+        getVariables(script, collector);
+        return collector.collected();
+    }
+
+    /**
+     * Utility class to collect variables.
+     */
+    protected static class VarCollector {
+        /**
+         * The collected variables represented as a set of list of strings.
+         */
+        private Set<List<String>> refs = new LinkedHashSet<List<String>>();
+        /**
+         * The current variable being collected.
+         */
+        private List<String> ref = new ArrayList<String>();
+        /**
+         * The node that started the collect.
+         */
+        private JexlNode root = null;
+
+        /**
+         * Starts/stops a variable collect.
+         * @param node starts if not null, stop if null
+         */
+        public void collect(JexlNode node) {
+            if (!ref.isEmpty()) {
+                refs.add(ref);
+                ref = new ArrayList<String>();
+            }
+            root = node;
+        }
+
+        /**
+         * @return true if currently collecting a variable, false otherwise
+         */
+        public boolean isCollecting() {
+            return root instanceof ASTIdentifier;
+        }
+
+        /**
+         * Adds a 'segment' to the variable being collected.
+         * @param name the name
+         */
+        public void add(String name) {
+            ref.add(name);
+        }
+
+        /**
+         *@return the collected variables
+         */
+        public Set<List<String>> collected() {
+            return refs;
+        }
     }
 
     /**
      * Fills up the list of variables accessed by a node.
      * @param node the node
-     * @param refs the set of variable being filled
-     * @param ref  the current variable being filled
+     * @param collector the variable collector
      */
-    protected void getVariables(JexlNode node, Set<List<String>> refs, List<String> ref) {
+    protected void getVariables(JexlNode node, VarCollector collector) {
         if (node instanceof ASTIdentifier) {
             JexlNode parent = node.jjtGetParent();
             if (parent instanceof ASTMethodNode || parent instanceof ASTFunctionNode) {
                 // skip identifiers for methods and functions
+                collector.collect(null);
                 return;
             }
             ASTIdentifier identifier = (ASTIdentifier) node;
             if (identifier.getSymbol() < 0) {
-                if (ref == null) {
-                    ref = new ArrayList<String>();
-                    refs.add(ref);
+                // start collecting from identifier
+                collector.collect(identifier);
+                collector.add(identifier.getName());
+            } else {
+                collector.collect(null);
+            }
+        } else if (node instanceof ASTIdentifierAccess) {
+            // belt and suspender since an identifier should have been seen first
+            if (collector.isCollecting()) {
+                collector.add(((ASTIdentifierAccess) node).getName());
+            }
+        } else if (node instanceof ASTArrayAccess) {
+            int num = node.jjtGetNumChildren();
+            // collect only if array access is const and follows an identifier
+            boolean collecting = collector.isCollecting();
+            for (int i = 0; i < num; ++i) {
+                JexlNode child = node.jjtGetChild(i);
+                if (collecting && child.isConstant()) {
+                    String image = child.toString();
+                    if (image == null) {
+                        image = new Debugger().data(child);
+                    }
+                    collector.add(image);
+                } else {
+                    collecting = false;
+                    collector.collect(null);
+                    getVariables(child, collector);
                 }
-                ref.add(identifier.getName());
             }
         } else {
             int num = node.jjtGetNumChildren();
-            boolean array = node instanceof ASTArrayAccess;
-            boolean reference = node instanceof ASTReference;
-            if (array || reference) {
-                List<String> var = ref != null ? ref : new ArrayList<String>();
-                boolean varf = true;
-                for (int i = 0; i < num; ++i) {
-                    JexlNode child = node.jjtGetChild(i);
-                    if (array) {
-                        if (varf && child.isConstant()) {
-                            String image = child.toString();
-                            if (image == null) {
-                                var.add(new Debugger().data(child));
-                            } else {
-                                var.add(image);
-                            }
-                        } else if (child instanceof ASTIdentifier) {
-                            ASTIdentifier ichild = (ASTIdentifier) child;
-                            if (ichild.getSymbol() < 0) {
-                                List<String> di = new ArrayList<String>(1);
-                                di.add(ichild.getName());
-                                refs.add(di);
-                            }
-                            var = new ArrayList<String>();
-                            varf = false;
-                        }
-                        continue;
-                    } else if (child instanceof ASTIdentifier) {
-                        ASTIdentifier ichild = (ASTIdentifier) child;
-                        if (i == 0 && ichild.getSymbol() < 0) {
-                            var.add(ichild.getName());
-                        }
-                        varf = false;
-                        continue;
-                    } else if (child instanceof ASTIdentifierAccess) {
-                        var.add(((ASTIdentifierAccess) child).getName());
-                        varf = false;
-                        continue;
-                    }
-                    getVariables(child, refs, var);
-                }
-                if (!var.isEmpty() && var != ref) {
-                    refs.add(var);
-                }
-            } else {
-                for (int i = 0; i < num; ++i) {
-                    getVariables(node.jjtGetChild(i), refs, null);
-                }
+            for (int i = 0; i < num; ++i) {
+                getVariables(node.jjtGetChild(i), collector);
             }
+            collector.collect(null);
         }
     }
 
@@ -608,15 +637,15 @@ public class Engine extends JexlEngine {
     /**
      * Parses an expression.
      *
-     * @param info       information structure
-     * @param expr       the expression to parse
-     * @param scope      the script frame
-     * @param registers  whether the parser should allow the unnamed '#number' syntax for 'registers'
+     * @param info      information structure
+     * @param expr      the expression to parse
+     * @param scope     the script frame
+     * @param registers whether the parser should allow the unnamed '#number' syntax for 'registers'
      * @return the parsed tree
      * @throws JexlException if any error occured during parsing
      */
     protected ASTJexlScript parse(JexlInfo info, String expr, Scope scope, boolean registers) {
-        final boolean cached = expr.length() < cacheThreshold && cache != null ;
+        final boolean cached = expr.length() < cacheThreshold && cache != null;
         ASTJexlScript script;
         synchronized (parser) {
             if (cached) {

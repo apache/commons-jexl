@@ -230,9 +230,28 @@ public class VarTest extends JexlTestCase {
         assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a + b.c + b.c.d + e['f']");
-        //LOGGER.info(flattenedStr(e));
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a"}, {"b", "c"}, {"b", "c", "d"}, {"e", "f"}});
+        assertTrue(eq(expect, vars));
+
+        e = JEXL.createScript("D[E[F]]");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"D"}, {"E"}, {"F"}});
+        assertTrue(eq(expect, vars));
+
+        e = JEXL.createScript("D[E[F[G[H]]]]");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"D"}, {"E"}, {"F"}, {"G"}, {"H"}});
+        assertTrue(eq(expect, vars));
+
+        e = JEXL.createScript(" A + B[C] + D[E[F]] + x[y[z]] ");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"A"}, {"B"}, {"C"}, {"D"}, {"E"}, {"F"}, {"x"} , {"y"}, {"z"}});
+        assertTrue(eq(expect, vars));
+
+        e = JEXL.createScript(" A + B[C] + D.E['F'] + x[y.z] ");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"A"}, {"B"}, {"C"}, {"D", "E", "F"}, {"x"} , {"y", "z"}});
         assertTrue(eq(expect, vars));
     }
 
