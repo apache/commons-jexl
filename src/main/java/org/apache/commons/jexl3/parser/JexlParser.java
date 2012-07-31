@@ -48,7 +48,7 @@ public abstract class JexlParser extends StringParser {
     public void allowRegisters(boolean registers) {
         ALLOW_REGISTERS = registers;
     }
-    
+
     /**
      * Sets the frame to use by this parser.
      * <p> This is used to allow parameters to be declared before parsing. </p>
@@ -148,7 +148,7 @@ public abstract class JexlParser extends StringParser {
         return null;
     }
 
-    void jjtreeOpenNodeScope(JexlNode n) {
+    void jjtreeOpenNodeScope(JexlNode node) {
     }
 
     /**

@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;

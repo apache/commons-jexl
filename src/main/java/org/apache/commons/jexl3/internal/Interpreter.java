@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.internal;
 
+
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -61,20 +62,22 @@ import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTModNode;
 import org.apache.commons.jexl3.parser.ASTMulNode;
 import org.apache.commons.jexl3.parser.ASTNENode;
+import org.apache.commons.jexl3.parser.ASTNEWNode;
 import org.apache.commons.jexl3.parser.ASTNRNode;
+import org.apache.commons.jexl3.parser.ASTNSWNode;
 import org.apache.commons.jexl3.parser.ASTNotNode;
 import org.apache.commons.jexl3.parser.ASTNullLiteral;
 import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
+import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
+import org.apache.commons.jexl3.parser.ASTSWNode;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
 import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
-import org.apache.commons.jexl3.parser.ASTSWNode;
-import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
@@ -502,10 +505,15 @@ public class Interpreter extends ParserVisitor {
         }
     }
 
-    @Override
-    protected Object visit(ASTSWNode node, Object data) {
-        Object left = node.jjtGetChild(0).jjtAccept(this, data);
-        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+    /**
+     * The 'startsWith' operator implementation.
+     * @param node  the node
+     * @param operator    the calling operator, $= or $!
+     * @param left  the left operand
+     * @param right the right operand
+     * @return true if left starts with right, false otherwise
+     */
+    protected boolean startsWith(JexlNode node, String operator, Object left, Object right) {
         try {
             if (left == null || right == null) {
                 return false;
@@ -526,22 +534,41 @@ public class Interpreter extends ParserVisitor {
                         }
                     }
                 } catch (InvocationTargetException e) {
-                    throw new JexlException(node, "=^ invocation error", e.getCause());
+                    throw new JexlException(node, operator + " invocation error", e.getCause());
                 } catch (Exception e) {
-                    throw new JexlException(node, "=^ error", e);
+                    throw new JexlException(node, operator + " error", e);
                 }
             }
             // defaults to equal
             return arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
         } catch (ArithmeticException xrt) {
-            throw new JexlException(node, "=^ error", xrt);
+            throw new JexlException(node, operator + " error", xrt);
         }
     }
 
     @Override
-    protected Object visit(ASTEWNode node, Object data) {
+    protected Object visit(ASTSWNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return startsWith(node, "^=", left, right)? Boolean.TRUE : Boolean.FALSE;
+    }
+
+    @Override
+    protected Object visit(ASTNSWNode node, Object data) {
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return startsWith(node, "^!", left, right)? Boolean.FALSE : Boolean.TRUE;
+    }
+
+    /**
+     * The 'endsWith' operator implementation.
+     * @param node      the node
+     * @param operator  the calling operator, ^= or ^!
+     * @param left      the left operand
+     * @param right     the right operand
+     * @return true     if left ends with right, false otherwise
+     */
+    protected boolean endsWith(JexlNode node, String operator, Object left, Object right) {
         try {
             if (left == null || right == null) {
                 return false;
@@ -562,59 +589,73 @@ public class Interpreter extends ParserVisitor {
                         }
                     }
                 } catch (InvocationTargetException e) {
-                    throw new JexlException(node, "=$ invocation error", e.getCause());
+                    throw new JexlException(node, operator + " invocation error", e.getCause());
                 } catch (Exception e) {
-                    throw new JexlException(node, "=$ error", e);
+                    throw new JexlException(node, operator + " error", e);
                 }
                 // defaults to equal
                 return arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
             }
         } catch (ArithmeticException xrt) {
-            throw new JexlException(node, "=$ error", xrt);
+            throw new JexlException(node, operator + " error", xrt);
         }
+    }
+
+    @Override
+    protected Object visit(ASTEWNode node, Object data) {
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return endsWith(node, "$=", left, right) ? Boolean.TRUE : Boolean.FALSE;
+    }
+
+    @Override
+    protected Object visit(ASTNEWNode node, Object data) {
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return endsWith(node, "$!", left, right) ? Boolean.FALSE : Boolean.TRUE;
     }
 
     /**
      * The 'match'/'in' operator implementation.
-     * @param node the node
-     * @param op the calling operator, =~ or !=
-     * @param left the left operand
+     * @param node  the node
+     * @param op    the calling operator, =~ or !=
+     * @param left  the left operand
      * @param right the right operand
      * @return true if left matches right, false otherwise
      */
-    protected Object matches(JexlNode node, String op, Object left, Object right) {
+    protected boolean matches(JexlNode node, String op, Object left, Object right) {
         try {
             // use arithmetic / pattern matching ?
             if (right instanceof java.util.regex.Pattern || right instanceof String) {
-                return arithmetic.matches(left, right) ? Boolean.TRUE : Boolean.FALSE;
+                return arithmetic.matches(left, right);
             }
             // left in right ? <=> right.contains(left) ?
             // try contains on collection
             if (right instanceof Set<?>) {
-                return ((Set<?>) right).contains(left) ? Boolean.TRUE : Boolean.FALSE;
+                return ((Set<?>) right).contains(left);
             }
             // try contains on map key
             if (right instanceof Map<?, ?>) {
-                return ((Map<?, ?>) right).containsKey(left) ? Boolean.TRUE : Boolean.FALSE;
+                return ((Map<?, ?>) right).containsKey(left);
             }
             // try contains on collection
             if (right instanceof Collection<?>) {
-                return ((Collection<?>) right).contains(left) ? Boolean.TRUE : Boolean.FALSE;
+                return ((Collection<?>) right).contains(left);
             }
             // try a contains method (duck type set)
             try {
                 Object[] argv = {left};
                 JexlMethod vm = uberspect.getMethod(right, "contains", argv);
                 if (vm != null) {
-                    return arithmetic.toBoolean(vm.invoke(right, argv)) ? Boolean.TRUE : Boolean.FALSE;
+                    return arithmetic.toBoolean(vm.invoke(right, argv));
                 } else if (arithmetic.narrowArguments(argv)) {
                     vm = uberspect.getMethod(right, "contains", argv);
                     if (vm != null) {
-                        return arithmetic.toBoolean(vm.invoke(right, argv)) ? Boolean.TRUE : Boolean.FALSE;
+                        return arithmetic.toBoolean(vm.invoke(right, argv));
                     }
                 }
             } catch (InvocationTargetException e) {
-                throw new JexlException(node, op +" invocation error", e.getCause());
+                throw new JexlException(node, op + " invocation error", e.getCause());
             } catch (Exception e) {
                 throw new JexlException(node, op + " error", e);
             }
@@ -627,10 +668,10 @@ public class Interpreter extends ParserVisitor {
                         return Boolean.TRUE;
                     }
                 }
-                return Boolean.FALSE;
+                return false;
             }
             // defaults to equal
-            return arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
+            return arithmetic.equals(left, right);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, op + " error", xrt);
         }
@@ -640,15 +681,14 @@ public class Interpreter extends ParserVisitor {
     protected Object visit(ASTERNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return matches(node, "=~", left, right);
+        return matches(node, "=~", left, right) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     @Override
     protected Object visit(ASTNRNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        Object result = matches(node, "!~", left, right);
-        return arithmetic.toBoolean(result) ? Boolean.FALSE : Boolean.TRUE;
+        return matches(node, "!~", left, right) ? Boolean.FALSE : Boolean.TRUE;
     }
 
     @Override
