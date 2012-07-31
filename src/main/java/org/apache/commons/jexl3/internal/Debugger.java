@@ -77,6 +77,8 @@ import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
 import java.util.regex.Pattern;
+import org.apache.commons.jexl3.parser.ASTNEWNode;
+import org.apache.commons.jexl3.parser.ASTNSWNode;
 
 /**
  * Helps pinpoint the cause of problems in expressions that fail during evaluation.
@@ -467,6 +469,16 @@ public final class Debugger extends ParserVisitor {
     @Override
     protected Object visit(ASTEWNode node, Object data) {
         return infixChildren(node, " =$ ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTNSWNode node, Object data) {
+        return infixChildren(node, " !^ ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTNEWNode node, Object data) {
+        return infixChildren(node, " !$ ", false, data);
     }
 
     @Override

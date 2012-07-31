@@ -80,6 +80,15 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.assertExpression("x =$ 'foo'", Boolean.TRUE);
     }
 
+    public void testNotStartsEndsWithString() throws Exception {
+        asserter.setVariable("x", "foobar");
+        asserter.assertExpression("x !^ 'foo'", Boolean.FALSE);
+        asserter.assertExpression("x !$ 'foo'", Boolean.TRUE);
+        asserter.setVariable("x", "barfoo");
+        asserter.assertExpression("x !^ 'foo'", Boolean.TRUE);
+        asserter.assertExpression("x !$ 'foo'", Boolean.FALSE);
+    }
+
     public static class MatchingContainer {
         private final Set<Integer> values;
 
@@ -185,6 +194,25 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.assertExpression("x =$ 42", Boolean.FALSE);
         asserter.assertExpression("x =^ [2, 4]", Boolean.TRUE);
         asserter.assertExpression("x =^ [42, 54]", Boolean.TRUE);
+    }
+
+    public void testNotStartsEndsWith() throws Exception {
+        asserter.setVariable("x", "foobar");
+        asserter.assertExpression("x !^ 'foo'", Boolean.FALSE);
+        asserter.assertExpression("x !$ 'foo'", Boolean.TRUE);
+        asserter.setVariable("x", "barfoo");
+        asserter.assertExpression("x !^ 'foo'", Boolean.TRUE);
+        asserter.assertExpression("x !$ 'foo'", Boolean.FALSE);
+
+        int[] ai = {2, 4, 42, 54};
+        IterableContainer ic = new IterableContainer(ai);
+        asserter.setVariable("x", ic);
+        asserter.assertExpression("x !^ 2", Boolean.FALSE);
+        asserter.assertExpression("x !$ 54", Boolean.FALSE);
+        asserter.assertExpression("x !^ 4", Boolean.TRUE);
+        asserter.assertExpression("x !$ 42", Boolean.TRUE);
+        asserter.assertExpression("x !^ [2, 4]", Boolean.FALSE);
+        asserter.assertExpression("x !^ [42, 54]", Boolean.FALSE);
     }
 
     public static class Aggregate {

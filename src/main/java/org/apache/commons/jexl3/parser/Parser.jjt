@@ -129,10 +129,12 @@ PARSER_END(Parser)
 <*> TOKEN : { /* COMPARISONS */
       < eq : "==" | "eq" >
     | < ne : "!=" | "ne" >
-    | < req : "=~" >
-    | < rne : "!~" >
-    | < sw : "=^" >
-    | < ew : "=$" >
+    | < req : "=~" > // regexp equal
+    | < rne : "!~" > // regexp not equal
+    | < seq : "=^" > // starts equal
+    | < eeq : "=$" > // ends equal
+    | < sne : "!^" > // start not equal
+    | < ene : "!$" > // ends not equal
     | < gt : ">" | "gt" >
     | < ge : ">=" | "ge" >
     | < lt : "<" | "lt" >
@@ -359,9 +361,13 @@ void RelationalExpression() #void : {}
    |
     <rne> AdditiveExpression() #NRNode(2) // not equals regexp
    |
-    <sw> AdditiveExpression() #SWNode(2) // starts with
+    <seq> AdditiveExpression() #SWNode(2) // starts with
    |
-    <ew> AdditiveExpression() #EWNode(2) // ends with
+    <sne> AdditiveExpression() #NSWNode(2) // not starts with
+   |
+    <eeq> AdditiveExpression() #EWNode(2) // ends with
+   |
+    <ene> AdditiveExpression() #NEWNode(2) // not ends with
   )?
 }
 
