@@ -507,6 +507,7 @@
             This is the negation of the 'starts with' operator.
             <code>a ^! "abc"</code> is equivalent to <code>!(a ^= "abc")</code>
           </td>
+        </tr>
         <tr>
           <td>Ends With<code>=$</code></td>
           <td>The syntactically CSS3 inspired <code>=$</code> operator is a short-hand for the 'endsWith' method.
@@ -522,7 +523,7 @@
             This is the negation of the 'ends with' operator.
           <code>a $! "abc"</code> is equivalent to <code>!(a $= "abc")</code>
           </td>
-        <tr>
+        </tr>
         <tr>
           <td>Range<code>..</code></td>
           <td>
