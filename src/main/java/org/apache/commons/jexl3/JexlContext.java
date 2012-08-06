@@ -18,8 +18,21 @@ package org.apache.commons.jexl3;
 
 /**
  * Manages variables which can be referenced in a JEXL expression.
- * <p>Note that JEXL may use '$jexl' and '$ujexl' variables for internal purpose; setting or getting those
- * variables may lead to unexpected results unless specified otherwise.</p>
+ * <p>
+ * Jexl variable names in their simplest form are 'java-like' identifiers.
+ * Jexl also considers 'ant' inspired variables expressions as valid.
+ * For instance, the expression 'x.y.z' is an 'antish' variable and will be resolved as a whole by the context,
+ * i.e. using the key "x.y.z". This proves to be useful to solve "fully qualified class names".
+ * <p>
+ * </p>
+ * The interpreter variable resolution algorithm will try the different sequences of identifiers till it finds
+ * one that exists in the context; if "x" is an object known in the context (JexlContext.has("x") returns true),
+ * "x.y" will <em>not</em> be looked up in the context but will most likely refer to "x.getY()".
+ * </p>
+ * <p>
+ * Note that JEXL may use '$jexl' and '$ujexl' variables for internal purpose; setting or getting those
+ * variables may lead to unexpected results unless specified otherwise.
+ * </p>
  *  @since 1.0
  */
 public interface JexlContext {

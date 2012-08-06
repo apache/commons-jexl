@@ -170,13 +170,13 @@
         <h3><a name="usage_ujexl">Unified Expressions and Templates</a></h3>
         <p>
             If you are looking for JSP-EL like and basic templating features, you can
-            use UnifiedExpression from a JxltEngine.
+            use Expression from a JxltEngine.
         </p>
         The main methods are:
         <ul>
             <li>{@link org.apache.commons.jexl3.JxltEngine#createExpression}</li>
-            <li>{@link org.apache.commons.jexl3.JxltEngine.UnifiedExpression#prepare}</li>
-            <li>{@link org.apache.commons.jexl3.JxltEngine.UnifiedExpression#evaluate}</li>
+            <li>{@link org.apache.commons.jexl3.JxltEngine.Expression#prepare}</li>
+            <li>{@link org.apache.commons.jexl3.JxltEngine.Expression#evaluate}</li>
             <li>{@link org.apache.commons.jexl3.JxltEngine#createTemplate}</li>
             <li>{@link org.apache.commons.jexl3.JxltEngine.Template#prepare}</li>
             <li>{@link org.apache.commons.jexl3.JxltEngine.Template#evaluate}</li>
@@ -185,11 +185,11 @@
         <pre>
             JexlEngine jexl = new JexlBuilder().create();
             JxltEngine jxlt = jexl.jxlt();
-            JxltEngine.UnifiedExpression expr = jxlt.createExpression("Hello ${user}");
+            JxltEngine.Expression expr = jxlt.createExpression("Hello ${user}");
             String hello = jxlt.evaluate(context, jxlt).toString();
         </pre>
 
-        <h3>JexlExpression, JexlScript, UnifiedExpression and Template: summary</h3>
+        <h3>JexlExpression, JexlScript, Expression and Template: summary</h3>
         <h4>JexlExpression </h4>
         <p>
             These are the most basic form of JexlEngine expressions and only allow for a single command
@@ -203,7 +203,7 @@
             use variable assignments, loops, calculations, etc. More or less what can be achieved in Shell or
             JavaScript at its basic level. The result from the last command is returned from the script.
         </p>
-        <h4>JxltEngine.UnifiedExpression</h4>
+        <h4>JxltEngine.Expression</h4>
         <p>
             These are ideal to produce "one-liner" text, like a 'toString()' on steroids.
             To get a calculation you use the EL-like syntax
@@ -216,7 +216,7 @@
         <h4>JxltEngine.Template</h4>
         <p>
             These produce text documents. Each line beginning with '$$' (as a default) is
-            considered JEXL code and all others considered as JxltEngine.UnifiedExpression.
+            considered JEXL code and all others considered as JxltEngine.Expression.
             Think of those as simple Velocity templates. A rewritten MudStore initial Velocity sample looks like this:
         </p>
         <pre><code>
@@ -298,7 +298,7 @@
             repeatedly in your application, these are worth configuring since expression parsing is quite heavy.
             Note that all caches created by JEXL are held through SoftReference; under high memory pressure, the GC will be able
             to reclaim those caches and JEXL will rebuild them if needed. By default, a JexlEngine does create a cache for "small" expressions
-            and a JxltEngine does create one for UnifiedExpression .
+            and a JxltEngine does create one for Expression .
         </p>
         <p>{@link org.apache.commons.jexl3.JexlBuilder#cache} will set how many expressions can be simultaneously cached by the
             JEXL engine. JxltEngine allows to define the cache size through its constructor.

@@ -175,7 +175,7 @@ public final class TemplateEngine extends JxltEngine {
     /**
      * The abstract base class for all unified expressions, immediate '${...}' and deferred '#{...}'.
      */
-    private abstract class TemplateExpression implements UnifiedExpression {
+    private abstract class TemplateExpression implements Expression {
         /** The source of this template expression(see {@link TemplateEngine.TemplateExpression#prepare}). */
         protected final TemplateExpression source;
 
@@ -582,7 +582,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     @Override
-    public JxltEngine.UnifiedExpression createExpression(String expression) {
+    public JxltEngine.Expression createExpression(String expression) {
         Exception xuel = null;
         TemplateExpression stmt = null;
         try {
@@ -988,7 +988,7 @@ public final class TemplateEngine extends JxltEngine {
         /** The wrapped context. */
         private final JexlContext wrap;
         /** The array of TemplateEngine expressions. */
-        private final UnifiedExpression[] exprs;
+        private final Expression[] exprs;
         /** The writer used to output. */
         private final Writer writer;
         /** The call frame. */
@@ -1002,7 +1002,7 @@ public final class TemplateEngine extends JxltEngine {
          * @param out         the output writer
          */
         protected TemplateContext(JexlContext jcontext, Scope.Frame jframe,
-                UnifiedExpression[] expressions, Writer out) {
+                Expression[] expressions, Writer out) {
             wrap = jcontext;
             frame = jframe;
             exprs = expressions;
@@ -1065,7 +1065,7 @@ public final class TemplateEngine extends JxltEngine {
             if (e < 0 || e >= exprs.length) {
                 return;
             }
-            UnifiedExpression expr = exprs[e];
+            Expression expr = exprs[e];
             if (expr.isDeferred()) {
                 expr = expr.prepare(wrap);
             }

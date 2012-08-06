@@ -56,7 +56,7 @@ public abstract class JxltEngine {
     }
 
     /**
-     * A unified expression can mix immediate, deferred and nested sub-expressions as well as string constants;
+     * A unified expression that can mix immediate, deferred and nested sub-expressions as well as string constants;
      * <ul>
      * <li>The "immediate" syntax is of the form <code>"...${jexl-expr}..."</code></li>
      * <li>The "deferred" syntax is of the form <code>"...#{jexl-expr}..."</code></li>
@@ -102,7 +102,7 @@ public abstract class JxltEngine {
      * </p>
      * @since 2.0
      */
-    public interface UnifiedExpression {
+    public interface Expression {
         /**
          * Generates this expression's string representation.
          * @return the string representation
@@ -137,7 +137,7 @@ public abstract class JxltEngine {
          * <p>Other expressions return themselves.</p>
          * @return the source expression
          */
-        UnifiedExpression getSource();
+        Expression getSource();
 
         /**
          * Gets the list of variables accessed by this expression.
@@ -176,12 +176,12 @@ public abstract class JxltEngine {
          * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
          * </p>
          * @param context the context to use for immediate expression evaluations
-         * @return an {@link UnifiedExpression} or null if an error occurs and the {@link JexlEngine} is running
+         * @return an {@link Expression} or null if an error occurs and the {@link JexlEngine} is running
          * in silent mode
          * @throws Exception if an error occurs and the {@link JexlEngine}
          * is not in silent mode
          */
-        UnifiedExpression prepare(JexlContext context);
+        Expression prepare(JexlContext context);
 
         /**
          * Formats this expression, adding its source string representation in
@@ -193,24 +193,24 @@ public abstract class JxltEngine {
     }
 
     /**
-     * Creates a a {@link UnifiedExpression} from an expression string.
+     * Creates a a {@link Expression} from an expression string.
      * Uses & fills up the expression cache if any.
      * <p>
      * If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.
      * </p>
      * @param expression the {@link Template} string expression
-     * @return the {@link UnifiedExpression}, null if silent and an error occured
+     * @return the {@link Expression}, null if silent and an error occured
      * @throws Exception if an error occurs and the {@link JexlEngine}
      * is not silent
      */
-    public abstract UnifiedExpression createExpression(String expression);
+    public abstract Expression createExpression(String expression);
 
     /**
      * A template is a JEXL script that evaluates by writing its content through a Writer.
      * <p>
      * The source text is parsed considering each line beginning with '$$' (as default pattern) as JEXL script code
      * and all others as Unified JEXL expressions; those expressions will be invoked from the script during
-     * evaluation and their output gathered through a writer. 
+     * evaluation and their output gathered through a writer.
      * It is thus possible to use looping or conditional construct "around" expressions generating output.
      * </p>
      * For instance:
