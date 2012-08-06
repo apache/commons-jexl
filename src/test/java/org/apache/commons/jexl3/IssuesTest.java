@@ -129,7 +129,7 @@ public class IssuesTest extends JexlTestCase {
         ctxt.setStrict(false);
         ctxt.set("ax", "ok");
 
-        JxltEngine.UnifiedExpression expr = uel.createExpression("${ax+(bx)}");
+        JxltEngine.Expression expr = uel.createExpression("${ax+(bx)}");
         Object value = expr.evaluate(ctxt);
         assertTrue("should be ok", "ok".equals(value));
     }
