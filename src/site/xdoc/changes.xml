@@ -26,6 +26,12 @@
   </properties>
   <body>
     <release version="2.1.2" date="2012-07-30">
+        <action dev="henrib" type="fix" issue="JEXL-136">
+            Script calls within scripts may fail with number arguments
+        </action>
+        <action dev="henrib" type="fix" issue="JEXL-135" due-to="Tomas Kukosa">
+            using map as script parameter or local variable
+        </action>
         <action dev="henrib" type="fix" issue="JEXL-134" due-to="Manoj Mokashi">
             Issue with evaluation of concat of variables : \r + \n gives 0
         </action>

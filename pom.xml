@@ -120,6 +120,8 @@
     </dependencies>
 
     <properties>
+        <toolchains.jdk.version>1.5</toolchains.jdk.version>
+        <toolchains.jdk.vendor>sun</toolchains.jdk.vendor>
         <maven.compile.source>1.5</maven.compile.source>
         <maven.compile.target>1.5</maven.compile.target>
         <commons.componentid>jexl</commons.componentid>

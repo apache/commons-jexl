@@ -40,8 +40,11 @@ Its goal is to expose scripting features usable by technical operatives or consu
 Release 2.1.2:
 ========================================================================================================================
 
-Version 2.1.2 is a micro release to fix bugs reported since 2.1.1:
+Version 2.1.2 is a micro release to fix issues reported in 2.1.1:
 
+* JEXL-136:     Script calls within scripts may fail with number arguments
+* JEXL-135:     Using map as script parameter or local variable
+* JEXL-134:     Issue with evaluation of concat of variables : \r + \n gives 0
 * JEXL-131:     UnifiedJexl parsing may fail with NPE
 * JEXL-130:     Ternary Conditional fails for Object values
 * JEXL-126:     Decimal numbers literals should be 'double' by default (instead of 'float')
