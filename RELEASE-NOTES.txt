@@ -53,9 +53,12 @@ What's new in 3.0:
 ==================
 * A redesigned API that properly segregates the "public" part and the "internal" parts of JEXL.
 * The ability to create JEXL functions in script, closure/variables hoisting included.
+* A set of String matching operators (^= startsWith, $= endsWith) and their negative counterparts (!^, !$)
+* A range operator (x .. y) to ease writing loops (for(var x : 1 .. 10) ... )
 
 New features in 3.0:
 ====================
+* JEXL-133:     String matching Operator short-hand inspired by CSS3
 * JEXL-128:     ObjectContext<> should implement NamespaceResolver
 * JEXL-127:     Allow the creation of functions
 * JEXL-123:     Redesign API for stability
@@ -66,8 +69,11 @@ New features in 3.0:
 Release 2.1.2:
 ========================================================================================================================
 
-Version 2.1.2 is a micro release to fix few issues detected in 2.1.1:
+Version 2.1.2 is a micro release to fix issues reported in 2.1.1:
 
+* JEXL-136:     Script calls within scripts may fail with number arguments
+* JEXL-135:     Using map as script parameter or local variable
+* JEXL-134:     Issue with evaluation of concat of variables : \r + \n gives 0
 * JEXL-131:     UnifiedJexl parsing may fail with NPE
 * JEXL-130:     Ternary Conditional fails for Object values
 * JEXL-126:     Decimal numbers literals should be 'double' by default (instead of 'float')
@@ -79,7 +85,7 @@ There are no other changes.
 Release 2.1.1
 ========================================================================================================================
 
-Version 2.1.2 is a micro release to fix a regression detected in 2.1:
+Version 2.1.1 is a micro release to fix a regression detected in 2.1:
 
 * JEXL-124:     Array parameters to methods don't work anymore (Jexl 2.1.1)
 
