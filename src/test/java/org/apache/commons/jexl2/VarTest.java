@@ -42,14 +42,14 @@ public class VarTest extends JexlTestCase {
 
         e = JEXL.createScript("x");
         try {
-            Object o = e.execute(ctxt);
+            e.execute(ctxt);
             fail("should have thrown an unknown var exception");
         } catch(JexlException xjexl) {
             // ok since we are strict and x does not exist
         }
         e = JEXL.createScript("x = 42");
         try {
-            Object o = e.execute(ctxt);
+            e.execute(ctxt);
             fail("should have thrown a readonly context exception");
         } catch(JexlException xjexl) {
             // ok since we are strict and context is readonly
@@ -58,7 +58,7 @@ public class VarTest extends JexlTestCase {
         map.set("x", "fourty-two");
         e = JEXL.createScript("x.theAnswerToEverything()");
         try {
-            Object o = e.execute(ctxt);
+            e.execute(ctxt);
             fail("should have thrown an unknown method exception");
         } catch(JexlException xjexl) {
             // ok since we are strict and method does not exist
