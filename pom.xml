@@ -120,12 +120,14 @@
     </dependencies>
 
     <properties>
+        <!--
         <toolchains.jdk.version>1.5</toolchains.jdk.version>
         <toolchains.jdk.vendor>sun</toolchains.jdk.vendor>
+        -->
         <maven.compile.source>1.5</maven.compile.source>
         <maven.compile.target>1.5</maven.compile.target>
         <commons.componentid>jexl</commons.componentid>
-        <commons.release.version>2.1.1</commons.release.version>
+        <commons.release.version>2.1.2</commons.release.version>
         <!-- The RC version used in the staging repository URL. -->
         <commons.rc.version>RC1</commons.rc.version>
         <commons.release.2.version>1.1</commons.release.2.version>
@@ -136,19 +138,29 @@
 
     <build>
         <plugins>
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-toolchains-plugin</artifactId>
                 <version>1.0</version>
+                <executions>
+                  <execution>
+                    <phase>validate</phase>
+                    <goals>
+                      <goal>toolchain</goal>
+                    </goals>
+                  </execution>
+                </executions>
                 <configuration>
                     <toolchains>
                         <jdk>
-                            <version>1.5</version>
-                            <vendor>sun</vendor>
+                            <version>${toolchains.jdk.version}</version>
+                            <vendor>${toolchains.jdk.vendor}</vendor>
                         </jdk>
                     </toolchains>
                 </configuration>
             </plugin>
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
