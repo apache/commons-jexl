@@ -25,12 +25,12 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.0" date="2012-07-30">
+        <release version="3.0" date="2012-09-30">
             <action dev="henrib" type="add" issue="JEXL-133" due-to="Alfred Reibenschuh">
                 String matching Operator short-hand inspired by CSS3
             </action>
             <action dev="henrib" type="add" >
-                Range operator
+                Added the range operator (x .. y)
             </action>
             <action dev="henrib" type="add" issue="JEXL-128" due-to="Matteo Trotta">
                 ObjectContext should implement NamespaceResolver
@@ -45,18 +45,24 @@
                 Move JEXL from org.apache.comms.jexl2 to org.apache.commons.jexl3
             </action>
         </release>
-        <release version="2.1.2" date="2012-07-30">
+        <release version="2.1.2" date="2012-08-30">
+            <action dev="henrib" type="fix" issue="JEXL-136">
+                Script calls within scripts may fail with number arguments
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-135" due-to="Tomas Kukosa">
+                using map as script parameter or local variable
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-134" due-to="Manoj Mokashi">
                 Issue with evaluation of concat of variables : \r + \n gives 0
             </action>
             <action dev="henrib" type="fix" issue="JEXL-131" due-to="Clay Bruce">
-                UnifiedJexl parsing may fail with NPE
+                UnifiedJexl (2.1.x) parsing may fail with NPE
             </action>
             <action dev="henrib" type="fix" issue="JEXL-130" due-to="William Bakker">
                 Ternary Conditional fails for Object values
             </action>
-            <action dev="henrib" type="fix" issue="JEXL-126" due-to="Grace">
-                Decimal numbers literals should be 'double' by default (instead of 'float')
+            <action dev="henrib" type="add" issue="JEXL-126" due-to="Grace">
+                Decimal numbers literals fix be 'double' by default (instead of 'float')
             </action>
         </release>
         <release version="2.1.1" date="2011-12-24">
