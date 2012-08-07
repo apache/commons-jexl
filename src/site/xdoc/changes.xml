@@ -44,8 +44,6 @@
             <action dev="henrib" type="add" issue="JEXL-122">
                 Move JEXL from org.apache.comms.jexl2 to org.apache.commons.jexl3
             </action>
-        </release>
-        <release version="2.1.2" date="2012-08-30">
             <action dev="henrib" type="fix" issue="JEXL-136">
                 Script calls within scripts may fail with number arguments
             </action>

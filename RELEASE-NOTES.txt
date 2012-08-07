@@ -63,14 +63,6 @@ New features in 3.0:
 * JEXL-127:     Allow the creation of functions
 * JEXL-123:     Redesign API for stability
 * JEXL-122:     Move JEXL from org.apache.comms.jexl2 to org.apache.commons.jexl3
-
-
-========================================================================================================================
-Release 2.1.2:
-========================================================================================================================
-
-Version 2.1.2 is a micro release to fix issues reported in 2.1.1:
-
 * JEXL-136:     Script calls within scripts may fail with number arguments
 * JEXL-135:     Using map as script parameter or local variable
 * JEXL-134:     Issue with evaluation of concat of variables : \r + \n gives 0
