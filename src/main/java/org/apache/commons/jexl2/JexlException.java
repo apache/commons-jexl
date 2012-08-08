@@ -255,11 +255,22 @@ public class JexlException extends RuntimeException {
      * @since 2.1
      */
     public static class Property extends JexlException {
+
+        /**
+         * Creates a new Property exception instance.
+         * @param node the offending ASTnode
+         * @param var the unknown variable
+         */
+        public Property(JexlNode node, String var) {
+            super(node, var);
+        }
+
         /**
          * Creates a new Property exception instance.
          * @param node the offending ASTnode
          * @param var the unknown variable
          * @param cause the exception causing the error
+         * @since 2.1.2
          */
         public Property(JexlNode node, String var, Throwable cause) {
             super(node, var, cause);
@@ -283,11 +294,22 @@ public class JexlException extends RuntimeException {
      * @since 2.1
      */
     public static class Method extends JexlException {
+
+        /**
+         * Creates a new Method exception instance.
+         * @param node the offending ASTnode
+         * @param name the unknown method
+         */
+        public Method(JexlNode node, String name) {
+            super(node, name);
+        }
+
         /**
          * Creates a new Method exception instance.
          * @param node the offending ASTnode
          * @param name the unknown method
          * @param cause the exception causing the error
+         * @since 2.1.2
          */
         public Method(JexlNode node, String name, Throwable cause) {
             super(node, name, cause);
