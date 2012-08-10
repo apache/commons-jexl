@@ -40,7 +40,6 @@ public class IssuesTest extends JexlTestCase {
         java.util.logging.Logger.getLogger(JexlEngine.class.getName()).setLevel(java.util.logging.Level.SEVERE);
     }
 
-
     // JEXL-49: blocks not parsed (fixed)
     public void test49() throws Exception {
         JexlEngine jexl = new Engine();
@@ -197,11 +196,11 @@ public class IssuesTest extends JexlTestCase {
         ctxt.set("a", null);
 
         String[] exprs = {
-            //"10 + null",
-            //"a - 10",
-            //"b * 10",
-            "a % b"//,
-        //"1000 / a"
+            "10 + null",
+            "a - 10",
+            "b * 10",
+            "a % b",
+            "1000 / a"
         };
         for (int e = 0; e < exprs.length; ++e) {
             try {
@@ -814,16 +813,16 @@ public class IssuesTest extends JexlTestCase {
         JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic132()).namespaces(ns).create();
 
         Object evaluate = jexl.createExpression("1/0").evaluate(null);
-        assertTrue(Double.isInfinite((Double)evaluate));
+        assertTrue(Double.isInfinite((Double) evaluate));
 
         evaluate = jexl.createExpression("-1/0").evaluate(null);
-        assertTrue(Double.isInfinite((Double)evaluate));
+        assertTrue(Double.isInfinite((Double) evaluate));
 
         evaluate = jexl.createExpression("1.0/0.0").evaluate(null);
-        assertTrue(Double.isInfinite((Double)evaluate));
+        assertTrue(Double.isInfinite((Double) evaluate));
 
         evaluate = jexl.createExpression("-1.0/0.0").evaluate(null);
-        assertTrue(Double.isInfinite((Double)evaluate));
+        assertTrue(Double.isInfinite((Double) evaluate));
 
         evaluate = jexl.createExpression("math:abs(-42)").evaluate(null);
         assertEquals(42, evaluate);
@@ -875,7 +874,6 @@ public class IssuesTest extends JexlTestCase {
         assertEquals(42, result);
     }
 
-
     @Test
     public void test136() throws Exception {
         JexlEngine jexl = new Engine();
@@ -893,5 +891,43 @@ public class IssuesTest extends JexlTestCase {
         expr = jexl.createExpression("fn01(IDX)");
         result = expr.evaluate(jc);
         assertEquals("EXPR01 result", 22, result);
+    }
+
+    public static class Context137 extends MapContext implements JexlContext.NamespaceResolver {
+        public static void log(Object fmt, Object... arr) {
+
+            System.out.println(String.format(fmt.toString(), arr));
+        }
+
+        public static void log(Object fmt, int... arr) {
+            System.out.println(String.format(fmt.toString(), arr));
+        }
+
+        @Override
+        public Object resolveNamespace(String name) {
+            return this;
+        }
+    }
+
+    @Test
+    public void test137() throws Exception {
+        String[] SCRIPTS = {
+            "var x = null; log('x = %s', x);",
+            "var x = 'abc'; log('x = %s', x);",
+            "var x = 333; log('x = %s', x);",
+            "var x = [1, 2]; log('x = %s', x);",
+            "var x = ['a', 'b']; log('x = %s', x);",
+            "var x = {1:'A', 2:'B'}; log('x = %s', x);"
+        };
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlContext jc = new Context137();
+        JexlScript script;
+
+        for (String stext : SCRIPTS) {
+            System.out.println(stext);
+            script = jexl.createScript(stext);
+            script.execute(jc);
+        }
+
     }
 }

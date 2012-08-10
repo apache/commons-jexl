@@ -70,7 +70,7 @@ public final class MethodKey {
      * correctly.
      * </p>
      * @param parm a may-be primitive type class
-     * @return the equivalent object class 
+     * @return the equivalent object class
      */
     static Class<?> primitiveClass(Class<?> parm) {
         // it is marginally faster to get from the map than call isPrimitive...
@@ -78,7 +78,7 @@ public final class MethodKey {
         Class<?> prim = PRIMITIVE_TYPES.get(parm);
         return prim == null ? parm : prim;
     }
-    
+
     /** The hash code. */
     private final int hashCode;
     /** The method name. */
@@ -530,11 +530,14 @@ public final class MethodKey {
             if (c2.length > c1.length) {
                 return LESS_SPECIFIC;
             }
+            // same length, keep ultimate param offset for vararg checks
+            final int length = c1.length;
+            final int ultimate = c1.length - 1;
 
             // ok, move on and compare those of equal lengths
-            for (int i = 0; i < c1.length; ++i) {
+            for (int i = 0; i < length; ++i) {
                 if (c1[i] != c2[i]) {
-                    boolean last = (i == c1.length - 1);
+                    boolean last = (i == ultimate);
                     c1MoreSpecific = c1MoreSpecific || isStrictConvertible(c2[i], c1[i], last);
                     c2MoreSpecific = c2MoreSpecific || isStrictConvertible(c1[i], c2[i], last);
                 }
@@ -553,11 +556,12 @@ public final class MethodKey {
 
             // attempt to choose by picking the one with the greater number of primitives or latest primitive parameter
             int primDiff = 0;
-            for (int c = 0; c < c1.length; ++c) {
-                if (c1[c].isPrimitive()) {
+            for (int c = 0; c < length; ++c) {
+                boolean last = (c == ultimate);
+                if (isPrimitive(c1[c], last)) {
                     primDiff += 1 << c;
                 }
-                if (c2[c].isPrimitive()) {
+                if (isPrimitive(c2[c], last)) {
                     primDiff -= 1 << c;
                 }
             }
@@ -571,6 +575,24 @@ public final class MethodKey {
              * foo(Runnable) vs. foo(Serializable))
              */
             return INCOMPARABLE;
+        }
+
+        /**
+         * Checks whether a parameter class is a primitive.
+         * @param c the parameter class
+         * @param possibleVararg true if this is the last parameter which can tbe be a primitive array (vararg call)
+         * @return true if primitive, false otherwise
+         */
+        private boolean isPrimitive(Class<?> c,  boolean possibleVarArg) {
+            if (c != null) {
+                if (c.isPrimitive()) {
+                    return true;
+                } else if (possibleVarArg) {
+                    Class<?> t = c.getComponentType();
+                    return t != null && t.isPrimitive();
+                }
+            }
+            return false;
         }
 
         /**
@@ -661,8 +683,7 @@ public final class MethodKey {
          *                       in the method declaration
          * @return see isMethodInvocationConvertible.
          */
-        private boolean isConvertible(Class<?> formal, Class<?> actual,
-                boolean possibleVarArg) {
+        private boolean isConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
             // if we see Void.class, the argument was null
             return isInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
         }
@@ -676,8 +697,7 @@ public final class MethodKey {
          *                       in the method declaration
          * @return see isStrictMethodInvocationConvertible.
          */
-        private boolean isStrictConvertible(Class<?> formal, Class<?> actual,
-                boolean possibleVarArg) {
+        private boolean isStrictConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
             // if we see Void.class, the argument was null
             return isStrictInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
         }
