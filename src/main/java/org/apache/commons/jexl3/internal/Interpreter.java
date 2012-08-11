@@ -525,12 +525,12 @@ public class Interpreter extends ParserVisitor {
                 try {
                     Object[] argv = {right};
                     JexlMethod vm = uberspect.getMethod(left, "startsWith", argv);
-                    if (vm != null) {
-                        return arithmetic.toBoolean(vm.invoke(left, argv)) ? Boolean.TRUE : Boolean.FALSE;
+                    if (vm != null && vm.getReturnType() == Boolean.TYPE) {
+                        return (Boolean) vm.invoke(left, argv);
                     } else if (arithmetic.narrowArguments(argv)) {
                         vm = uberspect.getMethod(left, "startsWith", argv);
-                        if (vm != null) {
-                            return arithmetic.toBoolean(vm.invoke(left, argv)) ? Boolean.TRUE : Boolean.FALSE;
+                        if (vm != null && vm.getReturnType() == Boolean.TYPE) {
+                            return (Boolean) vm.invoke(left, argv);
                         }
                     }
                 } catch (InvocationTargetException e) {
@@ -580,12 +580,12 @@ public class Interpreter extends ParserVisitor {
                 try {
                     Object[] argv = {right};
                     JexlMethod vm = uberspect.getMethod(left, "endsWith", argv);
-                    if (vm != null) {
-                        return arithmetic.toBoolean(vm.invoke(left, argv)) ? Boolean.TRUE : Boolean.FALSE;
+                    if (vm != null && vm.getReturnType() == Boolean.TYPE) {
+                        return (Boolean) vm.invoke(left, argv);
                     } else if (arithmetic.narrowArguments(argv)) {
                         vm = uberspect.getMethod(left, "endsWith", argv);
-                        if (vm != null) {
-                            return arithmetic.toBoolean(vm.invoke(left, argv)) ? Boolean.TRUE : Boolean.FALSE;
+                        if (vm != null && vm.getReturnType() == Boolean.TYPE) {
+                            return (Boolean) vm.invoke(left, argv);
                         }
                     }
                 } catch (InvocationTargetException e) {
@@ -646,12 +646,12 @@ public class Interpreter extends ParserVisitor {
             try {
                 Object[] argv = {left};
                 JexlMethod vm = uberspect.getMethod(right, "contains", argv);
-                if (vm != null) {
-                    return arithmetic.toBoolean(vm.invoke(right, argv));
+                if (vm != null && vm.getReturnType() == Boolean.TYPE) {
+                    return (Boolean) vm.invoke(right, argv);
                 } else if (arithmetic.narrowArguments(argv)) {
                     vm = uberspect.getMethod(right, "contains", argv);
-                    if (vm != null) {
-                        return arithmetic.toBoolean(vm.invoke(right, argv));
+                    if (vm != null && vm.getReturnType() == Boolean.TYPE) {
+                        return (Boolean) vm.invoke(right, argv);
                     }
                 }
             } catch (InvocationTargetException e) {
@@ -972,7 +972,7 @@ public class Interpreter extends ParserVisitor {
             return "".equals(object) ? Boolean.TRUE : Boolean.FALSE;
         }
         if (object.getClass().isArray()) {
-            return ((Object[]) object).length == 0 ? Boolean.TRUE : Boolean.FALSE;
+            return Array.getLength(object) == 0? Boolean.TRUE : Boolean.FALSE;
         }
         if (object instanceof Collection<?>) {
             return ((Collection<?>) object).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
@@ -983,12 +983,11 @@ public class Interpreter extends ParserVisitor {
         } else {
             // check if there is an isEmpty method on the object that returns a
             // boolean and if so, just use it
-            Object[] params = new Object[0];
             JexlMethod vm = uberspect.getMethod(object, "isEmpty", EMPTY_PARAMS);
             if (vm != null && vm.getReturnType() == Boolean.TYPE) {
                 Boolean result;
                 try {
-                    result = (Boolean) vm.invoke(object, params);
+                    result = (Boolean) vm.invoke(object, EMPTY_PARAMS);
                 } catch (Exception e) {
                     throw new JexlException(node, "empty() : error executing", e);
                 }
@@ -1020,12 +1019,11 @@ public class Interpreter extends ParserVisitor {
         } else {
             // check if there is a size method on the object that returns an
             // integer and if so, just use it
-            Object[] params = new Object[0];
             JexlMethod vm = uberspect.getMethod(object, "size", EMPTY_PARAMS);
             if (vm != null && vm.getReturnType() == Integer.TYPE) {
                 Integer result;
                 try {
-                    result = (Integer) vm.invoke(object, params);
+                    result = (Integer) vm.invoke(object, EMPTY_PARAMS);
                 } catch (Exception e) {
                     throw new JexlException(node, "size() : error executing", e);
                 }
