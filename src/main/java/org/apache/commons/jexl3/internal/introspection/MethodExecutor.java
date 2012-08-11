@@ -26,8 +26,8 @@ import java.lang.reflect.InvocationTargetException;
 public final class MethodExecutor extends AbstractExecutor.Method {
     /** Whether this method handles varargs. */
     private final boolean isVarArgs;
-    
-    
+
+
     /**
      * Discovers a {@link MethodExecutor}.
      * <p>
@@ -124,7 +124,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
             // make the last arg an array of the expected type
             if (actual[index] != null) {
                 Class<?> aclazz = actual[index].getClass();
-                if (!aclazz.isArray() || !aclazz.getComponentType().equals(type)) {
+                if (!aclazz.isArray() || !type.isAssignableFrom(aclazz.getComponentType())) {
                     // create a 1-length array to hold and replace the last argument
                     Object lastActual = Array.newInstance(type, 1);
                     Array.set(lastActual, 0, actual[index]);
