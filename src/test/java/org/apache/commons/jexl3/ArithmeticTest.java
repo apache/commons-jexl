@@ -356,4 +356,53 @@ public class ArithmeticTest extends JexlTestCase {
         result = script.execute(null);
         assertTrue((Boolean) result);
     }
+
+    public static class EmptyTestContext extends MapContext implements JexlContext.NamespaceResolver {
+        public static int log(Object fmt, Object... arr) {
+            //System.out.println(String.format(fmt.toString(), arr));
+            return arr == null ? 0 : arr.length;
+        }
+
+        public static int log(Object fmt, int... arr) {
+            //System.out.println(String.format(fmt.toString(), arr));
+            return arr == null ? 0 : arr.length;
+        }
+
+        @Override
+        public Object resolveNamespace(String name) {
+            return this;
+        }
+    }
+
+    public void testEmpty() throws Exception {
+        Object[] SCRIPTS = {
+            "var x = null; log('x = %s', x);", 0,
+            "var x = 'abc'; log('x = %s', x);", 1,
+            "var x = 333; log('x = %s', x);", 1,
+            "var x = [1, 2]; log('x = %s', x);", 2,
+            "var x = ['a', 'b']; log('x = %s', x);", 2,
+            "var x = {1:'A', 2:'B'}; log('x = %s', x);", 1,
+            "var x = null; return empty(x);", true,
+            "var x = ''; return empty(x);", true,
+            "var x = 'abc'; return empty(x);", false,
+            "var x = 0; return empty(x);", true,
+            "var x = 333; return empty(x);", false,
+            "var x = []; return empty(x);", true,
+            "var x = [1, 2]; return empty(x);", false,
+            "var x = ['a', 'b']; return empty(x);", false,
+            "var x = {:}; return empty(x);", true,
+            "var x = {1:'A', 2:'B'}; return empty(x);", false
+        };
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlContext jc = new EmptyTestContext();
+        JexlScript script;
+
+        for (int e = 0; e < SCRIPTS.length; e += 2) {
+            String stext = (String) SCRIPTS[e];
+            Object expected = SCRIPTS[e + 1];
+            script = jexl.createScript(stext);
+            Object result = script.execute(jc);
+            assertEquals("failed on " + stext, expected, result);
+        }
+    }
 }

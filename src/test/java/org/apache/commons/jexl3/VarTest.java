@@ -253,6 +253,21 @@ public class VarTest extends JexlTestCase {
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}, {"B"}, {"C"}, {"D", "E", "F"}, {"x"} , {"y", "z"}});
         assertTrue(eq(expect, vars));
+
+        e = JEXL.createScript("(A)");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"A"}});
+        assertTrue(eq(expect, vars));
+
+        e = JEXL.createScript("not(A)");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"A"}});
+        assertTrue(eq(expect, vars));
+
+        e = JEXL.createScript("not((A))");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"A"}});
+        assertTrue(eq(expect, vars));
     }
 
     public void testMix() throws Exception {
