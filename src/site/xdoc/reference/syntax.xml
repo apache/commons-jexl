@@ -185,8 +185,8 @@
         </tr>
         <tr>
           <td>Big Integer Literals</td>
-          <td>1 or more digits from <code>0</code> to <code>9</code> suffixed with <code>b</code> or <code>B</code>
-          , eg <code>42B</code>.
+          <td>1 or more digits from <code>0</code> to <code>9</code> suffixed with <code>h</code> or <code>H</code>
+           (for Huge ala OGNL, "does not interfere with hexa-decimal digits"), eg <code>42h</code>.
           </td>
         </tr>
         <tr>
@@ -194,8 +194,8 @@
           <td>
             1 or more digits from <code>0</code> to <code>9</code>, followed
             by a decimal point and then one or more digits from
-            <code>0</code> to <code>9</code> suffixed with <code>h</code> or <code>H</code> (for Huge ala OGNL))
-           , eg <code>42.0H</code>.
+            <code>0</code> to <code>9</code> suffixed with <code>b</code> or <code>B</code>)
+           , eg <code>42.0b</code>.
           </td>
         </tr>
         <tr>
@@ -565,7 +565,7 @@
           <td>
             Loop through items of an Array, Collection, Map, Iterator or Enumeration, e.g.
             <source>for(item : list) {
-    x = x + item; 
+    x = x + item;
 }</source>
             Where <code>item</code> and <code>list</code> are variables.
             The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>deprecated</strong>.
@@ -576,7 +576,7 @@
           <td>
             Loop until a condition is satisfied, e.g.
             <source>while (x lt 10) {
-    x = x + 2; 
+    x = x + 2;
 }</source>
           </td>
         </tr>
