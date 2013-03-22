@@ -28,7 +28,7 @@
     <name>Commons JEXL3</name>
     <inceptionYear>2001</inceptionYear>
     <description>The Commons Jexl library is an implementation of the JSTL Expression Language with extensions.</description>
-    <url>http://commons.apache.org/jexl/</url>
+    <url>http://commons.apache.org/proper/commons-jexl/</url>
 
     <issueManagement>
         <system>jira</system>
