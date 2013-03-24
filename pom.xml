@@ -54,7 +54,7 @@
             <name>dIon Gillard</name>
             <id>dion</id>
             <email>dion AT apache DOT org</email>
-            <organization>Apache Software Foundation</organization>
+            <organization>The Apache Software Foundation</organization>
         </developer>
         <developer>
             <name>Geir Magnusson Jr.</name>
@@ -72,7 +72,7 @@
             <name>Peter Royal</name>
             <id>proyal</id>
             <email>proyal AT apache DOT org</email>
-            <organization>Apache Software Foundation</organization>
+            <organization>The Apache Software Foundation</organization>
         </developer>
         <developer>
             <name>James Strachan</name>
@@ -84,7 +84,7 @@
             <name>Rahul Akolkar</name>
             <id>rahul</id>
             <email>rahul AT apache DOT org</email>
-            <organization>Apache Software Foundation</organization>
+            <organization>The Apache Software Foundation</organization>
         </developer>
         <developer>
             <name>Sebastian Bazley</name>
