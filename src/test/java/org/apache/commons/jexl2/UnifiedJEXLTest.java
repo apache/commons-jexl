@@ -303,7 +303,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
 
         UnifiedJEXL.Template t = EL.createTemplate(source);
 
-        vars.put("x", 42);
+        vars.put("x", Integer.valueOf(42));
         strw = new StringWriter();
         t.evaluate(context, strw);
         output = strw.toString();
@@ -329,7 +329,7 @@ public class UnifiedJEXLTest extends JexlTestCase {
         assertNotNull(dstr);
 
         strw = new StringWriter();
-        t.evaluate(context, strw, 42);
+        t.evaluate(context, strw, Integer.valueOf(42));
         output = strw.toString();
         assertEquals("x is 42\n", output);
 
