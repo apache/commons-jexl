@@ -312,7 +312,8 @@ public class ArithmeticTest extends JexlTestCase {
         jexl.setSilent(false);
         // for non-silent, silent...
         for (int s = 0; s < 2; ++s) {
-            JexlThreadedArithmetic.setLenient(Boolean.valueOf(s == 0));
+            final boolean lenient = s == 0;
+            jexl.setLenient(s == 0);
             int zthrow = 0;
             int zeval = 0;
             // for vars of all types...
@@ -337,7 +338,7 @@ public class ArithmeticTest extends JexlTestCase {
                     }
                 }
             }
-            if (!jexl.isLenient()) {
+            if (!lenient) {
                 assertTrue("All expressions should have thrown " + zthrow + "/" + PERMS,
                         zthrow == PERMS);
             } else {
