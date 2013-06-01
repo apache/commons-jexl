@@ -152,7 +152,6 @@ public class UnifiedJEXLTest extends JexlTestCase {
         Object o = phase1.evaluate(context);
         assertEquals("Dear Mr Doe;", o);
         
-        String p1 = getSource(phase1.toString());
         assertEquals(source, getSource(phase1.toString()));
         assertEquals(source, getSource(expr.toString()));
     }
