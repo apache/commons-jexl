@@ -25,9 +25,9 @@
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-jexl</artifactId>
     <version>2.1.2-SNAPSHOT</version>
-    <name>Commons JEXL</name>
+    <name>Apache Commons JEXL</name>
     <inceptionYear>2001</inceptionYear>
-    <description>The Commons Jexl library is an implementation of the JSTL Expression Language with extensions.</description>
+    <description>The Apache Commons Jexl library is an implementation of the JSTL Expression Language with extensions.</description>
     <url>http://commons.apache.org/jexl/</url>
 
     <issueManagement>
@@ -44,7 +44,7 @@
     <distributionManagement>
         <site>
             <id>people.apache.org</id>
-            <name>Commons Jexl</name>
+            <name>Apache Commons Jexl</name>
             <url>scp://people.apache.org/www/commons.apache.org/jexl</url>
         </site>
     </distributionManagement>
