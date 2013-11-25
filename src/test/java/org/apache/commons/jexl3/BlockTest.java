@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,7 +24,7 @@ public class BlockTest extends JexlTestCase {
 
     /**
      * Create the test
-     * 
+     *
      * @param testName name of the test
      */
     public BlockTest(String testName) {
@@ -32,46 +32,46 @@ public class BlockTest extends JexlTestCase {
     }
 
     public void testBlockSimple() throws Exception {
-        JexlExpression e = JEXL.createExpression("if (true) { 'hello'; }");
+        JexlScript e = JEXL.createScript("if (true) { 'hello'; }");
         JexlContext jc = new MapContext();
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertEquals("Result is wrong", "hello", o);
     }
 
     public void testBlockExecutesAll() throws Exception {
-        JexlExpression e = JEXL.createExpression("if (true) { x = 'Hello'; y = 'World';}");
+        JexlScript e = JEXL.createScript("if (true) { x = 'Hello'; y = 'World';}");
         JexlContext jc = new MapContext();
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertEquals("First result is wrong", "Hello", jc.get("x"));
         assertEquals("Second result is wrong", "World", jc.get("y"));
         assertEquals("Block result is wrong", "World", o);
     }
 
     public void testEmptyBlock() throws Exception {
-        JexlExpression e = JEXL.createExpression("if (true) { }");
+        JexlScript e = JEXL.createScript("if (true) { }");
         JexlContext jc = new MapContext();
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertNull("Result is wrong", o);
     }
 
     public void testBlockLastExecuted01() throws Exception {
-        JexlExpression e = JEXL.createExpression("if (true) { x = 1; } else { x = 2; }");
+        JexlScript e = JEXL.createScript("if (true) { x = 1; } else { x = 2; }");
         JexlContext jc = new MapContext();
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertEquals("Block result is wrong", new Integer(1), o);
     }
 
     public void testBlockLastExecuted02() throws Exception {
-        JexlExpression e = JEXL.createExpression("if (false) { x = 1; } else { x = 2; }");
+        JexlScript e = JEXL.createScript("if (false) { x = 1; } else { x = 2; }");
         JexlContext jc = new MapContext();
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertEquals("Block result is wrong", new Integer(2), o);
     }
 
     public void testNestedBlock() throws Exception {
-        JexlExpression e = JEXL.createExpression("if (true) { x = 'hello'; y = 'world';" + " if (true) { x; } y; }");
+        JexlScript e = JEXL.createScript("if (true) { x = 'hello'; y = 'world';" + " if (true) { x; } y; }");
         JexlContext jc = new MapContext();
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertEquals("Block result is wrong", "world", o);
     }
 }

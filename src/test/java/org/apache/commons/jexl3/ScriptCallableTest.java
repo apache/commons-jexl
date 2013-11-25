@@ -69,7 +69,6 @@ public class ScriptCallableTest extends JexlTestCase {
 
     public void testCallableClosure() throws Exception {
         JexlScript e = JEXL.createScript("function(t) {while(t);}");
-        e = (JexlScript) e.execute(null);
         Callable<Object> c = e.callable(null, Boolean.TRUE);
 
         ExecutorService executor = Executors.newFixedThreadPool(1);

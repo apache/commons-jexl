@@ -21,7 +21,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
-import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -47,7 +47,7 @@ public class Uberspect implements JexlUberspect {
      */
     public static final Object TRY_FAILED = AbstractExecutor.TRY_FAILED;
     /** The logger to use for all warnings & errors. */
-    protected final Log rlog;
+    protected final Logger rlog;
     /** The introspector version. */
     private final AtomicInteger version;
     /** The soft reference to the introspector currently in use. */
@@ -59,7 +59,7 @@ public class Uberspect implements JexlUberspect {
      * Creates a new Uberspect.
      * @param runtimeLogger the logger used for all logging needs
      */
-    public Uberspect(Log runtimeLogger) {
+    public Uberspect(Logger runtimeLogger) {
         rlog = runtimeLogger;
         ref = new SoftReference<Introspector>(null);
         loader = new SoftReference<ClassLoader>(getClass().getClassLoader());
@@ -120,7 +120,9 @@ public class Uberspect implements JexlUberspect {
     }
 
     /**
-     * Gets the field named by <code>key</code> for the class <code>c</code>.
+     * Gets the field named by
+     * <code>key</code> for the class
+     * <code>c</code>.
      *
      * @param c   Class in which the field search is taking place
      * @param key Name of the field being searched for
@@ -140,29 +142,33 @@ public class Uberspect implements JexlUberspect {
     }
 
     /**
-     * Gets the method defined by <code>name</code> and
-     * <code>params</code> for the Class <code>c</code>.
+     * Gets the method defined by
+     * <code>name</code> and
+     * <code>params</code> for the Class
+     * <code>c</code>.
      *
      * @param c      Class in which the method search is taking place
      * @param name   Name of the method being searched for
      * @param params An array of Objects (not Classes) that describe the
-     * the parameters
+     *               the parameters
      *
      * @return a {@link java.lang.reflect.Method}
-     * or null if no unambiguous method could be found through introspection.
+     *         or null if no unambiguous method could be found through introspection.
      */
     public final Method getMethod(Class<?> c, String name, Object[] params) {
         return base().getMethod(c, new MethodKey(name, params));
     }
 
     /**
-     * Gets the method defined by <code>key</code> and for the Class <code>c</code>.
+     * Gets the method defined by
+     * <code>key</code> and for the Class
+     * <code>c</code>.
      *
      * @param c   Class in which the method search is taking place
      * @param key MethodKey of the method being searched for
      *
      * @return a {@link java.lang.reflect.Method}
-     * or null if no unambiguous method could be found through introspection.
+     *         or null if no unambiguous method could be found through introspection.
      */
     public final Method getMethod(Class<?> c, MethodKey key) {
         return base().getMethod(c, key);
@@ -195,7 +201,7 @@ public class Uberspect implements JexlUberspect {
     @Override
     public JexlPropertyGet getPropertyGet(Object obj, Object identifier) {
         final Class<?> claz = obj.getClass();
-        final String property = AbstractExecutor.toString(identifier);
+        final String property = AbstractExecutor.castString(identifier);
         final Introspector is = base();
         JexlPropertyGet executor;
         // first try for a getFoo() type of property (also getfoo() )
@@ -216,32 +222,38 @@ public class Uberspect implements JexlUberspect {
             return executor;
         }
         // let's see if this is a list or array
-        executor = ListGetExecutor.discover(is, claz, identifier);
-        if (executor != null) {
-            return executor;
+        Integer index = AbstractExecutor.castInteger(identifier);
+        if (index != null) {
+            executor = ListGetExecutor.discover(is, claz, index);
+            if (executor != null) {
+                return executor;
+            }
         }
         // if that didn't work, look for get(foo)
         executor = DuckGetExecutor.discover(is, claz, identifier);
         if (executor != null) {
             return executor;
         }
-        // last, look for get("foo") if we did not try yet
-        if (property != null && !(identifier instanceof String)) {
-            // if that didn't work, look for get("foo")
-            executor = DuckGetExecutor.discover(is, claz, property);
-            if (executor != null) {
-                return executor;
+        if (property != null) {
+            // look for get("foo") if we did not try yet (just above)
+            if (property != identifier) {
+                executor = DuckGetExecutor.discover(is, claz, property);
+                if (executor != null) {
+                    return executor;
+                }
             }
-        }
-        // a field may be?
-        executor = FieldGetExecutor.discover(is, claz, property);
-        if (executor != null) {
-            return executor;
-        }
-        // or an indexed property?
-        executor = IndexedType.discover(is, obj, property);
-        if (executor != null) {
-            return executor;
+            if (index == null) {
+                // a field may be? (can not be a number)
+                executor = FieldGetExecutor.discover(is, claz, property);
+                if (executor != null) {
+                    return executor;
+                }
+                // or an indexed property?
+                executor = IndexedType.discover(is, obj, property);
+                if (executor != null) {
+                    return executor;
+                }
+            }
         }
         return null;
     }
@@ -249,7 +261,7 @@ public class Uberspect implements JexlUberspect {
     @Override
     public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg) {
         final Class<?> claz = obj.getClass();
-        final String property = AbstractExecutor.toString(identifier);
+        final String property = AbstractExecutor.castString(identifier);
         final Introspector is = base();
         JexlPropertySet executor;
         // first try for a setFoo() type of property (also setfoo() )
@@ -266,9 +278,12 @@ public class Uberspect implements JexlUberspect {
         }
         // let's see if we can convert the identifier to an int,
         // if obj is an array or a list, we can still do something
-        executor = ListSetExecutor.discover(is, claz, identifier, arg);
-        if (executor != null) {
-            return executor;
+        Integer index = AbstractExecutor.castInteger(identifier);
+        if (index != null) {
+            executor = ListSetExecutor.discover(is, claz, identifier, arg);
+            if (executor != null) {
+                return executor;
+            }
         }
         // if that didn't work, look for set(foo)
         executor = DuckSetExecutor.discover(is, claz, identifier, arg);
@@ -276,16 +291,20 @@ public class Uberspect implements JexlUberspect {
             return executor;
         }
         // last, look for set("foo") if we did not try yet
-        if (property != null && !(identifier instanceof String)) {
-            executor = DuckSetExecutor.discover(is, claz, property, arg);
-            if (executor != null) {
-                return executor;
+        if (property != null) {
+            if (property != identifier) {
+                executor = DuckSetExecutor.discover(is, claz, property, arg);
+                if (executor != null) {
+                    return executor;
+                }
             }
-        }
-        // a field may be?
-        executor = FieldSetExecutor.discover(is, claz, property, arg);
-        if (executor != null) {
-            return executor;
+            if (index == null) {
+                // a field may be?
+                executor = FieldSetExecutor.discover(is, claz, property, arg);
+                if (executor != null) {
+                    return executor;
+                }
+            }
         }
         return null;
     }
@@ -328,4 +347,63 @@ public class Uberspect implements JexlUberspect {
     public JexlMethod getConstructor(Object ctorHandle, Object[] args) {
         return ConstructorMethod.discover(base(), ctorHandle, args);
     }
+    /**
+     * May be a way to extend/improve sandboxing by choosing actual method for resolution.
+     **
+     * public static enum GetResolver {
+     * PROPERTY {
+     * @Override
+     * public JexlPropertyGet resolve(Uberspect uberspect, Object obj, Object identifier) {
+     * return PropertyGetExecutor.discover(uberspect.base(), obj.getClass(), AbstractExecutor.toString(identifier));
+     * }
+     * },
+     * BOOLEAN {
+     * @Override
+     * public JexlPropertyGet resolve(Uberspect uberspect, Object obj, Object identifier) {
+     * return BooleanGetExecutor.discover(uberspect.base(), obj.getClass(), AbstractExecutor.toString(identifier));
+     * }
+     * },
+     * MAP {
+     * @Override
+     * public JexlPropertyGet resolve(Uberspect uberspect, Object obj, Object identifier) {
+     * return MapGetExecutor.discover(uberspect.base(), obj.getClass(), identifier);
+     * }
+     * },
+     * LIST {
+     * @Override
+     * public JexlPropertyGet resolve(Uberspect uberspect, Object obj, Object identifier) {
+     * return ListGetExecutor.discover(uberspect.base(), obj.getClass(), identifier);
+     * }
+     * },
+     * DUCK {
+     * @Override
+     * public JexlPropertyGet resolve(Uberspect uberspect, Object obj, Object identifier) {
+     * final Introspector is = uberspect.base();
+     * final Class<?> clazz = obj.getClass();
+     * JexlPropertyGet executor = DuckGetExecutor.discover(is, clazz, identifier);
+     * if (executor == null && identifier != null && !(identifier instanceof String)) {
+     * executor = DuckGetExecutor.discover(is, clazz, AbstractExecutor.toString(identifier));
+     * }
+     * return executor;
+     * }
+     * },
+     * FIELD {
+     * @Override
+     * public JexlPropertyGet resolve(Uberspect uberspect, Object obj, Object identifier) {
+     * return FieldGetExecutor.discover(uberspect.base(), obj.getClass(), AbstractExecutor.toString(identifier));
+     * }
+     * },
+     * INDEXED {
+     * @Override
+     * public JexlPropertyGet resolve(Uberspect uberspect, Object obj, Object identifier) {
+     * return IndexedType.discover(uberspect.base(), obj, AbstractExecutor.toString(identifier));
+     * }
+     * },
+     * ANY {};
+     * <p/>
+     * public JexlPropertyGet resolve(Uberspect uberspect, Object obj, Object identifier) {
+     * return uberspect.getPropertyGet(obj, identifier);
+     * }
+     * }
+     */
 }

@@ -41,7 +41,7 @@ public class JexlTestCase extends TestCase {
     public JexlTestCase(String name) {
         this(name, new JexlBuilder().strict(true).silent(false).cache(32).create());
     }
-    
+
     protected JexlTestCase(String name, JexlEngine jexl) {
         super(name);
         JEXL = jexl;
@@ -55,7 +55,7 @@ public class JexlTestCase extends TestCase {
     public static JexlEngine createEngine(boolean lenient) {
         return new JexlBuilder().arithmetic(new JexlArithmetic(!lenient)).cache(512).create();
     }
-    
+
     /**
      * Will force testing the debugger for each derived test class by
      * recreating each expression from the JexlNode in the JexlEngine cache &

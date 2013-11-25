@@ -18,8 +18,6 @@ package org.apache.commons.jexl3;
 
 import java.math.MathContext;
 import java.nio.charset.Charset;
-import org.apache.commons.jexl3.JexlContext;
-import org.apache.commons.jexl3.JexlEngine;
 
 /**
  * A readonly context wrapper.

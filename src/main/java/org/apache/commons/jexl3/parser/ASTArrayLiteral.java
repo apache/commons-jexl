@@ -41,8 +41,7 @@ public final class ASTArrayLiteral extends JexlNode {
         return constant;
     }
 
-    /** {
-     * @inheritDoc} */
+    /** {@inheritDoc} */
     @Override
     public void jjtClose() {
         constant = true;
@@ -58,8 +57,7 @@ public final class ASTArrayLiteral extends JexlNode {
         }
     }
 
-    /** {
-     * @inheritDoc} */
+    /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);

@@ -35,7 +35,7 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
 
     /**
      * Attempts to discover a ListSetExecutor.
-     * 
+     *
      * @param is the introspector
      * @param clazz the class to find the get method from
      * @param identifier the key to use as an argument to the get method
@@ -43,8 +43,7 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
      * @return the executor if found, null otherwise
      */
     public static ListSetExecutor discover(Introspector is, Class<?> clazz, Object identifier, Object value) {
-        Integer index = toInteger(identifier);
-        java.lang.reflect.Method method = null;
+        Integer index = castInteger(identifier);
         if (index != null) {
             if (clazz.isArray()) {
                 // we could verify if the call can be performed but it does not change
@@ -52,18 +51,19 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
                 // Class<?> formal = clazz.getComponentType();
                 // Class<?> actual = value == null? Object.class : value.getClass();
                 // if (IntrospectionUtils.isMethodInvocationConvertible(formal, actual, false)) {
-                method = ARRAY_SET;
+                return new ListSetExecutor(clazz, ARRAY_SET, index);
                 // }
-            } else if (List.class.isAssignableFrom(clazz)) {
-                method = LIST_SET;
+            }
+            if (List.class.isAssignableFrom(clazz)) {
+                return new ListSetExecutor(clazz, LIST_SET, index);
             }
         }
-        return method == null ? null : new ListSetExecutor(clazz, method, index);
+        return null;
     }
 
     /**
      * Creates an instance.
-     * 
+     *
      * @param clazz the class the set method applies to
      * @param method the method called through this executor
      * @param key the key to use as 1st argument to the set method
@@ -92,7 +92,7 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
 
     @Override
     public Object tryInvoke(final Object obj, Object key, Object value) {
-        Integer index = toInteger(key);
+        Integer index = castInteger(key);
         if (obj != null && method != null
                 && objectClass.equals(obj.getClass())
                 && index != null) {

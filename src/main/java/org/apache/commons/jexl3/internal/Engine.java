@@ -37,8 +37,8 @@ import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.Parser;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.apache.log4j.LogManager;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -68,7 +68,7 @@ public class Engine extends JexlEngine {
     private static final class UberspectHolder {
         /** The default uberspector that handles all introspection patterns. */
         private static final Uberspect UBERSPECT =
-                new Uberspect(LogFactory.getLog(JexlEngine.class));
+                new Uberspect(LogManager.getLogger(JexlEngine.class));
 
         /** Non-instantiable. */
         private UberspectHolder() {
@@ -85,7 +85,7 @@ public class Engine extends JexlEngine {
     /**
      * The Log to which all JexlEngine messages will be logged.
      */
-    protected final Log logger;
+    protected final Logger logger;
     /**
      * The {@link Parser}; when parsing expressions, this engine synchronizes on the parser.
      */
@@ -147,7 +147,7 @@ public class Engine extends JexlEngine {
         } else {
             this.uberspect = new SandboxUberspect(uber, sandbox);
         }
-        this.logger = conf.logger() == null ? LogFactory.getLog(JexlEngine.class) : conf.logger();
+        this.logger = conf.logger() == null ? LogManager.getLogger(JexlEngine.class) : conf.logger();
         this.functions = conf.namespaces() == null ? Collections.<String, Object>emptyMap() : conf.namespaces();
         this.silent = conf.silent() == null ? false : conf.silent().booleanValue();
         this.debug = conf.debug() == null ? true : conf.debug().booleanValue();
@@ -167,8 +167,8 @@ public class Engine extends JexlEngine {
      * @param logger the logger to use for the underlying Uberspect
      * @return Uberspect the default uberspector instance.
      */
-    public static Uberspect getUberspect(Log logger) {
-        if (logger == null || logger.equals(LogFactory.getLog(JexlEngine.class))) {
+    public static Uberspect getUberspect(Logger logger) {
+        if (logger == null || logger.equals(LogManager.getLogger(JexlEngine.class))) {
             return UberspectHolder.UBERSPECT;
         }
         return new Uberspect(logger);
@@ -210,8 +210,19 @@ public class Engine extends JexlEngine {
     }
 
     @Override
-    public TemplateEngine createJxltEngine(int cacheSize, char immediate, char deferred) {
-        return new TemplateEngine(this, cacheSize, immediate, deferred);
+    public TemplateEngine createJxltEngine(boolean noScript, int cacheSize, char immediate, char deferred) {
+        return new TemplateEngine(this, noScript, cacheSize, immediate, deferred);
+    }
+
+    /**
+     * Swaps the current thread local context.
+     * @param tls the context or null
+     * @return the previous thread local context
+     */
+    protected JexlContext.ThreadLocal putThreadLocal(JexlContext.ThreadLocal tls) {
+        JexlContext.ThreadLocal local = CONTEXT.get();
+        CONTEXT.set(tls);
+        return local;
     }
 
     /**
@@ -336,7 +347,7 @@ public class Engine extends JexlEngine {
         }
         String source = trimSource(scriptText);
         Scope scope = names == null ? null : new Scope(null, names);
-        ASTJexlScript tree = parse(info, source, scope, false);
+        ASTJexlScript tree = parse(info, source, scope, false, false);
         return new Script(this, source, tree);
     }
 
@@ -349,11 +360,7 @@ public class Engine extends JexlEngine {
             info = createInfo();
         }
         String source = trimSource(expression);
-        ASTJexlScript tree = parse(info, source, null, false);
-        if (tree.toExpression()) {
-            logger.warn("The JEXL Expression created will be a reference"
-                    + " to the first expression from the supplied script: \"" + expression + "\" ");
-        }
+        ASTJexlScript tree = parse(info, source, null, false, true);
         return new Script(this, source, tree);
     }
 
@@ -369,11 +376,11 @@ public class Engine extends JexlEngine {
         }
         // synthetize expr using register
         String src = trimSource(expr);
-        src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + ";";
+        src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src;
         try {
             final JexlInfo info = debug ? createInfo() : null;
             final Scope scope = new Scope(null, "#0");
-            final ASTJexlScript script = parse(info, src, scope, true);
+            final ASTJexlScript script = parse(info, src, scope, true, true);
             final JexlNode node = script.jjtGetChild(0);
             final Scope.Frame frame = script.createFrame(bean);
             final Interpreter interpreter = createInterpreter(context, frame);
@@ -399,11 +406,11 @@ public class Engine extends JexlEngine {
         }
         // synthetize expr using registers
         String src = trimSource(expr);
-        src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + "=" + "#1" + ";";
+        src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + "=" + "#1";
         try {
             final JexlInfo info = debug ? createInfo() : null;
             final Scope scope = new Scope(null, "#0", "#1");
-            final ASTJexlScript script = parse(info, src, scope, true);
+            final ASTJexlScript script = parse(info, src, scope, true, true);
             final JexlNode node = script.jjtGetChild(0);
             final Scope.Frame frame = script.createFrame(bean, value);
             final Interpreter interpreter = createInterpreter(context, frame);
@@ -583,6 +590,12 @@ public class Engine extends JexlEngine {
                 collector.collect(null);
             }
         } else if (node instanceof ASTIdentifierAccess) {
+            JexlNode parent = node.jjtGetParent();
+            if (parent instanceof ASTMethodNode || parent instanceof ASTFunctionNode) {
+                // skip identifiers for methods and functions
+                collector.collect(null);
+                return;
+            }
             // belt and suspender since an identifier should have been seen first
             if (collector.isCollecting()) {
                 collector.add(((ASTIdentifierAccess) node).getName());
@@ -638,18 +651,19 @@ public class Engine extends JexlEngine {
      * Parses an expression.
      *
      * @param info      information structure
-     * @param expr      the expression to parse
+     * @param src      the expression to parse
      * @param scope     the script frame
      * @param registers whether the parser should allow the unnamed '#number' syntax for 'registers'
+     * @param expression whether the parser allows scripts or only expressions
      * @return the parsed tree
      * @throws JexlException if any error occured during parsing
      */
-    protected ASTJexlScript parse(JexlInfo info, String expr, Scope scope, boolean registers) {
-        final boolean cached = expr.length() < cacheThreshold && cache != null;
+    protected ASTJexlScript parse(JexlInfo info, String src, Scope scope, boolean registers, boolean expression) {
+        final boolean cached = src.length() < cacheThreshold && cache != null;
         ASTJexlScript script;
         synchronized (parser) {
             if (cached) {
-                script = cache.get(expr);
+                script = cache.get(src);
                 if (script != null) {
                     Scope f = script.getScope();
                     if ((f == null && scope == null) || (f != null && f.equals(scope))) {
@@ -657,9 +671,9 @@ public class Engine extends JexlEngine {
                     }
                 }
             }
-            script = parser.parse(info, expr, scope, registers);
+            script = parser.parse(info, src, scope, registers, expression);
             if (cached) {
-                cache.put(expr, script);
+                cache.put(src, script);
             }
         }
         return script;

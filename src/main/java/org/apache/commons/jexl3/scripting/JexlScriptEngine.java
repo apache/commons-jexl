@@ -38,8 +38,8 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlScript;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.apache.log4j.LogManager;
 
 /**
  * Implements the Jexl ScriptEngine for JSF-223.
@@ -62,7 +62,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class JexlScriptEngine extends AbstractScriptEngine implements Compilable {
     /** The logger. */
-    private static final Log LOG = LogFactory.getLog(JexlScriptEngine.class);
+    private static final Logger LOG = LogManager.getLogger(JexlScriptEngine.class);
 
     /** The shared expression cache size. */
     private static final int CACHE_SIZE = 512;
@@ -169,7 +169,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
          * Gives access to the engine logger.
          * @return the JexlScriptEngine logger
          */
-        public Log getLogger() {
+        public Logger getLogger() {
             return LOG;
         }
     }

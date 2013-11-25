@@ -288,7 +288,9 @@ public final class Scope {
          */
         public Frame assign(Object... values) {
             if (stack != null && values != null && values.length > 0) {
-                System.arraycopy(values, 0, stack, 0, Math.min(stack.length, values.length));
+                Object[] copy = stack.clone();
+                System.arraycopy(values, 0, copy, 0, Math.min(copy.length, values.length));
+                return new Frame(copy);
             }
             return this;
         }

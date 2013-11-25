@@ -23,10 +23,15 @@ import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Test cases for reported issues
+ * Test cases for reported issue .
  */
 @SuppressWarnings("boxing")
 public class IssuesTest extends JexlTestCase {
@@ -196,11 +201,11 @@ public class IssuesTest extends JexlTestCase {
         ctxt.set("a", null);
 
         String[] exprs = {
-            "10 + null",
-            "a - 10",
-            "b * 10",
-            "a % b",
-            "1000 / a"
+            //"10 + null",
+            //"a - 10",
+            //"b * 10",
+            "a % b"//,
+        //"1000 / a"
         };
         for (int e = 0; e < exprs.length; ++e) {
             try {
@@ -501,35 +506,35 @@ public class IssuesTest extends JexlTestCase {
     }
 
     public void test108() throws Exception {
-        JexlExpression expr;
+        JexlScript expr;
         Object value;
         JexlEngine jexl = new Engine();
-        expr = jexl.createExpression("size([])");
-        value = expr.evaluate(null);
+        expr = jexl.createScript("size([])");
+        value = expr.execute(null);
         assertEquals(0, value);
-        expr = jexl.createExpression(expr.getParsedText());
-        value = expr.evaluate(null);
+        expr = jexl.createScript(expr.getParsedText());
+        value = expr.execute(null);
         assertEquals(0, value);
 
-        expr = jexl.createExpression("if (true) { [] } else { {:} }");
-        value = expr.evaluate(null);
+        expr = jexl.createScript("if (true) { [] } else { {:} }");
+        value = expr.execute(null);
         assertTrue(value.getClass().isArray());
-        expr = jexl.createExpression(expr.getParsedText());
-        value = expr.evaluate(null);
+        expr = jexl.createScript(expr.getParsedText());
+        value = expr.execute(null);
         assertTrue(value.getClass().isArray());
 
-        expr = jexl.createExpression("size({:})");
-        value = expr.evaluate(null);
+        expr = jexl.createScript("size({:})");
+        value = expr.execute(null);
         assertEquals(0, value);
-        expr = jexl.createExpression(expr.getParsedText());
-        value = expr.evaluate(null);
+        expr = jexl.createScript(expr.getParsedText());
+        value = expr.execute(null);
         assertEquals(0, value);
 
-        expr = jexl.createExpression("if (false) { [] } else { {:} }");
-        value = expr.evaluate(null);
+        expr = jexl.createScript("if (false) { [] } else { {:} }");
+        value = expr.execute(null);
         assertTrue(value instanceof Map<?, ?>);
-        expr = jexl.createExpression(expr.getParsedText());
-        value = expr.evaluate(null);
+        expr = jexl.createScript(expr.getParsedText());
+        value = expr.execute(null);
         assertTrue(value instanceof Map<?, ?>);
     }
 
@@ -659,6 +664,10 @@ public class IssuesTest extends JexlTestCase {
     public static class Foo125 {
         public String method() {
             return "OK";
+        }
+
+        public String total(String tt) {
+            return "total " + tt;
         }
     }
 
@@ -891,5 +900,173 @@ public class IssuesTest extends JexlTestCase {
         expr = jexl.createExpression("fn01(IDX)");
         result = expr.evaluate(jc);
         assertEquals("EXPR01 result", 22, result);
+    }
+
+    public void test137() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlContext jc = new MapContext();
+        JexlScript script;
+        JexlExpression expr;
+        Object result;
+
+        script = jexl.createScript("(x)->{ x }");
+        Assert.assertArrayEquals(new String[]{"x"}, script.getParameters());
+        result = script.execute(null, 42);
+        Assert.assertEquals(42, result);
+    }
+
+//    public void test138() throws Exception {
+//        MapContext ctxt = new MapContext();
+//        ctxt.set("tz", java.util.TimeZone.class);
+//        String source = ""
+//                + "var currentDate = new('java.util.Date');"
+//                +  "var gmt = tz.getTimeZone('GMT');"
+//                +  "var cet = tz.getTimeZone('CET');"
+//                +  "var calendarGMT = new('java.util.GregorianCalendar' , gmt);"
+//                +  "var calendarCET = new('java.util.GregorianCalendar', cet);"
+//                +  "var diff = calendarCET.getTime() - calendarGMT.getTime();"
+//                + "return diff";
+//
+//        JexlEngine jexl = new Engine();
+//        JexlScript script = jexl.createScript(source);
+//        Object result = script.execute(ctxt);
+//        Assert.assertNotNull(result);
+//    }
+    public void test142() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlContext jc = new MapContext();
+        JexlScript script;
+        Object result;
+
+        script = jexl.createScript("map['']", "map");
+        result = script.execute(jc, Collections.singletonMap("", 42));
+        Assert.assertEquals(42, result);
+    }
+
+    public void test143() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlContext jc = new MapContext();
+        JexlScript script;
+        Object result;
+
+        script = jexl.createScript("var total = 10; total = (total - ((x < 3)? y : z)) / (total / 10); total", "x", "y", "z");
+        result = script.execute(jc, 2, 2, 1);
+        Assert.assertEquals(8, result);
+        script = jexl.createScript("var total = 10; total = (total - ((x < 3)? y : 1)) / (total / 10); total", "x", "y", "z");
+        result = script.execute(jc, 2, 2, 1);
+        Assert.assertEquals(8, result);
+    }
+
+    public void test144() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlContext jc = new MapContext();//ObjectContext<Foo125>(jexl, new Foo125());
+        JexlScript script;
+        Object result;
+        script = jexl.createScript("var total = 10; total('tt')");
+        try {
+            result = script.execute(jc);
+            Assert.fail("total() is not solvable");
+        } catch (JexlException.Method ambiguous) {
+            Assert.assertEquals("total", ambiguous.getMethod());
+        }
+        jc = new ObjectContext<Foo125>(jexl, new Foo125());
+        try {
+            result = script.execute(jc);
+        } catch (JexlException.Method ambiguous) {
+            Assert.fail("total() is solvable");
+        }
+    }
+
+    public void test145() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlContext jc = new MapContext();
+        JexlScript script = jexl.createScript("sum(TOTAL) - partial.sum() + partial['sub'].avg() - sum(partial.sub)");
+        Set<List<String>> vars = script.getVariables();
+
+        Assert.assertTrue(vars.size() == 3);
+    }
+
+    public void test143apache() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlExpression e = jexl.createExpression("9223372036854775806.5B");
+        JexlContext context = new MapContext();
+        String res = String.valueOf(e.evaluate(context));
+        Assert.assertEquals("9223372036854775806.5", res);
+    }
+
+    /**
+     * Test cases for empty array assignment.
+     */
+    public static class Quux144 {
+        String[] arr;
+        String[] arr2;
+
+        public Quux144() {
+        }
+
+        public String[] getArr() {
+            return arr;
+        }
+
+        public String[] getArr2() {
+            return arr2;
+        }
+
+        public void setArr(String[] arr) {
+            this.arr = arr;
+        }
+
+        public void setArr2(String[] arr2) {
+            this.arr2 = arr2;
+        }
+
+        // Overloaded setter with different argument type.
+        public void setArr2(Integer[] arr2) {
+        }
+    }
+
+    public void test144apache() throws Exception {
+        JexlEngine JEXL = new Engine();
+        JexlContext jc = new MapContext();
+        jc.set("quuxClass", Quux144.class);
+        JexlExpression create = JEXL.createExpression("quux = new(quuxClass)");
+        JexlExpression assignArray = JEXL.createExpression("quux.arr = [ 'hello', 'world' ]");
+        JexlExpression checkArray = JEXL.createExpression("quux.arr");
+
+        // test with a string
+        Quux144 quux = (Quux144) create.evaluate(jc);
+        assertNotNull("quux is null", quux);
+
+        // test with a nonempty string array
+        Object o = assignArray.evaluate(jc);
+        assertEquals("Result is not a string array", String[].class, o.getClass());
+        o = checkArray.evaluate(jc);
+        assertEquals("The array elements are equal", Arrays.asList("hello", "world"), Arrays.asList((String[]) o));
+
+        // test with a null array
+        assignArray = JEXL.createExpression("quux.arr = null");
+        o = assignArray.evaluate(jc);
+        assertNull("Result is not null", o);
+        o = checkArray.evaluate(jc);
+        assertNull("Result is not null", o);
+
+        // test with an empty array
+        assignArray = JEXL.createExpression("quux.arr = [ ]");
+        o = assignArray.evaluate(jc);
+        assertNotNull("Result is null", o);
+        o = checkArray.evaluate(jc);
+        assertEquals("The array elements are not equal", Arrays.asList(new String[0]), Arrays.asList((String[]) o));
+        assertEquals("The array size is not zero", 0, ((String[]) o).length);
+
+        // test with an empty array on the overloaded setter for different types.
+        // so, the assignment should fail with logging 'The ambiguous property, arr2, should have failed.'
+        try {
+            assignArray = JEXL.createExpression("quux.arr2 = [ ]");
+            o = assignArray.evaluate(jc);
+            fail("The arr2 property shouldn't be set due to its ambiguity (overloaded setters with different types).");
+        } catch (JexlException.Property e) {
+            //System.out.println("Expected ambiguous property setting exception: " + e);
+        }
+        assertNull("The arr2 property value should remain as null, not an empty array.", quux.arr2);
     }
 }

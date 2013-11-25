@@ -25,7 +25,55 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.0" date="2012-09-30">
+        <release version="3.0.1" date="unreleased">
+            <action dev="henrib" type="fix" >
+                Fixed issue in edge case method resolution wrt overload and varargs
+            </action>
+            <action dev="henrib" type="add" >
+                Switch logging to log4j 1.2
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-144" due-to="Woonsang Ko">
+                Empty array property setting fails
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-142" due-to="Juozas Baliuks">
+                Map expression issue with empty key
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-141" due-to="Harpreet Singh">
+                Suffix for Big Decimal and Big Integer Literal is incorrectly mentioned in Java docs
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-137">
+                Invalid script variable list for nested array/map access
+            </action>
+            <action dev="henrib" type="fix">
+                Fixed Engine.getVariables that was erroneously considering method calls as variable usage
+            </action>
+            <action dev="henrib" type="fix">
+                Fixed issue in ternary expression
+                (grammar was not precise enough to differentiate namespace:function calls vs ternary right hand side)
+            </action>
+            <action dev="henrib" type="add">
+                NaN is now a keyword equivalent to #NaN (deprecated): POTENTIAL SCRIPT BREAK!
+            </action>
+            <action dev="henrib" type="add">
+                Syntactically enforce that expressions do not contain statements: POTENTIAL EXPRESSION BREAK!
+                (ie an expression is not a script and can NOT use 'if','for'... and blocks)
+            </action>
+           <action dev="henrib" type="add">
+                Added syntactic shortcut to create parametric scripts (script source creates an anonymous function)
+            </action>
+            <action dev="henrib" type="fix">
+                Segregated JexlScript and JexlExpression further to avoid calling JexlExpression.evaluate on JexlScript
+                (instead of JexlScript.execute) which had the unexpected property of only evaluating the first statement
+            </action>
+            <action dev="henrib" type="fix">
+                Fix an edge case of ambiguous method matching (see http://apache-commons.680414.n4.nabble.com/jexl-mathod-within-namespace-not-found-if-parameter-is-int-tt4637888.html)
+            </action>
+            <action dev="henrib" type="fix">
+                Fix issue wrt isEmpty and method varargs (assignable types vs equal types)
+                (see http://apache-commons.680414.n4.nabble.com/jexl-empty-function-crashes-if-called-with-int-tt4637895.html)
+            </action>
+        </release>
+        <release version="3.0" date="unreleased">
             <action dev="henrib" type="add" issue="JEXL-133" due-to="Alfred Reibenschuh">
                 String matching Operator short-hand inspired by CSS3
             </action>

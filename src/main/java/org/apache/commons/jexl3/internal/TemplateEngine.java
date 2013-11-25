@@ -20,6 +20,7 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JxltEngine;
+import org.apache.commons.jexl3.internal.Engine.VarCollector;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
@@ -34,6 +35,7 @@ import java.io.Writer;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -50,19 +52,23 @@ public final class TemplateEngine extends JxltEngine {
     private final char immediateChar;
     /** The first character for deferred expressions. */
     private final char deferredChar;
+    /** Whether expressions can use Jexl script or only expressions (ie, no for, var, etc). */
+    private boolean noscript = true;
 
     /**
      * Creates a new instance of {@link JxltEngine} creating a local cache.
      * @param aJexl     the JexlEngine to use.
+     * @param noScript  whether this engine only allows Jexl expressions or scripts
      * @param cacheSize the number of expressions in this cache, default is 256
      * @param immediate the immediate template expression character, default is '$'
      * @param deferred  the deferred template expression character, default is '#'
      */
-    public TemplateEngine(Engine aJexl, int cacheSize, char immediate, char deferred) {
+    public TemplateEngine(Engine aJexl, boolean noScript, int cacheSize, char immediate, char deferred) {
         this.jexl = aJexl;
         this.cache = aJexl.new SoftCache<String, TemplateExpression>(cacheSize);
         immediateChar = immediate;
         deferredChar = deferred;
+        noscript = noScript;
     }
 
     /**
@@ -481,7 +487,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         protected TemplateExpression prepare(Interpreter interpreter) {
             String value = interpreter.interpret(node).toString();
-            JexlNode dnode = jexl.parse(jexl.isDebug() ? node.jexlInfo() : null, value, null, false);
+            JexlNode dnode = jexl.parse(jexl.isDebug() ? node.jexlInfo() : null, value, null, false, noscript);
             return new ImmediateExpression(value, dnode, this);
         }
 
@@ -537,6 +543,17 @@ public final class TemplateEngine extends JxltEngine {
                 expr.getVariables(collector);
             }
             return collector.collected();
+        }
+
+        /**
+         * Fills up the list of variables accessed by this unified expression.
+         * @param collector the variable collector
+         */
+        @Override
+        protected void getVariables(Engine.VarCollector collector) {
+            for (TemplateExpression expr : exprs) {
+                expr.getVariables(collector);
+            }
         }
 
         @Override
@@ -667,7 +684,7 @@ public final class TemplateEngine extends JxltEngine {
         ExpressionBuilder builder = new ExpressionBuilder(0);
         StringBuilder strb = new StringBuilder(size);
         ParseState state = ParseState.CONST;
-        int inner = 0;
+        int inner1 = 0;
         boolean nested = false;
         int inested = -1;
         for (int i = 0; i < size; ++i) {
@@ -726,7 +743,7 @@ public final class TemplateEngine extends JxltEngine {
                         String src = strb.toString();
                         TemplateExpression iexpr = new ImmediateExpression(
                                 src,
-                                jexl.parse(null, src, scope, false),
+                                jexl.parse(null, src, scope, false, noscript),
                                 null);
                         builder.add(iexpr);
                         strb.delete(0, Integer.MAX_VALUE);
@@ -746,7 +763,7 @@ public final class TemplateEngine extends JxltEngine {
                     // nested immediate in deferred; need to balance count of '{' & '}'
                     if (c == '{') {
                         if (expr.charAt(i - 1) == immediateChar) {
-                            inner += 1;
+                            inner1 += 1;
                             strb.deleteCharAt(strb.length() - 1);
                             nested = true;
                         }
@@ -755,8 +772,8 @@ public final class TemplateEngine extends JxltEngine {
                     // closing '}'
                     if (c == '}') {
                         // balance nested immediate
-                        if (inner > 0) {
-                            inner -= 1;
+                        if (inner1 > 0) {
+                            inner1 -= 1;
                         } else {
                             // materialize the nested/deferred expr
                             String src = strb.toString();
@@ -764,12 +781,12 @@ public final class TemplateEngine extends JxltEngine {
                             if (nested) {
                                 dexpr = new NestedExpression(
                                         expr.substring(inested, i + 1),
-                                        jexl.parse(null, src, scope, false),
+                                        jexl.parse(null, src, scope, false, noscript),
                                         null);
                             } else {
                                 dexpr = new DeferredExpression(
                                         strb.toString(),
-                                        jexl.parse(null, src, scope, false),
+                                        jexl.parse(null, src, scope, false, noscript),
                                         null);
                             }
                             builder.add(dexpr);
@@ -822,7 +839,7 @@ public final class TemplateEngine extends JxltEngine {
     private static final class Block {
         /** The type of block, verbatim or directive. */
         private final BlockType type;
-        /** The actual contexnt. */
+        /** The actual content. */
         private final String body;
 
         /**
@@ -837,7 +854,25 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public String toString() {
-            return body;
+            if (BlockType.VERBATIM.equals(type)) {
+                return body;
+            } else {
+                StringBuilder strb = new StringBuilder(64);
+                toString(strb, "$$");
+                return strb.toString();
+            }
+        }
+
+        protected void toString(StringBuilder strb, String prefix) {
+            if (BlockType.VERBATIM.equals(type)) {
+                strb.append(body);
+            } else {
+                Iterator<CharSequence> lines = readLines(new StringReader(body));
+                while (lines.hasNext()) {
+                    strb.append(prefix);
+                    strb.append(lines.next());
+                }
+            }
         }
     }
 
@@ -897,8 +932,8 @@ public final class TemplateEngine extends JxltEngine {
                     strb.append(block.body);
                 }
             }
-            // createExpression the script
-            script = jexl.parse(null, strb.toString(), scope, false);
+            // create the script
+            script = jexl.parse(null, strb.toString(), scope, false, false);
             scope = script.getScope();
             // createExpression the exprs using the code frame for those appearing after the first block of code
             for (int b = 0; b < blocks.size(); ++b) {
@@ -930,11 +965,7 @@ public final class TemplateEngine extends JxltEngine {
         public String toString() {
             StringBuilder strb = new StringBuilder();
             for (Block block : source) {
-                if (block.type == BlockType.DIRECTIVE) {
-                    strb.append(prefix);
-                }
-                strb.append(block.toString());
-                strb.append('\n');
+                block.toString(strb, prefix);
             }
             return strb.toString();
         }
@@ -976,6 +1007,22 @@ public final class TemplateEngine extends JxltEngine {
             TemplateContext tcontext = new TemplateContext(context, frame, exprs, writer);
             Interpreter interpreter = jexl.createInterpreter(tcontext, frame);
             interpreter.interpret(script);
+        }
+
+        /**
+         * Gets the list of variables accessed by this template.
+         * <p>This method will visit all nodes of the sub-expressions and extract all variables whether they
+         * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
+         * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
+         *         or the empty set if no variables are used
+         */
+        @Override
+        public Set<List<String>> getVariables() {
+            VarCollector collector = new VarCollector();
+            for (TemplateExpression expr : exprs) {
+                expr.getVariables(collector);
+            }
+            return collector.collected();
         }
     }
 
@@ -1142,72 +1189,126 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /**
+     * Read lines from a (buffered / mark-able) reader keeping all new-lines and line-feeds.
+     * @param reader the reader
+     * @return the line iterator
+     */
+    protected static Iterator<CharSequence> readLines(final Reader reader) {
+        if (!reader.markSupported()) {
+            throw new IllegalArgumentException("mark support in reader required");
+        }
+        return new Iterator<CharSequence>() {
+            CharSequence next = doNext();
+
+            private CharSequence doNext() {
+                StringBuffer strb = new StringBuffer(64);
+                int c;
+                boolean eol = false;
+                try {
+                    while ((c = reader.read()) >= 0) {
+                        if (eol && (c != '\n' && c != '\r')) {
+                            reader.reset();
+                            break;
+                        }
+                        if (c == '\n') {
+                            eol = true;
+                        }
+                        strb.append((char) c);
+                        reader.mark(1);
+                    }
+                } catch (IOException xio) {
+                    return null;
+                }
+                return strb.length() > 0 ? strb : null;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return next != null;
+            }
+
+            @Override
+            public CharSequence next() {
+                CharSequence current = next;
+                if (current != null) {
+                    next = doNext();
+                }
+                return current;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("Not supported.");
+            }
+        };
+    }
+
+    /**
      * Reads lines of a template grouping them by typed blocks.
      * @param prefix the directive prefix
      * @param source the source reader
      * @return the list of blocks
      */
     protected List<Block> readTemplate(final String prefix, Reader source) {
-        try {
-            int prefixLen;
-            List<Block> blocks = new ArrayList<Block>();
-            BufferedReader reader;
-            if (source instanceof BufferedReader) {
-                reader = (BufferedReader) source;
-            } else {
-                reader = new BufferedReader(source);
-            }
-            StringBuilder strb = new StringBuilder();
-            BlockType type = null;
-            while (true) {
-                CharSequence line = reader.readLine();
-                if (line == null) {
-                    // at end
-                    Block block = new Block(type, strb.toString());
-                    blocks.add(block);
-                    break;
-                } else if (type == null) {
-                    // determine starting type if not known yet
-                    prefixLen = startsWith(line, prefix);
-                    if (prefixLen >= 0) {
-                        type = BlockType.DIRECTIVE;
-                        strb.append(line.subSequence(prefixLen, line.length()));
-                    } else {
-                        type = BlockType.VERBATIM;
-                        strb.append(line.subSequence(0, line.length()));
-                        strb.append('\n');
-                    }
-                } else if (type == BlockType.DIRECTIVE) {
-                    // switch to verbatim if necessary
-                    prefixLen = startsWith(line, prefix);
-                    if (prefixLen < 0) {
-                        Block code = new Block(BlockType.DIRECTIVE, strb.toString());
-                        strb.delete(0, Integer.MAX_VALUE);
-                        blocks.add(code);
-                        type = BlockType.VERBATIM;
-                        strb.append(line.subSequence(0, line.length()));
-                    } else {
-                        strb.append(line.subSequence(prefixLen, line.length()));
-                    }
-                } else if (type == BlockType.VERBATIM) {
-                    // switch to code if necessary(
-                    prefixLen = startsWith(line, prefix);
-                    if (prefixLen >= 0) {
-                        strb.append('\n');
-                        Block verbatim = new Block(BlockType.VERBATIM, strb.toString());
-                        strb.delete(0, Integer.MAX_VALUE);
-                        blocks.add(verbatim);
-                        type = BlockType.DIRECTIVE;
-                        strb.append(line.subSequence(prefixLen, line.length()));
-                    } else {
-                        strb.append(line.subSequence(0, line.length()));
-                    }
+        final ArrayList<Block> blocks = new ArrayList<Block>();
+        final BufferedReader reader;
+        if (source instanceof BufferedReader) {
+            reader = (BufferedReader) source;
+        } else {
+            reader = new BufferedReader(source);
+        }
+        final StringBuilder strb = new StringBuilder();
+        BlockType type = null;
+        int prefixLen;
+        Iterator<CharSequence> lines = readLines(reader);
+        while (lines.hasNext()) {
+            CharSequence line = lines.next();
+            if (line == null) {
+                break;
+            } else if (type == null) {
+                // determine starting type if not known yet
+                prefixLen = startsWith(line, prefix);
+                if (prefixLen >= 0) {
+                    type = BlockType.DIRECTIVE;
+                    strb.append(line.subSequence(prefixLen, line.length()));
+                } else {
+                    type = BlockType.VERBATIM;
+                    strb.append(line.subSequence(0, line.length()));
+                }
+            } else if (type == BlockType.DIRECTIVE) {
+                // switch to verbatim if necessary
+                prefixLen = startsWith(line, prefix);
+                if (prefixLen < 0) {
+                    Block directive = new Block(BlockType.DIRECTIVE, strb.toString());
+                    strb.delete(0, Integer.MAX_VALUE);
+                    blocks.add(directive);
+                    type = BlockType.VERBATIM;
+                    strb.append(line.subSequence(0, line.length()));
+                } else {
+                    // still a directive
+                    strb.append(line.subSequence(prefixLen, line.length()));
+                }
+            } else if (type == BlockType.VERBATIM) {
+                // switch to directive if necessary
+                prefixLen = startsWith(line, prefix);
+                if (prefixLen >= 0) {
+                    Block verbatim = new Block(BlockType.VERBATIM, strb.toString());
+                    strb.delete(0, Integer.MAX_VALUE);
+                    blocks.add(verbatim);
+                    type = BlockType.DIRECTIVE;
+                    strb.append(line.subSequence(prefixLen, line.length()));
+                } else {
+                    strb.append(line.subSequence(0, line.length()));
                 }
             }
-            return blocks;
-        } catch (IOException xio) {
-            return null;
         }
+        // input may be null
+        if (type != null && strb.length() > 0) {
+            Block block = new Block(type, strb.toString());
+            blocks.add(block);
+        }
+        blocks.trimToSize();
+        return blocks;
     }
 
     @Override

@@ -27,7 +27,7 @@ public class ASTVar extends ASTIdentifier {
     public ASTVar(Parser p, int id) {
         super(p, id);
     }
-    
+
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);

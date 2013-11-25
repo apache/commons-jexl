@@ -30,6 +30,26 @@ public class JexlInfo {
     protected final String name;
 
     /**
+     * @return the detailed information in case of an error
+     */
+    public Detail getDetail() {
+        return null;
+    }
+
+    /**
+     * Describes errors more precicely.
+     */
+    public static interface Detail {
+        /** The start column on the line that triggered the error. */
+        int start();
+        /** The end column on the line that triggered the error. */
+        int end();
+        /** The actual part of code that triggered the error. */
+        @Override
+        String toString();
+    }
+
+    /**
      * Create info.
      * @param source source name
      * @param l line number
@@ -39,6 +59,12 @@ public class JexlInfo {
         name = source;
         line = l;
         column = c;
+    }
+
+    protected JexlInfo(JexlInfo copy) {
+        name = copy.getName();
+        line = copy.getLine();
+        column = copy.getColumn();
     }
 
     /**
@@ -55,6 +81,16 @@ public class JexlInfo {
                 sb.append(":");
                 sb.append(column);
             }
+        }
+        JexlInfo.Detail dbg = getDetail();
+        if (dbg!= null) {
+            sb.append("![");
+            sb.append(dbg.start());
+            sb.append(",");
+            sb.append(dbg.end());
+            sb.append("]: '");
+            sb.append(dbg.toString());
+            sb.append("'");
         }
         return sb.toString();
     }

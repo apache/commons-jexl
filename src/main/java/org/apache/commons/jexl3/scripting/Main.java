@@ -32,16 +32,16 @@ public class Main {
 
     /**
      * Test application for JexlScriptEngine (JSR-223 implementation).
-     * 
+     *
      * If a single argument is present, it is treated as a filename of a JEXL
      * script to be evaluated. Any exceptions terminate the application.
-     * 
+     *
      * Otherwise, lines are read from standard input and evaluated.
      * ScriptExceptions are logged, and do not cause the application to exit.
      * This is done so that interactive testing is easier.
-     * 
+     *
      * @param args (optional) filename to evaluate. Stored in the args variable.
-     * 
+     *
      * @throws Exception if parsing or IO fail
      */
     public static void main(String[] args) throws Exception {

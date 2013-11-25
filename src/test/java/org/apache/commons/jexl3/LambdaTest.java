@@ -38,16 +38,15 @@ public class LambdaTest extends JexlTestCase {
     public void testScriptContext() throws Exception {
         JexlEngine jexl = new Engine();
         JexlScript s = jexl.createScript("function(x) { x + x }");
-        JexlScript fs = (JexlScript) s.execute(null);
-        String fsstr = fs.toString();
+        String fsstr = s.getParsedText();
         assertEquals("(x)->{ x + x; }", fsstr);
-        assertEquals(42, fs.execute(null, 21));
+        assertEquals(42, s.execute(null, 21));
         JexlScript s42 = jexl.createScript("s(21)");
         JexlEvalContext ctxt = new JexlEvalContext();
-        ctxt.set("s", fs);
+        ctxt.set("s", s);
         Object result = s42.execute(ctxt);
         assertEquals(42, result);
-        result = s42.evaluate(ctxt);
+        result = s42.execute(ctxt);
         assertEquals(42, result);
     }
 

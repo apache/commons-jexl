@@ -42,7 +42,7 @@ public final class IndexedType implements JexlPropertyGet {
      * The code attempts to find the list of methods getXXX() and setXXX().
      * Note that this is not equivalent to the strict bean definition of indexed properties; the type of the key
      * is not necessarily an int and the set/get arrays are not resolved.
-     * 
+     *
      * @param is the introspector
      * @param object the object
      * @param name the container name
@@ -61,7 +61,7 @@ public final class IndexedType implements JexlPropertyGet {
         }
         return null;
     }
-    
+
     /**
      * A generic indexed property container, exposes get(key) and set(key, value) and solves method call dynamically
      * based on arguments.
@@ -104,7 +104,7 @@ public final class IndexedType implements JexlPropertyGet {
             return type.invokeSet(object, key, value);
         }
     }
-    
+
     /**
      * Creates a new indexed type.
      * @param name the container name
@@ -193,5 +193,5 @@ public final class IndexedType implements JexlPropertyGet {
         }
         throw new IntrospectionException("property set error: " + object.getClass().toString() + "@" + key.toString());
     }
-    
+
 }

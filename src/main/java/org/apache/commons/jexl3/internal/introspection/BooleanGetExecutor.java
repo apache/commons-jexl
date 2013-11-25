@@ -24,11 +24,11 @@ import java.lang.reflect.InvocationTargetException;
 public final class BooleanGetExecutor extends AbstractExecutor.Get {
     /** The property. */
     private final String property;
-    
+
     /**
      * Discovers a BooleanGetExecutor.
      * <p>The method to be found should be named "is{P,p}property and return a boolean.</p>
-     * 
+     *
      * @param is the introspector
      * @param clazz the class to find the get method from
      * @param property the the property name
@@ -42,7 +42,7 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
             return null;
         }
     }
-    
+
     /**
      * Creates an instance by attempting discovery of the get method.
      * @param clazz the class to introspect
@@ -63,7 +63,7 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
     public Object invoke(Object obj) throws IllegalAccessException, InvocationTargetException {
         return method == null ? null : method.invoke(obj, (Object[]) null);
     }
-    
+
     @Override
     public Object tryInvoke(Object obj, Object key) {
         if (obj != null && method !=  null

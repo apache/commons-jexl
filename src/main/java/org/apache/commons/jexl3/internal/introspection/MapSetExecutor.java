@@ -31,7 +31,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
 
     /**
      * Attempts to discover a MapSetExecutor.
-     * 
+     *
      * @param is the introspector
      * @param clazz the class to find the set method from
      * @param identifier the key to use as an argument to the get method
@@ -45,7 +45,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
             return null;
         }
     }
-    
+
     /**
      * Creates an instance.
      * @param clazz the class the set method applies to
@@ -61,7 +61,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     public Object getTargetProperty() {
         return property;
     }
-    
+
     @Override
     public Object invoke(final Object obj, Object value) throws IllegalAccessException, InvocationTargetException {
         @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method

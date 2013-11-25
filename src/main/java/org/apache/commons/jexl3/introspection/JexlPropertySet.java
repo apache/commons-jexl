@@ -28,7 +28,7 @@ package org.apache.commons.jexl3.introspection;
 public interface JexlPropertySet {
     /**
      * Method used to set the property value of an object.
-     * 
+     *
      * @param obj Object on which the property setter will be called with the value
      * @param arg value to be set
      * @return the value returned from the set operation (impl specific)
@@ -53,11 +53,11 @@ public interface JexlPropertySet {
      * @return true if tryInvoke failed, false otherwise
      */
     boolean tryFailed(Object rval);
-    
+
     /**
      * Specifies if this JexlPropertySet is cacheable and able to be reused for
      * this class of object it was returned for.
-     * 
+     *
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();

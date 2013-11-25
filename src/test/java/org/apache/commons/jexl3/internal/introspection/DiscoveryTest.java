@@ -29,7 +29,7 @@ import java.util.Map;
 
 /**
  * Tests for checking introspection discovery.
- * 
+ *
  * @since 2.0
  */
 public class DiscoveryTest extends JexlTestCase {

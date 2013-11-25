@@ -33,7 +33,7 @@ public class EnumerationIterator<T> implements Iterator<T> {
     private final Enumeration<T> enumeration;
 
     /**
-     * Creates a new iteratorwrapper instance for the specified 
+     * Creates a new iteratorwrapper instance for the specified
      * Enumeration.
      *
      * @param enumer  The Enumeration to wrap.
@@ -46,7 +46,7 @@ public class EnumerationIterator<T> implements Iterator<T> {
     public T next() {
         return enumeration.nextElement();
     }
-    
+
     @Override
     public boolean hasNext() {
         return enumeration.hasMoreElements();

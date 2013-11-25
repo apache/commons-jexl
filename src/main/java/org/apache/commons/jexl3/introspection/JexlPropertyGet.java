@@ -28,7 +28,7 @@ package org.apache.commons.jexl3.introspection;
 public interface JexlPropertyGet {
     /**
      * Method used to get the property value of an object.
-     * 
+     *
      * @param obj the object to get the property value from.
      * @return the property value.
      * @throws Exception on any error.

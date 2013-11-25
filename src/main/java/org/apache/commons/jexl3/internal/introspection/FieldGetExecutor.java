@@ -31,7 +31,7 @@ public final class FieldGetExecutor implements JexlPropertyGet {
 
     /**
      * Attempts to discover a FieldGetExecutor.
-     * 
+     *
      * @param is the introspector
      * @param clazz the class to find the get method from
      * @param identifier the key to use as an argument to the get method
@@ -80,5 +80,5 @@ public final class FieldGetExecutor implements JexlPropertyGet {
     public boolean isCacheable() {
         return true;
     }
-    
+
 }

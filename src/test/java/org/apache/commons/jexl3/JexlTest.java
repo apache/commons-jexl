@@ -649,7 +649,7 @@ public class JexlTest extends JexlTestCase {
         Foo foo = new Foo();
         jc.set("foo", foo);
         Parser parser = new Parser(new StringReader(";"));
-        parser.parse(null, "aString = 'World';", null, false);
+        parser.parse(null, "aString = 'World';", null, false, false);
 
         assertExpression(jc, "hello = 'world'", "world");
         assertEquals("hello variable not changed", "world", jc.get("hello"));
@@ -677,7 +677,7 @@ public class JexlTest extends JexlTestCase {
 
     public void testUnicodeSupport() throws Exception {
         JexlContext jc = new MapContext();
-        assertExpression(jc, "'x' == 'UÅ?ytkownik'", Boolean.FALSE);
+        assertExpression(jc, "'x' == '\\u0032?ytkownik'", Boolean.FALSE);
         assertExpression(jc, "'c:\\some\\windows\\path'", "c:\\some\\windows\\path");
         assertExpression(jc, "'foo\\u0020bar'", "foo\u0020bar");
         assertExpression(jc, "'foo\\u0020\\u0020bar'", "foo\u0020\u0020bar");

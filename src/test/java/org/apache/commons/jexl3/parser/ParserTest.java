@@ -37,20 +37,20 @@ public class ParserTest extends TestCase {
         Parser parser = new Parser(new StringReader(";"));
 
         JexlNode sn;
-        sn = parser.parse(null, "foo = 1;", null, false);
+        sn = parser.parse(null, "foo = 1;", null, false, false);
         assertNotNull("parsed node is null", sn);
 
-        sn = parser.parse(null, "foo = \"bar\";", null, false);
+        sn = parser.parse(null, "foo = \"bar\";", null, false, false);
         assertNotNull("parsed node is null", sn);
 
-        sn = parser.parse(null, "foo = 'bar';", null, false);
+        sn = parser.parse(null, "foo = 'bar';", null, false, false);
         assertNotNull("parsed node is null", sn);
     }
 
     public void testErrorAssign() throws Exception {
         Parser parser = new Parser(new StringReader(";"));
         try {
-            JexlNode sn = parser.parse(null, "foo() = 1;", null, false);
+            JexlNode sn = parser.parse(null, "foo() = 1;", null, false, false);
             fail("should have failed on invalid assignment");
         } catch (JexlException.Parsing xparse) {
             // ok
@@ -60,7 +60,7 @@ public class ParserTest extends TestCase {
     public void testErrorAmbiguous() throws Exception {
         Parser parser = new Parser(new StringReader(";"));
         try {
-            JexlNode sn = parser.parse(null, "x = 1 y = 5", null, false);
+            JexlNode sn = parser.parse(null, "x = 1 y = 5", null, false, false);
             fail("should have failed on ambiguous statement");
         } catch (JexlException.Ambiguous xambiguous) {
             // ok

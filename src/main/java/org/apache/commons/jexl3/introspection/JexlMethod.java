@@ -23,7 +23,7 @@ package org.apache.commons.jexl3.introspection;
  * <code>
  * ${foo.bar()}
  * </code>
- * 
+ *
  * @since 1.0
  */
 public interface JexlMethod {
@@ -51,7 +51,8 @@ public interface JexlMethod {
     Object tryInvoke(String name, Object obj, Object[] params);
 
     /**
-     * Checks whether a tryInvoke failed or not.
+     * Checks whether a tryInvoke return value indicates a failure or not.
+     * <p>Usage is : <code>Object r = tryInvoke(...); if (tryFailed(r) {...} else {...}</code>
      * @param rval the value returned by tryInvoke
      * @return true if tryInvoke failed, false otherwise
      */
@@ -60,7 +61,7 @@ public interface JexlMethod {
     /**
      * Specifies if this JexlMethod is cacheable and able to be reused for this
      * class of object it was returned for.
-     * 
+     *
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();

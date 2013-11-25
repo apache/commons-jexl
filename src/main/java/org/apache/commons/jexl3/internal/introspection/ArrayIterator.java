@@ -71,12 +71,12 @@ public class ArrayIterator implements Iterator<Object> {
     public Object next() {
         if (pos < size) {
             return Array.get(array, pos++);
-        }    
+        }
         // we screwed up...
         throw new NoSuchElementException("No more elements: " + pos
                                          + " / " + size);
     }
-    
+
     /**
      * Check to see if there is another element in the array.
      *

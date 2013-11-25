@@ -17,17 +17,41 @@
 package org.apache.commons.jexl3.internal;
 
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import org.apache.commons.jexl3.JexlArithmetic;
+import org.apache.commons.jexl3.internal.introspection.MethodKey;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Helper class to create typed arrays.
  */
 public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
+    /** The boxing types to primitive conversion map. */
+    private static final int PRIMITIVE_SIZE = 8;
+    private static final Map<Class<?>, Class<?>> BOXING_CLASSES;
+    static {
+        BOXING_CLASSES = new HashMap<Class<?>, Class<?>>(PRIMITIVE_SIZE);
+        BOXING_CLASSES.put(Boolean.class, Boolean.TYPE);
+        BOXING_CLASSES.put(Byte.class, Byte.TYPE);
+        BOXING_CLASSES.put(Character.class, Character.TYPE);
+        BOXING_CLASSES.put(Double.class, Double.TYPE);
+        BOXING_CLASSES.put(Float.class, Float.TYPE);
+        BOXING_CLASSES.put(Integer.class, Integer.TYPE);
+        BOXING_CLASSES.put(Long.class, Long.TYPE);
+        BOXING_CLASSES.put(Short.class, Short.TYPE);
+    }
+
+    private static Class<?> unboxingClass(Class<?> parm) {
+        Class<?> prim = BOXING_CLASSES.get(parm);
+        return prim == null ? parm : prim;
+    }
+
     /** The intended class array. */
     private Class<?> commonClass = null;
     /** Whether the array stores numbers. */
     private boolean isNumber = true;
+    /** Whether we can try unboxing. */
+    private boolean unboxing = true;
     /** The untyped list of items being added. */
     private final Object[] untyped;
     /** Number of added items. */
@@ -47,6 +71,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
         if (!Object.class.equals(commonClass)) {
             if (value == null) {
                 isNumber = false;
+                unboxing = false;
             } else {
                 Class<?> eclass = value.getClass();
                 // base common class on first non-null entry
@@ -83,13 +108,8 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
             // convert untyped array to the common class if not Object.class
             if (commonClass != null && !Object.class.equals(commonClass)) {
                 // if the commonClass is a number, it has an equivalent primitive type, get it
-                if (isNumber) {
-                    try {
-                        final Field type = commonClass.getField("TYPE");
-                        commonClass = (Class<?>) type.get(null);
-                    } catch (Exception xany) {
-                        // ignore
-                    }
+                if (unboxing) {
+                    commonClass = unboxingClass(commonClass);
                 }
                 // allocate and fill up the typed array
                 Object typed = Array.newInstance(commonClass, size);

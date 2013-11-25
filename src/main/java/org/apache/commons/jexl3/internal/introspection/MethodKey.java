@@ -49,7 +49,6 @@ public final class MethodKey {
     private static final int PRIMITIVE_SIZE = 13;
     /** The primitive type to class conversion map. */
     private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES;
-
     static {
         PRIMITIVE_TYPES = new HashMap<Class<?>, Class<?>>(PRIMITIVE_SIZE);
         PRIMITIVE_TYPES.put(Boolean.TYPE, Boolean.class);
@@ -78,7 +77,6 @@ public final class MethodKey {
         Class<?> prim = PRIMITIVE_TYPES.get(parm);
         return prim == null ? parm : prim;
     }
-
     /** The hash code. */
     private final int hashCode;
     /** The method name. */
@@ -93,7 +91,7 @@ public final class MethodKey {
     /**
      * Creates a key from a method name and a set of arguments.
      * @param aMethod the method to generate the key from
-     * @param args the intended method arguments
+     * @param args    the intended method arguments
      */
     public MethodKey(String aMethod, Object[] args) {
         super();
@@ -136,7 +134,7 @@ public final class MethodKey {
     /**
      * Creates a key from a method name and a set of parameters.
      * @param aMethod the method to generate the key from
-     * @param args the intended method parameters
+     * @param args    the intended method parameters
      */
     MethodKey(String aMethod, Class<?>[] args) {
         super();
@@ -257,9 +255,7 @@ public final class MethodKey {
      *         type or an object type of a primitive type that can be converted to
      *         the formal type.
      */
-    public static boolean isInvocationConvertible(Class<?> formal,
-            Class<?> actual,
-            boolean possibleVarArg) {
+    public static boolean isInvocationConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
         /* if it's a null, it means the arg was null */
         if (actual == null && !formal.isPrimitive()) {
             return true;
@@ -267,6 +263,11 @@ public final class MethodKey {
 
         /* Check for identity or widening reference conversion */
         if (actual != null && formal.isAssignableFrom(actual)) {
+            return true;
+        }
+
+        /** Catch all... */
+        if (formal == Object.class) {
             return true;
         }
 
@@ -315,8 +316,7 @@ public final class MethodKey {
             if (actual != null && actual.isArray()) {
                 actual = actual.getComponentType();
             }
-            return isInvocationConvertible(formal.getComponentType(),
-                    actual, false);
+            return isInvocationConvertible(formal.getComponentType(), actual, false);
         }
         return false;
     }
@@ -337,16 +337,14 @@ public final class MethodKey {
      *         or formal and actual are both primitive types and actual can be
      *         subject to widening conversion to formal.
      */
-    public static boolean isStrictInvocationConvertible(Class<?> formal,
-            Class<?> actual,
-            boolean possibleVarArg) {
+    public static boolean isStrictInvocationConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
         /* we shouldn't get a null into, but if so */
         if (actual == null && !formal.isPrimitive()) {
             return true;
         }
 
         /* Check for identity or widening reference conversion */
-        if (formal.isAssignableFrom(actual)) {
+        if (formal.isAssignableFrom(actual) && (formal.isArray() == actual.isArray())) {
             return true;
         }
 
@@ -382,8 +380,7 @@ public final class MethodKey {
             if (actual != null && actual.isArray()) {
                 actual = actual.getComponentType();
             }
-            return isStrictInvocationConvertible(formal.getComponentType(),
-                    actual, false);
+            return isStrictInvocationConvertible(formal.getComponentType(), actual, false);
         }
         return false;
     }
@@ -402,7 +399,7 @@ public final class MethodKey {
 
     /**
      * Simple distinguishable exception, used when
-     * we run across ambiguous overloading.  Caught
+     * we run across ambiguous overloading. Caught
      * by the introspector.
      */
     public static class AmbiguousException extends RuntimeException {
@@ -423,6 +420,8 @@ public final class MethodKey {
          * @return the parameters
          */
         protected abstract Class<?>[] getParameterTypes(T app);
+
+        protected abstract boolean isVarArgs(T app);
 
         // CSOFF: RedundantThrows
         /**
@@ -580,7 +579,7 @@ public final class MethodKey {
         /**
          * Checks whether a parameter class is a primitive.
          * @param c the parameter class
-         * @param possibleVararg true if this is the last parameter which can tbe be a primitive array (vararg call)
+         * @param possibleVararg true if this is the last parameter which can be a primitive array (vararg call)
          * @return true if primitive, false otherwise
          */
         private boolean isPrimitive(Class<?> c,  boolean possibleVarArg) {
@@ -610,7 +609,6 @@ public final class MethodKey {
                 if (isApplicable(method, classes)) {
                     list.add(method);
                 }
-
             }
             return list;
         }
@@ -623,48 +621,62 @@ public final class MethodKey {
          * @param classes arguments to method
          * @return true if method is applicable to arguments
          */
-        private boolean isApplicable(T method, Class<?>[] classes) {
-            Class<?>[] methodArgs = getParameterTypes(method);
-            // if samee number or args or
+        private boolean isApplicable(T method, Class<?>[] actuals) {
+            Class<?>[] formals = getParameterTypes(method);
+            // if same number or args or
             // there's just one more methodArg than class arg
             // and the last methodArg is an array, then treat it as a vararg
-            if (methodArgs.length == classes.length
-                || ((methodArgs.length == classes.length + 1) && methodArgs[methodArgs.length - 1].isArray())) {
+            if (formals.length == actuals.length) {
                 // this will properly match when the last methodArg
                 // is an array/varargs and the last class is the type of array
                 // (e.g. String when the method is expecting String...)
-                for (int i = 0; i < classes.length; ++i) {
-                    if (!isConvertible(methodArgs[i], classes[i], false)) {
+                for (int i = 0; i < actuals.length; ++i) {
+                    if (!isConvertible(formals[i], actuals[i], false)) {
                         // if we're on the last arg and the method expects an array
-                        if (i == classes.length - 1 && methodArgs[i].isArray()) {
+                        if (i == actuals.length - 1 && formals[i].isArray()) {
                             // check to see if the last arg is convertible
                             // to the array's component type
-                            return isConvertible(methodArgs[i], classes[i], true);
+                            return isConvertible(formals[i], actuals[i], true);
                         }
                         return false;
                     }
                 }
                 return true;
             }
-            // more arguments given than the method accepts; check for varargs
-            if (methodArgs.length > 0 && classes.length > 0) {
-                // check that the last methodArg is an array
-                Class<?> lastarg = methodArgs[methodArgs.length - 1];
-                if (!lastarg.isArray()) {
+
+            // number of formal and actual differ, method must be vararg
+            if (!isVarArgs(method)) {
+                return false;
+            }
+
+            // less arguments than method parameters: vararg is null
+            if (formals.length > actuals.length) {
+                // only one parameter, the last (ie vararg) can be missing
+                if (formals.length - actuals.length > 1) {
                     return false;
                 }
-
-                // check that they all match up to the last method arg
-                for (int i = 0; i < methodArgs.length - 1; ++i) {
-                    if (!isConvertible(methodArgs[i], classes[i], false)) {
+                // check that all present args match up to the method parms
+                for (int i = 0; i < actuals.length; ++i) {
+                    if (!isConvertible(formals[i], actuals[i], false)) {
                         return false;
                     }
                 }
+                return true;
+            }
 
+            // more arguments given than the method accepts; check for varargs
+            if (formals.length > 0 && actuals.length > 0) {
+                // check that they all match up to the last method arg
+                for (int i = 0; i < formals.length - 1; ++i) {
+                    if (!isConvertible(formals[i], actuals[i], false)) {
+                        return false;
+                    }
+                }
                 // check that all remaining arguments are convertible to the vararg type
-                Class<?> vararg = lastarg.getComponentType();
-                for (int i = methodArgs.length - 1; i < classes.length; ++i) {
-                    if (!isConvertible(vararg, classes[i], false)) {
+                // (last parm is an array since method is vararg)
+                Class<?> vararg = formals[formals.length - 1].getComponentType();
+                for (int i = formals.length - 1; i < actuals.length; ++i) {
+                    if (!isConvertible(vararg, actuals[i], false)) {
                         return false;
                     }
                 }
@@ -697,7 +709,8 @@ public final class MethodKey {
          *                       in the method declaration
          * @return see isStrictMethodInvocationConvertible.
          */
-        private boolean isStrictConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
+        private boolean isStrictConvertible(Class<?> formal, Class<?> actual,
+                boolean possibleVarArg) {
             // if we see Void.class, the argument was null
             return isStrictInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
         }
@@ -710,6 +723,10 @@ public final class MethodKey {
         protected Class<?>[] getParameterTypes(Method app) {
             return app.getParameterTypes();
         }
+        @Override
+        public boolean isVarArgs(Method app) {
+            return app.isVarArgs();
+        }
     };
     /**
      * The parameter matching service for constructors.
@@ -718,6 +735,10 @@ public final class MethodKey {
         @Override
         protected Class<?>[] getParameterTypes(Constructor<?> app) {
             return app.getParameterTypes();
+        }
+        @Override
+        public boolean isVarArgs(Constructor<?> app) {
+            return app.isVarArgs();
         }
     };
 }

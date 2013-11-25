@@ -30,7 +30,19 @@ import java.util.concurrent.Callable;
  *
  * @since 1.1
  */
-public interface JexlScript extends JexlExpression {
+public interface JexlScript {
+     /**
+     * Returns the source text of this expression.
+     * @return the source text
+     */
+    String getSourceText();
+
+    /**
+     * Recreates the source text of this expression from the internal synactic tree.
+     * @return the source text
+     */
+    String getParsedText();
+    
     /**
      * Executes the script with the variables contained in the
      * supplied {@link JexlContext}.

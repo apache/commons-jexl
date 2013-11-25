@@ -22,14 +22,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.apache.log4j.LogManager;
 
 /**
  * Tests local variables.
  */
 public class VarTest extends JexlTestCase {
-    static final Log LOGGER = LogFactory.getLog(VarTest.class.getName());
+    static final Logger LOGGER = LogManager.getLogger(VarTest.class.getName());
 
     public VarTest(String testName) {
         super(testName);
