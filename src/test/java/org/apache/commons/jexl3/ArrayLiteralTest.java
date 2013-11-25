@@ -27,7 +27,7 @@ public class ArrayLiteralTest extends JexlTestCase {
     public ArrayLiteralTest() {
         super("ArrayLiteralTest");
     }
-    
+
     public void testLiteralWithStrings() throws Exception {
         JexlExpression e = JEXL.createExpression( "[ 'foo' , 'bar' ]" );
         JexlContext jc = new MapContext();
@@ -63,7 +63,7 @@ public class ArrayLiteralTest extends JexlTestCase {
             "[ 10 , null , 10]",
             "[ '10' , null ]",
             "[ null, '10' , null ]"
-        }; 
+        };
         Object [][]checks = {
             {null, new Integer(10)},
             {new Integer(10), null},

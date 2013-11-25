@@ -71,10 +71,10 @@ public class ArrayTest extends TestCase {
         example(Output.JUNIT);
     }
 
-    /** 
+    /**
      * Command line entry point.
      * @param args command line arguments
-     * @throws Exception cos jexl does. 
+     * @throws Exception cos jexl does.
      */
     public static void main(String[] args) throws Exception {
         example(Output.SYSTEM);

@@ -16,8 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.apache.log4j.LogManager;
 
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -34,7 +34,7 @@ import java.util.Set;
 public class JXLTTest extends JexlTestCase {
     private static final JexlEngine ENGINE = new JexlBuilder().silent(false).cache(128).strict(true).create();
     private static final JxltEngine JXLT = ENGINE.createJxltEngine();
-    private static final Log LOG = LogFactory.getLog(JxltEngine.class);
+    private static final Logger LOG = LogManager.getLogger(JxltEngine.class);
     private MapContext vars = new MapContext();
     private JexlEvalContext context = null;
 
@@ -94,12 +94,14 @@ public class JXLTTest extends JexlTestCase {
     }
 
     public void testStatement() throws Exception {
-        context.set("froboz", new Froboz(123));
-        JxltEngine.Expression check = JXLT.createExpression("${froboz.value = 32; froboz.plus10(); froboz.value}");
+        Froboz froboz = new Froboz(32);
+        context.set("froboz", froboz);
+        JxltEngine.Expression check = JXLT.createExpression("${ froboz.plus10() }");
         Object o = check.evaluate(context);
-        assertEquals("Result is not 42", new Integer(42), o);
+        assertEquals("Result is not 32", new Integer(32), o);
+        assertEquals("Result is not 42", 42, froboz.getValue());
         Set<List<String>> evars = check.getVariables();
-        assertEquals(2, evars.size());
+        assertEquals(1, evars.size());
     }
 
     public void testAssign() throws Exception {
@@ -269,6 +271,21 @@ public class JXLTTest extends JexlTestCase {
         }
     }
 
+    public void testMalformedNested2() throws Exception {
+        try {
+            JxltEngine.Expression expr = JXLT.createExpression("#{${hi} world}");
+            JexlContext ctxt = new MapContext();
+            ctxt.set("hi", "hello");
+            expr.evaluate(ctxt);
+            fail("should be malformed");
+        } catch (JxltEngine.Exception xjexl) {
+            // expected
+            String xmsg = xjexl.getMessage();
+            LOG.warn(xmsg);
+        }
+    }
+
+
     public void testBadContextNested() throws Exception {
         try {
             JxltEngine.Expression expr = JXLT.createExpression("#{${hi}+'.world'}");
@@ -353,6 +370,8 @@ public class JXLTTest extends JexlTestCase {
         JxltEngine.Template tl10n = JXLT.createTemplate(source, "list");
         String dstr = tl10n.asString();
         assertNotNull(dstr);
+        Set<List<String>> vars = tl10n.getVariables();
+        assertFalse(vars.isEmpty());
         context.set("l10n", "valeur");
         JxltEngine.Template tpFR = tl10n.prepare(context);
         context.set("l10n", "value");
@@ -439,7 +458,44 @@ public class JXLTTest extends JexlTestCase {
         StringWriter strw = new StringWriter();
         t.evaluate(context, strw);
         String output = strw.toString();
-        String ctl = "<report>\n\n\n        11</report>";
+        String ctl = "<report>\n\n\n        11\n</report>\n";
         assertEquals(ctl, output);
     }
+
+
+    public void testOneLiner() throws Exception {
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader("fourty-two"));
+        StringWriter strw = new StringWriter();
+        t.evaluate(context, strw);
+        String output = strw.toString();
+        assertEquals("fourty-two", output);
+    }
+
+    public void testOneLinerVar() throws Exception {
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader("fourty-${x}"));
+        StringWriter strw = new StringWriter();
+        context.set("x", "two");
+        t.evaluate(context, strw);
+        String output = strw.toString();
+        assertEquals("fourty-two", output);
+    }
+//
+//    public void testDeferredTemplate() throws Exception {
+//        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(
+//             "select * from \n"+
+//             "##for(var c : tables) {\n"+
+//             "#{c} \n"+
+//             "##}\n"+
+//             "where $(w}\n"
+//                ));
+//        StringWriter strw = new StringWriter();
+//        context.set("tables", new String[]{"table1", "table2"});
+//        t = t.prepare(context);
+//        vars.clear();
+//        context.set("w" ,"x=1");
+//        t.evaluate(context, strw);
+//        String output = strw.toString();
+//        assertEquals("fourty-two", output);
+//
+//    }
 }

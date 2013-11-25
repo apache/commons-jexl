@@ -52,22 +52,12 @@ abstract class AbstractExecutor {
     }
 
     /**
-     * Coerce an Object  to an Integer.
+     * Coerce an Object which must be a number to an Integer.
      * @param arg the Object to coerce
      * @return an Integer if it can be converted, null otherwise
      */
-    static Integer toInteger(Object arg) {
-        if (arg == null) {
-            return null;
-        } else if (arg instanceof Number) {
-            return Integer.valueOf(((Number) arg).intValue());
-        } else {
-            try {
-                return Integer.valueOf(arg.toString());
-            } catch (NumberFormatException xnumber) {
-                return null;
-            }
-        }
+    static Integer castInteger(Object arg) {
+        return arg instanceof Number? Integer.valueOf(((Number) arg).intValue()) : null;
     }
 
     /**
@@ -75,8 +65,8 @@ abstract class AbstractExecutor {
      * @param arg the Object to coerce
      * @return a String if it can be converted, null otherwise
      */
-    static String toString(Object arg) {
-        return arg == null ? null : arg.toString();
+    static String castString(Object arg) {
+        return arg instanceof CharSequence || arg instanceof Integer ? arg.toString() : null;
     }
 
     /**
@@ -87,7 +77,7 @@ abstract class AbstractExecutor {
     static Object[] makeArgs(Object... args) {
         return args;
     }
-    
+
     /** The class this executor applies to. */
     protected final Class<?> objectClass;
     /** Method to be executed. */

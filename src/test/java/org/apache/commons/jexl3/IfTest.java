@@ -32,10 +32,10 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testSimpleIfTrue() throws Exception {
-        JexlExpression e = JEXL.createExpression("if (true) 1");
+        JexlScript e = JEXL.createScript("if (true) 1");
         JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertEquals("Result is not 1", new Integer(1), o);
     }
 
@@ -45,10 +45,10 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testSimpleIfFalse() throws Exception {
-        JexlExpression e = JEXL.createExpression("if (false) 1");
+        JexlScript e = JEXL.createScript("if (false) 1");
         JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertNull("Return value is not empty", o);
     }
 
@@ -58,10 +58,10 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testSimpleElse() throws Exception {
-        JexlExpression e = JEXL.createExpression("if (false) 1 else 2;");
+        JexlScript e = JEXL.createScript("if (false) 1 else 2;");
         JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertEquals("Result is not 2", new Integer(2), o);
     }
 
@@ -71,10 +71,10 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testBlockIfTrue() throws Exception {
-        JexlExpression e = JEXL.createExpression("if (true) { 'hello'; }");
+        JexlScript e = JEXL.createScript("if (true) { 'hello'; }");
         JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertEquals("Result is wrong", "hello", o);
     }
 
@@ -84,10 +84,10 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testBlockElse() throws Exception {
-        JexlExpression e = JEXL.createExpression("if (false) {1} else {2 ; 3}");
+        JexlScript e = JEXL.createScript("if (false) {1} else {2 ; 3}");
         JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertEquals("Result is wrong", new Integer(3), o);
     }
 
@@ -97,11 +97,11 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testIfWithSimpleExpression() throws Exception {
-        JexlExpression e = JEXL.createExpression("if (x == 1) true;");
+        JexlScript e = JEXL.createScript("if (x == 1) true;");
         JexlContext jc = new MapContext();
         jc.set("x", new Integer(1));
 
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
@@ -111,11 +111,11 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testIfWithArithmeticExpression() throws Exception {
-        JexlExpression e = JEXL.createExpression("if ((x * 2) + 1 == 5) true;");
+        JexlScript e = JEXL.createScript("if ((x * 2) + 1 == 5) true;");
         JexlContext jc = new MapContext();
         jc.set("x", new Integer(2));
 
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
@@ -125,11 +125,11 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testIfWithDecimalArithmeticExpression() throws Exception {
-        JexlExpression e = JEXL.createExpression("if ((x * 2) == 5) true");
+        JexlScript e = JEXL.createScript("if ((x * 2) == 5) true");
         JexlContext jc = new MapContext();
         jc.set("x", new Float(2.5f));
 
-        Object o = e.evaluate(jc);
+        Object o = e.execute(jc);
         assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
@@ -139,11 +139,11 @@ public class IfTest extends JexlTestCase {
      * @throws Exception on any error
      */
     public void testIfWithAssignment() throws Exception {
-        JexlExpression e = JEXL.createExpression("if ((x * 2) == 5) {y = 1} else {y = 2;}");
+        JexlScript e = JEXL.createScript("if ((x * 2) == 5) {y = 1} else {y = 2;}");
         JexlContext jc = new MapContext();
         jc.set("x", new Float(2.5f));
 
-        e.evaluate(jc);
+        e.execute(jc);
         Object result = jc.get("y");
         assertEquals("y has the wrong value", new Integer(1), result);
     }

@@ -19,7 +19,7 @@ package org.apache.commons.jexl3.parser;
 import org.apache.commons.jexl3.internal.Scope;
 
 /**
- * Enhanced script to allow parameters declaration.
+ * Lambda (function).
  */
 public final class ASTJexlLambda extends ASTJexlScript {
     ASTJexlLambda(int id) {
@@ -28,6 +28,10 @@ public final class ASTJexlLambda extends ASTJexlScript {
 
     ASTJexlLambda(Parser p, int id) {
         super(p, id);
+    }
+
+    public boolean isTopLevel() {
+        return parent == null;
     }
 
     /**

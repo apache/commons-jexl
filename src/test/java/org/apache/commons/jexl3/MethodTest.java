@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.junit.Asserter;
+import java.util.Arrays;
 
 /**
  * Tests for calling methods on objects
@@ -35,6 +36,11 @@ public class MethodTest extends JexlTestCase {
     }
 
     public static class VarArgs {
+        public String callInts() {
+            int result = -5000;
+            return "Varargs:" + result;
+        }
+
         public String callInts(Integer... args) {
             int result = 0;
             if (args != null) {
@@ -85,28 +91,6 @@ public class MethodTest extends JexlTestCase {
         }
     }
 
-    public static class Functor {
-        public int ten() {
-            return 10;
-        }
-
-        public int plus10(int num) {
-            return num + 10;
-        }
-
-        public static int TWENTY() {
-            return 20;
-        }
-
-        public static int PLUS20(int num) {
-            return num + 20;
-        }
-
-        public static Class<?> NPEIfNull(Object x) {
-            return x.getClass();
-        }
-    }
-
     public static class EnhancedContext extends JexlEvalContext {
         int factor = 6;
         final Map<String, Object> funcs;
@@ -143,11 +127,11 @@ public class MethodTest extends JexlTestCase {
     public void testCallVarArgMethod() throws Exception {
         VarArgs test = new VarArgs();
         asserter.setVariable("test", test);
-        asserter.assertExpression("test.callInts()", "Varargs:0");
-        asserter.assertExpression("test.callInts(1)", "Varargs:1");
-        asserter.assertExpression("test.callInts(1,2,3,4,5)", "Varargs:15");
-        asserter.assertExpression("test.concat(['1', '2', '3'])", "1, 2, 3");
-        asserter.assertExpression("test.concat('1', '2', '3')", "1, 2, 3");
+        asserter.assertExpression("test.callInts()", test.callInts());
+        asserter.assertExpression("test.callInts(1)", test.callInts(1));
+        asserter.assertExpression("test.callInts(1,2,3,4,5)", test.callInts(1,2,3,4,5));
+        asserter.assertExpression("test.concat(['1', '2', '3'])", test.concat(new String[]{"1", "2", "3"}));
+        asserter.assertExpression("test.concat('1', '2', '3')", test.concat("1", "2", "3"));
 
     }
 
@@ -155,14 +139,14 @@ public class MethodTest extends JexlTestCase {
         VarArgs test = new VarArgs();
         asserter.setVariable("test", test);
         assertEquals("Mixed:1", test.callMixed(Integer.valueOf(1)));
-        asserter.assertExpression("test.callMixed(1)", "Mixed:1");
+        asserter.assertExpression("test.callMixed(1)", test.callMixed(1));
         // Java and JEXL equivalent behavior: 'Mixed:-999' expected
         //{
         assertEquals("Mixed:-999", test.callMixed(Integer.valueOf(1), (Integer[]) null));
         asserter.assertExpression("test.callMixed(1, null)", "Mixed:-999");
         //}
-        asserter.assertExpression("test.callMixed(1,2)", "Mixed:3");
-        asserter.assertExpression("test.callMixed(1,2,3,4,5)", "Mixed:15");
+        asserter.assertExpression("test.callMixed(1,2)", test.callMixed(1,2));
+        asserter.assertExpression("test.callMixed(1,2,3,4,5)", test.callMixed(1,2,3,4,5));
     }
 
     public void testCallJexlVarArgMethod() throws Exception {
@@ -175,8 +159,30 @@ public class MethodTest extends JexlTestCase {
         assertEquals("jexl:-1000", test.callMixed("jexl", (Integer[]) null));
         asserter.assertExpression("test.callMixed('jexl', null)", "jexl:-1000");
         //}
-        asserter.assertExpression("test.callMixed('jexl', 2)", "jexl:2");
-        asserter.assertExpression("test.callMixed('jexl',2,3,4,5)", "jexl:14");
+        asserter.assertExpression("test.callMixed('jexl', 2)", test.callMixed("jexl", 2));
+        asserter.assertExpression("test.callMixed('jexl',2,3,4,5)", test.callMixed("jexl",2,3,4,5));
+    }
+
+    public static class Functor {
+        public int ten() {
+            return 10;
+        }
+
+        public int plus10(int num) {
+            return num + 10;
+        }
+
+        public static int TWENTY() {
+            return 20;
+        }
+
+        public static int PLUS20(int num) {
+            return num + 20;
+        }
+
+        public static Class<?> NPEIfNull(Object x) {
+            return x.getClass();
+        }
     }
 
     public void testInvoke() throws Exception {
@@ -300,6 +306,139 @@ public class MethodTest extends JexlTestCase {
         assertEquals("Result is not 40", new Integer(40), o);
     }
 
+    public static class Edge {
+        private Edge() {}
+
+        public int exec(int arg) {
+            return 1;
+        }
+
+        public int exec(int[] arg) {
+            return 20;
+        }
+
+        public int exec(String arg) {
+            return 2;
+        }
+
+        public int exec(String... arg) {
+            return 200;
+        }
+
+        public int exec(Object args) {
+            return 3;
+        }
+
+        public int exec(Object... args) {
+            return 4;
+        }
+
+        public int exec(Boolean x, int arg) {
+            return 1;
+        }
+
+        public int exec(Boolean x, int[] arg) {
+            return 20;
+        }
+
+        public int exec(Boolean x, String arg) {
+            return 2;
+        }
+
+        public int exec(Boolean x, Object args) {
+            return 3;
+        }
+
+        public int exec(Boolean x, Object... args) {
+            return 4;
+        }
+
+        public Class<?>[] execute(Object... args) {
+            Class<?>[] clazz = new Class<?>[args.length];
+            for(int a = 0; a < args.length; ++a) {
+                clazz[a] = args[a] != null? args[a].getClass() : Void.class;
+            }
+            return clazz;
+        }
+    }
+
+    private boolean eqExecute(Object lhs, Object rhs) {
+        if (lhs instanceof Class<?>[] && rhs instanceof Class<?>[]) {
+            Class<?>[] lhsa = (Class<?>[]) lhs;
+            Class<?>[] rhsa = (Class<?>[]) rhs;
+            return Arrays.deepEquals(lhsa, rhsa);
+        }
+        return false;
+    }
+
+
+    public void testNamespaceCallEdge() throws Exception {
+        java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
+        Edge func = new Edge();
+        funcs.put("func", func);
+
+        Object o;
+        Object c;
+        JexlExpression e;
+        JexlEvalContext jc = new EnhancedContext(funcs);
+        try {
+            for (int i = 0; i < 2; ++i) {
+                e = JEXL.createExpression("func:exec([1, 2])");
+                o = e.evaluate(jc);
+                assertEquals("exec(int[] arg): " + i, 20, o);
+
+                e = JEXL.createExpression("func:exec(1, 2)");
+                o = e.evaluate(jc);
+                assertEquals("exec(Object... args): " + i, 4, o);
+
+                e = JEXL.createExpression("func:exec([10.0, 20.0])");
+                o = e.evaluate(jc);
+                assertEquals("exec(Object args): " + i, 3, o);
+
+                e = JEXL.createExpression("func:exec('1', 2)");
+                o = e.evaluate(jc);
+                assertEquals("exec(Object... args): " + i, 4, o);
+
+                // no way to differentiate between a single arg call with an array and a vararg call with same args
+                assertEquals("exec(String... args): " + i, func.exec("1", "2"), func.exec(new String[]{"1", "2"}));
+                e = JEXL.createExpression("func:exec(['1', '2'])");
+                o = e.evaluate(jc);
+                assertEquals("exec(String... args): " + i, func.exec(new String[]{"1", "2"}), o);
+                e = JEXL.createExpression("func:exec('1', '2')");
+                o = e.evaluate(jc);
+                assertEquals("exec(String... args): " + i, func.exec("1", "2"), o);
+
+                e = JEXL.createExpression("func:exec(true, [1, 2])");
+                o = e.evaluate(jc);
+                assertEquals("exec(int[] arg): " + i, 20, o);
+
+                e = JEXL.createExpression("func:exec(true, 1, 2)");
+                o = e.evaluate(jc);
+                assertEquals("exec(Object... args): " + i, 4, o);
+
+                e = JEXL.createExpression("func:exec(true, ['1', '2'])");
+                o = e.evaluate(jc);
+                assertEquals("exec(Object args): " + i, 3, o);
+
+                e = JEXL.createExpression("func:exec(true, '1', '2')");
+                o = e.evaluate(jc);
+                assertEquals("exec(Object... args): " + i, 4, o);
+
+                e = JEXL.createExpression("func:execute(true, '1', '2')");
+                o = e.evaluate(jc);
+                c = func.execute(Boolean.TRUE, "1", "2");
+                assertTrue("execute(Object... args): " + i, eqExecute(o, c));
+
+                e = JEXL.createExpression("func:execute([true])");
+                o = e.evaluate(jc);
+                c = func.execute(new boolean[]{true});
+                assertTrue("execute(Object... args): " + i, eqExecute(o, c));
+            }
+        } catch (JexlException xjexl) {
+            fail(xjexl.toString());
+        }
+    }
+
     public static class ScriptContext extends MapContext implements JexlContext.NamespaceResolver {
         Map<String, Object> nsScript;
 
@@ -314,6 +453,20 @@ public class MethodTest extends JexlTestCase {
             }
             if ("script".equals(name)) {
                 return nsScript;
+            }
+            if ("functor".equals(name)) {
+                return new JexlContext.NamespaceFunctor() {
+                    @Override
+                    public Object createFunctor(JexlContext context) {
+                        Map<String, Object> values = new HashMap<String, Object>();
+                        if ("gin".equals(context.get("base"))) {
+                            values.put("drink", "gin fizz");
+                        } else {
+                            values.put("drink", "champaign");
+                        }
+                        return values;
+                    }
+                };
             }
             return null;
         }
@@ -388,5 +541,24 @@ public class MethodTest extends JexlTestCase {
         forty2 = JEXL.createScript("foo.'bar'.PLUS(4, 2) * foo.bar.PLUS(4, 3)");
         o = forty2.execute(context);
         assertEquals("Result is not 42", new Integer(42), o);
+    }
+
+
+    public void testFizzCall() throws Exception {
+        ScriptContext context = new ScriptContext(new HashMap<String, Object>());
+
+        JexlScript bar = JEXL.createScript("functor:get('drink')");
+        Object o;
+        o = bar.execute(context);
+        assertEquals("Wrong choice", "champaign", o);
+        context.set("base", "gin");
+        o = bar.execute(context);
+        assertEquals("Wrong choice", "gin fizz", o);
+
+        // despite being called twice, the functor is created only once.
+        context.set("base", "wine");
+        bar = JEXL.createScript("var glass = functor:get('drink'); base = 'gin'; functor:get('drink')");
+        o = bar.execute(context);
+        assertEquals("Wrong choice", "champaign", o);
     }
 }

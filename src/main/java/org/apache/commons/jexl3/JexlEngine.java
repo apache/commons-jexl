@@ -45,6 +45,35 @@ import java.nio.charset.Charset;
  */
 public abstract class JexlEngine {
     /**
+     * The thread local context.
+     */
+    protected static final java.lang.ThreadLocal<JexlContext.ThreadLocal> CONTEXT =
+            new java.lang.ThreadLocal<JexlContext.ThreadLocal>() {
+                @Override
+                protected JexlContext.ThreadLocal initialValue() {
+                    return null;
+                }
+            };
+
+    /**
+     * Accesses the current thread local context.
+     * @return the context or null
+     */
+    public static JexlContext.ThreadLocal getThreadContext() {
+        return CONTEXT.get();
+    }
+
+    /**
+     * Sets the current thread local context.
+     * <p>This should only be used carefully, for instance when re-evaluating a "stored" script that requires a
+     * given Namespace resolver. Remember to synchronize access if context is shared between threads.
+     * @param tls the thread local context to set
+     */
+    public static void setThreadContext(JexlContext.ThreadLocal tls) {
+        CONTEXT.set(tls);
+    }
+
+    /**
      * Script evaluation options.
      * <p>The JexlContext used for evaluation can implement this interface to alter behavior.</p>
      */
@@ -168,17 +197,27 @@ public abstract class JexlEngine {
      * @return a Jexl Template engine
      */
     public JxltEngine createJxltEngine() {
-        return createJxltEngine(JXLT_CACHE_SIZE, '$', '#');
+        return createJxltEngine(true);
+    }
+
+    /**
+     * Creates a new {@link JxltEngine} instance using this engine.
+     * @param noScript  whether the JxltEngine only allows Jexl expressions or scripts
+     * @return a Jexl Template engine
+     */
+    public JxltEngine createJxltEngine(boolean noScript) {
+        return createJxltEngine(noScript, JXLT_CACHE_SIZE, '$', '#');
     }
 
     /**
      * Creates a new instance of {@link JxltEngine} using this engine.
+     * @param noScript  whether the JxltEngine only allows Jexl expressions or scripts
      * @param cacheSize the number of expressions in this cache, default is 256
      * @param immediate the immediate template expression character, default is '$'
      * @param deferred  the deferred template expression character, default is '#'
      * @return a Jexl Template engine
      */
-    public abstract JxltEngine createJxltEngine(int cacheSize, char immediate, char deferred);
+    public abstract JxltEngine createJxltEngine(boolean noScript, int cacheSize, char immediate, char deferred);
 
     /**
      * Clears the expression cache.

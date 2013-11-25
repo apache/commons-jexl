@@ -16,7 +16,9 @@
  */
 package org.apache.commons.jexl3.internal;
 
+
 import org.apache.commons.jexl3.JexlExpression;
+import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.ASTAddNode;
 import org.apache.commons.jexl3.parser.ASTAndNode;
@@ -33,6 +35,7 @@ import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTDivNode;
 import org.apache.commons.jexl3.parser.ASTEQNode;
 import org.apache.commons.jexl3.parser.ASTERNode;
+import org.apache.commons.jexl3.parser.ASTEWNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
 import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
@@ -53,9 +56,9 @@ import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTModNode;
 import org.apache.commons.jexl3.parser.ASTMulNode;
 import org.apache.commons.jexl3.parser.ASTNENode;
+import org.apache.commons.jexl3.parser.ASTNEWNode;
 import org.apache.commons.jexl3.parser.ASTNRNode;
-import org.apache.commons.jexl3.parser.ASTEWNode;
-import org.apache.commons.jexl3.parser.ASTSWNode;
+import org.apache.commons.jexl3.parser.ASTNSWNode;
 import org.apache.commons.jexl3.parser.ASTNotNode;
 import org.apache.commons.jexl3.parser.ASTNullLiteral;
 import org.apache.commons.jexl3.parser.ASTNumberLiteral;
@@ -64,6 +67,7 @@ import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
+import org.apache.commons.jexl3.parser.ASTSWNode;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
 import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
@@ -77,8 +81,6 @@ import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
 import java.util.regex.Pattern;
-import org.apache.commons.jexl3.parser.ASTNEWNode;
-import org.apache.commons.jexl3.parser.ASTNSWNode;
 
 /**
  * Helps pinpoint the cause of problems in expressions that fail during evaluation.
@@ -88,7 +90,7 @@ import org.apache.commons.jexl3.parser.ASTNSWNode;
  * </p>
  * @since 2.0
  */
-public final class Debugger extends ParserVisitor {
+public final class Debugger extends ParserVisitor implements JexlInfo.Detail {
     /** The builder to compose messages. */
     private final StringBuilder builder = new StringBuilder();
     /** The cause of the issue to debug. */
@@ -187,6 +189,7 @@ public final class Debugger extends ParserVisitor {
     /**
      * @return The starting offset location of the cause in the expression
      */
+    @Override
     public int start() {
         return start;
     }
@@ -194,6 +197,7 @@ public final class Debugger extends ParserVisitor {
     /**
      * @return The end offset location of the cause in the expression
      */
+    @Override
     public int end() {
         return end;
     }

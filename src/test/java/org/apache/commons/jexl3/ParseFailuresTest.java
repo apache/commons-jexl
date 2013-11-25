@@ -16,8 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.apache.log4j.LogManager;
 
 /**
  * Tests for malformed expressions and scripts.
@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ParseFailuresTest extends JexlTestCase {
 
-    static final Log LOGGER = LogFactory.getLog(ParseFailuresTest.class.getName());
+    static final Logger LOGGER = LogManager.getLogger(ParseFailuresTest.class.getName());
     /**
      * Create the test.
      *

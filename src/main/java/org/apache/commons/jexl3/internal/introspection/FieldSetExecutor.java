@@ -32,7 +32,7 @@ public final class FieldSetExecutor implements JexlPropertySet {
 
     /**
      * Attempts to discover a FieldSetExecutor.
-     * 
+     *
      * @param is the introspector
      * @param clazz the class to find the get method from
      * @param identifier the key to use as an argument to the get method

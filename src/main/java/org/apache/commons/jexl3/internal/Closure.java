@@ -62,10 +62,11 @@ public class Closure extends Script {
 
     @Override
     public Object execute(JexlContext context, Object... args) {
+        Scope.Frame callFrame = null;
         if (frame != null) {
-            frame.assign(args);
+            callFrame = frame.assign(args);
         }
-        Interpreter interpreter = jexl.createInterpreter(context, frame);
+        Interpreter interpreter = jexl.createInterpreter(context, callFrame);
         interpreter.functors = functors;
         JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
         return interpreter.interpret(block);

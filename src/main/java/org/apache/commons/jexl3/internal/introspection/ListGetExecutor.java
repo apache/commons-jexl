@@ -35,34 +35,33 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
 
     /**
      * Attempts to discover a ListGetExecutor.
-     * 
+     *
      * @param is the introspector
      * @param clazz the class to find the get method from
-     * @param identifier the key to use as an argument to the get method
+     * @param index the index to use as an argument to the get method
      * @return the executor if found, null otherwise
      */
-    public static ListGetExecutor discover(Introspector is, Class<?> clazz, Object identifier) {
-        java.lang.reflect.Method method = null;
-        Integer index = toInteger(identifier);
+    public static ListGetExecutor discover(Introspector is, Class<?> clazz, Integer index) {
         if (index != null) {
             if (clazz.isArray()) {
-                method = ARRAY_GET;
-            } else if (List.class.isAssignableFrom(clazz)) {
-                method = LIST_GET;
+                return new ListGetExecutor(clazz, ARRAY_GET, index);
+            }
+            if (List.class.isAssignableFrom(clazz)) {
+                return new ListGetExecutor(clazz, LIST_GET, index);
             }
         }
-        return method == null ? null : new ListGetExecutor(clazz, method, index);
+        return null;
     }
 
     /**
      * Creates an instance.
      * @param clazz he class the get method applies to
      * @param method the method held by this executor
-     * @param identifier the property to get
+     * @param index the index to use as an argument to the get method
      */
-    private ListGetExecutor(Class<?> clazz, java.lang.reflect.Method method, Integer identifier) {
+    private ListGetExecutor(Class<?> clazz, java.lang.reflect.Method method, Integer index) {
         super(clazz, method);
-        property = identifier;
+        property = index;
     }
 
     @Override
@@ -80,8 +79,8 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
     }
 
     @Override
-    public Object tryInvoke(final Object obj, Object key) {
-        Integer index = toInteger(key);
+    public Object tryInvoke(final Object obj, Object identifier) {
+        Integer index = castInteger(identifier);
         if (obj != null && method != null
             && objectClass.equals(obj.getClass())
             && index != null) {

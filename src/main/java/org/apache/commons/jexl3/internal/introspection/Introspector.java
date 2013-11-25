@@ -16,7 +16,7 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -38,19 +38,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * in the form of an Object[]
  * <p/>
  * The first time the Introspector sees a class it creates a class method map
- * for the class in question. Basically the class method map is a Hastable where
- * Method objects are keyed by a concatenation of the method name and the names
- * of classes that make up the parameters.
- *
- * For example, a method with the following signature:
- *
- * public void method(String a, StringBuffer b)
- *
- * would be mapped by the key:
- *
- * "method" + "java.lang.String" + "java.lang.StringBuffer"
- *
- * This mapping is performed for all the methods in a class and stored.
+ * for the class in question.
+ * Basically the class method map is a Hashtable where Method objects are keyed by the aggregation of
+ * the method name and the array of parameters classes.
+ * This mapping is performed for all the public methods of a class and stored.
  * @since 1.0
  */
 public final class Introspector {
@@ -70,7 +61,7 @@ public final class Introspector {
     /**
      * the logger.
      */
-    protected final Log rlog;
+    protected final Logger rlog;
     /**
      * The class loader used to solve constructors if needed.
      */
@@ -97,7 +88,7 @@ public final class Introspector {
      * @param log     the logger to use
      * @param cloader the class loader
      */
-    public Introspector(Log log, ClassLoader cloader) {
+    public Introspector(Logger log, ClassLoader cloader) {
         this.rlog = log;
         loader = cloader;
     }

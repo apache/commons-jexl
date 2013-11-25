@@ -38,25 +38,27 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
 
     @Override
     public String toString() {
+        if (literal == null || clazz == null || Double.isNaN(literal.doubleValue())) {
+            return "NaN";
+        }
         if (BigDecimal.class.equals(clazz)) {
               return BIGDF.format(literal);
-        } else {
-            StringBuilder strb = new StringBuilder(literal.toString());
-            if (clazz != null) {
-                if (Float.class.equals(clazz)) {
-                    strb.append('f');
-                } else if (Double.class.equals(clazz)) {
-                    strb.append('d');
-                } else if (BigDecimal.class.equals(clazz)) {
-                    strb.append('b');
-                } else if (BigInteger.class.equals(clazz)) {
-                    strb.append('h');
-                } else if (Long.class.equals(clazz)) {
-                    strb.append('l');
-                }
-            }
-            return strb.toString();
         }
+        StringBuilder strb = new StringBuilder(literal.toString());
+        if (clazz != null) {
+            if (Float.class.equals(clazz)) {
+                strb.append('f');
+            } else if (Double.class.equals(clazz)) {
+                strb.append('d');
+            } else if (BigDecimal.class.equals(clazz)) {
+                strb.append('b');
+            } else if (BigInteger.class.equals(clazz)) {
+                strb.append('h');
+            } else if (Long.class.equals(clazz)) {
+                strb.append('l');
+            }
+        }
+        return strb.toString();
     }
 
     @Override
@@ -136,7 +138,7 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
     void setReal(String s) {
         Number result;
         Class<?> rclass;
-        if ("#NaN".equals(s)) {
+        if ("#NaN".equals(s) || "NaN".equals(s)) {
             result = Double.NaN;
             rclass = Double.class;
         } else {

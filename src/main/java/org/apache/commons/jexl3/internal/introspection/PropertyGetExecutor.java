@@ -27,11 +27,11 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
     private static final Object[] EMPTY_PARAMS = {};
     /** The property. */
     private final String property;
-    
+
     /**
      * Discovers a PropertyGetExecutor.
      * <p>The method to be found should be named "get{P,p}property.</p>
-     * 
+     *
      * @param is the introspector
      * @param clazz the class to find the get method from
      * @param property the property name to find
@@ -41,7 +41,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
         java.lang.reflect.Method method = discoverGet(is, "get", clazz, property);
         return method == null? null : new PropertyGetExecutor(clazz, method, property);
     }
-    
+
     /**
      * Creates an instance.
      * @param clazz he class the get method applies to
@@ -57,7 +57,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
     public Object getTargetProperty() {
         return property;
     }
-    
+
     @Override
     public Object invoke(Object o)
         throws IllegalAccessException, InvocationTargetException {
@@ -67,7 +67,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
     @Override
     public Object tryInvoke(Object o, Object identifier) {
         if (o != null && method !=  null
-            && property.equals(toString(identifier))
+            && property.equals(castString(identifier))
             && objectClass.equals(o.getClass())) {
             try {
                 return method.invoke(o, (Object[]) null);
@@ -89,8 +89,11 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
      * @return The {get,is}{p,P}roperty method if one exists, null otherwise.
      */
     static java.lang.reflect.Method discoverGet(Introspector is, String which, Class<?> clazz, String property) {
+        if (property == null || property.isEmpty()) {
+            return null;
+        }
         //  this is gross and linear, but it keeps it straightforward.
-        java.lang.reflect.Method method = null;
+        java.lang.reflect.Method method;
         final int start = which.length(); // "get" or "is" so 3 or 2 for char case switch
         // start with get<Property>
         StringBuilder sb = new StringBuilder(which);

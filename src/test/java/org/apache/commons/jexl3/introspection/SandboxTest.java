@@ -14,13 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl3;
+package org.apache.commons.jexl3.introspection;
 
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.JexlTestCase;
+import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.annotations.NoJexl;
-import org.apache.commons.jexl3.introspection.JexlSandbox;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.LogManager;
 
 /**
  * Tests sandbox features.

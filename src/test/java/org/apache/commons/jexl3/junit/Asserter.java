@@ -23,11 +23,11 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.apache.commons.jexl3.JexlEvalContext;
-import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlScript;
 
 /**
  * A utility class for performing JUnit based assertions using Jexl
@@ -95,8 +95,8 @@ public class Asserter extends Assert {
      * fails
      */
     public void assertExpression(String expression, Object expected) throws Exception {
-        JexlExpression exp = engine.createScript(expression);
-        Object value = exp.evaluate(context);
+        JexlScript exp = engine.createScript(expression);
+        Object value = exp.execute(context);
         if (expected instanceof BigDecimal) {
             JexlArithmetic jexla = engine.getArithmetic();
             assertTrue("expression: " + expression, ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)) == 0);
@@ -122,8 +122,8 @@ public class Asserter extends Assert {
      */
     public void failExpression(String expression, String matchException) throws Exception {
         try {
-            JexlExpression exp = engine.createScript(expression);
-            exp.evaluate(context);
+            JexlScript exp = engine.createScript(expression);
+            exp.execute(context);
             fail("expression: " + expression);
         } catch (JexlException xjexl) {
             if (matchException != null && !xjexl.getMessage().matches(matchException)) {

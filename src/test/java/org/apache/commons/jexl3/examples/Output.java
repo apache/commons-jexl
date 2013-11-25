@@ -47,7 +47,7 @@ public abstract class Output {
         }
     };
 
-        
+
     /**
      * The output instance for the general outputing to System.out.
      */

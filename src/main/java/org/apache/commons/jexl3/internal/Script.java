@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.concurrent.Callable;
  * <p>A JexlScript implementation.</p>
  * @since 1.1
  */
-public class Script implements JexlScript {
+public class Script implements JexlScript, JexlExpression {
     /**
      * The engine for this expression.
      */

@@ -37,6 +37,9 @@ public class ClassCreator {
     private String sourceName = null;
     private ClassLoader loader = null;
     public static final boolean canRun = comSunToolsJavacMain();
+
+    static final String GEN_PATH = "/org/apache/commons/jexl3/generated";
+    static final String GEN_CLASS = "org.apache.commons.jexl3.generated.";
     /**
      * Check if we can invoke Sun's java compiler.
      * @return true if it is possible, false otherwise
@@ -69,17 +72,17 @@ public class ClassCreator {
         seed = s;
         className = "foo" + s;
         sourceName = className + ".java";
-        packageDir = new File(base, seed + "/org/apache/commons/jexl3/generated");
+        packageDir = new File(base, seed + GEN_PATH);
         packageDir.mkdirs();
         loader = null;
     }
 
     public String getClassName() {
-        return "org.apache.commons.jexl3.generated." + className;
+        return GEN_CLASS + className;
     }
 
     public Class<?> getClassInstance() throws Exception {
-        return getClassLoader().loadClass("org.apache.commons.jexl3.generated." + className);
+        return getClassLoader().loadClass(getClassName());
     }
 
     public ClassLoader getClassLoader() throws Exception {
@@ -128,7 +131,16 @@ public class ClassCreator {
         if (javac == null) {
             return null;
         }
-        Integer r = (Integer) jexl.invokeMethod(javac, "compile", source);
+        Integer r;
+        try {
+            r = (Integer) jexl.invokeMethod(javac, "compile", source);
+            if (r.intValue() >= 0) {
+                return getClassLoader().loadClass("org.apache.commons.jexl3.generated." + className);
+            }
+        } catch (JexlException xignore) {
+            // ignore
+        }
+        r = (Integer) jexl.invokeMethod(javac, "compile", (Object) new String[]{source});
         if (r.intValue() >= 0) {
             return getClassLoader().loadClass("org.apache.commons.jexl3.generated." + className);
         }

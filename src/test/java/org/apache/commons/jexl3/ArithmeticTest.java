@@ -352,7 +352,13 @@ public class ArithmeticTest extends JexlTestCase {
         script = jexl.createScript("#NaN");
         result = script.execute(null);
         assertTrue(Double.isNaN((Double) result));
+        script = jexl.createScript("NaN");
+        result = script.execute(null);
+        assertTrue(Double.isNaN((Double) result));
         script = jexl.createScript("double:isNaN(#NaN)");
+        result = script.execute(null);
+        assertTrue((Boolean) result);
+        script = jexl.createScript("double:isNaN(NaN)");
         result = script.execute(null);
         assertTrue((Boolean) result);
     }

@@ -38,7 +38,7 @@ public class JexlException extends RuntimeException {
     /** The debug info. */
     private final transient JexlInfo info;
     /** Maximum number of characters around exception location. */
-    private static final int MAX_EXCHARLOC = 32;
+    private static final int MAX_EXCHARLOC = 42;
 
     /**
      * Creates a new JexlException.
@@ -83,6 +83,17 @@ public class JexlException extends RuntimeException {
      * @return the information
      */
     public JexlInfo getInfo() {
+        if (info != null && mark != null) {
+            final Debugger dbg = new Debugger();
+            if (dbg.debug(mark)) {
+                return new JexlInfo(info) {
+                    @Override
+                    public JexlInfo.Detail getDetail() {
+                        return dbg;
+                    }
+                };
+            }
+        }
         return info;
     }
 
@@ -343,7 +354,7 @@ public class JexlException extends RuntimeException {
 
         @Override
         protected String detailedMessage() {
-            return "inaccessible or unknown property " + getProperty();
+            return "unsolvable property '" + getProperty() + "'";
         }
     }
 
@@ -381,7 +392,7 @@ public class JexlException extends RuntimeException {
 
         @Override
         protected String detailedMessage() {
-            return "unknown, ambiguous or inaccessible method " + getMethod();
+            return "unsolvable function/method '" + getMethod() + "'";
         }
     }
 
@@ -441,19 +452,7 @@ public class JexlException extends RuntimeException {
         if (info != null) {
             msg.append(info.toString());
         } else {
-            msg.append('?');
-        }
-        if (mark != null) {
-            Debugger dbg = new Debugger();
-            if (dbg.debug(mark)) {
-                msg.append("![");
-                msg.append(dbg.start());
-                msg.append(",");
-                msg.append(dbg.end());
-                msg.append("]: '");
-                msg.append(dbg.toString());
-                msg.append("'");
-            }
+            msg.append("?:");
         }
         msg.append(' ');
         msg.append(detailedMessage());

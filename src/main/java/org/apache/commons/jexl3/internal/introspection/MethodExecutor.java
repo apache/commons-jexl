@@ -24,9 +24,10 @@ import java.lang.reflect.InvocationTargetException;
  * @since 2.0
  */
 public final class MethodExecutor extends AbstractExecutor.Method {
-    /** Whether this method handles varargs. */
-    private final boolean isVarArgs;
-
+    /** If this method is a vararg method, vaStart is the last argument index. */
+    private final int vaStart;
+    /** If this method is a vararg method, vaClass is the component type of the vararg array. */
+    private final Class<?> vaClass;
 
     /**
      * Discovers a {@link MethodExecutor}.
@@ -66,18 +67,24 @@ public final class MethodExecutor extends AbstractExecutor.Method {
      */
     private MethodExecutor(Class<?> c, java.lang.reflect.Method m, MethodKey k) {
         super(c, m, k);
-        isVarArgs = method != null && isVarArgMethod(method);
+        int vastart = -1;
+        Class<?> vaclass = null;
+        if (method != null) {
+            Class<?>[] formal = method.getParameterTypes();
+            // if the last parameter is an array, the method is considered as vararg
+            if (formal != null && method.isVarArgs()) {
+                vastart = formal.length - 1;
+                vaclass = formal[vastart].getComponentType();
+            }
+        }
+        vaStart = vastart;
+        vaClass = vaclass;
     }
 
     @Override
     public Object invoke(Object o, Object[] args) throws IllegalAccessException, InvocationTargetException  {
-        if (isVarArgs) {
-            Class<?>[] formal = method.getParameterTypes();
-            int index = formal.length - 1;
-            Class<?> type = formal[index].getComponentType();
-            if (args.length >= index) {
-                args = handleVarArg(type, index, args);
-            }
+        if (vaClass != null) {
+            args = handleVarArg(args);
         }
         if (method.getDeclaringClass() == ArrayListWrapper.class && o.getClass().isArray()) {
             return method.invoke(new ArrayListWrapper(o), args);
@@ -111,61 +118,44 @@ public final class MethodExecutor extends AbstractExecutor.Method {
      * @param index  The index of the vararg in the method declaration
      *               (This will always be one less than the number of
      *               expected arguments.)
-     * @param actual The actual parameters being passed to this method
+     * @param actual The actual arguments being passed to this method
      * @return The actual parameters adjusted for the varargs in order
      * to fit the method declaration.
      */
-    private Object[] handleVarArg(Class<?> type, int index, Object[] actual) {
-        final int size = actual.length - index;
+    @SuppressWarnings("SuspiciousSystemArraycopy")
+    private Object[] handleVarArg(Object[] actual) {
+        final Class<?> vaclass = vaClass;
+        final int vastart = vaStart;
+        // variable arguments count
+        final int varargc = actual.length - vastart;
         // if no values are being passed into the vararg, size == 0
-        if (size == 1) {
+        if (varargc == 1) {
             // if one non-null value is being passed into the vararg,
             // and that arg is not the sole argument and not an array of the expected type,
             // make the last arg an array of the expected type
-            if (actual[index] != null) {
-                Class<?> aclazz = actual[index].getClass();
-                if (!aclazz.isArray() || !type.isAssignableFrom(aclazz.getComponentType())) {
+            if (actual[vastart] != null) {
+                Class<?> aclazz = actual[vastart].getClass();
+                if (!aclazz.isArray() || !vaclass.isAssignableFrom(aclazz.getComponentType())) {
                     // create a 1-length array to hold and replace the last argument
-                    Object lastActual = Array.newInstance(type, 1);
-                    Array.set(lastActual, 0, actual[index]);
-                    actual[index] = lastActual;
+                    Object lastActual = Array.newInstance(vaclass, 1);
+                    Array.set(lastActual, 0, actual[vastart]);
+                    actual[vastart] = lastActual;
                 }
             }
             // else, the vararg is null and used as is, considered as T[]
         } else {
             // if no or multiple values are being passed into the vararg,
             // put them in an array of the expected type
-            Object lastActual = Array.newInstance(type, size);
-            for (int i = 0; i < size; i++) {
-                Array.set(lastActual, i, actual[index + i]);
-            }
-
+            Object varargs = Array.newInstance(vaclass, varargc);
+            System.arraycopy(actual, vastart, varargs, 0, varargc);
             // put all arguments into a new actual array of the appropriate size
-            Object[] newActual = new Object[index + 1];
-            System.arraycopy(actual, 0, newActual, 0, index);
-            newActual[index] = lastActual;
-
+            Object[] newActual = new Object[vastart + 1];
+            System.arraycopy(actual, 0, newActual, 0, vastart);
+            newActual[vastart] = varargs;
             // replace the old actual array
             actual = newActual;
         }
         return actual;
-    }
-
-   /**
-     * Determines if a method can accept a variable number of arguments.
-     * @param m a the method to check
-     * @return true if method is vararg, false otherwise
-     */
-    private static boolean isVarArgMethod(java.lang.reflect.Method m) {
-        Class<?>[] formal = m.getParameterTypes();
-        if (formal == null || formal.length == 0) {
-            return false;
-        } else {
-            Class<?> last = formal[formal.length - 1];
-            // if the last arg is an array, then
-            // we consider this a varargs method
-            return last.isArray();
-        }
     }
 }
 

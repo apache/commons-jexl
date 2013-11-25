@@ -13,7 +13,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package org.apache.commons.jexl3.scripting;
@@ -94,7 +94,7 @@ public class JexlScriptEngineTest extends TestCase {
         assertEquals(engine.getContext().getErrorWriter(),engine.eval("JEXL.err"));
         assertEquals(System.class,engine.eval("JEXL.System"));
     }
-    
+
     public void testNulls() throws Exception {
         ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull("Manager should not be null", manager);

@@ -33,6 +33,20 @@ public class ASTJexlScript extends JexlNode {
         super(p, id);
     }
 
+    /**
+     * Consider script with no parameters that return lambda as parametric-scripts.
+     * @return the script
+     */
+    public ASTJexlScript script() {
+        if (scope == null && children != null && children.length == 1 && children[0] instanceof ASTJexlLambda) {
+            ASTJexlLambda lambda = (ASTJexlLambda) children[0];
+            lambda.parent = null;
+            return lambda;
+        } else {
+            return this;
+        }
+    }
+
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);

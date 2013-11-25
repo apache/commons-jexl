@@ -32,10 +32,10 @@ import java.lang.reflect.InvocationTargetException;
 public final class DuckSetExecutor extends AbstractExecutor.Set {
     /** The property. */
     private final Object property;
-    
+
     /**
      * Discovers a DuckSetExecutor.
-     * 
+     *
      * @param is the introspector
      * @param clazz the class to find the set method from
      * @param key the key to use as 1st argument to the set method
@@ -46,7 +46,7 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
         java.lang.reflect.Method method = is.getMethod(clazz, "set", makeArgs(key, value));
         return method == null? null : new DuckSetExecutor(clazz, method, key);
     }
-    
+
     /**
      * Creates an instance.
      * @param clazz the class the set method applies to

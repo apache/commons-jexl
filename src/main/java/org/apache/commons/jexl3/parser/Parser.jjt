@@ -38,7 +38,7 @@ import org.apache.commons.jexl3.internal.Scope;
 
 public final class Parser extends JexlParser
 {
-    public ASTJexlScript parse(JexlInfo info, String jexlSrc, Scope scope, boolean registers) {
+    public ASTJexlScript parse(JexlInfo info, String jexlSrc, Scope scope, boolean registers, boolean expr) {
         try {
             // If registers are allowed, the default parser state has to be REGISTERS.
             if (registers || ALLOW_REGISTERS) {
@@ -48,7 +48,7 @@ public final class Parser extends JexlParser
             source = jexlSrc;
             ReInit(new java.io.StringReader(jexlSrc));
             frame = scope;
-            ASTJexlScript script = JexlScript(scope);
+            ASTJexlScript script = expr? JexlExpression(scope) : JexlScript(scope) ;
             script.value = info;
             return script;
         } catch (TokenMgrError xtme) {
@@ -159,6 +159,10 @@ PARSER_END(Parser)
 /***************************************
  *     Identifier & String tokens
  ***************************************/
+<*> TOKEN :  /* NaN */
+{
+    < NAN_LITERAL : "NaN" >
+}
 
 <*> TOKEN : /* IDENTIFIERS */
 {
@@ -205,7 +209,19 @@ ASTJexlScript JexlScript(Scope frame) : {
 }
 {
    ( Statement() )* <EOF>
-   { return jjtThis;}
+   {
+        return jjtThis.script();
+   }
+}
+
+ASTJexlScript JexlExpression(Scope frame) #JexlScript : {
+    jjtThis.setScope(frame);
+}
+{
+   ( Expression() )? <EOF>
+   {
+        return jjtThis.script();
+   }
 }
 
 void Statement() #void : {}
@@ -452,6 +468,14 @@ void Literal() #void :
   StringLiteral()
 |
   NullLiteral()
+|
+  NaNLiteral()
+}
+
+void NaNLiteral() #NumberLiteral :
+{}
+{
+    <NAN_LITERAL> { jjtThis.setReal("NaN"); }
 }
 
 void NullLiteral() : {}
@@ -533,6 +557,15 @@ void SizeMethod() #SizeMethod() : {}
 void Arguments() #Arguments : {}
 {
      <LPAREN> (Expression() (<COMMA> Expression())* )? <RPAREN>
+}
+
+void FunctionCallLookahead() #void : {}
+{
+    LOOKAHEAD(4) <IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>
+    |
+    LOOKAHEAD(2) <IDENTIFIER> <LPAREN>
+    |
+    LOOKAHEAD(2) <REGISTER> <LPAREN>
 }
 
 void FunctionCall() #void : {}
@@ -627,7 +660,7 @@ void PrimaryExpression() #void : {}
     |
        LOOKAHEAD( <NEW> ) Constructor()
     |
-       LOOKAHEAD(2) FunctionCall()
+       LOOKAHEAD( FunctionCallLookahead() ) FunctionCall()
     |
        Identifier(true)
     |

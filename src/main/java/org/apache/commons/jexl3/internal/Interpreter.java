@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3.internal;
 
-
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -87,7 +86,7 @@ import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.Node;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
-import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -96,7 +95,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * An interpreter of JEXL syntax.
@@ -107,7 +105,7 @@ public class Interpreter extends ParserVisitor {
     /** The JEXL engine. */
     protected final Engine jexl;
     /** The logger. */
-    protected final Log logger;
+    protected final Logger logger;
     /** The uberspect. */
     protected final JexlUberspect uberspect;
     /** The arithmetic handler. */
@@ -171,14 +169,19 @@ public class Interpreter extends ParserVisitor {
     }
 
     /**
-     * Interpret the given script/expression. <p> If the underlying JEXL engine is silent, errors will be logged through
-     * its logger as info. </p>
+     * Interpret the given script/expression.
+     * <p> If the underlying JEXL engine is silent, errors will be logged through
+     * its logger as warning.
      * @param node the script or expression to interpret.
      * @return the result of the interpretation.
      * @throws JexlException if any error occurs during interpretation.
      */
     public Object interpret(JexlNode node) {
+        JexlContext.ThreadLocal local = null;
         try {
+            if (context instanceof JexlContext.ThreadLocal) {
+                local = jexl.putThreadLocal((JexlContext.ThreadLocal) context);
+            }
             return node.jjtAccept(this, null);
         } catch (JexlException.Return xreturn) {
             Object value = xreturn.getValue();
@@ -190,8 +193,34 @@ public class Interpreter extends ParserVisitor {
             }
             throw xjexl.clean();
         } finally {
+            if (functors != null && AUTOCLOSEABLE != null ) {
+                for(Object functor : functors.values()) {
+                   if (functor != null && AUTOCLOSEABLE.isAssignableFrom(functor.getClass())) {
+                       try {
+                            jexl.invokeMethod(functor, "close", EMPTY_PARAMS);
+                       } catch(Exception xclose) {
+                            logger.warn(xclose.getMessage(), xclose.getCause());
+                       }
+                   }
+                }
+            }
             functors = null;
+            if (context instanceof JexlContext.ThreadLocal) {
+                jexl.putThreadLocal(local);
+            }
         }
+    }
+
+    /** Java7 AutoCloseable interface defined?. */
+    private static final Class<?> AUTOCLOSEABLE;
+    static {
+        Class<?> c;
+        try {
+          c = Class.forName("java.lang.AutoCloseable");
+        } catch(ClassNotFoundException xclass) {
+          c = null;
+        }
+        AUTOCLOSEABLE = c;
     }
 
     /**
@@ -271,7 +300,7 @@ public class Interpreter extends ParserVisitor {
                 return namespace;
             }
         }
-        // check if namespace if a resolver
+        // check if namespace is a resolver
         namespace = ns.resolveNamespace(prefix);
         if (namespace == null) {
             namespace = functions.get(prefix);
@@ -279,23 +308,31 @@ public class Interpreter extends ParserVisitor {
                 throw new JexlException(node, "no such function namespace " + prefix, null);
             }
         }
-        // allow namespace to be instantiated as functor with context if possible, not an error otherwise
-        if (namespace instanceof Class<?>) {
+        // allow namespace to instantiate a functor with context if possible, not an error otherwise
+        Object functor = null;
+        if (namespace instanceof JexlContext.NamespaceFunctor) {
+            functor = ((JexlContext.NamespaceFunctor) namespace).createFunctor(context);
+        } else if (namespace instanceof Class<?>) {
             Object[] args = new Object[]{context};
             JexlMethod ctor = uberspect.getConstructor(namespace, args);
             if (ctor != null) {
                 try {
-                    namespace = ctor.invoke(namespace, args);
-                    if (functors == null) {
-                        functors = new HashMap<String, Object>();
-                    }
-                    functors.put(prefix, namespace);
+                    functor = ctor.invoke(namespace, args);
                 } catch (Exception xinst) {
                     throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
                 }
             }
         }
-        return namespace;
+        // got a functor, store it and return it
+        if (functor != null) {
+            if (functors == null) {
+                functors = new HashMap<String, Object>();
+            }
+            functors.put(prefix, functor);
+            return functor;
+        } else {
+            return namespace;
+        }
     }
 
     @Override
@@ -507,10 +544,10 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * The 'startsWith' operator implementation.
-     * @param node  the node
-     * @param operator    the calling operator, $= or $!
-     * @param left  the left operand
-     * @param right the right operand
+     * @param node     the node
+     * @param operator the calling operator, $= or $!
+     * @param left     the left operand
+     * @param right    the right operand
      * @return true if left starts with right, false otherwise
      */
     protected boolean startsWith(JexlNode node, String operator, Object left, Object right) {
@@ -550,23 +587,23 @@ public class Interpreter extends ParserVisitor {
     protected Object visit(ASTSWNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return startsWith(node, "^=", left, right)? Boolean.TRUE : Boolean.FALSE;
+        return startsWith(node, "^=", left, right) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     @Override
     protected Object visit(ASTNSWNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return startsWith(node, "^!", left, right)? Boolean.FALSE : Boolean.TRUE;
+        return startsWith(node, "^!", left, right) ? Boolean.FALSE : Boolean.TRUE;
     }
 
     /**
      * The 'endsWith' operator implementation.
-     * @param node      the node
-     * @param operator  the calling operator, ^= or ^!
-     * @param left      the left operand
-     * @param right     the right operand
-     * @return true     if left ends with right, false otherwise
+     * @param node     the node
+     * @param operator the calling operator, ^= or ^!
+     * @param left     the left operand
+     * @param right    the right operand
+     * @return true if left ends with right, false otherwise
      */
     protected boolean endsWith(JexlNode node, String operator, Object left, Object right) {
         try {
@@ -630,10 +667,6 @@ public class Interpreter extends ParserVisitor {
                 return arithmetic.matches(left, right);
             }
             // left in right ? <=> right.contains(left) ?
-            // try contains on collection
-            if (right instanceof Set<?>) {
-                return ((Set<?>) right).contains(left);
-            }
             // try contains on map key
             if (right instanceof Map<?, ?>) {
                 return ((Map<?, ?>) right).containsKey(left);
@@ -665,7 +698,7 @@ public class Interpreter extends ParserVisitor {
                 while (it.hasNext()) {
                     Object next = it.next();
                     if (next == left || (next != null && next.equals(left))) {
-                        return Boolean.TRUE;
+                        return true;
                     }
                 }
                 return false;
@@ -972,7 +1005,7 @@ public class Interpreter extends ParserVisitor {
             return "".equals(object) ? Boolean.TRUE : Boolean.FALSE;
         }
         if (object.getClass().isArray()) {
-            return Array.getLength(object) == 0? Boolean.TRUE : Boolean.FALSE;
+            return Array.getLength(object) == 0 ? Boolean.TRUE : Boolean.FALSE;
         }
         if (object instanceof Collection<?>) {
             return ((Collection<?>) object).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
@@ -1035,7 +1068,7 @@ public class Interpreter extends ParserVisitor {
 
     @Override
     protected Object visit(ASTJexlScript node, Object data) {
-        if (node instanceof ASTJexlLambda) {
+        if (node instanceof ASTJexlLambda && !((ASTJexlLambda) node).isTopLevel()) {
             return new Closure(this, (ASTJexlLambda) node);
         } else {
             final int numChildren = node.jjtGetNumChildren();
@@ -1379,9 +1412,7 @@ public class Interpreter extends ParserVisitor {
         if (functor instanceof ASTIdentifier) {
             ASTIdentifier methodIdentifier = (ASTIdentifier) functor;
             symbol = methodIdentifier.getSymbol();
-            if (symbol < 0) {
-                methodName = methodIdentifier.getName();
-            }
+            methodName = methodIdentifier.getName();
             functor = null;
         } else if (functor instanceof ASTIdentifierAccess) {
             methodName = ((ASTIdentifierAccess) functor).getName();

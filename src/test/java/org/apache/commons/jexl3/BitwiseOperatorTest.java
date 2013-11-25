@@ -38,7 +38,7 @@ public class BitwiseOperatorTest extends JexlTestCase {
     public BitwiseOperatorTest(String name) {
         super(name);
     }
-    
+
     public void testAndWithTwoNulls() throws Exception {
         asserter.assertExpression("null & null", new Long(0));
     }
@@ -70,7 +70,7 @@ public class BitwiseOperatorTest extends JexlTestCase {
     public void testComplementWithNull() throws Exception {
         asserter.assertExpression("~null", new Long(-1));
     }
-    
+
     public void testComplementSimple() throws Exception {
         asserter.assertExpression("~128", new Long(-129));
     }
