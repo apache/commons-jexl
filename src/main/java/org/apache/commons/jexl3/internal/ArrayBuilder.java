@@ -16,10 +16,10 @@
  */
 package org.apache.commons.jexl3.internal;
 
-import java.lang.reflect.Array;
 import org.apache.commons.jexl3.JexlArithmetic;
-import org.apache.commons.jexl3.internal.introspection.MethodKey;
-import java.util.HashMap;
+
+import java.lang.reflect.Array;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
@@ -30,7 +30,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     private static final int PRIMITIVE_SIZE = 8;
     private static final Map<Class<?>, Class<?>> BOXING_CLASSES;
     static {
-        BOXING_CLASSES = new HashMap<Class<?>, Class<?>>(PRIMITIVE_SIZE);
+        BOXING_CLASSES = new IdentityHashMap<Class<?>, Class<?>>(PRIMITIVE_SIZE);
         BOXING_CLASSES.put(Boolean.class, Boolean.TYPE);
         BOXING_CLASSES.put(Byte.class, Byte.TYPE);
         BOXING_CLASSES.put(Character.class, Character.TYPE);
