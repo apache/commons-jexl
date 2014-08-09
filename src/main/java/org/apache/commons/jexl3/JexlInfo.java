@@ -61,6 +61,10 @@ public class JexlInfo {
         column = c;
     }
 
+    public JexlInfo at(int l, int c) {
+        return new JexlInfo(name, l, c);
+    }
+
     protected JexlInfo(JexlInfo copy) {
         name = copy.getName();
         line = copy.getLine();

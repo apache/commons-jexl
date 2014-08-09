@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import org.apache.commons.jexl3.introspection.JexlMethod;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -41,9 +43,108 @@ import java.math.MathContext;
  * @since 2.0
  */
 public class JexlArithmetic {
-    /** Maker class for null operand exceptions. */
-    public static class NullOperand extends ArithmeticException {
+    /**
+     * The overridable operators.
+     * @since 3.0
+     */
+    public enum Operator {
+        ADD("+", "add", 2),
+        SUBTRACT("-", "subtract", 2),
+        MULTIPLY("*", "multiply", 2),
+        DIVIDE("/", "divide", 2),
+        MOD("%", "mod", 2),
+        AND("&", "bitwiseAnd", 2),
+        OR("|", "bitwiseOr", 2),
+        XOR("^", "bitwiseXor", 2),
+        NOT("!", "logicalNot", 1),
+        COMPLEMENT("-", "bitwiseComplement", 1),
+        EQ("==", "equals", 2),
+        LT("<", "lessThan", 2),
+        LTE("<=", "lessThanOrEqual", 2),
+        GT(">", "greaterThan", 2),
+        GTE(">=", "greaterThanOrEqual", 2),
+        ABS("+", "abs", 1),
+        NEGATE("-", "negate", 1),
+        SIZE("size", "size", 1),
+        EMPTY("empty", "empty", 1);
+
+        /**
+         * The operator symbol.
+         */
+        private final String operator;
+        /**
+         * The associated operator method name.
+         */
+        private final String methodName;
+        /**
+         * The method arity.
+         */
+        private final int arity;
+
+        /**
+         * Creates an operator.
+         * @param o the operator name
+         * @param m the method name associated to this operator in a JexlArithmetic
+         * @param arity the number of parameters for the method
+         */
+        Operator(String o, String m, int arity) {
+            this.operator = o;
+            this.methodName = m;
+            this.arity = arity;
+        }
+
+        /**
+         * Gets this operator symbol.
+         * @return the symbol
+         */
+        public final String getOperatorSymbol() {
+            return operator;
+        }
+
+        /**
+         * Gets this operator method name in a JexlArithmetic.
+         * @return the method name
+         */
+        public final String getMethodName() {
+            return methodName;
+        }
+
+        /**
+         * Gets this operator number of parameters.
+         * @return the method arity
+         */
+        public int getArity() {
+            return arity;
+        }
     }
+
+    /**
+     * The interface that uberspects JexlArithmetic classes.
+     * <p>This allows overloaded operator methods discovery.
+     */
+    public interface Uberspect {
+        /**
+         * Gets the most specific method for a monadic operator.
+         * @param operator the operator
+         * @param arg the argument
+         * @return the most specific method or null if no specific override could be found
+         */
+        JexlMethod getOperator(JexlArithmetic.Operator operator, Object arg);
+        Object tryInvokeOperator(JexlArithmetic.Operator operator, Object arg);
+
+        /**
+         * Gets the most specific method for a diadic operator.
+         * @param operator the operator
+         * @param lhs the left hand side argument
+         * @param rhs the right hand side argument
+         * @return the most specific method or null if no specific override could be found
+         */
+        JexlMethod getOperator(JexlArithmetic.Operator operator, Object lhs, Object rhs);
+        Object tryInvokeOperator(JexlArithmetic.Operator operator, Object lhs, Object rhs);
+    }
+
+    /** Maker class for null operand exceptions. */
+    public static class NullOperand extends ArithmeticException {}
     /** Double.MAX_VALUE as BigDecimal. */
     protected static final BigDecimal BIGD_DOUBLE_MAX_VALUE = BigDecimal.valueOf(Double.MAX_VALUE);
     /** Double.MIN_VALUE as BigDecimal. */
@@ -746,6 +847,15 @@ public class JexlArithmetic {
     public Object bitwiseComplement(Object val) {
         long l = toLong(val);
         return Long.valueOf(~l);
+    }
+
+    /**
+     * Performs a logical not.
+     * @param val the operand
+     * @return !val
+     */
+    public Object logicalNot(Object val) {
+        return toBoolean(val) ? Boolean.FALSE : Boolean.TRUE;
     }
 
     /**

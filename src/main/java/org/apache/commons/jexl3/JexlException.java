@@ -438,6 +438,34 @@ public class JexlException extends RuntimeException {
     }
 
     /**
+     * Thrown to break a loop.
+     * @since 3.0
+     */
+    public static class Break extends JexlException {
+        /**
+         * Creates a new instance of Break.
+         * @param node the break
+         */
+        public Break(JexlNode node) {
+            super(node, "break loop", null);
+        }
+    }
+
+    /**
+     * Thrown to continue a loop.
+     * @since 3.0
+     */
+    public static class Continue extends JexlException {
+        /**
+         * Creates a new instance of Continue.
+         * @param node the continue
+         */
+        public Continue(JexlNode node) {
+            super(node, "continue loop", null);
+        }
+    }
+
+    /**
      * Detailed info message about this error.
      * Format is "debug![begin,end]: string \n msg" where:
      * - debug is the debugging information if it exists (@link JexlEngine.setDebug)

@@ -35,8 +35,8 @@ public final class ConstructorMethod implements JexlMethod {
      * @param args constructor arguments
      * @return a {@link JexlMethod}
      */
-    public static ConstructorMethod discover(Introspector is, Object ctorHandle, Object[] args) {
-        String className = null;
+    public static ConstructorMethod discover(Introspector is, Object ctorHandle, Object... args) {
+        String className;
         Class<?> clazz = null;
         if (ctorHandle instanceof Class<?>) {
             clazz = (Class<?>) ctorHandle;
@@ -62,7 +62,7 @@ public final class ConstructorMethod implements JexlMethod {
     }
 
     @Override
-    public Object invoke(Object obj, Object[] params) throws Exception {
+    public Object invoke(Object obj, Object... params) throws Exception {
         Class<?> ctorClass = ctor.getDeclaringClass();
         boolean invoke = true;
         if (obj != null) {
@@ -79,7 +79,7 @@ public final class ConstructorMethod implements JexlMethod {
     }
 
     @Override
-    public Object tryInvoke(String name, Object obj, Object[] params) {
+    public Object tryInvoke(String name, Object obj, Object... params) {
         try {
             Class<?> ctorClass = ctor.getDeclaringClass();
             boolean invoke = true;

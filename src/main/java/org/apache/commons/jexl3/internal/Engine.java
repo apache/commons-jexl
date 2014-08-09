@@ -156,6 +156,9 @@ public class Engine extends JexlEngine {
         this.cache = conf.cache() <= 0 ? null : new SoftCache<String, ASTJexlScript>(conf.cache());
         this.cacheThreshold = conf.cacheThreshold();
         this.charset = conf.charset();
+        if (uberspect == null) {
+            throw new IllegalArgumentException("uberspect can not be null");
+        }
     }
 
     /**

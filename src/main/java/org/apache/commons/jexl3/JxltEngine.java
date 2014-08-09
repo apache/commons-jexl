@@ -16,7 +16,9 @@
  */
 package org.apache.commons.jexl3;
 
+import org.apache.commons.jexl3.internal.TemplateEngine;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.util.List;
 import java.util.Set;
@@ -41,7 +43,7 @@ public abstract class JxltEngine {
     /**
      * The sole type of (runtime) exception the JxltEngine can throw.
      */
-    public static class Exception extends RuntimeException {
+    public static class Exception extends JexlException {
         /** Serial version UID. */
         private static final long serialVersionUID = 201112030113L;
 
@@ -50,8 +52,8 @@ public abstract class JxltEngine {
          * @param msg the exception message
          * @param cause the exception cause
          */
-        public Exception(String msg, Throwable cause) {
-            super(msg, cause);
+        public Exception(JexlInfo info, String msg, Throwable cause) {
+            super(info, msg, cause);
         }
     }
 
@@ -203,7 +205,23 @@ public abstract class JxltEngine {
      * @throws Exception if an error occurs and the {@link JexlEngine}
      * is not silent
      */
-    public abstract Expression createExpression(String expression);
+    public Expression createExpression(String expression) {
+        return createExpression(null, expression);
+    }
+
+    /**
+     * Creates a a {@link Expression} from an expression string.
+     * Uses & fills up the expression cache if any.
+     * <p>
+     * If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.
+     * </p>
+     * @param info the {@link JexlInfo} source information
+     * @param expression the {@link Template} string expression
+     * @return the {@link Expression}, null if silent and an error occured
+     * @throws Exception if an error occurs and the {@link JexlEngine}
+     * is not silent
+     */
+    public abstract Expression createExpression(JexlInfo info, String expression);
 
     /**
      * A template is a JEXL script that evaluates by writing its content through a Writer.
@@ -290,12 +308,45 @@ public abstract class JxltEngine {
 
     /**
      * Creates a new template.
+     * @param info the jexl info (file, line, column)
      * @param prefix the directive prefix
      * @param source the source
      * @param parms the parameter names
      * @return the template
      */
-    public abstract Template createTemplate(String prefix, Reader source, String... parms);
+    public abstract Template createTemplate(JexlInfo info, String prefix, Reader source, String... parms);
+
+    /**
+     * Creates a new template.
+     * @param info the source info
+     * @param parms the parameter names
+     * @param source the source
+     * @return the template
+     */
+    public Template createTemplate(JexlInfo info, String source, String... parms) {
+        return createTemplate(info, "$$", new StringReader(source), parms);
+    }
+
+    /**
+     * Creates a new template.
+     * @param info the source info
+     * @param source the source
+     * @return the template
+     */
+    public Template createTemplate(JexlInfo info, String source) {
+        return createTemplate(info, "$$", new StringReader(source), (String[]) null);
+    }
+
+    /**
+     * Creates a new template.
+     * @param prefix the directive prefix
+     * @param source the source
+     * @param parms the parameter names
+     * @return the template
+     */
+    public Template createTemplate(String prefix, Reader source, String... parms) {
+        return createTemplate(null, prefix, source, parms);
+    }
 
     /**
      * Creates a new template.
@@ -303,14 +354,18 @@ public abstract class JxltEngine {
      * @param parms the parameter names
      * @return the template
      */
-    public abstract Template createTemplate(String source, String... parms);
+    public Template createTemplate(String source, String... parms) {
+        return createTemplate(null, source, parms);
+    }
 
     /**
      * Creates a new template.
      * @param source the source
      * @return the template
      */
-    public abstract Template createTemplate(String source);
+    public Template createTemplate(String source) {
+        return createTemplate(null, source);
+    }
 
     /**
      * Gets the {@link JexlEngine} underlying this template engine.

@@ -27,6 +27,7 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import junit.framework.Assert;
 
 /**
  * Test cases for the UnifiedEL.
@@ -205,6 +206,42 @@ public class JXLTTest extends JexlTestCase {
         assertEquals(source, getSource(expr.toString()));
     }
 
+    public void testConstant2() throws Exception {
+        JexlContext none = null;
+        final String source = "${size({'map':123,'map2':456})}";
+        JxltEngine.Expression expr = JXLT.createExpression(source);
+        //assertTrue("prepare should return same expression", expr.prepare(none) == expr);
+        Object o = expr.evaluate(none);
+        assertTrue("expression should be immediate", expr.isImmediate());
+        assertEquals(2, o);
+
+        assertEquals(source, getSource(expr.toString()));
+    }
+
+    public void testConstant3() throws Exception {
+        JexlContext none = null;
+        final String source = "#{size({'map':123,'map2':456})}";
+        JxltEngine.Expression expr = JXLT.createExpression(source);
+        //assertTrue("prepare should return same expression", expr.prepare(none) == expr);
+        Object o = expr.evaluate(none);
+        assertTrue("expression should be deferred", expr.isDeferred());
+        assertEquals(2, o);
+
+        assertEquals(source, getSource(expr.toString()));
+    }
+
+    public void testConstant4() throws Exception {
+        JexlContext none = null;
+        final String source = "#{ ${size({'1':2,'2': 3})} }";
+        JxltEngine.Expression expr = JXLT.createExpression(source);
+        //assertTrue("prepare should return same expression", expr.prepare(none) == expr);
+        Object o = expr.evaluate(none);
+        assertTrue("expression should be deferred", expr.isDeferred());
+        assertEquals(2, o);
+
+        assertEquals(source, getSource(expr.toString()));
+    }
+
     public void testDeferred() throws Exception {
         JexlContext none = null;
         final String source = "#{'world'}";
@@ -340,6 +377,20 @@ public class JXLTTest extends JexlTestCase {
         String dstr = t.toString();
         assertNotNull(dstr);
     }
+    public void testTemplate10() throws Exception {
+        String source = "$$(x)->{ if(x) {\nx is ${x}\n$$ } else {\n${'no x'}\n$$ } }\n";
+        StringWriter strw;
+        String output;
+
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(source), (String[])null);
+        String dstr = t.asString();
+        assertNotNull(dstr);
+
+        strw = new StringWriter();
+        t.evaluate(context, strw, 42);
+        output = strw.toString();
+        assertEquals("x is 42\n", output);
+    }
 
     public void testTemplate1() throws Exception {
         String source = "$$ if(x) {\nx is ${x}\n$$ } else {\n${'no x'}\n$$ }\n";
@@ -460,6 +511,29 @@ public class JXLTTest extends JexlTestCase {
         String output = strw.toString();
         String ctl = "<report>\n\n\n        11\n</report>\n";
         assertEquals(ctl, output);
+    }
+
+    public void testReport1() throws Exception {
+        String rpt =
+                  "<report>\n"
+                + "this is ${x}\n"
+                + "${x + 1}\n"
+                + "${x + 2}\n"
+                + "${x + 3}\n"
+                + "</report>\n";
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
+        StringWriter strw = new StringWriter();
+        context.set("x", 42);
+        t.evaluate(context, strw, 42);
+        String output = strw.toString();
+        int count = 0;
+        for(int i = 0; i < output.length(); ++i) {
+            char c = output.charAt(i);
+            if ('\n' == c) {
+                count += 1;
+            }
+        }
+        assertEquals(6, count);
     }
 
 

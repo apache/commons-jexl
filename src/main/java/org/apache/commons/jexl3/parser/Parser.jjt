@@ -38,6 +38,8 @@ import org.apache.commons.jexl3.internal.Scope;
 
 public final class Parser extends JexlParser
 {
+    private int loopCount = 0;
+
     public ASTJexlScript parse(JexlInfo info, String jexlSrc, Scope scope, boolean registers, boolean expr) {
         try {
             // If registers are allowed, the default parser state has to be REGISTERS.
@@ -99,6 +101,8 @@ PARSER_END(Parser)
     | < RETURN : "return" >
     | < FUNCTION : "function" >
     | < LAMBDA : "->" >
+    | < BREAK : "break" >
+    | < CONTINUE : "continue" >
 }
 
 <FOR_EACH_IN> TOKEN : /* foreach in */
@@ -233,6 +237,8 @@ void Statement() #void : {}
     | WhileStatement()
     | ExpressionStatement()
     | ReturnStatement()
+    | Continue()
+    | Break()
     | Var()
 }
 
@@ -256,7 +262,7 @@ void IfStatement() : {}
 
 void WhileStatement() : {}
 {
-    <WHILE> <LPAREN> Expression() <RPAREN> Statement()
+    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount += 1; } Statement() { loopCount -= 1; }
 }
 
 void ReturnStatement() : {}
@@ -264,11 +270,21 @@ void ReturnStatement() : {}
     <RETURN> Expression()
 }
 
+void Continue() #Continue : {}
+{
+    <CONTINUE> { if (loopCount == 0) { throwParsingException(jjtThis); } }
+}
+
+void Break() #Break : {}
+{
+    <BREAK> { if (loopCount == 0) { throwParsingException(jjtThis); } }
+}
+
 void ForeachStatement() : {}
 {
-    <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> Statement()
+    <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> { loopCount += 1; } Statement() { loopCount -= 1; }
 |
-    <FOREACH> <LPAREN> ForEachVar() <IN>  Expression() <RPAREN> Statement()
+    <FOREACH> <LPAREN> ForEachVar() <IN>  Expression() <RPAREN>  { loopCount += 1; } Statement() { loopCount -= 1; }
 }
 
 void ForEachVar() #Reference : {}

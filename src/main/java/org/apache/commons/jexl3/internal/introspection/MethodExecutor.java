@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import org.apache.commons.jexl3.JexlEngine;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 
@@ -72,7 +73,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         if (method != null) {
             Class<?>[] formal = method.getParameterTypes();
             // if the last parameter is an array, the method is considered as vararg
-            if (formal != null && method.isVarArgs()) {
+            if (formal != null && MethodKey.isVarArgs(method)) {
                 vastart = formal.length - 1;
                 vaclass = formal[vastart].getComponentType();
             }
@@ -82,7 +83,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
     }
 
     @Override
-    public Object invoke(Object o, Object[] args) throws IllegalAccessException, InvocationTargetException  {
+    public Object invoke(Object o, Object... args) throws IllegalAccessException, InvocationTargetException  {
         if (vaClass != null) {
             args = handleVarArg(args);
         }
@@ -94,7 +95,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
     }
 
     @Override
-    public Object tryInvoke(String name, Object obj, Object[] args) {
+    public Object tryInvoke(String name, Object obj, Object... args) {
         MethodKey tkey = new MethodKey(name, args);
         // let's assume that invocation will fly if the declaring class is the
         // same and arguments have the same type
@@ -102,12 +103,12 @@ public final class MethodExecutor extends AbstractExecutor.Method {
             try {
                 return invoke(obj, args);
             } catch (InvocationTargetException xinvoke) {
-                return TRY_FAILED; // fail
+                return JexlEngine.TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
-                return TRY_FAILED;// fail
+                return JexlEngine.TRY_FAILED;// fail
             }
         }
-        return TRY_FAILED;
+        return JexlEngine.TRY_FAILED;
     }
 
 

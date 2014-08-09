@@ -19,6 +19,7 @@ package org.apache.commons.jexl3.internal;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.internal.Engine.VarCollector;
 import org.apache.commons.jexl3.introspection.JexlMethod;
@@ -209,6 +210,10 @@ public final class TemplateEngine extends JxltEngine {
          */
         abstract ExpressionType getType();
 
+        JexlInfo getInfo() {
+            return null;
+        }
+
         @Override
         public final String toString() {
             StringBuilder strb = new StringBuilder();
@@ -250,7 +255,7 @@ public final class TemplateEngine extends JxltEngine {
                 Interpreter interpreter = jexl.createInterpreter(context, frame);
                 return prepare(interpreter);
             } catch (JexlException xjexl) {
-                Exception xuel = createException("prepare", this, xjexl);
+                Exception xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
                 if (jexl.isSilent()) {
                     jexl.logger.warn(xuel.getMessage(), xuel.getCause());
                     return null;
@@ -268,7 +273,7 @@ public final class TemplateEngine extends JxltEngine {
                 Interpreter interpreter = jexl.createInterpreter(context, frame);
                 return evaluate(interpreter);
             } catch (JexlException xjexl) {
-                Exception xuel = createException("prepare", this, xjexl);
+                Exception xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
                 if (jexl.isSilent()) {
                     jexl.logger.warn(xuel.getMessage(), xuel.getCause());
                     return null;
@@ -388,6 +393,11 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         protected void getVariables(Engine.VarCollector collector) {
             jexl.getVariables(node, collector);
+        }
+
+        @Override
+        JexlInfo getInfo() {
+            return node.jexlInfo();
         }
     }
 
@@ -598,32 +608,34 @@ public final class TemplateEngine extends JxltEngine {
         }
     }
 
+
     @Override
-    public JxltEngine.Expression createExpression(String expression) {
+    public JxltEngine.Expression createExpression(JexlInfo info, String expression) {
+        if (info == null) {
+            info = jexl.createInfo();
+        }
         Exception xuel = null;
         TemplateExpression stmt = null;
         try {
             if (cache == null) {
-                stmt = parseExpression(expression, null);
+                stmt = parseExpression(info, expression, null);
             } else {
                 synchronized (cache) {
                     stmt = cache.get(expression);
                     if (stmt == null) {
-                        stmt = parseExpression(expression, null);
+                        stmt = parseExpression(info, expression, null);
                         cache.put(expression, stmt);
                     }
                 }
             }
         } catch (JexlException xjexl) {
-            xuel = new Exception("failed to parse '" + expression + "'", xjexl);
-        } catch (Exception xany) {
-            xuel = xany;
-        } finally {
-            if (xuel != null) {
-                if (jexl.isSilent()) {
-                    jexl.logger.warn(xuel.getMessage(), xuel.getCause());
-                    return null;
-                }
+            xuel = new Exception(xjexl.getInfo(), "failed to parse '" + expression + "'", xjexl);
+        }
+        if (xuel != null) {
+            if (jexl.isSilent()) {
+                jexl.logger.warn(xuel.getMessage(), xuel.getCause());
+                stmt = null;
+            } else {
                 throw xuel;
             }
         }
@@ -637,7 +649,7 @@ public final class TemplateEngine extends JxltEngine {
      * @param xany   the exception
      * @return an exception containing an explicit error message
      */
-    private Exception createException(String action, TemplateExpression expr, java.lang.Exception xany) {
+    private Exception createException(JexlInfo info, String action, TemplateExpression expr, java.lang.Exception xany) {
         StringBuilder strb = new StringBuilder("failed to ");
         strb.append(action);
         if (expr != null) {
@@ -653,7 +665,7 @@ public final class TemplateEngine extends JxltEngine {
                 strb.append(causeMsg);
             }
         }
-        return new Exception(strb.toString(), xany);
+        return new Exception(info, strb.toString(), xany);
     }
 
     /** The different parsing states. */
@@ -679,16 +691,19 @@ public final class TemplateEngine extends JxltEngine {
      * @return the unified expression instance
      * @throws JexlException if an error occur during parsing
      */
-    private TemplateExpression parseExpression(String expr, Scope scope) {
+    private TemplateExpression parseExpression(JexlInfo info, String expr, Scope scope) {
         final int size = expr.length();
         ExpressionBuilder builder = new ExpressionBuilder(0);
         StringBuilder strb = new StringBuilder(size);
         ParseState state = ParseState.CONST;
+        int immediate1 = 0;
+        int deferred1 = 0;
         int inner1 = 0;
         boolean nested = false;
         int inested = -1;
-        for (int i = 0; i < size; ++i) {
-            char c = expr.charAt(i);
+        int lineno = info.getLine();
+        for (int column = 0; column < size; ++column) {
+            char c = expr.charAt(column);
             switch (state) {
                 default: // in case we ever add new unified expresssion type
                     throw new UnsupportedOperationException("unexpected unified expression type");
@@ -696,7 +711,7 @@ public final class TemplateEngine extends JxltEngine {
                     if (c == immediateChar) {
                         state = ParseState.IMMEDIATE0;
                     } else if (c == deferredChar) {
-                        inested = i;
+                        inested = column;
                         state = ParseState.DEFERRED0;
                     } else if (c == '\\') {
                         state = ParseState.ESCAPE;
@@ -739,16 +754,24 @@ public final class TemplateEngine extends JxltEngine {
                     break;
                 case IMMEDIATE1: // ${...
                     if (c == '}') {
-                        // materialize the immediate expr
-                        String src = strb.toString();
-                        TemplateExpression iexpr = new ImmediateExpression(
-                                src,
-                                jexl.parse(null, src, scope, false, noscript),
-                                null);
-                        builder.add(iexpr);
-                        strb.delete(0, Integer.MAX_VALUE);
-                        state = ParseState.CONST;
+                        if (immediate1 > 0) {
+                            immediate1 -= 1;
+                            strb.append(c);
+                        } else {
+                            // materialize the immediate expr
+                            String src = strb.toString();
+                            TemplateExpression iexpr = new ImmediateExpression(
+                                    src,
+                                    jexl.parse(info.at(lineno, column), src, scope, false, noscript),
+                                    null);
+                            builder.add(iexpr);
+                            strb.delete(0, Integer.MAX_VALUE);
+                            state = ParseState.CONST;
+                        }
                     } else {
+                        if (c == '{') {
+                            immediate1 += 1;
+                        }
                         // do buildup expr
                         strb.append(c);
                     }
@@ -757,36 +780,42 @@ public final class TemplateEngine extends JxltEngine {
                     // skip inner strings (for '}')
                     if (c == '"' || c == '\'') {
                         strb.append(c);
-                        i = StringParser.readString(strb, expr, i + 1, c);
+                        column = StringParser.readString(strb, expr, column + 1, c);
                         continue;
                     }
                     // nested immediate in deferred; need to balance count of '{' & '}'
                     if (c == '{') {
-                        if (expr.charAt(i - 1) == immediateChar) {
+                        if (expr.charAt(column - 1) == immediateChar) {
                             inner1 += 1;
                             strb.deleteCharAt(strb.length() - 1);
                             nested = true;
+                        } else {
+                            deferred1 += 1;
+                            strb.append(c);
                         }
                         continue;
                     }
                     // closing '}'
                     if (c == '}') {
                         // balance nested immediate
-                        if (inner1 > 0) {
+                        if (deferred1 > 0) {
+                            deferred1 -= 1;
+                            strb.append(c);
+                        } else if (inner1 > 0) {
                             inner1 -= 1;
-                        } else {
+                        } else  {
                             // materialize the nested/deferred expr
                             String src = strb.toString();
                             TemplateExpression dexpr;
                             if (nested) {
                                 dexpr = new NestedExpression(
-                                        expr.substring(inested, i + 1),
-                                        jexl.parse(null, src, scope, false, noscript),
+                                        expr.substring(inested, column + 1),
+                                        jexl.parse(info.at(lineno, column), src, scope, false, noscript),
                                         null);
                             } else {
                                 dexpr = new DeferredExpression(
                                         strb.toString(),
-                                        jexl.parse(null, src, scope, false, noscript),
+                                        jexl.parse(info.at(lineno, column), src, scope, false, noscript),
                                         null);
                             }
                             builder.add(dexpr);
@@ -810,10 +839,13 @@ public final class TemplateEngine extends JxltEngine {
                     }
                     state = ParseState.CONST;
             }
+            if (c == '\n') {
+                lineno += 1;
+            }
         }
         // we should be in that state
         if (state != ParseState.CONST) {
-            throw new Exception("malformed expression: " + expr, null);
+            throw new Exception(info.at(lineno, 0), "malformed expression: " + expr, null);
         }
         // if any chars were buffered, add them as a constant
         if (strb.length() > 0) {
@@ -839,6 +871,8 @@ public final class TemplateEngine extends JxltEngine {
     private static final class Block {
         /** The type of block, verbatim or directive. */
         private final BlockType type;
+        /** The block start line info. */
+        private final int line;
         /** The actual content. */
         private final String body;
 
@@ -847,8 +881,9 @@ public final class TemplateEngine extends JxltEngine {
          * @param theType  the type
          * @param theBlock the content
          */
-        Block(BlockType theType, String theBlock) {
+        Block(BlockType theType, int theLine, String theBlock) {
             type = theType;
+            line = theLine;
             body = theBlock;
         }
 
@@ -898,7 +933,7 @@ public final class TemplateEngine extends JxltEngine {
          * @throws NullPointerException     if either the directive prefix or input is null
          * @throws IllegalArgumentException if the directive prefix is invalid
          */
-        public TemplateScript(String directive, Reader reader, String... parms) {
+        public TemplateScript(JexlInfo info, String directive, Reader reader, String... parms) {
             if (directive == null) {
                 throw new NullPointerException("null prefix");
             }
@@ -911,7 +946,7 @@ public final class TemplateEngine extends JxltEngine {
             if (reader == null) {
                 throw new NullPointerException("null input");
             }
-            Scope scope = new Scope(null, parms);
+            Scope scope = parms == null ? null : new Scope(null, parms);
             prefix = directive;
             List<Block> blocks = readTemplate(prefix, reader);
             List<TemplateExpression> uexprs = new ArrayList<TemplateExpression>();
@@ -933,13 +968,17 @@ public final class TemplateEngine extends JxltEngine {
                 }
             }
             // create the script
-            script = jexl.parse(null, strb.toString(), scope, false, false);
+            if (info == null) {
+                info = jexl.createInfo();
+            }
+            // allow lambda defining params
+            script = jexl.parse(info.at(0, 0), strb.toString(), scope, false, false).script();
             scope = script.getScope();
             // createExpression the exprs using the code frame for those appearing after the first block of code
             for (int b = 0; b < blocks.size(); ++b) {
                 Block block = blocks.get(b);
                 if (block.type == BlockType.VERBATIM) {
-                    uexprs.add(TemplateEngine.this.parseExpression(block.body, b > codeStart ? scope : null));
+                    uexprs.add(TemplateEngine.this.parseExpression(info.at(block.line, 0), block.body, b > codeStart ? scope : null));
                 }
             }
             source = blocks.toArray(new Block[blocks.size()]);
@@ -1035,7 +1074,7 @@ public final class TemplateEngine extends JxltEngine {
         /** The wrapped context. */
         private final JexlContext wrap;
         /** The array of TemplateEngine expressions. */
-        private final Expression[] exprs;
+        private final TemplateExpression[] exprs;
         /** The writer used to output. */
         private final Writer writer;
         /** The call frame. */
@@ -1049,7 +1088,7 @@ public final class TemplateEngine extends JxltEngine {
          * @param out         the output writer
          */
         protected TemplateContext(JexlContext jcontext, Scope.Frame jframe,
-                Expression[] expressions, Writer out) {
+                TemplateExpression[] expressions, Writer out) {
             wrap = jcontext;
             frame = jframe;
             exprs = expressions;
@@ -1112,14 +1151,14 @@ public final class TemplateEngine extends JxltEngine {
             if (e < 0 || e >= exprs.length) {
                 return;
             }
-            Expression expr = exprs[e];
+            TemplateExpression expr = exprs[e];
             if (expr.isDeferred()) {
                 expr = expr.prepare(wrap);
             }
             if (expr instanceof CompositeExpression) {
                 printComposite((CompositeExpression) expr);
             } else {
-                doPrint(expr.evaluate(this));
+                doPrint(expr.getInfo(), expr.evaluate(this));
             }
         }
 
@@ -1133,7 +1172,7 @@ public final class TemplateEngine extends JxltEngine {
             Object value;
             for (int e = 0; e < size; ++e) {
                 value = cexprs[e].evaluate(this);
-                doPrint(value);
+                doPrint(cexprs[e].getInfo(), value);
             }
         }
 
@@ -1144,7 +1183,7 @@ public final class TemplateEngine extends JxltEngine {
          * </p>
          * @param arg the argument to print out
          */
-        private void doPrint(Object arg) {
+        private void doPrint(JexlInfo info, Object arg) {
             try {
                 if (arg instanceof CharSequence) {
                     writer.write(arg.toString());
@@ -1159,9 +1198,9 @@ public final class TemplateEngine extends JxltEngine {
                     }
                 }
             } catch (java.io.IOException xio) {
-                throw createException("call print", null, xio);
+                throw createException(info, "call print", null, xio);
             } catch (java.lang.Exception xany) {
-                throw createException("invoke print", null, xany);
+                throw createException(info, "invoke print", null, xany);
             }
         }
     }
@@ -1245,6 +1284,7 @@ public final class TemplateEngine extends JxltEngine {
 
     /**
      * Reads lines of a template grouping them by typed blocks.
+     * @param info the source info
      * @param prefix the directive prefix
      * @param source the source reader
      * @return the list of blocks
@@ -1261,6 +1301,8 @@ public final class TemplateEngine extends JxltEngine {
         BlockType type = null;
         int prefixLen;
         Iterator<CharSequence> lines = readLines(reader);
+        int lineno = 0;
+        int start = 0;
         while (lines.hasNext()) {
             CharSequence line = lines.next();
             if (line == null) {
@@ -1275,15 +1317,17 @@ public final class TemplateEngine extends JxltEngine {
                     type = BlockType.VERBATIM;
                     strb.append(line.subSequence(0, line.length()));
                 }
+                start = lineno;
             } else if (type == BlockType.DIRECTIVE) {
                 // switch to verbatim if necessary
                 prefixLen = startsWith(line, prefix);
                 if (prefixLen < 0) {
-                    Block directive = new Block(BlockType.DIRECTIVE, strb.toString());
+                    Block directive = new Block(BlockType.DIRECTIVE, start, strb.toString());
                     strb.delete(0, Integer.MAX_VALUE);
                     blocks.add(directive);
                     type = BlockType.VERBATIM;
                     strb.append(line.subSequence(0, line.length()));
+                    start = lineno;
                 } else {
                     // still a directive
                     strb.append(line.subSequence(prefixLen, line.length()));
@@ -1292,19 +1336,21 @@ public final class TemplateEngine extends JxltEngine {
                 // switch to directive if necessary
                 prefixLen = startsWith(line, prefix);
                 if (prefixLen >= 0) {
-                    Block verbatim = new Block(BlockType.VERBATIM, strb.toString());
+                    Block verbatim = new Block(BlockType.VERBATIM, start, strb.toString());
                     strb.delete(0, Integer.MAX_VALUE);
                     blocks.add(verbatim);
                     type = BlockType.DIRECTIVE;
                     strb.append(line.subSequence(prefixLen, line.length()));
+                    start = lineno;
                 } else {
                     strb.append(line.subSequence(0, line.length()));
                 }
             }
+            lineno += 1;
         }
         // input may be null
         if (type != null && strb.length() > 0) {
-            Block block = new Block(type, strb.toString());
+            Block block = new Block(type, start, strb.toString());
             blocks.add(block);
         }
         blocks.trimToSize();
@@ -1312,17 +1358,8 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     @Override
-    public TemplateScript createTemplate(String prefix, Reader source, String... parms) {
-        return new TemplateScript(prefix, source, parms);
+    public TemplateScript createTemplate(JexlInfo info, String prefix, Reader source, String... parms) {
+        return new TemplateScript(info, prefix, source, parms);
     }
 
-    @Override
-    public TemplateScript createTemplate(String source, String... parms) {
-        return new TemplateScript("$$", new StringReader(source), parms);
-    }
-
-    @Override
-    public TemplateScript createTemplate(String source) {
-        return new TemplateScript("$$", new StringReader(source), (String[]) null);
-    }
 }

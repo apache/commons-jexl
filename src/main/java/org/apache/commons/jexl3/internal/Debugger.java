@@ -31,7 +31,9 @@ import org.apache.commons.jexl3.parser.ASTBitwiseComplNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseOrNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseXorNode;
 import org.apache.commons.jexl3.parser.ASTBlock;
+import org.apache.commons.jexl3.parser.ASTBreak;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
+import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDivNode;
 import org.apache.commons.jexl3.parser.ASTEQNode;
 import org.apache.commons.jexl3.parser.ASTERNode;
@@ -488,6 +490,16 @@ public final class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTFalseNode node, Object data) {
         return check(node, "false", data);
+    }
+
+    @Override
+    protected Object visit(ASTContinue node, Object data) {
+        return check(node, "continue", data);
+    }
+
+    @Override
+    protected Object visit(ASTBreak node, Object data) {
+        return check(node, "break", data);
     }
 
     @Override

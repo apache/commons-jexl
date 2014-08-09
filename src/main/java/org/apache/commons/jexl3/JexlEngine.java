@@ -44,6 +44,14 @@ import java.nio.charset.Charset;
  * @since 2.0
  */
 public abstract class JexlEngine {
+    /** A marker for invocation failures in tryInvoke. */
+    public static final Object TRY_FAILED = new Object() {
+        @Override
+        public String toString() {
+            return "tryExecute failed";
+        }
+    };
+    
     /**
      * The thread local context.
      */
@@ -462,7 +470,7 @@ public abstract class JexlEngine {
      * @param c  column number
      * @return a JexlInfo instance
      */
-    protected JexlInfo createInfo(String fn, int l, int c) {
+    public JexlInfo createInfo(String fn, int l, int c) {
         return new JexlInfo(fn, l, c);
     }
 
@@ -472,7 +480,7 @@ public abstract class JexlEngine {
      * outside of o.a.c.jexl3.</p>
      * @return a JexlInfo instance
      */
-    protected JexlInfo createInfo() {
+    public JexlInfo createInfo() {
         JexlInfo info = null;
         Throwable xinfo = new Throwable();
         xinfo.fillInStackTrace();
@@ -483,7 +491,7 @@ public abstract class JexlEngine {
             se = stack[s];
             String className = se.getClassName();
             if (!className.equals(name)) {
-                // go deeper if called from jexl3 implementation classes
+                // go deeper if called from jexl implementation classes
                 if (className.startsWith("org.apache.commons.jexl3.internal.")
                     || className.startsWith("org.apache.commons.jexl3.J")) {
                     name = className;

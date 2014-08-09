@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * A cache of introspection information for a specific class instance.
- * Keys objects by an agregation of the method name and the classes
+ * Keys objects by an aggregation of the method name and the classes
  * that make up the parameters.
  * <p>
  * Originally taken from the Velocity tree so we can be self-sufficient.
