@@ -26,6 +26,21 @@
     </properties>
     <body>
         <release version="3.0.1" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-145" due-to="Ian Connor">
+                Sandbox calling wrong check (classname vs class)
+            </action>
+            <action dev="henrib" type="fix" >
+                JXLT fails to parse expressions that use map constants
+            </action>
+            <action dev="henrib" type="add" >
+                Added break/continue in JEXL syntax
+            </action>
+            <action dev="henrib" type="add" >
+                Added convenience methods to pass/use JexlInfo and arguments in templates
+            </action>
+            <action dev="henrib" type="add" >
+                Added ability to overload some operators in JexlArithmetic (through introspection, based on method names)
+            </action>
             <action dev="henrib" type="fix" >
                 Fixed issue in edge case method resolution wrt overload and varargs
             </action>
