@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlArithmetic;
+import static org.apache.commons.jexl3.JexlArithmetic.Operator;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
@@ -36,7 +37,9 @@ import org.apache.commons.jexl3.parser.ASTBitwiseComplNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseOrNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseXorNode;
 import org.apache.commons.jexl3.parser.ASTBlock;
+import org.apache.commons.jexl3.parser.ASTBreak;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
+import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDivNode;
 import org.apache.commons.jexl3.parser.ASTEQNode;
 import org.apache.commons.jexl3.parser.ASTERNode;
@@ -110,6 +113,8 @@ public class Interpreter extends ParserVisitor {
     protected final JexlUberspect uberspect;
     /** The arithmetic handler. */
     protected final JexlArithmetic arithmetic;
+    /** The overloaded arithmetic operators. */
+    protected final JexlArithmetic.Uberspect operators;
     /** The map of symboled functions. */
     protected final Map<String, Object> functions;
     /** The map of symboled functions. */
@@ -163,6 +168,7 @@ public class Interpreter extends ParserVisitor {
         }
         this.functions = jexl.functions;
         this.strictArithmetic = this.arithmetic.isStrict();
+        this.operators = uberspect.getArithmetic(arithmetic);
         this.cache = jexl.cache != null;
         this.frame = eFrame;
         this.functors = null;
@@ -383,6 +389,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.ADD, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.add(left, right);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "+ error", xrt);
@@ -394,6 +406,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.SUBTRACT, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.subtract(left, right);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "- error", xrt);
@@ -405,6 +423,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.AND, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.bitwiseAnd(left, right);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "& error", xrt);
@@ -415,6 +439,12 @@ public class Interpreter extends ParserVisitor {
     protected Object visit(ASTBitwiseComplNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.COMPLEMENT, left);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.bitwiseComplement(left);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "~ error", xrt);
@@ -426,6 +456,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.OR, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.bitwiseOr(left, right);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "| error", xrt);
@@ -437,6 +473,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.XOR, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.bitwiseXor(left, right);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "^ error", xrt);
@@ -458,6 +500,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.DIVIDE, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.divide(left, right);
         } catch (ArithmeticException xrt) {
             if (!strictArithmetic) {
@@ -473,6 +521,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.EQ, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "== error", xrt);
@@ -482,6 +536,16 @@ public class Interpreter extends ParserVisitor {
     @Override
     protected Object visit(ASTFalseNode node, Object data) {
         return Boolean.FALSE;
+    }
+
+    @Override
+    protected Object visit(ASTContinue node, Object data) {
+        throw new JexlException.Continue(node);
+    }
+
+    @Override
+    protected Object visit(ASTBreak node, Object data) {
+        throw new JexlException.Break(node);
     }
 
     @Override
@@ -512,8 +576,14 @@ public class Interpreter extends ParserVisitor {
                     } else {
                         frame.set(symbol, value);
                     }
-                    // execute statement
-                    result = statement.jjtAccept(this, data);
+                    try {
+                        // execute statement
+                        result = statement.jjtAccept(this, data);
+                    } catch(JexlException.Break stmtBreak) {
+                        break;
+                    } catch(JexlException.Continue stmtContinue) {
+                        //continue;
+                    }
                 }
             }
         }
@@ -525,6 +595,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.GTE, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.greaterThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, ">= error", xrt);
@@ -536,6 +612,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.GT, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.greaterThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "> error", xrt);
@@ -762,6 +844,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.LTE, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.lessThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "<= error", xrt);
@@ -773,6 +861,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.LT, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.lessThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "< error", xrt);
@@ -818,6 +912,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.MOD, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.mod(left, right);
         } catch (ArithmeticException xrt) {
             if (!strictArithmetic) {
@@ -833,6 +933,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.MULTIPLY, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             return arithmetic.multiply(left, right);
         } catch (ArithmeticException xrt) {
             JexlNode xnode = findNullOperand(xrt, node, left, right);
@@ -845,6 +951,12 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.EQ, left, right);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return arithmetic.toBoolean(result)? Boolean.FALSE : Boolean.TRUE;
+                }
+            }
             return arithmetic.equals(left, right) ? Boolean.FALSE : Boolean.TRUE;
         } catch (ArithmeticException xrt) {
             JexlNode xnode = findNullOperand(xrt, node, left, right);
@@ -855,7 +967,17 @@ public class Interpreter extends ParserVisitor {
     @Override
     protected Object visit(ASTNotNode node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
-        return arithmetic.toBoolean(val) ? Boolean.FALSE : Boolean.TRUE;
+        try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.NOT, val);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
+            return arithmetic.toBoolean(val) ? Boolean.FALSE : Boolean.TRUE;
+        } catch (ArithmeticException xrt) {
+            throw new JexlException(node, "arithmetic error", xrt);
+        }
     }
 
     @Override
@@ -932,6 +1054,12 @@ public class Interpreter extends ParserVisitor {
         JexlNode valNode = node.jjtGetChild(0);
         Object val = valNode.jjtAccept(this, data);
         try {
+            if (operators != null) {
+                Object result = operators.tryInvokeOperator(Operator.NEGATE, val);
+                if (result != JexlEngine.TRY_FAILED) {
+                    return result;
+                }
+            }
             Object number = arithmetic.negate(val);
             // attempt to recoerce to literal class
             if (valNode instanceof ASTNumberLiteral && number instanceof Number) {
@@ -952,9 +1080,15 @@ public class Interpreter extends ParserVisitor {
             if (isCancelled()) {
                 throw new JexlException.Cancel(node);
             }
-            // execute statement
             if (node.jjtGetNumChildren() > 1) {
-                result = node.jjtGetChild(1).jjtAccept(this, data);
+                try {
+                    // execute statement
+                    result = node.jjtGetChild(1).jjtAccept(this, data);
+                } catch(JexlException.Break stmtBreak) {
+                    break;
+                } catch(JexlException.Continue stmtContinue) {
+                    //continue;
+                }
             }
         }
         return result;
@@ -966,13 +1100,13 @@ public class Interpreter extends ParserVisitor {
         if (val == null) {
             throw new JexlException(node, "size() : argument is null", null);
         }
-        return Integer.valueOf(sizeOf(node, val));
+        return sizeOf(node, val);
     }
 
     @Override
     protected Object visit(ASTSizeMethod node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
-        return Integer.valueOf(sizeOf(node, val));
+        return sizeOf(node, val);
     }
 
     @Override
@@ -994,9 +1128,15 @@ public class Interpreter extends ParserVisitor {
      * @param object the object to check the rmptyness of.
      * @return the boolean
      */
-    private Boolean isEmpty(JexlNode node, Object object) {
+    private Object isEmpty(JexlNode node, Object object) {
         if (object == null) {
             return Boolean.TRUE;
+        }
+        if (operators != null) {
+            Object result = operators.tryInvokeOperator(Operator.EMPTY, object);
+            if (result != JexlEngine.TRY_FAILED) {
+                return result;
+            }
         }
         if (object instanceof Number) {
             return ((Number) object).intValue() == 0 ? Boolean.TRUE : Boolean.FALSE;
@@ -1013,57 +1153,65 @@ public class Interpreter extends ParserVisitor {
         // Map isn't a collection
         if (object instanceof Map<?, ?>) {
             return ((Map<?, ?>) object).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
-        } else {
-            // check if there is an isEmpty method on the object that returns a
-            // boolean and if so, just use it
-            JexlMethod vm = uberspect.getMethod(object, "isEmpty", EMPTY_PARAMS);
-            if (vm != null && vm.getReturnType() == Boolean.TYPE) {
-                Boolean result;
-                try {
-                    result = (Boolean) vm.invoke(object, EMPTY_PARAMS);
-                } catch (Exception e) {
-                    throw new JexlException(node, "empty() : error executing", e);
-                }
-                return result;
-            }
-            throw new JexlException(node, "empty() : unsupported type : " + object.getClass(), null);
         }
+        // check if there is an isEmpty method on the object that returns a
+        // boolean and if so, just use it
+        JexlMethod vm = uberspect.getMethod(object, "isEmpty", EMPTY_PARAMS);
+        if (vm != null && vm.getReturnType() == Boolean.TYPE) {
+            Boolean result;
+            try {
+                result = (Boolean) vm.invoke(object, EMPTY_PARAMS);
+            } catch (Exception e) {
+                throw new JexlException(node, "empty() : error executing", e);
+            }
+            return result;
+        }
+        throw new JexlException(node, "empty() : unsupported type : " + object.getClass(), null);
     }
 
     /**
-     * Calculate the
-     * <code>size</code> of various types: Collection, Array, Map, String, and anything that has a int size() method.
+     * Calculate the <code>size</code> of various types:
+     * Collection, Array, Map, String, and anything that has a int size() method.
      *
      * @param node   the node that gave the value to size
      * @param object the object to get the size of.
      * @return the size of val
      */
-    private int sizeOf(JexlNode node, Object object) {
+    private Object sizeOf(JexlNode node, Object object) {
         if (object == null) {
             return 0;
-        } else if (object instanceof Collection<?>) {
-            return ((Collection<?>) object).size();
-        } else if (object.getClass().isArray()) {
-            return Array.getLength(object);
-        } else if (object instanceof Map<?, ?>) {
-            return ((Map<?, ?>) object).size();
-        } else if (object instanceof String) {
-            return ((String) object).length();
-        } else {
-            // check if there is a size method on the object that returns an
-            // integer and if so, just use it
-            JexlMethod vm = uberspect.getMethod(object, "size", EMPTY_PARAMS);
-            if (vm != null && vm.getReturnType() == Integer.TYPE) {
-                Integer result;
-                try {
-                    result = (Integer) vm.invoke(object, EMPTY_PARAMS);
-                } catch (Exception e) {
-                    throw new JexlException(node, "size() : error executing", e);
-                }
-                return result.intValue();
-            }
-            throw new JexlException(node, "size() : unsupported type : " + object.getClass(), null);
         }
+        if (operators != null) {
+            Object result = operators.tryInvokeOperator(Operator.SIZE, object);
+            if (result != JexlEngine.TRY_FAILED) {
+                return result;
+            }
+        }
+        if (object instanceof Collection<?>) {
+            return ((Collection<?>) object).size();
+        }
+        if (object.getClass().isArray()) {
+            return Array.getLength(object);
+        }
+        if (object instanceof Map<?, ?>) {
+            return ((Map<?, ?>) object).size();
+        }
+        if (object instanceof String) {
+            return ((String) object).length();
+        }
+        // check if there is a size method on the object that returns an
+        // integer and if so, just use it
+        JexlMethod vm = uberspect.getMethod(object, "size", EMPTY_PARAMS);
+        if (vm != null && vm.getReturnType() == Integer.TYPE) {
+            Integer result;
+            try {
+                result = (Integer) vm.invoke(object, EMPTY_PARAMS);
+            } catch (Exception e) {
+                throw new JexlException(node, "size() : error executing", e);
+            }
+            return result;
+        }
+        throw new JexlException(node, "size() : unsupported type : " + object.getClass(), null);
     }
 
     @Override

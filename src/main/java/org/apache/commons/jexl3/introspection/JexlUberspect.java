@@ -17,6 +17,7 @@
 
 package org.apache.commons.jexl3.introspection;
 
+import org.apache.commons.jexl3.JexlArithmetic;
 import java.util.Iterator;
 
 /**
@@ -46,7 +47,7 @@ public interface JexlUberspect {
      * @return a {@link JexlMethod}
      * @since 3.0
      */
-    JexlMethod getConstructor(Object ctorHandle, Object[] args);
+    JexlMethod getConstructor(Object ctorHandle, Object... args);
 
     /**
      * Returns a JexlMethod.
@@ -55,7 +56,7 @@ public interface JexlUberspect {
      * @param args method arguments
      * @return a {@link JexlMethod}
      */
-    JexlMethod getMethod(Object obj, String method, Object[] args);
+    JexlMethod getMethod(Object obj, String method, Object... args);
 
     /**
      * Property getter.
@@ -82,5 +83,13 @@ public interface JexlUberspect {
      * @return an iterator over obj
      */
     Iterator<?> getIterator(Object obj);
+
+    /**
+     * Gets an arithmetic operator resolver for a given arithmetic instance.
+     * @param arithmetic the arithmetic instance
+     * @return the arithmetic uberspect or null if no operator method were override
+     */
+    JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic);
+
 
 }

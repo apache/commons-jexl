@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
@@ -29,12 +30,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
  */
 abstract class AbstractExecutor {
     /** A marker for invocation failures in tryInvoke. */
-    public static final Object TRY_FAILED = new Object() {
-        @Override
-        public String toString() {
-            return "tryExecute failed";
-        }
-    };
+    public static final Object TRY_FAILED = JexlEngine.TRY_FAILED;
 
     /**
      * A helper to initialize the marker methods (array.get, list.get, etc...).
@@ -191,7 +187,7 @@ abstract class AbstractExecutor {
      * @return true if tryExecute failed, false otherwise
      */
     public final boolean tryFailed(Object exec) {
-        return exec == TRY_FAILED;
+        return exec == JexlEngine.TRY_FAILED;
     }
 
     /**

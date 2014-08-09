@@ -49,6 +49,7 @@ public final class MethodKey {
     private static final int PRIMITIVE_SIZE = 13;
     /** The primitive type to class conversion map. */
     private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES;
+
     static {
         PRIMITIVE_TYPES = new HashMap<Class<?>, Class<?>>(PRIMITIVE_SIZE);
         PRIMITIVE_TYPES.put(Boolean.TYPE, Boolean.class);
@@ -216,6 +217,35 @@ public final class MethodKey {
     }
 
     /**
+     * Checks whether a method is accepts a variable number of arguments.
+     * <p>May be due to a subtle bug in some JVMs, if a varargs method is an override, depending on (may be) the
+     * class introspection order, the isVarargs flag on the method itself will be false.
+     * To circumvent the potential problem, fetch the method with the same signature from iniial method declaring class,
+     * - which will be different if overriden  -and get the varargs flag from it.
+     * @param method the method to check for varargs
+     * @return true if declared varargs, false otherwise
+     */
+    public static boolean isVarArgs(Method method) {
+        if (method == null) {
+            return false;
+        }
+        if (method.isVarArgs()) {
+            return true;
+        }
+        // if this is an override, was it actually declared as varargs?
+        Class<?> clazz = method.getDeclaringClass();
+        try {
+            Method m = clazz.getMethod(method.getName(), method.getParameterTypes());
+            if (m.isVarArgs()) {
+                return true;
+            }
+        } catch (NoSuchMethodException xignore) {
+            // this should not happen...
+        }
+        return false;
+    }
+
+    /**
      * Gets the most specific method that is applicable to the parameters of this key.
      * @param methods a list of methods.
      * @return the most specific method.
@@ -344,7 +374,7 @@ public final class MethodKey {
         }
 
         /* Check for identity or widening reference conversion */
-        if (formal.isAssignableFrom(actual) && (formal.isArray() == actual.isArray())) {
+        if (formal.isAssignableFrom(actual) && (actual != null && formal.isArray() == actual.isArray())) {
             return true;
         }
 
@@ -459,12 +489,8 @@ public final class MethodKey {
              * the end of the below loop, the list will contain exactly one method,
              * (the most specific method) otherwise we have ambiguity.
              */
-
             LinkedList<T> maximals = new LinkedList<T>();
-
-            for (Iterator<T> applicable = applicables.iterator();
-                    applicable.hasNext();) {
-                T app = applicable.next();
+            for (T app : applicables) {
                 Class<?>[] appArgs = getParameterTypes(app);
 
                 boolean lessSpecific = false;
@@ -477,19 +503,19 @@ public final class MethodKey {
                     switch (moreSpecific(appArgs, getParameterTypes(max))) {
                         case MORE_SPECIFIC:
                             /*
-                             * This method is more specific than the previously
-                             * known maximally specific, so remove the old maximum.
-                             */
+                            * This method is more specific than the previously
+                            * known maximally specific, so remove the old maximum.
+                            */
                             maximal.remove();
                             break;
 
                         case LESS_SPECIFIC:
                             /*
-                             * This method is less specific than some of the
-                             * currently known maximally specific methods, so we
-                             * won't add it into the set of maximally specific
-                             * methods
-                             */
+                            * This method is less specific than some of the
+                            * currently known maximally specific methods, so we
+                            * won't add it into the set of maximally specific
+                            * methods
+                            */
 
                             lessSpecific = true;
                             break;
@@ -578,11 +604,11 @@ public final class MethodKey {
 
         /**
          * Checks whether a parameter class is a primitive.
-         * @param c the parameter class
+         * @param c              the parameter class
          * @param possibleVararg true if this is the last parameter which can be a primitive array (vararg call)
          * @return true if primitive, false otherwise
          */
-        private boolean isPrimitive(Class<?> c,  boolean possibleVarArg) {
+        private boolean isPrimitive(Class<?> c, boolean possibleVarArg) {
             if (c != null) {
                 if (c.isPrimitive()) {
                     return true;
@@ -723,9 +749,10 @@ public final class MethodKey {
         protected Class<?>[] getParameterTypes(Method app) {
             return app.getParameterTypes();
         }
+
         @Override
         public boolean isVarArgs(Method app) {
-            return app.isVarArgs();
+            return MethodKey.isVarArgs(app);
         }
     };
     /**
@@ -736,6 +763,7 @@ public final class MethodKey {
         protected Class<?>[] getParameterTypes(Constructor<?> app) {
             return app.getParameterTypes();
         }
+
         @Override
         public boolean isVarArgs(Constructor<?> app) {
             return app.isVarArgs();

@@ -16,6 +16,10 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+
+import org.apache.commons.jexl3.JexlArithmetic;
+import org.apache.commons.jexl3.JexlArithmetic.Operator;
+import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
@@ -26,10 +30,13 @@ import org.apache.log4j.Logger;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ConcurrentHashMap;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -45,7 +52,7 @@ public class Uberspect implements JexlUberspect {
     /**
      * Publicly exposed special failure object returned by tryInvoke.
      */
-    public static final Object TRY_FAILED = AbstractExecutor.TRY_FAILED;
+    public static final Object TRY_FAILED = JexlEngine.TRY_FAILED;
     /** The logger to use for all warnings & errors. */
     protected final Logger rlog;
     /** The introspector version. */
@@ -54,6 +61,12 @@ public class Uberspect implements JexlUberspect {
     private volatile Reference<Introspector> ref;
     /** The class loader reference; used to recreate the Introspector when necessary. */
     private volatile Reference<ClassLoader> loader;
+    /**
+     * The map from arithmetic classes to overloaded operator sets.
+     * <p>This keeps track of which operator methods are overloaded per JexlArithemtic classes
+     * allowing a fail fast test during interpretation by avoiding seeking a method when there is none.
+     */
+    private final Map<Class<? extends JexlArithmetic>, Set<Operator>> operatorMap;
 
     /**
      * Creates a new Uberspect.
@@ -63,6 +76,7 @@ public class Uberspect implements JexlUberspect {
         rlog = runtimeLogger;
         ref = new SoftReference<Introspector>(null);
         loader = new SoftReference<ClassLoader>(getClass().getClassLoader());
+        operatorMap = new ConcurrentHashMap<Class<? extends JexlArithmetic>, Set<Operator>>();
         version = new AtomicInteger(0);
     }
 
@@ -101,6 +115,7 @@ public class Uberspect implements JexlUberspect {
                 ref = new SoftReference<Introspector>(intro);
             }
             loader = new SoftReference<ClassLoader>(intro.getLoader());
+            operatorMap.clear();
             version.incrementAndGet();
         }
     }
@@ -194,7 +209,7 @@ public class Uberspect implements JexlUberspect {
     }
 
     @Override
-    public JexlMethod getMethod(Object obj, String method, Object[] args) {
+    public JexlMethod getMethod(Object obj, String method, Object... args) {
         return MethodExecutor.discover(base(), obj, method, args);
     }
 
@@ -331,7 +346,7 @@ public class Uberspect implements JexlUberspect {
             // look for an iterator() method to support the JDK5 Iterable
             // interface or any user tools/DTOs that want to work in
             // foreach without implementing the Collection interface
-            JexlMethod it = getMethod(obj, "iterator", null);
+            JexlMethod it = getMethod(obj, "iterator", (Object[]) null);
             if (it != null && Iterator.class.isAssignableFrom(it.getReturnType())) {
                 return (Iterator<Object>) it.invoke(obj, (Object[]) null);
             }
@@ -344,9 +359,97 @@ public class Uberspect implements JexlUberspect {
     }
 
     @Override
-    public JexlMethod getConstructor(Object ctorHandle, Object[] args) {
+    public JexlMethod getConstructor(Object ctorHandle, Object... args) {
         return ConstructorMethod.discover(base(), ctorHandle, args);
     }
+
+    /**
+     * The concrete uberspect Arithmetic class.
+     */
+    protected class ArithmeticUberspect implements JexlArithmetic.Uberspect {
+        private final JexlArithmetic arithmetic;
+        private final EnumSet<Operator> overloads;
+
+        private ArithmeticUberspect(JexlArithmetic arithmetic, Set<Operator> overloads) {
+            this.arithmetic = arithmetic;
+            this.overloads = EnumSet.copyOf(overloads);
+        }
+
+        @Override
+        public JexlMethod getOperator(JexlArithmetic.Operator operator, Object arg) {
+            return overloads.contains(operator) && arg != null?
+                   getMethod(arithmetic, operator.getMethodName(), arg) : null;
+        }
+
+        @Override
+        public JexlMethod getOperator(JexlArithmetic.Operator operator, Object lhs, Object rhs) {
+            return overloads.contains(operator) && lhs != null && rhs != null?
+                   getMethod(arithmetic, operator.getMethodName(), lhs, rhs) : null;
+        }
+
+        @Override
+        public Object tryInvokeOperator(JexlArithmetic.Operator operator, Object lhs, Object rhs) {
+            JexlMethod method = getOperator(operator, lhs, rhs);
+            if (method != null) {
+                try {
+                    return method.invoke(arithmetic, lhs, rhs);
+                } catch(Exception xany) {
+                    throw new ArithmeticException(xany.getMessage());
+                }
+            }
+            return JexlEngine.TRY_FAILED;
+        }
+
+        @Override
+        public Object tryInvokeOperator(JexlArithmetic.Operator operator, Object arg) {
+            JexlMethod method = getOperator(operator, arg);
+            if (method != null) {
+                try {
+                    return method.invoke(arithmetic, arg);
+                } catch(Exception xany) {
+                    throw new ArithmeticException(xany.getMessage());
+                }
+            }
+            return JexlEngine.TRY_FAILED;
+        }
+    }
+
+    @Override
+    public JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic) {
+        JexlArithmetic.Uberspect jau = null;
+        if (arithmetic != null) {
+            Set<Operator> ops = operatorMap.get(arithmetic.getClass());
+            if (ops == null) {
+                ops = EnumSet.noneOf(Operator.class);
+                for (JexlArithmetic.Operator op : JexlArithmetic.Operator.values()) {
+                    Method[] methods = getMethods(arithmetic.getClass(), op.getMethodName());
+                    if (methods != null) {
+                        for (Method method : methods) {
+                            Class<?>[] parms = method.getParameterTypes();
+                            if (parms.length != op.getArity()) {
+                                continue;
+                            }
+                            boolean root = true;
+                            for (int p = 0; root && p < parms.length; ++p) {
+                                if (!Object.class.equals(parms[p])) {
+                                    root = false;
+                                }
+                            }
+                            if (!root) {
+                                ops.add(op);
+                            }
+                        }
+                    }
+                }
+                operatorMap.put(arithmetic.getClass(), ops);
+            }
+            if (!ops.isEmpty()) {
+                jau = new ArithmeticUberspect(arithmetic, ops);
+            }
+        }
+        return jau;
+    }
+
     /**
      * May be a way to extend/improve sandboxing by choosing actual method for resolution.
      **

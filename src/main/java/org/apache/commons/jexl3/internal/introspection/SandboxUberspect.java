@@ -16,12 +16,14 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import java.util.Iterator;
+import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
-import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
+
+import java.util.Iterator;
 
 /**
  * An uberspect that controls usage of properties, methods and contructors through a sandbox.
@@ -69,7 +71,7 @@ public final class SandboxUberspect implements JexlUberspect {
      * {@inheritDoc}
      */
     @Override
-    public JexlMethod getConstructor(Object ctorHandle, Object[] args) {
+    public JexlMethod getConstructor(Object ctorHandle, Object... args) {
         final String className;
         if (ctorHandle instanceof Class<?>) {
             Class<?> clazz = (Class<?>) ctorHandle;
@@ -89,9 +91,10 @@ public final class SandboxUberspect implements JexlUberspect {
      * {@inheritDoc}
      */
     @Override
-    public JexlMethod getMethod(Object obj, String method, Object[] args) {
+    public JexlMethod getMethod(Object obj, String method, Object... args) {
         if (obj != null && method != null) {
-            String actual = sandbox.execute(obj.getClass().getName(), method);
+            String objClassName = (obj instanceof Class) ? ((Class<?>)obj).getName() : obj.getClass().getName();
+            String actual = sandbox.execute(objClassName, method);
             if (actual != null) {
                 return uberspect.getMethod(obj, actual, args);
             }
@@ -134,5 +137,13 @@ public final class SandboxUberspect implements JexlUberspect {
     @Override
     public Iterator<?> getIterator(Object obj) {
         return uberspect.getIterator(obj);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic) {
+        return uberspect.getArithmetic(arithmetic);
     }
 }

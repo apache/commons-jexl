@@ -175,6 +175,10 @@ public abstract class JexlParser extends StringParser {
         }
     }
 
+    protected void throwParsingException(JexlNode node) {
+        throwParsingException(null, node);
+    }
+
     /**
      * Throws a parsing exception.
      * @param xclazz the class of exception

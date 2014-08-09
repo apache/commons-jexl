@@ -36,7 +36,7 @@ public interface JexlMethod {
      * @return the result
      * @throws Exception on any error.
      */
-    Object invoke(Object obj, Object[] params) throws Exception;
+    Object invoke(Object obj, Object... params) throws Exception;
 
     /**
      * Attempts to reuse this JexlMethod, checking that it is compatible with
@@ -48,7 +48,7 @@ public interface JexlMethod {
      * @return the result of the method invocation that should be checked by tryFailed to determine if it succeeded
      * or failed.
      */
-    Object tryInvoke(String name, Object obj, Object[] params);
+    Object tryInvoke(String name, Object obj, Object... params);
 
     /**
      * Checks whether a tryInvoke return value indicates a failure or not.
