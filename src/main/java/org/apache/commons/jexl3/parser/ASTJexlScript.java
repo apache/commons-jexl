@@ -74,7 +74,7 @@ public class ASTJexlScript extends JexlNode {
     }
 
     /**
-     * Gets this script scope.
+     * @return this script scope
      */
     public Scope getScope() {
         return scope;

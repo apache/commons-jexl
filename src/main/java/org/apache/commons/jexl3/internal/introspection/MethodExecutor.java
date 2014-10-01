@@ -114,11 +114,6 @@ public final class MethodExecutor extends AbstractExecutor.Method {
 
     /**
      * Reassembles arguments if the method is a vararg method.
-     * @param type   The vararg class type (aka component type
-     *               of the expected array arg)
-     * @param index  The index of the vararg in the method declaration
-     *               (This will always be one less than the number of
-     *               expected arguments.)
      * @param actual The actual arguments being passed to this method
      * @return The actual parameters adjusted for the varargs in order
      * to fit the method declaration.

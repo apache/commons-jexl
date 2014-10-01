@@ -30,12 +30,16 @@ public final class ASTJexlLambda extends ASTJexlScript {
         super(p, id);
     }
 
+    /**
+     * @return true if outermost script.
+     */
     public boolean isTopLevel() {
         return parent == null;
     }
 
     /**
      * Creates an array of arguments by copying values up to the number of parameters.
+     * @param frame the calling frame
      * @param values the argument values
      * @return the arguments array
      */

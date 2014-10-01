@@ -210,6 +210,7 @@ public final class TemplateEngine extends JxltEngine {
          */
         abstract ExpressionType getType();
 
+        /** @return the info */
         JexlInfo getInfo() {
             return null;
         }
@@ -644,6 +645,7 @@ public final class TemplateEngine extends JxltEngine {
 
     /**
      * Creates a JxltEngine.Exception from a JexlException.
+     * @param info   the source info
      * @param action createExpression, prepare, evaluate
      * @param expr   the template expression
      * @param xany   the exception
@@ -686,6 +688,7 @@ public final class TemplateEngine extends JxltEngine {
 
     /**
      * Parses a unified expression.
+     * @param info  the source info
      * @param expr  the string expression
      * @param scope the template scope
      * @return the unified expression instance
@@ -878,7 +881,8 @@ public final class TemplateEngine extends JxltEngine {
 
         /**
          * Creates a new block.
-         * @param theType  the type
+         * @param theType  the block type
+         * @param theLine the line number
          * @param theBlock the content
          */
         Block(BlockType theType, int theLine, String theBlock) {
@@ -898,6 +902,11 @@ public final class TemplateEngine extends JxltEngine {
             }
         }
 
+        /**
+         * Appends this block string representation to a builder.
+         * @param strb the string builder to append to
+         * @param prefix the line prefix (immediate or deferred)
+         */
         protected void toString(StringBuilder strb, String prefix) {
             if (BlockType.VERBATIM.equals(type)) {
                 strb.append(body);
@@ -926,6 +935,7 @@ public final class TemplateEngine extends JxltEngine {
 
         /**
          * Creates a new template from an character input.
+         * @param info the source info
          * @param directive the prefix for lines of code; can not be "$", "${", "#" or "#{"
          *                  since this would preclude being able to differentiate directives and template expressions
          * @param reader    the input reader
@@ -978,7 +988,7 @@ public final class TemplateEngine extends JxltEngine {
             for (int b = 0; b < blocks.size(); ++b) {
                 Block block = blocks.get(b);
                 if (block.type == BlockType.VERBATIM) {
-                    uexprs.add(TemplateEngine.this.parseExpression(info.at(block.line, 0), block.body, b > codeStart ? scope : null));
+                    uexprs.add(parseExpression(info.at(block.line, 0), block.body, b > codeStart ? scope : null));
                 }
             }
             source = blocks.toArray(new Block[blocks.size()]);
@@ -1181,7 +1191,8 @@ public final class TemplateEngine extends JxltEngine {
          * <p>This will dynamically try to find the best suitable method in the writer through uberspection.
          * Subclassing Writer by adding 'print' methods should be the preferred way to specialize output.
          * </p>
-         * @param arg the argument to print out
+         * @param info   the source info
+         * @param arg    the argument to print out
          */
         private void doPrint(JexlInfo info, Object arg) {
             try {
@@ -1237,7 +1248,7 @@ public final class TemplateEngine extends JxltEngine {
             throw new IllegalArgumentException("mark support in reader required");
         }
         return new Iterator<CharSequence>() {
-            CharSequence next = doNext();
+            private CharSequence next = doNext();
 
             private CharSequence doNext() {
                 StringBuffer strb = new StringBuffer(64);
@@ -1284,7 +1295,6 @@ public final class TemplateEngine extends JxltEngine {
 
     /**
      * Reads lines of a template grouping them by typed blocks.
-     * @param info the source info
      * @param prefix the directive prefix
      * @param source the source reader
      * @return the list of blocks

@@ -18,6 +18,9 @@ package org.apache.commons.jexl3.parser;
 
 import org.apache.commons.jexl3.internal.Debugger;
 
+/**
+ * An array literal.
+ */
 public final class ASTArrayLiteral extends JexlNode {
     /** Whether this array is constant or not. */
     private boolean constant = false;

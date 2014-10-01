@@ -26,6 +26,18 @@
     </properties>
     <body>
         <release version="3.0.1" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-146" due-to="David Maplesden">
+                Performance problem in Interpreter.unknownVariable mechanism
+            </action>
+            <action dev="henrib" type="fix">
+                Functions assigned to local variables can not perform recursive calls
+            </action>
+            <action dev="henrib" type="fix">
+                Improved error reporting on undefined or null variables
+            </action>
+            <action dev="henrib" type="fix">
+                Improved operator overloading logic in JexlArithmeric (caching)
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-145" due-to="Ian Connor">
                 Sandbox calling wrong check (classname vs class)
             </action>

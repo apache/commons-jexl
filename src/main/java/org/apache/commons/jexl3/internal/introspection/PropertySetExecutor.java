@@ -150,12 +150,12 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * <p>This checks only one method with that name accepts an array as sole parameter.
      * @param is       the introspector
      * @param clazz    the class to find the get method from
-     * @param methodName the method name to find
+     * @param mname    the method name to find
      * @return         the sole method that accepts an array as parameter
      */
-    private static java.lang.reflect.Method lookupSetEmptyArray(Introspector is, final Class<?> clazz, String methodName) {
+    private static java.lang.reflect.Method lookupSetEmptyArray(Introspector is, final Class<?> clazz, String mname) {
         java.lang.reflect.Method candidate = null;
-        java.lang.reflect.Method[] methods = is.getMethods(clazz, methodName);
+        java.lang.reflect.Method[] methods = is.getMethods(clazz, mname);
         if (methods != null) {
             for (java.lang.reflect.Method method : methods) {
                 Class<?>[] paramTypes = method.getParameterTypes();

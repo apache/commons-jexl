@@ -165,7 +165,7 @@ public class ClassCreatorTest extends JexlTestCase {
 
                 // attempt to force GC:
                 // while we still have a MB free, create & store big objects
-                for (int b = 0; b < 64 && Runtime.getRuntime().freeMemory() > MEGA; ++b) {
+                for (int b = 0; b < 1024 && Runtime.getRuntime().freeMemory() > MEGA; ++b) {
                     BigObject big = new BigObject(b);
                     stuff.add(new InstanceReference(big, queue));
                 }

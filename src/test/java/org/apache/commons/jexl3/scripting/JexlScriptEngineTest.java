@@ -147,4 +147,10 @@ public class JexlScriptEngineTest extends TestCase {
         assertTrue(mymap instanceof Map<?, ?>);
         assertEquals(2,((Map<?, ?>)mymap).size());
     }
+
+    public void testDirectNew() throws Exception {
+        ScriptEngine engine = new JexlScriptEngine();
+        final Integer initialValue = Integer.valueOf(123);
+        assertEquals(initialValue,engine.eval("123"));
+    }
 }

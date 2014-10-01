@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.internal.TemplateEngine;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.Writer;
@@ -49,6 +48,7 @@ public abstract class JxltEngine {
 
         /**
          * Creates an Exception.
+         * @param info the contextual information
          * @param msg the exception message
          * @param cause the exception cause
          */

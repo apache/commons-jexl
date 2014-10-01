@@ -22,6 +22,12 @@ import java.io.FileWriter;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 
 /**
  * Helper class to test GC / reference interactions.
@@ -36,10 +42,11 @@ public class ClassCreator {
     private String className = null;
     private String sourceName = null;
     private ClassLoader loader = null;
-    public static final boolean canRun = comSunToolsJavacMain();
+    public static final boolean canRun = true;//comSunToolsJavacMain();
 
     static final String GEN_PATH = "/org/apache/commons/jexl3/generated";
-    static final String GEN_CLASS = "org.apache.commons.jexl3.generated.";
+    static final String GEN_PACKAGE = "org.apache.commons.jexl3.generated";
+    static final String GEN_CLASS = GEN_PACKAGE + ".";
     /**
      * Check if we can invoke Sun's java compiler.
      * @return true if it is possible, false otherwise
@@ -109,7 +116,9 @@ public class ClassCreator {
 
     void generate() throws Exception {
         FileWriter aWriter = new FileWriter(new File(packageDir, sourceName), false);
-        aWriter.write("package org.apache.commons.jexl3.generated;");
+        aWriter.write("package ");
+        aWriter.write(GEN_PACKAGE);
+        aWriter.write(";\n");
         aWriter.write("public class " + className + "{\n");
         aWriter.write("private int value =");
         aWriter.write(Integer.toString(seed));
@@ -125,7 +134,7 @@ public class ClassCreator {
         aWriter.close();
     }
 
-    Class<?> compile() throws Exception {
+    Class<?> compile0() throws Exception {
         String source = packageDir.getPath() + "/" + sourceName;
         Class<?> javac = getClassLoader().loadClass("com.sun.tools.javac.Main");
         if (javac == null) {
@@ -135,16 +144,34 @@ public class ClassCreator {
         try {
             r = (Integer) jexl.invokeMethod(javac, "compile", source);
             if (r.intValue() >= 0) {
-                return getClassLoader().loadClass("org.apache.commons.jexl3.generated." + className);
+                return getClassLoader().loadClass(GEN_CLASS + className);
             }
         } catch (JexlException xignore) {
             // ignore
         }
         r = (Integer) jexl.invokeMethod(javac, "compile", (Object) new String[]{source});
         if (r.intValue() >= 0) {
-            return getClassLoader().loadClass("org.apache.commons.jexl3.generated." + className);
+            return getClassLoader().loadClass(GEN_CLASS + className);
         }
         return null;
+    }
+
+    Class<?> compile() throws Exception {
+        String source = packageDir.getPath() + "/" + sourceName;
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+        Iterable<? extends JavaFileObject> compilationUnits = fileManager
+                .getJavaFileObjectsFromStrings(Arrays.asList(source));
+        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null,
+                null, compilationUnits);
+        boolean success = task.call();
+        fileManager.close();
+        if (success) {
+            return getClassLoader().loadClass(GEN_CLASS +  className);
+        } else {
+            return null;
+        }
     }
 
     Object validate(Class<?> clazz) throws Exception {

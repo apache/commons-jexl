@@ -144,6 +144,9 @@ public final class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @return true if the cause was located, false otherwise
      */
     public boolean debug(JexlNode node) {
+        return debug(node, true);
+    }
+    public boolean debug(JexlNode node, boolean r) {
         start = 0;
         end = 0;
         indentLevel = 0;
@@ -153,8 +156,10 @@ public final class Debugger extends ParserVisitor implements JexlInfo.Detail {
             cause = node;
             // make arg cause become the root cause
             JexlNode root = node;
+            if (r) {
             while (root.jjtGetParent() != null) {
                 root = root.jjtGetParent();
+            }
             }
             root.jjtAccept(this, null);
         }
