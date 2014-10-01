@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine;
+import java.util.concurrent.Callable;
 
 /**
  * Tests function/lambda/closure features.
@@ -106,5 +107,65 @@ public class LambdaTest extends JexlTestCase {
         JexlScript s42 = jexl.createScript(strs);
         Object result = s42.execute(null);
         assertEquals(42, result);
+    }
+
+    public void testNestLambada() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlContext ctx = null;
+        String strs = "(x)->{ (y)->{ x + y } }";
+        JexlScript s42 = jexl.createScript(strs);
+        Object result = s42.execute(ctx, 15);
+        assertTrue(result instanceof JexlScript);
+        JexlScript s15 = (JexlScript) result;
+        Callable<Object> s15b = s15.callable(ctx, 27);
+        result = s15.execute(ctx, 27);
+        assertEquals(42, result);
+        result = s15b.call();
+        assertEquals(42, result);
+    }
+
+    public void testRecurse() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlContext jc = new MapContext();
+        try {
+            JexlScript script = jexl.createScript("var fact = (x)->{ if (x <= 1) 1; else x * fact(x - 1) }; fact(5)");
+            int result = (Integer) script.execute(jc);
+            assertEquals(120, result);
+        } catch (JexlException xany) {
+            String msg = xany.toString();
+            throw xany;
+        }
+    }
+
+    public void testRecurse2() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlContext jc = new MapContext();
+        // adding some hoisted vars to get it confused
+        try {
+            JexlScript script = jexl.createScript(
+                    "var y = 1; var z = 1; "
+                    +"var fact = (x)->{ if (x <= y) z; else x * fact(x - 1) }; fact(6)");
+            int result = (Integer) script.execute(jc);
+            assertEquals(720, result);
+        } catch (JexlException xany) {
+            String msg = xany.toString();
+            throw xany;
+        }
+    }
+
+    public void testRecurse3() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlContext jc = new MapContext();
+        // adding some hoisted vars to get it confused
+        try {
+            JexlScript script = jexl.createScript(
+                    "var y = 1; var z = 1;var foo = (x)->{y + z}; "
+                    +"var fact = (x)->{ if (x <= y) z; else x * fact(x - 1) }; fact(6)");
+            int result = (Integer) script.execute(jc);
+            assertEquals(720, result);
+        } catch (JexlException xany) {
+            String msg = xany.toString();
+            throw xany;
+        }
     }
 }

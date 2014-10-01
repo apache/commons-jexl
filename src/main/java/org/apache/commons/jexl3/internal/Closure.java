@@ -44,10 +44,36 @@ public class Closure extends Script {
     }
 
     @Override
+    public String toString() {
+        return getParsedText();
+    }
+
+    @Override
     public String getParsedText() {
         Debugger debug = new Debugger();
-        debug.debug(script);
+        debug.debug(script, false);
         return debug.toString();
+    }
+
+    /**
+     * Sets the hoisted index of a given symbol, ie the target index of a parent hoisted symbol in this closure's frame.
+     * <p>This is meant to allow a locally defined function to "see" and call itself as a local (hoisted) variable;
+     * in other words, this allows recursive call of a function.
+     * @param symbol the symbol index (in the caller of this closure)
+     * @param value the value to set in the local frame
+     */
+    public void setHoisted(int symbol, Object value) {
+        if (script instanceof ASTJexlLambda) {
+            ASTJexlLambda lambda = (ASTJexlLambda) script;
+            Scope scope = lambda.getScope();
+            if (scope != null) {
+                Integer reg = scope.getHoisted(symbol);
+                if (reg != null) {
+                    frame.set(reg, value);
+                    return;
+                }
+            }
+        }
     }
 
     @Override
@@ -74,10 +100,11 @@ public class Closure extends Script {
 
     @Override
     public Callable<Object> callable(JexlContext context, Object... args) {
+        Scope.Frame local = null;
         if (frame != null) {
-            frame.assign(args);
+            local = frame.assign(args);
         }
-        final Interpreter interpreter = jexl.createInterpreter(context, frame);
+        final Interpreter interpreter = jexl.createInterpreter(context, local);
         interpreter.functors = functors;
         return new Callable<Object>() {
             /** Use interpreter as marker for not having run. */
@@ -87,7 +114,7 @@ public class Closure extends Script {
             public Object call() throws Exception {
                 if (result == interpreter) {
                     JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
-                    return interpreter.interpret(block);
+                    result = interpreter.interpret(block);
                 }
                 return result;
             }

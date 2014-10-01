@@ -26,8 +26,9 @@ import java.util.Map;
  * Helper class to create typed arrays.
  */
 public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
-    /** The boxing types to primitive conversion map. */
+    /** The number of primitive types. */
     private static final int PRIMITIVE_SIZE = 8;
+    /** The boxing types to primitive conversion map. */
     private static final Map<Class<?>, Class<?>> BOXING_CLASSES;
     static {
         BOXING_CLASSES = new IdentityHashMap<Class<?>, Class<?>>(PRIMITIVE_SIZE);
@@ -41,6 +42,11 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
         BOXING_CLASSES.put(Short.class, Short.TYPE);
     }
 
+    /**
+     * Gets the primitive type of a given class (when it exists).
+     * @param parm a class
+     * @return the primitive type or null it the argument is not unboxable
+     */
     private static Class<?> unboxingClass(Class<?> parm) {
         Class<?> prim = BOXING_CLASSES.get(parm);
         return prim == null ? parm : prim;

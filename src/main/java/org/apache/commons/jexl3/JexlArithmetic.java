@@ -44,28 +44,47 @@ import java.math.MathContext;
  */
 public class JexlArithmetic {
     /**
-     * The overridable operators.
+     * The overload-able operators.
+     * Note that logical and (ie &&) and logical or (ie ||) are not in this list to avoid breaking
+     * their shortcut semantics.
      * @since 3.0
      */
     public enum Operator {
+        /** add(x, y). */
         ADD("+", "add", 2),
+        /** subtract(x, y). */
         SUBTRACT("-", "subtract", 2),
+        /** multiply(x, y). */
         MULTIPLY("*", "multiply", 2),
+        /** divide(x, y). */
         DIVIDE("/", "divide", 2),
+        /** mod(x, y). */
         MOD("%", "mod", 2),
+        /** bitwiseAnd(x, y). */
         AND("&", "bitwiseAnd", 2),
+        /** bitwiseOr(x, y). */
         OR("|", "bitwiseOr", 2),
+        /** bitwiseXor(x, y). */
         XOR("^", "bitwiseXor", 2),
+        /** logicalNot(x). */
         NOT("!", "logicalNot", 1),
+        /** bitiwiseComplement(x). */
         COMPLEMENT("-", "bitwiseComplement", 1),
+        /** equals(x, y). */
         EQ("==", "equals", 2),
+        /** lessThan(x, y). */
         LT("<", "lessThan", 2),
+        /** lessThanOrEqual(x, y). */
         LTE("<=", "lessThanOrEqual", 2),
+        /** greaterThan(x, y). */
         GT(">", "greaterThan", 2),
+        /** greaterThanOrEqual(x, y). */
         GTE(">=", "greaterThanOrEqual", 2),
-        ABS("+", "abs", 1),
+        /** negate(x). */
         NEGATE("-", "negate", 1),
+        /** size(x). */
         SIZE("size", "size", 1),
+        /** empty(x). */
         EMPTY("empty", "empty", 1);
 
         /**
@@ -85,12 +104,12 @@ public class JexlArithmetic {
          * Creates an operator.
          * @param o the operator name
          * @param m the method name associated to this operator in a JexlArithmetic
-         * @param arity the number of parameters for the method
+         * @param argc the number of parameters for the method
          */
-        Operator(String o, String m, int arity) {
+        Operator(String o, String m, int argc) {
             this.operator = o;
             this.methodName = m;
-            this.arity = arity;
+            this.arity = argc;
         }
 
         /**
@@ -124,13 +143,19 @@ public class JexlArithmetic {
      */
     public interface Uberspect {
         /**
+         * Checks whether this uberspect has overloads for a given operator.
+         * @param operator the operator to check
+         * @return true if an overload exists, false otherwise
+         */
+        boolean overloads(JexlArithmetic.Operator operator);
+
+        /**
          * Gets the most specific method for a monadic operator.
          * @param operator the operator
          * @param arg the argument
          * @return the most specific method or null if no specific override could be found
          */
         JexlMethod getOperator(JexlArithmetic.Operator operator, Object arg);
-        Object tryInvokeOperator(JexlArithmetic.Operator operator, Object arg);
 
         /**
          * Gets the most specific method for a diadic operator.
@@ -140,10 +165,9 @@ public class JexlArithmetic {
          * @return the most specific method or null if no specific override could be found
          */
         JexlMethod getOperator(JexlArithmetic.Operator operator, Object lhs, Object rhs);
-        Object tryInvokeOperator(JexlArithmetic.Operator operator, Object lhs, Object rhs);
     }
 
-    /** Maker class for null operand exceptions. */
+    /** Marker class for null operand exceptions. */
     public static class NullOperand extends ArithmeticException {}
     /** Double.MAX_VALUE as BigDecimal. */
     protected static final BigDecimal BIGD_DOUBLE_MAX_VALUE = BigDecimal.valueOf(Double.MAX_VALUE);
@@ -190,7 +214,7 @@ public class JexlArithmetic {
     public JexlArithmetic options(JexlEngine.Options options) {
         boolean ostrict = options.isStrictArithmetic() == null
                           ? this.strict
-                          : options.isStrictArithmetic().booleanValue();
+                          : options.isStrictArithmetic();
         MathContext bigdContext = options.getArithmeticMathContext();
         if (bigdContext == null) {
             bigdContext = mathContext;

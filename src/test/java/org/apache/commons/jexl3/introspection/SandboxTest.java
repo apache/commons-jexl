@@ -295,8 +295,16 @@ public class SandboxTest extends JexlTestCase {
         String expr;
         JexlScript script;
         Object result;
-
+        
         script = sjexl.createScript("System.exit()");
+        try {
+            result = script.execute(context);
+            fail("should not allow calling exit!");
+        } catch (JexlException xjexl) {
+            LOGGER.info(xjexl.toString());
+        }
+
+        script = sjexl.createScript("System.exit(1)");
         try {
             result = script.execute(context);
             fail("should not allow calling exit!");

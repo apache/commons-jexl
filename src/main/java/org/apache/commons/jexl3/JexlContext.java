@@ -100,10 +100,10 @@ public interface JexlContext {
      * A marker interface that indicates the interpreter to put this context in the JexlEngine thread local context
      * instance during evaluation.
      * This allows user functions or methods to access the context during a call.
-     * Note that the usual caveats wrt using thread local apply (caching/leaking references, etc.); in particular, keeping
-     * a reference to such a context is to be considered with great care and caution.
-     * It should also be noted that sharing such a context between threads should implicate synchronizing variable access
-     * in the implementation class.
+     * Note that the usual caveats wrt using thread local apply (caching/leaking references, etc.); in particular,
+     * keeping a reference to such a context is to be considered with great care and caution.
+     * It should also be noted that sharing such a context between threads should implicate synchronizing variable
+     * accessing the implementation class.
      * @see JexlEngine#setThreadContext()
      * @see JexlEngine#getThreadContext()
      */

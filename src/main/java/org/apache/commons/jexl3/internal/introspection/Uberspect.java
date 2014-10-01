@@ -367,50 +367,40 @@ public class Uberspect implements JexlUberspect {
      * The concrete uberspect Arithmetic class.
      */
     protected class ArithmeticUberspect implements JexlArithmetic.Uberspect {
+        /** The arithmetic instance being analyzed. */
         private final JexlArithmetic arithmetic;
+        /** The set of overloaded operators. */
         private final EnumSet<Operator> overloads;
 
-        private ArithmeticUberspect(JexlArithmetic arithmetic, Set<Operator> overloads) {
-            this.arithmetic = arithmetic;
-            this.overloads = EnumSet.copyOf(overloads);
+        /**
+         * Creates an instance.
+         * @param theArithmetic the arithmetic instance
+         * @param theOverloads  the overloaded operators
+         */
+        private ArithmeticUberspect(JexlArithmetic theArithmetic, Set<Operator> theOverloads) {
+            this.arithmetic = theArithmetic;
+            this.overloads = EnumSet.copyOf(theOverloads);
+            // register this arithmetic class in the operator map
+            operatorMap.put(arithmetic.getClass(), overloads);
         }
 
         @Override
         public JexlMethod getOperator(JexlArithmetic.Operator operator, Object arg) {
-            return overloads.contains(operator) && arg != null?
-                   getMethod(arithmetic, operator.getMethodName(), arg) : null;
+            return overloads.contains(operator) && arg != null
+                   ? getMethod(arithmetic, operator.getMethodName(), arg)
+                   : null;
         }
 
         @Override
         public JexlMethod getOperator(JexlArithmetic.Operator operator, Object lhs, Object rhs) {
-            return overloads.contains(operator) && lhs != null && rhs != null?
-                   getMethod(arithmetic, operator.getMethodName(), lhs, rhs) : null;
+            return overloads.contains(operator) && lhs != null && rhs != null
+                   ? getMethod(arithmetic, operator.getMethodName(), lhs, rhs)
+                   : null;
         }
 
         @Override
-        public Object tryInvokeOperator(JexlArithmetic.Operator operator, Object lhs, Object rhs) {
-            JexlMethod method = getOperator(operator, lhs, rhs);
-            if (method != null) {
-                try {
-                    return method.invoke(arithmetic, lhs, rhs);
-                } catch(Exception xany) {
-                    throw new ArithmeticException(xany.getMessage());
-                }
-            }
-            return JexlEngine.TRY_FAILED;
-        }
-
-        @Override
-        public Object tryInvokeOperator(JexlArithmetic.Operator operator, Object arg) {
-            JexlMethod method = getOperator(operator, arg);
-            if (method != null) {
-                try {
-                    return method.invoke(arithmetic, arg);
-                } catch(Exception xany) {
-                    throw new ArithmeticException(xany.getMessage());
-                }
-            }
-            return JexlEngine.TRY_FAILED;
+        public boolean overloads(Operator operator) {
+            return overloads.contains(operator);
         }
     }
 
@@ -429,6 +419,7 @@ public class Uberspect implements JexlUberspect {
                             if (parms.length != op.getArity()) {
                                 continue;
                             }
+                            // eliminate method(Object) and method(Object, Object)
                             boolean root = true;
                             for (int p = 0; root && p < parms.length; ++p) {
                                 if (!Object.class.equals(parms[p])) {
@@ -441,7 +432,6 @@ public class Uberspect implements JexlUberspect {
                         }
                     }
                 }
-                operatorMap.put(arithmetic.getClass(), ops);
             }
             if (!ops.isEmpty()) {
                 jau = new ArithmeticUberspect(arithmetic, ops);

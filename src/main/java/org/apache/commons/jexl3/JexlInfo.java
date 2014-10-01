@@ -37,14 +37,20 @@ public class JexlInfo {
     }
 
     /**
-     * Describes errors more precicely.
+     * Describes errors more precisely.
      */
-    public static interface Detail {
-        /** The start column on the line that triggered the error. */
+    public interface Detail {
+        /**
+         * @return he start column on the line that triggered the error
+         */
         int start();
-        /** The end column on the line that triggered the error. */
+        /**
+         * @return the end column on the line that triggered the error
+         */
         int end();
-        /** The actual part of code that triggered the error. */
+        /**
+         * @return the actual part of code that triggered the error
+         */
         @Override
         String toString();
     }
@@ -61,10 +67,20 @@ public class JexlInfo {
         column = c;
     }
 
+    /**
+     * Creates info reusing the name.
+     * @param l the line
+     * @param c the column
+     * @return a new info instance
+     */
     public JexlInfo at(int l, int c) {
         return new JexlInfo(name, l, c);
     }
 
+    /**
+     * The copy constructor.
+     * @param copy the instance to copy
+     */
     protected JexlInfo(JexlInfo copy) {
         name = copy.getName();
         line = copy.getLine();

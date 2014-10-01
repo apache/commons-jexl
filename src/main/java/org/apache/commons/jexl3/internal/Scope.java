@@ -194,6 +194,23 @@ public final class Scope {
     }
 
     /**
+     * Gets the hoisted index of a given symbol, ie the target index of a symbol in a child frame.
+     * @param symbol the symbol index
+     * @return the target symbol index or null if the symbol is not hoisted
+     */
+    public Integer getHoisted(int symbol) {
+        if (hoistedVariables != null) {
+            for (Map.Entry<Integer, Integer> hoist : hoistedVariables.entrySet()) {
+                Integer source = hoist.getValue();
+                if (source == symbol) {
+                    return hoist.getKey();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Gets the (maximum) number of arguments this script expects.
      * @return the number of parameters
      */

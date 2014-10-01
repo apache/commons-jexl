@@ -83,9 +83,36 @@ public class JexlException extends RuntimeException {
      * @return the information
      */
     public JexlInfo getInfo() {
-        if (info != null && mark != null) {
+        return getInfo(mark, info);
+    }
+
+    /**
+     * Creates a string builder pre-filled with common error information (if possible).
+     * @param node the node
+     * @return a string builder
+     */
+    private static StringBuilder errorAt(JexlNode node) {
+        JexlInfo info = node != null? getInfo(node, node.jexlInfo()) : null;
+        StringBuilder msg = new StringBuilder();
+        if (info != null) {
+            msg.append(info.toString());
+        } else {
+            msg.append("?:");
+        }
+        msg.append(' ');
+        return msg;
+    }
+
+    /**
+     * Gets the most specific information attached to a node.
+     * @param node the node
+     * @param info the information
+     * @return the information or null
+     */
+    public static JexlInfo getInfo(JexlNode node, JexlInfo info) {
+        if (info != null && node != null) {
             final Debugger dbg = new Debugger();
-            if (dbg.debug(mark)) {
+            if (dbg.debug(node)) {
                 return new JexlInfo(info) {
                     @Override
                     public JexlInfo.Detail getDetail() {
@@ -300,12 +327,26 @@ public class JexlException extends RuntimeException {
      */
     public static class Variable extends JexlException {
         /**
+         * Undefined variable flag.
+         */
+        private final boolean undefined;
+        /**
          * Creates a new Variable exception instance.
          * @param node the offending ASTnode
          * @param var  the unknown variable
+         * @param undef whether the variable is undefined or evaluated as null
          */
-        public Variable(JexlNode node, String var) {
+        public Variable(JexlNode node, String var, boolean undef) {
             super(node, var, null);
+            undefined = undef;
+        }
+
+        /**
+         * Whether the variable causing an error is undefined or evaluated as null.
+         * @return true if undefined, false otherwise
+         */
+        public boolean isUndefined() {
+            return undefined;
         }
 
         /**
@@ -317,8 +358,27 @@ public class JexlException extends RuntimeException {
 
         @Override
         protected String detailedMessage() {
-            return "undefined variable " + getVariable();
+            return (undefined? "undefined" : "null value") + " variable " + getVariable();
         }
+    }
+
+    /**
+     * Generates a message for a variable error.
+     * @param node the node where the error occurred
+     * @param variable the variable
+     * @param undef whether the variable is null or undefined
+     * @return the error message
+     */
+    public static String variableError(JexlNode node, String variable, boolean undef) {
+        StringBuilder msg = errorAt(node);
+        if (undef) {
+            msg.append("undefined");
+        } else {
+            msg.append("null value");
+        }
+        msg.append(" variable ");
+        msg.append(variable);
+        return msg.toString();
     }
 
     /**
@@ -359,6 +419,20 @@ public class JexlException extends RuntimeException {
     }
 
     /**
+     * Generates a message for an unsolvable property error.
+     * @param node the node where the error occurred
+     * @param var the variable
+     * @return the error message
+     */
+    public static String propertyError(JexlNode node, String var) {
+        StringBuilder msg = errorAt(node);
+        msg.append("unsolvable property '");
+        msg.append(var);
+        msg.append('\'');
+        return msg.toString();
+    }
+
+    /**
      * Thrown when a method or ctor is unknown, ambiguous or inaccessible.
      * @since 3.0
      */
@@ -366,11 +440,10 @@ public class JexlException extends RuntimeException {
         /**
          * Creates a new Method exception instance.
          * @param node  the offending ASTnode
-         * @param name  the unknown method
-         * @param cause the exception causing the error
+         * @param name  the method name
          */
-        public Method(JexlNode node, String name, Throwable cause) {
-            super(node, name, cause);
+        public Method(JexlNode node, String name) {
+            super(node, name);
         }
 
         /**
@@ -394,6 +467,20 @@ public class JexlException extends RuntimeException {
         protected String detailedMessage() {
             return "unsolvable function/method '" + getMethod() + "'";
         }
+    }
+
+    /**
+     * Generates a message for a unsolvable method error.
+     * @param node the node where the error occurred
+     * @param method the method name
+     * @return the error message
+     */
+    public static String methodError(JexlNode node, String method) {
+        StringBuilder msg = errorAt(node);
+        msg.append("unsolvable function/method '");
+        msg.append(method);
+        msg.append('\'');
+        return msg.toString();
     }
 
     /**

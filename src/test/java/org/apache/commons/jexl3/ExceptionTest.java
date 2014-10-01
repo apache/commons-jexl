@@ -58,7 +58,7 @@ public class ExceptionTest extends JexlTestCase {
         // empty cotext
         try {
             /* Object o = */ e.evaluate(ctxt);
-            fail("c.e not declared as variable should throw");
+            fail("c.e not defined as variable should throw");
         } catch (JexlException.Variable xjexl) {
             String msg = xjexl.getMessage();
             assertTrue(msg.indexOf("c.e") > 0);
@@ -70,9 +70,9 @@ public class ExceptionTest extends JexlTestCase {
         try {
             /* Object o = */ e.evaluate(ctxt);
             fail("c.e as null operand should throw");
-        } catch (JexlException xjexl) {
+        } catch (JexlException.Variable xjexl) {
             String msg = xjexl.getMessage();
-            assertTrue(msg.indexOf("null operand") > 0);
+            assertTrue(msg.indexOf("c.e") > 0);
         }
 
         // allow null operands
@@ -96,4 +96,61 @@ public class ExceptionTest extends JexlTestCase {
         }
     }
 
+    // null local vars and strict arithmetic effects
+    public void testExVar() throws Exception {
+        JexlEngine jexl = createEngine(false);
+        JexlScript e = jexl.createScript("(x)->{ x * 6 }");
+        JexlEvalContext ctxt = new JexlEvalContext();
+        // ensure errors will throw
+        ctxt.setSilent(false);
+        // make unknown vars throw
+        ctxt.setStrict(true);
+        ctxt.setStrictArithmetic(true);
+        // empty cotext
+        try {
+            /* Object o = */ e.execute(ctxt);
+            fail("x is null, should throw");
+        } catch (JexlException xjexl) {
+            String msg = xjexl.getMessage();
+            assertTrue(msg.indexOf("null") > 0);
+        }
+
+        // allow null operands
+        ctxt.setStrictArithmetic(false);
+        try {
+            Object o = e.execute(ctxt);
+        } catch (JexlException.Variable xjexl) {
+            fail("arithmetic allows null operands, should not throw");
+        }
+    }
+
+    // Unknown vars and properties versus null operands
+    public void testExMethod() throws Exception {
+        JexlEngine jexl = createEngine(false);
+        JexlExpression e = jexl.createExpression("c.e.foo()");
+        JexlEvalContext ctxt = new JexlEvalContext();
+        // ensure errors will throw
+        ctxt.setSilent(false);
+        // make unknown vars throw
+        ctxt.setStrict(true);
+        // empty cotext
+        try {
+            /* Object o = */ e.evaluate(ctxt);
+            fail("c.e not declared as variable should throw");
+        } catch (JexlException.Variable xjexl) {
+            String msg = xjexl.getMessage();
+            assertTrue(msg.indexOf("c.e") > 0);
+        }
+
+        // disallow null operands
+        ctxt.setStrictArithmetic(true);
+        ctxt.set("c.e", null);
+        try {
+            /* Object o = */ e.evaluate(ctxt);
+            fail("c.e as null operand should throw");
+        } catch (JexlException xjexl) {
+            String msg = xjexl.getMessage();
+            assertTrue(msg.indexOf("c.e") > 0);
+        }
+    }
 }

@@ -83,7 +83,6 @@ public class ArithmeticTest extends JexlTestCase {
     public void testNullOperand() throws Exception {
         asserter.setVariable("right", null);
         asserter.failExpression("~right", ".*null.*");
-        asserter.failExpression("-right", ".*arithmetic.*");
     }
 
     public void testBigDecimal() throws Exception {
@@ -410,5 +409,190 @@ public class ArithmeticTest extends JexlTestCase {
             Object result = script.execute(jc);
             assertEquals("failed on " + stext, expected, result);
         }
+    }
+
+    public static class Var {
+        final int value;
+        Var(int v) {
+            value = v;
+        }
+    }
+
+    // an arithmetic that know how to subtract strings
+    public static class ArithmeticPlus extends JexlArithmetic {
+        public ArithmeticPlus(boolean strict) {
+            super(strict);
+        }
+        public boolean equals(Var lhs, Var rhs) {
+            return lhs.value == rhs.value;
+        }
+        public boolean lessThan(Var lhs, Var rhs) {
+            return lhs.value < rhs.value;
+        }
+        public boolean lessThanOrEqual(Var lhs, Var rhs) {
+            return lhs.value <= rhs.value;
+        }
+        public boolean greaterThan(Var lhs, Var rhs) {
+            return lhs.value > rhs.value;
+        }
+        public boolean greaterThanOrEqual(Var lhs, Var rhs) {
+            return lhs.value >= rhs.value;
+        }
+        public Var add(Var lhs, Var rhs) {
+            return new Var(lhs.value + rhs.value);
+        }
+        public Var subtract(Var lhs, Var rhs) {
+            return new Var(lhs.value - rhs.value);
+        }
+        public Var divide(Var lhs, Var rhs) {
+            return new Var(lhs.value / rhs.value);
+        }
+        public Var multiply(Var lhs, Var rhs) {
+            return new Var(lhs.value * rhs.value);
+        }
+        public Var mod(Var lhs, Var rhs) {
+            return new Var(lhs.value / rhs.value);
+        }
+        public Var negate(Var arg) {
+            return new Var(-arg.value);
+        }
+        public Var bitwiseAnd(Var lhs, Var rhs) {
+            return new Var(lhs.value & rhs.value);
+        }
+        public Var bitwiseOr(Var lhs, Var rhs) {
+            return new Var(lhs.value | rhs.value);
+        }
+        public Var bitwiseXor(Var lhs, Var rhs) {
+            return new Var(lhs.value ^ rhs.value);
+        }
+        public Var bitwiseComplement(Var arg) {
+            return new Var(~arg.value);
+        }
+
+        public Object subtract(String x, String y) {
+            int ix = x.indexOf(y);
+            if (ix < 0) {
+                return x;
+            }
+            StringBuilder strb = new StringBuilder(x.substring(0, ix));
+            strb.append(x.substring(ix + y.length()));
+            return strb.toString();
+        }
+
+        public Object negate(final String str) {
+            final int length = str.length();
+            StringBuilder strb = new StringBuilder(str.length());
+            for(int c = length - 1; c >= 0; --c) {
+                strb.append(str.charAt(c));
+            }
+            return strb.toString();
+        }
+    }
+
+    public void testArithmeticPlus() throws Exception {
+        JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new ArithmeticPlus(false)).create();
+        JexlContext jc = new EmptyTestContext();
+        runOverload(jexl, jc);
+    }
+
+    public void testArithmeticPlusNoCache() throws Exception {
+        JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new ArithmeticPlus(false)).create();
+        JexlContext jc = new EmptyTestContext();
+        runOverload(jexl, jc);
+    }
+
+    protected void runOverload(JexlEngine jexl,JexlContext jc) {
+        JexlScript script;
+        Object result;
+
+        script = jexl.createScript("(x, y)->{ x < y }");
+        result = script.execute(jc, 42, 43);
+        assertEquals(true, result);
+        result = script.execute(jc, new Var(42), new Var(43));
+        assertEquals(true, result);
+        result = script.execute(jc, new Var(42), new Var(43));
+        assertEquals(true, result);
+        result = script.execute(jc, 43, 42);
+        assertEquals(false, result);
+        result = script.execute(jc, new Var(43), new Var(42));
+        assertEquals(false, result);
+        result = script.execute(jc, new Var(43), new Var(42));
+        assertEquals(false, result);
+
+        script = jexl.createScript("(x, y)->{ x <= y }");
+        result = script.execute(jc, 42, 43);
+        assertEquals(true, result);
+        result = script.execute(jc, new Var(42), new Var(43));
+        assertEquals(true, result);
+        result = script.execute(jc, new Var(41), new Var(44));
+        assertEquals(true, result);
+        result = script.execute(jc, 43, 42);
+        assertEquals(false, result);
+        result = script.execute(jc, new Var(45), new Var(40));
+        assertEquals(false, result);
+        result = script.execute(jc, new Var(46), new Var(39));
+        assertEquals(false, result);
+
+        script = jexl.createScript("(x, y)->{ x == y }");
+        result = script.execute(jc, 42, 43);
+        assertEquals(false, result);
+        result = script.execute(jc, new Var(42), new Var(43));
+        assertEquals(false, result);
+        result = script.execute(jc, new Var(41), new Var(44));
+        assertEquals(false, result);
+        result = script.execute(jc, 43, 42);
+        assertEquals(false, result);
+        result = script.execute(jc, new Var(45), new Var(40));
+        assertEquals(false, result);
+        result = script.execute(jc, new Var(46), new Var(39));
+        assertEquals(false, result);
+
+        script = jexl.createScript("(x, y)->{ x % y }");
+        result = script.execute(jc, 4242, 100);
+        assertEquals(42, result);
+        result = script.execute(jc, new Var(4242), new Var(100));
+        assertEquals(42, ((Var) result).value);
+        result = script.execute(jc, new Var(4242), new Var(100));
+        assertEquals(42, ((Var) result).value);
+
+        script = jexl.createScript("(x, y)->{ x * y }");
+        result = script.execute(jc, 6, 7);
+        assertEquals(42, result);
+        result = script.execute(jc, new Var(6), new Var(7));
+        assertEquals(42, ((Var) result).value);
+        result = script.execute(jc, new Var(6), new Var(7));
+        assertEquals(42, ((Var) result).value);
+
+        script = jexl.createScript("(x, y)->{ x + y }");
+        result = script.execute(jc, 35, 7);
+        assertEquals(42, result);
+        result = script.execute(jc, new Var(35), new Var(7));
+        assertEquals(42, ((Var) result).value);
+        result = script.execute(jc, new Var(35), new Var(7));
+        assertEquals(42, ((Var) result).value);
+
+        script = jexl.createScript("(x, y)->{ x - y }");
+        result = script.execute(jc, 49, 7);
+        assertEquals(42, result);
+        result = script.execute(jc, "foobarquux", "bar");
+        assertEquals("fooquux", result);
+        result = script.execute(jc, 50, 8);
+        assertEquals(42, result);
+        result = script.execute(jc, new Var(50), new Var(8));
+        assertEquals(42, ((Var) result).value);
+        result = script.execute(jc, new Var(50), new Var(8));
+        assertEquals(42, ((Var) result).value);
+
+        script = jexl.createScript("(x)->{ -x }");
+        result = script.execute(jc, -42);
+        assertEquals(42, result);
+        result = script.execute(jc, new Var(-42));
+        assertEquals(42, ((Var) result).value);
+        result = script.execute(jc, new Var(-42));
+        assertEquals(42, ((Var) result).value);
+        result = script.execute(jc, "pizza");
+        assertEquals("azzip", result);
+        result = script.execute(jc, -142);
+        assertEquals(142, result);
     }
 }

@@ -451,6 +451,11 @@ public final class MethodKey {
          */
         protected abstract Class<?>[] getParameterTypes(T app);
 
+        /**
+         * Whether a constructor or method handles varargs.
+         * @param app the constructor or method
+         * @return true if varargs, false otherwise
+         */
         protected abstract boolean isVarArgs(T app);
 
         // CSOFF: RedundantThrows
@@ -605,7 +610,7 @@ public final class MethodKey {
         /**
          * Checks whether a parameter class is a primitive.
          * @param c              the parameter class
-         * @param possibleVararg true if this is the last parameter which can be a primitive array (vararg call)
+         * @param possibleVarArg true if this is the last parameter which can be a primitive array (vararg call)
          * @return true if primitive, false otherwise
          */
         private boolean isPrimitive(Class<?> c, boolean possibleVarArg) {
@@ -644,7 +649,7 @@ public final class MethodKey {
          * argument types.
          *
          * @param method  method that will be called
-         * @param classes arguments to method
+         * @param actuals arguments signature for method
          * @return true if method is applicable to arguments
          */
         private boolean isApplicable(T method, Class<?>[] actuals) {
