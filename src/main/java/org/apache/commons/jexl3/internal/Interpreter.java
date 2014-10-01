@@ -299,7 +299,6 @@ public class Interpreter extends ParserVisitor {
         return null;
     }
 
-
     /**
      * Triggered when method, function or constructor invocation fails.
      * @param xjexl the JexlException wrapping the original error

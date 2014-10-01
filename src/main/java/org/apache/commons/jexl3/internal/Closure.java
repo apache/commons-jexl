@@ -20,7 +20,6 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.JexlNode;
 
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -29,8 +28,6 @@ import java.util.concurrent.Callable;
 public class Closure extends Script {
     /** The frame. */
     protected final Scope.Frame frame;
-    /** The map of registered functions. */
-    protected final Map<String, Object> functors;
 
     /**
      * Creates a closure.
@@ -39,7 +36,6 @@ public class Closure extends Script {
      */
     protected Closure(Interpreter theCaller, ASTJexlLambda lambda) {
         super(theCaller.jexl, null, lambda);
-        functors = theCaller.functors;
         frame = lambda.createFrame(theCaller.frame);
     }
 
@@ -70,7 +66,6 @@ public class Closure extends Script {
                 Integer reg = scope.getHoisted(symbol);
                 if (reg != null) {
                     frame.set(reg, value);
-                    return;
                 }
             }
         }
@@ -93,7 +88,6 @@ public class Closure extends Script {
             callFrame = frame.assign(args);
         }
         Interpreter interpreter = jexl.createInterpreter(context, callFrame);
-        interpreter.functors = functors;
         JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
         return interpreter.interpret(block);
     }
@@ -105,7 +99,6 @@ public class Closure extends Script {
             local = frame.assign(args);
         }
         final Interpreter interpreter = jexl.createInterpreter(context, local);
-        interpreter.functors = functors;
         return new Callable<Object>() {
             /** Use interpreter as marker for not having run. */
             private Object result = interpreter;
