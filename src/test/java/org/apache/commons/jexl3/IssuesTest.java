@@ -1069,4 +1069,22 @@ public class IssuesTest extends JexlTestCase {
         }
         assertNull("The arr2 property value should remain as null, not an empty array.", quux.arr2);
     }
+
+    public void test147() throws Exception {
+        JexlEngine JEXL = new Engine();
+        JexlContext jc = new MapContext();
+        JexlExpression e147 = JEXL.createExpression("quux = [one, two]");
+
+        jc.set("one", 1);
+        jc.set("two", 2);
+        int[] o1 = (int[])e147.evaluate(jc);
+        assertEquals(1, o1[0]);
+        assertEquals(2, o1[1]);
+
+        jc.set("one", 10);
+        jc.set("two", 20);
+        int[] o2 = (int[]) e147.evaluate(jc);
+        assertEquals(10, o2[0]);
+        assertEquals(20, o2[1]);
+    }
 }

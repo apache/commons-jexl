@@ -26,6 +26,13 @@
     </properties>
     <body>
         <release version="3.0.1" date="unreleased">
+            <action dev="henrib" type="fix" >
+                Depending on unkown conditions, overriden varargs method may return false to isVarArgs;
+                fix by checking method in declaring class hierarchy.
+            </action>
+            <action dev="henrib" type="fix">
+                Performance problem in Interpreter.unknownVariable mechanism
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-146" due-to="David Maplesden">
                 Performance problem in Interpreter.unknownVariable mechanism
             </action>

@@ -42,8 +42,8 @@ public interface JexlMethod {
      * Attempts to reuse this JexlMethod, checking that it is compatible with
      * the actual set of arguments.
      * Related to isCacheable since this method is often used with cached JexlMethod instances.
-     * @param obj the object to invoke the method upon
      * @param name the method name
+     * @param obj the object to invoke the method upon
      * @param params the method arguments
      * @return the result of the method invocation that should be checked by tryFailed to determine if it succeeded
      * or failed.

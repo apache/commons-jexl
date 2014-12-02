@@ -194,4 +194,31 @@ public class ClassCreatorTest extends JexlTestCase {
         }
     }
 
+    public static class TwoCtors {
+        int value;
+
+        public TwoCtors(int v) {
+            this.value = v;
+        }
+
+        public TwoCtors(Number x) {
+            this.value = -x.intValue();
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
+    public void testBasicCtor() throws Exception {
+        JexlScript s = jexl.createScript("(c, v)->{ var ct2 = new(c, v); ct2.value; }");
+        Object r = s.execute(null, TwoCtors.class, 10);
+        assertEquals(10, r);
+        r = s.execute(null, TwoCtors.class, 5 + 5);
+        assertEquals(10, r);
+        r = s.execute(null, TwoCtors.class, 10d);
+        assertEquals(-10, r);
+        r = s.execute(null, TwoCtors.class, 100f);
+        assertEquals(-100, r);
+    }
 }
