@@ -217,31 +217,40 @@ public final class MethodKey {
     }
 
     /**
-     * Checks whether a method is accepts a variable number of arguments.
+     * Checks whether a method accepts a variable number of arguments.
      * <p>May be due to a subtle bug in some JVMs, if a varargs method is an override, depending on (may be) the
      * class introspection order, the isVarargs flag on the method itself will be false.
-     * To circumvent the potential problem, fetch the method with the same signature from iniial method declaring class,
-     * - which will be different if overriden  -and get the varargs flag from it.
+     * To circumvent the potential problem, fetch the method with the same signature from the super-classes,
+     * - which will be different if override  -and get the varargs flag from it.
      * @param method the method to check for varargs
      * @return true if declared varargs, false otherwise
      */
-    public static boolean isVarArgs(Method method) {
+    public static boolean isVarArgs(final Method method) {
         if (method == null) {
             return false;
         }
         if (method.isVarArgs()) {
             return true;
         }
+        // before climbing up the hierarchy, verify that the last parameter is an array
+        final Class<?>[] ptypes = method.getParameterTypes();
+        if (ptypes.length > 0 && ptypes[ptypes.length - 1].getComponentType() == null) {
+            return false;
+        }
+        final String mname = method.getName();
         // if this is an override, was it actually declared as varargs?
         Class<?> clazz = method.getDeclaringClass();
-        try {
-            Method m = clazz.getMethod(method.getName(), method.getParameterTypes());
-            if (m.isVarArgs()) {
-                return true;
+        do {
+            try {
+                Method m = clazz.getMethod(mname, ptypes);
+                if (m.isVarArgs()) {
+                    return true;
+                }
+            } catch (NoSuchMethodException xignore) {
+                // this should not happen...
             }
-        } catch (NoSuchMethodException xignore) {
-            // this should not happen...
-        }
+            clazz = clazz.getSuperclass();
+        } while(clazz != null);
         return false;
     }
 
