@@ -26,6 +26,16 @@
     </properties>
     <body>
         <release version="3.0.1" date="unreleased">
+            <action dev="henrib" type="add" >
+                Added #pragma instruction, allowing scripts to communicate information to the underlying execution
+                context.
+            </action>
+            <action dev="henrib" type="fix" >
+                Hoisted variables in a lambda are seen as local variables; should be seen as global
+            </action>
+            <action dev="henrib" type="fix" >
+                Local variables preclude antish variables handling
+            </action>
             <action dev="henrib" type="fix" >
                 Depending on unkown conditions, overriden varargs method may return false to isVarArgs;
                 fix by checking method in declaring class hierarchy.
