@@ -129,6 +129,15 @@ public final class Scope {
     }
 
     /**
+     * Checks whether a given symbol is hoisted.
+     * @param symbol the symbol number
+     * @return true if hoisted, false otherwise
+     */
+    public boolean isHoistedSymbol(int symbol) {
+        return hoistedVariables != null && hoistedVariables.containsKey(symbol);
+    }
+
+    /**
      * Declares a parameter.
      * <p>
      * This method creates an new entry in the symbol map.
@@ -246,15 +255,16 @@ public final class Scope {
     }
 
     /**
-     * Gets this script local variable, i.e. symbols assigned to local variables.
+     * Gets this script local variable, i.e. symbols assigned to local variables excluding hoisted variables.
      * @return the local variable names
      */
     public String[] getLocalVariables() {
         if (namedVariables != null && vars > 0) {
-            String[] pa = new String[parms];
+            String[] pa = new String[parms - (hoistedVariables == null? 0 : hoistedVariables.size())];
             int p = 0;
             for (Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
-                if (entry.getValue().intValue() >= parms) {
+                int symnum = entry.getValue().intValue();
+                if (symnum >= parms && (hoistedVariables == null || !hoistedVariables.containsKey(symnum))) {
                     pa[p++] = entry.getKey();
                 }
             }

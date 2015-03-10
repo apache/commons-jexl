@@ -22,6 +22,7 @@ import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -169,6 +170,16 @@ public class Script implements JexlScript, JexlExpression {
     @Override
     public Set<List<String>> getVariables() {
         return jexl.getVariables(script);
+    }
+
+    /**
+     * Get this script pragmas
+     * <p>Pragma keys are ant-ish variables, their values are scalar literals..
+     * @return the pragmas
+     */
+    @Override
+    public Map<String, Object> getPragmas() {
+        return script.getPragmas();
     }
 
     /**

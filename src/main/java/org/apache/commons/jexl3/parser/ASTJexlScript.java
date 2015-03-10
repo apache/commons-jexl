@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.parser;
 
 import org.apache.commons.jexl3.internal.Scope;
+import java.util.Map;
 
 /**
  * Enhanced script to allow parameters declaration.
@@ -24,6 +25,8 @@ import org.apache.commons.jexl3.internal.Scope;
 public class ASTJexlScript extends JexlNode {
     /** The script scope. */
     protected Scope scope = null;
+    /** The pragmas. */
+    protected Map<String, Object> pragmas = null;
 
     public ASTJexlScript(int id) {
         super(id);
@@ -81,6 +84,13 @@ public class ASTJexlScript extends JexlNode {
     }
 
     /**
+     * @return this script pragmas
+     */
+    public Map<String,Object> getPragmas() {
+        return pragmas;
+    }
+
+    /**
      * Creates an array of arguments by copying values up to the number of parameters.
      * @param values the argument values
      * @return the arguments array
@@ -125,5 +135,14 @@ public class ASTJexlScript extends JexlNode {
      */
     public String[] getLocalVariables() {
         return scope != null? scope.getLocalVariables() : null;
+    }
+
+    /**
+     * Checks whether a given symbol is hoisted.
+     * @param symbol the symbol number
+     * @return true if hoisted, false otherwise
+     */
+    public boolean isHoistedSymbol(int symbol) {
+        return scope != null? scope.isHoistedSymbol(symbol) : false;
     }
 }

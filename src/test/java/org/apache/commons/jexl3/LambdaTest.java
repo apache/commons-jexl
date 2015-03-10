@@ -17,6 +17,8 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
@@ -30,7 +32,7 @@ public class LambdaTest extends JexlTestCase {
 
     public void testScriptArguments() throws Exception {
         JexlEngine jexl = new Engine();
-        JexlScript s = jexl.createScript("{ x + x }", "x");
+        JexlScript s = jexl.createScript(" x + x ", "x");
         JexlScript s42 = jexl.createScript("s(21)", "s");
         Object result = s42.execute(null, s);
         assertEquals(42, result);
@@ -47,6 +49,9 @@ public class LambdaTest extends JexlTestCase {
         ctxt.set("s", s);
         Object result = s42.execute(ctxt);
         assertEquals(42, result);
+        result = s42.execute(ctxt);
+        assertEquals(42, result);
+         s = jexl.createScript("x-> { x + x }");
         result = s42.execute(ctxt);
         assertEquals(42, result);
     }
@@ -122,6 +127,40 @@ public class LambdaTest extends JexlTestCase {
         assertEquals(42, result);
         result = s15b.call();
         assertEquals(42, result);
+    }
+
+    public void testHoistLambada() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlContext ctx = null;
+        JexlScript s42;
+        Object result;
+        JexlScript s15;
+        String[] localv;
+        Set<List<String>> hvars;
+        String strs;
+
+        // hosted variables are NOT local variables
+        strs = "(x)->{ (y)->{ x + y } }";
+        s42 = jexl.createScript(strs);
+        result = s42.execute(ctx, 15);
+        assertTrue(result instanceof JexlScript);
+        s15 = (JexlScript) result;
+        localv = s15.getLocalVariables();
+        assertNull(localv);
+        hvars = s15.getVariables();
+        assertEquals(1, hvars.size());
+
+        // declaring a local that overrides hoisted
+        strs = "(x)->{ (y)->{ var x; x + y } }";
+        s42 = jexl.createScript(strs);
+        result = s42.execute(ctx, 15);
+        assertTrue(result instanceof JexlScript);
+        s15 = (JexlScript) result;
+        localv = s15.getLocalVariables();
+        assertNotNull(localv);
+        assertEquals(1, localv.length);
+        hvars = s15.getVariables();
+        assertEquals(0, hvars.size());
     }
 
     public void testRecurse() throws Exception {

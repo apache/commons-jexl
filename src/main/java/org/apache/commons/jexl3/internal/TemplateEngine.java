@@ -393,7 +393,7 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         protected void getVariables(Engine.VarCollector collector) {
-            jexl.getVariables(node, collector);
+            jexl.getVariables(node instanceof ASTJexlScript? (ASTJexlScript) node : null, node, collector);
         }
 
         @Override

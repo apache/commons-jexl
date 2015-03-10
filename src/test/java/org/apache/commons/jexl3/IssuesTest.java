@@ -50,7 +50,7 @@ public class IssuesTest extends JexlTestCase {
         JexlEngine jexl = new Engine();
         Map<String, Object> vars = new HashMap<String, Object>();
         JexlContext ctxt = new MapContext(vars);
-        String stmt = "{a = 'b'; c = 'd';}";
+        String stmt = "a = 'b'; c = 'd';";
         JexlScript expr = jexl.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         assertTrue("JEXL-49 is not fixed", vars.get("a").equals("b") && vars.get("c").equals("d"));
@@ -362,8 +362,8 @@ public class IssuesTest extends JexlTestCase {
         for (char v = 'a'; v <= 'z'; ++v) {
             ctxt.set(Character.toString(v), 10);
         }
-        String input =
-                "(((((((((((((((((((((((((z+y)/x)*w)-v)*u)/t)-s)*r)/q)+p)-o)*n)-m)+l)*k)+j)/i)+h)*g)+f)/e)+d)-c)/b)+a)";
+        String input
+                = "(((((((((((((((((((((((((z+y)/x)*w)-v)*u)/t)-s)*r)/q)+p)-o)*n)-m)+l)*k)+j)/i)+h)*g)+f)/e)+d)-c)/b)+a)";
 
         JexlExpression script;
         // Make sure everything is loaded...
@@ -600,7 +600,6 @@ public class IssuesTest extends JexlTestCase {
         context.set("y", 10);
         value = expr.evaluate(context);
         assertEquals("FirstValue=9.0", value);
-
 
         context.set("x", -10);
         context.set("y", 1);
@@ -1077,7 +1076,7 @@ public class IssuesTest extends JexlTestCase {
 
         jc.set("one", 1);
         jc.set("two", 2);
-        int[] o1 = (int[])e147.evaluate(jc);
+        int[] o1 = (int[]) e147.evaluate(jc);
         assertEquals(1, o1[0]);
         assertEquals(2, o1[1]);
 
@@ -1087,4 +1086,20 @@ public class IssuesTest extends JexlTestCase {
         assertEquals(10, o2[0]);
         assertEquals(20, o2[1]);
     }
+
+    public void test148() throws Exception {
+        String[] scripts = {"var x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x.one", // results to 1
+            "x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x.one",// results to 1
+            "x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x['one']",//results to 1
+            "var x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x['one']"// result to null?
+        };
+
+        JexlEngine JEXL = new Engine();
+        JexlContext jc = new MapContext();
+        for (String s : scripts) {
+            Object o = JEXL.createScript(s).execute(jc);
+            Assert.assertEquals(1, o);
+        }
+    }
+
 }

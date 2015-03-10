@@ -70,6 +70,7 @@ import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
 import org.apache.commons.jexl3.parser.ASTSWNode;
+import org.apache.commons.jexl3.parser.ASTSetLiteral;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
 import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
@@ -640,6 +641,21 @@ public final class Debugger extends ParserVisitor implements JexlInfo.Detail {
         accept(node.jjtGetChild(0), data);
         builder.append(" : ");
         accept(node.jjtGetChild(1), data);
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTSetLiteral node, Object data) {
+        int num = node.jjtGetNumChildren();
+        builder.append("{ ");
+        if (num > 0) {
+            accept(node.jjtGetChild(0), data);
+            for (int i = 1; i < num; ++i) {
+                builder.append(",");
+                accept(node.jjtGetChild(i), data);
+            }
+        }
+        builder.append(" }");
         return data;
     }
 
