@@ -25,7 +25,7 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.0.1" date="unreleased">
+        <release version="3.0" date="unreleased">
             <action dev="henrib" type="add" >
                 Added #pragma instruction, allowing scripts to communicate information to the underlying execution
                 context.
@@ -34,14 +34,11 @@
                 Hoisted variables in a lambda are seen as local variables; should be seen as global
             </action>
             <action dev="henrib" type="fix" >
-                Local variables preclude antish variables handling
+                Local variables must preclude antish variables handling
             </action>
             <action dev="henrib" type="fix" >
                 Depending on unkown conditions, overriden varargs method may return false to isVarArgs;
                 fix by checking method in declaring class hierarchy.
-            </action>
-            <action dev="henrib" type="fix">
-                Performance problem in Interpreter.unknownVariable mechanism
             </action>
             <action dev="henrib" type="fix" issue="JEXL-146" due-to="David Maplesden">
                 Performance problem in Interpreter.unknownVariable mechanism
@@ -116,8 +113,6 @@
                 Fix issue wrt isEmpty and method varargs (assignable types vs equal types)
                 (see http://apache-commons.680414.n4.nabble.com/jexl-empty-function-crashes-if-called-with-int-tt4637895.html)
             </action>
-        </release>
-        <release version="3.0" date="unreleased">
             <action dev="henrib" type="add" issue="JEXL-133" due-to="Alfred Reibenschuh">
                 String matching Operator short-hand inspired by CSS3
             </action>
