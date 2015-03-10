@@ -76,6 +76,7 @@ import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
 import org.apache.commons.jexl3.parser.ASTSWNode;
+import org.apache.commons.jexl3.parser.ASTSetLiteral;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
 import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
@@ -939,6 +940,21 @@ public class Interpreter extends ParserVisitor {
     }
 
     @Override
+    protected Object visit(ASTSetLiteral node, Object data) {
+        int childCount = node.jjtGetNumChildren();
+        JexlArithmetic.SetBuilder mb = arithmetic.setBuilder(childCount);
+        if (mb != null) {
+            for (int i = 0; i < childCount; i++) {
+                Object entry = node.jjtGetChild(i).jjtAccept(this, data);
+                mb.add(entry);
+            }
+            return mb.create();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     protected Object visit(ASTMapLiteral node, Object data) {
         int childCount = node.jjtGetNumChildren();
         JexlArithmetic.MapBuilder mb = arithmetic.mapBuilder(childCount);
@@ -1368,7 +1384,7 @@ public class Interpreter extends ParserVisitor {
         Object object = null;
         JexlNode objectNode;
         StringBuilder variableName = null;
-        boolean isVariable = !(parent instanceof ASTReference);
+        boolean antish = !(parent instanceof ASTReference);
         int v = 0;
         main:
         for (int c = 0; c < numChildren; c++) {
@@ -1381,9 +1397,15 @@ public class Interpreter extends ParserVisitor {
             }
             // attempt to evaluate the property within the object
             object = objectNode.jjtAccept(this, object);
-            if (object == null && isVariable) {
+            if (object == null && antish) {
                 // if we still have a null object and we are evaluating 'x.y', check for an antish variable
                 if (v == 0) {
+                    // if the first node is a local variable or parameter, the object can not be null
+                    JexlNode first = node.jjtGetChild(0);
+                    if (first instanceof ASTIdentifier && ((ASTIdentifier) first).getSymbol() >= 0) {
+                        antish = false;
+                        break main;
+                    }
                     // first node must be an Identifier
                     if (objectNode instanceof ASTIdentifier) {
                         variableName = new StringBuilder(((ASTIdentifier) objectNode).getName());
@@ -1406,9 +1428,9 @@ public class Interpreter extends ParserVisitor {
                 // variableName can *not* be null; the code before this line made sure of that
                 object = context.get(variableName.toString());
             }
-            isVariable &= object == null;
+            antish &= object == null;
         }
-        if (object == null && isVariable && variableName != null && !isTernaryProtected(node)) {
+        if (object == null && antish && variableName != null && !isTernaryProtected(node)) {
             boolean undefined = !(context.has(variableName.toString()) || isLocalVariable(node, 0));
             // variable unknown in context and not a local
             return unsolvableVariable(node, variableName.toString(), undefined);
@@ -1457,7 +1479,7 @@ public class Interpreter extends ParserVisitor {
         }
         // 1: follow children till penultimate, resolve dot/array
         JexlNode objectNode = null;
-        boolean isVariable = true;
+        boolean antish = true;
         int v = 0;
         StringBuilder variableName = null;
         // start at 1 if symbol
@@ -1469,29 +1491,35 @@ public class Interpreter extends ParserVisitor {
             object = objectNode.jjtAccept(this, object);
             if (object != null) {
                 // disallow mixing antish variable & bean with same root; avoid ambiguity
-                isVariable = false;
+                antish = false;
                 continue;
             }
             // if we still have a null object, check for an antish variable
-            if (isVariable) {
+            if (antish) {
                 if (v == 0) {
+                    // if the first node is a local variable or parameter, the object can not be null
+                    JexlNode first = left.jjtGetChild(0);
+                    if (first instanceof ASTIdentifier && ((ASTIdentifier) first).getSymbol() >= 0) {
+                        antish = false;
+                        break;
+                    }
                     if (objectNode instanceof ASTIdentifier) {
                         variableName = new StringBuilder(((ASTIdentifier) objectNode).getName());
                         v = 1;
                     } else {
-                        isVariable = false;
+                        antish = false;
                     }
                 }
-                for (; isVariable && v <= c; ++v) {
+                for (; antish && v <= c; ++v) {
                     JexlNode child = left.jjtGetChild(v);
                     if (child instanceof ASTIdentifierAccess) {
                         variableName.append('.');
                         variableName.append(((ASTIdentifierAccess) objectNode).getName());
                     } else {
-                        isVariable = false;
+                        antish = false;
                     }
                 }
-                if (isVariable) {
+                if (antish) {
                     object = context.get(variableName.toString());
                 } else {
                     break;

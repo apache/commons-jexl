@@ -267,6 +267,33 @@ public class JexlArithmetic {
     }
 
     /**
+     * Helper interface used when creating a set literal.
+     * <p>The default implementation creates a java.util.HashSet.</p>
+     */
+    public interface SetBuilder {
+        /**
+         * Adds a literal to the set.
+         * @param value the item to add
+         */
+        void add(Object value);
+
+        /**
+         * Creates the actual "set" instance.
+         * @return the array
+         */
+        Object create();
+    }
+
+    /**
+     * Called by the interpreter when evaluating a literal array.
+     * @param size the number of elements in the array
+     * @return the array builder
+     */
+    public SetBuilder setBuilder(int size) {
+        return new org.apache.commons.jexl3.internal.SetBuilder(size);
+    }
+
+    /**
      * Helper interface used when creating a map literal.
      * <p>The default implementation creates a java.util.HashMap.</p>
      */

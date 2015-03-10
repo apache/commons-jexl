@@ -164,4 +164,20 @@ public class AssignTest extends JexlTestCase {
         o = JEXL.getProperty(quux, "['froboz']['value']");
         assertEquals("Result is not 1000", new Integer(1000), o);
     }
+
+    public void testRejectLocal() throws Exception {
+        JexlContext jc = new MapContext();
+        JexlScript assign = JEXL.createScript("var quux = null; quux.froboz.value = 10");
+        try {
+            Object o = assign.execute(jc);
+            fail("quux is local and null, should fail");
+        } catch (JexlException xjexl) {
+            String x = xjexl.toString();
+            String y = x;
+        }
+        // quux is a global antish var
+        assign = JEXL.createScript("quux.froboz.value = 10");
+        Object o = assign.execute(jc);
+        assertEquals(10, o);
+    }
 }

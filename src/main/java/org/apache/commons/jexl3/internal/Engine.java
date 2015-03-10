@@ -493,14 +493,13 @@ public class Engine extends JexlEngine {
             xjexl = xany;
         } catch (Exception xany) {
             xjexl = new JexlException.Method(info, clazz.toString(), xany);
-        } finally {
-            if (xjexl != null) {
-                if (silent) {
-                    logger.warn(xjexl.getMessage(), xjexl.getCause());
-                    return null;
-                }
-                throw xjexl.clean();
+        }
+        if (xjexl != null) {
+            if (silent) {
+                logger.warn(xjexl.getMessage(), xjexl.getCause());
+                return null;
             }
+            throw xjexl.clean();
         }
         return result;
     }
@@ -513,9 +512,9 @@ public class Engine extends JexlEngine {
      * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
      *         or the empty set if no variables are used
      */
-    protected Set<List<String>> getVariables(JexlNode script) {
+    protected Set<List<String>> getVariables(ASTJexlScript script) {
         VarCollector collector = new VarCollector();
-        getVariables(script, collector);
+        getVariables(script, script, collector);
         return collector.collected();
     }
 
@@ -526,7 +525,7 @@ public class Engine extends JexlEngine {
         /**
          * The collected variables represented as a set of list of strings.
          */
-        private Set<List<String>> refs = new LinkedHashSet<List<String>>();
+        private final Set<List<String>> refs = new LinkedHashSet<List<String>>();
         /**
          * The current variable being collected.
          */
@@ -576,7 +575,7 @@ public class Engine extends JexlEngine {
      * @param node the node
      * @param collector the variable collector
      */
-    protected void getVariables(JexlNode node, VarCollector collector) {
+    protected void getVariables(final ASTJexlScript script, JexlNode node, VarCollector collector) {
         if (node instanceof ASTIdentifier) {
             JexlNode parent = node.jjtGetParent();
             if (parent instanceof ASTMethodNode || parent instanceof ASTFunctionNode) {
@@ -585,12 +584,14 @@ public class Engine extends JexlEngine {
                 return;
             }
             ASTIdentifier identifier = (ASTIdentifier) node;
-            if (identifier.getSymbol() < 0) {
+            int symbol = identifier.getSymbol();
+            // symbols that are hoisted are considered "global" variables
+            if (symbol >= 0 && script != null && !script.isHoistedSymbol(symbol)) {
+                collector.collect(null);
+            } else {
                 // start collecting from identifier
                 collector.collect(identifier);
                 collector.add(identifier.getName());
-            } else {
-                collector.collect(null);
             }
         } else if (node instanceof ASTIdentifierAccess) {
             JexlNode parent = node.jjtGetParent();
@@ -618,13 +619,13 @@ public class Engine extends JexlEngine {
                 } else {
                     collecting = false;
                     collector.collect(null);
-                    getVariables(child, collector);
+                    getVariables(script, child, collector);
                 }
             }
         } else {
             int num = node.jjtGetNumChildren();
             for (int i = 0; i < num; ++i) {
-                getVariables(node.jjtGetChild(i), collector);
+                getVariables(script, node.jjtGetChild(i), collector);
             }
             collector.collect(null);
         }

@@ -49,7 +49,7 @@ public abstract class ParserVisitor {
     protected abstract Object visit(ASTWhileStatement node, Object data);
 
     protected abstract Object visit(ASTContinue node, Object data);
-    
+
     protected abstract Object visit(ASTBreak node, Object data);
 
     protected abstract Object visit(ASTForeachStatement node, Object data);
@@ -125,6 +125,8 @@ public abstract class ParserVisitor {
     protected abstract Object visit(ASTNumberLiteral node, Object data);
 
     protected abstract Object visit(ASTStringLiteral node, Object data);
+
+    protected abstract Object visit(ASTSetLiteral node, Object data);
 
     protected abstract Object visit(ASTArrayLiteral node, Object data);
 

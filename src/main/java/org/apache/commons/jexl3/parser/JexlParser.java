@@ -23,6 +23,9 @@ import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.internal.Scope;
 
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.Stack;
 
 /**
@@ -40,6 +43,10 @@ public abstract class JexlParser extends StringParser {
      */
     protected Scope frame = null;
     protected Stack<Scope> frames = new Stack<Scope>();
+    /**
+     * The list of pragma declarations.
+     */
+    protected Map<String, Object> pragmas = null;
 
 
     /**
@@ -120,6 +127,18 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
+     * Adds a pragma declaration.
+     * @param key the pragma key
+     * @param value the pragma value
+     */
+    public void declarePragma(String key, Object value) {
+        if (pragmas == null) {
+            pragmas = new TreeMap<String, Object>();
+        }
+        pragmas.put(key, value);
+    }
+
+    /**
      * Declares a local parameter.
      * <p> This method creates an new entry in the symbol map. </p>
      * @param identifier the parameter name
@@ -175,6 +194,29 @@ public abstract class JexlParser extends StringParser {
         }
     }
 
+    /**
+     * Utility function to create '.' separated string from a list of string.
+     * @param lstr the list of strings
+     * @return the dotted version
+     */
+    String stringify(List<String> lstr) {
+        StringBuilder strb = new StringBuilder();
+        boolean dot = false;
+        for(String str : lstr) {
+            if (!dot) {
+               dot = true;
+            } else {
+               strb.append('.');
+            }
+            strb.append(str);
+        }
+        return strb.toString();
+    }
+
+    /**
+     * Throws a parsing exception.
+     * @param node the node that caused it
+     */
     protected void throwParsingException(JexlNode node) {
         throwParsingException(null, node);
     }
@@ -182,7 +224,7 @@ public abstract class JexlParser extends StringParser {
     /**
      * Throws a parsing exception.
      * @param xclazz the class of exception
-     * @param node the node that provoqued it
+     * @param node the node that caused it
      */
     private void throwParsingException(Class<? extends JexlException> xclazz, JexlNode node) {
         final JexlInfo dbgInfo;

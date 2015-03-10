@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -42,7 +43,7 @@ public interface JexlScript {
      * @return the source text
      */
     String getParsedText();
-    
+
     /**
      * Executes the script with the variables contained in the
      * supplied {@link JexlContext}.
@@ -88,6 +89,12 @@ public interface JexlScript {
      * @since 2.1
      */
     Set<List<String>> getVariables();
+
+    /**
+     * Gets this script pragmas
+     * @return the pragmas map
+     */
+    Map<String, Object> getPragmas();
 
     /**
      * Creates a Callable from this script.

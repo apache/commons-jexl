@@ -16,65 +16,49 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import java.text.DecimalFormat;
+import org.apache.commons.jexl3.internal.Debugger;
 
-public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constant<Number> {
-   private final NumberParser nlp;
-    ASTNumberLiteral(int id) {
+public final class ASTSetLiteral extends JexlNode {
+    /** Whether this set is constant or not. */
+    private boolean constant = false;
+
+    ASTSetLiteral(int id) {
         super(id);
-        nlp = new NumberParser();
     }
 
-    ASTNumberLiteral(Parser p, int id) {
+    ASTSetLiteral(Parser p, int id) {
         super(p, id);
-        nlp = new NumberParser();
     }
-
-    static final DecimalFormat BIGDF = new DecimalFormat("0.0b");
 
     @Override
     public String toString() {
-        return nlp.toString();
-    }
-
-    @Override
-    public Number getLiteral() {
-        return nlp.getLiteralValue();
+        Debugger dbg = new Debugger();
+        return dbg.data(this);
     }
 
     @Override
     protected boolean isConstant(boolean literal) {
-        return true;
+        return constant;
     }
 
-    public Class<?> getLiteralClass() {
-        return nlp.getLiteralClass();
+    /** {@inheritDoc} */
+    @Override
+    public void jjtClose() {
+        constant = true;
+        if (children != null) {
+            for (int c = 0; c < children.length && constant; ++c) {
+                JexlNode child = children[c];
+                if (!child.isConstant()) {
+                    constant = false;
+                }
+            }
+        }
     }
 
-    public boolean isInteger() {
-        return nlp.isInteger();
-    }
-
-    /**
-     * Sets this node as a natural literal.
-     * Originally from OGNL.
-     * @param s the natural as string
-     */
-    void setNatural(String s) {
-        nlp.setNatural(s);
-    }
-
-    /**
-     * Sets this node as a real literal.
-     * Originally from OGNL.
-     * @param s the real as string
-     */
-    void setReal(String s) {
-        nlp.setReal(s);
-    }
-
+    /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
+
 }
