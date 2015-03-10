@@ -1095,8 +1095,8 @@ public class IssuesTest extends JexlTestCase {
         };
 
         JexlEngine JEXL = new Engine();
-        JexlContext jc = new MapContext();
         for (String s : scripts) {
+            JexlContext jc = new MapContext();
             Object o = JEXL.createScript(s).execute(jc);
             Assert.assertEquals(1, o);
         }
