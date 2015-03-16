@@ -19,22 +19,24 @@ package org.apache.commons.jexl3.internal;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
- * A range of integers.
+ * A range of longs.
+ * <p>Behaves as a readonly collection of longs.
  */
-public class IntegerRange implements Collection<Integer> {
+public class LongRange implements Collection<Long>  {
     /** The lower boundary. */
-    private final int low;
+    private final long low;
     /** The upper boundary. */
-    private final int high;
+    private final long high;
 
     /**
      * Creates a new range.
      * @param from the lower inclusive boundary
      * @param to  the higher inclusive boundary
      */
-    public IntegerRange(int from, int to) {
+    public LongRange(long from, long to) {
         if (from > to) {
             high = from;
             low = to;
@@ -45,13 +47,13 @@ public class IntegerRange implements Collection<Integer> {
     }
 
     @Override
-    public Iterator<Integer> iterator() {
-        return new IntegerIterator(low, high);
+    public Iterator<Long> iterator() {
+        return new LongIterator(low, high);
     }
 
     @Override
     public int size() {
-        return high - low + 1;
+        return (int)(high - low + 1);
     }
 
     @Override
@@ -62,7 +64,7 @@ public class IntegerRange implements Collection<Integer> {
     @Override
     public boolean contains(Object o) {
         if (o instanceof Number) {
-            long v = ((Number) o).intValue();
+            long v = ((Number) o).longValue();
             return low <= v && v <= high;
         } else {
             return false;
@@ -85,7 +87,7 @@ public class IntegerRange implements Collection<Integer> {
         final Class<?> ct = array.getClass().getComponentType();
         final int length = size();
         T[] copy = array;
-        if (ct.isAssignableFrom(Integer.class)) {
+        if (ct.isAssignableFrom(Long.class)) {
             if (array.length < length) {
                 copy = ct == Object.class
                        ? (T[]) new Object[length]
@@ -113,7 +115,7 @@ public class IntegerRange implements Collection<Integer> {
     }
 
     @Override
-    public boolean add(Integer e) {
+    public boolean add(Long e) {
         throw new UnsupportedOperationException();
     }
 
@@ -123,7 +125,7 @@ public class IntegerRange implements Collection<Integer> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends Integer> c) {
+    public boolean addAll(Collection<? extends Long> c) {
         throw new UnsupportedOperationException();
     }
 
@@ -144,21 +146,21 @@ public class IntegerRange implements Collection<Integer> {
 }
 
 /**
- * An iterator on an integer range.
+ * An iterator on a long range.
  */
-class IntegerIterator implements Iterator<Integer> {
+class LongIterator implements Iterator<Long> {
     /** The lower boundary. */
-    private final int low;
+    private final long low;
     /** The upper boundary. */
-    private final int high;
+    private final long high;
     /** The current value. */
-    private int cursor;
+    private long cursor;
     /**
      * Creates a iterator on the range.
      * @param l low boundary
      * @param h high boundary
      */
-    public IntegerIterator(int l, int h) {
+    public LongIterator(long l, long h) {
         low = l;
         high = h;
         cursor = low;
@@ -170,18 +172,18 @@ class IntegerIterator implements Iterator<Integer> {
     }
 
     @Override
-    public Integer next() {
+    public Long next() {
         if (cursor <= high) {
-            int next = cursor;
+            long next = cursor;
             cursor += 1;
-            return Integer.valueOf(next);
+            return Long.valueOf(next);
         } else {
-            return null;
+            throw new NoSuchElementException();
         }
     }
 
     @Override
     public void remove() {
-        throw new UnsupportedOperationException("Not supported.");
+        throw new UnsupportedOperationException();
     }
 }

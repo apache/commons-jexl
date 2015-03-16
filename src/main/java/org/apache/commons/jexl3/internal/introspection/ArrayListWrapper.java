@@ -18,10 +18,6 @@ package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.Array;
 import java.util.AbstractList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.RandomAccess;
 
 /**
@@ -55,7 +51,7 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
     /** {@inheritDoc} */
     @Override
     public Object set(int index, Object element) {
-        Object old = get(index);
+        Object old = Array.get(array, index);
         Array.set(array, index, element);
         return old;
     }
@@ -79,7 +75,7 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
     @Override
     @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) {
-        int size = size();
+        final int size = size();
         if (a.length < size) {
             T[] x = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
             System.arraycopy(a, a.length, x, 0, a.length);
@@ -116,85 +112,4 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
     public boolean contains(Object o) {
         return indexOf(o) != -1;
     }
-
-    @Override
-    public boolean isEmpty() {
-        return super.isEmpty();
-    }
-
-    @Override
-    public Iterator<Object> iterator() {
-        return super.iterator();
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        return super.containsAll(c);
-    }
-
-    @Override
-    public int lastIndexOf(Object o) {
-        return super.lastIndexOf(o);
-    }
-
-    @Override
-    public ListIterator<Object> listIterator() {
-        return super.listIterator();
-    }
-
-    @Override
-    public ListIterator<Object> listIterator(int index) {
-        return super.listIterator(index);
-    }
-
-    @Override
-    public List<Object> subList(int fromIndex, int toIndex) {
-        return super.subList(fromIndex, toIndex);
-    }
-
-    @Override
-    public boolean add(Object o) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends Object> c) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends Object> c) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
-    @Override
-    public void clear() {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
-    @Override
-    public void add(int index, Object element) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
-    @Override
-    public Object remove(int index) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
 }

@@ -572,6 +572,7 @@ public class Engine extends JexlEngine {
 
     /**
      * Fills up the list of variables accessed by a node.
+     * @param script the owning script
      * @param node the node
      * @param collector the variable collector
      */
