@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.0" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-152" due-to="Dmitri Blinov">
+                Extend Range literal to support Long values
+            </action>
             <action dev="henrib" type="add" >
                 Added #pragma instruction, allowing scripts to communicate information to the underlying execution
                 context.
