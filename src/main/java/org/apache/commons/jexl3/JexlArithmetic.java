@@ -285,8 +285,8 @@ public class JexlArithmetic {
     }
 
     /**
-     * Called by the interpreter when evaluating a literal array.
-     * @param size the number of elements in the array
+     * Called by the interpreter when evaluating a literal set.
+     * @param size the number of elements in the set
      * @return the array builder
      */
     public SetBuilder setBuilder(int size) {
@@ -323,16 +323,21 @@ public class JexlArithmetic {
 
     /**
      * Creates a literal range.
-     * <p>The default implementation only accepts integers.</p>
+     * <p>The default implementation only accepts integers and longs.</p>
      * @param from the included lower bound value (null if none)
      * @param to   the included upper bound value (null if none)
      * @return the range as an iterable
      * @throws ArithmeticException as an option if creation fails
      */
     public Iterable<?> createRange(Object from, Object to) throws ArithmeticException {
-        final int ifrom = toInteger(from);
-        final int ito = toInteger(to);
-        return new org.apache.commons.jexl3.internal.IntegerRange(ifrom, ito);
+        final long lfrom = toLong(from);
+        final long lto = toLong(to);
+        if ((lfrom >= Integer.MIN_VALUE && lfrom <= Integer.MAX_VALUE)
+            && (lto >= Integer.MIN_VALUE && lto <= Integer.MAX_VALUE)) {
+            return new org.apache.commons.jexl3.internal.IntegerRange((int) lfrom, (int) lto);
+        } else {
+            return new org.apache.commons.jexl3.internal.LongRange(lfrom, lto);
+        }
     }
 
     /**

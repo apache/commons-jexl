@@ -91,8 +91,8 @@ public interface JexlScript {
     Set<List<String>> getVariables();
 
     /**
-     * Gets this script pragmas
-     * @return the pragmas map
+     * Gets this script pragmas.
+     * @return the (non null, may be empty) pragmas map
      */
     Map<String, Object> getPragmas();
 
