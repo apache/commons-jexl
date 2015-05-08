@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml Version="1.0"?>
 <!--
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
@@ -34,26 +34,32 @@
       </SVNRepository>
     </repository>
     <release>
-      <version>
+      <Version>
         <name>commons-jexl2</name>
         <created>2011-12-12</created>
         <revision>2.1</revision>
-      </version>
-      <version>
+      </Version>
+    </release>
+    <release>
+      <Version>
         <name>commons-jexl2</name>
         <created>2010-04-07</created>
         <revision>2.0.1</revision>
-      </version>
-      <version>
+      </Version>
+    </release>
+    <release>
+      <Version>
         <name>commons-jexl2</name>
         <created>2010-02-23</created>
         <revision>2.0</revision>
-      </version>
-      <version>
+      </Version>
+    </release>
+    <release>
+      <Version>
         <name>commons-jexl</name>
         <created>2006-09-12</created>
         <revision>1.1</revision>
-      </version>
+      </Version>
     </release>
     <mailing-list rdf:resource="http://commons.apache.org/mail-lists.html"/>
   </Project>
