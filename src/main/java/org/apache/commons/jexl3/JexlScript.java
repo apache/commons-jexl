@@ -39,7 +39,7 @@ public interface JexlScript {
     String getSourceText();
 
     /**
-     * Recreates the source text of this expression from the internal synactic tree.
+     * Recreates the source text of this expression from the internal syntactic tree.
      * @return the source text
      */
     String getParsedText();
