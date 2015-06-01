@@ -52,12 +52,14 @@ public final class Parser extends JexlParser
             }
             // lets do the 'Unique Init' in here to be safe - it's a pain to remember
             source = jexlSrc;
+            pragmas = null;
             ReInit(new java.io.StringReader(jexlSrc));
             frame = scope;
             ASTJexlScript script = expr? JexlExpression(scope) : JexlScript(scope) ;
             script.pragmas = pragmas != null
                              ? Collections.<String,Object>unmodifiableMap(pragmas)
                              : Collections.<String,Object>emptyMap();
+            pragmas = null;
             script.value = info;
             return script;
         } catch (TokenMgrError xtme) {
@@ -220,7 +222,7 @@ ASTJexlScript JexlScript(Scope frame) : {
     jjtThis.setScope(frame);
 }
 {
-   (LOOKAHEAD(<LCURLY> Expression() <SEMICOL>) Block() | ( Statement() )*) <EOF>
+   ( ( Statement() )*) <EOF>
    {
         return jjtThis.script();
    }
@@ -239,6 +241,8 @@ ASTJexlScript JexlExpression(Scope frame) #JexlScript : {
 void Statement() #void : {}
 {
     <SEMICOL>
+    | LOOKAHEAD(<LCURLY> Expression() <SEMICOL>) Block() // to diasmbiguate the set literals
+    | LOOKAHEAD(<LCURLY> Statement() <SEMICOL>) Block() //  to diasmbiguate the set literals
     | IfStatement()
     | ForeachStatement()
     | WhileStatement()
@@ -599,7 +603,7 @@ void MapEntry() : {}
 
 void SetLiteral() : {}
 {
-  <LCURLY> (Expression() ( <COMMA> Expression() )*)? <RCURLY>
+    <LCURLY> (Expression() ( <COMMA> Expression() )*)? <RCURLY>
 }
 
 /***************************************
