@@ -62,7 +62,7 @@ PARSER_END(Parser)
 
 
 /***************************************
- *     Skip & Number literal tokens
+ *     Skip &amp; Number literal tokens
  ***************************************/
 
 <*> SKIP : /* WHITE SPACE */
@@ -145,7 +145,7 @@ PARSER_END(Parser)
 }
 
 /***************************************
- *     Identifier & String tokens
+ *     Identifier &amp; String tokens
  ***************************************/
 
 <*> TOKEN : /* IDENTIFIERS */
@@ -275,7 +275,7 @@ void LValueVar() #Reference : {}
 }
 
 /***************************************
- *      Conditional & relational
+ *      Conditional &amp; relational
  ***************************************/
 
 void ConditionalExpression() #void : {}
@@ -398,7 +398,7 @@ void UnaryExpression() #void : {}
 
 
 /***************************************
- *      Identifier & Literals
+ *      Identifier &amp; Literals
  ***************************************/
 
 void Identifier(boolean top) :
@@ -501,7 +501,7 @@ void MapEntry() : {}
 
 
 /***************************************
- *      Functions & Methods
+ *      Functions &amp; Methods
  ***************************************/
 
 void EmptyFunction() : {}

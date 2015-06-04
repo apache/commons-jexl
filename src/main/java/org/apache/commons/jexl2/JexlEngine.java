@@ -53,14 +53,14 @@ import org.apache.commons.jexl2.parser.ASTReference;
 /**
  * <p>
  * Creates and evaluates Expression and Script objects.
- * Determines the behavior of Expressions & Scripts during their evaluation with respect to:
+ * Determines the behavior of Expressions &amp; Scripts during their evaluation with respect to:
+ * </p>
  * <ul>
  * <li>Introspection, see {@link Uberspect}</li>
- * <li>Arithmetic & comparison, see {@link JexlArithmetic}</li>
+ *  <li>Arithmetic &amp; comparison, see {@link JexlArithmetic}</li>
  * <li>Error reporting</li>
  * <li>Logging</li>
  * </ul>
- * </p>
  * <p>The <code>setSilent</code> and <code>setLenient</code> methods allow to fine-tune an engine instance behavior
  * according to various error control needs. The lenient/strict flag tells the engine when and if null as operand is
  * considered an error, the silent/verbose flag tells the engine what to do with the error
@@ -68,7 +68,7 @@ import org.apache.commons.jexl2.parser.ASTReference;
  * </p>
  * <ul>
  * <li>When "silent" &amp; "lenient":
- * <p> 0 & null should be indicators of "default" values so that even in an case of error,
+ * <p> 0 &amp; null should be indicators of "default" values so that even in an case of error,
  * something meaningfull can still be inferred; may be convenient for configurations.
  * </p>
  * </li>
@@ -84,7 +84,7 @@ import org.apache.commons.jexl2.parser.ASTReference;
  * </li>
  * <li>When "verbose" &amp; "strict":
  * <p>The finest error control grain is obtained; it is the closest to Java code -
- * still augmented by "script" capabilities regarding automated conversions & type matching.
+ * still augmented by "script" capabilities regarding automated conversions &amp; type matching.
  * </p>
  * </li>
  * </ul>
@@ -878,7 +878,7 @@ public class JexlEngine {
      * Creates a cache.
      * @param <K>       the key type
      * @param <V>       the value type
-     * @param cacheSize the cache size, must be > 0
+     * @param cacheSize the cache size, must be &gt; 0
      * @return a Map usable as a cache bounded to the given size
      */
     protected <K, V> Map<K, V> createCache(final int cacheSize) {
@@ -1335,7 +1335,7 @@ public class JexlEngine {
     }
 
     /**
-     * Trims the expression from front & ending spaces.
+     * Trims the expression from front &amp; ending spaces.
      * @param str expression to clean
      * @return trimmed expression ending in a semi-colon
      */

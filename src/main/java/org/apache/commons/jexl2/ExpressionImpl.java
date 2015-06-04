@@ -32,7 +32,7 @@ public class ExpressionImpl implements Expression, Script {
     /** The engine for this expression. */
     protected final JexlEngine jexl;
     /**
-     * Original expression stripped from leading & trailing spaces.
+     * Original expression stripped from leading &amp; trailing spaces.
      */
     protected final String expression;
     /**

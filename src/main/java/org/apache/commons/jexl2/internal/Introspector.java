@@ -28,11 +28,11 @@ import org.apache.commons.logging.Log;
 
 /**
  *  Default introspection services.
- *  <p>Finding methods as well as property getters & setters.</p>
+ *  <p>Finding methods as well as property getters &amp; setters.</p>
  * @since 1.0
  */
 public class Introspector {
-    /** The logger to use for all warnings & errors. */
+    /** The logger to use for all warnings &amp; errors. */
     protected final Log rlog;
     /** The soft reference to the introspector currently in use. */
     private volatile SoftReference<IntrospectorBase> ref;

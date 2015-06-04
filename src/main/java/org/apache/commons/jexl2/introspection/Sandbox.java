@@ -26,6 +26,7 @@ import java.util.Set;
  * through "whitelists" and "blacklists".
  * <p>
  * A <b>whitelist</b> explicitly allows methods/properties for a class;
+ * </p>
  * <ul>
  * <li>
  * If a whitelist is empty and thus does not contain any names, all properties/methods are allowed for its class.
@@ -34,9 +35,9 @@ import java.util.Set;
  * If it is not empty, the only allowed properties/methods are the ones contained.
  * </li>
  * </ul>
- * </p>
  * <p>
  * A <b>blacklist</b> explicitly forbids methods/properties for a class;
+ * </p>
  * <ul>
  * <li>
  * If a blacklist is empty and thus does not contain any names, all properties/methods are forbidden for its class.
@@ -47,12 +48,12 @@ import java.util.Set;
  * </ul>
  * <p>
  * Permissions are composed of three lists, read, write, execute, each being "white" or "black":
+ * </p>
  * <ul>
  * <li><b>read</b> controls readable properties </li>
  * <li><b>write</b> controls writeable properties</li>
  * <li><b>execute</b> controls executable methods and constructor</li>
  * </ul>
- * </p>
  * @since 2.1
  */
 public final class Sandbox {

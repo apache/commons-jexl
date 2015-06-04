@@ -31,7 +31,7 @@ import org.apache.commons.logging.Log;
  * This basic function of this class is to return a Method object for a
  * particular class given the name of a method and the parameters to the method
  * in the form of an Object[]
- * <p/>
+ * <p>
  * The first time the Introspector sees a class it creates a class method map
  * for the class in question. Basically the class method map is a Hastable where
  * Method objects are keyed by a concatenation of the method name and the names
