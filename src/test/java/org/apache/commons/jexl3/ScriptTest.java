@@ -18,11 +18,14 @@ package org.apache.commons.jexl3;
 
 import java.io.File;
 import java.net.URL;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests for JexlScript
  * @since 1.1
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ScriptTest extends JexlTestCase {
     static final String TEST1 =  "src/test/scripts/test1.jexl";
 
@@ -42,47 +45,46 @@ public class ScriptTest extends JexlTestCase {
     }
     /**
      * Create a new test case.
-     * @param name case name
      */
-    public ScriptTest(String name) {
-        super(name);
+    public ScriptTest() {
+        super("ScriptTest");
     }
 
     /**
      * Test creating a script from a string.
      */
-    public void testSimpleScript() throws Exception {
+    @Test public void testSimpleScript() throws Exception {
         String code = "while (x < 10) x = x + 1;";
         JexlScript s = JEXL.createScript(code);
         JexlContext jc = new MapContext();
         jc.set("x", new Integer(1));
 
         Object o = s.execute(jc);
-        assertEquals("Result is wrong", new Integer(10), o);
-        assertEquals("getText is wrong", code, s.getSourceText());
+        Assert.assertEquals("Result is wrong", new Integer(10), o);
+        Assert.assertEquals("getText is wrong", code, s.getSourceText());
     }
 
-    public void testScriptFromFile() throws Exception {
+    @Test public void testScriptFromFile() throws Exception {
         File testScript = new File(TEST1);
         JexlScript s = JEXL.createScript(testScript);
         JexlContext jc = new MapContext();
         jc.set("out", System.out);
         Object result = s.execute(jc);
-        assertNotNull("No result", result);
-        assertEquals("Wrong result", new Integer(7), result);
+        Assert.assertNotNull("No result", result);
+        Assert.assertEquals("Wrong result", new Integer(7), result);
     }
 
-    public void testScriptFromURL() throws Exception {
+    @Test public void testScriptFromURL() throws Exception {
         URL testUrl = new File("src/test/scripts/test1.jexl").toURI().toURL();
         JexlScript s = JEXL.createScript(testUrl);
         JexlContext jc = new MapContext();
         jc.set("out", System.out);
         Object result = s.execute(jc);
-        assertNotNull("No result", result);
-        assertEquals("Wrong result", new Integer(7), result);
+        Assert.assertNotNull("No result", result);
+        Assert.assertEquals("Wrong result", new Integer(7), result);
     }
 
-    public void testScriptUpdatesContext() throws Exception {
+    @Test public void testScriptUpdatesContext() throws Exception {
         String jexlCode = "resultat.setCode('OK')";
         JexlExpression e = JEXL.createExpression(jexlCode);
         JexlScript s = JEXL.createScript(jexlCode);
@@ -93,10 +95,10 @@ public class ScriptTest extends JexlTestCase {
 
         resultatJexl.setCode("");
         e.evaluate(jc);
-        assertEquals("OK", resultatJexl.getCode());
+        Assert.assertEquals("OK", resultatJexl.getCode());
         resultatJexl.setCode("");
         s.execute(jc);
-        assertEquals("OK", resultatJexl.getCode());
+        Assert.assertEquals("OK", resultatJexl.getCode());
     }
 
 }

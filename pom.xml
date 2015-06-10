@@ -117,10 +117,14 @@
         <maven.compiler.target>1.6</maven.compiler.target>
         <commons.componentid>jexl</commons.componentid>
         <commons.release.version>3.0</commons.release.version>
+        <commons.site.path>jexl</commons.site.path>
+        <commons.scmPubUrl>https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl</commons.scmPubUrl>
+        <commons.scmPubCheckoutDirectory>site-content</commons.scmPubCheckoutDirectory>
         <!-- The RC version used in the staging repository URL. -->
         <commons.rc.version>RC1</commons.rc.version>
         <commons.release.3.version>2.1</commons.release.3.version>
         <commons.release.3.binary.suffix>2.1.1</commons.release.3.binary.suffix>
+        <commons.release.2.desc>Legacy</commons.release.2.desc>
         <commons.release.2.version>1.1</commons.release.2.version>
         <commons.release.2.binary.suffix />
         <commons.jira.id>JEXL</commons.jira.id>
@@ -199,29 +203,29 @@
                     </instrumentation>
                 </configuration>
             </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-scm-publish-plugin</artifactId>
-            <configuration>
-              <ignorePathsToDelete>
-                <ignorePathToDelete>javadocs</ignorePathToDelete>
-              </ignorePathsToDelete>
-            </configuration>
-          </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <configuration>
+                    <ignorePathsToDelete>
+                        <ignorePathToDelete>javadocs</ignorePathToDelete>
+                    </ignorePathsToDelete>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
     <reporting>
         <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9.1</version>
-        <configuration>
-            <excludePackageNames>*.internal;*.parser</excludePackageNames>
-          <show>public</show>
-        </configuration>
-      </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <configuration>
+                    <excludePackageNames>*.internal;*.parser</excludePackageNames>
+                    <show>public</show>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-changes-plugin</artifactId>
@@ -262,7 +266,7 @@
                 <configuration>
                     <excludeFilterFile>${basedir}/src/main/config/findbugs-exclude-filter.xml</excludeFilterFile>
                     <xmlOutput>true</xmlOutput>
-                                <!-- Optional directory to put findbugs xdoc xml report -->
+                    <!-- Optional directory to put findbugs xdoc xml report -->
                     <xmlOutputDirectory>target/site</xmlOutputDirectory>
                 </configuration>
             </plugin>

@@ -26,6 +26,7 @@ import java.math.MathContext;
  * Perform arithmetic.
  * <p>
  * The 5 arithmetic operators (+, - , *, /, %) follow the same evaluation rules regarding their arguments.
+ * </p>
  * <ol>
  * <li>If both are null, result is 0</li>
  * <li>If either is a BigDecimal, coerce both to BigDecimal and perform operation</li>
@@ -38,14 +39,13 @@ import java.math.MathContext;
  * </ol>
  * </li>
  * </ol>
- * </p>
  * Note that the only exception thrown by JexlArithmetic is ArithmeticException.
  * @since 2.0
  */
 public class JexlArithmetic {
     /**
      * The overload-able operators.
-     * Note that logical and (ie &&) and logical or (ie ||) are not in this list to avoid breaking
+     * Note that logical and (ie &amp;&amp;) and logical or (ie ||) are not in this list to avoid breaking
      * their shortcut semantics.
      * @since 3.0
      */
@@ -863,7 +863,7 @@ public class JexlArithmetic {
      * Performs a bitwise and.
      * @param left  the left operand
      * @param right the right operator
-     * @return left & right
+     * @return left &amp; right
      */
     public Object bitwiseAnd(Object left, Object right) {
         long l = toLong(left);
@@ -919,7 +919,7 @@ public class JexlArithmetic {
      * @param left     the left operand
      * @param right    the right operator
      * @param operator the operator
-     * @return -1 if left &lt; right; +1 if left &gt > right; 0 if left == right
+     * @return -1 if left &lt; right; +1 if left &gt; right; 0 if left == right
      * @throws ArithmeticException if either left or right is null
      */
     protected int compare(Object left, Object right, String operator) {

@@ -23,8 +23,9 @@ import java.util.RandomAccess;
 /**
  * A class that wraps an array within an AbstractList.
  * <p>
- * It overrides all methods because introspection uses this class a a marker for wrapped arrays; the declared class
- * for any method is thus always ArrayListWrapper.
+ * It overrides some methods because introspection uses this class a a marker for wrapped arrays; the declared class
+ * for these method is thus ArrayListWrapper.
+ * The methods are get/set/size/contains and indexOf because it is used by contains.
  * </p>
  */
 public class ArrayListWrapper extends AbstractList<Object> implements RandomAccess {
@@ -60,33 +61,6 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
     @Override
     public int size() {
         return Array.getLength(array);
-    }
-
-    @Override
-    public Object[] toArray() {
-        final int size = size();
-        Object[] a = new Object[size];
-        for(int i = 0; i < size; ++i) {
-            a[i] = get(i);
-        }
-        return a;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T> T[] toArray(T[] a) {
-        final int size = size();
-        if (a.length < size) {
-            T[] x = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
-            System.arraycopy(a, a.length, x, 0, a.length);
-        }
-        for(int i = 0; i < size; ++i) {
-            a[i] = (T) get(i);
-        }
-        if (a.length > size) {
-            a[size] = null;
-        }
-        return a;
     }
 
     @Override

@@ -21,15 +21,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 
-import junit.framework.TestCase;
 import org.apache.commons.jexl3.internal.Util;
+import org.junit.After;
+import org.junit.Assert;
 
 /**
  * Implements runTest methods to dynamically instantiate and invoke a test,
  * wrapping the call with setUp(), tearDown() calls.
  * Eases the implementation of main methods to debug.
  */
-public class JexlTestCase extends TestCase {
+public class JexlTestCase {
     /** No parameters signature for test run. */
     private static final Class<?>[] noParms = {};
     /** String parameter signature for test run. */
@@ -43,12 +44,16 @@ public class JexlTestCase extends TestCase {
     }
 
     protected JexlTestCase(String name, JexlEngine jexl) {
-        super(name);
+        //super(name);
         JEXL = jexl;
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    public void setUp() throws Exception {
+        // nothing to do
+    }
+
+    @After
+    public void tearDown() throws Exception {
         debuggerCheck(JEXL);
     }
 
@@ -80,7 +85,7 @@ public class JexlTestCase extends TestCase {
             method = this.getClass().getDeclaredMethod(name, noParms);
         }
         catch(Exception xany) {
-            fail("no such test: " + name);
+            Assert.fail("no such test: " + name);
             return;
         }
         try {
@@ -112,7 +117,7 @@ public class JexlTestCase extends TestCase {
             clazz = (Class<JexlTestCase>) Class.forName(testClassName);
         }
         catch(ClassNotFoundException xclass) {
-            fail("no such class: " + testClassName);
+            Assert.fail("no such class: " + testClassName);
             return;
         }
         // find ctor & instantiate
@@ -127,12 +132,12 @@ public class JexlTestCase extends TestCase {
                 test = clazz.newInstance();
             }
             catch(Exception xany) {
-                fail("cant instantiate test: " + xany);
+                Assert.fail("cant instantiate test: " + xany);
                 return;
             }
         }
         catch(Exception xany) {
-            fail("cant instantiate test: " + xany);
+            Assert.fail("cant instantiate test: " + xany);
             return;
         }
         // Run the test

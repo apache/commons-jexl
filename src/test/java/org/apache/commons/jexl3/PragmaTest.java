@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import java.util.Map;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests for pragmas
@@ -27,13 +28,14 @@ public class PragmaTest extends JexlTestCase {
      * Create a new test case.
      * @param name case name
      */
-    public PragmaTest(String name) {
-        super(name);
+    public PragmaTest() {
+        super("PragmaTest");
     }
 
     /**
      * Test creating a script from a string.
      */
+    @Test
     public void testPragmas() throws Exception {
         JexlContext jc = new MapContext();
         try {

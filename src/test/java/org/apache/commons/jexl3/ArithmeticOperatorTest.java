@@ -26,6 +26,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.apache.commons.jexl3.junit.Asserter;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests for the startsWith, endsWith, match and range operators.
@@ -34,6 +37,7 @@ import org.apache.commons.jexl3.junit.Asserter;
 public class ArithmeticOperatorTest extends JexlTestCase {
     private Asserter asserter;
 
+    @Before
     @Override
     public void setUp() {
         asserter = new Asserter(JEXL);
@@ -44,10 +48,11 @@ public class ArithmeticOperatorTest extends JexlTestCase {
      * Create the named test.
      * @param name test name
      */
-    public ArithmeticOperatorTest(String name) {
-        super(name);
+    public ArithmeticOperatorTest() {
+        super("ArithmeticOperatorTest");
     }
 
+    @Test
     public void testRegexp() throws Exception {
         asserter.setVariable("str", "abc456");
         asserter.assertExpression("str =~ '.*456'", Boolean.TRUE);
@@ -71,6 +76,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.assertExpression("'z' !~ ['a','b','c','d','e','f']", Boolean.TRUE);
     }
 
+    @Test
     public void testStartsEndsWithString() throws Exception {
         asserter.setVariable("x", "foobar");
         asserter.assertExpression("x =^ 'foo'", Boolean.TRUE);
@@ -80,6 +86,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.assertExpression("x =$ 'foo'", Boolean.TRUE);
     }
 
+    @Test
     public void testNotStartsEndsWithString() throws Exception {
         asserter.setVariable("x", "foobar");
         asserter.assertExpression("x !^ 'foo'", Boolean.FALSE);
@@ -149,6 +156,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         }
     }
 
+    @Test
     public void testMatch() throws Exception {
         // check in/not-in on array, list, map, set and duck-type collection
         int[] ai = {2, 4, 42, 54};
@@ -177,6 +185,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         }
     }
 
+    @Test
     public void testStartsEndsWith() throws Exception {
         asserter.setVariable("x", "foobar");
         asserter.assertExpression("x =^ 'foo'", Boolean.TRUE);
@@ -196,6 +205,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.assertExpression("x =^ [42, 54]", Boolean.TRUE);
     }
 
+    @Test
     public void testNotStartsEndsWith() throws Exception {
         asserter.setVariable("x", "foobar");
         asserter.assertExpression("x !^ 'foo'", Boolean.FALSE);
@@ -226,6 +236,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         }
     }
 
+    @Test
     @SuppressWarnings("unchecked")
     public void testInterval() throws Exception {
         Map<String, Object> ns = new HashMap<String, Object>();
@@ -236,33 +247,33 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
         script = jexl.createScript("1 .. 3");
         result = script.execute(null);
-        assertTrue(result instanceof Iterable<?>);
+        Assert.assertTrue(result instanceof Iterable<?>);
         Iterator<Integer> ii = ((Iterable<Integer>) result).iterator();
-        assertEquals(Integer.valueOf(1), ii.next());
-        assertEquals(Integer.valueOf(2), ii.next());
-        assertEquals(Integer.valueOf(3), ii.next());
-        assertNull(ii.next());
+        Assert.assertEquals(Integer.valueOf(1), ii.next());
+        Assert.assertEquals(Integer.valueOf(2), ii.next());
+        Assert.assertEquals(Integer.valueOf(3), ii.next());
+        Assert.assertNull(ii.next());
 
         script = jexl.createScript("(4 - 3) .. (9 / 3)");
         result = script.execute(null);
-        assertTrue(result instanceof Iterable<?>);
+        Assert.assertTrue(result instanceof Iterable<?>);
         ii = ((Iterable<Integer>) result).iterator();
-        assertEquals(Integer.valueOf(1), ii.next());
-        assertEquals(Integer.valueOf(2), ii.next());
-        assertEquals(Integer.valueOf(3), ii.next());
-        assertNull(ii.next());
+        Assert.assertEquals(Integer.valueOf(1), ii.next());
+        Assert.assertEquals(Integer.valueOf(2), ii.next());
+        Assert.assertEquals(Integer.valueOf(3), ii.next());
+        Assert.assertNull(ii.next());
 
         // sum of 1, 2, 3
         script = jexl.createScript("var x = 0; for(var y : ((5 - 4) .. (12 / 4))) { x = x + y }; x");
         result = script.execute(null);
-        assertEquals(Integer.valueOf(6), result);
+        Assert.assertEquals(Integer.valueOf(6), result);
 
         script = jexl.createScript("calc:sum(1 .. 3)");
         result = script.execute(null);
-        assertEquals(Integer.valueOf(6), result);
+        Assert.assertEquals(Integer.valueOf(6), result);
 
         script = jexl.createScript("calc:sum(-3 .. 3)");
         result = script.execute(null);
-        assertEquals(Integer.valueOf(0), result);
+        Assert.assertEquals(Integer.valueOf(0), result);
     }
 }

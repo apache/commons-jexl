@@ -292,17 +292,17 @@ public final class TemplateEngine extends JxltEngine {
          * Prepares a sub-expression for interpretation.
          * @param interpreter a JEXL interpreter
          * @return a prepared unified expression
-         * @throws JexlException (only for nested & composite)
+         * @throws JexlException (only for nested and composite)
          */
         protected TemplateExpression prepare(Interpreter interpreter) {
             return this;
         }
 
         /**
-         * Intreprets a sub-expression.
+         * Interprets a sub-expression.
          * @param interpreter a JEXL interpreter
          * @return the result of interpretation
-         * @throws JexlException (only for nested & composite)
+         * @throws JexlException (only for nested and composite)
          */
         protected abstract Object evaluate(Interpreter interpreter);
     }

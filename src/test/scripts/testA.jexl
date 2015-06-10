@@ -1,0 +1,16 @@
+$out.println("Start Script Prompt Dependencies");
+//attention company doit être multivalué
+/*var vCountry = $in['company'];
+$out.add("The user input is the following: ");
+for (var g : members(vCountry))
+{
+  $out.add("Country: " + name(g));
+}*/
+
+var vCountry = $in['company'];
+var vResp = $in['responsible'];
+{
+  $out.add("Then, " + vResp.name + " is responsible for : " + vCountry.name);
+}
+
+$out.println("Stop Script Prompt Dependencies");

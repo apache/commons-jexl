@@ -16,62 +16,70 @@
  */
 package org.apache.commons.jexl3;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 /**
  * Tests for blocks
  * @since 1.1
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class BlockTest extends JexlTestCase {
 
     /**
      * Create the test
-     *
-     * @param testName name of the test
      */
-    public BlockTest(String testName) {
-        super(testName);
+    public BlockTest() {
+        super("BlockTest");
     }
 
+    @Test
     public void testBlockSimple() throws Exception {
         JexlScript e = JEXL.createScript("if (true) { 'hello'; }");
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
-        assertEquals("Result is wrong", "hello", o);
+        Assert.assertEquals("Result is wrong", "hello", o);
     }
 
+    @Test
     public void testBlockExecutesAll() throws Exception {
         JexlScript e = JEXL.createScript("if (true) { x = 'Hello'; y = 'World';}");
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
-        assertEquals("First result is wrong", "Hello", jc.get("x"));
-        assertEquals("Second result is wrong", "World", jc.get("y"));
-        assertEquals("Block result is wrong", "World", o);
+        Assert.assertEquals("First result is wrong", "Hello", jc.get("x"));
+        Assert.assertEquals("Second result is wrong", "World", jc.get("y"));
+        Assert.assertEquals("Block result is wrong", "World", o);
     }
 
+    @Test
     public void testEmptyBlock() throws Exception {
         JexlScript e = JEXL.createScript("if (true) { }");
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
-        assertNull("Result is wrong", o);
+        Assert.assertNull("Result is wrong", o);
     }
 
+    @Test
     public void testBlockLastExecuted01() throws Exception {
         JexlScript e = JEXL.createScript("if (true) { x = 1; } else { x = 2; }");
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
-        assertEquals("Block result is wrong", new Integer(1), o);
+        Assert.assertEquals("Block result is wrong", new Integer(1), o);
     }
 
+    @Test
     public void testBlockLastExecuted02() throws Exception {
         JexlScript e = JEXL.createScript("if (false) { x = 1; } else { x = 2; }");
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
-        assertEquals("Block result is wrong", new Integer(2), o);
+        Assert.assertEquals("Block result is wrong", new Integer(2), o);
     }
 
+    @Test
     public void testNestedBlock() throws Exception {
         JexlScript e = JEXL.createScript("if (true) { x = 'hello'; y = 'world';" + " if (true) { x; } y; }");
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
-        assertEquals("Block result is wrong", "world", o);
+        Assert.assertEquals("Block result is wrong", "world", o);
     }
 }

@@ -36,7 +36,7 @@ public class Script implements JexlScript, JexlExpression {
      */
     protected final Engine jexl;
     /**
-     * Original expression stripped from leading & trailing spaces.
+     * Original expression stripped from leading and trailing spaces.
      */
     protected final String source;
     /**

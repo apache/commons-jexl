@@ -14,22 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package  org.apache.commons.jexl3;
+package org.apache.commons.jexl3;
 
 import java.util.Collection;
 import java.util.Iterator;
 import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests for ranges.
  * @since 3.0
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class RangeTest extends JexlTestCase {
 
     public RangeTest() {
         super("RangeTest");
     }
 
+    @Test
     public void testIntegerRangeOne() throws Exception {
         JexlExpression e = JEXL.createExpression("(1..1)");
         JexlContext jc = new MapContext();
@@ -43,6 +46,7 @@ public class RangeTest extends JexlTestCase {
         Assert.assertEquals(1, ((Number) a[0]).intValue());
     }
 
+    @Test
     public void testIntegerRange() throws Exception {
         JexlExpression e = JEXL.createExpression("(1..32)");
         JexlContext jc = new MapContext();
@@ -60,19 +64,19 @@ public class RangeTest extends JexlTestCase {
         }
         Assert.assertEquals(32, i);
 
-        Integer[] aa = c.toArray(new Integer[32]);
+        Integer[] aa = c.<Integer>toArray(new Integer[32]);
         Assert.assertEquals(32, aa.length);
         for (int l = 0; l < 32; ++l) {
             Assert.assertTrue(aa[l] == l + 1);
         }
 
-        aa = c.toArray(new Integer[2]);
+        aa = c.<Integer>toArray(new Integer[2]);
         Assert.assertEquals(32, aa.length);
         for (int l = 0; l < 32; ++l) {
             Assert.assertTrue(aa[l] == l + 1);
         }
 
-        aa = c.toArray(new Integer[34]);
+        aa = c.<Integer>toArray(new Integer[34]);
         Assert.assertEquals(34, aa.length);
         for (int l = 0; l < 32; ++l) {
             Assert.assertTrue(aa[l] == l + 1);
@@ -85,6 +89,7 @@ public class RangeTest extends JexlTestCase {
         }
     }
 
+    @Test
     public void testLongRange() throws Exception {
         JexlExpression e = JEXL.createExpression("(6789000001L..6789000032L)");
         JexlContext jc = new MapContext();
@@ -102,19 +107,19 @@ public class RangeTest extends JexlTestCase {
         }
         Assert.assertEquals(6789000032L, i);
 
-        Long[] aa = c.toArray(new Long[32]);
+        Long[] aa = c.<Long>toArray(new Long[32]);
         Assert.assertEquals(32, aa.length);
         for (int l = 0; l < 32; ++l) {
             Assert.assertTrue(aa[l] == 6789000001L + l);
         }
 
-        aa = c.toArray(new Long[2]);
+        aa = c.<Long>toArray(new Long[2]);
         Assert.assertEquals(32, aa.length);
         for (int l = 0; l < 32; ++l) {
             Assert.assertTrue(aa[l] == 6789000001L + l);
         }
 
-        aa = c.toArray(new Long[34]);
+        aa = c.<Long>toArray(new Long[34]);
         Assert.assertEquals(34, aa.length);
         for (int l = 0; l < 32; ++l) {
             Assert.assertTrue(aa[l] == 6789000001L + l);
@@ -127,6 +132,7 @@ public class RangeTest extends JexlTestCase {
         }
     }
 
+    @Test
     public void testIntegerSum() throws Exception {
         JexlScript e = JEXL.createScript("var s = 0; for(var i : (1..5)) { s = s + i; }; s");
         JexlContext jc = new MapContext();
@@ -135,6 +141,7 @@ public class RangeTest extends JexlTestCase {
         Assert.assertEquals(15, ((Number) o).intValue());
     }
 
+    @Test
     public void testIntegerContains() throws Exception {
         JexlScript e = JEXL.createScript("(x)->{ x =~ (1..10) }");
         JexlContext jc = new MapContext();
@@ -147,6 +154,7 @@ public class RangeTest extends JexlTestCase {
         Assert.assertEquals(Boolean.FALSE, o);
     }
 
+    @Test
     public void testLongSum() throws Exception {
         JexlScript e = JEXL.createScript("var s = 0; for(var i : (6789000001L..6789000001L)) { s = s + i; }; s");
         JexlContext jc = new MapContext();
@@ -155,6 +163,7 @@ public class RangeTest extends JexlTestCase {
         Assert.assertEquals(6789000001L, ((Number) o).longValue());
     }
 
+    @Test
     public void testLongContains() throws Exception {
         JexlScript e = JEXL.createScript("(x)->{ x =~ (90000000001L..90000000010L) }");
         JexlContext jc = new MapContext();

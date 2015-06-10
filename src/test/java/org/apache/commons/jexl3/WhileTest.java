@@ -14,36 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.jexl3;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests for while statement.
  * @since 1.1
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class WhileTest extends JexlTestCase {
 
-    public WhileTest(String testName) {
-        super(testName);
+    public WhileTest() {
+        super("WhileTest");
     }
 
+    @Test
     public void testSimpleWhileFalse() throws Exception {
         JexlScript e = JEXL.createScript("while (false) ;");
         JexlContext jc = new MapContext();
 
         Object o = e.execute(jc);
-        assertNull("Result is not null", o);
+        Assert.assertNull("Result is not null", o);
     }
 
+    @Test
     public void testWhileExecutesExpressionWhenLooping() throws Exception {
         JexlScript e = JEXL.createScript("while (x < 10) x = x + 1;");
         JexlContext jc = new MapContext();
         jc.set("x", new Integer(1));
 
         Object o = e.execute(jc);
-        assertEquals("Result is wrong", new Integer(10), o);
+        Assert.assertEquals("Result is wrong", new Integer(10), o);
     }
 
+    @Test
     public void testWhileWithBlock() throws Exception {
         JexlScript e = JEXL.createScript("while (x < 10) { x = x + 1; y = y * 2; }");
         JexlContext jc = new MapContext();
@@ -51,8 +57,8 @@ public class WhileTest extends JexlTestCase {
         jc.set("y", new Integer(1));
 
         Object o = e.execute(jc);
-        assertEquals("Result is wrong", new Integer(512), o);
-        assertEquals("x is wrong", new Integer(10), jc.get("x"));
-        assertEquals("y is wrong", new Integer(512), jc.get("y"));
+        Assert.assertEquals("Result is wrong", new Integer(512), o);
+        Assert.assertEquals("x is wrong", new Integer(10), jc.get("x"));
+        Assert.assertEquals("y is wrong", new Integer(512), jc.get("y"));
     }
 }

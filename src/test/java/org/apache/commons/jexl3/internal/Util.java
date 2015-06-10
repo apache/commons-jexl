@@ -26,8 +26,7 @@ import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlNode;
 
 /**
- *
- * @author henri
+ * Helper methods for debug sessions.
  */
 public class Util {
     /**

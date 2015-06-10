@@ -26,10 +26,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Basic check on automated class creation
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ClassCreatorTest extends JexlTestCase {
     static final Logger logger = LogManager.getLogger(JexlTestCase.class);
     static final int LOOPS = 8;
@@ -40,6 +45,7 @@ public class ClassCreatorTest extends JexlTestCase {
         super("ClassCreatorTest");
     }
 
+    @Before
     @Override
     public void setUp() throws Exception {
         base = new File(System.getProperty("java.io.tmpdir") + File.pathSeparator + "jexl" + System.currentTimeMillis());
@@ -47,6 +53,7 @@ public class ClassCreatorTest extends JexlTestCase {
 
     }
 
+    @After
     @Override
     public void tearDown() throws Exception {
         deleteDirectory(base);
@@ -65,6 +72,7 @@ public class ClassCreatorTest extends JexlTestCase {
 
     // A space hog class
     static final int MEGA = 1024 * 1024;
+
     public class BigObject {
         @SuppressWarnings("unused")
         private final byte[] space = new byte[MEGA];
@@ -85,6 +93,7 @@ public class ClassCreatorTest extends JexlTestCase {
             super(clazz, queue);
         }
     }
+
     // A soft reference on instance
     static final class InstanceReference extends SoftReference<Object> {
         InstanceReference(Object obj, ReferenceQueue<Object> queue) {
@@ -92,6 +101,7 @@ public class ClassCreatorTest extends JexlTestCase {
         }
     }
 
+    @Test
     public void testOne() throws Exception {
         // abort test if class creator can not run
         if (!ClassCreator.canRun) {
@@ -100,10 +110,11 @@ public class ClassCreatorTest extends JexlTestCase {
         ClassCreator cctor = new ClassCreator(jexl, base);
         cctor.setSeed(1);
         Class<?> foo1 = cctor.createClass();
-        assertEquals("foo1", foo1.getSimpleName());
+        Assert.assertEquals("foo1", foo1.getSimpleName());
         cctor.clear();
     }
 
+    @Test
     public void testMany() throws Exception {
         // abort test if class creator can not run
         if (!ClassCreator.canRun) {
@@ -130,7 +141,7 @@ public class ClassCreatorTest extends JexlTestCase {
             } else {
                 clazz = cctor.getClassInstance();
                 if (clazz == null) {
-                    assertEquals(i, gced);
+                    Assert.assertEquals(i, gced);
                     break;
                 }
             }
@@ -142,17 +153,17 @@ public class ClassCreatorTest extends JexlTestCase {
             context.set("clazz", cctor.getClassName());
             context.set("foo", null);
             Object z = newx.evaluate(context);
-            assertNull(z);
+            Assert.assertNull(z);
             // check with the class itself
             context.set("clazz", clazz);
             z = newx.evaluate(context);
-            assertNotNull(clazz + ": class " + i + " could not be instantiated on pass " + pass, z);
-            assertEquals(new Integer(i), expr.evaluate(context));
+            Assert.assertNotNull(clazz + ": class " + i + " could not be instantiated on pass " + pass, z);
+            Assert.assertEquals(new Integer(i), expr.evaluate(context));
             // with the proper class loader, attempt to create an instance from the class name
             jexl.setClassLoader(cctor.getClassLoader());
             z = newx.evaluate(context);
-            assertTrue(z.getClass().equals(clazz));
-            assertEquals(new Integer(i), expr.evaluate(context));
+            Assert.assertTrue(z.getClass().equals(clazz));
+            Assert.assertEquals(new Integer(i), expr.evaluate(context));
             cctor.clear();
             jexl.setClassLoader(null);
 
@@ -190,7 +201,7 @@ public class ClassCreatorTest extends JexlTestCase {
 
         if (gced < 0) {
             logger.warn("unable to force GC");
-            //assertTrue(gced > 0);
+            //Assert.assertTrue(gced > 0);
         }
     }
 
@@ -210,15 +221,16 @@ public class ClassCreatorTest extends JexlTestCase {
         }
     }
 
+    @Test
     public void testBasicCtor() throws Exception {
         JexlScript s = jexl.createScript("(c, v)->{ var ct2 = new(c, v); ct2.value; }");
         Object r = s.execute(null, TwoCtors.class, 10);
-        assertEquals(10, r);
+        Assert.assertEquals(10, r);
         r = s.execute(null, TwoCtors.class, 5 + 5);
-        assertEquals(10, r);
+        Assert.assertEquals(10, r);
         r = s.execute(null, TwoCtors.class, 10d);
-        assertEquals(-10, r);
+        Assert.assertEquals(-10, r);
         r = s.execute(null, TwoCtors.class, 100f);
-        assertEquals(-100, r);
+        Assert.assertEquals(-100, r);
     }
 }

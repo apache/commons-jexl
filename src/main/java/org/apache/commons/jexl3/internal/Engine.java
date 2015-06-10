@@ -446,12 +446,12 @@ public class Engine extends JexlEngine {
             xjexl = xany;
         } catch (Exception xany) {
             xjexl = new JexlException.Method(info, meth, xany);
-        } finally {
-            if (xjexl != null) {
-                if (silent) {
-                    logger.warn(xjexl.getMessage(), xjexl.getCause());
-                    return null;
-                }
+        }
+        if (xjexl != null) {
+            if (silent) {
+                logger.warn(xjexl.getMessage(), xjexl.getCause());
+                result = null;
+            } else {
                 throw xjexl.clean();
             }
         }
@@ -661,7 +661,7 @@ public class Engine extends JexlEngine {
      * @param registers whether the parser should allow the unnamed '#number' syntax for 'registers'
      * @param expression whether the parser allows scripts or only expressions
      * @return the parsed tree
-     * @throws JexlException if any error occured during parsing
+     * @throws JexlException if any error occurred during parsing
      */
     protected ASTJexlScript parse(JexlInfo info, String src, Scope scope, boolean registers, boolean expression) {
         final boolean cached = src.length() < cacheThreshold && cache != null;
@@ -685,7 +685,7 @@ public class Engine extends JexlEngine {
     }
 
     /**
-     * Trims the source from front & ending spaces.
+     * Trims the source from front and ending spaces.
      * @param str expression to clean
      * @return trimmed expression ending in a semi-colon
      */

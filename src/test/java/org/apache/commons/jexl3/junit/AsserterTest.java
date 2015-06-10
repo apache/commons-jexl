@@ -21,32 +21,35 @@ import junit.framework.AssertionFailedError;
 
 import org.apache.commons.jexl3.Foo;
 import org.apache.commons.jexl3.JexlTestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  *  Simple testcases
  *
  *  @since 1.0
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class AsserterTest extends JexlTestCase {
-    public AsserterTest(String testName) {
-        super(testName);
+    public AsserterTest() {
+        super("AsserterTest");
     }
 
+    @Test
     public void testThis() throws Exception {
         Asserter asserter = new Asserter(JEXL);
         asserter.setVariable("this", new Foo());
-
         asserter.assertExpression("this.get('abc')", "Repeat : abc");
-
         try {
             asserter.assertExpression("this.count", "Wrong Value");
-            fail("This method should have thrown an assertion exception");
+            Assert.fail("This method should have thrown an assertion exception");
         }
         catch (AssertionFailedError e) {
             // it worked!
         }
     }
 
+    @Test
     public void testVariable() throws Exception {
         Asserter asserter = new Asserter(JEXL);
         asserter.setSilent(true);
@@ -61,7 +64,7 @@ public class AsserterTest extends JexlTestCase {
 
         try {
             asserter.assertExpression("bar.count", new Integer(5));
-            fail("This method should have thrown an assertion exception");
+            Assert.fail("This method should have thrown an assertion exception");
         }
         catch (AssertionFailedError e) {
             // it worked!

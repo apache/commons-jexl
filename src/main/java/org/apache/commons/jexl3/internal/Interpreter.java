@@ -124,11 +124,11 @@ public class Interpreter extends ParserVisitor {
     protected final JexlContext context;
     /** The context to store/retrieve variables. */
     protected final JexlContext.NamespaceResolver ns;
-    /** Strict interpreter flag (may temporarily change during when calling size & empty as functions). */
+    /** Strict interpreter flag (may temporarily change during when calling size and empty as functions). */
     protected boolean strictEngine;
     /** Strict interpreter flag. */
     protected final boolean strictArithmetic;
-    /** Silent intepreter flag. */
+    /** Silent interpreter flag. */
     protected final boolean silent;
     /** Cache executors. */
     protected final boolean cache;
@@ -177,7 +177,8 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * Interpret the given script/expression.
-     * <p> If the underlying JEXL engine is silent, errors will be logged through
+     * <p>
+     * If the underlying JEXL engine is silent, errors will be logged through
      * its logger as warning.
      * @param node the script or expression to interpret.
      * @return the result of the interpretation.
@@ -201,14 +202,14 @@ public class Interpreter extends ParserVisitor {
             throw xjexl.clean();
         } finally {
             if (functors != null && AUTOCLOSEABLE != null) {
-                for(Object functor : functors.values()) {
-                   if (functor != null && AUTOCLOSEABLE.isAssignableFrom(functor.getClass())) {
-                       try {
+                for (Object functor : functors.values()) {
+                    if (functor != null && AUTOCLOSEABLE.isAssignableFrom(functor.getClass())) {
+                        try {
                             jexl.invokeMethod(functor, "close", EMPTY_PARAMS);
-                       } catch(Exception xclose) {
+                        } catch (Exception xclose) {
                             logger.warn(xclose.getMessage(), xclose.getCause());
-                       }
-                   }
+                        }
+                    }
                 }
             }
             functors = null;
@@ -220,12 +221,13 @@ public class Interpreter extends ParserVisitor {
 
     /** Java7 AutoCloseable interface defined?. */
     private static final Class<?> AUTOCLOSEABLE;
+
     static {
         Class<?> c;
         try {
-          c = Class.forName("java.lang.AutoCloseable");
-        } catch(ClassNotFoundException xclass) {
-          c = null;
+            c = Class.forName("java.lang.AutoCloseable");
+        } catch (ClassNotFoundException xclass) {
+            c = null;
         }
         AUTOCLOSEABLE = c;
     }
@@ -252,8 +254,8 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * Triggered when a variable can not be resolved.
-     * @param node the node where the error originated from
-     * @param var the variable name
+     * @param node  the node where the error originated from
+     * @param var   the variable name
      * @param undef whether the variable is undefined or null
      * @return throws JexlException if isStrict, null otherwise
      */
@@ -269,7 +271,7 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * Triggered when a method can not be resolved.
-     * @param node the node where the error originated from
+     * @param node   the node where the error originated from
      * @param method the method name
      * @return throws JexlException if isStrict, null otherwise
      */
@@ -285,8 +287,8 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * Triggered when a property can not be resolved.
-     * @param node the node where the error originated from
-     * @param var the property name
+     * @param node  the node where the error originated from
+     * @param var   the property name
      * @param cause the cause if any
      * @return throws JexlException if isStrict, null otherwise
      */
@@ -327,7 +329,9 @@ public class Interpreter extends ParserVisitor {
     }
 
     /**
-     * Resolves a namespace, eventually allocating an instance using context as constructor argument. <p>The lifetime of
+     * Resolves a namespace, eventually allocating an instance using context as constructor argument.
+     * <p>
+     * The lifetime of
      * such instances span the current expression or script evaluation.</p>
      * @param prefix the prefix name (may be null for global namespace)
      * @param node   the AST node
@@ -379,10 +383,11 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * Attempts to call a monadic operator.
-     * <p>This takes care of finding and caching the operator method when appropriate
-     * @param node the syntactic node
+     * <p>
+     * This takes care of finding and caching the operator method when appropriate
+     * @param node     the syntactic node
      * @param operator the operator
-     * @param arg the argument
+     * @param arg      the argument
      * @return the result of the operator evaluation or TRY_FAILED
      */
     protected Object callOperator(JexlNode node, Operator operator, Object arg) {
@@ -415,11 +420,12 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * Attempts to call a diadic operator.
-     * <p>This takes care of finding and caching the operator method when appropriate
-     * @param node the syntactic node
+     * <p>
+     * This takes care of finding and caching the operator method when appropriate
+     * @param node     the syntactic node
      * @param operator the operator
-     * @param lhs the left hand side argument
-     * @param rhs the right hand side argument
+     * @param lhs      the left hand side argument
+     * @param rhs      the right hand side argument
      * @return the result of the operator evaluation or TRY_FAILED
      */
     protected Object callOperator(JexlNode node, Operator operator, Object lhs, Object rhs) {
@@ -499,7 +505,7 @@ public class Interpreter extends ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             Object result = callOperator(node, Operator.ADD, left, right);
-            return result != JexlEngine.TRY_FAILED? result : arithmetic.add(left, right);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.add(left, right);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "+ error", xrt);
         }
@@ -511,7 +517,7 @@ public class Interpreter extends ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             Object result = callOperator(node, Operator.SUBTRACT, left, right);
-            return result != JexlEngine.TRY_FAILED? result : arithmetic.subtract(left, right);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.subtract(left, right);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "- error", xrt);
         }
@@ -523,7 +529,7 @@ public class Interpreter extends ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             Object result = callOperator(node, Operator.AND, left, right);
-            return result != JexlEngine.TRY_FAILED? result : arithmetic.bitwiseAnd(left, right);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.bitwiseAnd(left, right);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "& error", xrt);
         }
@@ -534,7 +540,7 @@ public class Interpreter extends ParserVisitor {
         Object arg = node.jjtGetChild(0).jjtAccept(this, data);
         try {
             Object result = callOperator(node, Operator.COMPLEMENT, arg);
-            return result != JexlEngine.TRY_FAILED? result : arithmetic.bitwiseComplement(arg);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.bitwiseComplement(arg);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "~ error", xrt);
         }
@@ -546,7 +552,7 @@ public class Interpreter extends ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             Object result = callOperator(node, Operator.OR, left, right);
-            return result != JexlEngine.TRY_FAILED? result : arithmetic.bitwiseOr(left, right);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.bitwiseOr(left, right);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "| error", xrt);
         }
@@ -558,7 +564,7 @@ public class Interpreter extends ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             Object result = callOperator(node, Operator.XOR, left, right);
-            return result != JexlEngine.TRY_FAILED? result : arithmetic.bitwiseXor(left, right);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.bitwiseXor(left, right);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "^ error", xrt);
         }
@@ -580,7 +586,7 @@ public class Interpreter extends ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             Object result = callOperator(node, Operator.DIVIDE, left, right);
-            return result != JexlEngine.TRY_FAILED? result : arithmetic.divide(left, right);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.divide(left, right);
         } catch (ArithmeticException xrt) {
             if (!strictArithmetic) {
                 return 0.0d;
@@ -650,9 +656,9 @@ public class Interpreter extends ParserVisitor {
                     try {
                         // execute statement
                         result = statement.jjtAccept(this, data);
-                    } catch(JexlException.Break stmtBreak) {
+                    } catch (JexlException.Break stmtBreak) {
                         break;
-                    } catch(JexlException.Continue stmtContinue) {
+                    } catch (JexlException.Continue stmtContinue) {
                         //continue;
                     }
                 }
@@ -909,10 +915,10 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
-                Object result = callOperator(node, Operator.LTE, left, right);
-                return result != JexlEngine.TRY_FAILED
-                       ? result
-                       : arithmetic.lessThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
+            Object result = callOperator(node, Operator.LTE, left, right);
+            return result != JexlEngine.TRY_FAILED
+                   ? result
+                   : arithmetic.lessThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "<= error", xrt);
         }
@@ -923,10 +929,10 @@ public class Interpreter extends ParserVisitor {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
-                Object result = callOperator(node, Operator.LT, left, right);
-                return result != JexlEngine.TRY_FAILED
-                       ? result
-                       : arithmetic.lessThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
+            Object result = callOperator(node, Operator.LT, left, right);
+            return result != JexlEngine.TRY_FAILED
+                   ? result
+                   : arithmetic.lessThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "< error", xrt);
         }
@@ -987,7 +993,7 @@ public class Interpreter extends ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             Object result = callOperator(node, Operator.MOD, left, right);
-            return result != JexlEngine.TRY_FAILED? result : arithmetic.mod(left, right);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.mod(left, right);
         } catch (ArithmeticException xrt) {
             if (!strictArithmetic) {
                 return 0.0d;
@@ -1003,7 +1009,7 @@ public class Interpreter extends ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             Object result = callOperator(node, Operator.MULTIPLY, left, right);
-            return result != JexlEngine.TRY_FAILED? result : arithmetic.multiply(left, right);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.multiply(left, right);
         } catch (ArithmeticException xrt) {
             JexlNode xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "* error", xrt);
@@ -1016,7 +1022,7 @@ public class Interpreter extends ParserVisitor {
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             Object result = callOperator(node, Operator.EQ, left, right);
-           return result != JexlEngine.TRY_FAILED
+            return result != JexlEngine.TRY_FAILED
                    ? arithmetic.toBoolean(result) ? Boolean.FALSE : Boolean.TRUE
                    : arithmetic.equals(left, right) ? Boolean.FALSE : Boolean.TRUE;
         } catch (ArithmeticException xrt) {
@@ -1116,7 +1122,7 @@ public class Interpreter extends ParserVisitor {
             if (result != JexlEngine.TRY_FAILED) {
                 return result;
             }
-            Object number = result != JexlEngine.TRY_FAILED? result : arithmetic.negate(val);
+            Object number = result != JexlEngine.TRY_FAILED ? result : arithmetic.negate(val);
             // attempt to recoerce to literal class
             if (valNode instanceof ASTNumberLiteral && number instanceof Number) {
                 number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
@@ -1140,9 +1146,9 @@ public class Interpreter extends ParserVisitor {
                 try {
                     // execute statement
                     result = node.jjtGetChild(1).jjtAccept(this, data);
-                } catch(JexlException.Break stmtBreak) {
+                } catch (JexlException.Break stmtBreak) {
                     break;
-                } catch(JexlException.Continue stmtContinue) {
+                } catch (JexlException.Continue stmtContinue) {
                     //continue;
                 }
             }
@@ -1203,7 +1209,16 @@ public class Interpreter extends ParserVisitor {
             return opcall;
         }
         if (object instanceof Number) {
-            return ((Number) object).intValue() == 0 ? Boolean.TRUE : Boolean.FALSE;
+            Number number = (Number) object;
+            if (number instanceof Double) {
+                double value = number.doubleValue();
+                return value == 0. || Double.isNaN(value) ? Boolean.TRUE : Boolean.FALSE;
+            }
+            if (number instanceof Float) {
+                float value = number.floatValue();
+                return value == 0. || Float.isNaN(value) ? Boolean.TRUE : Boolean.FALSE;
+            }
+            return number.intValue() == 0 ? Boolean.TRUE : Boolean.FALSE;
         }
         if (object instanceof String) {
             return "".equals(object) ? Boolean.TRUE : Boolean.FALSE;
@@ -1249,17 +1264,17 @@ public class Interpreter extends ParserVisitor {
         if (opcall != JexlEngine.TRY_FAILED) {
             return opcall;
         }
-        if (object instanceof Collection<?>) {
-            return ((Collection<?>) object).size();
+        if (object instanceof String) {
+            return ((String) object).length();
         }
         if (object.getClass().isArray()) {
             return Array.getLength(object);
         }
+        if (object instanceof Collection<?>) {
+            return ((Collection<?>) object).size();
+        }
         if (object instanceof Map<?, ?>) {
             return ((Map<?, ?>) object).size();
-        }
-        if (object instanceof String) {
-            return ((String) object).length();
         }
         // check if there is a size method on the object that returns an
         // integer and if so, just use it
@@ -1615,7 +1630,8 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * Calls a method (or function).
-     * <p> Method resolution is a follows:
+     * <p>
+     * Method resolution is a follows:
      * 1 - attempt to find a method in the bean passed as parameter;
      * 3 - if this fails, seeks a JexlScript or JexlMethod as a property of that bean;
      * 2 - if this fails, narrow the arguments and try again
@@ -1710,7 +1726,7 @@ public class Interpreter extends ParserVisitor {
             } else {
                 return unsolvableMethod(node, methodName);
             }
-        } catch(JexlException.Method xmethod) {
+        } catch (JexlException.Method xmethod) {
             throw xmethod;
         } catch (Exception xany) {
             xjexl = new JexlException(node, methodName, xany);
@@ -1784,7 +1800,7 @@ public class Interpreter extends ParserVisitor {
                 node.jjtSetValue(ctor);
             }
             return instance;
-        } catch(JexlException.Method xmethod) {
+        } catch (JexlException.Method xmethod) {
             throw xmethod;
         } catch (Exception xany) {
             String dbgStr = cobject != null ? cobject.toString() : null;
@@ -1830,7 +1846,8 @@ public class Interpreter extends ParserVisitor {
                 }
             }
         }
-        JexlException xjexl = null;
+        // resolve that property
+        Exception xcause = null;
         JexlPropertyGet vg = uberspect.getPropertyGet(object, attribute);
         if (vg != null) {
             try {
@@ -1841,27 +1858,20 @@ public class Interpreter extends ParserVisitor {
                 }
                 return value;
             } catch (Exception xany) {
-                String attrStr = attribute != null ? attribute.toString() : null;
-                return unsolvableProperty(node, attrStr, xany);
+                xcause = xany;
             }
         }
-        if (xjexl == null) {
-            if (node == null) {
-                String error = "unable to get object property"
-                        + ", class: " + object.getClass().getName()
-                        + ", property: " + attribute;
-                throw new UnsupportedOperationException(error);
-            }
+        // lets fail
+        if (node != null) {
             String attrStr = attribute != null ? attribute.toString() : null;
-            return unsolvableProperty(node, attrStr, null);
+            return unsolvableProperty(node, attrStr, xcause);
+        } else {
+            // direct call
+            String error = "unable to get object property"
+                    + ", class: " + object.getClass().getName()
+                    + ", property: " + attribute;
+            throw new UnsupportedOperationException(error, xcause);
         }
-        if (strictEngine) {
-            throw xjexl;
-        }
-        if (!silent) {
-            logger.warn(xjexl.getMessage());
-        }
-        return null;
     }
 
     /**
@@ -1898,7 +1908,7 @@ public class Interpreter extends ParserVisitor {
                 }
             }
         }
-        JexlException xjexl = null;
+        Exception xcause = null;
         JexlPropertySet vs = uberspect.getPropertySet(object, attribute, value);
         // if we can't find an exact match, narrow the value argument and try again
         if (vs == null) {
@@ -1917,35 +1927,20 @@ public class Interpreter extends ParserVisitor {
                 }
                 return;
             } catch (Exception xany) {
-                if (node == null) {
-                    if (xany instanceof RuntimeException) {
-                        throw (RuntimeException) xany;
-                    } else {
-                        throw new RuntimeException(xany);
-                    }
-                }
-                String attrStr = attribute != null ? attribute.toString() : null;
-                unsolvableProperty(node, attrStr, xany);
-                return;
+                xcause = xany;
             }
         }
-        if (xjexl == null) {
-            if (node == null) {
-                String error = "unable to set object property"
-                        + ", class: " + object.getClass().getName()
-                        + ", property: " + attribute
-                        + ", argument: " + value.getClass().getSimpleName();
-                throw new UnsupportedOperationException(error);
-            }
+        // lets fail
+        if (node != null) {
             String attrStr = attribute != null ? attribute.toString() : null;
-            unsolvableProperty(node, attrStr, null);
-            return;
-        }
-        if (strictEngine) {
-            throw xjexl;
-        }
-        if (!silent) {
-            logger.warn(xjexl.getMessage());
+            unsolvableProperty(node, attrStr, xcause);
+        } else {
+            // direct call
+            String error = "unable to set object property"
+                    + ", class: " + object.getClass().getName()
+                    + ", property: " + attribute
+                    + ", argument: " + value.getClass().getSimpleName();
+            throw new UnsupportedOperationException(error, xcause);
         }
     }
 }

@@ -17,7 +17,6 @@
 
 package org.apache.commons.jexl3.examples;
 
-import junit.framework.TestCase;
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -26,13 +25,14 @@ import org.apache.commons.jexl3.MapContext;
 import java.util.List;
 import java.util.ArrayList;
 import org.apache.commons.jexl3.JexlBuilder;
+import org.junit.Test;
 
 /**
  *  Simple example to show how to access arrays.
  *
  *  @since 1.0
  */
-public class ArrayTest extends TestCase {
+public class ArrayTest {
     /**
      * An example for array access.
      */
@@ -67,7 +67,7 @@ public class ArrayTest extends TestCase {
      * Unit test entry point.
      * @throws Exception
      */
-    public void testExample() throws Exception {
+    @Test public void testExample() throws Exception {
         example(Output.JUNIT);
     }
 

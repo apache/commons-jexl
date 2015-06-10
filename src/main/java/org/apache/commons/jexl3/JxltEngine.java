@@ -66,7 +66,7 @@ public abstract class JxltEngine {
      * <li>The "composite" syntax is of the form <code>"...${jexl-expr0}... #{jexl-expr1}..."</code></li>
      * </ul>
      * <p>
-     * Deferred & immediate expression carry different intentions:
+     * Deferred and immediate expression carry different intentions:
      * <ul>
      * <li>An immediate expression indicate that evaluation is intended to be performed close to
      * the definition/parsing point.</li>
@@ -82,14 +82,14 @@ public abstract class JxltEngine {
      * <p>
      * The API reflects this feature in 2 methods, prepare and evaluate. The prepare method
      * will evaluate the immediate subexpression and return an expression that contains only
-     * the deferred subexpressions (& constants), a prepared expression. Such a prepared expression
+     * the deferred subexpressions (and constants), a prepared expression. Such a prepared expression
      * is suitable for a later phase evaluation that may occur with a different JexlContext.
      * Note that it is valid to call evaluate without prepare in which case the same JexlContext
      * is used for the 2 evaluation phases.
      * </p>
      * <p>
      * In the most common use-case where deferred expressions are to be kept around as properties of objects,
-     * one should createExpression & prepare an expression before storing it and evaluate it each time
+     * one should createExpression and prepare an expression before storing it and evaluate it each time
      * the property storing it is accessed.
      * </p>
      * <p>
@@ -172,7 +172,7 @@ public abstract class JxltEngine {
          * <p>
          * In effect, this binds the result of the immediate sub-expressions evaluation in the
          * context, allowing to differ evaluation of the remaining (deferred) expression within another context.
-         * This only has an effect to nested & composite expressions that contain differed & immediate sub-expressions.
+         * This only has an effect to nested and composite expressions that contain differed and immediate sub-expressions.
          * </p>
          * <p>
          * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
@@ -196,12 +196,12 @@ public abstract class JxltEngine {
 
     /**
      * Creates a a {@link Expression} from an expression string.
-     * Uses & fills up the expression cache if any.
+     * Uses and fills up the expression cache if any.
      * <p>
      * If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.
      * </p>
      * @param expression the {@link Template} string expression
-     * @return the {@link Expression}, null if silent and an error occured
+     * @return the {@link Expression}, null if silent and an error occurred
      * @throws Exception if an error occurs and the {@link JexlEngine}
      * is not silent
      */

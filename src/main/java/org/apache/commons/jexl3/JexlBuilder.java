@@ -36,7 +36,7 @@ import java.nio.charset.Charset;
  * </p>
  * <ul>
  * <li>When "silent" &amp; "not-strict":
- * <p> 0 & null should be indicators of "default" values so that even in an case of error,
+ * <p> 0 &amp; null should be indicators of "default" values so that even in an case of error,
  * something meaningfull can still be inferred; may be convenient for configurations.
  * </p>
  * </li>
@@ -52,7 +52,7 @@ import java.nio.charset.Charset;
  * </li>
  * <li>When "not-silent" &amp; "strict":
  * <p>The finest error control grain is obtained; it is the closest to Java code -
- * still augmented by "script" capabilities regarding automated conversions & type matching.
+ * still augmented by "script" capabilities regarding automated conversions and type matching.
  * </p>
  * </li>
  * </ul>

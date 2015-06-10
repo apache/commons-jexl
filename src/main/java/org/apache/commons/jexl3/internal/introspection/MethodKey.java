@@ -42,7 +42,7 @@ import java.util.Map;
  * </p>
  * A key can be constructed either from arguments (array of objects) or from parameters
  * (array of class).
- * Roughly 3x faster than string key to access the map & uses less memory.
+ * Roughly 3x faster than string key to access the map and uses less memory.
  */
 public final class MethodKey {
     /** The initial size of the primitive conversion map. */
