@@ -29,10 +29,10 @@ import java.nio.charset.Charset;
 
 /**
  * Creates and evaluates JexlExpression and JexlScript objects.
- * Determines the behavior of expressions & scripts during their evaluation with respect to:
+ * Determines the behavior of expressions and scripts during their evaluation with respect to:
  * <ul>
  * <li>Introspection, see {@link JexlUberspect}</li>
- * <li>Arithmetic & comparison, see {@link JexlArithmetic}</li>
+ * <li>Arithmetic and comparison, see {@link JexlArithmetic}</li>
  * <li>Error reporting</li>
  * <li>Logging</li>
  * </ul>
@@ -51,7 +51,7 @@ public abstract class JexlEngine {
             return "tryExecute failed";
         }
     };
-    
+
     /**
      * The thread local context.
      */

@@ -53,7 +53,7 @@ public class Uberspect implements JexlUberspect {
      * Publicly exposed special failure object returned by tryInvoke.
      */
     public static final Object TRY_FAILED = JexlEngine.TRY_FAILED;
-    /** The logger to use for all warnings & errors. */
+    /** The logger to use for all warnings and errors. */
     protected final Logger rlog;
     /** The introspector version. */
     private final AtomicInteger version;

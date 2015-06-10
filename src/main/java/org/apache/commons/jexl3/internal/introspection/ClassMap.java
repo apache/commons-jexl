@@ -63,12 +63,12 @@ final class ClassMap {
      * This is the cache to store and look up the method information.
      * <p>
      * It stores the association between:
-     *  - a key made of a method name & an array of argument types.
+     *  - a key made of a method name and an array of argument types.
      *  - a method.
      * </p>
      * <p>
      * Since the invocation of the associated method is dynamic, there is no need (nor way) to differentiate between
-     * foo(int,int) & foo(Integer,Integer) since in practise, only the latter form will be used through a call.
+     * foo(int,int) and foo(Integer,Integer) since in practise, only the latter form will be used through a call.
      * This of course, applies to all 8 primitive types.
      * </p>
      * Uses ConcurrentMap since 3.0, marginally faster than 2.1 under contention.

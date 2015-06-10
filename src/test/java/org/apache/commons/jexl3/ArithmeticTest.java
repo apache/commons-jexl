@@ -23,23 +23,30 @@ import java.util.Map;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ArithmeticTest extends JexlTestCase {
-    private Asserter asserter;
+    private final Asserter asserter;
 
     public ArithmeticTest() {
         super("ArithmeticTest");
         asserter = new Asserter(JEXL);
     }
 
+    @Before
     @Override
     public void setUp() {
     }
 
+    @Test
     public void testUndefinedVar() throws Exception {
         asserter.failExpression("objects[1].status", ".* undefined variable objects.*");
     }
 
+    @Test
     public void testLeftNullOperand() throws Exception {
         asserter.setVariable("left", null);
         asserter.setVariable("right", Integer.valueOf(8));
@@ -54,6 +61,7 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.failExpression("left ^ right", ".*null.*");
     }
 
+    @Test
     public void testRightNullOperand() throws Exception {
         asserter.setVariable("left", Integer.valueOf(9));
         asserter.setVariable("right", null);
@@ -67,6 +75,7 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.failExpression("left ^ right", ".*null.*");
     }
 
+    @Test
     public void testNullOperands() throws Exception {
         asserter.setVariable("left", null);
         asserter.setVariable("right", null);
@@ -80,11 +89,13 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.failExpression("left ^ right", ".*null.*");
     }
 
+    @Test
     public void testNullOperand() throws Exception {
         asserter.setVariable("right", null);
         asserter.failExpression("~right", ".*null.*");
     }
 
+    @Test
     public void testBigDecimal() throws Exception {
         asserter.setVariable("left", new BigDecimal(2));
         asserter.setVariable("right", new BigDecimal(6));
@@ -95,6 +106,7 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("right % left", new BigDecimal(0));
     }
 
+    @Test
     public void testBigInteger() throws Exception {
         asserter.setVariable("left", new BigInteger("2"));
         asserter.setVariable("right", new BigInteger("6"));
@@ -108,6 +120,7 @@ public class ArithmeticTest extends JexlTestCase {
     /**
      * test some simple mathematical calculations
      */
+    @Test
     public void testUnaryMinus() throws Exception {
         asserter.setVariable("aByte", new Byte((byte) 1));
         asserter.setVariable("aShort", new Short((short) 2));
@@ -133,6 +146,7 @@ public class ArithmeticTest extends JexlTestCase {
     /**
      * test some simple mathematical calculations
      */
+    @Test
     public void testCalculations() throws Exception {
         asserter.setStrict(true, false);
         /*
@@ -175,6 +189,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     }
 
+    @Test
     public void testCoercions() throws Exception {
         asserter.assertExpression("1", new Integer(1)); // numerics default to Integer
         asserter.assertExpression("5L", new Long(5));
@@ -207,50 +222,75 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     // JEXL-24: long integers (and doubles)
+    @Test
     public void testLongLiterals() throws Exception {
         JexlEvalContext ctxt = new JexlEvalContext();
         ctxt.setStrictArithmetic(true);
         String stmt = "{a = 10L; b = 10l; c = 42.0D; d = 42.0d; e=56.3F; f=56.3f; g=63.5; h=0x10; i=010; j=0x10L; k=010l}";
         JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
-        assertEquals(10L, ctxt.get("a"));
-        assertEquals(10l, ctxt.get("b"));
-        assertEquals(42.0D, ctxt.get("c"));
-        assertEquals(42.0d, ctxt.get("d"));
-        assertEquals(56.3f, ctxt.get("e"));
-        assertEquals(56.3f, ctxt.get("f"));
-        assertEquals(63.5d, ctxt.get("g"));
-        assertEquals(0x10, ctxt.get("h"));
-        assertEquals(010, ctxt.get("i"));
-        assertEquals(0x10L, ctxt.get("j"));
-        assertEquals(010l, ctxt.get("k"));
+        Assert.assertEquals(10L, ctxt.get("a"));
+        Assert.assertEquals(10l, ctxt.get("b"));
+        Assert.assertEquals(42.0D, ctxt.get("c"));
+        Assert.assertEquals(42.0d, ctxt.get("d"));
+        Assert.assertEquals(56.3f, ctxt.get("e"));
+        Assert.assertEquals(56.3f, ctxt.get("f"));
+        Assert.assertEquals(63.5d, ctxt.get("g"));
+        Assert.assertEquals(0x10, ctxt.get("h"));
+        Assert.assertEquals(010, ctxt.get("i"));
+        Assert.assertEquals(0x10L, ctxt.get("j"));
+        Assert.assertEquals(010l, ctxt.get("k"));
+    }
+
+    @Test
+    public void testBigLiteralValue() throws Exception {
+        JexlEvalContext ctxt = new JexlEvalContext();
+        ctxt.setStrictArithmetic(true);
+        JexlExpression e = JEXL.createExpression("9223372036854775806.5B");
+        String res = String.valueOf(e.evaluate(ctxt));
+        Assert.assertEquals("9223372036854775806.5", res);
+    }
+
+    @Test
+    public void testBigdOp() throws Exception {
+        BigDecimal sevendot475 = new BigDecimal("7.475");
+        BigDecimal SO = new BigDecimal("325");
+        JexlContext jc = new MapContext();
+        jc.set("SO", SO);
+
+        String expr = "2.3*SO/100";
+
+        Object evaluate = JEXL.createExpression(expr).evaluate(jc);
+        Assert.assertEquals(sevendot475, (BigDecimal) evaluate);
     }
 
     // JEXL-24: big integers and big decimals
+    @Test
     public void testBigLiterals() throws Exception {
         JexlEvalContext ctxt = new JexlEvalContext();
         ctxt.setStrictArithmetic(true);
         String stmt = "{a = 10H; b = 10h; c = 42.0B; d = 42.0b;}";
         JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
-        assertEquals(new BigInteger("10"), ctxt.get("a"));
-        assertEquals(new BigInteger("10"), ctxt.get("b"));
-        assertEquals(new BigDecimal("42.0"), ctxt.get("c"));
-        assertEquals(new BigDecimal("42.0"), ctxt.get("d"));
+        Assert.assertEquals(new BigInteger("10"), ctxt.get("a"));
+        Assert.assertEquals(new BigInteger("10"), ctxt.get("b"));
+        Assert.assertEquals(new BigDecimal("42.0"), ctxt.get("c"));
+        Assert.assertEquals(new BigDecimal("42.0"), ctxt.get("d"));
     }
 
     // JEXL-24: big decimals with exponent
+    @Test
     public void testBigExponentLiterals() throws Exception {
         JexlEvalContext ctxt = new JexlEvalContext();
         ctxt.setStrictArithmetic(true);
         String stmt = "{a = 42.0e1B; b = 42.0E+2B; c = 42.0e-1B; d = 42.0E-2b; e=4242.4242e1b}";
         JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
-        assertEquals(new BigDecimal("42.0e+1"), ctxt.get("a"));
-        assertEquals(new BigDecimal("42.0e+2"), ctxt.get("b"));
-        assertEquals(new BigDecimal("42.0e-1"), ctxt.get("c"));
-        assertEquals(new BigDecimal("42.0e-2"), ctxt.get("d"));
-        assertEquals(new BigDecimal("4242.4242e1"), ctxt.get("e"));
+        Assert.assertEquals(new BigDecimal("42.0e+1"), ctxt.get("a"));
+        Assert.assertEquals(new BigDecimal("42.0e+2"), ctxt.get("b"));
+        Assert.assertEquals(new BigDecimal("42.0e-1"), ctxt.get("c"));
+        Assert.assertEquals(new BigDecimal("42.0e-2"), ctxt.get("d"));
+        Assert.assertEquals(new BigDecimal("4242.4242e1"), ctxt.get("e"));
     }
 
     // JEXL-24: doubles with exponent
@@ -260,10 +300,10 @@ public class ArithmeticTest extends JexlTestCase {
         String stmt = "{a = 42.0e1D; b = 42.0E+2D; c = 42.0e-1d; d = 42.0E-2d;}";
         JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
-        assertEquals(Double.valueOf("42.0e+1"), ctxt.get("a"));
-        assertEquals(Double.valueOf("42.0e+2"), ctxt.get("b"));
-        assertEquals(Double.valueOf("42.0e-1"), ctxt.get("c"));
-        assertEquals(Double.valueOf("42.0e-2"), ctxt.get("d"));
+        Assert.assertEquals(Double.valueOf("42.0e+1"), ctxt.get("a"));
+        Assert.assertEquals(Double.valueOf("42.0e+2"), ctxt.get("b"));
+        Assert.assertEquals(Double.valueOf("42.0e-1"), ctxt.get("c"));
+        Assert.assertEquals(Double.valueOf("42.0e-2"), ctxt.get("d"));
     }
 
     /**
@@ -272,6 +312,7 @@ public class ArithmeticTest extends JexlTestCase {
      * if not silent, all arith exception throw
      * @throws Exception
      */
+    @Test
     public void testDivideByZero() throws Exception {
         Map<String, Object> vars = new HashMap<String, Object>();
         JexlEvalContext context = new JexlEvalContext(vars);
@@ -283,7 +324,6 @@ public class ArithmeticTest extends JexlTestCase {
         vars.put("aDouble", new Double(6.6));
         vars.put("aBigInteger", new BigInteger("7"));
         vars.put("aBigDecimal", new BigDecimal("8.8"));
-
 
         vars.put("zByte", new Byte((byte) 0));
         vars.put("zShort", new Short((short) 0));
@@ -332,16 +372,17 @@ public class ArithmeticTest extends JexlTestCase {
                 }
             }
             if (strict) {
-                assertTrue("All expressions should have thrown " + zthrow + "/" + PERMS,
+                Assert.assertTrue("All expressions should have thrown " + zthrow + "/" + PERMS,
                         zthrow == PERMS);
             } else {
-                assertTrue("All expressions should have zeroed " + zeval + "/" + PERMS,
+                Assert.assertTrue("All expressions should have zeroed " + zeval + "/" + PERMS,
                         zeval == PERMS);
             }
         }
         debuggerCheck(jexl);
     }
 
+    @Test
     public void testNaN() throws Exception {
         Map<String, Object> ns = new HashMap<String, Object>();
         ns.put("double", Double.class);
@@ -350,16 +391,16 @@ public class ArithmeticTest extends JexlTestCase {
         Object result;
         script = jexl.createScript("#NaN");
         result = script.execute(null);
-        assertTrue(Double.isNaN((Double) result));
+        Assert.assertTrue(Double.isNaN((Double) result));
         script = jexl.createScript("NaN");
         result = script.execute(null);
-        assertTrue(Double.isNaN((Double) result));
+        Assert.assertTrue(Double.isNaN((Double) result));
         script = jexl.createScript("double:isNaN(#NaN)");
         result = script.execute(null);
-        assertTrue((Boolean) result);
+        Assert.assertTrue((Boolean) result);
         script = jexl.createScript("double:isNaN(NaN)");
         result = script.execute(null);
-        assertTrue((Boolean) result);
+        Assert.assertTrue((Boolean) result);
     }
 
     public static class EmptyTestContext extends MapContext implements JexlContext.NamespaceResolver {
@@ -379,6 +420,7 @@ public class ArithmeticTest extends JexlTestCase {
         }
     }
 
+    @Test
     public void testEmpty() throws Exception {
         Object[] SCRIPTS = {
             "var x = null; log('x = %s', x);", 0,
@@ -407,12 +449,13 @@ public class ArithmeticTest extends JexlTestCase {
             Object expected = SCRIPTS[e + 1];
             script = jexl.createScript(stext);
             Object result = script.execute(jc);
-            assertEquals("failed on " + stext, expected, result);
+            Assert.assertEquals("failed on " + stext, expected, result);
         }
     }
 
     public static class Var {
         final int value;
+
         Var(int v) {
             value = v;
         }
@@ -423,48 +466,63 @@ public class ArithmeticTest extends JexlTestCase {
         public ArithmeticPlus(boolean strict) {
             super(strict);
         }
+
         public boolean equals(Var lhs, Var rhs) {
             return lhs.value == rhs.value;
         }
+
         public boolean lessThan(Var lhs, Var rhs) {
             return lhs.value < rhs.value;
         }
+
         public boolean lessThanOrEqual(Var lhs, Var rhs) {
             return lhs.value <= rhs.value;
         }
+
         public boolean greaterThan(Var lhs, Var rhs) {
             return lhs.value > rhs.value;
         }
+
         public boolean greaterThanOrEqual(Var lhs, Var rhs) {
             return lhs.value >= rhs.value;
         }
+
         public Var add(Var lhs, Var rhs) {
             return new Var(lhs.value + rhs.value);
         }
+
         public Var subtract(Var lhs, Var rhs) {
             return new Var(lhs.value - rhs.value);
         }
+
         public Var divide(Var lhs, Var rhs) {
             return new Var(lhs.value / rhs.value);
         }
+
         public Var multiply(Var lhs, Var rhs) {
             return new Var(lhs.value * rhs.value);
         }
+
         public Var mod(Var lhs, Var rhs) {
             return new Var(lhs.value / rhs.value);
         }
+
         public Var negate(Var arg) {
             return new Var(-arg.value);
         }
+
         public Var bitwiseAnd(Var lhs, Var rhs) {
             return new Var(lhs.value & rhs.value);
         }
+
         public Var bitwiseOr(Var lhs, Var rhs) {
             return new Var(lhs.value | rhs.value);
         }
+
         public Var bitwiseXor(Var lhs, Var rhs) {
             return new Var(lhs.value ^ rhs.value);
         }
+
         public Var bitwiseComplement(Var arg) {
             return new Var(~arg.value);
         }
@@ -482,117 +540,231 @@ public class ArithmeticTest extends JexlTestCase {
         public Object negate(final String str) {
             final int length = str.length();
             StringBuilder strb = new StringBuilder(str.length());
-            for(int c = length - 1; c >= 0; --c) {
+            for (int c = length - 1; c >= 0; --c) {
                 strb.append(str.charAt(c));
             }
             return strb.toString();
         }
     }
 
+    @Test
     public void testArithmeticPlus() throws Exception {
         JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new ArithmeticPlus(false)).create();
         JexlContext jc = new EmptyTestContext();
         runOverload(jexl, jc);
     }
 
+    @Test
     public void testArithmeticPlusNoCache() throws Exception {
         JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new ArithmeticPlus(false)).create();
         JexlContext jc = new EmptyTestContext();
         runOverload(jexl, jc);
     }
 
-    protected void runOverload(JexlEngine jexl,JexlContext jc) {
+    protected void runOverload(JexlEngine jexl, JexlContext jc) {
         JexlScript script;
         Object result;
 
         script = jexl.createScript("(x, y)->{ x < y }");
         result = script.execute(jc, 42, 43);
-        assertEquals(true, result);
+        Assert.assertEquals(true, result);
         result = script.execute(jc, new Var(42), new Var(43));
-        assertEquals(true, result);
+        Assert.assertEquals(true, result);
         result = script.execute(jc, new Var(42), new Var(43));
-        assertEquals(true, result);
+        Assert.assertEquals(true, result);
         result = script.execute(jc, 43, 42);
-        assertEquals(false, result);
+        Assert.assertEquals(false, result);
         result = script.execute(jc, new Var(43), new Var(42));
-        assertEquals(false, result);
+        Assert.assertEquals(false, result);
         result = script.execute(jc, new Var(43), new Var(42));
-        assertEquals(false, result);
+        Assert.assertEquals(false, result);
 
         script = jexl.createScript("(x, y)->{ x <= y }");
         result = script.execute(jc, 42, 43);
-        assertEquals(true, result);
+        Assert.assertEquals(true, result);
         result = script.execute(jc, new Var(42), new Var(43));
-        assertEquals(true, result);
+        Assert.assertEquals(true, result);
         result = script.execute(jc, new Var(41), new Var(44));
-        assertEquals(true, result);
+        Assert.assertEquals(true, result);
         result = script.execute(jc, 43, 42);
-        assertEquals(false, result);
+        Assert.assertEquals(false, result);
         result = script.execute(jc, new Var(45), new Var(40));
-        assertEquals(false, result);
+        Assert.assertEquals(false, result);
         result = script.execute(jc, new Var(46), new Var(39));
-        assertEquals(false, result);
+        Assert.assertEquals(false, result);
 
         script = jexl.createScript("(x, y)->{ x == y }");
         result = script.execute(jc, 42, 43);
-        assertEquals(false, result);
+        Assert.assertEquals(false, result);
         result = script.execute(jc, new Var(42), new Var(43));
-        assertEquals(false, result);
+        Assert.assertEquals(false, result);
         result = script.execute(jc, new Var(41), new Var(44));
-        assertEquals(false, result);
+        Assert.assertEquals(false, result);
         result = script.execute(jc, 43, 42);
-        assertEquals(false, result);
+        Assert.assertEquals(false, result);
         result = script.execute(jc, new Var(45), new Var(40));
-        assertEquals(false, result);
+        Assert.assertEquals(false, result);
         result = script.execute(jc, new Var(46), new Var(39));
-        assertEquals(false, result);
+        Assert.assertEquals(false, result);
 
         script = jexl.createScript("(x, y)->{ x % y }");
         result = script.execute(jc, 4242, 100);
-        assertEquals(42, result);
+        Assert.assertEquals(42, result);
         result = script.execute(jc, new Var(4242), new Var(100));
-        assertEquals(42, ((Var) result).value);
+        Assert.assertEquals(42, ((Var) result).value);
         result = script.execute(jc, new Var(4242), new Var(100));
-        assertEquals(42, ((Var) result).value);
+        Assert.assertEquals(42, ((Var) result).value);
 
         script = jexl.createScript("(x, y)->{ x * y }");
         result = script.execute(jc, 6, 7);
-        assertEquals(42, result);
+        Assert.assertEquals(42, result);
         result = script.execute(jc, new Var(6), new Var(7));
-        assertEquals(42, ((Var) result).value);
+        Assert.assertEquals(42, ((Var) result).value);
         result = script.execute(jc, new Var(6), new Var(7));
-        assertEquals(42, ((Var) result).value);
+        Assert.assertEquals(42, ((Var) result).value);
 
         script = jexl.createScript("(x, y)->{ x + y }");
         result = script.execute(jc, 35, 7);
-        assertEquals(42, result);
+        Assert.assertEquals(42, result);
         result = script.execute(jc, new Var(35), new Var(7));
-        assertEquals(42, ((Var) result).value);
+        Assert.assertEquals(42, ((Var) result).value);
         result = script.execute(jc, new Var(35), new Var(7));
-        assertEquals(42, ((Var) result).value);
+        Assert.assertEquals(42, ((Var) result).value);
 
         script = jexl.createScript("(x, y)->{ x - y }");
         result = script.execute(jc, 49, 7);
-        assertEquals(42, result);
+        Assert.assertEquals(42, result);
         result = script.execute(jc, "foobarquux", "bar");
-        assertEquals("fooquux", result);
+        Assert.assertEquals("fooquux", result);
         result = script.execute(jc, 50, 8);
-        assertEquals(42, result);
+        Assert.assertEquals(42, result);
         result = script.execute(jc, new Var(50), new Var(8));
-        assertEquals(42, ((Var) result).value);
+        Assert.assertEquals(42, ((Var) result).value);
         result = script.execute(jc, new Var(50), new Var(8));
-        assertEquals(42, ((Var) result).value);
+        Assert.assertEquals(42, ((Var) result).value);
 
         script = jexl.createScript("(x)->{ -x }");
         result = script.execute(jc, -42);
-        assertEquals(42, result);
+        Assert.assertEquals(42, result);
         result = script.execute(jc, new Var(-42));
-        assertEquals(42, ((Var) result).value);
+        Assert.assertEquals(42, ((Var) result).value);
         result = script.execute(jc, new Var(-42));
-        assertEquals(42, ((Var) result).value);
+        Assert.assertEquals(42, ((Var) result).value);
         result = script.execute(jc, "pizza");
-        assertEquals("azzip", result);
+        Assert.assertEquals("azzip", result);
         result = script.execute(jc, -142);
-        assertEquals(142, result);
+        Assert.assertEquals(142, result);
+    }
+
+    public static class Arithmetic132 extends JexlArithmetic {
+        public Arithmetic132() {
+            super(false);
+        }
+
+        protected double divideZero(BigDecimal x) {
+            int ls = x.signum();
+            if (ls < 0) {
+                return Double.NEGATIVE_INFINITY;
+            } else if (ls > 0) {
+                return Double.POSITIVE_INFINITY;
+            } else {
+                return Double.NaN;
+            }
+        }
+
+        protected double divideZero(BigInteger x) {
+            int ls = x.signum();
+            if (ls < 0) {
+                return Double.NEGATIVE_INFINITY;
+            } else if (ls > 0) {
+                return Double.POSITIVE_INFINITY;
+            } else {
+                return Double.NaN;
+            }
+        }
+
+        @Override
+        public Object divide(Object left, Object right) {
+            if (left == null && right == null) {
+                return controlNullNullOperands();
+            }
+            // if either are bigdecimal use that type
+            if (left instanceof BigDecimal || right instanceof BigDecimal) {
+                BigDecimal l = toBigDecimal(left);
+                BigDecimal r = toBigDecimal(right);
+                if (BigDecimal.ZERO.equals(r)) {
+                    return divideZero(l);
+                }
+                BigDecimal result = l.divide(r, getMathContext());
+                return narrowBigDecimal(left, right, result);
+            }
+            // if either are floating point (double or float) use double
+            if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
+                double l = toDouble(left);
+                double r = toDouble(right);
+                return new Double(l / r);
+            }
+            // otherwise treat as integers
+            BigInteger l = toBigInteger(left);
+            BigInteger r = toBigInteger(right);
+            if (BigInteger.ZERO.equals(r)) {
+                return divideZero(l);
+            }
+            BigInteger result = l.divide(r);
+            return narrowBigInteger(left, right, result);
+        }
+
+        @Override
+        public Object mod(Object left, Object right) {
+            if (left == null && right == null) {
+                return controlNullNullOperands();
+            }
+            // if either are bigdecimal use that type
+            if (left instanceof BigDecimal || right instanceof BigDecimal) {
+                BigDecimal l = toBigDecimal(left);
+                BigDecimal r = toBigDecimal(right);
+                if (BigDecimal.ZERO.equals(r)) {
+                    return divideZero(l);
+                }
+                BigDecimal remainder = l.remainder(r, getMathContext());
+                return narrowBigDecimal(left, right, remainder);
+            }
+            // if either are floating point (double or float) use double
+            if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
+                double l = toDouble(left);
+                double r = toDouble(right);
+                return new Double(l % r);
+            }
+            // otherwise treat as integers
+            BigInteger l = toBigInteger(left);
+            BigInteger r = toBigInteger(right);
+            BigInteger result = l.mod(r);
+            if (BigInteger.ZERO.equals(r)) {
+                return divideZero(l);
+            }
+            return narrowBigInteger(left, right, result);
+        }
+    }
+
+    @Test
+    public void testInfiniteArithmetic() throws Exception {
+        Map<String, Object> ns = new HashMap<String, Object>();
+        ns.put("math", Math.class);
+        JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic132()).namespaces(ns).create();
+
+        Object evaluate = jexl.createExpression("1/0").evaluate(null);
+        Assert.assertTrue(Double.isInfinite((Double) evaluate));
+
+        evaluate = jexl.createExpression("-1/0").evaluate(null);
+        Assert.assertTrue(Double.isInfinite((Double) evaluate));
+
+        evaluate = jexl.createExpression("1.0/0.0").evaluate(null);
+        Assert.assertTrue(Double.isInfinite((Double) evaluate));
+
+        evaluate = jexl.createExpression("-1.0/0.0").evaluate(null);
+        Assert.assertTrue(Double.isInfinite((Double) evaluate));
+
+        evaluate = jexl.createExpression("math:abs(-42)").evaluate(null);
+        Assert.assertEquals(42, evaluate);
     }
 }

@@ -17,13 +17,17 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine;
+import org.junit.Assert;
+import org.junit.Test;
+
 /**
  * Tests JexlContext (advanced) features.
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ContextNamespaceTest extends JexlTestCase {
 
-    public ContextNamespaceTest(String testName) {
-        super(testName);
+    public ContextNamespaceTest() {
+        super("ContextNamespaceTest");
     }
 
     /*
@@ -42,25 +46,29 @@ public class ContextNamespaceTest extends JexlTestCase {
     public static class TaxesContext extends MapContext implements JexlContext.ThreadLocal, JexlContext.NamespaceResolver {
         private final Taxes taxes = new Taxes();
         private final double vat;
+
         TaxesContext(double vat) {
             this.vat = vat;
         }
+
         @Override
         public Object resolveNamespace(String name) {
-           return "taxes".equals(name)? taxes : null;
+            return "taxes".equals(name) ? taxes : null;
         }
+
         public double getVAT() {
             return vat;
         }
     }
 
+    @Test
     public void testThreadedContext() throws Exception {
         JexlEngine jexl = new Engine();
         TaxesContext context = new TaxesContext(18.6);
         String strs = "taxes:vat(1000)";
         JexlScript staxes = jexl.createScript(strs);
         Object result = staxes.execute(context);
-        assertEquals(186., result);
+        Assert.assertEquals(186., result);
     }
 
 }

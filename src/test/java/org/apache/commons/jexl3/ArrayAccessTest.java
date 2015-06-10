@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.jexl3.junit.Asserter;
+import org.junit.Before;
 
 
 /**
@@ -48,6 +49,7 @@ public class ArrayAccessTest extends JexlTestCase {
     }
 
     @Override
+    @Before
     public void setUp() {
         asserter = new Asserter(JEXL);
     }
@@ -144,6 +146,18 @@ public class ArrayAccessTest extends JexlTestCase {
         asserter.setVariable("base.status", "Ok");
         asserter.assertExpression("base.objects[1].status", null);
         asserter.assertExpression("base.objects.1.status", null);
+    }
+
+    public void testArrayIdentifierParsing() throws Exception {
+        Map<Object, Number> map = new HashMap<Object, Number>();
+        map.put("00200", -42.42d);
+        map.put(200, 42.42d);
+        asserter.setVariable("objects", map);
+        asserter.assertExpression("objects.get('00200')", -42.42d);
+        asserter.assertExpression("objects.'00200'", -42.42d);
+        asserter.assertExpression("objects.get(200)", 42.42d);
+        asserter.assertExpression("objects.'200'", 42.42d);
+        asserter.assertExpression("objects.200", 42.42d);
     }
 
     public void testArrayMethods() throws Exception {

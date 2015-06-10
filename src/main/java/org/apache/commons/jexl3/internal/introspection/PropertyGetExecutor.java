@@ -81,7 +81,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
     }
 
     /**
-     * Base method for boolean & object property get.
+     * Base method for boolean and object property get.
      * @param is the introspector
      * @param which "is" or "get" for boolean or object
      * @param clazz The class being examined.

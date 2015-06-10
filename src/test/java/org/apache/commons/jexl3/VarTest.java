@@ -24,17 +24,21 @@ import java.util.List;
 import java.util.Set;
 import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Tests local variables.
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class VarTest extends JexlTestCase {
     static final Logger LOGGER = LogManager.getLogger(VarTest.class.getName());
 
-    public VarTest(String testName) {
-        super(testName);
+    public VarTest() {
+        super("VarTest");
     }
 
+    @Test
     public void testStrict() throws Exception {
         JexlEvalContext env = new JexlEvalContext();
         JexlContext ctxt = new ReadonlyContext(env, env);
@@ -45,14 +49,14 @@ public class VarTest extends JexlTestCase {
         e = JEXL.createScript("x");
         try {
             Object o = e.execute(ctxt);
-            fail("should have thrown an unknown var exception");
+            Assert.fail("should have thrown an unknown var exception");
         } catch(JexlException xjexl) {
             // ok since we are strict and x does not exist
         }
         e = JEXL.createScript("x = 42");
         try {
             Object o = e.execute(ctxt);
-            fail("should have thrown a readonly context exception");
+            Assert.fail("should have thrown a readonly context exception");
         } catch(JexlException xjexl) {
             // ok since we are strict and context is readonly
         }
@@ -61,28 +65,31 @@ public class VarTest extends JexlTestCase {
         e = JEXL.createScript("x.theAnswerToEverything()");
         try {
             Object o = e.execute(ctxt);
-            fail("should have thrown an unknown method exception");
+            Assert.fail("should have thrown an unknown method exception");
         } catch(JexlException xjexl) {
             // ok since we are strict and method does not exist
         }
     }
 
+    @Test
     public void testLocalBasic() throws Exception {
         JexlScript e = JEXL.createScript("var x; x = 42");
         Object o = e.execute(null);
-        assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", new Integer(42), o);
     }
 
+    @Test
     public void testLocalSimple() throws Exception {
         JexlScript e = JEXL.createScript("var x = 21; x + x");
         Object o = e.execute(null);
-        assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", new Integer(42), o);
     }
 
+    @Test
     public void testLocalFor() throws Exception {
         JexlScript e = JEXL.createScript("var y  = 0; for(var x : [5, 17, 20]) { y = y + x; } y;");
         Object o = e.execute(null);
-        assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", new Integer(42), o);
     }
 
     public static class NumbersContext extends MapContext implements JexlContext.NamespaceResolver {
@@ -96,20 +103,22 @@ public class VarTest extends JexlTestCase {
         }
     }
 
+    @Test
     public void testLocalForFunc() throws Exception {
         JexlContext jc = new NumbersContext();
         JexlScript e = JEXL.createScript("var y  = 0; for(var x : numbers()) { y = y + x; } y;");
         Object o = e.execute(jc);
-        assertEquals("Result is not 42", new Integer(42), o);
+        Assert.assertEquals("Result is not 42", new Integer(42), o);
     }
 
+    @Test
     public void testLocalForFuncReturn() throws Exception {
         JexlContext jc = new NumbersContext();
         JexlScript e = JEXL.createScript("var y  = 42; for(var x : numbers()) { if (x > 10) return x } y;");
         Object o = e.execute(jc);
-        assertEquals("Result is not 17", new Integer(17), o);
+        Assert.assertEquals("Result is not 17", new Integer(17), o);
 
-        assertTrue(toString(e.getVariables()), e.getVariables().isEmpty());
+        Assert.assertTrue(toString(e.getVariables()), e.getVariables().isEmpty());
     }
 
     /**
@@ -188,6 +197,7 @@ public class VarTest extends JexlTestCase {
         return ls;
     }
 
+    @Test
     public void testRefs() throws Exception {
         JexlScript e;
         Set<List<String>> vars;
@@ -196,80 +206,81 @@ public class VarTest extends JexlTestCase {
         e = JEXL.createScript("e[f]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e"},{"f"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
 
         e = JEXL.createScript("e[f][g]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e"},{"f"},{"g"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e['f'].goo");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e","f","goo"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e['f']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e","f"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e[f]['g']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e"},{"f"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e['f']['g']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e","f","g"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a['b'].c['d'].e");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a", "b", "c", "d", "e"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("a + b.c + b.c.d + e['f']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a"}, {"b", "c"}, {"b", "c", "d"}, {"e", "f"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("D[E[F]]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"D"}, {"E"}, {"F"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("D[E[F[G[H]]]]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"D"}, {"E"}, {"F"}, {"G"}, {"H"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript(" A + B[C] + D[E[F]] + x[y[z]] ");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}, {"B"}, {"C"}, {"D"}, {"E"}, {"F"}, {"x"} , {"y"}, {"z"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript(" A + B[C] + D.E['F'] + x[y.z] ");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}, {"B"}, {"C"}, {"D", "E", "F"}, {"x"} , {"y", "z"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("(A)");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("not(A)");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("not((A))");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}});
-        assertTrue(eq(expect, vars));
+        Assert.assertTrue(eq(expect, vars));
     }
 
+    @Test
     public void testMix() throws Exception {
         JexlScript e;
         // x is a parameter, y a context variable, z a local variable
@@ -278,26 +289,86 @@ public class VarTest extends JexlTestCase {
         String[] parms = e.getParameters();
         String[] locals = e.getLocalVariables();
 
-        assertTrue(eq(mkref(new String[][]{{"y"}}), vars));
-        assertEquals(1, parms.length);
-        assertEquals("x", parms[0]);
-        assertEquals(1, locals.length);
-        assertEquals("z", locals[0]);
+        Assert.assertTrue(eq(mkref(new String[][]{{"y"}}), vars));
+        Assert.assertEquals(1, parms.length);
+        Assert.assertEquals("x", parms[0]);
+        Assert.assertEquals(1, locals.length);
+        Assert.assertEquals("z", locals[0]);
     }
 
+    @Test
     public void testLiteral() throws Exception {
         JexlScript e = JEXL.createScript("x.y[['z', 't']]");
         Set<List<String>> vars = e.getVariables();
-        assertEquals(1, vars.size());
-        assertTrue(eq(mkref(new String[][]{{"x", "y", "[ 'z', 't' ]"}}), vars));
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "[ 'z', 't' ]"}}), vars));
 
         e = JEXL.createScript("x.y[{'z': 't'}]");
         vars = e.getVariables();
-        assertEquals(1, vars.size());
-        assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
         e = JEXL.createScript("x.y.'{ \\'z\\' : \\'t\\' }'");
         vars = e.getVariables();
-        assertEquals(1, vars.size());
-        assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
     }
+
+    @Test
+    public void testSyntacticVariations() throws Exception {
+        JexlScript script = JEXL.createScript("sum(TOTAL) - partial.sum() + partial['sub'].avg() - sum(partial.sub)");
+        Set<List<String>> vars = script.getVariables();
+
+        Assert.assertTrue(vars.size() == 3);
+    }
+
+    public static class TheVarContext {
+        private int x;
+        private String color;
+
+        public void setX(int x) {
+            this.x = x;
+        }
+
+        public void setColor(String color) {
+            this.color = color;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public String getColor() {
+            return color;
+        }
+    }
+
+    @Test
+    public void testObjectContext() throws Exception {
+        TheVarContext vars = new TheVarContext();
+        JexlContext jc = new ObjectContext<TheVarContext>(JEXL, vars);
+        try {
+            JexlScript script;
+            Object result;
+            script = JEXL.createScript("x = 3");
+            result = script.execute(jc);
+            Assert.assertEquals(3, vars.getX());
+            Assert.assertEquals(3, result);
+            script = JEXL.createScript("x == 3");
+            result = script.execute(jc);
+            Assert.assertTrue((Boolean) result);
+            Assert.assertTrue(jc.has("x"));
+
+            script = JEXL.createScript("color = 'blue'");
+            result = script.execute(jc);
+            Assert.assertEquals("blue", vars.getColor());
+            Assert.assertEquals("blue", result);
+            script = JEXL.createScript("color == 'blue'");
+            result = script.execute(jc);
+            Assert.assertTrue((Boolean) result);
+            Assert.assertTrue(jc.has("color"));
+        } catch (JexlException.Method ambiguous) {
+            Assert.fail("total() is solvable");
+        }
+    }
+
 }

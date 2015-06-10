@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal.introspection;
 
 import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Checks the CacheMap.MethodKey implementation
@@ -139,6 +140,7 @@ public class MethodKeyTest extends TestCase {
         assertTrue(out != null);
     }
 
+    @Test
     public void testObjectKey() throws Exception {
         for (int k = 0; k < keyList.length; ++k) {
             MethodKey ctl = keyList[k];
@@ -150,6 +152,7 @@ public class MethodKeyTest extends TestCase {
 
     }
 
+    @Test
     public void testStringKey() throws Exception {
         for (int k = 0; k < keyList.length; ++k) {
             MethodKey ctl = keyList[k];
@@ -162,6 +165,7 @@ public class MethodKeyTest extends TestCase {
     }
     private static final int LOOP = 3;//00;
 
+    @Test
     public void testPerfKey() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
             for (int k = 0; k < keyList.length; ++k) {
@@ -173,6 +177,7 @@ public class MethodKeyTest extends TestCase {
         }
     }
 
+    @Test
     public void testPerfString() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
             for (int k = 0; k < keyList.length; ++k) {
@@ -184,6 +189,7 @@ public class MethodKeyTest extends TestCase {
         }
     }
 
+    @Test
     public void testPerfKey2() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
             for (int m = 0; m < METHODS.length; ++m) {
@@ -201,6 +207,7 @@ public class MethodKeyTest extends TestCase {
         }
     }
 
+    @Test
     public void testPerfStringKey2() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
             for (int m = 0; m < METHODS.length; ++m) {

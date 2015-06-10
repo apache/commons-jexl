@@ -31,23 +31,27 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.jexl3.parser.Parser;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
- *  Simple testcases
+ * Simple testcases
  *
- *  @since 1.0
+ * @since 1.0
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class JexlTest extends JexlTestCase {
     protected static final String METHOD_STRING = "Method string";
     protected static final String GET_METHOD_STRING = "GetMethod string";
 
-    public JexlTest(String testName) {
-        super(testName);
+    public JexlTest() {
+        super("JexlTest");
     }
 
     /**
-     *  test a simple property expression
+     * test a simple property expression
      */
+    @Test
     public void testProperty() throws Exception {
         /*
          *  tests a simple property expression
@@ -59,10 +63,11 @@ public class JexlTest extends JexlTestCase {
         jc.set("foo", new Foo());
         Object o = e.evaluate(jc);
 
-        assertTrue("o not instanceof String", o instanceof String);
-        assertEquals("o incorrect", GET_METHOD_STRING, o);
+        Assert.assertTrue("o not instanceof String", o instanceof String);
+        Assert.assertEquals("o incorrect", GET_METHOD_STRING, o);
     }
 
+    @Test
     public void testBoolean() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("foo", new Foo());
@@ -77,6 +82,7 @@ public class JexlTest extends JexlTestCase {
         assertExpression(jc, "true ne false", Boolean.TRUE);
     }
 
+    @Test
     public void testStringLit() throws Exception {
         /*
          *  tests a simple property expression
@@ -86,6 +92,7 @@ public class JexlTest extends JexlTestCase {
         assertExpression(jc, "foo.get(\"woogie\")", "Repeat : woogie");
     }
 
+    @Test
     public void testExpression() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("foo", new Foo());
@@ -145,6 +152,7 @@ public class JexlTest extends JexlTestCase {
         assertExpression(jc, "num < bint", Boolean.TRUE);
     }
 
+    @Test
     public void testEmpty() throws Exception {
         JexlEvalContext jc = new JexlEvalContext();
         jc.setStrict(false);
@@ -168,6 +176,7 @@ public class JexlTest extends JexlTestCase {
         assertExpression(jc, "not empty longstring", Boolean.TRUE);
     }
 
+    @Test
     public void testSize() throws Exception {
         JexlEvalContext jc = new JexlEvalContext();
         jc.setStrict(false);
@@ -221,6 +230,7 @@ public class JexlTest extends JexlTestCase {
         assertExpression(jc, "list.get(list.size() - 1)", "5");
     }
 
+    @Test
     public void testSizeAsProperty() throws Exception {
         JexlContext jc = new MapContext();
         Map<String, Object> map = new HashMap<String, Object>();
@@ -237,8 +247,9 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  test the new function e.g constructor invocation
+     * test the new function e.g constructor invocation
      */
+    @Test
     public void testNew() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("double", Double.class);
@@ -247,18 +258,19 @@ public class JexlTest extends JexlTestCase {
         Object value;
         expr = JEXL.createExpression("new(double, 1)");
         value = expr.evaluate(jc);
-        assertEquals(expr.toString(), new Double(1.0), value);
+        Assert.assertEquals(expr.toString(), new Double(1.0), value);
         expr = JEXL.createExpression("new('java.lang.Float', 100)");
         value = expr.evaluate(jc);
-        assertEquals(expr.toString(), new Float(100.0), value);
+        Assert.assertEquals(expr.toString(), new Float(100.0), value);
         expr = JEXL.createExpression("new(foo).quux");
         value = expr.evaluate(jc);
-        assertEquals(expr.toString(), "Repeat : quux", value);
+        Assert.assertEquals(expr.toString(), "Repeat : quux", value);
     }
 
     /**
-     *  test some simple mathematical calculations
+     * test some simple mathematical calculations
      */
+    @Test
     public void testCalculations() throws Exception {
         JexlEvalContext jc = new JexlEvalContext();
         jc.setStrict(false);
@@ -282,8 +294,9 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  test some simple conditions
+     * test some simple conditions
      */
+    @Test
     public void testConditions() throws Exception {
         JexlEvalContext jc = new JexlEvalContext();
         jc.set("foo", new Integer(2));
@@ -329,8 +342,9 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  test some simple conditions
+     * test some simple conditions
      */
+    @Test
     public void testNotConditions() throws Exception {
         JexlContext jc = new MapContext();
 
@@ -360,8 +374,9 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  test some simple conditions
+     * test some simple conditions
      */
+    @Test
     public void testNotConditionsWithDots() throws Exception {
         JexlContext jc = new MapContext();
 
@@ -374,8 +389,9 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  test some simple conditions
+     * test some simple conditions
      */
+    @Test
     public void testComparisons() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("foo", "the quick and lazy fox");
@@ -386,8 +402,9 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  test some null conditions
+     * test some null conditions
      */
+    @Test
     public void testNull() throws Exception {
         JexlEvalContext jc = new JexlEvalContext();
         jc.setStrict(false);
@@ -405,6 +422,7 @@ public class JexlTest extends JexlTestCase {
     /**
      * test quoting in strings
      */
+    @Test
     public void testStringQuoting() throws Exception {
         JexlContext jc = new MapContext();
         assertExpression(jc, "'\"Hello\"'", "\"Hello\"");
@@ -412,8 +430,9 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  test some blank strings
+     * test some blank strings
      */
+    @Test
     public void testBlankStrings() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("bar", "");
@@ -425,8 +444,9 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  test some blank strings
+     * test some blank strings
      */
+    @Test
     public void testLogicExpressions() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("foo", "abc");
@@ -444,8 +464,9 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  test variables with underscore names
+     * test variables with underscore names
      */
+    @Test
     public void testVariableNames() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("foo_bar", "123");
@@ -454,8 +475,9 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  test the use of dot notation to lookup map entries
+     * test the use of dot notation to lookup map entries
      */
+    @Test
     public void testMapDot() throws Exception {
         Map<String, String> foo = new HashMap<String, String>();
         foo.put("bar", "123");
@@ -467,8 +489,9 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  Tests string literals
+     * Tests string literals
      */
+    @Test
     public void testStringLiterals() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("foo", "bar");
@@ -478,14 +501,15 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  test the use of an int based property
+     * test the use of an int based property
      */
+    @Test
     public void testIntProperty() throws Exception {
         Foo foo = new Foo();
 
         // lets check the square function first..
-        assertEquals(4, foo.square(2));
-        assertEquals(4, foo.square(-2));
+        Assert.assertEquals(4, foo.square(2));
+        Assert.assertEquals(4, foo.square(-2));
 
         JexlContext jc = new MapContext();
         jc.set("foo", foo);
@@ -496,8 +520,9 @@ public class JexlTest extends JexlTestCase {
     }
 
     /**
-     *  test the -1 comparison bug
+     * test the -1 comparison bug
      */
+    @Test
     public void testNegativeIntComparison() throws Exception {
         JexlContext jc = new MapContext();
         Foo foo = new Foo();
@@ -511,6 +536,7 @@ public class JexlTest extends JexlTestCase {
     /**
      * Attempts to recreate bug http://jira.werken.com/ViewIssue.jspa?key=JELLY-8
      */
+    @Test
     public void testCharAtBug() throws Exception {
         JexlEvalContext jc = new JexlEvalContext();
         jc.setSilent(true);
@@ -523,6 +549,7 @@ public class JexlTest extends JexlTestCase {
 
     }
 
+    @Test
     public void testEmptyDottedVariableName() throws Exception {
         JexlContext jc = new MapContext();
 
@@ -531,6 +558,7 @@ public class JexlTest extends JexlTestCase {
         assertExpression(jc, "empty(this.is.a.test)", Boolean.TRUE);
     }
 
+    @Test
     public void testEmptySubListOfMap() throws Exception {
         JexlContext jc = new MapContext();
         Map<String, ArrayList<?>> m = new HashMap<String, ArrayList<?>>();
@@ -541,6 +569,7 @@ public class JexlTest extends JexlTestCase {
         assertExpression(jc, "empty( aMap.aList )", Boolean.TRUE);
     }
 
+    @Test
     public void testCoercionWithComparisionOperators() throws Exception {
         JexlContext jc = new MapContext();
 
@@ -563,6 +592,7 @@ public class JexlTest extends JexlTestCase {
      * Test that 'and' only evaluates the second item if needed
      * @throws Exception if there are errors
      */
+    @Test
     public void testBooleanShortCircuitAnd() throws Exception {
         // handle false for the left arg of 'and'
         Foo tester = new Foo();
@@ -571,19 +601,20 @@ public class JexlTest extends JexlTestCase {
         jc.set("foo", tester);
         JexlExpression expr = JEXL.createExpression("first and foo.trueAndModify");
         expr.evaluate(jc);
-        assertTrue("Short circuit failure: rhs evaluated when lhs FALSE", !tester.getModified());
+        Assert.assertTrue("Short circuit failure: rhs evaluated when lhs FALSE", !tester.getModified());
         // handle true for the left arg of 'and'
         tester = new Foo();
         jc.set("first", Boolean.TRUE);
         jc.set("foo", tester);
         expr.evaluate(jc);
-        assertTrue("Short circuit failure: rhs not evaluated when lhs TRUE", tester.getModified());
+        Assert.assertTrue("Short circuit failure: rhs not evaluated when lhs TRUE", tester.getModified());
     }
 
     /**
      * Test that 'or' only evaluates the second item if needed
      * @throws Exception if there are errors
      */
+    @Test
     public void testBooleanShortCircuitOr() throws Exception {
         // handle false for the left arg of 'or'
         Foo tester = new Foo();
@@ -592,19 +623,20 @@ public class JexlTest extends JexlTestCase {
         jc.set("foo", tester);
         JexlExpression expr = JEXL.createExpression("first or foo.trueAndModify");
         expr.evaluate(jc);
-        assertTrue("Short circuit failure: rhs not evaluated when lhs FALSE", tester.getModified());
+        Assert.assertTrue("Short circuit failure: rhs not evaluated when lhs FALSE", tester.getModified());
         // handle true for the left arg of 'or'
         tester = new Foo();
         jc.set("first", Boolean.TRUE);
         jc.set("foo", tester);
         expr.evaluate(jc);
-        assertTrue("Short circuit failure: rhs evaluated when lhs TRUE", !tester.getModified());
+        Assert.assertTrue("Short circuit failure: rhs evaluated when lhs TRUE", !tester.getModified());
     }
 
     /**
      * Simple test of '+' as a string concatenation operator
      * @throws Exception
      */
+    @Test
     public void testStringConcatenation() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("first", "Hello");
@@ -612,20 +644,22 @@ public class JexlTest extends JexlTestCase {
         assertExpression(jc, "first + ' ' + second", "Hello World");
     }
 
+    @Test
     public void testToString() throws Exception {
         String code = "abcd";
         JexlExpression expr = JEXL.createExpression(code);
-        assertEquals("Bad expression value", code, expr.toString());
+        Assert.assertEquals("Bad expression value", code, expr.toString());
     }
 
     /**
      * Make sure bad syntax throws ParseException
      * @throws Exception on errors
      */
+    @Test
     public void testBadParse() throws Exception {
         try {
             assertExpression(new MapContext(), "empty()", null);
-            fail("Bad expression didn't throw ParseException");
+            Assert.fail("Bad expression didn't throw ParseException");
         } catch (JexlException pe) {
             // expected behaviour
         }
@@ -635,6 +669,7 @@ public class JexlTest extends JexlTestCase {
      * Test the ## comment in a string
      * @throws Exception
      */
+    @Test
     public void testComment() throws Exception {
         assertExpression(new MapContext(), "## double or nothing\n 1 + 1", Integer.valueOf("2"));
     }
@@ -643,6 +678,7 @@ public class JexlTest extends JexlTestCase {
      * Test assignment.
      * @throws Exception
      */
+    @Test
     public void testAssignment() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("aString", "Hello");
@@ -652,14 +688,15 @@ public class JexlTest extends JexlTestCase {
         parser.parse(null, "aString = 'World';", null, false, false);
 
         assertExpression(jc, "hello = 'world'", "world");
-        assertEquals("hello variable not changed", "world", jc.get("hello"));
+        Assert.assertEquals("hello variable not changed", "world", jc.get("hello"));
         assertExpression(jc, "result = 1 + 1", new Integer(2));
-        assertEquals("result variable not changed", new Integer(2), jc.get("result"));
+        Assert.assertEquals("result variable not changed", new Integer(2), jc.get("result"));
         // todo: make sure properties can be assigned to, fall back to flat var if no property
         // assertExpression(jc, "foo.property1 = '99'", "99");
-        // assertEquals("property not set", "99", foo.getProperty1());
+        // Assert.assertEquals("property not set", "99", foo.getProperty1());
     }
 
+    @Test
     public void testAntPropertiesWithMethods() throws Exception {
         JexlContext jc = new MapContext();
         String value = "Stinky Cheese";
@@ -675,6 +712,7 @@ public class JexlTest extends JexlTestCase {
 //        assertExpression(jc, "commons-logging", version);
     }
 
+    @Test
     public void testUnicodeSupport() throws Exception {
         JexlContext jc = new MapContext();
         assertExpression(jc, "'x' == '\\u0032?ytkownik'", Boolean.FALSE);
@@ -716,6 +754,7 @@ public class JexlTest extends JexlTestCase {
     }
 
     @SuppressWarnings("boxing")
+    @Test
     public void testDuck() throws Exception {
         JexlEngine jexl = JEXL;
         JexlContext jc = new MapContext();
@@ -724,25 +763,26 @@ public class JexlTest extends JexlTestCase {
         Object result;
         expr = jexl.createExpression("duck.zero");
         result = expr.evaluate(jc);
-        assertEquals(expr.toString(), 0, result);
+        Assert.assertEquals(expr.toString(), 0, result);
         expr = jexl.createExpression("duck.one");
         result = expr.evaluate(jc);
-        assertEquals(expr.toString(), 1, result);
+        Assert.assertEquals(expr.toString(), 1, result);
         expr = jexl.createExpression("duck.user = 20");
         result = expr.evaluate(jc);
-        assertEquals(expr.toString(), 20, result);
+        Assert.assertEquals(expr.toString(), 20, result);
         expr = jexl.createExpression("duck.user");
         result = expr.evaluate(jc);
-        assertEquals(expr.toString(), 20, result);
+        Assert.assertEquals(expr.toString(), 20, result);
         expr = jexl.createExpression("duck.user = 'zero'");
         result = expr.evaluate(jc);
-        assertEquals(expr.toString(), "zero", result);
+        Assert.assertEquals(expr.toString(), "zero", result);
         expr = jexl.createExpression("duck.user");
         result = expr.evaluate(jc);
-        assertEquals(expr.toString(), 0, result);
+        Assert.assertEquals(expr.toString(), 0, result);
     }
 
     @SuppressWarnings("boxing")
+    @Test
     public void testArray() throws Exception {
         int[] array = {100, 101, 102};
         JexlEngine jexl = JEXL;
@@ -752,13 +792,13 @@ public class JexlTest extends JexlTestCase {
         Object result;
         expr = jexl.createExpression("array.1");
         result = expr.evaluate(jc);
-        assertEquals(expr.toString(), 101, result);
+        Assert.assertEquals(expr.toString(), 101, result);
         expr = jexl.createExpression("array[1] = 1010");
         result = expr.evaluate(jc);
-        assertEquals(expr.toString(), 1010, result);
+        Assert.assertEquals(expr.toString(), 1010, result);
         expr = jexl.createExpression("array.0");
         result = expr.evaluate(jc);
-        assertEquals(expr.toString(), 100, result);
+        Assert.assertEquals(expr.toString(), 100, result);
     }
 
     /**
@@ -768,6 +808,6 @@ public class JexlTest extends JexlTestCase {
     protected void assertExpression(JexlContext jc, String expression, Object expected) throws Exception {
         JexlExpression e = JEXL.createExpression(expression);
         Object actual = e.evaluate(jc);
-        assertEquals(expression, expected, actual);
+        Assert.assertEquals(expression, expected, actual);
     }
 }

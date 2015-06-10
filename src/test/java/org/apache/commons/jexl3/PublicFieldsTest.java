@@ -16,10 +16,14 @@
  */
 package org.apache.commons.jexl3;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 /**
  * Tests public field set/get.
  */
-@SuppressWarnings("boxing")
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class PublicFieldsTest extends JexlTestCase {
     // some constants
     private static final String LOWER42 = "fourty-two";
@@ -49,6 +53,7 @@ public class PublicFieldsTest extends JexlTestCase {
         super("PublicFieldsTest");
     }
 
+    @Before
     @Override
     public void setUp() {
         pub = new Struct();
@@ -56,64 +61,64 @@ public class PublicFieldsTest extends JexlTestCase {
         ctxt.set("pub", pub);
     }
 
-    public void testGetInt() throws Exception {
+    @Test public void testGetInt() throws Exception {
         JexlExpression get = JEXL.createExpression("pub.anInt");
-        assertEquals(42, get.evaluate(ctxt));
+        Assert.assertEquals(42, get.evaluate(ctxt));
         JEXL.setProperty(pub, "anInt", -42);
-        assertEquals(-42, get.evaluate(ctxt));
+        Assert.assertEquals(-42, get.evaluate(ctxt));
     }
 
-    public void testSetInt() throws Exception {
+    @Test public void testSetInt() throws Exception {
         JexlExpression set = JEXL.createExpression("pub.anInt = value");
         ctxt.set("value", -42);
-        assertEquals(-42, set.evaluate(ctxt));
-        assertEquals(-42, JEXL.getProperty(pub, "anInt"));
+        Assert.assertEquals(-42, set.evaluate(ctxt));
+        Assert.assertEquals(-42, JEXL.getProperty(pub, "anInt"));
         ctxt.set("value", 42);
-        assertEquals(42, set.evaluate(ctxt));
-        assertEquals(42, JEXL.getProperty(pub, "anInt"));
+        Assert.assertEquals(42, set.evaluate(ctxt));
+        Assert.assertEquals(42, JEXL.getProperty(pub, "anInt"));
         try {
             ctxt.set("value", UPPER42);
-            assertEquals(null, set.evaluate(ctxt));
-            fail("should have thrown");
+            Assert.assertEquals(null, set.evaluate(ctxt));
+            Assert.fail("should have thrown");
         } catch(JexlException xjexl) {}
     }
 
-    public void testGetString() throws Exception {
+    @Test public void testGetString() throws Exception {
         JexlExpression get = JEXL.createExpression("pub.aString");
-        assertEquals(LOWER42, get.evaluate(ctxt));
+        Assert.assertEquals(LOWER42, get.evaluate(ctxt));
         JEXL.setProperty(pub, "aString", UPPER42);
-        assertEquals(UPPER42, get.evaluate(ctxt));
+        Assert.assertEquals(UPPER42, get.evaluate(ctxt));
     }
 
-    public void testSetString() throws Exception {
+    @Test public void testSetString() throws Exception {
         JexlExpression set = JEXL.createExpression("pub.aString = value");
         ctxt.set("value", UPPER42);
-        assertEquals(UPPER42, set.evaluate(ctxt));
-        assertEquals(UPPER42, JEXL.getProperty(pub, "aString"));
+        Assert.assertEquals(UPPER42, set.evaluate(ctxt));
+        Assert.assertEquals(UPPER42, JEXL.getProperty(pub, "aString"));
         ctxt.set("value", LOWER42);
-        assertEquals(LOWER42, set.evaluate(ctxt));
-        assertEquals(LOWER42, JEXL.getProperty(pub, "aString"));
+        Assert.assertEquals(LOWER42, set.evaluate(ctxt));
+        Assert.assertEquals(LOWER42, JEXL.getProperty(pub, "aString"));
     }
 
-    public void testGetInnerDouble() throws Exception {
+    @Test public void testGetInnerDouble() throws Exception {
         JexlExpression get = JEXL.createExpression("pub.inner.aDouble");
-        assertEquals(42.0, get.evaluate(ctxt));
+        Assert.assertEquals(42.0, get.evaluate(ctxt));
         JEXL.setProperty(pub, "inner.aDouble", -42);
-        assertEquals(-42.0, get.evaluate(ctxt));
+        Assert.assertEquals(-42.0, get.evaluate(ctxt));
     }
 
-    public void testSetInnerDouble() throws Exception {
+    @Test public void testSetInnerDouble() throws Exception {
         JexlExpression set = JEXL.createExpression("pub.inner.aDouble = value");
         ctxt.set("value", -42.0);
-        assertEquals(-42.0, set.evaluate(ctxt));
-        assertEquals(-42.0, JEXL.getProperty(pub, "inner.aDouble"));
+        Assert.assertEquals(-42.0, set.evaluate(ctxt));
+        Assert.assertEquals(-42.0, JEXL.getProperty(pub, "inner.aDouble"));
         ctxt.set("value", 42.0);
-        assertEquals(42.0, set.evaluate(ctxt));
-        assertEquals(42.0, JEXL.getProperty(pub, "inner.aDouble"));
+        Assert.assertEquals(42.0, set.evaluate(ctxt));
+        Assert.assertEquals(42.0, JEXL.getProperty(pub, "inner.aDouble"));
         try {
             ctxt.set("value", UPPER42);
-            assertEquals(null, set.evaluate(ctxt));
-            fail("should have thrown");
+            Assert.assertEquals(null, set.evaluate(ctxt));
+            Assert.fail("should have thrown");
         } catch(JexlException xjexl) {}
     }
 
