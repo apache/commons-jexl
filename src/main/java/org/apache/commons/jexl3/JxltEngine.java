@@ -297,13 +297,18 @@ public abstract class JxltEngine {
         Template prepare(JexlContext context);
 
         /**
-         * Gets the list of variables accessed by this expression.
+         * Gets the list of variables accessed by this template.
          * <p>This method will visit all nodes of the sub-expressions and extract all variables whether they
          * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
          * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
          * or the empty set if no variables are used
          */
         Set<List<String>> getVariables();
+
+        /**
+         * Gets the list of parameters expected by this template.
+         */
+        String[] getParameters();
     }
 
     /**

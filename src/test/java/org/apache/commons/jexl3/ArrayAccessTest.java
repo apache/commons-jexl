@@ -30,6 +30,7 @@ import org.junit.Before;
  *
  * @since 2.0
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ArrayAccessTest extends JexlTestCase {
 
     private Asserter asserter;
