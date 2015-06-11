@@ -26,6 +26,12 @@
     </properties>
     <body>
         <release version="3.0" date="unreleased">
+            <action dev="henrib" type="add" >
+                Added a method to get parameters from a template
+            </action>
+            <action dev="henrib" type="fix" >
+                Identifiers beginning with 0s (like 00200) shoud not be considered integers
+            </action>
             <action dev="henrib" type="add" issue="JEXL-152" due-to="Dmitri Blinov">
                 Extend Range literal to support Long values
             </action>

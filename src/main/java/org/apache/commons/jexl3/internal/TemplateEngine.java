@@ -1058,13 +1058,6 @@ public final class TemplateEngine extends JxltEngine {
             interpreter.interpret(script);
         }
 
-        /**
-         * Gets the list of variables accessed by this template.
-         * <p>This method will visit all nodes of the sub-expressions and extract all variables whether they
-         * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
-         * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
-         *         or the empty set if no variables are used
-         */
         @Override
         public Set<List<String>> getVariables() {
             VarCollector collector = new VarCollector();
@@ -1072,6 +1065,11 @@ public final class TemplateEngine extends JxltEngine {
                 expr.getVariables(collector);
             }
             return collector.collected();
+        }
+
+        @Override
+        public String[] getParameters() {
+            return script.getParameters();
         }
     }
 
