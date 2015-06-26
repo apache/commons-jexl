@@ -16,10 +16,9 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import java.text.DecimalFormat;
-
 public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constant<Number> {
-   private final NumberParser nlp;
+    private final NumberParser nlp;
+
     ASTNumberLiteral(int id) {
         super(id);
         nlp = new NumberParser();
@@ -29,8 +28,6 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
         super(p, id);
         nlp = new NumberParser();
     }
-
-    static final DecimalFormat BIGDF = new DecimalFormat("0.0b");
 
     @Override
     public String toString() {

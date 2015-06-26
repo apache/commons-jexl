@@ -19,15 +19,16 @@ package org.apache.commons.jexl3.parser;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 public final class NumberParser {
     /** The type literal value. */
     private Number literal = null;
     /** The expected class. */
     private Class<?> clazz = null;
-
-    static final DecimalFormat BIGDF = new DecimalFormat("0.0b");
-
+    /** JEXL locale-neutral big decimal format. */
+    static final DecimalFormat BIGDF = new DecimalFormat("0.0b", new DecimalFormatSymbols(Locale.ENGLISH));
 
     @Override
     public String toString() {
