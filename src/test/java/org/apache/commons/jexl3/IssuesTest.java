@@ -1037,4 +1037,76 @@ public class IssuesTest extends JexlTestCase {
         Assert.assertTrue(o instanceof List);
         Assert.assertEquals(Arrays.asList(1, 2), o);
     }
+
+    @Test
+    public void test155() throws Exception {
+        JexlEngine jexlEngine = new Engine();
+        JexlExpression jexlExpresssion = jexlEngine.createExpression("first.second.name");
+        JexlContext jc = new MapContext();
+        jc.set("first.second.name", "RIGHT");
+        jc.set("name", "WRONG");
+        Object value = jexlExpresssion.evaluate(jc);
+        Assert.assertEquals("RIGHT", value.toString());
+    }
+
+    public static class Question42 extends MapContext {
+        public String functionA(String arg) {
+            return "a".equals(arg)? "A" : "";
+        }
+        public String functionB(String arg) {
+            return "b".equals(arg)? "B" : "";
+        }
+        public String functionC(String arg) {
+            return "c".equals(arg)? "C" : "";
+        }
+        public String functionD(String arg) {
+            return "d".equals(arg)? "D" : "";
+        }
+    }
+
+    public static class Arithmetic42 extends JexlArithmetic {
+        public Arithmetic42() {
+            super(false);
+        }
+
+        public Object bitwiseAnd(String lhs, String rhs) {
+            if (rhs.isEmpty()) { return "";  }
+            if (lhs.isEmpty()) { return ""; }
+            return lhs + rhs;
+        }
+
+        public Object bitwiseOr(String lhs, String rhs) {
+            if (rhs.isEmpty()) { return lhs; }
+            if (lhs.isEmpty()) { return rhs; }
+            return lhs + rhs;
+        }
+    }
+
+    @Test
+    public void testQuestion42() throws Exception {
+        JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic42()).create();
+        JexlContext jc = new Question42();
+
+        String str0 = "(functionA('z') | functionB('b')) &  (functionC('c') |  functionD('d') ) ";
+        JexlExpression expr0 = jexl.createExpression(str0);
+        Object value0 = expr0.evaluate(jc);
+        Assert.assertEquals("BCD", value0);
+
+        String str1 = "(functionA('z') & functionB('b')) |  (functionC('c') &  functionD('d') ) ";
+        JexlExpression expr1 = jexl.createExpression(str1);
+        Object value1 = expr1.evaluate(jc);
+        Assert.assertEquals("CD", value1);
+    }
+
+    @Test
+    public void test156() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlContext jc = new MapContext();
+        Object ra = jexl.createExpression("463.0d * 0.1").evaluate(jc);
+        Assert.assertEquals(Double.class, ra.getClass());
+        Object r0 = jexl.createExpression("463.0B * 0.1").evaluate(jc);
+        Assert.assertEquals(java.math.BigDecimal.class, r0.getClass());
+        Object r1 = jexl.createExpression("463.0B * 0.1B").evaluate(jc);
+        Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
+    }
 }

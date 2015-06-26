@@ -193,6 +193,20 @@ public class JXLTTest extends JexlTestCase {
     }
 
     @Test
+    public void testNestedTemplate() throws Exception {
+        final String source = "#{${hi}+'.world'}";
+        JxltEngine.Template expr = JXLT.createTemplate(source, "hi");
+
+        context.set("greeting.world", "Hello World!");
+        StringWriter strw = new StringWriter();
+        expr.evaluate(context, strw, "greeting");
+        String o = strw.toString();
+        Assert.assertEquals("Hello World!", o);
+
+        Assert.assertEquals(source, getSource(expr.toString()));
+    }
+
+    @Test
     public void testImmediate() throws Exception {
         JexlContext none = null;
         final String source = "${'Hello ' + 'World!'}";
@@ -586,8 +600,38 @@ public class JXLTTest extends JexlTestCase {
             }
         }
         Assert.assertEquals(6, count);
+        Assert.assertTrue(output.indexOf("42") > 0);
+        Assert.assertTrue(output.indexOf("43") > 0);
+        Assert.assertTrue(output.indexOf("44") > 0);
+        Assert.assertTrue(output.indexOf("45") > 0);
     }
 
+    @Test
+    public void testReport2() throws Exception {
+        String rpt
+                = "<report>\n"
+                + "this is ${x}\n"
+                + "${x + 1}\n"
+                + "${x + 2}\n"
+                + "${x + 3}\n"
+                + "</report>\n";
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt), "x");
+        StringWriter strw = new StringWriter();
+        t.evaluate(context, strw, 42);
+        String output = strw.toString();
+        int count = 0;
+        for (int i = 0; i < output.length(); ++i) {
+            char c = output.charAt(i);
+            if ('\n' == c) {
+                count += 1;
+            }
+        }
+        Assert.assertEquals(6, count);
+        Assert.assertTrue(output.indexOf("42") > 0);
+        Assert.assertTrue(output.indexOf("43") > 0);
+        Assert.assertTrue(output.indexOf("44") > 0);
+        Assert.assertTrue(output.indexOf("45") > 0);
+    }
     @Test
     public void testOneLiner() throws Exception {
         JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader("fourty-two"));

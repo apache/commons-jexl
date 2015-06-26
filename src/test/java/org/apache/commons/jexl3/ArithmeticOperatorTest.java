@@ -34,6 +34,7 @@ import org.junit.Test;
  * Tests for the startsWith, endsWith, match and range operators.
  * @since 3.0
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ArithmeticOperatorTest extends JexlTestCase {
     private Asserter asserter;
 
@@ -252,7 +253,6 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         Assert.assertEquals(Integer.valueOf(1), ii.next());
         Assert.assertEquals(Integer.valueOf(2), ii.next());
         Assert.assertEquals(Integer.valueOf(3), ii.next());
-        Assert.assertNull(ii.next());
 
         script = jexl.createScript("(4 - 3) .. (9 / 3)");
         result = script.execute(null);
@@ -261,7 +261,6 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         Assert.assertEquals(Integer.valueOf(1), ii.next());
         Assert.assertEquals(Integer.valueOf(2), ii.next());
         Assert.assertEquals(Integer.valueOf(3), ii.next());
-        Assert.assertNull(ii.next());
 
         // sum of 1, 2, 3
         script = jexl.createScript("var x = 0; for(var y : ((5 - 4) .. (12 / 4))) { x = x + y }; x");

@@ -47,6 +47,32 @@ public class LongRange implements Collection<Long>  {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 41 * hash + (int) (this.low ^ (this.low >>> 32));
+        hash = 41 * hash + (int) (this.high ^ (this.high >>> 32));
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final LongRange other = (LongRange) obj;
+        if (this.low != other.low) {
+            return false;
+        }
+        if (this.high != other.high) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public Iterator<Long> iterator() {
         return new LongIterator(low, high);
     }

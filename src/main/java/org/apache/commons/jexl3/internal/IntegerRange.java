@@ -19,6 +19,7 @@ package org.apache.commons.jexl3.internal;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * A range of integers.
@@ -42,6 +43,32 @@ public class IntegerRange implements Collection<Integer> {
             low = from;
             high = to;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 13 * hash + this.low;
+        hash = 13 * hash + this.high;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final IntegerRange other = (IntegerRange) obj;
+        if (this.low != other.low) {
+            return false;
+        }
+        if (this.high != other.high) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -176,7 +203,7 @@ class IntegerIterator implements Iterator<Integer> {
             cursor += 1;
             return Integer.valueOf(next);
         } else {
-            return null;
+            throw new NoSuchElementException();
         }
     }
 
