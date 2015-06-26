@@ -105,7 +105,7 @@ public final class TemplateEngine extends JxltEngine {
      * A helper class to build expressions.
      * Keeps count of sub-expressions by type.
      */
-    private static class ExpressionBuilder {
+    private static final class ExpressionBuilder {
         /** Per TemplateExpression type counters. */
         private final int[] counts;
         /** The list of expressions. */
@@ -115,7 +115,7 @@ public final class TemplateEngine extends JxltEngine {
          * Creates a builder.
          * @param size the initial TemplateExpression array size
          */
-        ExpressionBuilder(int size) {
+        private ExpressionBuilder(int size) {
             counts = new int[]{0, 0, 0};
             expressions = new ArrayList<TemplateExpression>(size <= 0 ? 3 : size);
         }
@@ -124,9 +124,32 @@ public final class TemplateEngine extends JxltEngine {
          * Adds an TemplateExpression to the list of expressions, maintain per-type counts.
          * @param expr the TemplateExpression to add
          */
-        void add(TemplateExpression expr) {
+        private void add(TemplateExpression expr) {
             counts[expr.getType().index] += 1;
             expressions.add(expr);
+        }
+
+        @Override
+        public String toString() {
+            return toString(new StringBuilder()).toString();
+        }
+
+        /**
+         * Base for to-string.
+         * @param error the builder to fill
+         * @return the builder
+         */
+        private StringBuilder toString(StringBuilder error) {
+            error.append("exprs{");
+            error.append(expressions.size());
+            error.append(", constant:");
+            error.append(counts[ExpressionType.CONSTANT.index]);
+            error.append(", immediate:");
+            error.append(counts[ExpressionType.IMMEDIATE.index]);
+            error.append(", deferred:");
+            error.append(counts[ExpressionType.DEFERRED.index]);
+            error.append("}");
+            return error;
         }
 
         /**
@@ -135,21 +158,14 @@ public final class TemplateEngine extends JxltEngine {
          * @param source the source TemplateExpression
          * @return an TemplateExpression
          */
-        TemplateExpression build(TemplateEngine el, TemplateExpression source) {
+        private TemplateExpression build(TemplateEngine el, TemplateExpression source) {
             int sum = 0;
             for (int count : counts) {
                 sum += count;
             }
             if (expressions.size() != sum) {
-                StringBuilder error = new StringBuilder("parsing algorithm error, exprs: ");
-                error.append(expressions.size());
-                error.append(", constant:");
-                error.append(counts[ExpressionType.CONSTANT.index]);
-                error.append(", immediate:");
-                error.append(counts[ExpressionType.IMMEDIATE.index]);
-                error.append(", deferred:");
-                error.append(counts[ExpressionType.DEFERRED.index]);
-                throw new IllegalStateException(error.toString());
+                StringBuilder error = new StringBuilder("parsing algorithm error: ");
+                throw new IllegalStateException(toString(error).toString());
             }
             // if only one sub-expr, no need to create a composite
             if (expressions.size() == 1) {
@@ -239,6 +255,11 @@ public final class TemplateEngine extends JxltEngine {
             return Collections.emptySet();
         }
 
+        @Override
+        public final TemplateExpression getSource() {
+            return source;
+        }
+
         /**
          * Fills up the list of variables accessed by this unified expression.
          * @param collector the variable collector
@@ -249,43 +270,31 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public final TemplateExpression prepare(JexlContext context) {
-            try {
                 Scope.Frame frame = context instanceof TemplateContext
                                     ? ((TemplateContext) context).getFrame()
                                     : null;
+                return prepare(frame, context);
+        }
+
+        /**
+         * Prepares this expression.
+         * @param frame the frame storing parameters and local variables
+         * @param context the context storing global variables
+         * @return the expression value
+         * @throws JexlException
+         */
+        protected final TemplateExpression prepare(Scope.Frame frame, JexlContext context) {
+            try {
                 Interpreter interpreter = jexl.createInterpreter(context, frame);
                 return prepare(interpreter);
             } catch (JexlException xjexl) {
-                Exception xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
+                JexlException xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
                 if (jexl.isSilent()) {
                     jexl.logger.warn(xuel.getMessage(), xuel.getCause());
                     return null;
                 }
                 throw xuel;
             }
-        }
-
-        @Override
-        public final Object evaluate(JexlContext context) {
-            try {
-                Scope.Frame frame = context instanceof TemplateContext
-                                    ? ((TemplateContext) context).getFrame()
-                                    : null;
-                Interpreter interpreter = jexl.createInterpreter(context, frame);
-                return evaluate(interpreter);
-            } catch (JexlException xjexl) {
-                Exception xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
-                if (jexl.isSilent()) {
-                    jexl.logger.warn(xuel.getMessage(), xuel.getCause());
-                    return null;
-                }
-                throw xuel;
-            }
-        }
-
-        @Override
-        public final TemplateExpression getSource() {
-            return source;
         }
 
         /**
@@ -298,6 +307,35 @@ public final class TemplateEngine extends JxltEngine {
             return this;
         }
 
+        @Override
+        public final Object evaluate(JexlContext context) {
+                Scope.Frame frame = context instanceof TemplateContext
+                                    ? ((TemplateContext) context).getFrame()
+                                    : null;
+                return evaluate(frame, context);
+        }
+
+        /**
+         * Evaluates this expression.
+         * @param frame the frame storing parameters and local variables
+         * @param context the context storing global variables
+         * @return the expression value
+         * @throws JexlException
+         */
+        protected final Object evaluate(Scope.Frame frame, JexlContext context) {
+            try {
+                Interpreter interpreter = jexl.createInterpreter(context, frame);
+                return evaluate(interpreter);
+            } catch (JexlException xjexl) {
+                JexlException xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
+                if (jexl.isSilent()) {
+                    jexl.logger.warn(xuel.getMessage(), xuel.getCause());
+                    return null;
+                }
+                throw xuel;
+            }
+        }
+
         /**
          * Interprets a sub-expression.
          * @param interpreter a JEXL interpreter
@@ -305,6 +343,7 @@ public final class TemplateEngine extends JxltEngine {
          * @throws JexlException (only for nested and composite)
          */
         protected abstract Object evaluate(Interpreter interpreter);
+
     }
 
     /** A constant unified expression. */
@@ -588,8 +627,7 @@ public final class TemplateEngine extends JxltEngine {
                 // keep track of TemplateExpression equivalence
                 eq &= expr == prepared;
             }
-            TemplateExpression ready = eq ? this : builder.build(TemplateEngine.this, this);
-            return ready;
+            return eq ? this : builder.build(TemplateEngine.this, this);
         }
 
         @Override
@@ -696,8 +734,8 @@ public final class TemplateEngine extends JxltEngine {
      */
     private TemplateExpression parseExpression(JexlInfo info, String expr, Scope scope) {
         final int size = expr.length();
-        ExpressionBuilder builder = new ExpressionBuilder(0);
-        StringBuilder strb = new StringBuilder(size);
+        final ExpressionBuilder builder = new ExpressionBuilder(0);
+        final StringBuilder strb = new StringBuilder(size);
         ParseState state = ParseState.CONST;
         int immediate1 = 0;
         int deferred1 = 0;
@@ -1040,7 +1078,7 @@ public final class TemplateEngine extends JxltEngine {
             TemplateContext tcontext = new TemplateContext(context, frame, exprs, null);
             TemplateExpression[] immediates = new TemplateExpression[exprs.length];
             for (int e = 0; e < exprs.length; ++e) {
-                immediates[e] = exprs[e].prepare(tcontext);
+                immediates[e] = exprs[e].prepare(frame, tcontext);
             }
             return new TemplateScript(prefix, source, script, immediates);
         }
@@ -1161,12 +1199,12 @@ public final class TemplateEngine extends JxltEngine {
             }
             TemplateExpression expr = exprs[e];
             if (expr.isDeferred()) {
-                expr = expr.prepare(wrap);
+                expr = expr.prepare(frame, wrap);
             }
             if (expr instanceof CompositeExpression) {
                 printComposite((CompositeExpression) expr);
             } else {
-                doPrint(expr.getInfo(), expr.evaluate(this));
+                doPrint(expr.getInfo(), expr.evaluate(frame, this));
             }
         }
 
@@ -1179,7 +1217,7 @@ public final class TemplateEngine extends JxltEngine {
             final int size = cexprs.length;
             Object value;
             for (int e = 0; e < size; ++e) {
-                value = cexprs[e].evaluate(this);
+                value = cexprs[e].evaluate(frame, this);
                 doPrint(cexprs[e].getInfo(), value);
             }
         }
