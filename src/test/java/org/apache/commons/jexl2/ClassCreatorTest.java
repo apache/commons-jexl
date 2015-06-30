@@ -37,7 +37,7 @@ public class ClassCreatorTest extends JexlTestCase {
 
     @Override
     public void setUp() throws Exception {
-        base = new File(System.getProperty("java.io.tmpdir") + File.pathSeparator + "jexl" + System.currentTimeMillis());
+        base = new File(System.getProperty("java.io.tmpdir"), "jexl" + System.currentTimeMillis());
         jexl = new JexlEngine();
         jexl.setCache(512);
 
