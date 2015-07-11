@@ -747,7 +747,7 @@ void MethodCall() #void : {}
 {
     LOOKAHEAD(<DOT> <SIZE>) (<DOT> <SIZE> <LPAREN> <RPAREN>) #SizeMethod(1)
     |
-    LOOKAHEAD(<DOT> <EMPTY>) ( <DOT> <SIZE> <LPAREN> <RPAREN>) #EmptyMethod(1)
+    LOOKAHEAD(<DOT> <EMPTY>) (<DOT> <EMPTY> <LPAREN> <RPAREN>) #EmptyMethod(1)
     |
     (MemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
 }

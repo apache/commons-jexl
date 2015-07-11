@@ -18,14 +18,19 @@ package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.junit.Asserter;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ArithmeticTest extends JexlTestCase {
@@ -766,5 +771,66 @@ public class ArithmeticTest extends JexlTestCase {
 
         evaluate = jexl.createExpression("math:abs(-42)").evaluate(null);
         Assert.assertEquals(42, evaluate);
+    }
+
+    private static Document getDocument(String xml) throws Exception {
+        DocumentBuilder xmlBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        InputStream stringInputStream = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+        return xmlBuilder.parse(stringInputStream);
+    }
+
+    public static class XmlArithmetic extends JexlArithmetic {
+        public XmlArithmetic(boolean lenient) {
+            super(lenient);
+        }
+        public boolean empty(org.w3c.dom.Element elt) {
+            return !elt.hasAttributes() && !elt.hasChildNodes();
+        }
+        public int size(org.w3c.dom.Element elt) {
+            return elt.getChildNodes().getLength();
+        }
+    }
+
+    @Test
+    public void testXmlArithmetic() throws Exception {
+        JexlEngine jexl = new JexlBuilder().arithmetic(new XmlArithmetic(false)).create();
+        JexlScript e0 = jexl.createScript("x.empty()", "x");
+        JexlScript e1 = jexl.createScript("empty(x)", "x");
+        JexlScript s0 = jexl.createScript("x.size()", "x");
+        JexlScript s1 = jexl.createScript("size(x)", "x");
+        Document xml;
+        Node x;
+        Boolean empty;
+        int size;
+        xml = getDocument("<node info='123'/>");
+        x = xml.getLastChild();
+        empty = (Boolean) e0.execute(null, x);
+        Assert.assertFalse(empty);
+        empty = (Boolean) e1.execute(null, x);
+        Assert.assertFalse(empty);
+        size = (Integer) s0.execute(null, x);
+        Assert.assertEquals(0, size);
+        size = (Integer) s1.execute(null, x);
+        Assert.assertEquals(0, size);
+        xml = getDocument("<node><a/><b/></node>");
+        x = xml.getLastChild();
+        empty = (Boolean) e0.execute(null, x);
+        Assert.assertFalse(empty);
+        empty = (Boolean) e1.execute(null, x);
+        Assert.assertFalse(empty);
+        size = (Integer) s0.execute(null, x);
+        Assert.assertEquals(2, size);
+        size = (Integer) s1.execute(null, x);
+        Assert.assertEquals(2, size);
+        xml = getDocument("<node/>");
+        x = xml.getLastChild();
+        empty = (Boolean) e0.execute(null, x);
+        Assert.assertTrue(empty);
+        empty = (Boolean) e1.execute(null, x);
+        Assert.assertTrue(empty);
+        size = (Integer) s0.execute(null, x);
+        Assert.assertEquals(0, size);
+        size = (Integer) s1.execute(null, x);
+        Assert.assertEquals(0, size);
     }
 }

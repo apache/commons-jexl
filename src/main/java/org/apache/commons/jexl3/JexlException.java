@@ -484,6 +484,48 @@ public class JexlException extends RuntimeException {
     }
 
     /**
+     * Thrown when an operator fails.
+     * @since 3.0
+     */
+    public static class Operator extends JexlException {
+        /**
+         * Creates a new Operator exception instance.
+         * @param node  the location information
+         * @param symbol  the operator name
+         * @param cause the exception causing the error
+         */
+        public Operator(JexlNode node, String symbol, Throwable cause) {
+            super(node, symbol, cause);
+        }
+
+        /**
+         * @return the method name
+         */
+        public String getSymbol() {
+            return super.detailedMessage();
+        }
+
+        @Override
+        protected String detailedMessage() {
+            return "error calling operator '" + getSymbol() + "'";
+        }
+    }
+
+    /**
+     * Generates a message for an operator error.
+     * @param node the node where the error occurred
+     * @param symbol the operator name
+     * @return the error message
+     */
+    public static String operatorError(JexlNode node, String symbol) {
+        StringBuilder msg = errorAt(node);
+        msg.append("error calling operator '");
+        msg.append(symbol);
+        msg.append('\'');
+        return msg.toString();
+    }
+
+    /**
      * Thrown to return a value.
      * @since 3.0
      */

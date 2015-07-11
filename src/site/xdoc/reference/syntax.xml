@@ -290,28 +290,39 @@
         <tr>
           <td>empty</td>
           <td>
-            Returns true if the expression following is either:
+            Evaluates whether an expression if 'empty'.
+            This is true when the argument is:
             <ol>
               <li><code>null</code></li>
+              <li>An instance of class C and the derived JexlArithmetic overloads a method 'public boolean empty(C arg)'
+                  that returns true when the argument is considered empty</li>
               <li>An empty string</li>
               <li>An array of length zero</li>
               <li>A collection of size zero</li>
               <li>An empty map</li>
+              <li>Defining a method 'public boolean isEmpty()'
+                  that returns true when the instance is considered empty</li>
             </ol>
-            <source>empty(var1)</source>
+            This is false in other cases (besides errors).
+            <source>empty(arg)</source>
           </td>
         </tr>
         <tr>
           <td>size</td>
           <td>
-            Returns the information about the expression:
+            Evaluates the 'size' of an expression.
+            This returns:
             <ol>
+              <li>0 if the argument is null</li>
+              <li>The result of calling a method from a derived JexlArithmetic overload 'public int size(C arg)',
+                  C being the class of the argument</li>
               <li>Length of an array</li>
-              <li>Size of a List</li>
-              <li>Size of a Map</li>
-              <li>Size of a Set</li>
               <li>Length of a string</li>
+              <li>Size of a Collection</li>
+              <li>Size of a Map</li>
+              <li>The result of calling a method 'public int size()' defined by the argument class</li>
             </ol>
+            This returns 0 in other cases (besides errors).
             <source>size("Hello")</source> returns 5.
           </td>
         </tr>
