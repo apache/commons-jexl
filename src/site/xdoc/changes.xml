@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.0" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-162" due-to="Dmitri Blinov">
+                empty() function throws an exception : unsupported type
+            </action>
             <action dev="henrib" type="add" >
                 Added a method to get parameters from a template
             </action>

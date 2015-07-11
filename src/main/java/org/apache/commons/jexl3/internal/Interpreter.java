@@ -303,6 +303,24 @@ public class Interpreter extends ParserVisitor {
     }
 
     /**
+     * Triggered when an operator fails.
+     * @param node   the node where the error originated from
+     * @param operator the method name
+     * @param cause the cause of error (if any)
+     * @throws JexlException if isStrict
+     */
+    protected void operatorError(JexlNode node, JexlArithmetic.Operator operator, Throwable cause) {
+        if (cause != null) {
+            if (strictEngine) {
+                throw new JexlException.Operator(node, operator.getOperatorSymbol(), cause);
+            }
+            if (!silent) {
+                logger.warn(JexlException.operatorError(node, operator.getOperatorSymbol()));
+            }
+        }
+    }
+
+    /**
      * Triggered when method, function or constructor invocation fails.
      * @param xjexl the JexlException wrapping the original error
      * @return throws JexlException if isStrict, null otherwise
@@ -412,7 +430,7 @@ public class Interpreter extends ParserVisitor {
                     return result;
                 }
             } catch (Exception xany) {
-                return invocationFailed(new JexlException(node, operator.getMethodName(), xany));
+                operatorError(node,  operator, xany);
             }
         }
         return JexlEngine.TRY_FAILED;
@@ -450,7 +468,7 @@ public class Interpreter extends ParserVisitor {
                     return result;
                 }
             } catch (Exception xany) {
-                return invocationFailed(new JexlException(node, operator.getMethodName(), xany));
+                operatorError(node, operator, xany);
             }
         }
         return JexlEngine.TRY_FAILED;
@@ -1237,15 +1255,13 @@ public class Interpreter extends ParserVisitor {
         // boolean and if so, just use it
         JexlMethod vm = uberspect.getMethod(object, "isEmpty", EMPTY_PARAMS);
         if (vm != null && vm.getReturnType() == Boolean.TYPE) {
-            Boolean result;
             try {
-                result = (Boolean) vm.invoke(object, EMPTY_PARAMS);
-            } catch (Exception e) {
-                throw new JexlException(node, "empty() : error executing", e);
+                return (Boolean) vm.invoke(object, EMPTY_PARAMS);
+            } catch (Exception xany) {
+                operatorError(node, Operator.EMPTY, xany);
             }
-            return result;
         }
-        throw new JexlException(node, "empty() : unsupported type : " + object.getClass(), null);
+        return Boolean.FALSE;
     }
 
     /**
@@ -1280,15 +1296,13 @@ public class Interpreter extends ParserVisitor {
         // integer and if so, just use it
         JexlMethod vm = uberspect.getMethod(object, "size", EMPTY_PARAMS);
         if (vm != null && vm.getReturnType() == Integer.TYPE) {
-            Integer result;
             try {
-                result = (Integer) vm.invoke(object, EMPTY_PARAMS);
-            } catch (Exception e) {
-                throw new JexlException(node, "size() : error executing", e);
+                return (Integer) vm.invoke(object, EMPTY_PARAMS);
+            } catch (Exception xany) {
+                operatorError(node, Operator.SIZE, xany);
             }
-            return result;
         }
-        throw new JexlException(node, "size() : unsupported type : " + object.getClass(), null);
+        return 0;
     }
 
     @Override
