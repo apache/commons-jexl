@@ -1227,16 +1227,8 @@ public class Interpreter extends ParserVisitor {
             return opcall;
         }
         if (object instanceof Number) {
-            Number number = (Number) object;
-            if (number instanceof Double) {
-                double value = number.doubleValue();
-                return value == 0. || Double.isNaN(value) ? Boolean.TRUE : Boolean.FALSE;
-            }
-            if (number instanceof Float) {
-                float value = number.floatValue();
-                return value == 0. || Float.isNaN(value) ? Boolean.TRUE : Boolean.FALSE;
-            }
-            return number.intValue() == 0 ? Boolean.TRUE : Boolean.FALSE;
+            double d = ((Number) object).doubleValue();
+            return Double.isNaN(d) || d == 0.d ? Boolean.TRUE : Boolean.FALSE;
         }
         if (object instanceof String) {
             return "".equals(object) ? Boolean.TRUE : Boolean.FALSE;

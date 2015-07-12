@@ -202,7 +202,10 @@ PARSER_END(Parser)
   < FLOAT_LITERAL:
     "#NaN"
     |
-    (<DIGIT>)+ "." (<DIGIT>)+ ((["e","E"])(["+","-"])?(<DIGIT>)+)? (["d","D","f","F","b","B"])? >
+    (<DIGIT>)+ "." (<DIGIT>)+ ((["e","E"])(["+","-"])?(<DIGIT>)+)? (["d","D","f","F","b","B"])?
+    |
+    (<DIGIT>)+ (".")? ((["e","E"])(["+","-"])?(<DIGIT>)+)? ["d","D","f","F","b","B"]
+>
 }
 
 <*> TOKEN :
