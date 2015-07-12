@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.0" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-163" due-to="Dmitri Blinov">
+                empty(new ("java.lang.Long", 4294967296)) returns true
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-162" due-to="Dmitri Blinov">
                 empty() function throws an exception : unsupported type
             </action>

@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import javax.xml.parsers.DocumentBuilder;
@@ -34,6 +35,8 @@ import org.w3c.dom.Node;
 
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ArithmeticTest extends JexlTestCase {
+    /** A small delta to compare doubles. */
+    private static final double EPSILON = 1.e-6;
     private final Asserter asserter;
 
     public ArithmeticTest() {
@@ -832,5 +835,67 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(0, size);
         size = (Integer) s1.execute(null, x);
         Assert.assertEquals(0, size);
+    }
+
+    @Test
+    public void testEmptyLong() throws Exception {
+       Object x;
+       x = JEXL.createScript("new('java.lang.Long', 4294967296)").execute(null);
+       Assert.assertEquals(4294967296L, ((Long) x).longValue());
+       x = JEXL.createScript("new('java.lang.Long', '4294967296')").execute(null);
+       Assert.assertEquals(4294967296L, ((Long) x).longValue());
+       x = JEXL.createScript("4294967296l").execute(null);
+       Assert.assertEquals(4294967296L, ((Long) x).longValue());
+       x = JEXL.createScript("4294967296L").execute(null);
+       Assert.assertEquals(4294967296L, ((Long) x).longValue());
+       checkEmpty(x, false);
+       x = JEXL.createScript("0L").execute(null);
+       Assert.assertEquals(0, ((Long) x).longValue());
+       checkEmpty(x, true);
+    }
+
+    @Test
+    public void testEmptyFloat() throws Exception {
+       Object x;
+       x = JEXL.createScript("4294967296.f").execute(null);
+       Assert.assertEquals(4294967296.0f, (Float) x, EPSILON);
+       checkEmpty(x, false);
+       x = JEXL.createScript("4294967296.0f").execute(null);
+       Assert.assertEquals(4294967296.0f, (Float) x, EPSILON);
+       checkEmpty(x, false);
+       x = JEXL.createScript("0.0f").execute(null);
+       Assert.assertEquals(0.0f, (Float) x, EPSILON);
+       checkEmpty(x, true);
+       x = Float.NaN;
+       checkEmpty(x, true);
+    }
+
+    @Test
+    public void testEmptyDouble() throws Exception {
+       Object x;
+       x = JEXL.createScript("4294967296.d").execute(null);
+       Assert.assertEquals(4294967296.0d, (Double) x, EPSILON);
+       checkEmpty(x, false);
+       x = JEXL.createScript("4294967296.0d").execute(null);
+       Assert.assertEquals(4294967296.0d, (Double) x, EPSILON);
+       checkEmpty(x, false);
+       x = JEXL.createScript("0.0d").execute(null);
+       Assert.assertEquals(0.0d, (Double) x, EPSILON);
+       checkEmpty(x, true);
+       x = Double.NaN;
+       checkEmpty(x, true);
+
+    }
+
+    void checkEmpty(Object x, boolean expect) {
+        JexlScript s0 = JEXL.createScript("empty(x)", "x");
+        boolean empty = (Boolean) s0.execute(null, x);
+        Assert.assertEquals(expect, empty);
+        JexlScript s1 = JEXL.createScript("empty x", "x");
+        empty = (Boolean) s1.execute(null, x);
+        Assert.assertEquals(expect, empty);
+        JexlScript s2 = JEXL.createScript("x.empty()", "x");
+        empty = (Boolean) s2.execute(null, x);
+        Assert.assertEquals(expect, empty);
     }
 }
