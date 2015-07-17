@@ -51,11 +51,14 @@ public class RangeTest extends JexlTestCase {
     @Test
     public void testRanges() {
         LongRange lr0 = new LongRange(20,10);
+        Assert.assertEquals(10L, lr0.getMin());
+        Assert.assertEquals(20L, lr0.getMax());
         Assert.assertFalse(lr0.isEmpty());
         Assert.assertTrue(lr0.contains(10L));
         Assert.assertTrue(lr0.contains(20L));
         Assert.assertFalse(lr0.contains(30L));
         Assert.assertFalse(lr0.contains(5L));
+        Assert.assertFalse(lr0.contains(null));
         LongRange lr1 = new LongRange(10,20);
         Assert.assertEquals(lr0, lr1);
         Assert.assertTrue(lr0.containsAll(lr1));
@@ -64,11 +67,14 @@ public class RangeTest extends JexlTestCase {
         Assert.assertTrue(lr0.containsAll(lr2));
         Assert.assertFalse(lr2.containsAll(lr1));
         IntegerRange ir0 = new IntegerRange(20,10);
+        Assert.assertEquals(10, ir0.getMin());
+        Assert.assertEquals(20, ir0.getMax());
         Assert.assertFalse(ir0.isEmpty());
         Assert.assertTrue(ir0.contains(10));
         Assert.assertTrue(ir0.contains(20));
         Assert.assertFalse(ir0.contains(30));
         Assert.assertFalse(ir0.contains(5));
+        Assert.assertFalse(ir0.contains(null));
         IntegerRange ir1 = new IntegerRange(10,20);
         Assert.assertEquals(ir0, ir1);
         Assert.assertTrue(ir0.containsAll(ir1));

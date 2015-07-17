@@ -27,9 +27,9 @@ import java.util.NoSuchElementException;
  */
 public class LongRange implements Collection<Long>  {
     /** The lower boundary. */
-    private final long low;
+    private final long min;
     /** The upper boundary. */
-    private final long high;
+    private final long max;
 
     /**
      * Creates a new range.
@@ -38,19 +38,35 @@ public class LongRange implements Collection<Long>  {
      */
     public LongRange(long from, long to) {
         if (from > to) {
-            high = from;
-            low = to;
+            max = from;
+            min = to;
         } else {
-            low = from;
-            high = to;
+            min = from;
+            max = to;
         }
+    }
+
+    /**
+     * Gets the interval minimum value.
+     * @return the low boundary
+     */
+    public long getMin() {
+        return min;
+    }
+
+    /**
+     * Gets the interval maximum value.
+     * @return the high boundary
+     */
+    public long getMax() {
+        return max;
     }
 
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 41 * hash + (int) (this.low ^ (this.low >>> 32));
-        hash = 41 * hash + (int) (this.high ^ (this.high >>> 32));
+        hash = 41 * hash + (int) (this.min ^ (this.min >>> 32));
+        hash = 41 * hash + (int) (this.max ^ (this.max >>> 32));
         return hash;
     }
 
@@ -63,10 +79,10 @@ public class LongRange implements Collection<Long>  {
             return false;
         }
         final LongRange other = (LongRange) obj;
-        if (this.low != other.low) {
+        if (this.min != other.min) {
             return false;
         }
-        if (this.high != other.high) {
+        if (this.max != other.max) {
             return false;
         }
         return true;
@@ -74,12 +90,12 @@ public class LongRange implements Collection<Long>  {
 
     @Override
     public Iterator<Long> iterator() {
-        return new LongIterator(low, high);
+        return new LongIterator(min, max);
     }
 
     @Override
     public int size() {
-        return (int)(high - low + 1);
+        return (int)(max - min + 1);
     }
 
     @Override
@@ -91,7 +107,7 @@ public class LongRange implements Collection<Long>  {
     public boolean contains(Object o) {
         if (o instanceof Number) {
             long v = ((Number) o).longValue();
-            return low <= v && v <= high;
+            return min <= v && v <= max;
         } else {
             return false;
         }
@@ -102,7 +118,7 @@ public class LongRange implements Collection<Long>  {
         final int size = size();
         Object[] array = new Object[size];
         for(int a = 0; a < size; ++a) {
-            array[a] = low + a;
+            array[a] = min + a;
         }
         return array;
     }
@@ -120,7 +136,7 @@ public class LongRange implements Collection<Long>  {
                        : (T[]) Array.newInstance(ct, length);
             }
             for (int a = 0; a < length; ++a) {
-                Array.set(copy, a, low + a);
+                Array.set(copy, a, min + a);
             }
             if (length < array.length) {
                 array[length] = null;
@@ -176,9 +192,9 @@ public class LongRange implements Collection<Long>  {
  */
 class LongIterator implements Iterator<Long> {
     /** The lower boundary. */
-    private final long low;
+    private final long min;
     /** The upper boundary. */
-    private final long high;
+    private final long max;
     /** The current value. */
     private long cursor;
     /**
@@ -187,25 +203,22 @@ class LongIterator implements Iterator<Long> {
      * @param h high boundary
      */
     public LongIterator(long l, long h) {
-        low = l;
-        high = h;
-        cursor = low;
+        min = l;
+        max = h;
+        cursor = min;
     }
 
     @Override
     public boolean hasNext() {
-        return cursor <= high;
+        return cursor <= max;
     }
 
     @Override
     public Long next() {
-        if (cursor <= high) {
-            long next = cursor;
-            cursor += 1;
-            return Long.valueOf(next);
-        } else {
-            throw new NoSuchElementException();
+        if (cursor <= max) {
+            return cursor++;
         }
+        throw new NoSuchElementException();
     }
 
     @Override
