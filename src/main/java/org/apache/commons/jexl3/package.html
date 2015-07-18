@@ -18,7 +18,7 @@
     <head>
         <title>Package Documentation for org.apache.commons.jexl3 Package</title>
     </head>
-    <body bgcolor="white">
+    <body>
         Provides a framework for evaluating JEXL expressions.
         <br/><br/>
         <ul>
@@ -184,9 +184,9 @@
         The following example illustrates their usage:
         <pre>
             JexlEngine jexl = new JexlBuilder().create();
-            JxltEngine jxlt = jexl.jxlt();
+            JxltEngine jxlt = jexl.createJxltEngine();
             JxltEngine.Expression expr = jxlt.createExpression("Hello ${user}");
-            String hello = jxlt.evaluate(context, jxlt).toString();
+            String hello = expr.evaluate(context).toString();
         </pre>
 
         <h3>JexlExpression, JexlScript, Expression and Template: summary</h3>
@@ -348,17 +348,124 @@
             {@link org.apache.commons.jexl3.JexlArithmetic}
             is the class to derive if you need to change how operators behave or add types upon which they
             operate.
-            For example, this would be the case if you wanted '+' to operate on arrays; you'd need to derive
-            JexlArithmetic and implement your own version of Add.
 
-            There are 3 entry points that allow customizing the type of objects created for respectively
-            array literals {@link org.apache.commons.jexl3.JexlArithmetic#arrayBuilder},
-            map literals {@link org.apache.commons.jexl3.JexlArithmetic#mapBuilder}
-            and range objects {@link org.apache.commons.jexl3.JexlArithmetic#createRange}.
-
-            Note however that you can <em>not</em> change the operator precedence.
+            There are 3 entry points that allow customizing the type of objects created:
         </p>
-
+        <ul>
+            <li>array literals: {@link org.apache.commons.jexl3.JexlArithmetic#arrayBuilder}</li>
+            <li>map literals: {@link org.apache.commons.jexl3.JexlArithmetic#mapBuilder}</li>
+            <li>set literals: {@link org.apache.commons.jexl3.JexlArithmetic#setBuilder}</li>
+            <li>range objects: {@link org.apache.commons.jexl3.JexlArithmetic#createRange}</li>
+        </ul>
+        <p>
+            You can also overload operator methods; by convention, each operator has a method name associated to it.
+            If you overload some in your JexlArithmetic derived implementation, these methods will be called when the
+            arguments match your method signature.
+            For example, this would be the case if you wanted '+' to operate on arrays; you'd need to derive
+            JexlArithmetic and implement 'public Object add(Set<?> x, Set<?> y)' method.
+            Note however that you can <em>not</em> change the operator precedence.
+            The list of operator / method matches is the following:
+        </p>
+            <table>
+                <tr>
+                    <th>Operator</th>
+                    <th>Method Name</th>
+                    <th>Example</th>
+                </tr>
+                <tr>
+                    <td>+</td>
+                    <td>add</td>
+                    <td>add(x, y)</td>
+                </tr>
+                <tr>
+                    <td>-</td>
+                    <td>subtract</td>
+                    <td>subtract(x, y)</td>
+                </tr>
+                <tr>
+                    <td>*</td>
+                    <td>multiply</td>
+                    <td>multiply(x, y)</td>
+                </tr>
+                <tr>
+                    <td>/</td>
+                    <td>divide</td>
+                    <td>divide(x, y)</td>
+                </tr>
+                <tr>
+                    <td>%</td>
+                    <td>mod</td>
+                    <td>mod(x, y)</td>
+                </tr>
+                <tr>
+                    <td>&</td>
+                    <td>bitwiseAnd</td>
+                    <td>bitwiseAnd(x, y)</td>
+                </tr>
+                <tr>
+                    <td>|</td>
+                    <td>bitwiseOr</td>
+                    <td>bitwiseOr(x, y)</td>
+                </tr>
+                <tr>
+                    <td>^</td>
+                    <td>bitwiseXor</td>
+                    <td>bitwiseXor(x, y)</td>
+                </tr>
+                <tr>
+                    <td>!</td>
+                    <td>logicalNot</td>
+                    <td>logicalNot(x)</td>
+                </tr>
+                <tr>
+                    <td>-</td>
+                    <td>bitwiseComplement</td>
+                    <td>bitiwiseComplement(x)</td>
+                </tr>
+                <tr>
+                    <td>==</td>
+                    <td>equals</td>
+                    <td>equals(x, y)</td>
+                </tr>
+                <tr>
+                    <td>&lt;</td>
+                    <td>lessThan</td>
+                    <td>lessThan(x, y)</td>
+                </tr>
+                <tr>
+                    <td>&lt;=</td>
+                    <td>lessThanOrEqual</td>
+                    <td>lessThanOrEqual(x, y)</td>
+                </tr>
+                <tr>
+                    <td>&gt;</td>
+                    <td>greaterThan</td>
+                    <td>greaterThan(x, y)</td>
+                </tr>
+                <tr>
+                    <td>&gt;=</td>
+                    <td>greaterThanOrEqual</td>
+                    <td>greaterThanOrEqual(x, y)</td>
+                </tr>
+                <tr>
+                    <td>-</td>
+                    <td>negate</td>
+                    <td>negate(x)</td>
+                </tr>
+                <tr>
+                    <td>size</td>
+                    <td>size</td>
+                    <td>size(x)</td>
+                </tr>
+                <tr>
+                    <td>empty</td>
+                    <td>empty</td>
+                    <td>empty(x)</td>
+                </tr>
+            </table>
+        <p>
+            You can also override the base operator methods, those whose arguments are Object.
+        </p>
         <h2><a name="extension">Extending JEXL</a></h2>
         If you need to make JEXL treat some objects in a specialized manner or tweak how it
         reacts to some settings, you can derive most of its inner-workings. The classes and methods are rarely private or
