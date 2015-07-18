@@ -35,6 +35,9 @@
             <action dev="henrib" type="fix" issue="JEXL-162" due-to="Dmitri Blinov">
                 empty() function throws an exception : unsupported type
             </action>
+            <action dev="henrib" type="fix" issue="JEXL-160" due-to="Dmitri Blinov">
+                typo in package.html
+            </action>
             <action dev="henrib" type="add" >
                 Added a method to get parameters from a template
             </action>
