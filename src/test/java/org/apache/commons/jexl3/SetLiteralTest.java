@@ -116,8 +116,8 @@ public class SetLiteralTest extends JexlTestCase {
         };
         JexlContext jc = new MapContext();
         for (int t = 0; t < exprs.length; ++t) {
-            JexlExpression e = JEXL.createExpression(exprs[t]);
-            Object o = e.evaluate(jc);
+            JexlScript e = JEXL.createScript(exprs[t]);
+            Object o = e.execute(jc);
             Assert.assertTrue(exprs[t], Objects.equals(checks[t], o));
         }
 

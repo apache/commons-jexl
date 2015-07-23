@@ -25,7 +25,7 @@ import org.apache.commons.jexl3.JexlArithmetic;
  */
 public class MapBuilder implements JexlArithmetic.MapBuilder {
     /** The map being created. */
-    private final Map<Object, Object> map;
+    protected final Map<Object, Object> map;
 
     /**
      * Creates a new builder.
@@ -44,5 +44,4 @@ public class MapBuilder implements JexlArithmetic.MapBuilder {
     public Object create() {
         return map;
     }
-
 }

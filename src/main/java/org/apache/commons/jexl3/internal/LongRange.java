@@ -23,20 +23,35 @@ import java.util.NoSuchElementException;
 
 /**
  * A range of longs.
- * <p>Behaves as a readonly collection of longs.
+ * <p>
+ * Behaves as a readonly collection of longs.
  */
-public class LongRange implements Collection<Long>  {
+public abstract class LongRange implements Collection<Long> {
     /** The lower boundary. */
-    private final long min;
+    protected final long min;
     /** The upper boundary. */
-    private final long max;
+    protected final long max;
+
+    /**
+     * Creates a range, ascending or descending depending on boundaries order.
+     * @param from the lower inclusive boundary
+     * @param to   the higher inclusive boundary
+     * @return a range
+     */
+    public static LongRange create(long from, long to) {
+        if (from <= to) {
+            return new LongRange.Ascending(from, to);
+        } else {
+            return new LongRange.Descending(to, from);
+        }
+    }
 
     /**
      * Creates a new range.
      * @param from the lower inclusive boundary
-     * @param to  the higher inclusive boundary
+     * @param to   the higher inclusive boundary
      */
-    public LongRange(long from, long to) {
+    protected LongRange(long from, long to) {
         if (from > to) {
             max = from;
             min = to;
@@ -64,7 +79,7 @@ public class LongRange implements Collection<Long>  {
 
     @Override
     public int hashCode() {
-        int hash = 3;
+        int hash = getClass().hashCode();
         hash = 41 * hash + (int) (this.min ^ (this.min >>> 32));
         hash = 41 * hash + (int) (this.max ^ (this.max >>> 32));
         return hash;
@@ -89,13 +104,11 @@ public class LongRange implements Collection<Long>  {
     }
 
     @Override
-    public Iterator<Long> iterator() {
-        return new LongIterator(min, max);
-    }
+    public abstract Iterator<Long> iterator();
 
     @Override
     public int size() {
-        return (int)(max - min + 1);
+        return (int) (max - min + 1);
     }
 
     @Override
@@ -117,7 +130,7 @@ public class LongRange implements Collection<Long>  {
     public Object[] toArray() {
         final int size = size();
         Object[] array = new Object[size];
-        for(int a = 0; a < size; ++a) {
+        for (int a = 0; a < size; ++a) {
             array[a] = min + a;
         }
         return array;
@@ -148,7 +161,7 @@ public class LongRange implements Collection<Long>  {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        for(Object cc : c) {
+        for (Object cc : c) {
             if (!contains(cc)) {
                 return false;
             }
@@ -185,24 +198,53 @@ public class LongRange implements Collection<Long>  {
     public void clear() {
         throw new UnsupportedOperationException();
     }
+
+    /**
+     * Ascending long range.
+     */
+    public static class Ascending extends LongRange {
+        protected Ascending(long from, long to) {
+            super(from, to);
+        }
+
+        @Override
+        public Iterator<Long> iterator() {
+            return new AscLongIterator(min, max);
+        }
+    }
+
+    /**
+     * Descending long range.
+     */
+    public static class Descending extends LongRange {
+        protected Descending(long from, long to) {
+            super(from, to);
+        }
+
+        @Override
+        public Iterator<Long> iterator() {
+            return new DescLongIterator(min, max);
+        }
+    }
 }
 
 /**
  * An iterator on a long range.
  */
-class LongIterator implements Iterator<Long> {
+class AscLongIterator implements Iterator<Long> {
     /** The lower boundary. */
     private final long min;
     /** The upper boundary. */
     private final long max;
     /** The current value. */
     private long cursor;
+
     /**
      * Creates a iterator on the range.
      * @param l low boundary
      * @param h high boundary
      */
-    public LongIterator(long l, long h) {
+    AscLongIterator(long l, long h) {
         min = l;
         max = h;
         cursor = min;
@@ -217,6 +259,47 @@ class LongIterator implements Iterator<Long> {
     public Long next() {
         if (cursor <= max) {
             return cursor++;
+        }
+        throw new NoSuchElementException();
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
+}
+
+/**
+ * An iterator on a long range.
+ */
+class DescLongIterator implements Iterator<Long> {
+    /** The lower boundary. */
+    private final long min;
+    /** The upper boundary. */
+    private final long max;
+    /** The current value. */
+    private long cursor;
+
+    /**
+     * Creates a iterator on the range.
+     * @param l low boundary
+     * @param h high boundary
+     */
+    DescLongIterator(long l, long h) {
+        min = l;
+        max = h;
+        cursor = max;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return cursor >= min;
+    }
+
+    @Override
+    public Long next() {
+        if (cursor >= min) {
+            return cursor--;
         }
         throw new NoSuchElementException();
     }

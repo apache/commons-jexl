@@ -25,7 +25,7 @@ import java.util.Set;
  */
 public class SetBuilder implements JexlArithmetic.SetBuilder {
     /** The set being created. */
-    private final Set<Object> set;
+    protected final Set<Object> set;
 
     /**
      * Creates a new builder.
@@ -44,5 +44,4 @@ public class SetBuilder implements JexlArithmetic.SetBuilder {
     public Object create() {
         return set;
     }
-
 }

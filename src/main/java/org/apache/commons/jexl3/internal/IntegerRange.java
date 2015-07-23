@@ -24,12 +24,26 @@ import java.util.NoSuchElementException;
 /**
  * A range of integers.
  */
-public class IntegerRange implements Collection<Integer> {
+public abstract class IntegerRange implements Collection<Integer> {
     /** The lower boundary. */
-    private final int min;
+    protected final int min;
     /** The upper boundary. */
-    private final int max;
+    protected final int max;
 
+
+    /**
+     * Creates a range, ascending or descending depending on boundaries order.
+     * @param from the lower inclusive boundary
+     * @param to   the higher inclusive boundary
+     * @return a range
+     */
+    public static IntegerRange create(int from, int to) {
+        if (from <= to) {
+            return new IntegerRange.Ascending(from, to);
+        } else {
+            return new IntegerRange.Descending(to, from);
+        }
+    }
     /**
      * Creates a new range.
      * @param from the lower inclusive boundary
@@ -64,7 +78,7 @@ public class IntegerRange implements Collection<Integer> {
 
     @Override
     public int hashCode() {
-        int hash = 7;
+        int hash = getClass().hashCode();
         hash = 13 * hash + this.min;
         hash = 13 * hash + this.max;
         return hash;
@@ -89,9 +103,7 @@ public class IntegerRange implements Collection<Integer> {
     }
 
     @Override
-    public Iterator<Integer> iterator() {
-        return new IntegerIterator(min, max);
-    }
+    public abstract Iterator<Integer> iterator();
 
     @Override
     public int size() {
@@ -185,12 +197,40 @@ public class IntegerRange implements Collection<Integer> {
     public void clear() {
         throw new UnsupportedOperationException();
     }
+
+    /**
+     * Ascending integer range.
+     */
+    public static class Ascending extends IntegerRange {
+        protected Ascending(int from, int to) {
+            super(from, to);
+        }
+
+        @Override
+        public Iterator<Integer> iterator() {
+            return new AscIntegerIterator(min, max);
+        }
+    }
+
+    /**
+     * Descending integer range.
+     */
+    public static class Descending extends IntegerRange {
+        protected Descending(int from, int to) {
+            super(from, to);
+        }
+
+        @Override
+        public Iterator<Integer> iterator() {
+            return new DescIntegerIterator(min, max);
+        }
+    }
 }
 
 /**
- * An iterator on an integer range.
+ * An ascending iterator on an integer range.
  */
-class IntegerIterator implements Iterator<Integer> {
+class AscIntegerIterator implements Iterator<Integer> {
     /** The lower boundary. */
     private final int min;
     /** The upper boundary. */
@@ -202,7 +242,7 @@ class IntegerIterator implements Iterator<Integer> {
      * @param l low boundary
      * @param h high boundary
      */
-    public IntegerIterator(int l, int h) {
+    public AscIntegerIterator(int l, int h) {
         min = l;
         max = h;
         cursor = min;
@@ -217,6 +257,46 @@ class IntegerIterator implements Iterator<Integer> {
     public Integer next() {
         if (cursor <= max) {
             return cursor++;
+        }
+        throw new NoSuchElementException();
+    }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+}
+
+/**
+ * A descending iterator on an integer range.
+ */
+class DescIntegerIterator implements Iterator<Integer> {
+    /** The lower boundary. */
+    private final int min;
+    /** The upper boundary. */
+    private final int max;
+    /** The current value. */
+    private int cursor;
+    /**
+     * Creates a iterator on the range.
+     * @param l low boundary
+     * @param h high boundary
+     */
+    public DescIntegerIterator(int l, int h) {
+        min = l;
+        max = h;
+        cursor = max;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return cursor >= min;
+    }
+
+    @Override
+    public Integer next() {
+        if (cursor >= min) {
+            return cursor--;
         }
         throw new NoSuchElementException();
     }
