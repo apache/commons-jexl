@@ -71,7 +71,7 @@ public class Util {
             } catch (JexlException xjexl) {
                 throw new RuntimeException("check parse failed: "
                         + expressiondbg
-                        + " /******** */ "
+                        + " /*********/ "
                         + entry.getKey(), xjexl);
 
             }

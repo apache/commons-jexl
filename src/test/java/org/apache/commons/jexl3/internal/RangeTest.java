@@ -48,9 +48,37 @@ public class RangeTest extends JexlTestCase {
         super.tearDown();
     }
 
+    private void checkIteration(LongRange lr, long first, long last) throws Exception {
+        Iterator<Long> ii = lr.iterator();
+        if (ii.hasNext()) {
+            long l = ii.next();
+            Assert.assertEquals(first, l);
+            while(ii.hasNext()) {
+                l = ii.next();
+            }
+            Assert.assertEquals(last, l);
+        } else {
+            Assert.fail("empty iterator?");
+        }
+    }
+
+    private void checkIteration(IntegerRange ir, int first, int last) throws Exception {
+        Iterator<Integer> ii = ir.iterator();
+        if (ii.hasNext()) {
+            int l = ii.next();
+            Assert.assertEquals(first, l);
+            while(ii.hasNext()) {
+                l = ii.next();
+            }
+            Assert.assertEquals(last, l);
+        } else {
+            Assert.fail("empty iterator?");
+        }
+    }
+
     @Test
-    public void testRanges() {
-        LongRange lr0 = new LongRange(20,10);
+    public void testRanges() throws Exception {
+        LongRange lr0 = LongRange.create(20,10);
         Assert.assertEquals(10L, lr0.getMin());
         Assert.assertEquals(20L, lr0.getMax());
         Assert.assertFalse(lr0.isEmpty());
@@ -59,14 +87,16 @@ public class RangeTest extends JexlTestCase {
         Assert.assertFalse(lr0.contains(30L));
         Assert.assertFalse(lr0.contains(5L));
         Assert.assertFalse(lr0.contains(null));
-        LongRange lr1 = new LongRange(10,20);
-        Assert.assertEquals(lr0, lr1);
+        checkIteration(lr0, 20L, 10L);
+        LongRange lr1 = LongRange.create(10,20);
+        checkIteration(lr1, 10L, 20L);
         Assert.assertTrue(lr0.containsAll(lr1));
-        LongRange lr2 = new LongRange(10,15);
+        LongRange lr2 = LongRange.create(10,15);
         Assert.assertNotEquals(lr0, lr2);
         Assert.assertTrue(lr0.containsAll(lr2));
         Assert.assertFalse(lr2.containsAll(lr1));
-        IntegerRange ir0 = new IntegerRange(20,10);
+        IntegerRange ir0 = IntegerRange.create(20,10);
+        checkIteration(ir0, 20, 10);
         Assert.assertEquals(10, ir0.getMin());
         Assert.assertEquals(20, ir0.getMax());
         Assert.assertFalse(ir0.isEmpty());
@@ -75,17 +105,17 @@ public class RangeTest extends JexlTestCase {
         Assert.assertFalse(ir0.contains(30));
         Assert.assertFalse(ir0.contains(5));
         Assert.assertFalse(ir0.contains(null));
-        IntegerRange ir1 = new IntegerRange(10,20);
-        Assert.assertEquals(ir0, ir1);
+        IntegerRange ir1 = IntegerRange.create(10,20);
+        checkIteration(ir1, 10, 20);
         Assert.assertTrue(ir0.containsAll(ir1));
         Assert.assertNotEquals(ir0, lr0);
         Assert.assertNotEquals(ir1, lr1);
-        IntegerRange ir2 = new IntegerRange(10,15);
+        IntegerRange ir2 = IntegerRange.create(10,15);
         Assert.assertNotEquals(ir0, ir2);
         Assert.assertTrue(ir0.containsAll(ir2));
         Assert.assertFalse(ir2.containsAll(ir1));
 
-        long lc0 = 10;
+        long lc0 = 20;
         Iterator<Long> il0 = lr0.iterator();
         while(il0.hasNext()) {
             long v0 = il0.next();
@@ -102,9 +132,9 @@ public class RangeTest extends JexlTestCase {
             } catch(UnsupportedOperationException xuo) {
                 // ok
             }
-            lc0 += 1;
+            lc0 -= 1;
         }
-        Assert.assertEquals(21L, lc0);
+        Assert.assertEquals(9L, lc0);
         try {
             il0.next();
             Assert.fail();
@@ -112,7 +142,7 @@ public class RangeTest extends JexlTestCase {
             // ok
         }
 
-        int ic0 = 10;
+        int ic0 = 20;
         Iterator<Integer> ii0 = ir0.iterator();
         while(ii0.hasNext()) {
             int v0 = ii0.next();
@@ -129,9 +159,9 @@ public class RangeTest extends JexlTestCase {
             } catch(UnsupportedOperationException xuo) {
                 // ok
             }
-            ic0 += 1;
+            ic0 -= 1;
         }
-        Assert.assertEquals(21, ic0);
+        Assert.assertEquals(9, ic0);
         try {
             ii0.next();
             Assert.fail();

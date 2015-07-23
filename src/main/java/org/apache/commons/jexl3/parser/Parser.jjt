@@ -131,6 +131,7 @@ PARSER_END(Parser)
     | < COLON : ":" >
     | < COMMA : "," >
     | < DOT : "." >
+    | < ELIPSIS : "..." >
 }
 
 <*> TOKEN : { /* CONDITIONALS */
@@ -584,9 +585,20 @@ void StringLiteral() :
   { jjtThis.setLiteral(Parser.buildString(t.image, true)); }
 }
 
+void ExtendedLiteral() #ExtendedLiteral() : {}
+{
+   <ELIPSIS>
+}
+
 void ArrayLiteral() : {}
 {
-  <LBRACKET> (Expression() ( <COMMA> Expression() )*)? <RBRACKET>
+   <LBRACKET>
+   (
+        LOOKAHEAD(1) ExtendedLiteral()
+    |
+        (Expression() (LOOKAHEAD(2) <COMMA> Expression() )*)? (<COMMA> ExtendedLiteral())?
+   )
+   <RBRACKET>
 }
 
 void MapLiteral() : {}

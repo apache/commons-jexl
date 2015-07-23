@@ -21,6 +21,8 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Perform arithmetic.
@@ -50,7 +52,7 @@ public class JexlArithmetic {
      * @since 3.0
      */
     public enum Operator {
-        /** add(x, y). */
+        /** add(x, y). *//** add(x, y). */
         ADD("+", "add", 2),
         /** subtract(x, y). */
         SUBTRACT("-", "subtract", 2),
@@ -69,7 +71,7 @@ public class JexlArithmetic {
         /** logicalNot(x). */
         NOT("!", "logicalNot", 1),
         /** bitiwiseComplement(x). */
-        COMPLEMENT("-", "bitwiseComplement", 1),
+        COMPLEMENT("~", "bitwiseComplement", 1),
         /** equals(x, y). */
         EQ("==", "equals", 2),
         /** lessThan(x, y). */
@@ -82,10 +84,16 @@ public class JexlArithmetic {
         GTE(">=", "greaterThanOrEqual", 2),
         /** negate(x). */
         NEGATE("-", "negate", 1),
-        /** size(x). */
-        SIZE("size", "size", 1),
+        /** contains(x). */
+        CONTAINS("=~", "contains", 2),
+        /** startsWith(x, y). */
+        STARTSWITH("=^", "startsWith", 2),
+        /** endsWith(x, y). */
+        ENDSWITH("=$", "endsWith", 2),
         /** empty(x). */
-        EMPTY("empty", "empty", 1);
+        EMPTY("empty", "empty", 1),
+        /** size(x). */
+        SIZE("size", "size", 1);
 
         /**
          * The operator symbol.
@@ -252,9 +260,10 @@ public class JexlArithmetic {
 
         /**
          * Creates the actual "array" instance.
+         * @param extended true when the last argument is ', ...'
          * @return the array
          */
-        Object create();
+        Object create(boolean extended);
     }
 
     /**
@@ -279,7 +288,7 @@ public class JexlArithmetic {
 
         /**
          * Creates the actual "set" instance.
-         * @return the array
+         * @return the set
          */
         Object create();
     }
@@ -334,9 +343,9 @@ public class JexlArithmetic {
         final long lto = toLong(to);
         if ((lfrom >= Integer.MIN_VALUE && lfrom <= Integer.MAX_VALUE)
             && (lto >= Integer.MIN_VALUE && lto <= Integer.MAX_VALUE)) {
-            return new org.apache.commons.jexl3.internal.IntegerRange((int) lfrom, (int) lto);
+            return org.apache.commons.jexl3.internal.IntegerRange.create((int) lfrom, (int) lto);
         } else {
-            return new org.apache.commons.jexl3.internal.LongRange(lfrom, lto);
+            return org.apache.commons.jexl3.internal.LongRange.create(lfrom, lto);
         }
     }
 
@@ -836,13 +845,13 @@ public class JexlArithmetic {
     }
 
     /**
-     * Test if left regexp matches right.
+     * Test if left matches right.
      *
      * @param left  first value
      * @param right second value
-     * @return test result.
+     * @return test result or null if there is no arithmetic solution
      */
-    public boolean matches(Object left, Object right) {
+    public Boolean contains(Object left, Object right) {
         if (left == null && right == null) {
             //if both are null L == R
             return true;
@@ -851,12 +860,70 @@ public class JexlArithmetic {
             // we know both aren't null, therefore L != R
             return false;
         }
-        final String arg = left.toString();
+        // use arithmetic / pattern matching ?
         if (right instanceof java.util.regex.Pattern) {
-            return ((java.util.regex.Pattern) right).matcher(arg).matches();
-        } else {
-            return arg.matches(right.toString());
+            return ((java.util.regex.Pattern) right).matcher(left.toString()).matches();
         }
+        if ( right instanceof String) {
+            return left.toString().matches(right.toString());
+        }
+        // try contains on map key
+        if (right instanceof Map<?, ?>) {
+            return ((Map<?, ?>) right).containsKey(left);
+        }
+        // try contains on collection
+        if (right instanceof Collection<?>) {
+            if (left instanceof Collection<?>) {
+                return ((Collection<?>) right).containsAll((Collection<?>) left);
+            }
+            // left in right ? <=> right.contains(left) ?
+            return ((Collection<?>) right).contains(left);
+        }
+        return null;
+    }
+
+    /**
+     * Test if left ends with right.
+     *
+     * @param left  first value
+     * @param right second value
+     * @return test result or null if there is no arithmetic solution
+     */
+    public Boolean endsWith(Object left, Object right) {
+        if (left == null && right == null) {
+            //if both are null L == R
+            return true;
+        }
+        if (left == null || right == null) {
+            // we know both aren't null, therefore L != R
+            return false;
+        }
+        if (left instanceof String) {
+            return ((String) left).endsWith(toString(right));
+        }
+        return null;
+    }
+
+    /**
+     * Test if left starts with right.
+     *
+     * @param left  first value
+     * @param right second value
+     * @return test result or null if there is no arithmetic solution
+     */
+    public Boolean startsWith(Object left, Object right) {
+        if (left == null && right == null) {
+            //if both are null L == R
+            return true;
+        }
+        if (left == null || right == null) {
+            // we know both aren't null, therefore L != R
+            return false;
+        }
+        if (left instanceof String) {
+            return ((String) left).startsWith(toString(right));
+        }
+        return null;
     }
 
     /**
@@ -1182,10 +1249,12 @@ public class JexlArithmetic {
             if (Double.isNaN(dval.doubleValue())) {
                 return BigInteger.ZERO;
             } else {
-                return new BigInteger(dval.toString());
+                return BigInteger.valueOf(dval.longValue());
             }
         } else if (val instanceof Number) {
-            return new BigInteger(val.toString());
+            return BigInteger.valueOf(((Number) val).longValue());
+        } else if (val instanceof Boolean) {
+            return BigInteger.valueOf(((Boolean) val).booleanValue() ? 1L : 0L);
         } else if (val instanceof String) {
             String string = (String) val;
             if ("".equals(string)) {
@@ -1217,12 +1286,6 @@ public class JexlArithmetic {
         } else if (val == null) {
             controlNullOperand();
             return BigDecimal.ZERO;
-        } else if (val instanceof String) {
-            String string = (String) val;
-            if ("".equals(string)) {
-                return BigDecimal.ZERO;
-            }
-            return roundBigDecimal(new BigDecimal(string, getMathContext()));
         } else if (val instanceof Double) {
             if (Double.isNaN(((Double) val).doubleValue())) {
                 return BigDecimal.ZERO;
@@ -1231,6 +1294,14 @@ public class JexlArithmetic {
             }
         } else if (val instanceof Number) {
             return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
+        } else if (val instanceof Boolean) {
+            return BigDecimal.valueOf(((Boolean) val).booleanValue() ? 1. : 0.);
+        } else if (val instanceof String) {
+            String string = (String) val;
+            if ("".equals(string)) {
+                return BigDecimal.ZERO;
+            }
+            return roundBigDecimal(new BigDecimal(string, getMathContext()));
         } else if (val instanceof Character) {
             int i = ((Character) val).charValue();
             return new BigDecimal(i);

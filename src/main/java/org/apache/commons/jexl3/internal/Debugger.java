@@ -40,6 +40,7 @@ import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
 import org.apache.commons.jexl3.parser.ASTEmptyMethod;
+import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
@@ -379,6 +380,12 @@ public final class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
+    protected Object visit(ASTExtendedLiteral node, Object data) {
+        builder.append("...");
+        return data;
+    }
+
+    @Override
     protected Object visit(ASTArrayLiteral node, Object data) {
         int num = node.jjtGetNumChildren();
         builder.append("[ ");
@@ -650,11 +657,11 @@ public final class Debugger extends ParserVisitor implements JexlInfo.Detail {
         builder.append("{ ");
         if (num > 0) {
             accept(node.jjtGetChild(0), data);
-            for (int i = 1; i < num; ++i) {
-                builder.append(",");
-                accept(node.jjtGetChild(i), data);
+                for (int i = 1; i < num; ++i) {
+                    builder.append(",");
+                    accept(node.jjtGetChild(i), data);
+                }
             }
-        }
         builder.append(" }");
         return data;
     }

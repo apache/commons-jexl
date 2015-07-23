@@ -19,7 +19,9 @@ package org.apache.commons.jexl3.internal;
 import org.apache.commons.jexl3.JexlArithmetic;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,21 +49,21 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
      * @param parm a class
      * @return the primitive type or null it the argument is not unboxable
      */
-    private static Class<?> unboxingClass(Class<?> parm) {
+    protected static Class<?> unboxingClass(Class<?> parm) {
         Class<?> prim = BOXING_CLASSES.get(parm);
         return prim == null ? parm : prim;
     }
 
     /** The intended class array. */
-    private Class<?> commonClass = null;
+    protected Class<?> commonClass = null;
     /** Whether the array stores numbers. */
-    private boolean isNumber = true;
+    protected boolean isNumber = true;
     /** Whether we can try unboxing. */
-    private boolean unboxing = true;
+    protected boolean unboxing = true;
     /** The untyped list of items being added. */
-    private final Object[] untyped;
+    protected final Object[] untyped;
     /** Number of added items. */
-    private int added = 0;
+    protected int added = 0;
 
     /**
      * Creates a new builder.
@@ -108,11 +110,18 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     }
 
     @Override
-    public Object create() {
+    public Object create(boolean extended) {
         if (untyped != null) {
-            int size = untyped.length;
+            if (extended) {
+                List<Object> list = new ArrayList<Object>(added);
+                for(int i = 0; i < added; ++i) {
+                    list.add(untyped[i]);
+                }
+                return list;
+            }
             // convert untyped array to the common class if not Object.class
             if (commonClass != null && !Object.class.equals(commonClass)) {
+                final int size = added;
                 // if the commonClass is a number, it has an equivalent primitive type, get it
                 if (unboxing) {
                     commonClass = unboxingClass(commonClass);

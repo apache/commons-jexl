@@ -46,6 +46,7 @@ import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
 import org.apache.commons.jexl3.parser.ASTEmptyMethod;
+import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
@@ -304,9 +305,9 @@ public class Interpreter extends ParserVisitor {
 
     /**
      * Triggered when an operator fails.
-     * @param node   the node where the error originated from
+     * @param node     the node where the error originated from
      * @param operator the method name
-     * @param cause the cause of error (if any)
+     * @param cause    the cause of error (if any)
      * @throws JexlException if isStrict
      */
     protected void operatorError(JexlNode node, JexlArithmetic.Operator operator, Throwable cause) {
@@ -430,7 +431,7 @@ public class Interpreter extends ParserVisitor {
                     return result;
                 }
             } catch (Exception xany) {
-                operatorError(node,  operator, xany);
+                operatorError(node, operator, xany);
             }
         }
         return JexlEngine.TRY_FAILED;
@@ -507,11 +508,17 @@ public class Interpreter extends ParserVisitor {
         int childCount = node.jjtGetNumChildren();
         JexlArithmetic.ArrayBuilder ab = arithmetic.arrayBuilder(childCount);
         if (ab != null) {
+            boolean extended = false;
             for (int i = 0; i < childCount; i++) {
-                Object entry = node.jjtGetChild(i).jjtAccept(this, data);
-                ab.add(entry);
+                JexlNode child = node.jjtGetChild(i);
+                if (child instanceof ASTExtendedLiteral) {
+                    extended = true;
+                } else {
+                    Object entry = node.jjtGetChild(i).jjtAccept(this, data);
+                    ab.add(entry);
+                }
             }
-            return ab.create();
+            return ab.create(extended);
         } else {
             return null;
         }
@@ -723,29 +730,33 @@ public class Interpreter extends ParserVisitor {
      */
     protected boolean startsWith(JexlNode node, String operator, Object left, Object right) {
         try {
-            if (left == null || right == null) {
-                return false;
+            // try operator overload
+            Object result = callOperator(node, Operator.STARTSWITH, left, right);
+            if (result instanceof Boolean) {
+                return (Boolean) result;
             }
-            if (left instanceof String) {
-                return ((String) left).startsWith(arithmetic.toString(right));
-            } else {
-                // try a startsWith method (duck type)
-                try {
-                    Object[] argv = {right};
-                    JexlMethod vm = uberspect.getMethod(left, "startsWith", argv);
+            // use arithmetic / pattern matching ?
+            Boolean matched = arithmetic.startsWith(left, right);
+            if (matched != null) {
+                return matched;
+            }
+            // try a startsWith method (duck type)
+            try {
+                Object[] argv = {right};
+                JexlMethod vm = uberspect.getMethod(left, "startsWith", argv);
+                if (vm != null && vm.getReturnType() == Boolean.TYPE) {
+                    return (Boolean) vm.invoke(left, argv);
+                }
+                if (arithmetic.narrowArguments(argv)) {
+                    vm = uberspect.getMethod(left, "startsWith", argv);
                     if (vm != null && vm.getReturnType() == Boolean.TYPE) {
                         return (Boolean) vm.invoke(left, argv);
-                    } else if (arithmetic.narrowArguments(argv)) {
-                        vm = uberspect.getMethod(left, "startsWith", argv);
-                        if (vm != null && vm.getReturnType() == Boolean.TYPE) {
-                            return (Boolean) vm.invoke(left, argv);
-                        }
                     }
-                } catch (InvocationTargetException e) {
-                    throw new JexlException(node, operator + " invocation error", e.getCause());
-                } catch (Exception e) {
-                    throw new JexlException(node, operator + " error", e);
                 }
+            } catch (InvocationTargetException e) {
+                throw new JexlException(node, operator + " invocation error", e.getCause());
+            } catch (Exception e) {
+                throw new JexlException(node, operator + " error", e);
             }
             // defaults to equal
             return arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
@@ -778,32 +789,36 @@ public class Interpreter extends ParserVisitor {
      */
     protected boolean endsWith(JexlNode node, String operator, Object left, Object right) {
         try {
-            if (left == null || right == null) {
-                return false;
+            // try operator overload
+            Object result = callOperator(node, Operator.ENDSWITH, left, right);
+            if (result instanceof Boolean) {
+                return (Boolean) result;
             }
-            if (left instanceof String) {
-                return ((String) left).endsWith(arithmetic.toString(right));
-            } else {
-                // try a endsWith method (duck type)
-                try {
-                    Object[] argv = {right};
-                    JexlMethod vm = uberspect.getMethod(left, "endsWith", argv);
+            // use arithmetic / pattern matching ?
+            Boolean matched = arithmetic.endsWith(left, right);
+            if (matched != null) {
+                return matched;
+            }
+            // try a endsWith method (duck type)
+            try {
+                Object[] argv = {right};
+                JexlMethod vm = uberspect.getMethod(left, "endsWith", argv);
+                if (vm != null && vm.getReturnType() == Boolean.TYPE) {
+                    return (Boolean) vm.invoke(left, argv);
+                }
+                if (arithmetic.narrowArguments(argv)) {
+                    vm = uberspect.getMethod(left, "endsWith", argv);
                     if (vm != null && vm.getReturnType() == Boolean.TYPE) {
                         return (Boolean) vm.invoke(left, argv);
-                    } else if (arithmetic.narrowArguments(argv)) {
-                        vm = uberspect.getMethod(left, "endsWith", argv);
-                        if (vm != null && vm.getReturnType() == Boolean.TYPE) {
-                            return (Boolean) vm.invoke(left, argv);
-                        }
                     }
-                } catch (InvocationTargetException e) {
-                    throw new JexlException(node, operator + " invocation error", e.getCause());
-                } catch (Exception e) {
-                    throw new JexlException(node, operator + " error", e);
                 }
-                // defaults to equal
-                return arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
+            } catch (InvocationTargetException e) {
+                throw new JexlException(node, operator + " invocation error", e.getCause());
+            } catch (Exception e) {
+                throw new JexlException(node, operator + " error", e);
             }
+            // defaults to equal
+            return arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, operator + " error", xrt);
         }
@@ -831,20 +846,17 @@ public class Interpreter extends ParserVisitor {
      * @param right the right operand
      * @return true if left matches right, false otherwise
      */
-    protected boolean matches(JexlNode node, String op, Object left, Object right) {
+    protected boolean contains(JexlNode node, String op, Object left, Object right) {
         try {
+            // try operator overload
+            Object result = callOperator(node, Operator.CONTAINS, left, right);
+            if (result instanceof Boolean) {
+                return (Boolean) result;
+            }
             // use arithmetic / pattern matching ?
-            if (right instanceof java.util.regex.Pattern || right instanceof String) {
-                return arithmetic.matches(left, right);
-            }
-            // left in right ? <=> right.contains(left) ?
-            // try contains on map key
-            if (right instanceof Map<?, ?>) {
-                return ((Map<?, ?>) right).containsKey(left);
-            }
-            // try contains on collection
-            if (right instanceof Collection<?>) {
-                return ((Collection<?>) right).contains(left);
+            Boolean matched = arithmetic.contains(left, right);
+            if (matched != null) {
+                return matched;
             }
             // try a contains method (duck type set)
             try {
@@ -885,14 +897,14 @@ public class Interpreter extends ParserVisitor {
     protected Object visit(ASTERNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return matches(node, "=~", left, right) ? Boolean.TRUE : Boolean.FALSE;
+        return contains(node, "=~", left, right) ? Boolean.TRUE : Boolean.FALSE;
     }
 
     @Override
     protected Object visit(ASTNRNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return matches(node, "!~", left, right) ? Boolean.FALSE : Boolean.TRUE;
+        return contains(node, "!~", left, right) ? Boolean.FALSE : Boolean.TRUE;
     }
 
     @Override
@@ -961,6 +973,11 @@ public class Interpreter extends ParserVisitor {
         Object key = node.jjtGetChild(0).jjtAccept(this, data);
         Object value = node.jjtGetChild(1).jjtAccept(this, data);
         return new Object[]{key, value};
+    }
+
+    @Override
+    protected Object visit(ASTExtendedLiteral node, Object data) {
+        return node;
     }
 
     @Override
@@ -1480,7 +1497,7 @@ public class Interpreter extends ParserVisitor {
                     if (right instanceof Closure) {
                         ((Closure) right).setHoisted(symbol, right);
                     }
-                    return right;
+                    return right; // 1
                 }
                 object = frame.get(symbol);
             } else {
@@ -1491,7 +1508,7 @@ public class Interpreter extends ParserVisitor {
                     } catch (UnsupportedOperationException xsupport) {
                         throw new JexlException(node, "context is readonly", xsupport);
                     }
-                    return right;
+                    return right; // 2
                 }
                 object = context.get(var.getName());
             }
@@ -1565,7 +1582,7 @@ public class Interpreter extends ParserVisitor {
                 } catch (UnsupportedOperationException xsupport) {
                     throw new JexlException(node, "context is readonly", xsupport);
                 }
-                return right;
+                return right; // 3
             }
         } else if (propertyNode instanceof ASTArrayAccess) {
             // can have multiple nodes - either an expression, integer literal or reference
@@ -1590,7 +1607,7 @@ public class Interpreter extends ParserVisitor {
         }
         // 3: one before last, assign
         setAttribute(object, property, right, propertyNode);
-        return right;
+        return right; // 4
     }
 
     @Override
