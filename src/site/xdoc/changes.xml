@@ -26,6 +26,15 @@
     </properties>
     <body>
         <release version="3.0" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-79" due-to="sebb">
+                Add support for growable arrays (ArrayLists)
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-167" due-to="Dmitri Blinov">
+                Possible loss of value when converting BigDecimal to BigInteger
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-166" due-to="Dmitri Blinov">
+                Incorrect operator symbol for bitwise complement in jexlArithmetic
+            </action>
             <action dev="henrib" type="add" issue="JEXL-164" due-to="Dmitri Blinov">
                 public getters for high/low properties for IntegerRange and LongRange
             </action>
@@ -37,6 +46,12 @@
             </action>
             <action dev="henrib" type="fix" issue="JEXL-160" due-to="Dmitri Blinov">
                 typo in package.html
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-158" due-to="Lars Cebulla">
+                Handle locale decimal separators correctly
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-157" due-to="Lars Cebulla">
+                Replace File.pathSeparator with File.separator
             </action>
             <action dev="henrib" type="add" >
                 Added a method to get parameters from a template

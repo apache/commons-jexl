@@ -1251,6 +1251,8 @@ public class JexlArithmetic {
             } else {
                 return BigInteger.valueOf(dval.longValue());
             }
+        } else if (val instanceof BigDecimal) {
+            return ((BigDecimal) val).toBigInteger();
         } else if (val instanceof Number) {
             return BigInteger.valueOf(((Number) val).longValue());
         } else if (val instanceof Boolean) {
