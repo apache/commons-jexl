@@ -26,6 +26,12 @@
     </properties>
     <body>
         <release version="3.0" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-169" due-to="Robert Neßelrath">
+                A string is wrongly identified as FloatingPointNumber
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-168" due-to="Dmitri Blinov">
+                Dedicated operator for String concatenation
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-79" due-to="sebb">
                 Add support for growable arrays (ArrayLists)
             </action>

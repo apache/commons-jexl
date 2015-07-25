@@ -23,6 +23,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Collection;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Perform arithmetic.
@@ -351,7 +352,8 @@ public class JexlArithmetic {
 
     /**
      * Checks whether this JexlArithmetic instance
-     * strictly considers null as an error when used as operand unexpectedly.
+     * strictly considers null as an error when used as operand unexpectedly
+     * and forces add(...) to concatenate strings (instead of attempting number conversion).
      * @return true if strict, false if lenient
      */
     public boolean isStrict() {
@@ -411,6 +413,10 @@ public class JexlArithmetic {
     }
 
     /**
+     * The float regular expression pattern.
+     */
+    public static final Pattern FLOAT_PATTERN = Pattern.compile("^[+-]?\\d*(\\.\\d*)?([eE]?[+-]?\\d*)?$");
+    /**
      * Test if the passed value is a floating point number, i.e. a float, double
      * or string with ( "." | "E" | "e").
      *
@@ -422,8 +428,18 @@ public class JexlArithmetic {
             return true;
         }
         if (val instanceof String) {
-            String string = (String) val;
-            return string.indexOf('.') != -1 || string.indexOf('e') != -1 || string.indexOf('E') != -1;
+            String str = (String) val;
+            for(int c = 0; c < str.length(); ++c) {
+                char ch = str.charAt(c);
+                // we need at least a marker that says it is a float
+                if (ch == '.' || ch == 'E' || ch == 'e') {
+                    return FLOAT_PATTERN.matcher(str).matches();
+                }
+                // and it must be a number
+                if (ch != '+' && ch != '-' && ch < '0' && ch > '9') {
+                    break;
+                }
+            }
         }
         return false;
     }
@@ -640,32 +656,37 @@ public class JexlArithmetic {
         if (left == null && right == null) {
             return controlNullNullOperands();
         }
-        try {
-            // if either are bigdecimal use that type
-            if (left instanceof BigDecimal || right instanceof BigDecimal) {
-                BigDecimal l = toBigDecimal(left);
-                BigDecimal r = toBigDecimal(right);
-                BigDecimal result = l.add(r, getMathContext());
-                return narrowBigDecimal(left, right, result);
+        boolean strconcat = strict
+                            ? left instanceof String || right instanceof String
+                            : left instanceof String && right instanceof String;
+        if (!strconcat) {
+            try {
+                // if either are bigdecimal use that type
+                if (left instanceof BigDecimal || right instanceof BigDecimal) {
+                    BigDecimal l = toBigDecimal(left);
+                    BigDecimal r = toBigDecimal(right);
+                    BigDecimal result = l.add(r, getMathContext());
+                    return narrowBigDecimal(left, right, result);
+                }
+                // if either are floating point (double or float) use double
+                if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
+                    double l = toDouble(left);
+                    double r = toDouble(right);
+                    return new Double(l + r);
+                }
+                // otherwise treat as integers
+                BigInteger l = toBigInteger(left);
+                BigInteger r = toBigInteger(right);
+                BigInteger result = l.add(r);
+                return narrowBigInteger(left, right, result);
+            } catch (java.lang.NumberFormatException nfe) {
+                // Well, use strings!
+                if (left == null || right == null) {
+                    controlNullOperand();
+                }
             }
-            // if either are floating point (double or float) use double
-            if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-                double l = toDouble(left);
-                double r = toDouble(right);
-                return new Double(l + r);
-            }
-            // otherwise treat as integers
-            BigInteger l = toBigInteger(left);
-            BigInteger r = toBigInteger(right);
-            BigInteger result = l.add(r);
-            return narrowBigInteger(left, right, result);
-        } catch (java.lang.NumberFormatException nfe) {
-            // Well, use strings!
-            if (left == null || right == null) {
-                controlNullOperand();
-            }
-            return toString(left).concat(toString(right));
         }
+        return toString(left).concat(toString(right));
     }
 
     /**
