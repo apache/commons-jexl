@@ -109,7 +109,7 @@ public class ForEachTest extends JexlTestCase {
         JexlScript exs1 = JEXL.createScript("foreach(item in list) { x = x + item; }");
         JexlScript[] exs = {exs0, exs1};
         JexlContext jc = new MapContext();
-        jc.set("list", new Object[]{"2", "3"});
+        jc.set("list", new Object[]{2, 3});
         for (int ex = 0; ex < exs.length; ++ex) {
             jc.set("x", new Integer(1));
             Object o = exs[ex].execute(jc);

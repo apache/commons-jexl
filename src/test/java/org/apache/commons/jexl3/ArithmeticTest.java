@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import static org.apache.commons.jexl3.JexlArithmetic.FLOAT_PATTERN;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -409,6 +410,111 @@ public class ArithmeticTest extends JexlTestCase {
         script = jexl.createScript("double:isNaN(NaN)");
         result = script.execute(null);
         Assert.assertTrue((Boolean) result);
+    }
+
+
+    @Test
+    public void testAddWithStringsLenient() throws Exception {
+        JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(false)).create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript("'a' + 0");
+        result = script.execute(null);
+        Assert.assertEquals("a0", result);
+
+        script = jexl.createScript("0 + 'a' ");
+        result = script.execute(null);
+        Assert.assertEquals("0a", result);
+
+        script = jexl.createScript("0 + '1.2' ");
+        result = script.execute(null);
+        Assert.assertEquals(1.2d, (Double) result, EPSILON);
+
+        script = jexl.createScript("'1.2' + 1.2 ");
+        result = script.execute(null);
+        Assert.assertEquals(2.4d, (Double) result, EPSILON);
+
+        script = jexl.createScript("1.2 + 1.2 ");
+        result = script.execute(null);
+        Assert.assertEquals(2.4d, (Double) result, EPSILON);
+
+        script = jexl.createScript("1.2 + '1.2' ");
+        result = script.execute(null);
+        Assert.assertEquals(2.4d, (Double) result, EPSILON);
+
+        script = jexl.createScript("'1.2' + 0 ");
+        result = script.execute(null);
+        Assert.assertEquals(1.2d, (Double) result, EPSILON);
+
+        script = jexl.createScript("'1.2' + '1.2' ");
+        result = script.execute(null);
+        Assert.assertEquals("1.21.2", result);
+    }
+
+    @Test
+    public void testAddWithStringsStrict() throws Exception {
+        JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(true)).create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript("'a' + 0");
+        result = script.execute(null);
+        Assert.assertEquals("a0", result);
+
+        script = jexl.createScript("0 + 'a' ");
+        result = script.execute(null);
+        Assert.assertEquals("0a", result);
+
+        script = jexl.createScript("0 + '1.2' ");
+        result = script.execute(null);
+        Assert.assertEquals("01.2", result);
+
+        script = jexl.createScript("'1.2' + 1.2 ");
+        result = script.execute(null);
+        Assert.assertEquals("1.21.2", result);
+
+        script = jexl.createScript("1.2 + 1.2 ");
+        result = script.execute(null);
+        Assert.assertEquals(2.4d, (Double) result, EPSILON);
+
+        script = jexl.createScript("1.2 + '1.2' ");
+        result = script.execute(null);
+        Assert.assertEquals("1.21.2", result);
+
+        script = jexl.createScript("'1.2' + 0 ");
+        result = script.execute(null);
+        Assert.assertEquals("1.20", result);
+
+        script = jexl.createScript("'1.2' + '1.2' ");
+        result = script.execute(null);
+        Assert.assertEquals("1.21.2", result);
+    }
+
+    @Test
+    public void testIsFloatingPointPattern() throws Exception {
+        JexlArithmetic ja = new JexlArithmetic(true);
+
+        Assert.assertFalse(ja.isFloatingPointNumber("floating point"));
+        Assert.assertFalse(ja.isFloatingPointNumber("a1."));
+        Assert.assertFalse(ja.isFloatingPointNumber("b1.2"));
+        Assert.assertFalse(ja.isFloatingPointNumber("-10.2a-34"));
+        Assert.assertFalse(ja.isFloatingPointNumber("+10.2a+34"));
+        Assert.assertFalse(ja.isFloatingPointNumber("0"));
+        Assert.assertFalse(ja.isFloatingPointNumber("1"));
+
+        Assert.assertTrue(ja.isFloatingPointNumber("0."));
+        Assert.assertTrue(ja.isFloatingPointNumber("1."));
+        Assert.assertTrue(ja.isFloatingPointNumber("1.2"));
+        Assert.assertTrue(ja.isFloatingPointNumber("1.2e3"));
+        Assert.assertTrue(ja.isFloatingPointNumber("1.2e34"));
+        Assert.assertTrue(ja.isFloatingPointNumber("10.2e34"));
+        Assert.assertTrue(ja.isFloatingPointNumber("+10.2e34"));
+        Assert.assertTrue(ja.isFloatingPointNumber("-10.2e34"));
+        Assert.assertTrue(ja.isFloatingPointNumber("10.2e-34"));
+        Assert.assertTrue(ja.isFloatingPointNumber("10.2e+34"));
+        Assert.assertTrue(ja.isFloatingPointNumber("-10.2e-34"));
+        Assert.assertTrue(ja.isFloatingPointNumber("+10.2e+34"));
+        Assert.assertTrue(ja.isFloatingPointNumber("-10.2E-34"));
+        Assert.assertTrue(ja.isFloatingPointNumber("+10.2E+34"));
     }
 
     public static class EmptyTestContext extends MapContext implements JexlContext.NamespaceResolver {
