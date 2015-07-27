@@ -88,6 +88,7 @@ public interface JexlUberspect {
      * Gets an arithmetic operator resolver for a given arithmetic instance.
      * @param arithmetic the arithmetic instance
      * @return the arithmetic uberspect or null if no operator method were override
+     * @since 3.0
      */
     JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic);
 

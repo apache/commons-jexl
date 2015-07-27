@@ -18,8 +18,8 @@ package org.apache.commons.jexl3.internal.introspection;
 
 
 import org.apache.commons.jexl3.JexlArithmetic;
-import org.apache.commons.jexl3.JexlArithmetic.Operator;
 import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
@@ -66,7 +66,7 @@ public class Uberspect implements JexlUberspect {
      * <p>This keeps track of which operator methods are overloaded per JexlArithemtic classes
      * allowing a fail fast test during interpretation by avoiding seeking a method when there is none.
      */
-    private final Map<Class<? extends JexlArithmetic>, Set<Operator>> operatorMap;
+    private final Map<Class<? extends JexlArithmetic>, Set<JexlOperator>> operatorMap;
 
     /**
      * Creates a new Uberspect.
@@ -76,7 +76,7 @@ public class Uberspect implements JexlUberspect {
         rlog = runtimeLogger;
         ref = new SoftReference<Introspector>(null);
         loader = new SoftReference<ClassLoader>(getClass().getClassLoader());
-        operatorMap = new ConcurrentHashMap<Class<? extends JexlArithmetic>, Set<Operator>>();
+        operatorMap = new ConcurrentHashMap<Class<? extends JexlArithmetic>, Set<JexlOperator>>();
         version = new AtomicInteger(0);
     }
 
@@ -370,14 +370,14 @@ public class Uberspect implements JexlUberspect {
         /** The arithmetic instance being analyzed. */
         private final JexlArithmetic arithmetic;
         /** The set of overloaded operators. */
-        private final EnumSet<Operator> overloads;
+        private final EnumSet<JexlOperator> overloads;
 
         /**
          * Creates an instance.
          * @param theArithmetic the arithmetic instance
          * @param theOverloads  the overloaded operators
          */
-        private ArithmeticUberspect(JexlArithmetic theArithmetic, Set<Operator> theOverloads) {
+        private ArithmeticUberspect(JexlArithmetic theArithmetic, Set<JexlOperator> theOverloads) {
             this.arithmetic = theArithmetic;
             this.overloads = EnumSet.copyOf(theOverloads);
             // register this arithmetic class in the operator map
@@ -385,21 +385,21 @@ public class Uberspect implements JexlUberspect {
         }
 
         @Override
-        public JexlMethod getOperator(JexlArithmetic.Operator operator, Object arg) {
+        public JexlMethod getOperator(JexlOperator operator, Object arg) {
             return overloads.contains(operator) && arg != null
                    ? getMethod(arithmetic, operator.getMethodName(), arg)
                    : null;
         }
 
         @Override
-        public JexlMethod getOperator(JexlArithmetic.Operator operator, Object lhs, Object rhs) {
+        public JexlMethod getOperator(JexlOperator operator, Object lhs, Object rhs) {
             return overloads.contains(operator) && lhs != null && rhs != null
                    ? getMethod(arithmetic, operator.getMethodName(), lhs, rhs)
                    : null;
         }
 
         @Override
-        public boolean overloads(Operator operator) {
+        public boolean overloads(JexlOperator operator) {
             return overloads.contains(operator);
         }
     }
@@ -408,10 +408,10 @@ public class Uberspect implements JexlUberspect {
     public JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic) {
         JexlArithmetic.Uberspect jau = null;
         if (arithmetic != null) {
-            Set<Operator> ops = operatorMap.get(arithmetic.getClass());
+            Set<JexlOperator> ops = operatorMap.get(arithmetic.getClass());
             if (ops == null) {
-                ops = EnumSet.noneOf(Operator.class);
-                for (JexlArithmetic.Operator op : JexlArithmetic.Operator.values()) {
+                ops = EnumSet.noneOf(JexlOperator.class);
+                for (JexlOperator op : JexlOperator.values()) {
                     Method[] methods = getMethods(arithmetic.getClass(), op.getMethodName());
                     if (methods != null) {
                         for (Method method : methods) {

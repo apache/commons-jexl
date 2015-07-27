@@ -17,7 +17,7 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.introspection.JexlMethod;
-
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
@@ -26,9 +26,12 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * Perform arithmetic.
+ * Perform arithmetic, implements JexlOperator methods.
  * <p>
- * The 5 arithmetic operators (+, - , *, /, %) follow the same evaluation rules regarding their arguments.
+ * This is the class to derive to implement new operator behaviors.
+ * </p>
+ * <p>
+ * The 5 base arithmetic operators (+, - , *, /, %) follow the same evaluation rules regarding their arguments.
  * </p>
  * <ol>
  * <li>If both are null, result is 0</li>
@@ -42,140 +45,11 @@ import java.util.regex.Pattern;
  * </ol>
  * </li>
  * </ol>
- * Note that the only exception thrown by JexlArithmetic is ArithmeticException.
+ * Note that the only exception thrown by JexlArithmetic is and must be ArithmeticException.
+ * @see JexlOperator
  * @since 2.0
  */
 public class JexlArithmetic {
-    /**
-     * The overload-able operators.
-     * Note that logical and (ie &amp;&amp;) and logical or (ie ||) are not in this list to avoid breaking
-     * their shortcut semantics.
-     * @since 3.0
-     */
-    public enum Operator {
-        /** add(x, y). *//** add(x, y). */
-        ADD("+", "add", 2),
-        /** subtract(x, y). */
-        SUBTRACT("-", "subtract", 2),
-        /** multiply(x, y). */
-        MULTIPLY("*", "multiply", 2),
-        /** divide(x, y). */
-        DIVIDE("/", "divide", 2),
-        /** mod(x, y). */
-        MOD("%", "mod", 2),
-        /** bitwiseAnd(x, y). */
-        AND("&", "bitwiseAnd", 2),
-        /** bitwiseOr(x, y). */
-        OR("|", "bitwiseOr", 2),
-        /** bitwiseXor(x, y). */
-        XOR("^", "bitwiseXor", 2),
-        /** logicalNot(x). */
-        NOT("!", "logicalNot", 1),
-        /** bitiwiseComplement(x). */
-        COMPLEMENT("~", "bitwiseComplement", 1),
-        /** equals(x, y). */
-        EQ("==", "equals", 2),
-        /** lessThan(x, y). */
-        LT("<", "lessThan", 2),
-        /** lessThanOrEqual(x, y). */
-        LTE("<=", "lessThanOrEqual", 2),
-        /** greaterThan(x, y). */
-        GT(">", "greaterThan", 2),
-        /** greaterThanOrEqual(x, y). */
-        GTE(">=", "greaterThanOrEqual", 2),
-        /** negate(x). */
-        NEGATE("-", "negate", 1),
-        /** contains(x). */
-        CONTAINS("=~", "contains", 2),
-        /** startsWith(x, y). */
-        STARTSWITH("=^", "startsWith", 2),
-        /** endsWith(x, y). */
-        ENDSWITH("=$", "endsWith", 2),
-        /** empty(x). */
-        EMPTY("empty", "empty", 1),
-        /** size(x). */
-        SIZE("size", "size", 1);
-
-        /**
-         * The operator symbol.
-         */
-        private final String operator;
-        /**
-         * The associated operator method name.
-         */
-        private final String methodName;
-        /**
-         * The method arity.
-         */
-        private final int arity;
-
-        /**
-         * Creates an operator.
-         * @param o the operator name
-         * @param m the method name associated to this operator in a JexlArithmetic
-         * @param argc the number of parameters for the method
-         */
-        Operator(String o, String m, int argc) {
-            this.operator = o;
-            this.methodName = m;
-            this.arity = argc;
-        }
-
-        /**
-         * Gets this operator symbol.
-         * @return the symbol
-         */
-        public final String getOperatorSymbol() {
-            return operator;
-        }
-
-        /**
-         * Gets this operator method name in a JexlArithmetic.
-         * @return the method name
-         */
-        public final String getMethodName() {
-            return methodName;
-        }
-
-        /**
-         * Gets this operator number of parameters.
-         * @return the method arity
-         */
-        public int getArity() {
-            return arity;
-        }
-    }
-
-    /**
-     * The interface that uberspects JexlArithmetic classes.
-     * <p>This allows overloaded operator methods discovery.
-     */
-    public interface Uberspect {
-        /**
-         * Checks whether this uberspect has overloads for a given operator.
-         * @param operator the operator to check
-         * @return true if an overload exists, false otherwise
-         */
-        boolean overloads(JexlArithmetic.Operator operator);
-
-        /**
-         * Gets the most specific method for a monadic operator.
-         * @param operator the operator
-         * @param arg the argument
-         * @return the most specific method or null if no specific override could be found
-         */
-        JexlMethod getOperator(JexlArithmetic.Operator operator, Object arg);
-
-        /**
-         * Gets the most specific method for a diadic operator.
-         * @param operator the operator
-         * @param lhs the left hand side argument
-         * @param rhs the right hand side argument
-         * @return the most specific method or null if no specific override could be found
-         */
-        JexlMethod getOperator(JexlArithmetic.Operator operator, Object lhs, Object rhs);
-    }
-
     /** Marker class for null operand exceptions. */
     public static class NullOperand extends ArithmeticException {}
     /** Double.MAX_VALUE as BigDecimal. */
@@ -239,6 +113,36 @@ public class JexlArithmetic {
         } else {
             return this;
         }
+    }
+
+    /**
+     * The interface that uberspects JexlArithmetic classes.
+     * <p>This allows overloaded operator methods discovery.
+     */
+    public interface Uberspect {
+        /**
+         * Checks whether this uberspect has overloads for a given operator.
+         * @param operator the operator to check
+         * @return true if an overload exists, false otherwise
+         */
+        boolean overloads(JexlOperator operator);
+
+        /**
+         * Gets the most specific method for a monadic operator.
+         * @param operator the operator
+         * @param arg      the argument
+         * @return the most specific method or null if no specific override could be found
+         */
+        JexlMethod getOperator(JexlOperator operator, Object arg);
+
+        /**
+         * Gets the most specific method for a diadic operator.
+         * @param operator the operator
+         * @param lhs      the left hand side argument
+         * @param rhs      the right hand side argument
+         * @return the most specific method or null if no specific override could be found
+         */
+        JexlMethod getOperator(JexlOperator operator, Object lhs, Object rhs);
     }
 
     /**
@@ -343,7 +247,7 @@ public class JexlArithmetic {
         final long lfrom = toLong(from);
         final long lto = toLong(to);
         if ((lfrom >= Integer.MIN_VALUE && lfrom <= Integer.MAX_VALUE)
-            && (lto >= Integer.MIN_VALUE && lto <= Integer.MAX_VALUE)) {
+                && (lto >= Integer.MIN_VALUE && lto <= Integer.MAX_VALUE)) {
             return org.apache.commons.jexl3.internal.IntegerRange.create((int) lfrom, (int) lto);
         } else {
             return org.apache.commons.jexl3.internal.LongRange.create(lfrom, lto);
@@ -352,8 +256,7 @@ public class JexlArithmetic {
 
     /**
      * Checks whether this JexlArithmetic instance
-     * strictly considers null as an error when used as operand unexpectedly
-     * and forces add(...) to concatenate strings (instead of attempting number conversion).
+     * strictly considers null as an error when used as operand unexpectedly.
      * @return true if strict, false if lenient
      */
     public boolean isStrict() {
@@ -399,7 +302,7 @@ public class JexlArithmetic {
         if (isStrict()) {
             throw new NullOperand();
         }
-        return Integer.valueOf(0);
+        return 0;
     }
 
     /**
@@ -517,9 +420,9 @@ public class JexlArithmetic {
                     if (narrowAccept(narrow, Integer.class)
                             && l <= Integer.MAX_VALUE
                             && l >= Integer.MIN_VALUE) {
-                        return Integer.valueOf((int) l);
+                        return (int) l;
                     } else if (narrowAccept(narrow, Long.class)) {
-                        return Long.valueOf(l);
+                        return l;
                     }
                 } catch (ArithmeticException xa) {
                     // ignore, no exact value possible
@@ -531,7 +434,7 @@ public class JexlArithmetic {
             if (narrowAccept(narrow, Float.class)
                     && value <= Float.MAX_VALUE
                     && value >= Float.MIN_VALUE) {
-                result = Float.valueOf(result.floatValue());
+                result = result.floatValue();
             }
             // else it fits in a double only
         } else {
@@ -548,15 +451,15 @@ public class JexlArithmetic {
                     && value <= Byte.MAX_VALUE
                     && value >= Byte.MIN_VALUE) {
                 // it will fit in a byte
-                result = Byte.valueOf((byte) value);
+                result = (byte) value;
             } else if (narrowAccept(narrow, Short.class)
                     && value <= Short.MAX_VALUE
                     && value >= Short.MIN_VALUE) {
-                result = Short.valueOf((short) value);
+                result = (short) value;
             } else if (narrowAccept(narrow, Integer.class)
                     && value <= Integer.MAX_VALUE
                     && value >= Integer.MIN_VALUE) {
-                result = Integer.valueOf((int) value);
+                result = (int) value;
             }
             // else it fits in a long
         }
@@ -587,9 +490,9 @@ public class JexlArithmetic {
             if (!(lhs instanceof Long || rhs instanceof Long)
                     && l <= Integer.MAX_VALUE
                     && l >= Integer.MIN_VALUE) {
-                return Integer.valueOf((int) l);
+                return (int) l;
             }
-            return Long.valueOf(l);
+            return l;
         }
         return bigi;
     }
@@ -609,9 +512,9 @@ public class JexlArithmetic {
                 long l = bigd.longValueExact();
                 // coerce to int when possible (int being so often used in method parms)
                 if (l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE) {
-                    return Integer.valueOf((int) l);
+                    return (int) l;
                 } else {
-                    return Long.valueOf(l);
+                    return l;
                 }
             } catch (ArithmeticException xa) {
                 // ignore, no exact value possible
@@ -648,8 +551,8 @@ public class JexlArithmetic {
      * If any numeric add fails on coercion to the appropriate type,
      * treat as Strings and do concatenation.
      * </p>
-     * @param left  first value
-     * @param right second value
+     * @param left  left argument
+     * @param right  right argument
      * @return left + right.
      */
     public Object add(Object left, Object right) {
@@ -672,7 +575,7 @@ public class JexlArithmetic {
                 if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
                     double l = toDouble(left);
                     double r = toDouble(right);
-                    return new Double(l + r);
+                    return l + r;
                 }
                 // otherwise treat as integers
                 BigInteger l = toBigInteger(left);
@@ -680,7 +583,6 @@ public class JexlArithmetic {
                 BigInteger result = l.add(r);
                 return narrowBigInteger(left, right, result);
             } catch (java.lang.NumberFormatException nfe) {
-                // Well, use strings!
                 if (left == null || right == null) {
                     controlNullOperand();
                 }
@@ -691,8 +593,8 @@ public class JexlArithmetic {
 
     /**
      * Divide the left value by the right.
-     * @param left  first value
-     * @param right second value
+     * @param left  left argument
+     * @param right  right argument
      * @return left / right
      * @throws ArithmeticException if right == 0
      */
@@ -717,7 +619,7 @@ public class JexlArithmetic {
             if (r == 0.0) {
                 throw new ArithmeticException("/");
             }
-            return new Double(l / r);
+            return l / r;
         }
         // otherwise treat as integers
         BigInteger l = toBigInteger(left);
@@ -730,10 +632,10 @@ public class JexlArithmetic {
     }
 
     /**
-     * left value mod right.
-     * @param left  first value
-     * @param right second value
-     * @return left mod right
+     * left value modulo right.
+     * @param left  left argument
+     * @param right  right argument
+     * @return left % right
      * @throws ArithmeticException if right == 0.0
      */
     public Object mod(Object left, Object right) {
@@ -757,7 +659,7 @@ public class JexlArithmetic {
             if (r == 0.0) {
                 throw new ArithmeticException("%");
             }
-            return new Double(l % r);
+            return l % r;
         }
         // otherwise treat as integers
         BigInteger l = toBigInteger(left);
@@ -771,8 +673,8 @@ public class JexlArithmetic {
 
     /**
      * Multiply the left value by the right.
-     * @param left  first value
-     * @param right second value
+     * @param left  left argument
+     * @param right  right argument
      * @return left * right.
      */
     public Object multiply(Object left, Object right) {
@@ -790,7 +692,7 @@ public class JexlArithmetic {
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             double l = toDouble(left);
             double r = toDouble(right);
-            return new Double(l * r);
+            return l * r;
         }
         // otherwise treat as integers
         BigInteger l = toBigInteger(left);
@@ -801,8 +703,8 @@ public class JexlArithmetic {
 
     /**
      * Subtract the right value from the left.
-     * @param left  first value
-     * @param right second value
+     * @param left  left argument
+     * @param right  right argument
      * @return left - right.
      */
     public Object subtract(Object left, Object right) {
@@ -820,7 +722,7 @@ public class JexlArithmetic {
         if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
             double l = toDouble(left);
             double r = toDouble(right);
-            return new Double(l - r);
+            return l - r;
         }
         // otherwise treat as integers
         BigInteger l = toBigInteger(left);
@@ -836,69 +738,65 @@ public class JexlArithmetic {
      */
     public Object negate(Object val) {
         if (val instanceof Integer) {
-            int valueAsInt = ((Integer) val).intValue();
-            return Integer.valueOf(-valueAsInt);
+            return -((Integer) val);
         } else if (val instanceof Double) {
-            double valueAsDouble = ((Double) val).doubleValue();
-            return new Double(-valueAsDouble);
+            return - ((Double) val);
         } else if (val instanceof Long) {
-            long valueAsLong = -((Long) val).longValue();
-            return Long.valueOf(valueAsLong);
+            return -((Long) val);
         } else if (val instanceof BigDecimal) {
-            BigDecimal valueAsBigD = (BigDecimal) val;
-            return valueAsBigD.negate();
+            return ((BigDecimal) val).negate();
         } else if (val instanceof BigInteger) {
-            BigInteger valueAsBigI = (BigInteger) val;
-            return valueAsBigI.negate();
+            return ((BigInteger) val).negate();
         } else if (val instanceof Float) {
-            float valueAsFloat = ((Float) val).floatValue();
-            return new Float(-valueAsFloat);
+            return -((Float) val);
         } else if (val instanceof Short) {
-            short valueAsShort = ((Short) val).shortValue();
-            return Short.valueOf((short) -valueAsShort);
+            return (short) -((Short) val);
         } else if (val instanceof Byte) {
-            byte valueAsByte = ((Byte) val).byteValue();
-            return Byte.valueOf((byte) -valueAsByte);
+            return (byte) -((Byte) val);
         } else if (val instanceof Boolean) {
-            return ((Boolean) val).booleanValue() ? Boolean.FALSE : Boolean.TRUE;
+            return ((Boolean) val) ? Boolean.FALSE : Boolean.TRUE;
         }
         throw new ArithmeticException("Object negation:(" + val + ")");
     }
 
     /**
-     * Test if left matches right.
-     *
-     * @param left  first value
-     * @param right second value
+     * Test if left contains right (right matches/in left).
+     * <p>Beware that this method arguments are the opposite of the operator arguments.
+     * 'x in y' means 'y contains x'.</p>
+     * @param container the container
+     * @param value the value
      * @return test result or null if there is no arithmetic solution
      */
-    public Boolean contains(Object left, Object right) {
-        if (left == null && right == null) {
+    public Boolean contains(Object container, Object value) {
+        if (value == null && container == null) {
             //if both are null L == R
             return true;
         }
-        if (left == null || right == null) {
+        if (value == null || container == null) {
             // we know both aren't null, therefore L != R
             return false;
         }
         // use arithmetic / pattern matching ?
-        if (right instanceof java.util.regex.Pattern) {
-            return ((java.util.regex.Pattern) right).matcher(left.toString()).matches();
+        if (container instanceof java.util.regex.Pattern) {
+            return ((java.util.regex.Pattern) container).matcher(value.toString()).matches();
         }
-        if ( right instanceof String) {
-            return left.toString().matches(right.toString());
+        if (container instanceof String) {
+            return value.toString().matches(container.toString());
         }
         // try contains on map key
-        if (right instanceof Map<?, ?>) {
-            return ((Map<?, ?>) right).containsKey(left);
+        if (container instanceof Map<?, ?>) {
+            if (value instanceof Map<?, ?>) {
+                return ((Map<?, ?>) container).keySet().containsAll(((Map<?, ?>) value).keySet());
+            }
+            return ((Map<?, ?>) container).containsKey(value);
         }
         // try contains on collection
-        if (right instanceof Collection<?>) {
-            if (left instanceof Collection<?>) {
-                return ((Collection<?>) right).containsAll((Collection<?>) left);
+        if (container instanceof Collection<?>) {
+            if (value instanceof Collection<?>) {
+                return ((Collection<?>) container).containsAll((Collection<?>) value);
             }
             // left in right ? <=> right.contains(left) ?
-            return ((Collection<?>) right).contains(left);
+            return ((Collection<?>) container).contains(value);
         }
         return null;
     }
@@ -906,9 +804,9 @@ public class JexlArithmetic {
     /**
      * Test if left ends with right.
      *
-     * @param left  first value
-     * @param right second value
-     * @return test result or null if there is no arithmetic solution
+     * @param left  left argument
+     * @param right  right argument
+     * @return left $= right if there is no arithmetic solution
      */
     public Boolean endsWith(Object left, Object right) {
         if (left == null && right == null) {
@@ -928,9 +826,9 @@ public class JexlArithmetic {
     /**
      * Test if left starts with right.
      *
-     * @param left  first value
-     * @param right second value
-     * @return test result or null if there is no arithmetic solution
+     * @param left  left argument
+     * @param right  right argument
+     * @return left ^= right or null if there is no arithmetic solution
      */
     public Boolean startsWith(Object left, Object right) {
         if (left == null && right == null) {
@@ -948,15 +846,64 @@ public class JexlArithmetic {
     }
 
     /**
+     * Check for emptyness of various types: Number, Collection, Array, Map, String.
+     *
+     * @param object the object to check the emptyness of
+     * @return the boolean or null of there is no arithmetic solution
+     */
+    public Boolean isEmpty(Object object) {
+        if (object instanceof Number) {
+            double d = ((Number) object).doubleValue();
+            return Double.isNaN(d) || d == 0.d ? Boolean.TRUE : Boolean.FALSE;
+        }
+        if (object instanceof String) {
+            return "".equals(object) ? Boolean.TRUE : Boolean.FALSE;
+        }
+        if (object.getClass().isArray()) {
+            return Array.getLength(object) == 0 ? Boolean.TRUE : Boolean.FALSE;
+        }
+        if (object instanceof Collection<?>) {
+            return ((Collection<?>) object).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
+        }
+        // Map isn't a collection
+        if (object instanceof Map<?, ?>) {
+            return ((Map<?, ?>) object).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
+        }
+        return null;
+    }
+
+    /**
+     * Calculate the <code>size</code> of various types: Collection, Array, Map, String.
+     *
+     * @param object the object to get the size of
+     * @return the size of object or null if there is no arithmetic solution
+     */
+    public Integer size(Object object) {
+        if (object instanceof String) {
+            return ((String) object).length();
+        }
+        if (object.getClass().isArray()) {
+            return Array.getLength(object);
+        }
+        if (object instanceof Collection<?>) {
+            return ((Collection<?>) object).size();
+        }
+        if (object instanceof Map<?, ?>) {
+            return ((Map<?, ?>) object).size();
+        }
+        return null;
+    }
+
+    /**
      * Performs a bitwise and.
      * @param left  the left operand
      * @param right the right operator
      * @return left &amp; right
      */
-    public Object bitwiseAnd(Object left, Object right) {
+    public Object and(Object left, Object right) {
         long l = toLong(left);
         long r = toLong(right);
-        return Long.valueOf(l & r);
+        return l & r;
     }
 
     /**
@@ -965,22 +912,22 @@ public class JexlArithmetic {
      * @param right the right operator
      * @return left | right
      */
-    public Object bitwiseOr(Object left, Object right) {
+    public Object or(Object left, Object right) {
         long l = toLong(left);
         long r = toLong(right);
-        return Long.valueOf(l | r);
+        return l | r;
     }
 
     /**
      * Performs a bitwise xor.
      * @param left  the left operand
      * @param right the right operator
-     * @return left right
+     * @return left ^ right
      */
-    public Object bitwiseXor(Object left, Object right) {
+    public Object xor(Object left, Object right) {
         long l = toLong(left);
         long r = toLong(right);
-        return Long.valueOf(l ^ r);
+        return l ^ r;
     }
 
     /**
@@ -988,9 +935,9 @@ public class JexlArithmetic {
      * @param val the operand
      * @return ~val
      */
-    public Object bitwiseComplement(Object val) {
+    public Object complement(Object val) {
         long l = toLong(val);
-        return Long.valueOf(~l);
+        return ~l;
     }
 
     /**
@@ -998,7 +945,7 @@ public class JexlArithmetic {
      * @param val the operand
      * @return !val
      */
-    public Object logicalNot(Object val) {
+    public Object not(Object val) {
         return toBoolean(val) ? Boolean.FALSE : Boolean.TRUE;
     }
 
@@ -1069,9 +1016,9 @@ public class JexlArithmetic {
     /**
      * Test if left and right are equal.
      *
-     * @param left  first value
-     * @param right second value
-     * @return test result.
+     * @param left  left argument
+     * @param right right argument
+     * @return the test result
      */
     public boolean equals(Object left, Object right) {
         if (left == right) {
@@ -1088,9 +1035,9 @@ public class JexlArithmetic {
     /**
      * Test if left &lt; right.
      *
-     * @param left  first value
-     * @param right second value
-     * @return test result.
+     * @param left  left argument
+     * @param right right argument
+     * @return the test result
      */
     public boolean lessThan(Object left, Object right) {
         if ((left == right) || (left == null) || (right == null)) {
@@ -1104,9 +1051,9 @@ public class JexlArithmetic {
     /**
      * Test if left &gt; right.
      *
-     * @param left  first value
-     * @param right second value
-     * @return test result.
+     * @param left  left argument
+     * @param right right argument
+     * @return the test result
      */
     public boolean greaterThan(Object left, Object right) {
         if ((left == right) || left == null || right == null) {
@@ -1119,9 +1066,9 @@ public class JexlArithmetic {
     /**
      * Test if left &lt;= right.
      *
-     * @param left  first value
-     * @param right second value
-     * @return test result.
+     * @param left  left argument
+     * @param right right argument
+     * @return the test result
      */
     public boolean lessThanOrEqual(Object left, Object right) {
         if (left == right) {
@@ -1136,9 +1083,9 @@ public class JexlArithmetic {
     /**
      * Test if left &gt;= right.
      *
-     * @param left  first value
-     * @param right second value
-     * @return test result.
+     * @param left  left argument
+     * @param right right argument
+     * @return the test result
      */
     public boolean greaterThanOrEqual(Object left, Object right) {
         if (left == right) {
@@ -1154,7 +1101,7 @@ public class JexlArithmetic {
      * Coerce to a primitive boolean.
      * <p>Double.NaN, null, "false" and empty string coerce to false.</p>
      *
-     * @param val Object to be coerced.
+     * @param val value to coerce
      * @return the boolean value if coercion is possible, true if value was not null.
      */
     public boolean toBoolean(Object val) {
@@ -1162,7 +1109,7 @@ public class JexlArithmetic {
             controlNullOperand();
             return false;
         } else if (val instanceof Boolean) {
-            return ((Boolean) val).booleanValue();
+            return ((Boolean) val);
         } else if (val instanceof Number) {
             double number = toDouble(val);
             return !Double.isNaN(number) && number != 0.d;
@@ -1180,9 +1127,9 @@ public class JexlArithmetic {
      * <p>Double.NaN, null and empty string coerce to zero.</p>
      * <p>Boolean false is 0, true is 1.</p>
      *
-     * @param val Object to be coerced.
-     * @return The int coerced value.
-     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible.
+     * @param val value to coerce
+     * @return the value coerced to int
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      */
     public int toInteger(Object val) {
         if (val == null) {
@@ -1190,7 +1137,7 @@ public class JexlArithmetic {
             return 0;
         } else if (val instanceof Double) {
             Double dval = (Double) val;
-            if (Double.isNaN(dval.doubleValue())) {
+            if (Double.isNaN(dval)) {
                 return 0;
             } else {
                 return dval.intValue();
@@ -1203,9 +1150,9 @@ public class JexlArithmetic {
             }
             return Integer.parseInt((String) val);
         } else if (val instanceof Boolean) {
-            return ((Boolean) val).booleanValue() ? 1 : 0;
+            return ((Boolean) val) ? 1 : 0;
         } else if (val instanceof Character) {
-            return ((Character) val).charValue();
+            return ((Character) val);
         }
 
         throw new ArithmeticException("Integer coercion: "
@@ -1217,9 +1164,9 @@ public class JexlArithmetic {
      * <p>Double.NaN, null and empty string coerce to zero.</p>
      * <p>Boolean false is 0, true is 1.</p>
      *
-     * @param val Object to be coerced.
-     * @return The long coerced value.
-     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible.
+     * @param val value to coerce
+     * @return the value coerced to long
+     * @throws ArithmeticException if value is null and mode is strict or if coercion is not possible
      */
     public long toLong(Object val) {
         if (val == null) {
@@ -1227,7 +1174,7 @@ public class JexlArithmetic {
             return 0L;
         } else if (val instanceof Double) {
             Double dval = (Double) val;
-            if (Double.isNaN(dval.doubleValue())) {
+            if (Double.isNaN(dval)) {
                 return 0L;
             } else {
                 return dval.longValue();
@@ -1241,9 +1188,9 @@ public class JexlArithmetic {
                 return Long.parseLong((String) val);
             }
         } else if (val instanceof Boolean) {
-            return ((Boolean) val).booleanValue() ? 1L : 0L;
+            return ((Boolean) val) ? 1L : 0L;
         } else if (val instanceof Character) {
-            return ((Character) val).charValue();
+            return ((Character) val);
         }
 
         throw new ArithmeticException("Long coercion: "
@@ -1256,8 +1203,8 @@ public class JexlArithmetic {
      * <p>Boolean false is 0, true is 1.</p>
      *
      * @param val the object to be coerced.
-     * @return a BigDecimal.
-     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible.
+     * @return a BigDecimal
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      */
     public BigInteger toBigInteger(Object val) {
         if (val == null) {
@@ -1267,7 +1214,7 @@ public class JexlArithmetic {
             return (BigInteger) val;
         } else if (val instanceof Double) {
             Double dval = (Double) val;
-            if (Double.isNaN(dval.doubleValue())) {
+            if (Double.isNaN(dval)) {
                 return BigInteger.ZERO;
             } else {
                 return BigInteger.valueOf(dval.longValue());
@@ -1277,7 +1224,7 @@ public class JexlArithmetic {
         } else if (val instanceof Number) {
             return BigInteger.valueOf(((Number) val).longValue());
         } else if (val instanceof Boolean) {
-            return BigInteger.valueOf(((Boolean) val).booleanValue() ? 1L : 0L);
+            return BigInteger.valueOf(((Boolean) val) ? 1L : 0L);
         } else if (val instanceof String) {
             String string = (String) val;
             if ("".equals(string)) {
@@ -1286,7 +1233,7 @@ public class JexlArithmetic {
                 return new BigInteger(string);
             }
         } else if (val instanceof Character) {
-            int i = ((Character) val).charValue();
+            int i = ((Character) val);
             return BigInteger.valueOf(i);
         }
 
@@ -1301,7 +1248,7 @@ public class JexlArithmetic {
      *
      * @param val the object to be coerced.
      * @return a BigDecimal.
-     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      */
     public BigDecimal toBigDecimal(Object val) {
         if (val instanceof BigDecimal) {
@@ -1310,7 +1257,7 @@ public class JexlArithmetic {
             controlNullOperand();
             return BigDecimal.ZERO;
         } else if (val instanceof Double) {
-            if (Double.isNaN(((Double) val).doubleValue())) {
+            if (Double.isNaN(((Double) val))) {
                 return BigDecimal.ZERO;
             } else {
                 return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
@@ -1318,7 +1265,7 @@ public class JexlArithmetic {
         } else if (val instanceof Number) {
             return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
         } else if (val instanceof Boolean) {
-            return BigDecimal.valueOf(((Boolean) val).booleanValue() ? 1. : 0.);
+            return BigDecimal.valueOf(((Boolean) val) ? 1. : 0.);
         } else if (val instanceof String) {
             String string = (String) val;
             if ("".equals(string)) {
@@ -1326,7 +1273,7 @@ public class JexlArithmetic {
             }
             return roundBigDecimal(new BigDecimal(string, getMathContext()));
         } else if (val instanceof Character) {
-            int i = ((Character) val).charValue();
+            int i = ((Character) val);
             return new BigDecimal(i);
         }
         throw new ArithmeticException("BigDecimal coercion: "
@@ -1337,22 +1284,22 @@ public class JexlArithmetic {
      * Coerce to a primitive double.
      * <p>Double.NaN, null and empty string coerce to zero.</p>
      * <p>Boolean false is 0, true is 1.</p>
-     * @param val Object to be coerced.
+     * @param val value to coerce.
      * @return The double coerced value.
-     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      */
     public double toDouble(Object val) {
         if (val == null) {
             controlNullOperand();
             return 0;
         } else if (val instanceof Double) {
-            return ((Double) val).doubleValue();
+            return ((Double) val);
         } else if (val instanceof Number) {
             //The below construct is used rather than ((Number)val).doubleValue() to ensure
             //equality between comparing new Double( 6.4 / 3 ) and the jexl expression of 6.4 / 3
             return Double.parseDouble(String.valueOf(val));
         } else if (val instanceof Boolean) {
-            return ((Boolean) val).booleanValue() ? 1. : 0.;
+            return ((Boolean) val) ? 1. : 0.;
         } else if (val instanceof String) {
             String string = (String) val;
             if ("".equals(string)) {
@@ -1362,7 +1309,7 @@ public class JexlArithmetic {
                 return Double.parseDouble(string);
             }
         } else if (val instanceof Character) {
-            int i = ((Character) val).charValue();
+            int i = ((Character) val);
             return i;
         }
         throw new ArithmeticException("Double coercion: "
@@ -1373,9 +1320,9 @@ public class JexlArithmetic {
      * Coerce to a string.
      * <p>Double.NaN coerce to the empty string.</p>
      *
-     * @param val Object to be coerced.
+     * @param val value to coerce.
      * @return The String coerced value.
-     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
      */
     public String toString(Object val) {
         if (val == null) {
@@ -1383,7 +1330,7 @@ public class JexlArithmetic {
             return "";
         } else if (val instanceof Double) {
             Double dval = (Double) val;
-            if (Double.isNaN(dval.doubleValue())) {
+            if (Double.isNaN(dval)) {
                 return "";
             } else {
                 return dval.toString();
@@ -1392,4 +1339,68 @@ public class JexlArithmetic {
             return val.toString();
         }
     }
+
+    /**
+     * Use or overload and() instead.
+     * @param lhs left hand side
+     * @param rhs right hand side
+     * @return lhs & rhs
+     * @see JexlArithmetic#and
+     * @deprecated
+     */
+    @Deprecated
+    public final Object bitwiseAnd(Object lhs, Object rhs) {
+        return and(lhs, rhs);
+    }
+    /**
+     * Use or overload or() instead.
+     * @param lhs left hand side
+     * @param rhs right hand side
+     * @return lhs | rhs
+     * @see JexlArithmetic#or
+     * @deprecated
+     */
+    @Deprecated
+    public final Object bitwiseOr(Object lhs, Object rhs) {
+        return or(lhs, rhs);
+    }
+
+    /**
+     * Use or overload xor() instead.
+     * @param lhs left hand side
+     * @param rhs right hand side
+     * @return lhs ^ rhs
+     * @see JexlArithmetic#xor
+     * @deprecated
+     */
+    @Deprecated
+    public final Object bitwiseXor(Object lhs, Object rhs) {
+        return xor(lhs, rhs);
+    }
+
+    /**
+     * Use or overload not() instead.
+     * @param arg argument
+     * @return !arg
+     * @see JexlArithmetic#not
+     * @deprecated
+     */
+    @Deprecated
+    public final Object logicalNot(Object arg) {
+        return not(arg);
+    }
+
+    /**
+     * Use or overload contains() instead.
+     * @param lhs left hand side
+     * @param rhs right hand side
+     * @return contains(rhs, lhs)
+     * @see JexlArithmetic#contains
+     * @deprecated
+     */
+    @Deprecated
+    public final Object matches(Object lhs, Object rhs) {
+        return contains(rhs, lhs);
+    }
+
 }

@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.apache.commons.jexl3.junit.Asserter;
+import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -125,6 +126,14 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         @Override
         public Iterator<Integer> iterator() {
             return values.iterator();
+        }
+
+        public boolean contains(int i) {
+            return values.contains(i);
+        }
+
+        public boolean contains(int[] i) {
+            return values.containsAll(Arrays.asList(i));
         }
 
         public boolean startsWith(int i) {

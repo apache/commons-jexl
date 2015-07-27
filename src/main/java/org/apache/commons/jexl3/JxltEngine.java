@@ -172,7 +172,8 @@ public abstract class JxltEngine {
          * <p>
          * In effect, this binds the result of the immediate sub-expressions evaluation in the
          * context, allowing to differ evaluation of the remaining (deferred) expression within another context.
-         * This only has an effect to nested and composite expressions that contain differed and immediate sub-expressions.
+         * This only has an effect to nested and composite expressions that contain differed and
+         * immediate sub-expressions.
          * </p>
          * <p>
          * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
@@ -307,6 +308,7 @@ public abstract class JxltEngine {
 
         /**
          * Gets the list of parameters expected by this template.
+         * @return the parameter names array
          */
         String[] getParameters();
     }

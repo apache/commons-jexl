@@ -30,7 +30,6 @@ public abstract class IntegerRange implements Collection<Integer> {
     /** The upper boundary. */
     protected final int max;
 
-
     /**
      * Creates a range, ascending or descending depending on boundaries order.
      * @param from the lower inclusive boundary
@@ -50,13 +49,8 @@ public abstract class IntegerRange implements Collection<Integer> {
      * @param to  the higher inclusive boundary
      */
     public IntegerRange(int from, int to) {
-        if (from > to) {
-            max = from;
-            min = to;
-        } else {
-            min = from;
-            max = to;
-        }
+        min = from;
+        max = to;
     }
 
     /**
@@ -202,6 +196,11 @@ public abstract class IntegerRange implements Collection<Integer> {
      * Ascending integer range.
      */
     public static class Ascending extends IntegerRange {
+        /**
+         * Constructor.
+         * @param from lower boundary
+         * @param to upper boundary
+         */
         protected Ascending(int from, int to) {
             super(from, to);
         }
@@ -216,6 +215,11 @@ public abstract class IntegerRange implements Collection<Integer> {
      * Descending integer range.
      */
     public static class Descending extends IntegerRange {
+        /**
+         * Constructor.
+         * @param from upper boundary
+         * @param to lower boundary
+         */
         protected Descending(int from, int to) {
             super(from, to);
         }

@@ -22,14 +22,26 @@ import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+//import org.apache.commons.beanutils.LazyDynaMap;
 
 /**
  * Test cases for reported issue .
@@ -1051,16 +1063,19 @@ public class IssuesTest extends JexlTestCase {
 
     public static class Question42 extends MapContext {
         public String functionA(String arg) {
-            return "a".equals(arg)? "A" : "";
+            return "a".equals(arg) ? "A" : "";
         }
+
         public String functionB(String arg) {
-            return "b".equals(arg)? "B" : "";
+            return "b".equals(arg) ? "B" : "";
         }
+
         public String functionC(String arg) {
-            return "c".equals(arg)? "C" : "";
+            return "c".equals(arg) ? "C" : "";
         }
+
         public String functionD(String arg) {
-            return "d".equals(arg)? "D" : "";
+            return "d".equals(arg) ? "D" : "";
         }
     }
 
@@ -1069,15 +1084,23 @@ public class IssuesTest extends JexlTestCase {
             super(false);
         }
 
-        public Object bitwiseAnd(String lhs, String rhs) {
-            if (rhs.isEmpty()) { return "";  }
-            if (lhs.isEmpty()) { return ""; }
+        public Object and(String lhs, String rhs) {
+            if (rhs.isEmpty()) {
+                return "";
+            }
+            if (lhs.isEmpty()) {
+                return "";
+            }
             return lhs + rhs;
         }
 
-        public Object bitwiseOr(String lhs, String rhs) {
-            if (rhs.isEmpty()) { return lhs; }
-            if (lhs.isEmpty()) { return rhs; }
+        public Object or(String lhs, String rhs) {
+            if (rhs.isEmpty()) {
+                return lhs;
+            }
+            if (lhs.isEmpty()) {
+                return rhs;
+            }
             return lhs + rhs;
         }
     }
@@ -1108,5 +1131,118 @@ public class IssuesTest extends JexlTestCase {
         Assert.assertEquals(java.math.BigDecimal.class, r0.getClass());
         Object r1 = jexl.createExpression("463.0B * 0.1B").evaluate(jc);
         Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
+    }
+
+//
+//
+//	@Test
+//	public void testUnderscoreInName() {
+//        JexlEngine jexl = new Engine();
+//        String jexlExp = "(x.length_mm * x.width)";
+//        JexlExpression e = jexl.createExpression( jexlExp );
+//        JexlContext jc = new MapContext();
+//
+//        LazyDynaMap object = new LazyDynaMap();
+//        object.set("length_mm", "10.0");
+//        object.set("width", "5.0");
+//
+//        jc.set("x", object );
+//
+//	    Assert.assertEquals(null, ((Double)e.evaluate(jc)).doubleValue(), 50d, 0d);
+//   }
+//
+//	@Test
+//	public void testFullStopInName() {
+//        JexlEngine jexl = new Engine();
+//        String jexlExp = "(x.length.mm * x.width)";
+//        JexlExpression e = jexl.createExpression( jexlExp );
+//        JexlContext jc = new MapContext();
+//
+//        LazyDynaMap object = new LazyDynaMap();
+//        object.set("length.mm", "10.0");
+//        object.set("width", "5.0");
+//
+//        Assert.assertEquals(null, object.get("length.mm"), "10.0");
+//
+//        jc.set("x", object );
+//
+//	    Assert.assertEquals(null, ((Double)e.evaluate(jc)).doubleValue(), 50d, 0d);
+//	}
+//
+//	@Test
+//	public void testFullStopInNameMakingSubObject() {
+//        JexlEngine jexl = new Engine();
+//        String jexlExp = "(x.length.mm * x.width)";
+//        JexlExpression e = jexl.createExpression( jexlExp );
+//        JexlContext jc = new MapContext();
+//
+//        LazyDynaMap object = new LazyDynaMap();
+//        LazyDynaMap subObject = new LazyDynaMap();
+//        object.set("length", subObject);
+//        subObject.set("mm", "10.0");
+//        object.set("width", "5.0");
+//
+//        jc.set("x", object );
+//
+//	    Assert.assertEquals(null, ((Double)e.evaluate(jc)).doubleValue(), 50d, 0d);
+//	}
+
+
+    @Test
+    public void test161() throws Exception {
+        final JexlEngine jexl = new Engine();
+        final JexlContext jc = new MapContext();
+
+        Document xml = getDocument("<node info='123'/>");
+        NamedNodeMap nnm = xml.getLastChild().getAttributes();
+        Attr info = (Attr) nnm.getNamedItem("info");
+        Assert.assertEquals("123", info.getValue());
+
+        jc.set("x", xml.getLastChild());
+        final String y = "456";
+        jc.set("y", y);
+        JexlScript s = jexl.createScript("x.attribute.info = y");
+        Object r = s.execute(jc);
+        nnm = xml.getLastChild().getAttributes();
+        info = (Attr) nnm.getNamedItem("info");
+        Assert.assertEquals(y, r);
+        Assert.assertEquals(y, info.getValue());
+    }
+
+    public static class XmlArithmetic extends JexlArithmetic {
+        public XmlArithmetic(boolean lenient) {
+            super(lenient);
+        }
+        public boolean empty(org.w3c.dom.Element elt) {
+            return !elt.hasAttributes() && !elt.hasChildNodes();
+        }
+    }
+
+    @Test
+    public void test162() throws Exception {
+        JexlEngine jexl = //new JexlBuilder().arithmetic(new JexlArithmetic(false)).create();
+new JexlBuilder().arithmetic(new XmlArithmetic(false)).create();
+        JexlScript s0 = jexl.createScript("x.empty()", "x");
+        Document xml;
+        Node x;
+        Boolean r;
+        xml = getDocument("<node info='123'/>");
+        x = xml.getLastChild();
+        r = (Boolean) s0.execute(null, x);
+        Assert.assertFalse(r);
+        xml = getDocument("<node>some content</node>");
+        x = xml.getLastChild();
+        r = (Boolean) s0.execute(null, x);
+        Assert.assertFalse(r);
+        xml = getDocument("<node/>");
+        x = xml.getLastChild();
+        r = (Boolean) s0.execute(null, x);
+        Assert.assertTrue(r);
+    }
+
+    private static Document getDocument(String xml) throws IOException, SAXException, ParserConfigurationException {
+        DocumentBuilder xmlBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        InputStream stringInputStream = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+        return xmlBuilder.parse(stringInputStream);
     }
 }
