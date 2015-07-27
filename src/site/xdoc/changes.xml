@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.0" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-170">
+                Implement assignment operators
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-169" due-to="Robert Neßelrath">
                 A string is wrongly identified as FloatingPointNumber
             </action>

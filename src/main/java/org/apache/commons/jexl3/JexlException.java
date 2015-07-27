@@ -162,9 +162,9 @@ public class JexlException extends RuntimeException {
      */
     private static Throwable unwrap(Throwable xthrow) {
         if (xthrow instanceof InvocationTargetException) {
-            return ((InvocationTargetException) xthrow).getTargetException();
+            return ((InvocationTargetException) xthrow).getCause();
         } else if (xthrow instanceof UndeclaredThrowableException) {
-            return ((UndeclaredThrowableException) xthrow).getUndeclaredThrowable();
+            return ((UndeclaredThrowableException) xthrow).getCause();
         } else {
             return xthrow;
         }

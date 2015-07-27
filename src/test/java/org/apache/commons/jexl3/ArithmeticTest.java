@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+import static org.apache.commons.jexl3.JexlArithmetic.FLOAT_PATTERN;
 import org.apache.commons.jexl3.junit.Asserter;
 
 import java.io.ByteArrayInputStream;
@@ -27,7 +28,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import static org.apache.commons.jexl3.JexlArithmetic.FLOAT_PATTERN;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -412,7 +412,6 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertTrue((Boolean) result);
     }
 
-
     @Test
     public void testAddWithStringsLenient() throws Exception {
         JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(false)).create();
@@ -568,7 +567,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     public static class Var {
-        final int value;
+        int value;
 
         Var(int v) {
             value = v;
@@ -630,15 +629,15 @@ public class ArithmeticTest extends JexlTestCase {
             return new Var(-arg.value);
         }
 
-        public Var bitwiseAnd(Var lhs, Var rhs) {
+        public Var and(Var lhs, Var rhs) {
             return new Var(lhs.value & rhs.value);
         }
 
-        public Var bitwiseOr(Var lhs, Var rhs) {
+        public Var or(Var lhs, Var rhs) {
             return new Var(lhs.value | rhs.value);
         }
 
-        public Var bitwiseXor(Var lhs, Var rhs) {
+        public Var xor(Var lhs, Var rhs) {
             return new Var(lhs.value ^ rhs.value);
         }
 
@@ -654,7 +653,7 @@ public class ArithmeticTest extends JexlTestCase {
             return lhs.toString().endsWith(rhs.toString());
         }
 
-        public Var bitwiseComplement(Var arg) {
+        public Var complement(Var arg) {
             return new Var(~arg.value);
         }
 
@@ -682,6 +681,7 @@ public class ArithmeticTest extends JexlTestCase {
     public void testArithmeticPlus() throws Exception {
         JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new ArithmeticPlus(false)).create();
         JexlContext jc = new EmptyTestContext();
+        runOverload(jexl, jc);
         runOverload(jexl, jc);
     }
 
@@ -854,14 +854,20 @@ public class ArithmeticTest extends JexlTestCase {
         result = script.execute(jc, 3155, 15);
         Assert.assertFalse((Boolean) result);
         result = script.execute(jc, new Var(3155), new Var(15));
+        Assert.assertFalse((Boolean) result);
+        result = script.execute(jc, new Var(15), new Var(3155));
         Assert.assertTrue((Boolean) result);
 
         script = jexl.createScript("(x, y)->{ x !~ y }");
         result = script.execute(jc, 3115, 15);
         Assert.assertTrue((Boolean) result);
         result = script.execute(jc, new Var(3155), new Var(15));
+        Assert.assertTrue((Boolean) result);
+        result = script.execute(jc, new Var(15), new Var(3155));
         Assert.assertFalse((Boolean) result);
+
     }
+
 
     public static class Arithmetic132 extends JexlArithmetic {
         public Arithmetic132() {

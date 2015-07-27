@@ -71,7 +71,15 @@ import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
 import org.apache.commons.jexl3.parser.ASTSWNode;
+import org.apache.commons.jexl3.parser.ASTSetAddNode;
+import org.apache.commons.jexl3.parser.ASTSetAndNode;
+import org.apache.commons.jexl3.parser.ASTSetDivNode;
 import org.apache.commons.jexl3.parser.ASTSetLiteral;
+import org.apache.commons.jexl3.parser.ASTSetModNode;
+import org.apache.commons.jexl3.parser.ASTSetMultNode;
+import org.apache.commons.jexl3.parser.ASTSetOrNode;
+import org.apache.commons.jexl3.parser.ASTSetSubNode;
+import org.apache.commons.jexl3.parser.ASTSetXorNode;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
 import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
@@ -873,5 +881,45 @@ public final class Debugger extends ParserVisitor implements JexlInfo.Detail {
             builder.append(';');
         }
         return data;
+    }
+
+    @Override
+    protected Object visit(ASTSetAddNode node, Object data) {
+        return infixChildren(node, " += ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetSubNode node, Object data) {
+        return infixChildren(node, " -= ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetMultNode node, Object data) {
+        return infixChildren(node, " *= ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetDivNode node, Object data) {
+        return infixChildren(node, " /= ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetModNode node, Object data) {
+        return infixChildren(node, " %= ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetAndNode node, Object data) {
+        return infixChildren(node, " &= ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetOrNode node, Object data) {
+        return infixChildren(node, " |= ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetXorNode node, Object data) {
+        return infixChildren(node, " ^= ", false, data);
     }
 }

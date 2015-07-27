@@ -151,4 +151,21 @@ public class Asserter extends Assert {
     public Object removeVariable(String name) {
         return variables.remove(name);
     }
+
+    /**
+     * Gets a variable of a certain name.
+     *
+     * @param name variable name
+     * @return value variable value
+     */
+    public Object getVariable(String name) {
+        return variables.get(name);
+    }
+
+    /**
+     * @return the variables map
+     */
+    public Map<String, Object> getVariables() {
+        return variables;
+    }
 }

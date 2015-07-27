@@ -157,17 +157,27 @@ PARSER_END(Parser)
 }
 
 <*> TOKEN : { /* OPERATORS */
-      < assign : "=" >
-    | < mod : "%" | "mod" >
-    | < div : "/" | "div" >
-    | < not : "!" | "not" >
+      < plus_assign : "+=" >
+    | < minus_assign : "-=" >
+    | < mult_assign : "*=" >
+    | < div_assign : "/=" >
+    | < mod_assign : "%=" >
+    | < and_assign : "&=" >
+    | < or_assign : "|=" >
+    | < xor_assign : "^=" >
+
+    | < assign : "=" >
     | < plus : "+" >
     | < minus : "-" >
     | < mult : "*" >
-    | < tilda : "~" >
+    | < div : "/" | "div" >
+    | < mod : "%" | "mod" >
+    | < not : "!" | "not" >
     | < and : "&" >
     | < or : "|" >
     | < xor : "^" >
+
+    | < tilda : "~" >
     | < range : ".." >
 }
 
@@ -368,7 +378,26 @@ void Expression() #void : {}
 
 void AssignmentExpression() #void : {}
 {
-    ConditionalExpression() [ LOOKAHEAD( <assign> ) <assign> Expression() #Assignment(2) ]
+  ConditionalExpression()
+  ( LOOKAHEAD(2) (
+    <plus_assign>  Expression() #SetAddNode(2)
+  |
+    <mult_assign>  Expression() #SetMultNode(2)
+  |
+    <div_assign>  Expression() #SetDivNode(2)
+  |
+    <mod_assign>  Expression() #SetModNode(2)
+  |
+    <and_assign>  Expression() #SetAndNode(2)
+  |
+    <or_assign>  Expression() #SetOrNode(2)
+  |
+    <xor_assign> Expression() #SetXorNode(2)
+  |
+    <minus_assign>  Expression() #SetSubNode(2)
+  |
+    <assign> Expression() #Assignment(2)
+  ) )*
 }
 
 /***************************************
@@ -481,17 +510,17 @@ void MultiplicativeExpression() #void : {}
 
 void UnaryExpression() #void : {}
 {
-  <minus> UnaryExpression() #UnaryMinusNode(1)
-|
-  <tilda> UnaryExpression() #BitwiseComplNode(1)
-|
-  <not> UnaryExpression() #NotNode(1)
-|
-  <EMPTY> UnaryExpression() #EmptyFunction(1)
-|
-  <SIZE> UnaryExpression() #SizeFunction(1)
-|
-  ValueExpression()
+    <minus> UnaryExpression() #UnaryMinusNode(1)
+  |
+    <tilda> UnaryExpression() #BitwiseComplNode(1)
+  |
+    <not> UnaryExpression() #NotNode(1)
+  |
+    <EMPTY> UnaryExpression() #EmptyFunction(1)
+  |
+    <SIZE> UnaryExpression() #SizeFunction(1)
+  |
+    ValueExpression()
 }
 
 

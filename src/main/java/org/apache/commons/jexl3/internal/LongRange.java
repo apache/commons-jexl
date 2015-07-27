@@ -52,13 +52,8 @@ public abstract class LongRange implements Collection<Long> {
      * @param to   the higher inclusive boundary
      */
     protected LongRange(long from, long to) {
-        if (from > to) {
-            max = from;
-            min = to;
-        } else {
-            min = from;
-            max = to;
-        }
+        min = from;
+        max = to;
     }
 
     /**
@@ -203,6 +198,11 @@ public abstract class LongRange implements Collection<Long> {
      * Ascending long range.
      */
     public static class Ascending extends LongRange {
+        /**
+         * Constructor.
+         * @param from lower boundary
+         * @param to upper boundary
+         */
         protected Ascending(long from, long to) {
             super(from, to);
         }
@@ -217,6 +217,11 @@ public abstract class LongRange implements Collection<Long> {
      * Descending long range.
      */
     public static class Descending extends LongRange {
+        /**
+         * Constructor.
+         * @param from upper boundary
+         * @param to lower boundary
+         */
         protected Descending(long from, long to) {
             super(from, to);
         }
