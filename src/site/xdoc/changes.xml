@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.0" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-171" due-to="Dmitri Blinov">
+                Map access operator does not work if key name clashes with map property name
+            </action>
             <action dev="henrib" type="add" issue="JEXL-170">
                 Implement assignment operators
             </action>

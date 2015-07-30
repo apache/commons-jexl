@@ -22,8 +22,14 @@ import java.lang.reflect.InvocationTargetException;
  * Specialized executor to set a property of an object.
  * <p>Duck as in duck-typing for an interface like:
  * <code>
- * interface Set {
+ * interface Setable {
  *      Object set(Object property, Object value);
+ * }
+ * </code>
+ * or
+ * <code>
+ * interface Putable {
+ *      Object put(Object property, Object value);
  * }
  * </code>
  * </p>
@@ -44,6 +50,9 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
      */
     public static DuckSetExecutor discover(Introspector is, Class<?> clazz, Object key, Object value) {
         java.lang.reflect.Method method = is.getMethod(clazz, "set", makeArgs(key, value));
+        if (method == null) {
+            method = is.getMethod(clazz, "put", makeArgs(key, value));
+        }
         return method == null? null : new DuckSetExecutor(clazz, method, key);
     }
 

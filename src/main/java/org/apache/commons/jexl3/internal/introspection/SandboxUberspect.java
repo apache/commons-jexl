@@ -24,9 +24,10 @@ import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 import java.util.Iterator;
+import java.util.List;
 
 /**
- * An uberspect that controls usage of properties, methods and contructors through a sandbox.
+ * An uberspect that controls usage of properties, methods and constructors through a sandbox.
  * @since 3.0
  */
 public final class SandboxUberspect implements JexlUberspect {
@@ -107,10 +108,18 @@ public final class SandboxUberspect implements JexlUberspect {
      */
     @Override
     public JexlPropertyGet getPropertyGet(Object obj, Object identifier) {
+        return getPropertyGet(POJO, obj, identifier);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JexlPropertyGet getPropertyGet(List<ResolverType> strategy, Object obj, Object identifier) {
         if (obj != null && identifier != null) {
             String actual = sandbox.read(obj.getClass().getName(), identifier.toString());
             if (actual != null) {
-                return uberspect.getPropertyGet(obj, actual);
+                return uberspect.getPropertyGet(strategy, obj, actual);
             }
         }
         return null;
@@ -121,10 +130,18 @@ public final class SandboxUberspect implements JexlUberspect {
      */
     @Override
     public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg) {
+        return getPropertySet(POJO, obj, identifier, arg);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JexlPropertySet getPropertySet(final List<ResolverType> strategy, final Object obj, final Object identifier, Object arg) {
         if (obj != null && identifier != null) {
             String actual = sandbox.write(obj.getClass().getName(), identifier.toString());
             if (actual != null) {
-                return uberspect.getPropertySet(obj, actual, arg);
+                return uberspect.getPropertySet(strategy, obj, actual, arg);
             }
         }
         return null;

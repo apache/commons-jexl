@@ -75,8 +75,10 @@ public abstract class LongRange implements Collection<Long> {
     @Override
     public int hashCode() {
         int hash = getClass().hashCode();
-        hash = 41 * hash + (int) (this.min ^ (this.min >>> 32));
-        hash = 41 * hash + (int) (this.max ^ (this.max >>> 32));
+        //CHECKSTYLE:OFF Not magic number
+        hash = 13 * hash + (int) (this.min ^ (this.min >>> 32));
+        hash = 13 * hash + (int) (this.max ^ (this.max >>> 32));
+        //CHECKSTYLE:ON
         return hash;
     }
 

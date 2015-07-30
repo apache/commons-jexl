@@ -100,6 +100,7 @@ import org.apache.commons.jexl3.parser.Node;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 
@@ -1628,7 +1629,9 @@ public class Interpreter extends ParserVisitor {
         }
         // resolve that property
         Exception xcause = null;
-        JexlPropertyGet vg = uberspect.getPropertyGet(object, attribute);
+        List<JexlUberspect.ResolverType> strategy = (node == null) || !(node.jjtGetParent()instanceof ASTArrayAccess)
+                                                     ? JexlUberspect.POJO : JexlUberspect.MAP;
+        JexlPropertyGet vg = uberspect.getPropertyGet(strategy, object, attribute);
         if (vg != null) {
             try {
                 Object value = vg.invoke(object);
@@ -1689,7 +1692,9 @@ public class Interpreter extends ParserVisitor {
             }
         }
         Exception xcause = null;
-        JexlPropertySet vs = uberspect.getPropertySet(object, attribute, value);
+        List<JexlUberspect.ResolverType> strategy = (node == null) || !(node.jjtGetParent()instanceof ASTArrayAccess)
+                                                     ? JexlUberspect.POJO : JexlUberspect.MAP;
+        JexlPropertySet vs = uberspect.getPropertySet(strategy, object, attribute, value);
         // if we can't find an exact match, narrow the value argument and try again
         if (vs == null) {
             // replace all numbers with the smallest type that will fit
