@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal;
 
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -73,8 +74,10 @@ public abstract class IntegerRange implements Collection<Integer> {
     @Override
     public int hashCode() {
         int hash = getClass().hashCode();
+        //CHECKSTYLE:OFF Not magic number
         hash = 13 * hash + this.min;
         hash = 13 * hash + this.max;
+        //CHECKSTYLE:ON
         return hash;
     }
 

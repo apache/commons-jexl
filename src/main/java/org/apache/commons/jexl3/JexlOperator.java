@@ -36,168 +36,168 @@ package org.apache.commons.jexl3;
 public enum JexlOperator {
     /**
      * <strong>Syntax:</strong> <code>x + y</code>
-     * <br><strong>Method:</strong> <code>T add(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T add(L x, R y);</code>.
      * @see JexlArithmetic#add
      */
     ADD("+", "add", 2),
     /**
      * <strong>Syntax:</strong> <code>x - y</code>
-     * <br><strong>Method:</strong> <code>T subtract(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T subtract(L x, R y);</code>.
      * @see JexlArithmetic#subtract
      */
     SUBTRACT("-", "subtract", 2),
     /**
      * <strong>Syntax:</strong> <code>x * y</code>
-     * <br><strong>Method:</strong> <code>T multiply(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T multiply(L x, R y);</code>.
      * @see JexlArithmetic#multiply
      */
     MULTIPLY("*", "multiply", 2),
     /**
      * <strong>Syntax:</strong> <code>x / y</code>
-     * <br><strong>Method:</strong> <code>T divide(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T divide(L x, R y);</code>.
      * @see JexlArithmetic#divide
      */
     DIVIDE("/", "divide", 2),
     /**
      * <strong>Syntax:</strong> <code>x % y</code>
-     * <br><strong>Method:</strong> <code>T mod(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T mod(L x, R y);</code>.
      * @see JexlArithmetic#mod
      */
     MOD("%", "mod", 2),
     /**
      * <strong>Syntax:</strong> <code>x & y</code>
-     * <br><strong>Method:</strong> <code>T and(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T and(L x, R y);</code>.
      * @see JexlArithmetic#and
      */
     AND("&", "and", 2),
     /**
      * <strong>Syntax:</strong> <code>x | y</code>
-     * <br><strong>Method:</strong> <code>T or(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T or(L x, R y);</code>.
      * @see JexlArithmetic#or
      */
     OR("|", "or", 2),
     /**
      * <strong>Syntax:</strong> <code>x ^ y</code>
-     * <br><strong>Method:</strong> <code>T xor(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T xor(L x, R y);</code>.
      * @see JexlArithmetic#xor
      */
     XOR("^", "xor", 2),
     /**
      * <strong>Syntax:</strong> <code>x == y</code>
-     * <br><strong>Method:</strong> <code>boolean equals(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>boolean equals(L x, R y);</code>.
      * @see JexlArithmetic#equals
      */
     EQ("==", "equals", 2),
     /**
      * <strong>Syntax:</strong> <code>x < y</code>
-     * <br><strong>Method:</strong> <code>boolean lessThan(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>boolean lessThan(L x, R y);</code>.
      * @see JexlArithmetic#lessThan
      */
     LT("<", "lessThan", 2),
     /**
      * <strong>Syntax:</strong> <code>x <= y</code>
-     * <br><strong>Method:</strong> <code>boolean lessThanOrEqual(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>boolean lessThanOrEqual(L x, R y);</code>.
      * @see JexlArithmetic#lessThanOrEqual
      */
     LTE("<=", "lessThanOrEqual", 2),
     /**
      * <strong>Syntax:</strong> <code>x > y</code>
-     * <br><strong>Method:</strong> <code>boolean greaterThan(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>boolean greaterThan(L x, R y);</code>.
      * @see JexlArithmetic#greaterThan
      */
     GT(">", "greaterThan", 2),
     /**
      * <strong>Syntax:</strong> <code>x >= y</code>
-     * <br><strong>Method:</strong> <code>boolean greaterThanOrEqual(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>boolean greaterThanOrEqual(L x, R y);</code>.
      * @see JexlArithmetic#greaterThanOrEqual
      */
     GTE(">=", "greaterThanOrEqual", 2),
     /**
      * <strong>Syntax:</strong> <code>x =~ y</code>
-     * <br><strong>Method:</strong> <code>boolean contains(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>boolean contains(L x, R y);</code>.
      * @see JexlArithmetic#contains
      */
     CONTAINS("=~", "contains", 2),
     /**
      * <strong>Syntax:</strong> <code>x =^ y</code>
-     * <br><strong>Method:</strong> <code>boolean startsWith(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>boolean startsWith(L x, R y);</code>.
      * @see JexlArithmetic#startsWith
      */
     STARTSWITH("=^", "startsWith", 2),
     /**
      * <strong>Syntax:</strong> <code>x =$ y</code>
-     * <br><strong>Method:</strong> <code>boolean endsWith(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>boolean endsWith(L x, R y);</code>.
      * @see JexlArithmetic#endsWith
      */
     ENDSWITH("=$", "endsWith", 2),
     /**
      * <strong>Syntax:</strong> <code>!x</code>
-     * <br><strong>Method:</strong> <code>T not(L x);</code>
+     * <br><strong>Method:</strong> <code>T not(L x);</code>.
      * @see JexlArithmetic#not
      */
     NOT("!", "not", 1),
     /**
      * <strong>Syntax:</strong> <code>~x</code>
-     * <br><strong>Method:</strong> <code>T complement(L x);</code>
+     * <br><strong>Method:</strong> <code>T complement(L x);</code>.
      * @see JexlArithmetic#complement
      */
     COMPLEMENT("~", "complement", 1),
     /**
      * <strong>Syntax:</strong> <code>-x</code>
-     * <br><strong>Method:</strong> <code>T negate(L x);</code>
+     * <br><strong>Method:</strong> <code>T negate(L x);</code>.
      * @see JexlArithmetic#negate
      */
     NEGATE("-", "negate", 1),
     /**
      * <strong>Syntax:</strong> <code>empty x</code> or <code>empty(x)</code>
-     * <br><strong>Method:</strong> <code>boolean isEmpty(L x);</code>
+     * <br><strong>Method:</strong> <code>boolean isEmpty(L x);</code>.
      * @see JexlArithmetic#isEmpty
      */
     EMPTY("empty", "empty", 1),
     /**
      * <strong>Syntax:</strong> <code>size x</code> or <code>size(x)</code>
-     * <br><strong>Method:</strong> <code>int size(L x);</code>
+     * <br><strong>Method:</strong> <code>int size(L x);</code>.
      * @see JexlArithmetic#size
      */
     SIZE("size", "size", 1),
     /**
      * <strong>Syntax:</strong> <code>x += y</code>
-     * <br><strong>Method:</strong> <code>T selfAdd(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T selfAdd(L x, R y);</code>.
      */
     SELF_ADD("+=", "selfAdd", ADD),
     /**
      * <strong>Syntax:</strong> <code>x -= y</code>
-     * <br><strong>Method:</strong> <code>T selfSubtract(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T selfSubtract(L x, R y);</code>.
      */
     SELF_SUBTRACT("-=", "selfSubtract", SUBTRACT),
     /**
      * <strong>Syntax:</strong> <code>x *= y</code>
-     * <br><strong>Method:</strong> <code>T selfMultiply(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T selfMultiply(L x, R y);</code>.
      */
     SELF_MULTIPLY("*=", "selfMultiply", MULTIPLY),
     /**
      * <strong>Syntax:</strong> <code>x /= y</code>
-     * <br><strong>Method:</strong> <code>T selfDivide(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T selfDivide(L x, R y);</code>.
      */
     SELF_DIVIDE("/=", "selfDivide", DIVIDE),
     /**
      * <strong>Syntax:</strong> <code>x %= y</code>
-     * <br><strong>Method:</strong> <code>T selfMod(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T selfMod(L x, R y);</code>.
      */
     SELF_MOD("%=", "selfMod", MOD),
     /**
      * <strong>Syntax:</strong> <code>x &= y</code>
-     * <br><strong>Method:</strong> <code>T selfAnd(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T selfAnd(L x, R y);</code>.
      */
     SELF_AND("&=", "selfAnd", AND),
     /**
      * <strong>Syntax:</strong> <code>x |= y</code>
-     * <br><strong>Method:</strong> <code>T selfOr(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T selfOr(L x, R y);</code>.
      */
     SELF_OR("|=", "selfOr", OR),
     /**
      * <strong>Syntax:</strong> <code>x ^= y</code>
-     * <br><strong>Method:</strong> <code>T selfXor(L x, R y);</code>
+     * <br><strong>Method:</strong> <code>T selfXor(L x, R y);</code>.
      */
     SELF_XOR("^=", "selfXor", XOR),
     /**

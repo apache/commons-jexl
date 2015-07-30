@@ -18,7 +18,10 @@
 package org.apache.commons.jexl3.introspection;
 
 import org.apache.commons.jexl3.JexlArithmetic;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * 'Federated' introspection/reflection interface to allow JEXL introspection
@@ -27,6 +30,68 @@ import java.util.Iterator;
  * @since 1.0
  */
 public interface JexlUberspect {
+    /**
+     * The various property resolver types.
+     * <p>These are used to compose 'strategies' to solve properties; a strategy is an array (list) of resolver types.
+     * Each resolver type discovers how to set/get a property with different techniques; seeking
+     * method names or field names, etc.
+     * In a strategy, these are tried in sequence and the first non-null resolver stops the search.
+     */
+    enum ResolverType {
+        /**
+         * Seeks methods named get{P,p}property and is{P,p}property.
+         */
+        PROPERTY,
+        /**
+         * Seeks map methods get/put.
+         */
+        MAP,
+        /**
+         * Seeks list methods get/set.
+         */
+        LIST,
+        /**
+         * Seeks any get/{set,put} method (quacking like a list or a map).
+         */
+        DUCK,
+        /**
+         * Seeks public instance members.
+         */
+        FIELD,
+        /**
+         * Seeks a getContainer(property) and setContainer(property, value)
+         * as in <code>x.container.property</code>.
+         */
+        CONTAINER
+    }
+
+    /**
+     * A resolver strategy tailored for POJOs, favors '.' over '[]'.
+     * This is the default strategy for getPropertyGet/getPropertySet.
+     * @see JexlUberspect#getPropertyGet
+     * @see JexlUberspect#getPropertySet
+     */
+    static final List<ResolverType> POJO = Collections.unmodifiableList(Arrays.asList(
+        ResolverType.PROPERTY,
+        ResolverType.MAP,
+        ResolverType.LIST,
+        ResolverType.DUCK,
+        ResolverType.FIELD,
+        ResolverType.CONTAINER
+    ));
+
+    /**
+     * A resolver strategy tailored for Maps, favors '[]' over '.'.
+     */
+    static final  List<ResolverType> MAP = Collections.unmodifiableList(Arrays.asList(
+        ResolverType.MAP,
+        ResolverType.LIST,
+        ResolverType.DUCK,
+        ResolverType.PROPERTY,
+        ResolverType.FIELD,
+        ResolverType.CONTAINER
+     ));
+
     /**
      * Sets the class loader to use.
      * <p>This increments the version.</p>
@@ -60,34 +125,57 @@ public interface JexlUberspect {
 
     /**
      * Property getter.
-     * <p>Returns JexlPropertyGet appropos for ${bar.woogie}.
+     * <p>returns a JelPropertySet apropos to an expression like <code>bar.woogie</code>.</p>
      * @param obj the object to get the property from
      * @param identifier property name
-     * @return a {@link JexlPropertyGet}
+     * @return a {@link JexlPropertyGet} or null
      */
     JexlPropertyGet getPropertyGet(Object obj, Object identifier);
 
     /**
+     * Property getter.
+     * <p>Seeks a JexlPropertyGet apropos to an expression like <code>bar.woogie</code>.</p>
+     * @param strategy  the ordered list of resolver types
+     * @param obj the object to get the property from
+     * @param identifier property name
+     * @return a {@link JexlPropertyGet} or null
+     * @since 3.0
+     */
+    JexlPropertyGet getPropertyGet(List<ResolverType> strategy, Object obj, Object identifier);
+
+    /**
      * Property setter.
-     * <p>returns JelPropertySet appropos for ${foo.bar = "geir"}</p>.
+     * <p>Seeks a JelPropertySet apropos to an expression like  <code>foo.bar = "geir"</code>.</p>
      * @param obj the object to get the property from.
      * @param identifier property name
      * @param arg value to set
-     * @return a {@link JexlPropertySet}.
+     * @return a {@link JexlPropertySet} or null
      */
     JexlPropertySet getPropertySet(Object obj, Object identifier, Object arg);
 
     /**
+     * Property setter.
+     * <p>Seeks a JelPropertySet apropos to an expression like <code>foo.bar = "geir"</code>.</p>
+     * @param strategy the ordered list of resolver types
+     * @param obj the object to get the property from
+     * @param identifier property name
+     * @param arg value to set
+     * @return a {@link JexlPropertySet} or null
+     * @since 3.0
+     */
+    JexlPropertySet getPropertySet(List<ResolverType> strategy, Object obj, Object identifier, Object arg);
+
+    /**
      * Gets an iterator from an object.
      * @param obj to get the iterator from
-     * @return an iterator over obj
+     * @return an iterator over obj or null
      */
     Iterator<?> getIterator(Object obj);
 
     /**
      * Gets an arithmetic operator resolver for a given arithmetic instance.
      * @param arithmetic the arithmetic instance
-     * @return the arithmetic uberspect or null if no operator method were override
+     * @return the arithmetic uberspect or null if no operator method were overridden
      * @since 3.0
      */
     JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic);
