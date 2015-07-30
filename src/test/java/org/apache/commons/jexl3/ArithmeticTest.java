@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import static org.apache.commons.jexl3.JexlArithmetic.FLOAT_PATTERN;
 import org.apache.commons.jexl3.junit.Asserter;
 
 import java.io.ByteArrayInputStream;
@@ -675,6 +674,10 @@ public class ArithmeticTest extends JexlTestCase {
             }
             return strb.toString();
         }
+
+        public Object not(Var x) {
+            throw new NullPointerException("make it fail");
+        }
     }
 
     @Test
@@ -866,6 +869,13 @@ public class ArithmeticTest extends JexlTestCase {
         result = script.execute(jc, new Var(15), new Var(3155));
         Assert.assertFalse((Boolean) result);
 
+        script = jexl.createScript("(x)->{ !x }");
+        try {
+            result = script.execute(jc, new Var(-42));
+            Assert.fail("should fail");
+        } catch (JexlException xany) {
+            Assert.assertTrue(xany instanceof JexlException.Operator);
+        }
     }
 
 
