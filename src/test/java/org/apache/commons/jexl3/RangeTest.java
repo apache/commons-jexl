@@ -44,6 +44,7 @@ public class RangeTest extends JexlTestCase {
         Object[] a = c.toArray();
         Assert.assertEquals(1, a.length);
         Assert.assertEquals(1, ((Number) a[0]).intValue());
+        Assert.assertFalse((Boolean) JEXL.createScript("empty x", "x").execute(null, e));
     }
 
     @Test
@@ -51,10 +52,16 @@ public class RangeTest extends JexlTestCase {
         JexlExpression e = JEXL.createExpression("(1..32)");
         JexlContext jc = new MapContext();
 
+        Object o0 = e.evaluate(jc);
         Object o = e.evaluate(jc);
         Assert.assertTrue(o instanceof Collection<?>);
         Collection<?> c = (Collection<?>) o;
         Assert.assertEquals(32, c.size());
+
+        Assert.assertTrue(o0 != o);
+        Assert.assertEquals(o0.hashCode(), o.hashCode());
+        Assert.assertEquals(o0, o);
+
         int i = 0;
         Iterator<?> ii = c.iterator();
         while (ii.hasNext()) {
@@ -94,10 +101,17 @@ public class RangeTest extends JexlTestCase {
         JexlExpression e = JEXL.createExpression("(6789000001L..6789000032L)");
         JexlContext jc = new MapContext();
 
+        Object o0 = e.evaluate(jc);
         Object o = e.evaluate(jc);
         Assert.assertTrue(o instanceof Collection<?>);
         Collection<?> c = (Collection<?>) o;
         Assert.assertEquals(32, c.size());
+        Assert.assertFalse((Boolean) JEXL.createScript("empty x", "x").execute(null, e));
+
+        Assert.assertTrue(o0 != o);
+        Assert.assertEquals(o0.hashCode(), o.hashCode());
+        Assert.assertEquals(o0, o);
+
         long i = 6789000000L;
         Iterator<?> ii = c.iterator();
         while (ii.hasNext()) {

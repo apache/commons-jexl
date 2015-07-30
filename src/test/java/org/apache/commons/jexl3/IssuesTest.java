@@ -1245,4 +1245,45 @@ new JexlBuilder().arithmetic(new XmlArithmetic(false)).create();
         InputStream stringInputStream = new ByteArrayInputStream(xml.getBytes("UTF-8"));
         return xmlBuilder.parse(stringInputStream);
     }
+
+
+    @Test
+    public void test171() throws Exception {
+        final JexlEngine jexl = new Engine();
+        Object result;
+        Map<String, Object> i = new HashMap<String, Object>();
+
+        i.put("class", 42);
+        result = jexl.createScript("i['class'] ", "i").execute((JexlContext)null, i);
+        Assert.assertEquals(42, result);
+        result = jexl.createScript("i['class'] = 28", "i").execute((JexlContext)null, i);
+        Assert.assertEquals(28, result);
+        Assert.assertEquals(28, i.get("class"));
+        result = jexl.createScript("i.class", "i").execute((JexlContext)null, i);
+        Assert.assertEquals(java.util.HashMap.class, result);
+        result = jexl.createScript("i.'class'", "i").execute((JexlContext)null, i);
+        Assert.assertEquals(java.util.HashMap.class, result);
+
+        i.put("size", 4242);
+        result = jexl.createScript("i['size'] ", "i").execute((JexlContext)null, i);
+        Assert.assertEquals(4242 ,result);
+        result = jexl.createScript("i['size'] = 2828", "i").execute((JexlContext)null, i);
+        Assert.assertEquals(2828, result);
+        Assert.assertEquals(2828, i.get("size"));
+        result = jexl.createScript("i.'size'", "i").execute((JexlContext)null, i);
+        Assert.assertEquals(2828, result);
+        result = jexl.createScript("size i", "i").execute((JexlContext)null, i);
+        Assert.assertEquals(2, result);
+
+        i.put("empty", 424242);
+        result = jexl.createScript("i['empty'] ", "i").execute((JexlContext)null, i);
+        Assert.assertEquals(424242, result);
+        result = jexl.createScript("i['empty'] = 282828", "i").execute((JexlContext)null, i);
+        Assert.assertEquals(282828, result);
+        Assert.assertEquals(282828, i.get("empty"));
+        result = jexl.createScript("i.'empty'", "i").execute((JexlContext)null, i);
+        Assert.assertNotEquals(282828, result);
+        result = jexl.createScript("empty i", "i").execute((JexlContext)null, i);
+        Assert.assertFalse((Boolean) result);
+    }
 }
