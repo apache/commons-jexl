@@ -1286,8 +1286,7 @@ public class Interpreter extends ParserVisitor {
             if (object != null) {
                 // disallow mixing antish variable & bean with same root; avoid ambiguity
                 antish = false;
-            }
-            else if (antish) {
+            } else if (antish) {
                 if (ant == null) {
                     JexlNode first = left.jjtGetChild(0);
                     if (first instanceof ASTIdentifier && ((ASTIdentifier) first).getSymbol() < 0) {
@@ -1629,8 +1628,9 @@ public class Interpreter extends ParserVisitor {
         }
         // resolve that property
         Exception xcause = null;
-        List<JexlUberspect.ResolverType> strategy = (node == null) || !(node.jjtGetParent()instanceof ASTArrayAccess)
-                                                     ? JexlUberspect.POJO : JexlUberspect.MAP;
+        List<JexlUberspect.ResolverType> strategy = uberspect.getStrategy(
+                                                    !(node != null && node.jjtGetParent() instanceof ASTArrayAccess),
+                                                    object.getClass());
         JexlPropertyGet vg = uberspect.getPropertyGet(strategy, object, attribute);
         if (vg != null) {
             try {
@@ -1692,15 +1692,16 @@ public class Interpreter extends ParserVisitor {
             }
         }
         Exception xcause = null;
-        List<JexlUberspect.ResolverType> strategy = (node == null) || !(node.jjtGetParent()instanceof ASTArrayAccess)
-                                                     ? JexlUberspect.POJO : JexlUberspect.MAP;
+        List<JexlUberspect.ResolverType> strategy = uberspect.getStrategy(
+                                                    !(node != null && node.jjtGetParent() instanceof ASTArrayAccess),
+                                                    object.getClass());
         JexlPropertySet vs = uberspect.getPropertySet(strategy, object, attribute, value);
         // if we can't find an exact match, narrow the value argument and try again
         if (vs == null) {
             // replace all numbers with the smallest type that will fit
             Object[] narrow = {value};
             if (arithmetic.narrowArguments(narrow)) {
-                vs = uberspect.getPropertySet(object, attribute, narrow[0]);
+                vs = uberspect.getPropertySet(strategy, object, attribute, narrow[0]);
             }
         }
         if (vs != null) {
