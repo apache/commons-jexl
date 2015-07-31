@@ -71,7 +71,7 @@ public interface JexlUberspect {
      * @see JexlUberspect#getPropertyGet
      * @see JexlUberspect#getPropertySet
      */
-    static final List<ResolverType> POJO = Collections.unmodifiableList(Arrays.asList(
+    List<ResolverType> POJO = Collections.unmodifiableList(Arrays.asList(
         ResolverType.PROPERTY,
         ResolverType.MAP,
         ResolverType.LIST,
@@ -83,7 +83,7 @@ public interface JexlUberspect {
     /**
      * A resolver strategy tailored for Maps, favors '[]' over '.'.
      */
-    static final  List<ResolverType> MAP = Collections.unmodifiableList(Arrays.asList(
+    List<ResolverType> MAP = Collections.unmodifiableList(Arrays.asList(
         ResolverType.MAP,
         ResolverType.LIST,
         ResolverType.DUCK,
@@ -133,9 +133,18 @@ public interface JexlUberspect {
     JexlPropertyGet getPropertyGet(Object obj, Object identifier);
 
     /**
+     * Gets the strategy to apply for resolving properties.
+     * <p>Default behavior is to use POJO if db is true, MAP if db is false.
+     * @param db access operator flag, true for dot ('.' ) or false for bracket ('[]')
+     * @param clazz the property owner class
+     * @return the strategy
+     */
+    List<ResolverType> getStrategy(boolean db, Class<?> clazz);
+
+    /**
      * Property getter.
      * <p>Seeks a JexlPropertyGet apropos to an expression like <code>bar.woogie</code>.</p>
-     * @param strategy  the ordered list of resolver types
+     * @param strategy  the ordered list of resolver types, must not be null
      * @param obj the object to get the property from
      * @param identifier property name
      * @return a {@link JexlPropertyGet} or null
@@ -156,7 +165,7 @@ public interface JexlUberspect {
     /**
      * Property setter.
      * <p>Seeks a JelPropertySet apropos to an expression like <code>foo.bar = "geir"</code>.</p>
-     * @param strategy the ordered list of resolver types
+     * @param strategy the ordered list of resolver types, must not be null
      * @param obj the object to get the property from
      * @param identifier property name
      * @param arg value to set
@@ -179,6 +188,5 @@ public interface JexlUberspect {
      * @since 3.0
      */
     JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic);
-
 
 }

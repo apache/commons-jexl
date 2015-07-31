@@ -46,7 +46,7 @@ public class Operators {
     }
 
     /**
-     * Checks whether a method returns a boolean or a Boolean
+     * Checks whether a method returns a boolean or a Boolean.
      * @param vm the JexlMethod (may be null)
      * @return true of false
      */
