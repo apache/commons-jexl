@@ -68,7 +68,7 @@ public class Engine extends JexlEngine {
     private static final class UberspectHolder {
         /** The default uberspector that handles all introspection patterns. */
         private static final Uberspect UBERSPECT =
-                new Uberspect(LogManager.getLogger(JexlEngine.class));
+                new Uberspect(LogManager.getLogger(JexlEngine.class), JexlUberspect.JEXL_STRATEGY);
 
         /** Non-instantiable. */
         private UberspectHolder() {
@@ -137,7 +137,7 @@ public class Engine extends JexlEngine {
      */
     public Engine(JexlBuilder conf) {
         JexlSandbox sandbox = conf.sandbox();
-        JexlUberspect uber = conf.uberspect() == null ? getUberspect(conf.logger()) : conf.uberspect();
+        JexlUberspect uber = conf.uberspect() == null ? getUberspect(conf.logger(), conf.strategy()) : conf.uberspect();
         ClassLoader loader = conf.loader();
         if (loader != null) {
             uber.setClassLoader(loader);
@@ -168,13 +168,15 @@ public class Engine extends JexlEngine {
      * be able to use a (low level) introspector created with a given logger
      * instead of the default one.</p>
      * @param logger the logger to use for the underlying Uberspect
+     * @param strategy the property resolver strategy
      * @return Uberspect the default uberspector instance.
      */
-    public static Uberspect getUberspect(Logger logger) {
-        if (logger == null || logger.equals(LogManager.getLogger(JexlEngine.class))) {
+    public static Uberspect getUberspect(Logger logger, JexlUberspect.ResolverStrategy strategy) {
+        if ((logger == null || logger.equals(LogManager.getLogger(JexlEngine.class)))
+            && (strategy == null || strategy == JexlUberspect.JEXL_STRATEGY)) {
             return UberspectHolder.UBERSPECT;
         }
-        return new Uberspect(logger);
+        return new Uberspect(logger, strategy);
     }
 
     @Override

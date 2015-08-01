@@ -107,16 +107,8 @@ public final class SandboxUberspect implements JexlUberspect {
      * {@inheritDoc}
      */
     @Override
-    public List<ResolverType> getStrategy(boolean db, Class<?> clazz) {
-        return db ? JexlUberspect.POJO : JexlUberspect.MAP;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public JexlPropertyGet getPropertyGet(Object obj, Object identifier) {
-        return getPropertyGet(POJO, obj, identifier);
+        return getPropertyGet(null, obj, identifier);
     }
 
     /**
@@ -138,7 +130,7 @@ public final class SandboxUberspect implements JexlUberspect {
      */
     @Override
     public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg) {
-        return getPropertySet(POJO, obj, identifier, arg);
+        return getPropertySet(null, obj, identifier, arg);
     }
 
     /**

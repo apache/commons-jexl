@@ -75,10 +75,10 @@ public abstract class LongRange implements Collection<Long> {
     @Override
     public int hashCode() {
         int hash = getClass().hashCode();
-        //CHECKSTYLE:OFF Not magic number
+        //CSOFF: MagicNumber
         hash = 13 * hash + (int) (this.min ^ (this.min >>> 32));
         hash = 13 * hash + (int) (this.max ^ (this.max >>> 32));
-        //CHECKSTYLE:ON
+        //CSON: MagicNumber
         return hash;
     }
 

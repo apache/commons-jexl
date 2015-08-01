@@ -22,25 +22,14 @@ import java.math.MathContext;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 //import org.apache.commons.beanutils.LazyDynaMap;
 
 /**
@@ -1121,18 +1110,6 @@ public class IssuesTest extends JexlTestCase {
         Assert.assertEquals("CD", value1);
     }
 
-    @Test
-    public void test156() throws Exception {
-        JexlEngine jexl = new Engine();
-        JexlContext jc = new MapContext();
-        Object ra = jexl.createExpression("463.0d * 0.1").evaluate(jc);
-        Assert.assertEquals(Double.class, ra.getClass());
-        Object r0 = jexl.createExpression("463.0B * 0.1").evaluate(jc);
-        Assert.assertEquals(java.math.BigDecimal.class, r0.getClass());
-        Object r1 = jexl.createExpression("463.0B * 0.1B").evaluate(jc);
-        Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
-    }
-
 //
 //
 //	@Test
@@ -1186,104 +1163,4 @@ public class IssuesTest extends JexlTestCase {
 //
 //	    Assert.assertEquals(null, ((Double)e.evaluate(jc)).doubleValue(), 50d, 0d);
 //	}
-
-
-    @Test
-    public void test161() throws Exception {
-        final JexlEngine jexl = new Engine();
-        final JexlContext jc = new MapContext();
-
-        Document xml = getDocument("<node info='123'/>");
-        NamedNodeMap nnm = xml.getLastChild().getAttributes();
-        Attr info = (Attr) nnm.getNamedItem("info");
-        Assert.assertEquals("123", info.getValue());
-
-        jc.set("x", xml.getLastChild());
-        final String y = "456";
-        jc.set("y", y);
-        JexlScript s = jexl.createScript("x.attribute.info = y");
-        Object r = s.execute(jc);
-        nnm = xml.getLastChild().getAttributes();
-        info = (Attr) nnm.getNamedItem("info");
-        Assert.assertEquals(y, r);
-        Assert.assertEquals(y, info.getValue());
-    }
-
-    public static class XmlArithmetic extends JexlArithmetic {
-        public XmlArithmetic(boolean lenient) {
-            super(lenient);
-        }
-        public boolean empty(org.w3c.dom.Element elt) {
-            return !elt.hasAttributes() && !elt.hasChildNodes();
-        }
-    }
-
-    @Test
-    public void test162() throws Exception {
-        JexlEngine jexl = //new JexlBuilder().arithmetic(new JexlArithmetic(false)).create();
-new JexlBuilder().arithmetic(new XmlArithmetic(false)).create();
-        JexlScript s0 = jexl.createScript("x.empty()", "x");
-        Document xml;
-        Node x;
-        Boolean r;
-        xml = getDocument("<node info='123'/>");
-        x = xml.getLastChild();
-        r = (Boolean) s0.execute(null, x);
-        Assert.assertFalse(r);
-        xml = getDocument("<node>some content</node>");
-        x = xml.getLastChild();
-        r = (Boolean) s0.execute(null, x);
-        Assert.assertFalse(r);
-        xml = getDocument("<node/>");
-        x = xml.getLastChild();
-        r = (Boolean) s0.execute(null, x);
-        Assert.assertTrue(r);
-    }
-
-    private static Document getDocument(String xml) throws IOException, SAXException, ParserConfigurationException {
-        DocumentBuilder xmlBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        InputStream stringInputStream = new ByteArrayInputStream(xml.getBytes("UTF-8"));
-        return xmlBuilder.parse(stringInputStream);
-    }
-
-
-    @Test
-    public void test171() throws Exception {
-        final JexlEngine jexl = new Engine();
-        Object result;
-        Map<String, Object> i = new HashMap<String, Object>();
-
-        i.put("class", 42);
-        result = jexl.createScript("i['class'] ", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(42, result);
-        result = jexl.createScript("i['class'] = 28", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(28, result);
-        Assert.assertEquals(28, i.get("class"));
-        result = jexl.createScript("i.class", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(java.util.HashMap.class, result);
-        result = jexl.createScript("i.'class'", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(java.util.HashMap.class, result);
-
-        i.put("size", 4242);
-        result = jexl.createScript("i['size'] ", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(4242 ,result);
-        result = jexl.createScript("i['size'] = 2828", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(2828, result);
-        Assert.assertEquals(2828, i.get("size"));
-        result = jexl.createScript("i.'size'", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(2828, result);
-        result = jexl.createScript("size i", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(2, result);
-
-        i.put("empty", 424242);
-        result = jexl.createScript("i['empty'] ", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(424242, result);
-        result = jexl.createScript("i['empty'] = 282828", "i").execute((JexlContext)null, i);
-        Assert.assertEquals(282828, result);
-        Assert.assertEquals(282828, i.get("empty"));
-        result = jexl.createScript("i.'empty'", "i").execute((JexlContext)null, i);
-        Assert.assertNotEquals(282828, result);
-        result = jexl.createScript("empty i", "i").execute((JexlContext)null, i);
-        Assert.assertFalse((Boolean) result);
-    }
 }

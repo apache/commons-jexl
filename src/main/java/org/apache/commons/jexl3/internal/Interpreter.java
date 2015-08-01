@@ -1590,6 +1590,21 @@ public class Interpreter extends ParserVisitor {
     }
 
     /**
+     * Determines the property {s,g}etter strategy to use.
+     * @param node the syntactic node
+     * @param obj the instance we are seeking the {s,g}etter from
+     * @return a list of resolvers, not null
+     */
+    protected List<JexlUberspect.ResolverType> getPropertyResolvers(JexlNode node, Object obj) {
+        List<JexlUberspect.ResolverType> strategy = node == null
+                                                    ? null
+                                                    : node.jjtGetParent() instanceof ASTArrayAccess
+                                                    ? JexlUberspect.MAP
+                                                    : JexlUberspect.POJO;
+        return strategy;
+    }
+
+    /**
      * Gets an attribute of an object.
      *
      * @param object    to retrieve value from
@@ -1628,9 +1643,7 @@ public class Interpreter extends ParserVisitor {
         }
         // resolve that property
         Exception xcause = null;
-        List<JexlUberspect.ResolverType> strategy = uberspect.getStrategy(
-                                                    !(node != null && node.jjtGetParent() instanceof ASTArrayAccess),
-                                                    object.getClass());
+        List<JexlUberspect.ResolverType> strategy = getPropertyResolvers(node, object);
         JexlPropertyGet vg = uberspect.getPropertyGet(strategy, object, attribute);
         if (vg != null) {
             try {
@@ -1692,9 +1705,7 @@ public class Interpreter extends ParserVisitor {
             }
         }
         Exception xcause = null;
-        List<JexlUberspect.ResolverType> strategy = uberspect.getStrategy(
-                                                    !(node != null && node.jjtGetParent() instanceof ASTArrayAccess),
-                                                    object.getClass());
+        List<JexlUberspect.ResolverType> strategy = getPropertyResolvers(node, object);
         JexlPropertySet vs = uberspect.getPropertySet(strategy, object, attribute, value);
         // if we can't find an exact match, narrow the value argument and try again
         if (vs == null) {

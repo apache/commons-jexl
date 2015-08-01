@@ -156,6 +156,13 @@ public final class Debugger extends ParserVisitor implements JexlInfo.Detail {
     public boolean debug(JexlNode node) {
         return debug(node, true);
     }
+
+    /**
+     * Seeks the location of an error cause (a node) in an expression.
+     * @param node the node to debug
+     * @param r whether we should actively find the root node of the debugged node
+     * @return true if the cause was located, false otherwise
+     */
     public boolean debug(JexlNode node, boolean r) {
         start = 0;
         end = 0;
@@ -167,9 +174,9 @@ public final class Debugger extends ParserVisitor implements JexlInfo.Detail {
             // make arg cause become the root cause
             JexlNode root = node;
             if (r) {
-            while (root.jjtGetParent() != null) {
-                root = root.jjtGetParent();
-            }
+                while (root.jjtGetParent() != null) {
+                    root = root.jjtGetParent();
+                }
             }
             root.jjtAccept(this, null);
         }

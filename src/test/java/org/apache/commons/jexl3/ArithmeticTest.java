@@ -30,7 +30,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
@@ -409,6 +411,54 @@ public class ArithmeticTest extends JexlTestCase {
         script = jexl.createScript("double:isNaN(NaN)");
         result = script.execute(null);
         Assert.assertTrue((Boolean) result);
+    }
+
+    @Test
+    /**
+     * JEXL-156.
+     */
+    public void testMultClass() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlContext jc = new MapContext();
+        Object ra = jexl.createExpression("463.0d * 0.1").evaluate(jc);
+        Assert.assertEquals(Double.class, ra.getClass());
+        Object r0 = jexl.createExpression("463.0B * 0.1").evaluate(jc);
+        Assert.assertEquals(java.math.BigDecimal.class, r0.getClass());
+        Object r1 = jexl.createExpression("463.0B * 0.1B").evaluate(jc);
+        Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
+    }
+
+    public void testDivClass() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlContext jc = new MapContext();
+        Object ra = jexl.createExpression("463.0d / 0.1").evaluate(jc);
+        Assert.assertEquals(Double.class, ra.getClass());
+        Object r0 = jexl.createExpression("463.0B / 0.1").evaluate(jc);
+        Assert.assertEquals(java.math.BigDecimal.class, r0.getClass());
+        Object r1 = jexl.createExpression("463.0B / 0.1B").evaluate(jc);
+        Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
+    }
+
+    public void testPlusClass() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlContext jc = new MapContext();
+        Object ra = jexl.createExpression("463.0d + 0.1").evaluate(jc);
+        Assert.assertEquals(Double.class, ra.getClass());
+        Object r0 = jexl.createExpression("463.0B + 0.1").evaluate(jc);
+        Assert.assertEquals(java.math.BigDecimal.class, r0.getClass());
+        Object r1 = jexl.createExpression("463.0B + 0.1B").evaluate(jc);
+        Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
+    }
+    
+    public void testMinusClass() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlContext jc = new MapContext();
+        Object ra = jexl.createExpression("463.0d - 0.1").evaluate(jc);
+        Assert.assertEquals(Double.class, ra.getClass());
+        Object r0 = jexl.createExpression("463.0B - 0.1").evaluate(jc);
+        Assert.assertEquals(java.math.BigDecimal.class, r0.getClass());
+        Object r1 = jexl.createExpression("463.0B - 0.1B").evaluate(jc);
+        Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
     }
 
     @Test
@@ -1012,6 +1062,9 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
+    /**
+     * Inspired by JEXL-16{1,2}.
+     */
     public void testXmlArithmetic() throws Exception {
         JexlEngine jexl = new JexlBuilder().arithmetic(new XmlArithmetic(false)).create();
         JexlScript e0 = jexl.createScript("x.empty()", "x");
@@ -1052,6 +1105,22 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(0, size);
         size = (Integer) s1.execute(null, x);
         Assert.assertEquals(0, size);
+        xml = getDocument("<node info='123'/>");
+        NamedNodeMap nnm = xml.getLastChild().getAttributes();
+        Attr info = (Attr) nnm.getNamedItem("info");
+        Assert.assertEquals("123", info.getValue());
+
+        // JEXL-161
+        JexlContext jc = new MapContext();
+        jc.set("x", xml.getLastChild());
+        final String y = "456";
+        jc.set("y", y);
+        JexlScript s = jexl.createScript("x.attribute.info = y");
+        Object r = s.execute(jc);
+        nnm = xml.getLastChild().getAttributes();
+        info = (Attr) nnm.getNamedItem("info");
+        Assert.assertEquals(y, r);
+        Assert.assertEquals(y, info.getValue());
     }
 
     @Test
