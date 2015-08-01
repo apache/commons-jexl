@@ -56,6 +56,8 @@ public class Uberspect implements JexlUberspect {
     public static final Object TRY_FAILED = JexlEngine.TRY_FAILED;
     /** The logger to use for all warnings and errors. */
     protected final Logger rlog;
+    /** The resolver strategy. */
+    private final JexlUberspect.ResolverStrategy strategy;
     /** The introspector version. */
     private final AtomicInteger version;
     /** The soft reference to the introspector currently in use. */
@@ -73,9 +75,11 @@ public class Uberspect implements JexlUberspect {
     /**
      * Creates a new Uberspect.
      * @param runtimeLogger the logger used for all logging needs
+     * @param sty the resolver strategy
      */
-    public Uberspect(Logger runtimeLogger) {
+    public Uberspect(Logger runtimeLogger, JexlUberspect.ResolverStrategy sty) {
         rlog = runtimeLogger;
+        strategy = sty == null? JexlUberspect.JEXL_STRATEGY : sty;
         ref = new SoftReference<Introspector>(null);
         loader = new SoftReference<ClassLoader>(getClass().getClassLoader());
         operatorMap = new ConcurrentHashMap<Class<? extends JexlArithmetic>, Set<JexlOperator>>();
@@ -216,28 +220,27 @@ public class Uberspect implements JexlUberspect {
         return MethodExecutor.discover(base(), obj, method, args);
     }
 
-    @Override
-    public List<ResolverType> getStrategy(boolean db, Class<?> clazz) {
-        //return Map.class.isAssignableFrom(clazz)? JexlUberspect.MAP : JexlUberspect.POJO;
-        return db ? JexlUberspect.POJO : JexlUberspect.MAP;
-    }
+//    @Override
+//    public List<ResolverType> getStrategy(List<ResolverType> resolvers, Object obj) {
+//        return strategy.apply(resolvers, obj);
+//    }
 
     @Override
     public JexlPropertyGet getPropertyGet(Object obj, Object identifier) {
-        return getPropertyGet(POJO, obj, identifier);
+        return getPropertyGet(null, obj, identifier);
     }
 
     @Override
     public JexlPropertyGet getPropertyGet(
-            final List<ResolverType> strategy, final Object obj, final Object identifier) {
-        if (strategy == null) {
-            throw new NullPointerException("null property resolver strategy");
-        }
+            final List<ResolverType> resolvers, final Object obj, final Object identifier
+    ) {
+
+        final List<ResolverType> actual = strategy.apply(resolvers, obj);
         final Class<?> claz = obj.getClass();
         final String property = AbstractExecutor.castString(identifier);
         final Introspector is = base();
         JexlPropertyGet executor = null;
-        for (ResolverType resolver : strategy) {
+        for (ResolverType resolver : actual) {
             switch (resolver) {
                 case PROPERTY:
                     // first try for a getFoo() type of property (also getfoo() )
@@ -285,20 +288,19 @@ public class Uberspect implements JexlUberspect {
 
     @Override
     public JexlPropertySet getPropertySet(final Object obj, final Object identifier, final Object arg) {
-        return getPropertySet(POJO, obj, identifier, arg);
+        return getPropertySet(null, obj, identifier, arg);
     }
 
     @Override
     public JexlPropertySet getPropertySet(
-            final List<ResolverType> strategy, final Object obj, final Object identifier, final Object arg) {
-        if (strategy == null) {
-            throw new NullPointerException("null property resolver strategy");
-        }
+           final List<ResolverType> resolvers, final Object obj, final Object identifier, final Object arg
+    ) {
+        final List<ResolverType> actual = strategy.apply(resolvers, obj);
         final Class<?> claz = obj.getClass();
         final String property = AbstractExecutor.castString(identifier);
         final Introspector is = base();
         JexlPropertySet executor = null;
-        for (ResolverType resolver : strategy) {
+        for (ResolverType resolver : actual) {
             switch (resolver) {
                 case PROPERTY:
                     // first try for a setFoo() type of property (also setfoo() )

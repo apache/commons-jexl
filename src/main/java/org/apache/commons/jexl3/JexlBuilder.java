@@ -67,6 +67,10 @@ public class JexlBuilder {
      */
     protected JexlUberspect uberspect = null;
     /**
+     * The resolver strategy.
+     */
+    protected JexlUberspect.ResolverStrategy resolver = null;
+    /**
      * The sandbox.
      */
     protected JexlSandbox sandbox = null;
@@ -125,6 +129,22 @@ public class JexlBuilder {
     /** @return the uberspect */
     public JexlUberspect uberspect() {
         return this.uberspect;
+    }
+
+    /**
+     * Sets the JexlUberspect resolver strategy the engine will use.
+     * <p>This is ignored if the uberspect has been set.
+     * @param rs the strategy
+     * @return this builder
+     */
+    public JexlBuilder strategy(JexlUberspect.ResolverStrategy rs) {
+        this.resolver = rs;
+        return this;
+    }
+
+    /** @return the resolver strategy */
+    public JexlUberspect.ResolverStrategy strategy() {
+        return this.resolver;
     }
 
     /**
