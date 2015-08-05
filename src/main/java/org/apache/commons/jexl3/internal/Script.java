@@ -110,6 +110,34 @@ public class Script implements JexlScript, JexlExpression {
     }
 
     @Override
+    public int hashCode() {
+        // CSOFF: Magic number
+        int hash = 17;
+        hash = 31 * hash + (this.jexl != null ? this.jexl.hashCode() : 0);
+        hash = 31 * hash + (this.source != null ? this.source.hashCode() : 0);
+        return hash;
+        // CSON: Magic number
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Script other = (Script) obj;
+        if (this.jexl != other.jexl) {
+            return false;
+        }
+        if ((this.source == null) ? (other.source != null) : !this.source.equals(other.source)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public String toString() {
         CharSequence src = source;
         if (src == null) {

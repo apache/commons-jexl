@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.internal;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -288,6 +289,23 @@ public final class Scope {
          */
         public Frame(Object[] r) {
             stack = r;
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.deepHashCode(this.stack);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Frame other = (Frame) obj;
+            return Arrays.deepEquals(this.stack, other.stack);
         }
 
         /**
