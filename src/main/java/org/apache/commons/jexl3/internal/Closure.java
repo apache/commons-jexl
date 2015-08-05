@@ -51,6 +51,38 @@ public class Closure extends Script {
         return debug.toString();
     }
 
+    @Override
+    public int hashCode() {
+        // CSOFF: Magic number
+        int hash = 17;
+        hash = 31 * hash + (this.jexl != null ? this.jexl.hashCode() : 0);
+        hash = 31 * hash + (this.source != null ? this.source.hashCode() : 0);
+        hash = 31 * hash + (this.frame != null ? this.frame.hashCode() : 0);
+        // CSON: Magic number
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Closure other = (Closure) obj;
+        if (this.jexl != other.jexl) {
+            return false;
+        }
+        if ((this.source == null) ? (other.source != null) : !this.source.equals(other.source)) {
+            return false;
+        }
+        if (this.frame != other.frame && (this.frame == null || !this.frame.equals(other.frame))) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Sets the hoisted index of a given symbol, ie the target index of a parent hoisted symbol in this closure's frame.
      * <p>This is meant to allow a locally defined function to "see" and call itself as a local (hoisted) variable;
