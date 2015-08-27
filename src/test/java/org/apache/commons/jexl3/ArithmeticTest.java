@@ -449,7 +449,7 @@ public class ArithmeticTest extends JexlTestCase {
         Object r1 = jexl.createExpression("463.0B + 0.1B").evaluate(jc);
         Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
     }
-    
+
     public void testMinusClass() throws Exception {
         JexlEngine jexl = new JexlBuilder().create();
         JexlContext jc = new MapContext();
@@ -928,6 +928,28 @@ public class ArithmeticTest extends JexlTestCase {
         }
     }
 
+    public class Callable173 {
+        public Object call(String... arg) {
+            return 42;
+        }
+        public Object call(Integer... arg) {
+            return arg[0] * arg[1];
+        }
+    }
+
+    @Test
+    public void testJexl173() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlContext jc = new MapContext();
+        Callable173 c173 = new Callable173();
+        JexlScript e = jexl.createScript( "c173(9, 6)", "c173" );
+        Object result = e.execute(jc, c173);
+        Assert.assertEquals(54, result);
+        e = jexl.createScript( "c173('fourty', 'two')", "c173" );
+        result = e.execute(jc, c173);
+        Assert.assertEquals(42, result);
+
+    }
 
     public static class Arithmetic132 extends JexlArithmetic {
         public Arithmetic132() {
