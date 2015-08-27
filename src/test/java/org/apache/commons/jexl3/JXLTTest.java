@@ -16,6 +16,9 @@
  */
 package org.apache.commons.jexl3;
 
+import org.apache.commons.jexl3.internal.TemplateDebugger;
+import org.apache.commons.jexl3.internal.TemplateEngine;
+import org.apache.commons.jexl3.internal.TemplateScript;
 import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
 
@@ -56,6 +59,15 @@ public class JXLTTest extends JexlTestCase {
     public void tearDown() throws Exception {
         debuggerCheck(ENGINE);
         super.tearDown();
+    }
+
+    private static String refactor(TemplateDebugger td, JxltEngine.Template ts) {
+        boolean dbg = td.debug((TemplateScript)ts);
+        if (dbg) {
+            return td.toString();
+        } else {
+            return "";
+        }
     }
 
     /** Extract the source from a toString-ed expression. */
@@ -531,6 +543,11 @@ public class JXLTTest extends JexlTestCase {
 
         String dstr = t.asString();
         Assert.assertNotNull(dstr);
+
+        TemplateDebugger td = new TemplateDebugger();
+        String refactored = refactor(td, (TemplateScript) t);
+        Assert.assertNotNull(refactored);
+        Assert.assertEquals(test42, refactored);
     }
 
     public static class FrobozWriter extends PrintWriter {
@@ -564,9 +581,10 @@ public class JXLTTest extends JexlTestCase {
         String rpt
                 = "<report>\n"
                 + "\n"
+                + "\n$$ var a = 1;"
                 + "\n$$ var x = 2;"
                 + "\n"
-                + "\n     $$ var y = 9;"
+                + "\n$$ var y = 9;"
                 + "\n"
                 + "\n        ${x + y}"
                 + "\n</report>\n";
@@ -574,8 +592,13 @@ public class JXLTTest extends JexlTestCase {
         StringWriter strw = new StringWriter();
         t.evaluate(context, strw);
         String output = strw.toString();
-        String ctl = "<report>\n\n\n        11\n</report>\n";
+        String ctl = "<report>\n\n\n\n\n        11\n</report>\n";
         Assert.assertEquals(ctl, output);
+
+        TemplateDebugger td = new TemplateDebugger();
+        String refactored = refactor(td, (TemplateScript) t);
+        Assert.assertNotNull(refactored);
+        Assert.assertEquals(rpt, refactored);
     }
 
     @Test
@@ -631,6 +654,11 @@ public class JXLTTest extends JexlTestCase {
         Assert.assertTrue(output.indexOf("43") > 0);
         Assert.assertTrue(output.indexOf("44") > 0);
         Assert.assertTrue(output.indexOf("45") > 0);
+
+        TemplateDebugger td = new TemplateDebugger();
+        String xxx = refactor(td, (TemplateScript) t);
+        Assert.assertNotNull(xxx);
+        Assert.assertEquals(rpt, xxx);
     }
     @Test
     public void testOneLiner() throws Exception {
@@ -650,6 +678,49 @@ public class JXLTTest extends JexlTestCase {
         String output = strw.toString();
         Assert.assertEquals("fourty-two", output);
     }
+
+    @Test
+    public void testInterpolation() throws Exception {
+        context.set("user", "Dimitri");
+        String expr =  "`Hello \n${user}`";
+        Object value = JEXL.createScript(expr).execute(context);
+        Assert.assertEquals(expr, "Hello \nDimitri", value);
+    }
+
+    @Test
+    public void testInterpolationGlobal() throws Exception {
+        String expr =  "user='Dimitri'; `Hello \n${user}`";
+        Object value = JEXL.createScript(expr).execute(context);
+        Assert.assertEquals(expr, "Hello \nDimitri", value);
+    }
+
+    @Test
+    public void testInterpolationLocal() throws Exception {
+        String expr =  "var user='Henrib'; `Hello \n${user}`";
+        Object value = JEXL.createScript(expr).execute(context);
+        Assert.assertEquals(expr, "Hello \nHenrib", value);
+    }
+
+    @Test
+    public void testInterpolationLvsG() throws Exception {
+        String expr =  "user='Dimitri'; var user='Henrib'; `H\\\"ello \n${user}`";
+        Object value = JEXL.createScript(expr).execute(context);
+        Assert.assertEquals(expr, "H\"ello \nHenrib", value);
+    }
+        @Test
+    public void testInterpolationLvsG2() throws Exception {
+        String expr =  "user='Dimitri'; var user='Henrib'; `H\\`ello \n${user}`";
+        Object value = JEXL.createScript(expr).execute(context);
+        Assert.assertEquals(expr, "H`ello \nHenrib", value);
+    }
+
+    @Test
+    public void testInterpolationParameter() throws Exception {
+        String expr =  "(user)->{`Hello \n${user}`}";
+        Object value = JEXL.createScript(expr).execute(context, "Henrib");
+        Assert.assertEquals(expr, "Hello \nHenrib", value);
+    }
+//
 //
 //    @Test public void testDeferredTemplate() throws Exception {
 //        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(
