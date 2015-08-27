@@ -93,13 +93,15 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
                 return TRY_FAILED;// fail
+            } catch (IllegalArgumentException xarg) {
+                return TRY_FAILED;// fail
             }
         }
         return TRY_FAILED;
     }
 
     /**
-     * Checks wether an argument is an empty array.
+     * Checks whether an argument is an empty array.
      * @param arg the argument
      * @return true if <code>arg</code> is an empty array
      */
