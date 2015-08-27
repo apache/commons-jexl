@@ -17,11 +17,9 @@
 package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlContext;
-import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JxltEngine;
-import org.apache.commons.jexl3.internal.Engine.VarCollector;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
@@ -45,10 +43,10 @@ import java.util.Set;
  * @since 3.0
  */
 public final class TemplateEngine extends JxltEngine {
-    /** The JEXL engine instance. */
-    private final Engine jexl;
     /** The TemplateExpression cache. */
     private final Engine.SoftCache<String, TemplateExpression> cache;
+    /** The JEXL engine instance. */
+    private final Engine jexl;
     /** The first character for immediate expressions. */
     private final char immediateChar;
     /** The first character for deferred expressions. */
@@ -73,11 +71,25 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /**
+     * @return the immediate character
+     */
+    char getImmediateChar() {
+        return immediateChar;
+    }
+
+    /**
+     * @return the deferred character
+     */
+    char getDeferredChar() {
+        return deferredChar;
+    }
+
+    /**
      * Types of expressions.
      * Each instance carries a counter index per (composite sub-) template expression type.
      * @see ExpressionBuilder
      */
-    private static enum ExpressionType {
+    static enum ExpressionType {
         /** Constant TemplateExpression, count index 0. */
         CONSTANT(0),
         /** Immediate TemplateExpression, count index 1. */
@@ -105,7 +117,7 @@ public final class TemplateEngine extends JxltEngine {
      * A helper class to build expressions.
      * Keeps count of sub-expressions by type.
      */
-    private static final class ExpressionBuilder {
+    static final class ExpressionBuilder {
         /** Per TemplateExpression type counters. */
         private final int[] counts;
         /** The list of expressions. */
@@ -181,7 +193,7 @@ public final class TemplateEngine extends JxltEngine {
      * @return the JexlEngine
      */
     @Override
-    public JexlEngine getEngine() {
+    public Engine getEngine() {
         return jexl;
     }
 
@@ -198,7 +210,7 @@ public final class TemplateEngine extends JxltEngine {
     /**
      * The abstract base class for all unified expressions, immediate '${...}' and deferred '#{...}'.
      */
-    private abstract class TemplateExpression implements Expression {
+    abstract class TemplateExpression implements Expression {
         /** The source of this template expression(see {@link TemplateEngine.TemplateExpression#prepare}). */
         protected final TemplateExpression source;
 
@@ -347,7 +359,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /** A constant unified expression. */
-    private class ConstantExpression extends TemplateExpression {
+    class ConstantExpression extends TemplateExpression {
         /** The constant held by this unified expression. */
         private final Object value;
 
@@ -391,7 +403,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /** The base for Jexl based unified expressions. */
-    private abstract class JexlBasedExpression extends TemplateExpression {
+    abstract class JexlBasedExpression extends TemplateExpression {
         /** The JEXL string for this unified expression. */
         protected final CharSequence expr;
         /** The JEXL node for this unified expression. */
@@ -442,7 +454,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /** An immediate unified expression: ${jexl}. */
-    private class ImmediateExpression extends JexlBasedExpression {
+    class ImmediateExpression extends JexlBasedExpression {
         /**
          * Creates an immediate unified expression.
          * @param expr   the unified expression as a string
@@ -467,7 +479,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /** A deferred unified expression: #{jexl}. */
-    private class DeferredExpression extends JexlBasedExpression {
+    class DeferredExpression extends JexlBasedExpression {
         /**
          * Creates a deferred unified expression.
          * @param expr   the unified expression as a string
@@ -504,7 +516,7 @@ public final class TemplateEngine extends JxltEngine {
      * #{...${jexl}...}
      * Note that the deferred syntax is JEXL's.
      */
-    private class NestedExpression extends JexlBasedExpression {
+    class NestedExpression extends JexlBasedExpression {
         /**
          * Creates a nested unified expression.
          * @param expr   the unified expression as a string
@@ -548,7 +560,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /** A composite unified expression: "... ${...} ... #{...} ...". */
-    private class CompositeExpression extends TemplateExpression {
+    class CompositeExpression extends TemplateExpression {
         /** Bit encoded (deferred count > 0) bit 1, (immediate count > 0) bit 0. */
         private final int meta;
         /** The list of sub-expression resulting from parsing. */
@@ -732,7 +744,7 @@ public final class TemplateEngine extends JxltEngine {
      * @return the unified expression instance
      * @throws JexlException if an error occur during parsing
      */
-    private TemplateExpression parseExpression(JexlInfo info, String expr, Scope scope) {
+    TemplateExpression parseExpression(JexlInfo info, String expr, Scope scope) {
         final int size = expr.length();
         final ExpressionBuilder builder = new ExpressionBuilder(0);
         final StringBuilder strb = new StringBuilder(size);
@@ -899,7 +911,7 @@ public final class TemplateEngine extends JxltEngine {
     /**
      * The enum capturing the difference between verbatim and code source fragments.
      */
-    private static enum BlockType {
+    static enum BlockType {
         /** Block is to be output "as is" but may be a unified expression. */
         VERBATIM,
         /** Block is a directive, ie a fragment of JEXL code. */
@@ -909,7 +921,7 @@ public final class TemplateEngine extends JxltEngine {
     /**
      * Abstract the source fragments, verbatim or immediate typed text blocks.
      */
-    private static final class Block {
+    static final class Block {
         /** The type of block, verbatim or directive. */
         private final BlockType type;
         /** The block start line info. */
@@ -920,7 +932,7 @@ public final class TemplateEngine extends JxltEngine {
         /**
          * Creates a new block.
          * @param theType  the block type
-         * @param theLine the line number
+         * @param theLine  the line number
          * @param theBlock the content
          */
         Block(BlockType theType, int theLine, String theBlock) {
@@ -929,20 +941,44 @@ public final class TemplateEngine extends JxltEngine {
             body = theBlock;
         }
 
+        /**
+         * @return type
+         */
+        BlockType getType() {
+            return type;
+        }
+
+        /**
+         * @return line
+         */
+        int getLine() {
+            return line;
+        }
+
+        /**
+         * @return body
+         */
+        String getBody() {
+            return body;
+        }
+
         @Override
         public String toString() {
             if (BlockType.VERBATIM.equals(type)) {
                 return body;
             } else {
                 StringBuilder strb = new StringBuilder(64);
-                toString(strb, "$$");
+                Iterator<CharSequence> lines = readLines(new StringReader(body));
+                while (lines.hasNext()) {
+                    strb.append("$$").append(lines.next());
+                }
                 return strb.toString();
             }
         }
 
         /**
          * Appends this block string representation to a builder.
-         * @param strb the string builder to append to
+         * @param strb   the string builder to append to
          * @param prefix the line prefix (immediate or deferred)
          */
         protected void toString(StringBuilder strb, String prefix) {
@@ -951,165 +987,12 @@ public final class TemplateEngine extends JxltEngine {
             } else {
                 Iterator<CharSequence> lines = readLines(new StringReader(body));
                 while (lines.hasNext()) {
-                    strb.append(prefix);
-                    strb.append(lines.next());
+                    strb.append(prefix).append(lines.next());
                 }
             }
         }
     }
 
-    /**
-     * A Template instance.
-     */
-    public final class TemplateScript implements Template {
-        /** The prefix marker. */
-        private final String prefix;
-        /** The array of source blocks. */
-        private final Block[] source;
-        /** The resulting script. */
-        private final ASTJexlScript script;
-        /** The TemplateEngine expressions called by the script. */
-        private final TemplateExpression[] exprs;
-
-        /**
-         * Creates a new template from an character input.
-         * @param info the source info
-         * @param directive the prefix for lines of code; can not be "$", "${", "#" or "#{"
-         *                  since this would preclude being able to differentiate directives and template expressions
-         * @param reader    the input reader
-         * @param parms     the parameter names
-         * @throws NullPointerException     if either the directive prefix or input is null
-         * @throws IllegalArgumentException if the directive prefix is invalid
-         */
-        public TemplateScript(JexlInfo info, String directive, Reader reader, String... parms) {
-            if (directive == null) {
-                throw new NullPointerException("null prefix");
-            }
-            if (Character.toString(immediateChar).equals(directive)
-                    || (Character.toString(immediateChar) + "{").equals(directive)
-                    || Character.toString(deferredChar).equals(directive)
-                    || (Character.toString(deferredChar) + "{").equals(directive)) {
-                throw new IllegalArgumentException(directive + ": is not a valid directive pattern");
-            }
-            if (reader == null) {
-                throw new NullPointerException("null input");
-            }
-            Scope scope = parms == null ? null : new Scope(null, parms);
-            prefix = directive;
-            List<Block> blocks = readTemplate(prefix, reader);
-            List<TemplateExpression> uexprs = new ArrayList<TemplateExpression>();
-            StringBuilder strb = new StringBuilder();
-            int nuexpr = 0;
-            int codeStart = -1;
-            for (int b = 0; b < blocks.size(); ++b) {
-                Block block = blocks.get(b);
-                if (block.type == BlockType.VERBATIM) {
-                    strb.append("jexl:print(");
-                    strb.append(nuexpr++);
-                    strb.append(");");
-                } else {
-                    // keep track of first block of code, the frame creator
-                    if (codeStart < 0) {
-                        codeStart = b;
-                    }
-                    strb.append(block.body);
-                }
-            }
-            // create the script
-            if (info == null) {
-                info = jexl.createInfo();
-            }
-            // allow lambda defining params
-            script = jexl.parse(info.at(0, 0), strb.toString(), scope, false, false).script();
-            scope = script.getScope();
-            // createExpression the exprs using the code frame for those appearing after the first block of code
-            for (int b = 0; b < blocks.size(); ++b) {
-                Block block = blocks.get(b);
-                if (block.type == BlockType.VERBATIM) {
-                    uexprs.add(parseExpression(info.at(block.line, 0), block.body, b > codeStart ? scope : null));
-                }
-            }
-            source = blocks.toArray(new Block[blocks.size()]);
-            exprs = uexprs.toArray(new TemplateExpression[uexprs.size()]);
-        }
-
-        /**
-         * Private ctor used to expand deferred expressions during prepare.
-         * @param thePrefix the directive prefix
-         * @param theSource the source
-         * @param theScript the script
-         * @param theExprs  the expressions
-         */
-        private TemplateScript(String thePrefix, Block[] theSource,
-                ASTJexlScript theScript, TemplateExpression[] theExprs) {
-            prefix = thePrefix;
-            source = theSource;
-            script = theScript;
-            exprs = theExprs;
-        }
-
-        @Override
-        public String toString() {
-            StringBuilder strb = new StringBuilder();
-            for (Block block : source) {
-                block.toString(strb, prefix);
-            }
-            return strb.toString();
-        }
-
-        @Override
-        public String asString() {
-            StringBuilder strb = new StringBuilder();
-            int e = 0;
-            for (int b = 0; b < source.length; ++b) {
-                Block block = source[b];
-                if (block.type == BlockType.DIRECTIVE) {
-                    strb.append(prefix);
-                } else {
-                    exprs[e++].asString(strb);
-                }
-            }
-            return strb.toString();
-        }
-
-        @Override
-        public TemplateScript prepare(JexlContext context) {
-            Scope.Frame frame = script.createFrame((Object[]) null);
-            TemplateContext tcontext = new TemplateContext(context, frame, exprs, null);
-            TemplateExpression[] immediates = new TemplateExpression[exprs.length];
-            for (int e = 0; e < exprs.length; ++e) {
-                immediates[e] = exprs[e].prepare(frame, tcontext);
-            }
-            return new TemplateScript(prefix, source, script, immediates);
-        }
-
-        @Override
-        public void evaluate(JexlContext context, Writer writer) {
-            evaluate(context, writer, (Object[]) null);
-        }
-
-        @Override
-        public void evaluate(JexlContext context, Writer writer, Object... args) {
-            Scope.Frame frame = script.createFrame(args);
-            TemplateContext tcontext = new TemplateContext(context, frame, exprs, writer);
-            Interpreter interpreter = jexl.createInterpreter(tcontext, frame);
-            interpreter.interpret(script);
-        }
-
-        @Override
-        public Set<List<String>> getVariables() {
-            VarCollector collector = new VarCollector();
-            for (TemplateExpression expr : exprs) {
-                expr.getVariables(collector);
-            }
-            return collector.collected();
-        }
-
-        @Override
-        public String[] getParameters() {
-            return script.getParameters();
-        }
-    }
 
     /**
      * The type of context to use during evaluation of templates.
@@ -1292,7 +1175,7 @@ public final class TemplateEngine extends JxltEngine {
                 boolean eol = false;
                 try {
                     while ((c = reader.read()) >= 0) {
-                        if (eol && (c != '\n' && c != '\r')) {
+                        if (eol) {// && (c != '\n' && c != '\r')) {
                             reader.reset();
                             break;
                         }
@@ -1405,7 +1288,6 @@ public final class TemplateEngine extends JxltEngine {
 
     @Override
     public TemplateScript createTemplate(JexlInfo info, String prefix, Reader source, String... parms) {
-        return new TemplateScript(info, prefix, source, parms);
+        return new TemplateScript(this, info, prefix, source,  parms);
     }
-
 }
