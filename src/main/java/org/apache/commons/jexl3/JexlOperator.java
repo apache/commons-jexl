@@ -205,7 +205,23 @@ public enum JexlOperator {
      * <br/>Returns this from 'self*' overload method to let the engine know the side effect has been performed and
      * there is no need to assign the result.
      */
-    ASSIGN("=", null, null);
+    ASSIGN("=", null, null),
+    /**
+     * Property get operator as in: x.y.
+     */
+    PROPERTY_GET(".", "propertyGet", 2),
+    /**
+     * Property set operator as in: x.y = z.
+     */
+    PROPERTY_SET(".=", "propertySet", 3),
+    /**
+     * Array get operator as in: x[y].
+     */
+    ARRAY_GET("[]", "arrayGet", 2),
+    /**
+     * Array set operator as in: x[y] = z.
+     */
+    ARRAY_SET("[]=", "arraySet", 3);
     /**
      * The operator symbol.
      */

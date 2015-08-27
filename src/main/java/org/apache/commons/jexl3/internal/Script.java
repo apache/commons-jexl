@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
@@ -90,8 +91,14 @@ public class Script implements JexlScript, JexlExpression {
     }
 
     /**
-     * Gets this script original script source.
-     * @return the contents of the input source as a String.
+     * @return the engine that created this script
+     */
+    public JexlEngine getEngine() {
+        return jexl;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public String getSourceText() {
@@ -99,12 +106,20 @@ public class Script implements JexlScript, JexlExpression {
     }
 
     /**
-     * Gets a string representation of this script underlying AST.
-     * @return the script as text
+     * {@inheritDoc}
      */
     @Override
     public String getParsedText() {
+        return getParsedText(2);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getParsedText(int indent) {
         Debugger debug = new Debugger();
+        debug.setIndentation(indent);
         debug.debug(script);
         return debug.toString();
     }

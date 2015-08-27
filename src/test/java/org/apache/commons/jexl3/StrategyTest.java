@@ -17,7 +17,6 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine;
-import org.apache.commons.jexl3.introspection.JexlUberspect;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Assert;
@@ -34,6 +33,29 @@ public class StrategyTest extends JexlTestCase {
         super("StrategyTest");
     }
 
+    // JEXL-174
+    public static class MapArithmetic extends JexlArithmetic {
+        public MapArithmetic(boolean flag) {
+            super(flag);
+        }
+
+        public Object propertyGet(Map<?,?> map, Object identifier) {
+            return arrayGet(map, identifier);
+        }
+
+        public Object propertySet(Map<Object, Object> map, Object identifier, Object value) {
+             return arraySet(map, identifier, value);
+        }
+
+        public Object arrayGet(Map<?,?> map, Object identifier) {
+            return map.get(identifier);
+        }
+
+        public Object arraySet(Map<Object, Object> map, Object identifier, Object value) {
+             map.put(identifier, value);
+             return value;
+        }
+    }
 
     @Test
     public void testJexlStrategy() throws Exception {
@@ -43,7 +65,7 @@ public class StrategyTest extends JexlTestCase {
 
     @Test
     public void testMapStrategy() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().strategy(JexlUberspect.MAP_STRATEGY).create();
+        final JexlEngine jexl = new JexlBuilder().arithmetic( new MapArithmetic(true)).create();
         run171(jexl, false);
     }
 

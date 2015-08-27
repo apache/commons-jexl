@@ -22,10 +22,13 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
+
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.apache.commons.jexl3.introspection.JexlUberspect.PropertyResolver;
+
 import org.apache.commons.jexl3.parser.ASTAddNode;
 import org.apache.commons.jexl3.parser.ASTAndNode;
 import org.apache.commons.jexl3.parser.ASTArguments;
@@ -57,6 +60,7 @@ import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
+import org.apache.commons.jexl3.parser.ASTJxltLiteral;
 import org.apache.commons.jexl3.parser.ASTLENode;
 import org.apache.commons.jexl3.parser.ASTLTNode;
 import org.apache.commons.jexl3.parser.ASTMapEntry;
@@ -98,6 +102,7 @@ import org.apache.commons.jexl3.parser.ASTWhileStatement;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.Node;
 import org.apache.commons.jexl3.parser.ParserVisitor;
+import org.apache.commons.jexl3.parser.StringParser;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -300,7 +305,7 @@ public class Interpreter extends ParserVisitor {
             throw new JexlException.Property(node, var, cause);
         }
         if (!silent) {
-            logger.warn(JexlException.propertyError(node, var));
+            logger.warn(JexlException.propertyError(node, var), cause);
         }
         return null;
     }
@@ -318,7 +323,7 @@ public class Interpreter extends ParserVisitor {
                 throw new JexlException.Operator(node, operator.getOperatorSymbol(), cause);
             }
             if (!silent) {
-                logger.warn(JexlException.operatorError(node, operator.getOperatorSymbol()));
+                logger.warn(JexlException.operatorError(node, operator.getOperatorSymbol()), cause);
             }
         }
     }
@@ -1479,12 +1484,19 @@ public class Interpreter extends ParserVisitor {
                         }
                     }
                 }
-                // lambda, script or jexl method will do
-                if (functor instanceof JexlScript) {
-                    return ((JexlScript) functor).execute(context, argv);
-                }
-                if (functor instanceof JexlMethod) {
-                    return ((JexlMethod) functor).invoke(bean, argv);
+                if (functor != null) {
+                    // lambda, script or jexl method will do
+                    if (functor instanceof JexlScript) {
+                        return ((JexlScript) functor).execute(context, argv);
+                    }
+                    if (functor instanceof JexlMethod) {
+                        return ((JexlMethod) functor).invoke(bean, argv);
+                    }
+                    // a generic callable
+                    vm = uberspect.getMethod(functor, "call", argv);
+                    if (vm != null) {
+                        return vm.invoke(functor, argv);
+                    }
                 }
                 // if we did not find an exact method by name and we haven't tried yet,
                 // attempt to narrow the parameters and if this succeeds, try again in next loop
@@ -1590,21 +1602,6 @@ public class Interpreter extends ParserVisitor {
     }
 
     /**
-     * Determines the property {s,g}etter strategy to use.
-     * @param node the syntactic node
-     * @param obj the instance we are seeking the {s,g}etter from
-     * @return a list of resolvers, not null
-     */
-    protected List<JexlUberspect.ResolverType> getPropertyResolvers(JexlNode node, Object obj) {
-        List<JexlUberspect.ResolverType> strategy = node == null
-                                                    ? null
-                                                    : node.jjtGetParent() instanceof ASTArrayAccess
-                                                    ? JexlUberspect.MAP
-                                                    : JexlUberspect.POJO;
-        return strategy;
-    }
-
-    /**
      * Gets an attribute of an object.
      *
      * @param object    to retrieve value from
@@ -1630,6 +1627,12 @@ public class Interpreter extends ParserVisitor {
         if (isCancelled()) {
             throw new JexlException.Cancel(node);
         }
+        final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
+                                    ? JexlOperator.ARRAY_GET : JexlOperator.PROPERTY_GET;
+        Object result = operators.tryOverload(node, operator, object, attribute);
+        if (result != JexlEngine.TRY_FAILED) {
+            return result;
+        }
         // attempt to reuse last executor cached in volatile JexlNode.value
         if (node != null && cache) {
             Object cached = node.jjtGetValue();
@@ -1643,8 +1646,8 @@ public class Interpreter extends ParserVisitor {
         }
         // resolve that property
         Exception xcause = null;
-        List<JexlUberspect.ResolverType> strategy = getPropertyResolvers(node, object);
-        JexlPropertyGet vg = uberspect.getPropertyGet(strategy, object, attribute);
+        List<PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
+        JexlPropertyGet vg =  uberspect.getPropertyGet(resolvers, object, attribute);
         if (vg != null) {
             try {
                 Object value = vg.invoke(object);
@@ -1693,6 +1696,12 @@ public class Interpreter extends ParserVisitor {
         if (isCancelled()) {
             throw new JexlException.Cancel(node);
         }
+        final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
+                                    ? JexlOperator.ARRAY_SET : JexlOperator.PROPERTY_SET;
+        Object result = operators.tryOverload(node, operator, object, attribute, value);
+        if (result != JexlEngine.TRY_FAILED) {
+            return;
+        }
         // attempt to reuse last executor cached in volatile JexlNode.value
         if (node != null && cache) {
             Object cached = node.jjtGetValue();
@@ -1705,14 +1714,14 @@ public class Interpreter extends ParserVisitor {
             }
         }
         Exception xcause = null;
-        List<JexlUberspect.ResolverType> strategy = getPropertyResolvers(node, object);
-        JexlPropertySet vs = uberspect.getPropertySet(strategy, object, attribute, value);
+        List<PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
+        JexlPropertySet vs = uberspect.getPropertySet(resolvers, object, attribute, value);
         // if we can't find an exact match, narrow the value argument and try again
         if (vs == null) {
             // replace all numbers with the smallest type that will fit
             Object[] narrow = {value};
             if (arithmetic.narrowArguments(narrow)) {
-                vs = uberspect.getPropertySet(strategy, object, attribute, narrow[0]);
+                vs = uberspect.getPropertySet(resolvers, object, attribute, narrow[0]);
             }
         }
         if (vs != null) {
@@ -1739,5 +1748,19 @@ public class Interpreter extends ParserVisitor {
                     + ", argument: " + value.getClass().getSimpleName();
             throw new UnsupportedOperationException(error, xcause);
         }
+    }
+
+    @Override
+    protected Object visit(ASTJxltLiteral node, Object data) {
+        TemplateEngine.TemplateExpression tp = (TemplateEngine.TemplateExpression) node.jjtGetValue();
+        if (tp == null) {
+           TemplateEngine jxlt = jexl.jxlt();
+           tp = jxlt.parseExpression(node.jexlInfo(), node.getLiteral(), frame != null? frame.getScope() : null);
+           node.jjtSetValue(tp);
+        }
+        if (tp != null) {
+           return tp.evaluate(frame, context);
+        }
+        return null;
     }
 }
