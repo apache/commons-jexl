@@ -228,6 +228,13 @@ PARSER_END(Parser)
   >
 }
 
+<*> TOKEN :
+{
+  < JXLT_LITERAL:
+    "`" (~["`","\\"] | "\\" ~["\u0000"])* "`"
+  >
+}
+
 /***************************************
  *      Statements
  ***************************************/
@@ -560,6 +567,8 @@ void Literal() #void :
 |
   BooleanLiteral()
 |
+  JxltLiteral()
+|
   StringLiteral()
 |
   NullLiteral()
@@ -612,6 +621,16 @@ void StringLiteral() :
 {
   t=<STRING_LITERAL>
   { jjtThis.setLiteral(Parser.buildString(t.image, true)); }
+}
+
+
+void JxltLiteral() #JxltLiteral :
+{
+   Token t;
+}
+{
+   t=<JXLT_LITERAL>
+   { jjtThis.setLiteral(Parser.buildString(t.image, true)); }
 }
 
 void ExtendedLiteral() #ExtendedLiteral() : {}
