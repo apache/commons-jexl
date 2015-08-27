@@ -235,6 +235,16 @@
           </td>
         </tr>
         <tr>
+            <td>Multiline format literals</td>
+            <td>
+                Start and end with <code>`</code> delimiter - back-quote -, e.g. <source>`Hello world`</source>
+                <p>The escape character is <code>\</code> (backslash); it only escapes the string delimiter.</p>
+                These format literals can span multiple lines and allow Unified JEXL expressions (JSTL like expressions)
+                to be interpolated. If a variable <code>user</code> valued <code>JEXL</code>is present in the environment - whether
+                as a local or global variable -, the format <source>`Hello ${user}`</source> will evaluate as <source>Hello JEXL</source>.
+            </td>
+        </tr>
+        <tr>
           <td>Boolean literals</td>
           <td>
             The literals <code>true</code> and <code>false</code> can be used, e.g.

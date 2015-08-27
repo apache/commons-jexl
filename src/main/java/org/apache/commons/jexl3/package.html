@@ -71,7 +71,7 @@
         <ul>
             <li>Dynamic invocation of setters, getters, methods and constructors</li>
             <li>Script expressions known as JEXL expressions</li>
-            <li>JSP/JSF like expression known as UnifiedJEXL expressions</li>
+            <li>JSP/JSF like expression known as JXLT expressions</li>
         </ul>
 
         <h3><a name="usage_note">Important note</a></h3>
@@ -197,9 +197,13 @@
             everything after the first semi-colon and just returns the result from
             the first command.
         </p>
+        <p>
+            Also note that expressions are not statements (which is what scripts are made of) and do not allow
+            using the flow control (if, while, for), variables or lambdas syntactic elements.
+        </p>
         <h4>JexlScript</h4>
         <p>
-            This allows you to put multiple commands in the expression and you can
+            These allow you to use multiple statements and you can
             use variable assignments, loops, calculations, etc. More or less what can be achieved in Shell or
             JavaScript at its basic level. The result from the last command is returned from the script.
         </p>
@@ -311,7 +315,7 @@
 
         <h3><a name="dynamic_configuration">Dynamic Configuration</a></h3>
         <p>
-            Those configuration options can be overriden during evaluation by implementing a
+            Those configuration options can be overridden during evaluation by implementing a
             {@link org.apache.commons.jexl3.JexlContext}
             that also implements {@link org.apache.commons.jexl3.JexlEngine$Options} to carry evaluation options.
             An example of such a class exists in the test package.
@@ -464,8 +468,40 @@
                 </tr>
             </table>
         <p>
-            You can also override the base operator methods, those whose arguments are Object.
+            You can also add methods to overload property getters and setters operators behaviors.
+            Public methods of the JexlArithmetic instance named propertyGet/propertySet/arrayGet/arraySet are potential
+            overrides that will be called when appropriate.
+            The following table is an overview of the relation between a syntactic form and the method to call
+            where V is the property value class, O the object class and  P the property identifier class (usually String or Integer).
         </p>
+
+            <table>
+                <tr>
+                    <th>Expression</th>
+                    <th>Method Template</th>
+                </tr>
+                <tr>
+                    <td>foo.property</td>
+                    <td>public V propertyGet(O obj, P property);</td>
+                </tr>
+                <tr>
+                    <td>foo.property = value</td>
+                    <td>public V propertySet(O obj, P property, V value);</td>
+                </tr>
+                <tr>
+                    <td>foo[property]</td>
+                    <td>public V arrayGet(O obj, P property, V value);</td>
+                </tr>
+                <tr>
+                    <td>foo[property] = value</td>
+                    <td>public V arraySet(O obj, P property, V value);</td>
+                </tr>
+            </table>
+        <p>
+            You can also override the base operator methods, those whose arguments are Object which gives you total
+            control.
+        </p>
+
         <h2><a name="extension">Extending JEXL</a></h2>
         If you need to make JEXL treat some objects in a specialized manner or tweak how it
         reacts to some settings, you can derive most of its inner-workings. The classes and methods are rarely private or

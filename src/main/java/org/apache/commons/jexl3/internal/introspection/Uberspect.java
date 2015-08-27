@@ -50,9 +50,7 @@ import java.util.List;
  * @since 1.0
  */
 public class Uberspect implements JexlUberspect {
-    /**
-     * Publicly exposed special failure object returned by tryInvoke.
-     */
+    /** Publicly exposed special failure object returned by tryInvoke. */
     public static final Object TRY_FAILED = JexlEngine.TRY_FAILED;
     /** The logger to use for all warnings and errors. */
     protected final Logger rlog;
@@ -62,7 +60,7 @@ public class Uberspect implements JexlUberspect {
     private final AtomicInteger version;
     /** The soft reference to the introspector currently in use. */
     private volatile Reference<Introspector> ref;
-    /** The class loader reference; used to recreate the Introspector when necessary. */
+    /** The class loader reference; used to recreate the introspector when necessary. */
     private volatile Reference<ClassLoader> loader;
     /**
      * The map from arithmetic classes to overloaded operator sets.
@@ -111,6 +109,9 @@ public class Uberspect implements JexlUberspect {
     }
     // CSON: DoubleCheckedLocking
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setClassLoader(ClassLoader nloader) {
         synchronized (this) {
@@ -127,6 +128,9 @@ public class Uberspect implements JexlUberspect {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getVersion() {
         return version.intValue();
@@ -215,69 +219,84 @@ public class Uberspect implements JexlUberspect {
         return base().getMethods(c, methodName);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JexlMethod getMethod(Object obj, String method, Object... args) {
         return MethodExecutor.discover(base(), obj, method, args);
     }
 
-//    @Override
-//    public List<ResolverType> getStrategy(List<ResolverType> resolvers, Object obj) {
-//        return strategy.apply(resolvers, obj);
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<PropertyResolver> getResolvers(JexlOperator op, Object obj) {
+        return strategy.apply(op, obj);
+    }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JexlPropertyGet getPropertyGet(Object obj, Object identifier) {
         return getPropertyGet(null, obj, identifier);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JexlPropertyGet getPropertyGet(
-            final List<ResolverType> resolvers, final Object obj, final Object identifier
+            final List<PropertyResolver> resolvers, final Object obj, final Object identifier
     ) {
-
-        final List<ResolverType> actual = strategy.apply(resolvers, obj);
         final Class<?> claz = obj.getClass();
         final String property = AbstractExecutor.castString(identifier);
         final Introspector is = base();
+        final List<PropertyResolver> r = resolvers == null? strategy.apply(null, obj) : resolvers;
         JexlPropertyGet executor = null;
-        for (ResolverType resolver : actual) {
-            switch (resolver) {
-                case PROPERTY:
-                    // first try for a getFoo() type of property (also getfoo() )
-                    executor = PropertyGetExecutor.discover(is, claz, property);
-                    if (executor == null) {
-                        executor = BooleanGetExecutor.discover(is, claz, property);
-                    }
-                    break;
-                case MAP:
-                    // let's see if we are a map...
-                    executor = MapGetExecutor.discover(is, claz, identifier);
-                    break;
-                case LIST:
-                    // let's see if this is a list or array
-                    Integer index = AbstractExecutor.castInteger(identifier);
-                    if (index != null) {
-                        executor = ListGetExecutor.discover(is, claz, index);
-                    }
-                    break;
-                case DUCK:
-                    // if that didn't work, look for get(foo)
-                    executor = DuckGetExecutor.discover(is, claz, identifier);
-                    if (executor == null && property != null && property != identifier) {
-                        // look for get("foo") if we did not try yet (just above)
-                        executor = DuckGetExecutor.discover(is, claz, property);
-                    }
-                    break;
-                case FIELD:
-                    // a field may be? (can not be a number)
-                    executor = FieldGetExecutor.discover(is, claz, property);
-                    break;
-                case CONTAINER:
-                    // or an indexed property?
-                    executor = IndexedType.discover(is, obj, property);
-                    break;
-                default:
-                    continue; // in case we add new ones in enum
+        for (PropertyResolver resolver : r) {
+            if (resolver instanceof JexlResolver) {
+                switch ((JexlResolver) resolver) {
+                    case PROPERTY:
+                        // first try for a getFoo() type of property (also getfoo() )
+                        executor = PropertyGetExecutor.discover(is, claz, property);
+                        if (executor == null) {
+                            executor = BooleanGetExecutor.discover(is, claz, property);
+                        }
+                        break;
+                    case MAP:
+                        // let's see if we are a map...
+                        executor = MapGetExecutor.discover(is, claz, identifier);
+                        break;
+                    case LIST:
+                        // let's see if this is a list or array
+                        Integer index = AbstractExecutor.castInteger(identifier);
+                        if (index != null) {
+                            executor = ListGetExecutor.discover(is, claz, index);
+                        }
+                        break;
+                    case DUCK:
+                        // if that didn't work, look for get(foo)
+                        executor = DuckGetExecutor.discover(is, claz, identifier);
+                        if (executor == null && property != null && property != identifier) {
+                            // look for get("foo") if we did not try yet (just above)
+                            executor = DuckGetExecutor.discover(is, claz, property);
+                        }
+                        break;
+                    case FIELD:
+                        // a field may be? (can not be a number)
+                        executor = FieldGetExecutor.discover(is, claz, property);
+                        break;
+                    case CONTAINER:
+                        // or an indexed property?
+                        executor = IndexedType.discover(is, obj, property);
+                        break;
+                    default:
+                        continue; // in case we add new ones in enum
+                }
+            } else {
+                executor = resolver.getPropertyGet(this, obj, identifier);
             }
             if (executor != null) {
                 return executor;
@@ -285,53 +304,62 @@ public class Uberspect implements JexlUberspect {
         }
         return null;
     }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JexlPropertySet getPropertySet(final Object obj, final Object identifier, final Object arg) {
         return getPropertySet(null, obj, identifier, arg);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JexlPropertySet getPropertySet(
-           final List<ResolverType> resolvers, final Object obj, final Object identifier, final Object arg
+            final List<PropertyResolver> resolvers, final Object obj, final Object identifier, final Object arg
     ) {
-        final List<ResolverType> actual = strategy.apply(resolvers, obj);
         final Class<?> claz = obj.getClass();
         final String property = AbstractExecutor.castString(identifier);
         final Introspector is = base();
+        final List<PropertyResolver> actual = resolvers == null? strategy.apply(null, obj) : resolvers;
         JexlPropertySet executor = null;
-        for (ResolverType resolver : actual) {
-            switch (resolver) {
-                case PROPERTY:
-                    // first try for a setFoo() type of property (also setfoo() )
-                    executor = PropertySetExecutor.discover(is, claz, property, arg);
-                    break;
-                case MAP:
-                    // let's see if we are a map...
-                    executor = MapSetExecutor.discover(is, claz, identifier, arg);
-                    break;
-                case LIST:
+        for (PropertyResolver resolver : actual) {
+            if (resolver instanceof JexlResolver) {
+                switch ((JexlResolver) resolver) {
+                    case PROPERTY:
+                        // first try for a setFoo() type of property (also setfoo() )
+                        executor = PropertySetExecutor.discover(is, claz, property, arg);
+                        break;
+                    case MAP:
+                        // let's see if we are a map...
+                        executor = MapSetExecutor.discover(is, claz, identifier, arg);
+                        break;
+                    case LIST:
                     // let's see if we can convert the identifier to an int,
-                    // if obj is an array or a list, we can still do something
-                    Integer index = AbstractExecutor.castInteger(identifier);
-                    if (index != null) {
-                        executor = ListSetExecutor.discover(is, claz, identifier, arg);
-                    }
-                    break;
-                case DUCK:
-                    // if that didn't work, look for set(foo)
-                    executor = DuckSetExecutor.discover(is, claz, identifier, arg);
-                    if (executor == null && property != null && property != identifier) {
-                        executor = DuckSetExecutor.discover(is, claz, property, arg);
-                    }
-                    break;
-                case FIELD:
-                    // a field may be?
-                    executor = FieldSetExecutor.discover(is, claz, property, arg);
-                    break;
-                case CONTAINER:
-                default:
-                    continue; // in case we add new ones in enum
+                        // if obj is an array or a list, we can still do something
+                        Integer index = AbstractExecutor.castInteger(identifier);
+                        if (index != null) {
+                            executor = ListSetExecutor.discover(is, claz, identifier, arg);
+                        }
+                        break;
+                    case DUCK:
+                        // if that didn't work, look for set(foo)
+                        executor = DuckSetExecutor.discover(is, claz, identifier, arg);
+                        if (executor == null && property != null && property != identifier) {
+                            executor = DuckSetExecutor.discover(is, claz, property, arg);
+                        }
+                        break;
+                    case FIELD:
+                        // a field may be?
+                        executor = FieldSetExecutor.discover(is, claz, property, arg);
+                        break;
+                    case CONTAINER:
+                    default:
+                        continue; // in case we add new ones in enum
+                }
+            } else {
+                executor = resolver.getPropertySet(this, obj, identifier, arg);
             }
             if (executor != null) {
                 return executor;
@@ -340,6 +368,9 @@ public class Uberspect implements JexlUberspect {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @SuppressWarnings("unchecked")
     public Iterator<?> getIterator(Object obj) {
@@ -374,6 +405,9 @@ public class Uberspect implements JexlUberspect {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JexlMethod getConstructor(Object ctorHandle, Object... args) {
         return ConstructorMethod.discover(base(), ctorHandle, args);
@@ -401,16 +435,9 @@ public class Uberspect implements JexlUberspect {
         }
 
         @Override
-        public JexlMethod getOperator(JexlOperator operator, Object arg) {
-            return overloads.contains(operator) && arg != null
-                   ? getMethod(arithmetic, operator.getMethodName(), arg)
-                   : null;
-        }
-
-        @Override
-        public JexlMethod getOperator(JexlOperator operator, Object lhs, Object rhs) {
-            return overloads.contains(operator) && lhs != null && rhs != null
-                   ? getMethod(arithmetic, operator.getMethodName(), lhs, rhs)
+        public JexlMethod getOperator(JexlOperator operator, Object... args) {
+            return overloads.contains(operator) && args != null
+                   ? getMethod(arithmetic, operator.getMethodName(), args)
                    : null;
         }
 
@@ -420,6 +447,9 @@ public class Uberspect implements JexlUberspect {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic) {
         JexlArithmetic.Uberspect jau = null;

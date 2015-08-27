@@ -103,9 +103,11 @@ public final class MethodExecutor extends AbstractExecutor.Method {
             try {
                 return invoke(obj, args);
             } catch (InvocationTargetException xinvoke) {
-                return JexlEngine.TRY_FAILED; // fail
+                return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
-                return JexlEngine.TRY_FAILED;// fail
+                return TRY_FAILED;// fail
+            } catch (IllegalArgumentException xarg) {
+                return TRY_FAILED;// fail
             }
         }
         return JexlEngine.TRY_FAILED;

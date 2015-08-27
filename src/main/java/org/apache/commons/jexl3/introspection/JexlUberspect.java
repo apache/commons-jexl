@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.jexl3.introspection;
 
 import org.apache.commons.jexl3.JexlArithmetic;
+import org.apache.commons.jexl3.JexlOperator;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -26,26 +27,51 @@ import java.util.Map;
 
 /**
  * 'Federated' introspection/reflection interface to allow JEXL introspection
- *  behavior to be customized.
+ * behavior to be customized.
  *
  * @since 1.0
  */
 public interface JexlUberspect {
     /**
-     * The various property resolver types.
-     * <p>
-     * Each resolver type discovers how to set/get a property with different techniques; seeking
-     * method names or field names, etc.
+     * Abstracts getting property setter and getter.
      * <p>
      * These are used through 'strategies' to solve properties; a strategy orders a list of resolver types,
      * and each resolver type is tried in sequence; the first resolver that discovers a non null {s,g}etter
      * stops the search.
-     * @see ResolverStrategy
+     * @see JexlResolver
      * @see JexlUberspect#getPropertyGet
      * @see JexlUberspect#getPropertySet
      * @since 3.0
      */
-    enum ResolverType {
+    interface PropertyResolver {
+        /**
+         * Gets a property getter.
+         * @param uber       the uberspect
+         * @param obj        the object
+         * @param identifier the property identifier
+         * @return the property getter or null
+         */
+        JexlPropertyGet getPropertyGet(JexlUberspect uber, Object obj, Object identifier);
+
+        /**
+         * Gets a property setter.
+         * @param uber       the uberspect
+         * @param obj        the object
+         * @param identifier the property identifier
+         * @param arg        the property value
+         * @return the property setter or null
+         */
+        JexlPropertySet getPropertySet(JexlUberspect uber, Object obj, Object identifier, Object arg);
+    }
+
+    /**
+     * The various builtin property resolvers.
+     * <p>
+     * Each resolver discovers how to set/get a property with different techniques; seeking
+     * method names or field names, etc.
+     * @since 3.0
+     */
+    enum JexlResolver implements PropertyResolver {
         /**
          * Seeks methods named get{P,p}property and is{P,p}property.
          */
@@ -70,90 +96,119 @@ public interface JexlUberspect {
          * Seeks a getContainer(property) and setContainer(property, value)
          * as in <code>x.container.property</code>.
          */
-        CONTAINER
+        CONTAINER;
+
+        @Override
+        public final JexlPropertyGet getPropertyGet(JexlUberspect uber, Object obj, Object identifier) {
+            return uber.getPropertyGet(Collections.<PropertyResolver>singletonList(this), obj, identifier);
+        }
+
+        @Override
+        public final JexlPropertySet getPropertySet(JexlUberspect uber, Object obj, Object identifier, Object arg) {
+            return uber.getPropertySet(Collections.<PropertyResolver>singletonList(this), obj, identifier);
+        }
     }
 
     /**
      * A resolver types list tailored for POJOs, favors '.' over '[]'.
      */
-    List<ResolverType> POJO = Collections.unmodifiableList(Arrays.asList(
-        ResolverType.PROPERTY,
-        ResolverType.MAP,
-        ResolverType.LIST,
-        ResolverType.DUCK,
-        ResolverType.FIELD,
-        ResolverType.CONTAINER
+    List<PropertyResolver> POJO = Collections.<PropertyResolver>unmodifiableList(Arrays.asList(
+            JexlResolver.PROPERTY,
+            JexlResolver.MAP,
+            JexlResolver.LIST,
+            JexlResolver.DUCK,
+            JexlResolver.FIELD,
+            JexlResolver.CONTAINER
     ));
 
     /**
      * A resolver types list tailored for Maps, favors '[]' over '.'.
      */
-    List<ResolverType> MAP = Collections.unmodifiableList(Arrays.asList(
-        ResolverType.MAP,
-        ResolverType.LIST,
-        ResolverType.DUCK,
-        ResolverType.PROPERTY,
-        ResolverType.FIELD,
-        ResolverType.CONTAINER
-     ));
+    List<PropertyResolver> MAP = Collections.<PropertyResolver>unmodifiableList(Arrays.asList(
+            JexlResolver.MAP,
+            JexlResolver.LIST,
+            JexlResolver.DUCK,
+            JexlResolver.PROPERTY,
+            JexlResolver.FIELD,
+            JexlResolver.CONTAINER
+    ));
 
     /**
-     * Determine property resolution strategies.
+     * Determines property resolution strategy.
      * <p>
      * To use a strategy instance, you have to set it at engine creation using
      * {@link org.apache.commons.jexl3.JexlBuilder#strategy(JexlUberspect.ResolverStrategy)}
      * as in:<br/>
      * <code>JexlEngine jexl = new JexlBuilder().strategy(MY_STRATEGY).create();</code>
-     * @see ResolverType
      * @since 3.0
      */
     interface ResolverStrategy {
         /**
          * Applies this strategy to a list of resolver types.
          * <p>
-         * <ul>In the default implementation, the resolvers argument depends on the calling situation:
-         * <li>{@link #POJO} for dot operator resolution (foo.bar )</li>
-         * <li>{@link #MAP} for bracket operator resolution (foo['bar'])</li>
-         * <li>null when called from {@link #getPropertyGet(java.lang.Object, java.lang.Object) }
-         * or {@link #getPropertySet(java.lang.Object, java.lang.Object, java.lang.Object)}</li>
-         * </ul>
-         *
-         * @param resolvers candidate resolver types list
-         * @param obj the instance we seek to obtain a property setter/getter from, can not be null
+         * @param operator the property access operator, may be null
+         * @param obj      the instance we seek to obtain a property setter/getter from, can not be null
          * @return the ordered list of resolvers types, must not be null
          */
-        List<ResolverType> apply(List<ResolverType> resolvers, Object obj);
+        List<PropertyResolver> apply(JexlOperator operator, Object obj);
     }
 
     /**
      * The default strategy.
      * <p>
-     * If the resolvers list is not null, use that list.
-     * Otherwise, if the object is a map, use the MAP list, otherwise use the POJO list.
+     * If the operator is '[]' or if the operator is null and the object is a map, use the MAP list of resolvers;
+     * Other cases use the POJO list of resolvers.
      */
     ResolverStrategy JEXL_STRATEGY = new ResolverStrategy() {
         @Override
-        public List<ResolverType> apply(List<ResolverType> resolvers, Object obj) {
-            return resolvers != null ? resolvers : obj instanceof Map? JexlUberspect.MAP : JexlUberspect.POJO;
+        public List<PropertyResolver> apply(JexlOperator op, Object obj) {
+            if (op == JexlOperator.ARRAY_GET) {
+                return MAP;
+            }
+            if (op == JexlOperator.ARRAY_SET) {
+                return MAP;
+            }
+            if (op == null && obj instanceof Map) {
+                return MAP;
+            }
+            return POJO;
         }
     };
 
     /**
      * The map strategy.
      * <p>
-     * If the object is a map, use the MAP list.
-     * Otherwise, if the resolvers list is not null, use that list, otherwise use the POJO list.
+     * If the operator is '[]' or if the object is a map, use the MAP list of resolvers.
+     * Otherwise, use the POJO list of resolvers.
      */
     ResolverStrategy MAP_STRATEGY = new ResolverStrategy() {
         @Override
-        public List<ResolverType> apply(List<ResolverType> strategy, Object obj) {
-            return obj instanceof Map? JexlUberspect.MAP : strategy != null ? strategy : JexlUberspect.POJO;
+        public List<PropertyResolver> apply(JexlOperator op, Object obj) {
+            if (op == JexlOperator.ARRAY_GET) {
+                return MAP;
+            }
+            if (op == JexlOperator.ARRAY_SET) {
+                return MAP;
+            }
+            if (obj instanceof Map) {
+                return MAP;
+            }
+            return POJO;
         }
     };
 
     /**
+     * Applies this uberspect property resolver strategy.
+     * @param op the operator
+     * @param obj the object
+     * @return the applied strategy resolver list
+     */
+    List<PropertyResolver> getResolvers(JexlOperator op, Object obj);
+
+    /**
      * Sets the class loader to use.
-     * <p>This increments the version.</p>
+     * <p>
+     * This increments the version.</p>
      * @param loader the class loader
      */
     void setClassLoader(ClassLoader loader);
@@ -167,7 +222,7 @@ public interface JexlUberspect {
     /**
      * Returns a class constructor.
      * @param ctorHandle a class or class name
-     * @param args constructor arguments
+     * @param args       constructor arguments
      * @return a {@link JexlMethod}
      * @since 3.0
      */
@@ -175,17 +230,18 @@ public interface JexlUberspect {
 
     /**
      * Returns a JexlMethod.
-     * @param obj the object
+     * @param obj    the object
      * @param method the method name
-     * @param args method arguments
+     * @param args   method arguments
      * @return a {@link JexlMethod}
      */
     JexlMethod getMethod(Object obj, String method, Object... args);
 
     /**
      * Property getter.
-     * <p>returns a JelPropertySet apropos to an expression like <code>bar.woogie</code>.</p>
-     * @param obj the object to get the property from
+     * <p>
+     * returns a JelPropertySet apropos to an expression like <code>bar.woogie</code>.</p>
+     * @param obj        the object to get the property from
      * @param identifier property name
      * @return a {@link JexlPropertyGet} or null
      */
@@ -193,40 +249,43 @@ public interface JexlUberspect {
 
     /**
      * Property getter.
-     * <p>Seeks a JexlPropertyGet apropos to an expression like <code>bar.woogie</code>.</p>
-     * @param resolvers  the list of resolver types,
-     *                   argument to {@link ResolverStrategy#apply(java.util.List, java.lang.Object) }
-     * @param obj        the object to get the property from,
-     *                   argument to {@link ResolverStrategy#apply(java.util.List, java.lang.Object) }
+     * <p>
+     * Seeks a JexlPropertyGet apropos to an expression like <code>bar.woogie</code>.</p>
+     * See {@link ResolverStrategy#apply(JexlOperator, java.lang.Object) }
+     *
+     * @param resolvers  the list of property resolvers to try
+     * @param obj        the object to get the property from
      * @param identifier property name
      * @return a {@link JexlPropertyGet} or null
      * @since 3.0
      */
-    JexlPropertyGet getPropertyGet(List<ResolverType> resolvers, Object obj, Object identifier);
+    JexlPropertyGet getPropertyGet(List<PropertyResolver> resolvers, Object obj, Object identifier);
 
     /**
      * Property setter.
-     * <p>Seeks a JelPropertySet apropos to an expression like  <code>foo.bar = "geir"</code>.</p>
-     * @param obj the object to get the property from.
+     * <p>
+     * Seeks a JelPropertySet apropos to an expression like  <code>foo.bar = "geir"</code>.</p>
+     * @param obj        the object to get the property from.
      * @param identifier property name
-     * @param arg value to set
+     * @param arg        value to set
      * @return a {@link JexlPropertySet} or null
      */
     JexlPropertySet getPropertySet(Object obj, Object identifier, Object arg);
 
     /**
      * Property setter.
-     * <p>Seeks a JelPropertySet apropos to an expression like <code>foo.bar = "geir"</code>.</p>
-     * @param resolvers  the list of resolver types,
-     *                   argument to {@link ResolverStrategy#apply(java.util.List, java.lang.Object) }
-     * @param obj        the object to get the property from,
-     *                   argument to {@link ResolverStrategy#apply(java.util.List, java.lang.Object) }
+     * <p>
+     * Seeks a JelPropertySet apropos to an expression like <code>foo.bar = "geir"</code>.</p>
+     * See {@link ResolverStrategy#apply(JexlOperator, java.lang.Object) }
+     *
+     * @param resolvers  the list of property resolvers to try,
+     * @param obj        the object to get the property from
      * @param identifier property name
      * @param arg        value to set
      * @return a {@link JexlPropertySet} or null
      * @since 3.0
      */
-    JexlPropertySet getPropertySet(List<ResolverType> resolvers, Object obj, Object identifier, Object arg);
+    JexlPropertySet getPropertySet(List<PropertyResolver> resolvers, Object obj, Object identifier, Object arg);
 
     /**
      * Gets an iterator from an object.

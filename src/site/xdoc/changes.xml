@@ -26,6 +26,18 @@
     </properties>
     <body>
         <release version="3.0" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-178 " due-to="Dmitri Blinov">
+                'Unsolvable property' message to provide details about underlying exception
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-177" due-to="Dmitri Blinov">
+            Unified expressions to be used in String literals in Jexl scripts
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-174" due-to="Dmitri Blinov">
+                Overloadable property access operators
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-173" due-to="Dmitri Blinov">
+                Duck-typed java closures
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-171" due-to="Dmitri Blinov">
                 Map access operator does not work if key name clashes with map property name
             </action>

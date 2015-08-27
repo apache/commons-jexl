@@ -75,6 +75,8 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
                 return TRY_FAILED;// fail
+            } catch (IllegalArgumentException xarg) {
+                return TRY_FAILED;// fail
             }
         }
         return TRY_FAILED;
