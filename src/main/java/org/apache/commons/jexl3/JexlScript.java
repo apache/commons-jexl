@@ -45,6 +45,13 @@ public interface JexlScript {
     String getParsedText();
 
     /**
+     * Recreates the source text of this expression from the internal syntactic tree.
+     * @param indent the number of spaces for indentation, 0 meaning no indentation
+     * @return the source text
+     */
+    String getParsedText(int indent);
+
+    /**
      * Executes the script with the variables contained in the
      * supplied {@link JexlContext}.
      *

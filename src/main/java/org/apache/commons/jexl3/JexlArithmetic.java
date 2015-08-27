@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.introspection.JexlMethod;
+
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -128,21 +129,12 @@ public class JexlArithmetic {
         boolean overloads(JexlOperator operator);
 
         /**
-         * Gets the most specific method for a monadic operator.
+         * Gets the most specific method for an operator.
          * @param operator the operator
-         * @param arg      the argument
+         * @param arg      the arguments
          * @return the most specific method or null if no specific override could be found
          */
-        JexlMethod getOperator(JexlOperator operator, Object arg);
-
-        /**
-         * Gets the most specific method for a diadic operator.
-         * @param operator the operator
-         * @param lhs      the left hand side argument
-         * @param rhs      the right hand side argument
-         * @return the most specific method or null if no specific override could be found
-         */
-        JexlMethod getOperator(JexlOperator operator, Object lhs, Object rhs);
+        JexlMethod getOperator(JexlOperator operator, Object... arg);
     }
 
     /**

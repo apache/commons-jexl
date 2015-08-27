@@ -59,15 +59,15 @@ public class Operators {
     }
 
     /**
-     * Attempts to call a monadic operator.
+     * Attempts to call an operator.
      * <p>
      * This takes care of finding and caching the operator method when appropriate
      * @param node     the syntactic node
      * @param operator the operator
-     * @param arg      the argument
+     * @param args     the arguments
      * @return the result of the operator evaluation or TRY_FAILED
      */
-    protected Object tryOverload(JexlNode node, JexlOperator operator, Object arg) {
+    protected Object tryOverload(JexlNode node, JexlOperator operator, Object... args) {
         if (operators != null && operators.overloads(operator)) {
             final JexlArithmetic arithmetic = interpreter.arithmetic;
             final boolean cache = interpreter.cache;
@@ -75,58 +75,18 @@ public class Operators {
                 Object cached = node.jjtGetValue();
                 if (cached instanceof JexlMethod) {
                     JexlMethod me = (JexlMethod) cached;
-                    Object eval = me.tryInvoke(operator.getMethodName(), arithmetic, arg);
+                    Object eval = me.tryInvoke(operator.getMethodName(), arithmetic, args);
                     if (!me.tryFailed(eval)) {
                         return eval;
                     }
                 }
             }
             try {
-                JexlMethod emptym = operators.getOperator(operator, arg);
-                if (emptym != null) {
-                    Object result = emptym.invoke(arithmetic, arg);
+                JexlMethod vm = operators.getOperator(operator, args);
+                if (vm != null) {
+                    Object result = vm.invoke(arithmetic, args);
                     if (cache) {
-                        node.jjtSetValue(emptym);
-                    }
-                    return result;
-                }
-            } catch (Exception xany) {
-                interpreter.operatorError(node, operator, xany);
-            }
-        }
-        return JexlEngine.TRY_FAILED;
-    }
-
-    /**
-     * Attempts to call a diadic operator.
-     * <p>
-     * This takes care of finding and caching the operator method when appropriate
-     * @param node     the syntactic node
-     * @param operator the operator
-     * @param lhs      the left hand side argument
-     * @param rhs      the right hand side argument
-     * @return the result of the operator evaluation or TRY_FAILED
-     */
-    protected Object tryOverload(JexlNode node, JexlOperator operator, Object lhs, Object rhs) {
-        if (operators != null && operators.overloads(operator)) {
-            final JexlArithmetic arithmetic = interpreter.arithmetic;
-            final boolean cache = interpreter.cache;
-            if (cache) {
-                Object cached = node.jjtGetValue();
-                if (cached instanceof JexlMethod) {
-                    JexlMethod me = (JexlMethod) cached;
-                    Object eval = me.tryInvoke(operator.getMethodName(), arithmetic, lhs, rhs);
-                    if (!me.tryFailed(eval)) {
-                        return eval;
-                    }
-                }
-            }
-            try {
-                JexlMethod emptym = operators.getOperator(operator, lhs, rhs);
-                if (emptym != null) {
-                    Object result = emptym.invoke(arithmetic, lhs, rhs);
-                    if (cache) {
-                        node.jjtSetValue(emptym);
+                        node.jjtSetValue(vm);
                     }
                     return result;
                 }
@@ -146,14 +106,16 @@ public class Operators {
      * </p>
      * @param node     the syntactic node
      * @param operator the operator
-     * @param lhs      the left hand side, target of the side-effect
-     * @param rhs      the right hand side, argument of the (base) operator
+     * @param args     the arguments, the first one being the target of assignment
      * @return the result of the operator evaluation
      */
-    protected Object tryAssignOverload(JexlNode node, JexlOperator operator, Object lhs, Object rhs) {
+    protected Object tryAssignOverload(JexlNode node, JexlOperator operator, Object...args) {
         final JexlArithmetic arithmetic = interpreter.arithmetic;
+        if (args.length != operator.getArity()) {
+            return JexlEngine.TRY_FAILED;
+        }
         // try to call overload on side effect
-        Object result = tryOverload(node, operator, lhs, rhs);
+        Object result = tryOverload(node, operator, args);
         if (result != JexlEngine.TRY_FAILED) {
             return result;
         }
@@ -165,9 +127,9 @@ public class Operators {
         if (operators != null && operators.overloads(base)) {
             // in case there is an overload
             try {
-                JexlMethod emptym = operators.getOperator(base, lhs, rhs);
-                if (emptym != null) {
-                    result = emptym.invoke(arithmetic, lhs, rhs);
+                JexlMethod vm = operators.getOperator(base, args);
+                if (vm != null) {
+                    result = vm.invoke(arithmetic, args);
                     if (result != JexlEngine.TRY_FAILED) {
                         return result;
                     }
@@ -179,21 +141,21 @@ public class Operators {
         // base eval
         switch (operator) {
             case SELF_ADD:
-                return arithmetic.add(lhs, rhs);
+                return arithmetic.add(args[0], args[1]);
             case SELF_SUBTRACT:
-                return arithmetic.subtract(lhs, rhs);
+                return arithmetic.subtract(args[0], args[1]);
             case SELF_MULTIPLY:
-                return arithmetic.multiply(lhs, rhs);
+                return arithmetic.multiply(args[0], args[1]);
             case SELF_DIVIDE:
-                return arithmetic.divide(lhs, rhs);
+                return arithmetic.divide(args[0], args[1]);
             case SELF_MOD:
-                return arithmetic.mod(lhs, rhs);
+                return arithmetic.mod(args[0], args[1]);
             case SELF_AND:
-                return arithmetic.and(lhs, rhs);
+                return arithmetic.and(args[0], args[1]);
             case SELF_OR:
-                return arithmetic.or(lhs, rhs);
+                return arithmetic.or(args[0], args[1]);
             case SELF_XOR:
-                return arithmetic.xor(lhs, rhs);
+                return arithmetic.xor(args[0], args[1]);
             default:
                 throw new JexlException.Operator(node, operator.getOperatorSymbol(), null);
         }
@@ -294,7 +256,7 @@ public class Operators {
      * the JEXL operator arguments order syntax is the reverse of this method call.
      * </p>
      * @param node  the node
-     * @param op    the calling operator, =~ or !=
+     * @param op    the calling operator, =~ or !~
      * @param right the left operand
      * @param left  the right operand
      * @return true if left matches right, false otherwise
@@ -338,22 +300,23 @@ public class Operators {
     /**
      * Check for emptyness of various types: Collection, Array, Map, String, and anything that has a boolean isEmpty()
      * method.
+     * <p>Note that the result may not be a boolean.
      *
      * @param node   the node holding the object
-     * @param object the object to check the emptyness of.
-     * @return the boolean
+     * @param object the object to check the emptyness of
+     * @return the evaluation result
      */
-    protected Boolean empty(JexlNode node, Object object) {
-        final JexlArithmetic arithmetic = interpreter.arithmetic;
-        final JexlUberspect uberspect = interpreter.uberspect;
+    protected Object empty(JexlNode node, Object object) {
         if (object == null) {
             return Boolean.TRUE;
         }
-        Object opcall = Operators.this.tryOverload(node, JexlOperator.EMPTY, object);
-        if (opcall instanceof Boolean) {
-            return (Boolean) opcall;
+        final JexlArithmetic arithmetic = interpreter.arithmetic;
+        final JexlUberspect uberspect = interpreter.uberspect;
+        Object result = Operators.this.tryOverload(node, JexlOperator.EMPTY, object);
+        if (result != JexlEngine.TRY_FAILED) {
+            return result;
         }
-        Boolean result = arithmetic.isEmpty(object);
+        result = arithmetic.isEmpty(object);
         if (result == null) {
             result = false;
             // check if there is an isEmpty method on the object that returns a
@@ -373,22 +336,23 @@ public class Operators {
     /**
      * Calculate the <code>size</code> of various types:
      * Collection, Array, Map, String, and anything that has a int size() method.
+     * <p>Note that the result may not be an integer.
      *
      * @param node   the node that gave the value to size
      * @param object the object to get the size of.
-     * @return the size of val
+     * @return the evaluation result
      */
-    protected Integer size(JexlNode node, Object object) {
-        final JexlArithmetic arithmetic = interpreter.arithmetic;
-        final JexlUberspect uberspect = interpreter.uberspect;
+    protected Object size(JexlNode node, Object object) {
         if (object == null) {
             return 0;
         }
-        Object opcall = Operators.this.tryOverload(node, JexlOperator.SIZE, object);
-        if (opcall instanceof Integer) {
-            return (Integer) opcall;
+        final JexlArithmetic arithmetic = interpreter.arithmetic;
+        final JexlUberspect uberspect = interpreter.uberspect;
+        Object result = Operators.this.tryOverload(node, JexlOperator.SIZE, object);
+        if (result != JexlEngine.TRY_FAILED) {
+            return result;
         }
-        Integer result = arithmetic.size(object);
+        result = arithmetic.size(object);
         if (result == null) {
             // check if there is a size method on the object that returns an
             // integer and if so, just use it

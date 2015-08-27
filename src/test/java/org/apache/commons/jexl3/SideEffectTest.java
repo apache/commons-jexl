@@ -330,6 +330,29 @@ public class SideEffectTest extends JexlTestCase {
         Assert.assertEquals(3115L ^ 15,  v7.value);
     }
 
+
+    @Test
+    public void testOverrideGetSet() throws Exception {
+        JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
+        JexlContext jc = null;
+
+        JexlScript script;
+        Object result;
+        Var v0 = new Var(3115);
+        script = jexl.createScript("(x)->{ x.value}");
+        result = script.execute(jc, v0);
+        Assert.assertEquals(3115, result);
+        script = jexl.createScript("(x)->{ x['VALUE']}");
+        result = script.execute(jc, v0);
+        Assert.assertEquals(3115, result);
+        script = jexl.createScript("(x,y)->{ x.value = y}");
+        result = script.execute(jc, v0, 42);
+        Assert.assertEquals(42, result);
+        script = jexl.createScript("(x,y)->{ x['VALUE'] = y}");
+        result = script.execute(jc, v0, 169);
+        Assert.assertEquals(169, result);
+    }
+
     public static class Var {
         int value;
 
@@ -347,6 +370,22 @@ public class SideEffectTest extends JexlTestCase {
     public static class SelfArithmetic extends JexlArithmetic {
         public SelfArithmetic(boolean strict) {
             super(strict);
+        }
+
+        public Object propertyGet(Var var, String property) {
+            return "value".equals(property)? var.value : JexlEngine.TRY_FAILED;
+        }
+
+        public Object propertySet(Var var, String property, int v) {
+            return "value".equals(property)? var.value = v : JexlEngine.TRY_FAILED;
+        }
+
+        public Object arrayGet(Var var, String property) {
+            return "VALUE".equals(property)? var.value : JexlEngine.TRY_FAILED;
+        }
+
+        public Object arraySet(Var var, String property, int v) {
+            return "VALUE".equals(property)? var.value = v : JexlEngine.TRY_FAILED;
         }
 
         public JexlOperator selfAdd(Var lhs, Var rhs) {
