@@ -74,24 +74,20 @@ public final class Scope {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Scope && equals((Scope) o);
-    }
-
-    /**
-     * Whether this frame is equal to another.
-     * @param frame the frame to compare to
-     * @return true if equal, false otherwise
-     */
-    public boolean equals(Scope frame) {
-        if (this == frame) {
+        if (this == o) {
             return true;
-        } else if (frame == null || parms != frame.parms) {
-            return false;
-        } else if (namedVariables == null) {
-            return frame.namedVariables == null;
-        } else {
-            return namedVariables.equals(frame.namedVariables);
         }
+        if (!(o instanceof Scope)) {
+            return false;
+        }
+        Scope scope = (Scope) o;
+        if (parms != scope.parms) {
+            return false;
+        }
+        if (namedVariables == null) {
+            return scope.namedVariables == null;
+        }
+        return namedVariables.equals(scope.namedVariables);
     }
 
     /**
@@ -197,7 +193,7 @@ public final class Scope {
                     arguments[target.intValue()] = arg;
                 }
             }
-            return new Frame(arguments);
+            return new Frame(this, arguments);
         } else {
             return null;
         }
@@ -280,15 +276,27 @@ public final class Scope {
      * @since 3.0
      */
     public static final class Frame {
+        /** The scope. */
+        private final Scope scope;
         /** The actual stack frame. */
         private final Object[] stack;
 
         /**
          * Creates a new frame.
+         * @param s the scope
          * @param r the stack frame
          */
-        public Frame(Object[] r) {
+        public Frame(Scope s, Object[] r) {
+            scope = s;
             stack = r;
+        }
+
+        /**
+         * Gets the scope.
+         * @return this frame scope
+         */
+        public Scope getScope() {
+            return scope;
         }
 
         @Override
@@ -335,7 +343,7 @@ public final class Scope {
             if (stack != null && values != null && values.length > 0) {
                 Object[] copy = stack.clone();
                 System.arraycopy(values, 0, copy, 0, Math.min(copy.length, values.length));
-                return new Frame(copy);
+                return new Frame(scope, copy);
             }
             return this;
         }

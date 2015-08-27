@@ -71,8 +71,7 @@ public class Engine extends JexlEngine {
                 new Uberspect(LogManager.getLogger(JexlEngine.class), JexlUberspect.JEXL_STRATEGY);
 
         /** Non-instantiable. */
-        private UberspectHolder() {
-        }
+        private UberspectHolder() {}
     }
     /**
      * The JexlUberspect instance.
@@ -120,6 +119,10 @@ public class Engine extends JexlEngine {
      */
     protected final Charset charset;
     /**
+     * The default jxlt engine.
+     */
+    protected volatile TemplateEngine jxlt = null;
+    /**
      * The default cache load factor.
      */
     private static final float LOAD_FACTOR = 0.75f;
@@ -149,9 +152,9 @@ public class Engine extends JexlEngine {
         }
         this.logger = conf.logger() == null ? LogManager.getLogger(JexlEngine.class) : conf.logger();
         this.functions = conf.namespaces() == null ? Collections.<String, Object>emptyMap() : conf.namespaces();
-        this.silent = conf.silent() == null ? false : conf.silent().booleanValue();
-        this.debug = conf.debug() == null ? true : conf.debug().booleanValue();
-        this.strict = conf.strict() == null ? true : conf.strict().booleanValue();
+        this.silent = conf.silent() == null ? false : conf.silent();
+        this.debug = conf.debug() == null ? true : conf.debug();
+        this.strict = conf.strict() == null ? true : conf.strict();
         this.arithmetic = conf.arithmetic() == null ? new JexlArithmetic(this.strict) : conf.arithmetic();
         this.cache = conf.cache() <= 0 ? null : new SoftCache<String, ASTJexlScript>(conf.cache());
         this.cacheThreshold = conf.cacheThreshold();
@@ -709,5 +712,22 @@ public class Engine extends JexlEngine {
             return "";
         }
         return null;
+    }
+
+    /**
+     * Gets and/or creates a default template engine.
+     * @return a template engine
+     */
+    protected TemplateEngine jxlt() {
+        TemplateEngine e = jxlt;
+        if (e == null) {
+            synchronized(this) {
+                if (jxlt == null) {
+                    e = new TemplateEngine(this, true, 0, '$', '#');
+                    jxlt = e;
+                }
+            }
+        }
+        return e;
     }
 }
