@@ -24,9 +24,14 @@ import java.util.Map;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import java.io.File;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -1110,6 +1115,16 @@ public class IssuesTest extends JexlTestCase {
         Assert.assertEquals("CD", value1);
     }
 
+    @Test
+    public void test179() throws Exception {
+        JexlContext jc = new MapContext();
+        JexlEngine jexl = new JexlBuilder().create();
+        String src = "x = new ('java.util.HashSet'); x.add(1); x";
+        JexlScript e = jexl.createScript(src);
+        Object o = e.execute(jc);
+        Assert.assertTrue(o instanceof Set);
+        Assert.assertTrue(((Set) o).contains(1));
+    }
 //
 //
 //	@Test
@@ -1163,4 +1178,5 @@ public class IssuesTest extends JexlTestCase {
 //
 //	    Assert.assertEquals(null, ((Double)e.evaluate(jc)).doubleValue(), 50d, 0d);
 //	}
+
 }

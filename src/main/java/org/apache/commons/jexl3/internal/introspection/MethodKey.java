@@ -506,14 +506,10 @@ public final class MethodKey {
             LinkedList<T> maximals = new LinkedList<T>();
             for (T app : applicables) {
                 Class<?>[] appArgs = getParameterTypes(app);
-
                 boolean lessSpecific = false;
-
-                for (Iterator<T> maximal = maximals.iterator();
-                        !lessSpecific && maximal.hasNext();) {
+                Iterator<T> maximal = maximals.iterator();
+                while(!lessSpecific && maximal.hasNext()) {
                     T max = maximal.next();
-
-                    // CSOFF: MissingSwitchDefault
                     switch (moreSpecific(appArgs, getParameterTypes(max))) {
                         case MORE_SPECIFIC:
                             /*
@@ -533,8 +529,10 @@ public final class MethodKey {
 
                             lessSpecific = true;
                             break;
+                        default:
+                            // nothing do do
                     }
-                } // CSON: MissingSwitchDefault
+                }
 
                 if (!lessSpecific) {
                     maximals.addLast(app);

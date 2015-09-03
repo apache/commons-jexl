@@ -27,6 +27,9 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
  * @since 2.0
  */
 public abstract class JexlNode extends SimpleNode {
+    // line + column encoded: up to 4096 columns (ie 20 bits for line + 12 bits for column)
+    private int lc = -1;
+
     /**
      * A marker interface for constants.
      * @param <T> the literal type
@@ -43,6 +46,16 @@ public abstract class JexlNode extends SimpleNode {
         super(p, id);
     }
 
+    public void jjtSetFirstToken(Token t) {
+        // 0xc = 12, 12 bits -> 4096
+        // 0xfff, 12 bits mask
+        this.lc = (t.beginLine << 0xc) | (0xfff & t.beginColumn);
+    }
+
+    public void jjtSetLastToken(Token t) {
+        // nothing
+    }
+
     /**
      * Gets the associated JexlInfo instance.
      *
@@ -52,7 +65,15 @@ public abstract class JexlNode extends SimpleNode {
         JexlNode node = this;
         while (node != null) {
             if (node.value instanceof JexlInfo) {
-                return (JexlInfo) node.value;
+                JexlInfo info = (JexlInfo) node.value;
+                if (lc >= 0) {
+                    int c = lc & 0xfff;
+                    int l = lc >> 0xc;
+                    return info.at(l, c);
+                } else {
+                    // weird though; no jjSetFirstToken(...) ever called?
+                    return info;
+                }
             }
             node = node.jjtGetParent();
         }
@@ -61,13 +82,14 @@ public abstract class JexlNode extends SimpleNode {
 
     /**
      * Clears any cached value of type JexlProperty{G,S}et or JexlMethod.
-     * <p>This is called when the engine detects the evaluation of a script occurs with a class loader
+     * <p>
+     * This is called when the engine detects the evaluation of a script occurs with a class loader
      * different that the one that created it.</p>
      */
     public void clearCache() {
         if (value instanceof JexlPropertyGet
-                || value instanceof JexlPropertySet
-                || value instanceof JexlMethod) {
+            || value instanceof JexlPropertySet
+            || value instanceof JexlMethod) {
             value = null;
         }
         if (children != null) {

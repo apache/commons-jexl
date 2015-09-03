@@ -105,7 +105,7 @@ public interface JexlUberspect {
 
         @Override
         public final JexlPropertySet getPropertySet(JexlUberspect uber, Object obj, Object identifier, Object arg) {
-            return uber.getPropertySet(Collections.<PropertyResolver>singletonList(this), obj, identifier);
+            return uber.getPropertySet(Collections.<PropertyResolver>singletonList(this), obj, identifier, arg);
         }
     }
 

@@ -26,7 +26,12 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.apache.commons.jexl3.junit.Asserter;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -283,5 +288,130 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         script = jexl.createScript("calc:sum(-3 .. 3)");
         result = script.execute(null);
         Assert.assertEquals(Integer.valueOf(0), result);
+    }
+
+    public static class DateArithmetic extends JexlArithmetic {
+        DateArithmetic(boolean flag) {
+            super(flag);
+        }
+
+        protected Object getDateValue(Date date, String key) {
+            try {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(date);
+                if ("yyyy".equals(key)) {
+                    return cal.get(Calendar.YEAR);
+                } else if ("MM".equals(key)) {
+                    return cal.get(Calendar.MONTH) + 1;
+                } else if ("dd".equals(key)) {
+                    return cal.get(Calendar.DAY_OF_MONTH);
+                }
+                // Otherwise treat as format mask
+                SimpleDateFormat df = new SimpleDateFormat(key);//, dfs);
+                return df.format(date);
+
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+
+
+        protected Object setDateValue(Date date, String key, Object value) throws Exception {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            if ("yyyy".equals(key)) {
+                cal.set(Calendar.YEAR, toInteger(value));
+            } else if ("MM".equals(key)) {
+                cal.set(Calendar.MONTH, toInteger(value) - 1);
+            } else if ("dd".equals(key)) {
+                cal.set(Calendar.DAY_OF_MONTH, toInteger(value));
+            }
+            date.setTime(cal.getTimeInMillis());
+            return date;
+        }
+
+        public Object propertyGet(Date date, String identifier) {
+            return getDateValue(date, identifier);
+        }
+
+        public Object propertySet(Date date, String identifier, Object value) throws Exception {
+            return setDateValue(date, identifier, value);
+        }
+
+        public Object arrayGet(Date date, String identifier) {
+            return getDateValue(date, identifier);
+        }
+
+        public Object arraySet(Date date, String identifier, Object value) throws Exception {
+            return setDateValue(date, identifier, value);
+        }
+
+        public String format(Number number, String fmt) {
+            return new DecimalFormat(fmt).format(number);
+        }
+    }
+
+    public static class DateContext extends MapContext {
+        private Locale locale = Locale.US;
+
+        void setLocale(Locale l10n) {
+            this.locale = l10n;
+        }
+
+        public String format(Date date, String fmt) {
+            SimpleDateFormat sdf = new SimpleDateFormat(fmt, locale);
+            return sdf.format(date);
+        }
+    }
+
+    @Test
+    public void testDateArithmetic() throws Exception {
+        Date d = new Date();
+        JexlContext jc = new MapContext();
+        JexlEngine jexl = new JexlBuilder().cache(32).arithmetic(new DateArithmetic(true)).create();
+        JexlScript expr0 = jexl.createScript("date.yyyy = 1969; date.MM=7; date.dd=20; ", "date");
+        Object value0 = expr0.execute(jc, d);
+        Assert.assertNotNull(value0);
+        value0 = d;
+        //d = new Date();
+        Assert.assertEquals(1969, jexl.createScript("date.yyyy", "date").execute(jc, value0));
+        Assert.assertEquals(7, jexl.createScript("date.MM", "date").execute(jc, value0));
+        Assert.assertEquals(20, jexl.createScript("date.dd", "date").execute(jc, value0));
+    }
+
+    @Test
+    public void testFormatArithmetic() throws Exception {
+        Calendar cal = Calendar.getInstance();
+        cal.set(1969, 7, 20);
+        Date x0 = cal.getTime();
+        String y0 =  "MM/yy/dd";
+        Number x1 = 42.12345;
+        String y1 = "##0.##";
+        DateContext jc = new DateContext();
+        JexlEngine jexl = new JexlBuilder().cache(32).arithmetic(new DateArithmetic(true)).create();
+        JexlScript expr0 = jexl.createScript("x.format(y)", "x", "y");
+        Object value10 = expr0.execute(jc, x0, y0);
+        Object value20 = expr0.execute(jc, x0, y0);
+        Assert.assertEquals(value10, value20);
+        Object value11 = expr0.execute(jc, x1, y1);
+        Object value21 = expr0.execute(jc, x1, y1);
+        Assert.assertEquals(value11, value21);
+        value10 = expr0.execute(jc, x0, y0);
+        Assert.assertEquals(value10, value20);
+        value11 = expr0.execute(jc, x1, y1);
+        Assert.assertEquals(value11, value21);
+        value10 = expr0.execute(jc, x0, y0);
+        Assert.assertEquals(value10, value20);
+        value11 = expr0.execute(jc, x1, y1);
+        Assert.assertEquals(value11, value21);
+
+        JexlScript expr1 = jexl.createScript("format(x, y)", "x", "y");
+        value10 = expr1.execute(jc, x0, y0);
+        Assert.assertEquals(value10, value20);
+        Object s0 = expr1.execute(jc, x0, "EEE dd MMM yyyy");
+        Assert.assertEquals("Wed 20 Aug 1969", s0);
+        jc.setLocale(Locale.FRANCE);
+        s0 = expr1.execute(jc, x0, "EEE dd MMM yyyy");
+        Assert.assertEquals("mer. 20 août 1969", s0);
     }
 }

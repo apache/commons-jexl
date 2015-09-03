@@ -128,8 +128,15 @@ public class LambdaTest extends JexlTestCase {
         JexlContext ctx = null;
         String strs = "(x)->{ (y)->{ x + y } }";
         JexlScript s42 = jexl.createScript(strs);
+        JexlScript s42b = jexl.createScript(s42.toString());
+        Assert.assertEquals(s42.hashCode(), s42b.hashCode());
+        Assert.assertEquals(s42, s42b);
         Object result = s42.execute(ctx, 15);
         Assert.assertTrue(result instanceof JexlScript);
+        Object resultb = s42.execute(ctx, 15);
+        Assert.assertEquals(result.hashCode(), resultb.hashCode());
+        Assert.assertEquals(result, resultb);
+        Assert.assertEquals(result, jexl.createScript(resultb.toString(), "x").execute(ctx, 15));
         JexlScript s15 = (JexlScript) result;
         Callable<Object> s15b = s15.callable(ctx, 27);
         result = s15.execute(ctx, 27);
