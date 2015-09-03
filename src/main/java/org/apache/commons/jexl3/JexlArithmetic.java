@@ -519,7 +519,7 @@ public class JexlArithmetic {
      * Replace all numbers in an arguments array with the smallest type that will fit.
      * @param args the argument array
      * @return true if some arguments were narrowed and args array is modified,
-     *         false if no narrowing occured and args array has not been modified
+     *         false if no narrowing occurred and args array has not been modified
      */
     public boolean narrowArguments(Object[] args) {
         boolean narrowed = false;
@@ -529,9 +529,9 @@ public class JexlArithmetic {
                 Number narg = (Number) arg;
                 Number narrow = narrow(narg);
                 if (!narg.equals(narrow)) {
+                    args[a] = narrow;
                     narrowed = true;
                 }
-                args[a] = narrow;
             }
         }
         return narrowed;

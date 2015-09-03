@@ -41,7 +41,7 @@ public class JexlInfo {
      */
     public interface Detail {
         /**
-         * @return he start column on the line that triggered the error
+         * @return the start column on the line that triggered the error
          */
         int start();
         /**

@@ -24,6 +24,8 @@ options
    NODE_SCOPE_HOOK=true;
    NODE_CLASS="JexlNode";
    UNICODE_INPUT=true;
+   KEEP_LINE_COLUMN=true;
+   TRACK_TOKENS=true;
    //DEBUG_PARSER=true;
 }
 

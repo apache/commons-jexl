@@ -17,6 +17,9 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine;
+import org.apache.commons.jexl3.introspection.JexlPropertyGet;
+import org.apache.commons.jexl3.introspection.JexlPropertySet;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Assert;
@@ -58,14 +61,37 @@ public class StrategyTest extends JexlTestCase {
     }
 
     @Test
+    public void testRawResolvers() throws Exception {
+        Object map  = new HashMap<String, Object>();
+        final JexlEngine jexl = new JexlBuilder().create();
+        JexlUberspect uberspect = jexl.getUberspect();
+        JexlUberspect.PropertyResolver rfieldp = JexlUberspect.JexlResolver.FIELD;
+        JexlPropertyGet fget = rfieldp.getPropertyGet(uberspect, map, "key");
+        Assert.assertNull(fget);
+        JexlPropertySet fset = rfieldp.getPropertySet(uberspect, map, "key", "value");
+        Assert.assertNull(fset);
+        JexlUberspect.PropertyResolver rmap = JexlUberspect.JexlResolver.MAP;
+        JexlPropertyGet mget = rmap.getPropertyGet(uberspect, map, "key");
+        Assert.assertNotNull(mget);
+        JexlPropertySet mset = rmap.getPropertySet(uberspect, map, "key", "value");
+        Assert.assertNotNull(mset);
+    }
+
+    @Test
     public void testJexlStrategy() throws Exception {
         final JexlEngine jexl = new Engine();
         run171(jexl, true);
     }
 
     @Test
-    public void testMapStrategy() throws Exception {
+    public void testMyMapStrategy() throws Exception {
         final JexlEngine jexl = new JexlBuilder().arithmetic( new MapArithmetic(true)).create();
+        run171(jexl, false);
+    }
+
+    @Test
+    public void testMapStrategy() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().strategy(JexlUberspect.MAP_STRATEGY).create();
         run171(jexl, false);
     }
 
