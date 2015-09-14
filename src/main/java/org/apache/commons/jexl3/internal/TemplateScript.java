@@ -21,7 +21,6 @@ import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.internal.TemplateEngine.Block;
 import org.apache.commons.jexl3.internal.TemplateEngine.BlockType;
-import org.apache.commons.jexl3.internal.TemplateEngine.TemplateContext;
 import org.apache.commons.jexl3.internal.TemplateEngine.TemplateExpression;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import java.io.Reader;
@@ -175,10 +174,9 @@ public final class TemplateScript implements JxltEngine.Template {
     @Override
     public TemplateScript prepare(JexlContext context) {
         Scope.Frame frame = script.createFrame((Object[]) null);
-        TemplateContext tcontext = jxlt.new TemplateContext(context, frame, exprs, null);
         TemplateExpression[] immediates = new TemplateExpression[exprs.length];
         for (int e = 0; e < exprs.length; ++e) {
-            immediates[e] = exprs[e].prepare(frame, tcontext);
+            immediates[e] = exprs[e].prepare(frame, context);
         }
         return new TemplateScript(jxlt, prefix, source, script, immediates);
     }
@@ -191,8 +189,7 @@ public final class TemplateScript implements JxltEngine.Template {
     @Override
     public void evaluate(JexlContext context, Writer writer, Object... args) {
         Scope.Frame frame = script.createFrame(args);
-        TemplateContext tcontext = jxlt.new TemplateContext(context, frame, exprs, writer);
-        Interpreter interpreter = jxlt.getEngine().createInterpreter(tcontext, frame);
+        Interpreter interpreter = new TemplateInterpreter(jxlt.getEngine(), context, frame, exprs, writer);
         interpreter.interpret(script);
     }
 

@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.apache.commons.jexl3.junit.Asserter;
+import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -315,7 +316,6 @@ public class ArithmeticOperatorTest extends JexlTestCase {
             }
         }
 
-
         protected Object setDateValue(Date date, String key, Object value) throws Exception {
             Calendar cal = Calendar.getInstance();
             cal.setTime(date);
@@ -345,10 +345,6 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         public Object arraySet(Date date, String identifier, Object value) throws Exception {
             return setDateValue(date, identifier, value);
         }
-
-        public String format(Number number, String fmt) {
-            return new DecimalFormat(fmt).format(number);
-        }
     }
 
     public static class DateContext extends MapContext {
@@ -361,6 +357,10 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         public String format(Date date, String fmt) {
             SimpleDateFormat sdf = new SimpleDateFormat(fmt, locale);
             return sdf.format(date);
+        }
+
+        public String format(Number number, String fmt) {
+            return new DecimalFormat(fmt).format(number);
         }
     }
 
@@ -412,6 +412,37 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         Assert.assertEquals("Wed 20 Aug 1969", s0);
         jc.setLocale(Locale.FRANCE);
         s0 = expr1.execute(jc, x0, "EEE dd MMM yyyy");
-        Assert.assertEquals("mer. 20 août 1969", s0);
+        Assert.assertEquals("mer. 20 ao\u00fbt 1969", s0);
+    }
+
+    @Test
+    public void testFormatArithmeticJxlt() throws Exception {
+        Map<String, Object> ns = new HashMap<String, Object>();
+        ns.put("calc", Aggregate.class);
+        Calendar cal = Calendar.getInstance();
+        cal.set(1969, 7, 20);
+        Date x0 = cal.getTime();
+        String y0 =  "yyy-MM-dd";
+        DateContext jc = new DateContext();
+        JexlEngine jexl = new JexlBuilder().cache(32).namespaces(ns).arithmetic(new DateArithmetic(true)).create();
+        JxltEngine jxlt = jexl.createJxltEngine();
+
+        JxltEngine.Template expr0 = jxlt.createTemplate("${x.format(y)}", "x", "y");
+        StringWriter strw = new StringWriter();
+        expr0.evaluate(jc, strw, x0, y0);
+        String strws = strw.toString();
+        Assert.assertEquals("1969-08-20", strws);
+
+        expr0 = jxlt.createTemplate("${calc:sum(x .. y)}", "x", "y");
+        strw = new StringWriter();
+        expr0.evaluate(jc, strw, 1, 3);
+        strws = strw.toString();
+        Assert.assertEquals("6", strws);
+
+        JxltEngine.Template expr1 = jxlt.createTemplate("${jexl:include(s, x, y)}", "s", "x", "y");
+        strw = new StringWriter();
+        expr1.evaluate(jc, strw, expr0, 1, 3);
+        strws = strw.toString();
+        Assert.assertEquals("6", strws);
     }
 }
