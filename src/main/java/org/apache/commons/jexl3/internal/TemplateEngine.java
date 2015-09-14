@@ -20,8 +20,6 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JxltEngine;
-import org.apache.commons.jexl3.introspection.JexlMethod;
-import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.StringParser;
@@ -30,7 +28,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.Writer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -282,10 +279,7 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public final TemplateExpression prepare(JexlContext context) {
-                Scope.Frame frame = context instanceof TemplateContext
-                                    ? ((TemplateContext) context).getFrame()
-                                    : null;
-                return prepare(frame, context);
+                return prepare(null, context);
         }
 
         /**
@@ -297,7 +291,7 @@ public final class TemplateEngine extends JxltEngine {
          */
         protected final TemplateExpression prepare(Scope.Frame frame, JexlContext context) {
             try {
-                Interpreter interpreter = jexl.createInterpreter(context, frame);
+                Interpreter interpreter = new TemplateInterpreter(jexl, context, frame, null, null);
                 return prepare(interpreter);
             } catch (JexlException xjexl) {
                 JexlException xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
@@ -321,10 +315,7 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public final Object evaluate(JexlContext context) {
-                Scope.Frame frame = context instanceof TemplateContext
-                                    ? ((TemplateContext) context).getFrame()
-                                    : null;
-                return evaluate(frame, context);
+            return evaluate(null, context);
         }
 
         /**
@@ -336,10 +327,10 @@ public final class TemplateEngine extends JxltEngine {
          */
         protected final Object evaluate(Scope.Frame frame, JexlContext context) {
             try {
-                Interpreter interpreter = jexl.createInterpreter(context, frame);
+                Interpreter interpreter = new TemplateInterpreter(jexl, context, frame, null, null);
                 return evaluate(interpreter);
             } catch (JexlException xjexl) {
-                JexlException xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
+                JexlException xuel = createException(xjexl.getInfo(), "evaluate", this, xjexl);
                 if (jexl.isSilent()) {
                     jexl.logger.warn(xuel.getMessage(), xuel.getCause());
                     return null;
@@ -701,7 +692,7 @@ public final class TemplateEngine extends JxltEngine {
      * @param xany   the exception
      * @return an exception containing an explicit error message
      */
-    private Exception createException(JexlInfo info, String action, TemplateExpression expr, java.lang.Exception xany) {
+    static Exception createException(JexlInfo info, String action, TemplateExpression expr, java.lang.Exception xany) {
         StringBuilder strb = new StringBuilder("failed to ");
         strb.append(action);
         if (expr != null) {
@@ -994,146 +985,6 @@ public final class TemplateEngine extends JxltEngine {
     }
 
 
-    /**
-     * The type of context to use during evaluation of templates.
-     * <p>This context exposes its writer as '$jexl' to the scripts.</p>
-     * <p>public for introspection purpose.</p>
-     */
-    public final class TemplateContext implements JexlContext, JexlContext.NamespaceResolver {
-        /** The wrapped context. */
-        private final JexlContext wrap;
-        /** The array of TemplateEngine expressions. */
-        private final TemplateExpression[] exprs;
-        /** The writer used to output. */
-        private final Writer writer;
-        /** The call frame. */
-        private final Scope.Frame frame;
-
-        /**
-         * Creates a TemplateScript context instance.
-         * @param jcontext    the base context
-         * @param jframe      the calling frame
-         * @param expressions the list of TemplateExpression from the TemplateScript to evaluate
-         * @param out         the output writer
-         */
-        protected TemplateContext(JexlContext jcontext, Scope.Frame jframe,
-                TemplateExpression[] expressions, Writer out) {
-            wrap = jcontext;
-            frame = jframe;
-            exprs = expressions;
-            writer = out;
-        }
-
-        /**
-         * Gets this context calling frame.
-         * @return the engine frame
-         */
-        public Scope.Frame getFrame() {
-            return frame;
-        }
-
-        @Override
-        public Object get(String name) {
-            if ("$jexl".equals(name)) {
-                return writer;
-            } else {
-                return wrap.get(name);
-            }
-        }
-
-        @Override
-        public void set(String name, Object value) {
-            wrap.set(name, value);
-        }
-
-        @Override
-        public boolean has(String name) {
-            return wrap.has(name);
-        }
-
-        @Override
-        public Object resolveNamespace(String ns) {
-            if ("jexl".equals(ns)) {
-                return this;
-            } else if (wrap instanceof JexlContext.NamespaceResolver) {
-                return ((JexlContext.NamespaceResolver) wrap).resolveNamespace(ns);
-            } else {
-                return null;
-            }
-        }
-
-        /**
-         * Includes a call to another template.
-         * <p>Includes another template using this template initial context and writer.</p>
-         * @param script the TemplateScript to evaluate
-         * @param args   the arguments
-         */
-        public void include(TemplateScript script, Object... args) {
-            script.evaluate(wrap, writer, args);
-        }
-
-        /**
-         * Prints a unified expression evaluation result.
-         * @param e the expression number
-         */
-        public void print(int e) {
-            if (e < 0 || e >= exprs.length) {
-                return;
-            }
-            TemplateExpression expr = exprs[e];
-            if (expr.isDeferred()) {
-                expr = expr.prepare(frame, wrap);
-            }
-            if (expr instanceof CompositeExpression) {
-                printComposite((CompositeExpression) expr);
-            } else {
-                doPrint(expr.getInfo(), expr.evaluate(frame, this));
-            }
-        }
-
-        /**
-         * Prints a composite expression.
-         * @param composite the composite expression
-         */
-        protected void printComposite(CompositeExpression composite) {
-            TemplateExpression[] cexprs = composite.exprs;
-            final int size = cexprs.length;
-            Object value;
-            for (int e = 0; e < size; ++e) {
-                value = cexprs[e].evaluate(frame, this);
-                doPrint(cexprs[e].getInfo(), value);
-            }
-        }
-
-        /**
-         * Prints to output.
-         * <p>This will dynamically try to find the best suitable method in the writer through uberspection.
-         * Subclassing Writer by adding 'print' methods should be the preferred way to specialize output.
-         * </p>
-         * @param info   the source info
-         * @param arg    the argument to print out
-         */
-        private void doPrint(JexlInfo info, Object arg) {
-            try {
-                if (arg instanceof CharSequence) {
-                    writer.write(arg.toString());
-                } else if (arg != null) {
-                    Object[] value = {arg};
-                    JexlUberspect uber = getEngine().getUberspect();
-                    JexlMethod method = uber.getMethod(writer, "print", value);
-                    if (method != null) {
-                        method.invoke(writer, value);
-                    } else {
-                        writer.write(arg.toString());
-                    }
-                }
-            } catch (java.io.IOException xio) {
-                throw createException(info, "call print", null, xio);
-            } catch (java.lang.Exception xany) {
-                throw createException(info, "invoke print", null, xany);
-            }
-        }
-    }
 
     /**
      * Whether a sequence starts with a given set of characters (following spaces).

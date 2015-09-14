@@ -342,7 +342,7 @@ public class Engine extends JexlEngine {
      * @return an Interpreter
      */
     protected Interpreter createInterpreter(JexlContext context, Scope.Frame frame) {
-        return new Interpreter(this, context == null ? EMPTY_CONTEXT : context, frame);
+        return new Interpreter(this, context, frame);
     }
 
     @Override
