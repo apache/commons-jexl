@@ -345,6 +345,10 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         public Object arraySet(Date date, String identifier, Object value) throws Exception {
             return setDateValue(date, identifier, value);
         }
+
+        public Date now() {
+            return new Date(System.currentTimeMillis());
+        }
     }
 
     public static class DateContext extends MapContext {
@@ -413,6 +417,14 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         jc.setLocale(Locale.FRANCE);
         s0 = expr1.execute(jc, x0, "EEE dd MMM yyyy");
         Assert.assertEquals("mer. 20 ao\u00fbt 1969", s0);
+
+        expr1 = jexl.createScript("format(now(), y)", "y");
+        Object n0 = expr1.execute(jc, y0);
+        Assert.assertNotNull(n0);
+        expr1 = jexl.createScript("now().format(y)", "y");
+        Object n1 = expr1.execute(jc, y0);
+        Assert.assertNotNull(n0);
+        Assert.assertEquals(n0, n1);
     }
 
     @Test
@@ -444,5 +456,11 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         expr1.evaluate(jc, strw, expr0, 1, 3);
         strws = strw.toString();
         Assert.assertEquals("6", strws);
+
+        expr0 = jxlt.createTemplate("${now().format(y)}", "y");
+        strw = new StringWriter();
+        expr0.evaluate(jc, strw, y0);
+        strws = strw.toString();
+        Assert.assertNotNull(strws);
     }
 }

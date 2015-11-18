@@ -22,6 +22,7 @@ import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 
+import org.apache.commons.jexl3.parser.JexlNode;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,15 +80,23 @@ public class Script implements JexlScript, JexlExpression {
         }
     }
 
-    @Override
-    public Object evaluate(JexlContext context) {
-        if (script.jjtGetNumChildren() < 1) {
-            return null;
-        }
-        checkCacheVersion();
-        Scope.Frame frame = script.createFrame((Object[]) null);
-        Interpreter interpreter = jexl.createInterpreter(context, frame);
-        return interpreter.interpret(script.jjtGetChild(0));
+    /**
+     * Creates this script frame for evaluation.
+     * @param args the arguments to bind to parameters
+     * @return the frame (may be null)
+     */
+    protected Scope.Frame createFrame(Object[] args) {
+        return script.createFrame(args);
+    }
+
+    /**
+     * Creates this script interpreter.
+     * @param context the context
+     * @param frame the calling frame
+     * @return  the interpreter
+     */
+    protected Interpreter createInterpreter(JexlContext context, Scope.Frame frame) {
+        return jexl.createInterpreter(context, frame);
     }
 
     /**
@@ -167,10 +176,24 @@ public class Script implements JexlScript, JexlExpression {
      * {@inheritDoc}
      */
     @Override
+    public Object evaluate(JexlContext context) {
+        if (script.jjtGetNumChildren() < 1) {
+            return null;
+        }
+        checkCacheVersion();
+        Scope.Frame frame = createFrame((Object[]) null);
+        Interpreter interpreter = createInterpreter(context, frame);
+        return interpreter.interpret(script.jjtGetChild(0));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Object execute(JexlContext context) {
         checkCacheVersion();
-        Scope.Frame frame = script.createFrame((Object[]) null);
-        Interpreter interpreter = jexl.createInterpreter(context, frame);
+        Scope.Frame frame = createFrame((Object[]) null);
+        Interpreter interpreter = createInterpreter(context, frame);
         return interpreter.interpret(script);
     }
 
@@ -180,9 +203,75 @@ public class Script implements JexlScript, JexlExpression {
     @Override
     public Object execute(JexlContext context, Object... args) {
         checkCacheVersion();
-        Scope.Frame frame = script.createFrame(args != null && args.length > 0 ? args : null);
-        Interpreter interpreter = jexl.createInterpreter(context, frame);
+        Scope.Frame frame = createFrame(args != null && args.length > 0 ? args : null);
+        Interpreter interpreter = createInterpreter(context, frame);
         return interpreter.interpret(script);
+    }
+
+    /**
+     * A script whose parameters are (partially) bound.
+     */
+    public static class Curried extends Script {
+        /** The evaluation frame. */
+        private final Scope.Frame frame;
+
+        /**
+         * Creates a curried version of this script.
+         * @param base the base script
+         * @param args the arguments
+         */
+        protected Curried(Script base, Object[] args) {
+            super(base.jexl, base.source, base.script);
+            Scope.Frame sf = (base instanceof Curried) ? ((Curried) base).frame : null;
+            if (sf != null) {
+                frame = sf.assign(args);
+            } else {
+                frame = script.createFrame(args);
+            }
+        }
+
+        @Override
+        protected Scope.Frame createFrame(Object[] args) {
+            return frame != null? frame.assign(args) : super.createFrame(args);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return this == obj;
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(this);
+        }
+
+        @Override
+        public Object execute(JexlContext context) {
+            return execute(context, (Object[])null);
+        }
+
+        @Override
+        public Object execute(JexlContext context, Object... args) {
+            Scope.Frame callFrame = null;
+            if (frame != null) {
+                callFrame = frame.assign(args);
+            }
+            Interpreter interpreter = jexl.createInterpreter(context, callFrame);
+            JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
+            return interpreter.interpret(block);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JexlScript curry(Object... args) {
+        String[] parms = script.getParameters();
+        if (parms == null || parms.length == 0) {
+            return this;
+        }
+        return new Curried(this, args);
     }
 
     /**
