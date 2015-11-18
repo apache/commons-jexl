@@ -99,7 +99,7 @@
     // ...
 
     // work it out
-    Float result = (Float)e.evaluate(context);
+    Number result = (Number) e.evaluate(context);
       </source>
     </section>
     <section name="Custom Contexts">
