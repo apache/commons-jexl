@@ -193,7 +193,7 @@ public final class Scope {
                     arguments[target.intValue()] = arg;
                 }
             }
-            return new Frame(this, arguments);
+            return new Frame(this, arguments, 0);
         } else {
             return null;
         }
@@ -280,15 +280,19 @@ public final class Scope {
         private final Scope scope;
         /** The actual stack frame. */
         private final Object[] stack;
+        /** Number of curried parameters. */
+        private int curried = 0;
 
         /**
          * Creates a new frame.
          * @param s the scope
          * @param r the stack frame
+         * @param c the number of curried parameters
          */
-        public Frame(Scope s, Object[] r) {
+        public Frame(Scope s, Object[] r, int c) {
             scope = s;
             stack = r;
+            curried = c;
         }
 
         /**
@@ -342,8 +346,9 @@ public final class Scope {
         public Frame assign(Object... values) {
             if (stack != null && values != null && values.length > 0) {
                 Object[] copy = stack.clone();
-                System.arraycopy(values, 0, copy, 0, Math.min(copy.length, values.length));
-                return new Frame(scope, copy);
+                int ncopy = Math.min(copy.length - curried, values.length);
+                System.arraycopy(values, 0, copy, curried, ncopy);
+                return new Frame(scope, copy, curried + ncopy);
             }
             return this;
         }

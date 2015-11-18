@@ -123,4 +123,13 @@ public interface JexlScript {
      * @since 2.1
      */
     Callable<Object> callable(JexlContext context, Object... args);
+
+    /**
+     * Curries this script, returning a script with bound arguments.
+     * <p>If this script does not declare parameters or if all of them are already bound,
+     * no error is generated and this script is returned.</p>
+     * @param args the arguments to bind
+     * @return the curried script or this script if no binding can occur
+     */
+    JexlScript curry(Object... args);
 }
