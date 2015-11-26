@@ -36,6 +36,13 @@
     <release>
       <Version>
         <name>commons-jexl2</name>
+        <created>2011-12-24</created>
+        <revision>2.1.1</revision>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>commons-jexl2</name>
         <created>2011-12-12</created>
         <revision>2.1</revision>
       </Version>
