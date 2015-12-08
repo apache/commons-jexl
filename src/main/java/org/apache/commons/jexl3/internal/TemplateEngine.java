@@ -48,13 +48,13 @@ public final class TemplateEngine extends JxltEngine {
     private final char immediateChar;
     /** The first character for deferred expressions. */
     private final char deferredChar;
-    /** Whether expressions can use Jexl script or only expressions (ie, no for, var, etc). */
+    /** Whether expressions can use JEXL script or only expressions (ie, no for, var, etc). */
     private boolean noscript = true;
 
     /**
      * Creates a new instance of {@link JxltEngine} creating a local cache.
      * @param aJexl     the JexlEngine to use.
-     * @param noScript  whether this engine only allows Jexl expressions or scripts
+     * @param noScript  whether this engine only allows JEXL expressions or scripts
      * @param cacheSize the number of expressions in this cache, default is 256
      * @param immediate the immediate template expression character, default is '$'
      * @param deferred  the deferred template expression character, default is '#'
@@ -393,7 +393,7 @@ public final class TemplateEngine extends JxltEngine {
         }
     }
 
-    /** The base for Jexl based unified expressions. */
+    /** The base for JEXL based unified expressions. */
     abstract class JexlBasedExpression extends TemplateExpression {
         /** The JEXL string for this unified expression. */
         protected final CharSequence expr;

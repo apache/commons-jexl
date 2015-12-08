@@ -42,7 +42,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
 
 /**
- * Implements the Jexl ScriptEngine for JSF-223.
+ * Implements the JEXL ScriptEngine for JSF-223.
  * <p>
  * This implementation gives access to both ENGINE_SCOPE and GLOBAL_SCOPE bindings.
  * When a JEXL script accesses a variable for read or write,
@@ -112,7 +112,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
          * Gives access to the underlying JEXL engine shared between all ScriptEngine instances.
          * <p>Although this allows to manipulate various engine flags (lenient, debug, cache...)
          * for <strong>all</strong> JexlScriptEngine instances, you probably should only do so
-         * if you are in strict control and sole user of the Jexl scripting feature.</p>
+         * if you are in strict control and sole user of the JEXL scripting feature.</p>
          * @return the shared underlying JEXL engine
          */
         public JexlEngine getEngine() {
@@ -343,10 +343,10 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     }
 
     /**
-     * Wrapper to help convert a Jexl JexlScript into a JSR-223 CompiledScript.
+     * Wrapper to help convert a JEXL JexlScript into a JSR-223 CompiledScript.
      */
     private final class JexlCompiledScript extends CompiledScript {
-        /** The underlying Jexl expression instance. */
+        /** The underlying JEXL expression instance. */
         private final JexlScript script;
 
         /**

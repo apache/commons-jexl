@@ -17,7 +17,7 @@
 package org.apache.commons.jexl3;
 
 /**
- * Wraps an Object as a Jexl context and NamespaceResolver.
+ * Wraps an Object as a JEXL context and NamespaceResolver.
  * @param <T> the wrapped object type to use
  * @since 3.0
  */

@@ -202,7 +202,7 @@ public abstract class JexlEngine {
 
     /**
      * Creates a new {@link JxltEngine} instance using this engine.
-     * @return a Jexl Template engine
+     * @return a JEXL Template engine
      */
     public JxltEngine createJxltEngine() {
         return createJxltEngine(true);
@@ -211,7 +211,7 @@ public abstract class JexlEngine {
     /**
      * Creates a new {@link JxltEngine} instance using this engine.
      * @param noScript  whether the JxltEngine only allows Jexl expressions or scripts
-     * @return a Jexl Template engine
+     * @return a JEXL Template engine
      */
     public JxltEngine createJxltEngine(boolean noScript) {
         return createJxltEngine(noScript, JXLT_CACHE_SIZE, '$', '#');
@@ -219,11 +219,11 @@ public abstract class JexlEngine {
 
     /**
      * Creates a new instance of {@link JxltEngine} using this engine.
-     * @param noScript  whether the JxltEngine only allows Jexl expressions or scripts
+     * @param noScript  whether the JxltEngine only allows JEXL expressions or scripts
      * @param cacheSize the number of expressions in this cache, default is 256
      * @param immediate the immediate template expression character, default is '$'
      * @param deferred  the deferred template expression character, default is '#'
-     * @return a Jexl Template engine
+     * @return a JEXL Template engine
      */
     public abstract JxltEngine createJxltEngine(boolean noScript, int cacheSize, char immediate, char deferred);
 
@@ -522,7 +522,7 @@ public abstract class JexlEngine {
     }
 
     /**
-     * Reads a Jexl source from a File.
+     * Reads a JEXL source from a File.
      * @param file the script file
      * @return the source
      */
@@ -548,7 +548,7 @@ public abstract class JexlEngine {
     }
 
     /**
-     * Reads a Jexl source from an URL.
+     * Reads a JEXL source from an URL.
      * @param url the script url
      * @return the source
      */

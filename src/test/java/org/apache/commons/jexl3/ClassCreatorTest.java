@@ -149,7 +149,7 @@ public class ClassCreatorTest extends JexlTestCase {
             // its owning class from being GCed
 //          Method m = clazz.getDeclaredMethod("getValue", new Class<?>[0]);
 //          mm.add(m);
-            // we should not be able to create foox since it is unknown to the Jexl classloader
+            // we should not be able to create foox since it is unknown to the JEXL classloader
             context.set("clazz", cctor.getClassName());
             context.set("foo", null);
             Object z = newx.evaluate(context);

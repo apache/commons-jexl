@@ -21,7 +21,7 @@ import org.apache.commons.jexl3.internal.Engine;
 import java.util.Map;
 
 /**
- * Command line interface for Jexl for use in testing
+ * Command line interface for JEXL for use in testing
  * @since 1.0
  */
 public class Jexl {
