@@ -18,13 +18,13 @@ limitations under the License.
 <document>
  <properties>
   <title>Building Commons JEXL</title>
-  <author email="dev@commons.apache.org">Commons Documentation Team</author>
+  <author email="dev@commons.apache.org">Apache Commons Documentation Team</author>
  </properties>
 <body>
 <!-- ================================================== -->
 <section name="Overview">
 <p>
-  Commons JEXL uses <a href="http://maven.apache.org">Maven 2.2</a>. The source is
+  Apache Commons JEXL uses <a href="http://maven.apache.org">Maven 3</a>. The source is
   <a href="http://svn.apache.org/repos/asf/commons/proper/jexl/trunk/">here</a>.
 </p>
 </section>

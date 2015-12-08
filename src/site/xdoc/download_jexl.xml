@@ -45,11 +45,11 @@ limitations under the License.
 -->
 <document>
   <properties>
-    <title>Download Commons JEXL</title>
+    <title>Download Apache Commons JEXL</title>
     <author email="dev@commons.apache.org">Commons Documentation Team</author>
   </properties>
   <body>
-    <section name="Download Commons JEXL">
+    <section name="Download Apache Commons JEXL">
     <subsection name="Using a Mirror">
       <p>
         We recommend you use a mirror to download our release
@@ -95,7 +95,7 @@ limitations under the License.
       </p>
     </subsection>
     </section>
-    <section name="Commons JEXL 3.0 ">
+    <section name="Apache Commons JEXL 3.0 ">
       <subsection name="Binaries">
         <table>
           <tr>
@@ -125,7 +125,7 @@ limitations under the License.
         </table>
       </subsection>
     </section>
-    <section name="Commons JEXL 2.1.1 ">
+    <section name="Apache Commons JEXL 2.1.1 ">
       <subsection name="Binaries">
         <table>
           <tr>
@@ -155,7 +155,7 @@ limitations under the License.
         </table>
       </subsection>
     </section>
-    <section name="Commons JEXL 1.1 ">
+    <section name="Apache Commons JEXL 1.1 ">
       <subsection name="Binaries">
         <table>
           <tr>

@@ -18,13 +18,13 @@
 
 <document>
   <properties>
-    <title>Commons JEXL JSR-223 (scripting) Reference</title>
+    <title>Apache Commons JEXL JSR-223 (scripting) Reference</title>
   </properties>
 
   <body>
     <section name="Overview">
       <p>
-      Commons JEXL includes JSR-223 (javax.script) support.
+      Apache Commons JEXL includes JSR-223 (javax.script) support.
       The binary jar includes the scripting factory
       and the services definition javax.script.ScriptEngineFactory,
       so no special configuration is needed.
