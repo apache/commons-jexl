@@ -35,12 +35,23 @@ Also note that JEXL 3.0 now requires Java 6.
 What's new in 3.0:
 ==================
 * A redesigned API that properly segregates the "public" part and the "internal" parts of JEXL.
-* The ability to create JEXL functions in script, closure/variables hoisting included.
+* A real difference between Expression and Script (scripts accept statements: for, while, etc).
+* The ability to create JEXL functions in script, closure/variables hoisting/currying included.
+* A set of assignment operators (+=, *= , ...).
 * A set of String matching operators (^= startsWith, $= endsWith) and their negative counterparts (!^, !$)
 * A range operator (x .. y) to ease writing loops (for(var x : 1 .. 10) ... )
+* A literal set syntax to ease creating sets: { 1, 2...}
 
 New features in 3.0:
 ====================
+* JEXL-177:     Unified expressions to be used in String literals in JEXL scripts
+* JEXL-174:     Overloadable property access operators
+* JEXL-173:     Duck-typed java closures
+* JEXL-170:     Implement assignment operators
+* JEXL-178:     'Unsolvable property' message to provide details about underlying exception
+* JEXL-164:     public getters for high/low properties for IntegerRange and LongRange
+* JEXL-152:     Extend Range literal to support Long values
+* JEXL-149:     Set Construction as per EL 3.0 spec
 * JEXL-133:     String matching Operator short-hand inspired by CSS3
 * JEXL-128:     ObjectContext<> should implement NamespaceResolver
 * JEXL-127:     Allow the creation of functions
@@ -53,7 +64,29 @@ New features in 3.0:
 * JEXL-130:     Ternary Conditional fails for Object values
 * JEXL-126:     Decimal numbers literals should be 'double' by default (instead of 'float')
 
-There are no other changes.
+
+Bugs Fixed in 3.0:
+==================
+* JEXL-180:     Documentation - suggests using float for financials
+* JEXL-171:     Map access operator does not work if key name clashes with map property name
+* JEXL-169:     A string is wrongly identified as FloatingPointNumber
+* JEXL-168:     Dedicated operator for String concatenation
+* JEXL-79:      Add support for growable arrays (ArrayLists)
+* JEXL-167:     Possible loss of value when converting BigDecimal to BigInteger
+* JEXL-166:     Incorrect operator symbol for bitwise complement in jexlArithmetic
+* JEXL-163:     empty(new ("java.lang.Long", 4294967296)) returns true
+* JEXL-162:     empty() function throws an exception : unsupported type
+* JEXL-160:     typo in package.html
+* JEXL-158:     Handle locale decimal separators correctly
+* JEXL-157:     Replace File.pathSeparator with File.separator
+* JEXL-146:     Performance problem in Interpreter.unknownVariable mechanism
+* JEXL-145:     Sandbox calling wrong check (classname vs class)
+* JEXL-144:     Empty array property setting fails
+* JEXL-142:     Map expression issue with empty key
+* JEXL-141:     Suffix for Big Decimal and Big Integer Literal is incorrectly mentioned in Java docs
+* JEXL-137:     Invalid script variable list for nested array/map access
+
+Detail of all changes in changes.xml.
 
 
 ========================================================================================================================

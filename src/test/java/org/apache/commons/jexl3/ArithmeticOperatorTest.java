@@ -434,7 +434,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         Calendar cal = Calendar.getInstance();
         cal.set(1969, 7, 20);
         Date x0 = cal.getTime();
-        String y0 =  "yyy-MM-dd";
+        String y0 =  "yyyy-MM-dd";
         DateContext jc = new DateContext();
         JexlEngine jexl = new JexlBuilder().cache(32).namespaces(ns).arithmetic(new DateArithmetic(true)).create();
         JxltEngine jxlt = jexl.createJxltEngine();
