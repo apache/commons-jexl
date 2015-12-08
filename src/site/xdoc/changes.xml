@@ -36,7 +36,7 @@
                 'Unsolvable property' message to provide details about underlying exception
             </action>
             <action dev="henrib" type="add" issue="JEXL-177" due-to="Dmitri Blinov">
-            Unified expressions to be used in String literals in JEXL scripts
+                Unified expressions to be used in String literals in JEXL scripts
             </action>
             <action dev="henrib" type="add" issue="JEXL-174" due-to="Dmitri Blinov">
                 Overloadable property access operators

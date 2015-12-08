@@ -18,7 +18,6 @@ package org.apache.commons.jexl3;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,7 +44,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.evaluate(jc);
         Set<?> check = createSet("foo", "bar");
-        Assert.assertTrue(Objects.equals(check, o));
+        Assert.assertTrue(check.equals(o));
     }
 
     @Test
@@ -55,7 +54,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.evaluate(jc);
         Set<?> check = createSet("foo");
-        Assert.assertTrue(Objects.equals(check, o));
+        Assert.assertTrue(check.equals(o));
     }
 
     @Test
@@ -65,7 +64,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.execute(jc);
         Set<?> check = createSet("foo", "bar");
-        Assert.assertTrue(Objects.equals(check, o));
+        Assert.assertTrue(check.equals(o));
     }
 
     @Test
@@ -75,7 +74,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.execute(jc);
         Set<?> check = createSet("foo");
-        Assert.assertTrue(Objects.equals(check, o));
+        Assert.assertTrue(check.equals(o));
     }
 
     @Test
@@ -85,7 +84,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.execute(jc);
         Set<?> check = createSet("foo");
-        Assert.assertTrue(Objects.equals(check, o));
+        Assert.assertTrue(check.equals(o));
     }
 
     @Test
@@ -95,7 +94,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.evaluate(jc);
         Set<?> check = createSet(new Double(5.0), new Integer(10));
-        Assert.assertTrue(Objects.equals(check, o));
+        Assert.assertTrue(check.equals(o));
     }
 
     @Test
@@ -118,7 +117,7 @@ public class SetLiteralTest extends JexlTestCase {
         for (int t = 0; t < exprs.length; ++t) {
             JexlScript e = JEXL.createScript(exprs[t]);
             Object o = e.execute(jc);
-            Assert.assertTrue(exprs[t], Objects.equals(checks[t], o));
+            Assert.assertTrue(exprs[t], checks[t].equals(o));
         }
 
     }
