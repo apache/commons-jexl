@@ -24,8 +24,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.LogManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,7 +36,7 @@ import org.junit.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ClassCreatorTest extends JexlTestCase {
-    static final Logger logger = LogManager.getLogger(JexlTestCase.class);
+    static final Log logger = LogFactory.getLog(JexlTestCase.class);
     static final int LOOPS = 8;
     private File base = null;
     private JexlEngine jexl = null;

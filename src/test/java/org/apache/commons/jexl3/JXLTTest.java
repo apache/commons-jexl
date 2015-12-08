@@ -17,10 +17,9 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.TemplateDebugger;
-import org.apache.commons.jexl3.internal.TemplateEngine;
 import org.apache.commons.jexl3.internal.TemplateScript;
-import org.apache.log4j.Logger;
-import org.apache.log4j.LogManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -42,7 +41,7 @@ import org.junit.Test;
 public class JXLTTest extends JexlTestCase {
     private static final JexlEngine ENGINE = new JexlBuilder().silent(false).cache(128).strict(true).create();
     private static final JxltEngine JXLT = ENGINE.createJxltEngine();
-    private static final Logger LOG = LogManager.getLogger(JxltEngine.class);
+    private static final Log LOG = LogFactory.getLog(JxltEngine.class);
     private final MapContext vars = new MapContext();
     private JexlEvalContext context = null;
 

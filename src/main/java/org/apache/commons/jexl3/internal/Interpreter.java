@@ -106,7 +106,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 
 /**
  * An interpreter of JEXL syntax.
@@ -117,7 +117,7 @@ public class Interpreter extends ParserVisitor {
     /** The JEXL engine. */
     protected final Engine jexl;
     /** The logger. */
-    protected final Logger logger;
+    protected final Log logger;
     /** The uberspect. */
     protected final JexlUberspect uberspect;
     /** The arithmetic handler. */

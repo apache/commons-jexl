@@ -16,7 +16,7 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -36,13 +36,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * This basic function of this class is to return a Method object for a
  * particular class given the name of a method and the parameters to the method
  * in the form of an Object[].
- * 
+ *
  * <p>The first time the Introspector sees a class it creates a class method map
  * for the class in question.
  * Basically the class method map is a Hashtable where Method objects are keyed by the aggregation of
  * the method name and the array of parameters classes.
  * This mapping is performed for all the public methods of a class and stored.</p>
- * 
+ *
  * @since 1.0
  */
 public final class Introspector {
@@ -62,7 +62,7 @@ public final class Introspector {
     /**
      * the logger.
      */
-    protected final Logger rlog;
+    protected final Log rlog;
     /**
      * The class loader used to solve constructors if needed.
      */
@@ -89,7 +89,7 @@ public final class Introspector {
      * @param log     the logger to use
      * @param cloader the class loader
      */
-    public Introspector(Logger log, ClassLoader cloader) {
+    public Introspector(Log log, ClassLoader cloader) {
         this.rlog = log;
         loader = cloader;
     }

@@ -16,8 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.LogManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,7 +31,7 @@ import org.junit.Test;
  */
 public class ParseFailuresTest extends JexlTestCase {
 
-    static final Logger LOGGER = LogManager.getLogger(ParseFailuresTest.class.getName());
+    static final Log LOGGER = LogFactory.getLog(ParseFailuresTest.class.getName());
 
     /**
      * Create the test.

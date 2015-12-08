@@ -24,7 +24,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -53,7 +53,7 @@ public class Uberspect implements JexlUberspect {
     /** Publicly exposed special failure object returned by tryInvoke. */
     public static final Object TRY_FAILED = JexlEngine.TRY_FAILED;
     /** The logger to use for all warnings and errors. */
-    protected final Logger rlog;
+    protected final Log rlog;
     /** The resolver strategy. */
     private final JexlUberspect.ResolverStrategy strategy;
     /** The introspector version. */
@@ -75,7 +75,7 @@ public class Uberspect implements JexlUberspect {
      * @param runtimeLogger the logger used for all logging needs
      * @param sty the resolver strategy
      */
-    public Uberspect(Logger runtimeLogger, JexlUberspect.ResolverStrategy sty) {
+    public Uberspect(Log runtimeLogger, JexlUberspect.ResolverStrategy sty) {
         rlog = runtimeLogger;
         strategy = sty == null? JexlUberspect.JEXL_STRATEGY : sty;
         ref = new SoftReference<Introspector>(null);

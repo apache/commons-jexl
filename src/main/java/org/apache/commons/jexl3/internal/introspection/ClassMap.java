@@ -16,7 +16,7 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -90,7 +90,7 @@ final class ClassMap {
      * @param log the logger.
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    ClassMap(Class<?> aClass, Logger log) {
+    ClassMap(Class<?> aClass, Log log) {
         // eagerly cache methods
         create(this, aClass, log);
         // eagerly cache public fields
@@ -199,7 +199,7 @@ final class ClassMap {
      * @param classToReflect the class to cache
      * @param log the Log
      */
-    private static void create(ClassMap cache, Class<?> classToReflect, Logger log) {
+    private static void create(ClassMap cache, Class<?> classToReflect, Log log) {
         //
         // Build a list of all elements in the class hierarchy. This one is bottom-first (i.e. we start
         // with the actual declaring class and its interfaces and then move up (superclass etc.) until we
@@ -256,7 +256,7 @@ final class ClassMap {
      * @param iface the interface to populate the cache from
      * @param log the Log
      */
-    private static void populateWithInterface(ClassMap cache, Class<?> iface, Logger log) {
+    private static void populateWithInterface(ClassMap cache, Class<?> iface, Log log) {
         if (Modifier.isPublic(iface.getModifiers())) {
             populateWithClass(cache, iface, log);
         }
@@ -272,7 +272,7 @@ final class ClassMap {
      * @param clazz the class to populate the cache from
      * @param log the Log
      */
-    private static void populateWithClass(ClassMap cache, Class<?> clazz, Logger log) {
+    private static void populateWithClass(ClassMap cache, Class<?> clazz, Log log) {
         try {
             Method[] methods = clazz.getDeclaredMethods();
             for (int i = 0; i < methods.length; i++) {

@@ -20,11 +20,9 @@ package org.apache.commons.jexl3;
 import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
-
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
 
 import java.util.Map;
-
 import java.nio.charset.Charset;
 
 /**
@@ -77,7 +75,7 @@ public class JexlBuilder {
     /**
      * The Log to which all JexlEngine messages will be logged.
      */
-    protected Logger logger = null;
+    protected Log logger = null;
     /**
      * Whether expressions evaluated by this engine will throw exceptions (false) or
      * return null (true) on errors. Default is false.
@@ -182,13 +180,13 @@ public class JexlBuilder {
      * @param l the logger
      * @return this builder
      */
-    public JexlBuilder logger(Logger l) {
+    public JexlBuilder logger(Log l) {
         this.logger = l;
         return this;
     }
 
     /** @return the logger */
-    public Logger logger() {
+    public Log logger() {
         return this.logger;
     }
 

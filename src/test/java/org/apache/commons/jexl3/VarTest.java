@@ -22,17 +22,17 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.log4j.Logger;
-import org.apache.log4j.LogManager;
 import org.junit.Assert;
 import org.junit.Test;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Tests local variables.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class VarTest extends JexlTestCase {
-    static final Logger LOGGER = LogManager.getLogger(VarTest.class.getName());
+    static final Log LOGGER = LogFactory.getLog(VarTest.class.getName());
 
     public VarTest() {
         super("VarTest");
