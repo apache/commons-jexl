@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.jexl3.junit.Asserter;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -114,15 +113,28 @@ public class ArrayAccessTest extends JexlTestCase {
     /**
      * test some simple double array lookups
      */
+    @Test
     public void testDoubleArrays() throws Exception {
         Object[][] foo = new Object[2][2];
+
         foo[0][0] = "one";
         foo[0][1] = "two";
-
         asserter.setVariable("foo", foo);
         asserter.assertExpression("foo[0][1]", "two");
         asserter.assertExpression("foo[0][1] = 'three'", "three");
         asserter.assertExpression("foo[0][1]", "three");
+
+        foo[0][0] = "one";
+        foo[0][1] = "two";
+        asserter.assertExpression("foo.0[1]", "two");
+        asserter.assertExpression("foo.0[1] = 'three'", "three");
+        asserter.assertExpression("foo.0[1]", "three");
+
+        foo[0][0] = "one";
+        foo[0][1] = "two";
+        asserter.assertExpression("foo.0.'1'", "two");
+        asserter.assertExpression("foo.0.'1' = 'three'", "three");
+        asserter.assertExpression("foo.0.'1'", "three");
     }
 
     public void testArrayProperty() throws Exception {
