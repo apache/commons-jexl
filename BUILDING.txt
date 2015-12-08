@@ -1,4 +1,4 @@
-Jexl 3.0 uses Maven 3 as the build tool, and requires Java 6 (or later).
+JEXL 3.0 uses Maven 3 as the build tool, and requires Java 6 (or later).
 
 The following goals may be useful:
 * mvn clean - clean up

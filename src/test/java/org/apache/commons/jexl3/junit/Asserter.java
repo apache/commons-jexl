@@ -32,7 +32,7 @@ import org.apache.commons.jexl3.JexlScript;
 /**
  * A utility class for performing JUnit based assertions using Jexl
  * expressions. This class can make it easier to do unit tests using
- * Jexl navigation expressions.
+ * JEXL navigation expressions.
  *
  * @since 1.0
  */
@@ -41,7 +41,7 @@ public class Asserter extends Assert {
     private final Map<String, Object> variables = new HashMap<String, Object>();
     /** context to use during asserts. */
     private final JexlEvalContext context = new JexlEvalContext(variables);
-    /** Jexl engine to use during Asserts. */
+    /** JEXL engine to use during Asserts. */
     private final JexlEngine engine;
 
     /**
@@ -86,10 +86,10 @@ public class Asserter extends Assert {
     }
 
     /**
-     * Performs an assertion that the value of the given Jexl expression
+     * Performs an assertion that the value of the given JEXL expression
      * evaluates to the given expected value.
      *
-     * @param expression is the Jexl expression to evaluate
+     * @param expression is the JEXL expression to evaluate
      * @param expected is the expected value of the expression
      * @throws Exception if the expression could not be evaluationed or an assertion
      * fails

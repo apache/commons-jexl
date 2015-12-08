@@ -1,5 +1,5 @@
 
-                            Commons JEXL Package
+                            Apache Commons JEXL
                                 Version 3.0
                                Release Notes
 
@@ -62,7 +62,7 @@ Release 2.1.1
 
 Version 2.1.1 is a micro release to fix a regression detected in 2.1:
 
-* JEXL-124:     Array parameters to methods don't work anymore (Jexl 2.1.1)
+* JEXL-124:     Array parameters to methods don't work anymore (JEXL 2.1.1)
 
 There are no other changes.
 
@@ -129,7 +129,7 @@ Bugs fixed in 2.0.1:
 Bugs fixed in 2.0:
 ==================
 
-* JEXL-90:	Jexl parser allows invalid expressions, e.g. "a=1 b=2 3"
+* JEXL-90:	JEXL parser allows invalid expressions, e.g. "a=1 b=2 3"
 * JEXL-88:	MethodKey.java - name clash getMostSpecific() with Java 1.5.0
 * JEXL-87:	Inconsistent behaviour of arithmetical operations
 * JEXL-81:	Introspector does not use ListGetExecutor for List
@@ -237,7 +237,7 @@ The following methods have been removed:
 Behavior changes
 ================
 
-* Public fields are considered when using JexlPropertyGet / JexlPropertySet: Jexl 1.x behavior can be reimplemented
+* Public fields are considered when using JexlPropertyGet / JexlPropertySet: JEXL 1.x behavior can be reimplemented
 by subclassing UberspectImpl.
 
 *Division (/ operator) behavior change: division between integers no longer casts its operands to double; integer division
@@ -266,5 +266,5 @@ JSR-223 support
    * Implement JSR-223 Scripting Engine for JEXL script (need BSF-3.0 on Java < 6)
 
 Error and exception handling
-   * Configuring the leniency and verbosity of the Jexl engine allows user control over the
+   * Configuring the leniency and verbosity of the JEXL engine allows user control over the
      error handling policy

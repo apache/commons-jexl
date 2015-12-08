@@ -36,7 +36,7 @@ public class JexlTestCase {
     /** String parameter signature for test run. */
     private static final Class<?>[] stringParm = {String.class};
 
-    /** A default Jexl engine instance. */
+    /** A default JEXL engine instance. */
     protected final JexlEngine JEXL;
 
     public JexlTestCase(String name) {

@@ -19,8 +19,8 @@ package org.apache.commons.jexl3;
 /**
  * Manages variables which can be referenced in a JEXL expression.
  * 
- * <p>Jexl variable names in their simplest form are 'java-like' identifiers.
- * Jexl also considers 'ant' inspired variables expressions as valid.
+ * <p>JEXL variable names in their simplest form are 'java-like' identifiers.
+ * JEXL also considers 'ant' inspired variables expressions as valid.
  * For instance, the expression 'x.y.z' is an 'antish' variable and will be resolved as a whole by the context,
  * i.e. using the key "x.y.z". This proves to be useful to solve "fully qualified class names".</p>
  * 

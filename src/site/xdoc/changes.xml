@@ -36,7 +36,7 @@
                 'Unsolvable property' message to provide details about underlying exception
             </action>
             <action dev="henrib" type="add" issue="JEXL-177" due-to="Dmitri Blinov">
-            Unified expressions to be used in String literals in Jexl scripts
+            Unified expressions to be used in String literals in JEXL scripts
             </action>
             <action dev="henrib" type="add" issue="JEXL-174" due-to="Dmitri Blinov">
                 Overloadable property access operators
@@ -310,7 +310,7 @@
             <action dev="henrib" type="update">Various performance enhancements &amp; caches</action>
         </release>
         <release version="1.1.1-SNAPSHOT" date="unreleased">
-            <action dev="dion" type="update" issue="JEXL-23">Fix jdk1.3 only code that has crept into Jexl tests</action>
+            <action dev="dion" type="update" issue="JEXL-23">Fix jdk1.3 only code that has crept into JEXL tests</action>
             <action dev="dion" type="update" issue="JEXL-22" due-to="Randy H.">Allow unicode literals to be used</action>
         </release>
         <release version="1.1" date="2006-09-10">

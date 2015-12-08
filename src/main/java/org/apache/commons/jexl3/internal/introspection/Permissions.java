@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 import org.apache.commons.jexl3.annotations.NoJexl;
 
 /**
- * Checks whether an element (ctor, field or method) is visible by Jexl introspection
+ * Checks whether an element (ctor, field or method) is visible by JEXL introspection
  * by checking if has been annotated with NoJexl.
  */
 public class Permissions {

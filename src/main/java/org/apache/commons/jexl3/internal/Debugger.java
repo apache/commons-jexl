@@ -192,7 +192,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     /**
-     * Rebuilds an expression from a Jexl node.
+     * Rebuilds an expression from a JEXL node.
      * @param node the node to rebuilt from
      * @return the rebuilt expression
      * @since 3.0
