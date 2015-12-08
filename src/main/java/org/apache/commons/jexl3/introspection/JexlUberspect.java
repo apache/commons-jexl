@@ -135,11 +135,13 @@ public interface JexlUberspect {
 
     /**
      * Determines property resolution strategy.
-     * <p>
-     * To use a strategy instance, you have to set it at engine creation using
+     * 
+     * <p>To use a strategy instance, you have to set it at engine creation using
      * {@link org.apache.commons.jexl3.JexlBuilder#strategy(JexlUberspect.ResolverStrategy)}
-     * as in:<br/>
+     * as in:</p>
+     * 
      * <code>JexlEngine jexl = new JexlBuilder().strategy(MY_STRATEGY).create();</code>
+     * 
      * @since 3.0
      */
     interface ResolverStrategy {

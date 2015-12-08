@@ -311,7 +311,7 @@ public class Engine extends JexlEngine {
      * Creates a cache.
      * @param <K>       the key type
      * @param <V>       the value type
-     * @param cacheSize the cache size, must be > 0
+     * @param cacheSize the cache size, must be &gt; 0
      * @return a Map usable as a cache bounded to the given size
      */
     protected <K, V> Map<K, V> createCache(final int cacheSize) {

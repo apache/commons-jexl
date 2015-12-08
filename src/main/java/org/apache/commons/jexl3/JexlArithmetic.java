@@ -139,14 +139,13 @@ public class JexlArithmetic {
 
     /**
      * Helper interface used when creating an array literal.
-     * <p>The default implementation creates an array and attempts to type it strictly.
+     * <p>The default implementation creates an array and attempts to type it strictly.</p>
      * <ul>
      * <li>If all objects are of the same type, the array returned will be an array of that same type</li>
      * <li>If all objects are Numbers, the array returned will be an array of Numbers</li>
      * <li>If all objects are convertible to a primitive type, the array returned will be an array
      * of the primitive type</li>
      * </ul>
-     * </p>
      */
     public interface ArrayBuilder {
         /**
@@ -1336,7 +1335,7 @@ public class JexlArithmetic {
      * Use or overload and() instead.
      * @param lhs left hand side
      * @param rhs right hand side
-     * @return lhs & rhs
+     * @return lhs &amp; rhs
      * @see JexlArithmetic#and
      * @deprecated
      */
