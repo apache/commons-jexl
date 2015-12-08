@@ -162,4 +162,21 @@ public class MapLiteralTest extends JexlTestCase {
         Object result = script.execute(null, Collections.singletonMap("", 42));
         Assert.assertEquals(42, result);
     }
+
+    @Test
+    public void testVariableMap() throws Exception {
+        JexlScript script = JEXL.createScript("{ ['1', '2'.toString()] : someValue }", "someValue");
+        Object result = script.execute(null, 42);
+        Assert.assertTrue(result instanceof Map);
+        Object key = null;
+        Object value = null;
+        for(Map.Entry<?,?> e : ((Map<?,?>) result).entrySet()) {
+            key = e.getKey();
+            value = e.getValue();
+            break;
+        }
+        Object gg = ((Map) result).get(key);
+        Assert.assertEquals(42, ((Number) gg).intValue());
+        Assert.assertEquals(value, ((Number) gg).intValue());
+    }
 }
