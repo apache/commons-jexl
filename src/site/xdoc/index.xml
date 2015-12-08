@@ -111,21 +111,19 @@ working with enterprise platforms.
             </p>
 
             <source><![CDATA[
-            // Create or retrieve an engine
-            JexlEngine jexl = new JexlBuilder().create();
-
-            // Create an expression
-            String jexlExp = "foo.innerFoo.bar()";
-            JexlExpression e = jexl.createExpression( jexlExp );
-
-            // Create a context and add data
-            JexlContext jc = new MapContext();
-            jc.set("foo", new Foo() );
-
-            // Now evaluate the expression, getting the result
-            Object o = e.evaluate(jc);
-        ]]>
-            </source>
+    // Create or retrieve an engine
+    JexlEngine jexl = new JexlBuilder().create();
+    
+    // Create an expression
+    String jexlExp = "foo.innerFoo.bar()";
+    JexlExpression e = jexl.createExpression( jexlExp );
+    
+    // Create a context and add data
+    JexlContext jc = new MapContext();
+    jc.set("foo", new Foo() );
+    
+    // Now evaluate the expression, getting the result
+    Object o = e.evaluate(jc);]]></source>
         </section>
 
         <section name="Extensions to JSTL Expression Language">
