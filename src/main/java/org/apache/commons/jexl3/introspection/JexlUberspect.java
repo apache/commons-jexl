@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.commons.jexl3.introspection;
 
 import org.apache.commons.jexl3.JexlArithmetic;
@@ -38,14 +39,17 @@ public interface JexlUberspect {
      * These are used through 'strategies' to solve properties; a strategy orders a list of resolver types,
      * and each resolver type is tried in sequence; the first resolver that discovers a non null {s,g}etter
      * stops the search.
+     * 
      * @see JexlResolver
      * @see JexlUberspect#getPropertyGet
      * @see JexlUberspect#getPropertySet
      * @since 3.0
      */
     interface PropertyResolver {
+
         /**
          * Gets a property getter.
+         * 
          * @param uber       the uberspect
          * @param obj        the object
          * @param identifier the property identifier
@@ -55,6 +59,7 @@ public interface JexlUberspect {
 
         /**
          * Gets a property setter.
+         * 
          * @param uber       the uberspect
          * @param obj        the object
          * @param identifier the property identifier
@@ -69,33 +74,26 @@ public interface JexlUberspect {
      * <p>
      * Each resolver discovers how to set/get a property with different techniques; seeking
      * method names or field names, etc.
+     * 
      * @since 3.0
      */
     enum JexlResolver implements PropertyResolver {
-        /**
-         * Seeks methods named get{P,p}property and is{P,p}property.
-         */
+        /** Seeks methods named get{P,p}property and is{P,p}property. */
         PROPERTY,
-        /**
-         * Seeks map methods get/put.
-         */
+
+        /** Seeks map methods get/put. */
         MAP,
-        /**
-         * Seeks list methods get/set.
-         */
+
+        /** Seeks list methods get/set. */
         LIST,
-        /**
-         * Seeks any get/{set,put} method (quacking like a list or a map).
-         */
+
+        /** Seeks any get/{set,put} method (quacking like a list or a map). */
         DUCK,
-        /**
-         * Seeks public instance members.
-         */
+
+        /**  Seeks public instance members.*/
         FIELD,
-        /**
-         * Seeks a getContainer(property) and setContainer(property, value)
-         * as in <code>x.container.property</code>.
-         */
+
+        /** Seeks a getContainer(property) and setContainer(property, value) as in <code>x.container.property</code>. */
         CONTAINER;
 
         @Override
@@ -147,7 +145,7 @@ public interface JexlUberspect {
     interface ResolverStrategy {
         /**
          * Applies this strategy to a list of resolver types.
-         * <p>
+         * 
          * @param operator the property access operator, may be null
          * @param obj      the instance we seek to obtain a property setter/getter from, can not be null
          * @return the ordered list of resolvers types, must not be null
@@ -179,9 +177,9 @@ public interface JexlUberspect {
 
     /**
      * The map strategy.
-     * <p>
-     * If the operator is '[]' or if the object is a map, use the MAP list of resolvers.
-     * Otherwise, use the POJO list of resolvers.
+     * 
+     * <p>If the operator is '[]' or if the object is a map, use the MAP list of resolvers.
+     * Otherwise, use the POJO list of resolvers.</p>
      */
     ResolverStrategy MAP_STRATEGY = new ResolverStrategy() {
         @Override
@@ -201,6 +199,7 @@ public interface JexlUberspect {
 
     /**
      * Applies this uberspect property resolver strategy.
+     * 
      * @param op the operator
      * @param obj the object
      * @return the applied strategy resolver list
@@ -209,20 +208,23 @@ public interface JexlUberspect {
 
     /**
      * Sets the class loader to use.
-     * <p>
-     * This increments the version.</p>
+     * 
+     * <p>This increments the version.</p>
+     * 
      * @param loader the class loader
      */
     void setClassLoader(ClassLoader loader);
 
     /**
      * Gets this uberspect version.
+     * 
      * @return the class loader modification count
      */
     int getVersion();
 
     /**
      * Returns a class constructor.
+     * 
      * @param ctorHandle a class or class name
      * @param args       constructor arguments
      * @return a {@link JexlMethod}
@@ -232,6 +234,7 @@ public interface JexlUberspect {
 
     /**
      * Returns a JexlMethod.
+     * 
      * @param obj    the object
      * @param method the method name
      * @param args   method arguments
@@ -241,8 +244,9 @@ public interface JexlUberspect {
 
     /**
      * Property getter.
-     * <p>
-     * returns a JelPropertySet apropos to an expression like <code>bar.woogie</code>.</p>
+     * 
+     * <p>returns a JelPropertySet apropos to an expression like <code>bar.woogie</code>.</p>
+     * 
      * @param obj        the object to get the property from
      * @param identifier property name
      * @return a {@link JexlPropertyGet} or null
@@ -267,6 +271,7 @@ public interface JexlUberspect {
      * Property setter.
      * <p>
      * Seeks a JelPropertySet apropos to an expression like  <code>foo.bar = "geir"</code>.</p>
+     * 
      * @param obj        the object to get the property from.
      * @param identifier property name
      * @param arg        value to set
@@ -291,6 +296,7 @@ public interface JexlUberspect {
 
     /**
      * Gets an iterator from an object.
+     * 
      * @param obj to get the iterator from
      * @return an iterator over obj or null
      */
@@ -298,6 +304,7 @@ public interface JexlUberspect {
 
     /**
      * Gets an arithmetic operator resolver for a given arithmetic instance.
+     * 
      * @param arithmetic the arithmetic instance
      * @return the arithmetic uberspect or null if no operator method were overridden
      * @since 3.0

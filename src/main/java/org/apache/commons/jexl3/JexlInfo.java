@@ -14,19 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl3;
 
+package org.apache.commons.jexl3;
 
 /**
  * Helper class to carry information such as a url/file name, line and column for
  * debugging information reporting.
  */
 public class JexlInfo {
-    /** line number. */
+
+    /** line number */
     protected final int line;
-    /** column number. */
+
+    /** column number */
     protected final int column;
-    /** name. */
+
+    /** name */
     protected final String name;
 
     /**
@@ -44,19 +47,23 @@ public class JexlInfo {
          * @return the start column on the line that triggered the error
          */
         int start();
+
         /**
          * @return the end column on the line that triggered the error
          */
         int end();
+
         /**
          * @return the actual part of code that triggered the error
          */
+
         @Override
         String toString();
     }
 
     /**
      * Create info.
+     * 
      * @param source source name
      * @param l line number
      * @param c column number
@@ -69,6 +76,7 @@ public class JexlInfo {
 
     /**
      * Creates info reusing the name.
+     * 
      * @param l the line
      * @param c the column
      * @return a new info instance
@@ -79,6 +87,7 @@ public class JexlInfo {
 
     /**
      * The copy constructor.
+     * 
      * @param copy the instance to copy
      */
     protected JexlInfo(JexlInfo copy) {
@@ -118,6 +127,7 @@ public class JexlInfo {
 
     /**
      * Gets the file/script/url name.
+     * 
      * @return template name
      */
     public final String getName() {
@@ -126,6 +136,7 @@ public class JexlInfo {
 
     /**
      * Gets the line number.
+     * 
      * @return line number.
      */
     public final int getLine() {
@@ -134,6 +145,7 @@ public class JexlInfo {
 
     /**
      * Gets the column number.
+     * 
      * @return the column.
      */
     public final int getColumn() {

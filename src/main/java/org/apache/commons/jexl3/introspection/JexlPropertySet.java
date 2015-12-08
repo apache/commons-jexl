@@ -23,6 +23,7 @@ package org.apache.commons.jexl3.introspection;
  * <code>
  * ${foo.bar = "hello"}
  * </code>
+ * 
  * @since 1.0
  */
 public interface JexlPropertySet {
@@ -39,6 +40,7 @@ public interface JexlPropertySet {
     /**
      * Attempts to reuse this JexlPropertySet, checking that it is compatible with
      * the actual set of arguments.
+     * 
      * @param obj the object to invoke the the get upon
      * @param key the property key to get
      * @param value the property value to set
@@ -49,6 +51,7 @@ public interface JexlPropertySet {
 
     /**
      * Checks whether a tryInvoke failed or not.
+     * 
      * @param rval the value returned by tryInvoke
      * @return true if tryInvoke failed, false otherwise
      */

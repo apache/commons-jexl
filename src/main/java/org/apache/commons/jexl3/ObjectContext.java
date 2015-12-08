@@ -14,21 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.commons.jexl3;
 
 /**
  * Wraps an Object as a JEXL context and NamespaceResolver.
+ * 
  * @param <T> the wrapped object type to use
  * @since 3.0
  */
 public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResolver {
+
     /** The property solving jexl engine. */
     protected final JexlEngine jexl;
+
     /** The object serving as context provider. */
     protected final T object;
 
     /**
      * Creates a new ObjectContext.
+     * 
      * @param engine the jexl engine to use to solve properties
      * @param wrapped the object to wrap in this context
      */

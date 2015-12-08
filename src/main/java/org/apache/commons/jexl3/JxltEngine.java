@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.commons.jexl3;
 
 import java.io.Reader;
@@ -24,30 +25,31 @@ import java.util.Set;
 
 /**
  * A simple "JeXL Template" engine.
- * <p>
- * At the base is an evaluator similar to the Unified EL evaluator used in JSP/JSF based on JEXL.
+ * 
+ * <p>At the base is an evaluator similar to the Unified EL evaluator used in JSP/JSF based on JEXL.
  * At the top is a template engine inspired by Velocity that uses JEXL (instead of OGNL/VTL) as the scripting
-  * language.
- * </p>
- * <p>
- * The evaluator is intended to be used in configuration modules, XML based frameworks or JSP taglibs
- * and facilitate the implementation of expression evaluation.
- * </p>
- * <p>
- * The template engine is intended to output any form of text; html, XML, CSV...
- * </p>
+ * language.</p>
+ * 
+ * <p>The evaluator is intended to be used in configuration modules, XML based frameworks or JSP taglibs
+ * and facilitate the implementation of expression evaluation.</p>
+ * 
+ * <p>The template engine is intended to output any form of text; html, XML, CSV...</p>
+ * 
  * @since 3.0
  */
 public abstract class JxltEngine {
+
     /**
      * The sole type of (runtime) exception the JxltEngine can throw.
      */
     public static class Exception extends JexlException {
+
         /** Serial version UID. */
         private static final long serialVersionUID = 201112030113L;
 
         /**
          * Creates an Exception.
+         * 
          * @param info the contextual information
          * @param msg the exception message
          * @param cause the exception cause
@@ -60,17 +62,18 @@ public abstract class JxltEngine {
     /**
      * A unified expression that can mix immediate, deferred and nested sub-expressions as well as string constants;
      * <ul>
-     * <li>The "immediate" syntax is of the form <code>"...${jexl-expr}..."</code></li>
-     * <li>The "deferred" syntax is of the form <code>"...#{jexl-expr}..."</code></li>
-     * <li>The "nested" syntax is of the form <code>"...#{...${jexl-expr0}...}..."</code></li>
-     * <li>The "composite" syntax is of the form <code>"...${jexl-expr0}... #{jexl-expr1}..."</code></li>
+     *   <li>The "immediate" syntax is of the form <code>"...${jexl-expr}..."</code></li>
+     *   <li>The "deferred" syntax is of the form <code>"...#{jexl-expr}..."</code></li>
+     *   <li>The "nested" syntax is of the form <code>"...#{...${jexl-expr0}...}..."</code></li>
+     *   <li>The "composite" syntax is of the form <code>"...${jexl-expr0}... #{jexl-expr1}..."</code></li>
      * </ul>
      * 
      * <p>Deferred and immediate expression carry different intentions:</p>
+     * 
      * <ul>
-     * <li>An immediate expression indicate that evaluation is intended to be performed close to
-     * the definition/parsing point.</li>
-     * <li>A deferred expression indicate that evaluation is intended to occur at a later stage.</li>
+     *   <li>An immediate expression indicate that evaluation is intended to be performed close to
+     *       the definition/parsing point.</li>
+     *   <li>A deferred expression indicate that evaluation is intended to occur at a later stage.</li>
      * </ul>
      * 
      * <p>For instance: <code>"Hello ${name}, now is #{time}"</code> is a composite "deferred" expression since one
@@ -104,14 +107,17 @@ public abstract class JxltEngine {
      * @since 2.0
      */
     public interface Expression {
+
         /**
          * Generates this expression's string representation.
+         * 
          * @return the string representation
          */
         String asString();
 
         /**
          * Adds this expression's string representation to a StringBuilder.
+         * 
          * @param strb the builder to fill
          * @return the builder argument
          */
@@ -119,9 +125,9 @@ public abstract class JxltEngine {
 
         /**
          * Evaluates this expression.
-         * <p>
-         * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
-         * </p>
+         * 
+         * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warning.</p>
+         * 
          * @param context the variable context
          * @return the result of this expression evaluation or null if an error occurs and the {@link JexlEngine} is
          * running in silent mode
@@ -136,6 +142,7 @@ public abstract class JxltEngine {
          * If this expression was prepared, this allows to retrieve the
          * original expression that lead to it.</p>
          * <p>Other expressions return themselves.</p>
+         * 
          * @return the source expression
          */
         Expression getSource();
@@ -144,6 +151,7 @@ public abstract class JxltEngine {
          * Gets the list of variables accessed by this expression.
          * <p>This method will visit all nodes of the sub-expressions and extract all variables whether they
          * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
+         * 
          * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
          * or the empty set if no variables are used
          */
@@ -151,43 +159,43 @@ public abstract class JxltEngine {
 
         /**
          * Checks whether this expression is deferred.
+         * 
          * @return true if deferred, false otherwise
          */
         boolean isDeferred();
 
         /**
          * Checks whether this expression is immediate.
+         * 
          * @return true if immediate, false otherwise
          */
         boolean isImmediate();
 
         /**
          * Evaluates the immediate sub-expressions.
-         * <p>
-         * When the expression is dependant upon immediate and deferred sub-expressions,
+         * 
+         * <p>When the expression is dependant upon immediate and deferred sub-expressions,
          * evaluates the immediate sub-expressions with the context passed as parameter
-         * and returns this expression deferred form.
-         * </p>
-         * <p>
-         * In effect, this binds the result of the immediate sub-expressions evaluation in the
+         * and returns this expression deferred form.</p>
+         * 
+         * <p>In effect, this binds the result of the immediate sub-expressions evaluation in the
          * context, allowing to differ evaluation of the remaining (deferred) expression within another context.
          * This only has an effect to nested and composite expressions that contain differed and
-         * immediate sub-expressions.
-         * </p>
-         * <p>
-         * If the underlying JEXL engine is silent, errors will be logged through its logger as warning.
-         * </p>
+         * immediate sub-expressions.</p>
+         * 
+         * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warning.* </p>
+         * 
          * @param context the context to use for immediate expression evaluations
          * @return an {@link Expression} or null if an error occurs and the {@link JexlEngine} is running
          * in silent mode
-         * @throws Exception if an error occurs and the {@link JexlEngine}
-         * is not in silent mode
+         * @throws Exception if an error occurs and the {@link JexlEngine} is not in silent mode
          */
         Expression prepare(JexlContext context);
 
         /**
          * Formats this expression, adding its source string representation in
          * comments if available: 'expression /*= source *\/'' .
+         * 
          * @return the formatted expression string
          */
         @Override
@@ -197,13 +205,12 @@ public abstract class JxltEngine {
     /**
      * Creates a a {@link Expression} from an expression string.
      * Uses and fills up the expression cache if any.
-     * <p>
-     * If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.
-     * </p>
+     * 
+     * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.</p>
+     * 
      * @param expression the {@link Template} string expression
      * @return the {@link Expression}, null if silent and an error occurred
-     * @throws Exception if an error occurs and the {@link JexlEngine}
-     * is not silent
+     * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
      */
     public Expression createExpression(String expression) {
         return createExpression(null, expression);
@@ -212,14 +219,13 @@ public abstract class JxltEngine {
     /**
      * Creates a a {@link Expression} from an expression string.
      * Uses and fills up the expression cache if any.
-     * <p>
-     * If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.
-     * </p>
+     * 
+     * <p>If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.</p>
+     * 
      * @param info the {@link JexlInfo} source information
      * @param expression the {@link Template} string expression
      * @return the {@link Expression}, null if silent and an error occured
-     * @throws Exception if an error occurs and the {@link JexlEngine}
-     * is not silent
+     * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
      */
     public abstract Expression createExpression(JexlInfo info, String expression);
 
@@ -270,14 +276,17 @@ public abstract class JxltEngine {
      * @since 3.0
      */
     public interface Template {
+
         /**
          * Recreate the template source from its inner components.
+         * 
          * @return the template source rewritten
          */
         String asString();
 
         /**
          * Evaluates this template.
+         * 
          * @param context the context to use during evaluation
          * @param writer the writer to use for output
          */
@@ -285,6 +294,7 @@ public abstract class JxltEngine {
 
         /**
          * Evaluates this template.
+         * 
          * @param context the context to use during evaluation
          * @param writer the writer to use for output
          * @param args the arguments
@@ -293,6 +303,7 @@ public abstract class JxltEngine {
 
         /**
          * Prepares this template by expanding any contained deferred TemplateExpression.
+         * 
          * @param context the context to prepare against
          * @return the prepared version of the template
          */
@@ -302,6 +313,7 @@ public abstract class JxltEngine {
          * Gets the list of variables accessed by this template.
          * <p>This method will visit all nodes of the sub-expressions and extract all variables whether they
          * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
+         * 
          * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
          * or the empty set if no variables are used
          */
@@ -309,6 +321,7 @@ public abstract class JxltEngine {
 
         /**
          * Gets the list of parameters expected by this template.
+         * 
          * @return the parameter names array
          */
         String[] getParameters();
@@ -316,6 +329,7 @@ public abstract class JxltEngine {
 
     /**
      * Creates a new template.
+     * 
      * @param info the jexl info (file, line, column)
      * @param prefix the directive prefix
      * @param source the source
@@ -326,6 +340,7 @@ public abstract class JxltEngine {
 
     /**
      * Creates a new template.
+     * 
      * @param info the source info
      * @param parms the parameter names
      * @param source the source
@@ -337,6 +352,7 @@ public abstract class JxltEngine {
 
     /**
      * Creates a new template.
+     * 
      * @param info the source info
      * @param source the source
      * @return the template
@@ -347,6 +363,7 @@ public abstract class JxltEngine {
 
     /**
      * Creates a new template.
+     * 
      * @param prefix the directive prefix
      * @param source the source
      * @param parms the parameter names
@@ -358,6 +375,7 @@ public abstract class JxltEngine {
 
     /**
      * Creates a new template.
+     * 
      * @param source the source
      * @param parms the parameter names
      * @return the template
@@ -368,6 +386,7 @@ public abstract class JxltEngine {
 
     /**
      * Creates a new template.
+     * 
      * @param source the source
      * @return the template
      */
@@ -377,6 +396,7 @@ public abstract class JxltEngine {
 
     /**
      * Gets the {@link JexlEngine} underlying this template engine.
+     * 
      * @return the JexlEngine
      */
     public abstract JexlEngine getEngine();

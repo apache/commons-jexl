@@ -17,7 +17,6 @@
 
 package org.apache.commons.jexl3;
 
-
 /**
  * Represents a single JEXL expression.
  * <p>
@@ -34,6 +33,7 @@ package org.apache.commons.jexl3;
  * @since 1.0
  */
 public interface JexlExpression {
+
     /**
      * Evaluates the expression with the variables contained in the
      * supplied {@link JexlContext}.
@@ -46,12 +46,14 @@ public interface JexlExpression {
 
     /**
      * Returns the source text of this expression.
+     * 
      * @return the source text
      */
     String getSourceText();
 
     /**
      * Recreates the source text of this expression from the internal synactic tree.
+     * 
      * @return the source text
      */
     String getParsedText();
