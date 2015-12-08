@@ -37,9 +37,6 @@ import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.Parser;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.LogManager;
-
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +48,9 @@ import java.util.Set;
 
 import java.lang.ref.SoftReference;
 import java.nio.charset.Charset;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A JexlEngine implementation.
@@ -68,7 +68,7 @@ public class Engine extends JexlEngine {
     private static final class UberspectHolder {
         /** The default uberspector that handles all introspection patterns. */
         private static final Uberspect UBERSPECT =
-                new Uberspect(LogManager.getLogger(JexlEngine.class), JexlUberspect.JEXL_STRATEGY);
+                new Uberspect(LogFactory.getLog(JexlEngine.class), JexlUberspect.JEXL_STRATEGY);
 
         /** Non-instantiable. */
         private UberspectHolder() {}
@@ -84,7 +84,7 @@ public class Engine extends JexlEngine {
     /**
      * The Log to which all JexlEngine messages will be logged.
      */
-    protected final Logger logger;
+    protected final Log logger;
     /**
      * The {@link Parser}; when parsing expressions, this engine synchronizes on the parser.
      */
@@ -150,7 +150,7 @@ public class Engine extends JexlEngine {
         } else {
             this.uberspect = new SandboxUberspect(uber, sandbox);
         }
-        this.logger = conf.logger() == null ? LogManager.getLogger(JexlEngine.class) : conf.logger();
+        this.logger = conf.logger() == null ? LogFactory.getLog(JexlEngine.class) : conf.logger();
         this.functions = conf.namespaces() == null ? Collections.<String, Object>emptyMap() : conf.namespaces();
         this.silent = conf.silent() == null ? false : conf.silent();
         this.debug = conf.debug() == null ? true : conf.debug();
@@ -174,8 +174,8 @@ public class Engine extends JexlEngine {
      * @param strategy the property resolver strategy
      * @return Uberspect the default uberspector instance.
      */
-    public static Uberspect getUberspect(Logger logger, JexlUberspect.ResolverStrategy strategy) {
-        if ((logger == null || logger.equals(LogManager.getLogger(JexlEngine.class)))
+    public static Uberspect getUberspect(Log logger, JexlUberspect.ResolverStrategy strategy) {
+        if ((logger == null || logger.equals(LogFactory.getLog(JexlEngine.class)))
             && (strategy == null || strategy == JexlUberspect.JEXL_STRATEGY)) {
             return UberspectHolder.UBERSPECT;
         }

@@ -38,8 +38,8 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlScript;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.LogManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Implements the JEXL ScriptEngine for JSF-223.
@@ -62,7 +62,7 @@ import org.apache.log4j.LogManager;
  */
 public class JexlScriptEngine extends AbstractScriptEngine implements Compilable {
     /** The logger. */
-    private static final Logger LOG = LogManager.getLogger(JexlScriptEngine.class);
+    private static final Log LOG = LogFactory.getLog(JexlScriptEngine.class);
 
     /** The shared expression cache size. */
     private static final int CACHE_SIZE = 512;
@@ -84,7 +84,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
     /**
      * Default constructor.
-     * 
+     *
      * <p>Only intended for use when not using a factory.
      * Sets the factory to {@link JexlScriptEngineFactory}.</p>
      */
@@ -95,7 +95,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     /**
      * Implements engine and engine context properties for use by JEXL scripts.
      * Those properties are allways bound to the default engine scope context.
-     * 
+     *
      * <p>The following properties are defined:</p>
      * <ul>
      * <li>in - refers to the engine scope reader that defaults to reading System.err</li>
@@ -104,7 +104,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * <li>logger - the JexlScriptEngine logger</li>
      * <li>System - the System.class</li>
      * </ul>
-     * 
+     *
      * @since 2.0
      */
     public class JexlScriptObject {
@@ -169,7 +169,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
          * Gives access to the engine logger.
          * @return the JexlScriptEngine logger
          */
-        public Logger getLogger() {
+        public Log getLogger() {
             return LOG;
         }
     }
