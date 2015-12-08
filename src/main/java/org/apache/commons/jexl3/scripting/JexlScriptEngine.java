@@ -84,9 +84,9 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
     /**
      * Default constructor.
-     * <p>
-     * Only intended for use when not using a factory.
-     * Sets the factory to {@link JexlScriptEngineFactory}.
+     * 
+     * <p>Only intended for use when not using a factory.
+     * Sets the factory to {@link JexlScriptEngineFactory}.</p>
      */
     public JexlScriptEngine() {
         this(FactorySingletonHolder.DEFAULT_FACTORY);
@@ -95,8 +95,8 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     /**
      * Implements engine and engine context properties for use by JEXL scripts.
      * Those properties are allways bound to the default engine scope context.
-     * <p>
-     * The following properties are defined:
+     * 
+     * <p>The following properties are defined:</p>
      * <ul>
      * <li>in - refers to the engine scope reader that defaults to reading System.err</li>
      * <li>out - refers the engine scope writer that defaults to writing in System.out</li>
@@ -104,7 +104,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * <li>logger - the JexlScriptEngine logger</li>
      * <li>System - the System.class</li>
      * </ul>
-     * </p>
+     * 
      * @since 2.0
      */
     public class JexlScriptObject {

@@ -65,43 +65,42 @@ public abstract class JxltEngine {
      * <li>The "nested" syntax is of the form <code>"...#{...${jexl-expr0}...}..."</code></li>
      * <li>The "composite" syntax is of the form <code>"...${jexl-expr0}... #{jexl-expr1}..."</code></li>
      * </ul>
-     * <p>
-     * Deferred and immediate expression carry different intentions:
+     * 
+     * <p>Deferred and immediate expression carry different intentions:</p>
      * <ul>
      * <li>An immediate expression indicate that evaluation is intended to be performed close to
      * the definition/parsing point.</li>
      * <li>A deferred expression indicate that evaluation is intended to occur at a later stage.</li>
      * </ul>
-     * </p>
-     * <p>
-     * For instance: <code>"Hello ${name}, now is #{time}"</code> is a composite "deferred" expression since one
+     * 
+     * <p>For instance: <code>"Hello ${name}, now is #{time}"</code> is a composite "deferred" expression since one
      * of its subexpressions is deferred. Furthermore, this (composite) expression intent is
      * to perform two evaluations; one close to its definition and another one in a later
-     * phase.
-     * </p>
-     * <p>
-     * The API reflects this feature in 2 methods, prepare and evaluate. The prepare method
+     * phase.</p>
+     * 
+     * <p>The API reflects this feature in 2 methods, prepare and evaluate. The prepare method
      * will evaluate the immediate subexpression and return an expression that contains only
      * the deferred subexpressions (and constants), a prepared expression. Such a prepared expression
      * is suitable for a later phase evaluation that may occur with a different JexlContext.
      * Note that it is valid to call evaluate without prepare in which case the same JexlContext
-     * is used for the 2 evaluation phases.
-     * </p>
-     * <p>
-     * In the most common use-case where deferred expressions are to be kept around as properties of objects,
+     * is used for the 2 evaluation phases.</p>
+     * 
+     * <p>In the most common use-case where deferred expressions are to be kept around as properties of objects,
      * one should createExpression and prepare an expression before storing it and evaluate it each time
-     * the property storing it is accessed.
-     * </p>
-     * <p>
-     * Note that nested expression use the JEXL syntax as in:
-     * <code>"#{${bar}+'.charAt(2)'}"</code>
-     * The most common mistake leading to an invalid expression being the following:
-     * <code>"#{${bar}charAt(2)}"</code>
-     * </p>
+     * the property storing it is accessed.</p>
+     * 
+     * <p>Note that nested expression use the JEXL syntax as in:</p>
+     * 
+     * <blockquote><code>"#{${bar}+'.charAt(2)'}"</code></blockquote>
+     * 
+     * <p>The most common mistake leading to an invalid expression being the following:</p>
+     * 
+     * <blockquote><code>"#{${bar}charAt(2)}"</code></blockquote>
+     *  
      * <p>Also note that methods that createExpression evaluate expressions may throw <em>unchecked</em> exceptions;
      * The {@link JxltEngine.Exception} are thrown when the engine instance is in "non-silent" mode
-     * but since these are RuntimeException, user-code <em>should</em> catch them where appropriate.
-     * </p>
+     * but since these are RuntimeException, user-code <em>should</em> catch them where appropriate.</p>
+     * 
      * @since 2.0
      */
     public interface Expression {
@@ -212,7 +211,7 @@ public abstract class JxltEngine {
 
     /**
      * Creates a a {@link Expression} from an expression string.
-     * Uses & fills up the expression cache if any.
+     * Uses and fills up the expression cache if any.
      * <p>
      * If the underlying JEXL engine is silent, errors will be logged through its logger as warnings.
      * </p>
@@ -233,39 +232,41 @@ public abstract class JxltEngine {
      * It is thus possible to use looping or conditional construct "around" expressions generating output.
      * </p>
      * For instance:
-     * <p><blockquote><pre>
+     * <blockquote><pre>
      * $$ for(var x : [1, 3, 5, 42, 169]) {
      * $$   if (x == 42) {
      * Life, the universe, and everything
-     * $$   } else if (x > 42) {
+     * $$   } else if (x &gt; 42) {
      * The value $(x} is over fourty-two
      * $$   } else {
      * The value ${x} is under fourty-two
      * $$   }
      * $$ }
      * </pre></blockquote>
-     * Will evaluate as:
-     * <p><blockquote><pre>
+     * 
+     * <p>Will evaluate as:</p>
+     * 
+     * <blockquote><pre>
      * The value 1 is under fourty-two
      * The value 3 is under fourty-two
      * The value 5 is under fourty-two
      * Life, the universe, and everything
      * The value 169 is over fourty-two
      * </pre></blockquote>
-     * <p>
-     * During evaluation, the template context exposes its writer as '$jexl' which is safe to use in this case.
-     * This allows writing directly through the writer without adding new-lines as in:
-     * <p><blockquote><pre>
+     * 
+     * <p>During evaluation, the template context exposes its writer as '$jexl' which is safe to use in this case.
+     * This allows writing directly through the writer without adding new-lines as in:</p>
+     * 
+     * <blockquote><pre>
      * $$ for(var cell : cells) { $jexl.print(cell); $jexl.print(';') }
      * </pre></blockquote>
-     * </p>
-     * <p>
-     * A template is expanded as one JEXL script and a list of template expressions; each template expression is
+     * 
+     * <p>A template is expanded as one JEXL script and a list of template expressions; each template expression is
      * being replaced in the script by a call to jexl:print(expr) (the expr is in fact the expr number in the template).
      * This integration uses a specialized JexlContext (TemplateContext) that serves as a namespace (for jexl:)
      * and stores the template expression array and the writer (java.io.Writer) that the 'jexl:print(...)'
-     * delegates the output generation to.
-     * </p>
+     * delegates the output generation to.</p>
+     * 
      * @since 3.0
      */
     public interface Template {

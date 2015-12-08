@@ -88,7 +88,8 @@ public class JexlInfo {
     }
 
     /**
-     * Formats this info in the form 'name&#064line:column'.
+     * Formats this info in the form 'name&#064;line:column'.
+     * 
      * @return the formatted info
      */
     @Override

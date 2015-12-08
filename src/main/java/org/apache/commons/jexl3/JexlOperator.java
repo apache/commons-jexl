@@ -65,7 +65,7 @@ public enum JexlOperator {
      */
     MOD("%", "mod", 2),
     /**
-     * <strong>Syntax:</strong> <code>x & y</code>
+     * <strong>Syntax:</strong> <code>x &amp; y</code>
      * <br><strong>Method:</strong> <code>T and(L x, R y);</code>.
      * @see JexlArithmetic#and
      */
@@ -89,25 +89,25 @@ public enum JexlOperator {
      */
     EQ("==", "equals", 2),
     /**
-     * <strong>Syntax:</strong> <code>x < y</code>
+     * <strong>Syntax:</strong> <code>x &lt; y</code>
      * <br><strong>Method:</strong> <code>boolean lessThan(L x, R y);</code>.
      * @see JexlArithmetic#lessThan
      */
     LT("<", "lessThan", 2),
     /**
-     * <strong>Syntax:</strong> <code>x <= y</code>
+     * <strong>Syntax:</strong> <code>x &lt;= y</code>
      * <br><strong>Method:</strong> <code>boolean lessThanOrEqual(L x, R y);</code>.
      * @see JexlArithmetic#lessThanOrEqual
      */
     LTE("<=", "lessThanOrEqual", 2),
     /**
-     * <strong>Syntax:</strong> <code>x > y</code>
+     * <strong>Syntax:</strong> <code>x &gt; y</code>
      * <br><strong>Method:</strong> <code>boolean greaterThan(L x, R y);</code>.
      * @see JexlArithmetic#greaterThan
      */
     GT(">", "greaterThan", 2),
     /**
-     * <strong>Syntax:</strong> <code>x >= y</code>
+     * <strong>Syntax:</strong> <code>x &gt;= y</code>
      * <br><strong>Method:</strong> <code>boolean greaterThanOrEqual(L x, R y);</code>.
      * @see JexlArithmetic#greaterThanOrEqual
      */
@@ -186,7 +186,7 @@ public enum JexlOperator {
      */
     SELF_MOD("%=", "selfMod", MOD),
     /**
-     * <strong>Syntax:</strong> <code>x &= y</code>
+     * <strong>Syntax:</strong> <code>x &amp;= y</code>
      * <br><strong>Method:</strong> <code>T selfAnd(L x, R y);</code>.
      */
     SELF_AND("&=", "selfAnd", AND),
@@ -202,7 +202,7 @@ public enum JexlOperator {
     SELF_XOR("^=", "selfXor", XOR),
     /**
      * Marker for side effect.
-     * <br/>Returns this from 'self*' overload method to let the engine know the side effect has been performed and
+     * <br>Returns this from 'self*' overload method to let the engine know the side effect has been performed and
      * there is no need to assign the result.
      */
     ASSIGN("=", null, null),

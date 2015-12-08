@@ -35,13 +35,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * This basic function of this class is to return a Method object for a
  * particular class given the name of a method and the parameters to the method
- * in the form of an Object[]
- * <p/>
- * The first time the Introspector sees a class it creates a class method map
+ * in the form of an Object[].
+ * 
+ * <p>The first time the Introspector sees a class it creates a class method map
  * for the class in question.
  * Basically the class method map is a Hashtable where Method objects are keyed by the aggregation of
  * the method name and the array of parameters classes.
- * This mapping is performed for all the public methods of a class and stored.
+ * This mapping is performed for all the public methods of a class and stored.</p>
+ * 
  * @since 1.0
  */
 public final class Introspector {
