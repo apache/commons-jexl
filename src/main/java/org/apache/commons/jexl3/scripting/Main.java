@@ -42,7 +42,7 @@ public class Main {
      * @throws Exception if anything goes wrong
      */
     static BufferedReader read(Charset charset, String fileName) throws Exception {
-        BufferedReader in = new BufferedReader(
+        return new BufferedReader(
             new InputStreamReader(
                     fileName == null
                         ? System.in
@@ -50,7 +50,6 @@ public class Main {
                     charset == null
                         ? Charset.defaultCharset()
                         : charset));
-        return in;
     }
 
     /**

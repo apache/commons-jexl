@@ -44,7 +44,6 @@ public class MapContext implements JexlContext {
      * @param vars the variable map
      */
     public MapContext(Map<String, Object> vars) {
-        super();
         map = vars == null ? new HashMap<String, Object>() : vars;
     }
 
