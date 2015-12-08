@@ -88,7 +88,7 @@ limitations under the License.
       </form>
 
       <p>
-        The <a href="http://www.apache.org/dist/commons/KEYS">KEYS</a>
+        The <a href="https://www.apache.org/dist/commons/KEYS">KEYS</a>
         link links to the code signing keys used to sign the product.
         The <code>PGP</code> link downloads the OpenPGP compatible signature from our main site.
         The <code>MD5</code> link downloads the checksum from the main site.
@@ -100,13 +100,13 @@ limitations under the License.
         <table>
           <tr>
               <td><a href="[preferred]/commons/jexl/binaries/commons-jexl-3.0-bin.tar.gz">commons-jexl-3.0-bin.tar.gz</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/binaries/commons-jexl-3.0-bin.tar.gz.md5">md5</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/binaries/commons-jexl-3.0-bin.tar.gz.asc">pgp</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/binaries/commons-jexl-3.0-bin.tar.gz.md5">md5</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/binaries/commons-jexl-3.0-bin.tar.gz.asc">pgp</a></td>
           </tr>
           <tr>
               <td><a href="[preferred]/commons/jexl/binaries/commons-jexl-3.0-bin.zip">commons-jexl-3.0-bin.zip</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/binaries/commons-jexl-3.0-bin.zip.md5">md5</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/binaries/commons-jexl-3.0-bin.zip.asc">pgp</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/binaries/commons-jexl-3.0-bin.zip.md5">md5</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/binaries/commons-jexl-3.0-bin.zip.asc">pgp</a></td>
           </tr>
         </table>
       </subsection>
@@ -114,13 +114,13 @@ limitations under the License.
         <table>
           <tr>
               <td><a href="[preferred]/commons/jexl/source/commons-jexl-3.0-src.tar.gz">commons-jexl-3.0-src.tar.gz</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/source/commons-jexl-3.0-src.tar.gz.md5">md5</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/source/commons-jexl-3.0-src.tar.gz.asc">pgp</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/source/commons-jexl-3.0-src.tar.gz.md5">md5</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/source/commons-jexl-3.0-src.tar.gz.asc">pgp</a></td>
           </tr>
           <tr>
               <td><a href="[preferred]/commons/jexl/source/commons-jexl-3.0-src.zip">commons-jexl-3.0-src.zip</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/source/commons-jexl-3.0-src.zip.md5">md5</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/source/commons-jexl-3.0-src.zip.asc">pgp</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/source/commons-jexl-3.0-src.zip.md5">md5</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/source/commons-jexl-3.0-src.zip.asc">pgp</a></td>
           </tr>
         </table>
       </subsection>
@@ -130,13 +130,13 @@ limitations under the License.
         <table>
           <tr>
               <td><a href="[preferred]/commons/jexl/binaries/commons-jexl-2.1.1-bin.tar.gz">commons-jexl-2.1.1-bin.tar.gz</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/binaries/commons-jexl-2.1.1-bin.tar.gz.md5">md5</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/binaries/commons-jexl-2.1.1-bin.tar.gz.asc">pgp</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/binaries/commons-jexl-2.1.1-bin.tar.gz.md5">md5</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/binaries/commons-jexl-2.1.1-bin.tar.gz.asc">pgp</a></td>
           </tr>
           <tr>
               <td><a href="[preferred]/commons/jexl/binaries/commons-jexl-2.1.1-bin.zip">commons-jexl-2.1.1-bin.zip</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/binaries/commons-jexl-2.1.1-bin.zip.md5">md5</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/binaries/commons-jexl-2.1.1-bin.zip.asc">pgp</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/binaries/commons-jexl-2.1.1-bin.zip.md5">md5</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/binaries/commons-jexl-2.1.1-bin.zip.asc">pgp</a></td>
           </tr>
         </table>
       </subsection>
@@ -144,13 +144,13 @@ limitations under the License.
         <table>
           <tr>
               <td><a href="[preferred]/commons/jexl/source/commons-jexl-2.1.1-src.tar.gz">commons-jexl-2.1.1-src.tar.gz</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/source/commons-jexl-2.1.1-src.tar.gz.md5">md5</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/source/commons-jexl-2.1.1-src.tar.gz.asc">pgp</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/source/commons-jexl-2.1.1-src.tar.gz.md5">md5</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/source/commons-jexl-2.1.1-src.tar.gz.asc">pgp</a></td>
           </tr>
           <tr>
               <td><a href="[preferred]/commons/jexl/source/commons-jexl-2.1.1-src.zip">commons-jexl-2.1.1-src.zip</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/source/commons-jexl-2.1.1-src.zip.md5">md5</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/source/commons-jexl-2.1.1-src.zip.asc">pgp</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/source/commons-jexl-2.1.1-src.zip.md5">md5</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/source/commons-jexl-2.1.1-src.zip.asc">pgp</a></td>
           </tr>
         </table>
       </subsection>
@@ -160,13 +160,13 @@ limitations under the License.
         <table>
           <tr>
               <td><a href="[preferred]/commons/jexl/binaries/commons-jexl-1.1.tar.gz">commons-jexl-1.1.tar.gz</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/binaries/commons-jexl-1.1.tar.gz.md5">md5</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/binaries/commons-jexl-1.1.tar.gz.asc">pgp</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/binaries/commons-jexl-1.1.tar.gz.md5">md5</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/binaries/commons-jexl-1.1.tar.gz.asc">pgp</a></td>
           </tr>
           <tr>
               <td><a href="[preferred]/commons/jexl/binaries/commons-jexl-1.1.zip">commons-jexl-1.1.zip</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/binaries/commons-jexl-1.1.zip.md5">md5</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/binaries/commons-jexl-1.1.zip.asc">pgp</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/binaries/commons-jexl-1.1.zip.md5">md5</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/binaries/commons-jexl-1.1.zip.asc">pgp</a></td>
           </tr>
         </table>
       </subsection>
@@ -174,13 +174,13 @@ limitations under the License.
         <table>
           <tr>
               <td><a href="[preferred]/commons/jexl/source/commons-jexl-1.1-src.tar.gz">commons-jexl-1.1-src.tar.gz</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/source/commons-jexl-1.1-src.tar.gz.md5">md5</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/source/commons-jexl-1.1-src.tar.gz.asc">pgp</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/source/commons-jexl-1.1-src.tar.gz.md5">md5</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/source/commons-jexl-1.1-src.tar.gz.asc">pgp</a></td>
           </tr>
           <tr>
               <td><a href="[preferred]/commons/jexl/source/commons-jexl-1.1-src.zip">commons-jexl-1.1-src.zip</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/source/commons-jexl-1.1-src.zip.md5">md5</a></td>
-              <td><a href="http://www.apache.org/dist/commons/jexl/source/commons-jexl-1.1-src.zip.asc">pgp</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/source/commons-jexl-1.1-src.zip.md5">md5</a></td>
+              <td><a href="https://www.apache.org/dist/commons/jexl/source/commons-jexl-1.1-src.zip.asc">pgp</a></td>
           </tr>
         </table>
       </subsection>
