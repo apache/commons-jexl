@@ -153,10 +153,8 @@ public class JexlException extends RuntimeException {
      */
     private static <X extends Throwable> X clean(X xthrow) {
         if (xthrow != null) {
-            StackTraceElement[] stack = xthrow.getStackTrace();
             List<StackTraceElement> stackJexl = new ArrayList<StackTraceElement>();
-            for (int s = 0; s < stack.length; ++s) {
-                StackTraceElement se = stack[s];
+            for (StackTraceElement se : xthrow.getStackTrace()) {
                 String className = se.getClassName();
                 if (!className.startsWith("org.apache.commons.jexl3.internal")
                         && !className.startsWith("org.apache.commons.jexl3.parser")) {
@@ -176,9 +174,9 @@ public class JexlException extends RuntimeException {
      */
     private static Throwable unwrap(Throwable xthrow) {
         if (xthrow instanceof InvocationTargetException) {
-            return ((InvocationTargetException) xthrow).getCause();
+            return xthrow.getCause();
         } else if (xthrow instanceof UndeclaredThrowableException) {
-            return ((UndeclaredThrowableException) xthrow).getCause();
+            return xthrow.getCause();
         } else {
             return xthrow;
         }

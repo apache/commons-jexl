@@ -147,8 +147,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public ScriptEngine getScriptEngine() {
-        JexlScriptEngine engine = new JexlScriptEngine(this);
-        return engine;
+        return new JexlScriptEngine(this);
     }
 
 }

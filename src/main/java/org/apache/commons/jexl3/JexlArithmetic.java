@@ -432,7 +432,7 @@ public class JexlArithmetic {
      */
     public Number narrowNumber(Number original, Class<?> narrow) {
         if (original == null) {
-            return original;
+            return null;
         }
         Number result = original;
         if (original instanceof BigDecimal) {

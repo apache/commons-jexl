@@ -77,7 +77,7 @@ public interface JexlContext {
      * 
      * @since 3.0
      */
-    public interface NamespaceResolver {
+    interface NamespaceResolver {
 
         /**
          * Resolves a namespace by its name.
@@ -92,7 +92,7 @@ public interface JexlContext {
      * 
      * <p>The functor is created once during the lifetime of a script evaluation.</p>
      */
-    public interface NamespaceFunctor {
+    interface NamespaceFunctor {
         /**
          * Creates the functor object that will be used instead of the namespace.
          * @param context the context
@@ -113,7 +113,7 @@ public interface JexlContext {
      * @see JexlEngine#setThreadContext(JexlContext.ThreadLocal)
      * @see JexlEngine#getThreadContext()
      */
-    public interface ThreadLocal extends JexlContext {
+    interface ThreadLocal extends JexlContext {
         // no specific method
     }
 
