@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.commons.jexl3;
 
+package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
@@ -27,11 +27,12 @@ import java.nio.charset.Charset;
 
 /**
  * Configure and builds a JexlEngine.
+ * 
  * <p>The <code>setSilent</code> and <code>setStrict</code> methods allow to fine-tune an engine instance behavior
  * according to various error control needs. The strict flag tells the engine when and if null as operand is
  * considered an error, the silent flag tells the engine what to do with the error
- * (log as warning or throw exception).
- * </p>
+ * (log as warning or throw exception).</p>
+ * 
  * <ul>
  * <li>When "silent" &amp; "not-strict":
  * <p> 0 &amp; null should be indicators of "default" values so that even in an case of error,
@@ -56,66 +57,55 @@ import java.nio.charset.Charset;
  * </ul>
  */
 public class JexlBuilder {
-    /**
-     * The default maximum expression length to hit the expression cache.
-     */
+
+    /** The default maximum expression length to hit the expression cache. */
     protected static final int CACHE_THRESHOLD = 64;
-    /**
-     * The JexlUberspect instance.
-     */
+
+    /** The JexlUberspect instance. */
     protected JexlUberspect uberspect = null;
-    /**
-     * The strategy strategy.
-     */
+
+    /** The strategy strategy. */
     protected JexlUberspect.ResolverStrategy strategy = null;
-    /**
-     * The sandbox.
-     */
+
+    /** The sandbox. */
     protected JexlSandbox sandbox = null;
-    /**
-     * The Log to which all JexlEngine messages will be logged.
-     */
+
+    /** The Log to which all JexlEngine messages will be logged. */
     protected Log logger = null;
+
     /**
      * Whether expressions evaluated by this engine will throw exceptions (false) or
      * return null (true) on errors. Default is false.
      */
     protected Boolean silent = null;
-    /**
-     * Whether this engine is in lenient or strict mode; if unspecified, use the arithmetic lenient property.
-     */
+
+    /** Whether this engine is in lenient or strict mode; if unspecified, use the arithmetic lenient property. */
     protected Boolean strict = null;
-    /**
-     * Whether error messages will carry debugging information.
-     */
+
+    /** Whether error messages will carry debugging information. */
     protected Boolean debug = null;
-    /**
-     *  The map of 'prefix:function' to object implementing the namespaces.
-     */
+
+    /** The map of 'prefix:function' to object implementing the namespaces. */
     protected Map<String, Object> namespaces = null;
-    /**
-     * The {@link JexlArithmetic} instance.
-     */
+
+    /** The {@link JexlArithmetic} instance. */
     protected JexlArithmetic arithmetic = null;
-    /**
-     * The cache size.
-     */
+
+    /** The cache size. */
     protected int cache = -1;
-    /**
-     * The maximum expression length to hit the expression cache.
-     */
+
+    /** The maximum expression length to hit the expression cache. */
     protected int cacheThreshold = CACHE_THRESHOLD;
-    /**
-     * The charset.
-     */
+
+    /** The charset. */
     protected Charset charset = Charset.defaultCharset();
-    /**
-     * The class loader.
-     */
+
+    /** The class loader. */
     protected ClassLoader loader = null;
 
     /**
      * Sets the JexlUberspect instance the engine will use.
+     * 
      * @param u the uberspect
      * @return this builder
      */
@@ -132,6 +122,7 @@ public class JexlBuilder {
     /**
      * Sets the JexlUberspect strategy strategy the engine will use.
      * <p>This is ignored if the uberspect has been set.
+     * 
      * @param rs the strategy
      * @return this builder
      */
@@ -147,6 +138,7 @@ public class JexlBuilder {
 
     /**
      * Sets the JexlArithmetic instance the engine will use.
+     * 
      * @param a the arithmetic
      * @return this builder
      */
@@ -162,6 +154,7 @@ public class JexlBuilder {
 
     /**
      * Sets the sandbox the engine will use.
+     * 
      * @param box the sandbox
      * @return this builder
      */
@@ -177,6 +170,7 @@ public class JexlBuilder {
 
     /**
      * Sets the o.a.c.Log instance to use.
+     * 
      * @param l the logger
      * @return this builder
      */
@@ -192,6 +186,7 @@ public class JexlBuilder {
 
     /**
      * Sets the class loader to use.
+     * 
      * @param l the class loader
      * @return this builder
      */
@@ -207,6 +202,7 @@ public class JexlBuilder {
 
     /**
      * Sets the charset to use.
+     * 
      * @param arg the charset
      * @return this builder
      */
@@ -222,6 +218,7 @@ public class JexlBuilder {
 
     /**
      * Sets whether the engine will throw JexlException during evaluation when an error is triggered.
+     * 
      * @param flag true means no JexlException will occur, false allows them
      * @return this builder
      */
@@ -238,6 +235,7 @@ public class JexlBuilder {
     /**
      * Sets whether the engine considers unknown variables, methods, functions and constructors as errors or
      * evaluates them as null.
+     * 
      * @param flag true means strict error reporting, false allows them to be evaluated as null
      * @return this builder
      */
@@ -253,6 +251,7 @@ public class JexlBuilder {
 
     /**
      * Sets whether the engine will report debugging information when error occurs.
+     * 
      * @param flag true implies debug is on, false implies debug is off.
      * @return this builder
      */
@@ -287,6 +286,7 @@ public class JexlBuilder {
      * </p>
      * <p>Note that the JexlContext is also used to try to solve top-level namespaces. This allows ObjectContext
      * derived instances to call methods on the wrapped object.</p>
+     * 
      * @param ns the map of namespaces
      * @return this builder
      */
@@ -306,6 +306,7 @@ public class JexlBuilder {
      * Sets the expression cache size the engine will use.
      * <p>The cache will contain at most <code>size</code> expressions of at most <code>cacheThreshold</code> length.
      * Note that all JEXL caches are held through SoftReferences and may be garbage-collected.</p>
+     * 
      * @param size if not strictly positive, no cache is used.
      * @return this builder
      */
@@ -314,7 +315,9 @@ public class JexlBuilder {
         return this;
     }
 
-    /**@return the cache size */
+    /**
+     * @return the cache size
+     */
     public int cache() {
         return cache;
     }
@@ -325,6 +328,7 @@ public class JexlBuilder {
      * bypass the cache.</p>
      * <p>It is expected that a "long" script will be parsed once and its reference kept
      * around in user-space structures; the jexl expression cache has no added-value in this case.</p>
+     * 
      * @param length if not strictly positive, the value is silently replaced by the default value (64).
      * @return this builder
      */
@@ -333,7 +337,9 @@ public class JexlBuilder {
         return this;
     }
 
-    /**@return the cache threshold */
+    /**
+     * @return the cache threshold
+     */
     public int cacheThreshold() {
         return cacheThreshold;
     }

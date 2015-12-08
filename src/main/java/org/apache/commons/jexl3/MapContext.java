@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.commons.jexl3;
 
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import java.util.Map;
  * <p>Each entry in the map is considered a variable name, value pair.</p>
  */
 public class MapContext implements JexlContext {
+
     /**
      * The wrapped variable map.
      */
@@ -38,6 +40,7 @@ public class MapContext implements JexlContext {
 
     /**
      * Creates a MapContext wrapping an existing user provided map.
+     * 
      * @param vars the variable map
      */
     public MapContext(Map<String, Object> vars) {
