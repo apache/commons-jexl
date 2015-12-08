@@ -71,7 +71,7 @@ working with enterprise platforms.
             Velocity and the Expression Language defined in the JavaServer Pages Standard Tag Library version 1.1 (JSTL)
             and JavaServer Pages version 2.0 (JSP).
             JEXL 2.0 added features inspired by
-            <a href="http://java.sun.com/products/jsp/reference/techart/unifiedEL.html">Unified EL</a>.
+            <a href="https://en.wikipedia.org/wiki/Unified_Expression_Language">Unified EL</a>.
             The syntax is now close to a mix of ECMAScript and "shell-script"
             making it easy to master by technical operatives or consultants. The objects exposed and their behavior
             obviously need to be documented though...
@@ -160,7 +160,7 @@ working with enterprise platforms.
             </p>
             <ul>
                 <li>
-                    <a href="http://java.sun.com/products/jsp/index.jsp">JSP 2.0</a> is covered
+                    <a href="http://www.oracle.com/technetwork/java/index-jsp-138231.html">JSP 2.0</a> is covered
             by Java Specification Requests (JSR)
                     <a href="http://www.jcp.org/en/jsr/detail?id=152">JSR-152: JavaServer
             Pages 2.0 Specification</a>.
@@ -170,10 +170,10 @@ working with enterprise platforms.
             called <a href="http://commons.apache.org/el/index.html">EL</a>
                 </li>
                 <li>
-                    <a href="http://java.sun.com/products/jsp/jstl/">JSTL 1.1</a> is covered
+                    <a href="http://www.oracle.com/technetwork/java/index-jsp-135995.html">JSTL 1.1</a> is covered
             by <a href="http://jcp.org/en/jsr/detail?id=52">JSR 52: A Standard
             Tag Library for JavaServer Pages</a>. See the
-                    <a href="http://java.sun.com/products/jsp/jstl/1.1/docs/api/index.html">JSTL API</a>.
+                    <a href="http://docs.oracle.com/javaee/5/jstl/1.1/docs/tlddocs/">JSTL API</a>.
                 </li>
           <li>Apache has a <a href="http://tomcat.apache.org/taglibs/standard/">JSTL Implementation</a>.</li>
             </ul>
