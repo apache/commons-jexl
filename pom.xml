@@ -154,6 +154,7 @@
                         <descriptor>src/main/assembly/src.xml</descriptor>
                     </descriptors>
                     <tarLongFileMode>gnu</tarLongFileMode>
+                    <finalName>commons-jexl-${pom.version}</finalName>
                 </configuration>
             </plugin>
             <plugin>
