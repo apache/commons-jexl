@@ -23,14 +23,14 @@ package org.apache.commons.jexl3;
  */
 public class JexlInfo {
 
-    /** line number */
-    protected final int line;
+    /** line number. */
+    private final int line;
 
-    /** column number */
-    protected final int column;
+    /** column number. */
+    private final int column;
 
-    /** name */
-    protected final String name;
+    /** name. */
+    private final String name;
 
     /**
      * @return the detailed information in case of an error
