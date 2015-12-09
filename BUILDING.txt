@@ -6,3 +6,9 @@ The following goals may be useful:
 * mvn site - create the documentation
 * mvn package - build the jar
 * mvn install - build the jar and install in local maven repository
+
+Note that the Maven build process uses JavaCC to generate some sources.
+These are created under target/generated sources and automatically compiled.
+The generated class files are needed to compile some of the ordinary Java source files.
+This can cause problems for some IDEs, which will need to be configured accordingly.
+ 
