@@ -29,14 +29,16 @@ import java.util.Set;
  * <p>A <b>whitelist</b> explicitly allows methods/properties for a class;</p>
  * 
  * <ul>
- *   <li>If a whitelist is empty and thus does not contain any names, all properties/methods are allowed for its class.</li>
+ *   <li>If a whitelist is empty and thus does not contain any names, 
+ *       all properties/methods are allowed for its class.</li>
  *   <li>If it is not empty, the only allowed properties/methods are the ones contained.</li>
  * </ul>
  * 
  * <p>A <b>blacklist</b> explicitly forbids methods/properties for a class;</p>
  * 
  * <ul>
- *   <li>If a blacklist is empty and thus does not contain any names, all properties/methods are forbidden for its class.</li>
+ *   <li>If a blacklist is empty and thus does not contain any names,
+ *       all properties/methods are forbidden for its class.</li>
  *   <li>If it is not empty, the only forbidden properties/methods are the ones contained.</li>
  * </ul>
  * 
