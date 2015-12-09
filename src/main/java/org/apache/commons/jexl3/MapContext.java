@@ -29,7 +29,7 @@ public class MapContext implements JexlContext {
     /**
      * The wrapped variable map.
      */
-    protected final Map<String, Object> map;
+    private final Map<String, Object> map;
 
     /**
      * Creates a MapContext on an automatically allocated underlying HashMap.
