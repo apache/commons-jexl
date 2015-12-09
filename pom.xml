@@ -129,6 +129,8 @@
         <commons.release.2.binary.suffix />
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
+        <checkstyle.plugin.version>2.16</checkstyle.plugin.version>
+        <checksyle.version>6.13</checksyle.version>
     </properties>
 
     <build>
@@ -217,7 +219,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.16</version>
+                <version>${checkstyle.plugin.version}</version>
                 <configuration>
                     <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
                     <suppressionsLocation>${basedir}/src/main/config/checkstyle-suppressions.xml</suppressionsLocation>
@@ -230,7 +232,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>6.13</version>
+                        <version>${checksyle.version}</version>
                         <exclusions><!-- MCHECKSTYLE-156 -->
                             <exclusion>
                             <groupId>com.sun</groupId>
@@ -277,7 +279,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.16</version>
+                <version>${checkstyle.plugin.version}</version>
                 <configuration>
                     <configLocation>${basedir}/src/main/config/checkstyle.xml</configLocation>
                     <suppressionsLocation>${basedir}/src/main/config/checkstyle-suppressions.xml</suppressionsLocation>
