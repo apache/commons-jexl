@@ -34,7 +34,7 @@ public final class ASTJexlLambda extends ASTJexlScript {
      * @return true if outermost script.
      */
     public boolean isTopLevel() {
-        return parent == null;
+        return jjtGetParent() == null;
     }
 
     /**

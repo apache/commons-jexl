@@ -62,7 +62,7 @@ public final class Parser extends JexlParser
                              ? Collections.<String,Object>unmodifiableMap(pragmas)
                              : Collections.<String,Object>emptyMap();
             pragmas = null;
-            script.value = info;
+            script.jjtSetValue(info);
             return script;
         } catch (TokenMgrError xtme) {
             throw new JexlException.Tokenization(info, xtme).clean();
