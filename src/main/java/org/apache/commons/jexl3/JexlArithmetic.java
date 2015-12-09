@@ -72,13 +72,13 @@ public class JexlArithmetic {
     protected static final int BIGD_SCALE = -1;
 
     /** Whether this JexlArithmetic instance behaves in strict or lenient mode. */
-    protected final boolean strict;
+    private final boolean strict;
 
     /** The big decimal math context. */
-    protected final MathContext mathContext;
+    private final MathContext mathContext;
 
     /** The big decimal scale. */
-    protected final int mathScale;
+    private final int mathScale;
 
     /**
      * Creates a JexlArithmetic.
