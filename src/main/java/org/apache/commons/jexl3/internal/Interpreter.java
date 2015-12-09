@@ -1217,7 +1217,7 @@ public class Interpreter extends ParserVisitor {
      * @param data     the data
      * @return the left hand side
      */
-    protected Object executeAssign(JexlNode node, JexlOperator assignop, Object data) {
+    protected Object executeAssign(JexlNode node, JexlOperator assignop, Object data) { // CSOFF: MethodLength
         if (isCancelled()) {
             throw new JexlException.Cancel(node);
         }
