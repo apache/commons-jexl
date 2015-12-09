@@ -62,46 +62,46 @@ public class JexlBuilder {
     protected static final int CACHE_THRESHOLD = 64;
 
     /** The JexlUberspect instance. */
-    protected JexlUberspect uberspect = null;
+    private JexlUberspect uberspect = null;
 
     /** The strategy strategy. */
-    protected JexlUberspect.ResolverStrategy strategy = null;
+    private JexlUberspect.ResolverStrategy strategy = null;
 
     /** The sandbox. */
-    protected JexlSandbox sandbox = null;
+    private JexlSandbox sandbox = null;
 
     /** The Log to which all JexlEngine messages will be logged. */
-    protected Log logger = null;
+    private Log logger = null;
 
     /**
      * Whether expressions evaluated by this engine will throw exceptions (false) or
      * return null (true) on errors. Default is false.
      */
-    protected Boolean silent = null;
+    private Boolean silent = null;
 
     /** Whether this engine is in lenient or strict mode; if unspecified, use the arithmetic lenient property. */
-    protected Boolean strict = null;
+    private Boolean strict = null;
 
     /** Whether error messages will carry debugging information. */
-    protected Boolean debug = null;
+    private Boolean debug = null;
 
     /** The map of 'prefix:function' to object implementing the namespaces. */
-    protected Map<String, Object> namespaces = null;
+    private Map<String, Object> namespaces = null;
 
     /** The {@link JexlArithmetic} instance. */
-    protected JexlArithmetic arithmetic = null;
+    private JexlArithmetic arithmetic = null;
 
     /** The cache size. */
-    protected int cache = -1;
+    private int cache = -1;
 
     /** The maximum expression length to hit the expression cache. */
-    protected int cacheThreshold = CACHE_THRESHOLD;
+    private int cacheThreshold = CACHE_THRESHOLD;
 
     /** The charset. */
-    protected Charset charset = Charset.defaultCharset();
+    private Charset charset = Charset.defaultCharset();
 
     /** The class loader. */
-    protected ClassLoader loader = null;
+    private ClassLoader loader = null;
 
     /**
      * Sets the JexlUberspect instance the engine will use.
