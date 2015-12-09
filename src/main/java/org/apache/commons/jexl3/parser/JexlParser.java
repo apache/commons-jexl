@@ -33,20 +33,20 @@ import java.util.Stack;
  */
 public abstract class JexlParser extends StringParser {
     /** Whether the parser will allow user-named registers (aka #0 syntax). */
-    protected boolean ALLOW_REGISTERS = false;
+    boolean ALLOW_REGISTERS = false;
     /** The source being processed. */
-    protected String source = null;
+    String source = null;
     /**
      * The map of named registers aka script parameters.
      * <p>Each parameter is associated to a register and is materialized
      * as an offset in the registers array used during evaluation.</p>
      */
-    protected Scope frame = null;
-    protected Stack<Scope> frames = new Stack<Scope>();
+    Scope frame = null;
+    Stack<Scope> frames = new Stack<Scope>();
     /**
      * The list of pragma declarations.
      */
-    protected Map<String, Object> pragmas = null;
+    Map<String, Object> pragmas = null;
 
 
     /**

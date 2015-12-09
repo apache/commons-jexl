@@ -24,9 +24,9 @@ import java.util.Map;
  */
 public class ASTJexlScript extends JexlNode {
     /** The script scope. */
-    protected Scope scope = null;
+    private Scope scope = null;
     /** The pragmas. */
-    protected Map<String, Object> pragmas = null;
+    Map<String, Object> pragmas = null;
 
     public ASTJexlScript(int id) {
         super(id);
