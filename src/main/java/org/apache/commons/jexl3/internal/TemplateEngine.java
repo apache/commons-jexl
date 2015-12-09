@@ -735,7 +735,7 @@ public final class TemplateEngine extends JxltEngine {
      * @return the unified expression instance
      * @throws JexlException if an error occur during parsing
      */
-    TemplateExpression parseExpression(JexlInfo info, String expr, Scope scope) {
+    TemplateExpression parseExpression(JexlInfo info, String expr, Scope scope) {  // CSOFF: MethodLength
         final int size = expr.length();
         final ExpressionBuilder builder = new ExpressionBuilder(0);
         final StringBuilder strb = new StringBuilder(size);
@@ -958,7 +958,9 @@ public final class TemplateEngine extends JxltEngine {
             if (BlockType.VERBATIM.equals(type)) {
                 return body;
             } else {
-                StringBuilder strb = new StringBuilder(64);
+                // CHECKSTYLE:OFF
+                StringBuilder strb = new StringBuilder(64); // CSOFF: MagicNumber
+                // CHECKSTYLE:ON
                 Iterator<CharSequence> lines = readLines(new StringReader(body));
                 while (lines.hasNext()) {
                     strb.append("$$").append(lines.next());
@@ -1021,7 +1023,7 @@ public final class TemplateEngine extends JxltEngine {
             private CharSequence next = doNext();
 
             private CharSequence doNext() {
-                StringBuffer strb = new StringBuffer(64);
+                StringBuffer strb = new StringBuffer(64); // CSOFF: MagicNumber
                 int c;
                 boolean eol = false;
                 try {
