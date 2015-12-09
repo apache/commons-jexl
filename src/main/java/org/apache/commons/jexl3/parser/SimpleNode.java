@@ -33,13 +33,13 @@ package org.apache.commons.jexl3.parser;
  */
 public class SimpleNode implements Node {
     /** The parent node. */
-    protected JexlNode parent;
+    private JexlNode parent;
     /** The array of children nodes. */
-    protected JexlNode[] children;
+    private JexlNode[] children;
     /** The node type id. */
     protected final int id;
     /** volatile value so it can be used as a last evaluation cache. */
-    protected volatile Object value;
+    private volatile Object value;
 
     /**
      * Creates a SimpleNode instance.
@@ -98,6 +98,11 @@ public class SimpleNode implements Node {
             children = c;
         }
         children[i] = (JexlNode) n;
+    }
+
+    // For use by ASTJexlScript only
+    void jjtSetChildren(JexlNode[] jexlNodes) {
+        children = jexlNodes;
     }
 
     /**

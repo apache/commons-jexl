@@ -64,8 +64,8 @@ public abstract class JexlNode extends SimpleNode {
     public JexlInfo jexlInfo() {
         JexlNode node = this;
         while (node != null) {
-            if (node.value instanceof JexlInfo) {
-                JexlInfo info = (JexlInfo) node.value;
+            if (node.jjtGetValue() instanceof JexlInfo) {
+                JexlInfo info = (JexlInfo) node.jjtGetValue();
                 if (lc >= 0) {
                     int c = lc & 0xfff;
                     int l = lc >> 0xc;
@@ -87,15 +87,14 @@ public abstract class JexlNode extends SimpleNode {
      * different that the one that created it.</p>
      */
     public void clearCache() {
+        final Object value = jjtGetValue();
         if (value instanceof JexlPropertyGet
             || value instanceof JexlPropertySet
             || value instanceof JexlMethod) {
-            value = null;
+            jjtSetValue(null);
         }
-        if (children != null) {
-            for (int n = 0; n < children.length; ++n) {
-                children[n].clearCache();
-            }
+        for (int n = 0; n < jjtGetNumChildren(); ++n) {
+            jjtGetChild(n).clearCache();
         }
     }
 
@@ -111,21 +110,20 @@ public abstract class JexlNode extends SimpleNode {
 
     protected boolean isConstant(boolean literal) {
         if (literal) {
-            if (children != null) {
-                for (JexlNode child : children) {
-                    if (child instanceof ASTReference) {
-                        boolean is = child.isConstant(true);
-                        if (!is) {
-                            return false;
-                        }
-                    } else if (child instanceof ASTMapEntry) {
-                        boolean is = child.isConstant(true);
-                        if (!is) {
-                            return false;
-                        }
-                    } else if (!child.isConstant()) {
+            for (int n = 0; n < jjtGetNumChildren(); ++n) {
+                JexlNode child = jjtGetChild(n);
+                if (child instanceof ASTReference) {
+                    boolean is = child.isConstant(true);
+                    if (!is) {
                         return false;
                     }
+                } else if (child instanceof ASTMapEntry) {
+                    boolean is = child.isConstant(true);
+                    if (!is) {
+                        return false;
+                    }
+                } else if (!child.isConstant()) {
+                    return false;
                 }
             }
             return true;
@@ -146,7 +144,7 @@ public abstract class JexlNode extends SimpleNode {
             JexlNode last = this.jjtGetChild(this.jjtGetNumChildren() - 1);
             return last.isLeftValue();
         }
-        if (parent instanceof ASTReference || parent instanceof ASTArrayAccess) {
+        if (jjtGetParent() instanceof ASTReference || jjtGetParent() instanceof ASTArrayAccess) {
             return true;
         }
         return false;

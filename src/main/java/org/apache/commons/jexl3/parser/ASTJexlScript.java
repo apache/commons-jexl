@@ -41,9 +41,9 @@ public class ASTJexlScript extends JexlNode {
      * @return the script
      */
     public ASTJexlScript script() {
-        if (scope == null && children != null && children.length == 1 && children[0] instanceof ASTJexlLambda) {
-            ASTJexlLambda lambda = (ASTJexlLambda) children[0];
-            lambda.parent = null;
+        if (scope == null && jjtGetNumChildren() == 1 && jjtGetChild(0) instanceof ASTJexlLambda) {
+            ASTJexlLambda lambda = (ASTJexlLambda) jjtGetChild(0);
+            lambda.jjtSetParent(null);
             return lambda;
         } else {
             return this;
@@ -60,8 +60,8 @@ public class ASTJexlScript extends JexlNode {
      * @return true if the script was coerced, false otherwise
      */
     public boolean toExpression() {
-        if (children.length > 1) {
-            children = new JexlNode[]{children[0]};
+        if (jjtGetNumChildren() > 1) {
+            jjtSetChildren(new JexlNode[]{jjtGetChild(0)});
             return true;
         } else {
             return false;

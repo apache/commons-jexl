@@ -45,12 +45,10 @@ public final class ASTSetLiteral extends JexlNode {
     @Override
     public void jjtClose() {
         constant = true;
-        if (children != null) {
-            for (int c = 0; c < children.length && constant; ++c) {
-                JexlNode child = children[c];
-                if (!child.isConstant()) {
-                    constant = false;
-                }
+        for (int c = 0; c < jjtGetNumChildren() && constant; ++c) {
+            JexlNode child = jjtGetChild(c);
+            if (!child.isConstant()) {
+                constant = false;
             }
         }
     }
