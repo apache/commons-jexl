@@ -44,8 +44,8 @@ public final class ASTJexlLambda extends ASTJexlScript {
      * @return the arguments array
      */
     public Scope.Frame createFrame(Scope.Frame frame, Object... values) {
-        if (scope != null) {
-            Scope.Frame cframe = scope.createFrame(frame);
+        if (getScope() != null) {
+            Scope.Frame cframe = getScope().createFrame(frame);
             if (cframe != null) {
                 return cframe.assign(values);
             }
