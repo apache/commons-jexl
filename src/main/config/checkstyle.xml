@@ -83,6 +83,7 @@
         <!--     value="${basedir}/java.header"/>                   -->
         <property name="headerFile" value="${checkstyle.header.file}"/>
         <property name="ignoreLines" value="2"/>
+        <property name="fileExtensions" value="java,xml"/>
     </module>
                
     <!-- See http://checkstyle.sf.net/config_sizes.html -->
@@ -157,7 +158,9 @@
         <!-- Checks for blocks. You know, those {}'s         -->
         <!-- See http://checkstyle.sf.net/config_blocks.html -->
         <module name="AvoidNestedBlocks"/>
-        <module name="EmptyBlock"/>
+        <module name="EmptyBlock">
+            <property name="option" value="text"/>
+        </module>
         <module name="LeftCurly"/>
         <module name="NeedBraces"/>
         <module name="RightCurly"/>
@@ -166,7 +169,6 @@
         <!-- Checks for common coding problems               -->
         <!-- See http://checkstyle.sf.net/config_coding.html -->
         <!-- JEXL: module name="AvoidInlineConditionals"/-->
-        <module name="DoubleCheckedLocking"/>
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
         <module name="HiddenField"/>
@@ -188,6 +190,8 @@
         <!-- JEXL: module name="HideUtilityClassConstructor"/-->
         <module name="InterfaceIsType"/>
         <module name="VisibilityModifier">
+            <property name="packageAllowed" value="true"/>
+            <!-- Fixing protected vars would break compatibilty -->
             <property name="protectedAllowed" value="true"/>
         </module>
 
