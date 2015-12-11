@@ -135,6 +135,59 @@ public class ArrayAccessTest extends JexlTestCase {
         asserter.assertExpression("foo.0.'1'", "two");
         asserter.assertExpression("foo.0.'1' = 'three'", "three");
         asserter.assertExpression("foo.0.'1'", "three");
+
+        foo[0][0] = "one";
+        foo[0][1] = "two";
+        asserter.assertExpression("foo.'0'.'1'", "two");
+        asserter.assertExpression("foo.'0'.'1' = 'three'", "three");
+        asserter.assertExpression("foo.'0'.'1'", "three");
+
+
+        foo[0][0] = "one";
+        foo[0][1] = "two";
+        asserter.assertExpression("foo.0.1", "two");
+        asserter.assertExpression("foo.0.1 = 'three'", "three");
+        asserter.assertExpression("foo.0.1", "three");
+    }
+
+    @Test
+    public void testDoubleMaps() throws Exception {
+        Map<Object, Map<Object, Object>> foo = new HashMap<Object, Map<Object, Object>>();
+        Map<Object, Object> foo0 = new HashMap<Object, Object>();
+        foo.put(0, foo0);
+        foo0.put(0, "one");
+        foo0.put(1, "two");
+        foo0.put("3.0", "three");
+        asserter.setVariable("foo", foo);
+        asserter.assertExpression("foo[0][1]", "two");
+        asserter.assertExpression("foo[0][1] = 'three'", "three");
+        asserter.assertExpression("foo[0][1]", "three");
+        asserter.assertExpression("foo[0]['3.0']", "three");
+
+        foo0.put(0, "one");
+        foo0.put(1, "two");
+        asserter.assertExpression("foo.0[1]", "two");
+        asserter.assertExpression("foo.0[1] = 'three'", "three");
+        asserter.assertExpression("foo.0[1]", "three");
+        asserter.assertExpression("foo.0['3.0']", "three");
+
+        foo0.put(0, "one");
+        foo0.put(1, "two");
+        asserter.assertExpression("foo.0.'1'", "two");
+        asserter.assertExpression("foo.0.'1' = 'three'", "three");
+        asserter.assertExpression("foo.0.'1'", "three");
+
+        foo0.put(0, "one");
+        foo0.put(1, "two");
+        asserter.assertExpression("foo.'0'.'1'", "two");
+        asserter.assertExpression("foo.'0'.'1' = 'three'", "three");
+        asserter.assertExpression("foo.'0'.'1'", "three");
+
+        foo0.put(0, "one");
+        foo0.put(1, "two");
+        asserter.assertExpression("foo.0.1", "two");
+        asserter.assertExpression("foo.0.1 = 'three'", "three");
+        asserter.assertExpression("foo.0.1", "three");
     }
 
     public void testArrayProperty() throws Exception {
