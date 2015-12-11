@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.0" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-184">
+                dot-ed identifiers parsing failure
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-180" due-to="Kimball Robinson">
                 Documentation - suggests using float for financials
             </action>

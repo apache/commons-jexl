@@ -67,6 +67,7 @@ New features in 3.0:
 
 Bugs Fixed in 3.0:
 ==================
+* JEXL-184:     dot-ed identifiers parsing failure
 * JEXL-180:     Documentation - suggests using float for financials
 * JEXL-171:     Map access operator does not work if key name clashes with map property name
 * JEXL-169:     A string is wrongly identified as FloatingPointNumber

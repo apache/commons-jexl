@@ -578,13 +578,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
     /** Checks identifiers that contain space, quote, double-quotes or backspace. */
     protected static final Pattern QUOTED_IDENTIFIER = Pattern.compile("['\"\\s\\\\]");
-    /** Checks number used as identifiers. */
-    protected static final Pattern NUMBER_IDENTIFIER = Pattern.compile("^\\d*$");
 
     @Override
     protected Object visit(ASTIdentifier node, Object data) {
         String image = node.getName();
-        if (QUOTED_IDENTIFIER.matcher(image).find() || NUMBER_IDENTIFIER.matcher(image).find()) {
+        if (QUOTED_IDENTIFIER.matcher(image).find()) {
             // quote it
             image = "'" + image.replace("'", "\\'") + "'";
         }
@@ -595,7 +593,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTIdentifierAccess node, Object data) {
         builder.append(".");
         String image = node.getName();
-        if (QUOTED_IDENTIFIER.matcher(image).find() || NUMBER_IDENTIFIER.matcher(image).find()) {
+        if (QUOTED_IDENTIFIER.matcher(image).find()) {
             // quote it
             image = "'" + image.replace("'", "\\'") + "'";
         }

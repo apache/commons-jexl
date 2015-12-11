@@ -27,6 +27,7 @@ options
    KEEP_LINE_COLUMN=true;
    TRACK_TOKENS=true;
    //DEBUG_PARSER=true;
+   //DEBUG_TOKEN_MANAGER=true;
 }
 
 PARSER_BEGIN(Parser)
@@ -78,7 +79,24 @@ public final class Parser extends JexlParser
 
 PARSER_END(Parser)
 
+TOKEN_MGR_DECLS : {
+    /**
+     *   A stack of 1 for keeping state to deal with doted identifiers
+     */
+    int dotLexState = DEFAULT;
 
+    public void pushDot() {
+        dotLexState = curLexState;
+        curLexState = DOT_ID;
+    }
+
+    public void popDot() {
+        if (curLexState == DOT_ID) {
+            curLexState = dotLexState;
+            dotLexState = defaultLexState;
+        }
+    }
+}
 /***************************************
  *     Skip & Number literal tokens
  ***************************************/
@@ -104,8 +122,8 @@ PARSER_END(Parser)
     | < WHILE : "while" >
     | < NEW : "new" >
     | < VAR : "var" >
-    | < EMPTY : "empty" >
-    | < SIZE : "size" >
+    | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
+    | < SIZE : "size" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < NULL : "null" >
     | < TRUE : "true" >
     | < FALSE : "false" >
@@ -132,7 +150,7 @@ PARSER_END(Parser)
     | < SEMICOL : ";" >
     | < COLON : ":" >
     | < COMMA : "," >
-    | < DOT : "." >
+    | < DOT : "." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < ELIPSIS : "..." >
 }
 
@@ -191,7 +209,12 @@ PARSER_END(Parser)
     < NAN_LITERAL : "NaN" >
 }
 
-<*> TOKEN : /* IDENTIFIERS */
+<DOT_ID> TOKEN : /* IDENTIFIERS */
+{
+  < DOT_IDENTIFIER: ( [ "0"-"9", "a"-"z", "A"-"Z", "_", "$", "@" ])+ > { popDot(); } /* Revert state to default. */
+}
+
+<DEFAULT, FOR_EACH_IN, REGISTERS> TOKEN : /* IDENTIFIERS */
 {
   < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
 |
@@ -205,12 +228,12 @@ PARSER_END(Parser)
   < REGISTER: "#" (["0"-"9"])+ >
 }
 
-<*> TOKEN : /* LITERALS */
+<DEFAULT, REGISTERS> TOKEN : /* LITERALS */
 {
-    < INTEGER_LITERAL:
-        ( "0" (["0"-"7"])* | ["1"-"9"] (["0"-"9"])* | "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ )
-        (["l","L","h","H"])?
-    >
+  < INTEGER_LITERAL:
+      ( "0" (["0"-"7"])* | ["1"-"9"] (["0"-"9"])* | "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ )
+      (["l","L","h","H"])?
+  >
  |
   < FLOAT_LITERAL:
     "#NaN"
@@ -218,7 +241,7 @@ PARSER_END(Parser)
     (<DIGIT>)+ "." (<DIGIT>)+ ((["e","E"])(["+","-"])?(<DIGIT>)+)? (["d","D","f","F","b","B"])?
     |
     (<DIGIT>)+ (".")? ((["e","E"])(["+","-"])?(<DIGIT>)+)? ["d","D","f","F","b","B"]
->
+  >
 }
 
 <*> TOKEN :
@@ -227,7 +250,7 @@ PARSER_END(Parser)
     "\"" (~["\"","\\","\n","\r","\u2028","\u2029"] | "\\" ~["\n","\r","\u2028","\u2029"])* "\""
   |
     "'" (~["'","\\","\n","\r","\u2028","\u2029"] | "\\" ~["\n","\r","\u2028","\u2029"])* "'"
-  >
+  > { popDot(); } /* Revert state to default if was DOT_ID. */
 }
 
 <*> TOKEN :
@@ -758,9 +781,7 @@ void IdentifierAccess() :
 }
 {
     <DOT> (
-        t=<IDENTIFIER> { jjtThis.setIdentifier(t.image);}
-    |
-        t=<INTEGER_LITERAL> { jjtThis.setIdentifier(t.image); }
+        t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); }
     |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); }
     )
