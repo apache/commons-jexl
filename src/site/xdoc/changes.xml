@@ -41,6 +41,9 @@
             <action dev="henrib" type="add" issue="JEXL-177" due-to="Dmitri Blinov">
                 Unified expressions to be used in String literals in JEXL scripts
             </action>
+            <action dev="henrib" type="add" issue="JEXL-176" due-to="Dmitri Blinov">
+                Synonym operator name 'in' for operator =~ // Remove 'foreach...in' syntax
+            </action>
             <action dev="henrib" type="add" issue="JEXL-174" due-to="Dmitri Blinov">
                 Overloadable property access operators
             </action>
