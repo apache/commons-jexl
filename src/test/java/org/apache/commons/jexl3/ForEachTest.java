@@ -67,7 +67,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithCollection() throws Exception {
-        JexlScript e = JEXL.createScript("for(item : list) item");
+        JexlScript e = JEXL.createScript("for(var item : list) item");
         JexlContext jc = new MapContext();
         jc.set("list", Arrays.asList(new Object[]{"Hello", "World"}));
         Object o = e.execute(jc);
@@ -76,7 +76,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithEnumeration() throws Exception {
-        JexlScript e = JEXL.createScript("for(item : list) item");
+        JexlScript e = JEXL.createScript("for(var item : list) item");
         JexlContext jc = new MapContext();
         jc.set("list", new StringTokenizer("Hello,World", ","));
         Object o = e.execute(jc);
@@ -85,7 +85,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithIterator() throws Exception {
-        JexlScript e = JEXL.createScript("for(item : list) item");
+        JexlScript e = JEXL.createScript("for(var item : list) item");
         JexlContext jc = new MapContext();
         jc.set("list", Arrays.asList(new Object[]{"Hello", "World"}).iterator());
         Object o = e.execute(jc);
@@ -106,17 +106,13 @@ public class ForEachTest extends JexlTestCase {
     @Test
     public void testForEachWithBlock() throws Exception {
         JexlScript exs0 = JEXL.createScript("for(var in : list) { x = x + in; }");
-        JexlScript exs1 = JEXL.createScript("foreach(item in list) { x = x + item; }");
-        JexlScript[] exs = {exs0, exs1};
         JexlContext jc = new MapContext();
         jc.set("list", new Object[]{2, 3});
-        for (int ex = 0; ex < exs.length; ++ex) {
             jc.set("x", new Integer(1));
-            Object o = exs[ex].execute(jc);
+        Object o = exs0.execute(jc);
             Assert.assertEquals("Result is wrong", new Integer(6), o);
             Assert.assertEquals("x is wrong", new Integer(6), jc.get("x"));
         }
-    }
 
     @Test
     public void testForEachWithListExpression() throws Exception {

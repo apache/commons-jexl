@@ -118,7 +118,6 @@ TOKEN_MGR_DECLS : {
       < IF : "if" >
     | < ELSE : "else" >
     | < FOR : "for" >
-    | < FOREACH : "foreach" > : FOR_EACH_IN
     | < WHILE : "while" >
     | < NEW : "new" >
     | < VAR : "var" >
@@ -133,11 +132,6 @@ TOKEN_MGR_DECLS : {
     | < BREAK : "break" >
     | < CONTINUE : "continue" >
     | < PRAGMA : "#pragma" >
-}
-
-<FOR_EACH_IN> TOKEN : /* foreach in */
-{
-    < IN : "in" > : DEFAULT
 }
 
 <*> TOKEN : { /* SEPARATORS */
@@ -214,7 +208,7 @@ TOKEN_MGR_DECLS : {
   < DOT_IDENTIFIER: ( [ "0"-"9", "a"-"z", "A"-"Z", "_", "$", "@" ])+ > { popDot(); } /* Revert state to default. */
 }
 
-<DEFAULT, FOR_EACH_IN, REGISTERS> TOKEN : /* IDENTIFIERS */
+<DEFAULT, REGISTERS> TOKEN : /* IDENTIFIERS */
 {
   < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
 |
@@ -341,8 +335,6 @@ void Break() #Break : {}
 void ForeachStatement() : {}
 {
     <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
-|
-    <FOREACH> <LPAREN> ForEachVar() <IN>  Expression() <RPAREN>  { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()){ loopCount -= 1; }
 }
 
 void ForEachVar() #Reference : {}

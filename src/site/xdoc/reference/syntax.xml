@@ -664,7 +664,7 @@
     x = x + item;
 }</source>
             Where <code>item</code> and <code>list</code> are variables.
-            The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>deprecated</strong>.
+            The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>unsupported</strong>.
           </td>
         </tr>
         <tr>

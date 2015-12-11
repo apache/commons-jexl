@@ -44,11 +44,12 @@ What's new in 3.0:
 
 New features in 3.0:
 ====================
+* JEXL-178:     'Unsolvable property' message to provide details about underlying exception
 * JEXL-177:     Unified expressions to be used in String literals in JEXL scripts
+* JEXL-176:     Synonym operator name 'in' for operator =~ // Remove 'foreach...in' syntax
 * JEXL-174:     Overloadable property access operators
 * JEXL-173:     Duck-typed java closures
 * JEXL-170:     Implement assignment operators
-* JEXL-178:     'Unsolvable property' message to provide details about underlying exception
 * JEXL-164:     public getters for high/low properties for IntegerRange and LongRange
 * JEXL-152:     Extend Range literal to support Long values
 * JEXL-149:     Set Construction as per EL 3.0 spec
