@@ -24,7 +24,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-jexl3</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.0</version>
     <name>Apache Commons JEXL</name>
     <inceptionYear>2001</inceptionYear>
     <description>The Apache Commons JEXL library is an implementation of the JSTL Expression Language with extensions.</description>
@@ -36,9 +36,9 @@
     </issueManagement>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/commons/proper/jexl/trunk</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/commons/proper/jexl/trunk</developerConnection>
-        <url>http://svn.apache.org/viewvc/commons/proper/jexl/trunk</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/commons/proper/jexl/tags/COMMONS_JEXL_3_0</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/commons/proper/jexl/tags/COMMONS_JEXL_3_0</developerConnection>
+        <url>http://svn.apache.org/viewvc/commons/proper/jexl/tags/COMMONS_JEXL_3_0</url>
     </scm>
 
     <distributionManagement>
@@ -124,6 +124,7 @@
         <commons.rc.version>RC1</commons.rc.version>
         <commons.release.2.version>2.1.1</commons.release.2.version>
         <!-- Override the default, which is ${project.artifactId}-${commons.release.[23].version} -->
+        <commons.release.name>commons-jexl-${commons.release.version}</commons.release.name>
         <commons.release.2.name>commons-jexl-${commons.release.2.version}</commons.release.2.name>
         <commons.release.3.name>commons-jexl-${commons.release.3.version}</commons.release.3.name>
         <commons.release.3.desc>Legacy</commons.release.3.desc>
@@ -297,7 +298,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.2</version>
+                <version>3.0.0</version>
                 <configuration>
                     <excludeFilterFile>${basedir}/src/main/config/findbugs-exclude-filter.xml</excludeFilterFile>
                     <xmlOutput>true</xmlOutput>
