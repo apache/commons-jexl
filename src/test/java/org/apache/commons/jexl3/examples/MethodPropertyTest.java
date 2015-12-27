@@ -18,7 +18,8 @@
 package org.apache.commons.jexl3.examples;
 
 import junit.framework.TestCase;
-import org.apache.commons.jexl3.Expression;
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.MapContext;
@@ -37,7 +38,7 @@ public class MethodPropertyTest extends TestCase {
          * First step is to retrieve an instance of a JexlEngine;
          * it might be already existing and shared or created anew.
          */
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = new JexlBuilder().create();
         /*
          *  Second make a jexlContext and put stuff in it
          */
@@ -55,7 +56,7 @@ public class MethodPropertyTest extends TestCase {
         /*
          *  access a method w/o args
          */
-        Expression e = jexl.createExpression("foo.getFoo()");
+        JexlExpression e = jexl.createExpression("foo.getFoo()");
         Object o = e.evaluate(jc);
         out.print("value returned by the method getFoo() is : ", o, foo.getFoo());
 
@@ -64,15 +65,15 @@ public class MethodPropertyTest extends TestCase {
          */
         e = jexl.createExpression("foo.convert(1)");
         o = e.evaluate(jc);
-        out.print("value of " + e.getExpression() + " is : ", o, foo.convert(1));
+        out.print("value of " + e.getParsedText() + " is : ", o, foo.convert(1));
 
         e = jexl.createExpression("foo.convert(1+7)");
         o = e.evaluate(jc);
-        out.print("value of " + e.getExpression() + " is : ", o, foo.convert(1+7));
+        out.print("value of " + e.getParsedText() + " is : ", o, foo.convert(1+7));
 
         e = jexl.createExpression("foo.convert(1+number)");
         o = e.evaluate(jc);
-        out.print("value of " + e.getExpression() + " is : ", o, foo.convert(1+number.intValue()));
+        out.print("value of " + e.getParsedText() + " is : ", o, foo.convert(1+number.intValue()));
 
         /*
          * access a property

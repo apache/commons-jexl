@@ -16,11 +16,14 @@
  */
 package org.apache.commons.jexl3.parser;
 
-public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<Object> {
-    /** The type literal value. */
-    Object array = null;
+import org.apache.commons.jexl3.internal.Debugger;
+
+/**
+ * An array literal.
+ */
+public final class ASTArrayLiteral extends JexlNode {
     /** Whether this array is constant or not. */
-    boolean constant = false;
+    private boolean constant = false;
 
     ASTArrayLiteral(int id) {
         super(id);
@@ -30,37 +33,28 @@ public final class ASTArrayLiteral extends JexlNode implements JexlNode.Literal<
         super(p, id);
     }
 
+    @Override
+    public String toString() {
+        Debugger dbg = new Debugger();
+        return dbg.data(this);
+    }
+
+    @Override
+    protected boolean isConstant(boolean literal) {
+        return constant;
+    }
 
     /** {@inheritDoc} */
     @Override
     public void jjtClose() {
-        if (children == null || children.length == 0) {
-            array = new Object[0];
-            constant = true;
-        } else {
-            constant = isConstant();
-        }
-    }
-
-    /**
-     *  Gets the literal value.
-     * @return the array literal
-     */
-    public Object getLiteral() {
-        return array;
-    }
-
-    /**
-     * Sets the literal value only if the descendants of this node compose a constant
-     * @param literal the literal array value
-     * @throws IllegalArgumentException if literal is not an array or null
-     */
-    public void setLiteral(Object literal) {
-        if (constant) {
-            if (literal != null && !literal.getClass().isArray()) {
-                throw new IllegalArgumentException(literal.getClass() + " is not an array");
+        constant = true;
+        for (int c = 0; c < jjtGetNumChildren() && constant; ++c) {
+            JexlNode child = jjtGetChild(c);
+            if (child instanceof ASTReference) {
+                constant = child.isConstant(true);
+            } else if (!child.isConstant()) {
+                constant = false;
             }
-            this.array = literal;
         }
     }
 

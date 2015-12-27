@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.commons.jexl3;
 
 import java.util.HashMap;
@@ -24,10 +25,11 @@ import java.util.Map;
  * <p>Each entry in the map is considered a variable name, value pair.</p>
  */
 public class MapContext implements JexlContext {
+
     /**
      * The wrapped variable map.
      */
-    protected final Map<String, Object> map;
+    private final Map<String, Object> map;
 
     /**
      * Creates a MapContext on an automatically allocated underlying HashMap.
@@ -38,25 +40,32 @@ public class MapContext implements JexlContext {
 
     /**
      * Creates a MapContext wrapping an existing user provided map.
+     * 
      * @param vars the variable map
      */
     public MapContext(Map<String, Object> vars) {
-        super();
         map = vars == null ? new HashMap<String, Object>() : vars;
     }
 
-    /** {@inheritDoc} */
+    @Override
     public boolean has(String name) {
         return map.containsKey(name);
     }
 
-    /** {@inheritDoc} */
+    @Override
     public Object get(String name) {
         return map.get(name);
     }
 
-    /** {@inheritDoc} */
+    @Override
     public void set(String name, Object value) {
         map.put(name, value);
+    }
+
+    /**
+     * Clears all variables.
+     */
+    public void clear() {
+        map.clear();
     }
 }

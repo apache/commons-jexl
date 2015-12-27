@@ -22,18 +22,17 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.apache.commons.jexl3.Expression;
+import org.apache.commons.jexl3.JexlEvalContext;
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
-import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
-import org.apache.commons.jexl3.JexlThreadedArithmetic;
+import org.apache.commons.jexl3.JexlScript;
 
 /**
  * A utility class for performing JUnit based assertions using Jexl
  * expressions. This class can make it easier to do unit tests using
- * Jexl navigation expressions.
+ * JEXL navigation expressions.
  *
  * @since 1.0
  */
@@ -41,12 +40,12 @@ public class Asserter extends Assert {
     /** variables used during asserts. */
     private final Map<String, Object> variables = new HashMap<String, Object>();
     /** context to use during asserts. */
-    private final JexlContext context = new MapContext(variables);
-    /** Jexl engine to use during Asserts. */
+    private final JexlEvalContext context = new JexlEvalContext(variables);
+    /** JEXL engine to use during Asserts. */
     private final JexlEngine engine;
 
     /**
-     * 
+     *
      * Create an asserter.
      * @param jexl the JEXL engine to use
      */
@@ -70,21 +69,44 @@ public class Asserter extends Assert {
         return context;
     }
 
+    public void setStrict(boolean s) {
+        context.setStrict(s, s);
+    }
+
+    public void setStrict(boolean es, boolean as) {
+        context.setStrict(es, as);
+    }
+
+    public void setSilent(boolean silent) {
+        context.setSilent(silent);
+    }
+
+    public void clearOptions() {
+        context.clearOptions();
+    }
+
     /**
-     * Performs an assertion that the value of the given Jexl expression 
+     * Performs an assertion that the value of the given JEXL expression
      * evaluates to the given expected value.
-     * 
-     * @param expression is the Jexl expression to evaluate
+     *
+     * @param expression is the JEXL expression to evaluate
      * @param expected is the expected value of the expression
      * @throws Exception if the expression could not be evaluationed or an assertion
      * fails
      */
     public void assertExpression(String expression, Object expected) throws Exception {
-        Expression exp = engine.createExpression(expression);
-        Object value = exp.evaluate(context);
+        JexlScript exp = engine.createScript(expression);
+        Object value = exp.execute(context);
         if (expected instanceof BigDecimal) {
             JexlArithmetic jexla = engine.getArithmetic();
             assertTrue("expression: " + expression, ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)) == 0);
+        }
+        if (expected != null && value != null) {
+            assertEquals("expression: " + expression + ", "
+                    + expected.getClass().getSimpleName()
+                    + " ?= "
+                    + value.getClass().getSimpleName(),
+                    expected, value);
         } else {
             assertEquals("expression: " + expression, expected, value);
         }
@@ -99,31 +121,21 @@ public class Asserter extends Assert {
      * @throws Exception if the expression did not fail or the exception did not match the expected pattern
      */
     public void failExpression(String expression, String matchException) throws Exception {
-        boolean[] flags = {engine.isLenient(), engine.isSilent()};
         try {
-            if (engine.getArithmetic() instanceof JexlThreadedArithmetic) {
-                engine.setLenient(false);
-            }
-            engine.setSilent(false);
-            Expression exp = engine.createExpression(expression);
-            exp.evaluate(context);
+            JexlScript exp = engine.createScript(expression);
+            exp.execute(context);
             fail("expression: " + expression);
         } catch (JexlException xjexl) {
             if (matchException != null && !xjexl.getMessage().matches(matchException)) {
                 fail("expression: " + expression + ", expected: " + matchException + ", got " + xjexl.getMessage());
             }
-        } finally {
-            if (engine.getArithmetic() instanceof JexlThreadedArithmetic) {
-                engine.setLenient(flags[0]);
-            }
-            engine.setSilent(flags[1]);
         }
     }
 
     /**
      * Puts a variable of a certain name in the context so that it can be used from
      * assertion expressions.
-     * 
+     *
      * @param name variable name
      * @param value variable value
      */
@@ -138,5 +150,22 @@ public class Asserter extends Assert {
      */
     public Object removeVariable(String name) {
         return variables.remove(name);
+    }
+
+    /**
+     * Gets a variable of a certain name.
+     *
+     * @param name variable name
+     * @return value variable value
+     */
+    public Object getVariable(String name) {
+        return variables.get(name);
+    }
+
+    /**
+     * @return the variables map
+     */
+    public Map<String, Object> getVariables() {
+        return variables;
     }
 }

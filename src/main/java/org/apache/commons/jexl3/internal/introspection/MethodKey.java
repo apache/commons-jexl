@@ -16,12 +16,14 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Iterator;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * A method key usable by the introspector cache.
@@ -40,9 +42,42 @@ import java.util.Arrays;
  * </p>
  * A key can be constructed either from arguments (array of objects) or from parameters
  * (array of class).
- * Roughly 3x faster than string key to access the map & uses less memory.
+ * Roughly 3x faster than string key to access the map and uses less memory.
  */
 public final class MethodKey {
+    /** The initial size of the primitive conversion map. */
+    private static final int PRIMITIVE_SIZE = 13;
+    /** The primitive type to class conversion map. */
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES;
+
+    static {
+        PRIMITIVE_TYPES = new HashMap<Class<?>, Class<?>>(PRIMITIVE_SIZE);
+        PRIMITIVE_TYPES.put(Boolean.TYPE, Boolean.class);
+        PRIMITIVE_TYPES.put(Byte.TYPE, Byte.class);
+        PRIMITIVE_TYPES.put(Character.TYPE, Character.class);
+        PRIMITIVE_TYPES.put(Double.TYPE, Double.class);
+        PRIMITIVE_TYPES.put(Float.TYPE, Float.class);
+        PRIMITIVE_TYPES.put(Integer.TYPE, Integer.class);
+        PRIMITIVE_TYPES.put(Long.TYPE, Long.class);
+        PRIMITIVE_TYPES.put(Short.TYPE, Short.class);
+    }
+
+    /** Converts a primitive type to its corresponding class.
+     * <p>
+     * If the argument type is primitive then we want to convert our
+     * primitive type signature to the corresponding Object type so
+     * introspection for methods with primitive types will work
+     * correctly.
+     * </p>
+     * @param parm a may-be primitive type class
+     * @return the equivalent object class
+     */
+    static Class<?> primitiveClass(Class<?> parm) {
+        // it is marginally faster to get from the map than call isPrimitive...
+        //if (!parm.isPrimitive()) return parm;
+        Class<?> prim = PRIMITIVE_TYPES.get(parm);
+        return prim == null ? parm : prim;
+    }
     /** The hash code. */
     private final int hashCode;
     /** The method name. */
@@ -57,7 +92,7 @@ public final class MethodKey {
     /**
      * Creates a key from a method name and a set of arguments.
      * @param aMethod the method to generate the key from
-     * @param args the intended method arguments
+     * @param args    the intended method arguments
      */
     public MethodKey(String aMethod, Object[] args) {
         super();
@@ -80,7 +115,7 @@ public final class MethodKey {
         }
         this.hashCode = hash;
     }
-    
+
     /**
      * Creates a key from a method.
      * @param aMethod the method to generate the key from.
@@ -90,9 +125,17 @@ public final class MethodKey {
     }
 
     /**
+     * Creates a key from a constructor.
+     * @param aCtor the constructor to generate the key from.
+     */
+    MethodKey(Constructor<?> aCtor) {
+        this(aCtor.getDeclaringClass().getName(), aCtor.getParameterTypes());
+    }
+
+    /**
      * Creates a key from a method name and a set of parameters.
      * @param aMethod the method to generate the key from
-     * @param args the intended method parameters
+     * @param args    the intended method parameters
      */
     MethodKey(String aMethod, Class<?>[] args) {
         super();
@@ -104,7 +147,7 @@ public final class MethodKey {
         if (args != null && (size = args.length) > 0) {
             this.params = new Class<?>[size];
             for (int p = 0; p < size; ++p) {
-                Class<?> parm = ClassMap.MethodCache.primitiveClass(args[p]);
+                Class<?> parm = primitiveClass(args[p]);
                 hash = (HASH * hash) + parm.hashCode();
                 this.params[p] = parm;
             }
@@ -174,12 +217,50 @@ public final class MethodKey {
     }
 
     /**
+     * Checks whether a method accepts a variable number of arguments.
+     * <p>May be due to a subtle bug in some JVMs, if a varargs method is an override, depending on (may be) the
+     * class introspection order, the isVarargs flag on the method itself will be false.
+     * To circumvent the potential problem, fetch the method with the same signature from the super-classes,
+     * - which will be different if override  -and get the varargs flag from it.
+     * @param method the method to check for varargs
+     * @return true if declared varargs, false otherwise
+     */
+    public static boolean isVarArgs(final Method method) {
+        if (method == null) {
+            return false;
+        }
+        if (method.isVarArgs()) {
+            return true;
+        }
+        // before climbing up the hierarchy, verify that the last parameter is an array
+        final Class<?>[] ptypes = method.getParameterTypes();
+        if (ptypes.length > 0 && ptypes[ptypes.length - 1].getComponentType() == null) {
+            return false;
+        }
+        final String mname = method.getName();
+        // if this is an override, was it actually declared as varargs?
+        Class<?> clazz = method.getDeclaringClass();
+        do {
+            try {
+                Method m = clazz.getMethod(mname, ptypes);
+                if (m.isVarArgs()) {
+                    return true;
+                }
+            } catch (NoSuchMethodException xignore) {
+                // this should not happen...
+            }
+            clazz = clazz.getSuperclass();
+        } while(clazz != null);
+        return false;
+    }
+
+    /**
      * Gets the most specific method that is applicable to the parameters of this key.
      * @param methods a list of methods.
      * @return the most specific method.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
-    public Method getMostSpecificMethod(List<Method> methods) {
+    public Method getMostSpecificMethod(Method[] methods) {
         return METHODS.getMostSpecific(methods, params);
     }
 
@@ -189,10 +270,10 @@ public final class MethodKey {
      * @return the most specific constructor.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
-    public Constructor<?> getMostSpecificConstructor(List<Constructor<?>> methods) {
+    public Constructor<?> getMostSpecificConstructor(Constructor<?>[] methods) {
         return CONSTRUCTORS.getMostSpecific(methods, params);
     }
-    
+
     /**
      * Determines whether a type represented by a class object is
      * convertible to another type represented by a class object using a
@@ -213,9 +294,7 @@ public final class MethodKey {
      *         type or an object type of a primitive type that can be converted to
      *         the formal type.
      */
-    public static boolean isInvocationConvertible(Class<?> formal,
-            Class<?> actual,
-            boolean possibleVarArg) {
+    public static boolean isInvocationConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
         /* if it's a null, it means the arg was null */
         if (actual == null && !formal.isPrimitive()) {
             return true;
@@ -223,6 +302,11 @@ public final class MethodKey {
 
         /* Check for identity or widening reference conversion */
         if (actual != null && formal.isAssignableFrom(actual)) {
+            return true;
+        }
+
+        /** Catch all... */
+        if (formal == Object.class) {
             return true;
         }
 
@@ -271,8 +355,7 @@ public final class MethodKey {
             if (actual != null && actual.isArray()) {
                 actual = actual.getComponentType();
             }
-            return isInvocationConvertible(formal.getComponentType(),
-                    actual, false);
+            return isInvocationConvertible(formal.getComponentType(), actual, false);
         }
         return false;
     }
@@ -293,16 +376,14 @@ public final class MethodKey {
      *         or formal and actual are both primitive types and actual can be
      *         subject to widening conversion to formal.
      */
-    public static boolean isStrictInvocationConvertible(Class<?> formal,
-            Class<?> actual,
-            boolean possibleVarArg) {
+    public static boolean isStrictInvocationConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
         /* we shouldn't get a null into, but if so */
         if (actual == null && !formal.isPrimitive()) {
             return true;
         }
 
         /* Check for identity or widening reference conversion */
-        if (formal.isAssignableFrom(actual)) {
+        if (formal.isAssignableFrom(actual) && (actual != null && formal.isArray() == actual.isArray())) {
             return true;
         }
 
@@ -338,12 +419,10 @@ public final class MethodKey {
             if (actual != null && actual.isArray()) {
                 actual = actual.getComponentType();
             }
-            return isStrictInvocationConvertible(formal.getComponentType(),
-                    actual, false);
+            return isStrictInvocationConvertible(formal.getComponentType(), actual, false);
         }
         return false;
     }
-    
     /**
      * whether a method/ctor is more specific than a previously compared one.
      */
@@ -359,7 +438,7 @@ public final class MethodKey {
 
     /**
      * Simple distinguishable exception, used when
-     * we run across ambiguous overloading.  Caught
+     * we run across ambiguous overloading. Caught
      * by the introspector.
      */
     public static class AmbiguousException extends RuntimeException {
@@ -381,15 +460,34 @@ public final class MethodKey {
          */
         protected abstract Class<?>[] getParameterTypes(T app);
 
+        /**
+         * Whether a constructor or method handles varargs.
+         * @param app the constructor or method
+         * @return true if varargs, false otherwise
+         */
+        protected abstract boolean isVarArgs(T app);
+
         // CSOFF: RedundantThrows
         /**
-         * Gets the most specific method that is applicable to actual argument types.
+         * Gets the most specific method that is applicable to actual argument types.<p>
+         * Attempts to find the most specific applicable method using the
+         * algorithm described in the JLS section 15.12.2 (with the exception that it can't
+         * distinguish a primitive type argument from an object type argument, since in reflection
+         * primitive type arguments are represented by their object counterparts, so for an argument of
+         * type (say) java.lang.Integer, it will not be able to decide between a method that takes int and a
+         * method that takes java.lang.Integer as a parameter.
+         * </p>
+         * <p>
+         * This turns out to be a relatively rare case where this is needed - however, functionality
+         * like this is needed.
+         * </p>
+         *
          * @param methods a list of methods.
          * @param classes list of argument types.
          * @return the most specific method.
          * @throws MethodKey.AmbiguousException if there is more than one.
          */
-        private T getMostSpecific(List<T> methods, Class<?>[] classes) {
+        private T getMostSpecific(T[] methods, Class<?>[] classes) {
             LinkedList<T> applicables = getApplicables(methods, classes);
 
             if (applicables.isEmpty()) {
@@ -405,42 +503,36 @@ public final class MethodKey {
              * the end of the below loop, the list will contain exactly one method,
              * (the most specific method) otherwise we have ambiguity.
              */
-
             LinkedList<T> maximals = new LinkedList<T>();
-
-            for (Iterator<T> applicable = applicables.iterator();
-                    applicable.hasNext();) {
-                T app = applicable.next();
+            for (T app : applicables) {
                 Class<?>[] appArgs = getParameterTypes(app);
-
                 boolean lessSpecific = false;
-
-                for (Iterator<T> maximal = maximals.iterator();
-                        !lessSpecific && maximal.hasNext();) {
+                Iterator<T> maximal = maximals.iterator();
+                while(!lessSpecific && maximal.hasNext()) {
                     T max = maximal.next();
-
-                    // CSOFF: MissingSwitchDefault
                     switch (moreSpecific(appArgs, getParameterTypes(max))) {
                         case MORE_SPECIFIC:
                             /*
-                             * This method is more specific than the previously
-                             * known maximally specific, so remove the old maximum.
-                             */
+                            * This method is more specific than the previously
+                            * known maximally specific, so remove the old maximum.
+                            */
                             maximal.remove();
                             break;
 
                         case LESS_SPECIFIC:
                             /*
-                             * This method is less specific than some of the
-                             * currently known maximally specific methods, so we
-                             * won't add it into the set of maximally specific
-                             * methods
-                             */
+                            * This method is less specific than some of the
+                            * currently known maximally specific methods, so we
+                            * won't add it into the set of maximally specific
+                            * methods
+                            */
 
                             lessSpecific = true;
                             break;
+                        default:
+                            // nothing do do
                     }
-                } // CSON: MissingSwitchDefault
+                }
 
                 if (!lessSpecific) {
                     maximals.addLast(app);
@@ -475,11 +567,14 @@ public final class MethodKey {
             if (c2.length > c1.length) {
                 return LESS_SPECIFIC;
             }
+            // same length, keep ultimate param offset for vararg checks
+            final int length = c1.length;
+            final int ultimate = c1.length - 1;
 
             // ok, move on and compare those of equal lengths
-            for (int i = 0; i < c1.length; ++i) {
+            for (int i = 0; i < length; ++i) {
                 if (c1[i] != c2[i]) {
-                    boolean last = (i == c1.length - 1);
+                    boolean last = (i == ultimate);
                     c1MoreSpecific = c1MoreSpecific || isStrictConvertible(c2[i], c1[i], last);
                     c2MoreSpecific = c2MoreSpecific || isStrictConvertible(c1[i], c2[i], last);
                 }
@@ -498,11 +593,12 @@ public final class MethodKey {
 
             // attempt to choose by picking the one with the greater number of primitives or latest primitive parameter
             int primDiff = 0;
-            for (int c = 0; c < c1.length; ++c) {
-                if (c1[c].isPrimitive()) {
+            for (int c = 0; c < length; ++c) {
+                boolean last = (c == ultimate);
+                if (isPrimitive(c1[c], last)) {
                     primDiff += 1 << c;
                 }
-                if (c2[c].isPrimitive()) {
+                if (isPrimitive(c2[c], last)) {
                     primDiff -= 1 << c;
                 }
             }
@@ -519,6 +615,24 @@ public final class MethodKey {
         }
 
         /**
+         * Checks whether a parameter class is a primitive.
+         * @param c              the parameter class
+         * @param possibleVarArg true if this is the last parameter which can be a primitive array (vararg call)
+         * @return true if primitive, false otherwise
+         */
+        private boolean isPrimitive(Class<?> c, boolean possibleVarArg) {
+            if (c != null) {
+                if (c.isPrimitive()) {
+                    return true;
+                } else if (possibleVarArg) {
+                    Class<?> t = c.getComponentType();
+                    return t != null && t.isPrimitive();
+                }
+            }
+            return false;
+        }
+
+        /**
          * Returns all methods that are applicable to actual argument types.
          *
          * @param methods list of all candidate methods
@@ -527,15 +641,12 @@ public final class MethodKey {
          *         formal and actual arguments matches, and argument types are assignable
          *         to formal types through a method invocation conversion).
          */
-        private LinkedList<T> getApplicables(List<T> methods, Class<?>[] classes) {
+        private LinkedList<T> getApplicables(T[] methods, Class<?>[] classes) {
             LinkedList<T> list = new LinkedList<T>();
-
-            for (Iterator<T> imethod = methods.iterator(); imethod.hasNext();) {
-                T method = imethod.next();
+            for (T method : methods) {
                 if (isApplicable(method, classes)) {
                     list.add(method);
                 }
-
             }
             return list;
         }
@@ -545,51 +656,65 @@ public final class MethodKey {
          * argument types.
          *
          * @param method  method that will be called
-         * @param classes arguments to method
+         * @param actuals arguments signature for method
          * @return true if method is applicable to arguments
          */
-        private boolean isApplicable(T method, Class<?>[] classes) {
-            Class<?>[] methodArgs = getParameterTypes(method);
-            // if samee number or args or
+        private boolean isApplicable(T method, Class<?>[] actuals) {
+            Class<?>[] formals = getParameterTypes(method);
+            // if same number or args or
             // there's just one more methodArg than class arg
             // and the last methodArg is an array, then treat it as a vararg
-            if (methodArgs.length == classes.length
-                    || methodArgs.length == classes.length + 1 && methodArgs[methodArgs.length - 1].isArray()) {
+            if (formals.length == actuals.length) {
                 // this will properly match when the last methodArg
                 // is an array/varargs and the last class is the type of array
                 // (e.g. String when the method is expecting String...)
-                for (int i = 0; i < classes.length; ++i) {
-                    if (!isConvertible(methodArgs[i], classes[i], false)) {
+                for (int i = 0; i < actuals.length; ++i) {
+                    if (!isConvertible(formals[i], actuals[i], false)) {
                         // if we're on the last arg and the method expects an array
-                        if (i == classes.length - 1 && methodArgs[i].isArray()) {
+                        if (i == actuals.length - 1 && formals[i].isArray()) {
                             // check to see if the last arg is convertible
                             // to the array's component type
-                            return isConvertible(methodArgs[i], classes[i], true);
+                            return isConvertible(formals[i], actuals[i], true);
                         }
                         return false;
                     }
                 }
                 return true;
             }
-            // more arguments given than the method accepts; check for varargs
-            if (methodArgs.length > 0) {
-                // check that the last methodArg is an array
-                Class<?> lastarg = methodArgs[methodArgs.length - 1];
-                if (!lastarg.isArray()) {
+
+            // number of formal and actual differ, method must be vararg
+            if (!isVarArgs(method)) {
+                return false;
+            }
+
+            // less arguments than method parameters: vararg is null
+            if (formals.length > actuals.length) {
+                // only one parameter, the last (ie vararg) can be missing
+                if (formals.length - actuals.length > 1) {
                     return false;
                 }
-
-                // check that they all match up to the last method arg
-                for (int i = 0; i < methodArgs.length - 1; ++i) {
-                    if (!isConvertible(methodArgs[i], classes[i], false)) {
+                // check that all present args match up to the method parms
+                for (int i = 0; i < actuals.length; ++i) {
+                    if (!isConvertible(formals[i], actuals[i], false)) {
                         return false;
                     }
                 }
+                return true;
+            }
 
+            // more arguments given than the method accepts; check for varargs
+            if (formals.length > 0 && actuals.length > 0) {
+                // check that they all match up to the last method arg
+                for (int i = 0; i < formals.length - 1; ++i) {
+                    if (!isConvertible(formals[i], actuals[i], false)) {
+                        return false;
+                    }
+                }
                 // check that all remaining arguments are convertible to the vararg type
-                Class<?> vararg = lastarg.getComponentType();
-                for (int i = methodArgs.length - 1; i < classes.length; ++i) {
-                    if (!isConvertible(vararg, classes[i], false)) {
+                // (last parm is an array since method is vararg)
+                Class<?> vararg = formals[formals.length - 1].getComponentType();
+                for (int i = formals.length - 1; i < actuals.length; ++i) {
+                    if (!isConvertible(vararg, actuals[i], false)) {
                         return false;
                     }
                 }
@@ -608,8 +733,7 @@ public final class MethodKey {
          *                       in the method declaration
          * @return see isMethodInvocationConvertible.
          */
-        private boolean isConvertible(Class<?> formal, Class<?> actual,
-                boolean possibleVarArg) {
+        private boolean isConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
             // if we see Void.class, the argument was null
             return isInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
         }
@@ -629,7 +753,6 @@ public final class MethodKey {
             return isStrictInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
         }
     }
-    
     /**
      * The parameter matching service for methods.
      */
@@ -638,8 +761,12 @@ public final class MethodKey {
         protected Class<?>[] getParameterTypes(Method app) {
             return app.getParameterTypes();
         }
+
+        @Override
+        public boolean isVarArgs(Method app) {
+            return MethodKey.isVarArgs(app);
+        }
     };
-    
     /**
      * The parameter matching service for constructors.
      */
@@ -647,6 +774,11 @@ public final class MethodKey {
         @Override
         protected Class<?>[] getParameterTypes(Constructor<?> app) {
             return app.getParameterTypes();
+        }
+
+        @Override
+        public boolean isVarArgs(Constructor<?> app) {
+            return app.isVarArgs();
         }
     };
 }

@@ -1,22 +1,5 @@
-<!--
-   Licensed to the Apache Software Foundation (ASF) under one or more
-  contributor license agreements.  See the NOTICE file distributed with
-  this work for additional information regarding copyright ownership.
-  The ASF licenses this file to You under the Apache License, Version 2.0
-  (the "License"); you may not use this file except in compliance with
-  the License.  You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
--->
-$Id$
-
-                            Commons JEXL Package
+                            Apache Commons JEXL
                                 Version 3.0
                                Release Notes
 
@@ -36,12 +19,104 @@ Its goal is to expose scripting features usable by technical operatives or consu
   http://commons.apache.org/jexl/
 
 
-Due to binary and source incompatibilities and the scope of modifications, JEXL has moved to the org.apache.commons.jexl3
-package.
-However, this is a drop-in replacement through JSF-223 and casual code usage should find strict equivalence between
+========================================================================================================================
+Release 3.0
+========================================================================================================================
+
+Version 3.0 is a major release changing the public JEXL API.
+
+Due to binary and source incompatibilities and the scope of modifications, JEXL has moved to the
+org.apache.commons.jexl3 package.
+However, this is a drop-in replacement through JSR-223 and casual code usage should find easy equivalence between
 jexl-2.x and 3.x (besides the package name).
+Also note that JEXL 3.0 now requires Java 6.
+
 
 What's new in 3.0:
+==================
+* A redesigned API that properly segregates the "public" part and the "internal" parts of JEXL.
+* A real difference between Expression and Script (scripts accept statements: for, while, etc).
+* The ability to create JEXL functions in script, closure/variables hoisting/currying included.
+* A set of assignment operators (+=, *= , ...).
+* A set of String matching operators (^= startsWith, $= endsWith) and their negative counterparts (!^, !$)
+* A range operator (x .. y) to ease writing loops (for(var x : 1 .. 10) ... )
+* A literal set syntax to ease creating sets: { 1, 2...}
+
+New features in 3.0:
+====================
+* JEXL-178:     'Unsolvable property' message to provide details about underlying exception
+* JEXL-177:     Unified expressions to be used in String literals in JEXL scripts
+* JEXL-176:     Synonym operator name 'in' for operator =~ // Remove 'foreach...in' syntax
+* JEXL-174:     Overloadable property access operators
+* JEXL-173:     Duck-typed java closures
+* JEXL-170:     Implement assignment operators
+* JEXL-164:     public getters for high/low properties for IntegerRange and LongRange
+* JEXL-152:     Extend Range literal to support Long values
+* JEXL-149:     Set Construction as per EL 3.0 spec
+* JEXL-133:     String matching Operator short-hand inspired by CSS3
+* JEXL-128:     ObjectContext<> should implement NamespaceResolver
+* JEXL-127:     Allow the creation of functions
+* JEXL-123:     Redesign API for stability
+* JEXL-122:     Move JEXL from org.apache.comms.jexl2 to org.apache.commons.jexl3
+* JEXL-136:     Script calls within scripts may fail with number arguments
+* JEXL-135:     Using map as script parameter or local variable
+* JEXL-134:     Issue with evaluation of concat of variables : \r + \n gives 0
+* JEXL-131:     UnifiedJexl parsing may fail with NPE
+* JEXL-130:     Ternary Conditional fails for Object values
+* JEXL-126:     Decimal numbers literals should be 'double' by default (instead of 'float')
+
+
+Bugs Fixed in 3.0:
+==================
+* JEXL-184:     dot-ed identifiers parsing failure
+* JEXL-180:     Documentation - suggests using float for financials
+* JEXL-171:     Map access operator does not work if key name clashes with map property name
+* JEXL-169:     A string is wrongly identified as FloatingPointNumber
+* JEXL-168:     Dedicated operator for String concatenation
+* JEXL-79:      Add support for growable arrays (ArrayLists)
+* JEXL-167:     Possible loss of value when converting BigDecimal to BigInteger
+* JEXL-166:     Incorrect operator symbol for bitwise complement in jexlArithmetic
+* JEXL-163:     empty(new ("java.lang.Long", 4294967296)) returns true
+* JEXL-162:     empty() function throws an exception : unsupported type
+* JEXL-160:     typo in package.html
+* JEXL-158:     Handle locale decimal separators correctly
+* JEXL-157:     Replace File.pathSeparator with File.separator
+* JEXL-146:     Performance problem in Interpreter.unknownVariable mechanism
+* JEXL-145:     Sandbox calling wrong check (classname vs class)
+* JEXL-144:     Empty array property setting fails
+* JEXL-142:     Map expression issue with empty key
+* JEXL-141:     Suffix for Big Decimal and Big Integer Literal is incorrectly mentioned in Java docs
+* JEXL-137:     Invalid script variable list for nested array/map access
+
+Detail of all changes in changes.xml.
+
+
+========================================================================================================================
+Release 2.1.1
+========================================================================================================================
+
+Version 2.1.1 is a micro release to fix a regression detected in 2.1:
+
+* JEXL-124:     Array parameters to methods don't work anymore (JEXL 2.1.1)
+
+There are no other changes.
+
+
+========================================================================================================================
+Release 2.1
+========================================================================================================================
+
+Version 2.1 is a minor release adding new features and fixing known issues detected in 2.0.
+
+Compatibility with previous releases
+====================================
+Version 2.1 is binary compatible with 2.0.1.
+
+However it is not source compatible.
+New methods have been added to the org.apache.commons.jexl2.Script and org.apache.commons.jexl2.JexlInfo interfaces.
+Any source code that implements these interfaces will need to be updated.
+
+What's new in 2.1:
 ==================
 * A more thorough arithmetic (JexlArithmetic) that allows fine control over decimals (scale and precision), a
   new syntax for numeric literals (OGNL inspired Big and Huge notations) and a better type handling keeping the most
@@ -51,8 +126,8 @@ What's new in 3.0:
 * A sandoxing feature to restrict and rename what JEXL can access from the environment allowing tighter control over security.
 * Extensions to UnifiedJEXL that allow the creation of templates.
 
-New features in 3.0:
-====================	
+New features in 2.1:
+====================
 * JEXL-114:     Allow scripts to create local variables // Add return keyword
 * JEXL-113:     Add functions to extract which variables, parameters and local variables are used to evaluate a script
 * JEXL-118:     Provide an IN operator
@@ -63,7 +138,7 @@ New features in 3.0:
 * JEXL-106:     When divide two BigDecimal values in an expression it results in java.lang.ArithmeticException
 * JEXL-102:     Add "jexl2" as a supported name
 
-Bugs Fixed in 3.0:
+Bugs Fixed in 2.1:
 ==================
 * JEXL-83:      Make JexlArithmetic immutable (and threadsafe)
 * JEXL-24:      Support Long for integer literal instead of Integers
@@ -72,7 +147,7 @@ Bugs Fixed in 3.0:
 * JEXL-101:     Vararg methods where the first argument is no vararg can not be called with only the fixed parameters given
 * JEXL-105:     Array literals are considered constant even when they are not
 * JEXL-104:     NPE in JexlArithmetic when an Array-Expression containing a null is used.
-* JEXL-112:     Cannot parse Integer.MIN_VALUE	
+* JEXL-112:     Cannot parse Integer.MIN_VALUE
 * JEXL-111:     expression execute error
 
 Bugs fixed in 2.0.1:
@@ -83,15 +158,13 @@ Bugs fixed in 2.0.1:
 * JEXL-98:      Quote escaping cannot be escaped
 
 
-
-Previous Releases:
+2.0
 ==================
-
 
 Bugs fixed in 2.0:
 ==================
 
-* JEXL-90:	Jexl parser allows invalid expressions, e.g. "a=1 b=2 3"
+* JEXL-90:	JEXL parser allows invalid expressions, e.g. "a=1 b=2 3"
 * JEXL-88:	MethodKey.java - name clash getMostSpecific() with Java 1.5.0
 * JEXL-87:	Inconsistent behaviour of arithmetical operations
 * JEXL-81:	Introspector does not use ListGetExecutor for List
@@ -158,7 +231,7 @@ Other Changes:
 
 o Add @since 2.0 tags to code so we can track API additions via Javadoc
 
-Upgrading from JEXL 1.x 
+Upgrading from JEXL 1.x
 =======================
 
 JEXL now requires Java 1.5 or later.
@@ -199,7 +272,7 @@ The following methods have been removed:
 Behavior changes
 ================
 
-* Public fields are considered when using JexlPropertyGet / JexlPropertySet: Jexl 1.x behavior can be reimplemented
+* Public fields are considered when using JexlPropertyGet / JexlPropertySet: JEXL 1.x behavior can be reimplemented
 by subclassing UberspectImpl.
 
 *Division (/ operator) behavior change: division between integers no longer casts its operands to double; integer division
@@ -228,5 +301,5 @@ JSR-223 support
    * Implement JSR-223 Scripting Engine for JEXL script (need BSF-3.0 on Java < 6)
 
 Error and exception handling
-   * Configuring the leniency and verbosity of the Jexl engine allows user control over the
+   * Configuring the leniency and verbosity of the JEXL engine allows user control over the
      error handling policy

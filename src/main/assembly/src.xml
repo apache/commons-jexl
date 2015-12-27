@@ -34,11 +34,5 @@
         <fileSet>
             <directory>src</directory>
         </fileSet>
-        <fileSet>
-            <directory>jexl-compat</directory>
-            <excludes>
-                <exclude>target/**</exclude>
-            </excludes>
-        </fileSet>
     </fileSets>
 </assembly>

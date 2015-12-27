@@ -14,46 +14,91 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.commons.jexl3;
 
-
 /**
- * Helper class to carry in info such as a url/file name, line and column for
+ * Helper class to carry information such as a url/file name, line and column for
  * debugging information reporting.
  */
 public class JexlInfo {
+
     /** line number. */
-    protected final int line;
+    private final int line;
+
     /** column number. */
-    protected final int column;
+    private final int column;
+
     /** name. */
-    protected final String name;
-    
-    /** 
-     * Create info.
-     * @param tn template name
-     * @param l line number
-     * @param c column
+    private final String name;
+
+    /**
+     * @return the detailed information in case of an error
      */
-    public JexlInfo(String tn, int l, int c) {
-        name = tn;
+    public Detail getDetail() {
+        return null;
+    }
+
+    /**
+     * Describes errors more precisely.
+     */
+    public interface Detail {
+        /**
+         * @return the start column on the line that triggered the error
+         */
+        int start();
+
+        /**
+         * @return the end column on the line that triggered the error
+         */
+        int end();
+
+        /**
+         * @return the actual part of code that triggered the error
+         */
+
+        @Override
+        String toString();
+    }
+
+    /**
+     * Create info.
+     * 
+     * @param source source name
+     * @param l line number
+     * @param c column number
+     */
+    public JexlInfo(String source, int l, int c) {
+        name = source;
         line = l;
         column = c;
     }
-    
+
     /**
-     * Denotes objects that can expose a JexlInfo instance.
+     * Creates info reusing the name.
+     * 
+     * @param l the line
+     * @param c the column
+     * @return a new info instance
      */
-    public interface Handle {
-        /**
-         * Gets the associated JexlInfo instance.
-         * @return the info
-         */
-        JexlInfo jexlInfo();
+    public JexlInfo at(int l, int c) {
+        return new JexlInfo(name, l, c);
+    }
+
+    /**
+     * The copy constructor.
+     * 
+     * @param copy the instance to copy
+     */
+    protected JexlInfo(JexlInfo copy) {
+        name = copy.getName();
+        line = copy.getLine();
+        column = copy.getColumn();
     }
 
     /**
      * Formats this info in the form 'name&#064;line:column'.
+     * 
      * @return the formatted info
      */
     @Override
@@ -67,30 +112,43 @@ public class JexlInfo {
                 sb.append(column);
             }
         }
+        JexlInfo.Detail dbg = getDetail();
+        if (dbg!= null) {
+            sb.append("![");
+            sb.append(dbg.start());
+            sb.append(",");
+            sb.append(dbg.end());
+            sb.append("]: '");
+            sb.append(dbg.toString());
+            sb.append("'");
+        }
         return sb.toString();
     }
 
     /**
      * Gets the file/script/url name.
+     * 
      * @return template name
      */
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
     /**
      * Gets the line number.
+     * 
      * @return line number.
      */
-    public int getLine() {
+    public final int getLine() {
         return line;
     }
 
     /**
      * Gets the column number.
+     * 
      * @return the column.
      */
-    public int getColumn() {
+    public final int getColumn() {
         return column;
     }
 }

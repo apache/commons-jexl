@@ -16,14 +16,17 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.internal.Scope;
+import java.util.Map;
 
 /**
  * Enhanced script to allow parameters declaration.
  */
 public class ASTJexlScript extends JexlNode {
     /** The script scope. */
-    private JexlEngine.Scope scope = null;
+    private Scope scope = null;
+    /** The pragmas. */
+    Map<String, Object> pragmas = null;
 
     public ASTJexlScript(int id) {
         super(id);
@@ -33,35 +36,75 @@ public class ASTJexlScript extends JexlNode {
         super(p, id);
     }
 
+    /**
+     * Consider script with no parameters that return lambda as parametric-scripts.
+     * @return the script
+     */
+    public ASTJexlScript script() {
+        if (scope == null && jjtGetNumChildren() == 1 && jjtGetChild(0) instanceof ASTJexlLambda) {
+            ASTJexlLambda lambda = (ASTJexlLambda) jjtGetChild(0);
+            lambda.jjtSetParent(null);
+            return lambda;
+        } else {
+            return this;
+        }
+    }
+
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
 
     /**
-     * Sets the parameters and registers
+     * Coerce this script as an expression (ie only one child) if necessary.
+     * @return true if the script was coerced, false otherwise
+     */
+    public boolean toExpression() {
+        if (jjtGetNumChildren() > 1) {
+            jjtSetChildren(new JexlNode[]{jjtGetChild(0)});
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Sets this script scope.
      * @param theScope the scope
      */
-    public void setScope(JexlEngine.Scope theScope) {
+    public void setScope(Scope theScope) {
         this.scope = theScope;
     }
-    
+
     /**
-     * Gets this script scope.
+     * @return this script scope
      */
-    public JexlEngine.Scope getScope() {
+    public Scope getScope() {
         return scope;
     }
-    
+
+    /**
+     * @return this script pragmas
+     */
+    public Map<String,Object> getPragmas() {
+        return pragmas;
+    }
+
     /**
      * Creates an array of arguments by copying values up to the number of parameters.
      * @param values the argument values
      * @return the arguments array
      */
-    public JexlEngine.Frame createFrame(Object... values) {
-        return scope != null? scope.createFrame(values) : null;
+    public Scope.Frame createFrame(Object... values) {
+        if (scope != null) {
+            Scope.Frame frame = scope.createFrame(null);
+            if (frame != null) {
+                return frame.assign(values);
+            }
+        }
+        return null;
     }
-    
+
     /**
      * Gets the (maximum) number of arguments this script expects.
      * @return the number of parameters
@@ -69,17 +112,17 @@ public class ASTJexlScript extends JexlNode {
     public int getArgCount() {
         return scope != null? scope.getArgCount() : 0;
     }
-    
+
     /**
-     * Gets this script registers, i.e. parameters and local variables.
-     * @return the register names
+     * Gets this script symbols, i.e. parameters and local variables.
+     * @return the symbol names
      */
-    public String[] getRegisters() {
-        return scope != null? scope.getRegisters() : null;
+    public String[] getSymbols() {
+        return scope != null? scope.getSymbols() : null;
     }
 
     /**
-     * Gets this script parameters, i.e. registers assigned before creating local variables.
+     * Gets this script parameters, i.e. symbols assigned before creating local variables.
      * @return the parameter names
      */
     public String[] getParameters() {
@@ -87,10 +130,19 @@ public class ASTJexlScript extends JexlNode {
     }
 
     /**
-     * Gets this script local variable, i.e. registers assigned to local variables.
-     * @return the parameter names
+     * Gets this script local variable, i.e. symbols assigned to local variables.
+     * @return the local variable names
      */
     public String[] getLocalVariables() {
         return scope != null? scope.getLocalVariables() : null;
+    }
+
+    /**
+     * Checks whether a given symbol is hoisted.
+     * @param symbol the symbol number
+     * @return true if hoisted, false otherwise
+     */
+    public boolean isHoistedSymbol(int symbol) {
+        return scope != null? scope.isHoistedSymbol(symbol) : false;
     }
 }

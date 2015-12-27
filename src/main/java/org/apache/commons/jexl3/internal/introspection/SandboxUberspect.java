@@ -16,47 +16,64 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
-import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.JexlArithmetic;
+import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
-import org.apache.commons.jexl3.introspection.Sandbox;
-import org.apache.commons.logging.Log;
+import org.apache.commons.jexl3.introspection.JexlSandbox;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * An uberspect that controls usage of properties, methods and contructors through a sandbox.
+ * An uberspect that controls usage of properties, methods and constructors through a sandbox.
  * @since 3.0
  */
-public class SandboxUberspect extends Uberspect {
+public final class SandboxUberspect implements JexlUberspect {
+    /** The base uberspect. */
+    private final JexlUberspect uberspect;
     /**  The sandbox. */
-    protected final Sandbox sandbox;
+    private final JexlSandbox sandbox;
 
     /**
-     * A constructor for Sandbox uberspect.
-     * @param runtimeLogger the logger to use or null to use default
-     * @param theSandbox the sandbox instance to use
+     * A constructor for JexlSandbox uberspect.
+     * @param theUberspect the JexlUberspect to sandbox
+     * @param theSandbox the sandbox which is copied to avoid changes at runtime
      */
-    public SandboxUberspect(Log runtimeLogger, Sandbox theSandbox) {
-        super(runtimeLogger);
+    public SandboxUberspect(final JexlUberspect theUberspect, final JexlSandbox theSandbox) {
         if (theSandbox == null) {
             throw new NullPointerException("sandbox can not be null");
         }
-        this.sandbox = theSandbox;
+        if (theUberspect == null) {
+            throw new NullPointerException("uberspect can not be null");
+        }
+        this.uberspect = theUberspect;
+        this.sandbox = theSandbox.copy();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setLoader(ClassLoader cloader) {
-        base().setLoader(cloader);
+    public void setClassLoader(ClassLoader loader) {
+        uberspect.setClassLoader(loader);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public JexlMethod getConstructor(Object ctorHandle, Object[] args, JexlInfo.Handle info) {
+    public int getVersion() {
+        return uberspect.getVersion();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JexlMethod getConstructor(final Object ctorHandle, final Object... args) {
         final String className;
         if (ctorHandle instanceof Class<?>) {
             Class<?> clazz = (Class<?>) ctorHandle;
@@ -67,7 +84,7 @@ public class SandboxUberspect extends Uberspect {
             return null;
         }
         if (sandbox.execute(className, "") != null) {
-            return super.getConstructor(className, args, info);
+            return uberspect.getConstructor(className, args);
         }
         return null;
     }
@@ -76,11 +93,12 @@ public class SandboxUberspect extends Uberspect {
      * {@inheritDoc}
      */
     @Override
-    public JexlMethod getMethod(Object obj, String method, Object[] args, JexlInfo.Handle info) {
+    public JexlMethod getMethod(final Object obj, final String method, final Object... args) {
         if (obj != null && method != null) {
-            String actual = sandbox.execute(obj.getClass().getName(), method);
+            String objClassName = (obj instanceof Class) ? ((Class<?>)obj).getName() : obj.getClass().getName();
+            String actual = sandbox.execute(objClassName, method);
             if (actual != null) {
-                return getMethodExecutor(obj, actual, args);
+                return uberspect.getMethod(obj, actual, args);
             }
         }
         return null;
@@ -90,11 +108,29 @@ public class SandboxUberspect extends Uberspect {
      * {@inheritDoc}
      */
     @Override
-    public JexlPropertyGet getPropertyGet(Object obj, Object identifier, JexlInfo.Handle info) {
+    public List<PropertyResolver> getResolvers(JexlOperator op, Object obj) {
+        return uberspect.getResolvers(op, obj);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JexlPropertyGet getPropertyGet(final Object obj, final Object identifier) {
+        return getPropertyGet(null, obj, identifier);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JexlPropertyGet getPropertyGet(final List<PropertyResolver> resolvers,
+                                          final Object obj,
+                                          final Object identifier) {
         if (obj != null && identifier != null) {
             String actual = sandbox.read(obj.getClass().getName(), identifier.toString());
             if (actual != null) {
-                return super.getPropertyGet(obj, actual, info);
+                return uberspect.getPropertyGet(resolvers, obj, actual);
             }
         }
         return null;
@@ -104,14 +140,40 @@ public class SandboxUberspect extends Uberspect {
      * {@inheritDoc}
      */
     @Override
-    public JexlPropertySet getPropertySet(final Object obj, final Object identifier, Object arg, JexlInfo.Handle info) {
+    public JexlPropertySet getPropertySet(final Object obj,final Object identifier,final Object arg) {
+        return getPropertySet(null, obj, identifier, arg);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JexlPropertySet getPropertySet(final List<PropertyResolver> resolvers,
+                                          final Object obj,
+                                          final Object identifier,
+                                          final Object arg) {
         if (obj != null && identifier != null) {
             String actual = sandbox.write(obj.getClass().getName(), identifier.toString());
             if (actual != null) {
-                return super.getPropertySet(obj, actual, arg, info);
+                return uberspect.getPropertySet(resolvers, obj, actual, arg);
             }
         }
         return null;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterator<?> getIterator(final Object obj) {
+        return uberspect.getIterator(obj);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JexlArithmetic.Uberspect getArithmetic(final JexlArithmetic arithmetic) {
+        return uberspect.getArithmetic(arithmetic);
     }
 }

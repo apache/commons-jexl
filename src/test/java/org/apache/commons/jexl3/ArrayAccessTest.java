@@ -22,20 +22,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.jexl3.junit.Asserter;
-import org.apache.commons.jexl3.junit.Asserter;
+import org.junit.Before;
+import org.junit.Test;
 
 
 /**
  * Tests for array access operator []
- * 
+ *
  * @since 2.0
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ArrayAccessTest extends JexlTestCase {
 
     private Asserter asserter;
 
     private static final String GET_METHOD_STRING = "GetMethod string";
-    
+
     // Needs to be accessible by Foo.class
     static final String[] GET_METHOD_ARRAY =
         new String[] { "One", "Two", "Three" };
@@ -44,7 +46,12 @@ public class ArrayAccessTest extends JexlTestCase {
     static final String[][] GET_METHOD_ARRAY2 =
         new String[][] { {"One", "Two", "Three"},{"Four", "Five", "Six"} };
 
+    public ArrayAccessTest() {
+        super("ArrayAccessTest");
+    }
+
     @Override
+    @Before
     public void setUp() {
         asserter = new Asserter(JEXL);
     }
@@ -106,14 +113,81 @@ public class ArrayAccessTest extends JexlTestCase {
     /**
      * test some simple double array lookups
      */
+    @Test
     public void testDoubleArrays() throws Exception {
         Object[][] foo = new Object[2][2];
+
         foo[0][0] = "one";
         foo[0][1] = "two";
-
         asserter.setVariable("foo", foo);
-
         asserter.assertExpression("foo[0][1]", "two");
+        asserter.assertExpression("foo[0][1] = 'three'", "three");
+        asserter.assertExpression("foo[0][1]", "three");
+
+        foo[0][0] = "one";
+        foo[0][1] = "two";
+        asserter.assertExpression("foo.0[1]", "two");
+        asserter.assertExpression("foo.0[1] = 'three'", "three");
+        asserter.assertExpression("foo.0[1]", "three");
+
+        foo[0][0] = "one";
+        foo[0][1] = "two";
+        asserter.assertExpression("foo.0.'1'", "two");
+        asserter.assertExpression("foo.0.'1' = 'three'", "three");
+        asserter.assertExpression("foo.0.'1'", "three");
+
+        foo[0][0] = "one";
+        foo[0][1] = "two";
+        asserter.assertExpression("foo.'0'.'1'", "two");
+        asserter.assertExpression("foo.'0'.'1' = 'three'", "three");
+        asserter.assertExpression("foo.'0'.'1'", "three");
+
+
+        foo[0][0] = "one";
+        foo[0][1] = "two";
+        asserter.assertExpression("foo.0.1", "two");
+        asserter.assertExpression("foo.0.1 = 'three'", "three");
+        asserter.assertExpression("foo.0.1", "three");
+    }
+
+    @Test
+    public void testDoubleMaps() throws Exception {
+        Map<Object, Map<Object, Object>> foo = new HashMap<Object, Map<Object, Object>>();
+        Map<Object, Object> foo0 = new HashMap<Object, Object>();
+        foo.put(0, foo0);
+        foo0.put(0, "one");
+        foo0.put(1, "two");
+        foo0.put("3.0", "three");
+        asserter.setVariable("foo", foo);
+        asserter.assertExpression("foo[0][1]", "two");
+        asserter.assertExpression("foo[0][1] = 'three'", "three");
+        asserter.assertExpression("foo[0][1]", "three");
+        asserter.assertExpression("foo[0]['3.0']", "three");
+
+        foo0.put(0, "one");
+        foo0.put(1, "two");
+        asserter.assertExpression("foo.0[1]", "two");
+        asserter.assertExpression("foo.0[1] = 'three'", "three");
+        asserter.assertExpression("foo.0[1]", "three");
+        asserter.assertExpression("foo.0['3.0']", "three");
+
+        foo0.put(0, "one");
+        foo0.put(1, "two");
+        asserter.assertExpression("foo.0.'1'", "two");
+        asserter.assertExpression("foo.0.'1' = 'three'", "three");
+        asserter.assertExpression("foo.0.'1'", "three");
+
+        foo0.put(0, "one");
+        foo0.put(1, "two");
+        asserter.assertExpression("foo.'0'.'1'", "two");
+        asserter.assertExpression("foo.'0'.'1' = 'three'", "three");
+        asserter.assertExpression("foo.'0'.'1'", "three");
+
+        foo0.put(0, "one");
+        foo0.put(1, "two");
+        asserter.assertExpression("foo.0.1", "two");
+        asserter.assertExpression("foo.0.1 = 'three'", "three");
+        asserter.assertExpression("foo.0.1", "three");
     }
 
     public void testArrayProperty() throws Exception {
@@ -126,24 +200,37 @@ public class ArrayAccessTest extends JexlTestCase {
         asserter.assertExpression("foo.array2[1][1]", GET_METHOD_ARRAY2[1][1]);
         asserter.assertExpression("foo.array2[1].1", GET_METHOD_ARRAY2[1][1]);
     }
-    
+
     // This is JEXL-26
     public void testArrayAndDottedConflict() throws Exception {
         Object[] objects = new Object[] {"an", "array", new Long(0)};
-        
+        asserter.setStrict(false);
+        asserter.setSilent(true);
         asserter.setVariable("objects", objects);
         asserter.setVariable("status", "Enabled");
         asserter.assertExpression("objects[1].status", null);
         asserter.assertExpression("objects.1.status", null);
-        
+
         asserter.setVariable("base.status", "Ok");
         asserter.assertExpression("base.objects[1].status", null);
         asserter.assertExpression("base.objects.1.status", null);
     }
 
+    public void testArrayIdentifierParsing() throws Exception {
+        Map<Object, Number> map = new HashMap<Object, Number>();
+        map.put("00200", -42.42d);
+        map.put(200, 42.42d);
+        asserter.setVariable("objects", map);
+        asserter.assertExpression("objects.get('00200')", -42.42d);
+        asserter.assertExpression("objects.'00200'", -42.42d);
+        asserter.assertExpression("objects.get(200)", 42.42d);
+        asserter.assertExpression("objects.'200'", 42.42d);
+        asserter.assertExpression("objects.200", 42.42d);
+    }
+
     public void testArrayMethods() throws Exception {
         Object[] objects = new Object[] {"an", "array", new Long(0)};
-        
+
         asserter.setVariable("objects", objects);
         asserter.assertExpression("objects.get(1)", "array");
         asserter.assertExpression("objects.size()", new Integer(3));

@@ -23,47 +23,47 @@ import java.util.List;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
-import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.parser.StringParser;
 
 /**
- * Implements the Jexl ScriptEngineFactory for JSF-223.
+ * Implements the JEXL ScriptEngineFactory for JSF-223.
  * <p>
- * Supports the following:<br.>
- * Language short names: "JEXL", "Jexl", "jexl", "JEXL2", "Jexl2", "jexl2", "JEXL3", "Jexl3", "jexl3" <br/>
- * File Extensions: ".jexl", ".jexl2", ".jexl3"<br/>
+ * Supports the following:<br>
+ * Language short names: "JEXL", "Jexl", "jexl", "JEXL2", "Jexl2", "jexl2", "JEXL3", "Jexl3", "jexl3" <br>
+ * File Extensions: ".jexl", ".jexl2", ".jexl3"<br>
  * "jexl3" etc. were added for engineVersion="3.0".
  * </p>
  * <p>
  * See
  * <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">Java Scripting API</a>
  * Javadoc.
+ * 
  * @since 2.0
  */
 public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
-    /** {@inheritDoc} */
+    @Override
     public String getEngineName() {
         return "JEXL Engine";
     }
 
-    /** {@inheritDoc} */
+    @Override
     public String getEngineVersion() {
         return "3.0"; // ensure this is updated if function changes are made to this class
     }
 
-    /** {@inheritDoc} */
+    @Override
     public String getLanguageName() {
         return "JEXL";
     }
 
-    /** {@inheritDoc} */
+    @Override
     public String getLanguageVersion() {
         return "3.0"; // TODO this should be derived from the actual version
     }
 
-    /** {@inheritDoc} */
-    public String getMethodCallSyntax(String obj, String m, String[] args) {
+    @Override
+    public String getMethodCallSyntax(String obj, String m, String... args) {
         StringBuilder sb = new StringBuilder();
         sb.append(obj);
         sb.append('.');
@@ -81,26 +81,26 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
         return sb.toString();
     }
 
-    /** {@inheritDoc} */
+    @Override
     public List<String> getExtensions() {
         return Collections.unmodifiableList(Arrays.asList("jexl", "jexl2", "jexl3"));
     }
 
-    /** {@inheritDoc} */
+    @Override
     public List<String> getMimeTypes() {
         return Collections.unmodifiableList(Arrays.asList("application/x-jexl",
                                                           "application/x-jexl2",
                                                           "application/x-jexl3"));
     }
 
-    /** {@inheritDoc} */
+    @Override
     public List<String> getNames() {
         return Collections.unmodifiableList(Arrays.asList("JEXL", "Jexl", "jexl",
                                                           "JEXL2", "Jexl2", "jexl2",
                                                           "JEXL3", "Jexl3", "jexl3"));
     }
 
-    /** {@inheritDoc} */
+    @Override
     public String getOutputStatement(String toDisplay) {
         if (toDisplay == null) {
             return "JEXL.out.print(null)";
@@ -109,7 +109,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
         }
     }
 
-    /** {@inheritDoc} */
+    @Override
     public Object getParameter(String key) {
         if (key.equals(ScriptEngine.ENGINE)) {
             return getEngineName();
@@ -133,11 +133,11 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
         return null;
     }
 
-    /** {@inheritDoc} */
-    public String getProgram(String[] statements) {
+    @Override
+    public String getProgram(String... statements) {
         StringBuilder sb = new StringBuilder();
         for(String statement : statements){
-            sb.append(JexlEngine.cleanExpression(statement));
+            sb.append(statement.trim());
             if (!statement.endsWith(";")){
                 sb.append(';');
             }
@@ -145,10 +145,9 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
         return sb.toString();
     }
 
-    /** {@inheritDoc} */
+    @Override
     public ScriptEngine getScriptEngine() {
-        JexlScriptEngine engine = new JexlScriptEngine(this);
-        return engine;
+        return new JexlScriptEngine(this);
     }
 
 }

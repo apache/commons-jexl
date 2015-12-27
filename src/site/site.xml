@@ -17,16 +17,17 @@
 -->
 <project name="JEXL">
     <bannerRight>
-        <name>Commons JEXL</name>
+        <name>Apache Commons JEXL</name>
         <src>images/jexl-logo-white.png</src>
         <href>index.html</href>
     </bannerRight>
 
     <body>
-        <menu name="Commons&#xA0;Jexl">
+        <menu name="JEXL">
             <item name="Overview"                href="index.html" />
-            <item name="3.0&#xA0;Javadoc"        href="apidocs/index.html"/>
-            <item name="1.1&#xA0;Javadoc"        href="apidocs-1.1/index.html"/>
+            <item name="Javadoc 3.0"             href="apidocs/index.html"/>
+            <item name="Javadoc 2.1"             href="apidocs-2.1/index.html"/>
+            <item name="Javadoc 1.1"             href="apidocs-1.1/index.html"/>
             <item name="Download"                href="download_jexl.cgi"/>
             <item name="Reference"               href="reference/index.html"/>
         </menu>

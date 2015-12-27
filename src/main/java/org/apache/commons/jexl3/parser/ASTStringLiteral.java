@@ -16,30 +16,44 @@
  */
 package org.apache.commons.jexl3.parser;
 
-public final class ASTStringLiteral extends JexlNode implements JexlNode.Literal<String> {
+public final class ASTStringLiteral extends JexlNode implements JexlNode.Constant<String> {
+    /** The actual literal value; the inherited 'value' member may host a cached getter. */
+    private String literal = null;
 
-    public ASTStringLiteral(int id) {
+    ASTStringLiteral(int id) {
         super(id);
     }
 
-    public ASTStringLiteral(Parser p, int id) {
+    ASTStringLiteral(Parser p, int id) {
         super(p, id);
+    }
+
+    @Override
+    public String toString() {
+        return this.literal;
     }
 
     /**
      * Gets the literal value.
      * @return the string literal
      */
+    @Override
     public String getLiteral() {
-        return image;
+        return this.literal;
     }
-    
+
+
     /** {@inheritDoc} */
     @Override
     protected boolean isConstant(boolean literal) {
         return true;
     }
-    
+
+    void setLiteral(String literal) {
+        this.literal = literal;
+    }
+
+
     /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {

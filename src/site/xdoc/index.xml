@@ -6,9 +6,9 @@
    The ASF licenses this file to You under the Apache License, Version 2.0
    (the "License"); you may not use this file except in compliance with
    the License.  You may obtain a copy of the License at
-  
+
         http://www.apache.org/licenses/LICENSE-2.0
-  
+
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@
 
 <document>
     <properties>
-        <title>Commons JEXL Overview</title>
+        <title>Apache Commons JEXL Overview</title>
     </properties>
 
     <body>
@@ -71,7 +71,7 @@ working with enterprise platforms.
             Velocity and the Expression Language defined in the JavaServer Pages Standard Tag Library version 1.1 (JSTL)
             and JavaServer Pages version 2.0 (JSP).
             JEXL 2.0 added features inspired by
-            <a href="http://java.sun.com/products/jsp/reference/techart/unifiedEL.html">Unified EL</a>.
+            <a href="https://en.wikipedia.org/wiki/Unified_Expression_Language">Unified EL</a>.
             The syntax is now close to a mix of ECMAScript and "shell-script"
             making it easy to master by technical operatives or consultants. The objects exposed and their behavior
             obviously need to be documented though...
@@ -93,11 +93,13 @@ working with enterprise platforms.
             these specifications, see the <a href="http://commons.apache.org/el">Commons EL</a> project.
             </p>
         </section>
-    
+
         <section name="A Brief Example">
             <p>
             When evaluating expressions, JEXL merges an
-                <a href="apidocs/org/apache/commons/jexl3/Expression.html">Expression</a>
+                <a href="apidocs/org/apache/commons/jexl3/JexlExpression.html">JexlExpression</a>
+                or a
+                <a href="apidocs/org/apache/commons/jexl3/JexlScript.html">JexlScript</a>
             with a
                 <a href="apidocs/org/apache/commons/jexl3/JexlContext.html">JexlContext</a>.
             An Expression is created using
@@ -109,20 +111,19 @@ working with enterprise platforms.
             </p>
 
             <source><![CDATA[
-            // Create or retrieve a JexlEngine
-            JexlEngine jexl = new JexlEngine();
-            // Create an expression object
-            String jexlExp = "foo.innerFoo.bar()";
-            Expression e = jexl.createExpression( jexlExp );
-
-            // Create a context and add data
-            JexlContext jc = new MapContext();
-            jc.set("foo", new Foo() );
-
-            // Now evaluate the expression, getting the result
-            Object o = e.evaluate(jc);
-        ]]>
-            </source>
+    // Create or retrieve an engine
+    JexlEngine jexl = new JexlBuilder().create();
+    
+    // Create an expression
+    String jexlExp = "foo.innerFoo.bar()";
+    JexlExpression e = jexl.createExpression( jexlExp );
+    
+    // Create a context and add data
+    JexlContext jc = new MapContext();
+    jc.set("foo", new Foo() );
+    
+    // Now evaluate the expression, getting the result
+    Object o = e.evaluate(jc);]]></source>
         </section>
 
         <section name="Extensions to JSTL Expression Language">
@@ -133,6 +134,7 @@ working with enterprise platforms.
             <ul>
                 <li>Support for invocation of any accessible method (see example above).</li>
                 <li>Support for setting/getting any accessible public field.</li>
+                <li>A general <span class="literal">new()</span> method allowing to instantiate objects.</li>
                 <li>A general <span class="literal">size()</span> method, which works on:
                     <ul>
                         <li><span class="literal">String</span> - returns length</li>
@@ -141,9 +143,10 @@ working with enterprise platforms.
                     </ul>
                 </li>
                 <li>A general <span class="literal">empty()</span> method, which works on Collections and Strings.</li>
-                <li>A general <span class="literal">new()</span> method allowing to instantiate objects.</li>
                 <li>Support for the ternary operator 'a ? b : c' - and its GNU-C / "Elvis" variant 'a ?: c'.</li>
                 <li>Support for the Perl-like regex matching operators '=~' and '!~'</li>
+                <li>Support for the CSS3-inspired 'startsWith' and 'endsWith' operators '=^' and '=$'</li>
+                <li>Support for user-defined functions.</li>
                 <li>Misc : '+' has been overloaded to be use as a String concatenation operator</li>
             </ul>
 
@@ -157,8 +160,8 @@ working with enterprise platforms.
             </p>
             <ul>
                 <li>
-                    <a href="http://java.sun.com/products/jsp/index.jsp">JSP 2.0</a> is covered
-            by Java Specification Requests (JSR) 
+                    <a href="http://www.oracle.com/technetwork/java/index-jsp-138231.html">JSP 2.0</a> is covered
+            by Java Specification Requests (JSR)
                     <a href="http://www.jcp.org/en/jsr/detail?id=152">JSR-152: JavaServer
             Pages 2.0 Specification</a>.
                 </li>
@@ -167,17 +170,17 @@ working with enterprise platforms.
             called <a href="http://commons.apache.org/el/index.html">EL</a>
                 </li>
                 <li>
-                    <a href="http://java.sun.com/products/jsp/jstl/">JSTL 1.1</a> is covered
+                    <a href="http://www.oracle.com/technetwork/java/index-jsp-135995.html">JSTL 1.1</a> is covered
             by <a href="http://jcp.org/en/jsr/detail?id=52">JSR 52: A Standard
             Tag Library for JavaServer Pages</a>. See the
-                    <a href="http://java.sun.com/products/jsp/jstl/1.1/docs/api/index.html">JSTL API</a>.
+                    <a href="http://docs.oracle.com/javaee/5/jstl/1.1/docs/tlddocs/">JSTL API</a>.
                 </li>
           <li>Apache has a <a href="http://tomcat.apache.org/taglibs/standard/">JSTL Implementation</a>.</li>
             </ul>
             <subsection name="Velocity">
                 <p>
                     <a href="http://velocity.apache.org/">Apache Velocity</a> implements
-            a similar expression language. 
+            a similar expression language.
                 </p>
                 <p>
             In particular the <a href="http://velocity.apache.org/engine/devel/user-guide.html#References">References</a>

@@ -19,7 +19,7 @@ package org.apache.commons.jexl3.parser;
 import java.io.StringReader;
 
 import junit.framework.TestCase;
-import org.apache.commons.jexl3.parser.Parser;
+import org.apache.commons.jexl3.JexlException;
 
 /**
  * @since 1.0
@@ -31,23 +31,39 @@ public class ParserTest extends TestCase {
     }
 
     /**
-     *  parse test : see if we can parse a little script
+     * See if we can parse simple scripts
      */
-    public void testParse1() throws Exception {
+    public void testParse() throws Exception {
         Parser parser = new Parser(new StringReader(";"));
 
-        SimpleNode sn = parser.parse(new StringReader("foo = 1;"), null);
+        JexlNode sn;
+        sn = parser.parse(null, "foo = 1;", null, false, false);
+        assertNotNull("parsed node is null", sn);
+
+        sn = parser.parse(null, "foo = \"bar\";", null, false, false);
+        assertNotNull("parsed node is null", sn);
+
+        sn = parser.parse(null, "foo = 'bar';", null, false, false);
         assertNotNull("parsed node is null", sn);
     }
 
-    public void testParse2() throws Exception {
+    public void testErrorAssign() throws Exception {
         Parser parser = new Parser(new StringReader(";"));
-
-        SimpleNode sn = parser.parse(new StringReader("foo = \"bar\";"), null);
-        assertNotNull("parsed node is null", sn);
-
-        sn = parser.parse(new StringReader("foo = 'bar';"), null);
-        assertNotNull("parsed node is null", sn);
+        try {
+            JexlNode sn = parser.parse(null, "foo() = 1;", null, false, false);
+            fail("should have failed on invalid assignment");
+        } catch (JexlException.Parsing xparse) {
+            // ok
+        }
     }
 
+    public void testErrorAmbiguous() throws Exception {
+        Parser parser = new Parser(new StringReader(";"));
+        try {
+            JexlNode sn = parser.parse(null, "x = 1 y = 5", null, false, false);
+            fail("should have failed on ambiguous statement");
+        } catch (JexlException.Ambiguous xambiguous) {
+            // ok
+        }
+    }
 }

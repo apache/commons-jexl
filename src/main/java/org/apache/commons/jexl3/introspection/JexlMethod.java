@@ -23,7 +23,7 @@ package org.apache.commons.jexl3.introspection;
  * <code>
  * ${foo.bar()}
  * </code>
- * 
+ *
  * @since 1.0
  */
 public interface JexlMethod {
@@ -36,22 +36,25 @@ public interface JexlMethod {
      * @return the result
      * @throws Exception on any error.
      */
-    Object invoke(Object obj, Object[] params) throws Exception;
+    Object invoke(Object obj, Object... params) throws Exception;
 
     /**
      * Attempts to reuse this JexlMethod, checking that it is compatible with
      * the actual set of arguments.
      * Related to isCacheable since this method is often used with cached JexlMethod instances.
-     * @param obj the object to invoke the method upon
+     * 
      * @param name the method name
+     * @param obj the object to invoke the method upon
      * @param params the method arguments
      * @return the result of the method invocation that should be checked by tryFailed to determine if it succeeded
      * or failed.
      */
-    Object tryInvoke(String name, Object obj, Object[] params);
+    Object tryInvoke(String name, Object obj, Object... params);
 
     /**
-     * Checks whether a tryInvoke failed or not.
+     * Checks whether a tryInvoke return value indicates a failure or not.
+     * <p>Usage is : <code>Object r = tryInvoke(...); if (tryFailed(r) {...} else {...}</code>
+     * 
      * @param rval the value returned by tryInvoke
      * @return true if tryInvoke failed, false otherwise
      */
@@ -60,13 +63,14 @@ public interface JexlMethod {
     /**
      * Specifies if this JexlMethod is cacheable and able to be reused for this
      * class of object it was returned for.
-     * 
+     *
      * @return true if can be reused for this class, false if not
      */
     boolean isCacheable();
 
     /**
      * returns the return type of the method invoked.
+     * 
      * @return return type
      */
     Class<?> getReturnType();

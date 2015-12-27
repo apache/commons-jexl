@@ -16,12 +16,12 @@
  */
 package org.apache.commons.jexl3.parser;
 
-public final class ASTReferenceExpression extends ASTArrayAccess {
-    public ASTReferenceExpression(int id) {
+public final class ASTReferenceExpression extends JexlNode {
+    ASTReferenceExpression(int id) {
         super(id);
     }
 
-    public ASTReferenceExpression(Parser p, int id) {
+    ASTReferenceExpression(Parser p, int id) {
         super(p, id);
     }
 

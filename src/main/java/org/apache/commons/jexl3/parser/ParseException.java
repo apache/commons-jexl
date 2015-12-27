@@ -20,7 +20,7 @@ package org.apache.commons.jexl3.parser;
 /**
  * This exception is thrown when parse errors are encountered.
  */
-public class ParseException extends Exception {
+public class ParseException extends Exception implements JavaccError {
     /**
      * The version identifier.
      */
@@ -37,31 +37,7 @@ public class ParseException extends Exception {
      * Error column.
      */
     private int column = -1;
-    
-    /**
-     * Gets the line number.
-     * @return line number.
-     */
-    public int getLine() {
-        return line;
-    }
 
-    /**
-     * Gets the column number.
-     * @return the column.
-     */
-    public int getColumn() {
-        return column;
-    }
-    
-    /**
-     * Gets the last correct input.
-     * @return the string after which the error occured
-     */
-    public String getAfter() {
-        return after;
-    }
-    
     /**
      * This constructor is used by the method "generateParseException"
      * in the generated parser.  Calling this constructor generates
@@ -95,5 +71,20 @@ public class ParseException extends Exception {
     /** Constructor with message. */
     public ParseException(String message) {
         super(message);
+    }
+
+    @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
+    public int getColumn() {
+        return column;
+    }
+
+    @Override
+    public String getAfter() {
+        return after;
     }
 }

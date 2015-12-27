@@ -1,9 +1,10 @@
 /*
- * Copyright 2011 The Apache Software Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -19,17 +20,37 @@ package org.apache.commons.jexl3.parser;
  * Fully abstract to avoid public interface exposition.
  */
 public abstract class ParserVisitor {
-    protected abstract Object visit(SimpleNode node, Object data);
+    /**
+     * Unused, satisfy ParserVisitor interface.
+     * @param node a node
+     * @param data the data
+     * @return does not return
+     */
+    protected final Object visit(SimpleNode node, Object data) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    /**
+     * Unused, should throw in Parser.
+     * @param node a node
+     * @param data the data
+     * @return does not return
+     */
+    protected final Object visit(ASTAmbiguous node, Object data) {
+        throw new UnsupportedOperationException("unexpected type of node");
+    }
 
     protected abstract Object visit(ASTJexlScript node, Object data);
 
     protected abstract Object visit(ASTBlock node, Object data);
 
-    protected abstract Object visit(ASTAmbiguous node, Object data);
-
     protected abstract Object visit(ASTIfStatement node, Object data);
 
     protected abstract Object visit(ASTWhileStatement node, Object data);
+
+    protected abstract Object visit(ASTContinue node, Object data);
+
+    protected abstract Object visit(ASTBreak node, Object data);
 
     protected abstract Object visit(ASTForeachStatement node, Object data);
 
@@ -69,9 +90,17 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTNRNode node, Object data);
 
-    protected abstract Object visit(ASTAdditiveNode node, Object data);
+    protected abstract Object visit(ASTSWNode node, Object data);
 
-    protected abstract Object visit(ASTAdditiveOperator node, Object data);
+    protected abstract Object visit(ASTNSWNode node, Object data);
+
+    protected abstract Object visit(ASTEWNode node, Object data);
+
+    protected abstract Object visit(ASTNEWNode node, Object data);
+
+    protected abstract Object visit(ASTAddNode node, Object data);
+
+    protected abstract Object visit(ASTSubNode node, Object data);
 
     protected abstract Object visit(ASTMulNode node, Object data);
 
@@ -97,13 +126,21 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTStringLiteral node, Object data);
 
+    protected abstract Object visit(ASTSetLiteral node, Object data);
+
+    protected abstract Object visit(ASTExtendedLiteral node, Object data);
+
     protected abstract Object visit(ASTArrayLiteral node, Object data);
+
+    protected abstract Object visit(ASTRangeNode node, Object data);
 
     protected abstract Object visit(ASTMapLiteral node, Object data);
 
     protected abstract Object visit(ASTMapEntry node, Object data);
 
     protected abstract Object visit(ASTEmptyFunction node, Object data);
+
+    protected abstract Object visit(ASTEmptyMethod node, Object data);
 
     protected abstract Object visit(ASTSizeFunction node, Object data);
 
@@ -117,5 +154,27 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTArrayAccess node, Object data);
 
+    protected abstract Object visit(ASTIdentifierAccess node, Object data);
+
+    protected abstract Object visit(ASTArguments node, Object data);
+
     protected abstract Object visit(ASTReferenceExpression node, Object data);
+
+    protected abstract Object visit(ASTSetAddNode node, Object data);
+
+    protected abstract Object visit(ASTSetSubNode node, Object data);
+
+    protected abstract Object visit(ASTSetMultNode node, Object data);
+
+    protected abstract Object visit(ASTSetDivNode node, Object data);
+
+    protected abstract Object visit(ASTSetModNode node, Object data);
+
+    protected abstract Object visit(ASTSetAndNode node, Object data);
+
+    protected abstract Object visit(ASTSetOrNode node, Object data);
+
+    protected abstract Object visit(ASTSetXorNode node, Object data);
+
+    protected abstract Object visit(ASTJxltLiteral node, Object data);
 }

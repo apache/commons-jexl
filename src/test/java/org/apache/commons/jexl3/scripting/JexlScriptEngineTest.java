@@ -13,7 +13,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package org.apache.commons.jexl3.scripting;
@@ -94,7 +94,7 @@ public class JexlScriptEngineTest extends TestCase {
         assertEquals(engine.getContext().getErrorWriter(),engine.eval("JEXL.err"));
         assertEquals(System.class,engine.eval("JEXL.System"));
     }
-    
+
     public void testNulls() throws Exception {
         ScriptEngineManager manager = new ScriptEngineManager();
         assertNotNull("Manager should not be null", manager);
@@ -146,5 +146,11 @@ public class JexlScriptEngineTest extends TestCase {
         final Object mymap = engine.eval("testmap={ 'key1' : 'value1', 'key2' : 'value2' }");
         assertTrue(mymap instanceof Map<?, ?>);
         assertEquals(2,((Map<?, ?>)mymap).size());
+    }
+
+    public void testDirectNew() throws Exception {
+        ScriptEngine engine = new JexlScriptEngine();
+        final Integer initialValue = Integer.valueOf(123);
+        assertEquals(initialValue,engine.eval("123"));
     }
 }

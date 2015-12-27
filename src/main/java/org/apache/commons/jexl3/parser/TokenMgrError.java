@@ -19,7 +19,7 @@ package org.apache.commons.jexl3.parser;
 /**
  * Token Manager Error.
  */
-public class TokenMgrError extends Error {
+public class TokenMgrError extends Error implements JavaccError {
     /**
      * The version identifier for this Serializable class.
      * Increment only if the <i>serialized</i> form of the
@@ -65,7 +65,7 @@ public class TokenMgrError extends Error {
      */
     private String after;
     /**
-     * 
+     * Whether eof was reached whilst expecting more input.
      */
     private boolean eof;
     /**
@@ -76,39 +76,6 @@ public class TokenMgrError extends Error {
      * Error column.
      */
     private int column;
-    
-    /**
-     * Gets the reason why the exception is thrown.
-     * @return one of the 4 lexical error codes
-     */
-    public int getErrorCode() {
-        return errorCode;
-    }
-
-    /**
-     * Gets the line number.
-     * @return line number.
-     */
-    public int getLine() {
-        return line;
-    }
-
-    /**
-     * Gets the column number.
-     * @return the column.
-     */
-    public int getColumn() {
-        return column;
-    }
-    
-    /**
-     * Gets the last correct input.
-     * @return the string after which the error occured
-     */
-    public String getAfter() {
-        return after;
-    }
- 
 
     /**
      * Returns a detailed message for the Error when it is thrown by the
@@ -142,4 +109,76 @@ public class TokenMgrError extends Error {
         current = curChar;
         errorCode = reason;
     }
+
+    /**
+     * Gets the reason why the exception is thrown.
+     * @return one of the 4 lexical error codes
+     */
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    @Override
+    public int getLine() {
+        return line;
+    }
+
+    @Override
+    public int getColumn() {
+        return column;
+    }
+
+    @Override
+    public String getAfter() {
+        return after;
+    }
+
+     /***
+      * Replaces unprintable characters by their espaced (or unicode escaped)
+      * equivalents in the given string
+      */
+     protected static final String addEscapes(String str) {
+        StringBuffer retval = new StringBuffer();
+        char ch;
+        for (int i = 0; i < str.length(); i++) {
+          switch (str.charAt(i))
+          {
+             case 0 :
+                continue;
+             case '\b':
+                retval.append("//b");
+                continue;
+             case '\t':
+                retval.append("//t");
+                continue;
+             case '\n':
+                retval.append("//n");
+                continue;
+             case '\f':
+                retval.append("//f");
+                continue;
+             case '\r':
+                retval.append("//r");
+                continue;
+             case '\"':
+                retval.append("//\"");
+                continue;
+             case '\'':
+                retval.append("//\'");
+                continue;
+             case '/':
+                retval.append("////");
+                continue;
+             default:
+                if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
+                   String s = "0000" + Integer.toString(ch, 16);
+                   retval.append("//u" + s.substring(s.length() - 4, s.length()));
+                } else {
+                   retval.append(ch);
+                }
+                continue;
+          }
+        }
+        return retval.toString();
+     }
 }

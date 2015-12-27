@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,51 +20,51 @@ package org.apache.commons.jexl3.junit;
 import junit.framework.AssertionFailedError;
 
 import org.apache.commons.jexl3.Foo;
-import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlTestCase;
-import org.apache.commons.jexl3.JexlEngine;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  *  Simple testcases
  *
  *  @since 1.0
  */
+@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class AsserterTest extends JexlTestCase {
-    public AsserterTest(String testName) {
-        super(testName);
+    public AsserterTest() {
+        super("AsserterTest");
     }
 
+    @Test
     public void testThis() throws Exception {
         Asserter asserter = new Asserter(JEXL);
         asserter.setVariable("this", new Foo());
-        
         asserter.assertExpression("this.get('abc')", "Repeat : abc");
-        
         try {
             asserter.assertExpression("this.count", "Wrong Value");
-            fail("This method should have thrown an assertion exception");
+            Assert.fail("This method should have thrown an assertion exception");
         }
         catch (AssertionFailedError e) {
             // it worked!
         }
     }
 
+    @Test
     public void testVariable() throws Exception {
-        JexlEngine jexl = new JexlEngine();
-        jexl.setSilent(true);
-        Asserter asserter = new Asserter(jexl);
+        Asserter asserter = new Asserter(JEXL);
+        asserter.setSilent(true);
         asserter.setVariable("foo", new Foo());
         asserter.setVariable("person", "James");
 
         asserter.assertExpression("person", "James");
         asserter.assertExpression("size(person)", new Integer(5));
-        
+
         asserter.assertExpression("foo.getCount()", new Integer(5));
         asserter.assertExpression("foo.count", new Integer(5));
-        
+
         try {
             asserter.assertExpression("bar.count", new Integer(5));
-            fail("This method should have thrown an assertion exception");
+            Assert.fail("This method should have thrown an assertion exception");
         }
         catch (AssertionFailedError e) {
             // it worked!

@@ -17,30 +17,43 @@
 package org.apache.commons.jexl3.parser;
 
 /**
- * Identifiers, variables and registers.
+ * Identifiers, variables, ie symbols.
  */
 public class ASTIdentifier extends JexlNode {
-    private int register = -1;
-    public ASTIdentifier(int id) {
+    private String name = null;
+    private int symbol = -1;
+
+    ASTIdentifier(int id) {
         super(id);
     }
 
-    public ASTIdentifier(Parser p, int id) {
+    ASTIdentifier(Parser p, int id) {
         super(p, id);
     }
-    
-    void setRegister(String r) {
-        if (r.charAt(0) == '#') {
-            register = Integer.parseInt(r.substring(1));
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    void setSymbol(String identifier) {
+        if (identifier.charAt(0) == '#') {
+            symbol = Integer.parseInt(identifier.substring(1));
         }
+        name = identifier;
     }
-    
-    void setRegister(int r) {
-        register = r;
+
+    void setSymbol(int r, String identifier) {
+        symbol = r;
+        name = identifier;
     }
-    
-    public int getRegister() {
-        return register;
+
+    public int getSymbol() {
+        return symbol;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

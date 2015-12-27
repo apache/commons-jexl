@@ -17,21 +17,22 @@
 
 package org.apache.commons.jexl3.examples;
 
-import junit.framework.TestCase;
-import org.apache.commons.jexl3.Expression;
+import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.MapContext;
 
 import java.util.List;
 import java.util.ArrayList;
+import org.apache.commons.jexl3.JexlBuilder;
+import org.junit.Test;
 
 /**
  *  Simple example to show how to access arrays.
  *
  *  @since 1.0
  */
-public class ArrayTest extends TestCase {
+public class ArrayTest {
     /**
      * An example for array access.
      */
@@ -40,7 +41,7 @@ public class ArrayTest extends TestCase {
          * First step is to retrieve an instance of a JexlEngine;
          * it might be already existing and shared or created anew.
          */
-        JexlEngine jexl = new JexlEngine();
+        JexlEngine jexl = new JexlBuilder().create();
         /*
          *  Second make a jexlContext and put stuff in it
          */
@@ -52,7 +53,7 @@ public class ArrayTest extends TestCase {
         l.add(two);
         jc.set("array", l);
 
-        Expression e = jexl.createExpression("array[1]");
+        JexlExpression e = jexl.createExpression("array[1]");
         Object o = e.evaluate(jc);
         out.print("Object @ location 1 = ", o, two);
 
@@ -66,14 +67,14 @@ public class ArrayTest extends TestCase {
      * Unit test entry point.
      * @throws Exception
      */
-    public void testExample() throws Exception {
+    @Test public void testExample() throws Exception {
         example(Output.JUNIT);
     }
 
-    /** 
+    /**
      * Command line entry point.
      * @param args command line arguments
-     * @throws Exception cos jexl does. 
+     * @throws Exception cos jexl does.
      */
     public static void main(String[] args) throws Exception {
         example(Output.SYSTEM);

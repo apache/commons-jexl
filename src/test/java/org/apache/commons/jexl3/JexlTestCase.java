@@ -19,189 +19,58 @@ package org.apache.commons.jexl3;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
 
-import org.apache.commons.jexl3.parser.ASTJexlScript;
 
-import junit.framework.TestCase;
-import org.apache.commons.jexl3.parser.JexlNode;
+import org.apache.commons.jexl3.internal.Util;
+import org.junit.After;
+import org.junit.Assert;
 
 /**
  * Implements runTest methods to dynamically instantiate and invoke a test,
  * wrapping the call with setUp(), tearDown() calls.
  * Eases the implementation of main methods to debug.
  */
-public class JexlTestCase extends TestCase {
+public class JexlTestCase {
     /** No parameters signature for test run. */
     private static final Class<?>[] noParms = {};
     /** String parameter signature for test run. */
     private static final Class<?>[] stringParm = {String.class};
 
-    /** A default Jexl engine instance. */
+    /** A default JEXL engine instance. */
     protected final JexlEngine JEXL;
 
     public JexlTestCase(String name) {
-        this(name, new JexlEngine());
-    }
-    protected JexlTestCase(String name, JexlEngine jexl) {
-        super(name);
-        JEXL = jexl;
-        JEXL.setCache(512);
-    }
-    public JexlTestCase() {
-        this(new JexlEngine());
-    }
-    protected JexlTestCase(JexlEngine jexl) {
-        super();
-        JEXL = jexl;
-        JEXL.setCache(512);
+        this(name, new JexlBuilder().strict(true).silent(false).cache(32).create());
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    protected JexlTestCase(String name, JexlEngine jexl) {
+        //super(name);
+        JEXL = jexl;
+    }
+
+    public void setUp() throws Exception {
+        // nothing to do
+    }
+
+    @After
+    public void tearDown() throws Exception {
         debuggerCheck(JEXL);
     }
 
     public static JexlEngine createEngine(boolean lenient) {
-        return new JexlEngine(null, new JexlArithmetic(lenient), null, null);
+        return new JexlBuilder().arithmetic(new JexlArithmetic(!lenient)).cache(512).create();
     }
 
-    public static JexlEngine createThreadedArithmeticEngine(boolean lenient) {
-        return new JexlEngine(null, new JexlThreadedArithmetic(lenient), null, null);
-    }
-    
     /**
      * Will force testing the debugger for each derived test class by
      * recreating each expression from the JexlNode in the JexlEngine cache &
      * testing them for equality with the origin.
      * @throws Exception
      */
-    public static void debuggerCheck(JexlEngine jexl) throws Exception {
-        // without a cache, nothing to check
-        if (jexl.cache == null) {
-            return;
-        }
-        JexlEngine jdbg = new JexlEngine();
-        jdbg.parser.ALLOW_REGISTERS = true;
-        Debugger dbg = new Debugger();
-        // iterate over all expression in cache
-        Iterator<Map.Entry<String,ASTJexlScript>> inodes = jexl.cache.entrySet().iterator();
-        while (inodes.hasNext()) {
-            Map.Entry<String,ASTJexlScript> entry = inodes.next();
-            JexlNode node = entry.getValue();
-            // recreate expr string from AST
-            dbg.debug(node);
-            String expressiondbg = dbg.data();
-            // recreate expr from string
-            Script exprdbg = jdbg.createScript(expressiondbg);
-            // make arg cause become the root cause
-            JexlNode root = ((JexlScript) exprdbg).script;
-            while (root.jjtGetParent() != null) {
-                root = root.jjtGetParent();
-            }
-            // test equality
-            String reason = JexlTestCase.checkEquals(root, node);
-            if (reason != null) {
-                throw new RuntimeException("debugger equal failed: "
-                                           + expressiondbg
-                                           +" /**** "  +reason+" **** */ "
-                                           + entry.getKey());
-            }
-        }
+    public static void debuggerCheck(JexlEngine ijexl) throws Exception {
+         Util.debuggerCheck(ijexl);
     }
 
-    /**
-     * Creates a list of all descendants of a script including itself.
-     * @param script the script to flatten
-     * @return the descendants-and-self list
-     */
-    protected static ArrayList<JexlNode> flatten(JexlNode node) {
-        ArrayList<JexlNode> list = new ArrayList<JexlNode>();
-        flatten(list, node);
-        return list;
-    }
-
-    /**
-     * Recursively adds all children of a script to the list of descendants.
-     * @param list the list of descendants to add to
-     * @param script the script & descendants to add
-     */
-    private static void flatten(List<JexlNode> list, JexlNode node) {
-        int nc = node.jjtGetNumChildren();
-        list.add(node);
-        for(int c = 0; c < nc; ++c) {
-            flatten(list, node.jjtGetChild(c));
-        }
-    }
-
-    /**
-     * Checks the equality of 2 nodes by comparing all their descendants.
-     * Descendants must have the same class and same image if non null.
-     * @param lhs the left script
-     * @param rhs the right script
-     * @return null if true, a reason otherwise
-     */
-    private static String checkEquals(JexlNode lhs, JexlNode rhs) {
-        if (lhs != rhs) {
-            ArrayList<JexlNode> lhsl = flatten(lhs);
-            ArrayList<JexlNode> rhsl = flatten(rhs);
-            if (lhsl.size() != rhsl.size()) {
-                 return "size: " + lhsl.size() + " != " + rhsl.size();
-            }
-            for(int n = 0; n < lhsl.size(); ++n) {
-                lhs = lhsl.get(n);
-                rhs = rhsl.get(n);
-                if (lhs.getClass() != rhs.getClass()) {
-                    return "class: " + lhs.getClass() + " != " + rhs.getClass();
-                }
-                if ((lhs.image == null && rhs.image != null)
-                    || (lhs.image != null && rhs.image == null)) {
-                    return "image: " + lhs.image + " != " + rhs.image;
-                }
-                if (lhs.image != null && !lhs.image.equals(rhs.image)) {
-                    return "image: " + lhs.image + " != " + rhs.image;
-                }
-            }
-        }
-        return null;
-    }
-    
-    /**
-     * A helper class to help debug AST problems.
-     * @param e the script
-     * @return an indented version of the AST
-     */
-    protected String flattenedStr(Script e) {
-        return e.getText() + "\n" + flattenedStr(((ExpressionImpl) e).script);
-    }
-
-    static private String indent(JexlNode node) {
-        StringBuilder strb = new StringBuilder();
-        while (node != null) {
-            strb.append("  ");
-            node = node.jjtGetParent();
-        }
-        return strb.toString();
-    }
-
-
-    private String flattenedStr(JexlNode node) {
-        ArrayList<JexlNode> flattened = flatten(node);
-        StringBuilder strb = new StringBuilder();
-        for (JexlNode flat : flattened) {
-            strb.append(indent(flat));
-            strb.append(flat.getClass().getSimpleName());
-            if (flat.image != null) {
-                strb.append(" = ");
-                strb.append(flat.image);
-            }
-            strb.append("\n");
-        }
-        return strb.toString();
-    }
     /**
      * Dynamically runs a test method.
      * @param name the test method to run
@@ -216,7 +85,7 @@ public class JexlTestCase extends TestCase {
             method = this.getClass().getDeclaredMethod(name, noParms);
         }
         catch(Exception xany) {
-            fail("no such test: " + name);
+            Assert.fail("no such test: " + name);
             return;
         }
         try {
@@ -248,7 +117,7 @@ public class JexlTestCase extends TestCase {
             clazz = (Class<JexlTestCase>) Class.forName(testClassName);
         }
         catch(ClassNotFoundException xclass) {
-            fail("no such class: " + testClassName);
+            Assert.fail("no such class: " + testClassName);
             return;
         }
         // find ctor & instantiate
@@ -263,12 +132,12 @@ public class JexlTestCase extends TestCase {
                 test = clazz.newInstance();
             }
             catch(Exception xany) {
-                fail("cant instantiate test: " + xany);
+                Assert.fail("cant instantiate test: " + xany);
                 return;
             }
         }
         catch(Exception xany) {
-            fail("cant instantiate test: " + xany);
+            Assert.fail("cant instantiate test: " + xany);
             return;
         }
         // Run the test

@@ -16,49 +16,40 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
+public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constant<Number> {
+    private final NumberParser nlp;
 
-public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Number> {
-    /** The type literal value. */
-    Number literal = null;
-    /** The expected class. */
-    Class<?> clazz = null;
-
-    public ASTNumberLiteral(int id) {
+    ASTNumberLiteral(int id) {
         super(id);
+        nlp = new NumberParser();
     }
 
-    public ASTNumberLiteral(Parser p, int id) {
+    ASTNumberLiteral(Parser p, int id) {
         super(p, id);
+        nlp = new NumberParser();
     }
 
-    /**
-     * Gets the literal value.
-     * @return the number literal
-     */
-    public Number getLiteral() {
-        return literal;
+    @Override
+    public String toString() {
+        return nlp.toString();
     }
-    
-    /** {@inheritDoc} */
+
+    @Override
+    public Number getLiteral() {
+        return nlp.getLiteralValue();
+    }
+
     @Override
     protected boolean isConstant(boolean literal) {
         return true;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
-        return visitor.visit(this, data);
-    }
-
     public Class<?> getLiteralClass() {
-        return clazz;
+        return nlp.getLiteralClass();
     }
 
     public boolean isInteger() {
-        return Integer.class.equals(clazz);
+        return nlp.isInteger();
     }
 
     /**
@@ -66,50 +57,8 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
      * Originally from OGNL.
      * @param s the natural as string
      */
-    public void setNatural(String s) {
-        Number result;
-        Class<?> rclass;
-        // determine the base
-        final int base;
-        if (s.charAt(0) == '0') {
-            if ((s.length() > 1 && (s.charAt(1) == 'x' || s.charAt(1) == 'X'))) {
-                base = 16;
-                s = s.substring(2); // Trim the 0x off the front
-            } else {
-                base = 8;
-            }
-        } else {
-            base = 10;
-        }
-        final int last = s.length() - 1;
-        switch (s.charAt(last)) {
-            case 'l':
-            case 'L': {
-                rclass = Long.class;
-                result = Long.valueOf(s.substring(0, last), base);
-                break;
-            }
-            case 'h':
-            case 'H': {
-                rclass = BigInteger.class;
-                result = new BigInteger(s.substring(0, last), base);
-                break;
-            }
-            default: {
-                rclass = Integer.class;
-                try {
-                    result = Integer.valueOf(s, base);
-                } catch (NumberFormatException take2) {
-                    try {
-                        result = Long.valueOf(s, base);
-                    } catch (NumberFormatException take3) {
-                        result = new BigInteger(s, base);
-                    }
-                }
-            }
-        }
-        literal = result;
-        clazz = rclass;
+    void setNatural(String s) {
+        nlp.setNatural(s);
     }
 
     /**
@@ -117,40 +66,12 @@ public class ASTNumberLiteral extends JexlNode implements JexlNode.Literal<Numbe
      * Originally from OGNL.
      * @param s the real as string
      */
-    public void setReal(String s) {
-        Number result;
-        Class<?> rclass;
-        final int last = s.length() - 1;
-        switch (s.charAt(last)) {
-            case 'b':
-            case 'B': {
-                result = new BigDecimal(s.substring(0, last));
-                rclass = BigDecimal.class;
-                break;
-            }
-            case 'd':
-            case 'D': {
-                rclass = Double.class;
-                result = Double.valueOf(s);
-                break;
-            }
-            case 'f':
-            case 'F':
-            default: {
-                rclass = Float.class;
-                try {
-                    result = Float.valueOf(s);
-                } catch (NumberFormatException take2) {
-                    try {
-                        result = Double.valueOf(s);
-                    } catch (NumberFormatException take3) {
-                        result = new BigDecimal(s);
-                    }
-                }
-                break;
-            }
-        }
-        literal = result;
-        clazz = rclass;
+    void setReal(String s) {
+        nlp.setReal(s);
+    }
+
+    @Override
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
+        return visitor.visit(this, data);
     }
 }
