@@ -24,7 +24,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-jexl3</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.1-SNAPSHOT</version>
     <name>Apache Commons JEXL</name>
     <inceptionYear>2001</inceptionYear>
     <description>The Apache Commons JEXL library is an implementation of the JSTL Expression Language with extensions.</description>
