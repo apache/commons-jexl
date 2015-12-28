@@ -25,7 +25,7 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.0" date="unreleased">
+        <release version="3.0" date="2015-12-27">
             <action dev="henrib" type="fix" issue="JEXL-184">
                 dot-ed identifiers parsing failure
             </action>
