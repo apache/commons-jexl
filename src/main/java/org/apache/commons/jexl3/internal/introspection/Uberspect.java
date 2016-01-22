@@ -429,7 +429,9 @@ public class Uberspect implements JexlUberspect {
          */
         private ArithmeticUberspect(JexlArithmetic theArithmetic, Set<JexlOperator> theOverloads) {
             this.arithmetic = theArithmetic;
-            this.overloads = EnumSet.copyOf(theOverloads);
+            this.overloads = theOverloads == null || theOverloads.isEmpty()
+                             ? EnumSet.noneOf(JexlOperator.class)
+                             : EnumSet.copyOf(theOverloads);
             // register this arithmetic class in the operator map
             operatorMap.put(arithmetic.getClass(), overloads);
         }
@@ -479,9 +481,7 @@ public class Uberspect implements JexlUberspect {
                     }
                 }
             }
-            if (!ops.isEmpty()) {
-                jau = new ArithmeticUberspect(arithmetic, ops);
-            }
+            jau = new ArithmeticUberspect(arithmetic, ops);
         }
         return jau;
     }
