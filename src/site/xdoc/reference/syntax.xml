@@ -555,12 +555,11 @@
                         to behave has right-hand-size operands of this operator.
                     </td>
                 </tr>
-                <tr>
+                 <tr>
                     <td>Starts With<code>=^</code></td>
                     <td>
-                        The syntactically CSS3 inspired <code>=^</code> operator is a short-hand for the 'startsWith' method.
-                        For example,
-                        <code> "abcdef" ^= "abc" </code> returns <code>true</code>.
+                        The <code>=^</code> operator is a short-hand for the 'startsWith' method.
+                        For example, <code> "abcdef" =^ "abc" </code> returns <code>true</code>.
                         Note that through duck-typing, user classes exposing a public 'startsWith' method will allow their instances
                         to behave has left-hand-size operands of this operator.
                     </td>
@@ -569,23 +568,22 @@
                     <td>Not Starts With<code>!^</code></td>
                     <td>
                         This is the negation of the 'starts with' operator.
-                        <code>a ^! "abc"</code> is equivalent to <code>!(a ^= "abc")</code>
+                        <code>a !^ "abc"</code> is equivalent to <code>!(a =^ "abc")</code>
                     </td>
                 </tr>
                 <tr>
                     <td>Ends With<code>=$</code></td>
-                    <td>The syntactically CSS3 inspired <code>=$</code> operator is a short-hand for the 'endsWith' method.
-                        For example,
-                        <code> "abcdef" $= "def" </code> returns <code>true</code>.
+                    <td>The <code>=$</code> operator is a short-hand for the 'endsWith' method.
+                        For example, <code> "abcdef" =$ "def" </code> returns <code>true</code>.
                         Note that through duck-typing, user classes exposing an 'endsWith' method will allow their instances
                         to behave has left-hand-size operands of this operator.
                     </td>
                 </tr>
                 <tr>
-                    <td>Not Ends With<code>!^</code></td>
+                    <td>Not Ends With<code>!$</code></td>
                     <td>
                         This is the negation of the 'ends with' operator.
-                        <code>a $! "abc"</code> is equivalent to <code>!(a $= "abc")</code>
+                        <code>a !$ "abc"</code> is equivalent to <code>!(a =$ "abc")</code>
                     </td>
                 </tr>
                 <tr>
