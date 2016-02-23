@@ -38,9 +38,6 @@
             <action dev="henrib" type="fix" issue="JEXL-186" due-to="Philippe Mouawad">
                 Performance regression in arithmetic operations compared to JEXL 2.1
             </action>
-            <action dev="henrib" type="fix" issue="JEXL-180" due-to="Kimball Robinson">
-                Documentation - suggests using float for financials
-            </action>
         </release>
         <release version="3.0" date="2015-12-27">
             <action dev="henrib" type="fix" issue="JEXL-184">
