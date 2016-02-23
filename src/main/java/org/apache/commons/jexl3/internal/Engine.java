@@ -618,9 +618,6 @@ public class Engine extends JexlEngine {
                 JexlNode child = node.jjtGetChild(i);
                 if (collecting && child.isConstant()) {
                     String image = child.toString();
-                    if (image == null) {
-                        image = new Debugger().data(child);
-                    }
                     collector.add(image);
                 } else {
                     collecting = false;
