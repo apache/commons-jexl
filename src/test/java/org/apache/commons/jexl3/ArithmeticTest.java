@@ -548,11 +548,24 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertFalse(ja.isFloatingPointNumber("+10.2a+34"));
         Assert.assertFalse(ja.isFloatingPointNumber("0"));
         Assert.assertFalse(ja.isFloatingPointNumber("1"));
+        Assert.assertFalse(ja.isFloatingPointNumber("12A"));
+        Assert.assertFalse(ja.isFloatingPointNumber("2F3"));
+        Assert.assertFalse(ja.isFloatingPointNumber("23"));
+        Assert.assertFalse(ja.isFloatingPointNumber("+3"));
+        Assert.assertFalse(ja.isFloatingPointNumber("+34"));
+        Assert.assertFalse(ja.isFloatingPointNumber("+3-4"));
+        Assert.assertFalse(ja.isFloatingPointNumber("+3.-4"));
+        Assert.assertFalse(ja.isFloatingPointNumber("3ee4"));
 
         Assert.assertTrue(ja.isFloatingPointNumber("0."));
         Assert.assertTrue(ja.isFloatingPointNumber("1."));
         Assert.assertTrue(ja.isFloatingPointNumber("1.2"));
         Assert.assertTrue(ja.isFloatingPointNumber("1.2e3"));
+        Assert.assertTrue(ja.isFloatingPointNumber("2e3"));
+        Assert.assertTrue(ja.isFloatingPointNumber("+2e-3"));
+        Assert.assertTrue(ja.isFloatingPointNumber("+23E-34"));
+        Assert.assertTrue(ja.isFloatingPointNumber("+23.E-34"));
+        Assert.assertTrue(ja.isFloatingPointNumber("-23.4E+45"));
         Assert.assertTrue(ja.isFloatingPointNumber("1.2e34"));
         Assert.assertTrue(ja.isFloatingPointNumber("10.2e34"));
         Assert.assertTrue(ja.isFloatingPointNumber("+10.2e34"));
@@ -1296,5 +1309,6 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(BigDecimal.valueOf(1.), ja.toBigDecimal(true));
         Assert.assertEquals(BigDecimal.valueOf(0.), ja.toBigDecimal(false));
     }
+
 
 }
