@@ -169,7 +169,7 @@ public class Script implements JexlScript, JexlExpression {
             debug.debug(script);
             src = debug.toString();
         }
-        return src == null ? "/*no source*/" : src.toString();
+        return src.toString();
     }
 
     /**
