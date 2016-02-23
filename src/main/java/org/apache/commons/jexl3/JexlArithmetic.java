@@ -25,13 +25,14 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Collection;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Perform arithmetic, implements JexlOperator methods.
- * 
+ *
  * <p>This is the class to derive to implement new operator behaviors.</p>
- * 
+ *
  * <p>The 5 base arithmetic operators (+, - , *, /, %) follow the same evaluation rules regarding their arguments.</p>
  * <ol>
  *   <li>If both are null, result is 0</li>
@@ -45,9 +46,9 @@ import java.util.regex.Pattern;
  *     </ol>
  *   </li>
  * </ol>
- * 
+ *
  * Note that the only exception thrown by JexlArithmetic is and must be ArithmeticException.
- * 
+ *
  * @see JexlOperator
  * @since 2.0
  */
@@ -82,7 +83,7 @@ public class JexlArithmetic {
 
     /**
      * Creates a JexlArithmetic.
-     * 
+     *
      * @param astrict whether this arithmetic is strict or lenient
      */
     public JexlArithmetic(boolean astrict) {
@@ -91,7 +92,7 @@ public class JexlArithmetic {
 
     /**
      * Creates a JexlArithmetic.
-     * 
+     *
      * @param astrict     whether this arithmetic is lenient or strict
      * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
      * @param bigdScale   the scale used for big decimals.
@@ -104,7 +105,7 @@ public class JexlArithmetic {
 
     /**
      * Apply options to this arithmetic which eventually may create another instance.
-     * 
+     *
      * @param options the {@link JexlEngine.Options} to use
      * @return an arithmetic with those options set
      */
@@ -136,7 +137,7 @@ public class JexlArithmetic {
     public interface Uberspect {
         /**
          * Checks whether this uberspect has overloads for a given operator.
-         * 
+         *
          * @param operator the operator to check
          * @return true if an overload exists, false otherwise
          */
@@ -144,7 +145,7 @@ public class JexlArithmetic {
 
         /**
          * Gets the most specific method for an operator.
-         * 
+         *
          * @param operator the operator
          * @param arg      the arguments
          * @return the most specific method or null if no specific override could be found
@@ -154,9 +155,9 @@ public class JexlArithmetic {
 
     /**
      * Helper interface used when creating an array literal.
-     * 
+     *
      * <p>The default implementation creates an array and attempts to type it strictly.</p>
-     * 
+     *
      * <ul>
      *   <li>If all objects are of the same type, the array returned will be an array of that same type</li>
      *   <li>If all objects are Numbers, the array returned will be an array of Numbers</li>
@@ -168,14 +169,14 @@ public class JexlArithmetic {
 
         /**
          * Adds a literal to the array.
-         * 
+         *
          * @param value the item to add
          */
         void add(Object value);
 
         /**
          * Creates the actual "array" instance.
-         * 
+         *
          * @param extended true when the last argument is ', ...'
          * @return the array
          */
@@ -184,7 +185,7 @@ public class JexlArithmetic {
 
     /**
      * Called by the interpreter when evaluating a literal array.
-     * 
+     *
      * @param size the number of elements in the array
      * @return the array builder
      */
@@ -199,14 +200,14 @@ public class JexlArithmetic {
     public interface SetBuilder {
         /**
          * Adds a literal to the set.
-         * 
+         *
          * @param value the item to add
          */
         void add(Object value);
 
         /**
          * Creates the actual "set" instance.
-         * 
+         *
          * @return the set
          */
         Object create();
@@ -214,7 +215,7 @@ public class JexlArithmetic {
 
     /**
      * Called by the interpreter when evaluating a literal set.
-     * 
+     *
      * @param size the number of elements in the set
      * @return the array builder
      */
@@ -229,7 +230,7 @@ public class JexlArithmetic {
     public interface MapBuilder {
         /**
          * Adds a new entry to the map.
-         * 
+         *
          * @param key   the map entry key
          * @param value the map entry value
          */
@@ -237,7 +238,7 @@ public class JexlArithmetic {
 
         /**
          * Creates the actual "map" instance.
-         * 
+         *
          * @return the map
          */
         Object create();
@@ -245,7 +246,7 @@ public class JexlArithmetic {
 
     /**
      * Called by the interpreter when evaluating a literal map.
-     * 
+     *
      * @param size the number of elements in the map
      * @return the map builder
      */
@@ -256,7 +257,7 @@ public class JexlArithmetic {
     /**
      * Creates a literal range.
      * <p>The default implementation only accepts integers and longs.</p>
-     * 
+     *
      * @param from the included lower bound value (null if none)
      * @param to   the included upper bound value (null if none)
      * @return the range as an iterable
@@ -276,7 +277,7 @@ public class JexlArithmetic {
     /**
      * Checks whether this JexlArithmetic instance
      * strictly considers null as an error when used as operand unexpectedly.
-     * 
+     *
      * @return true if strict, false if lenient
      */
     public boolean isStrict() {
@@ -285,7 +286,7 @@ public class JexlArithmetic {
 
     /**
      * The MathContext instance used for +,-,/,*,% operations on big decimals.
-     * 
+     *
      * @return the math context
      */
     public MathContext getMathContext() {
@@ -294,7 +295,7 @@ public class JexlArithmetic {
 
     /**
      * The BigDecimal scale used for comparison and coericion operations.
-     * 
+     *
      * @return the scale
      */
     public int getMathScale() {
@@ -303,7 +304,7 @@ public class JexlArithmetic {
 
     /**
      * Ensure a big decimal is rounded by this arithmetic scale and rounding mode.
-     * 
+     *
      * @param number the big decimal to round
      * @return the rounded big decimal
      */
@@ -318,7 +319,7 @@ public class JexlArithmetic {
 
     /**
      * The result of +,/,-,*,% when both operands are null.
-     * 
+     *
      * @return Integer(0) if lenient
      * @throws ArithmeticException if strict
      */
@@ -331,7 +332,7 @@ public class JexlArithmetic {
 
     /**
      * Throw a NPE if arithmetic is strict.
-     * 
+     *
      * @throws ArithmeticException if strict
      */
     protected void controlNullOperand() {
@@ -342,8 +343,11 @@ public class JexlArithmetic {
 
     /**
      * The float regular expression pattern.
+     * <p>
+     * The decimal and exponent parts are optional and captured allowing to determine if the number is a real
+     * by checking whether one of these 2 capturing groups is not empty.
      */
-    public static final Pattern FLOAT_PATTERN = Pattern.compile("^[+-]?\\d*(\\.\\d*)?([eE]?[+-]?\\d*)?$");
+    public static final Pattern FLOAT_PATTERN = Pattern.compile("^[+-]?\\d*(\\.\\d*)?([eE][+-]?\\d+)?$");
 
     /**
      * Test if the passed value is a floating point number, i.e. a float, double
@@ -356,19 +360,11 @@ public class JexlArithmetic {
         if (val instanceof Float || val instanceof Double) {
             return true;
         }
-        if (val instanceof String) {
-            String str = (String) val;
-            for(int c = 0; c < str.length(); ++c) {
-                char ch = str.charAt(c);
-                // we need at least a marker that says it is a float
-                if (ch == '.' || ch == 'E' || ch == 'e') {
-                    return FLOAT_PATTERN.matcher(str).matches();
-                }
-                // and it must be a number
-                if (ch != '+' && ch != '-' && ch < '0' && ch > '9') {
-                    break;
-                }
-            }
+        if (val instanceof CharSequence) {
+            final Matcher m = FLOAT_PATTERN.matcher((CharSequence) val);
+            // first group is decimal, second is exponent;
+            // one of them must exist hence start({1,2}) >= 0
+            return m.matches() && (m.start(1) >= 0 || m.start(2) >= 0);
         }
         return false;
     }
@@ -414,7 +410,7 @@ public class JexlArithmetic {
 
     /**
      * Whether we consider the narrow class as a potential candidate for narrowing the source.
-     * 
+     *
      * @param narrow the target narrow class
      * @param source the orginal source class
      * @return true if attempt to narrow source to target is accepted
@@ -425,7 +421,7 @@ public class JexlArithmetic {
 
     /**
      * Given a Number, return back the value attempting to narrow it to a target class.
-     * 
+     *
      * @param original the original number
      * @param narrow   the attempted target class
      * @return the narrowed number or the source if no narrowing was possible
@@ -502,7 +498,7 @@ public class JexlArithmetic {
      * if either arguments is a BigInteger, no narrowing will occur
      * if either arguments is a Long, no narrowing to Integer will occur
      * </p>
-     * 
+     *
      * @param lhs  the left hand side operand that lead to the bigi result
      * @param rhs  the right hand side operand that lead to the bigi result
      * @param bigi the BigInteger to narrow
@@ -554,7 +550,7 @@ public class JexlArithmetic {
 
     /**
      * Replace all numbers in an arguments array with the smallest type that will fit.
-     * 
+     *
      * @param args the argument array
      * @return true if some arguments were narrowed and args array is modified,
      *         false if no narrowing occurred and args array has not been modified
@@ -581,7 +577,7 @@ public class JexlArithmetic {
      * If any numeric add fails on coercion to the appropriate type,
      * treat as Strings and do concatenation.
      * </p>
-     * 
+     *
      * @param left  left argument
      * @param right  right argument
      * @return left + right.
@@ -624,7 +620,7 @@ public class JexlArithmetic {
 
     /**
      * Divide the left value by the right.
-     * 
+     *
      * @param left  left argument
      * @param right  right argument
      * @return left / right
@@ -665,7 +661,7 @@ public class JexlArithmetic {
 
     /**
      * left value modulo right.
-     * 
+     *
      * @param left  left argument
      * @param right  right argument
      * @return left % right
@@ -706,7 +702,7 @@ public class JexlArithmetic {
 
     /**
      * Multiply the left value by the right.
-     * 
+     *
      * @param left  left argument
      * @param right  right argument
      * @return left * right.
@@ -737,7 +733,7 @@ public class JexlArithmetic {
 
     /**
      * Subtract the right value from the left.
-     * 
+     *
      * @param left  left argument
      * @param right  right argument
      * @return left - right.
@@ -768,7 +764,7 @@ public class JexlArithmetic {
 
     /**
      * Negates a value (unary minus for numbers).
-     * 
+     *
      * @param val the value to negate
      * @return the negated value
      */
@@ -799,7 +795,7 @@ public class JexlArithmetic {
      * Test if left contains right (right matches/in left).
      * <p>Beware that this method arguments are the opposite of the operator arguments.
      * 'x in y' means 'y contains x'.</p>
-     * 
+     *
      * @param container the container
      * @param value the value
      * @return test result or null if there is no arithmetic solution
@@ -933,7 +929,7 @@ public class JexlArithmetic {
 
     /**
      * Performs a bitwise and.
-     * 
+     *
      * @param left  the left operand
      * @param right the right operator
      * @return left &amp; right
@@ -946,7 +942,7 @@ public class JexlArithmetic {
 
     /**
      * Performs a bitwise or.
-     * 
+     *
      * @param left  the left operand
      * @param right the right operator
      * @return left | right
@@ -959,7 +955,7 @@ public class JexlArithmetic {
 
     /**
      * Performs a bitwise xor.
-     * 
+     *
      * @param left  the left operand
      * @param right the right operator
      * @return left ^ right
@@ -972,7 +968,7 @@ public class JexlArithmetic {
 
     /**
      * Performs a bitwise complement.
-     * 
+     *
      * @param val the operand
      * @return ~val
      */
@@ -983,7 +979,7 @@ public class JexlArithmetic {
 
     /**
      * Performs a logical not.
-     * 
+     *
      * @param val the operand
      * @return !val
      */
@@ -993,7 +989,7 @@ public class JexlArithmetic {
 
     /**
      * Performs a comparison.
-     * 
+     *
      * @param left     the left operand
      * @param right    the right operator
      * @param operator the operator
@@ -1327,7 +1323,7 @@ public class JexlArithmetic {
      * Coerce to a primitive double.
      * <p>Double.NaN, null and empty string coerce to zero.</p>
      * <p>Boolean false is 0, true is 1.</p>
-     * 
+     *
      * @param val value to coerce.
      * @return The double coerced value.
      * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
@@ -1399,7 +1395,7 @@ public class JexlArithmetic {
 
     /**
      * Use or overload or() instead.
-     * 
+     *
      * @param lhs left hand side
      * @param rhs right hand side
      * @return lhs | rhs
@@ -1413,7 +1409,7 @@ public class JexlArithmetic {
 
     /**
      * Use or overload xor() instead.
-     * 
+     *
      * @param lhs left hand side
      * @param rhs right hand side
      * @return lhs ^ rhs
@@ -1427,7 +1423,7 @@ public class JexlArithmetic {
 
     /**
      * Use or overload not() instead.
-     * 
+     *
      * @param arg argument
      * @return !arg
      * @see JexlArithmetic#not
@@ -1440,7 +1436,7 @@ public class JexlArithmetic {
 
     /**
      * Use or overload contains() instead.
-     * 
+     *
      * @param lhs left hand side
      * @param rhs right hand side
      * @return contains(rhs, lhs)
