@@ -347,7 +347,7 @@ public class Interpreter extends ParserVisitor {
      * @return true if cancelled, false otherwise
      */
     protected boolean isCancelled() {
-        if (cancelled | Thread.interrupted()) {
+        if (cancelled || Thread.currentThread().isInterrupted()) {
             cancelled = true;
         }
         return cancelled;
