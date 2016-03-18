@@ -287,6 +287,10 @@ public class Uberspect implements JexlUberspect {
                     case FIELD:
                         // a field may be? (can not be a number)
                         executor = FieldGetExecutor.discover(is, claz, property);
+                        // static class fields (enums included)
+                        if (obj instanceof Class<?>) {
+                            executor = FieldGetExecutor.discover(is, (Class<?>) obj, property);
+                        }
                         break;
                     case CONTAINER:
                         // or an indexed property?

@@ -33,6 +33,7 @@ public class PublicFieldsTest extends JexlTestCase {
      */
     public static class Inner {
         public double aDouble = 42.0;
+        public static double NOT42 = -42.0;
     }
 
     /**
@@ -122,4 +123,23 @@ public class PublicFieldsTest extends JexlTestCase {
         } catch(JexlException xjexl) {}
     }
 
+    public static enum Gender { MALE, FEMALE };
+
+    @Test public void testGetEnum() throws Exception {
+        ctxt.set("com.jexl.gender", Gender.class);
+        String src = "x = com.jexl.gender.FEMALE";
+        JexlScript script = JEXL.createScript(src);
+        Object result = script.execute(ctxt);
+        Assert.assertEquals(Gender.FEMALE, result);
+        Assert.assertEquals(Gender.FEMALE, ctxt.get("x"));
+    }
+
+    @Test public void testGetStaticField() throws Exception {
+        ctxt.set("com.jexl", Inner.class);
+        String src = "x = com.jexl.NOT42";
+        JexlScript script = JEXL.createScript(src);
+        Object result = script.execute(ctxt);
+        Assert.assertEquals(Inner.NOT42, result);
+        Assert.assertEquals(Inner.NOT42, ctxt.get("x"));
+    }
 }
