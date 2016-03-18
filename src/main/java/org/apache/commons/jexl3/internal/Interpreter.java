@@ -1407,7 +1407,7 @@ public class Interpreter extends ParserVisitor {
             }
             ASTArguments argNode = (ASTArguments) node.jjtGetChild(a);
             result = call(node, object, result, argNode);
-            object = null;
+            object = result;
         }
         return result;
     }
@@ -1416,13 +1416,9 @@ public class Interpreter extends ParserVisitor {
     protected Object visit(ASTFunctionNode node, Object data) {
         int argc = node.jjtGetNumChildren();
         if (argc == 2) {
-            Object namespace = resolveNamespace(null, node);
-            if (namespace == null) {
-                namespace = context;
-            }
             ASTIdentifier functionNode = (ASTIdentifier) node.jjtGetChild(0);
             ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
-            return call(node, namespace, functionNode, argNode);
+            return call(node, context, functionNode, argNode);
         } else {
             // objectNode 0 is the prefix
             String prefix = ((ASTIdentifier) node.jjtGetChild(0)).getName();
@@ -1438,33 +1434,40 @@ public class Interpreter extends ParserVisitor {
      * Concatenate arguments in call(...).
      * <p>When target == context, we are dealing with a global namespace function call
      * @param target    the pseudo-method owner, first to-be argument
-     * @param args the other arguments
+     * @param narrow    whether we should attempt to narrow number arguments
+     * @param args      the other (non null) arguments
      * @return the arguments array
      */
-    private Object[] functionArguments(Object target, Object[] args) {
-        if (args == null) {
-            return new Object[]{target};
-        }
-        if (context == target) {
+    private Object[] functionArguments(Object target, boolean narrow, Object[] args) {
+        // when target == context, we are dealing with the null namespace
+        if (target == null || target == context) {
+            if (narrow) {
+                arithmetic.narrowArguments(args);
+            }
             return args;
         }
+        // makes target 1st args, copy others - optionally narrow numbers
         Object[] nargv = new Object[args.length + 1];
-        nargv[0] = target;
-        System.arraycopy(args, 0, nargv, 1, args.length);
+        if (narrow) {
+            nargv[0] = functionArgument(true, target);
+            for(int a = 1; a <= args.length; ++a) {
+                nargv[a] = functionArgument(true, args[a - 1]);
+            }
+        } else {
+            nargv[0] = target;
+            System.arraycopy(args, 0, nargv, 1, args.length);
+        }
         return nargv;
     }
 
     /**
-     * Narrow arguments in call(...).
-     * @param narrow predicate
-     * @param args the arguments to narrow
-     * @return the narrowed arguments (or the original ones)
+     * Optionally narrows an argument for a function call.
+     * @param narrow whether narrowing should occur
+     * @param arg the argument
+     * @return the narrowed argument
      */
-    private Object[] narrowArguments(boolean narrow, Object[] args) {
-        if (narrow) {
-            arithmetic.narrowArguments(args);
-        }
-        return args;
+    private Object functionArgument(boolean narrow, Object arg) {
+       return narrow && arg instanceof Number ? arithmetic.narrow((Number) arg) : arg;
     }
 
     /**
@@ -1494,7 +1497,7 @@ public class Interpreter extends ParserVisitor {
          * @return the method invocation result (or JexlEngine.TRY_FAILED)
          */
         protected Object tryInvoke(Interpreter ii, String name, Object target, Object[] args) {
-            return me.tryInvoke(name, target, ii.narrowArguments(narrow, args));
+            return me.tryInvoke(name, target, ii.functionArguments(null, narrow, args));
         }
     }
 
@@ -1513,8 +1516,7 @@ public class Interpreter extends ParserVisitor {
 
         @Override
         protected Object tryInvoke(Interpreter ii, String name, Object target, Object[] args) {
-            Object[] nargs = ii.functionArguments(target, args);
-            return me.tryInvoke(name, ii.arithmetic, ii.narrowArguments(narrow, nargs));
+            return me.tryInvoke(name, ii.arithmetic, ii.functionArguments(target, narrow, args));
         }
     }
     /**
@@ -1532,8 +1534,7 @@ public class Interpreter extends ParserVisitor {
 
         @Override
         protected Object tryInvoke(Interpreter ii, String name, Object target, Object[] args) {
-            Object[] nargs = ii.functionArguments(target, args);
-            return me.tryInvoke(name, ii.context, ii.narrowArguments(narrow, nargs));
+            return me.tryInvoke(name, ii.context, ii.functionArguments(target, narrow, args));
         }
     }
 
@@ -1558,12 +1559,11 @@ public class Interpreter extends ParserVisitor {
         if (isCancelled()) {
             throw new JexlException.Cancel(node);
         }
-        JexlException xjexl;
         // evaluate the arguments
         Object[] argv = visit(argNode, null);
         // get the method name if identifier
-        String methodName = null;
-        int symbol = -1;
+        final int symbol;
+        final String methodName;
         if (functor instanceof ASTIdentifier) {
             ASTIdentifier methodIdentifier = (ASTIdentifier) functor;
             symbol = methodIdentifier.getSymbol();
@@ -1571,26 +1571,56 @@ public class Interpreter extends ParserVisitor {
             functor = null;
         } else if (functor instanceof ASTIdentifierAccess) {
             methodName = ((ASTIdentifierAccess) functor).getName();
+            symbol = -1;
             functor = null;
+        } else if (functor != null) {
+            symbol = -2;
+            methodName = null;
+        } else {
+            return unsolvableMethod(node, "?");
         }
+        // at this point, either the functor is a non null (hopefully) 'invocable' object or we do have the methodName
+        JexlException xjexl;
+        Object caller = target;
         try {
             boolean cacheable = cache;
-            // attempt to reuse last funcall cached in volatile JexlNode.value
-            if (cache) {
-                Object cached = node.jjtGetValue();
-                if (cached instanceof Funcall) {
-                    Object eval = ((Funcall) cached).tryInvoke(this, methodName, target, argv);
-                    if (JexlEngine.TRY_FAILED != eval) {
-                        return eval;
+            // do we have  a method/function name ?
+            if (methodName != null) {
+                // is it a global or local variable ?
+                if (target == context) {
+                    boolean isavar = true;
+                    if (symbol >= 0) {
+                        functor = frame.get(symbol);
+                    } else if (context.has(methodName)) {
+                        functor = context.get(methodName);
+                    } else {
+                        isavar = false;
+                    }
+                    // name is a variable, must be a functor, cant be cached
+                    if (isavar) {
+                        if (functor == null) {
+                            return unsolvableMethod(node, methodName);
+                        }
+                        cacheable = false;
+                    }
+                }
+                // attempt to reuse last funcall cached in volatile JexlNode.value (if it was not a variable)
+                if (cacheable) {
+                    Object cached = node.jjtGetValue();
+                    if (cached instanceof Funcall) {
+                        Object eval = ((Funcall) cached).tryInvoke(this, methodName, target, argv);
+                        if (JexlEngine.TRY_FAILED != eval) {
+                            return eval;
+                        }
                     }
                 }
             }
             boolean narrow = false;
             JexlMethod vm = null;
             Funcall funcall = null;
-            // pseudo loop and a half
+            // pseudo loop and a half to try acquiring methods without and with argument narrowing
             while (true) {
-                if (methodName != null) {
+                if (functor == null) {
                     // try a method
                     vm = uberspect.getMethod(target, methodName, argv);
                     if (vm != null) {
@@ -1599,12 +1629,17 @@ public class Interpreter extends ParserVisitor {
                         }
                         break;
                     }
-                }
-                // could not find a method, try as a var (local, global) or property (performed once)
-                if (functor == null && !narrow) {
-                    if (symbol >= 0) {
-                        functor = frame.get(symbol);
-                    } else {
+                    // solve 'null' namespace
+                    if (target == context) {
+                        Object namespace = resolveNamespace(null, node);
+                        if (namespace != null) {
+                            target = namespace;
+                            caller = null;
+                            continue;
+                        }
+                    }
+                    // could not find a method, try as a property of a non-context target (performed once)
+                    else if (!narrow) {
                         // the method may be a functor stored in a property of the target
                         JexlPropertyGet get = uberspect.getPropertyGet(target, methodName);
                         if (get != null) {
@@ -1628,9 +1663,9 @@ public class Interpreter extends ParserVisitor {
                     }
                 }
                 // try JexlArithmetic or JexlContext function
-                if (methodName != null) {
-                    // when target == context, we are dealing with a global namespace function call
-                    Object[] nargv = functionArguments(target, argv);
+                else {
+                    // no need to narrow since this has been performed in previous loop
+                    Object[] nargv = functionArguments(caller, narrow, argv);
                     vm = uberspect.getMethod(context, methodName, nargv);
                     if (vm != null) {
                         argv = nargv;
