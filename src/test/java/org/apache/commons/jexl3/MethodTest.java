@@ -579,4 +579,72 @@ public class MethodTest extends JexlTestCase {
         o = bar.execute(context);
         Assert.assertEquals("Wrong choice", "champaign", o);
     }
+
+    public static class ZArithmetic extends JexlArithmetic {
+        public ZArithmetic(boolean astrict) {
+            super(astrict);
+        }
+
+        public int zzzz(int z) {
+            return 38 + z;
+        }
+    }
+
+    public static class ZSpace {
+        public int zzz(int z) {
+            return 39 + z;
+        }
+    }
+
+    public static class ZContext extends MapContext {
+        public ZContext(Map<String,Object> map) {
+            super(map);
+        }
+
+        public int zz(int z) {
+            return 40 + z;
+        }
+
+        public int z(int z) {
+            return 181 + z;
+        }
+    }
+
+    @Test
+    public void testVariousFunctionLocation() throws Exception {
+        // see JEXL-190
+        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String,Object> funcs = new HashMap<String,Object>();
+        funcs.put(null, new ZSpace());
+        JexlEngine jexl = new JexlBuilder().namespaces(funcs).arithmetic(new ZArithmetic(true)).create();
+
+        JexlContext zjc = new ZContext(vars); // that implements a z(int x) function
+        String z41 = "z(41)";
+        JexlScript callz41 = jexl.createScript(z41);
+        Object onovar = callz41.execute(zjc);
+        Assert.assertEquals(222, onovar);
+
+        // override z() with global var
+        JexlScript z241 = jexl.createScript("(x)->{ return x + 241}");
+        vars.put("z", z241);
+        Object oglobal = callz41.execute(zjc);
+        Assert.assertEquals(282, oglobal);
+        // clear global and execute again
+        vars.remove("z");
+        onovar = callz41.execute(zjc);
+        Assert.assertEquals(222, onovar);
+
+        // override z() with local var
+        String slocal = "var z = (x)->{ return x + 141}; z(1)";
+        JexlScript jlocal = jexl.createScript(slocal);
+        Object olocal = jlocal.execute(zjc);
+        Assert.assertEquals(142, olocal);
+
+        // and now try the context, the null namespace and the arithmetic
+        Assert.assertEquals(42, jexl.createScript("zz(2)").execute(zjc));
+        Assert.assertEquals(42, jexl.createScript("zzz(3)").execute(zjc));
+        Assert.assertEquals(42, jexl.createScript("zzzz(4)").execute(zjc));
+    }
+
+
 }

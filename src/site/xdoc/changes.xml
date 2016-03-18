@@ -29,6 +29,9 @@
             <action dev="henrib" type="fix" issue="JEXL-191" due-to="Constantin Mitocaru">
                 Jexl3 unsolvable property exception when using enum
             </action>
+            <action dev="henrib" type="fix" issue="JEXL-190" due-to="Dmitri Blinov">
+                local function within context is not resolved if function resolver class without namespace is specified
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-189" due-to="Dmitri Blinov">
                 Possible bug in Interpreter.isCancelled()
             </action>
