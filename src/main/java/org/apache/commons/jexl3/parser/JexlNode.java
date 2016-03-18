@@ -62,22 +62,24 @@ public abstract class JexlNode extends SimpleNode {
      * @return the info
      */
     public JexlInfo jexlInfo() {
+        JexlInfo info = null;
         JexlNode node = this;
         while (node != null) {
             if (node.jjtGetValue() instanceof JexlInfo) {
-                JexlInfo info = (JexlInfo) node.jjtGetValue();
-                if (lc >= 0) {
-                    int c = lc & 0xfff;
-                    int l = lc >> 0xc;
-                    return info.at(l, c);
-                } else {
-                    // weird though; no jjSetFirstToken(...) ever called?
-                    return info;
-                }
+                info = (JexlInfo) node.jjtGetValue();
+                break;
             }
             node = node.jjtGetParent();
         }
-        return null;
+        if (lc >= 0) {
+            int c = lc & 0xfff;
+            int l = lc >> 0xc;
+            // at least an info with line/column number
+            return info != null? info.at(l, c) : new JexlInfo(null, l, c);
+        } else {
+            // weird though; no jjSetFirstToken(...) ever called?
+            return info;
+        }
     }
 
     /**
