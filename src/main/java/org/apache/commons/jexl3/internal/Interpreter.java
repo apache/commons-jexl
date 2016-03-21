@@ -1637,9 +1637,8 @@ public class Interpreter extends ParserVisitor {
                             caller = null;
                             continue;
                         }
-                    }
                     // could not find a method, try as a property of a non-context target (performed once)
-                    else if (!narrow) {
+                    } else if (!narrow) {
                         // the method may be a functor stored in a property of the target
                         JexlPropertyGet get = uberspect.getPropertyGet(target, methodName);
                         if (get != null) {
@@ -1661,9 +1660,8 @@ public class Interpreter extends ParserVisitor {
                     if (vm != null) {
                         return vm.invoke(functor, argv);
                     }
-                }
                 // try JexlArithmetic or JexlContext function
-                else {
+                } else {
                     // no need to narrow since this has been performed in previous loop
                     Object[] nargv = functionArguments(caller, narrow, argv);
                     vm = uberspect.getMethod(context, methodName, nargv);
