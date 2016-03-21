@@ -424,7 +424,7 @@ public class Uberspect implements JexlUberspect {
         /** The arithmetic instance being analyzed. */
         private final JexlArithmetic arithmetic;
         /** The set of overloaded operators. */
-        private final EnumSet<JexlOperator> overloads;
+        private final Set<JexlOperator> overloads;
 
         /**
          * Creates an instance.
@@ -433,11 +433,7 @@ public class Uberspect implements JexlUberspect {
          */
         private ArithmeticUberspect(JexlArithmetic theArithmetic, Set<JexlOperator> theOverloads) {
             this.arithmetic = theArithmetic;
-            this.overloads = theOverloads == null || theOverloads.isEmpty()
-                             ? EnumSet.noneOf(JexlOperator.class)
-                             : EnumSet.copyOf(theOverloads);
-            // register this arithmetic class in the operator map
-            operatorMap.put(arithmetic.getClass(), overloads);
+            this.overloads = theOverloads;
         }
 
         @Override
@@ -460,7 +456,8 @@ public class Uberspect implements JexlUberspect {
     public JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic) {
         JexlArithmetic.Uberspect jau = null;
         if (arithmetic != null) {
-            Set<JexlOperator> ops = operatorMap.get(arithmetic.getClass());
+            final Class<? extends JexlArithmetic> aclass = arithmetic.getClass();
+            Set<JexlOperator> ops = operatorMap.get(aclass);
             if (ops == null) {
                 ops = EnumSet.noneOf(JexlOperator.class);
                 for (JexlOperator op : JexlOperator.values()) {
@@ -484,6 +481,8 @@ public class Uberspect implements JexlUberspect {
                         }
                     }
                 }
+                // register this arithmetic class in the operator map
+                operatorMap.put(aclass, ops);
             }
             jau = new ArithmeticUberspect(arithmetic, ops);
         }
