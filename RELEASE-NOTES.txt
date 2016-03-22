@@ -1,6 +1,6 @@
 
                             Apache Commons JEXL
-                                Version 3.0
+                               Version 3.0.1
                                Release Notes
 
 
@@ -17,6 +17,26 @@ Its goal is to expose scripting features usable by technical operatives or consu
 
 
   http://commons.apache.org/jexl/
+
+
+========================================================================================================================
+Release 3.0.1
+========================================================================================================================
+
+Version 3.0.1 is a micro release to fix issues detected so far in 3.0:
+
+Bugs Fixed in 3.0.1:
+====================
+
+* JEXL-192:     Invalid return type when expected result is null
+* JEXL-191:     Jexl3 unsolvable property exception when using enum
+* JEXL-190:     local function within context is not resolved if function resolver class without namespace is specified
+* JEXL-189:     Possible bug in Interpreter.isCancelled()
+* JEXL-188:     Possible bug in JexlArithmetic.isFloatingPointNumber()
+* JEXL-187:     Jexl Syntax doc does not mention 'continue' and 'break' operators
+* JEXL-186:     Performance regression in arithmetic operations compared to JEXL 2.1
+
+There are no other changes.
 
 
 ========================================================================================================================
