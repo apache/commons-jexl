@@ -64,7 +64,7 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-48: bad assignment detection
     public static class Another {
         public String name = "whatever";
-        private Boolean foo = Boolean.TRUE;
+        private final Boolean foo = Boolean.TRUE;
 
         public Boolean foo() {
             return foo;
@@ -76,7 +76,7 @@ public class IssuesTest extends JexlTestCase {
     }
 
     public static class Foo {
-        private Another inner;
+        private final Another inner;
 
         Foo() {
             inner = new Another();
@@ -118,15 +118,15 @@ public class IssuesTest extends JexlTestCase {
 
         JexlExpression expr = jexl.createExpression("true//false\n");
         Object value = expr.evaluate(ctxt);
-        Assert.assertTrue("should be true", ((Boolean) value).booleanValue());
+        Assert.assertTrue("should be true", (Boolean) value);
 
         expr = jexl.createExpression("/*true*/false");
         value = expr.evaluate(ctxt);
-        Assert.assertFalse("should be false", ((Boolean) value).booleanValue());
+        Assert.assertFalse("should be false", (Boolean) value);
 
         expr = jexl.createExpression("/*\"true\"*/false");
         value = expr.evaluate(ctxt);
-        Assert.assertFalse("should be false", ((Boolean) value).booleanValue());
+        Assert.assertFalse("should be false", (Boolean) value);
     }
 
     // JEXL-42: NullPointerException evaluating an expression
@@ -170,7 +170,7 @@ public class IssuesTest extends JexlTestCase {
 
         JexlExpression expr = jexl.createExpression("derived.foo()");
         Object value = expr.evaluate(ctxt);
-        Assert.assertTrue("should be true", ((Boolean) value).booleanValue());
+        Assert.assertTrue("should be true", (Boolean) value);
     }
 
     // JEXL-52: can be implemented by deriving Interpreter.{g,s}etAttribute; later
@@ -891,12 +891,12 @@ public class IssuesTest extends JexlTestCase {
 
     @Test
     public void test144a() throws Exception {
-        JexlEngine JEXL = new Engine();
+        JexlEngine jexl = new Engine();
         JexlContext jc = new MapContext();
         jc.set("quuxClass", Quux144.class);
-        JexlExpression create = JEXL.createExpression("quux = new(quuxClass)");
-        JexlExpression assignArray = JEXL.createExpression("quux.arr = [ 'hello', 'world' ]");
-        JexlExpression checkArray = JEXL.createExpression("quux.arr");
+        JexlExpression create = jexl.createExpression("quux = new(quuxClass)");
+        JexlExpression assignArray = jexl.createExpression("quux.arr = [ 'hello', 'world' ]");
+        JexlExpression checkArray = jexl.createExpression("quux.arr");
 
         // test with a string
         Quux144 quux = (Quux144) create.evaluate(jc);
@@ -909,14 +909,14 @@ public class IssuesTest extends JexlTestCase {
         Assert.assertEquals("The array elements are equal", Arrays.asList("hello", "world"), Arrays.asList((String[]) o));
 
         // test with a null array
-        assignArray = JEXL.createExpression("quux.arr = null");
+        assignArray = jexl.createExpression("quux.arr = null");
         o = assignArray.evaluate(jc);
         Assert.assertNull("Result is not null", o);
         o = checkArray.evaluate(jc);
         Assert.assertNull("Result is not null", o);
 
         // test with an empty array
-        assignArray = JEXL.createExpression("quux.arr = [ ]");
+        assignArray = jexl.createExpression("quux.arr = [ ]");
         o = assignArray.evaluate(jc);
         Assert.assertNotNull("Result is null", o);
         o = checkArray.evaluate(jc);
@@ -926,7 +926,7 @@ public class IssuesTest extends JexlTestCase {
         // test with an empty array on the overloaded setter for different types.
         // so, the assignment should fail with logging 'The ambiguous property, arr2, should have failed.'
         try {
-            assignArray = JEXL.createExpression("quux.arr2 = [ ]");
+            assignArray = jexl.createExpression("quux.arr2 = [ ]");
             o = assignArray.evaluate(jc);
             Assert.fail("The arr2 property shouldn't be set due to its ambiguity (overloaded setters with different types).");
         } catch (JexlException.Property e) {
@@ -943,10 +943,10 @@ public class IssuesTest extends JexlTestCase {
             "var x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x['one']"// result to null?
         };
 
-        JexlEngine JEXL = new Engine();
+        JexlEngine jexl = new Engine();
         JexlContext jc = new MapContext();
         for (String s : scripts) {
-            Object o = JEXL.createScript(s).execute(jc);
+            Object o = jexl.createScript(s).execute(jc);
             Assert.assertEquals(1, o);
         }
     }
@@ -959,10 +959,10 @@ public class IssuesTest extends JexlTestCase {
             "x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x['one']",
             "var x = new ('java.util.HashMap'); x.one = 1; x.two = 2; x['one']"
         };
-        JexlEngine JEXL = new Engine();
+        JexlEngine jexl = new Engine();
         for (String s : scripts) {
             JexlContext jc = new MapContext();
-            Object o = JEXL.createScript(s).execute(jc);
+            Object o = jexl.createScript(s).execute(jc);
             Assert.assertEquals(1, o);
         }
     }
@@ -974,8 +974,8 @@ public class IssuesTest extends JexlTestCase {
                 + "  var y = \"A comment\";\n"
                 + "}";
         try {
-            JexlEngine JEXL = new Engine();
-            JexlScript s = JEXL.createScript(str);
+            JexlEngine jexl = new Engine();
+            JexlScript s = jexl.createScript(str);
         } catch (JexlException.Parsing xparse) {
             throw xparse;
         }
@@ -987,8 +987,8 @@ public class IssuesTest extends JexlTestCase {
                 + "  var x = \"A comment\";\n"
                 + "}";
         try {
-            JexlEngine JEXL = new Engine();
-            JexlScript s = JEXL.createScript(str);
+            JexlEngine jexl = new Engine();
+            JexlScript s = jexl.createScript(str);
         } catch (JexlException.Parsing xparse) {
             throw xparse;
         }
@@ -1000,8 +1000,8 @@ public class IssuesTest extends JexlTestCase {
     public void test5115c() throws Exception {
         URL testUrl = new File(TESTA).toURI().toURL();
         try {
-            JexlEngine JEXL = new Engine();
-            JexlScript s = JEXL.createScript(testUrl);
+            JexlEngine jexl = new Engine();
+            JexlScript s = jexl.createScript(testUrl);
         } catch (JexlException.Parsing xparse) {
             throw xparse;
         }
@@ -1120,6 +1120,47 @@ public class IssuesTest extends JexlTestCase {
         Object o = e.execute(jc);
         Assert.assertTrue(o instanceof Set);
         Assert.assertTrue(((Set) o).contains(1));
+    }
+
+    public static class C192 {
+        public C192() {}
+
+       public static Integer callme(Integer n) {
+           if (n == null) {
+               return null;
+           } else {
+               return n >= 0? 42 : -42;
+           }
+       }
+
+       public static Object kickme() {
+           return C192.class;
+       }
+    }
+
+    @Test
+    public void test192() throws Exception {
+        JexlContext jc = new MapContext();
+        jc.set("x.y.z",  C192.class);
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlExpression js0 = jexl.createExpression("x.y.z.callme(t)");
+        jc.set("t", null);
+        Assert.assertNull(js0.evaluate(jc));
+        jc.set("t", 10);
+        Assert.assertEquals(42, js0.evaluate(jc));
+        jc.set("t", -10);
+        Assert.assertEquals(-42, js0.evaluate(jc));
+        jc.set("t", null);
+        Assert.assertNull(js0.evaluate(jc));
+        js0 = jexl.createExpression("x.y.z.kickme().callme(t)");
+        jc.set("t", null);
+        Assert.assertNull(js0.evaluate(jc));
+        jc.set("t", 10);
+        Assert.assertEquals(42, js0.evaluate(jc));
+        jc.set("t", -10);
+        Assert.assertEquals(-42, js0.evaluate(jc));
+        jc.set("t", null);
+        Assert.assertNull(js0.evaluate(jc));
     }
 //
 //
