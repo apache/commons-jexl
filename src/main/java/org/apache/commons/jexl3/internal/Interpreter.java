@@ -1126,8 +1126,12 @@ public class Interpreter extends ParserVisitor {
         main:
         for (int c = 0; c < numChildren; c++) {
             objectNode = node.jjtGetChild(c);
-            if (objectNode instanceof ASTMethodNode && object == null) {
-                break;
+            if (objectNode instanceof ASTMethodNode) {
+                if (object == null) {
+                    break;
+                } else {
+                    antish = false;
+                }
             }
             // attempt to evaluate the property within the object (visit(ASTIdentifierAccess node))
             object = objectNode.jjtAccept(this, object);
