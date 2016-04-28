@@ -20,7 +20,6 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.JexlNode;
 
-import java.util.concurrent.Callable;
 
 /**
  * A Script closure.
@@ -125,23 +124,16 @@ public class Closure extends Script {
     }
 
     @Override
-    public Callable<Object> callable(JexlContext context, Object... args) {
+    public Callable callable(JexlContext context, Object... args) {
         Scope.Frame local = null;
         if (frame != null) {
             local = frame.assign(args);
         }
-        final Interpreter interpreter = jexl.createInterpreter(context, local);
-        return new Callable<Object>() {
-            /** Use interpreter as marker for not having run. */
-            private Object result = interpreter;
-
+        return new Callable(jexl.createInterpreter(context, local)) {
             @Override
-            public Object call() throws Exception {
-                if (result == interpreter) {
-                    JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
-                    result = interpreter.interpret(block);
-                }
-                return result;
+            public Object interpret() {
+                JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
+                return interpreter.interpret(block);
             }
         };
     }

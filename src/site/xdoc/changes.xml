@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.0.1" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-193" due-to="Dmitri Blinov">
+                InterruptedException is swallowed in function call in silent and non-strict mode
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-192" due-to="Constantin Mitocaru">
                 Invalid return type when expected result is null
             </action>

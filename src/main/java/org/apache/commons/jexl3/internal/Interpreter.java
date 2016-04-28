@@ -200,14 +200,17 @@ public class Interpreter extends ParserVisitor {
             }
             return node.jjtAccept(this, null);
         } catch (JexlException.Return xreturn) {
-            Object value = xreturn.getValue();
-            return value;
-        } catch (JexlException xjexl) {
-            if (silent) {
-                logger.warn(xjexl.getMessage(), xjexl.getCause());
-                return null;
+            return xreturn.getValue();
+        } catch (JexlException.Cancel xcancel) {
+            cancelled |= Thread.interrupted();
+            if (!silent && strictEngine) {
+                throw xcancel.clean();
             }
-            throw xjexl.clean();
+        } catch (JexlException xjexl) {
+            if (!silent) {
+                throw xjexl.clean();
+            }
+            logger.warn(xjexl.getMessage(), xjexl.getCause());
         } finally {
             if (functors != null && AUTOCLOSEABLE != null) {
                 for (Object functor : functors.values()) {
@@ -225,6 +228,7 @@ public class Interpreter extends ParserVisitor {
                 jexl.putThreadLocal(local);
             }
         }
+        return null;
     }
 
     /** Java7 AutoCloseable interface defined?. */
@@ -336,21 +340,51 @@ public class Interpreter extends ParserVisitor {
         if (!silent) {
             logger.warn(xjexl.getMessage(), xjexl.getCause());
         }
-        if (strictEngine || xjexl instanceof JexlException.Return) {
+        if (strictEngine
+            || xjexl instanceof JexlException.Return
+            || xjexl instanceof JexlException.Cancel) {
             throw xjexl;
         }
         return null;
     }
 
     /**
-     * Checks whether this interpreter execution was cancelled due to thread interruption.
-     * @return true if cancelled, false otherwise
+     * Wraps an exception thrown by an invocation.
+     * @param node the node triggering the exception
+     * @param methodName the method/function name
+     * @param xany the cause
+     * @return a JexlException
+     */
+    protected JexlException invocationException(JexlNode node, String methodName, Exception xany) {
+        Throwable cause = xany.getCause();
+        if (cause instanceof JexlException) {
+            throw (JexlException) cause;
+        }
+        if (cause instanceof InterruptedException) {
+            cancelled = true;
+            return new JexlException.Cancel(node);
+        }
+        return new JexlException(node, methodName, xany);
+    }
+
+    /**
+     * Checks whether this interpreter execution was canceled due to thread interruption.
+     * @return true if canceled, false otherwise
      */
     protected boolean isCancelled() {
-        if (cancelled || Thread.currentThread().isInterrupted()) {
-            cancelled = true;
-        }
-        return cancelled;
+         if (!cancelled) {
+             cancelled = Thread.currentThread().isInterrupted();
+         }
+         return cancelled;
+    }
+
+    /**
+     * Cancels this evaluation, setting the cancel flag that will result in a JexlException.Cancel to be thrown.
+     * @return true in all cases
+     */
+    protected boolean cancel() {
+         cancelled = true;
+         return cancelled;
     }
 
     /**
@@ -722,6 +756,9 @@ public class Interpreter extends ParserVisitor {
         int numChildren = node.jjtGetNumChildren();
         Object result = null;
         for (int i = 0; i < numChildren; i++) {
+            if (isCancelled()) {
+                throw new JexlException.Cancel(node);
+            }
             result = node.jjtGetChild(i).jjtAccept(this, data);
         }
         return result;
@@ -897,6 +934,9 @@ public class Interpreter extends ParserVisitor {
         if (ab != null) {
             boolean extended = false;
             for (int i = 0; i < childCount; i++) {
+                if (isCancelled()) {
+                    throw new JexlException.Cancel(node);
+                }
                 JexlNode child = node.jjtGetChild(i);
                 if (child instanceof ASTExtendedLiteral) {
                     extended = true;
@@ -922,6 +962,9 @@ public class Interpreter extends ParserVisitor {
         JexlArithmetic.SetBuilder mb = arithmetic.setBuilder(childCount);
         if (mb != null) {
             for (int i = 0; i < childCount; i++) {
+                if (isCancelled()) {
+                    throw new JexlException.Cancel(node);
+                }
                 Object entry = node.jjtGetChild(i).jjtAccept(this, data);
                 mb.add(entry);
             }
@@ -937,6 +980,9 @@ public class Interpreter extends ParserVisitor {
         JexlArithmetic.MapBuilder mb = arithmetic.mapBuilder(childCount);
         if (mb != null) {
             for (int i = 0; i < childCount; i++) {
+                if (isCancelled()) {
+                    throw new JexlException.Cancel(node);
+                }
                 Object[] entry = (Object[]) (node.jjtGetChild(i)).jjtAccept(this, data);
                 mb.put(entry[0], entry[1]);
             }
@@ -1016,6 +1062,9 @@ public class Interpreter extends ParserVisitor {
             for (int i = 0; i < numChildren; i++) {
                 JexlNode child = node.jjtGetChild(i);
                 result = child.jjtAccept(this, data);
+                if (isCancelled()) {
+                    throw new JexlException.Cancel(child);
+                }
             }
             return result;
         }
@@ -1067,6 +1116,9 @@ public class Interpreter extends ParserVisitor {
                 return null;
             }
             Object index = nindex.jjtAccept(this, null);
+            if (isCancelled()) {
+                throw new JexlException.Cancel(node);
+            }
             object = getAttribute(object, index, nindex);
         }
         return object;
@@ -1135,6 +1187,9 @@ public class Interpreter extends ParserVisitor {
             }
             // attempt to evaluate the property within the object (visit(ASTIdentifierAccess node))
             object = objectNode.jjtAccept(this, object);
+            if (isCancelled()) {
+                throw new JexlException.Cancel(node);
+            }
             if (object != null) {
                 // disallow mixing antish variable & bean with same root; avoid ambiguity
                 antish = false;
@@ -1710,7 +1765,7 @@ public class Interpreter extends ParserVisitor {
         } catch (JexlException.Method xmethod) {
             throw xmethod;
         } catch (Exception xany) {
-            xjexl = new JexlException(node, methodName, xany);
+            xjexl = invocationException(node, methodName, xany);
         }
         return invocationFailed(xjexl);
     }
@@ -1763,7 +1818,7 @@ public class Interpreter extends ParserVisitor {
             throw xmethod;
         } catch (Exception xany) {
             String dbgStr = cobject != null ? cobject.toString() : null;
-            xjexl = new JexlException(node, dbgStr, xany);
+            xjexl = invocationException(node, dbgStr, xany);
         }
         return invocationFailed(xjexl);
     }
