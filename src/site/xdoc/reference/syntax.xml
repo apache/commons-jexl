@@ -638,6 +638,25 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Side-effect operators</td>
+                    <td>
+                        Some operators exist in side-effect forms.
+                        Their default behavior is to execute the operator and assign the left hand side with the result.
+                        For instance <code>a += 2</code> is equivalent to <code>a = a + 2</code>
+                        The list of operators is:
+                        <ul>
+                            <li>+=</li>
+                            <li>-=</li>
+                            <li>*=</li>
+                            <li>/=</li>
+                            <li>%=</li>
+                            <li>&amp;=</li>
+                            <li>|=</li>
+                            <li>^=</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
                     <td>Negation</td>
                     <td>
                         The unary <code>-</code> operator is used.
@@ -653,7 +672,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>HashMap access</td>
+                    <td>Map access</td>
                     <td>
                         Map elements are accessed using square brackets, e.g.
                         <source>map[0]; map['name']; map[var];</source>
