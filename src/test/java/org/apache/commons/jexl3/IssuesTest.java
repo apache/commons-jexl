@@ -1123,25 +1123,26 @@ public class IssuesTest extends JexlTestCase {
     }
 
     public static class C192 {
-        public C192() {}
+        public C192() {
+        }
 
-       public static Integer callme(Integer n) {
-           if (n == null) {
-               return null;
-           } else {
-               return n >= 0? 42 : -42;
-           }
-       }
+        public static Integer callme(Integer n) {
+            if (n == null) {
+                return null;
+            } else {
+                return n >= 0 ? 42 : -42;
+            }
+        }
 
-       public static Object kickme() {
-           return C192.class;
-       }
+        public static Object kickme() {
+            return C192.class;
+        }
     }
 
     @Test
     public void test192() throws Exception {
         JexlContext jc = new MapContext();
-        jc.set("x.y.z",  C192.class);
+        jc.set("x.y.z", C192.class);
         JexlEngine jexl = new JexlBuilder().create();
         JexlExpression js0 = jexl.createExpression("x.y.z.callme(t)");
         jc.set("t", null);
@@ -1162,58 +1163,4 @@ public class IssuesTest extends JexlTestCase {
         jc.set("t", null);
         Assert.assertNull(js0.evaluate(jc));
     }
-//
-//
-//	@Test
-//	public void testUnderscoreInName() {
-//        JexlEngine jexl = new Engine();
-//        String jexlExp = "(x.length_mm * x.width)";
-//        JexlExpression e = jexl.createExpression( jexlExp );
-//        JexlContext jc = new MapContext();
-//
-//        LazyDynaMap object = new LazyDynaMap();
-//        object.set("length_mm", "10.0");
-//        object.set("width", "5.0");
-//
-//        jc.set("x", object );
-//
-//	    Assert.assertEquals(null, ((Double)e.evaluate(jc)).doubleValue(), 50d, 0d);
-//   }
-//
-//	@Test
-//	public void testFullStopInName() {
-//        JexlEngine jexl = new Engine();
-//        String jexlExp = "(x.length.mm * x.width)";
-//        JexlExpression e = jexl.createExpression( jexlExp );
-//        JexlContext jc = new MapContext();
-//
-//        LazyDynaMap object = new LazyDynaMap();
-//        object.set("length.mm", "10.0");
-//        object.set("width", "5.0");
-//
-//        Assert.assertEquals(null, object.get("length.mm"), "10.0");
-//
-//        jc.set("x", object );
-//
-//	    Assert.assertEquals(null, ((Double)e.evaluate(jc)).doubleValue(), 50d, 0d);
-//	}
-//
-//	@Test
-//	public void testFullStopInNameMakingSubObject() {
-//        JexlEngine jexl = new Engine();
-//        String jexlExp = "(x.length.mm * x.width)";
-//        JexlExpression e = jexl.createExpression( jexlExp );
-//        JexlContext jc = new MapContext();
-//
-//        LazyDynaMap object = new LazyDynaMap();
-//        LazyDynaMap subObject = new LazyDynaMap();
-//        object.set("length", subObject);
-//        subObject.set("mm", "10.0");
-//        object.set("width", "5.0");
-//
-//        jc.set("x", object );
-//
-//	    Assert.assertEquals(null, ((Double)e.evaluate(jc)).doubleValue(), 50d, 0d);
-//	}
-
 }

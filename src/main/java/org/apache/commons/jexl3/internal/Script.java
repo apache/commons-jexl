@@ -26,7 +26,6 @@ import org.apache.commons.jexl3.parser.JexlNode;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 /**
  * <p>A JexlScript implementation.</p>
@@ -322,7 +321,7 @@ public class Script implements JexlScript, JexlExpression {
      * @return the callable
      */
     @Override
-    public Callable<Object> callable(JexlContext context) {
+    public Callable callable(JexlContext context) {
         return callable(context, (Object[]) null);
     }
 
@@ -335,20 +334,45 @@ public class Script implements JexlScript, JexlExpression {
      * @return the callable
      */
     @Override
-    public Callable<Object> callable(JexlContext context, Object... args) {
-        final Interpreter interpreter = jexl.createInterpreter(context, script.createFrame(args));
-        return new Callable<Object>() {
-            /** Use interpreter as marker for not having run. */
-            private Object result = interpreter;
+    public Callable callable(JexlContext context, Object... args) {
+        return new Callable(jexl.createInterpreter(context, script.createFrame(args)));
+    }
 
-            @Override
-            public Object call() throws Exception {
+    /**
+     * Implements the Future and Callable interfaces to help delegation.
+     */
+    public class Callable implements java.util.concurrent.Callable<Object> {
+        /** The actual interpreter. */
+        protected final Interpreter interpreter;
+        /** Use interpreter as marker for not having run. */
+        protected Object result;
+
+        /**
+         * The base constructor.
+         * @param intrprtr the interpreter to use
+         */
+        protected Callable(Interpreter intrprtr) {
+            this.interpreter = intrprtr;
+            this.result = intrprtr;
+        }
+
+        /**
+         * Run the interpreter.
+         * @return the evaluation result
+         */
+        protected Object interpret() {
+            return interpreter.interpret(script);
+        }
+
+        @Override
+        public Object call() throws Exception {
+            synchronized(this) {
                 if (result == interpreter) {
                     checkCacheVersion();
-                    result = interpreter.interpret(script);
+                    result = interpret();
                 }
                 return result;
             }
-        };
+        }
     }
 }
