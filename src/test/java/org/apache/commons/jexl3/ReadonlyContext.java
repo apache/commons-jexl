@@ -66,8 +66,12 @@ public final class ReadonlyContext implements JexlContext, JexlEngine.Options {
 
     @Override
     public Boolean isStrict() {
-        // egnie
         return options == null? null : options.isStrict();
+    }
+
+    @Override
+    public Boolean isCancellable() {
+        return options == null? null : options.isCancellable();
     }
 
     @Override

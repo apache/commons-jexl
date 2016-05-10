@@ -374,5 +374,27 @@ public class Script implements JexlScript, JexlExpression {
                 return result;
             }
         }
+
+        /**
+         * Soft cancel the execution.
+         * @return true if cancel was successful, false otherwise
+         */
+        public boolean cancel() {
+            return interpreter.cancel();
+        }
+
+        /**
+         * @return true if evaluation was cancelled, false otherwise
+         */
+        public boolean isCancelled() {
+            return interpreter.isCancelled();
+        }
+
+        /**
+         * @return true if interruption will throw a JexlException.Cancel, false otherwise
+         */
+        public boolean isCancellable() {
+            return interpreter.isCancellable();
+        }
     }
 }

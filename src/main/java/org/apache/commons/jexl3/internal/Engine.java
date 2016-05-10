@@ -99,6 +99,12 @@ public class Engine extends JexlEngine {
      */
     protected final boolean silent;
     /**
+     * Whether expressions evaluated by this engine will throw JexlException.Cancel (true) or return null (false) when
+     * interrupted.
+     * Default is true when not silent and strict.
+     */
+    protected final boolean cancellable;
+    /**
      * Whether error messages will carry debugging information.
      */
     protected final boolean debug;
@@ -152,9 +158,10 @@ public class Engine extends JexlEngine {
         }
         this.logger = conf.logger() == null ? LogFactory.getLog(JexlEngine.class) : conf.logger();
         this.functions = conf.namespaces() == null ? Collections.<String, Object>emptyMap() : conf.namespaces();
-        this.silent = conf.silent() == null ? false : conf.silent();
-        this.debug = conf.debug() == null ? true : conf.debug();
         this.strict = conf.strict() == null ? true : conf.strict();
+        this.silent = conf.silent() == null ? false : conf.silent();
+        this.cancellable = conf.cancellable() == null ? !silent && strict : conf.cancellable();
+        this.debug = conf.debug() == null ? true : conf.debug();
         this.arithmetic = conf.arithmetic() == null ? new JexlArithmetic(this.strict) : conf.arithmetic();
         this.cache = conf.cache() <= 0 ? null : new SoftCache<String, ASTJexlScript>(conf.cache());
         this.cacheThreshold = conf.cacheThreshold();

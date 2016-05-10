@@ -25,6 +25,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.apache.commons.jexl3.internal.Script;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -268,22 +269,27 @@ public class ScriptCallableTest extends JexlTestCase {
 
     @Test
     public void testInterruptVerboseStrict() throws Exception {
-        runInterrupt(false, true);
+        runInterrupt(new JexlBuilder().silent(false).strict(true).create());
     }
 
     @Test
     public void testInterruptVerboseLenient() throws Exception {
-        runInterrupt(false, false);
+        runInterrupt(new JexlBuilder().silent(false).strict(false).create());
     }
 
     @Test
     public void testInterruptSilentStrict() throws Exception {
-        runInterrupt(true, true);
+        runInterrupt(new JexlBuilder().silent(true).strict(true).create());
     }
 
     @Test
     public void testInterruptSilentLenient() throws Exception {
-        runInterrupt(true, true);
+        runInterrupt(new JexlBuilder().silent(true).strict(false).create());
+    }
+
+    @Test
+    public void testInterruptCancellable() throws Exception {
+        runInterrupt(new JexlBuilder().silent(true).strict(true).cancellable(true).create());
     }
 
     /**
@@ -292,46 +298,54 @@ public class ScriptCallableTest extends JexlTestCase {
      * @param strict strict (aka not lenient) engine flag
      * @throws Exception if there is a regression
      */
-    private void runInterrupt(boolean silent, boolean strict) throws Exception {
+    private void runInterrupt(JexlEngine jexl) throws Exception {
         ExecutorService exec = Executors.newFixedThreadPool(2);
         try {
             JexlContext ctxt = new TestContext();
-            JexlEngine jexl = new JexlBuilder().silent(silent).strict(strict).create();
 
             // run an interrupt
             JexlScript sint = jexl.createScript("interrupt(); return 42");
             Object t = null;
+            Script.Callable c = (Script.Callable) sint.callable(ctxt);
             try {
-                Callable<Object> c = sint.callable(ctxt);
                 t = c.call();
+                if (c.isCancellable()) {
+                    Assert.fail("should have thrown a Cancel");
+                }
             } catch (JexlException.Cancel xjexl) {
-                if (silent || !strict) {
+                if (!c.isCancellable()) {
                     Assert.fail("should not have thrown " + xjexl);
                 }
             }
+            Assert.assertTrue(c.isCancelled());
             Assert.assertNotEquals(42, t);
 
             // self interrupt
-            Future<Object> c = null;
+            Future<Object> f = null;
+            c = (Script.Callable) sint.callable(ctxt);
             try {
-                c = exec.submit(sint.callable(ctxt));
-                t = c.get();
+                f = exec.submit(c);
+                t = f.get();
+                if (c.isCancellable()) {
+                    Assert.fail("should have thrown a Cancel");
+                }
             } catch (ExecutionException xexec) {
-                if (silent || !strict) {
+                if (!c.isCancellable()) {
                     Assert.fail("should not have thrown " + xexec);
                 }
             }
+            Assert.assertTrue(c.isCancelled());
             Assert.assertNotEquals(42, t);
 
             // timeout a sleep
             JexlScript ssleep = jexl.createScript("sleep(30000); return 42");
             try {
-                c = exec.submit(ssleep.callable(ctxt));
-                t = c.get(100L, TimeUnit.MILLISECONDS);
+                f = exec.submit(ssleep.callable(ctxt));
+                t = f.get(100L, TimeUnit.MILLISECONDS);
                 Assert.fail("should timeout");
             } catch (TimeoutException xtimeout) {
-                if (c != null) {
-                    c.cancel(true);
+                if (f != null) {
+                    f.cancel(true);
                 }
             }
             Assert.assertNotEquals(42, t);
@@ -351,7 +365,7 @@ public class ScriptCallableTest extends JexlTestCase {
                     }
                 };
                 exec.submit(cancels);
-                t = c.get();
+                t = fc.get();
                 Assert.fail("should be cancelled");
             } catch (CancellationException xexec) {
                 // this is the expected result
@@ -360,12 +374,12 @@ public class ScriptCallableTest extends JexlTestCase {
             // timeout a while(true)
             JexlScript swhile = jexl.createScript("while(true); return 42");
             try {
-                c = exec.submit(swhile.callable(ctxt));
-                t = c.get(100L, TimeUnit.MILLISECONDS);
+                f = exec.submit(swhile.callable(ctxt));
+                t = f.get(100L, TimeUnit.MILLISECONDS);
                 Assert.fail("should timeout");
             } catch (TimeoutException xtimeout) {
-                if (c != null) {
-                    c.cancel(true);
+                if (f != null) {
+                    f.cancel(true);
                 }
             }
             Assert.assertNotEquals(42, t);
@@ -385,7 +399,7 @@ public class ScriptCallableTest extends JexlTestCase {
                     }
                 };
                 exec.submit(cancels);
-                t = c.get();
+                t = fc.get();
                 Assert.fail("should be cancelled");
             } catch (CancellationException xexec) {
                 // this is the expected result

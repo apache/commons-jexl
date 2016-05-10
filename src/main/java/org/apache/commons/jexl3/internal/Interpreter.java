@@ -130,6 +130,8 @@ public class Interpreter extends ParserVisitor {
     protected Map<String, Object> functors;
     /** The context to store/retrieve variables. */
     protected final JexlContext context;
+    /** symbol values. */
+    protected final Scope.Frame frame;
     /** The context to store/retrieve variables. */
     protected final JexlContext.NamespaceResolver ns;
     /** Strict interpreter flag (may temporarily change when calling size and empty as functions). */
@@ -140,8 +142,8 @@ public class Interpreter extends ParserVisitor {
     protected final boolean silent;
     /** Cache executors. */
     protected final boolean cache;
-    /** symbol values. */
-    protected final Scope.Frame frame;
+    /** Throw on cancel. */
+    protected final boolean cancellable;
     /** Cancellation support. */
     protected volatile boolean cancelled = false;
     /** Empty parameters for method matching. */
@@ -162,12 +164,15 @@ public class Interpreter extends ParserVisitor {
             JexlEngine.Options opts = (JexlEngine.Options) context;
             Boolean ostrict = opts.isStrict();
             Boolean osilent = opts.isSilent();
+            Boolean ocancellable = opts.isCancellable();
             this.strictEngine = ostrict == null ? jexl.isStrict() : ostrict;
             this.silent = osilent == null ? jexl.isSilent() : osilent;
+            this.cancellable = ocancellable == null? jexl.cancellable : ocancellable;
             this.arithmetic = jexl.arithmetic.options(opts);
         } else {
             this.strictEngine = jexl.isStrict();
             this.silent = jexl.isSilent();
+            this.cancellable = jexl.cancellable;
             this.arithmetic = jexl.arithmetic;
         }
         if (this.context instanceof JexlContext.NamespaceResolver) {
@@ -203,7 +208,7 @@ public class Interpreter extends ParserVisitor {
             return xreturn.getValue();
         } catch (JexlException.Cancel xcancel) {
             cancelled |= Thread.interrupted();
-            if (!silent && strictEngine) {
+            if (cancellable) {
                 throw xcancel.clean();
             }
         } catch (JexlException xjexl) {
@@ -368,6 +373,19 @@ public class Interpreter extends ParserVisitor {
     }
 
     /**
+     * Cancels this evaluation, setting the cancel flag that will result in a JexlException.Cancel to be thrown.
+     * @return false if already cancelled, true otherwise
+     */
+    protected boolean cancel() {
+        if (cancelled) {
+            return false;
+        } else {
+            cancelled = true;
+            return true;
+        }
+    }
+
+    /**
      * Checks whether this interpreter execution was canceled due to thread interruption.
      * @return true if canceled, false otherwise
      */
@@ -378,13 +396,9 @@ public class Interpreter extends ParserVisitor {
          return cancelled;
     }
 
-    /**
-     * Cancels this evaluation, setting the cancel flag that will result in a JexlException.Cancel to be thrown.
-     * @return true in all cases
-     */
-    protected boolean cancel() {
-         cancelled = true;
-         return cancelled;
+    /** @return true if interrupt throws a JexlException.Cancel. */
+    protected boolean isCancellable() {
+        return cancellable;
     }
 
     /**
@@ -767,6 +781,9 @@ public class Interpreter extends ParserVisitor {
     @Override
     protected Object visit(ASTReturnStatement node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
+        }
         throw new JexlException.Return(node, null, val);
     }
 
@@ -796,29 +813,29 @@ public class Interpreter extends ParserVisitor {
             // get an iterator for the collection/array etc via the
             // introspector.
             Iterator<?> itemsIterator = uberspect.getIterator(iterableValue);
-            if (itemsIterator != null) {
-                while (itemsIterator.hasNext()) {
-                    if (isCancelled()) {
-                        throw new JexlException.Cancel(node);
-                    }
-                    // set loopVariable to value of iterator
-                    Object value = itemsIterator.next();
-                    if (symbol < 0) {
-                        context.set(loopVariable.getName(), value);
-                    } else {
-                        frame.set(symbol, value);
-                    }
-                    try {
-                        // execute statement
-                        result = statement.jjtAccept(this, data);
-                    } catch (JexlException.Break stmtBreak) {
-                        break;
-                    } catch (JexlException.Continue stmtContinue) {
-                        //continue;
+                if (itemsIterator != null) {
+                    while (itemsIterator.hasNext()) {
+                        if (isCancelled()) {
+                            throw new JexlException.Cancel(node);
+                        }
+                        // set loopVariable to value of iterator
+                        Object value = itemsIterator.next();
+                        if (symbol < 0) {
+                            context.set(loopVariable.getName(), value);
+                        } else {
+                            frame.set(symbol, value);
+                        }
+                        try {
+                            // execute statement
+                            result = statement.jjtAccept(this, data);
+                        } catch (JexlException.Break stmtBreak) {
+                            break;
+                        } catch (JexlException.Continue stmtContinue) {
+                            //continue;
+                        }
                     }
                 }
-            }
-        }
+                        }
         return result;
     }
 
