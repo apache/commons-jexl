@@ -85,6 +85,9 @@ public class JexlBuilder {
     /** Whether error messages will carry debugging information. */
     private Boolean debug = null;
 
+    /** Whether interrupt throws JexlException.Cancel. */
+    private Boolean cancellable = null;
+
     /** The map of 'prefix:function' to object implementing the namespaces. */
     private Map<String, Object> namespaces = null;
 
@@ -263,6 +266,23 @@ public class JexlBuilder {
     /** @return the debugging information flag */
     public Boolean debug() {
         return this.debug;
+    }
+
+    /**
+     * Sets the engine behavior upon interruption: throw an JexlException.Cancel or terminates the current evaluation
+     * and return null.
+     *
+     * @param flag true implies the engine throws the exception, false makes the engine return null.
+     * @return this builder
+     */
+    public JexlBuilder cancellable(boolean flag) {
+        this.cancellable = flag;
+        return this;
+    }
+
+    /** @return the cancellable information flag */
+    public Boolean cancellable() {
+        return this.cancellable;
     }
 
     /**

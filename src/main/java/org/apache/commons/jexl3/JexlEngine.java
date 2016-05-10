@@ -37,11 +37,11 @@ import java.nio.charset.Charset;
  * <li>Error reporting</li>
  * <li>Logging</li>
  * </ul>
- * 
+ *
  * <p>Note that methods that evaluate expressions may throw <em>unchecked</em> exceptions;
  * The {@link JexlException} are thrown in "non-silent" mode but since these are
  * RuntimeException, user-code <em>should</em> catch them wherever most appropriate.</p>
- * 
+ *
  * @since 2.0
  */
 public abstract class JexlEngine {
@@ -67,7 +67,7 @@ public abstract class JexlEngine {
 
     /**
      * Accesses the current thread local context.
-     * 
+     *
      * @return the context or null
      */
     public static JexlContext.ThreadLocal getThreadContext() {
@@ -78,7 +78,7 @@ public abstract class JexlEngine {
      * Sets the current thread local context.
      * <p>This should only be used carefully, for instance when re-evaluating a "stored" script that requires a
      * given Namespace resolver. Remember to synchronize access if context is shared between threads.
-     * 
+     *
      * @param tls the thread local context to set
      */
     public static void setThreadContext(JexlContext.ThreadLocal tls) {
@@ -93,13 +93,13 @@ public abstract class JexlEngine {
 
         /**
          * The charset used for parsing.
-         * 
+         *
          * @return the charset
          */
         Charset getCharset();
         /**
          * Sets whether the engine will throw a {@link JexlException} when an error is encountered during evaluation.
-         * 
+         *
          * @return true if silent, false otherwise
          */
         Boolean isSilent();
@@ -107,28 +107,34 @@ public abstract class JexlEngine {
         /**
          * Checks whether the engine considers unknown variables, methods, functions and constructors as errors or
          * evaluates them as null.
-         * 
+         *
          * @return true if strict, false otherwise
          */
         Boolean isStrict();
 
         /**
          * Checks whether the arithmetic triggers errors during evaluation when null is used as an operand.
-         * 
+         *
          * @return true if strict, false otherwise
          */
         Boolean isStrictArithmetic();
 
         /**
+         * Whether evaluation will throw JexlException.Cancel (true) or return null (false) when interrupted.
+         * @return true when cancellable, false otherwise
+         */
+        Boolean isCancellable();
+
+        /**
          * The MathContext instance used for +,-,/,*,% operations on big decimals.
-         * 
+         *
          * @return the math context
          */
         MathContext getArithmeticMathContext();
 
         /**
          * The BigDecimal scale used for comparison and coercion operations.
-         * 
+         *
          * @return the scale
          */
         int getArithmeticMathScale();
@@ -169,42 +175,42 @@ public abstract class JexlEngine {
 
     /**
      * Gets the charset used for parsing.
-     * 
+     *
      * @return the charset
      */
     public abstract Charset getCharset();
 
     /**
      * Gets this engine underlying {@link JexlUberspect}.
-     * 
+     *
      * @return the uberspect
      */
     public abstract JexlUberspect getUberspect();
 
     /**
      * Gets this engine underlying {@link JexlArithmetic}.
-     * 
+     *
      * @return the arithmetic
      */
     public abstract JexlArithmetic getArithmetic();
 
     /**
      * Checks whether this engine is in debug mode.
-     * 
+     *
      * @return true if debug is on, false otherwise
      */
     public abstract boolean isDebug();
 
     /**
      * Checks whether this engine throws JexlException during evaluation.
-     * 
+     *
      * @return true if silent, false (default) otherwise
      */
     public abstract boolean isSilent();
 
     /**
      * Checks whether the engine considers unknown variables, methods, functions and constructors as errors.
-     * 
+     *
      * @return true if strict, false otherwise
      */
     public abstract boolean isStrict();
@@ -213,14 +219,14 @@ public abstract class JexlEngine {
      * Sets the class loader used to discover classes in 'new' expressions.
      * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
      * initialization code before expression creation &amp; evaluation.</p>
-     * 
+     *
      * @param loader the class loader to use
      */
     public abstract void setClassLoader(ClassLoader loader);
 
     /**
      * Creates a new {@link JxltEngine} instance using this engine.
-     * 
+     *
      * @return a JEXL Template engine
      */
     public JxltEngine createJxltEngine() {
@@ -229,7 +235,7 @@ public abstract class JexlEngine {
 
     /**
      * Creates a new {@link JxltEngine} instance using this engine.
-     * 
+     *
      * @param noScript  whether the JxltEngine only allows Jexl expressions or scripts
      * @return a JEXL Template engine
      */
@@ -239,7 +245,7 @@ public abstract class JexlEngine {
 
     /**
      * Creates a new instance of {@link JxltEngine} using this engine.
-     * 
+     *
      * @param noScript  whether the JxltEngine only allows JEXL expressions or scripts
      * @param cacheSize the number of expressions in this cache, default is 256
      * @param immediate the immediate template expression character, default is '$'
@@ -459,7 +465,7 @@ public abstract class JexlEngine {
 
     /**
      * Invokes an object's method by name and arguments.
-     * 
+     *
      * @param obj  the method's invoker object
      * @param meth the method's name
      * @param args the method's arguments
@@ -470,7 +476,7 @@ public abstract class JexlEngine {
 
     /**
      * Creates a new instance of an object using the most appropriate constructor based on the arguments.
-     * 
+     *
      * @param <T>   the type of object
      * @param clazz the class to instantiate
      * @param args  the constructor arguments
@@ -480,7 +486,7 @@ public abstract class JexlEngine {
 
     /**
      * Creates a new instance of an object using the most appropriate constructor based on the arguments.
-     * 
+     *
      * @param clazz the name of the class to instantiate resolved through this engine's class loader
      * @param args  the constructor arguments
      * @return the created object instance or null on failure when silent
@@ -489,7 +495,7 @@ public abstract class JexlEngine {
 
     /**
      * Creates a JexlInfo instance.
-     * 
+     *
      * @param fn url/file/template/script user given name
      * @param l  line number
      * @param c  column number
@@ -503,7 +509,7 @@ public abstract class JexlEngine {
      * Create an information structure for dynamic set/get/invoke/new.
      * <p>This gathers the class, method and line number of the first calling method
      * outside of o.a.c.jexl3.</p>
-     * 
+     *
      * @return a JexlInfo instance
      */
     public JexlInfo createInfo() {
@@ -534,7 +540,7 @@ public abstract class JexlEngine {
 
     /**
      * Creates a string from a reader.
-     * 
+     *
      * @param reader to be read.
      * @return the contents of the reader as a String.
      * @throws IOException on any error reading the reader.
@@ -550,7 +556,7 @@ public abstract class JexlEngine {
 
     /**
      * Reads a JEXL source from a File.
-     * 
+     *
      * @param file the script file
      * @return the source
      */
@@ -577,7 +583,7 @@ public abstract class JexlEngine {
 
     /**
      * Reads a JEXL source from an URL.
-     * 
+     *
      * @param url the script url
      * @return the source
      */

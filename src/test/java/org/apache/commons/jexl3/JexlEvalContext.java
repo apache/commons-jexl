@@ -35,6 +35,8 @@ public class JexlEvalContext implements JexlContext, JexlContext.NamespaceResolv
     private Boolean silent = null;
     /** Whether the engine should be strict. */
     private Boolean strict = null;
+    /** Whether the engine should be cancellable. */
+    private Boolean cancellable = null;
     /** Whether the arithmetic should be strict. */
     private Boolean mathStrict = null;
     /** The math scale the arithmetic should use. */
@@ -109,6 +111,7 @@ public class JexlEvalContext implements JexlContext, JexlContext.NamespaceResolv
     public void clearOptions() {
         silent = null;
         strict = null;
+        cancellable = null;
         mathScale = -1;
         mathContext = null;
     }
@@ -124,6 +127,19 @@ public class JexlEvalContext implements JexlContext, JexlContext.NamespaceResolv
     @Override
     public Boolean isSilent() {
         return this.silent;
+    }
+
+    /**
+     * Sets whether the engine will throw JexlException.Cancel during evaluation when interrupted.
+     * @param s true means JexlException.Cancel will be thrown, false implies null will be returned
+     */
+    public void setCancellable(boolean c) {
+        this.cancellable = c ? Boolean.TRUE : Boolean.FALSE;
+    }
+
+    @Override
+    public Boolean isCancellable() {
+        return this.cancellable;
     }
 
     /**
