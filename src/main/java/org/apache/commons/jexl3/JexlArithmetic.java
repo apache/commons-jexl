@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -787,6 +788,8 @@ public class JexlArithmetic {
             return (byte) -((Byte) val);
         } else if (val instanceof Boolean) {
             return ((Boolean) val) ? Boolean.FALSE : Boolean.TRUE;
+        } else if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get() ? Boolean.FALSE : Boolean.TRUE;
         }
         throw new ArithmeticException("Object negation:(" + val + ")");
     }
@@ -1152,6 +1155,8 @@ public class JexlArithmetic {
         } else if (val instanceof Number) {
             double number = toDouble(val);
             return !Double.isNaN(number) && number != 0.d;
+        } else if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get();
         } else if (val instanceof String) {
             String strval = val.toString();
             return strval.length() > 0 && !"false".equals(strval);
@@ -1190,6 +1195,8 @@ public class JexlArithmetic {
             return Integer.parseInt((String) val);
         } else if (val instanceof Boolean) {
             return ((Boolean) val) ? 1 : 0;
+        } else if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get() ? 1 : 0;
         } else if (val instanceof Character) {
             return ((Character) val);
         }
@@ -1228,6 +1235,8 @@ public class JexlArithmetic {
             }
         } else if (val instanceof Boolean) {
             return ((Boolean) val) ? 1L : 0L;
+        } else if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get() ? 1L : 0L;
         } else if (val instanceof Character) {
             return ((Character) val);
         }
@@ -1264,6 +1273,8 @@ public class JexlArithmetic {
             return BigInteger.valueOf(((Number) val).longValue());
         } else if (val instanceof Boolean) {
             return BigInteger.valueOf(((Boolean) val) ? 1L : 0L);
+        } else if (val instanceof AtomicBoolean) {
+            return BigInteger.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
         } else if (val instanceof String) {
             String string = (String) val;
             if ("".equals(string)) {
@@ -1305,6 +1316,8 @@ public class JexlArithmetic {
             return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
         } else if (val instanceof Boolean) {
             return BigDecimal.valueOf(((Boolean) val) ? 1. : 0.);
+        } else if (val instanceof AtomicBoolean) {
+            return BigDecimal.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
         } else if (val instanceof String) {
             String string = (String) val;
             if ("".equals(string)) {
@@ -1340,6 +1353,8 @@ public class JexlArithmetic {
             return Double.parseDouble(String.valueOf(val));
         } else if (val instanceof Boolean) {
             return ((Boolean) val) ? 1. : 0.;
+        } else if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get() ? 1. : 0.;
         } else if (val instanceof String) {
             String string = (String) val;
             if ("".equals(string)) {

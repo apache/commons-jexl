@@ -28,6 +28,7 @@ Version 3.0.1 is a micro release to fix issues detected so far in 3.0:
 Bugs Fixed in 3.0.1:
 ====================
 
+* JEXL-195:     Support for AtomicBoolean in logical expressions
 * JEXL-193:     InterruptedException is swallowed in function call in silent and non-strict mode
 * JEXL-192:     Invalid return type when expected result is null
 * JEXL-191:     Jexl3 unsolvable property exception when using enum
