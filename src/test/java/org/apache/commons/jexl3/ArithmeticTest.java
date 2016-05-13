@@ -25,6 +25,7 @@ import java.util.Map;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.junit.Assert;
@@ -1310,5 +1311,74 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(BigDecimal.valueOf(0.), ja.toBigDecimal(false));
     }
 
+    @Test
+    public void testAtomicBoolean() throws Exception {
+        // in a condition
+        JexlScript e = JEXL.createScript("if (x) 1 else 2;", "x");
+        JexlContext jc = new MapContext();
+        AtomicBoolean ab = new AtomicBoolean(false);
+        Object o;
+        o = e.execute(jc, ab);
+        Assert.assertEquals("Result is not 2", new Integer(2), o);
+        ab.set(true);
+        o = e.execute(jc, ab);
+        Assert.assertEquals("Result is not 1", new Integer(1), o);
+        // in a binary logical op
+        e = JEXL.createScript("x && y", "x", "y");
+        ab.set(true);
+        o = e.execute(jc, ab, Boolean.FALSE);
+        Assert.assertFalse((Boolean) o);
+        ab.set(true);
+        o = e.execute(jc, ab, Boolean.TRUE);
+        Assert.assertTrue((Boolean) o);
+        ab.set(false);
+        o = e.execute(jc, ab, Boolean.FALSE);
+        Assert.assertFalse((Boolean) o);
+        ab.set(false);
+        o = e.execute(jc, ab, Boolean.FALSE);
+        Assert.assertFalse((Boolean) o);
+        // in arithmetic op
+        e = JEXL.createScript("x + y", "x", "y");
+        ab.set(true);
+        o = e.execute(jc, ab, 10);
+        Assert.assertEquals(11, o);
+        o = e.execute(jc, 10, ab);
+        Assert.assertEquals(11, o);
+        o = e.execute(jc, ab, 10.d);
+        Assert.assertEquals(11.d, (Double) o, EPSILON);
+        o = e.execute(jc, 10.d, ab);
+        Assert.assertEquals(11.d, (Double) o, EPSILON);
 
+        BigInteger bi10 = BigInteger.TEN;
+        ab.set(false);
+        o = e.execute(jc, ab, bi10);
+        Assert.assertEquals(bi10, o);
+        o = e.execute(jc, bi10, ab);
+        Assert.assertEquals(bi10, o);
+
+        BigDecimal bd10 = BigDecimal.TEN;
+        ab.set(false);
+        o = e.execute(jc, ab, bd10);
+        Assert.assertEquals(bd10, o);
+        o = e.execute(jc, bd10, ab);
+        Assert.assertEquals(bd10, o);
+
+        // in a (the) monadic op
+        e = JEXL.createScript("!x", "x");
+        ab.set(true);
+        o = e.execute(jc, ab);
+        Assert.assertFalse((Boolean) o);
+        ab.set(false);
+        o = e.execute(jc, ab);
+        Assert.assertTrue((Boolean) o);
+
+        // in a (the) monadic op
+        e = JEXL.createScript("-x", "x");
+        ab.set(true);
+        o = e.execute(jc, ab);
+        Assert.assertFalse((Boolean) o);
+        ab.set(false);
+        o = e.execute(jc, ab);
+        Assert.assertTrue((Boolean) o);
+    }
 }
