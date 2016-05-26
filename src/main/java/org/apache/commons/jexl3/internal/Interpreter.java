@@ -219,13 +219,7 @@ public class Interpreter extends ParserVisitor {
         } finally {
             if (functors != null && AUTOCLOSEABLE != null) {
                 for (Object functor : functors.values()) {
-                    if (functor != null && AUTOCLOSEABLE.isAssignableFrom(functor.getClass())) {
-                        try {
-                            jexl.invokeMethod(functor, "close", EMPTY_PARAMS);
-                        } catch (Exception xclose) {
-                            logger.warn(xclose.getMessage(), xclose.getCause());
-                        }
-                    }
+                    closeIfSupported(functor);
                 }
             }
             functors = null;
@@ -246,6 +240,26 @@ public class Interpreter extends ParserVisitor {
             c = null;
         }
         AUTOCLOSEABLE = c;
+    }
+
+    /**
+     * Attempt to call close() if supported.
+     * <p>This is used when dealing with auto-closeable (duck-like) objects
+     * @param closeable the object we'd like to close
+     */
+    protected void closeIfSupported(Object closeable) {
+        if (closeable != null) {
+            if (AUTOCLOSEABLE == null || AUTOCLOSEABLE.isAssignableFrom(closeable.getClass())) {
+                JexlMethod mclose = uberspect.getMethod(closeable, "close", EMPTY_PARAMS);
+                if (mclose != null) {
+                    try {
+                        mclose.invoke(closeable, EMPTY_PARAMS);
+                    } catch (Exception xignore) {
+                        logger.warn(xignore);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -810,9 +824,13 @@ public class Interpreter extends ParserVisitor {
         if (iterableValue != null && node.jjtGetNumChildren() >= 3) {
             /* third objectNode is the statement to execute */
             JexlNode statement = node.jjtGetChild(2);
-            // get an iterator for the collection/array etc via the
-            // introspector.
-            Iterator<?> itemsIterator = uberspect.getIterator(iterableValue);
+            // get an iterator for the collection/array etc via the introspector.
+            Object forEach = null;
+            try {
+                forEach = null;//operators.tryForeachOverload(node, iterableValue);
+                Iterator<?> itemsIterator = forEach instanceof Iterator
+                                ? (Iterator<?>) forEach
+                                : uberspect.getIterator(iterableValue);
                 if (itemsIterator != null) {
                     while (itemsIterator.hasNext()) {
                         if (isCancelled()) {
@@ -835,7 +853,11 @@ public class Interpreter extends ParserVisitor {
                         }
                     }
                 }
-                        }
+            } finally {
+                //  closeable iterator handling
+                closeIfSupported(forEach);
+            }
+        }
         return result;
     }
 
@@ -1708,7 +1730,11 @@ public class Interpreter extends ParserVisitor {
                     // solve 'null' namespace
                     if (target == context) {
                         Object namespace = resolveNamespace(null, node);
-                        if (namespace != null) {
+                        if (namespace == context) {
+                            // we can not solve it
+                            break;
+                        }
+                        else if (namespace != null) {
                             target = namespace;
                             caller = null;
                             continue;
