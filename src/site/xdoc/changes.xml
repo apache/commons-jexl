@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.0.1" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-196" due-to="Dmitri Blinov">
+                Script execution hangs while calling method with one argument without parameter
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-195" due-to="Dmitri Blinov">
                 Support for AtomicBoolean in logical expressions
             </action>

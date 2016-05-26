@@ -146,6 +146,10 @@ public class ScriptCallableTest extends JexlTestCase {
                 throw xint;
             }
         }
+
+        public int hangs(Object t) {
+            return 1;
+        }
     }
 
     @Test
@@ -407,6 +411,23 @@ public class ScriptCallableTest extends JexlTestCase {
             Assert.assertNotEquals(42, t);
         } finally {
             exec.shutdown();
+        }
+    }
+
+    @Test
+    public void testHangs() throws Exception {
+        JexlScript e = JEXL.createScript("hangs()");
+        Callable<Object> c = e.callable(new TestContext());
+
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        try {
+            Future<?> future = executor.submit(c);
+            Object t = future.get(1, TimeUnit.SECONDS);
+            Assert.fail("hangs should not be solved");
+        } catch(ExecutionException xexec) {
+            Assert.assertTrue(xexec.getCause() instanceof JexlException.Method);
+        } finally {
+            executor.shutdown();
         }
     }
 }
