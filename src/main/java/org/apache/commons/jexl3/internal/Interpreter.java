@@ -249,7 +249,7 @@ public class Interpreter extends ParserVisitor {
      */
     protected void closeIfSupported(Object closeable) {
         if (closeable != null) {
-            if (AUTOCLOSEABLE == null || AUTOCLOSEABLE.isAssignableFrom(closeable.getClass())) {
+            //if (AUTOCLOSEABLE == null || AUTOCLOSEABLE.isAssignableFrom(closeable.getClass())) {
                 JexlMethod mclose = uberspect.getMethod(closeable, "close", EMPTY_PARAMS);
                 if (mclose != null) {
                     try {
@@ -258,7 +258,7 @@ public class Interpreter extends ParserVisitor {
                         logger.warn(xignore);
                     }
                 }
-            }
+            //}
         }
     }
 
@@ -827,7 +827,7 @@ public class Interpreter extends ParserVisitor {
             // get an iterator for the collection/array etc via the introspector.
             Object forEach = null;
             try {
-                forEach = null;//operators.tryForeachOverload(node, iterableValue);
+                forEach = operators.tryForeachOverload(node, iterableValue);
                 Iterator<?> itemsIterator = forEach instanceof Iterator
                                 ? (Iterator<?>) forEach
                                 : uberspect.getIterator(iterableValue);

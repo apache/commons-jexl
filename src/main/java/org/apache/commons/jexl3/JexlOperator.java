@@ -21,16 +21,16 @@ package org.apache.commons.jexl3;
  * The JEXL operators.
  *
  * These are the operators that are executed by JexlArithmetic methods.
- * 
+ *
  * <p>Each of them  associates a symbol to a method signature.
  * For instance, '+' is associated to 'T add(L x, R y)'.</p>
- * 
+ *
  * <p>The default JexlArithmetic implements generic versions of these methods using Object as arguments.
  * You can use your own derived JexlArithmetic that override and/or overload those operator methods; these methods
  * must be public,
  * must respect the return type when primitive
  * and may be overloaded multiple times with different signatures.</p>
- * 
+ *
  * @since 3.0
  */
 public enum JexlOperator {
@@ -239,23 +239,40 @@ public enum JexlOperator {
 
     /**
      * Property get operator as in: x.y.
+     * <strong>Syntax:</strong> <code>x.y</code>
+     * <br><strong>Method:</strong> <code>Object propertyGet(L x, R y);</code>.
      */
     PROPERTY_GET(".", "propertyGet", 2),
 
     /**
      * Property set operator as in: x.y = z.
+     * <strong>Syntax:</strong> <code>x.y = z</code>
+     * <br><strong>Method:</strong> <code>void propertySet(L x, R y, V z);</code>.
      */
     PROPERTY_SET(".=", "propertySet", 3),
 
     /**
      * Array get operator as in: x[y].
+     * <strong>Syntax:</strong> <code>x.y</code>
+     * <br><strong>Method:</strong> <code>Object arrayyGet(L x, R y);</code>.
      */
     ARRAY_GET("[]", "arrayGet", 2),
 
     /**
      * Array set operator as in: x[y] = z.
+     * <strong>Syntax:</strong> <code>x[y] = z</code>
+     * <br><strong>Method:</strong> <code>void arraySet(L x, R y, V z);</code>.
      */
-    ARRAY_SET("[]=", "arraySet", 3);
+    ARRAY_SET("[]=", "arraySet", 3),
+
+    /**
+     * Iterator generator as in for(var x : y).
+     * <strong>Syntax:</strong> <code>for(var x : y){...} </code>
+     * <br><strong>Method:</strong> <code>Iterator<Object> forEach(R y);</code>.
+     *
+     * If the returned Iterator is AutoCloseable, close will be called after the last execution of the loop block.
+     */
+    FOR_EACH("for(...)", "forEach", 1);
 
     /**
      * The operator symbol.
@@ -279,7 +296,7 @@ public enum JexlOperator {
 
     /**
      * Creates a base operator.
-     * 
+     *
      * @param o    the operator name
      * @param m    the method name associated to this operator in a JexlArithmetic
      * @param argc the number of parameters for the method
@@ -293,7 +310,7 @@ public enum JexlOperator {
 
     /**
      * Creates a side-effect operator.
-     * 
+     *
      * @param o the operator name
      * @param m the method name associated to this operator in a JexlArithmetic
      * @param b the base operator, ie + for +=
@@ -307,7 +324,7 @@ public enum JexlOperator {
 
     /**
      * Gets this operator symbol.
-     * 
+     *
      * @return the symbol
      */
     public final String getOperatorSymbol() {
@@ -316,7 +333,7 @@ public enum JexlOperator {
 
     /**
      * Gets this operator method name in a JexlArithmetic.
-     * 
+     *
      * @return the method name
      */
     public final String getMethodName() {
@@ -325,7 +342,7 @@ public enum JexlOperator {
 
     /**
      * Gets this operator number of parameters.
-     * 
+     *
      * @return the method arity
      */
     public int getArity() {
@@ -334,7 +351,7 @@ public enum JexlOperator {
 
     /**
      * Gets the base operator.
-     * 
+     *
      * @return the base operator
      */
     public final JexlOperator getBaseOperator() {
