@@ -39,16 +39,31 @@ public class PragmaTest extends JexlTestCase {
     public void testPragmas() throws Exception {
         JexlContext jc = new MapContext();
         try {
-        JexlScript script = JEXL.createScript("#pragma one 1\n#pragma the.very.hard 'truth'\n2;");
-        Assert.assertTrue(script != null);
-        Map<String, Object> pragmas = script.getPragmas();
-        Assert.assertEquals(2, pragmas.size());
-        Assert.assertEquals(1, pragmas.get("one"));
-        Assert.assertEquals("truth", pragmas.get("the.very.hard"));
-        } catch(JexlException xjexl) {
+            JexlScript script = JEXL.createScript("#pragma one 1\n#pragma the.very.hard 'truth'\n2;");
+            Assert.assertTrue(script != null);
+            Map<String, Object> pragmas = script.getPragmas();
+            Assert.assertEquals(2, pragmas.size());
+            Assert.assertEquals(1, pragmas.get("one"));
+            Assert.assertEquals("truth", pragmas.get("the.very.hard"));
+        } catch (JexlException xjexl) {
             String s = xjexl.toString();
         }
     }
 
+    @Test
+    public void testJxltPragmas() throws Exception {
+        JexlContext jc = new MapContext();
+        try {
+            JxltEngine engine = new JexlBuilder().create().createJxltEngine();
+            JxltEngine.Template tscript = engine.createTemplate("$$ #pragma one 1\n$$ #pragma the.very.hard 'truth'\n2;");
+            Assert.assertTrue(tscript != null);
+            Map<String, Object> pragmas = tscript.getPragmas();
+            Assert.assertEquals(2, pragmas.size());
+            Assert.assertEquals(1, pragmas.get("one"));
+            Assert.assertEquals("truth", pragmas.get("the.very.hard"));
+        } catch (JexlException xjexl) {
+            String s = xjexl.toString();
+        }
+    }
 
 }
