@@ -24,6 +24,7 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.JexlNode;
 
+import java.util.Iterator;
 /**
  * Helper class to deal with operator overloading and specifics.
  * @since 3.0
@@ -92,6 +93,44 @@ public class Operators {
                 }
             } catch (Exception xany) {
                 interpreter.operatorError(node, operator, xany);
+            }
+        }
+        return JexlEngine.TRY_FAILED;
+    }
+
+    /**
+     * Attempts to call an overloaded forEach operator.
+     * <p>
+     * This takes care of finding and caching the operator method when appropriate
+     * @param node     the syntactic node
+     * @param arg      the argument
+     * @return the result of the operator evaluation or TRY_FAILED
+     */
+    protected Object tryForeachOverload(JexlNode node, Object arg) {
+        if (operators != null && operators.overloads(JexlOperator.FOR_EACH)) {
+            final JexlArithmetic arithmetic = interpreter.arithmetic;
+            final boolean cache = interpreter.cache;
+            if (cache) {
+                Object cached = node.jjtGetValue();
+                if (cached instanceof JexlMethod) {
+                    JexlMethod me = (JexlMethod) cached;
+                    Object eval = me.tryInvoke(JexlOperator.FOR_EACH.getMethodName(), arithmetic, arg);
+                    if (!me.tryFailed(eval)) {
+                        return eval;
+                    }
+                }
+            }
+            try {
+                JexlMethod vm = operators.getOperator(JexlOperator.FOR_EACH, arg);
+                if (vm != null && Iterator.class.isAssignableFrom(vm.getReturnType())) {
+                    Object result = vm.invoke(arithmetic, arg);
+                    if (cache) {
+                        node.jjtSetValue(vm);
+                    }
+                    return result;
+                }
+            } catch (Exception xany) {
+                interpreter.operatorError(node, JexlOperator.FOR_EACH, xany);
             }
         }
         return JexlEngine.TRY_FAILED;
