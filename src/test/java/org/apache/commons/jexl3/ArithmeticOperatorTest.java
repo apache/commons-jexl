@@ -95,6 +95,16 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
+    public void testStartsEndsWithStringDot() throws Exception {
+        asserter.setVariable("x.y", "foobar");
+        asserter.assertExpression("x.y =^ 'foo'", Boolean.TRUE);
+        asserter.assertExpression("x.y =$ 'foo'", Boolean.FALSE);
+        asserter.setVariable("x.y", "barfoo");
+        asserter.assertExpression("x.y =^ 'foo'", Boolean.FALSE);
+        asserter.assertExpression("x.y =$ 'foo'", Boolean.TRUE);
+    }
+
+    @Test
     public void testNotStartsEndsWithString() throws Exception {
         asserter.setVariable("x", "foobar");
         asserter.assertExpression("x !^ 'foo'", Boolean.FALSE);
@@ -102,6 +112,16 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.setVariable("x", "barfoo");
         asserter.assertExpression("x !^ 'foo'", Boolean.TRUE);
         asserter.assertExpression("x !$ 'foo'", Boolean.FALSE);
+    }
+
+    @Test
+    public void testNotStartsEndsWithStringDot() throws Exception {
+        asserter.setVariable("x.y", "foobar");
+        asserter.assertExpression("x.y !^ 'foo'", Boolean.FALSE);
+        asserter.assertExpression("x.y !$ 'foo'", Boolean.TRUE);
+        asserter.setVariable("x.y", "barfoo");
+        asserter.assertExpression("x.y !^ 'foo'", Boolean.TRUE);
+        asserter.assertExpression("x.y !$ 'foo'", Boolean.FALSE);
     }
 
     public static class MatchingContainer {

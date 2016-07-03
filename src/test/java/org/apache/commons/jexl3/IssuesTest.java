@@ -1163,4 +1163,51 @@ public class IssuesTest extends JexlTestCase {
         jc.set("t", null);
         Assert.assertNull(js0.evaluate(jc));
     }
+
+    @Test
+    public void test199() throws Exception {
+        JexlContext jc = new MapContext();
+        JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(false)).create();
+
+        JexlScript e = jexl.createScript("(x, y)->{ x + y }");
+        Object r = e.execute(jc, true, "EURT");
+        Assert.assertEquals("trueEURT", r);
+        r = e.execute(jc, "ELSAF", false);
+        Assert.assertEquals("ELSAFfalse", r);
+    }
+
+    public static class Eval {
+        private JexlEngine jexl;
+
+        public JexlScript fn(String src) {
+            return jexl.createScript(src);
+        }
+
+        void setJexl(JexlEngine je) {
+            jexl = je;
+        }
+    }
+
+    @Test
+    public void test200() throws Exception {
+        JexlContext jc = new MapContext();
+        Map<String, Object> funcs = new HashMap<String, Object>();
+        Eval eval = new Eval();
+        funcs.put(null, eval);
+        JexlEngine jexl = new JexlBuilder().namespaces(funcs).create();
+        eval.setJexl(jexl);
+        String src = "var f = fn(\'(x)->{x + 42}\'); f(y)";
+        JexlScript s200 = jexl.createScript(src, "y");
+        Assert.assertEquals(142, s200.execute(jc, 100));
+        Assert.assertEquals(52, s200.execute(jc, 10));
+    }
+
+    @Test
+    public void test200b() throws Exception {
+        JexlContext jc = new MapContext();
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript e = jexl.createScript("var x = 0; var f = (y)->{ x = y; }; f(42); x");
+        Object r = e.execute(jc);
+        Assert.assertEquals(0, r);
+    }
 }

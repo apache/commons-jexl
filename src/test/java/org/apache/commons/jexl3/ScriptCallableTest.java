@@ -62,7 +62,35 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     @Test
-    public void testCallable() throws Exception {
+    public void testCallableCancel() throws Exception {
+        JexlScript e = JEXL.createScript("while(true);");
+        final Script.Callable c = (Script.Callable) e.callable(null);
+        Object t = 42;
+        Callable<Object> kc = new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                return c.cancel();
+            }
+
+        };
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        Future<?> future = executor.submit(c);
+        Future<?> kfc = executor.submit(kc);
+        try {
+            Assert.assertTrue((Boolean) kfc.get());
+            t = future.get();
+            Assert.fail("should have been cancelled");
+        } catch (ExecutionException xexec) {
+            // ok, ignore
+            Assert.assertTrue(xexec.getCause() instanceof JexlException.Cancel);
+        } finally {
+            executor.shutdown();
+        }
+        Assert.assertTrue(c.isCancelled());
+    }
+
+    @Test
+    public void testCallableTimeout() throws Exception {
         JexlScript e = JEXL.createScript("while(true);");
         Callable<Object> c = e.callable(null);
         Object t = 42;

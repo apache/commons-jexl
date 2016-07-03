@@ -27,7 +27,7 @@ public abstract class ParserVisitor {
      * @return does not return
      */
     protected final Object visit(SimpleNode node, Object data) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(node.getClass().getSimpleName() + " : not supported yet.");
     }
 
     /**
@@ -177,4 +177,8 @@ public abstract class ParserVisitor {
     protected abstract Object visit(ASTSetXorNode node, Object data);
 
     protected abstract Object visit(ASTJxltLiteral node, Object data);
+
+    protected abstract Object visit(ASTAnnotation node, Object data);
+
+    protected abstract Object visit(ASTAnnotatedStatement node, Object data);
 }
