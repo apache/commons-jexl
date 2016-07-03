@@ -53,6 +53,16 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
     }
 
     @Test
+    public void testSynchronized() throws Exception {
+        Map<String, Object> ns = new TreeMap<String, Object>();
+        JexlContext jc = new SynchronizedContext(new MapContext());
+        JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
+        JexlScript js0 = jexl.createScript("@synchronized(y) {return y.size(); }", "y");
+        Object size = js0.execute(jc, "foobar");
+        Assert.assertEquals(6, size);
+    }
+
+    @Test
     public void testUnsafeMonitor() throws Exception {
         SynchronizedArithmetic.Monitor monitor = new SynchronizedArithmetic.UnsafeMonitor();
         Map<String, Object> foo = new TreeMap<String, Object>();
@@ -66,5 +76,9 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
         Assert.assertEquals(10.0d, t);
         Assert.assertTrue(monitor.isBalanced());
         Assert.assertEquals(2, monitor.getCount());
+        t = js0.execute(jc, foo);
+        Assert.assertEquals(10.0d, t);
+        Assert.assertTrue(monitor.isBalanced());
+        Assert.assertEquals(4, monitor.getCount());
     }
 }

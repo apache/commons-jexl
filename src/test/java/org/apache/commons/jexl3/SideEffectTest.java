@@ -84,6 +84,45 @@ public class SideEffectTest extends JexlTestCase {
     }
 
     @Test
+    public void testSideEffectVarDots() throws Exception {
+        Map<String,Object> context = asserter.getVariables();
+        Integer i41 = Integer.valueOf(4141);
+        Object foo = i41;
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux += 2", i41 + 2);
+        Assert.assertEquals(context.get("foo.bar.quux"), i41 + 2);
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux -= 2", i41 - 2);
+        Assert.assertEquals(context.get("foo.bar.quux"), i41 - 2);
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux *= 2", i41 * 2);
+        Assert.assertEquals(context.get("foo.bar.quux"), i41 * 2);
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux /= 2", i41 / 2);
+        Assert.assertEquals(context.get("foo.bar.quux"), i41 / 2);
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux %= 2", i41 % 2);
+        Assert.assertEquals(context.get("foo.bar.quux"), i41 % 2);
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux &= 3", (long) (i41 & 3));
+        Assert.assertEquals(context.get("foo.bar.quux"), (long)(i41 & 3));
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux |= 2", (long)(i41 | 2));
+        Assert.assertEquals(context.get("foo.bar.quux"), (long)(i41 | 2));
+
+        context.put("foo.bar.quux", foo);
+        asserter.assertExpression("foo.bar.quux ^= 2", (long)(i41 ^ 2));
+        Assert.assertEquals(context.get("foo.bar.quux"), (long)(i41 ^ 2));
+    }
+
+    @Test
     public void testSideEffectArray() throws Exception {
         Integer i41 = Integer.valueOf(4141);
         Integer i42 = Integer.valueOf(42);
@@ -117,6 +156,43 @@ public class SideEffectTest extends JexlTestCase {
         Assert.assertEquals(foo[0], (long)(i41 | 2));
         foo[0] = i41;
         asserter.assertExpression("foo[0] ^= 2", (long)(i41 ^ 2));
+        Assert.assertEquals(foo[0], (long)(i41 ^ 2));
+    }
+
+    @Test
+    public void testSideEffectDotArray() throws Exception {
+        Integer i41 = Integer.valueOf(4141);
+        Integer i42 = Integer.valueOf(42);
+        Integer i43 = Integer.valueOf(43);
+        String s42 = "fourty-two";
+        String s43 = "fourty-three";
+        Object[] foo = new Object[3];
+        foo[1] = i42;
+        foo[2] = i43;
+        asserter.setVariable("foo", foo);
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 += 2", i41 + 2);
+        Assert.assertEquals(foo[0], i41 + 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 -= 2", i41 - 2);
+        Assert.assertEquals(foo[0], i41 - 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 *= 2", i41 * 2);
+        Assert.assertEquals(foo[0], i41 * 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 /= 2", i41 / 2);
+        Assert.assertEquals(foo[0], i41 / 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 %= 2", i41 % 2);
+        Assert.assertEquals(foo[0], i41 % 2);
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 &= 3", (long) (i41 & 3));
+        Assert.assertEquals(foo[0], (long)(i41 & 3));
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 |= 2", (long)(i41 | 2));
+        Assert.assertEquals(foo[0], (long)(i41 | 2));
+        foo[0] = i41;
+        asserter.assertExpression("foo.0 ^= 2", (long)(i41 ^ 2));
         Assert.assertEquals(foo[0], (long)(i41 ^ 2));
     }
 

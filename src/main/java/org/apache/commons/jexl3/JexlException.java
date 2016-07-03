@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * Wraps any error that might occur during interpretation of a script or expression.
- * 
+ *
  * @since 2.0
  */
 public class JexlException extends RuntimeException {
@@ -47,7 +47,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Creates a new JexlException.
-     * 
+     *
      * @param node the node causing the error
      * @param msg  the error message
      */
@@ -57,7 +57,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Creates a new JexlException.
-     * 
+     *
      * @param node  the node causing the error
      * @param msg   the error message
      * @param cause the exception causing the error
@@ -75,7 +75,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Creates a new JexlException.
-     * 
+     *
      * @param jinfo the debugging information associated
      * @param msg   the error message
      * @param cause the exception causing the error
@@ -88,7 +88,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Gets the specific information for this exception.
-     * 
+     *
      * @return the information
      */
     public JexlInfo getInfo() {
@@ -97,7 +97,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Creates a string builder pre-filled with common error information (if possible).
-     * 
+     *
      * @param node the node
      * @return a string builder
      */
@@ -115,7 +115,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Gets the most specific information attached to a node.
-     * 
+     *
      * @param node the node
      * @param info the information
      * @return the information or null
@@ -137,7 +137,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Cleans a JexlException from any org.apache.commons.jexl3.internal stack trace element.
-     * 
+     *
      * @return this exception
      */
     public JexlException clean() {
@@ -146,7 +146,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Cleans a Throwable from any org.apache.commons.jexl3.internal stack trace element.
-     * 
+     *
      * @param <X>    the throwable type
      * @param xthrow the thowable
      * @return the throwable
@@ -168,7 +168,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Unwraps the cause of a throwable due to reflection.
-     * 
+     *
      * @param xthrow the throwable
      * @return the cause
      */
@@ -184,7 +184,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Merge the node info and the cause info to obtain best possible location.
-     * 
+     *
      * @param info  the node
      * @param cause the cause
      * @return the info to use
@@ -202,7 +202,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Accesses detailed message.
-     * 
+     *
      * @return the message
      */
     protected String detailedMessage() {
@@ -211,7 +211,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Formats an error message from the parser.
-     * 
+     *
      * @param prefix the prefix to the message
      * @param expr   the expression in error
      * @return the formatted message
@@ -235,7 +235,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when tokenization fails.
-     * 
+     *
      * @since 3.0
      */
     public static class Tokenization extends JexlException {
@@ -263,13 +263,13 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when parsing fails.
-     * 
+     *
      * @since 3.0
      */
     public static class Parsing extends JexlException {
         /**
          * Creates a new Parsing exception instance.
-         * 
+         *
          * @param info  the location information
          * @param cause the javacc cause
          */
@@ -279,7 +279,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Creates a new Parsing exception instance.
-         * 
+         *
          * @param info the location information
          * @param msg  the message
          */
@@ -302,7 +302,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when parsing fails due to an ambiguous statement.
-     * 
+     *
      * @since 3.0
      */
     public static class Ambiguous extends Parsing {
@@ -323,13 +323,13 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when parsing fails due to an invalid assigment.
-     * 
+     *
      * @since 3.0
      */
     public static class Assignment extends Parsing {
         /**
          * Creates a new Assignment statement exception instance.
-         * 
+         *
          * @param info  the location information
          * @param expr  the source expression line
          */
@@ -345,7 +345,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when a variable is unknown.
-     * 
+     *
      * @since 3.0
      */
     public static class Variable extends JexlException {
@@ -355,7 +355,7 @@ public class JexlException extends RuntimeException {
         private final boolean undefined;
         /**
          * Creates a new Variable exception instance.
-         * 
+         *
          * @param node the offending ASTnode
          * @param var  the unknown variable
          * @param undef whether the variable is undefined or evaluated as null
@@ -367,7 +367,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Whether the variable causing an error is undefined or evaluated as null.
-         * 
+         *
          * @return true if undefined, false otherwise
          */
         public boolean isUndefined() {
@@ -389,7 +389,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Generates a message for a variable error.
-     * 
+     *
      * @param node the node where the error occurred
      * @param variable the variable
      * @param undef whether the variable is null or undefined
@@ -409,13 +409,13 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when a property is unknown.
-     * 
+     *
      * @since 3.0
      */
     public static class Property extends JexlException {
         /**
          * Creates a new Property exception instance.
-         * 
+         *
          * @param node the offending ASTnode
          * @param var  the unknown variable
          */
@@ -425,7 +425,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Creates a new Property exception instance.
-         * 
+         *
          * @param node  the offending ASTnode
          * @param var   the unknown variable
          * @param cause the exception causing the error
@@ -449,7 +449,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Generates a message for an unsolvable property error.
-     * 
+     *
      * @param node the node where the error occurred
      * @param var the variable
      * @return the error message
@@ -464,13 +464,13 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when a method or ctor is unknown, ambiguous or inaccessible.
-     * 
+     *
      * @since 3.0
      */
     public static class Method extends JexlException {
         /**
          * Creates a new Method exception instance.
-         * 
+         *
          * @param node  the offending ASTnode
          * @param name  the method name
          */
@@ -480,7 +480,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Creates a new Method exception instance.
-         * 
+         *
          * @param info  the location information
          * @param name  the unknown method
          * @param cause the exception causing the error
@@ -504,7 +504,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Generates a message for a unsolvable method error.
-     * 
+     *
      * @param node the node where the error occurred
      * @param method the method name
      * @return the error message
@@ -519,13 +519,13 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown when an operator fails.
-     * 
+     *
      * @since 3.0
      */
     public static class Operator extends JexlException {
         /**
          * Creates a new Operator exception instance.
-         * 
+         *
          * @param node  the location information
          * @param symbol  the operator name
          * @param cause the exception causing the error
@@ -549,7 +549,7 @@ public class JexlException extends RuntimeException {
 
     /**
      * Generates a message for an operator error.
-     * 
+     *
      * @param node the node where the error occurred
      * @param symbol the operator name
      * @return the error message
@@ -563,8 +563,53 @@ public class JexlException extends RuntimeException {
     }
 
     /**
+     * Thrown when an annotation handler throws an exception.
+     *
+     * @since 3.1
+     */
+    public static class Annotation extends JexlException {
+        /**
+         * Creates a new Annotation exception instance.
+         *
+         * @param node  the annotated statement node
+         * @param name  the annotation name
+         * @param cause the exception causing the error
+         */
+        public Annotation(JexlNode node, String name, Throwable cause) {
+            super(node, name, cause);
+        }
+
+        /**
+         * @return the annotation name
+         */
+        public String getAnnotation() {
+            return super.detailedMessage();
+        }
+
+        @Override
+        protected String detailedMessage() {
+            return "error processing annotation '" + getAnnotation() + "'";
+        }
+    }
+
+    /**
+     * Generates a message for an annotation error.
+     *
+     * @param node the node where the error occurred
+     * @param annotation the annotation name
+     * @return the error message
+     */
+    public static String annotationError(JexlNode node, String annotation) {
+        StringBuilder msg = errorAt(node);
+        msg.append("error processing annotation '");
+        msg.append(annotation);
+        msg.append('\'');
+        return msg.toString();
+    }
+
+    /**
      * Thrown to return a value.
-     * 
+     *
      * @since 3.0
      */
     public static class Return extends JexlException {
@@ -574,7 +619,7 @@ public class JexlException extends RuntimeException {
 
         /**
          * Creates a new instance of Return.
-         * 
+         *
          * @param node  the return node
          * @param msg   the message
          * @param value the returned value
@@ -594,13 +639,13 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown to cancel a script execution.
-     * 
+     *
      * @since 3.0
      */
     public static class Cancel extends JexlException {
         /**
          * Creates a new instance of Cancel.
-         * 
+         *
          * @param node the node where the interruption was detected
          */
         public Cancel(JexlNode node) {
@@ -610,13 +655,13 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown to break a loop.
-     * 
+     *
      * @since 3.0
      */
     public static class Break extends JexlException {
         /**
          * Creates a new instance of Break.
-         * 
+         *
          * @param node the break
          */
         public Break(JexlNode node) {
@@ -626,13 +671,13 @@ public class JexlException extends RuntimeException {
 
     /**
      * Thrown to continue a loop.
-     * 
+     *
      * @since 3.0
      */
     public static class Continue extends JexlException {
         /**
          * Creates a new instance of Continue.
-         * 
+         *
          * @param node the continue
          */
         public Continue(JexlNode node) {
@@ -648,7 +693,7 @@ public class JexlException extends RuntimeException {
      * - begin, end are character offsets in the string for the precise location of the error
      * - string is the string representation of the offending expression
      * - msg is the actual explanation message for this error
-     * 
+     *
      * @return this error as a string
      */
     @Override

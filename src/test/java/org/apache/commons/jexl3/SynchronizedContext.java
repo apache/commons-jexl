@@ -16,10 +16,12 @@
  */
 package org.apache.commons.jexl3;
 
+import java.util.concurrent.Callable;
+
 /**
  * Exposes a synchronized call to a script and synchronizes access to get/set methods.
  */
-public class SynchronizedContext extends MapContext {
+public class SynchronizedContext extends MapContext implements JexlContext.AnnotationProcessor {
     private final JexlContext context;
 
     public SynchronizedContext(JexlContext ctxt) {
@@ -56,6 +58,17 @@ public class SynchronizedContext extends MapContext {
         synchronized (this) {
             super.set(name, value);
         }
+    }
+
+    @Override
+    public Object processAnnotation(String name, Object[] args, Callable<Object> statement) throws Exception {
+        if ("synchronized".equals(name)) {
+            final Object arg = args[0];
+            synchronized(arg) {
+                return statement.call();
+            }
+        }
+        throw new IllegalArgumentException("unknown annotation " + name);
     }
 
 }
