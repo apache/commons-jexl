@@ -25,6 +25,9 @@ import org.apache.commons.jexl3.internal.Scope;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.Stack;
 
@@ -171,6 +174,22 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
+     * The set of assignment operators as classes.
+     */
+    @SuppressWarnings("unchecked")
+    private static final Set<Class<? extends JexlNode>> ASSIGN_NODES = new HashSet<Class<? extends JexlNode>>(
+        Arrays.asList(
+            ASTAssignment.class,
+            ASTSetAddNode.class,
+            ASTSetMultNode.class,
+            ASTSetDivNode.class,
+            ASTSetAndNode.class,
+            ASTSetOrNode.class,
+            ASTSetXorNode.class,
+            ASTSetSubNode.class
+        )
+    );
+    /**
      * Called by parser at end of node construction.
      * <p>Detects "Ambiguous statement" and 'non-leaft value assignment'.</p>
      * @param node the node
@@ -186,7 +205,7 @@ public abstract class JexlParser extends StringParser {
             popFrame();
         } else if (node instanceof ASTAmbiguous) {
             throwParsingException(JexlException.Ambiguous.class, node);
-        } else if (node instanceof ASTAssignment) {
+        } else if (ASSIGN_NODES.contains(node.getClass())) {
             JexlNode lv = node.jjtGetChild(0);
             if (!lv.isLeftValue()) {
                 throwParsingException(JexlException.Assignment.class, lv);

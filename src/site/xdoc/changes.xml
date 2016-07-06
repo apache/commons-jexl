@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.0.1" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-202" due-to="Dmitri Blinov">
+                Detect invalid assignment operator usage with non-assignable l-value during script parsing
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-198" due-to="Terefang Verigorn">
                 JxltEngine Template does not expose pragmas
             </action>
