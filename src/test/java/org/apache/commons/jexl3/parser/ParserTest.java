@@ -48,12 +48,17 @@ public class ParserTest extends TestCase {
     }
 
     public void testErrorAssign() throws Exception {
-        Parser parser = new Parser(new StringReader(";"));
-        try {
-            JexlNode sn = parser.parse(null, "foo() = 1;", null, false, false);
-            fail("should have failed on invalid assignment");
-        } catch (JexlException.Parsing xparse) {
-            // ok
+        String[] ops = { "=", "+=", "-=", "/=", "*=", "^=", "&=", "|=" };
+        for(String op : ops) {
+            Parser parser = new Parser(new StringReader(";"));
+            try {
+                JexlNode sn = parser.parse(null, "foo() "+op+" 1;", null, false, false);
+                fail("should have failed on invalid assignment " + op);
+            } catch (JexlException.Parsing xparse) {
+                // ok
+                String ss = xparse.getDetail();
+                String sss = xparse.toString();
+            }
         }
     }
 
