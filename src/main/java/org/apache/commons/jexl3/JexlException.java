@@ -339,7 +339,7 @@ public class JexlException extends RuntimeException {
 
         @Override
         protected String detailedMessage() {
-            return parserError("assignement", getDetail());
+            return parserError("assignment", getDetail());
         }
     }
 
