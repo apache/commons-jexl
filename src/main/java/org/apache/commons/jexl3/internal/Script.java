@@ -345,7 +345,7 @@ public class Script implements JexlScript, JexlExpression {
         /** The actual interpreter. */
         protected final Interpreter interpreter;
         /** Use interpreter as marker for not having run. */
-        protected Object result;
+        protected volatile Object result;
 
         /**
          * The base constructor.
