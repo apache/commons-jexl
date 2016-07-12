@@ -539,6 +539,22 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
+    public void testOption() throws Exception {
+        Map<String, Object> vars = new HashMap<String, Object>();
+        JexlEvalContext context = new JexlEvalContext(vars);
+        JexlScript script = JEXL.createScript("0 + '1.2' ");
+        Object result;
+
+        context.setStrictArithmetic(true);
+        result = script.execute(context);
+        Assert.assertEquals("01.2", result);
+
+        context.setStrictArithmetic(false);
+        result = script.execute(context);
+        Assert.assertEquals(1.2d, (Double) result, EPSILON);
+    }
+
+    @Test
     public void testIsFloatingPointPattern() throws Exception {
         JexlArithmetic ja = new JexlArithmetic(true);
 

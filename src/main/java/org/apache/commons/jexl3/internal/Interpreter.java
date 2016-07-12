@@ -138,16 +138,8 @@ public class Interpreter extends ParserVisitor {
     protected final Scope.Frame frame;
     /** The context to store/retrieve variables. */
     protected final JexlContext.NamespaceResolver ns;
-    /** Strict interpreter flag (may temporarily change when calling size and empty as functions). */
-    protected final boolean strictEngine;
-    /** Strict interpreter flag. */
-    protected final boolean strictArithmetic;
-    /** Silent interpreter flag. */
-    protected final boolean silent;
     /** Cache executors. */
     protected final boolean cache;
-    /** Throw on cancel. */
-    protected final boolean cancellable;
     /** Cancellation support. */
     protected volatile boolean cancelled = false;
     /** Empty parameters for method matching. */
@@ -166,17 +158,14 @@ public class Interpreter extends ParserVisitor {
         this.context = aContext != null ? aContext : Engine.EMPTY_CONTEXT;
         if (this.context instanceof JexlEngine.Options) {
             JexlEngine.Options opts = (JexlEngine.Options) context;
-            Boolean ostrict = opts.isStrict();
-            Boolean osilent = opts.isSilent();
-            Boolean ocancellable = opts.isCancellable();
-            this.strictEngine = ostrict == null ? jexl.isStrict() : ostrict;
-            this.silent = osilent == null ? jexl.isSilent() : osilent;
-            this.cancellable = ocancellable == null ? jexl.cancellable : ocancellable;
             this.arithmetic = jexl.arithmetic.options(opts);
+            if (!arithmetic.getClass().equals(jexl.arithmetic.getClass())) {
+                logger.error(
+                        "expected arithmetic to be " + jexl.arithmetic.getClass().getSimpleName() +
+                        ", got " + arithmetic.getClass().getSimpleName()
+                );
+            }
         } else {
-            this.strictEngine = jexl.isStrict();
-            this.silent = jexl.isSilent();
-            this.cancellable = jexl.cancellable;
             this.arithmetic = jexl.arithmetic;
         }
         if (this.context instanceof JexlContext.NamespaceResolver) {
@@ -185,7 +174,6 @@ public class Interpreter extends ParserVisitor {
             ns = Engine.EMPTY_NS;
         }
         this.functions = jexl.functions;
-        this.strictArithmetic = this.arithmetic.isStrict();
         this.cache = jexl.cache != null;
         this.frame = eFrame;
         this.functors = null;
@@ -212,11 +200,11 @@ public class Interpreter extends ParserVisitor {
             return xreturn.getValue();
         } catch (JexlException.Cancel xcancel) {
             cancelled |= Thread.interrupted();
-            if (cancellable) {
+            if (isCancellable()) {
                 throw xcancel.clean();
             }
         } catch (JexlException xjexl) {
-            if (!silent) {
+            if (!isSilent()) {
                 throw xjexl.clean();
             }
             logger.warn(xjexl.getMessage(), xjexl.getCause());
@@ -267,6 +255,48 @@ public class Interpreter extends ParserVisitor {
     }
 
     /**
+     * Whether this interpreter is currently evaluating with a strict engine flag.
+     * @return true if strict engine, false otherwise
+     */
+    protected boolean isStrictEngine() {
+        if (this.context instanceof JexlEngine.Options) {
+            JexlEngine.Options opts = (JexlEngine.Options) context;
+            Boolean strict = opts.isStrict();
+            if (strict != null) {
+                return strict.booleanValue();
+            }
+        }
+        return jexl.isStrict();
+    }
+
+    /**
+     * Whether this interpreter is currently evaluating with a silent mode.
+     * @return true if silent, false otherwise
+     */
+    protected boolean isSilent() {
+        if (this.context instanceof JexlEngine.Options) {
+            JexlEngine.Options opts = (JexlEngine.Options) context;
+            Boolean silent = opts.isSilent();
+            if (silent != null) {
+                return silent.booleanValue();
+            }
+        }
+        return jexl.isSilent();
+    }
+
+    /** @return true if interrupt throws a JexlException.Cancel. */
+    protected boolean isCancellable() {
+        if (this.context instanceof JexlEngine.Options) {
+            JexlEngine.Options opts = (JexlEngine.Options) context;
+            Boolean ocancellable = opts.isCancellable();
+            if (ocancellable != null) {
+                return ocancellable.booleanValue();
+            }
+        }
+        return jexl.cancellable;
+    }
+    
+    /**
      * Finds the node causing a NPE for diadic operators.
      * @param xrt   the RuntimeException
      * @param node  the parent node
@@ -294,10 +324,10 @@ public class Interpreter extends ParserVisitor {
      * @return throws JexlException if isStrict, null otherwise
      */
     protected Object unsolvableVariable(JexlNode node, String var, boolean undef) {
-        if (!silent) {
+        if (!isSilent()) {
             logger.warn(JexlException.variableError(node, var, undef));
         }
-        if (strictEngine && (undef || arithmetic.isStrict())) {
+        if (isStrictEngine() && (undef || arithmetic.isStrict())) {
             throw new JexlException.Variable(node, var, undef);
         }
         return null;
@@ -310,10 +340,10 @@ public class Interpreter extends ParserVisitor {
      * @return throws JexlException if isStrict, null otherwise
      */
     protected Object unsolvableMethod(JexlNode node, String method) {
-        if (!silent) {
+        if (!isSilent()) {
             logger.warn(JexlException.methodError(node, method));
         }
-        if (strictEngine) {
+        if (isStrictEngine()) {
             throw new JexlException.Method(node, method);
         }
         return null;
@@ -327,10 +357,10 @@ public class Interpreter extends ParserVisitor {
      * @return throws JexlException if isStrict, null otherwise
      */
     protected Object unsolvableProperty(JexlNode node, String var, Throwable cause) {
-        if (!silent) {
+        if (!isSilent()) {
             logger.warn(JexlException.propertyError(node, var), cause);
         }
-        if (strictEngine) {
+        if (isStrictEngine()) {
             throw new JexlException.Property(node, var, cause);
         }
         return null;
@@ -345,10 +375,10 @@ public class Interpreter extends ParserVisitor {
      */
     protected void operatorError(JexlNode node, JexlOperator operator, Throwable cause) {
         if (cause != null) {
-            if (!silent) {
+            if (!isSilent()) {
                 logger.warn(JexlException.operatorError(node, operator.getOperatorSymbol()), cause);
             }
-            if (strictEngine) {
+            if (isStrictEngine()) {
                 throw new JexlException.Operator(node, operator.getOperatorSymbol(), cause);
             }
         }
@@ -360,10 +390,10 @@ public class Interpreter extends ParserVisitor {
      * @return throws JexlException if isStrict, null otherwise
      */
     protected Object invocationFailed(JexlException xjexl) {
-        if (!silent) {
+        if (!isSilent()) {
             logger.warn(xjexl.getMessage(), xjexl.getCause());
         }
-        if (strictEngine
+        if (isStrictEngine()
                 || xjexl instanceof JexlException.Return
                 || xjexl instanceof JexlException.Cancel) {
             throw xjexl;
@@ -398,10 +428,10 @@ public class Interpreter extends ParserVisitor {
      * @throws JexlException if isStrict
      */
     protected void annotationError(JexlNode node, String annotation, Throwable cause) {
-        if (!silent) {
+        if (!isSilent()) {
             logger.warn(JexlException.annotationError(node, annotation), cause);
         }
-        if (strictEngine) {
+        if (isStrictEngine()) {
             throw new JexlException.Annotation(node, annotation, cause);
         }
     }
@@ -428,11 +458,6 @@ public class Interpreter extends ParserVisitor {
             cancelled = Thread.currentThread().isInterrupted();
         }
         return cancelled;
-    }
-
-    /** @return true if interrupt throws a JexlException.Cancel. */
-    protected boolean isCancellable() {
-        return cancellable;
     }
 
     /**
@@ -533,7 +558,7 @@ public class Interpreter extends ParserVisitor {
             Object result = operators.tryOverload(node, JexlOperator.DIVIDE, left, right);
             return result != JexlEngine.TRY_FAILED ? result : arithmetic.divide(left, right);
         } catch (ArithmeticException xrt) {
-            if (!strictArithmetic) {
+            if (!arithmetic.isStrict()) {
                 return 0.0d;
             }
             JexlNode xnode = findNullOperand(xrt, node, left, right);
@@ -549,7 +574,7 @@ public class Interpreter extends ParserVisitor {
             Object result = operators.tryOverload(node, JexlOperator.MOD, left, right);
             return result != JexlEngine.TRY_FAILED ? result : arithmetic.mod(left, right);
         } catch (ArithmeticException xrt) {
-            if (!strictArithmetic) {
+            if (!arithmetic.isStrict()) {
                 return 0.0d;
             }
             JexlNode xnode = findNullOperand(xrt, node, left, right);
