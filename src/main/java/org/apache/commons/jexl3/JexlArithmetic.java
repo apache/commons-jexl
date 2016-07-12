@@ -106,29 +106,44 @@ public class JexlArithmetic {
 
     /**
      * Apply options to this arithmetic which eventually may create another instance.
+     * @see #createWithOptions(boolean, java.math.MathContext, int)
      *
      * @param options the {@link JexlEngine.Options} to use
      * @return an arithmetic with those options set
      */
     public JexlArithmetic options(JexlEngine.Options options) {
-        boolean ostrict = options.isStrictArithmetic() == null
-                          ? this.strict
-                          : options.isStrictArithmetic();
+        Boolean ostrict = options.isStrictArithmetic();
+        if (ostrict == null) {
+            ostrict = isStrict();
+        }
         MathContext bigdContext = options.getArithmeticMathContext();
         if (bigdContext == null) {
-            bigdContext = mathContext;
+            bigdContext = getMathContext();
         }
         int bigdScale = options.getArithmeticMathScale();
         if (bigdScale == Integer.MIN_VALUE) {
-            bigdScale = mathScale;
+            bigdScale = getMathScale();
         }
-        if ((ostrict != this.strict)
-                || bigdScale != this.mathScale
-                || bigdContext != this.mathContext) {
-            return new JexlArithmetic(ostrict, bigdContext, bigdScale);
-        } else {
-            return this;
+        if (ostrict != isStrict()
+            || bigdScale != getMathScale()
+            || bigdContext != getMathContext()) {
+            return createWithOptions(ostrict, bigdContext, bigdScale);
         }
+        return this;
+    }
+
+    /**
+     * Creates a JexlArithmetic instance.
+     * Called by options(...) method when another instance of the same class of arithmetic is required.
+     * @see #options(org.apache.commons.jexl3.JexlEngine.Options)
+     *
+     * @param astrict     whether this arithmetic is lenient or strict
+     * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
+     * @param bigdScale   the scale used for big decimals.
+     * @return default is a new JexlArithmetic instance
+     */
+    protected JexlArithmetic createWithOptions(boolean astrict, MathContext bigdContext, int bigdScale) {
+        return new JexlArithmetic(astrict, bigdContext, bigdScale);
     }
 
     /**
