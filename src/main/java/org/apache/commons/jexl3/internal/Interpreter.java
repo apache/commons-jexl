@@ -192,6 +192,9 @@ public class Interpreter extends ParserVisitor {
     public Object interpret(JexlNode node) {
         JexlContext.ThreadLocal local = null;
         try {
+            if (isCancelled()) {
+                throw new JexlException.Cancel(node);
+            }
             if (context instanceof JexlContext.ThreadLocal) {
                 local = jexl.putThreadLocal((JexlContext.ThreadLocal) context);
             }
@@ -295,7 +298,7 @@ public class Interpreter extends ParserVisitor {
         }
         return jexl.cancellable;
     }
-    
+
     /**
      * Finds the node causing a NPE for diadic operators.
      * @param xrt   the RuntimeException
