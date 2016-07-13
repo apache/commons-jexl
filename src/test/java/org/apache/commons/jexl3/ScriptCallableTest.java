@@ -160,9 +160,8 @@ public class ScriptCallableTest extends JexlTestCase {
         }
 
         public int runForever() {
-            boolean x = false;
             while (true) {
-                if (x) {
+                if (Thread.currentThread().isInterrupted()) {
                     break;
                 }
             }
