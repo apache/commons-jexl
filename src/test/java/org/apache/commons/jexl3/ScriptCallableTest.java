@@ -68,13 +68,13 @@ public class ScriptCallableTest extends JexlTestCase {
         JexlContext ctxt = new MapContext();
         ctxt.set("latch", latch);
 
-        JexlScript e = JEXL.createScript("latch.acquire(1); while(true);");
+        JexlScript e = JEXL.createScript("latch.release(); while(true);");
         final Script.Callable c = (Script.Callable) e.callable(ctxt);
         Object t = 42;
         Callable<Object> kc = new Callable<Object>() {
             @Override
             public Object call() throws Exception {
-                latch.release();
+                latch.acquire();
                 return c.cancel();
             }
         };
@@ -96,13 +96,18 @@ public class ScriptCallableTest extends JexlTestCase {
 
     @Test
     public void testCallableTimeout() throws Exception {
-        JexlScript e = JEXL.createScript("while(true);");
-        Callable<Object> c = e.callable(null);
+        final Semaphore latch = new Semaphore(0);
+        JexlContext ctxt = new MapContext();
+        ctxt.set("latch", latch);
+
+        JexlScript e = JEXL.createScript("latch.release(); while(true);");
+        Callable<Object> c = e.callable(ctxt);
         Object t = 42;
 
         ExecutorService executor = Executors.newFixedThreadPool(1);
         Future<?> future = executor.submit(c);
         try {
+            latch.acquire();
             t = future.get(100, TimeUnit.MILLISECONDS);
             Assert.fail("should have timed out");
         } catch (TimeoutException xtimeout) {
@@ -266,7 +271,7 @@ public class ScriptCallableTest extends JexlTestCase {
         JexlContext ctxt = new TestContext();
         ctxt.set("latch", latch);
 
-        JexlScript e = JEXL.createScript("runForever()");
+        JexlScript e = JEXL.createScript("latch.release(); runForever()");
         Callable<Object> c = e.callable(ctxt);
 
         ExecutorService executor = Executors.newFixedThreadPool(1);
@@ -274,7 +279,7 @@ public class ScriptCallableTest extends JexlTestCase {
         Object t = 42;
 
         try {
-            latch.release();
+            latch.acquire();
             t = future.get(100, TimeUnit.MILLISECONDS);
             Assert.fail("should have timed out");
         } catch (TimeoutException xtimeout) {
