@@ -26,6 +26,15 @@
     </properties>
     <body>
         <release version="3.0.1" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-206" due-to="Dmitri Blinov">
+                testCallableCancel() test hangs sporadically
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-205" due-to="Dmitri Blinov">
+                testCancelForever() is not terminated properly as 'Fixed'
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-204" due-to="Dmitri Blinov">
+                Script is not interrupted by a method call throwing Exception
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-202" due-to="Dmitri Blinov">
                 Detect invalid assignment operator usage with non-assignable l-value during script parsing
             </action>
