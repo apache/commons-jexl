@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.0.1" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-207" due-to="Dmitri Blinov">
+               Inconsistent error handling
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-206" due-to="Dmitri Blinov">
                 testCallableCancel() test hangs sporadically
             </action>

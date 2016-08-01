@@ -27,6 +27,7 @@ Version 3.0.1 is a micro release to fix issues detected so far in 3.0:
 
 Bugs Fixed in 3.0.1:
 ====================
+* JEXL-207:     Inconsistent error handling
 * JEXL-206:     testCallableCancel() test hangs sporadically
 * JEXL-205:     testCancelForever() is not terminated properly as 'Fixed'
 * JEXL-204:     Script is not interrupted by a method call throwing Exception
