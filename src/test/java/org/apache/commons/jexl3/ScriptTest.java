@@ -28,6 +28,7 @@ import org.junit.Test;
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ScriptTest extends JexlTestCase {
     static final String TEST1 =  "src/test/scripts/test1.jexl";
+    static final String TEST_ADD =  "src/test/scripts/testAdd.jexl";
 
     // test class for testScriptUpdatesContext
     // making this class private static will cause the test to fail.
@@ -74,14 +75,34 @@ public class ScriptTest extends JexlTestCase {
         Assert.assertEquals("Wrong result", new Integer(7), result);
     }
 
+    @Test public void testArgScriptFromFile() throws Exception {
+        File testScript = new File(TEST_ADD);
+        JexlScript s = JEXL.createScript(testScript,new String[]{"x","y"});
+        JexlContext jc = new MapContext();
+        jc.set("out", System.out);
+        Object result = s.execute(jc, 13, 29);
+        Assert.assertNotNull("No result", result);
+        Assert.assertEquals("Wrong result", new Integer(42), result);
+    }
+
     @Test public void testScriptFromURL() throws Exception {
-        URL testUrl = new File("src/test/scripts/test1.jexl").toURI().toURL();
+        URL testUrl = new File(TEST1).toURI().toURL();
         JexlScript s = JEXL.createScript(testUrl);
         JexlContext jc = new MapContext();
         jc.set("out", System.out);
         Object result = s.execute(jc);
         Assert.assertNotNull("No result", result);
         Assert.assertEquals("Wrong result", new Integer(7), result);
+    }
+
+    @Test public void testArgScriptFromURL() throws Exception {
+        URL testUrl = new File(TEST_ADD).toURI().toURL();
+        JexlScript s = JEXL.createScript(testUrl,new String[]{"x","y"});
+        JexlContext jc = new MapContext();
+        jc.set("out", System.out);
+        Object result = s.execute(jc, 13, 29);
+        Assert.assertNotNull("No result", result);
+        Assert.assertEquals("Wrong result", new Integer(42), result);
     }
 
     @Test public void testScriptUpdatesContext() throws Exception {

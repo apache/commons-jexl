@@ -124,33 +124,59 @@ public class AnnotationTest extends JexlTestCase {
 
     @Test
     public void testError() throws Exception {
+        testError(true);
+        testError(false);
+    }
+
+    private void testError(boolean silent) throws Exception {
+        CaptureLog log = new CaptureLog();
         AnnotationContext jc = new AnnotationContext();
-        JexlEngine jexl = new JexlBuilder().create();
+        JexlEngine jexl = new JexlBuilder().logger(log).strict(true).silent(silent).create();
         JexlScript e = jexl.createScript("@error('42') { return 42; }");
         try {
             Object r = e.execute(jc);
-            Assert.fail("should have failed");
+            if (!silent) {
+                Assert.fail("should have failed");
+            } else {
+                Assert.assertEquals(1, log.count("warn"));
+            }
         } catch (JexlException.Annotation xjexl) {
             Assert.assertEquals("error", xjexl.getAnnotation());
         }
         Assert.assertEquals(1, jc.getCount());
         Assert.assertTrue(jc.getNames().contains("error"));
         Assert.assertTrue(jc.getNames().contains("42"));
+        if (!silent) {
+            Assert.assertEquals(0, log.count("warn"));
+        }
     }
 
     @Test
     public void testUnknown() throws Exception {
+        testUnknown(true);
+        testUnknown(false);
+    }
+
+    private void testUnknown(boolean silent) throws Exception {
+        CaptureLog log = new CaptureLog();
         AnnotationContext jc = new AnnotationContext();
-        JexlEngine jexl = new JexlBuilder().create();
+        JexlEngine jexl = new JexlBuilder().logger(log).strict(true).silent(silent).create();
         JexlScript e = jexl.createScript("@unknown('42') { return 42; }");
         try {
             Object r = e.execute(jc);
-            Assert.fail("should have failed");
+            if (!silent) {
+                Assert.fail("should have failed");
+            } else {
+                Assert.assertEquals(1, log.count("warn"));
+            }
         } catch (JexlException.Annotation xjexl) {
             Assert.assertEquals("unknown", xjexl.getAnnotation());
         }
         Assert.assertEquals(1, jc.getCount());
         Assert.assertTrue(jc.getNames().contains("unknown"));
         Assert.assertFalse(jc.getNames().contains("42"));
+        if (!silent) {
+            Assert.assertEquals(0, log.count("warn"));
+        }
     }
 }

@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -27,6 +28,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.commons.jexl3.internal.Script;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,7 +38,7 @@ import org.junit.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ScriptCallableTest extends JexlTestCase {
-    //Logger LOGGER = Logger.getLogger(VarTest.class.getName());
+    //private Log logger = LogFactory.getLog(JexlEngine.class);
     public ScriptCallableTest() {
         super("ScriptCallableTest");
     }
@@ -64,6 +67,7 @@ public class ScriptCallableTest extends JexlTestCase {
 
     @Test
     public void testCallableCancel() throws Exception {
+        List<Runnable> lr = null;
         final Semaphore latch = new Semaphore(0);
         JexlContext ctxt = new MapContext();
         ctxt.set("latch", latch);
@@ -89,13 +93,15 @@ public class ScriptCallableTest extends JexlTestCase {
             // ok, ignore
             Assert.assertTrue(xexec.getCause() instanceof JexlException.Cancel);
         } finally {
-            executor.shutdown();
+            lr = executor.shutdownNow();
         }
         Assert.assertTrue(c.isCancelled());
+        Assert.assertTrue(lr == null || lr.isEmpty());
     }
 
     @Test
     public void testCallableTimeout() throws Exception {
+        List<Runnable> lr = null;
         final Semaphore latch = new Semaphore(0);
         JexlContext ctxt = new MapContext();
         ctxt.set("latch", latch);
@@ -114,14 +120,16 @@ public class ScriptCallableTest extends JexlTestCase {
             // ok, ignore
             future.cancel(true);
         } finally {
-            executor.shutdown();
+            lr = executor.shutdownNow();
         }
         Assert.assertTrue(future.isCancelled());
         Assert.assertEquals(42, t);
+        Assert.assertTrue(lr.isEmpty());
     }
 
     @Test
     public void testCallableClosure() throws Exception {
+        List<Runnable> lr = null;
         JexlScript e = JEXL.createScript("function(t) {while(t);}");
         Callable<Object> c = e.callable(null, Boolean.TRUE);
         Object t = 42;
@@ -135,10 +143,11 @@ public class ScriptCallableTest extends JexlTestCase {
             // ok, ignore
             future.cancel(true);
         } finally {
-            executor.shutdown();
+            lr = executor.shutdownNow();
         }
         Assert.assertTrue(future.isCancelled());
         Assert.assertEquals(42, t);
+        Assert.assertTrue(lr.isEmpty());
     }
 
     public static class TestContext extends MapContext implements JexlContext.NamespaceResolver {
@@ -191,6 +200,7 @@ public class ScriptCallableTest extends JexlTestCase {
 
     @Test
     public void testNoWait() throws Exception {
+        List<Runnable> lr = null;
         JexlScript e = JEXL.createScript("wait(0)");
         Callable<Object> c = e.callable(new TestContext());
 
@@ -201,12 +211,14 @@ public class ScriptCallableTest extends JexlTestCase {
             Assert.assertTrue(future.isDone());
             Assert.assertEquals(0, t);
         } finally {
-            executor.shutdown();
+            lr = executor.shutdownNow();
         }
+        Assert.assertTrue(lr.isEmpty());
     }
 
     @Test
     public void testWait() throws Exception {
+        List<Runnable> lr = null;
         JexlScript e = JEXL.createScript("wait(1)");
         Callable<Object> c = e.callable(new TestContext());
 
@@ -216,12 +228,14 @@ public class ScriptCallableTest extends JexlTestCase {
             Object t = future.get(2, TimeUnit.SECONDS);
             Assert.assertEquals(1, t);
         } finally {
-            executor.shutdown();
+            lr = executor.shutdownNow();
         }
+        Assert.assertTrue(lr.isEmpty());
     }
 
     @Test
     public void testCancelWait() throws Exception {
+        List<Runnable> lr = null;
         JexlScript e = JEXL.createScript("wait(10)");
         Callable<Object> c = e.callable(new TestContext());
 
@@ -239,12 +253,14 @@ public class ScriptCallableTest extends JexlTestCase {
             Assert.assertTrue(future.isCancelled());
             Assert.assertEquals(42, t);
         } finally {
-            executor.shutdown();
+            lr = executor.shutdownNow();
         }
+        Assert.assertTrue(lr.isEmpty());
     }
 
     @Test
     public void testCancelWaitInterrupt() throws Exception {
+        List<Runnable> lr = null;
         JexlScript e = JEXL.createScript("waitInterrupt(42)");
         Callable<Object> c = e.callable(new TestContext());
 
@@ -259,14 +275,16 @@ public class ScriptCallableTest extends JexlTestCase {
             // ok, ignore
             future.cancel(true);
         } finally {
-            executor.shutdown();
+            lr = executor.shutdownNow();
         }
         Assert.assertTrue(future.isCancelled());
         Assert.assertEquals(42, t);
+        Assert.assertTrue(lr.isEmpty());
     }
 
     @Test
     public void testCancelForever() throws Exception {
+        List<Runnable> lr = null;
         final Semaphore latch = new Semaphore(0);
         JexlContext ctxt = new TestContext();
         ctxt.set("latch", latch);
@@ -286,14 +304,16 @@ public class ScriptCallableTest extends JexlTestCase {
             // ok, ignore
             future.cancel(true);
         } finally {
-            executor.shutdown();
+            lr = executor.shutdownNow();
         }
         Assert.assertTrue(future.isCancelled());
         Assert.assertEquals(42, t);
+        Assert.assertTrue(lr.isEmpty());
     }
 
     @Test
     public void testCancelLoopWait() throws Exception {
+        List<Runnable> lr = null;
         JexlScript e = JEXL.createScript("while (true) { wait(10) }");
         Callable<Object> c = e.callable(new TestContext());
 
@@ -307,10 +327,11 @@ public class ScriptCallableTest extends JexlTestCase {
         } catch (TimeoutException xtimeout) {
             future.cancel(true);
         } finally {
-            executor.shutdown();
+            lr = executor.shutdownNow();
         }
         Assert.assertTrue(future.isCancelled());
         Assert.assertEquals(42, t);
+        Assert.assertTrue(lr.isEmpty());
     }
 
     @Test
@@ -345,6 +366,7 @@ public class ScriptCallableTest extends JexlTestCase {
      * @throws Exception if there is a regression
      */
     private void runInterrupt(JexlEngine jexl) throws Exception {
+        List<Runnable> lr = null;
         ExecutorService exec = Executors.newFixedThreadPool(2);
         try {
             JexlContext ctxt = new TestContext();
@@ -411,7 +433,7 @@ public class ScriptCallableTest extends JexlTestCase {
                     }
                 };
                 exec.submit(cancels);
-                t = fc.get();
+                t = f.get(100L, TimeUnit.MILLISECONDS);
                 Assert.fail("should be cancelled");
             } catch (CancellationException xexec) {
                 // this is the expected result
@@ -452,8 +474,9 @@ public class ScriptCallableTest extends JexlTestCase {
             }
             Assert.assertNotEquals(42, t);
         } finally {
-            exec.shutdown();
+            lr = exec.shutdownNow();
         }
+        Assert.assertTrue(lr.isEmpty());
     }
 
     @Test
