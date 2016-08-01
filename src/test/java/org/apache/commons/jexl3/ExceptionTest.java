@@ -16,7 +16,10 @@
  */
 package org.apache.commons.jexl3;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.jexl3.internal.Engine;
+import org.apache.commons.logging.Log;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -158,6 +161,54 @@ public class ExceptionTest extends JexlTestCase {
         } catch (JexlException xjexl) {
             String msg = xjexl.getMessage();
             Assert.assertTrue(msg.indexOf("c.e") > 0);
+        }
+    }
+
+
+    @Test
+    public void test206() throws Exception {
+        String src = "null.1 = 2; return 42";
+        doTest206(src, false, false);
+        doTest206(src, false, true);
+        doTest206(src, true, false);
+        doTest206(src, true, true);
+        src = "x = null.1; return 42";
+        doTest206(src, false, false);
+        doTest206(src, false, true);
+        doTest206(src, true, false);
+        doTest206(src, true, true);
+        src = "x = y.1; return 42";
+        doTest206(src, false, false);
+        doTest206(src, false, true);
+        doTest206(src, true, false);
+        doTest206(src, true, true);
+    }
+    private void doTest206(String src, boolean strict, boolean silent) throws Exception {
+        CaptureLog l = new CaptureLog();
+        JexlContext jc = new MapContext();
+        JexlEngine jexl = new JexlBuilder().logger(l).strict(strict).silent(silent).create();
+        JexlScript e;
+        Object r = -1;
+        e = jexl.createScript(src);
+        try {
+            r = e.execute(jc);
+            if (strict && !silent) {
+                Assert.fail("should have thrown an exception");
+            }
+        } catch(JexlException xjexl) {
+            if (!strict || silent) {
+                Assert.fail("should not have thrown an exception");
+            }
+        }
+        if (strict) {
+            if (silent && l.count("warn") == 0) {
+                Assert.fail("should have generated a warning");
+            }
+        } else {
+            if (l.count("debug") == 0) {
+                Assert.fail("should have generated a debug");
+            }
+            Assert.assertEquals(42, r);
         }
     }
 }

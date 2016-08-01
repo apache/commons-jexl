@@ -369,6 +369,10 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         public Date now() {
             return new Date(System.currentTimeMillis());
         }
+
+        public Date multiply(Date d0, Date d1) {
+            throw new ArithmeticException("unsupported");
+        }
     }
 
     public static class DateContext extends MapContext {
@@ -385,6 +389,34 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
         public String format(Number number, String fmt) {
             return new DecimalFormat(fmt).format(number);
+        }
+    }
+
+    @Test
+    public void testOperatorError() throws Exception {
+        testOperatorError(true);
+        testOperatorError(false);
+    }
+
+    private void testOperatorError(boolean silent) throws Exception {
+        CaptureLog log = new CaptureLog();
+        DateContext jc = new DateContext();
+        Date d = new Date();
+        JexlEngine jexl = new JexlBuilder().logger(log).strict(true).silent(silent).cache(32)
+                                           .arithmetic(new DateArithmetic(true)).create();
+        JexlScript expr0 = jexl.createScript("date * date", "date");
+        try {
+            Object value0 = expr0.execute(jc, d);
+            if (!silent) {
+                Assert.fail("should have failed");
+            } else {
+                Assert.assertEquals(1, log.count("warn"));
+            }
+        } catch(JexlException.Operator xop) {
+            Assert.assertEquals("*", xop.getSymbol());
+        }
+        if (!silent) {
+            Assert.assertEquals(0, log.count("warn"));
         }
     }
 
