@@ -1211,5 +1211,23 @@ public class IssuesTest extends JexlTestCase {
         JexlScript e = jexl.createScript("var x = 0; var f = (y)->{ x = y; }; f(42); x");
         Object r = e.execute(jc);
         Assert.assertEquals(0, r);
+    }    
+    
+    @Test
+    public void test209a() throws Exception {
+        JexlContext jc = new MapContext();
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript e = jexl.createScript("var x = new('java.util.HashMap'); x.a = ()->{return 1}; x['a']()");
+        Object r = e.execute(jc);
+        Assert.assertEquals(1, r);
+    }
+
+    @Test
+    public void test209b() throws Exception {
+        JexlContext jc = new MapContext();
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript e = jexl.createScript("var x = new('java.util.HashMap'); x['a'] = ()->{return 1}; x.a()");
+        Object r = e.execute(jc);
+        Assert.assertEquals(1, r);
     }
 }

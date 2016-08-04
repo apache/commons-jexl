@@ -1289,7 +1289,7 @@ public class Interpreter extends InterpreterBase {
                 return unsolvableMethod(objectNode, "<null>.<?>(...)");
             }
         } else {
-            method = methodNode.jjtAccept(this, null);
+            method = methodNode.jjtAccept(this, data);
         }
         Object result = method;
         for (int a = 1; a < node.jjtGetNumChildren(); ++a) {
