@@ -117,6 +117,17 @@ public class JexlEvalContext implements JexlContext, JexlContext.NamespaceResolv
     }
 
     /**
+     * Set options from engine.
+     * @param jexl the engine
+     */
+    public void setOptions(JexlEngine jexl) {
+        silent = jexl.isSilent();
+        strict = jexl.isStrict();
+        mathScale = jexl.getArithmetic().getMathScale();
+        mathContext = jexl.getArithmetic().getMathContext();
+    }
+
+    /**
      * Sets whether the engine will throw JexlException during evaluation when an error is triggered.
      * @param s true means no JexlException will occur, false allows them
      */
@@ -147,9 +158,9 @@ public class JexlEvalContext implements JexlContext, JexlContext.NamespaceResolv
      * @param se the engine strict flag
      * @param sa the arithmetic strict flag
      */
-    public void setStrict(boolean se, boolean sa) {
-        this.strict = se ? Boolean.TRUE : Boolean.FALSE;
-        this.mathStrict = sa ? Boolean.TRUE : Boolean.FALSE;
+    public void setStrict(Boolean se, Boolean sa) {
+        this.strict = se == null? null : se ? Boolean.TRUE : Boolean.FALSE;
+        this.mathStrict = sa == null? null : sa ? Boolean.TRUE : Boolean.FALSE;
     }
 
     /**
