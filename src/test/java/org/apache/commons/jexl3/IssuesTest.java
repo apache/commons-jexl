@@ -1211,8 +1211,8 @@ public class IssuesTest extends JexlTestCase {
         JexlScript e = jexl.createScript("var x = 0; var f = (y)->{ x = y; }; f(42); x");
         Object r = e.execute(jc);
         Assert.assertEquals(0, r);
-    }    
-    
+    }
+
     @Test
     public void test209a() throws Exception {
         JexlContext jc = new MapContext();
@@ -1229,5 +1229,38 @@ public class IssuesTest extends JexlTestCase {
         JexlScript e = jexl.createScript("var x = new('java.util.HashMap'); x['a'] = ()->{return 1}; x.a()");
         Object r = e.execute(jc);
         Assert.assertEquals(1, r);
+    }
+
+    public class T210 {
+        public void npe() {
+            throw new NullPointerException("NPE");
+        }
+    }
+
+    @Test
+    public void test210() throws Exception {
+        JexlContext jc = new MapContext();
+        jc.set("v210", new T210());
+        JexlEngine jexl;
+        JexlScript e;
+        Object r;
+        jexl = new JexlBuilder().strict(true).silent(false).create();
+        e = jexl.createScript("v210.npe()");
+        try {
+            r = e.execute(jc);
+            Assert.fail("should have thrown an exception");
+        } catch(JexlException xjexl) {
+            Throwable th = xjexl.getCause();
+            Assert.assertTrue(NullPointerException.class.equals(th.getClass()));
+        }
+        jexl = new JexlBuilder().strict(false).silent(false).create();
+        e = jexl.createScript("v210.npe()");
+        try {
+            r = e.execute(jc);
+            Assert.fail("should have thrown an exception");
+        } catch(JexlException xjexl) {
+            Throwable th = xjexl.getCause();
+            Assert.assertTrue(NullPointerException.class.equals(th.getClass()));
+        }
     }
 }

@@ -27,12 +27,15 @@ Version 3.0.1 is a micro release to fix issues detected so far in 3.0:
 
 Bugs Fixed in 3.0.1:
 ====================
+* JEXL-210:     The way to cancel script execution with an error
 * JEXL-209:     Unsolvable function/method '<?>.<null>(...)'
 * JEXL-207:     Inconsistent error handling
 * JEXL-206:     testCallableCancel() test hangs sporadically
 * JEXL-205:     testCancelForever() is not terminated properly as 'Fixed'
 * JEXL-204:     Script is not interrupted by a method call throwing Exception
+* JEXL-203:     JexlArithmetic.options() diverts Interpreter to use default implementation of JexlArithmetic instead of custom one
 * JEXL-202:     Detect invalid assignment operator usage with non-assignable l-value during script parsing
+* JEXL-201:     Allow Interpreter to use live values from JexlEngine.Option interface implemented by JexlContext
 * JEXL-198:     JxltEngine Template does not expose pragmas
 * JEXL-196:     Script execution hangs while calling method with one argument without parameter
 * JEXL-194      allow synchronization on iterableValue in foreach statement

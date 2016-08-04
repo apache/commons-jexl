@@ -25,7 +25,10 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.0.1" date="unreleased"> 
+        <release version="3.0.1" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-2010" due-to="Dmitri Blinov">
+                The way to cancel script execution with an error
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-209" due-to="Dmitri Blinov">
                Unsolvable function/method '&lt;?&gt;.&lt;null&gt;(...)'
             </action>
@@ -41,8 +44,14 @@
             <action dev="henrib" type="fix" issue="JEXL-204" due-to="Dmitri Blinov">
                 Script is not interrupted by a method call throwing Exception
             </action>
+            <action dev="henrib" type="fix" issue="JEXL-203" due-to="Dmitri Blinov">
+            JexlArithmetic.options() diverts Interpreter to use default implementation of JexlArithmetic instead of custom one
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-202" due-to="Dmitri Blinov">
                 Detect invalid assignment operator usage with non-assignable l-value during script parsing
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-201" due-to="Dmitri Blinov">
+                Allow Interpreter to use live values from JexlEngine.Option interface implemented by JexlContext
             </action>
             <action dev="henrib" type="fix" issue="JEXL-198" due-to="Terefang Verigorn">
                 JxltEngine Template does not expose pragmas
