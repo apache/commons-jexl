@@ -25,7 +25,10 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.0.1" date="unreleased">
+        <release version="3.0.1" date="unreleased"> 
+            <action dev="henrib" type="fix" issue="JEXL-209" due-to="Dmitri Blinov">
+               Unsolvable function/method '&lt;?&gt;.&lt;null&gt;(...)'
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-207" due-to="Dmitri Blinov">
                Inconsistent error handling
             </action>
