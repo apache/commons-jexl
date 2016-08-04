@@ -133,6 +133,19 @@ public class JexlArithmetic {
     }
 
     /**
+     * Apply options to this arithmetic which eventually may create another instance.
+     * @see #createWithOptions(boolean, java.math.MathContext, int)
+     *
+     * @param context the context that may extend {@link JexlEngine.Options} to use
+     * @return a new arithmetic instance or this
+     */
+    public JexlArithmetic options(JexlContext context) {
+        return context instanceof JexlEngine.Options
+               ? options((JexlEngine.Options) context)
+               : this;
+    }
+
+    /**
      * Creates a JexlArithmetic instance.
      * Called by options(...) method when another instance of the same class of arithmetic is required.
      * @see #options(org.apache.commons.jexl3.JexlEngine.Options)
@@ -709,10 +722,10 @@ public class JexlArithmetic {
         // otherwise treat as integers
         BigInteger l = toBigInteger(left);
         BigInteger r = toBigInteger(right);
-        BigInteger result = l.mod(r);
         if (BigInteger.ZERO.equals(r)) {
             throw new ArithmeticException("%");
         }
+        BigInteger result = l.mod(r);
         return narrowBigInteger(left, right, result);
     }
 
