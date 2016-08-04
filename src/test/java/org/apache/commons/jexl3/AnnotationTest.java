@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import java.math.MathContext;
+import java.nio.charset.Charset;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
@@ -72,6 +74,88 @@ public class AnnotationTest extends JexlTestCase {
         public Set<String> getNames() {
             return names;
         }
+    }
+
+    public class OptAnnotationContext extends JexlEvalContext implements JexlContext.AnnotationProcessor {
+        @Override
+        public Object processAnnotation(String name, Object[] args, Callable<Object> statement) throws Exception {
+            // transient side effect for strict
+            if ("strict".equals(name)) {
+                boolean s = (Boolean) args[0];
+                boolean b = this.isStrict();
+                setStrict(s);
+                Object r = statement.call();
+                setStrict(b);
+                return r;
+            }
+            // transient side effect for silent
+            if ("silent".equals(name)) {
+                boolean s = (Boolean) args[0];
+                boolean b = this.isSilent();
+                setSilent(s);
+                Object r = statement.call();
+                setSilent(b);
+                return r;
+            }
+            // durable side effect for scale
+            if ("scale".equals(name)) {
+                this.setMathScale((Integer) args[0]);
+                return statement.call();
+            }
+            return statement.call();
+        }
+    }
+
+    @Test
+    public void testVarStmt() throws Exception {
+        OptAnnotationContext jc = new OptAnnotationContext();
+        JexlEngine jexl = new JexlBuilder().strict(true).silent(false).create();
+        jc.setOptions(jexl);
+        JexlScript e;
+        Object r;
+        e = jexl.createScript("(s, v)->{ @strict(s) @silent(v) var x = y ; 42; }");
+
+        // wont make an error
+        try {
+            r = e.execute(jc, false, true);
+            Assert.assertEquals(42, r);
+        } catch (JexlException.Variable xjexl) {
+            Assert.fail("should not have thrown");
+        }
+
+        r = null;
+        // will make an error and throw
+        try {
+            r = e.execute(jc, true, false);
+            Assert.fail("should have thrown");
+        } catch (JexlException.Variable xjexl) {
+            Assert.assertNull(r);
+        }
+
+        r = null;
+        // will make an error and will not throw but result is null
+        try {
+            r = e.execute(jc, true, true);
+            Assert.assertEquals(null, r);
+        } catch (JexlException.Variable xjexl) {
+            Assert.fail("should not have thrown");
+        }
+
+        r = null;
+        // will not make an error and will not throw
+        try {
+            r = e.execute(jc, false, false);
+            Assert.assertEquals(42, r);
+        } catch (JexlException.Variable xjexl) {
+            Assert.fail("should not have thrown");
+        }
+        //Assert.assertEquals(42, r);
+        Assert.assertTrue(jc.isStrict());
+        e = jexl.createScript("@scale(5) 42;");
+        r = e.execute(jc);
+        Assert.assertEquals(42, r);
+        Assert.assertTrue(jc.isStrict());
+        Assert.assertEquals(5, jc.getArithmeticMathScale());
     }
 
     @Test

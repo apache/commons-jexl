@@ -60,18 +60,28 @@ public abstract class InterpreterBase extends ParserVisitor {
         this.logger = jexl.logger;
         this.uberspect = jexl.uberspect;
         this.context = aContext != null ? aContext : Engine.EMPTY_CONTEXT;
-        if (this.context instanceof JexlEngine.Options) {
-            JexlEngine.Options opts = (JexlEngine.Options) context;
-            this.arithmetic = jexl.arithmetic.options(opts);
-            if (!arithmetic.getClass().equals(jexl.arithmetic.getClass())) {
-                logger.error("expected arithmetic to be " + jexl.arithmetic.getClass().getSimpleName()
-                              + ", got " + arithmetic.getClass().getSimpleName()
-                );
-            }
-        } else {
-            this.arithmetic = jexl.arithmetic;
+        JexlArithmetic jexla = jexl.arithmetic;
+        this.arithmetic = jexla.options(context);
+        if (arithmetic != jexla && !arithmetic.getClass().equals(jexla.getClass())) {
+            logger.warn("expected arithmetic to be " + jexla.getClass().getSimpleName()
+                          + ", got " + arithmetic.getClass().getSimpleName()
+            );
         }
     }
+
+    /**
+     * Copy constructor.
+     * @param ii the base to copy
+     * @param jexla the arithmetic instance to use (or null)
+     */
+    protected InterpreterBase(InterpreterBase ii, JexlArithmetic jexla) {
+        jexl = ii.jexl;
+        logger = ii.logger;
+        uberspect = ii.uberspect;
+        context = ii.context;
+        arithmetic = ii.arithmetic;
+    }
+
 
     /** Java7 AutoCloseable interface defined?. */
     protected static final Class<?> AUTOCLOSEABLE;
@@ -175,12 +185,8 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @return throws JexlException if strict and not silent, null otherwise
      */
     protected Object unsolvableVariable(JexlNode node, String var, boolean undef) {
-        if (isStrictEngine()) {
-            if (isSilent()) {
-                logger.warn(JexlException.variableError(node, var, undef));
-            } else if (undef || arithmetic.isStrict()){
-                throw new JexlException.Variable(node, var, undef);
-            }
+        if (isStrictEngine() && (undef || arithmetic.isStrict())) {
+            throw new JexlException.Variable(node, var, undef);
         } else if (logger.isDebugEnabled()) {
             logger.debug(JexlException.variableError(node, var, undef));
         }
@@ -195,11 +201,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected Object unsolvableMethod(JexlNode node, String method) {
         if (isStrictEngine()) {
-            if (isSilent()) {
-                logger.warn(JexlException.methodError(node, method));
-            } else {
-                throw new JexlException.Method(node, method);
-            }
+            throw new JexlException.Method(node, method);
         } else if (logger.isDebugEnabled()) {
             logger.debug(JexlException.methodError(node, method));
         }
@@ -215,11 +217,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected Object unsolvableProperty(JexlNode node, String var, Throwable cause) {
         if (isStrictEngine()) {
-            if (isSilent()) {
-                logger.warn(JexlException.propertyError(node, var), cause);
-            } else {
-                throw new JexlException.Property(node, var, cause);
-            }
+            throw new JexlException.Property(node, var, cause);
         } else if (logger.isDebugEnabled()) {
             logger.debug(JexlException.propertyError(node, var), cause);
         }
@@ -235,11 +233,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected Object operatorError(JexlNode node, JexlOperator operator, Throwable cause) {
         if (isStrictEngine()) {
-            if (isSilent()) {
-                logger.warn(JexlException.operatorError(node, operator.getOperatorSymbol()), cause);
-            } else {
-                throw new JexlException.Operator(node, operator.getOperatorSymbol(), cause);
-            }
+            throw new JexlException.Operator(node, operator.getOperatorSymbol(), cause);
         } else if (logger.isDebugEnabled()) {
             logger.debug(JexlException.operatorError(node, operator.getOperatorSymbol()), cause);
         }
@@ -247,35 +241,29 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
 
     /**
-     * Triggered when method, function or constructor invocation fails.
-     * @param xjexl the JexlException wrapping the original error
+     * Triggered when an annotation processing fails.
+     * @param node     the node where the error originated from
+     * @param annotation the annotation name
+     * @param cause    the cause of error (if any)
      * @return throws a JexlException if strict and not silent, null otherwise
      */
-    protected Object invocationFailed(JexlException xjexl) {
-        if (xjexl instanceof JexlException.Return
-            || xjexl instanceof JexlException.Cancel) {
-            throw xjexl;
-        }
-        if (isStrictEngine())  {
-            if (isSilent()) {
-                logger.warn(xjexl.getMessage(), xjexl.getCause());
-            } else {
-                throw xjexl;
-            }
+    protected Object annotationError(JexlNode node, String annotation, Throwable cause) {
+        if (isStrictEngine()) {
+            throw new JexlException.Annotation(node, annotation, cause);
         } else if (logger.isDebugEnabled()) {
-            logger.debug(xjexl);
+            logger.debug(JexlException.annotationError(node, annotation), cause);
         }
         return null;
     }
 
     /**
-     * Wraps an exception thrown by an invocation.
+     * Triggered when method, function or constructor invocation fails with an exception.
      * @param node       the node triggering the exception
      * @param methodName the method/function name
      * @param xany       the cause
-     * @return a JexlException
+     * @return a JexlException that will be thrown
      */
-    protected JexlException exceptionOnInvocation(JexlNode node, String methodName, Exception xany) {
+    protected JexlException invocationException(JexlNode node, String methodName, Exception xany) {
         Throwable cause = xany.getCause();
         if (cause instanceof JexlException) {
             return (JexlException) cause;
@@ -288,30 +276,10 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
 
     /**
-     * Triggered when an annotation processing fails.
-     * @param node     the node where the error originated from
-     * @param annotation the annotation name
-     * @param cause    the cause of error (if any)
-     * @return throws a JexlException if strict and not silent, null otherwise
-     */
-    protected Object annotationError(JexlNode node, String annotation, Throwable cause) {
-        if (isStrictEngine()) {
-            if (isSilent()) {
-                logger.warn(JexlException.annotationError(node, annotation), cause);
-            } else {
-                throw new JexlException.Annotation(node, annotation, cause);
-            }
-        } else if (logger.isDebugEnabled()) {
-            logger.debug(JexlException.annotationError(node, annotation), cause);
-        }
-        return null;
-    }
-
-    /**
      * Cancels this evaluation, setting the cancel flag that will result in a JexlException.Cancel to be thrown.
      * @return false if already cancelled, true otherwise
      */
-    protected synchronized boolean  cancel() {
+    protected synchronized boolean cancel() {
         if (cancelled) {
             return false;
         } else {

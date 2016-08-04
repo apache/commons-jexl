@@ -151,6 +151,21 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
+     * Copy constructor.
+     * @param ii  the interpreter to copy
+     * @param jexla the arithmetic instance to use (or null)
+     */
+    protected Interpreter(Interpreter ii, JexlArithmetic jexla) {
+        super(ii, jexla);
+        operators = ii.operators;
+        cache = ii.cache;
+        frame = ii.frame;
+        ns = ii.ns;
+        functions = ii.functions;
+        functors = ii.functors;
+    }
+
+    /**
      * Interpret the given script/expression.
      * <p>
      * If the underlying JEXL engine is silent, errors will be logged through
@@ -180,7 +195,9 @@ public class Interpreter extends InterpreterBase {
             if (!isSilent()) {
                 throw xjexl.clean();
             }
-            logger.warn(xjexl.getMessage(), xjexl.getCause());
+            if (logger.isWarnEnabled()) {
+                logger.warn(xjexl.getMessage(), xjexl.getCause());
+            }
         } finally {
             synchronized(this) {
                 if (functors != null) {
@@ -1473,7 +1490,6 @@ public class Interpreter extends InterpreterBase {
             return unsolvableMethod(node, "?");
         }
         // at this point, either the functor is a non null (hopefully) 'invocable' object or we do have the methodName
-        JexlException xjexl;
         Object caller = target;
         try {
             boolean cacheable = cache;
@@ -1602,9 +1618,8 @@ public class Interpreter extends InterpreterBase {
         } catch (JexlException xthru) {
             throw xthru;
         } catch (Exception xany) {
-            xjexl = exceptionOnInvocation(node, methodName, xany);
+            throw invocationException(node, methodName, xany);
         }
-        return invocationFailed(xjexl);
     }
 
     @Override
@@ -1655,9 +1670,8 @@ public class Interpreter extends InterpreterBase {
             throw xthru;
         } catch (Exception xany) {
             String dbgStr = cobject != null ? cobject.toString() : null;
-            xjexl = exceptionOnInvocation(node, dbgStr, xany);
+            throw invocationException(node, dbgStr, xany);
         }
-        return invocationFailed(xjexl);
     }
 
     /**
@@ -1845,7 +1859,23 @@ public class Interpreter extends InterpreterBase {
         final int last = stmt.jjtGetNumChildren() - 1;
         if (index == last) {
             JexlNode block = stmt.jjtGetChild(last);
-            return block.jjtAccept(Interpreter.this, data);
+            // if the context has changed, might need a new interpreter
+            final JexlArithmetic jexla = arithmetic.options(context);
+            if (jexla != arithmetic) {
+                if (!arithmetic.getClass().equals(jexla.getClass())) {
+                    logger.warn("expected arithmetic to be " + arithmetic.getClass().getSimpleName()
+                            + ", got " + jexla.getClass().getSimpleName()
+                    );
+                }
+                Interpreter ii = new Interpreter(Interpreter.this, jexla);
+                Object r = block.jjtAccept(ii, data);
+                if (ii.isCancelled()) {
+                    Interpreter.this.cancel();
+                }
+                return r;
+            } else {
+                return block.jjtAccept(Interpreter.this, data);
+            }
         }
         // tracking whether we processed the annotation
         final boolean[] processed = new boolean[]{false};
