@@ -678,7 +678,7 @@ public class JexlException extends RuntimeException {
     /**
      * Detailed info message about this error.
      * Format is "debug![begin,end]: string \n msg" where:
-     * <ul></ul>
+     * 
      * - debug is the debugging information if it exists (@link JexlEngine.setDebug)
      * - begin, end are character offsets in the string for the precise location of the error
      * - string is the string representation of the offending expression
