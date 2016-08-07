@@ -26,7 +26,7 @@
     </properties>
     <body>
         <release version="3.0.1" date="unreleased">
-            <action dev="henrib" type="fix" issue="JEXL-2010" due-to="Dmitri Blinov">
+            <action dev="henrib" type="fix" issue="JEXL-210" due-to="Dmitri Blinov">
                 The way to cancel script execution with an error
             </action>
             <action dev="henrib" type="fix" issue="JEXL-209" due-to="Dmitri Blinov">
