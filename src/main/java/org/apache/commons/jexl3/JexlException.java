@@ -416,6 +416,16 @@ public class JexlException extends RuntimeException {
         /**
          * Creates a new Property exception instance.
          *
+         * @param node the offending ASTnode
+         * @param var  the unknown variable
+         */
+        public Property(JexlNode node, String var) {
+            this(node, var, null);
+        }
+
+        /**
+         * Creates a new Property exception instance.
+         *
          * @param node  the offending ASTnode
          * @param var   the unknown variable
          * @param cause the exception causing the error
