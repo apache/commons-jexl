@@ -538,7 +538,7 @@
                         It also checks whether any collection, set or map (on keys) contains a value or not; in that case, it behaves
                         as an "in" operator.
                         Note that arrays and user classes exposing a public 'contains' method will allow their instances
-                        to behave has right-hand side operands of this operator.
+                        to behave as right-hand side operands of this operator.
                         <code> "a" =~ ["a","b","c","d","e",f"]</code> returns <code>true</code>.
                     </td>
                 </tr>
@@ -552,7 +552,7 @@
                         It also checks whether any collection, set or map (on keys) does not contain a value; in that case, it behaves
                         as "not in" operator.
                         Note that arrays and user classes exposing a public 'contains' method will allow their instances
-                        to behave has right-hand side operands of this operator.
+                        to behave as right-hand side operands of this operator.
                         <code> "a" !~ ["a","b","c","d","e",f"]</code> returns <code>true</code>.
                     </td>
                 </tr>
@@ -562,7 +562,7 @@
                         The <code>=^</code> operator is a short-hand for the 'startsWith' method.
                         For example, <code> "abcdef" =^ "abc" </code> returns <code>true</code>.
                         Note that through duck-typing, user classes exposing a public 'startsWith' method will allow their instances
-                        to behave has left-hand side operands of this operator.
+                        to behave as left-hand side operands of this operator.
                     </td>
                 </tr>
                 <tr>
@@ -577,7 +577,7 @@
                     <td>The <code>=$</code> operator is a short-hand for the 'endsWith' method.
                         For example, <code> "abcdef" =$ "def" </code> returns <code>true</code>.
                         Note that through duck-typing, user classes exposing an 'endsWith' method will allow their instances
-                        to behave has left-hand side operands of this operator.
+                        to behave as left-hand side operands of this operator.
                     </td>
                 </tr>
                 <tr>
