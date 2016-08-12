@@ -171,6 +171,28 @@
                             real, string, null, NaN) and antish names</p>
                     </td>
                 </tr>
+                <tr>
+                    <td>@annotation</td>
+                    <td>
+                        Annotations in JEXL are 'meta-statements'; they allow to wrap the execution of the JEXL statement in a user provided
+                        caller; typical example would be: <source>@synchronized(x) x.someMethod();</source>
+                        <p>
+                            Annotations may be declared with zero or more paramaters;
+                            <source>@lenient x.someMethod();</source>
+                            <source>@synchronized(x) x.someMethod();</source>
+                            <source>@parallel(pool, 8) x.someMethod();</source>
+                        </p>
+                        <p>
+                            They also can be chained as in:
+                            <source>@lenient @silent x.someMethod();</source>
+                        </p>
+                        <p>
+                        Annotation processing is implemented by providing a JexlContext.AnnotationProcessor; its processAnnotation
+                        method will call the annotated statement encapsulated in a Callable. Annotation arguments are evaluated
+                        and passed as arguments to processAnnotation.
+                        </p>
+                    </td>
+                </tr>
             </table>
         </section>
         <section name="Literals">

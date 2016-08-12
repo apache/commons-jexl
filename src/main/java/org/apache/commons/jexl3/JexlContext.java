@@ -66,8 +66,8 @@ public interface JexlContext {
     boolean has(String name);
 
     /**
-     * This interface declares how to resolve a namespace from its name; it is used by the interpreter during
-     * evaluation.
+     * A marker interface of the JexlContext that declares how to resolve a namespace from its name;
+     * it is used by the interpreter during evaluation.
      *
      * <p>In JEXL, a namespace is an object that serves the purpose of encapsulating functions; for instance,
      * the "math" namespace would be the proper object to expose functions like "log(...)", "sinus(...)", etc.</p>
@@ -90,7 +90,8 @@ public interface JexlContext {
     }
 
     /**
-     * Namespace type that allows creating an instance to delegate namespace methods calls to.
+     * A marker interface of the JexlContext, NamespaceFunctor allows creating an instance
+     * to delegate namespace methods calls to.
      *
      * <p>The functor is created once during the lifetime of a script evaluation.</p>
      */
@@ -104,8 +105,8 @@ public interface JexlContext {
     }
 
     /**
-     * A marker interface that indicates the interpreter to put this context in the JexlEngine thread local context
-     * instance during evaluation.
+     * A marker interface  of the JexlContext that indicates the interpreter to put this context
+     * in the JexlEngine thread local context instance during evaluation.
      * This allows user functions or methods to access the context during a call.
      * Note that the usual caveats wrt using thread local apply (caching/leaking references, etc.); in particular,
      * keeping a reference to such a context is to be considered with great care and caution.
@@ -115,20 +116,26 @@ public interface JexlContext {
      * @see JexlEngine#setThreadContext(JexlContext.ThreadLocal)
      * @see JexlEngine#getThreadContext()
      */
-    interface ThreadLocal extends JexlContext {
+    interface ThreadLocal {
         // no specific method
     }
 
     /**
-     * This interface declares how to process annotations; it is used by the interpreter during
-     * evaluation.
-     * <p>All annotations are processed through this method; the statement should be
+     * A marker interface of the JexlContext that allows to process annotations.
+     * It is used by the interpreter during evaluation to execute annotation evaluations.
+     * <p>If the JexlContext is not an instance of an AnnotationProcessor, encountering an annotation will generate
+     * an error or a warning depending on the engine strictness.
      */
     interface AnnotationProcessor {
         /**
          * Processes an annotation.
+         * <p>All annotations are processed through this method; the statement 'call' is to be performed within
+         * the processAnnotation method. The implementation <em>must</em> perform the call explicitly.
+         * <p>The arguments and the statement <em>must not</em> be referenced or cached for longer than the duration
+         * of the processAnnotation call. 
+         *
          * @param name the annotation name
-         * @param args the arguments
+         * @param args the arguments of the annotation, evaluated as arguments of this call
          * @param statement the statement that was annotated; the processor should invoke this statement 'call' method
          * @return the result of statement.call()
          * @throws Exception if annotation processing fails
