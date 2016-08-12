@@ -25,7 +25,7 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.0.1" date="unreleased">
+        <release version="3.1" date="unreleased">
             <action dev="henrib" type="fix" issue="JEXL-210" due-to="Dmitri Blinov">
                 The way to cancel script execution with an error
             </action>
@@ -56,13 +56,16 @@
             <action dev="henrib" type="fix" issue="JEXL-198" due-to="Terefang Verigorn">
                 JxltEngine Template does not expose pragmas
             </action>
+            <action dev="henrib" type="add" issue="JEXL-197" due-to="Dmitri Blinov">
+                Add annotations
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-196" due-to="Dmitri Blinov">
                 Script execution hangs while calling method with one argument without parameter
             </action>
             <action dev="henrib" type="fix" issue="JEXL-195" due-to="Dmitri Blinov">
                 Support for AtomicBoolean in logical expressions
             </action>
-            <action dev="henrib" type="fix" issue="JEXL-194" due-to="Dmitri Blinov">
+            <action dev="henrib" type="add" issue="JEXL-194" due-to="Dmitri Blinov">
                 allow synchronization on iterableValue in foreach statement
             </action>
             <action dev="henrib" type="fix" issue="JEXL-193" due-to="Dmitri Blinov">
