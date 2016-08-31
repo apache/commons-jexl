@@ -203,13 +203,18 @@ public class JexlBuilder {
         return loader;
     }
 
+    @Deprecated
+    public JexlBuilder loader(Charset arg) {
+        return charset(arg);
+    } 
+    
     /**
      * Sets the charset to use.
      *
      * @param arg the charset
      * @return this builder
      */
-    public JexlBuilder loader(Charset arg) {
+    public JexlBuilder charset(Charset arg) {
         this.charset = arg;
         return this;
     }
