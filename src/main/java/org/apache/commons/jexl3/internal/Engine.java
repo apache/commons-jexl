@@ -357,9 +357,6 @@ public class Engine extends JexlEngine {
         if (scriptText == null) {
             throw new NullPointerException("source is null");
         }
-        if (info == null && debug) {
-            info = createInfo();
-        }
         String source = trimSource(scriptText);
         Scope scope = names == null ? null : new Scope(null, names);
         ASTJexlScript tree = parse(info, source, scope, false, false);
@@ -370,9 +367,6 @@ public class Engine extends JexlEngine {
     public Script createExpression(JexlInfo info, String expression) {
         if (expression == null) {
             throw new NullPointerException("source is null");
-        }
-        if (info == null && debug) {
-            info = createInfo();
         }
         String source = trimSource(expression);
         ASTJexlScript tree = parse(info, source, null, false, true);
@@ -393,9 +387,8 @@ public class Engine extends JexlEngine {
         String src = trimSource(expr);
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src;
         try {
-            final JexlInfo info = debug ? createInfo() : null;
             final Scope scope = new Scope(null, "#0");
-            final ASTJexlScript script = parse(info, src, scope, true, true);
+            final ASTJexlScript script = parse(null, src, scope, true, true);
             final JexlNode node = script.jjtGetChild(0);
             final Scope.Frame frame = script.createFrame(bean);
             final Interpreter interpreter = createInterpreter(context, frame);
@@ -423,9 +416,8 @@ public class Engine extends JexlEngine {
         String src = trimSource(expr);
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + "=" + "#1";
         try {
-            final JexlInfo info = debug ? createInfo() : null;
             final Scope scope = new Scope(null, "#0", "#1");
-            final ASTJexlScript script = parse(info, src, scope, true, true);
+            final ASTJexlScript script = parse(null, src, scope, true, true);
             final JexlNode node = script.jjtGetChild(0);
             final Scope.Frame frame = script.createFrame(bean, value);
             final Interpreter interpreter = createInterpreter(context, frame);
@@ -685,7 +677,8 @@ public class Engine extends JexlEngine {
                     }
                 }
             }
-            script = parser.parse(info, src, scope, registers, expression);
+            final JexlInfo ninfo = info == null && debug? createInfo() : info;
+            script = parser.parse(ninfo, src, scope, registers, expression);
             if (cached) {
                 cache.put(src, script);
             }
