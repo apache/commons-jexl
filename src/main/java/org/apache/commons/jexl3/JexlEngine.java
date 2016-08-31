@@ -514,9 +514,7 @@ public abstract class JexlEngine {
      */
     public JexlInfo createInfo() {
         JexlInfo info = null;
-        Throwable xinfo = new Throwable();
-        xinfo.fillInStackTrace();
-        StackTraceElement[] stack = xinfo.getStackTrace();
+        StackTraceElement[] stack = new Throwable().getStackTrace();
         StackTraceElement se = null;
         String name = getClass().getName();
         for (int s = 1; s < stack.length; ++s) {
