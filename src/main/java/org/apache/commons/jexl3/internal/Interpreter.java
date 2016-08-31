@@ -1701,37 +1701,37 @@ public class Interpreter extends InterpreterBase {
             throw new JexlException.Cancel(node);
         }
         final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
-                                      ? JexlOperator.ARRAY_GET : JexlOperator.PROPERTY_GET;
+                ? JexlOperator.ARRAY_GET : JexlOperator.PROPERTY_GET;
         Object result = operators.tryOverload(node, operator, object, attribute);
         if (result != JexlEngine.TRY_FAILED) {
             return result;
         }
-        // attempt to reuse last executor cached in volatile JexlNode.value
-        if (node != null && cache) {
-            Object cached = node.jjtGetValue();
-            if (cached instanceof JexlPropertyGet) {
-                JexlPropertyGet vg = (JexlPropertyGet) cached;
-                Object value = vg.tryInvoke(object, attribute);
-                if (!vg.tryFailed(value)) {
-                    return value;
+        Exception xcause = null;
+        try {
+            // attempt to reuse last executor cached in volatile JexlNode.value
+            if (node != null && cache) {
+                Object cached = node.jjtGetValue();
+                if (cached instanceof JexlPropertyGet) {
+                    JexlPropertyGet vg = (JexlPropertyGet) cached;
+                    Object value = vg.tryInvoke(object, attribute);
+                    if (!vg.tryFailed(value)) {
+                        return value;
+                    }
                 }
             }
-        }
-        // resolve that property
-        Exception xcause = null;
-        List<PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
-        JexlPropertyGet vg = uberspect.getPropertyGet(resolvers, object, attribute);
-        if (vg != null) {
-            try {
+            // resolve that property
+            List<PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
+            JexlPropertyGet vg = uberspect.getPropertyGet(resolvers, object, attribute);
+            if (vg != null) {
                 Object value = vg.invoke(object);
                 // cache executor in volatile JexlNode.value
                 if (node != null && cache && vg.isCacheable()) {
                     node.jjtSetValue(vg);
                 }
                 return value;
-            } catch (Exception xany) {
-                xcause = xany;
             }
+        } catch (Exception xany) {
+            xcause = xany;
         }
         // lets fail
         if (node != null) {
@@ -1775,39 +1775,39 @@ public class Interpreter extends InterpreterBase {
         if (result != JexlEngine.TRY_FAILED) {
             return;
         }
-        // attempt to reuse last executor cached in volatile JexlNode.value
-        if (node != null && cache) {
-            Object cached = node.jjtGetValue();
-            if (cached instanceof JexlPropertySet) {
-                JexlPropertySet setter = (JexlPropertySet) cached;
-                Object eval = setter.tryInvoke(object, attribute, value);
-                if (!setter.tryFailed(eval)) {
-                    return;
+        Exception xcause = null;
+        try {
+            // attempt to reuse last executor cached in volatile JexlNode.value
+            if (node != null && cache) {
+                Object cached = node.jjtGetValue();
+                if (cached instanceof JexlPropertySet) {
+                    JexlPropertySet setter = (JexlPropertySet) cached;
+                    Object eval = setter.tryInvoke(object, attribute, value);
+                    if (!setter.tryFailed(eval)) {
+                        return;
+                    }
                 }
             }
-        }
-        Exception xcause = null;
-        List<PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
-        JexlPropertySet vs = uberspect.getPropertySet(resolvers, object, attribute, value);
-        // if we can't find an exact match, narrow the value argument and try again
-        if (vs == null) {
-            // replace all numbers with the smallest type that will fit
-            Object[] narrow = {value};
-            if (arithmetic.narrowArguments(narrow)) {
-                vs = uberspect.getPropertySet(resolvers, object, attribute, narrow[0]);
+            List<PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
+            JexlPropertySet vs = uberspect.getPropertySet(resolvers, object, attribute, value);
+            // if we can't find an exact match, narrow the value argument and try again
+            if (vs == null) {
+                // replace all numbers with the smallest type that will fit
+                Object[] narrow = {value};
+                if (arithmetic.narrowArguments(narrow)) {
+                    vs = uberspect.getPropertySet(resolvers, object, attribute, narrow[0]);
+                }
             }
-        }
-        if (vs != null) {
-            try {
+            if (vs != null) {
                 // cache executor in volatile JexlNode.value
                 vs.invoke(object, value);
                 if (node != null && cache && vs.isCacheable()) {
                     node.jjtSetValue(vs);
                 }
                 return;
-            } catch (Exception xany) {
-                xcause = xany;
             }
+        } catch (Exception xany) {
+            xcause = xany;
         }
         // lets fail
         if (node != null) {

@@ -1263,4 +1263,32 @@ public class IssuesTest extends JexlTestCase {
             Assert.assertTrue(NullPointerException.class.equals(th.getClass()));
         }
     }
+
+    @Test
+    public void test217() throws Exception {
+        JexlEvalContext jc = new JexlEvalContext();
+        jc.set("foo", new int[]{0, 1, 2, 42});
+        JexlEngine jexl;
+        JexlScript e;
+        Object r;
+        jexl = new JexlBuilder().strict(false).silent(false).create();
+        e = jexl.createScript("foo[3]"); 
+        r = e.execute(jc);
+        Assert.assertEquals(42, r);
+        
+        // cache and fail?
+        jc.set("foo", new int[]{0, 1});
+        jc.setStrict(true);
+        try {
+            r = e.execute(jc);
+            Assert.fail("should have thrown an exception");
+        } catch(JexlException xjexl) {
+            Throwable th = xjexl.getCause();
+            Assert.assertTrue(ArrayIndexOutOfBoundsException.class.equals(th.getClass()));
+        }
+        //
+        jc.setStrict(false);
+        r = e.execute(jc);
+        Assert.assertNull("oob adverted", r);
+    }
 }
