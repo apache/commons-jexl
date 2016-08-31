@@ -71,17 +71,17 @@ public class Operators {
         if (operators != null && operators.overloads(operator)) {
             final JexlArithmetic arithmetic = interpreter.arithmetic;
             final boolean cache = interpreter.cache;
-            if (cache) {
-                Object cached = node.jjtGetValue();
-                if (cached instanceof JexlMethod) {
-                    JexlMethod me = (JexlMethod) cached;
-                    Object eval = me.tryInvoke(operator.getMethodName(), arithmetic, args);
-                    if (!me.tryFailed(eval)) {
-                        return eval;
+            try {
+                if (cache) {
+                    Object cached = node.jjtGetValue();
+                    if (cached instanceof JexlMethod) {
+                        JexlMethod me = (JexlMethod) cached;
+                        Object eval = me.tryInvoke(operator.getMethodName(), arithmetic, args);
+                        if (!me.tryFailed(eval)) {
+                            return eval;
+                        }
                     }
                 }
-            }
-            try {
                 JexlMethod vm = operators.getOperator(operator, args);
                 if (vm != null) {
                     Object result = vm.invoke(arithmetic, args);
