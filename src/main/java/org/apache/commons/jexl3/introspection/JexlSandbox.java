@@ -46,35 +46,52 @@ import java.util.Set;
  * 
  * <ul>
  *   <li><b>read</b> controls readable properties </li>
- *   <li><b>write</b> controls writeable properties</li>
+ *   <li><b>write</b> controls writable properties</li>
  *   <li><b>execute</b> controls executable methods and constructor</li>
  * </ul>
  * 
- * <p>Note that a JexlUberspect allways uses a copy of the JexlSandbox used to built it to avoid synchronization and/or
+ * <p>Note that a JexlUberspect always uses a copy of the JexlSandbox used to built it to avoid synchronization and/or
  * concurrent modifications at runtime.</p>
  * 
  * @since 3.0
  */
 public final class JexlSandbox {
-
     /**
      * The map from class names to permissions.
      */
     private final Map<String, Permissions> sandbox;
+    /**
+     * Default behavior, black or white.
+     */
+    private final boolean white;
 
     /**
      * Creates a new default sandbox.
+     * <p>In the absence of explicit permissions on a class, the 
+     * sandbox is a white-box, white-listing that class for all permissions (read, write and execute).
      */
     public JexlSandbox() {
-        this(new HashMap<String, Permissions>());
+        this(true, new HashMap<String, Permissions>());
+    }
+    
+    /**
+     * Creates a new default sandbox.
+     * <p>A white-box considers no permissions as &quote;everything is allowed&quote; when
+     * a black-box considers no permissions as &quote;nothing is allowed&quote;.
+     * @param wb whether this sandbox is white (true) or black (false)
+     * if no permission is explicitly defined for a class.
+     */
+    public JexlSandbox(boolean wb) {
+        this(wb, new HashMap<String, Permissions>());
     }
 
     /**
      * Creates a sandbox based on an existing permissions map.
-     * 
+     * @param wb whether this sandbox is white (true) or black (false)
      * @param map the permissions map
      */
-    protected JexlSandbox(Map<String, Permissions> map) {
+    private JexlSandbox(boolean wb, Map<String, Permissions> map) {
+        white = wb;
         sandbox = map;
     }
 
@@ -86,7 +103,7 @@ public final class JexlSandbox {
         for (Map.Entry<String, Permissions> entry : sandbox.entrySet()) {
             map.put(entry.getKey(), entry.getValue().copy());
         }
-        return new JexlSandbox(map);
+        return new JexlSandbox(white, map);
     }
 
     /**
@@ -110,7 +127,7 @@ public final class JexlSandbox {
     public String read(String clazz, String name) {
         Permissions permissions = sandbox.get(clazz);
         if (permissions == null) {
-            return name;
+            return white? name : null;
         } else {
             return permissions.read().get(name);
         }
@@ -137,7 +154,7 @@ public final class JexlSandbox {
     public String write(String clazz, String name) {
         Permissions permissions = sandbox.get(clazz);
         if (permissions == null) {
-            return name;
+            return white ? name : null;
         } else {
             return permissions.write().get(name);
         }
@@ -164,7 +181,7 @@ public final class JexlSandbox {
     public String execute(String clazz, String name) {
         Permissions permissions = sandbox.get(clazz);
         if (permissions == null) {
-            return name;
+            return white ? name : null;
         } else {
             return permissions.execute().get(name);
         }
@@ -304,7 +321,7 @@ public final class JexlSandbox {
         /** The controlled readable properties. */
         private final Names read;
 
-        /** The controlled  writeable properties. */
+        /** The controlled  writable properties. */
         private final Names write;
 
         /** The controlled methods. */
@@ -357,7 +374,7 @@ public final class JexlSandbox {
         }
 
         /**
-         * Adds a list of writeable property names to these permissions.
+         * Adds a list of writable property names to these permissions.
          * 
          * @param pnames the property names
          * @return this instance of permissions
@@ -393,7 +410,7 @@ public final class JexlSandbox {
         }
 
         /**
-         * Gets the set of writeable property names in these permissions.
+         * Gets the set of writable property names in these permissions.
          * 
          * @return the set of property names
          */
@@ -420,7 +437,7 @@ public final class JexlSandbox {
      * 
      * @param clazz the class for which these permissions apply
      * @param readFlag whether the readable property list is white - true - or black - false -
-     * @param writeFlag whether the writeable property list is white - true - or black - false -
+     * @param writeFlag whether the writable property list is white - true - or black - false -
      * @param executeFlag whether the executable method list is white white - true - or black - false -
      * @return the set of permissions
      */
