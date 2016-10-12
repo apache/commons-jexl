@@ -116,7 +116,7 @@ public interface JexlContext {
      * @see JexlEngine#setThreadContext(JexlContext.ThreadLocal)
      * @see JexlEngine#getThreadContext()
      */
-    interface ThreadLocal {
+    interface ThreadLocal extends JexlContext {
         // no specific method
     }
 
