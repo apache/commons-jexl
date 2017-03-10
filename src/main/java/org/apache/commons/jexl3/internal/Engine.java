@@ -43,11 +43,10 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
-import java.lang.ref.SoftReference;
 import java.nio.charset.Charset;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -86,7 +85,12 @@ public class Engine extends JexlEngine {
      */
     protected final Log logger;
     /**
-     * The {@link Parser}; when parsing expressions, this engine synchronizes on the parser.
+     * The atomic parsing flag; true whilst parsing.
+     */
+    protected final AtomicBoolean parsing = new AtomicBoolean(false);
+    /**
+     * The {@link Parser}; when parsing expressions, this engine uses the parser if it
+     * is not already in use otherwise it will create a new temporary one.
      */
     protected final Parser parser = new Parser(new StringReader(";")); //$NON-NLS-1$
     /**
@@ -128,10 +132,6 @@ public class Engine extends JexlEngine {
      * The default jxlt engine.
      */
     protected volatile TemplateEngine jxlt = null;
-    /**
-     * The default cache load factor.
-     */
-    private static final float LOAD_FACTOR = 0.75f;
 
     /**
      * Creates an engine with default arguments.
@@ -214,6 +214,11 @@ public class Engine extends JexlEngine {
         return strict;
     }
 
+    //@Override
+    public boolean isCancellable() {
+        return this.cancellable;
+    }
+
     @Override
     public void setClassLoader(ClassLoader loader) {
         uberspect.setClassLoader(loader);
@@ -229,116 +234,10 @@ public class Engine extends JexlEngine {
         return new TemplateEngine(this, noScript, cacheSize, immediate, deferred);
     }
 
-    /**
-     * Swaps the current thread local context.
-     * @param tls the context or null
-     * @return the previous thread local context
-     */
-    protected JexlContext.ThreadLocal putThreadLocal(JexlContext.ThreadLocal tls) {
-        JexlContext.ThreadLocal local = CONTEXT.get();
-        CONTEXT.set(tls);
-        return local;
-    }
-
-    /**
-     * A soft referenced cache.
-     * <p>The actual cache is held through a soft reference, allowing it to be GCed under
-     * memory pressure.</p>
-     * @param <K> the cache key entry type
-     * @param <V> the cache key value type
-     */
-    protected class SoftCache<K, V> {
-        /**
-         * The cache size.
-         */
-        private final int size;
-        /**
-         * The soft reference to the cache map.
-         */
-        private SoftReference<Map<K, V>> ref = null;
-
-        /**
-         * Creates a new instance of a soft cache.
-         * @param theSize the cache size
-         */
-        SoftCache(int theSize) {
-            size = theSize;
-        }
-
-        /**
-         * Returns the cache size.
-         * @return the cache size
-         */
-        int size() {
-            return size;
-        }
-
-        /**
-         * Clears the cache.
-         */
-        void clear() {
-            ref = null;
-        }
-
-        /**
-         * Produces the cache entry set.
-         * @return the cache entry set
-         */
-        Set<Entry<K, V>> entrySet() {
-            Map<K, V> map = ref != null ? ref.get() : null;
-            return map != null ? map.entrySet() : Collections.<Entry<K, V>>emptySet();
-        }
-
-        /**
-         * Gets a value from cache.
-         * @param key the cache entry key
-         * @return the cache entry value
-         */
-        V get(K key) {
-            final Map<K, V> map = ref != null ? ref.get() : null;
-            return map != null ? map.get(key) : null;
-        }
-
-        /**
-         * Puts a value in cache.
-         * @param key    the cache entry key
-         * @param script the cache entry value
-         */
-        void put(K key, V script) {
-            Map<K, V> map = ref != null ? ref.get() : null;
-            if (map == null) {
-                map = createCache(size);
-                ref = new SoftReference<Map<K, V>>(map);
-            }
-            map.put(key, script);
-        }
-    }
-
-    /**
-     * Creates a cache.
-     * @param <K>       the key type
-     * @param <V>       the value type
-     * @param cacheSize the cache size, must be &gt; 0
-     * @return a Map usable as a cache bounded to the given size
-     */
-    protected <K, V> Map<K, V> createCache(final int cacheSize) {
-        return new java.util.LinkedHashMap<K, V>(cacheSize, LOAD_FACTOR, true) {
-            /** Serial version UID. */
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-                return size() > cacheSize;
-            }
-        };
-    }
-
     @Override
     public void clearCache() {
-        synchronized (parser) {
-            if (cache != null) {
-                cache.clear();
-            }
+        if (cache != null) {
+            cache.clear();
         }
     }
 
@@ -509,6 +408,17 @@ public class Engine extends JexlEngine {
     }
 
     /**
+     * Swaps the current thread local context.
+     * @param tls the context or null
+     * @return the previous thread local context
+     */
+    protected JexlContext.ThreadLocal putThreadLocal(JexlContext.ThreadLocal tls) {
+        JexlContext.ThreadLocal local = CONTEXT.get();
+        CONTEXT.set(tls);
+        return local;
+    }
+
+    /**
      * Gets the list of variables accessed by a script.
      * <p>This method will visit all nodes of a script and extract all variables whether they
      * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>
@@ -666,22 +576,33 @@ public class Engine extends JexlEngine {
      */
     protected ASTJexlScript parse(JexlInfo info, String src, Scope scope, boolean registers, boolean expression) {
         final boolean cached = src.length() < cacheThreshold && cache != null;
-        ASTJexlScript script;
-        synchronized (parser) {
-            if (cached) {
-                script = cache.get(src);
-                if (script != null) {
-                    Scope f = script.getScope();
-                    if ((f == null && scope == null) || (f != null && f.equals(scope))) {
-                        return script;
-                    }
+        ASTJexlScript script = null;
+        if (cached) {
+            script = cache.get(src);
+            if (script != null) {
+                Scope f = script.getScope();
+                if ((f == null && scope == null) || (f != null && f.equals(scope))) {
+                    return script;
                 }
             }
-            final JexlInfo ninfo = info == null && debug? createInfo() : info;
-            script = parser.parse(ninfo, src, scope, registers, expression);
-            if (cached) {
-                cache.put(src, script);
+        }
+        final JexlInfo ninfo = info == null && debug ? createInfo() : info;
+        // if parser not in use...
+        if (parsing.compareAndSet(false, true)) {
+            try {
+                // lets parse
+                script = parser.parse(ninfo, src, scope, registers, expression);
+            } finally {
+                // no longer in use
+                parsing.set(false);
             }
+        } else {
+            // ...otherwise parser was in use, create a new temporary one
+            Parser lparser = new Parser(new StringReader(";"));
+            script = lparser.parse(ninfo, src, scope, registers, expression);
+        }
+        if (cached) {
+            cache.put(src, script);
         }
         return script;
     }

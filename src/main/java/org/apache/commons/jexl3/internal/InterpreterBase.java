@@ -154,7 +154,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                 return ocancellable.booleanValue();
             }
         }
-        return jexl.cancellable;
+        return jexl.isCancellable();
     }
 
     /**
