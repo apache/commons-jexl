@@ -26,6 +26,19 @@ Release 3.1
 Version 3.1 is a minor release.
 Note that JEXL 3.1 now requires Java 7.
 
+Warning:
+========
+This release does break compatibility by adding methods to interfaces; these interfaces are not expected to be
+implemented by code external to the Jexl project and this compatibility break should remain hypothetical.
+It is however possible and we are sorry if it causes problems to any of you.
+To mitigate this issue, besides continue using JEXL 3.0, you are likely delegating to JEXL3 objects and you
+shall be able to continue doing so with these new methods. The 3 interfaces & methods are:
+
+1 - 'public java.lang.Boolean isCancellable()' in interface org.apache.commons.jexl3.JexlEngine$Options
+2 - 'public java.util.concurrent.Callable callable(org.apache.commons.jexl3.JexlContext)'in interface org.apache.commons.jexl3.JexlExpression
+3 - 'public java.util.Map getPragmas()'in interface org.apache.commons.jexl3.JxltEngine$Template
+
+
 What's new in 3.1:
 ==================
 * Annotations syntax (@annotation) and processing capabilities.
