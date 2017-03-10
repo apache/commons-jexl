@@ -1233,7 +1233,7 @@ public class IssuesTest extends JexlTestCase {
 
     public class T210 {
         public void npe() {
-            throw new NullPointerException("NPE");
+            throw new NullPointerException("NPE210");
         }
     }
 
@@ -1241,26 +1241,14 @@ public class IssuesTest extends JexlTestCase {
     public void test210() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("v210", new T210());
-        JexlEngine jexl;
-        JexlScript e;
-        Object r;
-        jexl = new JexlBuilder().strict(true).silent(false).create();
-        e = jexl.createScript("v210.npe()");
+        JexlEngine jexl = new JexlBuilder().strict(false).silent(false).create();
+        JexlScript e = jexl.createScript("v210.npe()");
         try {
-            r = e.execute(jc);
+            e.execute(jc);
             Assert.fail("should have thrown an exception");
         } catch(JexlException xjexl) {
             Throwable th = xjexl.getCause();
-            Assert.assertTrue(NullPointerException.class.equals(th.getClass()));
-        }
-        jexl = new JexlBuilder().strict(false).silent(false).create();
-        e = jexl.createScript("v210.npe()");
-        try {
-            r = e.execute(jc);
-            Assert.fail("should have thrown an exception");
-        } catch(JexlException xjexl) {
-            Throwable th = xjexl.getCause();
-            Assert.assertTrue(NullPointerException.class.equals(th.getClass()));
+            Assert.assertEquals("NPE210", th.getMessage());
         }
     }
 
@@ -1272,10 +1260,10 @@ public class IssuesTest extends JexlTestCase {
         JexlScript e;
         Object r;
         jexl = new JexlBuilder().strict(false).silent(false).create();
-        e = jexl.createScript("foo[3]"); 
+        e = jexl.createScript("foo[3]");
         r = e.execute(jc);
         Assert.assertEquals(42, r);
-        
+
         // cache and fail?
         jc.set("foo", new int[]{0, 1});
         jc.setStrict(true);
@@ -1290,5 +1278,23 @@ public class IssuesTest extends JexlTestCase {
         jc.setStrict(false);
         r = e.execute(jc);
         Assert.assertNull("oob adverted", r);
+    }
+
+
+    @Test
+    public void test221() throws Exception {
+        JexlEvalContext jc = new JexlEvalContext();
+        Map<String, Integer> map = new HashMap<String, Integer>();
+        map.put("one", 1);
+        jc.set("map", map);
+        JexlEngine jexl = new JexlBuilder().cache(256).create();
+        JexlScript e = jexl.createScript("(x)->{ map[x] }");
+        Object r;
+        r = e.execute(jc, null);
+        Assert.assertEquals(null, r);
+        r = e.execute(jc, null);
+        Assert.assertEquals(null, r);
+        r = e.execute(jc, "one");
+        Assert.assertEquals(1, r);
     }
 }
