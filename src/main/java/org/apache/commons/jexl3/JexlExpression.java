@@ -17,6 +17,8 @@
 
 package org.apache.commons.jexl3;
 
+import java.util.concurrent.Callable;
+
 /**
  * Represents a single JEXL expression.
  * <p>
@@ -33,7 +35,6 @@ package org.apache.commons.jexl3;
  * @since 1.0
  */
 public interface JexlExpression {
-
     /**
      * Evaluates the expression with the variables contained in the
      * supplied {@link JexlContext}.
@@ -46,15 +47,27 @@ public interface JexlExpression {
 
     /**
      * Returns the source text of this expression.
-     * 
+     *
      * @return the source text
      */
     String getSourceText();
 
     /**
-     * Recreates the source text of this expression from the internal synactic tree.
-     * 
+     * Recreates the source text of this expression from the internal syntactic tree.
+     *
      * @return the source text
      */
     String getParsedText();
+
+    /**
+     * Creates a Callable from this expression.
+     *
+     * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
+     * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
+     *
+     * @param context the context
+     * @return the callable
+     * @since 3.1
+     */
+    Callable<Object> callable(JexlContext context);
 }
