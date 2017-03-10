@@ -35,12 +35,13 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
      * @return the executor if found, null otherwise
      */
     public static BooleanGetExecutor discover(Introspector is, final Class<?> clazz, String property) {
-        java.lang.reflect.Method m = PropertyGetExecutor.discoverGet(is, "is", clazz, property);
-        if (m != null && (m.getReturnType() == Boolean.TYPE || m.getReturnType() == Boolean.class)) {
-            return new BooleanGetExecutor(clazz, m, property);
-        } else {
-            return null;
+        if (property != null && !property.isEmpty()) {
+            java.lang.reflect.Method m = PropertyGetExecutor.discoverGet(is, "is", clazz, property);
+            if (m != null && (m.getReturnType() == Boolean.TYPE || m.getReturnType() == Boolean.class)) {
+                return new BooleanGetExecutor(clazz, m, property);
+            }
         }
+        return null;
     }
 
     /**

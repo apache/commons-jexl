@@ -30,7 +30,7 @@ import java.lang.reflect.InvocationTargetException;
  * @since 2.0
  */
 public final class DuckGetExecutor extends AbstractExecutor.Get {
-    /** The property. */
+    /** The property, may be null. */
     private final Object property;
 
     /**
@@ -69,10 +69,12 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
 
     @Override
     public Object tryInvoke(Object obj, Object key) {
-        if (obj != null && method != null
-                // ensure method name matches the property name
-                && property.equals(key)
-                && objectClass.equals(obj.getClass())) {
+        if (obj != null
+            && objectClass.equals(obj.getClass())
+            // ensure method name matches the property name
+            && method != null
+            && ((property == null && key == null)
+                 || (property != null && property.equals(key)))) {
             try {
                 Object[] args = {property};
                 return method.invoke(obj, args);

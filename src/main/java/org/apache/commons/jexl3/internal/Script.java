@@ -74,7 +74,10 @@ public class Script implements JexlScript, JexlExpression {
     protected void checkCacheVersion() {
         int uberVersion = jexl.getUberspect().getVersion();
         if (version != uberVersion) {
-            script.clearCache();
+            // version 0 of the uberSpect is an illusion due to order of construction; no need to clear cache
+            if (version > 0) {
+                script.clearCache();
+            }
             version = uberVersion;
         }
     }
@@ -176,13 +179,7 @@ public class Script implements JexlScript, JexlExpression {
      */
     @Override
     public Object evaluate(JexlContext context) {
-        if (script.jjtGetNumChildren() < 1) {
-            return null;
-        }
-        checkCacheVersion();
-        Scope.Frame frame = createFrame((Object[]) null);
-        Interpreter interpreter = createInterpreter(context, frame);
-        return interpreter.interpret(script.jjtGetChild(0));
+        return execute(context);
     }
 
     /**
