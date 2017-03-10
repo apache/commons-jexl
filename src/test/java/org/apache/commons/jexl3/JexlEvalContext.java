@@ -24,7 +24,10 @@ import java.util.Map;
 /**
  * A JEXL evaluation environment wrapping variables, namespace and options.
  */
-public class JexlEvalContext implements JexlContext, JexlContext.NamespaceResolver, JexlEngine.Options {
+public class JexlEvalContext implements
+       JexlContext,
+       JexlContext.NamespaceResolver,
+       JexlEngine.Options {
     /** The marker for the empty vars. */
     private static final Map<String,Object> EMPTY_MAP = Collections.<String,Object>emptyMap();
     /** The variables.*/

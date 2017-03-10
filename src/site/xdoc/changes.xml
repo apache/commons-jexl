@@ -26,6 +26,15 @@
     </properties>
     <body>
         <release version="3.1" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-221" due-to="Dmitri Blinov">
+                Sporadic undefined property error caused by NPE at MapGetExecutor.tryInvoke()
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-216" due-to="Dmitri Blinov">
+                Improve parsing concurrency in multithreaded environment
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-211" due-to="Dmitri Blinov">
+                Add callable method to JexlExpression interface
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-210" due-to="Dmitri Blinov">
                 The way to cancel script execution with an error
             </action>
@@ -39,7 +48,7 @@
                 testCallableCancel() test hangs sporadically
             </action>
             <action dev="henrib" type="fix" issue="JEXL-205" due-to="Dmitri Blinov">
-                testCancelForever() is not terminated properly as 'Fixed'
+                testCancelForever() is not terminated properly
             </action>
             <action dev="henrib" type="fix" issue="JEXL-204" due-to="Dmitri Blinov">
                 Script is not interrupted by a method call throwing Exception
