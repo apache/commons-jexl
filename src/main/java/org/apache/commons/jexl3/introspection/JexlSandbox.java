@@ -25,34 +25,34 @@ import java.util.Set;
 /**
  * A sandbox describes permissions on a class by explicitly allowing or forbidding access to methods and properties
  * through "whitelists" and "blacklists".
- * 
+ *
  * <p>A <b>whitelist</b> explicitly allows methods/properties for a class;</p>
- * 
+ *
  * <ul>
- *   <li>If a whitelist is empty and thus does not contain any names, 
+ *   <li>If a whitelist is empty and thus does not contain any names,
  *       all properties/methods are allowed for its class.</li>
  *   <li>If it is not empty, the only allowed properties/methods are the ones contained.</li>
  * </ul>
- * 
+ *
  * <p>A <b>blacklist</b> explicitly forbids methods/properties for a class;</p>
- * 
+ *
  * <ul>
  *   <li>If a blacklist is empty and thus does not contain any names,
  *       all properties/methods are forbidden for its class.</li>
  *   <li>If it is not empty, the only forbidden properties/methods are the ones contained.</li>
  * </ul>
- * 
+ *
  * <p>Permissions are composed of three lists, read, write, execute, each being "white" or "black":</p>
- * 
+ *
  * <ul>
  *   <li><b>read</b> controls readable properties </li>
  *   <li><b>write</b> controls writable properties</li>
  *   <li><b>execute</b> controls executable methods and constructor</li>
  * </ul>
- * 
+ *
  * <p>Note that a JexlUberspect always uses a copy of the JexlSandbox used to built it to avoid synchronization and/or
  * concurrent modifications at runtime.</p>
- * 
+ *
  * @since 3.0
  */
 public final class JexlSandbox {
@@ -67,13 +67,13 @@ public final class JexlSandbox {
 
     /**
      * Creates a new default sandbox.
-     * <p>In the absence of explicit permissions on a class, the 
+     * <p>In the absence of explicit permissions on a class, the
      * sandbox is a white-box, white-listing that class for all permissions (read, write and execute).
      */
     public JexlSandbox() {
         this(true, new HashMap<String, Permissions>());
     }
-    
+
     /**
      * Creates a new default sandbox.
      * <p>A white-box considers no permissions as &quote;everything is allowed&quote; when
@@ -87,10 +87,18 @@ public final class JexlSandbox {
 
     /**
      * Creates a sandbox based on an existing permissions map.
+     * @param map the permissions map
+     */
+    protected JexlSandbox(Map<String, Permissions> map) {
+        this(true, map);
+    }
+
+    /**
+     * Creates a sandbox based on an existing permissions map.
      * @param wb whether this sandbox is white (true) or black (false)
      * @param map the permissions map
      */
-    private JexlSandbox(boolean wb, Map<String, Permissions> map) {
+    protected JexlSandbox(boolean wb, Map<String, Permissions> map) {
         white = wb;
         sandbox = map;
     }
@@ -108,7 +116,7 @@ public final class JexlSandbox {
 
     /**
      * Gets the read permission value for a given property of a class.
-     * 
+     *
      * @param clazz the class
      * @param name the property name
      * @return null if not allowed, the name of the property to use otherwise
@@ -119,7 +127,7 @@ public final class JexlSandbox {
 
     /**
      * Gets the read permission value for a given property of a class.
-     * 
+     *
      * @param clazz the class name
      * @param name the property name
      * @return null if not allowed, the name of the property to use otherwise
@@ -135,7 +143,7 @@ public final class JexlSandbox {
 
     /**
      * Gets the write permission value for a given property of a class.
-     * 
+     *
      * @param clazz the class
      * @param name the property name
      * @return null if not allowed, the name of the property to use otherwise
@@ -146,7 +154,7 @@ public final class JexlSandbox {
 
     /**
      * Gets the write permission value for a given property of a class.
-     * 
+     *
      * @param clazz the class name
      * @param name the property name
      * @return null if not allowed, the name of the property to use otherwise
@@ -162,7 +170,7 @@ public final class JexlSandbox {
 
     /**
      * Gets the execute permission value for a given method of a class.
-     * 
+     *
      * @param clazz the class
      * @param name the method name
      * @return null if not allowed, the name of the method to use otherwise
@@ -173,7 +181,7 @@ public final class JexlSandbox {
 
     /**
      * Gets the execute permission value for a given method of a class.
-     * 
+     *
      * @param clazz the class name
      * @param name the method name
      * @return null if not allowed, the name of the method to use otherwise
@@ -194,7 +202,7 @@ public final class JexlSandbox {
 
         /**
          * Adds a name to this set.
-         * 
+         *
          * @param name the name to add
          * @return  true if the name was really added, false if not
          */
@@ -203,7 +211,7 @@ public final class JexlSandbox {
         /**
          * Adds an alias to a name to this set.
          * <p>This only has an effect on white lists.</p>
-         * 
+         *
          * @param name the name to alias
          * @param alias the alias
          * @return  true if the alias was added, false if it was already present
@@ -214,7 +222,7 @@ public final class JexlSandbox {
 
         /**
          * Whether a given name is allowed or not.
-         * 
+         *
          * @param name the method/property name to check
          * @return null if not allowed, the actual name to use otherwise
          */
@@ -329,7 +337,7 @@ public final class JexlSandbox {
 
         /**
          * Creates a new permissions instance.
-         * 
+         *
          * @param readFlag whether the read property list is white or black
          * @param writeFlag whether the write property list is white or black
          * @param executeFlag whether the method list is white of black
@@ -342,7 +350,7 @@ public final class JexlSandbox {
 
         /**
          * Creates a new permissions instance.
-         * 
+         *
          * @param nread the read set
          * @param nwrite the write set
          * @param nexecute the method set
@@ -362,7 +370,7 @@ public final class JexlSandbox {
 
         /**
          * Adds a list of readable property names to these permissions.
-         * 
+         *
          * @param pnames the property names
          * @return this instance of permissions
          */
@@ -375,7 +383,7 @@ public final class JexlSandbox {
 
         /**
          * Adds a list of writable property names to these permissions.
-         * 
+         *
          * @param pnames the property names
          * @return this instance of permissions
          */
@@ -389,7 +397,7 @@ public final class JexlSandbox {
         /**
          * Adds a list of executable methods names to these permissions.
          * <p>The constructor is denoted as the empty-string, all other methods by their names.</p>
-         * 
+         *
          * @param mnames the method names
          * @return this instance of permissions
          */
@@ -402,7 +410,7 @@ public final class JexlSandbox {
 
         /**
          * Gets the set of readable property names in these permissions.
-         * 
+         *
          * @return the set of property names
          */
         public Names read() {
@@ -411,7 +419,7 @@ public final class JexlSandbox {
 
         /**
          * Gets the set of writable property names in these permissions.
-         * 
+         *
          * @return the set of property names
          */
         public Names write() {
@@ -420,7 +428,7 @@ public final class JexlSandbox {
 
         /**
          * Gets the set of method names in these permissions.
-         * 
+         *
          * @return the set of method names
          */
         public Names execute() {
@@ -434,7 +442,7 @@ public final class JexlSandbox {
 
     /**
      * Creates the set of permissions for a given class.
-     * 
+     *
      * @param clazz the class for which these permissions apply
      * @param readFlag whether the readable property list is white - true - or black - false -
      * @param writeFlag whether the writable property list is white - true - or black - false -
@@ -449,7 +457,7 @@ public final class JexlSandbox {
 
     /**
      * Creates a new set of permissions based on white lists for methods and properties for a given class.
-     * 
+     *
      * @param clazz the whitened class name
      * @return the permissions instance
      */
@@ -459,7 +467,7 @@ public final class JexlSandbox {
 
     /**
      * Creates a new set of permissions based on black lists for methods and properties for a given class.
-     * 
+     *
      * @param clazz the blackened class name
      * @return the permissions instance
      */
@@ -469,7 +477,7 @@ public final class JexlSandbox {
 
     /**
      * Gets the set of permissions associated to a class.
-     * 
+     *
      * @param clazz the class name
      * @return the defined permissions or an all-white permission instance if none were defined
      */
