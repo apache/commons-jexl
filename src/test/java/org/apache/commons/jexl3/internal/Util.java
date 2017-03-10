@@ -44,8 +44,8 @@ public class Util {
         Engine jdbg = new Engine();
         jdbg.parser.allowRegisters(true);
         Debugger dbg = new Debugger();
-        // iterate over all expression in cache
-        Iterator<Map.Entry<String, ASTJexlScript>> inodes = jexl.cache.entrySet().iterator();
+        // iterate over all expression in
+        Iterator<Map.Entry<String, ASTJexlScript>> inodes = jexl.cache.entries().iterator();
         while (inodes.hasNext()) {
             Map.Entry<String, ASTJexlScript> entry = inodes.next();
             JexlNode node = entry.getValue();

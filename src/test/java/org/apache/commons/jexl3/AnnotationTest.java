@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import java.math.MathContext;
-import java.nio.charset.Charset;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
@@ -90,12 +88,23 @@ public class AnnotationTest extends JexlTestCase {
             }
             // transient side effect for silent
             if ("silent".equals(name)) {
-                boolean s = (Boolean) args[0];
-                boolean b = this.isSilent();
-                setSilent(s);
-                Object r = statement.call();
-                setSilent(b);
-                return r;
+                if (args == null || args.length == 0) {
+                    boolean b = this.isSilent();
+                    try {
+                        return statement.call();
+                    } catch(JexlException xjexl) {
+                        return null;
+                    } finally {
+                        setSilent(b);
+                    }
+                } else {
+                    boolean s = (Boolean) args[0];
+                    boolean b = this.isSilent();
+                    setSilent(s);
+                    Object r = statement.call();
+                    setSilent(b);
+                    return r;
+                }
             }
             // durable side effect for scale
             if ("scale".equals(name)) {

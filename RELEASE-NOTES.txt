@@ -1,6 +1,6 @@
 
                             Apache Commons JEXL
-                               Version 3.0.1
+                                Version 3.1
                                Release Notes
 
 
@@ -24,21 +24,25 @@ Release 3.1
 ========================================================================================================================
 
 Version 3.1 is a minor release.
+Note that JEXL 3.1 now requires Java 7.
 
 What's new in 3.1:
-================== 
+==================
 * Annotations syntax (@annotation) and processing capabilities.
 * Better support for script execution options, error handling and canceling.
 * All operators can be overloaded.
 
 New Features in 3.1:
 ====================
+* JEXL-216:     Improve parsing concurrency in multithreaded environment
+* JEXL-211:     Add callable method to JexlExpression interface
 * JEXL-201:     Allow Interpreter to use live values from JexlEngine.Option interface implemented by JexlContext
 * JEXL-197:     Add annotations
 * JEXL-194      Allow synchronization on iterableValue in foreach statement
 
 Bugs Fixed in 3.1:
 ====================
+* JEXL-221:     Sporadic undefined property error caused by NPE at MapGetExecutor.tryInvoke()
 * JEXL-210:     The way to cancel script execution with an error
 * JEXL-209:     Unsolvable function/method '<?>.<null>(...)'
 * JEXL-207:     Inconsistent error handling
