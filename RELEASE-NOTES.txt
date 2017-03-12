@@ -27,11 +27,11 @@ Version 3.1 is a minor release.
 
 Warning:
 ========
-This release does break compatibility by adding methods to interfaces; these interfaces are not expected to be
-implemented by code external to the Jexl project and this compatibility break should remain hypothetical.
-It is however possible and we are sorry if it causes problems to any of you.
-To mitigate this issue, besides continue using JEXL 3.0, you are likely delegating to JEXL3 objects and you
-shall be able to continue doing so with these new methods. The 3 interfaces & methods are:
+This release does break source compatibility by adding methods to existing interfaces; these interfaces are however not
+expected to be implemented by code external to the Jexl project. This compatibility break should remain hypothetical.
+It is nevertheless possible and we are sorry if it causes problems to any of you.
+If you encounter this issue, besides continuing using JEXL 3.0, your code likely delegates method calls to JEXL3 objects
+and you shall be able to continue doing so with these new methods. The 3 interfaces & methods are:
 
 1 - 'public java.lang.Boolean isCancellable()' in interface org.apache.commons.jexl3.JexlEngine$Options
 2 - 'public java.util.concurrent.Callable callable(org.apache.commons.jexl3.JexlContext)'in interface org.apache.commons.jexl3.JexlExpression
