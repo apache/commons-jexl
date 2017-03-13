@@ -513,7 +513,7 @@ public class MethodTest extends JexlTestCase {
         final JexlArithmetic ja = JEXL.getArithmetic();
         JexlMethod mplus = new JexlMethod() {
             @Override
-            public Object invoke(Object obj, Object[] params) throws Exception {
+            public Object invoke(Object obj, Object ... params) throws Exception {
                 if (obj instanceof Map<?, ?>) {
                     return ja.add(params[0], params[1]);
                 } else {
@@ -522,7 +522,7 @@ public class MethodTest extends JexlTestCase {
             }
 
             @Override
-            public Object tryInvoke(String name, Object obj, Object[] params) {
+            public Object tryInvoke(String name, Object obj, Object ... params) {
                 try {
                     if ("plus".equals(name)) {
                         return invoke(obj, params);
