@@ -331,6 +331,7 @@ public abstract class JxltEngine {
          * Gets this script pragmas.
          *
          * @return the (non null, may be empty) pragmas map
+         * @since 3.1
          */
         Map<String, Object> getPragmas();
     }

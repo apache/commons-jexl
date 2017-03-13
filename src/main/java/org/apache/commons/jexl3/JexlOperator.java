@@ -299,6 +299,7 @@ public enum JexlOperator {
      * If the returned Iterator is AutoCloseable, close will be called after the last execution of the loop block.
      * <br><strong>Syntax:</strong> <code>for(var x : y){...} </code>
      * <br><strong>Method:</strong> <code>Iterator&lt;Object&gt; forEach(R y);</code>.
+     * @since 3.1
      */
     FOR_EACH("for(...)", "forEach", 1);
 

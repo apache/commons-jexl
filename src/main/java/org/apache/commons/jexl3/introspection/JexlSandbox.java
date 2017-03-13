@@ -80,6 +80,7 @@ public final class JexlSandbox {
      * a black-box considers no permissions as &quote;nothing is allowed&quote;.
      * @param wb whether this sandbox is white (true) or black (false)
      * if no permission is explicitly defined for a class.
+     * @since 3.1
      */
     public JexlSandbox(boolean wb) {
         this(wb, new HashMap<String, Permissions>());
@@ -97,6 +98,7 @@ public final class JexlSandbox {
      * Creates a sandbox based on an existing permissions map.
      * @param wb whether this sandbox is white (true) or black (false)
      * @param map the permissions map
+     * @since 3.1
      */
     protected JexlSandbox(boolean wb, Map<String, Permissions> map) {
         white = wb;

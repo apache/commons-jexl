@@ -598,6 +598,7 @@ public class JexlException extends RuntimeException {
      * @param node the node where the error occurred
      * @param annotation the annotation name
      * @return the error message
+     * @since 3.1
      */
     public static String annotationError(JexlNode node, String annotation) {
         StringBuilder msg = errorAt(node);

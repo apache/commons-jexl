@@ -203,6 +203,9 @@ public class JexlBuilder {
         return loader;
     }
 
+    /**
+     * @deprecated since 3.1 use {@link #charset(Charset)} instead
+     */
     @Deprecated
     public JexlBuilder loader(Charset arg) {
         return charset(arg);
@@ -213,6 +216,7 @@ public class JexlBuilder {
      *
      * @param arg the charset
      * @return this builder
+     * @since 3.1
      */
     public JexlBuilder charset(Charset arg) {
         this.charset = arg;
@@ -279,13 +283,17 @@ public class JexlBuilder {
      *
      * @param flag true implies the engine throws the exception, false makes the engine return null.
      * @return this builder
+     * @since 3.1
      */
     public JexlBuilder cancellable(boolean flag) {
         this.cancellable = flag;
         return this;
     }
 
-    /** @return the cancellable information flag */
+    /**
+     * @return the cancellable information flag 
+     * @since 3.1
+     */
     public Boolean cancellable() {
         return this.cancellable;
     }
