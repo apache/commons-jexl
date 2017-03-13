@@ -138,6 +138,7 @@ public class JexlArithmetic {
      *
      * @param context the context that may extend {@link JexlEngine.Options} to use
      * @return a new arithmetic instance or this
+     * @since 3.1
      */
     public JexlArithmetic options(JexlContext context) {
         return context instanceof JexlEngine.Options
@@ -154,6 +155,7 @@ public class JexlArithmetic {
      * @param bigdContext the math context instance to use for +,-,/,*,% operations on big decimals.
      * @param bigdScale   the scale used for big decimals.
      * @return default is a new JexlArithmetic instance
+     * @since 3.1
      */
     protected JexlArithmetic createWithOptions(boolean astrict, MathContext bigdContext, int bigdScale) {
         return new JexlArithmetic(astrict, bigdContext, bigdScale);

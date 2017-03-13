@@ -122,6 +122,7 @@ public abstract class JexlEngine {
         /**
          * Whether evaluation will throw JexlException.Cancel (true) or return null (false) when interrupted.
          * @return true when cancellable, false otherwise
+         * @since 3.1
          */
         Boolean isCancellable();
 

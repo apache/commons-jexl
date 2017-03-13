@@ -125,6 +125,7 @@ public interface JexlContext {
      * It is used by the interpreter during evaluation to execute annotation evaluations.
      * <p>If the JexlContext is not an instance of an AnnotationProcessor, encountering an annotation will generate
      * an error or a warning depending on the engine strictness.
+     * @since 3.1
      */
     interface AnnotationProcessor {
         /**
