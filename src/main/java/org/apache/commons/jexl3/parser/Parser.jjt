@@ -35,10 +35,8 @@ PARSER_BEGIN(Parser)
 package org.apache.commons.jexl3.parser;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.LinkedList;
 
-import java.io.Reader;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.internal.Scope;
