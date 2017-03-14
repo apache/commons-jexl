@@ -45,24 +45,31 @@ What's new in 3.1:
 
 New Features in 3.1:
 ====================
+* JEXL-222:     The ability to declare indexed property getter/setter in customised JexlArithmetic implementation
+* JEXL-219:     Blacklist by default in sandbox
 * JEXL-216:     Improve parsing concurrency in multithreaded environment
 * JEXL-211:     Add callable method to JexlExpression interface
 * JEXL-201:     Allow Interpreter to use live values from JexlEngine.Option interface implemented by JexlContext
+* JEXL-198:     JxltEngine Template does not expose pragmas 
 * JEXL-197:     Add annotations
-* JEXL-194      Allow synchronization on iterableValue in foreach statement
+* JEXL-194:     Allow synchronization on iterableValue in foreach statement
 
 Bugs Fixed in 3.1:
 ====================
 * JEXL-221:     Sporadic undefined property error caused by NPE at MapGetExecutor.tryInvoke()
+* JEXL-217:     Interpreter.getAttribute() raises exception in non-strict mode when cached property resolver is used
+* JEXL-215:     JexlEngine.createInfo() is redundantly called when debug and caching is enabled leading to sub-optimal performance
+* JEXL-214:     Redundant call of fillInStackTrace() in JexlEngine.createInfo() ?
+* JEXL-213:     rename JexlBuilder.loader(Charset arg) to JexlBuilder.charset(Charset arg)
 * JEXL-210:     The way to cancel script execution with an error
 * JEXL-209:     Unsolvable function/method '<?>.<null>(...)'
+* JEXL-208:     Documentation typos/inconsistencies
 * JEXL-207:     Inconsistent error handling
 * JEXL-206:     testCallableCancel() test hangs sporadically
 * JEXL-205:     testCancelForever() is not terminated properly as 'Fixed'
 * JEXL-204:     Script is not interrupted by a method call throwing Exception
 * JEXL-203:     JexlArithmetic.options() diverts Interpreter to use default implementation of JexlArithmetic instead of custom one
 * JEXL-202:     Detect invalid assignment operator usage with non-assignable l-value during script parsing
-* JEXL-198:     JxltEngine Template does not expose pragmas
 * JEXL-196:     Script execution hangs while calling method with one argument without parameter
 * JEXL-195:     Support for AtomicBoolean in logical expressions
 * JEXL-193:     InterruptedException is swallowed in function call in silent and non-strict mode
