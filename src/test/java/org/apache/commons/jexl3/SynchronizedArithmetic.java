@@ -34,9 +34,9 @@ public class SynchronizedArithmetic extends JexlArithmetic {
     private final Monitor monitor;
 
     /**
-     * A base synchronized arithemtic.
-     * @param monitor the synchronizatiobn monitor
-     * @param strict  whether the aruthmetic is strict or not
+     * A base synchronized arithmetic.
+     * @param monitor the synchronization monitor
+     * @param strict  whether the arithmetic is strict or not
      */
     protected SynchronizedArithmetic(Monitor monitor, boolean strict) {
         super(strict);
