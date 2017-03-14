@@ -26,11 +26,29 @@
     </properties>
     <body>
         <release version="3.1" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-222" due-to="Dmitri Blinov">
+                The ability to declare indexed property getter/setter in customised JexlArithmetic implementation
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-221" due-to="Dmitri Blinov">
                 Sporadic undefined property error caused by NPE at MapGetExecutor.tryInvoke()
             </action>
+            <action dev="henrib" type="add" issue="JEXL-219">
+                Blacklist by default in sandbox
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-217" due-to="Dmitri Blinov">
+                Interpreter.getAttribute() raises exception in non-strict mode when cached property resolver is used
+            </action>
             <action dev="henrib" type="add" issue="JEXL-216" due-to="Dmitri Blinov">
                 Improve parsing concurrency in multithreaded environment
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-215" due-to="Dmitri Blinov">
+            JexlEngine.createInfo() is redundantly called when debug and caching is enabled leading to sub-optimal performance
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-214" due-to="Dmitri Blinov">
+                Redundant call of fillInStackTrace() in JexlEngine.createInfo() ?
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-213" due-to="Dmitri Blinov">
+                rename JexlBuilder.loader(Charset arg) to JexlBuilder.charset(Charset arg)
             </action>
             <action dev="henrib" type="add" issue="JEXL-211" due-to="Dmitri Blinov">
                 Add callable method to JexlExpression interface
@@ -40,6 +58,9 @@
             </action>
             <action dev="henrib" type="fix" issue="JEXL-209" due-to="Dmitri Blinov">
                Unsolvable function/method '&lt;?&gt;.&lt;null&gt;(...)'
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-208" due-to="Joe Tom">
+                Documentation typos/inconsistencies
             </action>
             <action dev="henrib" type="fix" issue="JEXL-207" due-to="Dmitri Blinov">
                Inconsistent error handling
