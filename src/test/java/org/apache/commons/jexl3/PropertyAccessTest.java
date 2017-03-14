@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.jexl3.internal.Debugger;
+import org.apache.commons.jexl3.internal.introspection.IndexedType;
 import org.apache.commons.jexl3.junit.Asserter;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,7 +46,6 @@ public class PropertyAccessTest extends JexlTestCase {
         asserter = new Asserter(JEXL);
     }
 
-
     @Test public void testPropertyProperty() throws Exception {
         Integer i42 = Integer.valueOf(42);
         Integer i43 = Integer.valueOf(43);
@@ -70,16 +70,19 @@ public class PropertyAccessTest extends JexlTestCase {
             asserter.assertExpression("foo.0.'1'", i42);
         }
     }
-
-    public static class Container {
+    
+    /**
+     * A base property container; can only set from string.
+     */
+    public static class PropertyContainer {
         String value0;
         int value1;
-
-        public Container(String name, int number) {
+        
+        public PropertyContainer(String name, int number) {
             value0 = name;
             value1 = number;
         }
-
+        
         public Object getProperty(String name) {
             if ("name".equals(name)) {
                 return value0;
@@ -88,6 +91,91 @@ public class PropertyAccessTest extends JexlTestCase {
             } else {
                 return null;
             }
+        }
+        
+        public void setProperty(String name, String value) {
+            if ("name".equals(name)) {
+                this.value0 = value.toUpperCase();
+            }
+            if ("number".equals(name)) {
+                this.value1 = Integer.parseInt(value) + 1000;
+            }
+        }
+    }
+
+    
+    /**
+     * Overloads propertySet.
+     */
+    public static class PropertyArithmetic extends JexlArithmetic {
+        int ncalls = 0;
+        
+        public PropertyArithmetic(boolean astrict) {
+            super(astrict);
+        }
+
+        public Object propertySet(IndexedType.IndexedContainer map, String key, Integer value) {
+            if (map.getContainerClass().equals(PropertyContainer.class)
+                && map.getContainerName().equals("property")) {
+                try {
+                    map.set(key, value.toString());
+                    ncalls += 1;
+                } catch (Exception xany) {
+                    throw new JexlException.Operator(null, key + "." + value.toString(), xany);
+                }
+                return null;
+            }
+            return JexlEngine.TRY_FAILED;
+        }
+        
+        public int getCalls() {
+            return ncalls;
+        }
+    }
+
+    @Test public void testInnerViaArithmetic() throws Exception {
+        PropertyArithmetic pa = new PropertyArithmetic(true);
+        JexlEngine jexl = new JexlBuilder().arithmetic(pa).debug(true).strict(true).cache(32).create();
+        PropertyContainer quux = new PropertyContainer("bar", 169);
+        Object result;
+
+        JexlScript getName = jexl.createScript("foo.property.name", "foo");
+        result = getName.execute(null, quux);
+        Assert.assertEquals("bar", result);
+        int calls = pa.getCalls();
+        JexlScript setName = jexl.createScript("foo.property.name = $0", "foo", "$0");
+        setName.execute(null, quux, 123);
+        result = getName.execute(null, quux);
+        Assert.assertEquals("123", result);
+        setName.execute(null, quux, 456);
+        result = getName.execute(null, quux);
+        Assert.assertEquals("456", result);
+        Assert.assertEquals(calls + 2, pa.getCalls());
+        setName.execute(null, quux, "quux");
+        result = getName.execute(null, quux);
+        Assert.assertEquals("QUUX", result);
+        Assert.assertEquals(calls + 2, pa.getCalls());
+        
+        JexlScript getNumber = jexl.createScript("foo.property.number", "foo");
+        result = getNumber.execute(null, quux);
+        Assert.assertEquals(169, result);
+        JexlScript setNumber = jexl.createScript("foo.property.number = $0", "foo", "$0");
+        setNumber.execute(null, quux, 42);
+        result = getNumber.execute(null, quux);
+        Assert.assertEquals(1042, result);
+        setNumber.execute(null, quux, 24);
+        result = getNumber.execute(null, quux);
+        Assert.assertEquals(1024, result);
+        Assert.assertEquals(calls + 4, pa.getCalls());
+        setNumber.execute(null, quux, "42");
+        result = getNumber.execute(null, quux);
+        Assert.assertEquals(1042, result);
+        Assert.assertEquals(calls + 4, pa.getCalls());
+    }
+    
+    public static class Container extends PropertyContainer {
+        public Container(String name, int number) {
+            super(name, number);
         }
 
         public Object getProperty(int ref) {
@@ -126,10 +214,13 @@ public class PropertyAccessTest extends JexlTestCase {
     }
 
     @Test public void testInnerProperty() throws Exception {
+        PropertyArithmetic pa = new PropertyArithmetic(true);
+        JexlEngine jexl = new JexlBuilder().arithmetic(pa).debug(true).strict(true).cache(32).create();
         Container quux = new Container("quux", 42);
         JexlScript get;
         Object result;
 
+        int calls = pa.getCalls();
         JexlScript getName = JEXL.createScript("foo.property.name", "foo");
         result = getName.execute(null, quux);
         Assert.assertEquals("quux", result);
@@ -173,6 +264,8 @@ public class PropertyAccessTest extends JexlTestCase {
         Assert.assertEquals(24, result);
         result = get1.execute(null, quux);
         Assert.assertEquals(24, result);
+        
+        Assert.assertEquals(calls, pa.getCalls());
     }
 
 

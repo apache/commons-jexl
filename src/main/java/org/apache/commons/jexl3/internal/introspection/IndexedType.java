@@ -24,18 +24,23 @@ import java.beans.IntrospectionException;
 
 /**
  * Abstract an indexed property container.
- * This stores the container name and owning class as well as the list of available getter and setter methods.
+ * <p>This allows getting properties from expressions like <code>var.container.property</code>.
+ * This stores the container name and class as well as the list of available getter and setter methods.
  * It implements JexlPropertyGet since such a container can only be accessed from its owning instance (not set).
  */
 public final class IndexedType implements JexlPropertyGet {
-    /** The container name. */
+     /** The container name. */
     private final String container;
-    /** The owning class. */
+    /** The container class. */
     private final Class<?> clazz;
     /** The array of getter methods. */
     private final Method[] getters;
+    /** Last get method used. */
+    private volatile Method get = null;
     /** The array of setter methods. */
     private final Method[] setters;
+    /** Last set method used. */
+    private volatile Method set = null;
 
     /**
      * Attempts to find an indexed-property getter in an object.
@@ -63,50 +68,66 @@ public final class IndexedType implements JexlPropertyGet {
     }
 
     /**
-     * A generic indexed property container, exposes get(key) and set(key, value) and solves method call dynamically
-     * based on arguments.
+     * A generic indexed property container, exposes get(key) and set(key, value)
+     * and solves method call dynamically based on arguments.
      * <p>Must remain public for introspection purpose.</p>
      */
     public static final class IndexedContainer {
-        /** The instance owning the container. */
-        private final Object object;
+        /** The container instance. */
+        private final Object container;
         /** The container type instance. */
         private final IndexedType type;
 
         /**
          * Creates a new duck container.
          * @param theType the container type
-         * @param theObject the instance owning the container
+         * @param theContainer the container instance
          */
-        private IndexedContainer(IndexedType theType, Object theObject) {
+        private IndexedContainer(IndexedType theType, Object theContainer) {
             this.type = theType;
-            this.object = theObject;
+            this.container = theContainer;
+        }
+        
+        /**
+         * Gets the property container name.
+         * @return the container name
+         */
+        public String getContainerName() {
+            return type.container;
         }
 
         /**
-         * Gets a property from a container.
+         * Gets the property container class.
+         * @return the container class
+         */
+        public Class<?> getContainerClass() {
+            return type.clazz;
+        }
+        
+        /**
+         * Gets a property from this indexed container.
          * @param key the property key
          * @return the property value
          * @throws Exception if inner invocation fails
          */
         public Object get(Object key) throws Exception {
-            return type.invokeGet(object, key);
+            return type.invokeGet(container, key);
         }
 
         /**
-         * Sets a property in a container.
+         * Sets a property in this indexed container.
          * @param key the property key
          * @param value the property value
          * @return the invocation result (frequently null)
          * @throws Exception if inner invocation fails
          */
         public Object set(Object key, Object value) throws Exception {
-            return type.invokeSet(object, key, value);
+            return type.invokeSet(container, key, value);
         }
     }
 
     /**
-     * Creates a new indexed type.
+     * Creates a new indexed property container type.
      * @param name the container name
      * @param c the owning class
      * @param gets the array of getter methods
@@ -130,7 +151,9 @@ public final class IndexedType implements JexlPropertyGet {
 
     @Override
     public Object tryInvoke(Object obj, Object key) {
-        if (obj != null && key != null && clazz.equals(obj.getClass()) && container.equals(key.toString())) {
+        if (obj != null && key != null
+            && clazz.equals(obj.getClass())
+            && container.equals(key.toString())) {
             return new IndexedContainer(this, obj);
         } else {
             return Uberspect.TRY_FAILED;
@@ -149,49 +172,69 @@ public final class IndexedType implements JexlPropertyGet {
 
     /**
      * Gets the value of a property from a container.
-     * @param object the instance owning the container (not null)
+     * @param object the container instance (not null)
      * @param key the property key (not null)
      * @return the property value
-     * @throws Exception if invocation failed; IntrospectionException if a property getter could not be found
+     * @throws Exception if invocation failed;
+     *         IntrospectionException if a property getter could not be found
      */
     private Object invokeGet(Object object, Object key) throws Exception {
-        if (getters != null) {
-            final Object[] args = {key};
-            final Method jm;
-            if (getters.length == 1) {
-                jm = getters[0];
-            } else {
-                jm = new MethodKey(getters[0].getName(), args).getMostSpecificMethod(getters);
-            }
+        if (getters != null && getters.length > 0) {
+            Method jm = get;
             if (jm != null) {
-                return jm.invoke(object, args);
+                final Class<?>[] ptypes = jm.getParameterTypes();
+                if (ptypes[0].isAssignableFrom(key.getClass())) {
+                    return jm.invoke(object, key);
+                }
+            }
+            final Object[] args = {key};
+            final String mname = getters[0].getName();
+            final MethodKey km = new MethodKey(mname, args);
+            jm = km.getMostSpecificMethod(getters);
+            if (jm != null) {
+                Object invoked = jm.invoke(object, args);
+                get = jm;
+                return invoked;
             }
         }
-        throw new IntrospectionException("property get error: " + object.getClass().toString() + "@" + key.toString());
+        throw new IntrospectionException("property get error: "
+                + object.getClass().toString()
+                + "@" + key.toString());
     }
 
     /**
      * Sets the value of a property in a container.
-     * @param object the instance owning the container (not null)
+     * @param object the container instance (not null)
      * @param key the property key (not null)
      * @param value the property value (not null)
      * @return the result of the method invocation (frequently null)
-     * @throws Exception if invocation failed; IntrospectionException if a property setter could not be found
+     * @throws Exception if invocation failed;
+     *         IntrospectionException if a property setter could not be found
      */
     private Object invokeSet(Object object, Object key, Object value) throws Exception {
-        if (setters != null) {
-            final Object[] args = {key, value};
-            final Method jm;
-            if (setters.length == 1) {
-                jm = setters[0];
-            } else {
-                jm = new MethodKey(setters[0].getName(), args).getMostSpecificMethod(setters);
-            }
+        if (setters != null && setters.length > 0) {
+            Method jm = set;
             if (jm != null) {
-                return jm.invoke(object, args);
+                final Class<?>[] ptypes = jm.getParameterTypes();
+                if (ptypes[0].isAssignableFrom(key.getClass())
+                    && (value == null
+                        || ptypes[1].isAssignableFrom(value.getClass()))) {
+                    return jm.invoke(object, key, value);
+                }
+            }
+            final Object[] args = {key, value};
+            final String mname = setters[0].getName();
+            final MethodKey km = new MethodKey(mname, args);
+            jm = km.getMostSpecificMethod(setters);
+            if (jm != null) {
+                Object invoked = jm.invoke(object, args);
+                set = jm;
+                return invoked;
             }
         }
-        throw new IntrospectionException("property set error: " + object.getClass().toString() + "@" + key.toString());
+        throw new IntrospectionException("property set error: "
+                + object.getClass().toString()
+                + "@" + key.toString());
     }
 
 }
