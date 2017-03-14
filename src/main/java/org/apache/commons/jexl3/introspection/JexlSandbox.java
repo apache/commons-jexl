@@ -76,8 +76,8 @@ public final class JexlSandbox {
 
     /**
      * Creates a new default sandbox.
-     * <p>A white-box considers no permissions as &quote;everything is allowed&quote; when
-     * a black-box considers no permissions as &quote;nothing is allowed&quote;.
+     * <p>A white-box considers no permissions as &quot;everything is allowed&quot; when
+     * a black-box considers no permissions as &quot;nothing is allowed&quot;.
      * @param wb whether this sandbox is white (true) or black (false)
      * if no permission is explicitly defined for a class.
      * @since 3.1
