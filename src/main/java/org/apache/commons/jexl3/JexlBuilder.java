@@ -204,13 +204,17 @@ public class JexlBuilder {
     }
 
     /**
+     * Sets the charset to use.
+     *
+     * @param arg the charset
+     * @return this builder
      * @deprecated since 3.1 use {@link #charset(Charset)} instead
      */
     @Deprecated
     public JexlBuilder loader(Charset arg) {
         return charset(arg);
-    } 
-    
+    }
+
     /**
      * Sets the charset to use.
      *
@@ -291,7 +295,7 @@ public class JexlBuilder {
     }
 
     /**
-     * @return the cancellable information flag 
+     * @return the cancellable information flag
      * @since 3.1
      */
     public Boolean cancellable() {

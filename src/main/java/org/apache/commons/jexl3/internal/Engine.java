@@ -214,7 +214,7 @@ public class Engine extends JexlEngine {
         return strict;
     }
 
-    //@Override
+    @Override
     public boolean isCancellable() {
         return this.cancellable;
     }
