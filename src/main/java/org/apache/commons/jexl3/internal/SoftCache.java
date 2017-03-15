@@ -204,7 +204,7 @@ class SoftCacheEntry<K, V> implements Map.Entry<K, V> {
     }
 
     @Override
-    public V setValue(V value) {
+    public V setValue(V v) {
         throw new UnsupportedOperationException("Not supported.");
     }
 }

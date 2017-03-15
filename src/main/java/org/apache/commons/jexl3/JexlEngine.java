@@ -210,11 +210,19 @@ public abstract class JexlEngine {
     public abstract boolean isSilent();
 
     /**
-     * Checks whether the engine considers unknown variables, methods, functions and constructors as errors.
+     * Checks whether this engine considers unknown variables, methods, functions and constructors as errors.
      *
      * @return true if strict, false otherwise
      */
     public abstract boolean isStrict();
+
+    /**
+     * Checks whether this engine will throw JexlException.Cancel (true) or return null (false) when interrupted
+     * during an execution.
+     *
+     * @return true if cancellable, false otherwise
+     */
+    public abstract boolean isCancellable();
 
     /**
      * Sets the class loader used to discover classes in 'new' expressions.
