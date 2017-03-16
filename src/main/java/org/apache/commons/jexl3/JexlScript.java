@@ -32,6 +32,8 @@ import java.util.concurrent.Callable;
  * <p>The statements can be <code>blocks</code> (curly braces containing code),
  * Control statements such as <code>if</code> and <code>while</code>
  * as well as expressions and assignment statements.</p>
+ * 
+ * <p>Do <em>not</em> create classes that implement this interface; delegate or compose instead.</p>
  *
  * @since 1.1
  */
