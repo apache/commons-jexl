@@ -29,8 +29,9 @@ import java.util.concurrent.Callable;
  * <p>
  * An expression is different than a script - it is simply a reference to
  * a single expression, not to multiple statements.
- * This implies 'if','for','while','var' and blocks '{'... '}'are NOT allowed in expressions.
+ * This implies 'if','for','while','var' and blocks '{'... '}'are <em>not</em> allowed in expressions.
  * </p>
+ * <p>Do <em>not</em> create classes that implement this interface; delegate or compose instead.</p>
  *
  * @since 1.0
  */
