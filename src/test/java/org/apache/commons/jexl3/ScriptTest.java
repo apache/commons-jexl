@@ -54,7 +54,8 @@ public class ScriptTest extends JexlTestCase {
     /**
      * Test creating a script from a string.
      */
-    @Test public void testSimpleScript() throws Exception {
+    @Test
+    public void testSimpleScript() throws Exception {
         String code = "while (x < 10) x = x + 1;";
         JexlScript s = JEXL.createScript(code);
         JexlContext jc = new MapContext();
@@ -65,7 +66,8 @@ public class ScriptTest extends JexlTestCase {
         Assert.assertEquals("getText is wrong", code, s.getSourceText());
     }
 
-    @Test public void testScriptFromFile() throws Exception {
+    @Test
+    public void testScriptFromFile() throws Exception {
         File testScript = new File(TEST1);
         JexlScript s = JEXL.createScript(testScript);
         JexlContext jc = new MapContext();
@@ -75,7 +77,8 @@ public class ScriptTest extends JexlTestCase {
         Assert.assertEquals("Wrong result", new Integer(7), result);
     }
 
-    @Test public void testArgScriptFromFile() throws Exception {
+    @Test
+    public void testArgScriptFromFile() throws Exception {
         File testScript = new File(TEST_ADD);
         JexlScript s = JEXL.createScript(testScript,new String[]{"x","y"});
         JexlContext jc = new MapContext();
@@ -85,7 +88,8 @@ public class ScriptTest extends JexlTestCase {
         Assert.assertEquals("Wrong result", new Integer(42), result);
     }
 
-    @Test public void testScriptFromURL() throws Exception {
+    @Test
+    public void testScriptFromURL() throws Exception {
         URL testUrl = new File(TEST1).toURI().toURL();
         JexlScript s = JEXL.createScript(testUrl);
         JexlContext jc = new MapContext();
@@ -95,7 +99,8 @@ public class ScriptTest extends JexlTestCase {
         Assert.assertEquals("Wrong result", new Integer(7), result);
     }
 
-    @Test public void testArgScriptFromURL() throws Exception {
+    @Test
+    public void testArgScriptFromURL() throws Exception {
         URL testUrl = new File(TEST_ADD).toURI().toURL();
         JexlScript s = JEXL.createScript(testUrl,new String[]{"x","y"});
         JexlContext jc = new MapContext();
@@ -105,7 +110,8 @@ public class ScriptTest extends JexlTestCase {
         Assert.assertEquals("Wrong result", new Integer(42), result);
     }
 
-    @Test public void testScriptUpdatesContext() throws Exception {
+    @Test
+    public void testScriptUpdatesContext() throws Exception {
         String jexlCode = "resultat.setCode('OK')";
         JexlExpression e = JEXL.createExpression(jexlCode);
         JexlScript s = JEXL.createScript(jexlCode);

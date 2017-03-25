@@ -727,7 +727,8 @@ public class JXLTTest extends JexlTestCase {
     }
 //
 //
-//    @Test public void testDeferredTemplate() throws Exception {
+//    @Test
+//    public void testDeferredTemplate() throws Exception {
 //        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(
 //             "select * from \n"+
 //             "##for(var c : tables) {\n"+

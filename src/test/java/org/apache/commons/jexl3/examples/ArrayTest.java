@@ -67,7 +67,8 @@ public class ArrayTest {
      * Unit test entry point.
      * @throws Exception
      */
-    @Test public void testExample() throws Exception {
+    @Test
+    public void testExample() throws Exception {
         example(Output.JUNIT);
     }
 
