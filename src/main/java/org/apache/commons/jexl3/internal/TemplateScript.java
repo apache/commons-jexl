@@ -161,8 +161,7 @@ public final class TemplateScript implements JxltEngine.Template {
     public String asString() {
         StringBuilder strb = new StringBuilder();
         int e = 0;
-        for (int b = 0; b < source.length; ++b) {
-            Block block = source[b];
+        for (Block block : source) {
             if (block.getType() == BlockType.DIRECTIVE) {
                 strb.append(prefix);
             } else {
