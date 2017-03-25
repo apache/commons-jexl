@@ -123,7 +123,7 @@ public class PublicFieldsTest extends JexlTestCase {
         } catch(JexlException xjexl) {}
     }
 
-    public static enum Gender { MALE, FEMALE };
+    public enum Gender { MALE, FEMALE };
 
     @Test public void testGetEnum() throws Exception {
         ctxt.set("com.jexl.gender", Gender.class);
