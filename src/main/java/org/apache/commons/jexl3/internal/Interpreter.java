@@ -1636,7 +1636,6 @@ public class Interpreter extends InterpreterBase {
             argv[i] = node.jjtGetChild(i + 1).jjtAccept(this, data);
         }
 
-        JexlException xjexl = null;
         try {
             // attempt to reuse last constructor cached in volatile JexlNode.value
             if (cache) {
