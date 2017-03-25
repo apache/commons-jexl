@@ -659,14 +659,10 @@ public final class TemplateEngine extends JxltEngine {
         Exception xuel = null;
         TemplateExpression stmt = null;
         try {
-            if (cache == null) {
+            stmt = cache.get(expression);
+            if (stmt == null) {
                 stmt = parseExpression(info, expression, null);
-            } else {
-                stmt = cache.get(expression);
-                if (stmt == null) {
-                    stmt = parseExpression(info, expression, null);
-                    cache.put(expression, stmt);
-                }
+                cache.put(expression, stmt);
             }
         } catch (JexlException xjexl) {
             xuel = new Exception(xjexl.getInfo(), "failed to parse '" + expression + "'", xjexl);
