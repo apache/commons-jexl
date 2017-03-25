@@ -710,7 +710,7 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /** The different parsing states. */
-    private static enum ParseState {
+    private enum ParseState {
         /** Parsing a constant. */
         CONST,
         /** Parsing after $ . */
@@ -900,11 +900,11 @@ public final class TemplateEngine extends JxltEngine {
     /**
      * The enum capturing the difference between verbatim and code source fragments.
      */
-    static enum BlockType {
+    enum BlockType {
         /** Block is to be output "as is" but may be a unified expression. */
         VERBATIM,
         /** Block is a directive, ie a fragment of JEXL code. */
-        DIRECTIVE;
+        DIRECTIVE
     }
 
     /**
