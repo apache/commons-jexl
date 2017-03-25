@@ -59,6 +59,7 @@ public class ArrayAccessTest extends JexlTestCase {
     /**
      * test simple array access
      */
+    @Test
     public void testArrayAccess() throws Exception {
 
         /*
@@ -190,6 +191,7 @@ public class ArrayAccessTest extends JexlTestCase {
         asserter.assertExpression("foo.0.1", "three");
     }
 
+    @Test
     public void testArrayProperty() throws Exception {
         Foo foo = new Foo();
 
@@ -202,6 +204,7 @@ public class ArrayAccessTest extends JexlTestCase {
     }
 
     // This is JEXL-26
+    @Test
     public void testArrayAndDottedConflict() throws Exception {
         Object[] objects = new Object[] {"an", "array", new Long(0)};
         asserter.setStrict(false);
@@ -216,6 +219,7 @@ public class ArrayAccessTest extends JexlTestCase {
         asserter.assertExpression("base.objects.1.status", null);
     }
 
+    @Test
     public void testArrayIdentifierParsing() throws Exception {
         Map<Object, Number> map = new HashMap<Object, Number>();
         map.put("00200", -42.42d);
@@ -228,6 +232,7 @@ public class ArrayAccessTest extends JexlTestCase {
         asserter.assertExpression("objects.200", 42.42d);
     }
 
+    @Test
     public void testArrayMethods() throws Exception {
         Object[] objects = new Object[] {"an", "array", new Long(0)};
 
@@ -239,6 +244,7 @@ public class ArrayAccessTest extends JexlTestCase {
         asserter.assertExpression("objects[1]", "dion");
     }
 
+    @Test
     public void testArrayArray() throws Exception {
         Integer i42 = Integer.valueOf(42);
         Integer i43 = Integer.valueOf(43);

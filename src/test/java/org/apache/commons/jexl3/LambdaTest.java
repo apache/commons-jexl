@@ -33,6 +33,7 @@ public class LambdaTest extends JexlTestCase {
         super("LambdaTest");
     }
 
+    @Test
     public void testScriptArguments() throws Exception {
         JexlEngine jexl = new Engine();
         JexlScript s = jexl.createScript(" x + x ", "x");

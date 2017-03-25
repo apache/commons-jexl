@@ -305,6 +305,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     // JEXL-24: doubles with exponent
+    @Test
     public void test2DoubleLiterals() throws Exception {
         JexlEvalContext ctxt = new JexlEvalContext();
         ctxt.setStrictArithmetic(true);
@@ -429,6 +430,7 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
     }
 
+    @Test
     public void testDivClass() throws Exception {
         JexlEngine jexl = new JexlBuilder().create();
         JexlContext jc = new MapContext();
@@ -440,6 +442,7 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
     }
 
+    @Test
     public void testPlusClass() throws Exception {
         JexlEngine jexl = new JexlBuilder().create();
         JexlContext jc = new MapContext();
@@ -451,6 +454,7 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
     }
 
+    @Test
     public void testMinusClass() throws Exception {
         JexlEngine jexl = new JexlBuilder().create();
         JexlContext jc = new MapContext();
