@@ -109,6 +109,7 @@ public class AssignTest extends JexlTestCase {
         Assert.assertEquals("Result is not 10", new Integer(10), o);
     }
 
+    @Test
     public void testAmbiguous() throws Exception {
         JexlExpression assign = JEXL.createExpression("froboz.nosuchbean = 10");
         JexlContext jc = new MapContext();
