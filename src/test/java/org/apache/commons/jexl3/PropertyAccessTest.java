@@ -46,7 +46,8 @@ public class PropertyAccessTest extends JexlTestCase {
         asserter = new Asserter(JEXL);
     }
 
-    @Test public void testPropertyProperty() throws Exception {
+    @Test
+    public void testPropertyProperty() throws Exception {
         Integer i42 = Integer.valueOf(42);
         Integer i43 = Integer.valueOf(43);
         String s42 = "fourty-two";
@@ -133,7 +134,8 @@ public class PropertyAccessTest extends JexlTestCase {
         }
     }
 
-    @Test public void testInnerViaArithmetic() throws Exception {
+    @Test
+    public void testInnerViaArithmetic() throws Exception {
         PropertyArithmetic pa = new PropertyArithmetic(true);
         JexlEngine jexl = new JexlBuilder().arithmetic(pa).debug(true).strict(true).cache(32).create();
         PropertyContainer quux = new PropertyContainer("bar", 169);
@@ -213,7 +215,8 @@ public class PropertyAccessTest extends JexlTestCase {
         }
     }
 
-    @Test public void testInnerProperty() throws Exception {
+    @Test
+    public void testInnerProperty() throws Exception {
         PropertyArithmetic pa = new PropertyArithmetic(true);
         JexlEngine jexl = new JexlBuilder().arithmetic(pa).debug(true).strict(true).cache(32).create();
         Container quux = new Container("quux", 42);
@@ -269,7 +272,8 @@ public class PropertyAccessTest extends JexlTestCase {
     }
 
 
-    @Test public void testStringIdentifier() throws Exception {
+    @Test
+    public void testStringIdentifier() throws Exception {
         Map<String, String> foo = new HashMap<String, String>();
 
         JexlContext jc = new MapContext();
