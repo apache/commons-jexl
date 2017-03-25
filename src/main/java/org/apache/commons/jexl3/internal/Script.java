@@ -188,7 +188,7 @@ public class Script implements JexlScript, JexlExpression {
     @Override
     public Object execute(JexlContext context) {
         checkCacheVersion();
-        Scope.Frame frame = createFrame((Object[]) null);
+        Scope.Frame frame = createFrame(null);
         Interpreter interpreter = createInterpreter(context, frame);
         return interpreter.interpret(script);
     }
