@@ -86,7 +86,7 @@ public final class TemplateEngine extends JxltEngine {
      * Each instance carries a counter index per (composite sub-) template expression type.
      * @see ExpressionBuilder
      */
-    static enum ExpressionType {
+    enum ExpressionType {
         /** Constant TemplateExpression, count index 0. */
         CONSTANT(0),
         /** Immediate TemplateExpression, count index 1. */
