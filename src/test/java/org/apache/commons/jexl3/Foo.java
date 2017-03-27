@@ -51,9 +51,12 @@ public class Foo {
         return new Foo();
     }
 
-    public String get(String arg)
-    {
-        return "Repeat : " + arg;
+    public String getQuux() {
+        return "String : quux";
+    }
+
+    public String repeat(String str) {
+        return "Repeat : " + str;
     }
 
     public String convertBoolean(boolean b)

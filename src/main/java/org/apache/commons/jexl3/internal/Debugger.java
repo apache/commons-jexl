@@ -578,13 +578,28 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTGTNode node, Object data) {
         return infixChildren(node, " > ", false, data);
     }
-    /** Checks identifiers that contain space, quote, double-quotes or backspace. */
-    protected static final Pattern QUOTED_IDENTIFIER = Pattern.compile("['\"\\s\\\\]");
+    
+    /** Checks identifiers that contain spaces or punctuation
+     * (but underscore, at-sign, sharp-sign and dollar).
+     */
+    protected static final Pattern QUOTED_IDENTIFIER = 
+            Pattern.compile("[\\s]|[\\p{Punct}&&[^@#\\$_]]");
+    
+    /**
+     * Checks whether an identifier should be quoted or not.
+     * @param str the identifier
+     * @return true if needing quotes, false otherwise
+     */
+    protected boolean needQuotes(String str) {
+        return QUOTED_IDENTIFIER.matcher(str).find()
+            || "size".equals(str)
+            || "empty".equals(str);
+    }
 
     @Override
     protected Object visit(ASTIdentifier node, Object data) {
         String image = node.getName();
-        if (QUOTED_IDENTIFIER.matcher(image).find()) {
+        if (needQuotes(image)) {
             // quote it
             image = "'" + image.replace("'", "\\'") + "'";
         }
@@ -595,7 +610,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTIdentifierAccess node, Object data) {
         builder.append(".");
         String image = node.getName();
-        if (QUOTED_IDENTIFIER.matcher(image).find()) {
+        if (needQuotes(image)) {
             // quote it
             image = "'" + image.replace("'", "\\'") + "'";
         }

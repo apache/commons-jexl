@@ -89,7 +89,7 @@ public class JexlTest extends JexlTestCase {
          */
         JexlContext jc = new MapContext();
         jc.set("foo", new Foo());
-        assertExpression(jc, "foo.get(\"woogie\")", "Repeat : woogie");
+        assertExpression(jc, "foo.repeat(\"woogie\")", "Repeat : woogie");
     }
 
     @Test
@@ -213,21 +213,20 @@ public class JexlTest extends JexlTestCase {
         // support generic int size() method
         BitSet bitset = new BitSet(5);
         jc.set("bitset", bitset);
-//
-//        assertExpression(jc, "size(s)", new Integer(5));
-//        assertExpression(jc, "size(array)", new Integer(5));
-//        assertExpression(jc, "size(list)", new Integer(5));
-//        assertExpression(jc, "size(map)", new Integer(5));
-//        assertExpression(jc, "size(set)", new Integer(5));
-//        assertExpression(jc, "size(bitset)", new Integer(64));
-//        assertExpression(jc, "list.size()", new Integer(5));
-//        assertExpression(jc, "map.size()", new Integer(5));
-//        assertExpression(jc, "set.size()", new Integer(5));
-//        assertExpression(jc, "bitset.size()", new Integer(64));
-//
-//        assertExpression(jc, "list.get(size(list) - 1)", "5");
-//        assertExpression(jc, "list[size(list) - 1]", "5");
-        // here
+
+        assertExpression(jc, "size(s)", new Integer(5));
+        assertExpression(jc, "size(array)", new Integer(5));
+        assertExpression(jc, "size(list)", new Integer(5));
+        assertExpression(jc, "size(map)", new Integer(5));
+        assertExpression(jc, "size(set)", new Integer(5));
+        assertExpression(jc, "size(bitset)", new Integer(64));
+        assertExpression(jc, "list.size()", new Integer(5));
+        assertExpression(jc, "map.size()", new Integer(5));
+        assertExpression(jc, "set.size()", new Integer(5));
+        assertExpression(jc, "bitset.size()", new Integer(64));
+
+        assertExpression(jc, "list.get(size(list) - 1)", "5");
+        assertExpression(jc, "list[size(list) - 1]", "5");
         assertExpression(jc, "list.get(list.size() - 1)", "5");
     }
 
@@ -236,15 +235,17 @@ public class JexlTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("size", "cheese");
+        map.put("si & ze", "cheese");
         jc.set("map", map);
         jc.set("foo", new Foo());
 
         assertExpression(jc, "map['size']", "cheese");
-// PR - unsure whether or not we should support map.size or force usage of the above 'escaped' version
-//        assertExpression(jc, "map.size", "cheese");
-        assertExpression(jc, "foo.getSize()", new Integer(22));
-        // failing assertion for size property
-        //assertExpression(jc, "foo.size", new Integer(22));
+        assertExpression(jc, "map['si & ze']", "cheese");
+        assertExpression(jc, "map.'si & ze'", "cheese");
+        assertExpression(jc, "map.size()", 2);
+        assertExpression(jc, "size(map)", 2);
+        assertExpression(jc, "foo.getSize()", 22);
+        assertExpression(jc, "foo.'size'", 22);
     }
 
     /**
@@ -265,7 +266,7 @@ public class JexlTest extends JexlTestCase {
         Assert.assertEquals(expr.toString(), new Float(100.0), value);
         expr = JEXL.createExpression("new(foo).quux");
         value = expr.evaluate(jc);
-        Assert.assertEquals(expr.toString(), "Repeat : quux", value);
+        Assert.assertEquals(expr.toString(), "String : quux", value);
     }
 
     /**
