@@ -177,7 +177,7 @@
                         Annotations in JEXL are 'meta-statements'; they allow to wrap the execution of the JEXL statement in a user provided
                         caller; typical example would be: <source>@synchronized(x) x.someMethod();</source>
                         <p>
-                            Annotations may be declared with zero or more paramaters;
+                            Annotations may be declared with zero or more parameters;
                             <source>@lenient x.someMethod();</source>
                             <source>@synchronized(x) x.someMethod();</source>
                             <source>@parallel(pool, 8) x.someMethod();</source>
