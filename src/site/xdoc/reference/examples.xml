@@ -32,7 +32,7 @@
         </ul>
       </p>
       <p>
-        You can find two sample programs in JEXL's CVS repository:
+        You can find two sample programs in JEXL's source repository:
         <ul>
           <li><a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/java/org/apache/commons/jexl3/examples/ArrayTest.java?view=markup">Using arrays</a></li>
           <li><a href="http://svn.apache.org/viewvc/commons/proper/jexl/trunk/src/test/java/org/apache/commons/jexl3/examples/MethodPropertyTest.java?view=markup">Accessing Properties and invoking methods</a></li>
