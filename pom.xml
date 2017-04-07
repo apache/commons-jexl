@@ -116,7 +116,7 @@
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
         <commons.componentid>jexl</commons.componentid>
-        <commons.release.version>3.0.1</commons.release.version>
+        <commons.release.version>3.1</commons.release.version>
         <commons.site.path>jexl</commons.site.path>
         <commons.scmPubUrl>https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl</commons.scmPubUrl>
         <commons.scmPubCheckoutDirectory>site-content</commons.scmPubCheckoutDirectory>
