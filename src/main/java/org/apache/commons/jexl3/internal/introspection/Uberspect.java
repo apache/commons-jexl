@@ -109,9 +109,6 @@ public class Uberspect implements JexlUberspect {
     }
     // CSON: DoubleCheckedLocking
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setClassLoader(ClassLoader nloader) {
         synchronized (this) {
@@ -128,9 +125,6 @@ public class Uberspect implements JexlUberspect {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getVersion() {
         return version.intValue();
@@ -219,33 +213,21 @@ public class Uberspect implements JexlUberspect {
         return base().getMethods(c, methodName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlMethod getMethod(Object obj, String method, Object... args) {
         return MethodExecutor.discover(base(), obj, method, args);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<PropertyResolver> getResolvers(JexlOperator op, Object obj) {
         return strategy.apply(op, obj);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlPropertyGet getPropertyGet(Object obj, Object identifier) {
         return getPropertyGet(null, obj, identifier);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlPropertyGet getPropertyGet(
             final List<PropertyResolver> resolvers, final Object obj, final Object identifier
@@ -308,17 +290,12 @@ public class Uberspect implements JexlUberspect {
         }
         return null;
     }
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public JexlPropertySet getPropertySet(final Object obj, final Object identifier, final Object arg) {
         return getPropertySet(null, obj, identifier, arg);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlPropertySet getPropertySet(
             final List<PropertyResolver> resolvers, final Object obj, final Object identifier, final Object arg
@@ -372,9 +349,6 @@ public class Uberspect implements JexlUberspect {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @SuppressWarnings("unchecked")
     public Iterator<?> getIterator(Object obj) {
@@ -409,9 +383,6 @@ public class Uberspect implements JexlUberspect {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlMethod getConstructor(Object ctorHandle, Object... args) {
         return ConstructorMethod.discover(base(), ctorHandle, args);
@@ -449,9 +420,6 @@ public class Uberspect implements JexlUberspect {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic) {
         JexlArithmetic.Uberspect jau = null;

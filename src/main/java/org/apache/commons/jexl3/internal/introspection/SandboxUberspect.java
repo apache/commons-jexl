@@ -53,25 +53,16 @@ public final class SandboxUberspect implements JexlUberspect {
         this.sandbox = theSandbox.copy();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setClassLoader(ClassLoader loader) {
         uberspect.setClassLoader(loader);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getVersion() {
         return uberspect.getVersion();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlMethod getConstructor(final Object ctorHandle, final Object... args) {
         final String className;
@@ -89,9 +80,6 @@ public final class SandboxUberspect implements JexlUberspect {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlMethod getMethod(final Object obj, final String method, final Object... args) {
         if (obj != null && method != null) {
@@ -104,25 +92,16 @@ public final class SandboxUberspect implements JexlUberspect {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<PropertyResolver> getResolvers(JexlOperator op, Object obj) {
         return uberspect.getResolvers(op, obj);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlPropertyGet getPropertyGet(final Object obj, final Object identifier) {
         return getPropertyGet(null, obj, identifier);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlPropertyGet getPropertyGet(final List<PropertyResolver> resolvers,
                                           final Object obj,
@@ -136,17 +115,11 @@ public final class SandboxUberspect implements JexlUberspect {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlPropertySet getPropertySet(final Object obj,final Object identifier,final Object arg) {
         return getPropertySet(null, obj, identifier, arg);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlPropertySet getPropertySet(final List<PropertyResolver> resolvers,
                                           final Object obj,
@@ -161,17 +134,11 @@ public final class SandboxUberspect implements JexlUberspect {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<?> getIterator(final Object obj) {
         return uberspect.getIterator(obj);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlArithmetic.Uberspect getArithmetic(final JexlArithmetic arithmetic) {
         return uberspect.getArithmetic(arithmetic);

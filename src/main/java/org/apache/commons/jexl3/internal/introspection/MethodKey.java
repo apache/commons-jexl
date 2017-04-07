@@ -173,13 +173,11 @@ public final class MethodKey {
         return params;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return hashCode;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof MethodKey) {
@@ -189,7 +187,6 @@ public final class MethodKey {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(method);

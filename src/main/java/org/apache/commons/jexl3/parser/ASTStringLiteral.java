@@ -42,8 +42,6 @@ public final class ASTStringLiteral extends JexlNode implements JexlNode.Constan
         return this.literal;
     }
 
-
-    /** {@inheritDoc} */
     @Override
     protected boolean isConstant(boolean literal) {
         return true;
@@ -53,8 +51,6 @@ public final class ASTStringLiteral extends JexlNode implements JexlNode.Constan
         this.literal = literal;
     }
 
-
-    /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);

@@ -41,7 +41,6 @@ public final class ASTSetLiteral extends JexlNode {
         return constant;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void jjtClose() {
         constant = true;
@@ -53,7 +52,6 @@ public final class ASTSetLiteral extends JexlNode {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
