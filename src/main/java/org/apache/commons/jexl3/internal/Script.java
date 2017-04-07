@@ -108,25 +108,16 @@ public class Script implements JexlScript, JexlExpression {
         return jexl;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getSourceText() {
         return source;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getParsedText() {
         return getParsedText(2);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getParsedText(int indent) {
         Debugger debug = new Debugger();
@@ -174,17 +165,11 @@ public class Script implements JexlScript, JexlExpression {
         return src.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object evaluate(JexlContext context) {
         return execute(context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object execute(JexlContext context) {
         checkCacheVersion();
@@ -193,9 +178,6 @@ public class Script implements JexlScript, JexlExpression {
         return interpreter.interpret(script);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object execute(JexlContext context, Object... args) {
         checkCacheVersion();
@@ -258,9 +240,6 @@ public class Script implements JexlScript, JexlExpression {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public JexlScript curry(Object... args) {
         String[] parms = script.getParameters();

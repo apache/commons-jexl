@@ -45,7 +45,6 @@ public final class ASTJxltLiteral extends JexlNode {
         return this.literal;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);

@@ -89,13 +89,11 @@ abstract class AbstractExecutor {
         method = theMethod;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         return this == obj || (obj instanceof AbstractExecutor && equals((AbstractExecutor) obj));
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return method.hashCode();
@@ -236,7 +234,6 @@ abstract class AbstractExecutor {
             key = k;
         }
 
-        /** {@inheritDoc} */
         @Override
         public Object getTargetProperty() {
             return key;

@@ -43,13 +43,11 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
         this.array = anArray;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object get(int index) {
         return Array.get(array, index);
     }
 
-    /** {@inheritDoc} */
     @Override
     public Object set(int index, Object element) {
         Object old = Array.get(array, index);
@@ -57,7 +55,6 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
         return old;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int size() {
         return Array.getLength(array);
