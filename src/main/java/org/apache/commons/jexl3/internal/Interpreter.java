@@ -775,24 +775,20 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(ASTArrayLiteral node, Object data) {
         int childCount = node.jjtGetNumChildren();
         JexlArithmetic.ArrayBuilder ab = arithmetic.arrayBuilder(childCount);
-        if (ab != null) {
-            boolean extended = false;
-            for (int i = 0; i < childCount; i++) {
-                if (isCancelled()) {
-                    throw new JexlException.Cancel(node);
-                }
-                JexlNode child = node.jjtGetChild(i);
-                if (child instanceof ASTExtendedLiteral) {
-                    extended = true;
-                } else {
-                    Object entry = node.jjtGetChild(i).jjtAccept(this, data);
-                    ab.add(entry);
-                }
+        boolean extended = false;
+        for (int i = 0; i < childCount; i++) {
+            if (isCancelled()) {
+                throw new JexlException.Cancel(node);
             }
-            return ab.create(extended);
-        } else {
-            return null;
+            JexlNode child = node.jjtGetChild(i);
+            if (child instanceof ASTExtendedLiteral) {
+                extended = true;
+            } else {
+                Object entry = node.jjtGetChild(i).jjtAccept(this, data);
+                ab.add(entry);
+            }
         }
+        return ab.create(extended);
     }
 
     @Override
@@ -804,36 +800,28 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(ASTSetLiteral node, Object data) {
         int childCount = node.jjtGetNumChildren();
         JexlArithmetic.SetBuilder mb = arithmetic.setBuilder(childCount);
-        if (mb != null) {
-            for (int i = 0; i < childCount; i++) {
-                if (isCancelled()) {
-                    throw new JexlException.Cancel(node);
-                }
-                Object entry = node.jjtGetChild(i).jjtAccept(this, data);
-                mb.add(entry);
+        for (int i = 0; i < childCount; i++) {
+            if (isCancelled()) {
+                throw new JexlException.Cancel(node);
             }
-            return mb.create();
-        } else {
-            return null;
+            Object entry = node.jjtGetChild(i).jjtAccept(this, data);
+            mb.add(entry);
         }
+        return mb.create();
     }
 
     @Override
     protected Object visit(ASTMapLiteral node, Object data) {
         int childCount = node.jjtGetNumChildren();
         JexlArithmetic.MapBuilder mb = arithmetic.mapBuilder(childCount);
-        if (mb != null) {
-            for (int i = 0; i < childCount; i++) {
-                if (isCancelled()) {
-                    throw new JexlException.Cancel(node);
-                }
-                Object[] entry = (Object[]) (node.jjtGetChild(i)).jjtAccept(this, data);
-                mb.put(entry[0], entry[1]);
+        for (int i = 0; i < childCount; i++) {
+            if (isCancelled()) {
+                throw new JexlException.Cancel(node);
             }
-            return mb.create();
-        } else {
-            return null;
+            Object[] entry = (Object[]) (node.jjtGetChild(i)).jjtAccept(this, data);
+            mb.put(entry[0], entry[1]);
         }
+        return mb.create();
     }
 
     @Override
