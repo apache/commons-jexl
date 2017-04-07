@@ -81,7 +81,7 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
     @Override
     public Object invoke(final Object obj, Object value) {
         if (method == ARRAY_SET) {
-            java.lang.reflect.Array.set(obj, property.intValue(), value);
+            Array.set(obj, property.intValue(), value);
         } else {
             @SuppressWarnings("unchecked") // LSE should only be created for array or list types
             final List<Object> list = (List<Object>) obj;
