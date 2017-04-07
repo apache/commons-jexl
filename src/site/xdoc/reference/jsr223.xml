@@ -54,7 +54,7 @@
         <p>
         The binary release includes a command-line application which can be used to exercise the JSR-223 script engine.
         For example:
-        <source>java -cp commons-jexl-3.0.jar;commons-logging-1.2.jar
+        <source>java -cp commons-jexl-3.1.jar;commons-logging-1.2.jar
             org.apache.commons.jexl3.scripting.Main script.jexl</source>
         If a single argument is provided, then that is assumed to be the name of a script file;
         otherwise, the application prompts for script input to be evaluated.
