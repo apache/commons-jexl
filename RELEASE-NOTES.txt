@@ -25,22 +25,32 @@ Release 3.1
 
 Version 3.1 is a minor release.
 
-Warning:
-========
-This release does break source compatibility by adding methods to existing interfaces; these interfaces are however not
-expected to be implemented by code external to the Jexl project. This compatibility break should remain hypothetical.
-It is nevertheless possible and we are sorry if it causes problems to any of you.
-If you encounter this issue, besides continuing using JEXL 3.0, your code likely delegates method calls to JEXL3 objects
-and you shall be able to continue doing so with these new methods. The 3 interfaces & methods are:
+Compatibility with previous releases
+====================================
+Version 3.1 is binary compatible with 3.0.
 
-1 - 'public java.lang.Boolean isCancellable()' in interface org.apache.commons.jexl3.JexlEngine$Options
-2 - 'public java.util.concurrent.Callable callable(org.apache.commons.jexl3.JexlContext)'in interface org.apache.commons.jexl3.JexlExpression
-3 - 'public java.util.Map getPragmas()'in interface org.apache.commons.jexl3.JxltEngine$Template
+However it is not source compatible, this release does break source compatibility by adding methods to existing
+interfaces; these interfaces are however not expected to be implemented by code external to the JEXL project.
+This compatibility break should remain hypothetical. It is nevertheless possible and we are sorry if it causes problems
+to any of you.
+If you encounter this issue, besides continuing using JEXL 3.0, your code likely delegates method calls to JEXL3 objects
+and you shall be able to continue doing so with these new methods.
+
+The three interfaces and methods are:
+
+1 - 'isCancellable()' in interface org.apache.commons.jexl3.JexlEngine$Options
+2 - 'callable(JexlContext)' in interface org.apache.commons.jexl3.JexlExpression
+3 - 'getPragmas()' in interface org.apache.commons.jexl3.JxltEngine$Template
 
 What's new in 3.1:
 ==================
 * Annotations syntax (@annotation) and processing capabilities.
-* Better support for script execution options, error handling and canceling.
+  Annotations in JEXL are 'meta-statements'; they allow to wrap the execution of the JEXL statement in a user provided
+  caller; a typical example would be: ""@synchronized(x) x.someMethod();". Annotations may be declared with zero or more
+  parameters. Annotation processing is implemented by providing a JexlContext.AnnotationProcessor; its processAnnotation
+  method will call the annotated statement encapsulated in a Callable. Annotation arguments are evaluated and passed
+  as arguments to processAnnotation.
+* Better support for script execution options, error handling and cancelling.
 * All operators can be overloaded.
 
 New Features in 3.1:
@@ -55,7 +65,7 @@ New Features in 3.1:
 * JEXL-194:     Allow synchronization on iterableValue in foreach statement
 
 Bugs Fixed in 3.1:
-====================
+==================
 * JEXL-221:     Sporadic undefined property error caused by NPE at MapGetExecutor.tryInvoke()
 * JEXL-217:     Interpreter.getAttribute() raises exception in non-strict mode when cached property resolver is used
 * JEXL-215:     JexlEngine.createInfo() is redundantly called when debug and caching is enabled leading to sub-optimal performance
@@ -80,8 +90,6 @@ Bugs Fixed in 3.1:
 * JEXL-188:     Possible bug in JexlArithmetic.isFloatingPointNumber()
 * JEXL-187:     Jexl Syntax doc does not mention 'continue' and 'break' operators
 * JEXL-186:     Performance regression in arithmetic operations compared to JEXL 2.1
-
-There are no other changes.
 
 
 ========================================================================================================================
