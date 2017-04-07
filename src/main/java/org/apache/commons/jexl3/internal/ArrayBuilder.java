@@ -85,7 +85,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
                 // base common class on first non-null entry
                 if (commonClass == null) {
                     commonClass = eclass;
-                    isNumber &= Number.class.isAssignableFrom(commonClass);
+                    isNumber = isNumber && Number.class.isAssignableFrom(commonClass);
                 } else if (!commonClass.equals(eclass)) {
                     // if both are numbers...
                     if (isNumber && Number.class.isAssignableFrom(eclass)) {
