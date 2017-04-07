@@ -289,8 +289,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
 
     /**
-     * Checks whether this interpreter execution was canceled due to thread interruption.
-     * @return true if canceled, false otherwise
+     * Checks whether this interpreter execution was cancelled due to thread interruption.
+     * @return true if cancelled, false otherwise
      */
     protected synchronized boolean isCancelled() {
         if (!cancelled) {
