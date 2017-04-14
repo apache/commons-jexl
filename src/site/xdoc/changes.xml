@@ -25,7 +25,7 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.1" date="unreleased">
+        <release version="3.1" date="2017-04-14">
             <action dev="henrib" type="add" issue="JEXL-222" due-to="Dmitri Blinov">
                 The ability to declare indexed property getter/setter in customised JexlArithmetic implementation
             </action>
