@@ -148,7 +148,7 @@ TOKEN_MGR_DECLS : {
 
 <*> TOKEN : { /* CONDITIONALS */
       < QMARK : "?" >
-    | < ELVIS : "?:" >
+    | < ELVIS : "?:" | "??" >
     | < AND : "&&" | "and" >
     | < OR : "||" | "or" >
 }
@@ -857,4 +857,3 @@ void ValueExpression() #void : {}
 {
     ( PrimaryExpression() ( LOOKAHEAD(2) MemberExpression() )*) #Reference(>1)
 }
-
