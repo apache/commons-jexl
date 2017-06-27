@@ -91,7 +91,7 @@
                         </p>
                         <p>
                             <strong>N.B.</strong> the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
-                            <code>or and eq ne lt gt le ge div mod not null true false new var return</code>
+                            <code>or and eq ne lt gt le ge div mod not null true false new var break continue return</code>
                             For example, the following is invalid:
                             <source>my.new.dotted.var // invalid ('new' is keyword)</source>
                             In such cases, quoted identifiers or the [ ] operator can be used, for example:
@@ -133,7 +133,7 @@
                 <tr>
                     <td>Statements</td>
                     <td>
-                        A statement can be the empty statement, the semicolon (<code>;</code>) ,  block, assignment or an expression.
+                        A statement can be the empty statement, the semicolon (<code>;</code>) , block, assignment or an expression.
                         Statements are optionally terminated with a semicolon.
                     </td>
                 </tr>
@@ -313,6 +313,15 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>List literal</td>
+                    <td>
+                        A <code>[</code> followed by one or more expressions separated by <code>,</code> and ending
+                        with <code>,...]</code>, e.g.
+                        <source>[ 1, 2, "three",...]</source>
+                        <p>This syntax creates an <code>ArrayList&lt;Object&gt;</code>.</p>
+                    </td>
+                </tr>
+                <tr>
                     <td>Set literal</td>
                     <td>
                         A <code>{</code> followed by one or more expressions separated by <code>,</code> and ending
@@ -404,6 +413,8 @@
                     <td>
                         Defines a function within the script, usually associated with a local variable assignment.
                         <code>var fun = function(x, y) { x + y }</code>
+                        The following syntax is also supported
+                        <code>var fun = (x, y) -> { x + y }</code>
                         Calling a function follows the usual convention:
                         <code>fun(17, 25)</code>
                         <p>Note that functions can use local variables and parameters from their declaring script.
@@ -695,6 +706,13 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>List access</td>
+                    <td>
+                        List elements may be accessed using either square brackets or a dotted numeral, e.g.
+                        <source>list[0]</source> and <source>list.0</source> are equivalent
+                    </td>
+                </tr>
+                <tr>
                     <td>Map access</td>
                     <td>
                         Map elements are accessed using square brackets, e.g.
@@ -702,6 +720,8 @@
                         Note that <source>map['7']</source> and <source>map[7]</source> refer to different elements.
                         Map elements with a numeric key may also be accessed using a dotted numeral, e.g.
                         <source>map[0]</source> and <source>map.0</source> are equivalent.
+                        Note that <source>map.1</source> and <source>map.01</source> refer to different elements,
+                        while <source>map.1</source> and <source>map[01]</source> are equivalent.
                     </td>
                 </tr>
             </table>
@@ -727,7 +747,7 @@
                     <td>for</td>
                     <td>
                         Loop through items of an Array, Collection, Map, Iterator or Enumeration, e.g.
-                        <source>for(item : list) {
+                        <source>for (item : list) {
                             x = x + item;
                             }</source>
                         Where <code>item</code> and <code>list</code> are variables.
