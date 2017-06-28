@@ -26,11 +26,14 @@
     </properties>
     <body>
         <release version="3.1.1" date="unreleased">
-            <action dev="henrib" type="add" issue="JEXL-226" due-to="Min Wei">
-                add ?? operator support
+            <action dev="henrib" type="fix" issue="JEXL-231" due-to="Dmitri Blinov">
+                Syntax for accessing List elements is not mentioned in docs
             </action>
             <action dev="henrib" type="fix" issue="JEXL-230" due-to="Dmitri Blinov">
                 List literal is not mentioned in docs
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-226" due-to="Min Wei">
+                add ?? operator support
             </action>
         </release>
         <release version="3.1" date="2017-04-14">
