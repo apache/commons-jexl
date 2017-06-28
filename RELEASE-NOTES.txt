@@ -25,6 +25,7 @@ Release 3.2
 
 Version 3.2 is a minor release.
 
+* JEXL-231:      Syntax for accessing List elements is not mentioned in docs
 * JEXL-230:      List literal is not mentioned in docs
 * JEXL-226:      add ?? operator support
 
