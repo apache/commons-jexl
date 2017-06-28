@@ -20,6 +20,18 @@ Its goal is to expose scripting features usable by technical operatives or consu
 
 
 ========================================================================================================================
+Release 3.2
+========================================================================================================================
+
+Version 3.2 is a minor release.
+
+* JEXL-230:      List literal is not mentioned in docs
+* JEXL-226:      add ?? operator support
+
+There are no other changes.
+
+
+========================================================================================================================
 Release 3.1
 ========================================================================================================================
 
@@ -55,12 +67,12 @@ What's new in 3.1:
 
 New Features in 3.1:
 ====================
-* JEXL-222:     The ability to declare indexed property getter/setter in customised JexlArithmetic implementation
+* JEXL-222:     The ability to declare indexed property getter/setter in customized JexlArithmetic implementation
 * JEXL-219:     Blacklist by default in sandbox
 * JEXL-216:     Improve parsing concurrency in multithreaded environment
 * JEXL-211:     Add callable method to JexlExpression interface
 * JEXL-201:     Allow Interpreter to use live values from JexlEngine.Option interface implemented by JexlContext
-* JEXL-198:     JxltEngine Template does not expose pragmas 
+* JEXL-198:     JxltEngine Template does not expose pragmas
 * JEXL-197:     Add annotations
 * JEXL-194:     Allow synchronization on iterableValue in foreach statement
 
