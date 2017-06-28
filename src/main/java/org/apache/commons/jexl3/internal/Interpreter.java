@@ -76,6 +76,7 @@ import org.apache.commons.jexl3.parser.ASTNRNode;
 import org.apache.commons.jexl3.parser.ASTNSWNode;
 import org.apache.commons.jexl3.parser.ASTNotNode;
 import org.apache.commons.jexl3.parser.ASTNullLiteral;
+import org.apache.commons.jexl3.parser.ASTNullpNode;
 import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
@@ -849,6 +850,12 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
+    protected Object visit(ASTNullpNode node, Object data) {
+        Object lhs = node.jjtGetChild(0).jjtAccept(this, data);
+        return lhs != null? lhs : node.jjtGetChild(1).jjtAccept(this, data);
+    }
+
+    @Override
     protected Object visit(ASTSizeFunction node, Object data) {
         try {
             Object val = node.jjtGetChild(0).jjtAccept(this, data);
@@ -956,7 +963,7 @@ public class Interpreter extends InterpreterBase {
      * Check if a null evaluated expression is protected by a ternary expression.
      * <p>
      * The rationale is that the ternary / elvis expressions are meant for the user to explictly take control
-     * over the error generation; ie, ternaries can return null even if the engine in isStrict mode
+     * over the error generation; ie, ternaries can return null even if the engine in strict mode
      * would normally throw an exception.
      * </p>
      * @param node the expression node
@@ -966,7 +973,11 @@ public class Interpreter extends InterpreterBase {
         for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
             if (walk instanceof ASTTernaryNode) {
                 return true;
-            } else if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {
+            }
+            if (walk instanceof ASTNullpNode) {
+                return true;
+            }
+            if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {
                 break;
             }
         }

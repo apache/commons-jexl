@@ -222,13 +222,14 @@ public class IfTest extends JexlTestCase {
 
     /**
      * Ternary operator condition undefined or null evaluates to false
-     * independantly of engine flags.
+     * independently of engine flags; same for null coalescing operator.
      * @throws Exception
      */
     @Test
     public void testTernaryShorthand() throws Exception {
         JexlEvalContext jc = new JexlEvalContext();
         JexlExpression e = JEXL.createExpression("x.y.z = foo?:'quux'");
+        JexlExpression f = JEXL.createExpression("foo??'quux'");
         Object o;
 
         // undefined foo
@@ -238,6 +239,8 @@ public class IfTest extends JexlTestCase {
             o = e.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
+            Assert.assertEquals("Should be quux", "quux", o);
+            o = f.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
         }
 
@@ -250,6 +253,8 @@ public class IfTest extends JexlTestCase {
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
             Assert.assertEquals("Should be quux", "quux", o);
+            o = f.evaluate(jc);
+            Assert.assertEquals("Should be quux", "quux", o);
         }
 
         jc.set("foo", Boolean.FALSE);
@@ -261,6 +266,8 @@ public class IfTest extends JexlTestCase {
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
             Assert.assertEquals("Should be quux", "quux", o);
+            o = f.evaluate(jc);
+            Assert.assertEquals("Should be false", false, o);
         }
 
         jc.set("foo", Double.NaN);
@@ -272,6 +279,8 @@ public class IfTest extends JexlTestCase {
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
             Assert.assertEquals("Should be quux", "quux", o);
+            o = f.evaluate(jc);
+            Assert.assertTrue("Should be NaN", Double.isNaN((Double) o));
         }
 
         jc.set("foo", "");
@@ -283,6 +292,8 @@ public class IfTest extends JexlTestCase {
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
             Assert.assertEquals("Should be quux", "quux", o);
+            o = f.evaluate(jc);
+            Assert.assertEquals("Should be empty string", "", o);
         }
 
         jc.set("foo", "false");
@@ -294,6 +305,8 @@ public class IfTest extends JexlTestCase {
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
             Assert.assertEquals("Should be quux", "quux", o);
+            o = f.evaluate(jc);
+            Assert.assertEquals("Should be 'false'", "false", o);
         }
 
         jc.set("foo", 0d);
@@ -305,6 +318,8 @@ public class IfTest extends JexlTestCase {
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
             Assert.assertEquals("Should be quux", "quux", o);
+            o = f.evaluate(jc);
+            Assert.assertEquals("Should be 0", 0.d, o);
         }
 
         jc.set("foo", 0);
@@ -316,6 +331,8 @@ public class IfTest extends JexlTestCase {
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
             Assert.assertEquals("Should be quux", "quux", o);
+            o = f.evaluate(jc);
+            Assert.assertEquals("Should be 0", 0, o);
         }
 
         jc.set("foo", "bar");
@@ -332,4 +349,22 @@ public class IfTest extends JexlTestCase {
         debuggerCheck(JEXL);
     }
 
+    @Test
+    public void testNullCoaelescing() throws Exception {
+        Object o;
+        JexlEvalContext jc = new JexlEvalContext();
+        JexlExpression xtrue = JEXL.createExpression("x??true");
+        o = xtrue.evaluate(jc);
+        Assert.assertEquals("Should be true", true, o);
+        jc.set("x", false);
+        o = xtrue.evaluate(jc);
+        Assert.assertEquals("Should be false", false, o);
+        JexlExpression yone = JEXL.createExpression("y??1");
+        o = yone.evaluate(jc);
+        Assert.assertEquals("Should be 1", 1, o);
+        jc.set("y", 0);
+        o = yone.evaluate(jc);
+        Assert.assertEquals("Should be 0", 0, o);
+        debuggerCheck(JEXL);
+    }
 }

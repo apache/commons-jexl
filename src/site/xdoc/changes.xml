@@ -25,7 +25,13 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.2" date="unreleased">
+        <release version="3.1.1" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-226" due-to="Min Wei">
+                add ?? operator support
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-230" due-to="Dmitri Blinov">
+                List literal is not mentioned in docs
+            </action>
         </release>
         <release version="3.1" date="2017-04-14">
             <action dev="henrib" type="add" issue="JEXL-222" due-to="Dmitri Blinov">

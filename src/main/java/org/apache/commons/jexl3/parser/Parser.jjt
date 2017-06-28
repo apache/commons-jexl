@@ -149,6 +149,7 @@ TOKEN_MGR_DECLS : {
 <*> TOKEN : { /* CONDITIONALS */
       < QMARK : "?" >
     | < ELVIS : "?:" >
+    | < NULLP : "??" >
     | < AND : "&&" | "and" >
     | < OR : "||" | "or" >
 }
@@ -452,6 +453,8 @@ void ConditionalExpression() #void : {}
     <QMARK> Expression() <COLON> Expression() #TernaryNode(3)
   |
     <ELVIS> Expression() #TernaryNode(2)
+  |
+    <NULLP> Expression() #NullpNode(2)
   )?
 }
 
