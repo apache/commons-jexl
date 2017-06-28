@@ -90,12 +90,14 @@ import org.apache.commons.jexl3.parser.ASTTrueNode;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
 import org.apache.commons.jexl3.parser.ASTWhileStatement;
+import org.apache.commons.jexl3.parser.ASTAnnotatedStatement;
+import org.apache.commons.jexl3.parser.ASTAnnotation;
+import org.apache.commons.jexl3.parser.ASTNullpNode;
+
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
 import java.util.regex.Pattern;
-import org.apache.commons.jexl3.parser.ASTAnnotatedStatement;
-import org.apache.commons.jexl3.parser.ASTAnnotation;
 
 /**
  * Helps pinpoint the cause of problems in expressions that fail during evaluation.
@@ -578,13 +580,13 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTGTNode node, Object data) {
         return infixChildren(node, " > ", false, data);
     }
-    
+
     /** Checks identifiers that contain spaces or punctuation
      * (but underscore, at-sign, sharp-sign and dollar).
      */
-    protected static final Pattern QUOTED_IDENTIFIER = 
+    protected static final Pattern QUOTED_IDENTIFIER =
             Pattern.compile("[\\s]|[\\p{Punct}&&[^@#\\$_]]");
-    
+
     /**
      * Checks whether an identifier should be quoted or not.
      * @param str the identifier
@@ -897,6 +899,14 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             accept(node.jjtGetChild(1), data);
 
         }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTNullpNode node, Object data) {
+        accept(node.jjtGetChild(0), data);
+        builder.append("??");
+        accept(node.jjtGetChild(1), data);
         return data;
     }
 

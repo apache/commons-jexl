@@ -501,6 +501,26 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Null coalescing operator <code>??</code> </td>
+                    <td>
+                        The null coalescing operator returns the result of its first operand if it is defined and is not null.
+                        <p>When <code>x</code>and<code>y</code>are null or undefined,
+                            <code>x ?? 'unknown or null x'</code> evaluates as  <code>'unknown or null x'</code>
+                            <code>y ?? "default"</code> evaluates as  <code>"default"</code>.
+                        </p>
+                        <p>
+                            When <code>var x = 42</code> and  <code>var y = "forty-two"</code>,<code>x??"other"</code>
+                            evaluates as <code>42</code> and <code>y??"other"</code> evaluates as <code>"forty-two"</code>.
+                        </p>
+                        <p>
+                            <strong>NOTE:</strong> this operator does not behave like the ternary conditional since it
+                            does not coerce the first argument to a boolean to evaluate the condition.
+                            When <code>var x = false</code> and  <code>var y = 0</code>,<code>x??true</code>
+                            evaluates as <code>false</code> and <code>y??1</code> evaluates as <code>0</code>.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
                     <td>Equality</td>
                     <td>
                         The usual <code>==</code> operator can be used as well as the abbreviation <code>eq</code>.
