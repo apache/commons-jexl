@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.1.1" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-234" due-to="Dmitri Blinov">
+                Extend application of operators startsWith and endsWith from String to CharSequence types
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-231" due-to="Dmitri Blinov">
                 Syntax for accessing List elements is not mentioned in docs
             </action>

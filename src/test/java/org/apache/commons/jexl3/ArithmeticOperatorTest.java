@@ -124,6 +124,26 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.assertExpression("x.y !$ 'foo'", Boolean.FALSE);
     }
 
+    @Test
+    public void testStartsEndsWithStringBuilder() throws Exception {
+        asserter.setVariable("x", new StringBuilder("foobar"));
+        asserter.assertExpression("x =^ 'foo'", Boolean.TRUE);
+        asserter.assertExpression("x =$ 'foo'", Boolean.FALSE);
+        asserter.setVariable("x", new StringBuilder("barfoo"));
+        asserter.assertExpression("x =^ 'foo'", Boolean.FALSE);
+        asserter.assertExpression("x =$ 'foo'", Boolean.TRUE);
+    }
+
+    @Test
+    public void testNotStartsEndsWithStringBuilder() throws Exception {
+        asserter.setVariable("x", new StringBuilder("foobar"));
+        asserter.assertExpression("x !^ 'foo'", Boolean.FALSE);
+        asserter.assertExpression("x !$ 'foo'", Boolean.TRUE);
+        asserter.setVariable("x", new StringBuilder("barfoo"));
+        asserter.assertExpression("x !^ 'foo'", Boolean.TRUE);
+        asserter.assertExpression("x !$ 'foo'", Boolean.FALSE);
+    }
+
     public static class MatchingContainer {
         private final Set<Integer> values;
 
