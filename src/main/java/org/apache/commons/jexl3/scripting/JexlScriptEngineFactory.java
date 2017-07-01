@@ -37,7 +37,7 @@ import org.apache.commons.jexl3.parser.StringParser;
  * See
  * <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">Java Scripting API</a>
  * Javadoc.
- * 
+ *
  * @since 2.0
  */
 public class JexlScriptEngineFactory implements ScriptEngineFactory {
@@ -49,7 +49,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getEngineVersion() {
-        return "3.0"; // ensure this is updated if function changes are made to this class
+        return "3.2"; // ensure this is updated if function changes are made to this class
     }
 
     @Override
@@ -59,7 +59,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getLanguageVersion() {
-        return "3.0"; // TODO this should be derived from the actual version
+        return "3.2"; // TODO this should be derived from the actual version
     }
 
     @Override
