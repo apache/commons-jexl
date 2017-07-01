@@ -883,8 +883,8 @@ public class JexlArithmetic {
             // we know both aren't null, therefore L != R
             return false;
         }
-        if (left instanceof String) {
-            return ((String) left).endsWith(toString(right));
+        if (left instanceof CharSequence) {
+            return (toString(left)).endsWith(toString(right));
         }
         return null;
     }
@@ -905,8 +905,8 @@ public class JexlArithmetic {
             // we know both aren't null, therefore L != R
             return false;
         }
-        if (left instanceof String) {
-            return ((String) left).startsWith(toString(right));
+        if (left instanceof CharSequence) {
+            return (toString(left)).startsWith(toString(right));
         }
         return null;
     }
