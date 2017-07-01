@@ -35,6 +35,9 @@
             <action dev="henrib" type="fix" issue="JEXL-230" due-to="Dmitri Blinov">
                 List literal is not mentioned in docs
             </action>
+            <action dev="henrib" type="fix" issue="JEXL-227" due-to="Dmitri Blinov">
+                JexlScriptEngineFactory.getEngineVersion() should return actual version
+            </action>
             <action dev="henrib" type="add" issue="JEXL-226" due-to="Min Wei">
                 add ?? operator support
             </action>
