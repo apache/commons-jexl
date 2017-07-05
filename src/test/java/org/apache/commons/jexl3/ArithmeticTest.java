@@ -633,8 +633,12 @@ public class ArithmeticTest extends JexlTestCase {
             "var x = []; return empty(x);", true,
             "var x = [1, 2]; return empty(x);", false,
             "var x = ['a', 'b']; return empty(x);", false,
+            "var x = [...]; return empty(x);", true,
+            "var x = [1, 2,...]; return empty(x);", false,
             "var x = {:}; return empty(x);", true,
-            "var x = {1:'A', 2:'B'}; return empty(x);", false
+            "var x = {1:'A', 2:'B'}; return empty(x);", false,
+            "var x = {}; return empty(x);", true,
+            "var x = {'A','B'}; return empty(x);", false
         };
         JexlEngine jexl = new JexlBuilder().create();
         JexlContext jc = new EmptyTestContext();

@@ -71,6 +71,12 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.assertExpression("str !~ match", Boolean.FALSE);
         asserter.assertExpression("str !~ nomatch", Boolean.TRUE);
         asserter.assertExpression("str =~ nomatch", Boolean.FALSE);
+        asserter.setVariable("match", new StringBuilder("abc.*"));
+        asserter.setVariable("nomatch", new StringBuilder(".*123"));
+        asserter.assertExpression("str =~ match", Boolean.TRUE);
+        asserter.assertExpression("str !~ match", Boolean.FALSE);
+        asserter.assertExpression("str !~ nomatch", Boolean.TRUE);
+        asserter.assertExpression("str =~ nomatch", Boolean.FALSE);
         asserter.setVariable("match", java.util.regex.Pattern.compile("abc.*"));
         asserter.setVariable("nomatch", java.util.regex.Pattern.compile(".*123"));
         asserter.assertExpression("str =~ match", Boolean.TRUE);
