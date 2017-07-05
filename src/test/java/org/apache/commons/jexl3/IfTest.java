@@ -367,4 +367,23 @@ public class IfTest extends JexlTestCase {
         Assert.assertEquals("Should be 0", 0, o);
         debuggerCheck(JEXL);
     }
+
+    @Test
+    public void testNullCoaelescingScript() throws Exception {
+        Object o;
+        JexlEvalContext jc = new JexlEvalContext();
+        JexlScript xtrue = JEXL.createScript("x??true");
+        o = xtrue.execute(jc);
+        Assert.assertEquals("Should be true", true, o);
+        jc.set("x", false);
+        o = xtrue.execute(jc);
+        Assert.assertEquals("Should be false", false, o);
+        JexlScript yone = JEXL.createScript("y??1");
+        o = yone.execute(jc);
+        Assert.assertEquals("Should be 1", 1, o);
+        jc.set("y", 0);
+        o = yone.execute(jc);
+        Assert.assertEquals("Should be 0", 0, o);
+        debuggerCheck(JEXL);
+    }
 }
