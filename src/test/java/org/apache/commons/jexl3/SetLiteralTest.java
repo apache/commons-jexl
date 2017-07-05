@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Assert;
@@ -88,6 +89,16 @@ public class SetLiteralTest extends JexlTestCase {
     }
 
     @Test
+    public void testSetLiteralWithOneNestedSet() throws Exception {
+        JexlScript e = JEXL.createScript("{ { 'foo' } }");
+        JexlContext jc = new MapContext();
+
+        Object o = e.execute(jc);
+        Set<?> check = createSet(createSet("foo"));
+        Assert.assertTrue(check.equals(o));
+    }
+
+    @Test
     public void testSetLiteralWithNumbers() throws Exception {
         JexlExpression e = JEXL.createExpression("{ 5.0 , 10 }");
         JexlContext jc = new MapContext();
@@ -100,6 +111,7 @@ public class SetLiteralTest extends JexlTestCase {
     @Test
     public void testSetLiteralWithNulls() throws Exception {
         String[] exprs = {
+            "{  }",
             "{ 10 }",
             "{ 10 , null }",
             "{ 10 , null , 20}",
@@ -107,6 +119,7 @@ public class SetLiteralTest extends JexlTestCase {
             "{ null, '10' , 20 }"
         };
         Set<?>[] checks = {
+            Collections.emptySet(),
             createSet(new Integer(10)),
             createSet(new Integer(10), null),
             createSet(new Integer(10), null, new Integer(20)),
