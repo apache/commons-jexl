@@ -846,7 +846,7 @@ public class JexlArithmetic {
         if (container instanceof java.util.regex.Pattern) {
             return ((java.util.regex.Pattern) container).matcher(value.toString()).matches();
         }
-        if (container instanceof String) {
+        if (container instanceof CharSequence) {
             return value.toString().matches(container.toString());
         }
         // try contains on map key
@@ -922,8 +922,8 @@ public class JexlArithmetic {
             double d = ((Number) object).doubleValue();
             return Double.isNaN(d) || d == 0.d ? Boolean.TRUE : Boolean.FALSE;
         }
-        if (object instanceof String) {
-            return "".equals(object) ? Boolean.TRUE : Boolean.FALSE;
+        if (object instanceof CharSequence) {
+            return ((CharSequence) object).length() == 0 ? Boolean.TRUE : Boolean.FALSE;
         }
         if (object.getClass().isArray()) {
             return Array.getLength(object) == 0 ? Boolean.TRUE : Boolean.FALSE;
@@ -945,8 +945,8 @@ public class JexlArithmetic {
      * @return the size of object or null if there is no arithmetic solution
      */
     public Integer size(Object object) {
-        if (object instanceof String) {
-            return ((String) object).length();
+        if (object instanceof CharSequence) {
+            return ((CharSequence) object).length();
         }
         if (object.getClass().isArray()) {
             return Array.getLength(object);
