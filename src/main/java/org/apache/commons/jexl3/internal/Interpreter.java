@@ -1557,6 +1557,8 @@ public class Interpreter extends InterpreterBase {
                         }
                     }
                 }
+                final Object[] nargv;
+                final String mname;
                 // this may happen without the above when we are chaining call like x(a)(b)
                 if (functor != null) {
                     // lambda, script or jexl method will do
@@ -1567,41 +1569,42 @@ public class Interpreter extends InterpreterBase {
                         return ((JexlMethod) functor).invoke(target, argv);
                     }
                     // a generic callable
-                    vm = uberspect.getMethod(functor, "call", argv);
+                    mname = "call";
+                    vm = uberspect.getMethod(functor, mname, argv);
                     if (vm != null) {
                         return vm.invoke(functor, argv);
                     }
-                    // try JexlArithmetic or JexlContext function
+                    // prepend functor to arg to try JexlArithmetic or JexlContext function
+                    nargv = functionArguments(functor, narrow, argv);
                 } else {
+                    mname = methodName;
                     // no need to narrow since this has been performed in previous loop
-                    Object[] nargv = functionArguments(caller, narrow, argv);
-                    vm = uberspect.getMethod(context, methodName, nargv);
-                    if (vm != null) {
-                        argv = nargv;
-                        target = context;
-                        if (cacheable && vm.isCacheable()) {
-                            funcall = new ContextFuncall(vm, narrow);
-                        }
-                        break;
-                    }
-                    vm = uberspect.getMethod(arithmetic, methodName, nargv);
-                    if (vm != null) {
-                        argv = nargv;
-                        target = arithmetic;
-                        if (cacheable && vm.isCacheable()) {
-                            funcall = new ArithmeticFuncall(vm, narrow);
-                        }
-                        break;
-                    }
-                    // if we did not find an exact method by name and we haven't tried yet,
-                    // attempt to narrow the parameters and if this succeeds, try again in next loop
-                    if (arithmetic.narrowArguments(argv)) {
-                        narrow = true;
-                        continue;
-                    }
+                    nargv = functionArguments(caller, narrow, argv);
                 }
-                // we are done trying
-                break;
+                vm = uberspect.getMethod(context, mname, nargv);
+                if (vm != null) {
+                    argv = nargv;
+                    target = context;
+                    if (cacheable && vm.isCacheable()) {
+                        funcall = new ContextFuncall(vm, narrow);
+                    }
+                    break;
+                }
+                vm = uberspect.getMethod(arithmetic, mname, nargv);
+                if (vm != null) {
+                    argv = nargv;
+                    target = arithmetic;
+                    if (cacheable && vm.isCacheable()) {
+                        funcall = new ArithmeticFuncall(vm, narrow);
+                    }
+                    break;
+                }
+                // if we did not find an exact method by name and we haven't tried yet,
+                // attempt to narrow the parameters and if this succeeds, try again in next loop
+                if (!arithmetic.narrowArguments(argv)) {
+                    break;
+                }
+                narrow = true;
             }
             // we have either evaluated and returned or might have found a method
             if (vm != null) {
