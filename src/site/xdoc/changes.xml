@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.1.1" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-236" due-to="Dmitri Blinov">
+                Support CharSequence in size(), empty() and contains() operators
+            </action>
             <action dev="henrib" type="add" issue="JEXL-234" due-to="Dmitri Blinov">
                 Extend application of operators startsWith and endsWith from String to CharSequence types
             </action>
@@ -40,6 +43,12 @@
             </action>
             <action dev="henrib" type="add" issue="JEXL-226" due-to="Min Wei">
                 add ?? operator support
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-225" due-to="Vyacheslav Shago">
+                Incorrect invoking methods with ObjectContext
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-224" due-to="Dmitri Blinov">
+                The ability to overload call() operator in customized JexlArithmetic implementation
             </action>
         </release>
         <release version="3.1" date="2017-04-14">
