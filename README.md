@@ -43,8 +43,9 @@
 Apache Commons JEXL
 ===================
 
-[![Build Status](https://travis-ci.org/apache/commons-jexl.svg?branch=trunk)](https://travis-ci.org/apache/commons-jexl3)
+[![Build Status](https://travis-ci.org/apache/commons-jexl.svg?branch=trunk)](https://travis-ci.org/apache/commons-jexl)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/)
+
 The Apache Commons JEXL library is an implementation of the JSTL Expression Language with extensions.
 
 Documentation
