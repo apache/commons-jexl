@@ -150,6 +150,8 @@
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
+                    <!-- to increase memory for test on travis ci -->
+                    <argLine>-Xmx64m</argLine>
                 </configuration>
             </plugin>
             <plugin>
