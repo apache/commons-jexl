@@ -912,10 +912,10 @@ public class JexlArithmetic {
     }
 
     /**
-     * Check for emptyness of various types: Number, Collection, Array, Map, String.
+     * Check for emptiness of various types: Number, Collection, Array, Map, String.
      *
-     * @param object the object to check the emptyness of
-     * @return the boolean or null of there is no arithmetic solution
+     * @param object the object to check the emptiness of
+     * @return the boolean or null if there is no arithmetic solution
      */
     public Boolean isEmpty(Object object) {
         if (object instanceof Number) {
