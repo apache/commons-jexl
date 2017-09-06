@@ -46,7 +46,7 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
     public Object getTargetProperty() {
         return property;
     }
-    
+
     /**
      * Get the property from the map.
      * @param obj the map.
@@ -62,11 +62,13 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
     /** {@inheritDoc} */
     @Override
     public Object tryExecute(final Object obj, Object key) {
-        if (obj != null &&  method != null
+        if (obj != null
+            && method != null
             && objectClass.equals(obj.getClass())
-            && (key == null || property.getClass().equals(key.getClass()))) {
+            && ((property == null && key == null)
+                || (property != null && key != null && property.getClass().equals(key.getClass())))) {
             @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
-            final Map<Object,?> map = (Map<Object, ?>) obj;
+            final Map<Object, ?> map = (Map<Object, ?>) obj;
             return map.get(key);
         }
         return TRY_FAILED;

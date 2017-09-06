@@ -67,16 +67,20 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
     /** {@inheritDoc} */
     @Override
     public Object tryExecute(Object obj, Object key) {
-        if (obj != null && method !=  null
+        if (obj != null
+            && objectClass.equals(obj.getClass())
             // ensure method name matches the property name
-            && property.equals(key)
-            && objectClass.equals(obj.getClass())) {
+            && method != null
+            && ((property == null && key == null)
+                 || (property != null && property.equals(key)))) {
             try {
                 Object[] args = {property};
                 return method.invoke(obj, args);
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
+                return TRY_FAILED;// fail
+            } catch (IllegalArgumentException xarg) {
                 return TRY_FAILED;// fail
             }
         }

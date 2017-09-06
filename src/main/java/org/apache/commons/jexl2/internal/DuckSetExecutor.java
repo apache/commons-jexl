@@ -32,7 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 public final class DuckSetExecutor extends AbstractExecutor.Set {
     /** The property. */
     private final Object property;
-    
+
     /**
      * Creates an instance.
      *@param is the introspector
@@ -65,10 +65,11 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
     /** {@inheritDoc} */
     @Override
     public Object tryExecute(Object obj, Object key, Object value) {
-        if (obj != null && method !=  null
-            // ensure method name matches the property name
-            && property.equals(key)
-            && objectClass.equals(obj.getClass())) {
+        if (obj != null
+            && objectClass.equals(obj.getClass())
+            && method !=  null
+            && ((property != null && property.equals(key))
+                || (property == null && key == null))) {
             try {
                 Object[] args = {property, value};
                 method.invoke(obj, args);
@@ -76,6 +77,8 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
+                return TRY_FAILED;// fail
+            } catch (IllegalArgumentException xarg) {
                 return TRY_FAILED;// fail
             }
         }

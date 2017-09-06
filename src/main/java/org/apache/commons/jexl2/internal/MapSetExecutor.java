@@ -45,7 +45,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     public Object getTargetProperty() {
         return property;
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public Object execute(final Object obj, Object value)
@@ -59,9 +59,11 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     /** {@inheritDoc} */
     @Override
     public Object tryExecute(final Object obj, Object key, Object value) {
-        if (obj != null && method != null
+        if (obj != null
+            && method != null
             && objectClass.equals(obj.getClass())
-            && (key == null || property.getClass().equals(key.getClass()))) {
+            && ((property == null && key == null)
+                || (property != null && key != null && property.getClass().equals(key.getClass())))) {
             @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
             final Map<Object,Object> map = ((Map<Object, Object>) obj);
             map.put(key, value);

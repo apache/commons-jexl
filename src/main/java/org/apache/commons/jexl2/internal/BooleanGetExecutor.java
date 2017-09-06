@@ -47,7 +47,7 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
         throws IllegalAccessException, InvocationTargetException {
         return method == null ? null : method.invoke(obj, (Object[]) null);
     }
-    
+
     /** {@inheritDoc} */
     @Override
     public Object tryExecute(Object obj, Object key) {
@@ -75,7 +75,7 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
      *@return the method if found, null otherwise
      */
     static java.lang.reflect.Method discover(Introspector is, final Class<?> clazz, String property) {
-        java.lang.reflect.Method m = PropertyGetExecutor.discoverGet(is, "is", clazz, property);
+        java.lang.reflect.Method m = property != null? PropertyGetExecutor.discoverGet(is, "is", clazz, property) : null;
         return (m != null && m.getReturnType() == Boolean.TYPE) ? m : null;
     }
 
