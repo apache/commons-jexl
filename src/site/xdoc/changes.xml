@@ -25,7 +25,13 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.1.1" date="unreleased">
+        <release version="3.2" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-240" due-to="Dmitri Blinov">
+                 Unable to invoke a call operator using antish style variable resoltion
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-238" due-to="Cameron Samak">
+                Restrict getLiteralClass to a Number for NumberLiterals
+            </action>
             <action dev="henrib" type="add" issue="JEXL-236" due-to="Dmitri Blinov">
                 Support CharSequence in size(), empty() and contains() operators
             </action>
