@@ -1311,7 +1311,7 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
-     * Execute a method call, ie syntactically written as name.call(...)
+     * Execute a method call, ie syntactically written as name.call(...).
      * @param node the actual method call node
      * @param object non null when name.call is an antish variable
      * @param data the context
