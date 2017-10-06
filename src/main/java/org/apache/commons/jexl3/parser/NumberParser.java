@@ -26,7 +26,7 @@ public final class NumberParser {
     /** The type literal value. */
     private Number literal = null;
     /** The expected class. */
-    private Class<?> clazz = null;
+    private Class<? extends Number> clazz = null;
     /** JEXL locale-neutral big decimal format. */
     static final DecimalFormat BIGDF = new DecimalFormat("0.0b", new DecimalFormatSymbols(Locale.ENGLISH));
 
@@ -54,7 +54,7 @@ public final class NumberParser {
     }
 
 
-    Class<?> getLiteralClass() {
+    Class<? extends Number> getLiteralClass() {
         return clazz;
     }
 
@@ -85,7 +85,7 @@ public final class NumberParser {
      */
     void setNatural(String s) {
         Number result;
-        Class<?> rclass;
+        Class<? extends Number> rclass;
         // determine the base
         final int base;
         if (s.charAt(0) == '0') {
@@ -136,7 +136,7 @@ public final class NumberParser {
      */
     void setReal(String s) {
         Number result;
-        Class<?> rclass;
+        Class<? extends Number> rclass;
         if ("#NaN".equals(s) || "NaN".equals(s)) {
             result = Double.NaN;
             rclass = Double.class;

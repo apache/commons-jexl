@@ -44,7 +44,7 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
         return true;
     }
 
-    public Class<?> getLiteralClass() {
+    public Class<? extends Number> getLiteralClass() {
         return nlp.getLiteralClass();
     }
 
