@@ -27,6 +27,7 @@ Version 3.2 is a minor release.
 
 New Features in 3.2:
 ====================
+* JEXL-238:      Restrict getLiteralClass to a Number for NumberLiterals
 * JEXL-236:      Support CharSequence in size(), empty() and contains() operators
 * JEXL-234:      Extend application of operators startsWith and endsWith from String to CharSequence types
 * JEXL-226:      add ?? operator support
@@ -34,6 +35,7 @@ New Features in 3.2:
 
 Bugs Fixed in 3.2:
 ==================
+* JEXL-240:      Unable to invoke a call operator using antish style variable resolution
 * JEXL-231:      Syntax for accessing List elements is not mentioned in docs
 * JEXL-230:      List literal is not mentioned in docs
 * JEXL-227:      JexlScriptEngineFactory.getEngineVersion() should return actual version
