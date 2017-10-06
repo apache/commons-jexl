@@ -419,6 +419,17 @@ public class Engine extends JexlEngine {
     }
 
     /**
+     * Swaps the current thread local engine.
+     * @param jexl the engine or null
+     * @return the previous thread local engine
+     */
+    protected JexlEngine putThreadEngine(JexlEngine jexl) {
+        JexlEngine pjexl = ENGINE.get();
+        ENGINE.set(jexl);
+        return pjexl;
+    }
+
+    /**
      * Gets the list of variables accessed by a script.
      * <p>This method will visit all nodes of a script and extract all variables whether they
      * are written in 'dot' or 'bracketed' notation. (a.b is equivalent to a['b']).</p>

@@ -75,6 +75,27 @@ public abstract class JexlEngine {
     }
 
     /**
+     * The thread local engine.
+     */
+    protected static final java.lang.ThreadLocal<JexlEngine> ENGINE =
+            new java.lang.ThreadLocal<JexlEngine>() {
+                @Override
+                protected JexlEngine initialValue() {
+                    return null;
+                }
+            };
+
+    /**
+     * Accesses the current thread local engine.
+     * <p>Advanced: you should only use this to retrieve the engine within a method/ctor called through the evaluation
+     * of a script/expression.</p>
+     * @return the engine or null
+     */
+    public static JexlEngine getThreadEngine() {
+        return ENGINE.get();
+    }
+
+    /**
      * Sets the current thread local context.
      * <p>This should only be used carefully, for instance when re-evaluating a "stored" script that requires a
      * given Namespace resolver. Remember to synchronize access if context is shared between threads.
