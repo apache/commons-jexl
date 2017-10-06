@@ -176,14 +176,16 @@ public class Interpreter extends InterpreterBase {
      * @throws JexlException if any error occurs during interpretation.
      */
     public Object interpret(JexlNode node) {
-        JexlContext.ThreadLocal local = null;
+        JexlContext.ThreadLocal tcontext = null;
+        JexlEngine tjexl = null;
         try {
             if (isCancelled()) {
                 throw new JexlException.Cancel(node);
             }
             if (context instanceof JexlContext.ThreadLocal) {
-                local = jexl.putThreadLocal((JexlContext.ThreadLocal) context);
+                tcontext = jexl.putThreadLocal((JexlContext.ThreadLocal) context);
             }
+            tjexl = jexl.putThreadEngine(jexl);
             return node.jjtAccept(this, null);
         } catch (JexlException.Return xreturn) {
             return xreturn.getValue();
@@ -211,8 +213,9 @@ public class Interpreter extends InterpreterBase {
                     functors = null;
                 }
             }
+            jexl.putThreadEngine(tjexl);
             if (context instanceof JexlContext.ThreadLocal) {
-                jexl.putThreadLocal(local);
+                jexl.putThreadLocal(tcontext);
             }
         }
         return null;
@@ -1020,6 +1023,19 @@ public class Interpreter extends InterpreterBase {
             objectNode = node.jjtGetChild(c);
             if (objectNode instanceof ASTMethodNode) {
                 if (object == null) {
+                    // we may be performing a method call on an antish var
+                    if (ant != null) {
+                        JexlNode child = objectNode.jjtGetChild(0);
+                        if (child instanceof ASTIdentifierAccess) {
+                            ant.append('.');
+                            ant.append(((ASTIdentifierAccess) child).getName());
+                            object = context.get(ant.toString());
+                            if (object != null) {
+                                object = visit((ASTMethodNode) objectNode, object, context);
+                            }
+                            continue;
+                        }
+                    }
                     break;
                 } else {
                     antish = false;
@@ -1291,18 +1307,32 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(final ASTMethodNode node, Object data) {
+        return visit(node, null, data);
+    }
+
+    /**
+     * Execute a method call, ie syntactically written as name.call(...)
+     * @param node the actual method call node
+     * @param object non null when name.call is an antish variable
+     * @param data the context
+     * @return the method call result
+     */
+    private Object visit(final ASTMethodNode node, Object object, Object data) {
         // left contains the reference to the method
         final JexlNode methodNode = node.jjtGetChild(0);
-        Object object = null;
-        JexlNode objectNode = null;
         Object method;
         // 1: determine object and method or functor
         if (methodNode instanceof ASTIdentifierAccess) {
             method = methodNode;
-            object = data;
             if (object == null) {
-                // no object, we fail
-                return unsolvableMethod(objectNode, "<null>.<?>(...)");
+                object = data;
+                if (object == null) {
+                    // no object, we fail
+                    return unsolvableMethod(methodNode, "<null>.<?>(...)");
+                }
+            } else {
+                // edge case of antish var used as functor
+                method = object;
             }
         } else {
             method = methodNode.jjtAccept(this, data);
@@ -1483,7 +1513,7 @@ public class Interpreter extends InterpreterBase {
             symbol = -1;
             functor = null;
         } else if (functor != null) {
-            symbol = -2;
+            symbol = -1 - 1; // -2;
             methodName = null;
         } else {
             return unsolvableMethod(node, "?");
@@ -1522,6 +1552,9 @@ public class Interpreter extends InterpreterBase {
                         }
                     }
                 }
+            } else {
+                // if no name, we should not cache
+                cacheable = false;
             }
             boolean narrow = false;
             JexlMethod vm = null;
@@ -1560,6 +1593,7 @@ public class Interpreter extends InterpreterBase {
                 final Object[] nargv;
                 final String mname;
                 // this may happen without the above when we are chaining call like x(a)(b)
+                // or when a var/symbol or antish var is used as a "function" name
                 if (functor != null) {
                     // lambda, script or jexl method will do
                     if (functor instanceof JexlScript) {
@@ -1567,6 +1601,12 @@ public class Interpreter extends InterpreterBase {
                     }
                     if (functor instanceof JexlMethod) {
                         return ((JexlMethod) functor).invoke(target, argv);
+                    }
+                    if (functor instanceof Class<?>) {
+                        vm = uberspect.getConstructor(functor, argv);
+                        if (vm != null) {
+                            return vm.invoke(functor, argv);
+                        }
                     }
                     // a generic callable
                     mname = "call";
