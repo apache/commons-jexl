@@ -651,7 +651,8 @@ public class Engine extends JexlEngine {
         TemplateEngine e = jxlt;
         if (e == null) {
             synchronized(this) {
-                if (jxlt == null) {
+                e = jxlt;
+                if (e == null) {
                     e = new TemplateEngine(this, true, 0, '$', '#');
                     jxlt = e;
                 }
