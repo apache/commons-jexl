@@ -1,6 +1,6 @@
 
                             Apache Commons JEXL
-                                Version 3.1
+                                Version 3.2
                                Release Notes
 
 
@@ -35,6 +35,7 @@ New Features in 3.2:
 
 Bugs Fixed in 3.2:
 ==================
+* JEXL-241:      NPE when script containing string interpolation executed in multiple threads
 * JEXL-240:      Unable to invoke a call operator using antish style variable resolution
 * JEXL-231:      Syntax for accessing List elements is not mentioned in docs
 * JEXL-230:      List literal is not mentioned in docs
