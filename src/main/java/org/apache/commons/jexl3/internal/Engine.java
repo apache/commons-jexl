@@ -156,6 +156,7 @@ public class Engine extends JexlEngine {
         } else {
             this.uberspect = new SandboxUberspect(uber, sandbox);
         }
+        parser.setFeatures(conf.features() == null? JexlEngine.DEFAULT_FEATURES : conf.features());
         this.logger = conf.logger() == null ? LogFactory.getLog(JexlEngine.class) : conf.logger();
         this.functions = conf.namespaces() == null ? Collections.<String, Object>emptyMap() : conf.namespaces();
         this.strict = conf.strict() == null ? true : conf.strict();

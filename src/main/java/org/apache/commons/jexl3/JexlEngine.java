@@ -162,6 +162,9 @@ public abstract class JexlEngine {
         int getArithmeticMathScale();
     }
 
+    /** Default features. */
+    public static final JexlFeatures DEFAULT_FEATURES = new JexlFeatures();
+
     /**
      * An empty/static/non-mutable JexlContext used instead of null context.
      */

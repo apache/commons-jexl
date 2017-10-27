@@ -48,7 +48,7 @@ public final class Parser extends JexlParser
     public ASTJexlScript parse(JexlInfo info, String jexlSrc, Scope scope, boolean registers, boolean expr) {
         try {
             // If registers are allowed, the default parser state has to be REGISTERS.
-            if (registers || ALLOW_REGISTERS) {
+            if (registers || features.supportsRegisters()) {
                 token_source.defaultLexState = REGISTERS;
             }
             // lets do the 'Unique Init' in here to be safe - it's a pain to remember

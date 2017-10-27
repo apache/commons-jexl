@@ -151,4 +151,29 @@ public abstract class JexlNode extends SimpleNode {
         }
         return false;
     }
+
+    public boolean isGlobalVar() {
+        if (this instanceof ASTVar) {
+            return false;
+        }
+        if (this instanceof ASTIdentifier) {
+            return ((ASTIdentifier) this).getSymbol() < 0;
+        }
+         if (this instanceof ASTIdentifierAccess) {
+            return true;
+        }
+        int nc = this.jjtGetNumChildren() - 1;
+        if (nc >= 0) {
+            JexlNode first = this.jjtGetChild(0);
+            return first.isGlobalVar();
+        }
+        if (jjtGetParent() instanceof ASTReference) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isLocalVar() {
+        return this instanceof ASTIdentifier && ((ASTIdentifier) this).getSymbol() >= 0;
+    }
 }
