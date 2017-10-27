@@ -106,6 +106,9 @@ public class JexlBuilder {
     /** The class loader. */
     private ClassLoader loader = null;
 
+    /** The features. */
+    private JexlFeatures features = null;
+
     /**
      * Sets the JexlUberspect instance the engine will use.
      *
@@ -169,6 +172,21 @@ public class JexlBuilder {
     /** @return the sandbox */
     public JexlSandbox sandbox() {
         return this.sandbox;
+    }
+
+    /**
+     * Sets the features the engine will use.
+     * @param f the features
+     * @return this builder
+     */
+    public JexlBuilder features(JexlFeatures f) {
+        this.features = f;
+        return this;
+    }
+
+    /** @return the features */
+    public JexlFeatures features() {
+        return this.features;
     }
 
     /**

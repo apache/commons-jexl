@@ -344,6 +344,31 @@ public class JexlException extends RuntimeException {
     }
 
     /**
+     * Thrown when parsing fails due to a disallowed feature.
+     *
+     * @since 3.2
+     */
+    public static class Feature extends Parsing {
+        /** The feature code. */
+        private final int code;
+        /**
+         * Creates a new Ambiguous statement exception instance.
+         * @param info  the location information
+         * @param feature the feature code
+         * @param expr  the source expression line
+         */
+        public Feature(JexlInfo info, int feature, String expr) {
+            super(info, expr);
+            this.code = feature;
+        }
+
+        @Override
+        protected String detailedMessage() {
+            return parserError(JexlFeatures.stringify(code), getDetail());
+        }
+    }
+
+    /**
      * Thrown when a variable is unknown.
      *
      * @since 3.0
@@ -689,7 +714,7 @@ public class JexlException extends RuntimeException {
     /**
      * Detailed info message about this error.
      * Format is "debug![begin,end]: string \n msg" where:
-     * 
+     *
      * - debug is the debugging information if it exists (@link JexlEngine.setDebug)
      * - begin, end are character offsets in the string for the precise location of the error
      * - string is the string representation of the offending expression

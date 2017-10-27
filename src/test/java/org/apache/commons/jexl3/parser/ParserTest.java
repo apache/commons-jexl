@@ -18,42 +18,43 @@ package org.apache.commons.jexl3.parser;
 
 import java.io.StringReader;
 
-import junit.framework.TestCase;
 import org.apache.commons.jexl3.JexlException;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @since 1.0
  *
  */
-public class ParserTest extends TestCase {
-    public ParserTest(String testName) {
-        super(testName);
-    }
+public class ParserTest {
+    public ParserTest() {}
 
     /**
      * See if we can parse simple scripts
      */
+    @Test
     public void testParse() throws Exception {
         Parser parser = new Parser(new StringReader(";"));
 
         JexlNode sn;
         sn = parser.parse(null, "foo = 1;", null, false, false);
-        assertNotNull("parsed node is null", sn);
+        Assert.assertNotNull("parsed node is null", sn);
 
         sn = parser.parse(null, "foo = \"bar\";", null, false, false);
-        assertNotNull("parsed node is null", sn);
+        Assert.assertNotNull("parsed node is null", sn);
 
         sn = parser.parse(null, "foo = 'bar';", null, false, false);
-        assertNotNull("parsed node is null", sn);
+        Assert.assertNotNull("parsed node is null", sn);
     }
 
+    @Test
     public void testErrorAssign() throws Exception {
         String[] ops = { "=", "+=", "-=", "/=", "*=", "^=", "&=", "|=" };
         for(String op : ops) {
             Parser parser = new Parser(new StringReader(";"));
             try {
                 JexlNode sn = parser.parse(null, "foo() "+op+" 1;", null, false, false);
-                fail("should have failed on invalid assignment " + op);
+                Assert.fail("should have failed on invalid assignment " + op);
             } catch (JexlException.Parsing xparse) {
                 // ok
                 String ss = xparse.getDetail();
@@ -62,13 +63,16 @@ public class ParserTest extends TestCase {
         }
     }
 
+    @Test
     public void testErrorAmbiguous() throws Exception {
         Parser parser = new Parser(new StringReader(";"));
         try {
             JexlNode sn = parser.parse(null, "x = 1 y = 5", null, false, false);
-            fail("should have failed on ambiguous statement");
+            Assert.fail("should have failed on ambiguous statement");
         } catch (JexlException.Ambiguous xambiguous) {
             // ok
+        } catch(JexlException xother) {
+            Assert.fail(xother.toString());
         }
     }
 }

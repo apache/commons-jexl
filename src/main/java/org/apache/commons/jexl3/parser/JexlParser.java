@@ -16,28 +16,36 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
+import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.internal.Scope;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.TreeMap;
 import java.util.Stack;
+import java.util.TreeMap;
+
 
 /**
  * The base class for parsing, manages the parameter/local variable frame.
  */
 public abstract class JexlParser extends StringParser {
-    /** Whether the parser will allow user-named registers (aka #0 syntax). */
-    boolean ALLOW_REGISTERS = false;
-    /** The source being processed. */
+    /**
+     * The features.
+     */
+    JexlFeatures features = JexlEngine.DEFAULT_FEATURES;
+    /**
+     * The source being processed.
+     */
     String source = null;
     /**
      * The map of named registers aka script parameters.
@@ -51,12 +59,19 @@ public abstract class JexlParser extends StringParser {
      */
     Map<String, Object> pragmas = null;
 
-
     /**
      * Internal, for debug purpose only.
      */
     public void allowRegisters(boolean registers) {
-        ALLOW_REGISTERS = registers;
+        features = new JexlFeatures(features).registers(registers);
+    }
+
+    /**
+     * Sets a new set of options.
+     * @param features
+     */
+    public void setFeatures(JexlFeatures features) {
+        this.features = features;
     }
 
     /**
@@ -122,6 +137,12 @@ public abstract class JexlParser extends StringParser {
      * @param image      the variable name
      */
     public void declareVariable(ASTVar identifier, String image) {
+        if (!features.supportsLocals()) {
+            throwFeatureException( JexlFeatures.LOCALS, identifier);
+        }
+        if (features.isReservedName(image)) {
+            throwFeatureException(JexlFeatures.RESERVED, identifier);
+        }
         if (frame == null) {
             frame = new Scope(null, (String[]) null);
         }
@@ -147,6 +168,12 @@ public abstract class JexlParser extends StringParser {
      * @param identifier the parameter name
      */
     public void declareParameter(String identifier) {
+        if (!features.supportsLocals()) {
+            throwFeatureException(JexlFeatures.LOCALS, null);
+        }
+        if (features.isReservedName(identifier)) {
+            throwFeatureException(JexlFeatures.RESERVED, null);
+        }
         if (frame == null) {
             frame = new Scope(null, (String[]) null);
         }
@@ -166,9 +193,7 @@ public abstract class JexlParser extends StringParser {
         Identifier(false);
     }
 
-    public Token getToken(int index) {
-        return null;
-    }
+    public abstract Token getToken(int index);
 
     void jjtreeOpenNodeScope(JexlNode node) {
     }
@@ -191,25 +216,46 @@ public abstract class JexlParser extends StringParser {
     );
     /**
      * Called by parser at end of node construction.
-     * <p>Detects "Ambiguous statement" and 'non-leaft value assignment'.</p>
+     * <p>Detects "Ambiguous statement" and 'non-left value assignment'.</p>
      * @param node the node
      * @throws ParseException
      */
     void jjtreeCloseNodeScope(JexlNode node) throws ParseException {
         if (node instanceof ASTJexlScript) {
+            if (node instanceof ASTJexlLambda && !features.supportsLambda()) {
+                throwFeatureException(JexlFeatures.LAMBDA, node);
+            }
             ASTJexlScript script = (ASTJexlScript) node;
             // reaccess in case local variables have been declared
             if (script.getScope() != frame) {
                 script.setScope(frame);
             }
             popFrame();
-        } else if (node instanceof ASTAmbiguous) {
+            return;
+        }
+        if (node instanceof ASTAmbiguous) {
             throwParsingException(JexlException.Ambiguous.class, node);
-        } else if (ASSIGN_NODES.contains(node.getClass())) {
+        }
+        if (ASSIGN_NODES.contains(node.getClass())) {
             JexlNode lv = node.jjtGetChild(0);
             if (!lv.isLeftValue()) {
                 throwParsingException(JexlException.Assignment.class, lv);
             }
+            if (!features.supportsSideEffectsGlobal() &&  lv.isGlobalVar()) {
+                throwFeatureException(JexlFeatures.SIDE_EFFECTS_GLOBALS, lv);
+            }
+            if (!features.supportsSideEffects()) {
+                throwFeatureException(JexlFeatures.SIDE_EFFECTS, lv);
+            }
+        }
+        if (node instanceof ASTWhileStatement && !features.supportsLoops()) {
+            throwFeatureException(JexlFeatures.LOOPS, node);
+        }
+        if (node instanceof ASTForeachStatement && !features.supportsLoops()) {
+            throwFeatureException(JexlFeatures.LOOPS, node);
+        }
+        if (node instanceof ASTConstructorNode && !features.supportsNewInstance()) {
+            throwFeatureException(JexlFeatures.NEW_INSTANCE, node);
         }
     }
 
@@ -232,6 +278,37 @@ public abstract class JexlParser extends StringParser {
         return strb.toString();
     }
 
+    private String readSourceLine(int lineno) {
+        String msg = "";
+        if (source != null) {
+            try {
+                BufferedReader reader = new BufferedReader(new StringReader(source));
+                for (int l = 0; l < lineno; ++l) {
+                    msg = reader.readLine();
+                }
+            } catch (IOException xio) {
+                // ignore, very unlikely but then again...
+            }
+        }
+        return msg;
+    }
+
+
+    /**
+     * Throws a feature exception.
+     * @param feature the feature code
+     * @param node the node that caused it
+     */
+    void throwFeatureException(int feature, JexlNode node) {
+        Token tok = this.getToken(0);
+        if (tok == null) {
+            throw new JexlException.Parsing(null, "unrecoverable state");
+        }
+        JexlInfo dbgInfo = new JexlInfo(tok.image, tok.beginLine, tok.beginColumn);
+        String msg = readSourceLine(tok.beginLine);
+        throw new JexlException.Feature(dbgInfo, feature, msg);
+    }
+
     /**
      * Throws a parsing exception.
      * @param node the node that caused it
@@ -245,33 +322,22 @@ public abstract class JexlParser extends StringParser {
      * @param xclazz the class of exception
      * @param node the node that caused it
      */
-    private void throwParsingException(Class<? extends JexlException> xclazz, JexlNode node) {
-        final JexlInfo dbgInfo;
+    void throwParsingException(Class<? extends JexlException> xclazz, JexlNode node) {
         Token tok = this.getToken(0);
-        if (tok != null) {
-            dbgInfo = new JexlInfo(tok.image, tok.beginLine, tok.beginColumn);
-        } else {
-            dbgInfo = node.jexlInfo();
+        if (tok == null) {
+            throw new JexlException.Parsing(null, "unrecoverable state");
         }
-        String msg = null;
-        try {
-            if (source != null) {
-                BufferedReader reader = new BufferedReader(new StringReader(source));
-                for (int l = 0; l < dbgInfo.getLine(); ++l) {
-                    msg = reader.readLine();
-                }
-            } else {
-                msg = "";
+        JexlInfo dbgInfo = new JexlInfo(tok.image, tok.beginLine, tok.beginColumn);
+        String msg = readSourceLine(tok.beginLine);
+        JexlException xjexl = null;
+        if (xclazz != null) {
+            try {
+                Constructor<? extends JexlException> ctor = xclazz.getConstructor(JexlInfo.class, String.class);
+                xjexl = ctor.newInstance(dbgInfo, msg);
+            } catch (Exception xany) {
+                // ignore, very unlikely but then again..
             }
-        } catch (IOException xio) {
-            // ignore
         }
-        if (JexlException.Ambiguous.class.equals(xclazz)) {
-            throw new JexlException.Ambiguous(dbgInfo, msg);
-        }
-        if (JexlException.Assignment.class.equals(xclazz)) {
-            throw new JexlException.Assignment(dbgInfo, msg);
-        }
-        throw new JexlException.Parsing(dbgInfo, msg);
+        throw xjexl != null ? xjexl : new JexlException.Parsing(dbgInfo, msg);
     }
 }
