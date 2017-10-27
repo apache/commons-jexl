@@ -1602,12 +1602,6 @@ public class Interpreter extends InterpreterBase {
                     if (functor instanceof JexlMethod) {
                         return ((JexlMethod) functor).invoke(target, argv);
                     }
-                    if (functor instanceof Class<?>) {
-                        vm = uberspect.getConstructor(functor, argv);
-                        if (vm != null) {
-                            return vm.invoke(functor, argv);
-                        }
-                    }
                     // a generic callable
                     mname = "call";
                     vm = uberspect.getMethod(functor, mname, argv);
