@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-244" due-to="Dmitri Blinov">
+                Webapp classloader memory leaks
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-241" due-to="Yang Wang">
                 NPE when script containing string interpolation executed in multiple threads
             </action>
