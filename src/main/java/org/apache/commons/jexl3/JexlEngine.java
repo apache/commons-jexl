@@ -46,8 +46,16 @@ import java.nio.charset.Charset;
  */
 public abstract class JexlEngine {
 
-    /** A marker for invocation failures in tryInvoke. */
-    public static final Object TRY_FAILED = new Object() {
+    /** A marker singleton for invocation failures in tryInvoke. */
+    public static final Object TRY_FAILED = new FailObject();
+
+    /** The failure marker class. */
+    private static final class FailObject {
+        /**
+         * Default ctor.
+         */
+        private FailObject() {}
+
         @Override
         public String toString() {
             return "tryExecute failed";
@@ -58,12 +66,7 @@ public abstract class JexlEngine {
      * The thread local context.
      */
     protected static final java.lang.ThreadLocal<JexlContext.ThreadLocal> CONTEXT =
-            new java.lang.ThreadLocal<JexlContext.ThreadLocal>() {
-                @Override
-                protected JexlContext.ThreadLocal initialValue() {
-                    return null;
-                }
-            };
+                       new java.lang.ThreadLocal<JexlContext.ThreadLocal>();
 
     /**
      * Accesses the current thread local context.
@@ -78,12 +81,7 @@ public abstract class JexlEngine {
      * The thread local engine.
      */
     protected static final java.lang.ThreadLocal<JexlEngine> ENGINE =
-            new java.lang.ThreadLocal<JexlEngine>() {
-                @Override
-                protected JexlEngine initialValue() {
-                    return null;
-                }
-            };
+                       new java.lang.ThreadLocal<JexlEngine>();
 
     /**
      * Accesses the current thread local engine.
@@ -166,9 +164,19 @@ public abstract class JexlEngine {
     public static final JexlFeatures DEFAULT_FEATURES = new JexlFeatures();
 
     /**
-     * An empty/static/non-mutable JexlContext used instead of null context.
+     * An empty/static/non-mutable JexlContext singleton used instead of null context.
      */
-    public static final JexlContext EMPTY_CONTEXT = new JexlContext() {
+    public static final JexlContext EMPTY_CONTEXT = new EmptyContext();
+
+    /**
+     * The empty context class, public for instrospection.
+     */
+    public static final class EmptyContext implements JexlContext {
+        /**
+         * Default ctor.
+         */
+        private EmptyContext() {}
+
         @Override
         public Object get(String name) {
             return null;
@@ -186,9 +194,19 @@ public abstract class JexlEngine {
     };
 
     /**
-     * An empty/static/non-mutable JexlNamesapce used instead of null namespace.
+     * An empty/static/non-mutable JexlNamespace singleton used instead of null namespace.
      */
-    public static final JexlContext.NamespaceResolver EMPTY_NS = new JexlContext.NamespaceResolver() {
+    public static final JexlContext.NamespaceResolver EMPTY_NS = new EmptyNamespaceResolver();
+
+    /**
+     * The  empty/static/non-mutable JexlNamespace class, public for instrospection.
+     */
+    public static final class EmptyNamespaceResolver implements JexlContext.NamespaceResolver {
+        /**
+         * Default ctor.
+         */
+        private EmptyNamespaceResolver() {}
+
         @Override
         public Object resolveNamespace(String name) {
             return null;
