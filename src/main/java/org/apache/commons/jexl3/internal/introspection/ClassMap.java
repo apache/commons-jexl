@@ -63,8 +63,8 @@ final class ClassMap {
      * This is the cache to store and look up the method information.
      * <p>
      * It stores the association between:
-     *  - a key made of a method name and an array of argument types.
-     *  - a method.
+     * - a key made of a method name and an array of argument types.
+     * - a method.
      * </p>
      * <p>
      * Since the invocation of the associated method is dynamic, there is no need (nor way) to differentiate between
@@ -87,18 +87,19 @@ final class ClassMap {
      * Standard constructor.
      *
      * @param aClass the class to deconstruct.
-     * @param log the logger.
+     * @param permissions the permissions to apply during introspection
+     * @param log    the logger.
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    ClassMap(Class<?> aClass, Log log) {
+    ClassMap(Class<?> aClass, Permissions permissions, Log log) {
         // eagerly cache methods
-        create(this, aClass, log);
+        create(this, permissions, aClass, log);
         // eagerly cache public fields
         Field[] fields = aClass.getFields();
         if (fields.length > 0) {
             Map<String, Field> cache = new HashMap<String, Field>();
             for (Field field : fields) {
-                if (Modifier.isPublic(field.getModifiers()) && Permissions.allow(field)) {
+                if (permissions.allow(field)) {
                     cache.put(field.getName(), field);
                 }
             }
@@ -149,16 +150,16 @@ final class ClassMap {
 
     /**
      * Find a Method using the method name and parameter objects.
-     *<p>
-     * Look in the methodMap for an entry.  If found,
+     * <p>
+     * Look in the methodMap for an entry. If found,
      * it'll either be a CACHE_MISS, in which case we
      * simply give up, or it'll be a Method, in which
      * case, we return it.
-     *</p>
+     * </p>
      * <p>
      * If nothing is found, then we must actually go
      * and introspect the method from the MethodMap.
-     *</p>
+     * </p>
      * @param methodKey the method key
      * @return A Method object representing the method to invoke or null.
      * @throws MethodKey.AmbiguousException When more than one method is a match for the parameters.
@@ -195,11 +196,12 @@ final class ClassMap {
     /**
      * Populate the Map of direct hits. These are taken from all the public methods
      * that our class, its parents and their implemented interfaces provide.
-     * @param cache the ClassMap instance we create
+     * @param cache          the ClassMap instance we create
+     * @param permissions    the permissions to apply during introspection
      * @param classToReflect the class to cache
-     * @param log the Log
+     * @param log            the Log
      */
-    private static void create(ClassMap cache, Class<?> classToReflect, Log log) {
+    private static void create(ClassMap cache, Permissions permissions, Class<?> classToReflect, Log log) {
         //
         // Build a list of all elements in the class hierarchy. This one is bottom-first (i.e. we start
         // with the actual declaring class and its interfaces and then move up (superclass etc.) until we
@@ -210,11 +212,11 @@ final class ClassMap {
         //
         for (; classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
             if (Modifier.isPublic(classToReflect.getModifiers())) {
-                populateWithClass(cache, classToReflect, log);
+                populateWithClass(cache, permissions, classToReflect, log);
             }
             Class<?>[] interfaces = classToReflect.getInterfaces();
             for (int i = 0; i < interfaces.length; i++) {
-                populateWithInterface(cache, interfaces[i], log);
+                populateWithInterface(cache, permissions, interfaces[i], log);
             }
         }
         // now that we've got all methods keyed in, lets organize them by name
@@ -253,31 +255,33 @@ final class ClassMap {
     /**
      * Recurses up interface hierarchy to get all super interfaces.
      * @param cache the cache to fill
+     * @param permissions the permissions to apply during introspection
      * @param iface the interface to populate the cache from
-     * @param log the Log
+     * @param log   the Log
      */
-    private static void populateWithInterface(ClassMap cache, Class<?> iface, Log log) {
+    private static void populateWithInterface(ClassMap cache, Permissions permissions, Class<?> iface, Log log) {
         if (Modifier.isPublic(iface.getModifiers())) {
-            populateWithClass(cache, iface, log);
-        }
-        Class<?>[] supers = iface.getInterfaces();
-        for (int i = 0; i < supers.length; i++) {
-            populateWithInterface(cache, supers[i], log);
+            populateWithClass(cache, permissions, iface, log);
+            Class<?>[] supers = iface.getInterfaces();
+            for (int i = 0; i < supers.length; i++) {
+                populateWithInterface(cache, permissions, supers[i], log);
+            }
         }
     }
 
     /**
      * Recurses up class hierarchy to get all super classes.
      * @param cache the cache to fill
+     * @param permissions the permissions to apply during introspection
      * @param clazz the class to populate the cache from
-     * @param log the Log
+     * @param log   the Log
      */
-    private static void populateWithClass(ClassMap cache, Class<?> clazz, Log log) {
+    private static void populateWithClass(ClassMap cache, Permissions permissions, Class<?> clazz, Log log) {
         try {
             Method[] methods = clazz.getDeclaredMethods();
             for (int i = 0; i < methods.length; i++) {
                 Method mi = methods[i];
-                if (Modifier.isPublic(mi.getModifiers()) && Permissions.allow(mi)) {
+                if (permissions.allow(mi)) {
                     // add method to byKey cache; do not override
                     cache.byKey.putIfAbsent(new MethodKey(mi), mi);
                 }
