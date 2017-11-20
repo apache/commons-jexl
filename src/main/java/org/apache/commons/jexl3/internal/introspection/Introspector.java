@@ -21,7 +21,6 @@ import org.apache.commons.logging.Log;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,6 +67,10 @@ public final class Introspector {
      */
     private ClassLoader loader;
     /**
+     * The permissions.
+     */
+    private final Permissions permissions;
+    /**
      * The read/write lock.
      */
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
@@ -90,8 +93,19 @@ public final class Introspector {
      * @param cloader the class loader
      */
     public Introspector(Log log, ClassLoader cloader) {
+        this(log, cloader, null);
+    }
+
+    /**
+     * Create the introspector.
+     * @param log     the logger to use
+     * @param cloader the class loader
+     * @param perms the permissions
+     */
+    public Introspector(Log log, ClassLoader cloader, Permissions perms) {
         this.rlog = log;
-        loader = cloader;
+        this.loader = cloader;
+        this.permissions = perms != null? perms : Permissions.DEFAULT;
     }
 
     /**
@@ -247,7 +261,7 @@ public final class Introspector {
                 }
                 List<Constructor<?>> l = new ArrayList<Constructor<?>>();
                 for (Constructor<?> ictor : clazz.getConstructors()) {
-                    if (Modifier.isPublic(ictor.getModifiers()) && Permissions.allow(ictor)) {
+                    if (permissions.allow(ictor)) {
                         l.add(ictor);
                     }
                 }
@@ -298,7 +312,7 @@ public final class Introspector {
                 // try again
                 classMap = classMethodMaps.get(c);
                 if (classMap == null) {
-                    classMap = new ClassMap(c, rlog);
+                    classMap = new ClassMap(c, permissions, rlog);
                     classMethodMaps.put(c, classMap);
                 }
             } finally {

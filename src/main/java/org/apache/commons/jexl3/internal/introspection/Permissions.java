@@ -20,25 +20,42 @@ package org.apache.commons.jexl3.internal.introspection;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import org.apache.commons.jexl3.annotations.NoJexl;
 
 /**
- * Checks whether an element (ctor, field or method) is visible by JEXL introspection
- * by checking if has been annotated with NoJexl.
+ * Checks whether an element (ctor, field or method) is visible by JEXL introspection.
+ * Default implementation does this by checking if element has been annotated with NoJexl.
  */
 public class Permissions {
     /** Make non instantiable. */
     private Permissions() {
     }
+    /**
+     * The default singleton.
+     */
+    public static final Permissions DEFAULT = new Permissions();
 
     /**
-     * Checks whether a class or one of its superclasses or implemented interfaces
+     * Checks whether a package explicitly disallows JEXL introspection.
+     * @param pack the package
+     * @return true if JEXL is allowed to introspect, false otherwise
+     */
+    public boolean allow(Package pack) {
+        if (pack != null && pack.getAnnotation(NoJexl.class) != null) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Checks whether a class or one of its super-classes or implemented interfaces
      * explicitly disallows JEXL introspection.
      * @param clazz the class to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    public static boolean allow(Class<?> clazz) {
-        return allow(clazz, true);
+    public boolean allow(Class<?> clazz) {
+        return clazz != null && allow(clazz.getPackage()) && allow(clazz, true);
     }
 
     /**
@@ -46,8 +63,11 @@ public class Permissions {
      * @param ctor the constructor to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    public static boolean allow(Constructor<?> ctor) {
+    public boolean allow(Constructor<?> ctor) {
         if (ctor == null) {
+            return false;
+        }
+        if (!Modifier.isPublic(ctor.getModifiers())) {
             return false;
         }
         Class<?> clazz = ctor.getDeclaringClass();
@@ -67,8 +87,11 @@ public class Permissions {
      * @param field the field to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    public static boolean allow(Field field) {
+    public boolean allow(Field field) {
         if (field == null) {
+            return false;
+        }
+        if (!Modifier.isPublic(field.getModifiers())) {
             return false;
         }
         Class<?> clazz = field.getDeclaringClass();
@@ -85,13 +108,16 @@ public class Permissions {
 
     /**
      * Checks whether a method explicitly disallows JEXL introspection.
-     * <p>Since methods can be overriden, this also checks that no superclass or interface
+     * <p>Since methods can be overridden, this also checks that no superclass or interface
      * explictly disallows this methods.</p>
      * @param method the method to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    public static boolean allow(Method method) {
+    public boolean allow(Method method) {
         if (method == null) {
+            return false;
+        }
+        if (!Modifier.isPublic(method.getModifiers())) {
             return false;
         }
         // is method annotated with nojexl ?
@@ -134,9 +160,7 @@ public class Permissions {
         if (clazz == null) {
             return false;
         }
-        // is package annotated with nojexl ?
-        Package pack = clazz.getPackage();
-        if (pack != null && pack.getAnnotation(NoJexl.class) != null) {
+        if (!Modifier.isPublic(clazz.getModifiers())) {
             return false;
         }
         // lets walk all interfaces
