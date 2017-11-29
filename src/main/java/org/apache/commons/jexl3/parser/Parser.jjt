@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 
 import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.internal.Scope;
 
@@ -45,23 +46,25 @@ public final class Parser extends JexlParser
 {
     private int loopCount = 0;
 
-    public ASTJexlScript parse(JexlInfo info, String jexlSrc, Scope scope, boolean registers, boolean expr) {
+    public ASTJexlScript parse(JexlInfo info, JexlFeatures jexlFeatures, String jexlSrc, Scope scope) {
+        JexlFeatures previous = getFeatures();
         try {
+            setFeatures(jexlFeatures);
             // If registers are allowed, the default parser state has to be REGISTERS.
-            if (registers || features.supportsRegisters()) {
+            if (jexlFeatures.supportsRegister()) {
                 token_source.defaultLexState = REGISTERS;
             }
             // lets do the 'Unique Init' in here to be safe - it's a pain to remember
             source = jexlSrc;
             pragmas = null;
-            ReInit(new java.io.StringReader(jexlSrc));
             frame = scope;
-            ASTJexlScript script = expr? JexlExpression(scope) : JexlScript(scope) ;
-            script.pragmas = pragmas != null
-                             ? Collections.<String,Object>unmodifiableMap(pragmas)
-                             : Collections.<String,Object>emptyMap();
-            pragmas = null;
+            ReInit(new java.io.StringReader(jexlSrc));
+            ASTJexlScript script = jexlFeatures.supportsScript()? JexlScript(scope) : JexlExpression(scope);
             script.jjtSetValue(info);
+            script.setPragmas(pragmas != null
+                             ? Collections.<String,Object>unmodifiableMap(pragmas)
+                             : Collections.<String,Object>emptyMap());
+            pragmas = null;
             return script;
         } catch (TokenMgrError xtme) {
             throw new JexlException.Tokenization(info, xtme).clean();
@@ -71,6 +74,7 @@ public final class Parser extends JexlParser
             source = null;
             frame = null;
             token_source.defaultLexState = DEFAULT;
+            setFeatures(previous);
         }
     }
 }
@@ -320,13 +324,15 @@ void Block() #Block : {}
 
 void ExpressionStatement() #void : {}
 {
-    Expression() (LOOKAHEAD(1) Expression() #Ambiguous())* (LOOKAHEAD(2) <SEMICOL>)?
+    Expression() (LOOKAHEAD(1) Expression() #Ambiguous())* (LOOKAHEAD(1) <SEMICOL>)?
 }
 
 
 void IfStatement() : {}
 {
-    <IF> <LPAREN> Expression() <RPAREN>  (LOOKAHEAD(1) Block() | Statement()) ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | Statement()) )?
+    <IF> <LPAREN> Expression() <RPAREN>  (LOOKAHEAD(1) Block() | Statement())
+    ( LOOKAHEAD(2) <ELSE> <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | Statement()) )*
+    ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | Statement()) )?
 }
 
 
@@ -337,7 +343,7 @@ void WhileStatement() : {}
 
 void ReturnStatement() : {}
 {
-    <RETURN> Expression()
+    <RETURN> ExpressionStatement()
 }
 
 void Continue() #Continue : {}
@@ -372,7 +378,7 @@ void DeclareVar() #Var :
     Token t;
 }
 {
-    t=<IDENTIFIER> { declareVariable(jjtThis, t.image); }
+    t=<IDENTIFIER> { declareVariable(jjtThis, t); }
 }
 
 void Pragma() #void :
@@ -751,7 +757,7 @@ void Parameter() #void :
     Token t;
 }
 {
-    t=<IDENTIFIER> { declareParameter(t.image); }
+    t=<IDENTIFIER> { declareParameter(t); }
 }
 
 void Parameters() #void : {}

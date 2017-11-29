@@ -280,7 +280,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             || child instanceof ASTBlock
             || child instanceof ASTIfStatement
             || child instanceof ASTForeachStatement
-            || child instanceof ASTWhileStatement)) {
+            || child instanceof ASTWhileStatement
+            || child instanceof ASTAnnotation)) {
             builder.append(';');
             if (indent > 0) {
                 builder.append('\n');
@@ -622,15 +623,23 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTIfStatement node, Object data) {
+        final int numChildren = node.jjtGetNumChildren();
+        // if (...) ...
         builder.append("if (");
         accept(node.jjtGetChild(0), data);
         builder.append(") ");
-        if (node.jjtGetNumChildren() > 1) {
-            acceptStatement(node.jjtGetChild(1), data);
-            if (node.jjtGetNumChildren() > 2) {
-                builder.append(" else ");
-                acceptStatement(node.jjtGetChild(2), data);
-            }
+        acceptStatement(node.jjtGetChild(1), data);
+        //.. else if (...) ...
+        for(int c = 2; c <  numChildren - 1; c += 2) {
+            builder.append(" else if (");
+            accept(node.jjtGetChild(c), data);
+            builder.append(") ");
+            acceptStatement(node.jjtGetChild(c + 1), data);
+        }
+        // else...
+        if (numChildren % 2 == 1) {
+            builder.append(" else ");
+            acceptStatement(node.jjtGetChild(numChildren - 1), data);
         } else {
             builder.append(';');
         }
@@ -993,14 +1002,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         builder.append('@');
         builder.append(node.getName());
         if (num > 0) {
-            builder.append("(");
-            accept(node.jjtGetChild(0), data);
-            for(int i = 0; i < num; ++i) {
-                builder.append(", ");
-                JexlNode child = node.jjtGetChild(i);
-                acceptStatement(child, data);
-            }
-            builder.append(")");
+            accept(node.jjtGetChild(0), data); // zut
         }
         return null;
     }
@@ -1009,6 +1011,9 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTAnnotatedStatement node, Object data) {
         int num = node.jjtGetNumChildren();
         for (int i = 0; i < num; ++i) {
+            if (i > 0) {// && child instanceof ASTBlock) {
+                builder.append(' ');
+            }
             JexlNode child = node.jjtGetChild(i);
             acceptStatement(child, data);
         }

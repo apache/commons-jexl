@@ -96,7 +96,7 @@ public final class TemplateScript implements JxltEngine.Template {
             info = jxlt.getEngine().createInfo();
         }
         // allow lambda defining params
-        script = jxlt.getEngine().parse(info.at(0, 0), strb.toString(), scope, false, false).script();
+        script = jxlt.getEngine().parse(info.at(0, 0), false, strb.toString(), scope).script();
         scope = script.getScope();
         // create the exprs using the code frame for those appearing after the first block of code
         for (int b = 0; b < blocks.size(); ++b) {

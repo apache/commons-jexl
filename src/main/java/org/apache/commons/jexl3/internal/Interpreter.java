@@ -566,21 +566,22 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTIfStatement node, Object data) {
         int n = 0;
+        final int numChildren = node.jjtGetNumChildren();
         try {
             Object result = null;
-            // first objectNode is the condition
-            Object expression = node.jjtGetChild(0).jjtAccept(this, null);
-            if (arithmetic.toBoolean(expression)) {
-                // first objectNode is true statement
-                n = 1;
-                result = node.jjtGetChild(n).jjtAccept(this, null);
-            } else {
-                    // if there is a false, execute it. false statement is the second
-                // objectNode
-                if (node.jjtGetNumChildren() == 3) {
-                    n = 2;
-                    result = node.jjtGetChild(n).jjtAccept(this, null);
+            // pairs of { conditions , 'then' statement }
+            for(int ifElse = 0; ifElse < (numChildren - 1); ifElse += 2) {
+                Object condition = node.jjtGetChild(ifElse).jjtAccept(this, null);
+                if (arithmetic.toBoolean(condition)) {
+                    // first objectNode is true statement
+                    return node.jjtGetChild(ifElse + 1).jjtAccept(this, null);
                 }
+            }
+            //
+            if (numChildren % 2 == 1) {
+                // if there is an else, there are an odd number of childrenin the statement and it is the last child,
+                // execute it.
+                result = node.jjtGetChild(numChildren - 1).jjtAccept(this, null);
             }
             return result;
         } catch (ArithmeticException xrt) {

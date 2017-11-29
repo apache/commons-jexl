@@ -71,4 +71,52 @@ public class ContextNamespaceTest extends JexlTestCase {
         Assert.assertEquals(186., result);
     }
 
+    public static class Vat {
+        private double vat;
+
+        Vat(double vat) {
+            this.vat = vat;
+        }
+
+        public double getVAT() {
+            return vat;
+        }
+
+        public void setVAT(double vat) {
+            this.vat = vat;
+        }
+
+        public double getvat() {
+            throw new UnsupportedOperationException("no way");
+        }
+
+        public void setvat(double vat) {
+            throw new UnsupportedOperationException("no way");
+        }
+    }
+
+    @Test
+    public void testObjectContext() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(true).silent(false).create();
+        Vat vat = new Vat(18.6);
+        ObjectContext<Vat> ctxt = new ObjectContext<Vat>(jexl, vat);
+        Assert.assertEquals(18.6d, (Double) ctxt.get("VAT"), 0.0001d);
+        ctxt.set("VAT", 20.0d);
+        Assert.assertEquals(20.0d, (Double) ctxt.get("VAT"), 0.0001d);
+
+        try {
+            ctxt.get("vat");
+            Assert.fail("should have failed");
+        } catch(JexlException.Property xprop) {
+            //
+        }
+
+        try {
+            ctxt.set("vat", 33.0d);
+            Assert.fail("should have failed");
+        } catch(JexlException.Property xprop) {
+            //
+        }
+    }
+
 }

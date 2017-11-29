@@ -21,6 +21,7 @@ import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.internal.introspection.SandboxUberspect;
@@ -73,6 +74,10 @@ public class Engine extends JexlEngine {
         private UberspectHolder() {}
     }
     /**
+     * The Log to which all JexlEngine messages will be logged.
+     */
+    protected final Log logger;
+    /**
      * The JexlUberspect instance.
      */
     protected final JexlUberspect uberspect;
@@ -81,18 +86,9 @@ public class Engine extends JexlEngine {
      */
     protected final JexlArithmetic arithmetic;
     /**
-     * The Log to which all JexlEngine messages will be logged.
+     * The map of 'prefix:function' to object implementing the namespaces.
      */
-    protected final Log logger;
-    /**
-     * The atomic parsing flag; true whilst parsing.
-     */
-    protected final AtomicBoolean parsing = new AtomicBoolean(false);
-    /**
-     * The {@link Parser}; when parsing expressions, this engine uses the parser if it
-     * is not already in use otherwise it will create a new temporary one.
-     */
-    protected final Parser parser = new Parser(new StringReader(";")); //$NON-NLS-1$
+    protected final Map<String, Object> functions;
     /**
      * Whether this engine considers unknown variables, methods and constructors as errors.
      */
@@ -113,21 +109,34 @@ public class Engine extends JexlEngine {
      */
     protected final boolean debug;
     /**
-     * The map of 'prefix:function' to object implementing the namespaces.
+     * The atomic parsing flag; true whilst parsing.
      */
-    protected final Map<String, Object> functions;
+    protected final AtomicBoolean parsing = new AtomicBoolean(false);
     /**
-     * The expression cache.
+     * The default charset.
      */
-    protected final SoftCache<String, ASTJexlScript> cache;
+    protected final Charset charset;
+    /**
+     * The set of default script parsing features.
+     */
+    protected final JexlFeatures scriptFeatures;
+    /**
+     * The set of default expression parsing features.
+     */
+    protected final JexlFeatures expressionFeatures;
+    /**
+     * The {@link Parser}; when parsing expressions, this engine uses the parser if it
+     * is not already in use otherwise it will create a new temporary one.
+     */
+    protected final Parser parser = new Parser(new StringReader(";")); //$NON-NLS-1$
     /**
      * The expression max length to hit the cache.
      */
     protected final int cacheThreshold;
     /**
-     * The default charset.
+     * The expression cache.
      */
-    protected final Charset charset;
+    protected final SoftCache<Source, ASTJexlScript> cache;
     /**
      * The default jxlt engine.
      */
@@ -145,28 +154,34 @@ public class Engine extends JexlEngine {
      * @param conf the builder
      */
     public Engine(JexlBuilder conf) {
-        JexlSandbox sandbox = conf.sandbox();
+        // options:
+        this.strict = conf.strict() == null ? true : conf.strict();
+        this.silent = conf.silent() == null ? false : conf.silent();
+        this.cancellable = conf.cancellable() == null ? !silent && strict : conf.cancellable();
+        this.debug = conf.debug() == null ? true : conf.debug();
+        // core properties:
         JexlUberspect uber = conf.uberspect() == null ? getUberspect(conf.logger(), conf.strategy()) : conf.uberspect();
         ClassLoader loader = conf.loader();
         if (loader != null) {
             uber.setClassLoader(loader);
         }
+        JexlSandbox sandbox = conf.sandbox();
         if (sandbox == null) {
             this.uberspect = uber;
         } else {
             this.uberspect = new SandboxUberspect(uber, sandbox);
         }
-        parser.setFeatures(conf.features() == null? JexlEngine.DEFAULT_FEATURES : conf.features());
         this.logger = conf.logger() == null ? LogFactory.getLog(JexlEngine.class) : conf.logger();
-        this.functions = conf.namespaces() == null ? Collections.<String, Object>emptyMap() : conf.namespaces();
-        this.strict = conf.strict() == null ? true : conf.strict();
-        this.silent = conf.silent() == null ? false : conf.silent();
-        this.cancellable = conf.cancellable() == null ? !silent && strict : conf.cancellable();
-        this.debug = conf.debug() == null ? true : conf.debug();
         this.arithmetic = conf.arithmetic() == null ? new JexlArithmetic(this.strict) : conf.arithmetic();
-        this.cache = conf.cache() <= 0 ? null : new SoftCache<String, ASTJexlScript>(conf.cache());
-        this.cacheThreshold = conf.cacheThreshold();
+        this.functions = conf.namespaces() == null ? Collections.<String, Object>emptyMap() : conf.namespaces();
+        // parsing & features:
+        JexlFeatures features = conf.features() == null? DEFAULT_FEATURES : conf.features();
+        this.expressionFeatures = new JexlFeatures(features).script(false);
+        this.scriptFeatures = new JexlFeatures(features).script(true);
         this.charset = conf.charset();
+        // caching:
+        this.cache = conf.cache() <= 0 ? null : new SoftCache<Source, ASTJexlScript>(conf.cache());
+        this.cacheThreshold = conf.cacheThreshold();
         if (uberspect == null) {
             throw new IllegalArgumentException("uberspect can not be null");
         }
@@ -252,26 +267,34 @@ public class Engine extends JexlEngine {
         return new Interpreter(this, context, frame);
     }
 
+
     @Override
-    public Script createScript(JexlInfo info, String scriptText, String[] names) {
+    public Script createExpression(JexlInfo info, String expression) {
+        return createScript(expressionFeatures, info, expression, null);
+    }
+
+    @Override
+    public Script createScript(JexlFeatures features, JexlInfo info, String scriptText, String[] names) {
         if (scriptText == null) {
             throw new NullPointerException("source is null");
         }
         String source = trimSource(scriptText);
         Scope scope = names == null ? null : new Scope(null, names);
-        ASTJexlScript tree = parse(info, source, scope, false, false);
+        ASTJexlScript tree = parse(info, features == null? scriptFeatures : features, source, scope);
         return new Script(this, source, tree);
     }
 
-    @Override
-    public Script createExpression(JexlInfo info, String expression) {
-        if (expression == null) {
-            throw new NullPointerException("source is null");
-        }
-        String source = trimSource(expression);
-        ASTJexlScript tree = parse(info, source, null, false, true);
-        return new Script(this, source, tree);
-    }
+    /**
+     * The features allowed for property set/get methods.
+     */
+    protected static final JexlFeatures PROPERTY_FEATURES = new JexlFeatures()
+            .localVar(false)
+            .loops(false)
+            .lambda(false)
+            .script(false)
+            .arrayReferenceExpr(false)
+            .methodCall(false)
+            .register(true);
 
     @Override
     public Object getProperty(Object bean, String expr) {
@@ -288,7 +311,7 @@ public class Engine extends JexlEngine {
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src;
         try {
             final Scope scope = new Scope(null, "#0");
-            final ASTJexlScript script = parse(null, src, scope, true, true);
+            final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Scope.Frame frame = script.createFrame(bean);
             final Interpreter interpreter = createInterpreter(context, frame);
@@ -312,12 +335,12 @@ public class Engine extends JexlEngine {
         if (context == null) {
             context = EMPTY_CONTEXT;
         }
-        // synthetize expr using registers
+        // synthetize expr using register
         String src = trimSource(expr);
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + "=" + "#1";
         try {
             final Scope scope = new Scope(null, "#0", "#1");
-            final ASTJexlScript script = parse(null, src, scope, true, true);
+            final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Scope.Frame frame = script.createFrame(bean, value);
             final Interpreter interpreter = createInterpreter(context, frame);
@@ -579,18 +602,33 @@ public class Engine extends JexlEngine {
      * Parses an expression.
      *
      * @param info      information structure
+     * @param expr     whether we parse an expression or a feature
      * @param src      the expression to parse
      * @param scope     the script frame
-     * @param registers whether the parser should allow the unnamed '#number' syntax for 'registers'
-     * @param expression whether the parser allows scripts or only expressions
      * @return the parsed tree
      * @throws JexlException if any error occurred during parsing
      */
-    protected ASTJexlScript parse(JexlInfo info, String src, Scope scope, boolean registers, boolean expression) {
+    protected ASTJexlScript parse(JexlInfo info, boolean expr, String src, Scope scope) {
+        return parse(info, expr? this.expressionFeatures : this.scriptFeatures, src, scope);
+    }
+
+    /**
+     * Parses an expression.
+     *
+     * @param info      information structure
+     * @param parsingf  the set of parsing features
+     * @param src      the expression to parse
+     * @param scope     the script frame
+     * @return the parsed tree
+     * @throws JexlException if any error occurred during parsing
+     */
+    protected ASTJexlScript parse(JexlInfo info, JexlFeatures parsingf, String src, Scope scope) {
         final boolean cached = src.length() < cacheThreshold && cache != null;
+        final JexlFeatures features = parsingf != null? parsingf : DEFAULT_FEATURES;
+        final Source source = cached? new Source(features, src) : null;
         ASTJexlScript script = null;
-        if (cached) {
-            script = cache.get(src);
+        if (source != null) {
+            script = cache.get(source);
             if (script != null) {
                 Scope f = script.getScope();
                 if ((f == null && scope == null) || (f != null && f.equals(scope))) {
@@ -603,7 +641,7 @@ public class Engine extends JexlEngine {
         if (parsing.compareAndSet(false, true)) {
             try {
                 // lets parse
-                script = parser.parse(ninfo, src, scope, registers, expression);
+                script = parser.parse(ninfo, features, src, scope);
             } finally {
                 // no longer in use
                 parsing.set(false);
@@ -611,10 +649,10 @@ public class Engine extends JexlEngine {
         } else {
             // ...otherwise parser was in use, create a new temporary one
             Parser lparser = new Parser(new StringReader(";"));
-            script = lparser.parse(ninfo, src, scope, registers, expression);
+            script = lparser.parse(ninfo, features, src, scope);
         }
-        if (cached) {
-            cache.put(src, script);
+        if (source != null) {
+            cache.put(source, script);
         }
         return script;
     }

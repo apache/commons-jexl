@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.parser;
 
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.internal.Scope;
 import java.util.Map;
 
@@ -26,7 +27,9 @@ public class ASTJexlScript extends JexlNode {
     /** The script scope. */
     private Scope scope = null;
     /** The pragmas. */
-    Map<String, Object> pragmas = null;
+    private Map<String, Object> pragmas = null;
+    /** Features. */
+    private JexlFeatures features = null;
 
     public ASTJexlScript(int id) {
         super(id);
@@ -54,18 +57,34 @@ public class ASTJexlScript extends JexlNode {
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
+      /**
+     * Sets this script pragmas.
+     * @param pragmas the pragmas
+     */
+    public void setPragmas(Map<String, Object> thePragmas) {
+        this.pragmas = thePragmas;
+    }
 
     /**
-     * Coerce this script as an expression (ie only one child) if necessary.
-     * @return true if the script was coerced, false otherwise
+     * @return this script pragmas.
      */
-    public boolean toExpression() {
-        if (jjtGetNumChildren() > 1) {
-            jjtSetChildren(new JexlNode[]{jjtGetChild(0)});
-            return true;
-        } else {
-            return false;
-        }
+    public Map<String, Object> getPragmas() {
+        return pragmas;
+    }
+
+    /**
+     * Sets this script features.
+     * @param theFeatures the features
+     */
+    public void setFeatures(JexlFeatures theFeatures) {
+        this.features = theFeatures;
+    }
+
+    /**
+     * @return this script scope
+     */
+    public JexlFeatures getFeatures() {
+        return features;
     }
 
     /**
@@ -81,13 +100,6 @@ public class ASTJexlScript extends JexlNode {
      */
     public Scope getScope() {
         return scope;
-    }
-
-    /**
-     * @return this script pragmas
-     */
-    public Map<String,Object> getPragmas() {
-        return pragmas;
     }
 
     /**

@@ -19,6 +19,7 @@ package org.apache.commons.jexl3.parser;
 import java.io.StringReader;
 
 import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlFeatures;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,6 +28,7 @@ import org.junit.Test;
  *
  */
 public class ParserTest {
+    static final JexlFeatures features = new JexlFeatures();
     public ParserTest() {}
 
     /**
@@ -35,15 +37,14 @@ public class ParserTest {
     @Test
     public void testParse() throws Exception {
         Parser parser = new Parser(new StringReader(";"));
-
         JexlNode sn;
-        sn = parser.parse(null, "foo = 1;", null, false, false);
+        sn = parser.parse(null, features, "foo = 1;", null);
         Assert.assertNotNull("parsed node is null", sn);
 
-        sn = parser.parse(null, "foo = \"bar\";", null, false, false);
+        sn = parser.parse(null, features, "foo = \"bar\";", null);
         Assert.assertNotNull("parsed node is null", sn);
 
-        sn = parser.parse(null, "foo = 'bar';", null, false, false);
+        sn = parser.parse(null, features, "foo = 'bar';", null);
         Assert.assertNotNull("parsed node is null", sn);
     }
 
@@ -53,7 +54,7 @@ public class ParserTest {
         for(String op : ops) {
             Parser parser = new Parser(new StringReader(";"));
             try {
-                JexlNode sn = parser.parse(null, "foo() "+op+" 1;", null, false, false);
+                JexlNode sn = parser.parse(null, features, "foo() "+op+" 1;", null);
                 Assert.fail("should have failed on invalid assignment " + op);
             } catch (JexlException.Parsing xparse) {
                 // ok
@@ -67,7 +68,7 @@ public class ParserTest {
     public void testErrorAmbiguous() throws Exception {
         Parser parser = new Parser(new StringReader(";"));
         try {
-            JexlNode sn = parser.parse(null, "x = 1 y = 5", null, false, false);
+            JexlNode sn = parser.parse(null, features, "x = 1 y = 5", null);
             Assert.fail("should have failed on ambiguous statement");
         } catch (JexlException.Ambiguous xambiguous) {
             // ok

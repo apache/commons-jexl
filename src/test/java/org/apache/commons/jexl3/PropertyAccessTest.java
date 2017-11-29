@@ -71,19 +71,19 @@ public class PropertyAccessTest extends JexlTestCase {
             asserter.assertExpression("foo.0.'1'", i42);
         }
     }
-    
+
     /**
      * A base property container; can only set from string.
      */
     public static class PropertyContainer {
         String value0;
         int value1;
-        
+
         public PropertyContainer(String name, int number) {
             value0 = name;
             value1 = number;
         }
-        
+
         public Object getProperty(String name) {
             if ("name".equals(name)) {
                 return value0;
@@ -93,7 +93,7 @@ public class PropertyAccessTest extends JexlTestCase {
                 return null;
             }
         }
-        
+
         public void setProperty(String name, String value) {
             if ("name".equals(name)) {
                 this.value0 = value.toUpperCase();
@@ -104,13 +104,13 @@ public class PropertyAccessTest extends JexlTestCase {
         }
     }
 
-    
+
     /**
      * Overloads propertySet.
      */
     public static class PropertyArithmetic extends JexlArithmetic {
         int ncalls = 0;
-        
+
         public PropertyArithmetic(boolean astrict) {
             super(astrict);
         }
@@ -128,7 +128,7 @@ public class PropertyAccessTest extends JexlTestCase {
             }
             return JexlEngine.TRY_FAILED;
         }
-        
+
         public int getCalls() {
             return ncalls;
         }
@@ -157,7 +157,7 @@ public class PropertyAccessTest extends JexlTestCase {
         result = getName.execute(null, quux);
         Assert.assertEquals("QUUX", result);
         Assert.assertEquals(calls + 2, pa.getCalls());
-        
+
         JexlScript getNumber = jexl.createScript("foo.property.number", "foo");
         result = getNumber.execute(null, quux);
         Assert.assertEquals(169, result);
@@ -174,22 +174,24 @@ public class PropertyAccessTest extends JexlTestCase {
         Assert.assertEquals(1042, result);
         Assert.assertEquals(calls + 4, pa.getCalls());
     }
-    
+
     public static class Container extends PropertyContainer {
         public Container(String name, int number) {
             super(name, number);
         }
 
         public Object getProperty(int ref) {
-            if (0 == ref) {
-                return value0;
-            } else if (1 == ref) {
-                return value1;
-            } else {
-                return null;
+            switch (ref) {
+                case 0:
+                    return value0;
+                case 1:
+                    return value1;
+                default:
+                    return null;
             }
         }
 
+        @Override
         public void setProperty(String name, String value) {
             if ("name".equals(name)) {
                 this.value0 = value;
@@ -267,7 +269,7 @@ public class PropertyAccessTest extends JexlTestCase {
         Assert.assertEquals(24, result);
         result = get1.execute(null, quux);
         Assert.assertEquals(24, result);
-        
+
         Assert.assertEquals(calls, pa.getCalls());
     }
 
