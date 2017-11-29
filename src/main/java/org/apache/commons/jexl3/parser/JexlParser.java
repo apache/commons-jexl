@@ -40,38 +40,88 @@ import java.util.TreeMap;
  */
 public abstract class JexlParser extends StringParser {
     /**
-     * The features.
+     * The associated controller.
      */
-    JexlFeatures features = JexlEngine.DEFAULT_FEATURES;
+    protected final FeatureController featureController = new FeatureController(JexlEngine.DEFAULT_FEATURES);
     /**
      * The source being processed.
      */
-    String source = null;
+    protected String source = null;
     /**
      * The map of named registers aka script parameters.
      * <p>Each parameter is associated to a register and is materialized
      * as an offset in the registers array used during evaluation.</p>
      */
-    Scope frame = null;
-    Stack<Scope> frames = new Stack<Scope>();
+    protected Scope frame = null;
+    /**
+     * When parsing inner functions/lambda, need to stack the scope (sic).
+     */
+    protected Stack<Scope> frames = new Stack<Scope>();
     /**
      * The list of pragma declarations.
      */
-    Map<String, Object> pragmas = null;
+    protected Map<String, Object> pragmas = null;
+
+    /**
+     * Utility function to create '.' separated string from a list of string.
+     * @param lstr the list of strings
+     * @return the dotted version
+     */
+    protected static String stringify(List<String> lstr) {
+        StringBuilder strb = new StringBuilder();
+        boolean dot = false;
+        for(String str : lstr) {
+            if (!dot) {
+               dot = true;
+            } else {
+               strb.append('.');
+            }
+            strb.append(str);
+        }
+        return strb.toString();
+    }
+
+    /**
+     * Reading a given source line
+     * @parma src the source
+     * @param lineno the line number
+     * @return the line
+     */
+    protected static String readSourceLine(String src, int lineno) {
+        String msg = "";
+        if (src != null && lineno >= 0) {
+            try {
+                BufferedReader reader = new BufferedReader(new StringReader(src));
+                for (int l = 0; l < lineno; ++l) {
+                    msg = reader.readLine();
+                }
+            } catch (IOException xio) {
+                // ignore, very unlikely but then again...
+            }
+        }
+        return msg;
+    }
 
     /**
      * Internal, for debug purpose only.
      */
     public void allowRegisters(boolean registers) {
-        features = new JexlFeatures(features).registers(registers);
+        featureController.setFeatures(new JexlFeatures(featureController.getFeatures()).register(registers));
     }
 
     /**
      * Sets a new set of options.
      * @param features
      */
-    public void setFeatures(JexlFeatures features) {
-        this.features = features;
+    protected void setFeatures(JexlFeatures features) {
+        this.featureController.setFeatures(features);
+    }
+
+    /**
+     * @return the current set of features active during parsing
+     */
+    protected JexlFeatures getFeatures() {
+        return featureController.getFeatures();
     }
 
     /**
@@ -79,7 +129,7 @@ public abstract class JexlParser extends StringParser {
      * <p> This is used to allow parameters to be declared before parsing. </p>
      * @param theFrame the register map
      */
-    public void setFrame(Scope theFrame) {
+    protected void setFrame(Scope theFrame) {
         frame = theFrame;
     }
 
@@ -89,14 +139,14 @@ public abstract class JexlParser extends StringParser {
      * regain access after parsing to known which / how-many registers are needed. </p>
      * @return the named register map
      */
-    public Scope getFrame() {
+    protected Scope getFrame() {
         return frame;
     }
 
     /**
      * Create a new local variable frame and push it as current scope.
      */
-    public void pushFrame() {
+    protected void pushFrame() {
         if (frame != null) {
             frames.push(frame);
         }
@@ -106,7 +156,7 @@ public abstract class JexlParser extends StringParser {
     /**
      * Pops back to previous local variable frame.
      */
-    public void popFrame() {
+    protected void popFrame() {
         if (!frames.isEmpty()) {
             frame = frames.pop();
         } else {
@@ -120,7 +170,7 @@ public abstract class JexlParser extends StringParser {
      * @param image      the identifier image
      * @return the image
      */
-    public String checkVariable(ASTIdentifier identifier, String image) {
+    protected String checkVariable(ASTIdentifier identifier, String image) {
         if (frame != null) {
             Integer register = frame.getSymbol(image);
             if (register != null) {
@@ -130,24 +180,33 @@ public abstract class JexlParser extends StringParser {
         return image;
     }
 
+    protected boolean allowVariable(String image) {
+        JexlFeatures features = getFeatures();
+        if (!features.supportsLocalVar()) {
+            return false;
+        }
+        if (features.isReservedName(image)) {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Declares a local variable.
      * <p> This method creates an new entry in the symbol map. </p>
-     * @param identifier the identifier used to declare
-     * @param image      the variable name
+     * @param var the identifier used to declare
+     * @param token      the variable name toekn
      */
-    public void declareVariable(ASTVar identifier, String image) {
-        if (!features.supportsLocals()) {
-            throwFeatureException( JexlFeatures.LOCALS, identifier);
-        }
-        if (features.isReservedName(image)) {
-            throwFeatureException(JexlFeatures.RESERVED, identifier);
+    protected void declareVariable(ASTVar var, Token token) {
+        String identifier = token.image;
+        if (!allowVariable(identifier)) {
+            throwFeatureException(JexlFeatures.LOCAL_VAR, token);
         }
         if (frame == null) {
             frame = new Scope(null, (String[]) null);
         }
-        Integer register = frame.declareVariable(image);
-        identifier.setSymbol(register.intValue(), image);
+        Integer register = frame.declareVariable(identifier);
+        var.setSymbol(register.intValue(), identifier);
     }
 
     /**
@@ -155,7 +214,10 @@ public abstract class JexlParser extends StringParser {
      * @param key the pragma key
      * @param value the pragma value
      */
-    public void declarePragma(String key, Object value) {
+    protected void declarePragma(String key, Object value) {
+        if (!getFeatures().supportsPragma()) {
+            throwFeatureException(JexlFeatures.PRAGMA, getToken(0));
+        }
         if (pragmas == null) {
             pragmas = new TreeMap<String, Object>();
         }
@@ -165,14 +227,12 @@ public abstract class JexlParser extends StringParser {
     /**
      * Declares a local parameter.
      * <p> This method creates an new entry in the symbol map. </p>
-     * @param identifier the parameter name
+     * @param token the parameter name toekn
      */
-    public void declareParameter(String identifier) {
-        if (!features.supportsLocals()) {
-            throwFeatureException(JexlFeatures.LOCALS, null);
-        }
-        if (features.isReservedName(identifier)) {
-            throwFeatureException(JexlFeatures.RESERVED, null);
+    protected void declareParameter(Token token) {
+        String identifier =  token.image;
+        if (!allowVariable(identifier)) {
+            throwFeatureException(JexlFeatures.LOCAL_VAR, token);
         }
         if (frame == null) {
             frame = new Scope(null, (String[]) null);
@@ -185,17 +245,25 @@ public abstract class JexlParser extends StringParser {
      * @param top whether the identifier is beginning an l/r value
      * @throws ParseException subclasses may throw this
      */
-    public void Identifier(boolean top) throws ParseException {
+    protected void Identifier(boolean top) throws ParseException {
         // Overriden by generated code
     }
 
-    final public void Identifier() throws ParseException {
+    final protected void Identifier() throws ParseException {
         Identifier(false);
     }
 
-    public abstract Token getToken(int index);
+    /**
+     * Overridden in actual parser to access tokens stack.
+     * @param index 0 to get current token
+     * @return the token on the stack
+     */
+    protected abstract Token getToken(int index);
 
-    void jjtreeOpenNodeScope(JexlNode node) {
+    protected void jjtreeOpenNodeScope(JexlNode node) {
+        if (node instanceof ASTAmbiguous) {
+            throwParsingException(JexlException.Ambiguous.class, node);
+        }
     }
 
     /**
@@ -214,16 +282,18 @@ public abstract class JexlParser extends StringParser {
             ASTSetSubNode.class
         )
     );
+
     /**
      * Called by parser at end of node construction.
-     * <p>Detects "Ambiguous statement" and 'non-left value assignment'.</p>
+     * <p>
+     * Detects "Ambiguous statement" and 'non-left value assignment'.</p>
      * @param node the node
      * @throws ParseException
      */
-    void jjtreeCloseNodeScope(JexlNode node) throws ParseException {
+    protected void jjtreeCloseNodeScope(JexlNode node) throws ParseException {
         if (node instanceof ASTJexlScript) {
-            if (node instanceof ASTJexlLambda && !features.supportsLambda()) {
-                throwFeatureException(JexlFeatures.LAMBDA, node);
+            if (node instanceof ASTJexlLambda && !getFeatures().supportsLambda()) {
+                throwFeatureException(JexlFeatures.LAMBDA, node.jexlInfo());
             }
             ASTJexlScript script = (ASTJexlScript) node;
             // reaccess in case local variables have been declared
@@ -231,82 +301,41 @@ public abstract class JexlParser extends StringParser {
                 script.setScope(frame);
             }
             popFrame();
-            return;
-        }
-        if (node instanceof ASTAmbiguous) {
-            throwParsingException(JexlException.Ambiguous.class, node);
-        }
-        if (ASSIGN_NODES.contains(node.getClass())) {
+        } else if (ASSIGN_NODES.contains(node.getClass())) {
             JexlNode lv = node.jjtGetChild(0);
             if (!lv.isLeftValue()) {
                 throwParsingException(JexlException.Assignment.class, lv);
             }
-            if (!features.supportsSideEffectsGlobal() &&  lv.isGlobalVar()) {
-                throwFeatureException(JexlFeatures.SIDE_EFFECTS_GLOBALS, lv);
-            }
-            if (!features.supportsSideEffects()) {
-                throwFeatureException(JexlFeatures.SIDE_EFFECTS, lv);
-            }
         }
-        if (node instanceof ASTWhileStatement && !features.supportsLoops()) {
-            throwFeatureException(JexlFeatures.LOOPS, node);
-        }
-        if (node instanceof ASTForeachStatement && !features.supportsLoops()) {
-            throwFeatureException(JexlFeatures.LOOPS, node);
-        }
-        if (node instanceof ASTConstructorNode && !features.supportsNewInstance()) {
-            throwFeatureException(JexlFeatures.NEW_INSTANCE, node);
-        }
-    }
-
-    /**
-     * Utility function to create '.' separated string from a list of string.
-     * @param lstr the list of strings
-     * @return the dotted version
-     */
-    String stringify(List<String> lstr) {
-        StringBuilder strb = new StringBuilder();
-        boolean dot = false;
-        for(String str : lstr) {
-            if (!dot) {
-               dot = true;
-            } else {
-               strb.append('.');
-            }
-            strb.append(str);
-        }
-        return strb.toString();
-    }
-
-    private String readSourceLine(int lineno) {
-        String msg = "";
-        if (source != null) {
-            try {
-                BufferedReader reader = new BufferedReader(new StringReader(source));
-                for (int l = 0; l < lineno; ++l) {
-                    msg = reader.readLine();
-                }
-            } catch (IOException xio) {
-                // ignore, very unlikely but then again...
-            }
-        }
-        return msg;
+        // heavy check
+        featureController.controlNode(node);
     }
 
 
     /**
      * Throws a feature exception.
      * @param feature the feature code
-     * @param node the node that caused it
+     * @param info the exception surroundings
      */
-    void throwFeatureException(int feature, JexlNode node) {
-        Token tok = this.getToken(0);
-        if (tok == null) {
-            throw new JexlException.Parsing(null, "unrecoverable state");
+    protected void throwFeatureException(int feature, JexlInfo info) {
+        String msg = info != null? readSourceLine(source, info.getLine()) : null;
+        throw new JexlException.Feature(info, feature, msg);
+    }
+
+    /**
+     * Throws a feature exception.
+     * @param feature the feature code
+     * @param token the token that triggered it
+     */
+    protected void throwFeatureException(int feature, Token token) {
+        if (token == null) {
+            token = this.getToken(0);
+            if (token == null) {
+                throw new JexlException.Parsing(null, JexlFeatures.stringify(feature));
+            }
         }
-        JexlInfo dbgInfo = new JexlInfo(tok.image, tok.beginLine, tok.beginColumn);
-        String msg = readSourceLine(tok.beginLine);
-        throw new JexlException.Feature(dbgInfo, feature, msg);
+        JexlInfo info = new JexlInfo(token.image, token.beginLine, token.beginColumn);
+        throwFeatureException(feature, info);
     }
 
     /**
@@ -322,13 +351,13 @@ public abstract class JexlParser extends StringParser {
      * @param xclazz the class of exception
      * @param node the node that caused it
      */
-    void throwParsingException(Class<? extends JexlException> xclazz, JexlNode node) {
+    protected void throwParsingException(Class<? extends JexlException> xclazz, JexlNode node) {
         Token tok = this.getToken(0);
         if (tok == null) {
             throw new JexlException.Parsing(null, "unrecoverable state");
         }
         JexlInfo dbgInfo = new JexlInfo(tok.image, tok.beginLine, tok.beginColumn);
-        String msg = readSourceLine(tok.beginLine);
+        String msg = readSourceLine(source, tok.beginLine);
         JexlException xjexl = null;
         if (xclazz != null) {
             try {

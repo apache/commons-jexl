@@ -29,6 +29,9 @@
             <action dev="henrib" type="fix" issue="JEXL-244" due-to="Dmitri Blinov">
                 Webapp classloader memory leaks
             </action>
+            <action dev="henrib" type="add" issue="JEXL-243">
+                Allow restricting available features in Script/Expressions
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-241" due-to="Yang Wang">
                 NPE when script containing string interpolation executed in multiple threads
             </action>
@@ -37,6 +40,9 @@
             </action>
             <action dev="henrib" type="add" issue="JEXL-238" due-to="Cameron Samak">
                 Restrict getLiteralClass to a Number for NumberLiterals
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-237" due-to="Dmitri Blinov">
+                Ability to restrict usage of certain names when declaring local variables
             </action>
             <action dev="henrib" type="add" issue="JEXL-236" due-to="Dmitri Blinov">
                 Support CharSequence in size(), empty() and contains() operators
@@ -61,6 +67,9 @@
             </action>
             <action dev="henrib" type="add" issue="JEXL-224" due-to="Dmitri Blinov">
                 The ability to overload call() operator in customized JexlArithmetic implementation
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-212" due-to="Dmitri Blinov">
+                Restrict usage of assignment statements in JexlExpression
             </action>
         </release>
         <release version="3.1" date="2017-04-14">

@@ -540,7 +540,7 @@ public final class TemplateEngine extends JxltEngine {
         @Override
         protected TemplateExpression prepare(Interpreter interpreter) {
             String value = interpreter.interpret(node).toString();
-            JexlNode dnode = jexl.parse(node.jexlInfo(), value, null, false, noscript);
+            JexlNode dnode = jexl.parse(node.jexlInfo(), noscript, value, null);
             return new ImmediateExpression(value, dnode, this);
         }
 
@@ -800,7 +800,7 @@ public final class TemplateEngine extends JxltEngine {
                             String src = strb.toString();
                             TemplateExpression iexpr = new ImmediateExpression(
                                     src,
-                                    jexl.parse(info.at(lineno, column), src, scope, false, noscript),
+                                    jexl.parse(info.at(lineno, column), noscript, src, scope),
                                     null);
                             builder.add(iexpr);
                             strb.delete(0, Integer.MAX_VALUE);
@@ -848,12 +848,12 @@ public final class TemplateEngine extends JxltEngine {
                             if (nested) {
                                 dexpr = new NestedExpression(
                                         expr.substring(inested, column + 1),
-                                        jexl.parse(info.at(lineno, column), src, scope, false, noscript),
+                                        jexl.parse(info.at(lineno, column), noscript, src, scope),
                                         null);
                             } else {
                                 dexpr = new DeferredExpression(
                                         strb.toString(),
-                                        jexl.parse(info.at(lineno, column), src, scope, false, noscript),
+                                        jexl.parse(info.at(lineno, column), noscript, src, scope),
                                         null);
                             }
                             builder.add(dexpr);

@@ -322,6 +322,31 @@ public abstract class JexlEngine {
     public abstract JexlExpression createExpression(JexlInfo info, String expression);
 
     /**
+     * Creates a JexlExpression from a String containing valid JEXL syntax.
+     * This method parses the expression which must contain either a reference or an expression.
+     *
+     * @param expression A String containing valid JEXL syntax
+     * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
+     * @throws JexlException if there is a problem parsing the script
+     */
+    public final JexlExpression createExpression(String expression) {
+        return createExpression(null, expression);
+    }
+    /**
+     * Creates a JexlScript from a String containing valid JEXL syntax.
+     * This method parses the script and validates the syntax.
+     *
+     * @param features A set of features that will be enforced during parsing
+     * @param info   An info structure to carry debugging information if needed
+     * @param source A string containing valid JEXL syntax
+     * @param names  The script parameter names used during parsing; a corresponding array of arguments containing
+     * values should be used during evaluation
+     * @return A {@link JexlScript} which can be executed using a {@link JexlContext}
+     * @throws JexlException if there is a problem parsing the script
+     */
+    public abstract JexlScript createScript(JexlFeatures features, JexlInfo info, String source, String[] names);
+
+    /**
      * Creates a JexlScript from a String containing valid JEXL syntax.
      * This method parses the script and validates the syntax.
      *
@@ -332,18 +357,8 @@ public abstract class JexlEngine {
      * @return A {@link JexlScript} which can be executed using a {@link JexlContext}
      * @throws JexlException if there is a problem parsing the script
      */
-    public abstract JexlScript createScript(JexlInfo info, String source, String[] names);
-
-    /**
-     * Creates a JexlExpression from a String containing valid JEXL syntax.
-     * This method parses the expression which must contain either a reference or an expression.
-     *
-     * @param expression A String containing valid JEXL syntax
-     * @return An {@link JexlExpression} which can be evaluated using a {@link JexlContext}
-     * @throws JexlException if there is a problem parsing the script
-     */
-    public final JexlExpression createExpression(String expression) {
-        return createExpression(null, expression);
+    public final JexlScript createScript(JexlInfo info, String source, String[] names) {
+        return createScript(null, null, source, names);
     }
 
     /**
@@ -355,7 +370,7 @@ public abstract class JexlEngine {
      * @throws JexlException if there is a problem parsing the script.
      */
     public final JexlScript createScript(String scriptText) {
-        return createScript(null, scriptText, null);
+        return createScript(null, null, scriptText, null);
     }
 
     /**
@@ -369,7 +384,7 @@ public abstract class JexlEngine {
      * @throws JexlException if there is a problem parsing the script
      */
     public final JexlScript createScript(String scriptText, String... names) {
-        return createScript(null, scriptText, names);
+        return createScript(null, null, scriptText, names);
     }
 
     /**
@@ -381,7 +396,7 @@ public abstract class JexlEngine {
      * @throws JexlException if there is a problem reading or parsing the script.
      */
     public final JexlScript createScript(File scriptFile) {
-        return createScript(null, readSource(scriptFile), null);
+        return createScript(null, null, readSource(scriptFile), null);
     }
 
     /**
@@ -395,7 +410,7 @@ public abstract class JexlEngine {
      * @throws JexlException if there is a problem reading or parsing the script.
      */
     public final JexlScript createScript(File scriptFile, String... names) {
-        return createScript(null, readSource(scriptFile), names);
+        return createScript(null, null, readSource(scriptFile), names);
     }
 
     /**
@@ -410,7 +425,7 @@ public abstract class JexlEngine {
      * @throws JexlException if there is a problem reading or parsing the script.
      */
     public final JexlScript createScript(JexlInfo info, File scriptFile, String[] names) {
-        return createScript(info, readSource(scriptFile), names);
+        return createScript(null, info, readSource(scriptFile), names);
     }
 
     /**
@@ -436,7 +451,7 @@ public abstract class JexlEngine {
      * @throws JexlException if there is a problem reading or parsing the script.
      */
     public final JexlScript createScript(URL scriptUrl, String[] names) {
-        return createScript(null, readSource(scriptUrl), names);
+        return createScript(null, null, readSource(scriptUrl), names);
     }
 
     /**
@@ -451,7 +466,7 @@ public abstract class JexlEngine {
      * @throws JexlException if there is a problem reading or parsing the script.
      */
     public final JexlScript createScript(JexlInfo info, URL scriptUrl, String[] names) {
-        return createScript(info, readSource(scriptUrl), names);
+        return createScript(null, info, readSource(scriptUrl), names);
     }
 
     /**

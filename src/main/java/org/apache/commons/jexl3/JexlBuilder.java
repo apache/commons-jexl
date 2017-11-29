@@ -175,7 +175,9 @@ public class JexlBuilder {
     }
 
     /**
-     * Sets the features the engine will use.
+     * Sets the features the engine will use as a base by default.
+     * <p>Note that the script flag will be ignored; the engine will be able to parse expressions and scripts.
+     * <p>Note also that these will apply to template expressions and scripts.
      * @param f the features
      * @return this builder
      */

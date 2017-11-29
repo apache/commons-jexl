@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,6 +25,8 @@ import java.util.Map;
 import java.util.Set;
 
 import java.util.TreeSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -238,5 +241,63 @@ public class IssuesTest200 extends JexlTestCase {
         Assert.assertEquals("bar", expression.evaluate(df));
         ObjectContext<Object> context = new ObjectContext<Object>(jexl, df);
         Assert.assertEquals("bar", expression.evaluate(context));
+    }
+
+    private static void handle(ExecutorService pool, final JexlScript script, final Map<String, Object> payload) {
+       pool.submit(new Runnable() {
+            @Override public void run() {
+                System.out.printf("START: %s\n", Thread.currentThread());
+                System.out.println(script.execute(new MapContext(payload)));
+                System.out.printf("STOP: %s\n", Thread.currentThread());
+            }
+        });
+    }
+
+    @Test
+    public void test241() throws Exception {
+        ExecutorService pool;
+        JexlScript script = new JexlBuilder().create().createScript("`${item}`");
+
+        pool = Executors.newFixedThreadPool(4);
+
+        Map<String, Object> m1 = new HashMap<String, Object>();
+        m1.put("item", "A");
+        Map<String, Object> m2 = new HashMap<String, Object>();
+        m2.put("item", "B");
+
+        handle(pool, script, m1);
+        System.out.println(script.execute(new MapContext(m2)));
+        System.out.println("Reached the end");
+        pool.shutdown();
+    }
+
+    @Test
+    public void test242() throws Exception {
+        Double a = -40.05d;
+        Double b = -8.01d;
+        Double c = a + b;
+        final JexlContext context = new MapContext();
+        context.set("a", a);
+        context.set("b", b);
+        JexlEngine JEXL_ENGINE = new JexlBuilder().strict(true).silent(true).create();
+        JexlExpression jsp = JEXL_ENGINE.createExpression("a + b");
+        Double e = (Double) jsp.evaluate(context);
+        Assert.assertTrue(Double.doubleToLongBits(e) + " != " + Double.doubleToLongBits(c), c.doubleValue() == e.doubleValue());
+        Assert.assertTrue(Double.doubleToLongBits(e) + " != " + Double.doubleToLongBits(c), a + b == e);
+    }
+
+
+    @Test
+    public void test243a() throws Exception {
+        JexlEngine jexl = new JexlBuilder().cache(32).create();
+        JexlScript script = jexl.createScript("while(true);");
+        try {
+            JexlExpression expr = jexl.createExpression("while(true);");
+            Assert.fail("should have failed!, expr do not allow 'while' statement");
+        } catch (JexlException.Parsing xparse) {
+            // ok
+        } catch (JexlException xother) {
+            // ok
+        }
     }
 }

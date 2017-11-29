@@ -115,6 +115,46 @@ public class IfTest extends JexlTestCase {
         Assert.assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
+    @Test
+    public void testIfElseIfExpression() throws Exception {
+        JexlScript e = JEXL.createScript("if (x == 1) { 10; } else if (x == 2) 20  else 30", "x");
+        Object o = e.execute(null, 1);
+        Assert.assertEquals(10, o);
+        o = e.execute(null, 2);
+        Assert.assertEquals(20, o);
+        o = e.execute(null, 4);
+        Assert.assertEquals(30, o);
+    }
+
+    @Test
+    public void testIfElseIfReturnExpression0() throws Exception {
+        JexlScript e = JEXL.createScript(
+                "if (x == 1) return 10; if (x == 2)  return 20; else if (x == 3) return 30  else { return 40 }",
+                "x");
+        Object o = e.execute(null, 1);
+        Assert.assertEquals(10, o);
+        o = e.execute(null, 2);
+        Assert.assertEquals(20, o);
+        o = e.execute(null, 3);
+        Assert.assertEquals(30, o);
+        o = e.execute(null, 4);
+        Assert.assertEquals(40, o);
+    }
+    @Test
+    public void testIfElseIfReturnExpression() throws Exception {
+        JexlScript e = JEXL.createScript(
+                "if (x == 1) return 10;  if (x == 2) return 20  else if (x == 3) return 30; else return 40;",
+                "x");
+        Object o = e.execute(null, 1);
+        Assert.assertEquals(10, o);
+        o = e.execute(null, 2);
+        Assert.assertEquals(20, o);
+        o = e.execute(null, 3);
+        Assert.assertEquals(30, o);
+        o = e.execute(null, 4);
+        Assert.assertEquals(40, o);
+    }
+
     /**
      * Test the if statement evaluates arithmetic expressions correctly
      *

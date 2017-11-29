@@ -21,12 +21,13 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlNode;
 
 /**
- * Helper methods for debug sessions.
+ * Helper methods for validate sessions.
  */
 public class Util {
     /**
@@ -45,16 +46,17 @@ public class Util {
         jdbg.parser.allowRegisters(true);
         Debugger dbg = new Debugger();
         // iterate over all expression in
-        Iterator<Map.Entry<String, ASTJexlScript>> inodes = jexl.cache.entries().iterator();
+        Iterator<Map.Entry<Source, ASTJexlScript>> inodes = jexl.cache.entries().iterator();
         while (inodes.hasNext()) {
-            Map.Entry<String, ASTJexlScript> entry = inodes.next();
+            Map.Entry<Source, ASTJexlScript> entry = inodes.next();
             JexlNode node = entry.getValue();
             // recreate expr string from AST
             dbg.debug(node);
             String expressiondbg = dbg.toString();
+            JexlFeatures features = entry.getKey().getFeatures();
             // recreate expr from string
             try {
-                Script exprdbg = jdbg.createScript(null, expressiondbg, null);
+                Script exprdbg = jdbg.createScript(features, null, expressiondbg, null);
                 // make arg cause become the root cause
                 JexlNode root = exprdbg.script;
                 while (root.jjtGetParent() != null) {
@@ -137,7 +139,7 @@ public class Util {
     }
 
     /**
-     * A helper class to help debug AST problems.
+     * A helper class to help validate AST problems.
      * @param e the script
      * @return an indented version of the AST
      */

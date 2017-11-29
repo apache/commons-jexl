@@ -50,6 +50,13 @@ public class Script implements JexlScript, JexlExpression {
     protected int version;
 
     /**
+     * @return the script AST
+     */
+    protected ASTJexlScript getScript() {
+        return script;
+    }
+
+    /**
      * Do not let this be generally instantiated with a 'new'.
      *
      * @param engine the interpreter to evaluate the expression
