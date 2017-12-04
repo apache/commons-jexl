@@ -1015,9 +1015,9 @@ public class Interpreter extends InterpreterBase {
         // pass first piece of data in and loop through children
         Object object = null;
         JexlNode objectNode;
+        JexlNode ptyNode = null;
         StringBuilder ant = null;
         boolean antish = !(parent instanceof ASTReference);
-        boolean pty = true;
         int v = 1;
         main:
         for (int c = 0; c < numChildren; c++) {
@@ -1060,7 +1060,7 @@ public class Interpreter extends InterpreterBase {
                             break;
                         }
                     } else {
-                        pty = false;
+                        ptyNode = objectNode;
                         break;
                     }
                 }
@@ -1075,7 +1075,9 @@ public class Interpreter extends InterpreterBase {
                 }
                 object = context.get(ant.toString());
             } else {
-                break;
+                // the last one may be null
+                ptyNode = c != numChildren - 1? objectNode : null;
+                break; //
             }
         }
         if (object == null && !isTernaryProtected(node)) {
@@ -1083,8 +1085,8 @@ public class Interpreter extends InterpreterBase {
                 boolean undefined = !(context.has(ant.toString()) || isLocalVariable(node, 0));
                 // variable unknown in context and not a local
                 return unsolvableVariable(node, ant.toString(), undefined);
-            } else if (!pty) {
-                return unsolvableProperty(node, "<null>.<?>", null);
+            } else if (ptyNode != null) {
+                return unsolvableProperty(node, ptyNode != null? ptyNode.toString() : "<null>.<?>", null);
             }
         }
         return object;

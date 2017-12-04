@@ -246,9 +246,7 @@ public class IssuesTest200 extends JexlTestCase {
     private static void handle(ExecutorService pool, final JexlScript script, final Map<String, Object> payload) {
        pool.submit(new Runnable() {
             @Override public void run() {
-                System.out.printf("START: %s\n", Thread.currentThread());
-                System.out.println(script.execute(new MapContext(payload)));
-                System.out.printf("STOP: %s\n", Thread.currentThread());
+                script.execute(new MapContext(payload));
             }
         });
     }
@@ -298,6 +296,51 @@ public class IssuesTest200 extends JexlTestCase {
             // ok
         } catch (JexlException xother) {
             // ok
+        }
+    }
+
+    public static class Foo245 {
+        private Object bar = null;
+
+        void setBar(Object bar) {
+            this.bar = bar;
+        }
+
+        public Object getBar() {
+            return bar;
+        }
+    }
+
+    @Test
+    public void test245() throws Exception {
+        MapContext ctx = new MapContext();
+        Foo245 foo245 = new Foo245();
+        ctx.set("foo", foo245);
+
+        JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
+        JexlExpression foobar = engine.createExpression("foo.bar");
+        JexlExpression foobaz = engine.createExpression("foo.baz");
+        JexlExpression foobarbaz = engine.createExpression("foo.bar.baz");
+        // add ambiguity with null & not-null
+        Object[] args = { null, 245 };
+        for(Object arg : args ){
+            foo245.setBar(arg);
+            // ok
+            Assert.assertEquals(foo245.getBar(), foobar.evaluate(ctx));
+            // fail level 1
+            try {
+                foobaz.evaluate(ctx);
+                Assert.fail("foo.baz is not solvable");
+            } catch(JexlException xp) {
+                Assert.assertTrue(xp instanceof JexlException.Property);
+            }
+            // fail level 2
+            try {
+                foobarbaz.evaluate(ctx);
+                Assert.fail("foo.bar.baz is not solvable");
+            } catch(JexlException xp) {
+                Assert.assertTrue(xp instanceof JexlException.Property);
+            }
         }
     }
 }
