@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-246" due-to="Dmitri Blinov">
+                Intermittent ambiguous method invocation when processing assignOverload
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-245" due-to="Ate Douma">
                 Engine in strict mode fails to fail on unsolvable variables or properties
             </action>

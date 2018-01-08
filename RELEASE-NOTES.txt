@@ -40,6 +40,7 @@ New Features in 3.2:
 Bugs Fixed in 3.2:
 ==================
 
+* JEXL-246:      Intermittent ambiguous method invocation when processing assignOverload
 * JEXL-245:      Engine in strict mode fails to fail on unsolvable variables or properties
 * JEXL-244:      Webapp classloader memory leaks
 * JEXL-241:      NPE when script containing string interpolation executed in multiple threads
