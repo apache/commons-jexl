@@ -636,8 +636,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             builder.append(") ");
             acceptStatement(node.jjtGetChild(c + 1), data);
         }
-        // else...
-        if (numChildren % 2 == 1) {
+        // else... (if odd)
+        if ((numChildren & 1) == 1) {
             builder.append(" else ");
             acceptStatement(node.jjtGetChild(numChildren - 1), data);
         } else {
