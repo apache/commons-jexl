@@ -16,7 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
-import java.text.NumberFormat;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,6 +28,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -264,8 +269,7 @@ public class IssuesTest200 extends JexlTestCase {
         m2.put("item", "B");
 
         handle(pool, script, m1);
-        System.out.println(script.execute(new MapContext(m2)));
-        System.out.println("Reached the end");
+        script.execute(new MapContext(m2));
         pool.shutdown();
     }
 
@@ -342,5 +346,72 @@ public class IssuesTest200 extends JexlTestCase {
                 Assert.assertTrue(xp instanceof JexlException.Property);
             }
         }
+    }
+
+    /**
+     * An arithmetic that implements 2 selfAdd methods.
+     */
+    public static class Arithmetic246 extends JexlArithmetic {
+        public Arithmetic246(boolean astrict) {
+            super(astrict);
+        }
+
+        public Collection<String> selfAdd(Collection<String> c, String item) {
+            c.add(item);
+            return c;
+        }
+
+        public Appendable selfAdd(Appendable c, String item) throws IOException {
+            c.append(item);
+            return c;
+        }
+    }
+
+    @Test
+    public void test246() throws Exception {
+        Log log246 = LogFactory.getLog(IssuesTest200.class);
+        // quiesce the logger
+        java.util.logging.Logger ll246 = java.util.logging.LogManager.getLogManager().getLogger(IssuesTest200.class.getName());
+        ll246.setLevel(Level.SEVERE);
+        JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic246(true)).debug(true).logger(log246).create();
+        JexlScript script = jexl.createScript("z += x", "x");
+        MapContext ctx = new MapContext();
+        List<String> z = new ArrayList<String>(1);
+        Object zz;
+
+        // no ambiguous, std case
+        ctx.set("z", z);
+        zz = script.execute(ctx, "42");
+        Assert.assertTrue(zz == z);
+        Assert.assertEquals(1, z.size());
+        z.clear();
+        ctx.clear();
+
+        // method discovery will fail due to ambiguity: first arg is null, no type, 2 potential methods
+        // create a cache-miss entry in method resolution
+        String expectNullOperand = null;
+        try {
+            script.execute(ctx, "42");
+            Assert.fail("null z evaluating 'z += x'");
+        } catch(JexlException xae) {
+            expectNullOperand = xae.toString();
+        }
+        Assert.assertNotNull(expectNullOperand);
+
+        // second call will not provoque ambiguity (since cache-miss is recalled) but operator will fail nevertheless
+        try {
+            // discovery will fail for null arg
+            script.execute(ctx, "42");
+            Assert.fail("null z evaluating 'z += x'");
+        } catch(JexlException xae) {
+            expectNullOperand = xae.toString();
+        }
+        Assert.assertNotNull(expectNullOperand);
+
+        // a non ambiguous call still succeeds
+        ctx.set("z", z);
+        zz = script.execute(ctx, "42");
+        Assert.assertTrue(zz == z);
+        Assert.assertEquals(1, z.size());
     }
 }
