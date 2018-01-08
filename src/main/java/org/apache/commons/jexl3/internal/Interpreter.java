@@ -577,9 +577,9 @@ public class Interpreter extends InterpreterBase {
                     return node.jjtGetChild(ifElse + 1).jjtAccept(this, null);
                 }
             }
-            //
-            if (numChildren % 2 == 1) {
-                // if there is an else, there are an odd number of childrenin the statement and it is the last child,
+            // if odd...
+            if ((numChildren & 1) == 1) {
+                // if there is an else, there are an odd number of children in the statement and it is the last child,
                 // execute it.
                 result = node.jjtGetChild(numChildren - 1).jjtAccept(this, null);
             }
@@ -1085,8 +1085,9 @@ public class Interpreter extends InterpreterBase {
                 boolean undefined = !(context.has(ant.toString()) || isLocalVariable(node, 0));
                 // variable unknown in context and not a local
                 return unsolvableVariable(node, ant.toString(), undefined);
-            } else if (ptyNode != null) {
-                return unsolvableProperty(node, ptyNode != null? ptyNode.toString() : "<null>.<?>", null);
+            }
+            if (ptyNode != null) {
+                return unsolvableProperty(node, ptyNode.toString(), null);
             }
         }
         return object;

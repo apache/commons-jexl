@@ -136,7 +136,7 @@ public class SoftCache<K, V> {
             final Set<Map.Entry<K, V>> set = map.entrySet();
             final List<Map.Entry<K, V>> entries = new ArrayList<Map.Entry<K, V>>(set.size());
             for (Map.Entry<K, V> e : set) {
-                entries.add(new SoftCacheEntry(e));
+                entries.add(new SoftCacheEntry<K, V>(e));
             }
             return entries;
         } finally {
@@ -161,7 +161,7 @@ public class SoftCache<K, V> {
 
             @Override
             protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-                return size() > cacheSize;
+                return super.size() > cacheSize;
             }
         };
     }
