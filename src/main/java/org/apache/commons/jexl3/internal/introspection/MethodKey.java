@@ -529,10 +529,11 @@ public final class MethodKey {
         /**
          * Creates an ambiguous exception.
          * <p>
-         * This computes the severity of the ambiguity. The only <em>non-severe</em> case is when there is
-         * at least one null argument and at most one applicable have a corresponding 'Object' parameter.
+         * This method computes the severity of the ambiguity. The only <em>non-severe</em> case is when there is
+         * at least one null argument and at most one applicable method or constructor has a corresponding 'Object'
+         * parameter.
          * We thus consider that ambiguity is benign in presence of null arguments but in the case where
-         * the 'catch all' type Object is applicable more than once.
+         * the corresponding parameter is of type Object in more than one applicable overloads.
          * <p>
          * Rephrasing:
          * <ul>
