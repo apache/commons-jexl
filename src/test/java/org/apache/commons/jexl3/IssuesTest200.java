@@ -356,14 +356,14 @@ public class IssuesTest200 extends JexlTestCase {
             super(astrict);
         }
 
-        public Collection<String> selfAdd(Collection<String> c, String item) {
+        public JexlOperator selfAdd(Collection<String> c, String item) {
             c.add(item);
-            return c;
+            return JexlOperator.ASSIGN;
         }
 
-        public Appendable selfAdd(Appendable c, String item) throws IOException {
+        public JexlOperator selfAdd(Appendable c, String item) throws IOException {
             c.append(item);
-            return c;
+            return JexlOperator.ASSIGN;
         }
     }
 
@@ -372,7 +372,7 @@ public class IssuesTest200 extends JexlTestCase {
         Log log246 = LogFactory.getLog(IssuesTest200.class);
         // quiesce the logger
         java.util.logging.Logger ll246 = java.util.logging.LogManager.getLogManager().getLogger(IssuesTest200.class.getName());
-        ll246.setLevel(Level.SEVERE);
+        ll246.setLevel(Level.INFO);
         JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic246(true)).debug(true).logger(log246).create();
         JexlScript script = jexl.createScript("z += x", "x");
         MapContext ctx = new MapContext();

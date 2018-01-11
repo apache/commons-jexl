@@ -20,9 +20,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,38 +47,7 @@ import java.util.Map;
  */
 public final class MethodKey {
     /** The initial size of the primitive conversion map. */
-    private static final int PRIMITIVE_SIZE = 13;
-    /** The primitive type to class conversion map. */
-    private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES;
-
-    static {
-        PRIMITIVE_TYPES = new HashMap<Class<?>, Class<?>>(PRIMITIVE_SIZE);
-        PRIMITIVE_TYPES.put(Boolean.TYPE, Boolean.class);
-        PRIMITIVE_TYPES.put(Byte.TYPE, Byte.class);
-        PRIMITIVE_TYPES.put(Character.TYPE, Character.class);
-        PRIMITIVE_TYPES.put(Double.TYPE, Double.class);
-        PRIMITIVE_TYPES.put(Float.TYPE, Float.class);
-        PRIMITIVE_TYPES.put(Integer.TYPE, Integer.class);
-        PRIMITIVE_TYPES.put(Long.TYPE, Long.class);
-        PRIMITIVE_TYPES.put(Short.TYPE, Short.class);
-    }
-
-    /** Converts a primitive type to its corresponding class.
-     * <p>
-     * If the argument type is primitive then we want to convert our
-     * primitive type signature to the corresponding Object type so
-     * introspection for methods with primitive types will work
-     * correctly.
-     * </p>
-     * @param parm a may-be primitive type class
-     * @return the equivalent object class
-     */
-    static Class<?> primitiveClass(Class<?> parm) {
-        // it is marginally faster to get from the map than call isPrimitive...
-        //if (!parm.isPrimitive()) return parm;
-        Class<?> prim = PRIMITIVE_TYPES.get(parm);
-        return prim == null ? parm : prim;
-    }
+    private static final int PRIMITIVE_SIZE = 11;
     /** The hash code. */
     private final int hashCode;
     /** The method name. */
@@ -258,7 +228,7 @@ public final class MethodKey {
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
     public Method getMostSpecificMethod(Method[] methods) {
-        return METHODS.getMostSpecific(methods, params);
+        return METHODS.getMostSpecific(this, methods);
     }
 
     /**
@@ -268,7 +238,7 @@ public final class MethodKey {
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
     public Constructor<?> getMostSpecificConstructor(Constructor<?>[] methods) {
-        return CONSTRUCTORS.getMostSpecific(methods, params);
+        return CONSTRUCTORS.getMostSpecific(this, methods);
     }
 
     /**
@@ -292,69 +262,7 @@ public final class MethodKey {
      *         the formal type.
      */
     public static boolean isInvocationConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
-        /* if it's a null, it means the arg was null */
-        if (actual == null && !formal.isPrimitive()) {
-            return true;
-        }
-
-        /* Check for identity or widening reference conversion */
-        if (actual != null && formal.isAssignableFrom(actual)) {
-            return true;
-        }
-
-        /** Catch all... */
-        if (formal == Object.class) {
-            return true;
-        }
-
-        /* Check for boxing with widening primitive conversion. Note that
-         * actual parameters are never primitives. */
-        if (formal.isPrimitive()) {
-            if (formal == Boolean.TYPE && actual == Boolean.class) {
-                return true;
-            }
-            if (formal == Character.TYPE && actual == Character.class) {
-                return true;
-            }
-            if (formal == Byte.TYPE && actual == Byte.class) {
-                return true;
-            }
-            if (formal == Short.TYPE
-                    && (actual == Short.class || actual == Byte.class)) {
-                return true;
-            }
-            if (formal == Integer.TYPE
-                    && (actual == Integer.class || actual == Short.class
-                    || actual == Byte.class)) {
-                return true;
-            }
-            if (formal == Long.TYPE
-                    && (actual == Long.class || actual == Integer.class
-                    || actual == Short.class || actual == Byte.class)) {
-                return true;
-            }
-            if (formal == Float.TYPE
-                    && (actual == Float.class || actual == Long.class
-                    || actual == Integer.class || actual == Short.class
-                    || actual == Byte.class)) {
-                return true;
-            }
-            if (formal == Double.TYPE
-                    && (actual == Double.class || actual == Float.class
-                    || actual == Long.class || actual == Integer.class
-                    || actual == Short.class || actual == Byte.class)) {
-                return true;
-            }
-        }
-
-        /* Check for vararg conversion. */
-        if (possibleVarArg && formal.isArray()) {
-            if (actual != null && actual.isArray()) {
-                actual = actual.getComponentType();
-            }
-            return isInvocationConvertible(formal.getComponentType(), actual, false);
-        }
-        return false;
+        return isInvocationConvertible(formal, actual, false, possibleVarArg);
     }
 
     /**
@@ -374,52 +282,110 @@ public final class MethodKey {
      *         subject to widening conversion to formal.
      */
     public static boolean isStrictInvocationConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
-        /* we shouldn't get a null into, but if so */
+        return isInvocationConvertible(formal, actual, true, possibleVarArg);
+    }
+
+    /** Converts a primitive type to its corresponding class.
+     * <p>
+     * If the argument type is primitive then we want to convert our
+     * primitive type signature to the corresponding Object type so
+     * introspection for methods with primitive types will work
+     * correctly.
+     * </p>
+     * @param parm a may-be primitive type class
+     * @return the equivalent object class
+     */
+    static Class<?> primitiveClass(Class<?> parm) {
+        // it was marginally faster to get from the map than call isPrimitive...
+        //if (!parm.isPrimitive()) return parm;
+        List<Class<?>> prim = CONVERTIBLES.get(parm);
+        return prim == null ? parm : prim.get(0);
+    }
+
+    /**
+     * Maps from primitive types to invocation compatible classes.
+     * <p>Considering the key as a parameter type, the value is the list of argument classes that are invocation
+     * compatible with the parameter. Example is Long is invocation convertible to long.
+     */
+    private static final Map<Class<?>, List<Class<?>>> CONVERTIBLES;
+    static {
+        CONVERTIBLES = new IdentityHashMap<Class<?>, List<Class<?>>>(PRIMITIVE_SIZE);
+        CONVERTIBLES.put(Boolean.TYPE,
+                Arrays.<Class<?>>asList(Boolean.class));
+        CONVERTIBLES.put(Character.TYPE,
+                Arrays.<Class<?>>asList(Character.class));
+        CONVERTIBLES.put(Byte.TYPE,
+                Arrays.<Class<?>>asList(Byte.class));
+        CONVERTIBLES.put(Short.TYPE,
+                Arrays.<Class<?>>asList(Short.class, Byte.class));
+        CONVERTIBLES.put(Integer.TYPE,
+                Arrays.<Class<?>>asList(Integer.class, Short.class, Byte.class));
+        CONVERTIBLES.put(Long.TYPE,
+                Arrays.<Class<?>>asList(Long.class, Integer.class, Short.class, Byte.class));
+        CONVERTIBLES.put(Float.TYPE,
+                Arrays.<Class<?>>asList(Float.class, Long.class, Integer.class, Short.class, Byte.class));
+        CONVERTIBLES.put(Double.TYPE,
+            Arrays.<Class<?>>asList(Double.class, Float.class, Long.class, Integer.class, Short.class, Byte.class));
+    }
+
+    /**
+     * Maps from primitive types to invocation compatible primitive types.
+     * <p>Considering the key as a parameter type, the value is the list of argument types that are invocation
+     * compatible with the parameter. Example is 'int' is invocation convertible to 'long'.
+     */
+    private static final Map<Class<?>, List<Class<?>>> STRICT_CONVERTIBLES;
+    static {
+        STRICT_CONVERTIBLES = new IdentityHashMap<Class<?>, List<Class<?>>>(PRIMITIVE_SIZE);
+        STRICT_CONVERTIBLES.put(Short.TYPE,
+                Arrays.<Class<?>>asList(Byte.TYPE));
+        STRICT_CONVERTIBLES.put(Integer.TYPE,
+                Arrays.<Class<?>>asList(Short.TYPE, Byte.TYPE));
+        STRICT_CONVERTIBLES.put(Long.TYPE,
+                Arrays.<Class<?>>asList(Integer.TYPE, Short.TYPE, Byte.TYPE));
+        STRICT_CONVERTIBLES.put(Float.TYPE,
+                Arrays.<Class<?>>asList(Long.TYPE, Integer.TYPE, Short.TYPE, Byte.TYPE));
+        STRICT_CONVERTIBLES.put(Double.TYPE,
+                Arrays.<Class<?>>asList(Float.TYPE, Long.TYPE, Integer.TYPE, Short.TYPE, Byte.TYPE));
+    }
+
+    /**
+     * Determines parameter-argument invocation compatibility.
+     *
+     * @param formal         the formal parameter type
+     * @param actual         the argument type
+     * @param strict         whether the check is strict or not
+     * @param possibleVarArg whether or not we're dealing with the last parameter in the method declaration
+     * @return true if compatible, false otherwise
+     */
+    private static boolean isInvocationConvertible(
+            Class<?> formal, Class<?> actual, boolean strict, boolean possibleVarArg) {
+        /* if it's a null, it means the arg was null */
         if (actual == null && !formal.isPrimitive()) {
             return true;
         }
-
-        /* Check for identity or widening reference conversion */
-        if (formal.isAssignableFrom(actual) && (actual != null && formal.isArray() == actual.isArray())) {
+        /* system asssignable, both sides must be array or not */
+        if (formal.isAssignableFrom(actual) && (actual != null && actual.isArray() == formal.isArray())) {
             return true;
         }
-
-        /* Check for widening primitive conversion. */
-        if (formal.isPrimitive()) {
-            if (formal == Short.TYPE && (actual == Byte.TYPE)) {
-                return true;
-            }
-            if (formal == Integer.TYPE
-                    && (actual == Short.TYPE || actual == Byte.TYPE)) {
-                return true;
-            }
-            if (formal == Long.TYPE
-                    && (actual == Integer.TYPE || actual == Short.TYPE
-                    || actual == Byte.TYPE)) {
-                return true;
-            }
-            if (formal == Float.TYPE
-                    && (actual == Long.TYPE || actual == Integer.TYPE
-                    || actual == Short.TYPE || actual == Byte.TYPE)) {
-                return true;
-            }
-            if (formal == Double.TYPE
-                    && (actual == Float.TYPE || actual == Long.TYPE
-                    || actual == Integer.TYPE || actual == Short.TYPE
-                    || actual == Byte.TYPE)) {
-                return true;
-            }
+        /** catch all... */
+        if (!strict && formal == Object.class) {
+            return true;
         }
-
+        /* Primitive conversion check. */
+        if (formal.isPrimitive()) {
+            List<Class<?>> clist = strict ? STRICT_CONVERTIBLES.get(formal) : CONVERTIBLES.get(formal);
+            return clist.contains(actual);
+        }
         /* Check for vararg conversion. */
         if (possibleVarArg && formal.isArray()) {
             if (actual != null && actual.isArray()) {
                 actual = actual.getComponentType();
             }
-            return isStrictInvocationConvertible(formal.getComponentType(), actual, false);
+            return isInvocationConvertible(formal.getComponentType(), actual, strict, false);
         }
         return false;
     }
+
     /**
      * whether a method/ctor is more specific than a previously compared one.
      */
@@ -439,10 +405,28 @@ public final class MethodKey {
      * by the introspector.
      */
     public static class AmbiguousException extends RuntimeException {
+        /** Version Id for serializable. */
+        private static final long serialVersionUID = -201801091655L;
+        /** Whether this exception should be considered severe. */
+        private final boolean severe;
+
         /**
-         * Version Id for serializable.
+         * A severe or not ambiguous exception.
+         * @param flag logging flag
          */
-        private static final long serialVersionUID = -2314636505414551664L;
+        AmbiguousException(boolean flag) {
+            this.severe = flag;
+        }
+
+        /**
+         * Whether this exception is considered severe or benign.
+         * <p>Note that this is meant in the context of an ambiguous exception; benign cases can only be triggered
+         * by null arguments often related to runtime problems (not simply on overload signatures).
+         * @return true if severe, false if benign.
+         */
+        public boolean isSevere() {
+            return severe;
+        }
     }
 
     /**
@@ -479,14 +463,14 @@ public final class MethodKey {
          * like this is needed.
          * </p>
          *
-         * @param methods a list of methods.
-         * @param classes list of argument types.
+         * @param key a method key, esp its parameters
+         * @param methods a list of methods
          * @return the most specific method.
          * @throws MethodKey.AmbiguousException if there is more than one.
          */
-        private T getMostSpecific(T[] methods, Class<?>[] classes) {
+        private T getMostSpecific(MethodKey key, T[] methods) {
+            final Class<?>[] classes = key.params;
             LinkedList<T> applicables = getApplicables(methods, classes);
-
             if (applicables.isEmpty()) {
                 return null;
             }
@@ -535,12 +519,56 @@ public final class MethodKey {
                     maximals.addLast(app);
                 }
             }
+            // if we have more than one maximally specific method, this call is ambiguous...
             if (maximals.size() > 1) {
-                // We have more than one maximally specific method
-                throw new AmbiguousException();
+                throw ambiguousException(classes, applicables);
             }
             return maximals.getFirst();
         } // CSON: RedundantThrows
+
+        /**
+         * Creates an ambiguous exception.
+         * <p>
+         * This computes the severity of the ambiguity. The only <em>non-severe</em> case is when there is
+         * at least one null argument and at most one applicable have a corresponding 'Object' parameter.
+         * We thus consider that ambiguity is benign in presence of null arguments but in the case where
+         * the 'catch all' type Object is applicable more than once.
+         * <p>
+         * Rephrasing:
+         * <ul>
+         *  <li>If all arguments are valid instances - no null argument -, ambiguity is severe.</li>
+         *  <li>If there is at least one null argument, the ambiguity is severe if more than one method has a
+         *  corresponding parameter of class 'Object'.</li>
+         * </ul>
+         *
+         * @param classes the argument classes
+         * @param applicables the list of applicable methods or constructors
+         * @return an ambiguous exception
+         */
+        private AmbiguousException ambiguousException (Class<?>[] classes, List<T> applicables) {
+            boolean severe = false;
+            int instanceArgCount = 0; // count the number of valid instances, aka not null
+            for(int c = 0; c < classes.length; ++c) {
+                Class<?> argClazz = classes[c];
+                if (Void.class.equals(argClazz)) {
+                    // count the number of methods for which the current arg maps to an Object parameter
+                    int objectParmCount = 0;
+                    for (T app : applicables) {
+                        Class<?>[] parmClasses = getParameterTypes(app);
+                        Class<?> parmClass =  parmClasses[c];
+                        if (Object.class.equals(parmClass)) {
+                            if (objectParmCount++ == 2) {
+                                severe = true;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    instanceArgCount += 1;
+                }
+            }
+            return new AmbiguousException(severe || instanceArgCount == classes.length);
+        }
 
         /**
          * Determines which method signature (represented by a class array) is more
@@ -601,7 +629,8 @@ public final class MethodKey {
             }
             if (primDiff > 0) {
                 return MORE_SPECIFIC;
-            } else if (primDiff < 0) {
+            }
+            if (primDiff < 0) {
                 return LESS_SPECIFIC;
             }
             /*
@@ -750,6 +779,7 @@ public final class MethodKey {
             return isStrictInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
         }
     }
+
     /**
      * The parameter matching service for methods.
      */
@@ -763,7 +793,9 @@ public final class MethodKey {
         public boolean isVarArgs(Method app) {
             return MethodKey.isVarArgs(app);
         }
+
     };
+
     /**
      * The parameter matching service for constructors.
      */
@@ -777,5 +809,6 @@ public final class MethodKey {
         public boolean isVarArgs(Constructor<?> app) {
             return app.isVarArgs();
         }
+
     };
 }

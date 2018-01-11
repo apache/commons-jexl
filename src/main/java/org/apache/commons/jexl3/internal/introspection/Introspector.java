@@ -145,8 +145,8 @@ public final class Introspector {
         try {
             return getMap(c).getMethod(key);
         } catch (MethodKey.AmbiguousException xambiguous) {
-            // whoops.  Ambiguous.  Make a nice log message and return null...
-            if (rlog != null && rlog.isInfoEnabled()) {
+            // whoops. Ambiguous and not benign. Make a nice log message and return null...
+            if (rlog != null && xambiguous.isSevere() && rlog.isInfoEnabled()) {
                 rlog.info("ambiguous method invocation: "
                         + c.getName() + "."
                         + key.debugString(), xambiguous);
