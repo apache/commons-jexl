@@ -25,7 +25,6 @@ import java.util.TreeSet;
  * A set of language feature options.
  * These control <em>syntactical</em> constructs that will throw JexlException.Feature exceptions (a
  * subclass of JexlException.Parsing) when disabled.
- * <p>
  * <ul>
  * <li>Registers: register syntax (#number), used internally for {g,s}etProperty
  * <li>Reserved Names: a set of reserved variable names that can not be used as local variable (or parameter) names
@@ -34,7 +33,7 @@ import java.util.TreeSet;
  * <li>Constant Array Reference: ensures array references only use constants;they should be statically solvable.
  * <li>New Instance: creating an instance using new(...)
  * <li>Loops: loop constructs (while(true), for(...))
- * <li>Lambda: function definitions (()->{...}, function(...) ).
+ * <li>Lambda: function definitions (()-&gt;{...}, function(...) ).
  * <li>Method calls: calling methods (obj.method(...) or obj['method'](...)); when disabled, leaves function calls
  * - including namespace prefixes - available
  * <li>Structured literals: arrays, lists, maps, sets, ranges
@@ -387,7 +386,7 @@ public final class JexlFeatures {
     /**
      * Sets whether lambda/function constructs are enabled.
      * <p>
-     * When disabled, parsing a script/expression using syntactic lambda constructs (->,function)
+     * When disabled, parsing a script/expression using syntactic lambda constructs (-&gt;,function)
      * will throw a parsing exception.
      * @param flag true to enable, false to disable
      * @return this features instance
