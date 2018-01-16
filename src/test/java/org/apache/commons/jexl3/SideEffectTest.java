@@ -16,9 +16,17 @@
  */
 package org.apache.commons.jexl3;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
+import java.util.logging.Level;
 import org.apache.commons.jexl3.junit.Asserter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -515,5 +523,94 @@ public class SideEffectTest extends JexlTestCase {
             lhs.value ^= rhs.value;
             return JexlOperator.ASSIGN;
         }
+    }
+
+    /**
+     * An arithmetic that implements 2 selfAdd methods.
+     */
+    public static class Arithmetic246 extends JexlArithmetic {
+        public Arithmetic246(boolean astrict) {
+            super(astrict);
+        }
+
+        public JexlOperator selfAdd(Collection<String> c, String item) throws IOException {
+            c.add(item);
+            return JexlOperator.ASSIGN;
+        }
+
+        public JexlOperator selfAdd(Appendable c, String item) throws IOException {
+            c.append(item);
+            return JexlOperator.ASSIGN;
+        }
+    }
+
+   public static class Arithmetic246b extends Arithmetic246 {
+        public Arithmetic246b(boolean astrict) {
+            super(astrict);
+        }
+
+        public Object selfAdd(Object c, String item) throws IOException {
+            if (c == null) {
+                return new ArrayList<String>(Arrays.asList(item));
+            }
+            if (c instanceof Appendable) {
+                ((Appendable) c).append(item);
+                return JexlOperator.ASSIGN;
+            }
+            return JexlEngine.TRY_FAILED;
+        }
+    }
+
+    @Test
+    public void test246() throws Exception {
+        run246(new Arithmetic246(true));
+    }
+
+    @Test
+    public void test246b() throws Exception {
+        run246(new Arithmetic246b(true));
+    }
+
+    private void run246(JexlArithmetic j246) throws Exception {
+        Log log246 = LogFactory.getLog(SideEffectTest.class);
+        // quiesce the logger
+        java.util.logging.Logger ll246 = java.util.logging.LogManager.getLogManager().getLogger(SideEffectTest.class.getName());
+       // ll246.setLevel(Level.WARNING);
+        JexlEngine jexl = new JexlBuilder().arithmetic(j246).cache(32).debug(true).logger(log246).create();
+        JexlScript script = jexl.createScript("z += x", "x");
+        MapContext ctx = new MapContext();
+        List<String> z = new ArrayList<String>(1);
+        Object zz = null;
+
+        // no ambiguous, std case
+        ctx.set("z", z);
+        zz = script.execute(ctx, "42");
+        Assert.assertTrue(zz == z);
+        Assert.assertEquals(1, z.size());
+        z.clear();
+        ctx.clear();
+
+        boolean t246 = false;
+        // call with null
+        try {
+            script.execute(ctx, "42");
+            zz = ctx.get("z");
+            Assert.assertTrue(zz instanceof List<?>);
+            z = (List<String>) zz;
+            Assert.assertEquals(1, z.size());
+        } catch(JexlException xjexl) {
+            t246 = true;
+            Assert.assertTrue(j246.getClass().equals(Arithmetic246.class));
+        } catch(ArithmeticException xjexl) {
+            t246 = true;
+            Assert.assertTrue(j246.getClass().equals(Arithmetic246.class));
+        }
+        ctx.clear();
+
+        // a non ambiguous call still succeeds
+        ctx.set("z", z);
+        zz = script.execute(ctx, "-42");
+        Assert.assertTrue(zz == z);
+        Assert.assertEquals(t246? 1 : 2, z.size());
     }
 }

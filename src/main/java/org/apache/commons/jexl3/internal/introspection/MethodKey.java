@@ -20,7 +20,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -298,34 +298,43 @@ public final class MethodKey {
     static Class<?> primitiveClass(Class<?> parm) {
         // it was marginally faster to get from the map than call isPrimitive...
         //if (!parm.isPrimitive()) return parm;
-        List<Class<?>> prim = CONVERTIBLES.get(parm);
-        return prim == null ? parm : prim.get(0);
+        Class<?>[] prim = CONVERTIBLES.get(parm);
+        return prim == null ? parm : prim[0];
+    }
+
+    /**
+     * Helper to build class arrays.
+     * @param args the classes
+     * @return the array
+     */
+    private static Class<?>[] asArray(Class<?>... args) {
+        return args;
     }
 
     /**
      * Maps from primitive types to invocation compatible classes.
      * <p>Considering the key as a parameter type, the value is the list of argument classes that are invocation
-     * compatible with the parameter. Example is Long is invocation convertible to long.
+     *   compatible with the parameter. Example is Long is invocation convertible to long.
      */
-    private static final Map<Class<?>, List<Class<?>>> CONVERTIBLES;
+    private static final Map<Class<?>, Class<?>[]> CONVERTIBLES;
     static {
-        CONVERTIBLES = new IdentityHashMap<Class<?>, List<Class<?>>>(PRIMITIVE_SIZE);
+        CONVERTIBLES = new HashMap<Class<?>, Class<?>[]>(PRIMITIVE_SIZE);
         CONVERTIBLES.put(Boolean.TYPE,
-                Arrays.<Class<?>>asList(Boolean.class));
+                asArray(Boolean.class));
         CONVERTIBLES.put(Character.TYPE,
-                Arrays.<Class<?>>asList(Character.class));
+                asArray(Character.class));
         CONVERTIBLES.put(Byte.TYPE,
-                Arrays.<Class<?>>asList(Byte.class));
+                asArray(Byte.class));
         CONVERTIBLES.put(Short.TYPE,
-                Arrays.<Class<?>>asList(Short.class, Byte.class));
+                asArray(Short.class, Byte.class));
         CONVERTIBLES.put(Integer.TYPE,
-                Arrays.<Class<?>>asList(Integer.class, Short.class, Byte.class));
+                asArray(Integer.class, Short.class, Byte.class));
         CONVERTIBLES.put(Long.TYPE,
-                Arrays.<Class<?>>asList(Long.class, Integer.class, Short.class, Byte.class));
+                asArray(Long.class, Integer.class, Short.class, Byte.class));
         CONVERTIBLES.put(Float.TYPE,
-                Arrays.<Class<?>>asList(Float.class, Long.class, Integer.class, Short.class, Byte.class));
+                asArray(Float.class, Long.class, Integer.class, Short.class, Byte.class));
         CONVERTIBLES.put(Double.TYPE,
-            Arrays.<Class<?>>asList(Double.class, Float.class, Long.class, Integer.class, Short.class, Byte.class));
+            asArray(Double.class, Float.class, Long.class, Integer.class, Short.class, Byte.class));
     }
 
     /**
@@ -333,19 +342,19 @@ public final class MethodKey {
      * <p>Considering the key as a parameter type, the value is the list of argument types that are invocation
      * compatible with the parameter. Example is 'int' is invocation convertible to 'long'.
      */
-    private static final Map<Class<?>, List<Class<?>>> STRICT_CONVERTIBLES;
+    private static final Map<Class<?>, Class<?>[]> STRICT_CONVERTIBLES;
     static {
-        STRICT_CONVERTIBLES = new IdentityHashMap<Class<?>, List<Class<?>>>(PRIMITIVE_SIZE);
+        STRICT_CONVERTIBLES = new HashMap<Class<?>, Class<?>[]>(PRIMITIVE_SIZE);
         STRICT_CONVERTIBLES.put(Short.TYPE,
-                Arrays.<Class<?>>asList(Byte.TYPE));
+                asArray(Byte.TYPE));
         STRICT_CONVERTIBLES.put(Integer.TYPE,
-                Arrays.<Class<?>>asList(Short.TYPE, Byte.TYPE));
+                asArray(Short.TYPE, Byte.TYPE));
         STRICT_CONVERTIBLES.put(Long.TYPE,
-                Arrays.<Class<?>>asList(Integer.TYPE, Short.TYPE, Byte.TYPE));
+                asArray(Integer.TYPE, Short.TYPE, Byte.TYPE));
         STRICT_CONVERTIBLES.put(Float.TYPE,
-                Arrays.<Class<?>>asList(Long.TYPE, Integer.TYPE, Short.TYPE, Byte.TYPE));
+                asArray(Long.TYPE, Integer.TYPE, Short.TYPE, Byte.TYPE));
         STRICT_CONVERTIBLES.put(Double.TYPE,
-                Arrays.<Class<?>>asList(Float.TYPE, Long.TYPE, Integer.TYPE, Short.TYPE, Byte.TYPE));
+                asArray(Float.TYPE, Long.TYPE, Integer.TYPE, Short.TYPE, Byte.TYPE));
     }
 
     /**
@@ -373,8 +382,13 @@ public final class MethodKey {
         }
         /* Primitive conversion check. */
         if (formal.isPrimitive()) {
-            List<Class<?>> clist = strict ? STRICT_CONVERTIBLES.get(formal) : CONVERTIBLES.get(formal);
-            return clist.contains(actual);
+            Class<?>[] clist = strict ? STRICT_CONVERTIBLES.get(formal) : CONVERTIBLES.get(formal);
+            for(int c = 0; c < clist.length; ++c) {
+                if (actual == clist[c]) {
+                    return true;
+                }
+            }
+            return false;
         }
         /* Check for vararg conversion. */
         if (possibleVarArg && formal.isArray()) {
@@ -469,8 +483,8 @@ public final class MethodKey {
          * @throws MethodKey.AmbiguousException if there is more than one.
          */
         private T getMostSpecific(MethodKey key, T[] methods) {
-            final Class<?>[] classes = key.params;
-            LinkedList<T> applicables = getApplicables(methods, classes);
+            final Class<?>[] args = key.params;
+            LinkedList<T> applicables = getApplicables(methods, args);
             if (applicables.isEmpty()) {
                 return null;
             }
@@ -486,12 +500,12 @@ public final class MethodKey {
              */
             LinkedList<T> maximals = new LinkedList<T>();
             for (T app : applicables) {
-                Class<?>[] appArgs = getParameterTypes(app);
+                final Class<?>[] parms = getParameterTypes(app);
                 boolean lessSpecific = false;
                 Iterator<T> maximal = maximals.iterator();
                 while(!lessSpecific && maximal.hasNext()) {
                     T max = maximal.next();
-                    switch (moreSpecific(appArgs, getParameterTypes(max))) {
+                    switch (moreSpecific(args, parms, getParameterTypes(max))) {
                         case MORE_SPECIFIC:
                             /*
                             * This method is more specific than the previously
@@ -521,7 +535,7 @@ public final class MethodKey {
             }
             // if we have more than one maximally specific method, this call is ambiguous...
             if (maximals.size() > 1) {
-                throw ambiguousException(classes, applicables);
+                throw ambiguousException(args, applicables);
             }
             return maximals.getFirst();
         } // CSON: RedundantThrows
@@ -542,7 +556,7 @@ public final class MethodKey {
          *  corresponding parameter of class 'Object'.</li>
          * </ul>
          *
-         * @param classes the argument classes
+         * @param classes the argument args
          * @param applicables the list of applicable methods or constructors
          * @return an ambiguous exception
          */
@@ -575,12 +589,13 @@ public final class MethodKey {
          * Determines which method signature (represented by a class array) is more
          * specific. This defines a partial ordering on the method signatures.
          *
-         * @param c1 first signature to compare
-         * @param c2 second signature to compare
+         * @param a the arguments signature
+         * @param c1 first method signature to compare
+         * @param c2 second method signature to compare
          * @return MORE_SPECIFIC if c1 is more specific than c2, LESS_SPECIFIC if
          *         c1 is less specific than c2, INCOMPARABLE if they are incomparable.
          */
-        private int moreSpecific(Class<?>[] c1, Class<?>[] c2) {
+         private int moreSpecific(final Class<?>[] a, final Class<?>[] c1, final Class<?>[] c2) {
             boolean c1MoreSpecific = false;
             boolean c2MoreSpecific = false;
 
@@ -601,6 +616,16 @@ public final class MethodKey {
             for (int i = 0; i < length; ++i) {
                 if (c1[i] != c2[i]) {
                     boolean last = (i == ultimate);
+                    if (a[i] == Void.class) {
+                        if (c1[i] == Object.class && c2[i] != Object.class) {
+                            c1MoreSpecific = true;
+                            continue;
+                        }
+                        if (c1[i] != Object.class && c2[i] == Object.class) {
+                            c2MoreSpecific = true;
+                            continue;
+                        }
+                    }
                     c1MoreSpecific = c1MoreSpecific || isStrictConvertible(c2[i], c1[i], last);
                     c2MoreSpecific = c2MoreSpecific || isStrictConvertible(c1[i], c2[i], last);
                 }
