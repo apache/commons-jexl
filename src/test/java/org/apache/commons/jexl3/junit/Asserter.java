@@ -16,11 +16,11 @@
  */
 package org.apache.commons.jexl3.junit;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
 
 import org.apache.commons.jexl3.JexlEvalContext;
 import org.apache.commons.jexl3.JexlArithmetic;
@@ -28,6 +28,8 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
+import org.junit.Assert;
+import static org.junit.Assert.fail;
 
 /**
  * A utility class for performing JUnit based assertions using Jexl
@@ -99,16 +101,26 @@ public class Asserter extends Assert {
         Object value = exp.execute(context);
         if (expected instanceof BigDecimal) {
             JexlArithmetic jexla = engine.getArithmetic();
-            assertTrue("expression: " + expression, ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)) == 0);
+            Assert.assertTrue("expression: " + expression, ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)) == 0);
         }
         if (expected != null && value != null) {
-            assertEquals("expression: " + expression + ", "
-                    + expected.getClass().getSimpleName()
-                    + " ?= "
-                    + value.getClass().getSimpleName(),
-                    expected, value);
+            if (expected.getClass().isArray() && value.getClass().isArray()) {
+                int esz = Array.getLength(expected);
+                int vsz = Array.getLength(value);
+                String report = "expression: " + expression;
+                Assert.assertEquals(report + ", array size", esz, vsz);
+                for (int i = 0; i < vsz; ++i) {
+                    Assert.assertEquals(report + ", value@[]" + i, Array.get(expected, i), Array.get(value, i));
+                }
+            } else {
+                Assert.assertEquals("expression: " + expression + ", "
+                        + expected.getClass().getSimpleName()
+                        + " ?= "
+                        + value.getClass().getSimpleName(),
+                        expected, value);
+            }
         } else {
-            assertEquals("expression: " + expression, expected, value);
+            Assert.assertEquals("expression: " + expression, expected, value);
         }
     }
 
