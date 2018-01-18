@@ -25,9 +25,10 @@ import java.util.Map;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class JexlScriptEngineTest extends TestCase {
+public class JexlScriptEngineTest {
     private static final List<String> NAMES = Arrays.asList("JEXL", "Jexl", "jexl",
                                                             "JEXL2", "Jexl2", "jexl2",
                                                             "JEXL3", "Jexl3", "jexl3");
@@ -38,87 +39,91 @@ public class JexlScriptEngineTest extends TestCase {
 
     public void testScriptEngineFactory() throws Exception {
         JexlScriptEngineFactory factory = new JexlScriptEngineFactory();
-        assertEquals("JEXL Engine", factory.getParameter(ScriptEngine.ENGINE));
-        assertEquals("3.2", factory.getParameter(ScriptEngine.ENGINE_VERSION));
-        assertEquals("JEXL", factory.getParameter(ScriptEngine.LANGUAGE));
-        assertEquals("3.2", factory.getParameter(ScriptEngine.LANGUAGE_VERSION));
-        assertNull(factory.getParameter("THREADING"));
-        assertEquals(NAMES, factory.getParameter(ScriptEngine.NAME));
-        assertEquals(EXTENSIONS, factory.getExtensions());
-        assertEquals(MIMES, factory.getMimeTypes());
+        Assert.assertEquals("JEXL Engine", factory.getParameter(ScriptEngine.ENGINE));
+        Assert.assertEquals("3.2", factory.getParameter(ScriptEngine.ENGINE_VERSION));
+        Assert.assertEquals("JEXL", factory.getParameter(ScriptEngine.LANGUAGE));
+        Assert.assertEquals("3.2", factory.getParameter(ScriptEngine.LANGUAGE_VERSION));
+        Assert.assertNull(factory.getParameter("THREADING"));
+        Assert.assertEquals(NAMES, factory.getParameter(ScriptEngine.NAME));
+        Assert.assertEquals(EXTENSIONS, factory.getExtensions());
+        Assert.assertEquals(MIMES, factory.getMimeTypes());
 
-        assertEquals("42;", factory.getProgram(new String[]{"42"}));
-        assertEquals("str.substring(3,4)", factory.getMethodCallSyntax("str", "substring", new String[]{"3", "4"}));
+        Assert.assertEquals("42;", factory.getProgram(new String[]{"42"}));
+        Assert.assertEquals("str.substring(3,4)", factory.getMethodCallSyntax("str", "substring", new String[]{"3", "4"}));
     }
 
+    @Test
     public void testScriptingGetBy() throws Exception {
         ScriptEngineManager manager = new ScriptEngineManager();
-        assertNotNull("Manager should not be null", manager);
+        Assert.assertNotNull("Manager should not be null", manager);
         for (String name : NAMES) {
             ScriptEngine engine = manager.getEngineByName(name);
-            assertNotNull("Engine should not be null (name)", engine);
+            Assert.assertNotNull("Engine should not be null (name)", engine);
         }
         for (String extension : EXTENSIONS) {
             ScriptEngine engine = manager.getEngineByExtension(extension);
-            assertNotNull("Engine should not be null (extension)", engine);
+            Assert.assertNotNull("Engine should not be null (extension)", engine);
         }
         for (String mime : MIMES) {
             ScriptEngine engine = manager.getEngineByMimeType(mime);
-            assertNotNull("Engine should not be null (mime)", engine);
+            Assert.assertNotNull("Engine should not be null (mime)", engine);
         }
     }
 
+    @Test
     public void testScripting() throws Exception {
         ScriptEngineManager manager = new ScriptEngineManager();
-        assertNotNull("Manager should not be null", manager);
+        Assert.assertNotNull("Manager should not be null", manager);
         ScriptEngine engine = manager.getEngineByName("jexl3");
         final Integer initialValue = Integer.valueOf(123);
-        assertEquals(initialValue,engine.eval("123"));
-        assertEquals(initialValue,engine.eval("0;123"));// multiple statements
+        Assert.assertEquals(initialValue,engine.eval("123"));
+        Assert.assertEquals(initialValue,engine.eval("0;123"));// multiple statements
         long time1 = System.currentTimeMillis();
         Long time2 = (Long) engine.eval(
              "sys=context.class.forName(\"java.lang.System\");"
             +"now=sys.currentTimeMillis();"
             );
-        assertTrue("Must take some time to process this",time1 <= time2.longValue());
+        Assert.assertTrue("Must take some time to process this",time1 <= time2.longValue());
         engine.put("value", initialValue);
-        assertEquals(initialValue,engine.get("value"));
+        Assert.assertEquals(initialValue,engine.get("value"));
         final Integer newValue = Integer.valueOf(124);
-        assertEquals(newValue,engine.eval("old=value;value=value+1"));
-        assertEquals(initialValue,engine.get("old"));
-        assertEquals(newValue,engine.get("value"));
-        assertEquals(engine.getContext(),engine.get(JexlScriptEngine.CONTEXT_KEY));
+        Assert.assertEquals(newValue,engine.eval("old=value;value=value+1"));
+        Assert.assertEquals(initialValue,engine.get("old"));
+        Assert.assertEquals(newValue,engine.get("value"));
+        Assert.assertEquals(engine.getContext(),engine.get(JexlScriptEngine.CONTEXT_KEY));
         // Check behaviour of JEXL object
-        assertEquals(engine.getContext().getReader(),engine.eval("JEXL.in"));
-        assertEquals(engine.getContext().getWriter(),engine.eval("JEXL.out"));
-        assertEquals(engine.getContext().getErrorWriter(),engine.eval("JEXL.err"));
-        assertEquals(System.class,engine.eval("JEXL.System"));
+        Assert.assertEquals(engine.getContext().getReader(),engine.eval("JEXL.in"));
+        Assert.assertEquals(engine.getContext().getWriter(),engine.eval("JEXL.out"));
+        Assert.assertEquals(engine.getContext().getErrorWriter(),engine.eval("JEXL.err"));
+        Assert.assertEquals(System.class,engine.eval("JEXL.System"));
     }
 
+    @Test
     public void testNulls() throws Exception {
         ScriptEngineManager manager = new ScriptEngineManager();
-        assertNotNull("Manager should not be null", manager);
+        Assert.assertNotNull("Manager should not be null", manager);
         ScriptEngine engine = manager.getEngineByName("jexl3");
-        assertNotNull("Engine should not be null (name)", engine);
+        Assert.assertNotNull("Engine should not be null (name)", engine);
         try {
             engine.eval((String)null);
-            fail("Should have caused NPE");
+            Assert.fail("Should have caused NPE");
         } catch (NullPointerException e) {
             // NOOP
         }
         try {
             engine.eval((Reader)null);
-            fail("Should have caused NPE");
+            Assert.fail("Should have caused NPE");
         } catch (NullPointerException e) {
             // NOOP
         }
     }
 
+    @Test
     public void testScopes() throws Exception {
         ScriptEngineManager manager = new ScriptEngineManager();
-        assertNotNull("Manager should not be null", manager);
+        Assert.assertNotNull("Manager should not be null", manager);
         ScriptEngine engine = manager.getEngineByName("JEXL");
-        assertNotNull("Engine should not be null (JEXL)", engine);
+        Assert.assertNotNull("Engine should not be null (JEXL)", engine);
         manager.put("global",Integer.valueOf(1));
         engine.put("local", Integer.valueOf(10));
         manager.put("both",Integer.valueOf(7));
@@ -127,30 +132,32 @@ public class JexlScriptEngineTest extends TestCase {
         engine.eval("global=global+1");
         engine.eval("both=both+1"); // should update engine value only
         engine.eval("newvar=42;");
-        assertEquals(Integer.valueOf(2),manager.get("global"));
-        assertEquals(Integer.valueOf(11),engine.get("local"));
-        assertEquals(Integer.valueOf(7),manager.get("both"));
-        assertEquals(Integer.valueOf(8),engine.get("both"));
-        assertEquals(Integer.valueOf(42),engine.get("newvar"));
-        assertNull(manager.get("newvar"));
+        Assert.assertEquals(Integer.valueOf(2),manager.get("global"));
+        Assert.assertEquals(Integer.valueOf(11),engine.get("local"));
+        Assert.assertEquals(Integer.valueOf(7),manager.get("both"));
+        Assert.assertEquals(Integer.valueOf(8),engine.get("both"));
+        Assert.assertEquals(Integer.valueOf(42),engine.get("newvar"));
+        Assert.assertNull(manager.get("newvar"));
     }
 
+    @Test
     public void testDottedNames() throws Exception {
         ScriptEngineManager manager = new ScriptEngineManager();
-        assertNotNull("Manager should not be null", manager);
+        Assert.assertNotNull("Manager should not be null", manager);
         ScriptEngine engine = manager.getEngineByName("JEXL");
-        assertNotNull("Engine should not be null (JEXL)", engine);
+        Assert.assertNotNull("Engine should not be null (JEXL)", engine);
         engine.eval("this.is.a.test=null");
-        assertNull(engine.get("this.is.a.test"));
-        assertEquals(Boolean.TRUE, engine.eval("empty(this.is.a.test)"));
+        Assert.assertNull(engine.get("this.is.a.test"));
+        Assert.assertEquals(Boolean.TRUE, engine.eval("empty(this.is.a.test)"));
         final Object mymap = engine.eval("testmap={ 'key1' : 'value1', 'key2' : 'value2' }");
-        assertTrue(mymap instanceof Map<?, ?>);
-        assertEquals(2,((Map<?, ?>)mymap).size());
+        Assert.assertTrue(mymap instanceof Map<?, ?>);
+        Assert.assertEquals(2,((Map<?, ?>)mymap).size());
     }
 
+    @Test
     public void testDirectNew() throws Exception {
         ScriptEngine engine = new JexlScriptEngine();
         final Integer initialValue = Integer.valueOf(123);
-        assertEquals(initialValue,engine.eval("123"));
+        Assert.assertEquals(initialValue,engine.eval("123"));
     }
 }

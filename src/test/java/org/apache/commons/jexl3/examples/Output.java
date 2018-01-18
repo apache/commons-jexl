@@ -16,7 +16,8 @@
  */
 
 package org.apache.commons.jexl3.examples;
-import junit.framework.TestCase;
+
+import org.junit.Assert;
 
 /**
  * Abstracts using a test within Junit or through a main method.
@@ -43,7 +44,7 @@ public abstract class Output {
     public static final Output JUNIT = new Output() {
         @Override
         public void print(String expr, Object actual, Object expected) {
-            TestCase.assertEquals(expr, expected, actual);
+            Assert.assertEquals(expr, expected, actual);
         }
     };
 

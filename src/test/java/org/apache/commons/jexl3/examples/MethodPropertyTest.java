@@ -17,19 +17,19 @@
 
 package org.apache.commons.jexl3.examples;
 
-import junit.framework.TestCase;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.MapContext;
+import org.junit.Test;
 
 /**
  *  Simple example to show how to access method and properties.
  *
  *  @since 1.0
  */
-public class MethodPropertyTest extends TestCase {
+public class MethodPropertyTest {
     /**
      * An example for method access.
      */
@@ -120,6 +120,7 @@ public class MethodPropertyTest extends TestCase {
      * Unit test entry point.
      * @throws Exception
      */
+    @Test
     public void testExample() throws Exception {
         example(Output.JUNIT);
     }

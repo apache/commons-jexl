@@ -17,8 +17,6 @@
 /* $Id$ */
 package org.apache.commons.jexl3.junit;
 
-import junit.framework.AssertionFailedError;
-
 import org.apache.commons.jexl3.Foo;
 import org.apache.commons.jexl3.JexlTestCase;
 import org.junit.Assert;
@@ -44,7 +42,7 @@ public class AsserterTest extends JexlTestCase {
             asserter.assertExpression("this.count", "Wrong Value");
             Assert.fail("This method should have thrown an assertion exception");
         }
-        catch (AssertionFailedError e) {
+        catch (AssertionError e) {
             // it worked!
         }
     }
@@ -66,7 +64,7 @@ public class AsserterTest extends JexlTestCase {
             asserter.assertExpression("bar.count", new Integer(5));
             Assert.fail("This method should have thrown an assertion exception");
         }
-        catch (AssertionFailedError e) {
+        catch (AssertionError e) {
             // it worked!
         }
     }
