@@ -588,14 +588,16 @@ public class JexlArithmetic {
      */
     public boolean narrowArguments(Object[] args) {
         boolean narrowed = false;
-        for (int a = 0; a < args.length; ++a) {
-            Object arg = args[a];
-            if (arg instanceof Number) {
-                Number narg = (Number) arg;
-                Number narrow = narrow(narg);
-                if (!narg.equals(narrow)) {
-                    args[a] = narrow;
-                    narrowed = true;
+        if (args != null) {
+            for (int a = 0; a < args.length; ++a) {
+                Object arg = args[a];
+                if (arg instanceof Number) {
+                    Number narg = (Number) arg;
+                    Number narrow = narrow(narg);
+                    if (!narg.equals(narrow)) {
+                        args[a] = narrow;
+                        narrowed = true;
+                    }
                 }
             }
         }
