@@ -37,6 +37,7 @@ public class JexlScriptEngineTest {
                                                             "application/x-jexl2",
                                                             "application/x-jexl3");
 
+    @Test
     public void testScriptEngineFactory() throws Exception {
         JexlScriptEngineFactory factory = new JexlScriptEngineFactory();
         Assert.assertEquals("JEXL Engine", factory.getParameter(ScriptEngine.ENGINE));
