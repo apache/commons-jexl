@@ -141,6 +141,13 @@ public class MethodKeyTest {
     }
 
     @Test
+    public void testDebugString() throws Exception {
+        MethodKey c = KEY_LIST[0];
+        String str = c.debugString();
+        Assert.assertNotNull(str);
+    }
+
+    @Test
     public void testObjectKey() throws Exception {
         for (int k = 0; k < KEY_LIST.length; ++k) {
             MethodKey ctl = KEY_LIST[k];
