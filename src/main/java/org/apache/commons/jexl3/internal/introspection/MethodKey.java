@@ -373,7 +373,7 @@ public final class MethodKey {
             return true;
         }
         /* system asssignable, both sides must be array or not */
-        if (formal.isAssignableFrom(actual) && (actual != null && actual.isArray() == formal.isArray())) {
+        if (actual != null && formal.isAssignableFrom(actual) && actual.isArray() == formal.isArray()) {
             return true;
         }
         /** catch all... */
