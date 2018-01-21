@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.junit.Asserter;
 import java.util.Arrays;
+import java.util.Date;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -191,6 +192,25 @@ public class MethodTest extends JexlTestCase {
         public static Class<?> NPEIfNull(Object x) {
             return x.getClass();
         }
+
+        public Object over(String f, int i) {
+            return f + " + " + i;
+        }
+
+        public Object over(String f, Date g) {
+            return f + " + " + g;
+        }
+
+        public Object over(String f, String g) {
+            return f + " + " + g;
+        }
+    }
+
+    public static class FunctorOver extends Functor {
+
+        public Object over(Object f, Object g) {
+            return f + " + " + g;
+        }
     }
 
     @Test
@@ -209,6 +229,31 @@ public class MethodTest extends JexlTestCase {
             Assert.fail("method should have thrown!");
         } catch (Exception xj0) {
             // ignore
+        }
+
+        Object result;
+        try {
+            result = JEXL.invokeMethod(func, "over", "foo", 42);
+            Assert.assertEquals("foo + 42", result);
+        } catch (Exception xj0) {
+            // ignore
+            result = xj0;
+        }
+
+        try {
+            result = JEXL.invokeMethod(func, "over", null, null);
+            Assert.fail("method should have thrown!");
+        } catch (Exception xj0) {
+            // ignore
+            result = xj0;
+        }
+
+        func = new FunctorOver();
+        try {
+            result = JEXL.invokeMethod(func, "over", null, null);
+            Assert.assertEquals("null + null", result);
+        } catch (Exception xj0) {
+            Assert.fail("method should not have thrown!");
         }
     }
 
