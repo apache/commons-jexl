@@ -283,7 +283,12 @@ final class ClassMap {
                 Method mi = methods[i];
                 if (permissions.allow(mi)) {
                     // add method to byKey cache; do not override
-                    cache.byKey.putIfAbsent(new MethodKey(mi), mi);
+                    MethodKey key = new MethodKey(mi);
+                    Method pmi = cache.byKey.putIfAbsent(key, mi);
+                    if (pmi != null && log.isDebugEnabled()) {
+                        // foo(int) and foo(Integer) have the same signature for JEXL
+                        log.debug("Method "+ pmi + " is already registered, key: " + key);
+                    }
                 }
             }
         } catch (SecurityException se) {
