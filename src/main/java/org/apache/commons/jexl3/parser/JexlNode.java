@@ -138,17 +138,22 @@ public abstract class JexlNode extends SimpleNode {
      * @return true if node is assignable, false otherwise
      */
     public boolean isLeftValue() {
-        if (this instanceof ASTIdentifier || this instanceof ASTIdentifierAccess) {
-            return true;
-        }
-        int nc = this.jjtGetNumChildren() - 1;
-        if (nc >= 0) {
-            JexlNode last = this.jjtGetChild(this.jjtGetNumChildren() - 1);
-            return last.isLeftValue();
-        }
-        if (jjtGetParent() instanceof ASTReference || jjtGetParent() instanceof ASTArrayAccess) {
-            return true;
-        }
+        JexlNode walk = this;
+        do {
+            if (walk instanceof ASTIdentifier
+                || walk instanceof ASTIdentifierAccess
+                || walk instanceof ASTArrayAccess) {
+                return true;
+            }
+            int nc = walk.jjtGetNumChildren() - 1;
+            if (nc >= 0) {
+                walk = walk.jjtGetChild(nc);
+            } else if (walk.jjtGetParent() instanceof ASTReference) {
+                return true;
+            } else {
+                return false;
+            }
+        } while (walk != null);
         return false;
     }
 
