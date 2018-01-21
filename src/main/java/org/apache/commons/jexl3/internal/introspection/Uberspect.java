@@ -428,17 +428,24 @@ public class Uberspect implements JexlUberspect {
             Set<JexlOperator> ops = operatorMap.get(aclass);
             if (ops == null) {
                 ops = EnumSet.noneOf(JexlOperator.class);
-                for (JexlOperator op : JexlOperator.values()) {
-                    Method[] methods = getMethods(arithmetic.getClass(), op.getMethodName());
-                    if (methods != null) {
-                        mloop: for (Method method : methods) {
-                            Class<?>[] parms = method.getParameterTypes();
-                            if (parms.length != op.getArity()) {
-                                continue;
-                            }
-                            // eliminate method(Object) and method(Object, Object)
-                            if (!JexlArithmetic.class.equals(method.getDeclaringClass())) {
-                                ops.add(op);
+                // deal only with derived classes
+                if (!JexlArithmetic.class.equals(aclass)) {
+                    for (JexlOperator op : JexlOperator.values()) {
+                        Method[] methods = getMethods(arithmetic.getClass(), op.getMethodName());
+                        if (methods != null) {
+                            mloop:
+                            for (Method method : methods) {
+                                Class<?>[] parms = method.getParameterTypes();
+                                if (parms.length != op.getArity()) {
+                                    continue;
+                                }
+                                // keep only methods that are not overrides
+                                try {
+                                    JexlArithmetic.class.getMethod(method.getName(), method.getParameterTypes());
+                                } catch (NoSuchMethodException xmethod) {
+                                    // method was not found in JexlArithmetic; this is an operator definition
+                                    ops.add(op);
+                                }
                             }
                         }
                     }
