@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-248" due-to="Dmitri Blinov">
+                Allow range subexpression as an array property assignment identifier
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-246" due-to="Dmitri Blinov">
                 Intermittent ambiguous method invocation when processing assignOverload
             </action>

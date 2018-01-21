@@ -39,6 +39,9 @@
                         <a href="#Operators">Operators</a>
                     </li>
                     <li>
+                        <a href="#Access">Access</a>
+                    </li>
+                    <li>
                         <a href="#Conditional">Conditional Statements</a>
                     </li>
                 </ol>
@@ -59,12 +62,12 @@
                     <td>Comments</td>
                     <td>
                         Specified using <code>##</code> or <code>//</code>and extend to the end of line, e.g.
-                        <source>## This is a comment</source>
+                        <code>## This is a comment</code>
                         Also specified using <code>//</code>, e.g.
-                        <source>// This is a comment</source>
+                        <code>// This is a comment</code>
                         Multiple lines comments are specified using <code>/*...*/</code>, e.g.
-                        <source>/* This is a
-                            multi-line comment */</source>
+                        <code>/* This is a
+                            multi-line comment */</code>
                     </td>
                 </tr>
                 <tr>
@@ -82,21 +85,21 @@
                         </p>
                         <p>
                             <strong>NOTE:</strong> JEXL does not support variables with hyphens in them, e.g.
-                            <source>commons-logging // invalid variable name (hyphenated)</source> is not a valid variable, but instead is treated as a
+                            <code>commons-logging // invalid variable name (hyphenated)</code> is not a valid variable, but instead is treated as a
                             subtraction of the variable <code>logging</code> from the variable <code>commons</code>
                         </p>
                         <p>
                             JEXL also supports <code>ant-style</code> variables, the following is a valid variable name:
-                            <source>my.dotted.var</source>
+                            <code>my.dotted.var</code>
                         </p>
                         <p>
                             <strong>N.B.</strong> the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
                             <code>or and eq ne lt gt le ge div mod not null true false new var break continue return</code>
                             For example, the following is invalid:
-                            <source>my.new.dotted.var // invalid ('new' is keyword)</source>
+                            <code>my.new.dotted.var // invalid ('new' is keyword)</code>
                             In such cases, quoted identifiers or the [ ] operator can be used, for example:
-                            <source>my.'new'.dotted.var</source>
-                            <source>my['new'].dotted.var</source>
+                            <code>my.'new'.dotted.var</code>
+                            <code>my['new'].dotted.var</code>
                         </p>
                     </td>
                 </tr>
@@ -104,13 +107,16 @@
                     <td>Scripts</td>
                     <td>
                         <p>
-                            A script in JEXL is made up of zero or more statements. Scripts can be read from a String, File or URL.
+                            A script in JEXL is made up of zero or more statements. Scripts can include one or more pragmas.
+                        </p>
+                        <p>
+                            Scripts can be read from a String, File or URL.
                         </p>
                         <p>
                             They can be created with named parameters which allow a later evaluation to be performed with arguments.
                         </p>
                         <p>
-                            A script returns the last expression evaluated by default.
+                            By default a script returns the value of the last evaluated statement.
                         </p>
                         <p>
                             Using the <code>return</code> keyword, a script will return the expression that follows (or null).
@@ -133,8 +139,9 @@
                 <tr>
                     <td>Statements</td>
                     <td>
-                        A statement can be the empty statement, the semicolon (<code>;</code>) , block, assignment or an expression.
+                        A statement can be the empty statement, the semicolon (<code>;</code>) , block, conditional, assignment or an expression.
                         Statements are optionally terminated with a semicolon.
+                        A single statement or a statement block can be annotated.
                     </td>
                 </tr>
                 <tr>
@@ -152,20 +159,67 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Method calls</td>
+                    <td>Expression</td>
+                    <td>
+                        An expression can be the literal, variable, access operator, function definition, function call, method call or
+                        an evaluation operator.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Function definition</td>
+                    <td>
+                        Defines a function within the script, usually associated with a local variable assignment.
+                        <code>var fun = function(x, y) { x + y }</code>
+                        The following syntax is also supported
+                        <code>var fun = (x, y) -> { x + y }</code>
+                        Calling a function follows the usual convention:
+                        <code>fun(17, 25)</code>
+                        <p>Note that functions can use local variables and parameters from their declaring script.
+                            Those variables values are bound in the function environment at definition time.</p>
+                        <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
+                        The function closure hoists 't' when defined; the result of the evaluation will
+                        lead to <code>15 +7 + 20 = 42</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Method call</td>
                     <td>
                         Calls a method of an object, e.g.
-                        <source>"hello world".hashCode()</source> will call the <code>hashCode</code> method
+                        <code>"hello world".hashCode()</code> will call the <code>hashCode</code> method
                         of the <code>"hello world"</code> String.
                         <p>In case of multiple arguments and overloading, JEXL will make the best effort to find
                             the most appropriate non ambiguous method to call.</p>
                     </td>
                 </tr>
                 <tr>
+                    <td>Access Operator</td>
+                    <td>
+                        Allows to evaluate a property of an object, a value of the collection or an array
+                        by using either square brackets or a dotted numeral, e.g.
+                        <code>foo.bar</code> will access the <code>bar</code> property
+                        of the <code>foo</code> Object.
+                        <code>arr1[0]</code> will access the first element of the
+                        of the <code>arr1</code> array.
+                        <p>Access operators can be overloaded in <code>JexlArithmetic</code>, so that
+                           the operator behaviour will differ depending on the type of the operator arguments</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Evaluation Operator</td>
+                    <td>
+                        Performs computational, logical or comparative action between one, two or three arguments
+                        whose values are expressions, e.g.
+                        <code>40 + 2</code> will call the <code>add</code> operator
+                        between two integer literals.
+                        <p>All operators, except when stated otherwise, can be overloaded in <code>JexlArithmetic</code>, so that the action taken
+                           will differ depending on the type of the operator arguments</p>
+                    </td>
+                </tr>
+                <tr>
                     <td>#pragma</td>
                     <td>
                         Declares a pragma, a method to communicate information from a script to its execution environment, e.g.
-                        <source>#pragma execution.option 42</source> will declare a pragma named <code>execution.option</code> with
+                        <code>#pragma execution.option 42</code> will declare a pragma named <code>execution.option</code> with
                         a value of <code>42</code>.
                         <p>Pragma keys can be identifiers or antish names, pragma values can be literals (boolean, integer,
                             real, string, null, NaN) and antish names</p>
@@ -175,16 +229,16 @@
                     <td>@annotation</td>
                     <td>
                         Annotations in JEXL are 'meta-statements'; they allow to wrap the execution of the JEXL statement in a user provided
-                        caller; typical example would be: <source>@synchronized(x) x.someMethod();</source>
+                        caller; typical example would be: <code>@synchronized(x) x.someMethod();</code>
                         <p>
                             Annotations may be declared with zero or more parameters;
-                            <source>@lenient x.someMethod();</source>
-                            <source>@synchronized(x) x.someMethod();</source>
-                            <source>@parallel(pool, 8) x.someMethod();</source>
+                            <code>@lenient x.someMethod();</code>
+                            <code>@synchronized(x) x.someMethod();</code>
+                            <code>@parallel(pool, 8) x.someMethod();</code>
                         </p>
                         <p>
                             They also can be chained as in:
-                            <source>@lenient @silent x.someMethod();</source>
+                            <code>@lenient @silent x.someMethod();</code>
                         </p>
                         <p>
                         Annotation processing is implemented by providing a JexlContext.AnnotationProcessor; its processAnnotation
@@ -267,33 +321,33 @@
                     <td>String literals</td>
                     <td>
                         Can start and end with either <code>'</code> or <code>"</code> delimiters, e.g.
-                        <source>"Hello world"</source> and
-                        <source>'Hello world'</source> are equivalent.
+                        <code>"Hello world"</code> and
+                        <code>'Hello world'</code> are equivalent.
                         <p>The escape character is <code>\</code> (backslash); it only escapes the string delimiter</p>
                     </td>
                 </tr>
                 <tr>
                     <td>Multiline format literals</td>
                     <td>
-                        Start and end with <code>`</code> delimiter - back-quote -, e.g. <source>`Hello world`</source>
+                        Start and end with <code>`</code> delimiter - back-quote -, e.g. <code>`Hello world`</code>
                         <p>The escape character is <code>\</code> (backslash); it only escapes the string delimiter.</p>
                         These format literals can span multiple lines and allow Unified JEXL expressions (JSTL like expressions)
                         to be interpolated. If a variable <code>user</code> valued <code>JEXL</code>is present in the environment - whether
-                        as a local or global variable -, the format <source>`Hello ${user}`</source> will evaluate as <source>Hello JEXL</source>.
+                        as a local or global variable -, the format <code>`Hello ${user}`</code> will evaluate as <code>Hello JEXL</code>.
                     </td>
                 </tr>
                 <tr>
                     <td>Boolean literals</td>
                     <td>
                         The literals <code>true</code> and <code>false</code> can be used, e.g.
-                        <source>val1 == true</source>
+                        <code>val1 == true</code>
                     </td>
                 </tr>
                 <tr>
                     <td>Null literal</td>
                     <td>
                         The null value is represented as in java using the literal <code>null</code>, e.g.
-                        <source>val1 == null</source>
+                        <code>val1 == null</code>
                     </td>
                 </tr>
                 <tr>
@@ -301,7 +355,7 @@
                     <td>
                         A <code>[</code> followed by one or more expressions separated by <code>,</code> and ending
                         with <code>]</code>, e.g.
-                        <source>[ 1, 2, "three" ]</source>
+                        <code>[ 1, 2, "three" ]</code>
                         <p>This syntax creates an <code>Object[]</code>.</p>
                         <p>
                             JEXL will attempt to strongly type the array; if all entries are of the same class or if all
@@ -317,7 +371,7 @@
                     <td>
                         A <code>[</code> followed by one or more expressions separated by <code>,</code> and ending
                         with <code>,...]</code>, e.g.
-                        <source>[ 1, 2, "three",...]</source>
+                        <code>[ 1, 2, "three",...]</code>
                         <p>This syntax creates an <code>ArrayList&lt;Object&gt;</code>.</p>
                     </td>
                 </tr>
@@ -326,7 +380,7 @@
                     <td>
                         A <code>{</code> followed by one or more expressions separated by <code>,</code> and ending
                         with <code>}</code>, e.g.
-                        <source>{ "one" , 2, "more"}</source>
+                        <code>{ "one" , 2, "more"}</code>
                         <p>This syntax creates a <code>HashSet&lt;Object&gt;</code>.</p>
                     </td>
                 </tr>
@@ -335,10 +389,21 @@
                     <td>
                         A <code>{</code> followed by one or more sets of <code>key : value</code> pairs separated by <code>,</code> and ending
                         with <code>}</code>, e.g.
-                        <source>{ "one" : 1, "two" : 2, "three" : 3, "more": "many more" }</source>
+                        <code>{ "one" : 1, "two" : 2, "three" : 3, "more": "many more" }</code>
                         <p>This syntax creates a <code>HashMap&lt;Object,Object&gt;</code>.</p>
                     </td>
                 </tr>
+
+                <tr>
+                    <td>Range literal</td>
+                    <td>
+                        A value followed by <code>..</code> and ending with other value, e.g.
+                        <code>1 .. 42</code>
+                        <p>This syntax creates a 'range' object in the form of a java iterable which can be used in for statement, e.g.
+                           <code>for (i : 1..42) a = a + b[i]</code></p>
+                    </td>
+                </tr>
+
             </table>
         </section>
         <section name="Functions">
@@ -366,7 +431,7 @@
                                 that returns true when the instance is considered empty</li>
                         </ol>
                         This is false in other cases (besides errors).
-                        <source>empty(arg)</source>
+                        <code>empty(arg)</code>
                     </td>
                 </tr>
                 <tr>
@@ -385,14 +450,14 @@
                             <li>The result of calling a method 'public int size()' defined by the argument class</li>
                         </ol>
                         This returns 0 in other cases (besides errors).
-                        <source>size("Hello")</source> returns 5.
+                        <code>size("Hello")</code> returns 5.
                     </td>
                 </tr>
                 <tr>
                     <td>new</td>
                     <td>
                         Creates a new instance using a fully-qualified class name or Class:
-                        <source>new("java.lang.Double", 10)</source> returns 10.0.
+                        <code>new("java.lang.Double", 10)</code> returns 10.0.
                         <p>Note that the first argument of <code>new</code> can be a variable or any
                             expression evaluating as a String or Class; the rest of the arguments are used
                             as arguments to the constructor for the class considered.</p>
@@ -401,27 +466,24 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Top level function</td>
+                    <td>
+                        Top level function is a function which can be invoked without specifying a namespace.
+                        <p>Top level function can be defined by the function definition method inside the script</p>
+                        <p>A <code>JexlContext</code> can define methods which can be invoked as top level functions.
+                        This can allow expressions like:
+                        <code>string(23.0)</code></p>
+                        <p>Another way to define top level function is to register to <code>JexlEngine</code> objects or classes
+                           with null namespace.</p>
+
+                    </td>
+                </tr>
+                <tr>
                     <td>ns:function</td>
                     <td>
                         A <code>JexlEngine</code> can register objects or classes used as function namespaces.
                         This can allow expressions like:
-                        <source>math:cosinus(23.0)</source>
-                    </td>
-                </tr>
-                <tr>
-                    <td>function</td>
-                    <td>
-                        Defines a function within the script, usually associated with a local variable assignment.
-                        <code>var fun = function(x, y) { x + y }</code>
-                        The following syntax is also supported
-                        <code>var fun = (x, y) -> { x + y }</code>
-                        Calling a function follows the usual convention:
-                        <code>fun(17, 25)</code>
-                        <p>Note that functions can use local variables and parameters from their declaring script.
-                            Those variables values are bound in the function environment at definition time.</p>
-                        <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
-                        The function closure hoists 't' when defined; the result of the evaluation will
-                        lead to <code>15 +7 + 20 = 42</code>.
+                        <code>math:cosinus(23.0)</code>
                     </td>
                 </tr>
             </table>
@@ -435,53 +497,56 @@
                 <tr>
                     <td>Boolean <code>and</code></td>
                     <td>
-                        The usual <code>&amp;&amp;</code> operator can be used as well as the word <code>and</code>, e.g.
-                        <source>cond1 and cond2</source> and
-                        <source>cond1 &amp;&amp; cond2</source> are equivalent
+                        <p>The usual <code>&amp;&amp;</code> operator can be used as well as the word <code>and</code>, e.g.
+                        <code>cond1 and cond2</code> and
+                        <code>cond1 &amp;&amp; cond2</code> are equivalent.</p>
+                        <p>Note that this operator can not be overloaded</p>
                     </td>
                 </tr>
                 <tr>
                     <td>Boolean <code>or</code></td>
                     <td>
-                        The usual <code>||</code> operator can be used as well as the word <code>or</code>, e.g.
-                        <source>cond1 or cond2</source> and
-                        <source>cond1 || cond2</source> are equivalent
+                        <p>The usual <code>||</code> operator can be used as well as the word <code>or</code>, e.g.
+                        <code>cond1 or cond2</code> and
+                        <code>cond1 || cond2</code> are equivalent.</p>
+                        <p>Note that this operator can not be overloaded</p>
                     </td>
                 </tr>
                 <tr>
                     <td>Boolean <code>not</code></td>
                     <td>
-                        The usual <code>!</code> operator can be used as well as the word <code>not</code>, e.g.
-                        <source>!cond1</source> and
-                        <source>not cond1</source> are equivalent
+                        <p>The usual <code>!</code> operator can be used as well as the word <code>not</code>, e.g.
+                        <code>!cond1</code> and
+                        <code>not cond1</code> are equivalent.</p>
+                        <p>Note that this operator can not be overloaded</p>
                     </td>
                 </tr>
                 <tr>
                     <td>Bitwise <code>and</code></td>
                     <td>
                         The usual <code>&amp;</code> operator is used, e.g.
-                        <source>33 &amp; 4</source>, 0010 0001 &amp; 0000 0100 = 0.
+                        <code>33 &amp; 4</code>, 0010 0001 &amp; 0000 0100 = 0.
                     </td>
                 </tr>
                 <tr>
                     <td>Bitwise <code>or</code></td>
                     <td>
                         The usual <code>|</code> operator is used, e.g.
-                        <source>33 | 4</source>, 0010 0001 | 0000 0100 = 0010 0101 = 37.
+                        <code>33 | 4</code>, 0010 0001 | 0000 0100 = 0010 0101 = 37.
                     </td>
                 </tr>
                 <tr>
                     <td>Bitwise <code>xor</code></td>
                     <td>
                         The usual <code>^</code> operator is used, e.g.
-                        <source>33 ^ 4</source>, 0010 0001 ^ 0000 0100 = 0010 0100 = 37.
+                        <code>33 ^ 4</code>, 0010 0001 ^ 0000 0100 = 0010 0100 = 37.
                     </td>
                 </tr>
                 <tr>
                     <td>Bitwise <code>complement</code></td>
                     <td>
                         The usual <code>~</code> operator is used, e.g.
-                        <source>~33</source>, ~0010 0001 = 1101 1110 = -34.
+                        <code>~33</code>, ~0010 0001 = 1101 1110 = -34.
                     </td>
                 </tr>
                 <tr>
@@ -490,14 +555,15 @@
                         The usual ternary conditional operator <code>condition ? if_true : if_false</code> operator can be
                         used as well as the abbreviation <code>value ?: if_false</code> which returns the <code>value</code> if
                         its evaluation is defined, non-null and non-false, e.g.
-                        <source>val1 ? val1 : val2</source> and
-                        <source>val1 ?: val2 </source> are equivalent.
+                        <code>val1 ? val1 : val2</code> and
+                        <code>val1 ?: val2 </code> are equivalent.
                         <p>
                             <strong>NOTE:</strong> The condition will evaluate to <code>false</code> when it
                             refers to an undefined variable or <code>null</code> for all <code>JexlEngine</code>
                             flag combinations. This allows explicit syntactic leniency and treats the condition
                             'if undefined or null or false' the same way in all cases.
                         </p>
+                        <p>Note that this operator can not be overloaded</p>
                     </td>
                 </tr>
                 <tr>
@@ -518,6 +584,7 @@
                             When <code>var x = false</code> and  <code>var y = 0</code>,<code>x??true</code>
                             evaluates as <code>false</code> and <code>y??1</code> evaluates as <code>0</code>.
                         </p>
+                        <p>Note that this operator can not be overloaded</p>
                     </td>
                 </tr>
                 <tr>
@@ -525,8 +592,8 @@
                     <td>
                         The usual <code>==</code> operator can be used as well as the abbreviation <code>eq</code>.
                         For example
-                        <source>val1 == val2</source> and
-                        <source>val1 eq val2</source> are equivalent.
+                        <code>val1 == val2</code> and
+                        <code>val1 eq val2</code> are equivalent.
                         <ol>
                             <li>
                                 <code>null</code> is only ever equal to null, that is if you compare null
@@ -541,8 +608,8 @@
                     <td>
                         The usual <code>!=</code> operator can be used as well as the abbreviation <code>ne</code>.
                         For example
-                        <source>val1 != val2</source> and
-                        <source>val1 ne val2</source> are equivalent.
+                        <code>val1 != val2</code> and
+                        <code>val1 ne val2</code> are equivalent.
                     </td>
                 </tr>
                 <tr>
@@ -550,8 +617,8 @@
                     <td>
                         The usual <code>&lt;</code> operator can be used as well as the abbreviation <code>lt</code>.
                         For example
-                        <source>val1 &lt; val2</source> and
-                        <source>val1 lt val2</source> are equivalent.
+                        <code>val1 &lt; val2</code> and
+                        <code>val1 lt val2</code> are equivalent.
                     </td>
                 </tr>
                 <tr>
@@ -559,8 +626,8 @@
                     <td>
                         The usual <code>&lt;=</code> operator can be used as well as the abbreviation <code>le</code>.
                         For example
-                        <source>val1 &lt;= val2</source> and
-                        <source>val1 le val2</source> are equivalent.
+                        <code>val1 &lt;= val2</code> and
+                        <code>val1 le val2</code> are equivalent.
                     </td>
                 </tr>
                 <tr>
@@ -568,8 +635,8 @@
                     <td>
                         The usual <code>&gt;</code> operator can be used as well as the abbreviation <code>gt</code>.
                         For example
-                        <source>val1 &gt; val2</source> and
-                        <source>val1 gt val2</source> are equivalent.
+                        <code>val1 &gt; val2</code> and
+                        <code>val1 gt val2</code> are equivalent.
                     </td>
                 </tr>
                 <tr>
@@ -577,8 +644,8 @@
                     <td>
                         The usual <code>&gt;=</code> operator can be used as well as the abbreviation <code>ge</code>.
                         For example
-                        <source>val1 &gt;= val2</source> and
-                        <source>val1 ge val2</source> are equivalent.
+                        <code>val1 &gt;= val2</code> and
+                        <code>val1 ge val2</code> are equivalent.
                     </td>
                 </tr>
                 <tr>
@@ -641,19 +708,11 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Range<code>..</code></td>
-                    <td>
-                        This operator creates a 'range' of values (in the form of a java iterable).
-                        For example,
-                        <code>for(var x: 1 .. 3) {}</code> will loop 3 times with the value of 'x' being 1, 2 and 3.
-                    </td>
-                </tr>
-                <tr>
                     <td>Addition</td>
                     <td>
                         The usual <code>+</code> operator is used.
                         For example
-                        <source>val1 + val2</source>
+                        <code>val1 + val2</code>
                     </td>
                 </tr>
                 <tr>
@@ -661,7 +720,7 @@
                     <td>
                         The usual <code>-</code> operator is used.
                         For example
-                        <source>val1 - val2</source>
+                        <code>val1 - val2</code>
                     </td>
                 </tr>
                 <tr>
@@ -669,7 +728,7 @@
                     <td>
                         The usual <code>*</code> operator is used.
                         For example
-                        <source>val1 * val2</source>
+                        <code>val1 * val2</code>
                     </td>
                 </tr>
                 <tr>
@@ -677,9 +736,9 @@
                     <td>
                         The usual <code>/</code> operator is used, or one can use the <code>div</code> operator.
                         For example
-                        <source>val1 / val2</source>
+                        <code>val1 / val2</code>
                         or
-                        <source>val1 div val2</source>
+                        <code>val1 div val2</code>
                     </td>
                 </tr>
                 <tr>
@@ -688,7 +747,7 @@
                         The <code>%</code> operator is used. An alternative is the <code>mod</code>
                         operator.
                         For example
-                        <source>5 mod 2</source> gives 1 and is equivalent to <source>5 % 2</source>
+                        <code>5 mod 2</code> gives 1 and is equivalent to <code>5 % 2</code>
                     </td>
                 </tr>
                 <tr>
@@ -715,33 +774,76 @@
                     <td>
                         The unary <code>-</code> operator is used.
                         For example
-                        <source>-12</source>
+                        <code>-12</code>
                     </td>
+                </tr>
+            </table>
+        </section>
+        <section name="Access">
+            <table>
+                <tr>
+                    <th width="15%">Operator</th>
+                    <th>Description</th>
                 </tr>
                 <tr>
                     <td>Array access</td>
                     <td>
                         Array elements may be accessed using either square brackets or a dotted numeral, e.g.
-                        <source>arr1[0]</source> and <source>arr1.0</source> are equivalent
+                        <code>arr1[0]</code> and <code>arr1.0</code> are equivalent
                     </td>
                 </tr>
                 <tr>
                     <td>List access</td>
                     <td>
                         List elements may be accessed using either square brackets or a dotted numeral, e.g.
-                        <source>list[0]</source> and <source>list.0</source> are equivalent
+                        <code>list[0]</code> and <code>list.0</code> are equivalent
                     </td>
                 </tr>
                 <tr>
                     <td>Map access</td>
                     <td>
                         Map elements are accessed using square brackets, e.g.
-                        <source>map[0]; map['name']; map[var];</source>
-                        Note that <source>map['7']</source> and <source>map[7]</source> refer to different elements.
+                        <code>map[0]; map['name']; map[var];</code>
+                        Note that <code>map['7']</code> and <code>map[7]</code> refer to different elements.
                         Map elements with a numeric key may also be accessed using a dotted numeral, e.g.
-                        <source>map[0]</source> and <source>map.0</source> are equivalent.
-                        Note that <source>map.1</source> and <source>map.01</source> refer to different elements,
-                        while <source>map.1</source> and <source>map[01]</source> are equivalent.
+                        <code>map[0]</code> and <code>map.0</code> are equivalent.
+                        <p>Note that <code>map.1</code> and <code>map.01</code> refer to different elements,
+                        while <code>map.1</code> and <code>map[01]</code> are equivalent.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>JavaBean property access</td>
+                    <td>
+                        Properties of JavaBean objects that define appropriate getter methods can be accessed
+                        using either square brackets or a dotted numeral, e.g.
+                        <code>foo['bar']</code> and <code>foo.bar</code> are equivalent.
+                        The appropriate <code>Foo.getBar()</code> method will be called.
+                        <p>Note that both <code>foo.Bar</code> and <code>foo.bar</code> can be used</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Indexed JavaBean property access</td>
+                    <td>
+                        Indexed properties of JavaBean objects that define appropriate getter methods can be accessed
+                        using either square brackets or a dotted numeral, e.g.
+                        <code>x.attribute['name']</code> and <code>x.attribute.name</code> are equivalent.
+                        The appropriate <code>Foo.getAttribute(String index)</code> method will be called
+                    </td>
+                </tr>
+                <tr>
+                    <td>Public field access</td>
+                    <td>
+                        Public fields of java objects can be accessed using either square brackets or a dotted numeral, e.g.
+                        <code>foo['bar']</code> and <code>foo.bar</code> are equivalent.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Duck-typed collection property access</td>
+                    <td>
+                        Properties of Java classes that define public <code>Object get(String name)</code> method can be accessed
+                        using either square brackets or a dotted numeral, e.g.
+                        <code>foo['bar']</code> and <code>foo.bar</code> are equivalent.
+                        The appropriate <code>Foo.get(String index)</code> method will be called with the argument of <code>"bar"</code> String
                     </td>
                 </tr>
             </table>
@@ -749,38 +851,45 @@
         <section name="Conditional">
             <table>
                 <tr>
-                    <th width="15%">Operator</th>
+                    <th width="15%">Statement</th>
                     <th>Description</th>
                 </tr>
                 <tr>
                     <td>if</td>
                     <td>
                         Classic, if/else statement, e.g.
-                        <source>if ((x * 2) == 5) {
+                        <code>if ((x * 2) == 5) {
                             y = 1;
                             } else {
                             y = 2;
-                            }</source>
+                            }</code>
                     </td>
                 </tr>
                 <tr>
                     <td>for</td>
                     <td>
-                        Loop through items of an Array, Collection, Map, Iterator or Enumeration, e.g.
-                        <source>for (item : list) {
+                        <p>Loop through items of an Array, Collection, Map, Iterator or Enumeration, e.g.
+                        <code>for (item : list) {
                             x = x + item;
-                            }</source>
-                        Where <code>item</code> and <code>list</code> are variables.
-                        The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>unsupported</strong>.
+                            }</code>
+                        Where <code>item</code> is a context variable.</p>
+                        <p>The following syntax is also supported:
+                        <code>for (var item : list) {
+                            x = x + item;
+                            }</code>
+
+                        Where <code>item</code> is a local variable.</p>
+                        <p>Note that <code>item</code> variable is accessible after loop evaluation</p>
+                        <p>The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>unsupported</strong>.</p>
                     </td>
                 </tr>
                 <tr>
                     <td>while</td>
                     <td>
                         Loop until a condition is satisfied, e.g.
-                        <source>while (x lt 10) {
+                        <code>while (x lt 10) {
                             x = x + 2;
-                            }</source>
+                            }</code>
                     </td>
                 </tr>
                 <tr>

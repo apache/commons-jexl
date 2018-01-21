@@ -542,6 +542,11 @@ public class SideEffectTest extends JexlTestCase {
             c.append(item);
             return JexlOperator.ASSIGN;
         }
+
+        @Override
+        public Object add(Object right, Object left) {
+            return super.add(left, right);
+        }
     }
 
    public static class Arithmetic246b extends Arithmetic246 {
@@ -613,4 +618,53 @@ public class SideEffectTest extends JexlTestCase {
         Assert.assertTrue(zz == z);
         Assert.assertEquals(t246? 1 : 2, z.size());
     }
+
+    // an arithmetic that performs side effects
+    public static class Arithmetic248 extends JexlArithmetic {
+        public Arithmetic248(boolean strict) {
+            super(strict);
+        }
+
+        public Object arrayGet(List<?> list, Collection<Integer> range) {
+            List<Object> rl = new ArrayList<Object>(range.size());
+            for(int i : range) {
+                rl.add(list.get(i));
+            }
+            return rl;
+        }
+
+        public Object arraySet(List<Object> list, Collection<Integer> range, Object value) {
+            for(int i : range) {
+                list.set(i, value);
+            }
+            return list;
+        }
+    }
+
+    @Test
+    public void test248() throws Exception {
+        MapContext ctx = new MapContext();
+        List<Object> foo = new ArrayList<Object>();
+        foo.addAll(Arrays.asList(10, 20, 30, 40));
+        ctx.set("foo", foo);
+
+        JexlEngine engine = new JexlBuilder().arithmetic(new Arithmetic248(true)).create();
+        JexlScript foo12 = engine.createScript("foo[1..2]");
+        try {
+            Object r = foo12.execute(ctx);
+            Assert.assertEquals(Arrays.asList(20, 30), r);
+        } catch (JexlException xp) {
+            Assert.assertTrue(xp instanceof JexlException.Property);
+        }
+
+        JexlScript foo12assign = engine.createScript("foo[1..2] = x", "x");
+        try {
+            Object r = foo12assign.execute(ctx, 25);
+            Assert.assertEquals(25, r);
+            Assert.assertEquals(Arrays.asList(10, 25, 25, 40), foo);
+        } catch (JexlException xp) {
+            Assert.assertTrue(xp instanceof JexlException.Property);
+        }
+    }
+
 }
