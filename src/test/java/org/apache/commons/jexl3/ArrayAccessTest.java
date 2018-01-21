@@ -310,4 +310,23 @@ public class ArrayAccessTest extends JexlTestCase {
             asserter.assertExpression("foo[zero][zero][two]", s42);
         }
     }
+
+    public static class Sample {
+        private int[] array;
+        public void setFoo(int[] a) {
+            array = a;
+        }
+        public int[] getFoo() {
+            return array;
+        }
+    }
+    @Test
+    public void testArrayGetSet() throws Exception {
+        Sample bar  = new Sample();
+        bar.setFoo(new int[]{24});
+        asserter.setVariable("bar", bar);
+        asserter.assertExpression("bar.foo[0]", 24);
+        asserter.assertExpression("bar.foo = []", new int[0]);
+        //asserter.assertExpression("bar.foo[0]", 42);
+    }
 }
