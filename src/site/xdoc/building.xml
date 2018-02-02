@@ -25,7 +25,7 @@ limitations under the License.
 <section name="Overview">
 <p>
   Apache Commons JEXL uses <a href="http://maven.apache.org">Maven 3</a>. The source is
-  <a href="http://svn.apache.org/repos/asf/commons/proper/jexl/trunk/">here</a>.
+  <a href="https://gitbox.apache.org/repos/asf/commons-jexl.git">here</a>.
 </p>
 </section>
 <!-- ================================================== -->
