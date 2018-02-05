@@ -16,10 +16,11 @@
  */
 package org.apache.commons.jexl3.parser;
 
+
 /**
  * Identifiers, variables and registers.
  */
-public final class ASTIdentifierAccess extends JexlNode {
+public class ASTIdentifierAccess extends JexlNode {
     private String name = null;
     private Integer identifier = null;
 
@@ -34,6 +35,22 @@ public final class ASTIdentifierAccess extends JexlNode {
     void setIdentifier(String id) {
         name = id;
         identifier = parseIdentifier(id);
+    }
+
+    /**
+     * Whether this is a dot or a question-mark-dot aka safe-navigation access.
+     * @return true is ?., false if .
+     */
+    public boolean isSafe() {
+        return false;
+    }
+
+    /**
+     * Whether this is a Jxlt based identifier.
+     * @return true if `..${...}...`, false otherwise
+     */
+    public boolean isExpression() {
+        return false;
     }
 
     /**

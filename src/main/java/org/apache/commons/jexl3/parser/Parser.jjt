@@ -147,6 +147,7 @@ TOKEN_MGR_DECLS : {
     | < COLON : ":" >
     | < COMMA : "," >
     | < DOT : "." > { pushDot(); } /* Lexical state is now DOT_ID */
+    | < QDOT : "?." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < ELIPSIS : "..." >
 }
 
@@ -259,7 +260,7 @@ TOKEN_MGR_DECLS : {
 {
   < JXLT_LITERAL:
     "`" (~["`","\\"] | "\\" ~["\u0000"])* "`"
-  >
+  > { popDot(); } /* Revert state to default if was DOT_ID. */
 }
 
 /***************************************
@@ -793,15 +794,25 @@ void Lambda() #JexlLambda() :
  *     References
  ***************************************/
 
-void IdentifierAccess() :
+void IdentifierAccess() #void :
 {
     Token t;
 }
 {
     <DOT> (
-        t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); }
+        t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
     |
-        t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); }
+        t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccess
+    |
+        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessJxlt
+    )
+    |
+    <QDOT> (
+        t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
+    |
+        t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafe
+    |
+        t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafeJxlt
     )
 }
 
@@ -815,6 +826,8 @@ void MemberAccess() #void : {}
     LOOKAHEAD(<LBRACKET>) ArrayAccess()
     |
     LOOKAHEAD(<DOT>) IdentifierAccess()
+    |
+    LOOKAHEAD(<QDOT>) IdentifierAccess()
 }
 
 void ReferenceExpression() #MethodNode(>1) : {}

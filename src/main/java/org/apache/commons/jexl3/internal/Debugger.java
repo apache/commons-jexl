@@ -611,13 +611,20 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTIdentifierAccess node, Object data) {
-        builder.append(".");
+        builder.append(node.isSafe() ? "?." : ".");
         String image = node.getName();
-        if (needQuotes(image)) {
+        if (node.isExpression()) {
+            builder.append('`');
+            builder.append(image.replace("`", "\\`"));
+            builder.append('`');
+        } else if (needQuotes(image)) {
             // quote it
-            image = "'" + image.replace("'", "\\'") + "'";
+            builder.append('\'');
+            builder.append(image.replace("'", "\\'"));
+            builder.append('\'');
+        } else {
+            builder.append(image);
         }
-        builder.append(image);
         return data;
     }
 

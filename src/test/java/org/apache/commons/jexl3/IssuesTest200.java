@@ -341,4 +341,26 @@ public class IssuesTest200 extends JexlTestCase {
             }
         }
     }
+
+    @Test
+    public void test252() throws Exception {
+        MapContext ctx = new MapContext();
+        JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
+        String stmt = "(x, dflt)->{ x?.class1 ?? dflt }";
+        JexlScript script = engine.createScript(stmt);
+        Object result = script.execute(ctx, "querty", "default");
+        Assert.assertEquals("default", result);
+        try {
+        stmt = "(x, al, dflt)->{  x.`c${al}ss` ?? dflt }";
+        script = engine.createScript(stmt);
+        result = script.execute(ctx, "querty", "la", "default");
+        Assert.assertEquals(stmt.getClass(), result);
+        stmt = "(x, al, dflt)->{  x?.`c${al}ss` ?? dflt }";
+        script = engine.createScript(stmt);
+        result = script.execute(ctx, "querty", "la", "default");
+        Assert.assertEquals(stmt.getClass(), result);
+        } catch(JexlException xany) {
+            String xanystr = xany.toString();
+        }
+    }
 }

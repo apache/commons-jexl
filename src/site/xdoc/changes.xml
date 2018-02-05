@@ -26,6 +26,12 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-252" due-to="Dmitri Blinov">
+                Allow for interpolated strings to be used in property access operators
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-250" due-to="Dmitri Blinov">
+                Safe navigation operator
+            </action>
             <action dev="henrib" type="add" issue="JEXL-248" due-to="Dmitri Blinov">
                 Allow range subexpression as an array property assignment identifier
             </action>

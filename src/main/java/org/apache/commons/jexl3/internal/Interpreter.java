@@ -59,6 +59,7 @@ import org.apache.commons.jexl3.parser.ASTGENode;
 import org.apache.commons.jexl3.parser.ASTGTNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
+import org.apache.commons.jexl3.parser.ASTIdentifierAccessJxlt;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
@@ -1000,9 +1001,34 @@ public class Interpreter extends InterpreterBase {
                 && ((ASTIdentifier) node.jjtGetChild(which)).getSymbol() >= 0);
     }
 
+    /**
+     * Evaluates an access identifier based on the 2 main implementations;
+     * static (name or numbered identifier) or dynamic (jxlt).
+     * @param node the identifier access node
+     * @return the evaluated identifier
+     */
+    private Object evalIdentifier(ASTIdentifierAccess node) {
+        if (node instanceof ASTIdentifierAccessJxlt) {
+            ASTIdentifierAccessJxlt accessJxlt = (ASTIdentifierAccessJxlt) node;
+            TemplateEngine.TemplateExpression expr = (TemplateEngine.TemplateExpression) accessJxlt.getExpression();
+            if (expr == null) {
+                TemplateEngine jxlt = jexl.jxlt();
+                expr = jxlt.parseExpression(node.jexlInfo(), node.getName(), frame != null ? frame.getScope() : null);
+                accessJxlt.setExpression(expr);
+            }
+            if (expr != null) {
+                return expr.evaluate(frame, context);
+            }
+            throw new JexlException.Property(node, node.getName());
+        } else {
+            return node.getIdentifier();
+        }
+    }
+
     @Override
     protected Object visit(ASTIdentifierAccess node, Object data) {
-        return data != null ? getAttribute(data, node.getIdentifier(), node) : null;
+        Object id = evalIdentifier(node);
+        return data != null ? getAttribute(data, id, node) : null;
     }
 
     @Override
@@ -1245,7 +1271,7 @@ public class Interpreter extends InterpreterBase {
         Object property = null;
         JexlNode propertyNode = left.jjtGetChild(last);
         if (propertyNode instanceof ASTIdentifierAccess) {
-            property = ((ASTIdentifierAccess) propertyNode).getIdentifier();
+            property = evalIdentifier((ASTIdentifierAccess) propertyNode);
             // deal with antish variable
             if (ant != null && object == null) {
                 if (last > 0) {
@@ -1774,8 +1800,13 @@ public class Interpreter extends InterpreterBase {
         }
         // lets fail
         if (node != null) {
-            String attrStr = attribute != null ? attribute.toString() : null;
-            return unsolvableProperty(node, attrStr, xcause);
+            boolean safe = (node instanceof ASTIdentifierAccess) && ((ASTIdentifierAccess) node).isSafe();
+            if (safe) {
+                return null;
+            } else {
+                String attrStr = attribute != null ? attribute.toString() : null;
+                return unsolvableProperty(node, attrStr, xcause);
+            }
         } else {
             // direct call
             String error = "unable to get object property"

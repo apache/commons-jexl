@@ -25,9 +25,22 @@ Release 3.2
 
 Version 3.2 is a minor release.
 
+What's new in 3.2:
+==================
+
+* Interpolated strings in identifiers, as in x.`${prefix}_${suffix}` that in many cases would be equivalent to
+  x[prefix + '_' + suffix] or x[`${prefix}_${suffix}`].
+* Safe-navigation operator '?.' allowing lenient handling of non-existent or null properties so that an expression
+  like 'x?.y?.z' would behave as 'x.y.z' in nominal execution and return null instead of throwing an exception in error
+  cases.
+* A set of syntactic restrictions can be applied to scripts ranging from not allowing side-effects to not allowing
+  loops enabling fine control over what end-users may be able to enter as expressions/scripts.
+
 New Features in 3.2:
 ====================
 
+* JEXL-252:      Allow for interpolated strings to be used in property access operators
+* JEXL-250:      Safe navigation operator
 * JEXL-248:      Allow range subexpression as an array property assignment identifier
 * JEXL-243:      Allow restricting available features in Script/Expressions
 * JEXL-238:      Restrict getLiteralClass to a Number for NumberLiterals
