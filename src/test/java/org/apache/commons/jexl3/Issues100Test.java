@@ -37,9 +37,9 @@ import org.junit.Test;
  * Test cases for reported issue between JEXL-100 and JEXL-199.
  */
 @SuppressWarnings({"boxing", "UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class IssuesTest100 extends JexlTestCase {
-    public IssuesTest100() {
-        super("IssuesTest100", null);
+public class Issues100Test extends JexlTestCase {
+    public Issues100Test() {
+        super("Issues100Test", null);
     }
 
     @Before
