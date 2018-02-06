@@ -59,7 +59,7 @@ public class ASTIdentifierAccess extends JexlNode {
      * @param id the identifier
      * @return an integer or null
      */
-    private static Integer parseIdentifier(String id) {
+    public static Integer parseIdentifier(String id) {
         // hand coded because the was no way to fail on leading '0's using NumberFormat
         if (id != null) {
             final int length = id.length();

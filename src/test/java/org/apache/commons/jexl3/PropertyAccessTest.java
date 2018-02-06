@@ -51,7 +51,6 @@ public class PropertyAccessTest extends JexlTestCase {
         Integer i42 = Integer.valueOf(42);
         Integer i43 = Integer.valueOf(43);
         String s42 = "fourty-two";
-        String s43 = "fourty-three";
         Object[] foo = new Object[3];
         foo[0] = foo;
         foo[1] = i42;
@@ -60,7 +59,7 @@ public class PropertyAccessTest extends JexlTestCase {
         asserter.setVariable("zero", Integer.valueOf(0));
         asserter.setVariable("one", Integer.valueOf(1));
         asserter.setVariable("two", Integer.valueOf(2));
-        for(int l = 0; l < 2; ++l) {
+        for (int l = 0; l < 2; ++l) {
             asserter.assertExpression("foo.0", foo);
             asserter.assertExpression("foo.0.'0'", foo);
             asserter.assertExpression("foo.'1'", foo[1]);
@@ -68,7 +67,26 @@ public class PropertyAccessTest extends JexlTestCase {
             asserter.assertExpression("foo.0.'1' = 43", i43);
             asserter.assertExpression("foo.0.'1'", i43);
             asserter.assertExpression("foo.0.'1' = 42", i42);
-            asserter.assertExpression("foo.0.'1'", i42);
+            //
+            asserter.assertExpression("foo?.0.'1'", i42);
+            asserter.assertExpression("foo?.0", foo);
+            asserter.assertExpression("foo?.0.'0'", foo);
+            asserter.assertExpression("foo?.'1'", foo[1]);
+            asserter.assertExpression("foo.0?.'1'", foo[1]);
+            asserter.assertExpression("foo?.0.'1' = 43", i43);
+            asserter.assertExpression("foo?.0?.'1'", i43);
+            asserter.assertExpression("foo?.0.'1' = 42", i42);
+            asserter.assertExpression("foo?.0.'1'", i42);
+            //
+            asserter.assertExpression("foo?.0.`1`", i42);
+            asserter.assertExpression("foo?.0", foo);
+            asserter.assertExpression("foo?.0.'0'", foo);
+            asserter.assertExpression("foo?.`1`", foo[1]);
+            asserter.assertExpression("foo?.0.`1`", foo[1]);
+            asserter.assertExpression("foo?.0.`${one}` = 43", i43);
+            asserter.assertExpression("foo.0?.`${one}`", i43);
+            asserter.assertExpression("foo.0.`${one}` = 42", i42);
+            asserter.assertExpression("foo?.0?.`${one}`", i42);
         }
     }
 
@@ -298,5 +316,75 @@ public class PropertyAccessTest extends JexlTestCase {
         dbg.debug(e);
         String dbgdata = dbg.toString();
         Assert.assertEquals("foo.'q u u x'", dbgdata);
+    }
+
+    @Test
+    public void testErroneousIdentifier() throws Exception {
+        MapContext ctx = new MapContext();
+        JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
+        
+        // base succeeds
+        String stmt = "(x)->{ x?.class1 ?? 'oops' }";
+        JexlScript script = engine.createScript(stmt);
+        Object result = script.execute(ctx, "querty");
+        Assert.assertEquals("oops", result);
+
+        // fail with unknown property
+        try {
+            stmt = "(x)->{ x.class1 ?? 'oops' }";
+            script = engine.createScript(stmt);
+            result = script.execute(ctx, "querty");
+            Assert.fail("should have failed!");
+            Assert.assertNull(result); // unreachable
+        } catch (JexlException.Property xjexl) {
+            Assert.assertTrue(xjexl.getMessage().contains("class1"));
+        }
+
+        // succeeds with jxlt & strict navigation
+        ctx.set("al", "la");
+        stmt = "(x)->{ x.`c${al}ss` ?? 'oops' }";
+        script = engine.createScript(stmt);
+        result = script.execute(ctx, "querty");
+        Assert.assertEquals("querty".getClass(), result);
+
+        // succeeds with jxlt & lenient navigation
+        stmt = "(x)->{ x?.`c${al}ss` ?? 'oops' }";
+        script = engine.createScript(stmt);
+        result = script.execute(ctx, "querty");
+        Assert.assertEquals("querty".getClass(), result);
+
+        // fails with jxlt & lenient navigation
+        stmt = "(x)->{ x?.`c${la}ss` ?? 'oops' }";
+        script = engine.createScript(stmt);
+        result = script.execute(ctx, "querty");
+        Assert.assertEquals("oops", result);
+
+        // fails with jxlt & strict navigation
+        try {
+            stmt = "(x)->{ x.`c${la}ss` ?? 'oops' }";
+            script = engine.createScript(stmt);
+            result = script.execute(ctx, "querty");
+            Assert.assertEquals("oops", result);
+            Assert.fail("should have failed!");
+        } catch (JexlException.Property xjexl) {
+            Assert.assertTrue(xjexl.getMessage().contains("c${la}ss"));
+        }
+
+        // fails with jxlt & lenient navigation
+        stmt = "(x)->{ x?.`c${la--ss` ?? 'oops' }";
+        script = engine.createScript(stmt);
+        result = script.execute(ctx, "querty");
+        Assert.assertEquals("oops", result);
+
+        // fails with jxlt & strict navigation
+        try {
+            stmt = "(x)->{ x.`c${la--ss` ?? 'oops' }";
+            script = engine.createScript(stmt);
+            result = script.execute(ctx, "querty");
+            Assert.assertEquals("oops", result);
+            Assert.fail("should have failed!");
+        } catch (JexlException.Property xjexl) {
+            Assert.assertTrue(xjexl.getMessage().contains("c${la--ss"));
+        }
     }
 }

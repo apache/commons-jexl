@@ -111,6 +111,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import org.apache.commons.jexl3.JxltEngine;
 
 
 /**
@@ -1009,17 +1010,32 @@ public class Interpreter extends InterpreterBase {
      */
     private Object evalIdentifier(ASTIdentifierAccess node) {
         if (node instanceof ASTIdentifierAccessJxlt) {
-            ASTIdentifierAccessJxlt accessJxlt = (ASTIdentifierAccessJxlt) node;
+            final ASTIdentifierAccessJxlt accessJxlt = (ASTIdentifierAccessJxlt) node;
+            final String src = node.getName();
             TemplateEngine.TemplateExpression expr = (TemplateEngine.TemplateExpression) accessJxlt.getExpression();
             if (expr == null) {
                 TemplateEngine jxlt = jexl.jxlt();
-                expr = jxlt.parseExpression(node.jexlInfo(), node.getName(), frame != null ? frame.getScope() : null);
+                try {
+                    expr = jxlt.parseExpression(node.jexlInfo(), src, frame != null ? frame.getScope() : null);
+                } catch(JxltEngine.Exception xjxlt) {
+                    return node.isSafe()? null : unsolvableProperty(node, src, xjxlt);
+                }
                 accessJxlt.setExpression(expr);
             }
             if (expr != null) {
-                return expr.evaluate(frame, context);
+                Object name;
+                try {
+                    name = expr.evaluate(frame, context);
+                } catch(JxltEngine.Exception xjxlt) {
+                    return node.isSafe()? null : unsolvableProperty(node, src, xjxlt);
+                }
+                if (name != null) {
+                    Integer id = ASTIdentifierAccess.parseIdentifier(name.toString());
+                    return id != null? id : name;
+                }
+                return null;
             }
-            throw new JexlException.Property(node, node.getName());
+            return node.isSafe()? null : unsolvableProperty(node, src, null);
         } else {
             return node.getIdentifier();
         }
