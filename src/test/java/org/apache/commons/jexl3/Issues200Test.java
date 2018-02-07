@@ -345,7 +345,7 @@ public class Issues200Test extends JexlTestCase {
     @Test
     public void test250() throws Exception {
         MapContext ctx = new MapContext();
-        HashMap<Object,Object> x = new HashMap<Object, Object> ();
+        HashMap<Object, Object> x = new HashMap<Object, Object>();
         x.put(2, "123456789");
         ctx.set("x", x);
         JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
@@ -379,12 +379,12 @@ public class Issues200Test extends JexlTestCase {
         } catch (JexlException xany) {
             Assert.fail("Should have evaluated to null");
         }
-                try {
-        stmt = "y?.3.class.name";
-        script = engine.createScript(stmt);
-        result = script.execute(ctx);
-        Assert.assertNull(result);
-        } catch(JexlException xany) {
+        try {
+            stmt = "y?.3.class.name";
+            script = engine.createScript(stmt);
+            result = script.execute(ctx);
+            Assert.assertNull(result);
+        } catch (JexlException xany) {
             Assert.fail("Should have evaluated to null");
         }
     }
