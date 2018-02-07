@@ -194,12 +194,21 @@
                 <tr>
                     <td>Access Operator</td>
                     <td>
-                        Allows to evaluate a property of an object, a value of the collection or an array
+                        <p>Allows to evaluate a property of an object, a value of the collection or an array
                         by using either square brackets or a dotted numeral, e.g.
                         <code>foo.bar</code> will access the <code>bar</code> property
                         of the <code>foo</code> Object.
                         <code>arr1[0]</code> will access the first element of the
-                        of the <code>arr1</code> array.
+                        of the <code>arr1</code> array.</p>
+                        <p>The safe-access operator <code>foo?.bar</code> shortcuts any null or non-existent references
+                        along the navigation path, allowing a safe-navigation free of errors. In the previous expression,
+                        if 'foo' is null, the whole expression will evaluate as null. This is an efficient shortcut
+                        to defensive expressions such as <code>x?.y?.z</code> that would otherwise be expressed as
+                        <code>x? (x.y? (x.y.z ?: null) :null) : null</code>.</p>
+                        <p>Properties can also be quoted as in <code>foo.'b a r'</code> and can be dynamic
+                        back-quoted interpolation strings as in <code>cal.`${dd.year}-${dd.month}-${dd.day}`</code>.
+                        These syntaxes are mixable with safe-access as in <code>foo.'b a r'?.quux</code> or <code>
+                            foo?.`${bar}`.quux</code>.</p>
                         <p>Access operators can be overloaded in <code>JexlArithmetic</code>, so that
                            the operator behaviour will differ depending on the type of the operator arguments</p>
                     </td>
