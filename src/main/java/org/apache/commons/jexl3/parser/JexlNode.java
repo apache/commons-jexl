@@ -157,15 +157,15 @@ public abstract class JexlNode extends SimpleNode {
         return false;
     }
 
+    /**
+     * @return true if this node looks like a global var
+     */
     public boolean isGlobalVar() {
         if (this instanceof ASTVar) {
             return false;
         }
         if (this instanceof ASTIdentifier) {
             return ((ASTIdentifier) this).getSymbol() < 0;
-        }
-         if (this instanceof ASTIdentifierAccess) {
-            return true;
         }
         int nc = this.jjtGetNumChildren() - 1;
         if (nc >= 0) {
@@ -178,7 +178,73 @@ public abstract class JexlNode extends SimpleNode {
         return false;
     }
 
+    /**
+     * Whether this node is a local variable.
+     * @return true if local, false otherwise
+     */
     public boolean isLocalVar() {
         return this instanceof ASTIdentifier && ((ASTIdentifier) this).getSymbol() >= 0;
     }
+
+    /**
+     * Whether this node is the left-hand side of a safe access identifier as in.
+     * For instance, in 'x?.y' , 'x' is safe.
+     * @return true if safe lhs, false otherwise
+     */
+    public boolean isSafeLhs() {
+        if (this instanceof ASTReference) {
+            return jjtGetChild(0).isSafeLhs();
+        }
+        JexlNode parent = this.jjtGetParent();
+        if (parent == null) {
+            return false;
+        }
+        // find this node in its parent
+        int nsiblings = parent.jjtGetNumChildren();
+        int rhs = -1;
+        for(int s = 0; s < nsiblings; ++s) {
+            JexlNode sibling = parent.jjtGetChild(s);
+            if (sibling == this) {
+                // the next chid offset of this nodes parent
+                rhs = s + 1;
+                break;
+            }
+        }
+        // seek next child in parent
+        if (rhs >= 0 && rhs < nsiblings) {
+            JexlNode rsibling = parent.jjtGetChild(rhs);
+            if (rsibling instanceof ASTIdentifierAccess && ((ASTIdentifierAccess) rsibling).isSafe()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if a null evaluated expression is protected by a ternary expression.
+     * <p>
+     * The rationale is that the ternary / elvis expressions are meant for the user to explictly take control
+     * over the error generation; ie, ternaries can return null even if the engine in strict mode
+     * would normally throw an exception.
+     * </p>
+     * @param node the expression node
+     * @return true if nullable variable, false otherwise
+     */
+    public boolean isTernaryProtected() {
+        JexlNode node = this;
+        for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
+            if (walk instanceof ASTTernaryNode) {
+                return true;
+            }
+            if (walk instanceof ASTNullpNode) {
+                return true;
+            }
+            if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {
+                break;
+            }
+        }
+        return false;
+    }
+
+
 }

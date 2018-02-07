@@ -37,6 +37,11 @@ public class ASTIdentifierAccess extends JexlNode {
         identifier = parseIdentifier(id);
     }
 
+    @Override
+    public boolean isGlobalVar() {
+        return !isSafe() && !isExpression();
+    }
+
     /**
      * Whether this is a dot or a question-mark-dot aka safe-navigation access.
      * @return true is ?., false if .

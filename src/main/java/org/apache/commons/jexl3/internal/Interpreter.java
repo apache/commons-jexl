@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+//CSOFF: FileLength
 package org.apache.commons.jexl3.internal;
 
 
@@ -936,7 +937,7 @@ public class Interpreter extends InterpreterBase {
             if (value == null
                     && !(node.jjtGetParent() instanceof ASTReference)
                     && !context.has(name)
-                    && !isTernaryProtected(node)) {
+                    && !node.isTernaryProtected()) {
                 return unsolvableVariable(node, name, true);
             }
             return value;
@@ -966,31 +967,6 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
-     * Check if a null evaluated expression is protected by a ternary expression.
-     * <p>
-     * The rationale is that the ternary / elvis expressions are meant for the user to explictly take control
-     * over the error generation; ie, ternaries can return null even if the engine in strict mode
-     * would normally throw an exception.
-     * </p>
-     * @param node the expression node
-     * @return true if nullable variable, false otherwise
-     */
-    protected boolean isTernaryProtected(JexlNode node) {
-        for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
-            if (walk instanceof ASTTernaryNode) {
-                return true;
-            }
-            if (walk instanceof ASTNullpNode) {
-                return true;
-            }
-            if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {
-                break;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Checks whether a reference child node holds a local variable reference.
      * @param node  the reference node
      * @param which the child we are checking
@@ -1012,30 +988,25 @@ public class Interpreter extends InterpreterBase {
         if (node instanceof ASTIdentifierAccessJxlt) {
             final ASTIdentifierAccessJxlt accessJxlt = (ASTIdentifierAccessJxlt) node;
             final String src = node.getName();
+            Throwable cause = null;
             TemplateEngine.TemplateExpression expr = (TemplateEngine.TemplateExpression) accessJxlt.getExpression();
-            if (expr == null) {
-                TemplateEngine jxlt = jexl.jxlt();
-                try {
+            try {
+                if (expr == null) {
+                    TemplateEngine jxlt = jexl.jxlt();
                     expr = jxlt.parseExpression(node.jexlInfo(), src, frame != null ? frame.getScope() : null);
-                } catch(JxltEngine.Exception xjxlt) {
-                    return node.isSafe()? null : unsolvableProperty(node, src, xjxlt);
+                    accessJxlt.setExpression(expr);
                 }
-                accessJxlt.setExpression(expr);
+                if (expr != null) {
+                    Object name = expr.evaluate(frame, context);
+                    if (name != null) {
+                        Integer id = ASTIdentifierAccess.parseIdentifier(name.toString());
+                        return id != null ? id : name;
+                    }
+                }
+            } catch (JxltEngine.Exception xjxlt) {
+                cause = xjxlt;
             }
-            if (expr != null) {
-                Object name;
-                try {
-                    name = expr.evaluate(frame, context);
-                } catch(JxltEngine.Exception xjxlt) {
-                    return node.isSafe()? null : unsolvableProperty(node, src, xjxlt);
-                }
-                if (name != null) {
-                    Integer id = ASTIdentifierAccess.parseIdentifier(name.toString());
-                    return id != null? id : name;
-                }
-                return null;
-            }
-            return node.isSafe()? null : unsolvableProperty(node, src, null);
+            return node.isSafe() ? null : unsolvableProperty(node, src, cause);
         } else {
             return node.getIdentifier();
         }
@@ -1043,8 +1014,11 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTIdentifierAccess node, Object data) {
+        if (data == null) {
+            return null;
+        }
         Object id = evalIdentifier(node);
-        return data != null ? getAttribute(data, id, node) : null;
+        return getAttribute(data, id, node);
     }
 
     @Override
@@ -1053,10 +1027,10 @@ public class Interpreter extends InterpreterBase {
             throw new JexlException.Cancel(node);
         }
         final int numChildren = node.jjtGetNumChildren();
-        JexlNode parent = node.jjtGetParent();
+        final JexlNode parent = node.jjtGetParent();
         // pass first piece of data in and loop through children
         Object object = null;
-        JexlNode objectNode;
+        JexlNode objectNode = null;
         JexlNode ptyNode = null;
         StringBuilder ant = null;
         boolean antish = !(parent instanceof ASTReference);
@@ -1096,23 +1070,28 @@ public class Interpreter extends InterpreterBase {
                 if (ant == null) {
                     JexlNode first = node.jjtGetChild(0);
                     if (first instanceof ASTIdentifier) {
-                        if (((ASTIdentifier) first).getSymbol() < 0) {
-                            ant = new StringBuilder(((ASTIdentifier) first).getName());
+                        ASTIdentifier afirst = (ASTIdentifier) first;
+                        if (afirst.getSymbol() < 0) {
+                            ant = new StringBuilder(afirst.getName());
                         } else {
-                            break;
+                            break main;
                         }
                     } else {
                         ptyNode = objectNode;
-                        break;
+                        break main;
                     }
                 }
                 for (; v <= c; ++v) {
                     JexlNode child = node.jjtGetChild(v);
                     if (child instanceof ASTIdentifierAccess) {
+                        ASTIdentifierAccess achild = (ASTIdentifierAccess) child;
+                        if (achild.isSafe() || achild.isExpression()) {
+                           break main;
+                        }
                         ant.append('.');
                         ant.append(((ASTIdentifierAccess) objectNode).getName());
                     } else {
-                        break;
+                        break main;
                     }
                 }
                 object = context.get(ant.toString());
@@ -1122,14 +1101,15 @@ public class Interpreter extends InterpreterBase {
                 break; //
             }
         }
-        if (object == null && !isTernaryProtected(node)) {
+        if (object == null && !node.isTernaryProtected()) {
             if (antish && ant != null) {
                 boolean undefined = !(context.has(ant.toString()) || isLocalVariable(node, 0));
                 // variable unknown in context and not a local
-                return unsolvableVariable(node, ant.toString(), undefined);
+                return node.isSafeLhs()? null : unsolvableVariable(node, ant.toString(), undefined);
             }
             if (ptyNode != null) {
-                return unsolvableProperty(node, ptyNode.toString(), null);
+                // am I the left-hand side of a safe op ?
+                return ptyNode.isSafeLhs()? null : unsolvableProperty(node, ptyNode.toString(), null);
             }
         }
         return object;
