@@ -182,9 +182,7 @@ public class Interpreter extends InterpreterBase {
         JexlContext.ThreadLocal tcontext = null;
         JexlEngine tjexl = null;
         try {
-            if (isCancelled()) {
-                throw new JexlException.Cancel(node);
-            }
+            cancelCheck(node);
             if (context instanceof JexlContext.ThreadLocal) {
                 tcontext = jexl.putThreadLocal((JexlContext.ThreadLocal) context);
             }
@@ -597,9 +595,7 @@ public class Interpreter extends InterpreterBase {
         int numChildren = node.jjtGetNumChildren();
         Object result = null;
         for (int i = 0; i < numChildren; i++) {
-            if (isCancelled()) {
-                throw new JexlException.Cancel(node);
-            }
+            cancelCheck(node);
             result = node.jjtGetChild(i).jjtAccept(this, data);
         }
         return result;
@@ -608,9 +604,7 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTReturnStatement node, Object data) {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
-        if (isCancelled()) {
-            throw new JexlException.Cancel(node);
-        }
+        cancelCheck(node);
         throw new JexlException.Return(node, null, val);
     }
 
@@ -646,9 +640,7 @@ public class Interpreter extends InterpreterBase {
                                             : uberspect.getIterator(iterableValue);
                 if (itemsIterator != null) {
                     while (itemsIterator.hasNext()) {
-                        if (isCancelled()) {
-                            throw new JexlException.Cancel(node);
-                        }
+                        cancelCheck(node);
                         // set loopVariable to value of iterator
                         Object value = itemsIterator.next();
                         if (symbol < 0) {
@@ -680,9 +672,7 @@ public class Interpreter extends InterpreterBase {
         /* first objectNode is the expression */
         Node expressionNode = node.jjtGetChild(0);
         while (arithmetic.toBoolean(expressionNode.jjtAccept(this, data))) {
-            if (isCancelled()) {
-                throw new JexlException.Cancel(node);
-            }
+            cancelCheck(node);
             if (node.jjtGetNumChildren() > 1) {
                 try {
                     // execute statement
@@ -785,9 +775,7 @@ public class Interpreter extends InterpreterBase {
         JexlArithmetic.ArrayBuilder ab = arithmetic.arrayBuilder(childCount);
         boolean extended = false;
         for (int i = 0; i < childCount; i++) {
-            if (isCancelled()) {
-                throw new JexlException.Cancel(node);
-            }
+            cancelCheck(node);
             JexlNode child = node.jjtGetChild(i);
             if (child instanceof ASTExtendedLiteral) {
                 extended = true;
@@ -809,9 +797,7 @@ public class Interpreter extends InterpreterBase {
         int childCount = node.jjtGetNumChildren();
         JexlArithmetic.SetBuilder mb = arithmetic.setBuilder(childCount);
         for (int i = 0; i < childCount; i++) {
-            if (isCancelled()) {
-                throw new JexlException.Cancel(node);
-            }
+            cancelCheck(node);
             Object entry = node.jjtGetChild(i).jjtAccept(this, data);
             mb.add(entry);
         }
@@ -823,9 +809,7 @@ public class Interpreter extends InterpreterBase {
         int childCount = node.jjtGetNumChildren();
         JexlArithmetic.MapBuilder mb = arithmetic.mapBuilder(childCount);
         for (int i = 0; i < childCount; i++) {
-            if (isCancelled()) {
-                throw new JexlException.Cancel(node);
-            }
+            cancelCheck(node);
             Object[] entry = (Object[]) (node.jjtGetChild(i)).jjtAccept(this, data);
             mb.put(entry[0], entry[1]);
         }
@@ -904,9 +888,7 @@ public class Interpreter extends InterpreterBase {
             for (int i = 0; i < numChildren; i++) {
                 JexlNode child = node.jjtGetChild(i);
                 result = child.jjtAccept(this, data);
-                if (isCancelled()) {
-                    throw new JexlException.Cancel(child);
-                }
+                cancelCheck(child);
             }
             return result;
         }
@@ -924,9 +906,7 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTIdentifier node, Object data) {
-        if (isCancelled()) {
-            throw new JexlException.Cancel(node);
-        }
+        cancelCheck(node);
         String name = node.getName();
         if (data == null) {
             int symbol = node.getSymbol();
@@ -958,9 +938,7 @@ public class Interpreter extends InterpreterBase {
                 return null;
             }
             Object index = nindex.jjtAccept(this, null);
-            if (isCancelled()) {
-                throw new JexlException.Cancel(node);
-            }
+            cancelCheck(node);
             object = getAttribute(object, index, nindex);
         }
         return object;
@@ -1023,9 +1001,7 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTReference node, Object data) {
-        if (isCancelled()) {
-            throw new JexlException.Cancel(node);
-        }
+        cancelCheck(node);
         final int numChildren = node.jjtGetNumChildren();
         final JexlNode parent = node.jjtGetParent();
         // pass first piece of data in and loop through children
@@ -1060,9 +1036,7 @@ public class Interpreter extends InterpreterBase {
             }
             // attempt to evaluate the property within the object (visit(ASTIdentifierAccess node))
             object = objectNode.jjtAccept(this, object);
-            if (isCancelled()) {
-                throw new JexlException.Cancel(node);
-            }
+            cancelCheck(node);
             if (object != null) {
                 // disallow mixing antish variable & bean with same root; avoid ambiguity
                 antish = false;
@@ -1168,9 +1142,7 @@ public class Interpreter extends InterpreterBase {
      * @return the left hand side
      */
     protected Object executeAssign(JexlNode node, JexlOperator assignop, Object data) { // CSOFF: MethodLength
-        if (isCancelled()) {
-            throw new JexlException.Cancel(node);
-        }
+        cancelCheck(node);
         // left contains the reference to assign to
         final JexlNode left = node.jjtGetChild(0);
         // right is the value expression to assign
@@ -1521,9 +1493,7 @@ public class Interpreter extends InterpreterBase {
      * @return the result of the method invocation
      */
     protected Object call(final JexlNode node, Object target, Object functor, final ASTArguments argNode) {
-        if (isCancelled()) {
-            throw new JexlException.Cancel(node);
-        }
+        cancelCheck(node);
         // evaluate the arguments
         Object[] argv = visit(argNode, null);
         // get the method name if identifier
@@ -1686,9 +1656,7 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTConstructorNode node, Object data) {
-        if (isCancelled()) {
-            throw new JexlException.Cancel(node);
-        }
+        cancelCheck(node);
         // first child is class or class name
         Object cobject = node.jjtGetChild(0).jjtAccept(this, data);
         // get the ctor args
@@ -1758,9 +1726,7 @@ public class Interpreter extends InterpreterBase {
         if (object == null) {
             throw new JexlException(node, "object is null");
         }
-        if (isCancelled()) {
-            throw new JexlException.Cancel(node);
-        }
+        cancelCheck(node);
         final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
                 ? JexlOperator.ARRAY_GET : JexlOperator.PROPERTY_GET;
         Object result = operators.tryOverload(node, operator, object, attribute);
@@ -1832,9 +1798,7 @@ public class Interpreter extends InterpreterBase {
      * @param node      the node that evaluated as the object
      */
     protected void setAttribute(Object object, Object attribute, Object value, JexlNode node) {
-        if (isCancelled()) {
-            throw new JexlException.Cancel(node);
-        }
+        cancelCheck(node);
         final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
                                       ? JexlOperator.ARRAY_SET : JexlOperator.PROPERTY_SET;
         Object result = operators.tryOverload(node, operator, object, attribute, value);
@@ -1949,7 +1913,15 @@ public class Interpreter extends InterpreterBase {
             @Override
             public Object call() throws Exception {
                 processed[0] = true;
-                return processAnnotation(stmt, index + 1, data);
+                try {
+                    return processAnnotation(stmt, index + 1, data);
+                } catch(JexlException.Return xreturn) {
+                    return xreturn;
+                } catch(JexlException.Break xbreak) {
+                    return xbreak;
+                } catch(JexlException.Continue xcontinue) {
+                    return xcontinue;
+                }
             }
         };
         // the annotation node and name
@@ -1957,21 +1929,25 @@ public class Interpreter extends InterpreterBase {
         final String aname = anode.getName();
         // evaluate the arguments
         Object[] argv = anode.jjtGetNumChildren() > 0
-                ? visit((ASTArguments) anode.jjtGetChild(0), null) : null;
+                        ? visit((ASTArguments) anode.jjtGetChild(0), null) : null;
         // wrap the future, will recurse through annotation processor
+        Object result;
         try {
-            Object result = processAnnotation(aname, argv, jstmt);
+            result = processAnnotation(aname, argv, jstmt);
             // not processing an annotation is an error
             if (!processed[0]) {
                 return annotationError(anode, aname, null);
-            } else {
-                return result;
             }
-        } catch(JexlException xjexl) {
-            throw xjexl;
-        } catch(Exception xany) {
+        } catch (JexlException xany) {
+            throw xany;
+        } catch (Exception xany) {
             return annotationError(anode, aname, xany);
         }
+        // the caller may return a return, break or continue
+        if (result instanceof JexlException) {
+            throw (JexlException) result;
+        }
+        return result;
     }
 
     /**

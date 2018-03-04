@@ -279,10 +279,11 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Cancels this evaluation, setting the cancel flag that will result in a JexlException.Cancel to be thrown.
      * @return false if already cancelled, true otherwise
      */
-    protected synchronized boolean cancel() {
+    protected  boolean cancel() {
         if (cancelled) {
             return false;
-        } else {
+        }
+        synchronized(this) {
             cancelled = true;
             return true;
         }
@@ -293,9 +294,16 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @return true if cancelled, false otherwise
      */
     protected synchronized boolean isCancelled() {
-        if (!cancelled) {
-            cancelled = Thread.currentThread().isInterrupted();
+        return cancelled |= Thread.currentThread().isInterrupted();
+    }
+
+    /**
+     * Throws a JexlException.Cancel if script execution was cancelled.
+     * @param node the node being evaluated
+     */
+    protected void cancelCheck(JexlNode node) {
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
         }
-        return cancelled;
     }
 }

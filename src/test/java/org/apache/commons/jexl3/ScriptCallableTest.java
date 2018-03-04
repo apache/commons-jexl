@@ -495,4 +495,58 @@ public class ScriptCallableTest extends JexlTestCase {
             executor.shutdown();
         }
     }
+
+    public static class AnnotationContext extends MapContext implements JexlContext.AnnotationProcessor {
+        @Override
+        public Object processAnnotation(String name, Object[] args, Callable<Object> statement) throws Exception {
+            if ("timeout".equals(name) && args != null && args.length > 0) {
+                long ms = args[0] instanceof Number
+                          ? ((Number) args[0]).longValue()
+                          : Long.parseLong(args[0].toString());
+                Object def = args.length > 1? args[1] : null;
+                if (ms > 0) {
+                    ExecutorService executor = Executors.newFixedThreadPool(1);
+                    Future<?> future = null;
+                    try {
+                        future = executor.submit(statement);
+                        return future.get(ms, TimeUnit.MILLISECONDS);
+                    } catch (TimeoutException xtimeout) {
+                        if (future != null) {
+                            future.cancel(true);
+                        }
+                    } finally {
+                        executor.shutdown();
+                    }
+
+                }
+                return def;
+            }
+            return statement.call();
+        }
+
+    }
+
+    @Test
+    public void testTimeout() throws Exception {
+        JexlScript script = JEXL.createScript("(flag)->{ @timeout(100) { while(flag); return 42 }; 'cancelled' }");
+        JexlContext ctxt = new AnnotationContext();
+        Object result = null;
+        try {
+            result = script.execute(ctxt, true);
+            Assert.assertEquals("cancelled", result);
+        } catch (Exception xany) {
+            String msg = xany.toString();
+        }
+        result = script.execute(ctxt, false);
+        Assert.assertEquals(42, result);
+        script = JEXL.createScript("(flag)->{ @timeout(100, 'cancelled') { while(flag); 42; } }");
+        try {
+            result = script.execute(ctxt, true);
+            Assert.assertEquals("cancelled", result);
+        } catch (Exception xany) {
+            String msg = xany.toString();
+        }
+        result = script.execute(ctxt, false);
+        Assert.assertEquals(42, result);
+    }
 }
