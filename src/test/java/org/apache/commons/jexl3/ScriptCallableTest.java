@@ -524,6 +524,10 @@ public class ScriptCallableTest extends JexlTestCase {
             return statement.call();
         }
 
+        public void sleep(long ms) throws InterruptedException {
+           Thread.sleep(ms);
+        }
+
     }
 
     @Test
@@ -533,20 +537,44 @@ public class ScriptCallableTest extends JexlTestCase {
         Object result = null;
         try {
             result = script.execute(ctxt, true);
-            Assert.assertEquals("cancelled", result);
         } catch (Exception xany) {
-            String msg = xany.toString();
+            Assert.fail(xany.toString());
         }
+        Assert.assertEquals("cancelled", result);
+
         result = script.execute(ctxt, false);
         Assert.assertEquals(42, result);
         script = JEXL.createScript("(flag)->{ @timeout(100, 'cancelled') { while(flag); 42; } }");
         try {
             result = script.execute(ctxt, true);
-            Assert.assertEquals("cancelled", result);
         } catch (Exception xany) {
-            String msg = xany.toString();
+            Assert.fail(xany.toString());
         }
+        Assert.assertEquals("cancelled", result);
+
         result = script.execute(ctxt, false);
+        Assert.assertEquals(42, result);
+        script = JEXL.createScript("@timeout(10) {sleep(1000); 42; } -42;");
+        try {
+            result = script.execute(ctxt);
+        } catch (Exception xany) {
+            Assert.fail(xany.toString());
+        }
+        Assert.assertEquals(-42, result);
+
+        script = JEXL.createScript("@timeout(10) {sleep(1000); return 42; } return -42;");
+        try {
+            result = script.execute(ctxt);
+        } catch (Exception xany) {
+            Assert.fail(xany.toString());
+        }
+        Assert.assertEquals(-42, result);
+        script = JEXL.createScript("@timeout(1000) {sleep(10); return 42; } return -42;");
+        try {
+            result = script.execute(ctxt);
+        } catch (Exception xany) {
+            Assert.fail(xany.toString());
+        }
         Assert.assertEquals(42, result);
     }
 }

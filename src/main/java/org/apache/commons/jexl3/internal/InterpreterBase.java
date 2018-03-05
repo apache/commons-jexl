@@ -269,7 +269,6 @@ public abstract class InterpreterBase extends ParserVisitor {
             return (JexlException) cause;
         }
         if (cause instanceof InterruptedException) {
-            cancelled = true;
             return new JexlException.Cancel(node);
         }
         return new JexlException(node, methodName, xany);
@@ -280,21 +279,15 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @return false if already cancelled, true otherwise
      */
     protected  boolean cancel() {
-        if (cancelled) {
-            return false;
-        }
-        synchronized(this) {
-            cancelled = true;
-            return true;
-        }
+        return cancelled? false : (cancelled = true);
     }
 
     /**
      * Checks whether this interpreter execution was cancelled due to thread interruption.
      * @return true if cancelled, false otherwise
      */
-    protected synchronized boolean isCancelled() {
-        return cancelled |= Thread.currentThread().isInterrupted();
+    protected boolean isCancelled() {
+        return cancelled | Thread.currentThread().isInterrupted();
     }
 
     /**
