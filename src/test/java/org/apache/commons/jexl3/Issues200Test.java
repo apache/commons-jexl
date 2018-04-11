@@ -387,6 +387,22 @@ public class Issues200Test extends JexlTestCase {
         } catch (JexlException xany) {
             Assert.fail("Should have evaluated to null");
         }
+        try {
+            stmt = "x?.y?.z";
+            script = engine.createScript(stmt);
+            result = script.execute(ctx);
+            Assert.assertNull(result);
+        } catch (JexlException xany) {
+            Assert.fail("Should have evaluated to null");
+        }
+        try {
+            stmt = "x? (x.y? (x.y.z ?: null) :null) : null";
+            script = engine.createScript(stmt);
+            result = script.execute(ctx);
+            Assert.assertNull(result);
+        } catch (JexlException xany) {
+            Assert.fail("Should have evaluated to null");
+        }
     }
 
     @Test
@@ -409,5 +425,43 @@ public class Issues200Test extends JexlTestCase {
         } catch(JexlException xany) {
             String xanystr = xany.toString();
         }
+    }
+
+    @Test
+    public void test256() throws Exception {
+        MapContext ctx = new MapContext() {
+            @Override public void set(String name, Object value) {
+                if ("java".equals(name)) {
+                    throw new JexlException(null, "can not set " + name);
+                }
+                super.set(name, value);
+            }
+            @Override public Object get(String name) {
+                if ("java".equals(name)) {
+                    return null;
+                }
+                return super.get(name);
+            }
+            @Override public boolean has(String name) {
+                if ("java".equals(name)) {
+                    return false;
+                }
+                return super.has(name);
+            }
+        };
+        ctx.set("java.version", 10);
+        JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
+        Object result = null;
+        JexlScript script;
+        script = engine.createScript("java = 3");
+        try {
+             script.execute(ctx);
+             Assert.fail("should have failed!");
+        } catch(JexlException xjexl) {
+            // expected
+        }
+        script = engine.createScript("java.version");
+        result = script.execute(ctx);
+        Assert.assertEquals(10, result);
     }
 }
