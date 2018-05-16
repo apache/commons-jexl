@@ -205,5 +205,72 @@ public class StringParser {
         strb.append(delim);
         return strb.toString();
     }
+    
+    /**
+     * Remove escape char ('\') from an identifier.
+     * @param str the identifier escaped string, ie with a backslash before space, quote, double-quote and backslash
+     * @return the string with no '\\' character
+     */
+    public static String unescapeIdentifier(String str) {
+        StringBuilder strb = null;
+        boolean esc = false;
+        if (str != null) {
+            int n = 0;
+            int last = str.length();
+            while (n < last) {
+                char c = str.charAt(n);
+                if (esc) {
+                    if (strb == null) {
+                        strb = new StringBuilder(last);
+                        strb.append(str.substring(0, n));
+                    } else {
+                        strb.append(c);
+                    }
+                    esc = false;
+                } else if (c == '\\') {
+                    esc = true;
+                } else if (strb != null) {
+                    strb.append(c);
+                }
+                n += 1;
+            }
+        }
+        return strb == null ? str : strb.toString();
+    }
 
+    /**
+     * Adds a escape char ('\') where needed in a string form of an ide
+     * @param str the identifier un-escaped string
+     * @return the string with added  backslash character before space, quote, double-quote and backslash
+     */
+    public static String escapeIdentifier(String str) {
+        StringBuilder strb = null;
+        if (str != null) {
+            int n = 0;
+            int last = str.length();
+            while (n < last) {
+                char c = str.charAt(n);
+                switch (c) {
+                    case ' ':
+                    case '\'':
+                    case '"':
+                    case '\\': {
+                        if (strb == null) {
+                            strb = new StringBuilder(last);
+                            strb.append(str.substring(0, n));
+                        }
+                        strb.append('\\');
+                        strb.append(c);
+                        break;
+                    }
+                    default:
+                        if (strb != null) {
+                            strb.append(c);
+                        }
+                }
+                n += 1;
+            }
+        }
+        return strb == null ? str : strb.toString();
+    }
 }
