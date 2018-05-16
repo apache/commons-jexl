@@ -81,8 +81,9 @@ public class ParserTest {
     public void testIdentifierEscape() {
         String[] ids = new String[]{"a\\ b", "a\\ b\\ c", "a\\'b\\\"c", "a\\ \\ c"};
         for(String id : ids) {
-            String esc0 = StringParser.escapeIdentifier(id);
-            String esc1 = StringParser.unescapeIdentifier(esc0);
+            String esc0 = StringParser.unescapeIdentifier(id);
+            Assert.assertFalse(esc0.contains("\\"));
+            String esc1 = StringParser.escapeIdentifier(esc0);
             Assert.assertEquals(id, esc1);
         }
     }

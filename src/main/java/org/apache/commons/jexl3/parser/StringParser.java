@@ -213,22 +213,16 @@ public class StringParser {
      */
     public static String unescapeIdentifier(String str) {
         StringBuilder strb = null;
-        boolean esc = false;
         if (str != null) {
             int n = 0;
             int last = str.length();
             while (n < last) {
                 char c = str.charAt(n);
-                if (esc) {
+                if (c == '\\') {
                     if (strb == null) {
                         strb = new StringBuilder(last);
                         strb.append(str.substring(0, n));
-                    } else {
-                        strb.append(c);
-                    }
-                    esc = false;
-                } else if (c == '\\') {
-                    esc = true;
+                    } 
                 } else if (strb != null) {
                     strb.append(c);
                 }
@@ -239,7 +233,7 @@ public class StringParser {
     }
 
     /**
-     * Adds a escape char ('\') where needed in a string form of an ide
+     * Adds a escape char ('\') where needed in a string form of an identifier.
      * @param str the identifier un-escaped string
      * @return the string with added  backslash character before space, quote, double-quote and backslash
      */
