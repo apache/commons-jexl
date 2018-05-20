@@ -1397,6 +1397,28 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
+     * Concatenate arguments in call(...).
+     * @param target the pseudo-method owner, first to-be argument
+     * @param narrow whether we should attempt to narrow number arguments
+     * @param args   the other (non null) arguments
+     * @return the arguments array
+     */
+    private Object[] callArguments(Object target, boolean narrow, Object[] args) {
+        // makes target 1st args, copy others - optionally narrow numbers
+        Object[] nargv = new Object[args.length + 1];
+        if (narrow) {
+            nargv[0] = functionArgument(true, target);
+            for (int a = 1; a <= args.length; ++a) {
+                nargv[a] = functionArgument(true, args[a - 1]);
+            }
+        } else {
+            nargv[0] = target;
+            System.arraycopy(args, 0, nargv, 1, args.length);
+        }
+        return nargv;
+    }
+    
+    /**
      * Optionally narrows an argument for a function call.
      * @param narrow whether narrowing should occur
      * @param arg    the argument
@@ -1474,7 +1496,26 @@ public class Interpreter extends InterpreterBase {
             return me.tryInvoke(name, ii.context, ii.functionArguments(target, narrow, args));
         }
     }
+    
+    /**
+     * A ctor that needs a context as 1st argument.
+     */
+    private static class ContextualCtor extends Funcall {
+        /**
+         * Constructor.
+         * @param jme the method
+         * @param flag the narrow flag
+         */
+        protected ContextualCtor(JexlMethod jme, boolean flag) {
+            super(jme, flag);
+        }
 
+        @Override
+        protected Object tryInvoke(Interpreter ii, String name, Object target, Object[] args) {
+            return me.tryInvoke(name, target, ii.callArguments(ii.context, narrow, args));
+        }
+    }
+    
     /**
      * Calls a method (or function).
      * <p>
@@ -1656,9 +1697,11 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTConstructorNode node, Object data) {
-        cancelCheck(node);
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
+        }
         // first child is class or class name
-        Object cobject = node.jjtGetChild(0).jjtAccept(this, data);
+        final Object target = node.jjtGetChild(0).jjtAccept(this, data);
         // get the ctor args
         int argc = node.jjtGetNumChildren() - 1;
         Object[] argv = new Object[argc];
@@ -1667,39 +1710,64 @@ public class Interpreter extends InterpreterBase {
         }
 
         try {
-            // attempt to reuse last constructor cached in volatile JexlNode.value
+            boolean cacheable = cache;
+            // attempt to reuse last funcall cached in volatile JexlNode.value
             if (cache) {
                 Object cached = node.jjtGetValue();
-                if (cached instanceof JexlMethod) {
-                    JexlMethod mctor = (JexlMethod) cached;
-                    Object eval = mctor.tryInvoke(null, cobject, argv);
-                    if (!mctor.tryFailed(eval)) {
+                if (cached instanceof Funcall) {
+                    Object eval = ((Funcall) cached).tryInvoke(this, null, target, argv);
+                    if (JexlEngine.TRY_FAILED != eval) {
                         return eval;
                     }
                 }
             }
-            JexlMethod ctor = uberspect.getConstructor(cobject, argv);
-            // DG: If we can't find an exact match, narrow the parameters and try again
-            if (ctor == null) {
+            boolean narrow = false;
+            JexlMethod ctor = null;
+            Funcall funcall = null;
+            while (true) {
+                // try as stated
+                ctor = uberspect.getConstructor(target, argv);
+                if (ctor != null) {
+                    if (cacheable && ctor.isCacheable()) {
+                        funcall = new Funcall(ctor, narrow);
+                    }
+                    break;
+                }
+                // try with prepending context as first argument
+                Object[] nargv = callArguments(context, narrow, argv);
+                ctor = uberspect.getConstructor(target, nargv);
+                if (ctor != null) {
+                    if (cacheable && ctor.isCacheable()) {
+                        funcall = new ContextualCtor(ctor, narrow);
+                    }
+                    argv = nargv;
+                    break;
+                }
+                // if we did not find an exact method by name and we haven't tried yet,
+                // attempt to narrow the parameters and if this succeeds, try again in next loop
                 if (arithmetic.narrowArguments(argv)) {
-                    ctor = uberspect.getConstructor(cobject, argv);
+                    narrow = true;
+                    continue;
                 }
-                if (ctor == null) {
-                    String dbgStr = cobject != null ? cobject.toString() : null;
-                    return unsolvableMethod(node, dbgStr);
+                // we are done trying
+                break;
+            }
+            // we have either evaluated and returned or might have found a ctor
+            if (ctor != null) {
+                Object eval = ctor.invoke(target, argv);
+                // cache executor in volatile JexlNode.value
+                if (funcall != null) {
+                    node.jjtSetValue(funcall);
                 }
+                return eval;
             }
-            Object instance = ctor.invoke(cobject, argv);
-            // cache executor in volatile JexlNode.value
-            if (cache && ctor.isCacheable()) {
-                node.jjtSetValue(ctor);
-            }
-            return instance;
-        } catch (JexlException xthru) {
-            throw xthru;
+            String tstr = target != null ? target.toString() : "?";
+            return unsolvableMethod(node, tstr);
+        } catch (JexlException.Method xmethod) {
+            throw xmethod;
         } catch (Exception xany) {
-            String dbgStr = cobject != null ? cobject.toString() : null;
-            throw invocationException(node, dbgStr, xany);
+            String tstr = target != null ? target.toString() : "?";
+            throw invocationException(node, tstr, xany);
         }
     }
 

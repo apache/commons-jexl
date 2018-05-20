@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-260">
+                Automatically inject JexlContext in constructor call when possible
+            </action>
             <action dev="henrib" type="add" issue="JEXL-252" due-to="Dmitri Blinov">
                 Allow for interpolated strings to be used in property access operators
             </action>

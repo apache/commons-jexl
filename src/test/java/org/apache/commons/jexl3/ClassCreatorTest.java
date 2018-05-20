@@ -233,4 +233,32 @@ public class ClassCreatorTest extends JexlTestCase {
         r = s.execute(null, TwoCtors.class, 100f);
         Assert.assertEquals(-100, r);
     }
+        
+    public static class ContextualCtor {
+        int value = -1;
+        
+        public ContextualCtor(JexlContext ctxt) {
+            value = (Integer) ctxt.get("value");
+        }
+        
+        public ContextualCtor(JexlContext ctxt, int v) {
+            value = (Integer) ctxt.get("value") + v;
+        }
+        
+        public int getValue() {
+            return value;
+        }
+    }
+    
+    @Test
+    public void testContextualCtor() throws Exception {
+        MapContext ctxt = new MapContext();
+        ctxt.set("value", 42);
+        JexlScript s = jexl.createScript("(c)->{ new(c).value }");
+        Object r = s.execute(ctxt, ContextualCtor.class);
+        Assert.assertEquals(42, r);
+        s = jexl.createScript("(c, v)->{ new(c, v).value }");
+        r = s.execute(ctxt, ContextualCtor.class, 100);
+        Assert.assertEquals(142, r);
+    }
 }
