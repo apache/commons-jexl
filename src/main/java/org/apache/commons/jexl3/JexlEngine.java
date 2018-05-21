@@ -268,8 +268,8 @@ public abstract class JexlEngine {
 
     /**
      * Sets the class loader used to discover classes in 'new' expressions.
-     * <p>This method is <em>not</em> thread safe; it should be called as an optional step of the JexlEngine
-     * initialization code before expression creation &amp; evaluation.</p>
+     * <p>This method is <em>not</em> thread safe; it may be called after JexlEngine
+     * initialization and allow scripts to use new classes definitions.</p>
      *
      * @param loader the class loader to use
      */

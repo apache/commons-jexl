@@ -238,6 +238,27 @@ public class Engine extends JexlEngine {
     @Override
     public void setClassLoader(ClassLoader loader) {
         uberspect.setClassLoader(loader);
+        if (functions != null) {
+            ClassLoader nloader = uberspect.getClassLoader();
+            List<String> names = new ArrayList<String>(functions.keySet());
+            for(String name : names) {
+                Object functor = functions.get(name);
+                if (functor instanceof Class<?>) {
+                    Class<?> fclass = ((Class<?>) functor);
+                    try {
+                        Class<?> nclass = nloader.loadClass(fclass.getName());
+                        if (nclass != fclass) {
+                            if (nclass == null) {
+                                nclass = Void.class;
+                            }
+                            functions.put(name, nclass);
+                        }
+                    } catch (ClassNotFoundException xany) {
+                         functions.remove(name);
+                    }
+                }
+            }
+        }
     }
 
     @Override

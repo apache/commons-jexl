@@ -214,6 +214,12 @@ public interface JexlUberspect {
      * @param loader the class loader
      */
     void setClassLoader(ClassLoader loader);
+    
+    /**
+     * Gets the current class loader.
+     * @return the class loader
+     */
+    ClassLoader getClassLoader();
 
     /**
      * Gets this uberspect version.

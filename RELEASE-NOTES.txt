@@ -55,6 +55,7 @@ New Features in 3.2:
 Bugs Fixed in 3.2:
 ==================
 
+* JEXL-261:      JexlEngine.setClassLoader(...) should reload namespaces that are classes
 * JEXL-246:      Intermittent ambiguous method invocation when processing assignOverload
 * JEXL-245:      Engine in strict mode fails to fail on unsolvable variables or properties
 * JEXL-244:      Webapp classloader memory leaks

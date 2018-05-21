@@ -124,6 +124,11 @@ public class Uberspect implements JexlUberspect {
             version.incrementAndGet();
         }
     }
+    
+    @Override
+    public ClassLoader getClassLoader() {
+        return loader.get();
+    }
 
     @Override
     public int getVersion() {

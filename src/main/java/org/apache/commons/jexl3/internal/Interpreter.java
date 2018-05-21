@@ -249,33 +249,51 @@ public class Interpreter extends InterpreterBase {
                 throw new JexlException(node, "no such function namespace " + prefix, null);
             }
         }
-        // allow namespace to instantiate a functor with context if possible, not an error otherwise
-        Object functor = null;
-        if (namespace instanceof JexlContext.NamespaceFunctor) {
-            functor = ((JexlContext.NamespaceFunctor) namespace).createFunctor(context);
-        } else if (namespace instanceof Class<?>) {
-            Object[] args = new Object[]{context};
-            JexlMethod ctor = uberspect.getConstructor(namespace, args);
-            if (ctor != null) {
-                try {
-                    functor = ctor.invoke(namespace, args);
-                } catch (Exception xinst) {
-                    throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
+        // shortcut if ns is known to be not-a-functor
+        final boolean cacheable = cache;
+        Object cached = cacheable ? node.jjtGetValue() : null;
+        if (cached != JexlContext.NamespaceFunctor.class) {
+            // allow namespace to instantiate a functor with context if possible, not an error otherwise
+            Object functor = null;
+            if (namespace instanceof JexlContext.NamespaceFunctor) {
+                functor = ((JexlContext.NamespaceFunctor) namespace).createFunctor(context);
+            } else if (namespace != null) {
+                // attempt to reuse last ctor cached in volatile JexlNode.value
+                if (cached instanceof JexlMethod) {
+                    Object eval = ((JexlMethod) cached).tryInvoke(null, context);
+                    if (JexlEngine.TRY_FAILED != eval) {
+                        functor = eval;
+                    }
+                }
+                if (functor == null) {
+                    JexlMethod ctor = uberspect.getConstructor(namespace, context);
+                    if (ctor != null) {
+                        try {
+                            functor = ctor.invoke(namespace, context);
+                            if (cacheable && ctor.isCacheable()) {
+                                node.jjtSetValue(ctor);
+                            }
+                        } catch (Exception xinst) {
+                            throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
+                        }
+                    }
                 }
             }
-        }
-        // got a functor, store it and return it
-        if (functor != null) {
-            synchronized (this) {
-                if (functors == null) {
-                    functors = new HashMap<String, Object>();
+            // got a functor, store it and return it
+            if (functor != null) {
+                synchronized (this) {
+                    if (functors == null) {
+                        functors = new HashMap<String, Object>();
+                    }
+                    functors.put(prefix, functor);
                 }
-                functors.put(prefix, functor);
+                return functor;
+            } else {
+                // use the NamespaceFunctor class to tag this node as not-a-functor
+                node.jjtSetValue(JexlContext.NamespaceFunctor.class);
             }
-            return functor;
-        } else {
-            return namespace;
         }
+        return namespace;
     }
 
     @Override
@@ -1431,7 +1449,7 @@ public class Interpreter extends InterpreterBase {
     /**
      * Cached function call.
      */
-    private static class Funcall {
+    private static class Funcall implements JexlNode.Funcall {
         /** Whether narrow should be applied to arguments. */
         protected final boolean narrow;
         /** The JexlMethod to delegate the call to. */
@@ -1712,7 +1730,7 @@ public class Interpreter extends InterpreterBase {
         try {
             boolean cacheable = cache;
             // attempt to reuse last funcall cached in volatile JexlNode.value
-            if (cache) {
+            if (cacheable) {
                 Object cached = node.jjtGetValue();
                 if (cached instanceof Funcall) {
                     Object eval = ((Funcall) cached).tryInvoke(this, null, target, argv);

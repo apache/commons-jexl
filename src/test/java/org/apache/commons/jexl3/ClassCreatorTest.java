@@ -22,7 +22,9 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -105,6 +107,7 @@ public class ClassCreatorTest extends JexlTestCase {
     public void testOne() throws Exception {
         // abort test if class creator can not run
         if (!ClassCreator.canRun) {
+            logger.warn("unable to create classes");
             return;
         }
         ClassCreator cctor = new ClassCreator(jexl, base);
@@ -113,7 +116,154 @@ public class ClassCreatorTest extends JexlTestCase {
         Assert.assertEquals("foo1", foo1.getSimpleName());
         cctor.clear();
     }
-
+    
+    @Test
+    public void testFunctorOne() throws Exception {
+        JexlContext ctxt = new MapContext();
+        ctxt.set("value", 1000);
+        
+        // create a class foo1 with a ctor whose body gets a value
+        // from the context to initialize its value
+        ClassCreator cctor = new ClassCreator(jexl, base);
+        cctor.setSeed(1);
+        cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 10;");
+        Class<?> foo1 = cctor.createClass(true);
+        Assert.assertTrue(foo1.getClassLoader() == cctor.getClassLoader());
+        Assert.assertEquals("foo1", foo1.getSimpleName());
+        Object result = cctor.newInstance(foo1, ctxt);
+        Assert.assertEquals(foo1, result.getClass());
+        jexl.setClassLoader(cctor.getClassLoader());
+        cctor.clear();
+        
+        // check we can invoke that ctor using its name or class
+        JexlScript script = jexl.createScript("(c)->{ new(c).value; }");
+        result = script.execute(ctxt, foo1);
+        Assert.assertEquals(1010, result);
+        result = script.execute(ctxt, foo1.getName());
+        Assert.assertEquals(1010, result);
+        
+        // re-create foo1 with a different body!
+        cctor.setSeed(1);
+        cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 99;");
+        Class<?> foo11 = cctor.createClass(true);
+        Assert.assertEquals("foo1", foo1.getSimpleName());
+        Assert.assertTrue(foo11 != foo1);
+        foo1 = foo11;
+        result = cctor.newInstance(foo1, ctxt);
+        Assert.assertEquals(foo1, result.getClass());
+        // drum rolll....
+        jexl.setClassLoader(foo1.getClassLoader());
+        result = script.execute(ctxt, foo1.getName());
+        // tada! 
+        Assert.assertEquals(1099, result);
+        result = script.execute(ctxt, foo1);
+        Assert.assertEquals(1099, result);
+    }
+    
+    public static class NsTest implements JexlContext.NamespaceFunctor {
+        private String className;
+        
+        public NsTest(String cls) {
+            className = cls;
+        }
+        @Override
+        public Object createFunctor(JexlContext context) {
+            JexlEngine jexl = JexlEngine.getThreadEngine();
+            return jexl.newInstance(className, context);
+        }
+        
+    }
+        
+    @Test
+    public void testFunctor2Name() throws Exception {
+        functorTwo(ClassCreator.GEN_CLASS + "foo2");
+    }
+    
+    @Test
+    public void testFunctor2Class() throws Exception {
+        functorTwo(new NsTest(ClassCreator.GEN_CLASS + "foo2"));
+    }
+    
+    void functorTwo(Object nstest) throws Exception {
+        // create jexl2 with a 'test' namespace 
+        Map<String, Object> ns = new HashMap<String, Object>();
+        ns.put("test", nstest);
+        JexlEngine jexl2 = new JexlBuilder().namespaces(ns).create();
+        JexlContext ctxt = new MapContext();
+        ctxt.set("value", 1000);
+        
+        // inject 'foo2' as test namespace functor class
+        ClassCreator cctor = new ClassCreator(jexl, base);
+        cctor.setSeed(2);
+        cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 10;");
+        Class<?> foo1 = cctor.createClass(true);
+        Assert.assertTrue(foo1.getClassLoader() == cctor.getClassLoader());
+        Assert.assertEquals("foo2", foo1.getSimpleName());
+        Object result = cctor.newInstance(foo1, ctxt);
+        Assert.assertEquals(foo1, result.getClass());
+        jexl2.setClassLoader(cctor.getClassLoader());
+        cctor.clear();
+        
+        // check the namespace functor behavior
+        JexlScript script = jexl2.createScript("test:getValue()");
+        result = script.execute(ctxt, foo1.getName());
+        Assert.assertEquals(1010, result);
+        
+        // change the body
+        cctor.setSeed(2);
+        cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 99;");
+        Class<?> foo11 = cctor.createClass(true);
+        Assert.assertEquals("foo2", foo1.getSimpleName());
+        Assert.assertTrue(foo11 != foo1);
+        foo1 = foo11;
+        result = cctor .newInstance(foo1, ctxt);
+        Assert.assertEquals(foo1, result.getClass());
+        // drum rolll....
+        jexl2.setClassLoader(foo1.getClassLoader());
+        result = script.execute(ctxt, foo1.getName());
+        // tada! 
+        Assert.assertEquals(1099, result);
+    }
+            
+    @Test
+    public void testFunctorThree() throws Exception {
+        JexlContext ctxt = new MapContext();
+        ctxt.set("value", 1000);
+        
+        ClassCreator cctor = new ClassCreator(jexl, base);
+        cctor.setSeed(2);
+        cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 10;");
+        Class<?> foo1 = cctor.createClass(true);
+        Assert.assertTrue(foo1.getClassLoader() == cctor.getClassLoader());
+        Assert.assertEquals("foo2", foo1.getSimpleName());
+        Object result = cctor.newInstance(foo1, ctxt);
+        Assert.assertEquals(foo1, result.getClass());
+        jexl.setClassLoader(cctor.getClassLoader());
+        cctor.clear();
+        
+        Map<String, Object> ns = new HashMap<String, Object>();
+        ns.put("test", foo1);
+        JexlEngine jexl2 = new JexlBuilder().namespaces(ns).create();
+        
+        JexlScript script = jexl2.createScript("test:getValue()");
+        result = script.execute(ctxt, foo1.getName());
+        Assert.assertEquals(1010, result);
+        
+        cctor.setSeed(2);
+        cctor.setCtorBody("value = (Integer) ctxt.get(\"value\") + 99;");
+        Class<?> foo11 = cctor.createClass(true);
+        Assert.assertEquals("foo2", foo1.getSimpleName());
+        Assert.assertTrue(foo11 != foo1);
+        foo1 = foo11;
+        result = cctor.newInstance(foo1, ctxt);
+        Assert.assertEquals(foo1, result.getClass());
+        // drum rolll....
+        jexl2.setClassLoader(foo1.getClassLoader());
+        result = script.execute(ctxt, foo1.getName());
+        // tada! 
+        Assert.assertEquals(1099, result);
+    }
+    
     @Test
     public void testMany() throws Exception {
         // abort test if class creator can not run

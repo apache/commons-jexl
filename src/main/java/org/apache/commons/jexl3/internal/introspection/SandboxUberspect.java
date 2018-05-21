@@ -57,6 +57,11 @@ public final class SandboxUberspect implements JexlUberspect {
     public void setClassLoader(ClassLoader loader) {
         uberspect.setClassLoader(loader);
     }
+        
+    @Override
+    public ClassLoader getClassLoader() {
+        return uberspect.getClassLoader();
+    }
 
     @Override
     public int getVersion() {

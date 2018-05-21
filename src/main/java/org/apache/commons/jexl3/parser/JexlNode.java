@@ -81,6 +81,11 @@ public abstract class JexlNode extends SimpleNode {
             return info;
         }
     }
+    
+    /**
+     * Marker interface for cachable function calls.
+     */
+    public interface Funcall {} 
 
     /**
      * Clears any cached value of type JexlProperty{G,S}et or JexlMethod.
@@ -92,7 +97,8 @@ public abstract class JexlNode extends SimpleNode {
         final Object value = jjtGetValue();
         if (value instanceof JexlPropertyGet
             || value instanceof JexlPropertySet
-            || value instanceof JexlMethod) {
+            || value instanceof JexlMethod
+            || value instanceof Funcall ) {
             jjtSetValue(null);
         }
         for (int n = 0; n < jjtGetNumChildren(); ++n) {
@@ -227,7 +233,6 @@ public abstract class JexlNode extends SimpleNode {
      * over the error generation; ie, ternaries can return null even if the engine in strict mode
      * would normally throw an exception.
      * </p>
-     * @param node the expression node
      * @return true if nullable variable, false otherwise
      */
     public boolean isTernaryProtected() {

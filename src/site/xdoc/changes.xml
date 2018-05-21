@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-261">
+                JexlEngine.setClassLoader(...) should reload namespaces that are classes
+            </action>
             <action dev="henrib" type="add" issue="JEXL-260">
                 Automatically inject JexlContext in constructor call when possible
             </action>

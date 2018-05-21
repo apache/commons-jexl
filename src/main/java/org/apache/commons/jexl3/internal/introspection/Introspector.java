@@ -273,14 +273,14 @@ public final class Introspector {
                     constructorsMap.put(key, CTOR_MISS);
                 }
             } catch (ClassNotFoundException xnotfound) {
-                if (rlog != null && rlog.isInfoEnabled()) {
-                    rlog.info("unable to find class: "
+                if (rlog != null && rlog.isDebugEnabled()) {
+                    rlog.debug("unable to find class: "
                             + cname + "."
                             + key.debugString(), xnotfound);
                 }
                 ctor = null;
             } catch (MethodKey.AmbiguousException xambiguous) {
-                if (rlog != null && rlog.isInfoEnabled()) {
+                if (rlog != null  && xambiguous.isSevere() &&  rlog.isInfoEnabled()) {
                     rlog.info("ambiguous constructor invocation: "
                             + cname + "."
                             + key.debugString(), xambiguous);
