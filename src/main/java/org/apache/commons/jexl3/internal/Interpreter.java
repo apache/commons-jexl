@@ -257,7 +257,7 @@ public class Interpreter extends InterpreterBase {
             Object functor = null;
             if (namespace instanceof JexlContext.NamespaceFunctor) {
                 functor = ((JexlContext.NamespaceFunctor) namespace).createFunctor(context);
-            } else if (namespace != null) {
+            } else if (namespace instanceof Class<?> || namespace instanceof String) {
                 // attempt to reuse last ctor cached in volatile JexlNode.value
                 if (cached instanceof JexlMethod) {
                     Object eval = ((JexlMethod) cached).tryInvoke(null, context);
@@ -1690,10 +1690,12 @@ public class Interpreter extends InterpreterBase {
                 }
                 // if we did not find an exact method by name and we haven't tried yet,
                 // attempt to narrow the parameters and if this succeeds, try again in next loop
-                if (!arithmetic.narrowArguments(argv)) {
-                    break;
+                if (!narrow && arithmetic.narrowArguments(argv)) {
+                    narrow = true;
+                    continue;
                 }
-                narrow = true;
+                // stop trying
+                break;
             }
             // we have either evaluated and returned or might have found a method
             if (vm != null) {
@@ -1763,7 +1765,7 @@ public class Interpreter extends InterpreterBase {
                 }
                 // if we did not find an exact method by name and we haven't tried yet,
                 // attempt to narrow the parameters and if this succeeds, try again in next loop
-                if (arithmetic.narrowArguments(argv)) {
+                if (!narrow && arithmetic.narrowArguments(argv)) {
                     narrow = true;
                     continue;
                 }
