@@ -39,6 +39,7 @@ What's new in 3.2:
 New Features in 3.2:
 ====================
 
+* JEXL-264:      Allow space, quote & double-quote in identifiers
 * JEXL-260:      Automatically inject JexlContext in constructor call when possible
 * JEXL-252:      Allow for interpolated strings to be used in property access operators
 * JEXL-250:      Safe navigation operator

@@ -219,11 +219,13 @@ TOKEN_MGR_DECLS : {
 
 <DEFAULT, REGISTERS> TOKEN : /* IDENTIFIERS */
 {
-  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>|<ESCAPE>)* > { matchedToken.image = StringParser.unescapeIdentifier(matchedToken.image); }
 |
   < #LETTER: [ "a"-"z", "A"-"Z", "_", "$", "@" ] >
 |
   < #DIGIT: [ "0"-"9"] >
+|
+  < #ESCAPE: "\\" [" ", "'", "\"", "\\"] >
 }
 
 <REGISTERS> TOKEN : /* REGISTERS: parser.ALLOW_REGISTER must be set to true before calling parse */

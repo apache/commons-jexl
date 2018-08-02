@@ -233,7 +233,7 @@ public class StringParser {
     }
 
     /**
-     * Adds a escape char ('\') where needed in a string form of an identifier.
+     * Adds a escape char ('\') where needed in a string form of an ide
      * @param str the identifier un-escaped string
      * @return the string with added  backslash character before space, quote, double-quote and backslash
      */

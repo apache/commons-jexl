@@ -98,6 +98,7 @@ import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
 import java.util.regex.Pattern;
+import org.apache.commons.jexl3.parser.StringParser;
 
 /**
  * Helps pinpoint the cause of problems in expressions that fail during evaluation.
@@ -601,11 +602,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTIdentifier node, Object data) {
-        String image = node.getName();
-        if (needQuotes(image)) {
-            // quote it
-            image = "'" + image.replace("'", "\\'") + "'";
-        }
+        String image = StringParser.escapeIdentifier(node.getName());
         return check(node, image, data);
     }
 

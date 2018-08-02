@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-264">
+                Allow space, quote and double-quote in identifiers
+            </action>
             <action dev="henrib" type="add" issue="JEXL-261">
                 JexlEngine.setClassLoader(...) should reload namespaces that are classes
             </action>

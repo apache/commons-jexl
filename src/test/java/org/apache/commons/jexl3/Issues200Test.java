@@ -464,4 +464,23 @@ public class Issues200Test extends JexlTestCase {
         result = script.execute(ctx);
         Assert.assertEquals(10, result);
     }
+      
+    @Test
+    public void test230() throws Exception {
+        JexlEngine jexl = new JexlBuilder().cache(4).create();
+        JexlContext ctxt = new MapContext();
+        int[] foo = {42};
+        ctxt.set("fo o", foo);
+        Object value;
+        for (int l = 0; l < 2; ++l) {
+            value = jexl.createExpression("fo\\ o[0]").evaluate(ctxt);
+            Assert.assertEquals(42, value);
+            value = jexl.createExpression("fo\\ o[0] = 43").evaluate(ctxt);
+            Assert.assertEquals(43, value);
+            value = jexl.createExpression("fo\\ o.0").evaluate(ctxt);
+            Assert.assertEquals(43, value);
+            value = jexl.createExpression("fo\\ o.0 = 42").evaluate(ctxt);
+            Assert.assertEquals(42, value);
+        }
+    }
 }
