@@ -1368,20 +1368,11 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTFunctionNode node, Object data) {
-        int argc = node.jjtGetNumChildren();
-        if (argc == 2) {
-            ASTIdentifier functionNode = (ASTIdentifier) node.jjtGetChild(0);
-            ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
-            return call(node, context, functionNode, argNode);
-        } else {
-            // objectNode 0 is the prefix
-            String prefix = ((ASTIdentifier) node.jjtGetChild(0)).getName();
-            Object namespace = resolveNamespace(prefix, node);
-            // objectNode 1 is the identifier , the others are parameters.
-            ASTIdentifier functionNode = (ASTIdentifier) node.jjtGetChild(1);
-            ASTArguments argNode = (ASTArguments) node.jjtGetChild(2);
-            return call(node, namespace, functionNode, argNode);
-        }
+        ASTIdentifier functionNode = (ASTIdentifier) node.jjtGetChild(0);
+        String nsid = functionNode.getNamespace();
+        Object namespace = (nsid != null)? resolveNamespace(nsid, node) : context;
+        ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
+        return call(node, namespace, functionNode, argNode);
     }
 
     /**

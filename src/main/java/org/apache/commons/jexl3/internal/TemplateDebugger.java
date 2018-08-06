@@ -151,20 +151,16 @@ public class TemplateDebugger extends Debugger {
     private int getPrintStatement(JexlNode child) {
         if (child instanceof ASTFunctionNode) {
             ASTFunctionNode node = (ASTFunctionNode) child;
-            int num = node.jjtGetNumChildren();
-            if (num == 3) {
-                ASTIdentifier ns = (ASTIdentifier) node.jjtGetChild(0);
-                ASTIdentifier fn = (ASTIdentifier) node.jjtGetChild(1);
-                JexlNode args = node.jjtGetChild(2);
-                if ("jexl".equals(ns.getName())
-                    && "print".equals(fn.getName())
-                    && args.jjtGetNumChildren() == 1
-                    && args.jjtGetChild(0) instanceof ASTNumberLiteral) {
-                    ASTNumberLiteral exprn = (ASTNumberLiteral) args.jjtGetChild(0);
-                    int n = exprn.getLiteral().intValue();
-                    if (exprs != null && n >= 0 && n < exprs.length) {
-                        return n;
-                    }
+            ASTIdentifier ns = (ASTIdentifier) node.jjtGetChild(0);
+            JexlNode args = node.jjtGetChild(1);
+            if ("jexl".equals(ns.getNamespace())
+                && "print".equals(ns.getName())
+                && args.jjtGetNumChildren() == 1
+                && args.jjtGetChild(0) instanceof ASTNumberLiteral) {
+                ASTNumberLiteral exprn = (ASTNumberLiteral) args.jjtGetChild(0);
+                int n = exprn.getLiteral().intValue();
+                if (exprs != null && n >= 0 && n < exprs.length) {
+                    return n;
                 }
             }
         }

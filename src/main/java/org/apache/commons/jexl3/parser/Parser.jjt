@@ -144,7 +144,7 @@ TOKEN_MGR_DECLS : {
     | < LBRACKET : "[" >
     | < RBRACKET : "]" >
     | < SEMICOL : ";" >
-    | < COLON : ":" >
+    | < COLON : ":" > 
     | < COMMA : "," >
     | < DOT : "." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < QDOT : "?." > { pushDot(); } /* Lexical state is now DOT_ID */
@@ -591,15 +591,22 @@ void Identifier(boolean top) :
     t=<REGISTER> { jjtThis.setSymbol(t.image); }
 }
 
+
+void NamespaceIdentifier()  #NamespaceIdentifier :
+{
+    Token ns;
+    Token id;
+}
+{
+    ns=<IDENTIFIER> <COLON> id=<IDENTIFIER> { jjtThis.setNamespace(ns.image, id.image); }
+}
+
 void StringIdentifier() #Identifier :
 {
     Token t;
 }
 {
-  t=<STRING_LITERAL>
-  {
-    jjtThis.setSymbol(Parser.buildString(t.image, true));
-  }
+    t=<STRING_LITERAL>  { jjtThis.setSymbol(Parser.buildString(t.image, true));  }
 }
 
 void Literal() #void :
@@ -736,7 +743,7 @@ void Arguments() #Arguments : {}
 
 void FunctionCallLookahead() #void : {}
 {
-    LOOKAHEAD(4) <IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>
+    LOOKAHEAD(2) <IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>
     |
     LOOKAHEAD(2) <IDENTIFIER> <LPAREN>
     |
@@ -745,7 +752,7 @@ void FunctionCallLookahead() #void : {}
 
 void FunctionCall() #void : {}
 {
-      LOOKAHEAD(2) Identifier() <COLON> Identifier() Arguments() #FunctionNode(3)
+      LOOKAHEAD(2) NamespaceIdentifier() Arguments() #FunctionNode(2)
     |
       LOOKAHEAD(2) Identifier(true) Arguments() #FunctionNode(2)
 }

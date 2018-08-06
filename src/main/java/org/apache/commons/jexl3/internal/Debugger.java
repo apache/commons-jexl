@@ -602,8 +602,14 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTIdentifier node, Object data) {
+        String ns = node.getNamespace();
         String image = StringParser.escapeIdentifier(node.getName());
-        return check(node, image, data);
+        if (ns == null) {
+            return check(node, image, data);
+        } else {
+            String nsid = StringParser.escapeIdentifier(ns) + ":" + image;
+            return check(node, nsid, data);
+        }
     }
 
     @Override

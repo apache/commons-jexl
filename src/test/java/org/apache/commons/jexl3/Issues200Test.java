@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -482,5 +483,28 @@ public class Issues200Test extends JexlTestCase {
             value = jexl.createExpression("fo\\ o.0 = 42").evaluate(ctxt);
             Assert.assertEquals(42, value);
         }
+    }
+    
+    @Test
+    public void test265() throws Exception {
+        JexlEngine jexl = new JexlBuilder().cache(4).create();
+        JexlContext ctxt = new MapContext();
+        ctxt.set("x", 42);
+        Object result;
+        JexlScript script;
+        try {
+            script = jexl.createScript("(true) ? x : abs(1)");
+        } catch (JexlException.Parsing xparse) {
+            // ambiguous, parsing fails
+        }
+        script = jexl.createScript("(true) ? (x) : abs(2)");
+        result = script.execute(ctxt);  
+        Assert.assertEquals(42, result);
+        script = jexl.createScript("(true) ? x : (abs(3))");
+        result = script.execute(ctxt);  
+        Assert.assertEquals(42, result);
+        script = jexl.createScript("(!true) ? abs(4) : x");
+        result = script.execute(ctxt);  
+        Assert.assertEquals(42, result);
     }
 }

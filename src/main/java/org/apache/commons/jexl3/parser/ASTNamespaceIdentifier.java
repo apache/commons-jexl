@@ -17,51 +17,28 @@
 package org.apache.commons.jexl3.parser;
 
 /**
- * Identifiers, variables, ie symbols.
+ * Namespace : identifier.
  */
-public class ASTIdentifier extends JexlNode {
-    protected String name = null;
-    protected int symbol = -1;
-
-    ASTIdentifier(int id) {
+public class ASTNamespaceIdentifier extends ASTIdentifier {
+    private String namespace;
+    
+    public ASTNamespaceIdentifier(int id) {
         super(id);
     }
-
-    ASTIdentifier(Parser p, int id) {
-        super(p, id);
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    void setSymbol(String identifier) {
-        if (identifier.charAt(0) == '#') {
-            symbol = Integer.parseInt(identifier.substring(1));
-        }
-        name = identifier;
-    }
-
-    void setSymbol(int r, String identifier) {
-        symbol = r;
-        name = identifier;
-    }
-
-    public int getSymbol() {
-        return symbol;
-    }
-
-    public String getName() {
-        return name;
-    }
     
+    @Override
     public String getNamespace() {
-        return null;
+        return namespace;
     }
 
-    @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
-        return visitor.visit(this, data);
+    /**
+     * Sets the namespace:identifier.
+     *
+     * @param ns the namespace
+     * @param id the names
+     */
+    public void setNamespace(String ns, String id) {
+        this.namespace = ns;
+        this.name = id;
     }
 }
