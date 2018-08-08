@@ -48,6 +48,14 @@ public class TemplateDebugger extends Debugger {
     public TemplateDebugger() {
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+        // so we can use it more than one time
+        exprs = null;
+        script = null;
+    }
+    
     /**
      * Position the debugger on the root of a template expression.
      * @param je the expression
