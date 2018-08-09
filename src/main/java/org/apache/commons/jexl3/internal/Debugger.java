@@ -70,6 +70,7 @@ import org.apache.commons.jexl3.parser.ASTOrNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
+import org.apache.commons.jexl3.parser.ASTRemove;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
 import org.apache.commons.jexl3.parser.ASTSWNode;
 import org.apache.commons.jexl3.parser.ASTSetAddNode;
@@ -551,6 +552,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTContinue node, Object data) {
         return check(node, "continue", data);
+    }
+
+    @Override
+    protected Object visit(ASTRemove node, Object data) {
+        return check(node, "remove", data);
     }
 
     @Override

@@ -166,6 +166,16 @@ public class ForEachTest extends JexlTestCase {
     }
 
     @Test
+    public void testForEachRemoveMethod() throws Exception {
+        JexlScript e = JEXL.createScript(
+                "var set = {1, 2, 3 ,4 ,5, 6}; for(var item : set) { if (item <= 3) remove} size(set)"
+        );
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not last evaluated expression", 3, o);
+    }
+
+    @Test
     public void testForEachContinueBroken() throws Exception {
         try {
             JexlScript e = JEXL.createScript("var rr = 0; continue;");
@@ -173,6 +183,17 @@ public class ForEachTest extends JexlTestCase {
         } catch (JexlException.Parsing xparse) {
             String str = xparse.detailedMessage();
             Assert.assertTrue(str.contains("continue"));
+        }
+    }
+
+    @Test
+    public void testForEachRemoveBroken() throws Exception {
+        try {
+            JexlScript e = JEXL.createScript("var rr = 0; remove;");
+            Assert.fail("remove is out of loop!");
+        } catch (JexlException.Parsing xparse) {
+            String str = xparse.detailedMessage();
+            Assert.assertTrue(str.contains("remove"));
         }
     }
 

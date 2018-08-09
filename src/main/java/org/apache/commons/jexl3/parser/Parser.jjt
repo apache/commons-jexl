@@ -45,6 +45,7 @@ import org.apache.commons.jexl3.internal.Scope;
 public final class Parser extends JexlParser
 {
     private int loopCount = 0;
+    private int forLoopCount = 0;
 
     public ASTJexlScript parse(JexlInfo info, JexlFeatures jexlFeatures, String jexlSrc, Scope scope) {
         JexlFeatures previous = getFeatures();
@@ -133,6 +134,7 @@ TOKEN_MGR_DECLS : {
     | < LAMBDA : "->" >
     | < BREAK : "break" >
     | < CONTINUE : "continue" >
+    | < REMOVE : "remove" >
     | < PRAGMA : "#pragma" >
 }
 
@@ -314,6 +316,7 @@ void Statement() #void : {}
     | ExpressionStatement()
     | ReturnStatement()
     | Continue()
+    | Remove()
     | Break()
     | Var()
     | Pragma()
@@ -351,17 +354,22 @@ void ReturnStatement() : {}
 
 void Continue() #Continue : {}
 {
-    <CONTINUE> { if (loopCount == 0) { throwParsingException(jjtThis); } }
+    <CONTINUE> { if (loopCount == 0 && forLoopCount == 0) { throwParsingException(jjtThis); } }
+}
+
+void Remove() #Remove : {}
+{
+    <REMOVE> { if (forLoopCount == 0) { throwParsingException(jjtThis); } }
 }
 
 void Break() #Break : {}
 {
-    <BREAK> { if (loopCount == 0) { throwParsingException(jjtThis); } }
+    <BREAK> { if (loopCount == 0 && forLoopCount == 0) { throwParsingException(jjtThis); } }
 }
 
 void ForeachStatement() : {}
 {
-    <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
+    <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> { forLoopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { forLoopCount -= 1; }
 }
 
 void ForEachVar() #Reference : {}

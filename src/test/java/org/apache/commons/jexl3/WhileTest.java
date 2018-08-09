@@ -61,4 +61,16 @@ public class WhileTest extends JexlTestCase {
         Assert.assertEquals("x is wrong", new Integer(10), jc.get("x"));
         Assert.assertEquals("y is wrong", new Integer(512), jc.get("y"));
     }
+
+    @Test
+    public void testWhileRemoveBroken() throws Exception {
+        try {
+            JexlScript e = JEXL.createScript("while (x < 10) remove;");
+            Assert.fail("remove is out of loop!");
+        } catch (JexlException.Parsing xparse) {
+            String str = xparse.detailedMessage();
+            Assert.assertTrue(str.contains("remove"));
+        }
+    }
+
 }

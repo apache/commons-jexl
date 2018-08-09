@@ -84,6 +84,7 @@ import org.apache.commons.jexl3.parser.ASTOrNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
+import org.apache.commons.jexl3.parser.ASTRemove;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
 import org.apache.commons.jexl3.parser.ASTSWNode;
 import org.apache.commons.jexl3.parser.ASTSetAddNode;
@@ -632,6 +633,11 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
+    protected Object visit(ASTRemove node, Object data) {
+        throw new JexlException.Remove(node);
+    }
+
+    @Override
     protected Object visit(ASTBreak node, Object data) {
         throw new JexlException.Break(node);
     }
@@ -673,6 +679,9 @@ public class Interpreter extends InterpreterBase {
                             break;
                         } catch (JexlException.Continue stmtContinue) {
                             //continue;
+                        } catch (JexlException.Remove stmtRemove) {
+                            itemsIterator.remove();
+                            // and continue
                         }
                     }
                 }
@@ -1994,12 +2003,14 @@ public class Interpreter extends InterpreterBase {
                 processed[0] = true;
                 try {
                     return processAnnotation(stmt, index + 1, data);
-                } catch(JexlException.Return xreturn) {
+                } catch (JexlException.Return xreturn) {
                     return xreturn;
-                } catch(JexlException.Break xbreak) {
+                } catch (JexlException.Break xbreak) {
                     return xbreak;
-                } catch(JexlException.Continue xcontinue) {
+                } catch (JexlException.Continue xcontinue) {
                     return xcontinue;
+                } catch (JexlException.Remove xremove) {
+                    return xremove;
                 }
             }
         };
