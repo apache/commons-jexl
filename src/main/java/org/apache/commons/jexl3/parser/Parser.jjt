@@ -162,8 +162,8 @@ TOKEN_MGR_DECLS : {
 <*> TOKEN : { /* COMPARISONS */
       < eq : "==" | "eq" >
     | < ne : "!=" | "ne" >
-    | < req : "=~" > // regexp equal
-    | < rne : "!~" > // regexp not equal
+    | < req : "=~" | "in" > // regexp equal
+    | < rne : "!~" | "!in" > // regexp not equal
     | < seq : "=^" > // starts equal
     | < eeq : "=$" > // ends equal
     | < sne : "!^" > // start not equal

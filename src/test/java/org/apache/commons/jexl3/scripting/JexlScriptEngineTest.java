@@ -93,9 +93,9 @@ public class JexlScriptEngineTest {
         Assert.assertEquals(newValue,engine.get("value"));
         Assert.assertEquals(engine.getContext(),engine.get(JexlScriptEngine.CONTEXT_KEY));
         // Check behaviour of JEXL object
-        Assert.assertEquals(engine.getContext().getReader(),engine.eval("JEXL.in"));
-        Assert.assertEquals(engine.getContext().getWriter(),engine.eval("JEXL.out"));
-        Assert.assertEquals(engine.getContext().getErrorWriter(),engine.eval("JEXL.err"));
+        Assert.assertEquals(engine.getContext().getReader(),engine.eval("JEXL['in']"));
+        Assert.assertEquals(engine.getContext().getWriter(),engine.eval("JEXL['out']"));
+        Assert.assertEquals(engine.getContext().getErrorWriter(),engine.eval("JEXL['err']"));
         Assert.assertEquals(System.class,engine.eval("JEXL.System"));
     }
 
