@@ -94,7 +94,7 @@
                         </p>
                         <p>
                             <strong>N.B.</strong> the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
-                            <code>or and eq ne lt gt le ge div mod not null true false new var break continue return</code>
+                            <code>or and eq ne lt gt le ge in div mod not null true false new var break continue return</code>
                             For example, the following is invalid:
                             <code>my.new.dotted.var // invalid ('new' is keyword)</code>
                             In such cases, quoted identifiers or the [ ] operator can be used, for example:
