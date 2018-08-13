@@ -105,7 +105,7 @@ public class ForEachTest extends JexlTestCase {
 
     @Test
     public void testForEachWithBlock() throws Exception {
-        JexlScript exs0 = JEXL.createScript("for(var in : list) { x = x + in; }");
+        JexlScript exs0 = JEXL.createScript("for(var i : list) { x = x + i; }");
         JexlContext jc = new MapContext();
         jc.set("list", new Object[]{2, 3});
             jc.set("x", new Integer(1));
