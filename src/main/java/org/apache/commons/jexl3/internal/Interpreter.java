@@ -61,6 +61,10 @@ import org.apache.commons.jexl3.parser.ASTGTNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccessJxlt;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyNode;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
@@ -851,6 +855,75 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
+    protected Object visit(ASTInlinePropertyAssignment node, Object data) {
+
+        int childCount = node.jjtGetNumChildren();
+
+        for (int i = 0; i < childCount; i++) {
+            cancelCheck(node);
+
+            JexlNode p = node.jjtGetChild(i);
+
+            if (p instanceof ASTInlinePropertyEntry) {
+
+               Object[] entry = (Object[]) p.jjtAccept(this, null);
+
+               String name = String.valueOf(entry[0]);
+               Object value = entry[1];
+
+               setAttribute(data, name, value, p, JexlOperator.PROPERTY_SET);
+
+            } else if (p instanceof ASTInlinePropertyArrayEntry) {
+
+               Object[] entry = (Object[]) p.jjtAccept(this, null);
+
+               Object key = entry[0];
+               Object value = entry[1];
+
+               setAttribute(data, key, value, p, JexlOperator.ARRAY_SET);
+
+            } else {
+
+               // ASTInlinePropertyNode
+               p.jjtAccept(this, data);
+            }
+        }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTInlinePropertyArrayEntry node, Object data) {
+
+        Object key = node.jjtGetChild(0).jjtAccept(this, data);
+        Object value = node.jjtGetChild(1).jjtAccept(this, data);
+
+        return new Object[] {key, value};
+    }
+
+    @Override
+    protected Object visit(ASTInlinePropertyEntry node, Object data) {
+        JexlNode name = node.jjtGetChild(0);
+
+        Object key = name instanceof ASTIdentifier ? ((ASTIdentifier) name).getName() : name.jjtAccept(this, data);
+        Object value = node.jjtGetChild(1).jjtAccept(this, data);
+
+        return new Object[] {key, value};
+    }
+
+    @Override
+    protected Object visit(ASTInlinePropertyNode node, Object data) {
+
+        JexlNode object = node.jjtGetChild(0);
+
+        Object target = object.jjtAccept(this, data);
+
+        // evaluate ASTInlinePropertyAssignment with calculated target
+        node.jjtGetChild(1).jjtAccept(this, target);
+
+        return target;
+    }
+
+    @Override
     protected Object visit(ASTTernaryNode node, Object data) {
         Object condition = node.jjtGetChild(0).jjtAccept(this, data);
         if (node.jjtGetNumChildren() == 3) {
@@ -1032,7 +1105,7 @@ public class Interpreter extends InterpreterBase {
         final int numChildren = node.jjtGetNumChildren();
         final JexlNode parent = node.jjtGetParent();
         // pass first piece of data in and loop through children
-        Object object = null;
+        Object object = data;
         JexlNode objectNode = null;
         JexlNode ptyNode = null;
         StringBuilder ant = null;
@@ -1316,7 +1389,11 @@ public class Interpreter extends InterpreterBase {
                 return self;
             }
         }
-        setAttribute(object, property, right, propertyNode);
+
+        final JexlOperator operator = propertyNode != null && propertyNode.jjtGetParent() instanceof ASTArrayAccess
+                                      ? JexlOperator.ARRAY_SET : JexlOperator.PROPERTY_SET;
+
+        setAttribute(object, property, right, propertyNode, operator);
         return right; // 4
     }
 
@@ -1874,7 +1951,7 @@ public class Interpreter extends InterpreterBase {
      * @param value     the value to assign to the object's attribute
      */
     public void setAttribute(Object object, Object attribute, Object value) {
-        setAttribute(object, attribute, value, null);
+        setAttribute(object, attribute, value, null, JexlOperator.PROPERTY_SET);
     }
 
     /**
@@ -1885,10 +1962,8 @@ public class Interpreter extends InterpreterBase {
      * @param value     the value to assign to the object's attribute
      * @param node      the node that evaluated as the object
      */
-    protected void setAttribute(Object object, Object attribute, Object value, JexlNode node) {
+    protected void setAttribute(Object object, Object attribute, Object value, JexlNode node, JexlOperator operator) {
         cancelCheck(node);
-        final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
-                                      ? JexlOperator.ARRAY_SET : JexlOperator.PROPERTY_SET;
         Object result = operators.tryOverload(node, operator, object, attribute, value);
         if (result != JexlEngine.TRY_FAILED) {
             return;

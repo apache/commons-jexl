@@ -369,7 +369,7 @@ void Break() #Break : {}
 
 void ForeachStatement() : {}
 {
-    <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> { forLoopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { forLoopCount -= 1; }
+    <FOR> <LPAREN> ForEachVar() <COLON> Expression() <RPAREN> { forLoopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { forLoopCount -= 1; }
 }
 
 void ForEachVar() #Reference : {}
@@ -432,7 +432,7 @@ LinkedList<String> lstr = new LinkedList<String>();
 
 void Expression() #void : {}
 {
-      AssignmentExpression()
+  AssignmentExpression() 
 }
 
 void AssignmentExpression() #void : {}
@@ -581,9 +581,17 @@ void UnaryExpression() #void : {}
   |
     <SIZE> UnaryExpression() #SizeFunction(1)
   |
-    ValueExpression()
+    InlinePropertyExpression()
 }
 
+void InlinePropertyExpression() #void : {}
+{
+  ValueExpression() 
+  ( LOOKAHEAD(<LCURLY>) ( 
+    InlinePropertyAssignment() #InlinePropertyNode(2)
+  ) )*
+
+}
 
 /***************************************
  *      Identifier & Literals
@@ -723,6 +731,47 @@ void MapLiteral() : {}
 void MapEntry() : {}
 {
     Expression() <COLON> Expression()
+}
+
+void InlinePropertyAssignment() : {}
+{
+    <LCURLY> (InlinePropertyBlock() ( <COMMA> InlinePropertyBlock() )* ) <RCURLY>
+}
+
+void InlinePropertyBlock() #void : {}
+{
+    (
+      LOOKAHEAD(InlinePropertyName() <COLON>) InlinePropertyEntry()
+      |
+      LOOKAHEAD(<LBRACKET> Expression() <RBRACKET> <COLON>) InlinePropertyArrayEntry()
+      |
+      InlinePropertyNested() InlinePropertyAssignment() #InlinePropertyNode(2)
+    )
+}
+
+void InlinePropertyName() #void : {}
+{
+    Identifier()
+    |
+    StringLiteral()
+    |
+    JxltLiteral()
+}
+
+void InlinePropertyNested() #void : {}
+{
+    ( (LOOKAHEAD(<LBRACKET>)ArrayAccess() | Identifier()) (LOOKAHEAD(2) MemberAccess() )*) #Reference()
+
+}
+
+void InlinePropertyEntry() : {}
+{
+    InlinePropertyName() <COLON> Expression()
+}
+
+void InlinePropertyArrayEntry() : {}
+{
+    <LBRACKET> Expression() <RBRACKET> <COLON> Expression()
 }
 
 void SetLiteral() : {}
