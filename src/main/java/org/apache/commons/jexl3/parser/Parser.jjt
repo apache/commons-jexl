@@ -126,6 +126,7 @@ TOKEN_MGR_DECLS : {
     | < VAR : "var" >
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < SIZE : "size" > { popDot(); } /* Revert state to default if was DOT_ID. */
+    | < THIS : "this" >
     | < NULL : "null" >
     | < TRUE : "true" >
     | < FALSE : "false" >
@@ -642,7 +643,14 @@ void Literal() #void :
 |
   NullLiteral()
 |
+  ThisLiteral()
+|
   NaNLiteral()
+}
+
+void ThisLiteral() #void : {}
+{
+    <THIS> #ThisNode
 }
 
 void NaNLiteral() #NumberLiteral :

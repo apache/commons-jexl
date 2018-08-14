@@ -83,6 +83,17 @@ public class JexlTest extends JexlTestCase {
     }
 
     @Test
+    public void testThis() throws Exception {
+        JexlContext jc = new MapContext();
+        jc.set("a", Boolean.TRUE);
+        jc.set("b", Boolean.FALSE);
+
+        assertExpression(jc, "this", jc);
+        assertExpression(jc, "this.a", Boolean.TRUE);
+        assertExpression(jc, "this['b']", Boolean.FALSE);
+    }
+
+    @Test
     public void testStringLit() throws Exception {
         /*
          *  tests a simple property expression

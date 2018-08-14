@@ -147,9 +147,9 @@ public class JexlScriptEngineTest {
         Assert.assertNotNull("Manager should not be null", manager);
         ScriptEngine engine = manager.getEngineByName("JEXL");
         Assert.assertNotNull("Engine should not be null (JEXL)", engine);
-        engine.eval("this.is.a.test=null");
-        Assert.assertNull(engine.get("this.is.a.test"));
-        Assert.assertEquals(Boolean.TRUE, engine.eval("empty(this.is.a.test)"));
+        engine.eval("a.test.variable=null");
+        Assert.assertNull(engine.get("a.test.variable"));
+        Assert.assertEquals(Boolean.TRUE, engine.eval("empty(a.test.variable)"));
         final Object mymap = engine.eval("testmap={ 'key1' : 'value1', 'key2' : 'value2' }");
         Assert.assertTrue(mymap instanceof Map<?, ?>);
         Assert.assertEquals(2,((Map<?, ?>)mymap).size());
