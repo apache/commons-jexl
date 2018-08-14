@@ -268,6 +268,13 @@ TOKEN_MGR_DECLS : {
   > { popDot(); } /* Revert state to default if was DOT_ID. */
 }
 
+<*> TOKEN :
+{
+  < REGEX_LITERAL:
+    "~" "/" (~["/","\n","\r","\u2028","\u2029"] | "\\" "/" )* "/"
+  > { popDot(); } /* Revert state to default if was DOT_ID. */
+}
+
 /***************************************
  *      Statements
  ***************************************/
@@ -641,6 +648,8 @@ void Literal() #void :
 |
   StringLiteral()
 |
+  RegexLiteral()
+|
   NullLiteral()
 |
   ThisLiteral()
@@ -709,6 +718,16 @@ void JxltLiteral() #JxltLiteral :
    t=<JXLT_LITERAL>
    { jjtThis.setLiteral(Parser.buildString(t.image, true)); }
 }
+
+void RegexLiteral() :
+{
+   Token t;
+}
+{
+  t=<REGEX_LITERAL>
+  { jjtThis.setLiteral(Parser.buildRegex(t.image)); }
+}
+
 
 void ExtendedLiteral() #ExtendedLiteral() : {}
 {
