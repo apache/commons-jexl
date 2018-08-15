@@ -136,7 +136,7 @@ TOKEN_MGR_DECLS : {
     | < LAMBDA : "->" >
     | < BREAK : "break" >
     | < CONTINUE : "continue" >
-    | < REMOVE : "remove" >
+    | < REMOVE : "remove" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < PRAGMA : "#pragma" >
 }
 
@@ -323,7 +323,7 @@ void Statement() #void : {}
     | ForeachStatement()
     | WhileStatement()
     | DoWhileStatement()
-    | ExpressionStatement()
+    | LOOKAHEAD(2) ExpressionStatement()
     | ReturnStatement()
     | Continue()
     | Remove()
@@ -340,7 +340,7 @@ void Block() #Block : {}
 
 void ExpressionStatement() #void : {}
 {
-    Expression() (LOOKAHEAD(1) Expression() #Ambiguous())* (LOOKAHEAD(1) <SEMICOL>)?
+    Expression() (LOOKAHEAD(2) Expression() #Ambiguous())* (LOOKAHEAD(1) <SEMICOL>)?
 }
 
 
@@ -621,7 +621,6 @@ void Identifier(boolean top) :
     t=<REGISTER> { jjtThis.setSymbol(t.image); }
 }
 
-
 void NamespaceIdentifier()  #NamespaceIdentifier :
 {
     Token ns;
@@ -636,7 +635,15 @@ void StringIdentifier() #Identifier :
     Token t;
 }
 {
-    t=<STRING_LITERAL>  { jjtThis.setSymbol(Parser.buildString(t.image, true));  }
+    t=<STRING_LITERAL> { jjtThis.setSymbol(Parser.buildString(t.image, true));  }
+}
+
+void RemoveIdentifier() #Identifier :
+{
+    Token t;
+}
+{
+    t=<REMOVE> { jjtThis.setSymbol(t.image); }
 }
 
 void Literal() #void :
@@ -838,13 +845,17 @@ void FunctionCallLookahead() #void : {}
     LOOKAHEAD(2) <IDENTIFIER> <LPAREN>
     |
     LOOKAHEAD(2) <REGISTER> <LPAREN>
+    |
+    LOOKAHEAD(2) <REMOVE> <LPAREN>
 }
 
 void FunctionCall() #void : {}
 {
-      LOOKAHEAD(2) NamespaceIdentifier() Arguments() #FunctionNode(2)
+    LOOKAHEAD(2) NamespaceIdentifier() Arguments() #FunctionNode(2)
     |
-      LOOKAHEAD(2) Identifier(true) Arguments() #FunctionNode(2)
+    LOOKAHEAD(2) Identifier(true) Arguments() #FunctionNode(2)
+    |
+    LOOKAHEAD(2) RemoveIdentifier() Arguments() #FunctionNode(2)
 }
 
 void Constructor() #ConstructorNode() : {}
@@ -904,6 +915,8 @@ void IdentifierAccess() #void :
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccess
     |
         t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessJxlt
+    |
+        t=<REMOVE> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
     )
     |
     <QDOT> (
@@ -912,6 +925,8 @@ void IdentifierAccess() #void :
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafe
     |
         t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafeJxlt
+    |
+        t=<REMOVE> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
     )
 }
 
@@ -967,7 +982,6 @@ void MethodCall() #void : {}
     |
     (MemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
 }
-
 
 void MemberExpression() #void : {}
 {

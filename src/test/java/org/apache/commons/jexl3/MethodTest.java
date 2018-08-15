@@ -131,6 +131,15 @@ public class MethodTest extends JexlTestCase {
     }
 
     @Test
+    public void testCallRemoveMethod() throws Exception {
+
+        JexlContext context = new MapContext();
+        JexlScript rm = JEXL.createScript("var x = {1, 2, 3}; x.remove(3); size(x)");
+        Object o = rm.execute(context);
+        Assert.assertEquals("Result is not 2", new Integer(2), o);
+    }
+
+    @Test
     public void testCallVarArgMethod() throws Exception {
         VarArgs test = new VarArgs();
         asserter.setVariable("test", test);
@@ -139,7 +148,6 @@ public class MethodTest extends JexlTestCase {
         asserter.assertExpression("test.callInts(1,2,3,4,5)", test.callInts(1, 2, 3, 4, 5));
         asserter.assertExpression("test.concat(['1', '2', '3'])", test.concat(new String[]{"1", "2", "3"}));
         asserter.assertExpression("test.concat('1', '2', '3')", test.concat("1", "2", "3"));
-
     }
 
     @Test
