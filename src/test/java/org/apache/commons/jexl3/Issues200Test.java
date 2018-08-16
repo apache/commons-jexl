@@ -588,6 +588,10 @@ public class Issues200Test extends JexlTestCase {
             queue.addFirst(it266);
             return it266;
         }
+                
+        public Iterator<?> forEach(Map<?,?> collection) {
+            return forEach(collection.values());
+        }
         
         public void remove() {
             Deque<Iterator266> queue = TLS_FOREACH.get();
@@ -603,14 +607,29 @@ public class Issues200Test extends JexlTestCase {
     
     @Test
     public void test266() throws Exception {
-        JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic266(true)).create();
-        JexlContext ctxt = new MapContext();
-        List<Integer> li = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5 ,6));
-        ctxt.set("list", li);
         Object result;
         JexlScript script;
+        JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic266(true)).create();
+        JexlContext ctxt = new MapContext();
+        
+        List<Integer> li = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5 ,6));
+        ctxt.set("list", li);
         script = jexl.createScript("for (var item : list) { if (item <= 3) remove(); } return size(list)");
         result = script.execute(ctxt);
         Assert.assertEquals(3, result);
+        Assert.assertEquals(3, li.size());
+        
+        Map<String, Integer> msi = new HashMap<String, Integer>();
+        msi.put("a", 1);
+        msi.put("b", 2);
+        msi.put("c", 3);
+        msi.put("d", 4);
+        msi.put("e", 5);
+        msi.put("f", 6);
+        ctxt.set("map", msi);
+        script = jexl.createScript("for (var item : map) { if (item <= 2) remove(); } return size(map)");
+        result = script.execute(ctxt);
+        Assert.assertEquals(4, result);
+        Assert.assertEquals(4, msi.size());
     }
 }
