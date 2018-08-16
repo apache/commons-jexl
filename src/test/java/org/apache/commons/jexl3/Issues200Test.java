@@ -632,4 +632,25 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertEquals(4, result);
         Assert.assertEquals(4, msi.size());
     }
+    
+    @Test
+    public void test267() throws Exception {
+        Object result;
+        JexlScript script;
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlContext ctxt = new MapContext();
+        // API declared params
+        script = jexl.createScript("x + y", "x", "y");
+        result = script.execute(ctxt, 20, 22);
+        Assert.assertEquals(42, result);
+        // script declared params
+        script = jexl.createScript("(x, y)->{ x + y}");
+        result = script.execute(ctxt, 22, 20);
+        Assert.assertEquals(42, result);
+        // explicitly returning the lambda
+        script = jexl.createScript("return (x, y)->{ x + y}");
+        result = script.execute(ctxt);
+        Assert.assertTrue(result instanceof JexlScript);
+    }
+        
 }
