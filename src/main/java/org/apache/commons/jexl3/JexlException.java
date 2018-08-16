@@ -712,6 +712,22 @@ public class JexlException extends RuntimeException {
     }
 
     /**
+     * Thrown to remove an element from underlying iterator collection within a loop.
+     *
+     * @since 3.2
+     */
+    public static class Remove extends JexlException {
+        /**
+         * Creates a new instance of Remove.
+         *
+         * @param node the remove
+         */
+        public Remove(JexlNode node) {
+            super(node, "remove", null);
+        }
+    }
+
+    /**
      * Detailed info message about this error.
      * Format is "debug![begin,end]: string \n msg" where:
      *

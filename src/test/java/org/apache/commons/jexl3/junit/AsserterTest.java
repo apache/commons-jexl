@@ -36,10 +36,10 @@ public class AsserterTest extends JexlTestCase {
     @Test
     public void testThis() throws Exception {
         Asserter asserter = new Asserter(JEXL);
-        asserter.setVariable("this", new Foo());
-        asserter.assertExpression("this.repeat('abc')", "Repeat : abc");
+        asserter.setVariable("foo", new Foo());
+        asserter.assertExpression("foo.repeat('abc')", "Repeat : abc");
         try {
-            asserter.assertExpression("this.count", "Wrong Value");
+            asserter.assertExpression("foo.count", "Wrong Value");
             Assert.fail("This method should have thrown an assertion exception");
         }
         catch (AssertionError e) {

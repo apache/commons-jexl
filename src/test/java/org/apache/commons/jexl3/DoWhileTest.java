@@ -24,15 +24,15 @@ import org.junit.Test;
  * @since 1.1
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
-public class WhileTest extends JexlTestCase {
+public class DoWhileTest extends JexlTestCase {
 
-    public WhileTest() {
-        super("WhileTest");
+    public DoWhileTest() {
+        super("DoWhileTest");
     }
 
     @Test
     public void testSimpleWhileFalse() throws Exception {
-        JexlScript e = JEXL.createScript("while (false) ;");
+        JexlScript e = JEXL.createScript("do {} while (false)");
         JexlContext jc = new MapContext();
 
         Object o = e.execute(jc);
@@ -41,7 +41,7 @@ public class WhileTest extends JexlTestCase {
 
     @Test
     public void testWhileExecutesExpressionWhenLooping() throws Exception {
-        JexlScript e = JEXL.createScript("while (x < 10) x = x + 1;");
+        JexlScript e = JEXL.createScript("do x = x + 1 while (x < 10)");
         JexlContext jc = new MapContext();
         jc.set("x", new Integer(1));
 
@@ -51,7 +51,7 @@ public class WhileTest extends JexlTestCase {
 
     @Test
     public void testWhileWithBlock() throws Exception {
-        JexlScript e = JEXL.createScript("while (x < 10) { x = x + 1; y = y * 2; }");
+        JexlScript e = JEXL.createScript("do { x = x + 1; y = y * 2; } while (x < 10)");
         JexlContext jc = new MapContext();
         jc.set("x", new Integer(1));
         jc.set("y", new Integer(1));
@@ -65,7 +65,7 @@ public class WhileTest extends JexlTestCase {
     @Test
     public void testWhileRemoveBroken() throws Exception {
         try {
-            JexlScript e = JEXL.createScript("while (x < 10) remove;");
+            JexlScript e = JEXL.createScript("do remove while (x < 10)");
             Assert.fail("remove is out of loop!");
         } catch (JexlException.Parsing xparse) {
             String str = xparse.detailedMessage();

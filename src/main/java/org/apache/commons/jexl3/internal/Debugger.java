@@ -35,6 +35,7 @@ import org.apache.commons.jexl3.parser.ASTBreak;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDivNode;
+import org.apache.commons.jexl3.parser.ASTDoWhileStatement;
 import org.apache.commons.jexl3.parser.ASTEQNode;
 import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
@@ -48,6 +49,11 @@ import org.apache.commons.jexl3.parser.ASTGENode;
 import org.apache.commons.jexl3.parser.ASTGTNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyNode;
+import org.apache.commons.jexl3.parser.ASTMapLiteral;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
@@ -70,6 +76,8 @@ import org.apache.commons.jexl3.parser.ASTOrNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
+import org.apache.commons.jexl3.parser.ASTRegexLiteral;
+import org.apache.commons.jexl3.parser.ASTRemove;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
 import org.apache.commons.jexl3.parser.ASTSWNode;
 import org.apache.commons.jexl3.parser.ASTSetAddNode;
@@ -86,6 +94,7 @@ import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
+import org.apache.commons.jexl3.parser.ASTThisNode;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
@@ -294,6 +303,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             || child instanceof ASTIfStatement
             || child instanceof ASTForeachStatement
             || child instanceof ASTWhileStatement
+            || child instanceof ASTDoWhileStatement
             || child instanceof ASTAnnotation)) {
             builder.append(';');
             if (indent > 0) {
@@ -566,6 +576,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
+    protected Object visit(ASTRemove node, Object data) {
+        return check(node, "remove", data);
+    }
+
+    @Override
     protected Object visit(ASTBreak node, Object data) {
         return check(node, "break", data);
     }
@@ -774,6 +789,44 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
+    protected Object visit(ASTInlinePropertyArrayEntry node, Object data) {
+        builder.append("[");
+        accept(node.jjtGetChild(0), data);
+        builder.append("] : ");
+        accept(node.jjtGetChild(1), data);
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTInlinePropertyEntry node, Object data) {
+        accept(node.jjtGetChild(0), data);
+        builder.append(" : ");
+        accept(node.jjtGetChild(1), data);
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTInlinePropertyAssignment node, Object data) {
+        int num = node.jjtGetNumChildren();
+        builder.append("{ ");
+        accept(node.jjtGetChild(0), data);
+        for (int i = 1; i < num; ++i) {
+            builder.append(",");
+            accept(node.jjtGetChild(i), data);
+        }
+        builder.append(" }");
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTInlinePropertyNode node, Object data) {
+        accept(node.jjtGetChild(0), data);
+        builder.append(" ");
+        accept(node.jjtGetChild(1), data);
+        return data;
+    }
+
+    @Override
     protected Object visit(ASTConstructorNode node, Object data) {
         int num = node.jjtGetNumChildren();
         builder.append("new(");
@@ -918,6 +971,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
+    protected Object visit(ASTRegexLiteral node, Object data) {
+        String img = node.getLiteral().replace("/", "\\/");
+        return check(node, "~/" + img + "/", data);
+    }
+
+    @Override
     protected Object visit(ASTTernaryNode node, Object data) {
         accept(node.jjtGetChild(0), data);
         if (node.jjtGetNumChildren() > 2) {
@@ -948,6 +1007,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
+    protected Object visit(ASTThisNode node, Object data) {
+        check(node, "this", data);
+        return data;
+    }
+
+    @Override
     protected Object visit(ASTUnaryMinusNode node, Object data) {
         return prefixChild(node, "-", data);
     }
@@ -969,6 +1034,20 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         } else {
             builder.append(';');
         }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTDoWhileStatement node, Object data) {
+        builder.append("do ");
+
+        acceptStatement(node.jjtGetChild(0), data);
+
+        builder.append(" while (");
+
+        accept(node.jjtGetChild(1), data);
+
+        builder.append(")");
         return data;
     }
 

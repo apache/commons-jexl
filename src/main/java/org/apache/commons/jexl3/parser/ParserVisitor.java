@@ -48,7 +48,11 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTWhileStatement node, Object data);
 
+    protected abstract Object visit(ASTDoWhileStatement node, Object data);
+
     protected abstract Object visit(ASTContinue node, Object data);
+
+    protected abstract Object visit(ASTRemove node, Object data);
 
     protected abstract Object visit(ASTBreak node, Object data);
 
@@ -120,6 +124,8 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTNullLiteral node, Object data);
 
+    protected abstract Object visit(ASTThisNode node, Object data);
+
     protected abstract Object visit(ASTTrueNode node, Object data);
 
     protected abstract Object visit(ASTFalseNode node, Object data);
@@ -127,6 +133,8 @@ public abstract class ParserVisitor {
     protected abstract Object visit(ASTNumberLiteral node, Object data);
 
     protected abstract Object visit(ASTStringLiteral node, Object data);
+
+    protected abstract Object visit(ASTRegexLiteral node, Object data);
 
     protected abstract Object visit(ASTSetLiteral node, Object data);
 
@@ -139,6 +147,14 @@ public abstract class ParserVisitor {
     protected abstract Object visit(ASTMapLiteral node, Object data);
 
     protected abstract Object visit(ASTMapEntry node, Object data);
+
+    protected abstract Object visit(ASTInlinePropertyNode node, Object data);
+
+    protected abstract Object visit(ASTInlinePropertyAssignment node, Object data);
+
+    protected abstract Object visit(ASTInlinePropertyArrayEntry node, Object data);
+
+    protected abstract Object visit(ASTInlinePropertyEntry node, Object data);
 
     protected abstract Object visit(ASTEmptyFunction node, Object data);
 

@@ -45,6 +45,7 @@ import org.apache.commons.jexl3.internal.Scope;
 public final class Parser extends JexlParser
 {
     private int loopCount = 0;
+    private int forLoopCount = 0;
 
     public ASTJexlScript parse(JexlInfo info, JexlFeatures jexlFeatures, String jexlSrc, Scope scope) {
         JexlFeatures previous = getFeatures();
@@ -121,10 +122,12 @@ TOKEN_MGR_DECLS : {
     | < ELSE : "else" >
     | < FOR : "for" >
     | < WHILE : "while" >
+    | < DO : "do" >
     | < NEW : "new" >
     | < VAR : "var" >
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < SIZE : "size" > { popDot(); } /* Revert state to default if was DOT_ID. */
+    | < THIS : "this" >
     | < NULL : "null" >
     | < TRUE : "true" >
     | < FALSE : "false" >
@@ -133,6 +136,7 @@ TOKEN_MGR_DECLS : {
     | < LAMBDA : "->" >
     | < BREAK : "break" >
     | < CONTINUE : "continue" >
+    | < REMOVE : "remove" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < PRAGMA : "#pragma" >
 }
 
@@ -162,8 +166,8 @@ TOKEN_MGR_DECLS : {
 <*> TOKEN : { /* COMPARISONS */
       < eq : "==" | "eq" >
     | < ne : "!=" | "ne" >
-    | < req : "=~" > // regexp equal
-    | < rne : "!~" > // regexp not equal
+    | < req : "=~" | "in" > // regexp equal
+    | < rne : "!~" | "!in" > // regexp not equal
     | < seq : "=^" > // starts equal
     | < eeq : "=$" > // ends equal
     | < sne : "!^" > // start not equal
@@ -265,6 +269,13 @@ TOKEN_MGR_DECLS : {
   > { popDot(); } /* Revert state to default if was DOT_ID. */
 }
 
+<*> TOKEN :
+{
+  < REGEX_LITERAL:
+    "~" "/" (~["/","\n","\r","\u2028","\u2029"] | "\\" "/" )* "/"
+  > { popDot(); } /* Revert state to default if was DOT_ID. */
+}
+
 /***************************************
  *      Statements
  ***************************************/
@@ -311,9 +322,11 @@ void Statement() #void : {}
     | IfStatement()
     | ForeachStatement()
     | WhileStatement()
-    | ExpressionStatement()
+    | DoWhileStatement()
+    | LOOKAHEAD(2) ExpressionStatement()
     | ReturnStatement()
     | Continue()
+    | Remove()
     | Break()
     | Var()
     | Pragma()
@@ -327,7 +340,7 @@ void Block() #Block : {}
 
 void ExpressionStatement() #void : {}
 {
-    Expression() (LOOKAHEAD(1) Expression() #Ambiguous())* (LOOKAHEAD(1) <SEMICOL>)?
+    Expression() (LOOKAHEAD(2) Expression() #Ambiguous())* (LOOKAHEAD(1) <SEMICOL>)?
 }
 
 
@@ -338,10 +351,14 @@ void IfStatement() : {}
     ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | Statement()) )?
 }
 
-
 void WhileStatement() : {}
 {
     <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount += 1; }  (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
+}
+
+void DoWhileStatement() : {}
+{
+    <DO> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount -= 1; }
 }
 
 void ReturnStatement() : {}
@@ -351,17 +368,22 @@ void ReturnStatement() : {}
 
 void Continue() #Continue : {}
 {
-    <CONTINUE> { if (loopCount == 0) { throwParsingException(jjtThis); } }
+    <CONTINUE> { if (loopCount == 0 && forLoopCount == 0) { throwParsingException(jjtThis); } }
+}
+
+void Remove() #Remove : {}
+{
+    <REMOVE> { if (forLoopCount == 0) { throwParsingException(jjtThis); } }
 }
 
 void Break() #Break : {}
 {
-    <BREAK> { if (loopCount == 0) { throwParsingException(jjtThis); } }
+    <BREAK> { if (loopCount == 0 && forLoopCount == 0) { throwParsingException(jjtThis); } }
 }
 
 void ForeachStatement() : {}
 {
-    <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
+    <FOR> <LPAREN> ForEachVar() <COLON> Expression() <RPAREN> { forLoopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { forLoopCount -= 1; }
 }
 
 void ForEachVar() #Reference : {}
@@ -424,7 +446,7 @@ LinkedList<String> lstr = new LinkedList<String>();
 
 void Expression() #void : {}
 {
-      AssignmentExpression()
+  AssignmentExpression() 
 }
 
 void AssignmentExpression() #void : {}
@@ -573,9 +595,17 @@ void UnaryExpression() #void : {}
   |
     <SIZE> UnaryExpression() #SizeFunction(1)
   |
-    ValueExpression()
+    InlinePropertyExpression()
 }
 
+void InlinePropertyExpression() #void : {}
+{
+  ValueExpression() 
+  ( LOOKAHEAD(<LCURLY>) ( 
+    InlinePropertyAssignment() #InlinePropertyNode(2)
+  ) )*
+
+}
 
 /***************************************
  *      Identifier & Literals
@@ -591,7 +621,6 @@ void Identifier(boolean top) :
     t=<REGISTER> { jjtThis.setSymbol(t.image); }
 }
 
-
 void NamespaceIdentifier()  #NamespaceIdentifier :
 {
     Token ns;
@@ -606,7 +635,15 @@ void StringIdentifier() #Identifier :
     Token t;
 }
 {
-    t=<STRING_LITERAL>  { jjtThis.setSymbol(Parser.buildString(t.image, true));  }
+    t=<STRING_LITERAL> { jjtThis.setSymbol(Parser.buildString(t.image, true));  }
+}
+
+void RemoveIdentifier() #Identifier :
+{
+    Token t;
+}
+{
+    t=<REMOVE> { jjtThis.setSymbol(t.image); }
 }
 
 void Literal() #void :
@@ -624,9 +661,18 @@ void Literal() #void :
 |
   StringLiteral()
 |
+  RegexLiteral()
+|
   NullLiteral()
 |
+  ThisLiteral()
+|
   NaNLiteral()
+}
+
+void ThisLiteral() #void : {}
+{
+    <THIS> #ThisNode
 }
 
 void NaNLiteral() #NumberLiteral :
@@ -686,6 +732,16 @@ void JxltLiteral() #JxltLiteral :
    { jjtThis.setLiteral(Parser.buildString(t.image, true)); }
 }
 
+void RegexLiteral() :
+{
+   Token t;
+}
+{
+  t=<REGEX_LITERAL>
+  { jjtThis.setLiteral(Parser.buildRegex(t.image)); }
+}
+
+
 void ExtendedLiteral() #ExtendedLiteral() : {}
 {
    <ELIPSIS>
@@ -715,6 +771,47 @@ void MapLiteral() : {}
 void MapEntry() : {}
 {
     Expression() <COLON> Expression()
+}
+
+void InlinePropertyAssignment() : {}
+{
+    <LCURLY> (InlinePropertyBlock() ( <COMMA> InlinePropertyBlock() )* ) <RCURLY>
+}
+
+void InlinePropertyBlock() #void : {}
+{
+    (
+      LOOKAHEAD(InlinePropertyName() <COLON>) InlinePropertyEntry()
+      |
+      LOOKAHEAD(<LBRACKET> Expression() <RBRACKET> <COLON>) InlinePropertyArrayEntry()
+      |
+      InlinePropertyNested() InlinePropertyAssignment() #InlinePropertyNode(2)
+    )
+}
+
+void InlinePropertyName() #void : {}
+{
+    Identifier()
+    |
+    StringLiteral()
+    |
+    JxltLiteral()
+}
+
+void InlinePropertyNested() #void : {}
+{
+    ( (LOOKAHEAD(<LBRACKET>)ArrayAccess() | Identifier()) (LOOKAHEAD(2) MemberAccess() )*) #Reference()
+
+}
+
+void InlinePropertyEntry() : {}
+{
+    InlinePropertyName() <COLON> Expression()
+}
+
+void InlinePropertyArrayEntry() : {}
+{
+    <LBRACKET> Expression() <RBRACKET> <COLON> Expression()
 }
 
 void SetLiteral() : {}
@@ -748,13 +845,17 @@ void FunctionCallLookahead() #void : {}
     LOOKAHEAD(2) <IDENTIFIER> <LPAREN>
     |
     LOOKAHEAD(2) <REGISTER> <LPAREN>
+    |
+    LOOKAHEAD(2) <REMOVE> <LPAREN>
 }
 
 void FunctionCall() #void : {}
 {
-      LOOKAHEAD(2) NamespaceIdentifier() Arguments() #FunctionNode(2)
+    LOOKAHEAD(2) NamespaceIdentifier() Arguments() #FunctionNode(2)
     |
-      LOOKAHEAD(2) Identifier(true) Arguments() #FunctionNode(2)
+    LOOKAHEAD(2) Identifier(true) Arguments() #FunctionNode(2)
+    |
+    LOOKAHEAD(2) RemoveIdentifier() Arguments() #FunctionNode(2)
 }
 
 void Constructor() #ConstructorNode() : {}
@@ -814,6 +915,8 @@ void IdentifierAccess() #void :
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccess
     |
         t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessJxlt
+    |
+        t=<REMOVE> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
     )
     |
     <QDOT> (
@@ -822,6 +925,8 @@ void IdentifierAccess() #void :
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafe
     |
         t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafeJxlt
+    |
+        t=<REMOVE> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
     )
 }
 
@@ -877,7 +982,6 @@ void MethodCall() #void : {}
     |
     (MemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
 }
-
 
 void MemberExpression() #void : {}
 {

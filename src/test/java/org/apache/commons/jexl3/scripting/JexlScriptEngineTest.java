@@ -93,9 +93,9 @@ public class JexlScriptEngineTest {
         Assert.assertEquals(newValue,engine.get("value"));
         Assert.assertEquals(engine.getContext(),engine.get(JexlScriptEngine.CONTEXT_KEY));
         // Check behaviour of JEXL object
-        Assert.assertEquals(engine.getContext().getReader(),engine.eval("JEXL.in"));
-        Assert.assertEquals(engine.getContext().getWriter(),engine.eval("JEXL.out"));
-        Assert.assertEquals(engine.getContext().getErrorWriter(),engine.eval("JEXL.err"));
+        Assert.assertEquals(engine.getContext().getReader(),engine.eval("JEXL['in']"));
+        Assert.assertEquals(engine.getContext().getWriter(),engine.eval("JEXL['out']"));
+        Assert.assertEquals(engine.getContext().getErrorWriter(),engine.eval("JEXL['err']"));
         Assert.assertEquals(System.class,engine.eval("JEXL.System"));
     }
 
@@ -147,9 +147,9 @@ public class JexlScriptEngineTest {
         Assert.assertNotNull("Manager should not be null", manager);
         ScriptEngine engine = manager.getEngineByName("JEXL");
         Assert.assertNotNull("Engine should not be null (JEXL)", engine);
-        engine.eval("this.is.a.test=null");
-        Assert.assertNull(engine.get("this.is.a.test"));
-        Assert.assertEquals(Boolean.TRUE, engine.eval("empty(this.is.a.test)"));
+        engine.eval("a.test.variable=null");
+        Assert.assertNull(engine.get("a.test.variable"));
+        Assert.assertEquals(Boolean.TRUE, engine.eval("empty(a.test.variable)"));
         final Object mymap = engine.eval("testmap={ 'key1' : 'value1', 'key2' : 'value2' }");
         Assert.assertTrue(mymap instanceof Map<?, ?>);
         Assert.assertEquals(2,((Map<?, ?>)mymap).size());
