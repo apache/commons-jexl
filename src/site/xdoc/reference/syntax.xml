@@ -94,7 +94,7 @@
                         </p>
                         <p>
                             <strong>N.B.</strong> the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
-                            <code>or and eq ne lt gt le ge div mod not null true false new var break continue return</code>
+                            <code>or and eq ne lt gt le ge div mod not null true false new do while var break continue return</code>
                             For example, the following is invalid:
                             <code>my.new.dotted.var // invalid ('new' is keyword)</code>
                             In such cases, quoted identifiers or the [ ] operator can be used, for example:
@@ -902,15 +902,24 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>do/while</td>
+                    <td>
+                        Loop until a condition is satisfied, e.g.
+                        <code>do {
+                            x = x + 2;
+                            } while (x lt 10)</code>
+                    </td>
+                </tr>
+                <tr>
                     <td>continue</td>
                     <td>
-                        Within loops (while/for), allows to skip to the next iteration.
+                        Within loops (do/while/for), allows to skip to the next iteration.
                     </td>
                 </tr>
                 <tr>
                     <td>break</td>
                     <td>
-                        Allows to break from a loop (while/for) inconditionally.
+                        Allows to break from a loop (do/while/for) unconditionally.
                     </td>
                 </tr>
             </table>

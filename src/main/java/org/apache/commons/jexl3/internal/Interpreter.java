@@ -47,6 +47,7 @@ import org.apache.commons.jexl3.parser.ASTBreak;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDivNode;
+import org.apache.commons.jexl3.parser.ASTDoWhileStatement;
 import org.apache.commons.jexl3.parser.ASTEQNode;
 import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
@@ -702,6 +703,28 @@ public class Interpreter extends InterpreterBase {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    protected Object visit(ASTDoWhileStatement node, Object data) {
+        Object result = null;
+        /* last objectNode is the expression */
+        Node expressionNode = node.jjtGetChild(1);
+        do {
+            cancelCheck(node);
+
+            try {
+                // execute statement
+                result = node.jjtGetChild(0).jjtAccept(this, data);
+            } catch (JexlException.Break stmtBreak) {
+                break;
+            } catch (JexlException.Continue stmtContinue) {
+                //continue;
+            }
+
+        } while (arithmetic.toBoolean(expressionNode.jjtAccept(this, data)));
+
         return result;
     }
 
