@@ -54,6 +54,36 @@ public class StringParser {
     }
 
     /**
+     * Builds a regex pattern string, handles escaping '/' through '\/' syntax.
+     * @param str the string to build from
+     * @return the built string
+     */
+    public static String buildRegex(CharSequence str) {
+
+        int length = str.length();
+
+        StringBuilder strb = new StringBuilder(length);
+
+        int start = 2;
+        int end = length - 1;
+
+        for (int i = start; i < end; ++i) {
+            char c = str.charAt(i);
+            if (c == '\\') {
+                if (i+1 < end && str.charAt(i+1) == '/') {
+                    strb.append("/");
+                    i++;
+                } else {
+                    strb.append(c);
+                }
+            } else {
+                strb.append(c);
+            }
+        }
+        return strb.toString();
+    }
+
+    /**
      * Read the remainder of a string till a given separator,
      * handles escaping through '\' syntax.
      * @param strb the destination buffer to copy characters into

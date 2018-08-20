@@ -346,6 +346,14 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Regex literals</td>
+                    <td>
+                        Start with <code>~/</code> and ends with <code>/</code> delimiters, e.g.
+                        <code>~/ABC.*/</code>
+                        <p>The escape character is <code>\</code> (backslash); it only escapes the string delimiter <code>\</code> (slash)</p>
+                    </td>
+                </tr>
+                <tr>
                     <td>Boolean literals</td>
                     <td>
                         The literals <code>true</code> and <code>false</code> can be used, e.g.

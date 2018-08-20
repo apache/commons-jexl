@@ -84,6 +84,7 @@ import org.apache.commons.jexl3.parser.ASTOrNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
+import org.apache.commons.jexl3.parser.ASTRegexLiteral;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
 import org.apache.commons.jexl3.parser.ASTSWNode;
 import org.apache.commons.jexl3.parser.ASTSetAddNode;
@@ -111,7 +112,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.concurrent.Callable;
+
 import org.apache.commons.jexl3.JxltEngine;
 
 
@@ -785,6 +788,11 @@ public class Interpreter extends InterpreterBase {
             return getAttribute(data, node.getLiteral(), node);
         }
         return node.getLiteral();
+    }
+
+    @Override
+    protected Object visit(ASTRegexLiteral node, Object data) {
+        return Pattern.compile(node.getLiteral());
     }
 
     @Override

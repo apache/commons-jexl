@@ -70,6 +70,7 @@ import org.apache.commons.jexl3.parser.ASTOrNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
+import org.apache.commons.jexl3.parser.ASTRegexLiteral;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
 import org.apache.commons.jexl3.parser.ASTSWNode;
 import org.apache.commons.jexl3.parser.ASTSetAddNode;
@@ -903,6 +904,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTStringLiteral node, Object data) {
         String img = node.getLiteral().replace("'", "\\'");
         return check(node, "'" + img + "'", data);
+    }
+
+    @Override
+    protected Object visit(ASTRegexLiteral node, Object data) {
+        String img = node.getLiteral().replace("/", "\\/");
+        return check(node, "~/" + img + "/", data);
     }
 
     @Override
