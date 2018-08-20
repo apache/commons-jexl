@@ -86,6 +86,7 @@ import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
+import org.apache.commons.jexl3.parser.ASTThisNode;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
@@ -932,6 +933,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTTrueNode node, Object data) {
         check(node, "true", data);
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTThisNode node, Object data) {
+        check(node, "this", data);
         return data;
     }
 
