@@ -48,6 +48,11 @@ import org.apache.commons.jexl3.parser.ASTGENode;
 import org.apache.commons.jexl3.parser.ASTGTNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyNode;
+import org.apache.commons.jexl3.parser.ASTMapLiteral;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
@@ -758,6 +763,44 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             builder.append(':');
         }
         builder.append(" }");
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTInlinePropertyArrayEntry node, Object data) {
+        builder.append("[");
+        accept(node.jjtGetChild(0), data);
+        builder.append("] : ");
+        accept(node.jjtGetChild(1), data);
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTInlinePropertyEntry node, Object data) {
+        accept(node.jjtGetChild(0), data);
+        builder.append(" : ");
+        accept(node.jjtGetChild(1), data);
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTInlinePropertyAssignment node, Object data) {
+        int num = node.jjtGetNumChildren();
+        builder.append("{ ");
+        accept(node.jjtGetChild(0), data);
+        for (int i = 1; i < num; ++i) {
+            builder.append(",");
+            accept(node.jjtGetChild(i), data);
+        }
+        builder.append(" }");
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTInlinePropertyNode node, Object data) {
+        accept(node.jjtGetChild(0), data);
+        builder.append(" ");
+        accept(node.jjtGetChild(1), data);
         return data;
     }
 

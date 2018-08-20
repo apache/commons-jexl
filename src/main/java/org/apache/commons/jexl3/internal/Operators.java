@@ -70,7 +70,7 @@ public class Operators {
     protected Object tryOverload(JexlNode node, JexlOperator operator, Object... args) {
         if (operators != null && operators.overloads(operator)) {
             final JexlArithmetic arithmetic = interpreter.arithmetic;
-            final boolean cache = interpreter.cache;
+            final boolean cache = interpreter.cache && node != null;
             try {
                 if (cache) {
                     Object cached = node.jjtGetValue();
