@@ -53,6 +53,7 @@ import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
 import org.apache.commons.jexl3.parser.ASTEmptyMethod;
+import org.apache.commons.jexl3.parser.ASTExpressionStatement;
 import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
@@ -593,6 +594,13 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
+    protected Object visit(ASTExpressionStatement node, Object data) {
+        cancelCheck(node);
+        Object result = node.jjtGetChild(0).jjtAccept(this, data);
+        return result;
+    }
+
+    @Override
     protected Object visit(ASTIfStatement node, Object data) {
         int n = 0;
         final int numChildren = node.jjtGetNumChildren();
@@ -1051,6 +1059,34 @@ public class Interpreter extends InterpreterBase {
                 return frame.get(symbol);
             }
             Object value = context.get(name);
+
+            if (value == null && node.jjtGetParent() instanceof ASTExpressionStatement) {
+
+               Object[] argv = new Object[] {};
+               JexlMethod vm = uberspect.getMethod(arithmetic, name, argv);
+
+               if (vm != null) {
+
+                   try {
+                      Object eval = vm.invoke(arithmetic, argv);
+
+                      if (cache && vm.isCacheable()) {
+
+                          Funcall funcall = new ArithmeticFuncall(vm, false);
+
+                          node.jjtSetValue(funcall);
+                      }
+
+                      return eval;
+
+                   } catch (JexlException xthru) {
+                       throw xthru;
+                   } catch (Exception xany) {
+                       throw invocationException(node, name, xany);
+                   }
+               }
+            }
+
             if (value == null
                     && !(node.jjtGetParent() instanceof ASTReference)
                     && !context.has(name)

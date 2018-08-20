@@ -26,6 +26,7 @@ import org.apache.commons.jexl3.internal.TemplateEngine.TemplateExpression;
 
 import org.apache.commons.jexl3.parser.ASTBlock;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
+import org.apache.commons.jexl3.parser.ASTExpressionStatement;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.ASTNumberLiteral;
@@ -149,6 +150,11 @@ public class TemplateDebugger extends Debugger {
      * @return the expression number or -1 if the node is not a jexl:print
      */
     private int getPrintStatement(JexlNode child) {
+
+        if (child instanceof ASTExpressionStatement && child.jjtGetNumChildren() == 1) {
+            child = child.jjtGetChild(0);
+        }
+
         if (child instanceof ASTFunctionNode) {
             ASTFunctionNode node = (ASTFunctionNode) child;
             ASTIdentifier ns = (ASTIdentifier) node.jjtGetChild(0);

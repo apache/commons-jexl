@@ -284,10 +284,9 @@ ASTJexlScript JexlScript(Scope frame) : {
     jjtThis.setScope(frame);
 }
 {
-   ( ( Statement() )*) <EOF>
-   {
-        return jjtThis.script();
-   }
+   LOOKAHEAD( LambdaLookahead() ) Lambda() (LOOKAHEAD(1) <SEMICOL>)? <EOF> { return jjtThis.script(); }
+   |
+   ( ( Statement() )*) <EOF> { return jjtThis.script(); }
 }
 
 ASTJexlScript JexlExpression(Scope frame) #JexlScript : {
@@ -337,12 +336,10 @@ void Block() #Block : {}
     <LCURLY> ( Statement() )* <RCURLY>
 }
 
-
-void ExpressionStatement() #void : {}
+void ExpressionStatement() : {}
 {
     Expression() (LOOKAHEAD(2) Expression() #Ambiguous())* (LOOKAHEAD(1) <SEMICOL>)?
 }
-
 
 void IfStatement() : {}
 {
