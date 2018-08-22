@@ -715,8 +715,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             if (named) {
                 builder.append("function");
             }
-            builder.append('(');
+
             String[] params = node.getParameters();
+
+            if (named || params == null || params.length != 1) 
+                builder.append('(');
+
             if (params != null && params.length > 0) {
                 builder.append(visitParameter(params[0], data));
                 for (int p = 1; p < params.length; ++p) {
@@ -724,11 +728,28 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                     builder.append(visitParameter(params[p], data));
                 }
             }
-            builder.append(')');
+
+            if (named || params == null || params.length != 1) 
+                builder.append(')');
+
             if (named) {
                 builder.append(' ');
             } else {
-                builder.append("->");
+
+                boolean expr = false;
+
+                if (node.jjtGetNumChildren() == 1) {
+                   JexlNode child = node.jjtGetChild(0);
+
+                   if (!(child instanceof ASTBlock))
+                       expr = true;
+                } 
+
+                if (expr) {
+                    builder.append("=>");
+                } else {
+                    builder.append("->");
+                }
             }
             // we will need a block...
         }
