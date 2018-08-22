@@ -789,7 +789,9 @@ void Parameters() #void : {}
 
 void LambdaLookahead() #void() : {}
 {
-  <FUNCTION> Parameters()
+  LOOKAHEAD(2) <FUNCTION> Parameters()
+  |
+  LOOKAHEAD(2) <FUNCTION> <LCURLY>
   |
   Parameters() ( <LAMBDA> | <LAMBDAE> )
   |
@@ -801,7 +803,9 @@ void Lambda() #JexlLambda() :
    pushFrame();
 }
 {
-  <FUNCTION> Parameters() Block()
+  LOOKAHEAD(2) <FUNCTION> Parameters() Block()
+  |
+  LOOKAHEAD(2) <FUNCTION> Block()
   |
   Parameters() ( <LAMBDA> Block() | <LAMBDAE> Expression() )
   |
