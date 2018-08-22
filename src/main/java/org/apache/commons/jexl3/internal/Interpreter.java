@@ -1062,13 +1062,12 @@ public class Interpreter extends InterpreterBase {
 
             if (value == null && node.jjtGetParent() instanceof ASTExpressionStatement) {
 
-               Object[] argv = new Object[] {};
-               JexlMethod vm = uberspect.getMethod(arithmetic, name, argv);
+               JexlMethod vm = uberspect.getMethod(arithmetic, name, EMPTY_PARAMS);
 
                if (vm != null) {
 
                    try {
-                      Object eval = vm.invoke(arithmetic, argv);
+                      Object eval = vm.invoke(arithmetic, EMPTY_PARAMS);
 
                       if (cache && vm.isCacheable()) {
 
