@@ -131,6 +131,7 @@ TOKEN_MGR_DECLS : {
     | < RETURN : "return" >
     | < FUNCTION : "function" >
     | < LAMBDA : "->" >
+    | < LAMBDAE : "=>" >
     | < BREAK : "break" >
     | < CONTINUE : "continue" >
     | < PRAGMA : "#pragma" >
@@ -458,61 +459,71 @@ void AssignmentExpression() #void : {}
 void ConditionalExpression() #void : {}
 {
   ConditionalOrExpression()
-  (
+  ( LOOKAHEAD(2) (
     <QMARK> Expression() <COLON> Expression() #TernaryNode(3)
   |
     <ELVIS> Expression() #TernaryNode(2)
   |
     <NULLP> Expression() #NullpNode(2)
-  )?
+  ) )?
 }
 
 void ConditionalOrExpression() #void : {}
 {
   ConditionalAndExpression()
-  ( <OR> ConditionalAndExpression() #OrNode(2) )*
+  ( LOOKAHEAD(2) (
+     <OR> ConditionalAndExpression() #OrNode(2) 
+  ) )*
 }
 
 void ConditionalAndExpression() #void : {}
 {
   InclusiveOrExpression()
-  ( <AND> InclusiveOrExpression() #AndNode(2) )*
+  ( LOOKAHEAD(2) (
+     <AND> InclusiveOrExpression() #AndNode(2) 
+  ) )*
 }
 
 void InclusiveOrExpression() #void : {}
 {
   ExclusiveOrExpression()
-  ( <or> ExclusiveOrExpression() #BitwiseOrNode(2) )*
+  ( LOOKAHEAD(2) (
+     <or> ExclusiveOrExpression() #BitwiseOrNode(2) 
+  ) )*
 }
 
 void ExclusiveOrExpression() #void : {}
 {
   AndExpression()
-  ( <xor> AndExpression() #BitwiseXorNode(2) )*
+  ( LOOKAHEAD(2) (
+     <xor> AndExpression() #BitwiseXorNode(2) 
+  ) )*
 }
 
 void AndExpression() #void : {}
 {
   EqualityExpression()
-  ( <and> EqualityExpression() #BitwiseAndNode(2) )*
+  ( LOOKAHEAD(2) (
+     <and> EqualityExpression() #BitwiseAndNode(2) 
+  ) )*
 }
 
 void EqualityExpression() #void : {}
 {
   RelationalExpression()
-  (
+  ( LOOKAHEAD(2) (
      <eq> RelationalExpression() #EQNode(2)
    |
      <ne> RelationalExpression() #NENode(2)
    |
      <range> RelationalExpression() #RangeNode(2) // range
-  )?
+  ) )?
 }
 
 void RelationalExpression() #void : {}
 {
   AdditiveExpression()
-  (
+  ( LOOKAHEAD(2) (
     <lt> AdditiveExpression() #LTNode(2)
    |
     <gt> AdditiveExpression() #GTNode(2)
@@ -532,7 +543,7 @@ void RelationalExpression() #void : {}
     <eeq> AdditiveExpression() #EWNode(2) // ends with
    |
     <ene> AdditiveExpression() #NEWNode(2) // not ends with
-  )?
+  ) )?
 }
 
 /***************************************
@@ -552,13 +563,13 @@ void AdditiveExpression() #void : {}
 void MultiplicativeExpression() #void : {}
 {
   UnaryExpression()
-  (
+  ( LOOKAHEAD(2) (
     <mult> UnaryExpression() #MulNode(2)
   |
     <div> UnaryExpression() #DivNode(2)
   |
     <mod> UnaryExpression() #ModNode(2)
-  )*
+  ) )*
 }
 
 void UnaryExpression() #void : {}
@@ -780,9 +791,9 @@ void LambdaLookahead() #void() : {}
 {
   <FUNCTION> Parameters()
   |
-  Parameters() <LAMBDA>
+  Parameters() ( <LAMBDA> | <LAMBDAE> )
   |
-  Parameter() <LAMBDA>
+  Parameter() ( <LAMBDA> | <LAMBDAE> )
 }
 
 void Lambda() #JexlLambda() :
@@ -792,9 +803,9 @@ void Lambda() #JexlLambda() :
 {
   <FUNCTION> Parameters() Block()
   |
-  Parameters() <LAMBDA> Block()
+  Parameters() ( <LAMBDA> Block() | <LAMBDAE> Expression() )
   |
-  Parameter() <LAMBDA> Block()
+  Parameter() ( <LAMBDA> Block() | <LAMBDAE> Expression() )
 }
 
 
