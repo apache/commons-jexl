@@ -43,6 +43,8 @@ import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
+import org.apache.commons.jexl3.parser.ASTForeachVar;
+import org.apache.commons.jexl3.parser.ASTForVar;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTGENode;
 import org.apache.commons.jexl3.parser.ASTGTNode;
@@ -170,6 +172,11 @@ public class ScriptVisitor extends ParserVisitor {
     }
 
     @Override
+    protected Object visit(ASTForeachVar node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
     protected Object visit(ASTReturnStatement node, Object data) {
         return visitNode(node, data);
     }
@@ -181,6 +188,11 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTVar node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTForVar node, Object data) {
         return visitNode(node, data);
     }
 

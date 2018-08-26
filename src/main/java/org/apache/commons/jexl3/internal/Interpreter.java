@@ -55,6 +55,8 @@ import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
+import org.apache.commons.jexl3.parser.ASTForeachVar;
+import org.apache.commons.jexl3.parser.ASTForVar;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTGENode;
 import org.apache.commons.jexl3.parser.ASTGTNode;
@@ -640,11 +642,13 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(ASTForeachStatement node, Object data) {
         Object result = null;
         /* first objectNode is the loop variable */
-        ASTReference loopReference = (ASTReference) node.jjtGetChild(0);
+        ASTForeachVar loopReference = (ASTForeachVar) node.jjtGetChild(0);
+
         ASTIdentifier loopVariable = (ASTIdentifier) loopReference.jjtGetChild(0);
-        int symbol = loopVariable.getSymbol();
+
         /* second objectNode is the variable to iterate */
         Object iterableValue = node.jjtGetChild(1).jjtAccept(this, data);
+
         // make sure there is a value to iterate on and a statement to execute
         if (iterableValue != null && node.jjtGetNumChildren() >= 3) {
             /* third objectNode is the statement to execute */
@@ -652,36 +656,104 @@ public class Interpreter extends InterpreterBase {
             // get an iterator for the collection/array etc via the introspector.
             Object forEach = null;
             try {
-                forEach = operators.tryOverload(node, JexlOperator.FOR_EACH, iterableValue);
-                Iterator<?> itemsIterator = forEach instanceof Iterator
+
+                if (loopReference.jjtGetNumChildren() > 1) {
+
+                    ASTIdentifier loopValueVariable = (ASTIdentifier) loopReference.jjtGetChild(1);
+
+                    int symbol = loopVariable.getSymbol();
+                    int valueSymbol = loopValueVariable.getSymbol();
+
+                    forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, iterableValue);
+                    Iterator<?> itemsIterator = forEach instanceof Iterator
+                                            ? (Iterator<?>) forEach
+                                            : uberspect.getIndexedIterator(iterableValue);
+
+                    int i = -1;
+
+                    if (itemsIterator != null) {
+                        while (itemsIterator.hasNext()) {
+                            cancelCheck(node);
+                            i += 1;
+                            // set loopVariable to value of iterator
+                            Object value = itemsIterator.next();
+
+                            if (value instanceof Map.Entry<?,?>) {
+                                Map.Entry<?,?> entry = (Map.Entry<?,?>) value; 
+                                if (symbol < 0) {
+                                    context.set(loopVariable.getName(), entry.getKey());
+                                } else {
+                                    frame.set(symbol, entry.getKey());
+                                }
+                                if (valueSymbol < 0) {
+                                    context.set(loopValueVariable.getName(), entry.getValue());
+                                } else {
+                                    frame.set(valueSymbol, entry.getValue());
+                                }
+                            } else {
+                                if (symbol < 0) {
+                                    context.set(loopVariable.getName(), i);
+                                } else {
+                                    frame.set(symbol, i);
+                                }
+                                if (valueSymbol < 0) {
+                                    context.set(loopValueVariable.getName(), value);
+                                } else {
+                                    frame.set(valueSymbol, value);
+                                }
+                            }
+
+                            try {
+                                // execute statement
+                                result = statement.jjtAccept(this, data);
+                            } catch (JexlException.Break stmtBreak) {
+                                break;
+                            } catch (JexlException.Continue stmtContinue) {
+                                //continue;
+                            }
+                        }
+                    }
+
+                } else {
+                    int symbol = loopVariable.getSymbol();
+
+                    forEach = operators.tryOverload(node, JexlOperator.FOR_EACH, iterableValue);
+                    Iterator<?> itemsIterator = forEach instanceof Iterator
                                             ? (Iterator<?>) forEach
                                             : uberspect.getIterator(iterableValue);
-                if (itemsIterator != null) {
-                    while (itemsIterator.hasNext()) {
-                        cancelCheck(node);
-                        // set loopVariable to value of iterator
-                        Object value = itemsIterator.next();
-                        if (symbol < 0) {
-                            context.set(loopVariable.getName(), value);
-                        } else {
-                            frame.set(symbol, value);
-                        }
-                        try {
-                            // execute statement
-                            result = statement.jjtAccept(this, data);
-                        } catch (JexlException.Break stmtBreak) {
-                            break;
-                        } catch (JexlException.Continue stmtContinue) {
-                            //continue;
+                    if (itemsIterator != null) {
+                        while (itemsIterator.hasNext()) {
+                            cancelCheck(node);
+                            // set loopVariable to value of iterator
+                            Object value = itemsIterator.next();
+                            if (symbol < 0) {
+                                context.set(loopVariable.getName(), value);
+                            } else {
+                                frame.set(symbol, value);
+                            }
+                            try {
+                                // execute statement
+                                result = statement.jjtAccept(this, data);
+                            } catch (JexlException.Break stmtBreak) {
+                                break;
+                            } catch (JexlException.Continue stmtContinue) {
+                                //continue;
+                            }
                         }
                     }
                 }
+
             } finally {
                 //  closeable iterator handling
                 closeIfSupported(forEach);
             }
         }
         return result;
+    }
+
+    @Override
+    protected Object visit(ASTForeachVar node, Object data) {
+        return null;
     }
 
     @Override
@@ -914,6 +986,11 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTVar node, Object data) {
+        return visit((ASTIdentifier) node, data);
+    }
+
+    @Override
+    protected Object visit(ASTForVar node, Object data) {
         return visit((ASTIdentifier) node, data);
     }
 

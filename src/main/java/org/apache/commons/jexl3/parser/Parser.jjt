@@ -361,14 +361,14 @@ void Break() #Break : {}
 
 void ForeachStatement() : {}
 {
-    <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
+    <FOR> <LPAREN> ForeachVar() <COLON> Expression() <RPAREN> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
 }
 
-void ForEachVar() #Reference : {}
+void ForeachVar() : {}
 {
-    <VAR> DeclareVar()
-|
-    Identifier()
+    <VAR> DeclareVar() (LOOKAHEAD(1) <COMMA> DeclareForVar())?
+    |
+    Identifier() (LOOKAHEAD(1) <COMMA> Identifier())?
 }
 
 void Var() #void : {}
@@ -377,6 +377,14 @@ void Var() #void : {}
 }
 
 void DeclareVar() #Var :
+{
+    Token t;
+}
+{
+    t=<IDENTIFIER> { declareVariable(jjtThis, t); }
+}
+
+void DeclareForVar() #ForVar :
 {
     Token t;
 }

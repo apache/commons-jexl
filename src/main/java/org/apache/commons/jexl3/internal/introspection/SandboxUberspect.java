@@ -145,6 +145,11 @@ public final class SandboxUberspect implements JexlUberspect {
     }
 
     @Override
+    public Iterator<?> getIndexedIterator(final Object obj) {
+        return uberspect.getIndexedIterator(obj);
+    }
+
+    @Override
     public JexlArithmetic.Uberspect getArithmetic(final JexlArithmetic arithmetic) {
         return uberspect.getArithmetic(arithmetic);
     }
