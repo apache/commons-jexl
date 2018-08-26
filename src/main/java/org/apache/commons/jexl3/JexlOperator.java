@@ -301,7 +301,16 @@ public enum JexlOperator {
      * <br><strong>Method:</strong> <code>Iterator&lt;Object&gt; forEach(R y);</code>.
      * @since 3.1
      */
-    FOR_EACH("for(...)", "forEach", 1);
+    FOR_EACH("for(x:y)", "forEach", 1),
+
+    /**
+     * Iterator generator as in for(var i,j : y).
+     * If the returned Iterator is AutoCloseable, close will be called after the last execution of the loop block.
+     * <br><strong>Syntax:</strong> <code>for(var i,j : y){...} </code>
+     * <br><strong>Method:</strong> <code>Iterator&lt;Object&gt; forEachIndexed(R y);</code>.
+     * @since 3.2
+     */
+    FOR_EACH_INDEXED("for(i,j:y)", "forEachIndexed", 1);
 
     /**
      * The operator symbol.

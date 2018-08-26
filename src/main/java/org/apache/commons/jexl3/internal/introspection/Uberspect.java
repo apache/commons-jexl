@@ -389,6 +389,17 @@ public class Uberspect implements JexlUberspect {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public Iterator<?> getIndexedIterator(Object obj) {
+
+        if (obj instanceof Map<?, ?>) {
+            return ((Map<?, ?>) obj).entrySet().iterator();
+        }
+
+        return getIterator(obj);
+    }
+
+    @Override
     public JexlMethod getConstructor(Object ctorHandle, Object... args) {
         return ConstructorMethod.discover(base(), ctorHandle, args);
     }

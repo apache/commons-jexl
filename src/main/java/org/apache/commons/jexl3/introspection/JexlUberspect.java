@@ -309,6 +309,15 @@ public interface JexlUberspect {
     Iterator<?> getIterator(Object obj);
 
     /**
+     * Gets an indexed iterator from an object.
+     * 
+     * @param obj to get the iterator from
+     * @return an iterator over obj or null
+     * @since 3.2
+     */
+    Iterator<?> getIndexedIterator(Object obj);
+
+    /**
      * Gets an arithmetic operator resolver for a given arithmetic instance.
      * 
      * @param arithmetic the arithmetic instance

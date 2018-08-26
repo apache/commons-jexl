@@ -45,6 +45,8 @@ import org.apache.commons.jexl3.parser.ASTExpressionStatement;
 import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
+import org.apache.commons.jexl3.parser.ASTForeachVar;
+import org.apache.commons.jexl3.parser.ASTForVar;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTGENode;
 import org.apache.commons.jexl3.parser.ASTGTNode;
@@ -602,6 +604,16 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
+    protected Object visit(ASTForeachVar node, Object data) {
+        accept(node.jjtGetChild(0), data);
+        if (node.jjtGetNumChildren() > 1) {
+            builder.append(", ");
+            accept(node.jjtGetChild(1), data);
+        }
+        return data;
+    }
+
+    @Override
     protected Object visit(ASTGENode node, Object data) {
         return infixChildren(node, " >= ", false, data);
     }
@@ -1048,6 +1060,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTVar node, Object data) {
         builder.append("var ");
+        check(node, node.getName(), data);
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTForVar node, Object data) {
         check(node, node.getName(), data);
         return data;
     }
