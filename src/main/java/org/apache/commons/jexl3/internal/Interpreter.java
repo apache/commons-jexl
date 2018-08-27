@@ -735,6 +735,7 @@ public class Interpreter extends InterpreterBase {
                                 //continue;
                             } catch (JexlException.Remove stmtRemove) {
                                 itemsIterator.remove();
+                                i -= 1;
                                 // and continue
                             }
                         }
