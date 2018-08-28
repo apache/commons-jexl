@@ -1151,9 +1151,7 @@ public class Interpreter extends InterpreterBase {
                       Object eval = vm.invoke(arithmetic, EMPTY_PARAMS);
 
                       if (cache && vm.isCacheable()) {
-
                           Funcall funcall = new ArithmeticFuncall(vm, false);
-
                           node.jjtSetValue(funcall);
                       }
 
@@ -1732,7 +1730,17 @@ public class Interpreter extends InterpreterBase {
                 if (functor != null) {
                     // lambda, script or jexl method will do
                     if (functor instanceof JexlScript) {
-                        return ((JexlScript) functor).execute(context, argv);
+                        JexlScript s = (JexlScript) functor;
+                        boolean varArgs = s.isVarArgs();
+                        if (!varArgs && isStrictEngine()) {
+                            String[] params = s.getParameters();
+                            int paramCount = params != null ? params.length : 0;
+                            int argCount = argv != null ? argv.length : 0;
+                            if (argCount > paramCount)
+                                return unsolvableMethod(node, "(...)");
+                        }
+
+                        return s.execute(context, argv);
                     }
                     if (functor instanceof JexlMethod) {
                         return ((JexlMethod) functor).invoke(target, argv);

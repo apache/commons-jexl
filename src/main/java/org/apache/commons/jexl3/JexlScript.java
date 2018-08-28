@@ -93,8 +93,16 @@ public interface JexlScript {
     String[] getParameters();
 
     /**
-     * Gets this script local variables.
+     * Returns true if script support variable arguments.
      * 
+     * @return boolean
+     * @since 3.2
+     */
+    boolean isVarArgs();
+
+    /**
+     * Gets this script local variables.
+     *
      * @return the local variables or null
      * @since 2.1
      */

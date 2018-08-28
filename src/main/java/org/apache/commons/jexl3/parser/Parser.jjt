@@ -153,7 +153,7 @@ TOKEN_MGR_DECLS : {
     | < COMMA : "," >
     | < DOT : "." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < QDOT : "?." > { pushDot(); } /* Lexical state is now DOT_ID */
-    | < ELIPSIS : "..." >
+    | < ELLIPSIS : "..." >
 }
 
 <*> TOKEN : { /* CONDITIONALS */
@@ -760,7 +760,7 @@ void RegexLiteral() :
 
 void ExtendedLiteral() #ExtendedLiteral() : {}
 {
-   <ELIPSIS>
+   <ELLIPSIS>
 }
 
 void ArrayLiteral() : {}
@@ -889,7 +889,9 @@ void Parameter() #void :
 
 void Parameters() #void : {}
 {
-     <LPAREN> [Parameter() (<COMMA> Parameter())* ] <RPAREN>
+     <LPAREN> [
+       Parameter() (LOOKAHEAD(2) <COMMA> Parameter())* (<ELLIPSIS> { declareVarArgSupport(); })? ] 
+     <RPAREN>
 }
 
 

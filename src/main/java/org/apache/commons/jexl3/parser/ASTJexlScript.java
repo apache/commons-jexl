@@ -126,6 +126,14 @@ public class ASTJexlScript extends JexlNode {
     }
 
     /**
+     * If this script expects a variable number of arguments.
+     * @return true or false
+     */
+    public boolean isVarArgs() {
+        return scope != null ? scope.isVarArgs() : false;
+    }
+
+    /**
      * Gets this script symbols, i.e. parameters and local variables.
      * @return the symbol names
      */

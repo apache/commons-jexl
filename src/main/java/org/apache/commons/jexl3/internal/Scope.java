@@ -28,11 +28,15 @@ public final class Scope {
     /**
      * The parent scope.
      */
-    private Scope parent = null;
+    private final Scope parent;
     /**
      * The number of parameters.
      */
     private int parms;
+    /**
+     * If params have variable number.
+     */
+    private boolean varArgs;
     /**
      * The number of local variables.
      */
@@ -82,6 +86,9 @@ public final class Scope {
         }
         Scope scope = (Scope) o;
         if (parms != scope.parms) {
+            return false;
+        }
+        if (varArgs != scope.varArgs) {
             return false;
         }
         if (namedVariables == null) {
@@ -156,6 +163,13 @@ public final class Scope {
     }
 
     /**
+     * Declares a scope to support variable parameters.
+     */
+    public void declareVarArgs() {
+        varArgs = true;
+    }
+
+    /**
      * Declares a local variable.
      * <p>
      * This method creates an new entry in the symbol map.
@@ -222,6 +236,14 @@ public final class Scope {
      */
     public int getArgCount() {
         return parms;
+    }
+
+    /**
+     * If this script expects a variable number of arguments.
+     * @return true or false
+     */
+    public boolean isVarArgs() {
+        return varArgs;
     }
 
     /**
@@ -352,5 +374,15 @@ public final class Scope {
             }
             return this;
         }
+
+        /**
+         * Creates a clone of this frame.
+         * @return new frame
+         */
+        public Frame clone() {
+            Object[] copy = stack != null ? stack.clone() : null;
+            return new Frame(scope, copy, curried);
+        }
+
     }
 }

@@ -241,6 +241,15 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
+     * Declares a local vararg parameter.
+     * <p> This method creates an new entry in the symbol map. </p>
+     * @param token the parameter name toekn
+     */
+    protected void declareVarArgSupport() {
+        frame.declareVarArgs();
+    }
+
+    /**
      * Default implementation does nothing but is overriden by generated code.
      * @param top whether the identifier is beginning an l/r value
      * @throws ParseException subclasses may throw this

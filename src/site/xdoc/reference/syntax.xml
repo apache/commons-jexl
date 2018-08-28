@@ -176,6 +176,8 @@
                         <code>var fun = x -> { x * x }</code>
                         If the function is a simple expression the following syntax can also be used
                         <code>var fun = (x, y) => x + y</code>
+                        Function can also take arbitraty number arguments, in that case the following syntax can be used
+                        <code>var fun = (x, y...) -> {x + y[0] + y[1]}</code>
                         Calling a function follows the usual convention:
                         <code>fun(17, 25)</code>
                         <p>Note that functions can use local variables and parameters from their declaring script.
