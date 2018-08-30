@@ -129,7 +129,7 @@ public class Script implements JexlScript, JexlExpression {
     public String getParsedText(int indent) {
         Debugger debug = new Debugger();
         debug.setIndentation(indent);
-        debug.debug(script);
+        debug.debug(script, false);
         return debug.toString();
     }
 
@@ -166,7 +166,7 @@ public class Script implements JexlScript, JexlExpression {
         CharSequence src = source;
         if (src == null) {
             Debugger debug = new Debugger();
-            debug.debug(script);
+            debug.debug(script, false);
             src = debug.toString();
         }
         return src.toString();
