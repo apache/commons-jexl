@@ -93,7 +93,7 @@ public interface JexlScript {
     String[] getParameters();
 
     /**
-     * Returns true if script support variable arguments.
+     * Returns true if script supports taking variable number of arguments.
      * 
      * @return boolean
      * @since 3.2
