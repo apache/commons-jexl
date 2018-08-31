@@ -288,4 +288,24 @@ public class LambdaTest extends JexlTestCase {
         result = script.execute(null, 22);
         Assert.assertEquals(42, result);
     }
+
+    @Test
+    public void testCurryScript() throws Exception {
+        JexlEngine jexl = new Engine();
+        JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");
+        String text = base.toString();
+        JexlScript script = base.curry(5, 15);
+        Assert.assertEquals(text, script.toString());
+
+        JexlEvalContext ctxt = new JexlEvalContext();
+        ctxt.set("s", base);
+        script = jexl.createScript("return s");
+        Object result = script.execute(ctxt);
+        Assert.assertEquals(text, result.toString());
+
+        script = jexl.createScript("return s.curry(1)");
+        result = script.execute(ctxt);
+        Assert.assertEquals(text, result.toString());
+    }
+
 }
