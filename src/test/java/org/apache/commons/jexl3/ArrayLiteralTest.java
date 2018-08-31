@@ -55,7 +55,7 @@ public class ArrayLiteralTest extends JexlTestCase {
     }
 
     @Test
-    public void testLiteralWithElipsis() throws Exception {
+    public void testLiteralWithEllipsis() throws Exception {
         JexlExpression e = JEXL.createExpression("[ 'foo' , 'bar', ... ]");
         JexlContext jc = new MapContext();
 

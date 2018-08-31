@@ -53,6 +53,7 @@ import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
 import org.apache.commons.jexl3.parser.ASTEmptyMethod;
+import org.apache.commons.jexl3.parser.ASTEnumerationNode;
 import org.apache.commons.jexl3.parser.ASTExpressionStatement;
 import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
@@ -121,6 +122,7 @@ import org.apache.commons.jexl3.parser.Node;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.concurrent.Callable;
@@ -596,6 +598,22 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
+    protected Object visit(ASTEnumerationNode node, Object data) {
+        JexlNode valNode = node.jjtGetChild(0);
+        Object iterableValue = valNode.jjtAccept(this, data);
+
+        if (iterableValue != null) {
+            Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH, iterableValue);
+            Iterator<?> itemsIterator = forEach instanceof Iterator
+                                   ? (Iterator<?>) forEach
+                                   : uberspect.getIndexedIterator(iterableValue);
+            return itemsIterator;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     protected Object visit(ASTExpressionStatement node, Object data) {
         cancelCheck(node);
         Object result = node.jjtGetChild(0).jjtAccept(this, data);
@@ -931,8 +949,17 @@ public class Interpreter extends InterpreterBase {
             JexlNode child = node.jjtGetChild(i);
             if (child instanceof ASTExtendedLiteral) {
                 extended = true;
+            } else if (child instanceof ASTEnumerationNode) {
+                Iterator<?> it = (Iterator<?>) child.jjtAccept(this, data);
+                if (it != null) {
+                   while (it.hasNext()) {
+                       Object entry = it.next();
+                       ab.add(entry);
+                   }
+                }
+                closeIfSupported(it);
             } else {
-                Object entry = node.jjtGetChild(i).jjtAccept(this, data);
+                Object entry = child.jjtAccept(this, data);
                 ab.add(entry);
             }
         }
@@ -950,8 +977,20 @@ public class Interpreter extends InterpreterBase {
         JexlArithmetic.SetBuilder mb = arithmetic.setBuilder(childCount);
         for (int i = 0; i < childCount; i++) {
             cancelCheck(node);
-            Object entry = node.jjtGetChild(i).jjtAccept(this, data);
-            mb.add(entry);
+            JexlNode child = node.jjtGetChild(i);
+            if (child instanceof ASTEnumerationNode) {
+                Iterator<?> it = (Iterator<?>) child.jjtAccept(this, data);
+                if (it != null) {
+                   while (it.hasNext()) {
+                       Object entry = it.next();
+                       mb.add(entry);
+                   }
+                }
+                closeIfSupported(it);
+            } else {
+                Object entry = child.jjtAccept(this, data);
+                mb.add(entry);
+            }
         }
         return mb.create();
     }
@@ -1550,12 +1589,29 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object[] visit(ASTArguments node, Object data) {
-        final int argc = node.jjtGetNumChildren();
-        final Object[] argv = new Object[argc];
-        for (int i = 0; i < argc; i++) {
-            argv[i] = node.jjtGetChild(i).jjtAccept(this, data);
+        int childCount = node.jjtGetNumChildren();
+        if (childCount > 0) {
+            List<Object> av = new ArrayList<Object> (childCount);
+            for (int i = 0; i < childCount; i++) {
+                JexlNode child = node.jjtGetChild(i);
+                if (child instanceof ASTEnumerationNode) {
+                    Iterator<?> it = (Iterator<?>) child.jjtAccept(this, data);
+                    if (it != null) {
+                       while (it.hasNext()) {
+                           Object entry = it.next();
+                           av.add(entry);
+                       }
+                    }
+                    closeIfSupported(it);
+                } else {
+                    Object entry = child.jjtAccept(this, data);
+                    av.add(entry);
+                }
+            }
+            return av.toArray();
+        } else {
+            return EMPTY_PARAMS;
         }
-        return argv;
     }
 
     @Override

@@ -61,16 +61,14 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
     /** Whether we can try unboxing. */
     protected boolean unboxing = true;
     /** The untyped list of items being added. */
-    protected final Object[] untyped;
-    /** Number of added items. */
-    protected int added = 0;
+    protected final ArrayList<Object> untyped;
 
     /**
      * Creates a new builder.
-     * @param size the exact array size
+     * @param size the initial array size
      */
     public ArrayBuilder(int size) {
-        untyped = new Object[size];
+        untyped = new ArrayList<Object> (size);
     }
 
     @Override
@@ -103,40 +101,29 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
                 }
             }
         }
-        if (added >= untyped.length) {
-            throw new IllegalArgumentException("add() over size");
-        }
-        untyped[added++] = value;
+        untyped.add(value);
     }
 
     @Override
     public Object create(boolean extended) {
-        if (untyped != null) {
-            if (extended) {
-                List<Object> list = new ArrayList<Object>(added);
-                for(int i = 0; i < added; ++i) {
-                    list.add(untyped[i]);
-                }
-                return list;
-            }
-            // convert untyped array to the common class if not Object.class
-            if (commonClass != null && !Object.class.equals(commonClass)) {
-                final int size = added;
-                // if the commonClass is a number, it has an equivalent primitive type, get it
-                if (unboxing) {
-                    commonClass = unboxingClass(commonClass);
-                }
-                // allocate and fill up the typed array
-                Object typed = Array.newInstance(commonClass, size);
-                for (int i = 0; i < size; ++i) {
-                    Array.set(typed, i, untyped[i]);
-                }
-                return typed;
-            } else {
-                return untyped;
-            }
-        } else {
-            return new Object[0];
+        if (extended) {
+            return untyped;
         }
+
+        if (commonClass == null)
+            commonClass = Object.class;
+
+        // convert untyped array to the common class
+        final int size = untyped.size();
+        // if the commonClass is a number, it has an equivalent primitive type, get it
+        if (unboxing) {
+            commonClass = unboxingClass(commonClass);
+        }
+        // allocate and fill up the typed array
+        Object typed = Array.newInstance(commonClass, size);
+        for (int i = 0; i < size; ++i) {
+            Array.set(typed, i, untyped.get(i));
+        }
+        return typed;
     }
 }

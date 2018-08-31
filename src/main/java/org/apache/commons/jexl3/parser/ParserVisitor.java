@@ -126,6 +126,8 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTNotNode node, Object data);
 
+    protected abstract Object visit(ASTEnumerationNode node, Object data);
+
     protected abstract Object visit(ASTIdentifier node, Object data);
 
     protected abstract Object visit(ASTNullLiteral node, Object data);

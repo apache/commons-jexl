@@ -28,8 +28,8 @@ public class SetBuilder implements JexlArithmetic.SetBuilder {
     protected final Set<Object> set;
 
     /**
-     * Creates a new builder.
-     * @param size the expected set size
+     * Creates a new builder with specified set size.
+     * @param size the initial set size
      */
     public SetBuilder(int size) {
         set = new HashSet<Object>(size);

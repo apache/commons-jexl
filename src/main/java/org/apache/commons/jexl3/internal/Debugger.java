@@ -41,6 +41,7 @@ import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
 import org.apache.commons.jexl3.parser.ASTEmptyMethod;
+import org.apache.commons.jexl3.parser.ASTEnumerationNode;
 import org.apache.commons.jexl3.parser.ASTExpressionStatement;
 import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
@@ -1058,6 +1059,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTUnaryMinusNode node, Object data) {
         return prefixChild(node, "-", data);
+    }
+
+    @Override
+    protected Object visit(ASTEnumerationNode node, Object data) {
+        return prefixChild(node, "...", data);
     }
 
     @Override

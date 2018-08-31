@@ -178,13 +178,22 @@
                         <code>var fun = (x, y) => x + y</code>
                         Function can also take arbitraty number arguments, in that case the following syntax can be used
                         <code>var fun = (x, y...) -> {x + y[0] + y[1]}</code>
-                        Calling a function follows the usual convention:
-                        <code>fun(17, 25)</code>
                         <p>Note that functions can use local variables and parameters from their declaring script.
                             Those variables values are bound in the function environment at definition time.</p>
                         <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
                         The function closure hoists 't' when defined; the result of the evaluation will
                         lead to <code>15 +7 + 20 = 42</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Function call</td>
+                    <td>
+                        Calling a function follows the usual convention, e.g.
+                        <code>fun(17, 25)</code> will call the <code>fun</code> function with arguments <code>17</code> 
+                        and <code>25</code>
+                        <p>Argument comprehentions syntax can also be used to pass variable number of arguments based on other iterable objects, 
+                            like collections and arrays, e.g. <code>fun(...[17, 25])</code>
+                            will call the <code>fun</code> function with arguments <code>17</code> and <code>25</code></p>
                     </td>
                 </tr>
                 <tr>
@@ -385,10 +394,14 @@
                 <tr>
                     <td>Array literal</td>
                     <td>
-                        A <code>[</code> followed by one or more expressions separated by <code>,</code> and ending
+                        A <code>[</code> followed by zero or more expressions separated by <code>,</code> and ending
                         with <code>]</code>, e.g.
                         <code>[ 1, 2, "three" ]</code>
                         <p>This syntax creates an <code>Object[]</code>.</p>
+                        <p>Empty array literal can be specified as <code>[]</code> with result of creating <code>Object[]</code></p>
+                        <p>Array literal can be specified as <code>[]</code> with result of creating <code>Object[]</code></p>
+                        <p>Array comprehentions syntax can also be used to construct arrays based on other iterable objects, 
+                            like collections and arrays, e.g.<code>[1, 2, 3, ...[4, 5, 6]]</code></p>
                         <p>
                             JEXL will attempt to strongly type the array; if all entries are of the same class or if all
                             entries are Number instance, the array literal will be an <code>MyClass[]</code> in the former
@@ -401,28 +414,35 @@
                 <tr>
                     <td>List literal</td>
                     <td>
-                        A <code>[</code> followed by one or more expressions separated by <code>,</code> and ending
+                        A <code>[</code> followed by zero or more expressions separated by <code>,</code> and ending
                         with <code>,...]</code>, e.g.
                         <code>[ 1, 2, "three",...]</code>
                         <p>This syntax creates an <code>ArrayList&lt;Object&gt;</code>.</p>
+                        <p>Empty list literal can be specified as <code>[...]</code></p>
+                        <p>List comprehentions syntax can also be used to construct lists based on other iterable objects, 
+                            like collections and arrays, e.g.<code>[1, 2, 3, ...[4, 5, 6],...]</code></p>
                     </td>
                 </tr>
                 <tr>
                     <td>Set literal</td>
                     <td>
-                        A <code>{</code> followed by one or more expressions separated by <code>,</code> and ending
+                        A <code>{</code> followed by zero or more expressions separated by <code>,</code> and ending
                         with <code>}</code>, e.g.
                         <code>{ "one" , 2, "more"}</code>
                         <p>This syntax creates a <code>HashSet&lt;Object&gt;</code>.</p>
+                        <p>Empty set literal can be specified as <code>{}</code></p>
+                        <p>Set comprehentions syntax can also be used to construct sets based on other iterable objects, 
+                            like collections and arrays, e.g.<code>{1, 2, 3, ...[4, 5, 6]}</code></p>
                     </td>
                 </tr>
                 <tr>
                     <td>Map literal</td>
                     <td>
-                        A <code>{</code> followed by one or more sets of <code>key : value</code> pairs separated by <code>,</code> and ending
+                        A <code>{</code> followed by zero or more sets of <code>key : value</code> pairs separated by <code>,</code> and ending
                         with <code>}</code>, e.g.
                         <code>{ "one" : 1, "two" : 2, "three" : 3, "more": "many more" }</code>
                         <p>This syntax creates a <code>HashMap&lt;Object,Object&gt;</code>.</p>
+                        <p>Empty map literal can be specified as <code>{:}</code></p>
                     </td>
                 </tr>
 
