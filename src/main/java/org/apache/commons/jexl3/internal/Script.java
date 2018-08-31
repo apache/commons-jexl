@@ -210,16 +210,15 @@ public class Script implements JexlScript, JexlExpression {
         if (varArgs && args != null && args.length > 0 && args.length >= argCount) {
 
             if (argCount > 0) {
-               params = new Object[argCount];
-               for (int i = 0; i < argCount - 1; i++)
-                   params[i] = args[i];
-               int varArgCount = args.length - argCount + 1;
-               Object[] varg = new Object[varArgCount];
-               for (int i = 0; i < varArgCount; i++)
-                   varg[i] = args[argCount + i - 1];
-               params[argCount-1] = varg;
+                params = new Object[argCount];
+                System.arraycopy(args, 0, params, 0, argCount - 1);
+                int varArgCount = args.length - argCount + 1;
+                Object[] varg = new Object[varArgCount];
+                System.arraycopy(args, argCount - 1, varg, 0, varArgCount);
+
+                params[argCount-1] = varg;
             } else {
-               params = new Object[] {args};
+                params = new Object[] {args};
             }
         } else {
             params = args;
@@ -254,9 +253,9 @@ public class Script implements JexlScript, JexlExpression {
 
                 if (varArgs) {
                     if (baseArgCount >= script.getArgCount()) {
-                       frame = createNewVarArgFrame(sf, args);
+                        frame = createNewVarArgFrame(sf, args);
                     } else {
-                       frame = sf.assign(scriptArgs(baseArgCount, args));
+                        frame = sf.assign(scriptArgs(baseArgCount, args));
                     }
                 } else {
                     frame = sf.assign(args);
@@ -271,19 +270,19 @@ public class Script implements JexlScript, JexlExpression {
         protected Scope.Frame createNewVarArgFrame(Scope.Frame sf, Object[] args) {
 
             if (args != null && args.length > 0) {
-               int varArgPos = script.getArgCount() - 1;
-               Scope.Frame frame = sf.clone();
+                int varArgPos = script.getArgCount() - 1;
+                Scope.Frame frame = sf.clone();
 
-               Object[] carg = (Object[]) frame.get(varArgPos);
-               Object[] varg = new Object[carg.length + args.length];
+                Object[] carg = (Object[]) frame.get(varArgPos);
+                Object[] varg = new Object[carg.length + args.length];
 
-               System.arraycopy(carg, 0, varg, 0, carg.length);
-               System.arraycopy(args, 0, varg, carg.length, args.length);
-               frame.set(varArgPos, varg);
+                System.arraycopy(carg, 0, varg, 0, carg.length);
+                System.arraycopy(args, 0, varg, carg.length, args.length);
+                frame.set(varArgPos, varg);
 
-               return frame;
+                return frame;
             } else {
-               return sf;
+                return sf;
             }
         }
 
@@ -298,16 +297,16 @@ public class Script implements JexlScript, JexlExpression {
             String[] scriptParams = super.getParameters();
 
             if (scriptParams == null || scriptParams.length == 0)
-              return scriptParams;
+                return scriptParams;
 
             boolean varArgs = script.isVarArgs();
 
             if (argCount >= scriptParams.length) {
-               return varArgs ? new String[] {scriptParams[scriptParams.length - 1]} : null;
+                return varArgs ? new String[] {scriptParams[scriptParams.length - 1]} : null;
             } else {
-               String[] result = new String[scriptParams.length - argCount];
-               System.arraycopy(scriptParams, argCount, result, 0, scriptParams.length - argCount);
-               return result;
+                String[] result = new String[scriptParams.length - argCount];
+                System.arraycopy(scriptParams, argCount, result, 0, scriptParams.length - argCount);
+                return result;
             }
         }
 
@@ -341,16 +340,14 @@ public class Script implements JexlScript, JexlExpression {
                 if (varArgs) {
 
                     if (argCount >= script.getArgCount()) {
-                       callFrame = createNewVarArgFrame(frame, args);
+                        callFrame = createNewVarArgFrame(frame, args);
                     } else {
-                       callFrame = frame.assign(scriptArgs(argCount, args));
+                        callFrame = frame.assign(scriptArgs(argCount, args));
                     }
 
                 } else {
                     callFrame = frame.assign(args);
                 }
-            } else {
-                callFrame = script.createFrame(scriptArgs(args));
             }
             Interpreter interpreter = jexl.createInterpreter(context, callFrame);
             JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
