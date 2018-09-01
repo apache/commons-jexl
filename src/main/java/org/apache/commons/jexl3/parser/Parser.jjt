@@ -128,13 +128,13 @@ TOKEN_MGR_DECLS : {
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < SIZE : "size" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < THIS : "this" >
-    | < NULL : "null" >
+    | < NULL : "null" | "\u2205" >
     | < TRUE : "true" >
     | < FALSE : "false" >
     | < RETURN : "return" >
     | < FUNCTION : "function" >
-    | < LAMBDA : "->" >
-    | < LAMBDAE : "=>" >
+    | < LAMBDA : "->" | "\u2192" >
+    | < LAMBDAE : "=>" | "\u21D2" >
     | < BREAK : "break" >
     | < CONTINUE : "continue" >
     | < REMOVE : "remove" > { popDot(); } /* Revert state to default if was DOT_ID. */
@@ -153,30 +153,30 @@ TOKEN_MGR_DECLS : {
     | < COMMA : "," >
     | < DOT : "." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < QDOT : "?." > { pushDot(); } /* Lexical state is now DOT_ID */
-    | < ELLIPSIS : "..." >
+    | < ELLIPSIS : "..." | "\u2026">
 }
 
 <*> TOKEN : { /* CONDITIONALS */
       < QMARK : "?" >
     | < ELVIS : "?:" >
     | < NULLP : "??" >
-    | < AND : "&&" | "and" >
-    | < OR : "||" | "or" >
+    | < AND : "&&" | "and" | "\u2227" >
+    | < OR : "||" | "or" | "\u2228" >
 }
 
 <*> TOKEN : { /* COMPARISONS */
-      < eq : "==" | "eq" >
-    | < ne : "!=" | "ne" >
-    | < req : "=~" | "in" > // regexp equal
-    | < rne : "!~" | "!in" > // regexp not equal
+      < eq : "==" | "eq" | "\u2261">
+    | < ne : "!=" | "ne" | "\u2260" >
+    | < req : "=~" | "in" | "\u2208" > // regexp equal
+    | < rne : "!~" | "!in" | "\u2209" > // regexp not equal
     | < seq : "=^" > // starts equal
     | < eeq : "=$" > // ends equal
     | < sne : "!^" > // start not equal
     | < ene : "!$" > // ends not equal
     | < gt : ">" | "gt" >
-    | < ge : ">=" | "ge" >
+    | < ge : ">=" | "ge" | "\u2265" >
     | < lt : "<" | "lt" >
-    | < le : "<=" | "le" >
+    | < le : "<=" | "le" | "\u2264" >
 }
 
 <*> TOKEN : { /* OPERATORS */
@@ -192,16 +192,17 @@ TOKEN_MGR_DECLS : {
     | < assign : "=" >
     | < plus : "+" >
     | < minus : "-" >
-    | < mult : "*" >
+    | < unary_minus : "\u2212" >
+    | < mult : "*" | "\u22C5" >
     | < div : "/" | "div" >
     | < mod : "%" | "mod" >
-    | < not : "!" | "not" >
+    | < not : "!" | "not" | "\u00AC" >
     | < and : "&" >
     | < or : "|" >
     | < xor : "^" >
 
     | < tilda : "~" >
-    | < range : ".." >
+    | < range : ".." | "\u2025" >
 }
 
 /***************************************
@@ -602,6 +603,8 @@ void MultiplicativeExpression() #void : {}
 void UnaryExpression() #void : {}
 {
   <minus> UnaryExpression() #UnaryMinusNode(1)
+  |
+  <unary_minus> UnaryExpression() #UnaryMinusNode(1)
   |
   <tilda> UnaryExpression() #BitwiseComplNode(1)
   |
