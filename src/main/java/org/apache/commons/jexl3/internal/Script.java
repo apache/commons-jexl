@@ -261,6 +261,19 @@ public class Script implements JexlScript, JexlExpression {
                     frame = sf.assign(args);
                 }
                 argCount = baseArgCount + args.length;
+
+            } else if (base instanceof Closure) {
+                Scope.Frame sf = ((Closure) base).frame;
+
+                boolean varArgs = script.isVarArgs();
+
+                if (varArgs) {
+                    frame = sf.assign(scriptArgs(args));
+                } else {
+                    frame = sf.assign(args);
+                }
+                argCount = args.length;
+
             } else {
                 frame = script.createFrame(scriptArgs(args));
                 argCount = args.length;

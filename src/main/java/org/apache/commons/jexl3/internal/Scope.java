@@ -116,7 +116,7 @@ public final class Scope {
     private Integer getSymbol(String name, boolean hoist) {
         Integer register = namedVariables != null ? namedVariables.get(name) : null;
         if (register == null && hoist && parent != null) {
-            Integer pr = parent.getSymbol(name, false);
+            Integer pr = parent.getSymbol(name, true);
             if (pr != null) {
                 if (hoistedVariables == null) {
                     hoistedVariables = new LinkedHashMap<Integer, Integer>();
