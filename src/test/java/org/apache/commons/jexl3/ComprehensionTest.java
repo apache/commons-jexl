@@ -44,7 +44,6 @@ public class ComprehensionTest extends JexlTestCase {
         Assert.assertEquals(3, ((int[]) o).length);
     }
 
-
     @Test
     public void testSetComprehensionLiteral() throws Exception {
         JexlContext jc = new MapContext();
@@ -64,6 +63,16 @@ public class ComprehensionTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         Object o = JEXL.createScript("var x = (a, b, c) -> {return a + b + c}; var y = [1, 2, 3]; x(...y)").execute(jc);
         Assert.assertEquals(6, o);
+    }
+
+    @Test
+    public void testIteratorEmpty() throws Exception {
+        JexlContext jc = new MapContext();
+        Object o = JEXL.createScript("var x = [1, 2, 3]; not empty ...x").execute(jc);
+        Assert.assertEquals(Boolean.TRUE, o);
+
+        o = JEXL.createScript("var x = []; empty ...x").execute(jc);
+        Assert.assertEquals(Boolean.TRUE, o);
     }
 
 }

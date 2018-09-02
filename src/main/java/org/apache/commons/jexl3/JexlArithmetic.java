@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -936,6 +937,9 @@ public class JexlArithmetic {
         // Map isn't a collection
         if (object instanceof Map<?, ?>) {
             return ((Map<?, ?>) object).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
+        }
+        if (object instanceof Iterator<?>) {
+            return ((Iterator<?>) object).hasNext() ? Boolean.FALSE : Boolean.TRUE;
         }
         return null;
     }
