@@ -1852,7 +1852,7 @@ public class Interpreter extends InterpreterBase {
         final Object target = node.jjtGetChild(0).jjtAccept(this, data);
         // get the ctor args
         int argc = node.jjtGetNumChildren() - 1;
-        Object[] argv = new Object[argc];
+        Object[] argv = argc > 0 ? new Object[argc] : EMPTY_PARAMS;
         for (int i = 0; i < argc; i++) {
             argv[i] = node.jjtGetChild(i + 1).jjtAccept(this, data);
         }
