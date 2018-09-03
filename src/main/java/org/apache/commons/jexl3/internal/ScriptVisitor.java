@@ -63,6 +63,7 @@ import org.apache.commons.jexl3.parser.ASTJxltLiteral;
 import org.apache.commons.jexl3.parser.ASTLENode;
 import org.apache.commons.jexl3.parser.ASTLTNode;
 import org.apache.commons.jexl3.parser.ASTMapEntry;
+import org.apache.commons.jexl3.parser.ASTMapEnumerationNode;
 import org.apache.commons.jexl3.parser.ASTMapLiteral;
 import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTModNode;
@@ -433,6 +434,11 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTMapEntry node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTMapEnumerationNode node, Object data) {
         return visitNode(node, data);
     }
 

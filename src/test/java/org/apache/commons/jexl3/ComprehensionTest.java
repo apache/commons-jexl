@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -56,6 +57,20 @@ public class ComprehensionTest extends JexlTestCase {
 
         o = JEXL.createScript("var x = [3, 4, 5]; var y = {1, 2, 3, ...x}").execute(jc);
         Assert.assertEquals(5, ((Set) o).size());
+    }
+
+    @Test
+    public void testMapComprehensionLiteral() throws Exception {
+        JexlContext jc = new MapContext();
+        Object o = JEXL.createScript("var x = {1:1, 2:2, 3:3}; var y = {*:...x}").execute(jc);
+        Assert.assertTrue(o instanceof Map);
+        Assert.assertEquals(3, ((Map) o).size());
+
+        o = JEXL.createScript("var x = null; var y = {1:1, 2:2, 3:3, *:...x}").execute(jc);
+        Assert.assertEquals(3, ((Map) o).size());
+
+        o = JEXL.createScript("var x = [3, 4, 5]; var y = {1:1, 2:2, 3:3, *:...x}").execute(jc);
+        Assert.assertEquals(5, ((Map) o).size());
     }
 
     @Test

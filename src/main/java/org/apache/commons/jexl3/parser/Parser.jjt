@@ -784,10 +784,18 @@ void MapLiteral() : {}
 {
     <LCURLY>
     (
-        MapEntry() ( <COMMA> MapEntry() )*
+        MapElement() ( <COMMA> MapElement() )*
     |
         <COLON>
     ) <RCURLY>
+}
+
+void MapElement() #void : {}
+{
+    LOOKAHEAD(<mult> <COLON> <ELLIPSIS>) <mult> <COLON> <ELLIPSIS> InlinePropertyExpression() #MapEnumerationNode(1)
+    | 
+    MapEntry()
+
 }
 
 void MapEntry() : {}
@@ -981,7 +989,7 @@ void PrimaryExpression() #void : {}
     |
     LOOKAHEAD( <LPAREN> ) ReferenceExpression()
     |
-    LOOKAHEAD( <LCURLY> Expression() <COLON>) MapLiteral()
+    LOOKAHEAD( <LCURLY> MapElement() ) MapLiteral()
     |
     LOOKAHEAD( <LCURLY> <COLON>) MapLiteral()
     |
