@@ -307,6 +307,7 @@
                         by a decimal point and then one or more digits from
                         <code>0</code> to <code>9</code> suffixed with <code>d</code> or <code>D</code>
                         , eg <code>42.0d</code>.
+                        A special literal <code>NaN</code> can be used to denote <code>Double.NaN</code> constant
                     </td>
                 </tr>
                 <tr>
