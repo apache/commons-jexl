@@ -604,10 +604,10 @@ public class Interpreter extends InterpreterBase {
         Object iterableValue = valNode.jjtAccept(this, data);
 
         if (iterableValue != null) {
-            Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH, iterableValue);
+            Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, iterableValue);
             Iterator<?> itemsIterator = forEach instanceof Iterator
                                    ? (Iterator<?>) forEach
-                                   : uberspect.getIterator(iterableValue);
+                                   : uberspect.getIndexedIterator(iterableValue);
             return itemsIterator;
         } else {
             return null;
