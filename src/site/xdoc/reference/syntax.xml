@@ -444,6 +444,8 @@
                         <code>{ "one" : 1, "two" : 2, "three" : 3, "more": "many more" }</code>
                         <p>This syntax creates a <code>HashMap&lt;Object,Object&gt;</code>.</p>
                         <p>Empty map literal can be specified as <code>{:}</code></p>
+                        <p>Map comprehentions syntax can also be used to construct maps based on other maps, 
+                             e.g.<code>{1:1, 2:2, 3:3, *:...{4:4, 5:5, 6:6}}</code></p>
                     </td>
                 </tr>
 
