@@ -91,6 +91,7 @@ import org.apache.commons.jexl3.parser.ASTNullLiteral;
 import org.apache.commons.jexl3.parser.ASTNullpNode;
 import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
+import org.apache.commons.jexl3.parser.ASTProjectionNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
@@ -98,6 +99,7 @@ import org.apache.commons.jexl3.parser.ASTRegexLiteral;
 import org.apache.commons.jexl3.parser.ASTRemove;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
 import org.apache.commons.jexl3.parser.ASTSWNode;
+import org.apache.commons.jexl3.parser.ASTSelectionNode;
 import org.apache.commons.jexl3.parser.ASTSetAddNode;
 import org.apache.commons.jexl3.parser.ASTSetAndNode;
 import org.apache.commons.jexl3.parser.ASTSetDivNode;
@@ -125,6 +127,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.AbstractMap;
+import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 import java.util.concurrent.Callable;
 
@@ -2217,4 +2221,199 @@ public class Interpreter extends InterpreterBase {
                 ? ((JexlContext.AnnotationProcessor) context).processAnnotation(annotation, args, stmt)
                 : stmt.call();
     }
+
+    protected abstract class IteratorBase implements Iterator<Object> {
+
+        protected final Iterator<?> itemsIterator;
+        protected final JexlNode node;
+
+        protected int i;
+
+        protected IteratorBase(Iterator<?> iterator, JexlNode projection) {
+            itemsIterator = iterator;
+            node = projection;
+
+            i = 0;
+        }
+
+        protected Object[] prepareArgs(ASTJexlLambda lambda, Object data) {
+
+            int argCount = lambda.getArgCount();
+            Object[] argv = null;
+
+            if (argCount == 0) {
+                argv = EMPTY_PARAMS;
+            } else if (argCount == 1) {
+                argv = new Object[] {data};
+            } else if (argCount > 1) {
+                if (data instanceof Map.Entry<?,?>) {
+                    Map.Entry<Object, Object> entry = (Map.Entry<Object, Object>) data;
+                    argv = new Object[] {entry.getKey(), entry.getValue()};
+                } else {
+                    argv = new Object[] {i, data};
+                }
+            }
+
+            return argv;
+        }
+
+    }
+
+    public class ProjectionIterator extends IteratorBase {
+
+        protected Map<Integer,Closure> scripts;
+
+        protected ProjectionIterator(Iterator<?> iterator, JexlNode projection) {
+            super(iterator, projection);
+
+            scripts = new HashMap<Integer,Closure> ();
+            i = -1;
+        }
+
+        protected Object evaluateProjection(int i, Object data) {
+            JexlNode child = node.jjtGetChild(i);
+
+            if (child instanceof ASTJexlLambda) {
+                ASTJexlLambda lambda = (ASTJexlLambda) child;
+                Closure c = scripts.get(i);
+                if (c == null) {
+                    c = new Closure(Interpreter.this, lambda);
+                    scripts.put(i, c);
+                }
+                Object[] argv = prepareArgs(lambda, data);
+                return c.execute(null, argv);
+            } else {
+                return child.jjtAccept(Interpreter.this, data);
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return itemsIterator.hasNext();
+        }
+
+        @Override
+        public Object next() {
+
+            cancelCheck(node);
+
+            Object data = itemsIterator.next();
+
+            i += 1;
+
+            // can have multiple nodes
+            int numChildren = node.jjtGetNumChildren();        
+
+            if (numChildren == 1) {
+                return evaluateProjection(0, data);
+            } else if (numChildren == 2) {
+                Object key = evaluateProjection(0, data);
+                Object value = evaluateProjection(1, data);
+                return new AbstractMap.SimpleEntry<Object,Object>(key, value);
+            } else {
+                Object[] value = new Object[numChildren];
+
+                for (int child = 0; child < numChildren; child++) {
+                    value[child] = evaluateProjection(child, data);
+                }
+
+                return value;
+            }
+        }
+
+        @Override
+        public void remove() {
+            itemsIterator.remove();
+        }
+    }
+
+    @Override
+    protected Object visit(ASTProjectionNode node, Object data) {
+
+        Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, data);
+        Iterator<?> itemsIterator = forEach instanceof Iterator
+                                ? (Iterator<?>) forEach
+                                : uberspect.getIndexedIterator(data);
+
+        return new ProjectionIterator(itemsIterator, node);
+    }
+
+    public class SelectionIterator extends IteratorBase {
+
+        protected final Closure closure;
+
+        protected Object nextItem;
+        protected boolean hasNextItem;
+
+        protected SelectionIterator(Iterator<?> iterator, ASTJexlLambda filter) {
+            super(iterator, filter);
+            closure = new Closure(Interpreter.this, filter);
+        }
+
+        protected void findNextItem() {
+            if (!itemsIterator.hasNext()) {
+                hasNextItem = false;
+                nextItem = null;
+            } else {
+                Object data = null;
+                boolean selected = false;
+
+                do {
+                    data = itemsIterator.next();
+                    Object[] argv = prepareArgs((ASTJexlLambda) node, data);
+                    selected = arithmetic.toBoolean(closure.execute(null, argv));
+                } while (!selected && itemsIterator.hasNext());
+
+                if (selected) {
+                    hasNextItem = true;
+                    nextItem = data;
+                }
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+
+            if (!hasNextItem)
+                findNextItem();
+
+            return hasNextItem;
+        }
+
+        @Override
+        public Object next() {
+            cancelCheck(node);
+
+            if (!hasNextItem)
+                findNextItem();
+
+            if (!hasNextItem)
+                throw new NoSuchElementException();
+
+            i += 1;
+            hasNextItem = false;
+
+            return nextItem;
+        }
+
+        @Override
+        public void remove() {
+            itemsIterator.remove();
+        }
+
+    }
+
+    @Override
+    protected Object visit(ASTSelectionNode node, Object data) {
+
+        Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, data);
+        Iterator<?> itemsIterator = forEach instanceof Iterator
+                                ? (Iterator<?>) forEach
+                                : uberspect.getIndexedIterator(data);
+
+        ASTJexlLambda script = (ASTJexlLambda) node.jjtGetChild(0);
+
+        return new SelectionIterator(itemsIterator, script);
+    }
+
 }

@@ -77,6 +77,7 @@ import org.apache.commons.jexl3.parser.ASTNullLiteral;
 import org.apache.commons.jexl3.parser.ASTNullpNode;
 import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
+import org.apache.commons.jexl3.parser.ASTProjectionNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
@@ -84,6 +85,7 @@ import org.apache.commons.jexl3.parser.ASTRegexLiteral;
 import org.apache.commons.jexl3.parser.ASTRemove;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
 import org.apache.commons.jexl3.parser.ASTSWNode;
+import org.apache.commons.jexl3.parser.ASTSelectionNode;
 import org.apache.commons.jexl3.parser.ASTSetAddNode;
 import org.apache.commons.jexl3.parser.ASTSetAndNode;
 import org.apache.commons.jexl3.parser.ASTSetDivNode;
@@ -571,4 +573,15 @@ public class ScriptVisitor extends ParserVisitor {
     protected Object visit(ASTAnnotatedStatement node, Object data) {
         return visitNode(node, data);
     }
+
+    @Override
+    protected Object visit(ASTProjectionNode node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTSelectionNode node, Object data) {
+        return visitNode(node, data);
+    }
+
 }
