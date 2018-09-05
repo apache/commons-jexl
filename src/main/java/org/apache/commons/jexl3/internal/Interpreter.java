@@ -1112,6 +1112,9 @@ public class Interpreter extends InterpreterBase {
 
         Object target = object.jjtAccept(this, data);
 
+        if (target == null)
+            return unsolvableProperty(node, "<null>{<?>}", null);
+
         // evaluate ASTInlinePropertyAssignment with calculated target
         node.jjtGetChild(1).jjtAccept(this, target);
 
