@@ -79,6 +79,7 @@ import org.apache.commons.jexl3.parser.ASTLTNode;
 import org.apache.commons.jexl3.parser.ASTMapEntry;
 import org.apache.commons.jexl3.parser.ASTMapEnumerationNode;
 import org.apache.commons.jexl3.parser.ASTMapLiteral;
+import org.apache.commons.jexl3.parser.ASTMapProjectionNode;
 import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTModNode;
 import org.apache.commons.jexl3.parser.ASTMulNode;
@@ -93,6 +94,7 @@ import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
 import org.apache.commons.jexl3.parser.ASTProjectionNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
+import org.apache.commons.jexl3.parser.ASTReductionNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
 import org.apache.commons.jexl3.parser.ASTRegexLiteral;
@@ -2222,6 +2224,15 @@ public class Interpreter extends InterpreterBase {
                 : stmt.call();
     }
 
+    protected Iterator<?> prepareIndexedIterator(Object data, JexlNode node) {
+
+        Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, data);
+        Iterator<?> itemsIterator = forEach instanceof Iterator
+                                ? (Iterator<?>) forEach
+                                : uberspect.getIndexedIterator(data);
+        return itemsIterator;
+    }
+
     protected abstract class IteratorBase implements Iterator<Object> {
 
         protected final Iterator<?> itemsIterator;
@@ -2239,19 +2250,27 @@ public class Interpreter extends InterpreterBase {
         protected Object[] prepareArgs(ASTJexlLambda lambda, Object data) {
 
             int argCount = lambda.getArgCount();
+            boolean varArgs = lambda.isVarArgs();
+
             Object[] argv = null;
 
             if (argCount == 0) {
                 argv = EMPTY_PARAMS;
             } else if (argCount == 1) {
                 argv = new Object[] {data};
-            } else if (argCount > 1) {
-                if (data instanceof Map.Entry<?,?>) {
-                    Map.Entry<Object, Object> entry = (Map.Entry<Object, Object>) data;
-                    argv = new Object[] {entry.getKey(), entry.getValue()};
+            } else if (!varArgs && data instanceof Object[]) {
+                int len = ((Object[]) data).length;
+                if (argCount > len) {
+                    argv = new Object[len + 1];
+                    argv[0] = i;
+                    System.arraycopy(data, 0, argv, 1, len);
+                } else if (argCount == len) {
+                    argv = (Object[]) data;
                 } else {
                     argv = new Object[] {i, data};
                 }
+            } else {
+                argv = new Object[] {i, data};
             }
 
             return argv;
@@ -2306,17 +2325,11 @@ public class Interpreter extends InterpreterBase {
 
             if (numChildren == 1) {
                 return evaluateProjection(0, data);
-            } else if (numChildren == 2) {
-                Object key = evaluateProjection(0, data);
-                Object value = evaluateProjection(1, data);
-                return new AbstractMap.SimpleEntry<Object,Object>(key, value);
             } else {
                 Object[] value = new Object[numChildren];
-
                 for (int child = 0; child < numChildren; child++) {
                     value[child] = evaluateProjection(child, data);
                 }
-
                 return value;
             }
         }
@@ -2329,13 +2342,35 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTProjectionNode node, Object data) {
+        return new ProjectionIterator(prepareIndexedIterator(data, node), node);
+    }
 
-        Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, data);
-        Iterator<?> itemsIterator = forEach instanceof Iterator
-                                ? (Iterator<?>) forEach
-                                : uberspect.getIndexedIterator(data);
+    public class MapProjectionIterator extends ProjectionIterator {
 
-        return new ProjectionIterator(itemsIterator, node);
+        protected MapProjectionIterator(Iterator<?> iterator, JexlNode projection) {
+            super(iterator, projection);
+        }
+
+        @Override
+        public Object next() {
+
+            cancelCheck(node);
+
+            Object data = itemsIterator.next();
+
+            i += 1;
+
+            Object key = evaluateProjection(0, data);
+            Object value = evaluateProjection(1, data);
+
+            return new AbstractMap.SimpleEntry<Object,Object> (key, value);
+        }
+
+    }
+
+    @Override
+    protected Object visit(ASTMapProjectionNode node, Object data) {
+        return new MapProjectionIterator(prepareIndexedIterator(data, node), node);
     }
 
     public class SelectionIterator extends IteratorBase {
@@ -2405,15 +2440,49 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTSelectionNode node, Object data) {
-
-        Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, data);
-        Iterator<?> itemsIterator = forEach instanceof Iterator
-                                ? (Iterator<?>) forEach
-                                : uberspect.getIndexedIterator(data);
-
         ASTJexlLambda script = (ASTJexlLambda) node.jjtGetChild(0);
+        return new SelectionIterator(prepareIndexedIterator(data, node), script);
+    }
 
-        return new SelectionIterator(itemsIterator, script);
+    @Override
+    protected Object visit(ASTReductionNode node, Object data) {
+        int numChildren = node.jjtGetNumChildren();
+
+        ASTJexlLambda reduction = null;
+        Object result = null;
+
+        if (numChildren > 1) {
+            result = node.jjtGetChild(0).jjtAccept(this, null);
+            reduction = (ASTJexlLambda) node.jjtGetChild(1);
+        } else {
+            reduction = (ASTJexlLambda) node.jjtGetChild(0);
+        }
+
+        Iterator<?> itemsIterator = prepareIndexedIterator(data, node);
+
+        if (itemsIterator != null) {
+
+            Closure closure = new Closure(this, reduction);
+
+            while (itemsIterator.hasNext()) {
+                Object value = itemsIterator.next();
+
+                Object[] argv = null;
+
+                int argCount = reduction.getArgCount();
+                if (argCount == 0) {
+                    argv = EMPTY_PARAMS;
+                } else if (argCount == 1) {
+                    argv = new Object[] {result};
+                } else {
+                    argv = new Object[] {result, value};
+                }
+
+                result = closure.execute(null, argv);
+            }
+        }
+
+        return result;
     }
 
 }

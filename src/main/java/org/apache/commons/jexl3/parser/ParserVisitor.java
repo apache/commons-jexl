@@ -212,5 +212,9 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTProjectionNode node, Object data);
 
+    protected abstract Object visit(ASTMapProjectionNode node, Object data);
+
     protected abstract Object visit(ASTSelectionNode node, Object data);
+
+    protected abstract Object visit(ASTReductionNode node, Object data);
 }

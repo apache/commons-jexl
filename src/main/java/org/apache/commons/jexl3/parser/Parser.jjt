@@ -153,9 +153,14 @@ TOKEN_MGR_DECLS : {
     | < COMMA : "," >
     | < DOT : "." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < QDOT : "?." > { pushDot(); } /* Lexical state is now DOT_ID */
-    | < DOTP : ".(" >
-    | < DOTB : ".[" >
     | < ELLIPSIS : "..." | "\u2026">
+}
+
+<*> TOKEN : { /* STREAMS */
+      < DOTP : ".(" >
+    | < DOTB : ".[" >
+    | < DOTC : ".{" >
+    | < DOTS : ".$" >
 }
 
 <*> TOKEN : { /* CONDITIONALS */
@@ -973,9 +978,13 @@ void ArrayAccess() : {}
 
 void MemberAccess() #void : {}
 {
-    LOOKAHEAD(<DOTP>) Projection()
+    LOOKAHEAD(<DOTB>) ArrayProjection()
     |
-    LOOKAHEAD(<DOTB>) Selection()
+    LOOKAHEAD(<DOTC>) MapProjection()
+    |
+    LOOKAHEAD(<DOTP>) Selection()
+    |
+    LOOKAHEAD(<DOTS>) Reduction()
     |
     LOOKAHEAD(<LBRACKET>) ArrayAccess()
     |
@@ -984,14 +993,24 @@ void MemberAccess() #void : {}
     LOOKAHEAD(<QDOT>) IdentifierAccess()
 }
 
-void Selection() #SelectionNode : {}
+void Reduction() #ReductionNode : {}
 {
-    <DOTB> Lambda() <RBRACKET>
+    <DOTS> <LPAREN> [LOOKAHEAD(Expression() <COLON>) Expression() <COLON>] Lambda() <RPAREN>
 }
 
-void Projection() #ProjectionNode : {}
+void Selection() #SelectionNode : {}
 {
-    <DOTP> ProjectionExpression() ( LOOKAHEAD(2) <COMMA> ProjectionExpression() )* <RPAREN>
+    <DOTP> Lambda() <RPAREN>
+}
+
+void ArrayProjection() #ProjectionNode : {}
+{
+    <DOTB> ProjectionExpression() ( LOOKAHEAD(2) <COMMA> ProjectionExpression() )* <RBRACKET>
+}
+
+void MapProjection() #MapProjectionNode : {}
+{
+    <DOTC> ProjectionExpression() <COLON> ProjectionExpression() <RCURLY>
 }
 
 void ProjectionExpression() #void : {}

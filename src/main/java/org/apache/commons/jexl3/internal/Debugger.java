@@ -67,6 +67,7 @@ import org.apache.commons.jexl3.parser.ASTLTNode;
 import org.apache.commons.jexl3.parser.ASTMapEntry;
 import org.apache.commons.jexl3.parser.ASTMapEnumerationNode;
 import org.apache.commons.jexl3.parser.ASTMapLiteral;
+import org.apache.commons.jexl3.parser.ASTMapProjectionNode;
 import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTModNode;
 import org.apache.commons.jexl3.parser.ASTMulNode;
@@ -80,6 +81,7 @@ import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
 import org.apache.commons.jexl3.parser.ASTProjectionNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
+import org.apache.commons.jexl3.parser.ASTReductionNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
 import org.apache.commons.jexl3.parser.ASTRegexLiteral;
@@ -1187,19 +1189,44 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTProjectionNode node, Object data) {
         int num = node.jjtGetNumChildren();
+        builder.append(".[");
         for (int i = 0; i < num; ++i) {
-            builder.append(".(");
+            if (i > 0)
+                builder.append(',');
             accept(node.jjtGetChild(i), data);
-            builder.append(')');
         }
+        builder.append(']');
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTMapProjectionNode node, Object data) {
+        builder.append(".{");
+        accept(node.jjtGetChild(0), data);
+        builder.append(':');
+        accept(node.jjtGetChild(1), data);
+        builder.append('}');
         return data;
     }
 
     @Override
     protected Object visit(ASTSelectionNode node, Object data) {
-        builder.append(".[");
+        builder.append(".(");
         accept(node.jjtGetChild(0), data);
-        builder.append(']');
+        builder.append(')');
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTReductionNode node, Object data) {
+        int num = node.jjtGetNumChildren();
+        builder.append(".$(");
+        accept(node.jjtGetChild(0), data);
+        if (num > 1) {
+            builder.append(':');
+            accept(node.jjtGetChild(1), data);
+        }
+        builder.append(')');
         return data;
     }
 
