@@ -213,12 +213,17 @@ public class Script implements JexlScript, JexlExpression {
                 params = new Object[argCount];
                 System.arraycopy(args, 0, params, 0, argCount - 1);
                 int varArgCount = args.length - argCount + 1;
-                Object[] varg = new Object[varArgCount];
-                System.arraycopy(args, argCount - 1, varg, 0, varArgCount);
+                Object[] varg = null;
 
+                if (varArgCount == 1 && args[args.length-1] instanceof Object[]) {
+                    varg = (Object[]) args[args.length-1];
+                } else {
+                    varg = new Object[varArgCount];
+                    System.arraycopy(args, argCount - 1, varg, 0, varArgCount);
+                }
                 params[argCount-1] = varg;
             } else {
-                params = new Object[] {args};
+                params = (args.length == 1 && args[0] instanceof Object[]) ? (Object[]) args[0] : new Object[] {args};
             }
         } else {
             params = args;
