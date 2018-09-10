@@ -133,12 +133,6 @@ public class Interpreter extends InterpreterBase {
     protected Map<String, Object> functors;
 
     /**
-     * The thread local interpreter.
-     */
-    protected static final java.lang.ThreadLocal<Interpreter> INTER =
-                       new java.lang.ThreadLocal<Interpreter>();
-
-    /**
      * Creates an interpreter.
      * @param engine   the engine creating this interpreter
      * @param aContext the context to evaluate expression
@@ -172,25 +166,6 @@ public class Interpreter extends InterpreterBase {
         functions = ii.functions;
         functors = ii.functors;
     }
-    
-    /**
-     * @return the current interpreter frame
-     */
-    static Scope.Frame getCurrentFrame() {
-        Interpreter inter = INTER.get();
-        return inter != null? inter.frame : null;
-    }
-        
-    /**
-     * Swaps the current thread local interpreter.
-     * @param inter the interpreter or null
-     * @return the previous thread local interpreter
-     */
-    protected Interpreter putThreadInterpreter(Interpreter inter) {
-        Interpreter pinter = INTER.get();
-        INTER.set(inter);
-        return pinter;
-    }
 
     /**
      * Interpret the given script/expression.
@@ -204,10 +179,8 @@ public class Interpreter extends InterpreterBase {
     public Object interpret(JexlNode node) {
         JexlContext.ThreadLocal tcontext = null;
         JexlEngine tjexl = null;
-        Interpreter tinter = null;
         try {
             cancelCheck(node);
-            tinter = putThreadInterpreter(this);
             if (context instanceof JexlContext.ThreadLocal) {
                 tcontext = jexl.putThreadLocal((JexlContext.ThreadLocal) context);
             }
@@ -243,7 +216,6 @@ public class Interpreter extends InterpreterBase {
             if (context instanceof JexlContext.ThreadLocal) {
                 jexl.putThreadLocal(tcontext);
             }
-            putThreadInterpreter(tinter);
         }
         return null;
     }

@@ -687,4 +687,22 @@ public class Issues200Test extends JexlTestCase {
         Object result = base.execute(null);
         Assert.assertEquals(8, result);
     }
+        
+    @Test
+    public void test271c() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(false).create();
+        JexlScript base = jexl.createScript("(x, y, z)->{ 2 + x + y + z };");
+        JexlScript y = base.curry(1);
+        Object result = y.execute((JexlContext) null, 2, 3);
+        Assert.assertEquals(8, result);
+    }
+    
+    @Test
+    public void test271d() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(false).create();
+        JexlScript base = jexl.createScript("var base = 2; return (x, y, z)->{ base + x + y + z };");
+        JexlScript y = ((JexlScript) base.execute(null)).curry(1);
+        Object result = y.execute((JexlContext) null, 2, 3);
+        Assert.assertEquals(8, result);
+    }
 }
