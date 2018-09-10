@@ -49,8 +49,8 @@ public class ClassCreator {
     public static final boolean canRun = true;//comSunToolsJavacMain();
 
     static final String JEXL_PACKAGE = "org.apache.commons.jexl3";
-    static final String GEN_PATH = "/org/apache/commons/jexl3/generated";
     static final String GEN_PACKAGE = "org.apache.commons.jexl3.generated";
+    static final String GEN_PATH = "/" + GEN_PACKAGE.replace(".", "/");///org/apache/commons/jexl3/generated";
     static final String GEN_CLASS = GEN_PACKAGE + ".";
 
     /**
