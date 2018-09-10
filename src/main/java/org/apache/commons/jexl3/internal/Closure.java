@@ -37,17 +37,18 @@ public class Closure extends Script {
         super(theCaller.jexl, null, lambda);
         frame = lambda.createFrame(theCaller.frame);
     }
-
-    @Override
-    public String toString() {
-        return getParsedText();
-    }
-
-    @Override
-    public String getParsedText() {
-        Debugger debug = new Debugger();
-        debug.debug(script, false);
-        return debug.toString();
+    
+    /**
+     * Creates a curried version of a script.
+     * @param base the base script
+     * @param args the script arguments
+     */
+    protected Closure(Script base, Object[] args) {
+        super(base.jexl, base.source, base.script);
+        Scope.Frame sf = (base instanceof Closure) ? ((Closure) base).frame :  null;
+        frame = sf == null
+                ? script.createFrame(args)
+                : sf.assign(args);
     }
 
     @Override

@@ -22,7 +22,6 @@ import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 
-import org.apache.commons.jexl3.parser.JexlNode;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -124,13 +123,24 @@ public class Script implements JexlScript, JexlExpression {
     public String getParsedText() {
         return getParsedText(2);
     }
-
+    
     @Override
     public String getParsedText(int indent) {
         Debugger debug = new Debugger();
         debug.setIndentation(indent);
         debug.debug(script, false);
         return debug.toString();
+    }
+
+    @Override
+    public String toString() {
+        CharSequence src = source;
+        if (src == null) {
+            Debugger debug = new Debugger();
+            debug.debug(script, false);
+            src = debug.toString();
+        }
+        return src.toString();
     }
 
     @Override
@@ -159,17 +169,6 @@ public class Script implements JexlScript, JexlExpression {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public String toString() {
-        CharSequence src = source;
-        if (src == null) {
-            Debugger debug = new Debugger();
-            debug.debug(script, false);
-            src = debug.toString();
-        }
-        return src.toString();
     }
 
     @Override
@@ -373,12 +372,20 @@ public class Script implements JexlScript, JexlExpression {
         }
     }
 
+=======
+    
+>>>>>>> pr/2
     @Override
     public JexlScript curry(Object... args) {
         String[] parms = script.getParameters();
         if (parms == null || parms.length == 0 || args == null || args.length == 0)
             return this;
+<<<<<<< HEAD
         return new Curried(this, args);
+=======
+        }
+        return new Closure(this, args);
+>>>>>>> pr/2
     }
 
     /**

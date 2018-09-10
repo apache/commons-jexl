@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.internal.Scope;
-
 /**
  * Lambda (function).
  */
@@ -35,21 +33,5 @@ public final class ASTJexlLambda extends ASTJexlScript {
      */
     public boolean isTopLevel() {
         return jjtGetParent() == null;
-    }
-
-    /**
-     * Creates an array of arguments by copying values up to the number of parameters.
-     * @param frame the calling frame
-     * @param values the argument values
-     * @return the arguments array
-     */
-    public Scope.Frame createFrame(Scope.Frame frame, Object... values) {
-        if (getScope() != null) {
-            Scope.Frame cframe = getScope().createFrame(frame);
-            if (cframe != null) {
-                return cframe.assign(values);
-            }
-        }
-        return null;
     }
 }

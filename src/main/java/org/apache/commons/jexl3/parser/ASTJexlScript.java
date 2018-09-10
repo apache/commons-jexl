@@ -59,7 +59,7 @@ public class ASTJexlScript extends JexlNode {
     }
       /**
      * Sets this script pragmas.
-     * @param pragmas the pragmas
+     * @param thePragmas the pragmas
      */
     public void setPragmas(Map<String, Object> thePragmas) {
         this.pragmas = thePragmas;
@@ -104,17 +104,27 @@ public class ASTJexlScript extends JexlNode {
 
     /**
      * Creates an array of arguments by copying values up to the number of parameters.
+     * @param caller the calling frame
      * @param values the argument values
      * @return the arguments array
      */
-    public Scope.Frame createFrame(Object... values) {
+    public Scope.Frame createFrame(Scope.Frame caller, Object... values) {
         if (scope != null) {
-            Scope.Frame frame = scope.createFrame(null);
+            Scope.Frame frame = scope.createFrame(caller);
             if (frame != null) {
                 return frame.assign(values);
             }
         }
         return null;
+    }
+    
+    /**
+     * Creates an array of arguments by copying values up to the number of parameters.
+     * @param values the argument values
+     * @return the arguments array
+     */
+    public Scope.Frame createFrame(Object... values) {
+        return createFrame(null, values);
     }
 
     /**
