@@ -652,5 +652,39 @@ public class Issues200Test extends JexlTestCase {
         result = script.execute(ctxt);
         Assert.assertTrue(result instanceof JexlScript);
     }
+         
+    @Test
+    public void test270() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");
+        String text = base.toString();
+        JexlScript script = base.curry(5, 15);
+        Assert.assertEquals(text, script.toString());
+
+        JexlEvalContext ctxt = new JexlEvalContext();
+        ctxt.set("s", base);
+        script = jexl.createScript("return s");
+        Object result = script.execute(ctxt);
+        Assert.assertEquals(text, result.toString());
+
+        script = jexl.createScript("return s.curry(1)");
+        result = script.execute(ctxt);
+        Assert.assertEquals(text, result.toString());
+    }
         
+    @Test
+    public void test271a() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(false).create();
+        JexlScript base = jexl.createScript("var base = 1; var x = (a)->{ var y = (b) -> {base + b}; return base + y(a)}; x(40)");
+        Object result = base.execute(null);
+        Assert.assertEquals(42, result);
+    }
+
+    @Test
+    public void test271b() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(false).create();
+        JexlScript base = jexl.createScript("var base = 2; var sum = (x, y, z)->{ base + x + y + z }; var y = sum.curry(1); y(2,3)");
+        Object result = base.execute(null);
+        Assert.assertEquals(8, result);
+    }
 }

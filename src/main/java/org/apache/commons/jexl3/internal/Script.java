@@ -124,13 +124,24 @@ public class Script implements JexlScript, JexlExpression {
     public String getParsedText() {
         return getParsedText(2);
     }
-
+    
     @Override
     public String getParsedText(int indent) {
         Debugger debug = new Debugger();
         debug.setIndentation(indent);
-        debug.debug(script);
+        debug.debug(script, false);
         return debug.toString();
+    }
+
+    @Override
+    public String toString() {
+        CharSequence src = source;
+        if (src == null) {
+            Debugger debug = new Debugger();
+            debug.debug(script, false);
+            src = debug.toString();
+        }
+        return src.toString();
     }
 
     @Override
@@ -159,17 +170,6 @@ public class Script implements JexlScript, JexlExpression {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public String toString() {
-        CharSequence src = source;
-        if (src == null) {
-            Debugger debug = new Debugger();
-            debug.debug(script);
-            src = debug.toString();
-        }
-        return src.toString();
     }
 
     @Override
@@ -211,10 +211,11 @@ public class Script implements JexlScript, JexlExpression {
             if (sf != null) {
                 frame = sf.assign(args);
             } else {
-                frame = script.createFrame(args);
+                sf = Interpreter.getCurrentFrame();
+                frame = script.createFrame(sf, args);
             }
         }
-
+        
         @Override
         protected Scope.Frame createFrame(Object[] args) {
             return frame != null? frame.assign(args) : super.createFrame(args);
