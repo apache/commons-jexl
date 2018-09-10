@@ -160,7 +160,7 @@ TOKEN_MGR_DECLS : {
       < DOTP : ".(" >
     | < DOTB : ".[" >
     | < DOTC : ".{" >
-    | < DOTS : ".$" >
+    | < DOTS : ".@" >
 }
 
 <*> TOKEN : { /* CONDITIONALS */
@@ -705,8 +705,7 @@ void ThisLiteral() #void : {}
     <THIS> #ThisNode
 }
 
-void NaNLiteral() #NumberLiteral :
-{}
+void NaNLiteral() #NumberLiteral : {}
 {
     <NAN_LITERAL> { jjtThis.setReal("NaN"); }
 }
@@ -716,8 +715,7 @@ void NullLiteral() : {}
     <NULL>
 }
 
-void BooleanLiteral() #void :
-{}
+void BooleanLiteral() #void : {}
 {
   <TRUE> #TrueNode
 |

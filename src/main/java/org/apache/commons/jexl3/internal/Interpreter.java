@@ -2295,13 +2295,17 @@ public class Interpreter extends InterpreterBase {
                 : stmt.call();
     }
 
-    protected Iterator<?> prepareIndexedIterator(Object data, JexlNode node) {
+    protected Iterator<?> prepareIndexedIterator(JexlNode node, Object iterableValue) {
 
-        Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, data);
-        Iterator<?> itemsIterator = forEach instanceof Iterator
-                                ? (Iterator<?>) forEach
-                                : uberspect.getIndexedIterator(data);
-        return itemsIterator;
+        if (iterableValue != null) {
+            Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, iterableValue);
+            Iterator<?> itemsIterator = forEach instanceof Iterator
+                                    ? (Iterator<?>) forEach
+                                    : uberspect.getIndexedIterator(iterableValue);
+            return itemsIterator;
+        }
+
+        return null;
     }
 
     protected abstract class IteratorBase implements Iterator<Object> {
@@ -2346,7 +2350,6 @@ public class Interpreter extends InterpreterBase {
 
             return argv;
         }
-
     }
 
     public class ProjectionIterator extends IteratorBase {
@@ -2413,7 +2416,8 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTProjectionNode node, Object data) {
-        return new ProjectionIterator(prepareIndexedIterator(data, node), node);
+        Iterator<?> itemsIterator = prepareIndexedIterator(node, data);
+        return itemsIterator != null ? new ProjectionIterator(itemsIterator, node) : null;
     }
 
     public class MapProjectionIterator extends ProjectionIterator {
@@ -2441,7 +2445,8 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTMapProjectionNode node, Object data) {
-        return new MapProjectionIterator(prepareIndexedIterator(data, node), node);
+        Iterator<?> itemsIterator = prepareIndexedIterator(node, data);
+        return itemsIterator != null ? new MapProjectionIterator(itemsIterator, node) : null;
     }
 
     public class SelectionIterator extends IteratorBase {
@@ -2512,7 +2517,8 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTSelectionNode node, Object data) {
         ASTJexlLambda script = (ASTJexlLambda) node.jjtGetChild(0);
-        return new SelectionIterator(prepareIndexedIterator(data, node), script);
+        Iterator<?> itemsIterator = prepareIndexedIterator(script, data);
+        return itemsIterator != null ? new SelectionIterator(itemsIterator, script) : null;
     }
 
     @Override
@@ -2529,27 +2535,56 @@ public class Interpreter extends InterpreterBase {
             reduction = (ASTJexlLambda) node.jjtGetChild(0);
         }
 
-        Iterator<?> itemsIterator = prepareIndexedIterator(data, node);
+        Iterator<?> itemsIterator = prepareIndexedIterator(node, data);
 
         if (itemsIterator != null) {
 
             Closure closure = new Closure(this, reduction);
+
+            boolean varArgs = reduction.isVarArgs();
+            int argCount = reduction.getArgCount();
+
+            int i = 0;
 
             while (itemsIterator.hasNext()) {
                 Object value = itemsIterator.next();
 
                 Object[] argv = null;
 
-                int argCount = reduction.getArgCount();
                 if (argCount == 0) {
                     argv = EMPTY_PARAMS;
                 } else if (argCount == 1) {
                     argv = new Object[] {result};
-                } else {
+                } else if (argCount == 2) {
                     argv = new Object[] {result, value};
+                } else if (argCount == 3) {
+                    argv = new Object[] {result, i, value};
+                } else if (value instanceof Map.Entry<?,?>) {
+                    Map.Entry<?,?> entry = (Map.Entry<?,?>) value;
+                    argv = new Object[] {result, i, entry.getKey(), entry.getValue()};
+                } else if (!varArgs && value instanceof Object[]) {
+
+                    int len = ((Object[]) value).length;
+                    if (argCount > len + 1) {
+                       argv = new Object[len + 2];
+                       argv[0] = result;
+                       argv[2] = i;
+                       System.arraycopy(value, 0, argv, 2, len);
+                    } else if (argCount == len + 1) {
+                       argv = new Object[len + 1];
+                       argv[0] = result;
+                       System.arraycopy(value, 0, argv, 1, len);
+                    } else {
+                       argv = new Object[] {result, i, value};
+                    }
+
+                } else {
+                    argv = new Object[] {result, i, value};
                 }
 
                 result = closure.execute(null, argv);
+
+                i += 1;
             }
         }
 
