@@ -26,6 +26,12 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-271" due-to="Dmitri Blinov">
+                Hoisted variable is lost when currying lambda
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-270" due-to="Dmitri Blinov">
+            Wrong Script$Curried creation when script.curry() method is called inside script
+            </action>
             <action dev="henrib" type="add" issue="JEXL-264">
                 Allow space, quote and double-quote in identifiers
             </action>
