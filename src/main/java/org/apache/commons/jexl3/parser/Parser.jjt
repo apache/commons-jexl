@@ -621,6 +621,8 @@ void UnaryExpression() #void : {}
   |
   <SIZE> UnaryExpression() #SizeFunction(1)
   |
+  LOOKAHEAD(<ELLIPSIS> <LPAREN> Expression() <COLON>) <ELLIPSIS> <LPAREN> Expression() <COLON> Lambda() <RPAREN> #EnumerationNode(2)
+  |
   <ELLIPSIS> InlinePropertyExpression() #EnumerationNode(1)
   |
   InlinePropertyExpression()

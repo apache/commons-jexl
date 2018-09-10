@@ -161,7 +161,7 @@
                 <tr>
                     <td>Expression</td>
                     <td>
-                        An expression can be the literal, variable, access operator, function definition, function call, method call or
+                        An expression can be the literal, variable, access operator, iterator operator, function definition, function call, method call or
                         an evaluation operator.
                     </td>
                 </tr>
@@ -226,6 +226,20 @@
                             foo?.`${bar}`.quux</code>.</p>
                         <p>Access operators can be overloaded in <code>JexlArithmetic</code>, so that
                            the operator behaviour will differ depending on the type of the operator arguments</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Iterator Operator</td>
+                    <td>
+                        Returns an iterator of iterable object, e.g.
+                        <code>...[1,2,3]</code> will return an iterator producing items of the corresponding array.
+                        <p>Iterator can also be specified in a form of generator function e.g.
+                        <code>...(initValue : x -> {x &lt; 10 ? x + 2 : null})</code>.
+                        Generator iterator terminates only when the generator function returns null; If the <code>initialValue</code>
+                        is null, then the initally empty iterator will be created.</p>
+                        <p>The generator function can also take two arguments <code>(index, value) -> {index &lt; 10 ? value + 2 : null}</code>
+                        with the first argument <code>index</code> being the zero based index of the next generated element of the sequence, 
+                        and the second <code>value</code> is the previously generated element.</p>
                     </td>
                 </tr>
                 <tr>
@@ -482,6 +496,7 @@
                             <li>An array of length zero</li>
                             <li>A collection of size zero</li>
                             <li>An empty map</li>
+                            <li>An iterator which 'hasNext()' method returns false</li>
                             <li>Defining a method 'public boolean isEmpty()'
                                 that returns true when the instance is considered empty</li>
                         </ol>

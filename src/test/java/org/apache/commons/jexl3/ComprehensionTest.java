@@ -24,8 +24,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests for array literals.
- * @since 2.0
+ * Tests for comprehensions operator.
+ * @since 3.2
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ComprehensionTest extends JexlTestCase {
@@ -88,6 +88,16 @@ public class ComprehensionTest extends JexlTestCase {
 
         o = JEXL.createScript("var x = []; empty ...x").execute(jc);
         Assert.assertEquals(Boolean.TRUE, o);
+    }
+
+    @Test
+    public void testGeneratorIterator() throws Exception {
+        JexlContext jc = new MapContext();
+        Object o = JEXL.createScript("var x = ...(0 : x -> {x < 10 ? x + 2 : null}); return [...x]").execute(jc);
+        Assert.assertEquals(6, ((int[]) o).length);
+
+        o = JEXL.createScript("var x = ...(0 : (i,x) -> {i < 10 ? x + 2 : null}); return [...x]").execute(jc);
+        Assert.assertEquals(10, ((int[]) o).length);
     }
 
 }

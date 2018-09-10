@@ -606,19 +606,90 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTEnumerationNode node, Object data) {
-        JexlNode valNode = node.jjtGetChild(0);
-        Object iterableValue = valNode.jjtAccept(this, data);
+        final int numChildren = node.jjtGetNumChildren();
+        if (numChildren == 1) {
+            JexlNode valNode = node.jjtGetChild(0);
+            Object iterableValue = valNode.jjtAccept(this, data);
 
-        if (iterableValue != null) {
-            Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, iterableValue);
-            Iterator<?> itemsIterator = forEach instanceof Iterator
-                                   ? (Iterator<?>) forEach
-                                   : uberspect.getIndexedIterator(iterableValue);
-            return itemsIterator;
+            if (iterableValue != null) {
+                Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, iterableValue);
+                Iterator<?> itemsIterator = forEach instanceof Iterator
+                                      ? (Iterator<?>) forEach
+                                      : uberspect.getIndexedIterator(iterableValue);
+                return itemsIterator;
+            } else {
+                return null;
+            }
         } else {
-            return null;
+            Object initialValue = node.jjtGetChild(0).jjtAccept(this, data);
+
+            ASTJexlLambda generator = (ASTJexlLambda) node.jjtGetChild(1);
+            return new GeneratorIterator(initialValue, generator);
         }
     }
+
+    public class GeneratorIterator implements Iterator<Object> {
+
+        protected final ASTJexlLambda node;
+        protected final Closure generator;
+
+        protected int i;
+
+        protected Object value;
+
+        protected GeneratorIterator(Object initialValue, ASTJexlLambda node) {
+            this.node = node;
+            generator = new Closure(Interpreter.this, node);
+
+            i = 0;
+            value = initialValue;
+        }
+
+        protected void nextValue() {
+
+            i += 1;
+
+            int argCount = node.getArgCount();
+
+            Object[] argv = null;
+
+            if (argCount == 0) {
+                argv = EMPTY_PARAMS;
+            } else if (argCount == 1) {
+                argv = new Object[] {value};
+            } else if (argCount == 2) {
+                argv = new Object[] {i, value};
+            }
+
+            value = generator.execute(null, argv);
+        }
+
+        @Override
+        public boolean hasNext() {
+            return value != null;
+        }
+
+        @Override
+        public Object next() {
+            cancelCheck(node);
+
+            if (value == null)
+                throw new NoSuchElementException();
+
+            Object result = value;
+
+            nextValue();
+
+            return result;
+        }
+
+        @Override
+        public void remove() throws UnsupportedOperationException {
+            throw new UnsupportedOperationException();
+        }
+
+    }
+
 
     @Override
     protected Object visit(ASTExpressionStatement node, Object data) {
