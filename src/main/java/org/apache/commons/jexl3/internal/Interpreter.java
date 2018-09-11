@@ -52,6 +52,7 @@ import org.apache.commons.jexl3.parser.ASTEWNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
 import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTEnumerationNode;
+import org.apache.commons.jexl3.parser.ASTEnumerationReference;
 import org.apache.commons.jexl3.parser.ASTExpressionStatement;
 import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
@@ -603,6 +604,22 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
+    protected Object visit(ASTEnumerationReference node, Object data) {
+        cancelCheck(node);
+        final int numChildren = node.jjtGetNumChildren();
+        // pass first piece of data in and loop through children
+        Object object = data;
+        JexlNode objectNode = null;
+        for (int c = 0; c < numChildren; c++) {
+            objectNode = node.jjtGetChild(c);
+            // attempt to evaluate the property within the object)
+            object = objectNode.jjtAccept(this, object);
+            cancelCheck(node);
+        }
+        return object;
+    }
+
+    @Override
     protected Object visit(ASTEnumerationNode node, Object data) {
         final int numChildren = node.jjtGetNumChildren();
         if (numChildren == 1) {
@@ -1025,7 +1042,7 @@ public class Interpreter extends InterpreterBase {
             JexlNode child = node.jjtGetChild(i);
             if (child instanceof ASTExtendedLiteral) {
                 extended = true;
-            } else if (child instanceof ASTEnumerationNode) {
+            } else if (child instanceof ASTEnumerationNode || child instanceof ASTEnumerationReference) {
                 Iterator<?> it = (Iterator<?>) child.jjtAccept(this, data);
                 if (it != null) {
                    while (it.hasNext()) {
@@ -1054,7 +1071,7 @@ public class Interpreter extends InterpreterBase {
         for (int i = 0; i < childCount; i++) {
             cancelCheck(node);
             JexlNode child = node.jjtGetChild(i);
-            if (child instanceof ASTEnumerationNode) {
+            if (child instanceof ASTEnumerationNode || child instanceof ASTEnumerationReference) {
                 Iterator<?> it = (Iterator<?>) child.jjtAccept(this, data);
                 if (it != null) {
                    while (it.hasNext()) {
@@ -1707,7 +1724,7 @@ public class Interpreter extends InterpreterBase {
             List<Object> av = new ArrayList<Object> (childCount);
             for (int i = 0; i < childCount; i++) {
                 JexlNode child = node.jjtGetChild(i);
-                if (child instanceof ASTEnumerationNode) {
+                if (child instanceof ASTEnumerationNode || child instanceof ASTEnumerationReference) {
                     Iterator<?> it = (Iterator<?>) child.jjtAccept(this, data);
                     if (it != null) {
                        while (it.hasNext()) {
@@ -2509,14 +2526,53 @@ public class Interpreter extends InterpreterBase {
         public void remove() {
             itemsIterator.remove();
         }
+    }
 
+    public class StopCountIterator extends IteratorBase {
+
+        protected final int limit;
+
+        protected StopCountIterator(Iterator<?> iterator, JexlNode node, int stopCount) {
+            super(iterator, node);
+            limit = stopCount;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return itemsIterator.hasNext() && i < limit;
+        }
+
+        @Override
+        public Object next() {
+            cancelCheck(node);
+
+            if (!hasNext())
+                throw new NoSuchElementException();
+
+            i += 1;
+
+            return itemsIterator.next();
+        }
+
+        @Override
+        public void remove() {
+            itemsIterator.remove();
+        }
     }
 
     @Override
     protected Object visit(ASTSelectionNode node, Object data) {
-        ASTJexlLambda script = (ASTJexlLambda) node.jjtGetChild(0);
-        Iterator<?> itemsIterator = prepareIndexedIterator(script, data);
-        return itemsIterator != null ? new SelectionIterator(itemsIterator, script) : null;
+        JexlNode child = node.jjtGetChild(0);
+
+        if (child instanceof ASTJexlLambda) {
+           ASTJexlLambda script = (ASTJexlLambda) child;
+           Iterator<?> itemsIterator = prepareIndexedIterator(child, data);
+           return itemsIterator != null ? new SelectionIterator(itemsIterator, script) : null;
+        } else {
+           int stopCount = arithmetic.toInteger(child.jjtAccept(this, null));
+           Iterator<?> itemsIterator = prepareIndexedIterator(child, data);
+           return itemsIterator != null ? new StopCountIterator(itemsIterator, node, stopCount) : null;
+        }
     }
 
     @Override

@@ -42,6 +42,7 @@ import org.apache.commons.jexl3.parser.ASTEWNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
 import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTEnumerationNode;
+import org.apache.commons.jexl3.parser.ASTEnumerationReference;
 import org.apache.commons.jexl3.parser.ASTExpressionStatement;
 import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
@@ -1075,7 +1076,9 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTEnumerationNode node, Object data) {
         int num = node.jjtGetNumChildren();
         if (num == 1) {
-            return prefixChild(node, "...", data);
+            builder.append("...");
+            accept(node.jjtGetChild(0), data);
+            return data;
         } else {
             builder.append("...(");
             accept(node.jjtGetChild(0), data);
@@ -1084,6 +1087,15 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             builder.append(")");
             return data;
         }
+    }
+
+    @Override
+    protected Object visit(ASTEnumerationReference node, Object data) {
+        int num = node.jjtGetNumChildren();
+        for (int i = 0; i < num; ++i) {
+            accept(node.jjtGetChild(i), data);
+        }
+        return data;
     }
 
     @Override

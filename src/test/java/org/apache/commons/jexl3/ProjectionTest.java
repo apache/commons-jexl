@@ -52,7 +52,7 @@ public class ProjectionTest extends JexlTestCase {
 
     @Test
     public void testMapProjection() throws Exception {
-        JexlScript e = JEXL.createScript("var s = {}; for (var i : m.[key]) s.add(i); s");
+        JexlScript e = JEXL.createScript("var s = {}; for (var i : ...m.[key]) s.add(i); s");
         JexlContext jc = new MapContext();
         jc.set("m", testMap);
 
@@ -60,7 +60,7 @@ public class ProjectionTest extends JexlTestCase {
         Assert.assertEquals(Boolean.TRUE, ((Set)o).contains("foo"));
         Assert.assertEquals(Boolean.FALSE, ((Set)o).contains("bar"));
 
-        e = JEXL.createScript("var s = {}; for (var i : m.[value]) s.add(i); s");
+        e = JEXL.createScript("var s = {}; for (var i : ...m.[value]) s.add(i); s");
         o = e.execute(jc);
         Assert.assertEquals(Boolean.FALSE, ((Set)o).contains("foo"));
         Assert.assertEquals(Boolean.TRUE, ((Set)o).contains("bar"));
@@ -68,7 +68,7 @@ public class ProjectionTest extends JexlTestCase {
 
     @Test
     public void testMapProjection2() throws Exception {
-        JexlScript e = JEXL.createScript("var s = {:}; for (var i : m.[key,value]) s.put(i[0],i[1]); s");
+        JexlScript e = JEXL.createScript("var s = {:}; for (var i : ...m.[key,value]) s.put(i[0],i[1]); s");
         JexlContext jc = new MapContext();
         jc.set("m", testMap);
 
@@ -76,7 +76,7 @@ public class ProjectionTest extends JexlTestCase {
         Assert.assertEquals(Boolean.TRUE, ((Map)o).containsKey("foo"));
         Assert.assertEquals(Boolean.TRUE, ((Map)o).containsValue("food"));
 
-        e = JEXL.createScript("var s = {:}; for (var i : m.{value:key}) s.put(i.key,i.value); s");
+        e = JEXL.createScript("var s = {:}; for (var i : ...m.{value:key}) s.put(i.key,i.value); s");
         o = e.execute(jc);
         Assert.assertEquals(Boolean.TRUE, ((Map)o).containsKey("bar"));
         Assert.assertEquals(Boolean.TRUE, ((Map)o).containsValue("eat"));
@@ -84,7 +84,7 @@ public class ProjectionTest extends JexlTestCase {
 
     @Test
     public void testMapProjection3() throws Exception {
-        JexlScript e = JEXL.createScript("var s = {:}; for (var i : m.[key.length(),key,value]) s.put(i[1],i[2]); s");
+        JexlScript e = JEXL.createScript("var s = {:}; for (var i : ...m.[key.length(),key,value]) s.put(i[1],i[2]); s");
         JexlContext jc = new MapContext();
         jc.set("m", testMap);
 
@@ -95,7 +95,7 @@ public class ProjectionTest extends JexlTestCase {
 
     @Test
     public void testLambdaMapProjection() throws Exception {
-        JexlScript e = JEXL.createScript("var s = {}; for (var i : m.[(index, entry) -> {entry.value}]) s.add(i); s");
+        JexlScript e = JEXL.createScript("var s = {}; for (var i : ...m.[(index, entry) -> {entry.value}]) s.add(i); s");
         JexlContext jc = new MapContext();
         jc.set("m", testMap);
 
@@ -106,7 +106,7 @@ public class ProjectionTest extends JexlTestCase {
 
     @Test
     public void testLambdaMapProjection2() throws Exception {
-        JexlScript e = JEXL.createScript("var s = {}; for (var i : m.[entry -> {entry.value}]) s.add(i); s");
+        JexlScript e = JEXL.createScript("var s = {}; for (var i : ...m.[entry -> {entry.value}]) s.add(i); s");
         JexlContext jc = new MapContext();
         jc.set("m", testMap);
 
@@ -117,7 +117,7 @@ public class ProjectionTest extends JexlTestCase {
 
     @Test
     public void testListProjection() throws Exception {
-        JexlScript e = JEXL.createScript("var s = {}; for (var i : fruits.[value -> {value.length()}]) s.add(i); s");
+        JexlScript e = JEXL.createScript("var s = {}; for (var i : ...fruits.[value -> {value.length()}]) s.add(i); s");
         JexlContext jc = new MapContext();
         jc.set("fruits", test);
 
@@ -128,7 +128,7 @@ public class ProjectionTest extends JexlTestCase {
 
     @Test
     public void testIndexedListProjection() throws Exception {
-        JexlScript e = JEXL.createScript("var s = {}; for (var i : fruits.[(index, value) -> {index}]) s.add(i); s");
+        JexlScript e = JEXL.createScript("var s = {}; for (var i : ...fruits.[(index, value) -> {index}]) s.add(i); s");
         JexlContext jc = new MapContext();
         jc.set("fruits", test);
 
@@ -136,17 +136,17 @@ public class ProjectionTest extends JexlTestCase {
         Assert.assertEquals(Boolean.TRUE, ((Set)o).contains(0));
         Assert.assertEquals(Boolean.TRUE, ((Set)o).contains(1));
 
-        e = JEXL.createScript("var s = {}; for (var i : fruits.[(index, value) -> {value}]) s.add(i); s");
+        e = JEXL.createScript("var s = {}; for (var i : ...fruits.[(index, value) -> {value}]) s.add(i); s");
         o = e.execute(jc);
         Assert.assertEquals(Boolean.TRUE, ((Set)o).contains("banana"));
         Assert.assertEquals(Boolean.TRUE, ((Set)o).contains("kiwi"));
 
-        e = JEXL.createScript("var s = {}; for (var i : fruits.[(index, value, dummy) -> {empty dummy ? value : index}]) s.add(i); s");
+        e = JEXL.createScript("var s = {}; for (var i : ...fruits.[(index, value, dummy) -> {empty dummy ? value : index}]) s.add(i); s");
         o = e.execute(jc);
         Assert.assertEquals(Boolean.TRUE, ((Set)o).contains("banana"));
         Assert.assertEquals(Boolean.TRUE, ((Set)o).contains("apple"));
 
-        e = JEXL.createScript("var s = {}; for (var i : fruits.[(index, value) -> {index},(index, value) -> {value}]) s.add(i[1]); s");
+        e = JEXL.createScript("var s = {}; for (var i : ...fruits.[(index, value) -> {index},(index, value) -> {value}]) s.add(i[1]); s");
         o = e.execute(jc);
         Assert.assertEquals(Boolean.TRUE, ((Set)o).contains("banana"));
         Assert.assertEquals(Boolean.TRUE, ((Set)o).contains("kiwi"));
@@ -154,7 +154,7 @@ public class ProjectionTest extends JexlTestCase {
 
     @Test
     public void testListSelection() throws Exception {
-        JexlScript e = JEXL.createScript("var s = {}; for (var i : fruits.(value -> {value.length() >= 5})) s.add(i); s");
+        JexlScript e = JEXL.createScript("var s = {}; for (var i : ...fruits.(value -> {value.length() >= 5})) s.add(i); s");
         JexlContext jc = new MapContext();
         jc.set("fruits", test);
 
@@ -165,7 +165,7 @@ public class ProjectionTest extends JexlTestCase {
 
     @Test
     public void testListSelectionProjection() throws Exception {
-        JexlScript e = JEXL.createScript("var s = {}; for (var i : fruits.(value -> {value.length() >= 5}).[value -> {value.length()}]) s.add(i); s");
+        JexlScript e = JEXL.createScript("var s = {}; for (var i : ...fruits.(value -> {value.length() >= 5}).[value -> {value.length()}]) s.add(i); s");
         JexlContext jc = new MapContext();
         jc.set("fruits", test);
 
@@ -176,7 +176,7 @@ public class ProjectionTest extends JexlTestCase {
 
     @Test
     public void testListProjectionSelection() throws Exception {
-        JexlScript e = JEXL.createScript("var s = {}; for (var i : fruits.[value->{value.length()}].(len->{len >= 5})) s.add(i); s");
+        JexlScript e = JEXL.createScript("var s = {}; for (var i : ...fruits.[value->{value.length()}].(len->{len >= 5})) s.add(i); s");
         JexlContext jc = new MapContext();
         jc.set("fruits", test);
 

@@ -621,11 +621,78 @@ void UnaryExpression() #void : {}
   |
   <SIZE> UnaryExpression() #SizeFunction(1)
   |
-  LOOKAHEAD(<ELLIPSIS> <LPAREN> Expression() <COLON>) <ELLIPSIS> <LPAREN> Expression() <COLON> Lambda() <RPAREN> #EnumerationNode(2)
-  |
-  <ELLIPSIS> InlinePropertyExpression() #EnumerationNode(1)
+  <ELLIPSIS> EnumerationExpression()
   |
   InlinePropertyExpression()
+}
+
+void EnumerationExpression() #void : {}
+{
+    ((IteratorExpression() (LOOKAHEAD(2) EnumerationAccess() )*) #EnumerationReference(>1) (LOOKAHEAD(<DOTS>) Reduction())?) #Reference(>1)
+}
+
+void EnumerationAccess() #void : {}
+{
+    LOOKAHEAD(<DOTB>) ArrayProjection()
+    |
+    LOOKAHEAD(<DOTC>) MapProjection()
+    |
+    LOOKAHEAD(<DOTP>) Selection()   
+}
+
+void Reduction() #ReductionNode : {}
+{
+    <DOTS> <LPAREN> [LOOKAHEAD(Expression() <COLON>) Expression() <COLON>] Lambda() <RPAREN>
+}
+
+void Selection() #SelectionNode : {}
+{
+    <DOTP> Expression() <RPAREN>
+}
+
+void ArrayProjection() #ProjectionNode : {}
+{
+    <DOTB> ProjectionExpression() ( LOOKAHEAD(2) <COMMA> ProjectionExpression() )* <RBRACKET>
+}
+
+void MapProjection() #MapProjectionNode : {}
+{
+    <DOTC> ProjectionExpression() <COLON> ProjectionExpression() <RCURLY>
+}
+
+void ProjectionExpression() #void : {}
+{
+    LOOKAHEAD( LambdaLookahead() ) Lambda()
+    |
+    (Identifier() ( LOOKAHEAD(2) ProjectionMemberExpression() )*) #Reference(>1)
+}
+
+void ProjectionMemberExpression() #void : {}
+{
+    LOOKAHEAD(ProjectionMethodCall()) ProjectionMethodCall() 
+    |
+    ProjectionMemberAccess()
+}
+
+void ProjectionMemberAccess() #void : {}
+{
+    LOOKAHEAD(<LBRACKET>) ArrayAccess()
+    |
+    LOOKAHEAD(<DOT>) IdentifierAccess()
+    |
+    LOOKAHEAD(<QDOT>) IdentifierAccess()
+}
+
+void ProjectionMethodCall() #void : {}
+{
+    (ProjectionMemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
+}
+
+void IteratorExpression() #void : {}
+{
+  LOOKAHEAD(<LPAREN> Expression() <COLON>) <LPAREN> Expression() <COLON> Lambda() <RPAREN> #EnumerationNode(2)
+  |
+  InlinePropertyExpression() #EnumerationNode(1)
 }
 
 void InlinePropertyExpression() #void : {}
@@ -978,67 +1045,11 @@ void ArrayAccess() : {}
 
 void MemberAccess() #void : {}
 {
-    LOOKAHEAD(<DOTB>) ArrayProjection()
-    |
-    LOOKAHEAD(<DOTC>) MapProjection()
-    |
-    LOOKAHEAD(<DOTP>) Selection()
-    |
-    LOOKAHEAD(<DOTS>) Reduction()
-    |
     LOOKAHEAD(<LBRACKET>) ArrayAccess()
     |
     LOOKAHEAD(<DOT>) IdentifierAccess()
     |
     LOOKAHEAD(<QDOT>) IdentifierAccess()
-}
-
-void Reduction() #ReductionNode : {}
-{
-    <DOTS> <LPAREN> [LOOKAHEAD(Expression() <COLON>) Expression() <COLON>] Lambda() <RPAREN>
-}
-
-void Selection() #SelectionNode : {}
-{
-    <DOTP> Lambda() <RPAREN>
-}
-
-void ArrayProjection() #ProjectionNode : {}
-{
-    <DOTB> ProjectionExpression() ( LOOKAHEAD(2) <COMMA> ProjectionExpression() )* <RBRACKET>
-}
-
-void MapProjection() #MapProjectionNode : {}
-{
-    <DOTC> ProjectionExpression() <COLON> ProjectionExpression() <RCURLY>
-}
-
-void ProjectionExpression() #void : {}
-{
-    LOOKAHEAD( LambdaLookahead() ) Lambda()
-    |
-    (Identifier() ( LOOKAHEAD(2) ProjectionMemberExpression() )*) #Reference(>1)
-}
-
-void ProjectionMemberExpression() #void : {}
-{
-    LOOKAHEAD(ProjectionMethodCall()) ProjectionMethodCall() 
-    |
-    ProjectionMemberAccess()
-}
-
-void ProjectionMemberAccess() #void : {}
-{
-    LOOKAHEAD(<LBRACKET>) ArrayAccess()
-    |
-    LOOKAHEAD(<DOT>) IdentifierAccess()
-    |
-    LOOKAHEAD(<QDOT>) IdentifierAccess()
-}
-
-void ProjectionMethodCall() #void : {}
-{
-    (ProjectionMemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
 }
 
 void ReferenceExpression() #MethodNode(>1) : {}
