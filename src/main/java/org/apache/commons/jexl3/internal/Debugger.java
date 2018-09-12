@@ -128,7 +128,19 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      */
     public Debugger() {
     }
-
+    
+    /**
+     * Resets this debugger state.
+     */
+    public void reset() {
+        builder.setLength(0);
+        cause = null;
+        start = 0;
+        end = 0;
+        indentLevel = 0;
+        indent = 2;
+    }
+    
     /**
      * Position the debugger on the root of an expression.
      * @param jscript the expression

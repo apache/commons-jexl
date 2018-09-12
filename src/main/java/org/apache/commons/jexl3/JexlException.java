@@ -439,24 +439,43 @@ public class JexlException extends RuntimeException {
      */
     public static class Property extends JexlException {
         /**
-         * Creates a new Property exception instance.
-         *
-         * @param node the offending ASTnode
-         * @param var  the unknown variable
+         * Undefined variable flag.
          */
-        public Property(JexlNode node, String var) {
-            this(node, var, null);
-        }
-
+        private final boolean undefined;
+               
         /**
          * Creates a new Property exception instance.
          *
-         * @param node  the offending ASTnode
-         * @param var   the unknown variable
+         * @param node the offending ASTnode
+         * @param pty  the unknown property
+         * @param cause the exception causing the error
+         * @deprecated 3.2
+         */
+        @Deprecated
+        public Property(JexlNode node, String pty, Throwable cause) {
+            this(node, pty, true, cause);
+        }
+        
+        /**
+         * Creates a new Property exception instance.
+         *
+         * @param node the offending ASTnode
+         * @param pty  the unknown property
+         * @param undef whether the variable is null or undefined
          * @param cause the exception causing the error
          */
-        public Property(JexlNode node, String var, Throwable cause) {
-            super(node, var, cause);
+        public Property(JexlNode node, String pty, boolean undef, Throwable cause) {
+            super(node, pty, cause);
+            undefined = undef;
+        }
+
+        /**
+         * Whether the variable causing an error is undefined or evaluated as null.
+         *
+         * @return true if undefined, false otherwise
+         */
+        public boolean isUndefined() {
+            return undefined;
         }
 
         /**
@@ -468,7 +487,7 @@ public class JexlException extends RuntimeException {
 
         @Override
         protected String detailedMessage() {
-            return "unsolvable property '" + getProperty() + "'";
+            return (undefined? "undefined" : "null value") + " property " + getProperty();
         }
     }
 
@@ -476,14 +495,19 @@ public class JexlException extends RuntimeException {
      * Generates a message for an unsolvable property error.
      *
      * @param node the node where the error occurred
-     * @param var the variable
+     * @param pty the property
+     * @param undef whether the property is null or undefined
      * @return the error message
      */
-    public static String propertyError(JexlNode node, String var) {
+    public static String propertyError(JexlNode node, String pty, boolean undef) {
         StringBuilder msg = errorAt(node);
-        msg.append("unsolvable property '");
-        msg.append(var);
-        msg.append('\'');
+        if (undef) {
+            msg.append("unsolvable");
+        } else {
+            msg.append("null value");
+        }
+        msg.append(" property ");
+        msg.append(pty);
         return msg.toString();
     }
 
