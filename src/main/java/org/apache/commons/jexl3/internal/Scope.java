@@ -243,6 +243,12 @@ public final class Scope {
     public String[] getParameters() {
         return getParameters(0);
     }
+        
+    /**
+     * Gets this script parameters.
+     * @param bound number of known bound parameters (curry)
+     * @return the parameter names
+     */
     protected String[] getParameters(int bound) {
         int unbound = parms - bound;
         if (namedVariables != null && unbound > 0) {

@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-272">
+                Dereferencing null property not reported on method call
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-271" due-to="Dmitri Blinov">
                 Hoisted variable is lost when currying lambda
             </action>

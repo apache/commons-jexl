@@ -66,7 +66,7 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
                 return jget.invoke(object);
             } catch (Exception xany) {
                 if (jexl.isStrict()) {
-                    throw new JexlException.Property(null, name, xany);
+                    throw new JexlException.Property(null, name, true, xany);
                 }
             }
         }
@@ -82,7 +82,7 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
             } catch (Exception xany) {
                 // ignore
                 if (jexl.isStrict()) {
-                    throw new JexlException.Property(null, name, xany);
+                    throw new JexlException.Property(null, name, true, xany);
                 }
             }
         }

@@ -219,6 +219,9 @@ public abstract class JexlNode extends SimpleNode {
         // seek next child in parent
         if (rhs >= 0 && rhs < nsiblings) {
             JexlNode rsibling = parent.jjtGetChild(rhs);
+            if (rsibling instanceof ASTMethodNode) {
+                rsibling = rsibling.jjtGetChild(0);
+            }
             if (rsibling instanceof ASTIdentifierAccess && ((ASTIdentifierAccess) rsibling).isSafe()) {
                 return true;
             }

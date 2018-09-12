@@ -24,6 +24,8 @@ import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
@@ -211,17 +213,44 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a property can not be resolved.
      * @param node  the node where the error originated from
-     * @param var   the property name
+     * @param property   the property node
      * @param cause the cause if any
+     * @param undef whether the property is undefined or null
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object unsolvableProperty(JexlNode node, String var, Throwable cause) {
+    protected Object unsolvableProperty(JexlNode node, String property, boolean undef, Throwable cause) {
         if (isStrictEngine()) {
-            throw new JexlException.Property(node, var, cause);
+            throw new JexlException.Property(node, property, undef, cause);
         } else if (logger.isDebugEnabled()) {
-            logger.debug(JexlException.propertyError(node, var), cause);
+            logger.debug(JexlException.propertyError(node, property, undef));
         }
         return null;
+    }
+    
+    /**
+     * Pretty-prints a failing property (de)reference.
+     * <p>Used by calls to unsolvableProperty(...).</p>
+     * @param node the property node
+     * @return the (pretty) string
+     */
+    protected String stringifyProperty(JexlNode node) {
+        if (node instanceof ASTArrayAccess) {
+            if (node.jjtGetChild(0) != null) {
+                return "["
+                       + node.jjtGetChild(0).toString()
+                       + "]";
+            }
+            return "[???]";
+        }
+        if (node instanceof ASTMethodNode) {
+            if (node.jjtGetChild(0) != null) {
+                return "."
+                       + node.jjtGetChild(0).toString()
+                       + "(...)";
+            }
+            return ".???(...)";
+        }
+        return node.toString();
     }
 
     /**

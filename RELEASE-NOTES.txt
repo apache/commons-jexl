@@ -40,7 +40,8 @@ New Features in 3.2:
 ====================
 
 * JEXL-264:      Allow space, quote & double-quote in identifiers
-* JEXL-260:      Automatically inject JexlContext in constructor call when possible
+* JEXL-260:      Automatically inject JexlContext in constructor call when possib
+* JEXL-272:      Dereferencing null property not reported on method callle
 * JEXL-252:      Allow for interpolated strings to be used in property access operators
 * JEXL-250:      Safe navigation operator (?.)
 * JEXL-248:      Allow range subexpression as an array property assignment identifier
@@ -56,6 +57,7 @@ New Features in 3.2:
 Bugs Fixed in 3.2:
 ==================
 
+* JEXL-272:      Dereferencing null property not reported on method call
 * JEXL-271:      Hoisted variable is lost when currying lambda
 * JEXL-270:      Wrong Script$Curried creation when script.curry() method is called inside script
 * JEXL-261:      JexlEngine.setClassLoader(...) should reload namespaces that are classes

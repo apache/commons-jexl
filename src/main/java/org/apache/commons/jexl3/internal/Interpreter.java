@@ -24,6 +24,7 @@ import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
@@ -110,7 +111,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import org.apache.commons.jexl3.JxltEngine;
 
 
 /**
@@ -1000,7 +1000,7 @@ public class Interpreter extends InterpreterBase {
             } catch (JxltEngine.Exception xjxlt) {
                 cause = xjxlt;
             }
-            return node.isSafe() ? null : unsolvableProperty(node, src, cause);
+            return node.isSafe() ? null : unsolvableProperty(node, src, true, cause);
         } else {
             return node.getIdentifier();
         }
@@ -1095,11 +1095,15 @@ public class Interpreter extends InterpreterBase {
             if (antish && ant != null) {
                 boolean undefined = !(context.has(ant.toString()) || isLocalVariable(node, 0));
                 // variable unknown in context and not a local
-                return node.isSafeLhs()? null : unsolvableVariable(node, ant.toString(), undefined);
+                return node.isSafeLhs()
+                        ? null
+                        : unsolvableVariable(node, ant.toString(), undefined);
             }
             if (ptyNode != null) {
                 // am I the left-hand side of a safe op ?
-                return ptyNode.isSafeLhs()? null : unsolvableProperty(node, ptyNode.toString(), null);
+                return ptyNode.isSafeLhs()
+                       ? null
+                       : unsolvableProperty(node, stringifyProperty(ptyNode), false, null);
             }
         }
         return object;
@@ -1291,11 +1295,11 @@ public class Interpreter extends InterpreterBase {
         }
         if (property == null) {
             // no property, we fail
-            return unsolvableProperty(propertyNode, "<?>.<null>", null);
+            return unsolvableProperty(propertyNode, "<?>.<null>", true, null);
         }
         if (object == null) {
             // no object, we fail
-            return unsolvableProperty(objectNode, "<null>.<?>", null);
+            return unsolvableProperty(objectNode, "<null>.<?>", true, null);
         }
         // 3: one before last, assign
         if (assignop != null) {
@@ -1678,7 +1682,7 @@ public class Interpreter extends InterpreterBase {
                 return null;
             } else {
                 String attrStr = attribute != null ? attribute.toString() : null;
-                return unsolvableProperty(node, attrStr, xcause);
+                return unsolvableProperty(node, attrStr, true, xcause);
             }
         } else {
             // direct call
@@ -1753,7 +1757,7 @@ public class Interpreter extends InterpreterBase {
         // lets fail
         if (node != null) {
             String attrStr = attribute != null ? attribute.toString() : null;
-            unsolvableProperty(node, attrStr, xcause);
+            unsolvableProperty(node, attrStr, true, xcause);
         } else {
             // direct call
             String error = "unable to set object property"
