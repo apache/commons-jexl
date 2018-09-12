@@ -92,21 +92,21 @@ public class Closure extends Script {
     }
 
     @Override
-    public String[] getParameters() {
+    public String[] getUnboundParameters() {
 
         String[] scriptParams = super.getParameters();
 
         if (scriptParams == null || scriptParams.length == 0)
-          return scriptParams;
+            return scriptParams;
+
+        String[] unboundParams = frame.getUnboundParameters();
 
         boolean varArgs = script.isVarArgs();
 
-        if (argCount >= scriptParams.length) {
-           return varArgs ? new String[] {scriptParams[scriptParams.length - 1]} : null;
+        if (unboundParams.length == 0 && varArgs) {
+            return new String[] {scriptParams[scriptParams.length - 1]};
         } else {
-           String[] result = new String[scriptParams.length - argCount];
-           System.arraycopy(scriptParams, argCount, result, 0, scriptParams.length - argCount);
-           return result;
+            return unboundParams;
         }
     }
 
@@ -140,11 +140,6 @@ public class Closure extends Script {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public String[] getUnboundParameters() {
-        return frame.getUnboundParameters();
     }
 
     /**

@@ -1919,7 +1919,7 @@ public class Interpreter extends InterpreterBase {
                         JexlScript s = (JexlScript) functor;
                         boolean varArgs = s.isVarArgs();
                         if (!varArgs && isStrictEngine()) {
-                            String[] params = s.getParameters();
+                            String[] params = s.getUnboundParameters();
                             int paramCount = params != null ? params.length : 0;
                             int argCount = argv != null ? argv.length : 0;
                             if (argCount > paramCount)
