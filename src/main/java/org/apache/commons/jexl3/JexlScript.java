@@ -24,15 +24,15 @@ import java.util.concurrent.Callable;
 
 /**
  * A JEXL Script.
- * 
+ *
  * <p>A script is some valid JEXL syntax to be executed with a given set of {@link JexlContext} variables.</p>
- * 
+ *
  * <p>A script is a group of statements, separated by semicolons.</p>
- * 
+ *
  * <p>The statements can be <code>blocks</code> (curly braces containing code),
  * Control statements such as <code>if</code> and <code>while</code>
  * as well as expressions and assignment statements.</p>
- * 
+ *
  * <p>Do <em>not</em> create classes that implement this interface; delegate or compose instead.</p>
  *
  * @since 1.1
@@ -41,21 +41,21 @@ public interface JexlScript {
 
      /**
      * Returns the source text of this expression.
-      * 
+      *
      * @return the source text
      */
     String getSourceText();
 
     /**
      * Recreates the source text of this expression from the internal syntactic tree.
-     * 
+     *
      * @return the source text
      */
     String getParsedText();
 
     /**
      * Recreates the source text of this expression from the internal syntactic tree.
-     * 
+     *
      * @param indent the number of spaces for indentation, 0 meaning no indentation
      * @return the source text
      */
@@ -86,7 +86,7 @@ public interface JexlScript {
 
     /**
      * Gets this script parameters.
-     * 
+     *
      * @return the parameters or null
      * @since 2.1
      */
@@ -94,11 +94,19 @@ public interface JexlScript {
 
     /**
      * Returns true if script supports taking variable number of arguments.
-     * 
+     *
      * @return boolean
      * @since 3.2
      */
     boolean isVarArgs();
+
+    /**
+     * Gets this script unbound parameters.
+     * <p>Parameters that haven't been bound by a previous call to curry().
+     * @return the parameters or null
+     * @since 3.2
+     */
+    String[] getUnboundParameters();
 
     /**
      * Gets this script local variables.
@@ -112,7 +120,7 @@ public interface JexlScript {
      * Gets this script variables.
      * <p>Note that since variables can be in an ant-ish form (ie foo.bar.quux), each variable is returned as
      * a list of strings where each entry is a fragment of the variable ({"foo", "bar", "quux"} in the example.</p>
-     * 
+     *
      * @return the variables or null
      * @since 2.1
      */
@@ -120,17 +128,17 @@ public interface JexlScript {
 
     /**
      * Gets this script pragmas.
-     * 
+     *
      * @return the (non null, may be empty) pragmas map
      */
     Map<String, Object> getPragmas();
 
     /**
      * Creates a Callable from this script.
-     * 
+     *
      * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
-     * 
+     *
      * @param context the context
      * @return the callable
      * @since 2.1
@@ -139,10 +147,10 @@ public interface JexlScript {
 
     /**
      * Creates a Callable from this script.
-     * 
+     *
      * <p>This allows to submit it to an executor pool and provides support for asynchronous calls.</p>
      * <p>The interpreter will handle interruption/cancellation gracefully if needed.</p>
-     * 
+     *
      * @param context the context
      * @param args the script arguments
      * @return the callable
@@ -152,10 +160,10 @@ public interface JexlScript {
 
     /**
      * Curries this script, returning a script with bound arguments.
-     * 
+     *
      * <p>If this script does not declare parameters or if all of them are already bound,
      * no error is generated and this script is returned.</p>
-     * 
+     *
      * @param args the arguments to bind
      * @return the curried script or this script if no binding can occur
      */

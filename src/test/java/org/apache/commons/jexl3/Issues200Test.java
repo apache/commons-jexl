@@ -469,7 +469,7 @@ public class Issues200Test extends JexlTestCase {
         result = script.execute(ctx);
         Assert.assertEquals(10, result);
     }
-      
+
     @Test
     public void test230() throws Exception {
         JexlEngine jexl = new JexlBuilder().cache(4).create();
@@ -488,7 +488,7 @@ public class Issues200Test extends JexlTestCase {
             Assert.assertEquals(42, value);
         }
     }
-    
+
     @Test
     public void test265() throws Exception {
         JexlEngine jexl = new JexlBuilder().cache(4).create();
@@ -502,17 +502,17 @@ public class Issues200Test extends JexlTestCase {
             // ambiguous, parsing fails
         }
         script = jexl.createScript("(true) ? (x) : abs(2)");
-        result = script.execute(ctxt);  
+        result = script.execute(ctxt);
         Assert.assertEquals(42, result);
         script = jexl.createScript("(true) ? x : (abs(3))");
-        result = script.execute(ctxt);  
+        result = script.execute(ctxt);
         Assert.assertEquals(42, result);
         script = jexl.createScript("(!true) ? abs(4) : x");
-        result = script.execute(ctxt);  
+        result = script.execute(ctxt);
         Assert.assertEquals(42, result);
     }
-    
-    
+
+
     /**
      * An iterator that implements Closeable (at least implements a close method).
      */
@@ -574,25 +574,25 @@ public class Issues200Test extends JexlTestCase {
         public Arithmetic266(boolean strict) {
             super(strict);
         }
-        
+
         static void closeIterator(Iterator266 i266) {
             Deque<Iterator266> queue = TLS_FOREACH.get();
             if (queue != null) {
                 queue.remove(i266);
             }
         }
-        
+
         public Iterator<?> forEach(Iterable<?> collection) {
             Iterator266 it266 = new Iterator266((Iterator<Object>) collection.iterator());
             Deque<Iterator266> queue = TLS_FOREACH.get();
             queue.addFirst(it266);
             return it266;
         }
-                
+
         public Iterator<?> forEach(Map<?,?> collection) {
             return forEach(collection.values());
         }
-        
+
         public void remove() {
             Deque<Iterator266> queue = TLS_FOREACH.get();
             Iterator266 i266 = queue.getFirst();
@@ -604,21 +604,21 @@ public class Issues200Test extends JexlTestCase {
             }
         }
     }
-    
+
     @Test
     public void test266() throws Exception {
         Object result;
         JexlScript script;
         JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic266(true)).create();
         JexlContext ctxt = new MapContext();
-        
+
         List<Integer> li = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5 ,6));
         ctxt.set("list", li);
         script = jexl.createScript("for (var item : list) { if (item <= 3) remove(); } return size(list)");
         result = script.execute(ctxt);
         Assert.assertEquals(3, result);
         Assert.assertEquals(3, li.size());
-        
+
         Map<String, Integer> msi = new HashMap<String, Integer>();
         msi.put("a", 1);
         msi.put("b", 2);
@@ -632,7 +632,7 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertEquals(4, result);
         Assert.assertEquals(4, msi.size());
     }
-    
+
     @Test
     public void test267() throws Exception {
         Object result;
@@ -651,58 +651,5 @@ public class Issues200Test extends JexlTestCase {
         script = jexl.createScript("return (x, y)->{ x + y}");
         result = script.execute(ctxt);
         Assert.assertTrue(result instanceof JexlScript);
-    }
-         
-    @Test
-    public void test270() throws Exception {
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");
-        String text = base.toString();
-        JexlScript script = base.curry(5, 15);
-        Assert.assertEquals(text, script.toString());
-
-        JexlEvalContext ctxt = new JexlEvalContext();
-        ctxt.set("s", base);
-        script = jexl.createScript("return s");
-        Object result = script.execute(ctxt);
-        Assert.assertEquals(text, result.toString());
-
-        script = jexl.createScript("return s.curry(1)");
-        result = script.execute(ctxt);
-        Assert.assertEquals(text, result.toString());
-    }
-        
-    @Test
-    public void test271a() throws Exception {
-        JexlEngine jexl = new JexlBuilder().strict(false).create();
-        JexlScript base = jexl.createScript("var base = 1; var x = (a)->{ var y = (b) -> {base + b}; return base + y(a)}; x(40)");
-        Object result = base.execute(null);
-        Assert.assertEquals(42, result);
-    }
-
-    @Test
-    public void test271b() throws Exception {
-        JexlEngine jexl = new JexlBuilder().strict(false).create();
-        JexlScript base = jexl.createScript("var base = 2; var sum = (x, y, z)->{ base + x + y + z }; var y = sum.curry(1); y(2,3)");
-        Object result = base.execute(null);
-        Assert.assertEquals(8, result);
-    }
-        
-    @Test
-    public void test271c() throws Exception {
-        JexlEngine jexl = new JexlBuilder().strict(false).create();
-        JexlScript base = jexl.createScript("(x, y, z)->{ 2 + x + y + z };");
-        JexlScript y = base.curry(1);
-        Object result = y.execute((JexlContext) null, 2, 3);
-        Assert.assertEquals(8, result);
-    }
-    
-    @Test
-    public void test271d() throws Exception {
-        JexlEngine jexl = new JexlBuilder().strict(false).create();
-        JexlScript base = jexl.createScript("var base = 2; return (x, y, z)->{ base + x + y + z };");
-        JexlScript y = ((JexlScript) base.execute(null)).curry(1);
-        Object result = y.execute((JexlContext) null, 2, 3);
-        Assert.assertEquals(8, result);
     }
 }

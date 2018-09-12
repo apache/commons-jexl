@@ -41,7 +41,7 @@ public class Closure extends Script {
         frame = lambda.createFrame(theCaller.frame);
         argCount = 0;
     }
-    
+
     /**
      * Creates a curried version of a script.
      * @param base the base script
@@ -140,6 +140,11 @@ public class Closure extends Script {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String[] getUnboundParameters() {
+        return frame.getUnboundParameters();
     }
 
     /**

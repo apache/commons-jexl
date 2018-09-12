@@ -123,7 +123,7 @@ public class Script implements JexlScript, JexlExpression {
     public String getParsedText() {
         return getParsedText(2);
     }
-    
+
     @Override
     public String getParsedText(int indent) {
         Debugger debug = new Debugger();
@@ -239,14 +239,14 @@ public class Script implements JexlScript, JexlExpression {
         return new Closure(this, args);
     }
 
-    /**
-     * Gets this script parameters.
-     * @return the parameters or null
-     * @since 3.0
-     */
     @Override
     public String[] getParameters() {
         return script.getParameters();
+    }
+
+    @Override
+    public String[] getUnboundParameters() {
+        return getParameters();
     }
 
     /**
