@@ -37,7 +37,7 @@ public class Closure extends Script {
         super(theCaller.jexl, null, lambda);
         frame = lambda.createFrame(theCaller.frame);
     }
-    
+
     /**
      * Creates a curried version of a script.
      * @param base the base script
@@ -81,6 +81,11 @@ public class Closure extends Script {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public String[] getUnboundParameters() {
+        return frame.getUnboundParameters();
     }
 
     /**

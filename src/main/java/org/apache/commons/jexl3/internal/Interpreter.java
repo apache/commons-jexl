@@ -180,11 +180,11 @@ public class Interpreter extends InterpreterBase {
         JexlContext.ThreadLocal tcontext = null;
         JexlEngine tjexl = null;
         try {
-            cancelCheck(node);
             if (context instanceof JexlContext.ThreadLocal) {
                 tcontext = jexl.putThreadLocal((JexlContext.ThreadLocal) context);
             }
             tjexl = jexl.putThreadEngine(jexl);
+            cancelCheck(node);
             return node.jjtAccept(this, null);
         } catch (JexlException.Return xreturn) {
             return xreturn.getValue();
@@ -1413,7 +1413,7 @@ public class Interpreter extends InterpreterBase {
                 } else if (context.has(methodName)) {
                     functor = context.get(methodName);
                     isavar = functor != null;
-                } 
+                }
                 // name is a variable, cant be cached
                 cacheable &= !isavar;
             }
@@ -1431,7 +1431,7 @@ public class Interpreter extends InterpreterBase {
         } else {
             return unsolvableMethod(node, "?");
         }
-        
+
         // solving the call site
         CallDispatcher call = new CallDispatcher(node, cacheable);
         try {
@@ -1439,7 +1439,7 @@ public class Interpreter extends InterpreterBase {
             Object eval = call.tryEval(target, methodName, argv);
             if (JexlEngine.TRY_FAILED != eval) {
                 return eval;
-            } 
+            }
             boolean functorp = false;
             boolean narrow = false;
             // pseudo loop to try acquiring methods without and with argument narrowing

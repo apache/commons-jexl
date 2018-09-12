@@ -123,7 +123,7 @@ public class Script implements JexlScript, JexlExpression {
     public String getParsedText() {
         return getParsedText(2);
     }
-    
+
     @Override
     public String getParsedText(int indent) {
         Debugger debug = new Debugger();
@@ -191,7 +191,7 @@ public class Script implements JexlScript, JexlExpression {
         Interpreter interpreter = createInterpreter(context, frame);
         return interpreter.interpret(script);
     }
-    
+
     @Override
     public JexlScript curry(Object... args) {
         String[] parms = script.getParameters();
@@ -201,20 +201,16 @@ public class Script implements JexlScript, JexlExpression {
         return new Closure(this, args);
     }
 
-    /**
-     * Gets this script parameters.
-     * @return the parameters or null
-     * @since 3.0
-     */
     @Override
     public String[] getParameters() {
         return script.getParameters();
     }
 
-    /**
-     * Gets this script local variables.
-     * @return the local variables or null
-     */
+    @Override
+    public String[] getUnboundParameters() {
+        return getParameters();
+    }
+
     @Override
     public String[] getLocalVariables() {
         return script.getLocalVariables();
