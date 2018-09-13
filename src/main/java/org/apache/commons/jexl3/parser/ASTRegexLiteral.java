@@ -16,9 +16,13 @@
  */
 package org.apache.commons.jexl3.parser;
 
-public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant<String> {
+import java.util.regex.Pattern;
+
+public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant<Pattern> {
+
     /** The actual literal value; the inherited 'value' member may host a cached getter. */
-    private String literal = null;
+
+    private Pattern literal = null;
 
     ASTRegexLiteral(int id) {
         super(id);
@@ -30,15 +34,15 @@ public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant
 
     @Override
     public String toString() {
-        return this.literal;
+        return literal != null ? literal.toString() : "";
     }
 
     /**
      * Gets the literal value.
-     * @return the string literal
+     * @return the Pattern literal
      */
     @Override
-    public String getLiteral() {
+    public Pattern getLiteral() {
         return this.literal;
     }
 
@@ -48,7 +52,7 @@ public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant
     }
 
     void setLiteral(String literal) {
-        this.literal = literal;
+        this.literal = Pattern.compile(literal);
     }
 
     @Override

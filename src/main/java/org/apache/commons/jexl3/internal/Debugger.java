@@ -908,7 +908,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTRegexLiteral node, Object data) {
-        String img = node.getLiteral().replace("/", "\\/");
+        String img = node.toString().replace("/", "\\/");
         return check(node, "~/" + img + "/", data);
     }
 
