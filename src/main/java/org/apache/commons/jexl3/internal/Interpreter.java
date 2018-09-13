@@ -1029,7 +1029,7 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTRegexLiteral node, Object data) {
-        return Pattern.compile(node.getLiteral());
+        return node.getLiteral();
     }
 
     @Override
