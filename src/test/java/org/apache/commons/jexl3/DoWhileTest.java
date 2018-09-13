@@ -20,8 +20,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests for while statement.
- * @since 1.1
+ * Tests do while statement.
+ * @since 3.2
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class DoWhileTest extends JexlTestCase {
@@ -37,16 +37,32 @@ public class DoWhileTest extends JexlTestCase {
 
         Object o = e.execute(jc);
         Assert.assertNull("Result is not null", o);
+        e = JEXL.createScript("do {} while (false); 23");
+        o = e.execute(jc);
+        Assert.assertEquals(23, o);
+        
     }
 
     @Test
     public void testWhileExecutesExpressionWhenLooping() throws Exception {
         JexlScript e = JEXL.createScript("do x = x + 1 while (x < 10)");
         JexlContext jc = new MapContext();
-        jc.set("x", new Integer(1));
+        jc.set("x", 1);
 
         Object o = e.execute(jc);
-        Assert.assertEquals("Result is wrong", new Integer(10), o);
+        Assert.assertEquals(10, o);
+        Assert.assertEquals(10, jc.get("x"));
+        
+        e = JEXL.createScript("var x = 0; do x += 1; while (x < 23)");
+        o = e.execute(jc);
+        Assert.assertEquals(23, o);
+        
+        
+        jc.set("x", 1);
+        e = JEXL.createScript("do x += 1; while (x < 23); return 42;");
+        o = e.execute(jc);
+        Assert.assertEquals(23, jc.get("x"));
+        Assert.assertEquals(42, o);
     }
 
     @Test
@@ -60,17 +76,6 @@ public class DoWhileTest extends JexlTestCase {
         Assert.assertEquals("Result is wrong", new Integer(512), o);
         Assert.assertEquals("x is wrong", new Integer(10), jc.get("x"));
         Assert.assertEquals("y is wrong", new Integer(512), jc.get("y"));
-    }
-
-    @Test
-    public void testWhileRemoveBroken() throws Exception {
-        try {
-            JexlScript e = JEXL.createScript("do remove while (x < 10)");
-            Assert.fail("remove is out of loop!");
-        } catch (JexlException.Parsing xparse) {
-            String str = xparse.detailedMessage();
-            Assert.assertTrue(str.contains("remove"));
-        }
     }
 
 }
