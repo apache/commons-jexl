@@ -16,12 +16,16 @@
  */
 package org.apache.commons.jexl3;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import java.util.TreeSet;
@@ -465,7 +469,7 @@ public class Issues200Test extends JexlTestCase {
         result = script.execute(ctx);
         Assert.assertEquals(10, result);
     }
-      
+
     @Test
     public void test230() throws Exception {
         JexlEngine jexl = new JexlBuilder().cache(4).create();
@@ -484,7 +488,7 @@ public class Issues200Test extends JexlTestCase {
             Assert.assertEquals(42, value);
         }
     }
-    
+
     @Test
     public void test265() throws Exception {
         JexlEngine jexl = new JexlBuilder().cache(4).create();
@@ -498,13 +502,237 @@ public class Issues200Test extends JexlTestCase {
             // ambiguous, parsing fails
         }
         script = jexl.createScript("(true) ? (x) : abs(2)");
-        result = script.execute(ctxt);  
+        result = script.execute(ctxt);
         Assert.assertEquals(42, result);
         script = jexl.createScript("(true) ? x : (abs(3))");
-        result = script.execute(ctxt);  
+        result = script.execute(ctxt);
         Assert.assertEquals(42, result);
         script = jexl.createScript("(!true) ? abs(4) : x");
-        result = script.execute(ctxt);  
+        result = script.execute(ctxt);
         Assert.assertEquals(42, result);
+    }
+
+
+    /**
+     * An iterator that implements Closeable (at least implements a close method).
+     */
+    public static class Iterator266 implements /*Closeable,*/ Iterator<Object> {
+        private Iterator<Object> iterator;
+
+        Iterator266(Iterator<Object> ator) {
+            iterator = ator;
+        }
+
+        @Override
+        protected void finalize() throws Throwable {
+            close();
+            super.finalize();
+        }
+
+        //@Override
+        public void close() {
+            if (iterator != null) {
+                Arithmetic266.closeIterator(this);
+                iterator = null;
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (iterator == null) {
+                return false;
+            }
+            boolean n = iterator.hasNext();
+            if (!n) {
+                close();
+            }
+            return n;
+        }
+
+        @Override
+        public Object next() {
+            if (iterator == null) {
+                throw new NoSuchElementException();
+            }
+            return iterator.next();
+        }
+
+        @Override
+        public void remove() {
+            if (iterator != null) {
+                iterator.remove();
+            }
+        }
+    }
+    public static class Arithmetic266 extends JexlArithmetic {
+        static final ThreadLocal<Deque<Iterator266>> TLS_FOREACH = new ThreadLocal<Deque<Iterator266>>() {
+            @Override
+            public Deque<Iterator266> initialValue() {
+                return new LinkedList<Iterator266>();
+            }
+        };
+        public Arithmetic266(boolean strict) {
+            super(strict);
+        }
+
+        static void closeIterator(Iterator266 i266) {
+            Deque<Iterator266> queue = TLS_FOREACH.get();
+            if (queue != null) {
+                queue.remove(i266);
+            }
+        }
+
+        public Iterator<?> forEach(Iterable<?> collection) {
+            Iterator266 it266 = new Iterator266((Iterator<Object>) collection.iterator());
+            Deque<Iterator266> queue = TLS_FOREACH.get();
+            queue.addFirst(it266);
+            return it266;
+        }
+
+        public Iterator<?> forEach(Map<?,?> collection) {
+            return forEach(collection.values());
+        }
+
+        public void remove() {
+            Deque<Iterator266> queue = TLS_FOREACH.get();
+            Iterator266 i266 = queue.getFirst();
+            if (i266 != null) {
+                i266.remove();
+                throw new JexlException.Continue(null);
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
+    }
+
+    @Test
+    public void test266() throws Exception {
+        Object result;
+        JexlScript script;
+        JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic266(true)).create();
+        JexlContext ctxt = new MapContext();
+
+        List<Integer> li = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5 ,6));
+        ctxt.set("list", li);
+        script = jexl.createScript("for (var item : list) { if (item <= 3) remove(); } return size(list)");
+        result = script.execute(ctxt);
+        Assert.assertEquals(3, result);
+        Assert.assertEquals(3, li.size());
+
+        Map<String, Integer> msi = new HashMap<String, Integer>();
+        msi.put("a", 1);
+        msi.put("b", 2);
+        msi.put("c", 3);
+        msi.put("d", 4);
+        msi.put("e", 5);
+        msi.put("f", 6);
+        ctxt.set("map", msi);
+        script = jexl.createScript("for (var item : map) { if (item <= 2) remove(); } return size(map)");
+        result = script.execute(ctxt);
+        Assert.assertEquals(4, result);
+        Assert.assertEquals(4, msi.size());
+    }
+
+    @Test
+    public void test267() throws Exception {
+        Object result;
+        JexlScript script;
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlContext ctxt = new MapContext();
+        // API declared params
+        script = jexl.createScript("x + y", "x", "y");
+        result = script.execute(ctxt, 20, 22);
+        Assert.assertEquals(42, result);
+        // script declared params
+        script = jexl.createScript("(x, y)->{ x + y}");
+        result = script.execute(ctxt, 22, 20);
+        Assert.assertEquals(42, result);
+        // explicitly returning the lambda
+        script = jexl.createScript("return (x, y)->{ x + y}");
+        result = script.execute(ctxt);
+        Assert.assertTrue(result instanceof JexlScript);
+    }
+    
+    public static class Prompt {
+        private final Map<String, PromptValue> values = new HashMap<String, PromptValue>();
+        
+        public Object get(String name) {
+            PromptValue v = values.get(name);
+            return v != null? v.getValue() : null;
+        }
+        
+        public void set(String name, Object value) {
+            values.put(name, new PromptValue(value));
+        }
+    }
+    
+    /**
+     * A valued prompt.
+     */
+    public static class PromptValue {
+
+        /** Prompt value. */
+        private Object value;
+
+        public PromptValue(Object v) {
+           value = v;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
+        }
+    }
+    
+    @Test
+    public void test272() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        JexlContext ctxt = new MapContext();
+        JexlScript script;
+        Object result = null;
+        Prompt p0 = new Prompt();
+        p0.set("stuff", 42);
+        ctxt.set("$in", p0); 
+        
+        // unprotected navigation
+        script = jexl.createScript("$in[p].intValue()", "p");
+        try {
+            result = script.execute(ctxt, "fail");
+            Assert.fail("should have thrown a " + JexlException.Property.class);
+        } catch (JexlException xany) {
+            Assert.assertEquals(JexlException.Property.class, xany.getClass());            
+        }
+        Assert.assertEquals(null, result);
+        result = script.execute(ctxt, "stuff");
+        Assert.assertEquals(42, result);
+       
+        // protected navigation
+        script = jexl.createScript("$in[p]?.intValue()", "p");
+        result = script.execute(ctxt, "fail");
+        Assert.assertEquals(null, result);
+        result = script.execute(ctxt, "stuff");
+        Assert.assertEquals(42, result); 
+        
+        // unprotected navigation
+        script = jexl.createScript("$in.`${p}`.intValue()", "p");
+        try {
+            result = script.execute(ctxt, "fail");
+            Assert.fail("should have thrown a " + JexlException.Property.class);
+        } catch (JexlException xany) {
+            Assert.assertEquals(JexlException.Property.class, xany.getClass());            
+        }
+        result = script.execute(ctxt, "stuff");
+        Assert.assertEquals(42, result);
+        
+        // protected navigation
+        script = jexl.createScript("$in.`${p}`?.intValue()", "p");
+        result = script.execute(ctxt, "fail");
+        Assert.assertEquals(null, result);
+        result = script.execute(ctxt, "stuff");
+        Assert.assertEquals(42, result); 
+        
     }
 }

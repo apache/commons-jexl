@@ -29,6 +29,14 @@ public class CaptureLog implements Log {
         StackTraceElement[] stack = new Exception().fillInStackTrace().getStackTrace();
         return stack[2];
     }
+   
+    public CaptureLog() {
+        this("org.apache.commons.jexl3");
+    }
+    
+    public CaptureLog(String name) {
+        //super(name);
+    }
 
     public boolean isEmpty() {
         return captured.isEmpty();
@@ -42,6 +50,11 @@ public class CaptureLog implements Log {
             }
         }
         return count;
+    }
+        
+    //@Override
+    public boolean isEnabledFor(int /*Priority*/ p) {
+        return true;
     }
 
     @Override

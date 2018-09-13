@@ -26,10 +26,15 @@ package org.apache.commons.jexl3;
  * For instance, '+' is associated to 'T add(L x, R y)'.</p>
  *
  * <p>The default JexlArithmetic implements generic versions of these methods using Object as arguments.
- * You can use your own derived JexlArithmetic that override and/or overload those operator methods; these methods
- * must be public,
- * must respect the return type when primitive
- * and may be overloaded multiple times with different signatures.</p>
+ * You can use your own derived JexlArithmetic that override and/or overload those operator methods.
+ * Note that these are overloads by convention, not actual Java overloads.
+ * The following rules apply to operator methods:</p>
+ * <ul>
+ * <li>Operator methods should be public</li>
+ * <li>Operators return type should be respected when primitive (int, boolean,...)</li>
+ * <li>Operators may be overloaded multiple times with different signatures</li>
+ * <li>Operators may return JexlEngine.TRY_AGAIN to fallback on default JEXL implementation</li>
+ * </ul>
  *
  * @since 3.0
  */
