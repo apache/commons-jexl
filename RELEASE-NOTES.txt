@@ -52,6 +52,7 @@ New Features in 3.2:
 * JEXL-226:      Add ?? operator support
 * JEXL-224:      The ability to overload call() operator in customized JexlArithmetic implementation
 * JEXL-212:      Restrict usage of assignment statements in JexlExpression
+* JEXL-175:      java.util.regex.Pattern creation operator (regex literals)
 
 Bugs Fixed in 3.2:
 ==================

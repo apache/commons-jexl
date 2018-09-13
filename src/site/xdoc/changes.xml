@@ -104,6 +104,9 @@
             <action dev="henrib" type="add" issue="JEXL-212" due-to="Dmitri Blinov">
                 Restrict usage of assignment statements in JexlExpression
             </action>
+            <action dev="Dmitri Blinov" type="add" issue="JEXL-175" due-to="Dmitri Blinov">
+                 java.util.regex.Pattern creation operator (regex literals)
+            </action>
         </release>
         <release version="3.1" date="2017-04-14">
             <action dev="henrib" type="add" issue="JEXL-222" due-to="Dmitri Blinov">
