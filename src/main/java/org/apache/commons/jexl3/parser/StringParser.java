@@ -59,28 +59,7 @@ public class StringParser {
      * @return the built string
      */
     public static String buildRegex(CharSequence str) {
-
-        int length = str.length();
-
-        StringBuilder strb = new StringBuilder(length);
-
-        int start = 2;
-        int end = length - 1;
-
-        for (int i = start; i < end; ++i) {
-            char c = str.charAt(i);
-            if (c == '\\') {
-                if (i+1 < end && str.charAt(i+1) == '/') {
-                    strb.append("/");
-                    i++;
-                } else {
-                    strb.append(c);
-                }
-            } else {
-                strb.append(c);
-            }
-        }
-        return strb.toString();
+        return buildString(str.subSequence(1, str.length()), true);
     }
 
     /**
@@ -178,6 +157,7 @@ public class StringParser {
 
     /**
      * Escapes a String representation, expand non-ASCII characters as Unicode escape sequence.
+     * @param delim the delimiter character
      * @param str the string to escape
      * @return the escaped representation
      */

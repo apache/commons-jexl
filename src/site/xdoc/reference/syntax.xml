@@ -346,7 +346,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Regex literals</td>
+                    <td>Regular expression (regex) literals</td>
                     <td>
                         Start with <code>~/</code> and ends with <code>/</code> delimiters, e.g.
                         <code>~/ABC.*/</code>
