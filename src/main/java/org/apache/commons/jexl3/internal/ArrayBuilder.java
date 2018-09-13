@@ -54,6 +54,8 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
         return prim == null ? parm : prim;
     }
 
+    protected static Object[] EMPTY_ARRAY = new Object[0];
+
     /** The intended class array. */
     protected Class<?> commonClass = null;
     /** Whether the array stores numbers. */
@@ -119,6 +121,11 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
         if (unboxing) {
             commonClass = unboxingClass(commonClass);
         }
+
+        if (commonClass == Object.class) {
+            return untyped.size() > 0 ? untyped.toArray() : EMPTY_ARRAY;
+        }
+
         // allocate and fill up the typed array
         Object typed = Array.newInstance(commonClass, size);
         for (int i = 0; i < size; ++i) {
