@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="Dmitri Blinov" type="add" issue="JEXL-175" due-to="Dmitri Blinov">
+                 Add do...while(...) loops
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-272">
                 Dereferencing null property not reported on method call
             </action>
