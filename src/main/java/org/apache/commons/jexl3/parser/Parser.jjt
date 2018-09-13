@@ -121,6 +121,7 @@ TOKEN_MGR_DECLS : {
     | < ELSE : "else" >
     | < FOR : "for" >
     | < WHILE : "while" >
+    | < DO : "do" >
     | < NEW : "new" >
     | < VAR : "var" >
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
@@ -318,6 +319,7 @@ void Statement() #void : {}
     | IfStatement()
     | ForeachStatement()
     | WhileStatement()
+    | DoWhileStatement()
     | ExpressionStatement()
     | ReturnStatement()
     | Continue()
@@ -345,10 +347,14 @@ void IfStatement() : {}
     ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | Statement()) )?
 }
 
-
 void WhileStatement() : {}
 {
     <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount += 1; }  (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
+}
+
+void DoWhileStatement() : {}
+{
+    <DO> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount -= 1; }
 }
 
 void ReturnStatement() : {}
