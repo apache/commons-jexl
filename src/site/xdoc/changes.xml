@@ -26,6 +26,12 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="Dmitri Blinov" type="add" issue="JEXL-175" due-to="Dmitri Blinov">
+                 Add do...while(...) loops
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-272">
+                Dereferencing null property not reported on method call
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-271" due-to="Dmitri Blinov">
                 Hoisted variable is lost when currying lambda
             </action>
@@ -100,6 +106,9 @@
             </action>
             <action dev="henrib" type="add" issue="JEXL-212" due-to="Dmitri Blinov">
                 Restrict usage of assignment statements in JexlExpression
+            </action>
+            <action dev="Dmitri Blinov" type="add" issue="JEXL-175" due-to="Dmitri Blinov">
+                 java.util.regex.Pattern creation operator (regex literals)
             </action>
         </release>
         <release version="3.1" date="2017-04-14">

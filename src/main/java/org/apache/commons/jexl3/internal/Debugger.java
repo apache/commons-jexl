@@ -146,7 +146,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      */
     public Debugger() {
     }
-    
+
     /**
      * Resets this debugger state.
      */
@@ -158,7 +158,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         indentLevel = 0;
         indent = 2;
     }
-    
+
     /**
      * Position the debugger on the root of an expression.
      * @param jscript the expression
@@ -737,7 +737,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
             String[] params = node.getParameters();
 
-            if (named || params == null || params.length != 1 || node.isVarArgs()) 
+            if (named || params == null || params.length != 1 || node.isVarArgs())
                 builder.append('(');
 
             if (params != null && params.length > 0) {
@@ -751,7 +751,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                     builder.append("...");
             }
 
-            if (named || params == null || params.length != 1 || node.isVarArgs()) 
+            if (named || params == null || params.length != 1 || node.isVarArgs())
                 builder.append(')');
 
             if (named) {
@@ -765,7 +765,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
                    if (!(child instanceof ASTBlock))
                        expr = true;
-                } 
+                }
 
                 if (expr) {
                     builder.append("=>");

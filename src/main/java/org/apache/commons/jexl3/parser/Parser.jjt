@@ -149,7 +149,7 @@ TOKEN_MGR_DECLS : {
     | < LBRACKET : "[" >
     | < RBRACKET : "]" >
     | < SEMICOL : ";" >
-    | < COLON : ":" > 
+    | < COLON : ":" >
     | < COMMA : "," >
     | < DOT : "." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < QDOT : "?." > { pushDot(); } /* Lexical state is now DOT_ID */
@@ -460,7 +460,7 @@ LinkedList<String> lstr = new LinkedList<String>();
 
 void Expression() #void : {}
 {
-  AssignmentExpression() 
+  AssignmentExpression()
 }
 
 void AssignmentExpression() #void : {}
@@ -507,7 +507,7 @@ void ConditionalOrExpression() #void : {}
 {
   ConditionalAndExpression()
   ( LOOKAHEAD(2) (
-     <OR> ConditionalAndExpression() #OrNode(2) 
+     <OR> ConditionalAndExpression() #OrNode(2)
   ) )*
 }
 
@@ -515,7 +515,7 @@ void ConditionalAndExpression() #void : {}
 {
   InclusiveOrExpression()
   ( LOOKAHEAD(2) (
-     <AND> InclusiveOrExpression() #AndNode(2) 
+     <AND> InclusiveOrExpression() #AndNode(2)
   ) )*
 }
 
@@ -523,7 +523,7 @@ void InclusiveOrExpression() #void : {}
 {
   ExclusiveOrExpression()
   ( LOOKAHEAD(2) (
-     <or> ExclusiveOrExpression() #BitwiseOrNode(2) 
+     <or> ExclusiveOrExpression() #BitwiseOrNode(2)
   ) )*
 }
 
@@ -531,7 +531,7 @@ void ExclusiveOrExpression() #void : {}
 {
   AndExpression()
   ( LOOKAHEAD(2) (
-     <xor> AndExpression() #BitwiseXorNode(2) 
+     <xor> AndExpression() #BitwiseXorNode(2)
   ) )*
 }
 
@@ -539,7 +539,7 @@ void AndExpression() #void : {}
 {
   EqualityExpression()
   ( LOOKAHEAD(2) (
-     <and> EqualityExpression() #BitwiseAndNode(2) 
+     <and> EqualityExpression() #BitwiseAndNode(2)
   ) )*
 }
 
@@ -637,7 +637,7 @@ void EnumerationAccess() #void : {}
     |
     LOOKAHEAD(<DOTC>) MapProjection()
     |
-    LOOKAHEAD(<DOTP>) Selection()   
+    LOOKAHEAD(<DOTP>) Selection()
 }
 
 void Reduction() #ReductionNode : {}
@@ -669,7 +669,7 @@ void ProjectionExpression() #void : {}
 
 void ProjectionMemberExpression() #void : {}
 {
-    LOOKAHEAD(ProjectionMethodCall()) ProjectionMethodCall() 
+    LOOKAHEAD(ProjectionMethodCall()) ProjectionMethodCall()
     |
     ProjectionMemberAccess()
 }
@@ -697,8 +697,8 @@ void IteratorExpression() #void : {}
 
 void InlinePropertyExpression() #void : {}
 {
-  ValueExpression() 
-  ( LOOKAHEAD(<LCURLY>) ( 
+  ValueExpression()
+  ( LOOKAHEAD(<LCURLY>) (
     InlinePropertyAssignment() #InlinePropertyNode(2)
   ) )*
 
@@ -849,7 +849,7 @@ void EmptyListLiteral() #ArrayLiteral() : {}
 
 void ArrayLiteral() : {}
 {
-   <LBRACKET> 
+   <LBRACKET>
       (Expression() (LOOKAHEAD(<COMMA> Expression()) <COMMA> Expression() )*)? (LOOKAHEAD(2) <COMMA> ExtendedLiteral())?
    <RBRACKET>
 }
@@ -867,7 +867,7 @@ void MapLiteral() : {}
 void MapElement() #void : {}
 {
     LOOKAHEAD(<mult> <COLON> <ELLIPSIS>) <mult> <COLON> <ELLIPSIS> InlinePropertyExpression() #MapEnumerationNode(1)
-    | 
+    |
     MapEntry()
 
 }
@@ -1071,7 +1071,7 @@ void PrimaryExpression() #void : {}
     |
     LOOKAHEAD( <LCURLY> <RCURLY> ) SetLiteral()
     |
-    LOOKAHEAD( EmptyListLiteral() ) EmptyListLiteral()   
+    LOOKAHEAD( EmptyListLiteral() ) EmptyListLiteral()
     |
     LOOKAHEAD( <LBRACKET> ) ArrayLiteral()
     |
@@ -1095,7 +1095,7 @@ void MethodCall() #void : {}
 
 void MemberExpression() #void : {}
 {
-    LOOKAHEAD(MethodCall()) MethodCall() 
+    LOOKAHEAD(MethodCall()) MethodCall()
     |
     MemberAccess()
 }
@@ -1104,4 +1104,3 @@ void ValueExpression() #void : {}
 {
     ( PrimaryExpression() ( LOOKAHEAD(2) MemberExpression() )*) #Reference(>1)
 }
-
