@@ -62,7 +62,7 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void testParameterlessFunction() throws Exception {
-        JexlEngine jexl = new Engine();
+        JexlEngine jexl = createEngine();
         String strs = "var s = function { 21 + 21 }; s()";
         JexlScript s42 = jexl.createScript(strs);
         Object result = s42.execute(null);
