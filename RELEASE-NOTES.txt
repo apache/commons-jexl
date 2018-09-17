@@ -39,6 +39,7 @@ What's new in 3.2:
 New Features in 3.2:
 ====================
 
+* JEXL-275:      Allow safe navigation as option
 * JEXL-273:      Add do...while(...) loops
 * JEXL-264:      Allow space, quote & double-quote in identifiers
 * JEXL-260:      Automatically inject JexlContext in constructor call when possible

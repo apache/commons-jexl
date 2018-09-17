@@ -114,6 +114,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.concurrent.Callable;
+import org.apache.commons.jexl3.JxltEngine;
 
 
 /**
@@ -1125,13 +1126,13 @@ public class Interpreter extends InterpreterBase {
             if (antish && ant != null) {
                 boolean undefined = !(context.has(ant.toString()) || isLocalVariable(node, 0));
                 // variable unknown in context and not a local
-                return node.isSafeLhs()
+                return node.isSafeLhs(jexl.safe)
                         ? null
                         : unsolvableVariable(node, ant.toString(), undefined);
             }
             if (ptyNode != null) {
                 // am I the left-hand side of a safe op ?
-                return ptyNode.isSafeLhs()
+                return ptyNode.isSafeLhs(jexl.safe)
                        ? null
                        : unsolvableProperty(node, stringifyProperty(ptyNode), false, null);
             }
@@ -1447,7 +1448,7 @@ public class Interpreter extends InterpreterBase {
                 } else if (context.has(methodName)) {
                     functor = context.get(methodName);
                     isavar = functor != null;
-                }
+                } 
                 // name is a variable, cant be cached
                 cacheable &= !isavar;
             }
@@ -1465,7 +1466,7 @@ public class Interpreter extends InterpreterBase {
         } else {
             return unsolvableMethod(node, "?");
         }
-
+        
         // solving the call site
         CallDispatcher call = new CallDispatcher(node, cacheable);
         try {
@@ -1473,7 +1474,7 @@ public class Interpreter extends InterpreterBase {
             Object eval = call.tryEval(target, methodName, argv);
             if (JexlEngine.TRY_FAILED != eval) {
                 return eval;
-            }
+            } 
             boolean functorp = false;
             boolean narrow = false;
             // pseudo loop to try acquiring methods without and with argument narrowing

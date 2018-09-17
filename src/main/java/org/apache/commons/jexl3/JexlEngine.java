@@ -130,7 +130,7 @@ public abstract class JexlEngine {
          * @return true if strict, false otherwise
          */
         Boolean isStrict();
-
+        
         /**
          * Checks whether the arithmetic triggers errors during evaluation when null is used as an operand.
          *

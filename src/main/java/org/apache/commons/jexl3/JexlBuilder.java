@@ -82,6 +82,9 @@ public class JexlBuilder {
     /** Whether this engine is in lenient or strict mode; if unspecified, use the arithmetic lenient property. */
     private Boolean strict = null;
 
+    /** Whether this engine is in tolerant mode. */
+    private Boolean safe = false;
+    
     /** Whether error messages will carry debugging information. */
     private Boolean debug = null;
 
@@ -285,6 +288,25 @@ public class JexlBuilder {
         return this.strict;
     }
 
+    /**
+     * Sets whether the engine considers dereferencing null in navigation expressions
+     * as errors or evaluates them as null.
+     * <p><code>x.y()</code> if x is null throws an exception when not safe,
+     * return null and warns if it is.<p>
+     *
+     * @param flag true means safe navigation, false throws exception when dereferencing null
+     * @return this builder
+     */
+    public JexlBuilder safe(boolean flag) {
+        this.safe = flag;
+        return this;
+    }
+
+    /** @return true if safe, false otherwise */
+    public Boolean safe() {
+        return this.safe;
+    }
+    
     /**
      * Sets whether the engine will report debugging information when error occurs.
      *
