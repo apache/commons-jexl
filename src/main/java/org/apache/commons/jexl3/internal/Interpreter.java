@@ -50,6 +50,7 @@ import org.apache.commons.jexl3.parser.ASTDivNode;
 import org.apache.commons.jexl3.parser.ASTEQNode;
 import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
+import org.apache.commons.jexl3.parser.ASTElvisNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
 import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
@@ -844,13 +845,17 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTTernaryNode node, Object data) {
         Object condition = node.jjtGetChild(0).jjtAccept(this, data);
+        if (condition != null && arithmetic.toBoolean(condition))
+            return node.jjtGetChild(1).jjtAccept(this, data);
         if (node.jjtGetNumChildren() == 3) {
-            if (condition != null && arithmetic.toBoolean(condition)) {
-                return node.jjtGetChild(1).jjtAccept(this, data);
-            } else {
-                return node.jjtGetChild(2).jjtAccept(this, data);
-            }
+            return node.jjtGetChild(2).jjtAccept(this, data);
         }
+        return null;
+    }
+
+    @Override
+    protected Object visit(ASTElvisNode node, Object data) {
+        Object condition = node.jjtGetChild(0).jjtAccept(this, data);
         if (condition != null && arithmetic.toBoolean(condition)) {
             return condition;
         } else {

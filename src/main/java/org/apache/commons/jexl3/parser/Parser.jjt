@@ -458,13 +458,20 @@ void AssignmentExpression() #void : {}
 void ConditionalExpression() #void : {}
 {
   ConditionalOrExpression()
-  (
-    <QMARK> Expression() <COLON> Expression() #TernaryNode(3)
-  |
-    <ELVIS> Expression() #TernaryNode(2)
-  |
+  ( LOOKAHEAD(2) (
+    <QMARK> TernaryExpression() 
+    |
+    <ELVIS> Expression() #ElvisNode(2)
+    |
     <NULLP> Expression() #NullpNode(2)
-  )?
+  ) )?
+}
+
+void TernaryExpression() #void : {}
+{
+  LOOKAHEAD(Expression() <COLON>) Expression() <COLON> Expression() #TernaryNode(3)
+  |
+  Expression() #TernaryNode(2)
 }
 
 void ConditionalOrExpression() #void : {}

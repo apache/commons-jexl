@@ -262,6 +262,65 @@ public class IfTest extends JexlTestCase {
 
     /**
      * Ternary operator condition undefined or null evaluates to false
+     * independantly of engine flags.
+     * @throws Exception
+     */
+    @Test
+    public void testTernaryOptional() throws Exception {
+        JexlEngine jexl = JEXL;
+
+        JexlEvalContext jc = new JexlEvalContext();
+        JexlExpression e = jexl.createExpression("x.y.z = foo ?'bar'");
+        Object o;
+
+        // undefined foo
+        for (int l = 0; l < 4; ++l) {
+            jc.setStrict((l & 1) == 0);
+            jc.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            Assert.assertNull(o);
+            o = jc.get("x.y.z");
+            Assert.assertNull(o);
+        }
+
+        jc.set("foo", null);
+
+        for (int l = 0; l < 4; ++l) {
+            jc.setStrict((l & 1) == 0);
+            jc.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            Assert.assertNull(o);
+            o = jc.get("x.y.z");
+            Assert.assertNull(o);
+        }
+
+        jc.set("foo", Boolean.FALSE);
+
+        for (int l = 0; l < 4; ++l) {
+            jc.setStrict((l & 1) == 0);
+            jc.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            Assert.assertNull(o);
+            o = jc.get("x.y.z");
+            Assert.assertNull(o);
+        }
+
+        jc.set("foo", Boolean.TRUE);
+
+        for (int l = 0; l < 4; ++l) {
+            jc.setStrict((l & 1) == 0);
+            jc.setSilent((l & 2) != 0);
+            o = e.evaluate(jc);
+            Assert.assertEquals("Should be bar", "bar", o);
+            o = jc.get("x.y.z");
+            Assert.assertEquals("Should be bar", "bar", o);
+        }
+
+        debuggerCheck(jexl);
+    }
+
+    /**
+     * Ternary operator condition undefined or null evaluates to false
      * independently of engine flags; same for null coalescing operator.
      * @throws Exception
      */

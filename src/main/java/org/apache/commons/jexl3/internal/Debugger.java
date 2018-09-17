@@ -38,6 +38,7 @@ import org.apache.commons.jexl3.parser.ASTDivNode;
 import org.apache.commons.jexl3.parser.ASTEQNode;
 import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
+import org.apache.commons.jexl3.parser.ASTElvisNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
 import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
@@ -908,16 +909,20 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTTernaryNode node, Object data) {
         accept(node.jjtGetChild(0), data);
+        builder.append("? ");
+        accept(node.jjtGetChild(1), data);
         if (node.jjtGetNumChildren() > 2) {
-            builder.append("? ");
-            accept(node.jjtGetChild(1), data);
             builder.append(" : ");
             accept(node.jjtGetChild(2), data);
-        } else {
-            builder.append("?:");
-            accept(node.jjtGetChild(1), data);
-
         }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTElvisNode node, Object data) {
+        accept(node.jjtGetChild(0), data);
+        builder.append("?:");
+        accept(node.jjtGetChild(1), data);
         return data;
     }
 
