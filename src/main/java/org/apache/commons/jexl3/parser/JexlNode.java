@@ -244,6 +244,9 @@ public abstract class JexlNode extends SimpleNode {
             if (walk instanceof ASTTernaryNode) {
                 return true;
             }
+            if (walk instanceof ASTElvisNode) {
+                return true;
+            }
             if (walk instanceof ASTNullpNode) {
                 return true;
             }
