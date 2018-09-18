@@ -926,12 +926,6 @@
 
                         Where <code>item</code> is a local variable.</p>
                         <p>Note that the loop variable <code>item</code> is accessible after loop evaluation</p>
-                        <p>The syntax with a key and a value variable is also supported:
-                        <code>for (var i, item : list) {
-                            if (i lt 3) x = x + item;
-                            }</code>
-                        Where <code>i</code> is the index and <code>item</code> is a value variable.
-                        For the instances of Map iterator the index variable is the Map key, and the value variable is the Map value</p>
                         <p>The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>unsupported</strong>.</p>
                     </td>
                 </tr>
