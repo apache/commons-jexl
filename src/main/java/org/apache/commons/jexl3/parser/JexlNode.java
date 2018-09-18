@@ -195,11 +195,12 @@ public abstract class JexlNode extends SimpleNode {
     /**
      * Whether this node is the left-hand side of a safe access identifier as in.
      * For instance, in 'x?.y' , 'x' is safe.
+     * @param safe whether the engine is in safe-navigation mode
      * @return true if safe lhs, false otherwise
      */
-    public boolean isSafeLhs() {
+    public boolean isSafeLhs(boolean safe) {
         if (this instanceof ASTReference) {
-            return jjtGetChild(0).isSafeLhs();
+            return jjtGetChild(0).isSafeLhs(safe);
         }
         JexlNode parent = this.jjtGetParent();
         if (parent == null) {
@@ -219,7 +220,11 @@ public abstract class JexlNode extends SimpleNode {
         // seek next child in parent
         if (rhs >= 0 && rhs < nsiblings) {
             JexlNode rsibling = parent.jjtGetChild(rhs);
-            if (rsibling instanceof ASTIdentifierAccess && ((ASTIdentifierAccess) rsibling).isSafe()) {
+            if (rsibling instanceof ASTMethodNode || rsibling instanceof ASTFunctionNode) {
+                rsibling = rsibling.jjtGetChild(0);
+            }
+            if (rsibling instanceof ASTIdentifierAccess
+                && (((ASTIdentifierAccess) rsibling).isSafe() || safe)) {
                 return true;
             }
         }

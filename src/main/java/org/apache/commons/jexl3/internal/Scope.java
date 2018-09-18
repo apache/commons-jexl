@@ -47,6 +47,10 @@ public final class Scope {
      * The map of local hoisted variables to parent scope variables, ie closure.
      */
     private Map<Integer, Integer> hoistedVariables = null;
+    /**
+     * The empty string array.
+     */
+    private static final String[] EMPTY_STRS = new String[0];
 
     /**
      * Creates a new scope with a list of parameters.
@@ -109,7 +113,7 @@ public final class Scope {
     private Integer getSymbol(String name, boolean hoist) {
         Integer register = namedVariables != null ? namedVariables.get(name) : null;
         if (register == null && hoist && parent != null) {
-            Integer pr = parent.getSymbol(name, false);
+            Integer pr = parent.getSymbol(name, true);
             if (pr != null) {
                 if (hoistedVariables == null) {
                     hoistedVariables = new LinkedHashMap<Integer, Integer>();
@@ -229,7 +233,7 @@ public final class Scope {
      * @return the symbol names
      */
     public String[] getSymbols() {
-        return namedVariables != null ? namedVariables.keySet().toArray(new String[0]) : new String[0];
+        return namedVariables != null ? namedVariables.keySet().toArray(new String[0]) : EMPTY_STRS;
     }
 
     /**
@@ -237,17 +241,28 @@ public final class Scope {
      * @return the parameter names
      */
     public String[] getParameters() {
-        if (namedVariables != null && parms > 0) {
-            String[] pa = new String[parms];
+        return getParameters(0);
+    }
+        
+    /**
+     * Gets this script parameters.
+     * @param bound number of known bound parameters (curry)
+     * @return the parameter names
+     */
+    protected String[] getParameters(int bound) {
+        int unbound = parms - bound;
+        if (namedVariables != null && unbound > 0) {
+            String[] pa = new String[unbound];
             int p = 0;
             for (Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
-                if (entry.getValue().intValue() < parms) {
+                int argn = entry.getValue();
+                if (argn >= bound && argn < parms) {
                     pa[p++] = entry.getKey();
                 }
             }
             return pa;
         } else {
-            return null;
+            return EMPTY_STRS;
         }
     }
 
@@ -267,7 +282,7 @@ public final class Scope {
             }
             return pa;
         } else {
-            return null;
+            return EMPTY_STRS;
         }
     }
 
@@ -293,6 +308,14 @@ public final class Scope {
             scope = s;
             stack = r;
             curried = c;
+        }
+
+        /**
+         * Gets this script unbound parameters, i.e. parameters not bound through curry().
+         * @return the parameter names
+         */
+        public String[] getUnboundParameters() {
+            return scope.getParameters(curried);
         }
 
         /**

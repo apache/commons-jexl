@@ -22,7 +22,6 @@ import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 
-import org.apache.commons.jexl3.parser.JexlNode;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -129,8 +128,19 @@ public class Script implements JexlScript, JexlExpression {
     public String getParsedText(int indent) {
         Debugger debug = new Debugger();
         debug.setIndentation(indent);
-        debug.debug(script);
+        debug.debug(script, false);
         return debug.toString();
+    }
+
+    @Override
+    public String toString() {
+        CharSequence src = source;
+        if (src == null) {
+            Debugger debug = new Debugger();
+            debug.debug(script, false);
+            src = debug.toString();
+        }
+        return src.toString();
     }
 
     @Override
@@ -162,17 +172,6 @@ public class Script implements JexlScript, JexlExpression {
     }
 
     @Override
-    public String toString() {
-        CharSequence src = source;
-        if (src == null) {
-            Debugger debug = new Debugger();
-            debug.debug(script);
-            src = debug.toString();
-        }
-        return src.toString();
-    }
-
-    @Override
     public Object evaluate(JexlContext context) {
         return execute(context);
     }
@@ -193,83 +192,25 @@ public class Script implements JexlScript, JexlExpression {
         return interpreter.interpret(script);
     }
 
-    /**
-     * A script whose parameters are (partially) bound.
-     */
-    public static class Curried extends Script {
-        /** The evaluation frame. */
-        private final Scope.Frame frame;
-
-        /**
-         * Creates a curried version of this script.
-         * @param base the base script
-         * @param args the arguments
-         */
-        protected Curried(Script base, Object[] args) {
-            super(base.jexl, base.source, base.script);
-            Scope.Frame sf = (base instanceof Curried) ? ((Curried) base).frame : null;
-            if (sf != null) {
-                frame = sf.assign(args);
-            } else {
-                frame = script.createFrame(args);
-            }
-        }
-
-        @Override
-        protected Scope.Frame createFrame(Object[] args) {
-            return frame != null? frame.assign(args) : super.createFrame(args);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return this == obj;
-        }
-
-        @Override
-        public int hashCode() {
-            return System.identityHashCode(this);
-        }
-
-        @Override
-        public Object execute(JexlContext context) {
-            return execute(context, (Object[])null);
-        }
-
-        @Override
-        public Object execute(JexlContext context, Object... args) {
-            Scope.Frame callFrame = null;
-            if (frame != null) {
-                callFrame = frame.assign(args);
-            }
-            Interpreter interpreter = jexl.createInterpreter(context, callFrame);
-            JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
-            return interpreter.interpret(block);
-        }
-    }
-
     @Override
     public JexlScript curry(Object... args) {
         String[] parms = script.getParameters();
         if (parms == null || parms.length == 0) {
             return this;
         }
-        return new Curried(this, args);
+        return new Closure(this, args);
     }
 
-    /**
-     * Gets this script parameters.
-     * @return the parameters or null
-     * @since 3.0
-     */
     @Override
     public String[] getParameters() {
         return script.getParameters();
     }
 
-    /**
-     * Gets this script local variables.
-     * @return the local variables or null
-     */
+    @Override
+    public String[] getUnboundParameters() {
+        return getParameters();
+    }
+
     @Override
     public String[] getLocalVariables() {
         return script.getLocalVariables();

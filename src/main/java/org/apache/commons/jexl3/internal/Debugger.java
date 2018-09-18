@@ -35,6 +35,7 @@ import org.apache.commons.jexl3.parser.ASTBreak;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDivNode;
+import org.apache.commons.jexl3.parser.ASTDoWhileStatement;
 import org.apache.commons.jexl3.parser.ASTEQNode;
 import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
@@ -70,6 +71,7 @@ import org.apache.commons.jexl3.parser.ASTOrNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.ASTReferenceExpression;
+import org.apache.commons.jexl3.parser.ASTRegexLiteral;
 import org.apache.commons.jexl3.parser.ASTReturnStatement;
 import org.apache.commons.jexl3.parser.ASTSWNode;
 import org.apache.commons.jexl3.parser.ASTSetAddNode;
@@ -127,7 +129,19 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      */
     public Debugger() {
     }
-
+    
+    /**
+     * Resets this debugger state.
+     */
+    public void reset() {
+        builder.setLength(0);
+        cause = null;
+        start = 0;
+        end = 0;
+        indentLevel = 0;
+        indent = 2;
+    }
+    
     /**
      * Position the debugger on the root of an expression.
      * @param jscript the expression
@@ -282,6 +296,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             || child instanceof ASTIfStatement
             || child instanceof ASTForeachStatement
             || child instanceof ASTWhileStatement
+            || child instanceof ASTDoWhileStatement
             || child instanceof ASTAnnotation)) {
             builder.append(';');
             if (indent > 0) {
@@ -906,6 +921,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
+    protected Object visit(ASTRegexLiteral node, Object data) {
+        String img = node.toString().replace("/", "\\/");
+        return check(node, "~/" + img + "/", data);
+    }
+
+    @Override
     protected Object visit(ASTTernaryNode node, Object data) {
         accept(node.jjtGetChild(0), data);
         if (node.jjtGetNumChildren() > 2) {
@@ -957,6 +978,20 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         } else {
             builder.append(';');
         }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTDoWhileStatement node, Object data) {
+        builder.append("do ");
+
+        acceptStatement(node.jjtGetChild(0), data);
+
+        builder.append(" while (");
+
+        accept(node.jjtGetChild(1), data);
+
+        builder.append(")");
         return data;
     }
 

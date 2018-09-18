@@ -16,22 +16,47 @@
  */
 package org.apache.commons.jexl3.parser;
 
-/**
- * Lambda (function).
- */
-public final class ASTJexlLambda extends ASTJexlScript {
-    ASTJexlLambda(int id) {
+import java.util.regex.Pattern;
+
+public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant<Pattern> {
+
+    /** The actual literal value; the inherited 'value' member may host a cached getter. */
+
+    private Pattern literal = null;
+
+    ASTRegexLiteral(int id) {
         super(id);
     }
 
-    ASTJexlLambda(Parser p, int id) {
+    ASTRegexLiteral(Parser p, int id) {
         super(p, id);
     }
 
+    @Override
+    public String toString() {
+        return literal != null ? literal.toString() : "";
+    }
+
     /**
-     * @return true if outermost script.
+     * Gets the literal value.
+     * @return the Pattern literal
      */
-    public boolean isTopLevel() {
-        return jjtGetParent() == null;
+    @Override
+    public Pattern getLiteral() {
+        return this.literal;
+    }
+
+    @Override
+    protected boolean isConstant(boolean literal) {
+        return true;
+    }
+
+    void setLiteral(String literal) {
+        this.literal = Pattern.compile(literal);
+    }
+
+    @Override
+    public Object jjtAccept(ParserVisitor visitor, Object data) {
+        return visitor.visit(this, data);
     }
 }

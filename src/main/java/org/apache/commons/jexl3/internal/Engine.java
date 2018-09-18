@@ -94,6 +94,10 @@ public class Engine extends JexlEngine {
      */
     protected final boolean strict;
     /**
+     * Whether this engine considers null in navigation expression as errors.
+     */
+    protected final boolean safe;
+    /**
      * Whether expressions evaluated by this engine will throw exceptions (false) or return null (true) on errors.
      * Default is false.
      */
@@ -156,6 +160,7 @@ public class Engine extends JexlEngine {
     public Engine(JexlBuilder conf) {
         // options:
         this.strict = conf.strict() == null ? true : conf.strict();
+        this.safe = conf.safe() == null ? false : conf.safe();
         this.silent = conf.silent() == null ? false : conf.silent();
         this.cancellable = conf.cancellable() == null ? !silent && strict : conf.cancellable();
         this.debug = conf.debug() == null ? true : conf.debug();

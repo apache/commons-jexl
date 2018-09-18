@@ -39,23 +39,29 @@ What's new in 3.2:
 New Features in 3.2:
 ====================
 
+* JEXL-275:      Allow safe navigation as option
+* JEXL-273:      Add do...while(...) loops
 * JEXL-264:      Allow space, quote & double-quote in identifiers
 * JEXL-260:      Automatically inject JexlContext in constructor call when possible
 * JEXL-252:      Allow for interpolated strings to be used in property access operators
-* JEXL-250:      Safe navigation operator
+* JEXL-250:      Safe navigation operator (?.)
 * JEXL-248:      Allow range subexpression as an array property assignment identifier
 * JEXL-243:      Allow restricting available features in Script/Expressions
 * JEXL-238:      Restrict getLiteralClass to a Number for NumberLiterals
 * JEXL-237:      Ability to restrict usage of certain names when declaring local variables
 * JEXL-236:      Support CharSequence in size(), empty() and contains() operators
 * JEXL-234:      Extend application of operators startsWith and endsWith from String to CharSequence types
-* JEXL-226:      add ?? operator support
+* JEXL-226:      Add ?? operator support
 * JEXL-224:      The ability to overload call() operator in customized JexlArithmetic implementation
 * JEXL-212:      Restrict usage of assignment statements in JexlExpression
+* JEXL-175:      java.util.regex.Pattern creation operator (regex literals)
 
 Bugs Fixed in 3.2:
 ==================
 
+* JEXL-272:      Dereferencing null property not reported on method call
+* JEXL-271:      Hoisted variable is lost when currying lambda
+* JEXL-270:      Wrong Script$Curried creation when script.curry() method is called inside script
 * JEXL-261:      JexlEngine.setClassLoader(...) should reload namespaces that are classes
 * JEXL-246:      Intermittent ambiguous method invocation when processing assignOverload
 * JEXL-245:      Engine in strict mode fails to fail on unsolvable variables or properties

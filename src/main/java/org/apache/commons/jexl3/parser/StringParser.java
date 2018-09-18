@@ -54,6 +54,15 @@ public class StringParser {
     }
 
     /**
+     * Builds a regex pattern string, handles escaping '/' through '\/' syntax.
+     * @param str the string to build from
+     * @return the built string
+     */
+    public static String buildRegex(CharSequence str) {
+        return buildString(str.subSequence(1, str.length()), true);
+    }
+
+    /**
      * Read the remainder of a string till a given separator,
      * handles escaping through '\' syntax.
      * @param strb the destination buffer to copy characters into
@@ -148,6 +157,7 @@ public class StringParser {
 
     /**
      * Escapes a String representation, expand non-ASCII characters as Unicode escape sequence.
+     * @param delim the delimiter character
      * @param str the string to escape
      * @return the escaped representation
      */

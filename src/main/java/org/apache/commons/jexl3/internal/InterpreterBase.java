@@ -24,6 +24,9 @@ import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTFunctionNode;
+import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
@@ -211,17 +214,51 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Triggered when a property can not be resolved.
      * @param node  the node where the error originated from
-     * @param var   the property name
+     * @param property   the property node
      * @param cause the cause if any
+     * @param undef whether the property is undefined or null
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object unsolvableProperty(JexlNode node, String var, Throwable cause) {
+    protected Object unsolvableProperty(JexlNode node, String property, boolean undef, Throwable cause) {
         if (isStrictEngine()) {
-            throw new JexlException.Property(node, var, cause);
+            throw new JexlException.Property(node, property, undef, cause);
         } else if (logger.isDebugEnabled()) {
-            logger.debug(JexlException.propertyError(node, var), cause);
+            logger.debug(JexlException.propertyError(node, property, undef));
         }
         return null;
+    }
+    
+    /**
+     * Pretty-prints a failing property (de)reference.
+     * <p>Used by calls to unsolvableProperty(...).</p>
+     * @param node the property node
+     * @return the (pretty) string
+     */
+    protected String stringifyProperty(JexlNode node) {
+        if (node instanceof ASTArrayAccess) {
+            if (node.jjtGetChild(0) != null) {
+                return "["
+                       + node.jjtGetChild(0).toString()
+                       + "]";
+            }
+            return "[???]";
+        }
+        if (node instanceof ASTMethodNode) {
+            if (node.jjtGetChild(0) != null) {
+                return "."
+                       + node.jjtGetChild(0).toString()
+                       + "(...)";
+            }
+            return ".???(...)";
+        }
+        if (node instanceof ASTFunctionNode) {
+            if (node.jjtGetChild(0) != null) {
+                return node.jjtGetChild(0).toString()
+                       + "(...)";
+            }
+            return "???(...)";
+        }
+        return node.toString();
     }
 
     /**
@@ -299,4 +336,305 @@ public abstract class InterpreterBase extends ParserVisitor {
             throw new JexlException.Cancel(node);
         }
     }
+    
+    /**
+     * Concatenate arguments in call(...).
+     * <p>When target == context, we are dealing with a global namespace function call
+     * @param target the pseudo-method owner, first to-be argument
+     * @param narrow whether we should attempt to narrow number arguments
+     * @param args   the other (non null) arguments
+     * @return the arguments array
+     */
+    protected Object[] functionArguments(Object target, boolean narrow, Object[] args) {
+        // when target == context, we are dealing with the null namespace
+        if (target == null || target == context) {
+            if (narrow) {
+                arithmetic.narrowArguments(args);
+            }
+            return args;
+        }
+        // makes target 1st args, copy others - optionally narrow numbers
+        Object[] nargv = new Object[args.length + 1];
+        if (narrow) {
+            nargv[0] = functionArgument(true, target);
+            for (int a = 1; a <= args.length; ++a) {
+                nargv[a] = functionArgument(true, args[a - 1]);
+            }
+        } else {
+            nargv[0] = target;
+            System.arraycopy(args, 0, nargv, 1, args.length);
+        }
+        return nargv;
+    }
+
+    /**
+     * Concatenate arguments in call(...).
+     * @param target the pseudo-method owner, first to-be argument
+     * @param narrow whether we should attempt to narrow number arguments
+     * @param args   the other (non null) arguments
+     * @return the arguments array
+     */
+    protected Object[] callArguments(Object target, boolean narrow, Object[] args) {
+        // makes target 1st args, copy others - optionally narrow numbers
+        Object[] nargv = new Object[args.length + 1];
+        if (narrow) {
+            nargv[0] = functionArgument(true, target);
+            for (int a = 1; a <= args.length; ++a) {
+                nargv[a] = functionArgument(true, args[a - 1]);
+            }
+        } else {
+            nargv[0] = target;
+            System.arraycopy(args, 0, nargv, 1, args.length);
+        }
+        return nargv;
+    }
+    
+    /**
+     * Optionally narrows an argument for a function call.
+     * @param narrow whether narrowing should occur
+     * @param arg    the argument
+     * @return the narrowed argument
+     */
+    protected Object functionArgument(boolean narrow, Object arg) {
+        return narrow && arg instanceof Number ? arithmetic.narrow((Number) arg) : arg;
+    }
+
+    /**
+     * Cached function call.
+     */
+    protected static class Funcall implements JexlNode.Funcall {
+        /** Whether narrow should be applied to arguments. */
+        protected final boolean narrow;
+        /** The JexlMethod to delegate the call to. */
+        protected final JexlMethod me;
+        /**
+         * Constructor.
+         * @param jme  the method
+         * @param flag the narrow flag
+         */
+        protected Funcall(JexlMethod jme, boolean flag) {
+            this.me = jme;
+            this.narrow = flag;
+        }
+
+        /**
+         * Try invocation.
+         * @param ii     the interpreter
+         * @param name   the method name
+         * @param target the method target
+         * @param args   the method arguments
+         * @return the method invocation result (or JexlEngine.TRY_FAILED)
+         */
+        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) {
+            return me.tryInvoke(name, target, ii.functionArguments(null, narrow, args));
+        }
+    }
+
+    /**
+     * Cached arithmetic function call.
+     */
+    protected static class ArithmeticFuncall extends Funcall {
+        /**
+         * Constructor.
+         * @param jme  the method
+         * @param flag the narrow flag
+         */
+        protected ArithmeticFuncall(JexlMethod jme, boolean flag) {
+            super(jme, flag);
+        }
+
+        @Override
+        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) {
+            return me.tryInvoke(name, ii.arithmetic, ii.functionArguments(target, narrow, args));
+        }
+    }
+
+    /**
+     * Cached context function call.
+     */
+    protected static class ContextFuncall extends Funcall {
+        /**
+         * Constructor.
+         * @param jme  the method
+         * @param flag the narrow flag
+         */
+        protected ContextFuncall(JexlMethod jme, boolean flag) {
+            super(jme, flag);
+        }
+
+        @Override
+        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) {
+            return me.tryInvoke(name, ii.context, ii.functionArguments(target, narrow, args));
+        }
+    }
+    
+    /**
+     * A ctor that needs a context as 1st argument.
+     */
+    protected static class ContextualCtor extends Funcall {
+        /**
+         * Constructor.
+         * @param jme the method
+         * @param flag the narrow flag
+         */
+        protected ContextualCtor(JexlMethod jme, boolean flag) {
+            super(jme, flag);
+        }
+
+        @Override
+        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) {
+            return me.tryInvoke(name, target, ii.callArguments(ii.context, narrow, args));
+        }
+    }
+    
+    /**
+     * Helping dispatch function calls.
+     */
+    protected class CallDispatcher {
+        /**
+         * The syntactic node.
+         */
+        final JexlNode node;
+        /**
+         * Whether solution is cacheable.
+         */
+        boolean cacheable = true;
+        /**
+         * Whether arguments have been narrowed.
+         */
+        boolean narrow = false;
+        /**
+         * The method to call.
+         */
+        JexlMethod vm = null;
+        /**
+         * The method invocation target.
+         */
+        Object target = null;
+        /**
+         * The actual arguments.
+         */
+        Object[] argv = null;
+        /**
+         * The cacheable funcall if any.
+         */
+        Funcall funcall = null;
+
+        /**
+         * Dispatcher ctor.
+         *
+         * @param anode the syntactic node.
+         * @param acacheable whether resolution can be cached
+         */
+        CallDispatcher(JexlNode anode, boolean acacheable) {
+            this.node = anode;
+            this.cacheable = acacheable;
+        }
+
+        /**
+         * Whether the method is a target method.
+         *
+         * @param ntarget the target instance
+         * @param mname the method name
+         * @param arguments the method arguments
+         * @return true if arithmetic, false otherwise
+         */
+        protected boolean isTargetMethod(Object ntarget, String mname, final Object[] arguments) {
+            // try a method
+            vm = uberspect.getMethod(ntarget, mname, arguments);
+            if (vm != null) {
+                argv = arguments;
+                target = ntarget;
+                if (cacheable && vm.isCacheable()) {
+                    funcall = new Funcall(vm, narrow);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Whether the method is a context method.
+         *
+         * @param mname the method name
+         * @param arguments the method arguments
+         * @return true if arithmetic, false otherwise
+         */
+        protected boolean isContextMethod(String mname, final Object[] arguments) {
+            vm = uberspect.getMethod(context, mname, arguments);
+            if (vm != null) {
+                argv = arguments;
+                target = context;
+                if (cacheable && vm.isCacheable()) {
+                    funcall = new ContextFuncall(vm, narrow);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Whether the method is an arithmetic method.
+         *
+         * @param mname the method name
+         * @param arguments the method arguments
+         * @return true if arithmetic, false otherwise
+         */
+        protected boolean isArithmeticMethod(String mname, final Object[] arguments) {
+            vm = uberspect.getMethod(arithmetic, mname, arguments);
+            if (vm != null) {
+                argv = arguments;
+                target = arithmetic;
+                if (cacheable && vm.isCacheable()) {
+                    funcall = new ArithmeticFuncall(vm, narrow);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Attempt to reuse last funcall cached in volatile JexlNode.value (if
+         * it was cacheable).
+         *
+         * @param ntarget the target instance
+         * @param mname the method name
+         * @param arguments the method arguments
+         * @return TRY_FAILED if invocation was not possible or failed, the
+         * result otherwise
+         */
+        protected Object tryEval(final Object ntarget, final String mname, final Object[] arguments) {
+            // do we have  a method/function name ?
+            // attempt to reuse last funcall cached in volatile JexlNode.value (if it was not a variable)
+            if (mname != null && cacheable && ntarget != null) {
+                Object cached = node.jjtGetValue();
+                if (cached instanceof Funcall) {
+                    return ((Funcall) cached).tryInvoke(InterpreterBase.this, mname, ntarget, arguments);
+                }
+            }
+            return JexlEngine.TRY_FAILED;
+        }
+
+        /**
+         * Evaluates the method previously dispatched.
+         *
+         * @param mname the method name
+         * @return the method invocation result
+         * @throws Exception when invocation fails
+         */
+        protected Object eval(String mname) throws Exception {
+            // we have either evaluated and returned or might have found a method
+            if (vm != null) {
+                // vm cannot be null if xjexl is null
+                Object eval = vm.invoke(target, argv);
+                // cache executor in volatile JexlNode.value
+                if (funcall != null) {
+                    node.jjtSetValue(funcall);
+                }
+                return eval;
+            }
+            return unsolvableMethod(node, mname);
+        }
+    }
+
 }

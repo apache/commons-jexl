@@ -91,6 +91,16 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     @Test
+    public void testRegexp2() throws Exception {
+        asserter.setVariable("str", "abc456");
+        asserter.assertExpression("str =~ ~/.*456/", Boolean.TRUE);
+        asserter.assertExpression("str !~ ~/ABC.*/", Boolean.TRUE);
+        asserter.assertExpression("str =~ ~/abc\\d{3}/", Boolean.TRUE);
+        asserter.setVariable("str", "4/6");
+        asserter.assertExpression("str =~ ~/\\d\\/\\d/", Boolean.TRUE);
+    }
+
+    @Test
     public void testStartsEndsWithString() throws Exception {
         asserter.setVariable("x", "foobar");
         asserter.assertExpression("x =^ 'foo'", Boolean.TRUE);
