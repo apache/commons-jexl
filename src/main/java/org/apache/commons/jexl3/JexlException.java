@@ -322,6 +322,36 @@ public class JexlException extends RuntimeException {
     }
 
     /**
+     * Thrown when reaching stack-overflow.
+     *
+     * @since 3.2
+     */
+    public static class StackOverflow extends JexlException {
+        /**
+         * Creates a new stack overflow exception instance.
+         *
+         * @param info  the location information
+         * @param name  the unknown method
+         * @param cause the exception causing the error
+         */
+        public StackOverflow(JexlInfo info, String name, Throwable cause) {
+            super(info, name, cause);
+        }
+
+        /**
+         * @return the specific detailed message
+         */
+        public String getDetail() {
+            return super.detailedMessage();
+        }
+
+        @Override
+        protected String detailedMessage() {
+            return "stack overflow " + getDetail();
+        }
+    }
+    
+    /**
      * Thrown when parsing fails due to an invalid assigment.
      *
      * @since 3.0

@@ -29,6 +29,9 @@
             <action dev="henrib" type="add" issue="JEXL-275">
                  Allow safe navigation as option
             </action>
+            <action dev="henrib" type="add" issue="JEXL-274">
+                Handle soft and hard stack overflow
+            </action>
             <action dev="Dmitri Blinov" type="add" issue="JEXL-175" due-to="Dmitri Blinov">
                  Add do...while(...) loops
             </action>

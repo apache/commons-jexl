@@ -568,4 +568,32 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertTrue(result instanceof JexlScript);
     }
     
+    
+    @Test
+    public void test274() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(true).safe(true).stackOverflow(5).create();
+        JexlContext ctxt = new MapContext();
+        JexlScript script= jexl.createScript("var f = (x)->{ x > 1? x * f(x - 1) : x }; f(a)", "a");
+        Object result = null;
+        result = script.execute(ctxt, 3);
+        Assert.assertEquals(6, result);
+        try {
+            result = script.execute(ctxt, 32);
+            Assert.fail("should have overflown");
+        } catch(JexlException.StackOverflow xstack) {
+            // expected
+            String sxs = xstack.toString();
+            Assert.assertTrue(sxs.contains("jexl"));
+        }
+        jexl = new JexlBuilder().strict(true).create();
+        script= jexl.createScript("var f = (x)->{ x * f(x - 1) }; f(a)", "a");
+        try {
+            result = script.execute(ctxt, 32);
+            Assert.fail("should have overflown");
+        } catch(JexlException.StackOverflow xstack) {
+            // expected
+            String sxs = xstack.toString();
+            Assert.assertTrue(sxs.contains("jvm"));
+        }
+    }
 }

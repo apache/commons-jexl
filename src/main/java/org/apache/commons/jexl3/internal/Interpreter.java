@@ -112,9 +112,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.concurrent.Callable;
-import org.apache.commons.jexl3.JxltEngine;
 
 
 /**
@@ -127,6 +125,8 @@ public class Interpreter extends InterpreterBase {
     protected final Operators operators;
     /** Cache executors. */
     protected final boolean cache;
+    /** Frame height. */
+    protected int fp = 0;
     /** Symbol values. */
     protected final Scope.Frame frame;
     /** The context to store/retrieve variables. */
@@ -135,6 +135,12 @@ public class Interpreter extends InterpreterBase {
     protected final Map<String, Object> functions;
     /** The map of dynamically creates namespaces, NamespaceFunctor or duck-types of those. */
     protected Map<String, Object> functors;
+
+    /**
+     * The thread local interpreter.
+     */
+    protected static final java.lang.ThreadLocal<Interpreter> INTER =
+                       new java.lang.ThreadLocal<Interpreter>();
 
     /**
      * Creates an interpreter.
@@ -170,6 +176,17 @@ public class Interpreter extends InterpreterBase {
         functions = ii.functions;
         functors = ii.functors;
     }
+        
+    /**
+     * Swaps the current thread local interpreter.
+     * @param inter the interpreter or null
+     * @return the previous thread local interpreter
+     */
+    protected Interpreter putThreadInterpreter(Interpreter inter) {
+        Interpreter pinter = INTER.get();
+        INTER.set(inter);
+        return pinter;
+    }
 
     /**
      * Interpret the given script/expression.
@@ -183,13 +200,29 @@ public class Interpreter extends InterpreterBase {
     public Object interpret(JexlNode node) {
         JexlContext.ThreadLocal tcontext = null;
         JexlEngine tjexl = null;
+        Interpreter tinter = null;
         try {
+            tinter = putThreadInterpreter(this);
+            if (tinter != null) {
+                fp = tinter.fp + 1;
+            }
             if (context instanceof JexlContext.ThreadLocal) {
                 tcontext = jexl.putThreadLocal((JexlContext.ThreadLocal) context);
             }
             tjexl = jexl.putThreadEngine(jexl);
+            if (fp > jexl.stackOverflow) {
+                throw new JexlException.StackOverflow(node.jexlInfo(), "jexl (" + jexl.stackOverflow + ")", null);
+            }
             cancelCheck(node);
             return node.jjtAccept(this, null);
+        } catch(StackOverflowError xstack) {
+            JexlException xjexl = new JexlException.StackOverflow(node.jexlInfo(), "jvm", xstack);
+            if (!isSilent()) {
+                throw xjexl.clean();
+            }
+            if (logger.isWarnEnabled()) {
+                logger.warn(xjexl.getMessage(), xjexl.getCause());
+            }
         } catch (JexlException.Return xreturn) {
             return xreturn.getValue();
         } catch (JexlException.Cancel xcancel) {
@@ -220,6 +253,10 @@ public class Interpreter extends InterpreterBase {
             if (context instanceof JexlContext.ThreadLocal) {
                 jexl.putThreadLocal(tcontext);
             }
+            if (tinter != null) {
+                fp = tinter.fp - 1;
+            }
+            putThreadInterpreter(tinter);
         }
         return null;
     }

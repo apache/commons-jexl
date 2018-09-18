@@ -30,9 +30,9 @@ What's new in 3.2:
 
 * Interpolated strings in identifiers, as in x.`${prefix}_${suffix}` that in many cases would be equivalent to
   x[prefix + '_' + suffix] or x[`${prefix}_${suffix}`].
-* Safe-navigation operator '?.' allowing lenient handling of non-existent or null properties so that an expression
+* Safe-navigation mode and operator '?.' allowing lenient handling of non-existent or null properties so that an expression
   like 'x?.y?.z' would behave as 'x.y.z' in nominal execution and return null instead of throwing an exception in error
-  cases.
+  cases. The safe() option on the builder enables the behavior making '.' and '[...]' behave as '?.'.
 * A set of syntactic restrictions can be applied to scripts ranging from not allowing side-effects to not allowing
   loops enabling fine control over what end-users may be able to enter as expressions/scripts.
 
@@ -40,6 +40,7 @@ New Features in 3.2:
 ====================
 
 * JEXL-275:      Allow safe navigation as option
+* JEXL-274:      Handle soft and hard stack overflow
 * JEXL-273:      Add do...while(...) loops
 * JEXL-264:      Allow space, quote & double-quote in identifiers
 * JEXL-260:      Automatically inject JexlContext in constructor call when possible

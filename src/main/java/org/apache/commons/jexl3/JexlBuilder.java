@@ -99,6 +99,9 @@ public class JexlBuilder {
 
     /** The cache size. */
     private int cache = -1;
+    
+    /** The stack overflow limit. */
+    private int stackOverflow = Integer.MAX_VALUE;
 
     /** The maximum expression length to hit the expression cache. */
     private int cacheThreshold = CACHE_THRESHOLD;
@@ -423,6 +426,23 @@ public class JexlBuilder {
         return cacheThreshold;
     }
 
+    /**
+     * Sets the number of script/expression evaluations that can be stacked.
+     * @param size if not strictly positive, limit is reached when java StackOverflow is thrown.
+     * @return this builder
+     */
+    public JexlBuilder stackOverflow(int size) {
+        this.stackOverflow = size;
+        return this;
+    }
+
+    /**
+     * @return the cache size
+     */
+    public int stackOverflow() {
+        return stackOverflow;
+    }
+    
     /**
      * @return a {@link JexlEngine} instance
      */
