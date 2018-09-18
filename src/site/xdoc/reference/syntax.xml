@@ -94,7 +94,7 @@
                         </p>
                         <p>
                             <strong>N.B.</strong> the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
-                            <code>or and eq ne lt gt le ge div mod not null true false new var break continue return</code>
+                            <code>or and eq ne lt gt le ge div mod not null true false new var do while break continue function return</code>
                             For example, the following is invalid:
                             <code>my.new.dotted.var // invalid ('new' is keyword)</code>
                             In such cases, quoted identifiers or the [ ] operator can be used, for example:
@@ -107,16 +107,17 @@
                     <td>Scripts</td>
                     <td>
                         <p>
-                            A script in JEXL is made up of zero or more statements. Scripts can include one or more pragmas.
+                            A script in JEXL is made up of zero or more statements, optionally enclosed in a function definition block.
+                            Scripts can include one or more pragmas.
                         </p>
                         <p>
                             Scripts can be read from a String, File or URL.
                         </p>
                         <p>
-                            They can be created with named parameters which allow a later evaluation to be performed with arguments.
+                            Scripts can be created with named parameters which allow a later evaluation to be performed with arguments.
                         </p>
                         <p>
-                            By default a script returns the value of the last evaluated statement.
+                            By default scripts return the value of the last evaluated statement.
                         </p>
                         <p>
                             Using the <code>return</code> keyword, a script will return the expression that follows (or null).
@@ -124,22 +125,19 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Local variables</td>
-                    <td>Can be defined using the <code>var</code> keyword; their identifying rules are the same as contextual variables.
-                        <ul>
-                            <li>Basic declaration: <code>var x;</code></li>
-                            <li>Declaration with assignment: <code>var theAnswer = 42;</code></li>
-                            <li>Invalid declaration: <code>var x.y;</code></li>
-                        </ul>
-                        Their scope is the entire script scope and they take precedence in resolution over contextual variables.
-                        When scripts are created with named parameters, those behave as local variables.
-                        Local variables can not use <code>ant-style</code> naming, only one identifier.
+                    <td>#pragma</td>
+                    <td>
+                        Declares a pragma, a method to communicate information from a script to its execution environment, e.g.
+                        <code>#pragma execution.option 42</code> will declare a pragma named <code>execution.option</code> with
+                        a value of <code>42</code>.
+                        <p>Pragma keys can be identifiers or antish names, pragma values can be literals (boolean, integer,
+                            real, string, null, NaN) and antish names</p>
                     </td>
                 </tr>
                 <tr>
                     <td>Statements</td>
                     <td>
-                        A statement can be the empty statement, the semicolon (<code>;</code>) , block, conditional, assignment or an expression.
+                        A statement can be the empty statement, the semicolon (<code>;</code>), block, conditional, variable declaration or an expression.
                         Statements are optionally terminated with a semicolon.
                         A single statement or a statement block can be annotated.
                     </td>
@@ -151,18 +149,32 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Assignment</td>
-                    <td>
-                        Assigns the value of a variable  (<code>my.var = 'a value'</code>) using a
-                        <code>JexlContext</code> as initial resolver. Both <em>beans</em> and <em>ant-ish</em>
-                        variables assignment are supported.
+                    <td>Local variables</td>
+                    <td>Can be defined using the <code>var</code> keyword; their identifying rules are the same as contextual variables.
+                        <ul>
+                            <li>Basic declaration: <code>var x;</code></li>
+                            <li>Declaration with assignment: <code>var theAnswer = 42;</code></li>
+                            <li>Invalid declaration: <code>var x.y;</code></li>
+                        </ul>
+                        Their scope is either the entire script scope or the function definition block;
+                        Local variables they take precedence in resolution over contextual variables.
+                        When scripts are created with named parameters, those behave as local variables.
+                        Local variables can not use <code>ant-style</code> naming, only one identifier.
                     </td>
                 </tr>
                 <tr>
                     <td>Expression</td>
                     <td>
-                        An expression can be the literal, variable, access operator, function definition, function call, method call or
+                        An expression can be the literal, variable, assignment, access operator, function definition, function call, method call or
                         an evaluation operator.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Assignment</td>
+                    <td>
+                        Assigns the value of a variable  (<code>my.var = 'a value'</code>) using a
+                        <code>JexlContext</code> as initial resolver. Both <em>beans</em> and <em>ant-ish</em>
+                        variables assignment are supported.
                     </td>
                 </tr>
                 <tr>
@@ -172,13 +184,21 @@
                         <code>var fun = function(x, y) { x + y }</code>
                         The following syntax is also supported
                         <code>var fun = (x, y) -> { x + y }</code>
-                        Calling a function follows the usual convention:
-                        <code>fun(17, 25)</code>
+                        If the function has only one argument the parentheses may be omitted
+                        <code>var fun = x -> { x * x }</code>
                         <p>Note that functions can use local variables and parameters from their declaring script.
-                            Those variables values are bound in the function environment at definition time.</p>
+                            Those variables values are bound to the function environment at definition time.</p>
                         <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
                         The function closure hoists 't' when defined; the result of the evaluation will
-                        lead to <code>15 +7 + 20 = 42</code>.
+                        lead to <code>15 + 7 + 20 = 42</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Function call</td>
+                    <td>
+                        Calling a function follows the usual convention, e.g.
+                        <code>fun(17, 25)</code> will call the <code>fun</code> function with arguments <code>17</code>
+                        and <code>25</code>
                     </td>
                 </tr>
                 <tr>
@@ -222,16 +242,6 @@
                         between two integer literals.
                         <p>All operators, except when stated otherwise, can be overloaded in <code>JexlArithmetic</code>, so that the action taken
                            will differ depending on the type of the operator arguments</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>#pragma</td>
-                    <td>
-                        Declares a pragma, a method to communicate information from a script to its execution environment, e.g.
-                        <code>#pragma execution.option 42</code> will declare a pragma named <code>execution.option</code> with
-                        a value of <code>42</code>.
-                        <p>Pragma keys can be identifiers or antish names, pragma values can be literals (boolean, integer,
-                            real, string, null, NaN) and antish names</p>
                     </td>
                 </tr>
                 <tr>
@@ -292,16 +302,17 @@
                         by a decimal point and then one or more digits from
                         <code>0</code> to <code>9</code> suffixed with <code>d</code> or <code>D</code>
                         , eg <code>42.0d</code>.
+                        A special literal <code>NaN</code> can be used to denote <code>Double.NaN</code> constant
                     </td>
                 </tr>
                 <tr>
-                    <td>Big Integer Literals</td>
+                    <td>BigInteger Literals</td>
                     <td>1 or more digits from <code>0</code> to <code>9</code> suffixed with <code>h</code> or <code>H</code>
                         (for Huge ala OGNL, "does not interfere with hexa-decimal digits"), eg <code>42h</code>.
                     </td>
                 </tr>
                 <tr>
-                    <td>Big Decimal Literals</td>
+                    <td>BigDecimal Literals</td>
                     <td>
                         1 or more digits from <code>0</code> to <code>9</code>, followed
                         by a decimal point and then one or more digits from
@@ -346,6 +357,14 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Regular expression (regex) literals</td>
+                    <td>
+                        Start with <code>~/</code> and ends with <code>/</code> delimiters, e.g.
+                        <code>~/ABC.*/</code>
+                        <p>The escape character is <code>\</code> (backslash); it only escapes the string delimiter <code>\</code> (slash)</p>
+                    </td>
+                </tr>
+                <tr>
                     <td>Boolean literals</td>
                     <td>
                         The literals <code>true</code> and <code>false</code> can be used, e.g.
@@ -362,10 +381,11 @@
                 <tr>
                     <td>Array literal</td>
                     <td>
-                        A <code>[</code> followed by one or more expressions separated by <code>,</code> and ending
+                        A <code>[</code> followed by zero or more expressions separated by <code>,</code> and ending
                         with <code>]</code>, e.g.
                         <code>[ 1, 2, "three" ]</code>
                         <p>This syntax creates an <code>Object[]</code>.</p>
+                        <p>Empty array literal can be specified as <code>[]</code> with result of creating <code>Object[]</code></p>
                         <p>
                             JEXL will attempt to strongly type the array; if all entries are of the same class or if all
                             entries are Number instance, the array literal will be an <code>MyClass[]</code> in the former
@@ -378,28 +398,31 @@
                 <tr>
                     <td>List literal</td>
                     <td>
-                        A <code>[</code> followed by one or more expressions separated by <code>,</code> and ending
+                        A <code>[</code> followed by zero or more expressions separated by <code>,</code> and ending
                         with <code>,...]</code>, e.g.
                         <code>[ 1, 2, "three",...]</code>
                         <p>This syntax creates an <code>ArrayList&lt;Object&gt;</code>.</p>
+                        <p>Empty list literal can be specified as <code>[...]</code></p>
                     </td>
                 </tr>
                 <tr>
                     <td>Set literal</td>
                     <td>
-                        A <code>{</code> followed by one or more expressions separated by <code>,</code> and ending
+                        A <code>{</code> followed by zero or more expressions separated by <code>,</code> and ending
                         with <code>}</code>, e.g.
                         <code>{ "one" , 2, "more"}</code>
                         <p>This syntax creates a <code>HashSet&lt;Object&gt;</code>.</p>
+                        <p>Empty set literal can be specified as <code>{}</code></p>
                     </td>
                 </tr>
                 <tr>
                     <td>Map literal</td>
                     <td>
-                        A <code>{</code> followed by one or more sets of <code>key : value</code> pairs separated by <code>,</code> and ending
+                        A <code>{</code> followed by zero or more sets of <code>key : value</code> pairs separated by <code>,</code> and ending
                         with <code>}</code>, e.g.
                         <code>{ "one" : 1, "two" : 2, "three" : 3, "more": "many more" }</code>
                         <p>This syntax creates a <code>HashMap&lt;Object,Object&gt;</code>.</p>
+                        <p>Empty map literal can be specified as <code>{:}</code></p>
                     </td>
                 </tr>
 
@@ -786,6 +809,20 @@
                         <code>-12</code>
                     </td>
                 </tr>
+                <tr>
+                    <td>Empty</td>
+                    <td>
+                        The unary <code>empty</code> operator behaves exactly as the corresponding function <code>empty()</code>.
+                        For example <code>empty arg</code> and <code>empty(arg)</code> are equivalent
+                    </td>
+                </tr>
+                <tr>
+                    <td>Size</td>
+                    <td>
+                        The unary <code>size</code> operator behaves exactly as the corresponding function <code>size()</code>.
+                        For example <code>size [1,2,3]</code> and <code>size([1,2,3])</code> are equivalent
+                    </td>
+                </tr>
             </table>
         </section>
         <section name="Access">
@@ -888,7 +925,13 @@
                             }</code>
 
                         Where <code>item</code> is a local variable.</p>
-                        <p>Note that <code>item</code> variable is accessible after loop evaluation</p>
+                        <p>Note that the loop variable <code>item</code> is accessible after loop evaluation</p>
+                        <p>The syntax with a key and a value variable is also supported:
+                        <code>for (var i, item : list) {
+                            if (i lt 3) x = x + item;
+                            }</code>
+                        Where <code>i</code> is the index and <code>item</code> is a value variable.
+                        For the instances of Map iterator the index variable is the Map key, and the value variable is the Map value</p>
                         <p>The JEXL 1.1 syntax using <code>foreach(item in list)</code> is now <strong>unsupported</strong>.</p>
                     </td>
                 </tr>
@@ -902,15 +945,24 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>do/while</td>
+                    <td>
+                        Loop until a condition is satisfied, e.g.
+                        <code>do {
+                            x = x + 2;
+                            } while (x lt 10)</code>
+                    </td>
+                </tr>
+                <tr>
                     <td>continue</td>
                     <td>
-                        Within loops (while/for), allows to skip to the next iteration.
+                        Within loops (do/while/for), allows to skip to the next iteration.
                     </td>
                 </tr>
                 <tr>
                     <td>break</td>
                     <td>
-                        Allows to break from a loop (while/for) inconditionally.
+                        Allows to break from a loop (do/while/for) unconditionally.
                     </td>
                 </tr>
             </table>
@@ -918,4 +970,3 @@
 
     </body>
 </document>
-
