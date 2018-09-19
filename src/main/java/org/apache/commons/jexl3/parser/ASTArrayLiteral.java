@@ -25,6 +25,8 @@ public final class ASTArrayLiteral extends JexlNode {
     /** Whether this array is constant or not. */
     private boolean constant = false;
 
+    private boolean extended = false;
+
     ASTArrayLiteral(int id) {
         super(id);
     }
@@ -42,6 +44,14 @@ public final class ASTArrayLiteral extends JexlNode {
     @Override
     protected boolean isConstant(boolean literal) {
         return constant;
+    }
+
+    public boolean isExtended() {
+        return extended;
+    }
+
+    public void setExtended(boolean value) {
+        extended = value;
     }
 
     @Override

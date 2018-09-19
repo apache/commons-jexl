@@ -859,21 +859,15 @@ void RegexLiteral() :
   { jjtThis.setLiteral(Parser.buildRegex(t.image)); }
 }
 
-
-void ExtendedLiteral() #ExtendedLiteral() : {}
-{
-   <ELLIPSIS>
-}
-
 void EmptyListLiteral() #ArrayLiteral() : {}
 {
-   <LBRACKET> ExtendedLiteral() <RBRACKET>
+   <LBRACKET> <ELLIPSIS> { jjtThis.setExtended(true); } <RBRACKET>
 }
 
 void ArrayLiteral() : {}
 {
    <LBRACKET>
-      (Expression() (LOOKAHEAD(<COMMA> Expression()) <COMMA> Expression() )*)? (LOOKAHEAD(2) <COMMA> ExtendedLiteral())?
+      (Expression() (LOOKAHEAD(<COMMA> Expression()) <COMMA> Expression() )*)? (LOOKAHEAD(2) <COMMA> <ELLIPSIS> { jjtThis.setExtended(true); })?
    <RBRACKET>
 }
 

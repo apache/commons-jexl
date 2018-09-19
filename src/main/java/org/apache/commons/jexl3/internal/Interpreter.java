@@ -56,7 +56,6 @@ import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTEnumerationNode;
 import org.apache.commons.jexl3.parser.ASTEnumerationReference;
 import org.apache.commons.jexl3.parser.ASTExpressionStatement;
-import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
 import org.apache.commons.jexl3.parser.ASTForeachVar;
@@ -1078,13 +1077,11 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(ASTArrayLiteral node, Object data) {
         int childCount = node.jjtGetNumChildren();
         JexlArithmetic.ArrayBuilder ab = arithmetic.arrayBuilder(childCount);
-        boolean extended = false;
+        boolean extended = node.isExtended();
         for (int i = 0; i < childCount; i++) {
             cancelCheck(node);
             JexlNode child = node.jjtGetChild(i);
-            if (child instanceof ASTExtendedLiteral) {
-                extended = true;
-            } else if (child instanceof ASTEnumerationNode || child instanceof ASTEnumerationReference) {
+            if (child instanceof ASTEnumerationNode || child instanceof ASTEnumerationReference) {
                 Iterator<?> it = (Iterator<?>) child.jjtAccept(this, data);
                 if (it != null) {
                    while (it.hasNext()) {
@@ -1099,11 +1096,6 @@ public class Interpreter extends InterpreterBase {
             }
         }
         return ab.create(extended);
-    }
-
-    @Override
-    protected Object visit(ASTExtendedLiteral node, Object data) {
-        return node;
     }
 
     @Override
