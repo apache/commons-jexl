@@ -107,16 +107,17 @@
                     <td>Scripts</td>
                     <td>
                         <p>
-                            A script in JEXL is made up of zero or more statements. Scripts can include one or more pragmas.
+                            A script in JEXL is made up of zero or more statements, optionally enclosed in a function definition block.
+                            Scripts can include one or more pragmas.
                         </p>
                         <p>
                             Scripts can be read from a String, File or URL.
                         </p>
                         <p>
-                            They can be created with named parameters which allow a later evaluation to be performed with arguments.
+                            Scripts can be created with named parameters which allow a later evaluation to be performed with arguments.
                         </p>
                         <p>
-                            By default a script returns the value of the last evaluated statement.
+                            By default scripts return the value of the last evaluated statement.
                         </p>
                         <p>
                             Using the <code>return</code> keyword, a script will return the expression that follows (or null).
@@ -124,22 +125,19 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Local variables</td>
-                    <td>Can be defined using the <code>var</code> keyword; their identifying rules are the same as contextual variables.
-                        <ul>
-                            <li>Basic declaration: <code>var x;</code></li>
-                            <li>Declaration with assignment: <code>var theAnswer = 42;</code></li>
-                            <li>Invalid declaration: <code>var x.y;</code></li>
-                        </ul>
-                        Their scope is the entire script scope and they take precedence in resolution over contextual variables.
-                        When scripts are created with named parameters, those behave as local variables.
-                        Local variables can not use <code>ant-style</code> naming, only one identifier.
+                    <td>#pragma</td>
+                    <td>
+                        Declares a pragma, a method to communicate information from a script to its execution environment, e.g.
+                        <code>#pragma execution.option 42</code> will declare a pragma named <code>execution.option</code> with
+                        a value of <code>42</code>.
+                        <p>Pragma keys can be identifiers or antish names, pragma values can be literals (boolean, integer,
+                            real, string, null, NaN) and antish names</p>
                     </td>
                 </tr>
                 <tr>
                     <td>Statements</td>
                     <td>
-                        A statement can be the empty statement, the semicolon (<code>;</code>) , block, conditional, assignment or an expression.
+                        A statement can be the empty statement, the semicolon (<code>;</code>), block, conditional, variable declaration or an expression.
                         Statements are optionally terminated with a semicolon.
                         A single statement or a statement block can be annotated.
                     </td>
@@ -151,18 +149,32 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Assignment</td>
-                    <td>
-                        Assigns the value of a variable  (<code>my.var = 'a value'</code>) using a
-                        <code>JexlContext</code> as initial resolver. Both <em>beans</em> and <em>ant-ish</em>
-                        variables assignment are supported.
+                    <td>Local variables</td>
+                    <td>Can be defined using the <code>var</code> keyword; their identifying rules are the same as contextual variables.
+                        <ul>
+                            <li>Basic declaration: <code>var x;</code></li>
+                            <li>Declaration with assignment: <code>var theAnswer = 42;</code></li>
+                            <li>Invalid declaration: <code>var x.y;</code></li>
+                        </ul>
+                        Their scope is either the entire script scope or the function definition block;
+                        Local variables they take precedence in resolution over contextual variables.
+                        When scripts are created with named parameters, those behave as local variables.
+                        Local variables can not use <code>ant-style</code> naming, only one identifier.
                     </td>
                 </tr>
                 <tr>
                     <td>Expression</td>
                     <td>
-                        An expression can be the literal, variable, access operator, iterator operator, stream operator, function definition, function call, method call or
+                        An expression can be the literal, variable, assignment, access operator, iterator operator, stream operator, function definition, function call, method call or
                         an evaluation operator.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Assignment</td>
+                    <td>
+                        Assigns the value of a variable  (<code>my.var = 'a value'</code>) using a
+                        <code>JexlContext</code> as initial resolver. Both <em>beans</em> and <em>ant-ish</em>
+                        variables assignment are supported.
                     </td>
                 </tr>
                 <tr>
@@ -179,10 +191,10 @@
                         Function can also take arbitraty number arguments, in that case the following syntax can be used
                         <code>var fun = (x, y...) -> {x + y[0] + y[1]}</code>
                         <p>Note that functions can use local variables and parameters from their declaring script.
-                            Those variables values are bound in the function environment at definition time.</p>
+                            Those variables values are bound to the function environment at definition time.</p>
                         <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
                         The function closure hoists 't' when defined; the result of the evaluation will
-                        lead to <code>15 +7 + 20 = 42</code>.
+                        lead to <code>15 + 7 + 20 = 42</code>.
                     </td>
                 </tr>
                 <tr>
@@ -269,16 +281,6 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>#pragma</td>
-                    <td>
-                        Declares a pragma, a method to communicate information from a script to its execution environment, e.g.
-                        <code>#pragma execution.option 42</code> will declare a pragma named <code>execution.option</code> with
-                        a value of <code>42</code>.
-                        <p>Pragma keys can be identifiers or antish names, pragma values can be literals (boolean, integer,
-                            real, string, null, NaN) and antish names</p>
-                    </td>
-                </tr>
-                <tr>
                     <td>@annotation</td>
                     <td>
                         Annotations in JEXL are 'meta-statements'; they allow to wrap the execution of the JEXL statement in a user provided
@@ -340,13 +342,13 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Big Integer Literals</td>
+                    <td>BigInteger Literals</td>
                     <td>1 or more digits from <code>0</code> to <code>9</code> suffixed with <code>h</code> or <code>H</code>
                         (for Huge ala OGNL, "does not interfere with hexa-decimal digits"), eg <code>42h</code>.
                     </td>
                 </tr>
                 <tr>
-                    <td>Big Decimal Literals</td>
+                    <td>BigDecimal Literals</td>
                     <td>
                         1 or more digits from <code>0</code> to <code>9</code>, followed
                         by a decimal point and then one or more digits from
@@ -429,7 +431,6 @@
                         <code>[ 1, 2, "three" ]</code>
                         <p>This syntax creates an <code>Object[]</code>.</p>
                         <p>Empty array literal can be specified as <code>[]</code> with result of creating <code>Object[]</code></p>
-                        <p>Array literal can be specified as <code>[]</code> with result of creating <code>Object[]</code></p>
                         <p>Array comprehentions syntax can also be used to construct arrays based on other iterable objects,
                             like collections and arrays, e.g.<code>[1, 2, 3, ...[4, 5, 6]]</code></p>
                         <p>
@@ -477,7 +478,6 @@
                              e.g.<code>{1:1, 2:2, 3:3, *:...{4:4, 5:5, 6:6}}</code></p>
                     </td>
                 </tr>
-
                 <tr>
                     <td>Range literal</td>
                     <td>
@@ -876,6 +876,20 @@
                         The unary <code>-</code> operator is used.
                         For example
                         <code>-12</code>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Empty</td>
+                    <td>
+                        The unary <code>empty</code> operator behaves exactly as the corresponding function <code>empty()</code>.
+                        For example <code>empty arg</code> and <code>empty(arg)</code> are equivalent
+                    </td>
+                </tr>
+                <tr>
+                    <td>Size</td>
+                    <td>
+                        The unary <code>size</code> operator behaves exactly as the corresponding function <code>size()</code>.
+                        For example <code>size [1,2,3]</code> and <code>size([1,2,3])</code> are equivalent
                     </td>
                 </tr>
             </table>

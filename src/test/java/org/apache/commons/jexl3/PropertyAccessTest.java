@@ -387,4 +387,185 @@ public class PropertyAccessTest extends JexlTestCase {
             Assert.assertTrue(xjexl.getMessage().contains("c${la--ss"));
         }
     }
+    
+    @Test
+    public void test250() throws Exception {
+        MapContext ctx = new MapContext();
+        HashMap<Object, Object> x = new HashMap<Object, Object>();
+        x.put(2, "123456789");
+        ctx.set("x", x);
+        JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
+        String stmt = "x.2.class.name";
+        JexlScript script = engine.createScript(stmt);
+        Object result = script.execute(ctx);
+        Assert.assertEquals("java.lang.String", result);
+
+        try {
+            stmt = "x.3?.class.name";
+            script = engine.createScript(stmt);
+            result = script.execute(ctx);
+            Assert.assertNull(result);
+        } catch (JexlException xany) {
+            Assert.fail("Should have evaluated to null");
+        }
+        try {
+            stmt = "x?.3.class.name";
+            script = engine.createScript(stmt);
+            result = script.execute(ctx);
+            Assert.fail("Should have thrown, fail on 3");
+            Assert.assertNull(result);
+        } catch (JexlException xany) {
+            Assert.assertTrue(xany.detailedMessage().contains("3"));
+        }
+        try {
+            stmt = "x?.3?.class.name";
+            script = engine.createScript(stmt);
+            result = script.execute(ctx);
+            Assert.assertNull(result);
+        } catch (JexlException xany) {
+            Assert.fail("Should have evaluated to null");
+        }
+        try {
+            stmt = "y?.3.class.name";
+            script = engine.createScript(stmt);
+            result = script.execute(ctx);
+            Assert.assertNull(result);
+        } catch (JexlException xany) {
+            Assert.fail("Should have evaluated to null");
+        }
+        try {
+            stmt = "x?.y?.z";
+            script = engine.createScript(stmt);
+            result = script.execute(ctx);
+            Assert.assertNull(result);
+        } catch (JexlException xany) {
+            Assert.fail("Should have evaluated to null");
+        }
+        try {
+            stmt = "x? (x.y? (x.y.z ?: null) :null) : null";
+            script = engine.createScript(stmt);
+            result = script.execute(ctx);
+            Assert.assertNull(result);
+        } catch (JexlException xany) {
+            Assert.fail("Should have evaluated to null");
+        }
+    }
+
+    public static class Prompt {
+        private final Map<String, PromptValue> values = new HashMap<String, PromptValue>();
+        
+        public Object get(String name) {
+            PromptValue v = values.get(name);
+            return v != null? v.getValue() : null;
+        }
+        
+        public void set(String name, Object value) {
+            values.put(name, new PromptValue(value));
+        }
+    }
+    
+    /**
+     * A valued prompt.
+     */
+    public static class PromptValue {
+
+        /** Prompt value. */
+        private Object value;
+
+        public PromptValue(Object v) {
+           value = v;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
+        }
+    }
+    
+    @Test
+    public void test275a() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
+        JexlContext ctxt = new MapContext();
+        JexlScript script;
+        Object result = null;
+        Prompt p0 = new Prompt();
+        p0.set("stuff", 42);
+        ctxt.set("$in", p0); 
+        
+        // unprotected navigation
+        script = jexl.createScript("$in[p].intValue()", "p");
+        try {
+            result = script.execute(ctxt, "fail");
+            Assert.fail("should have thrown a " + JexlException.Property.class);
+        } catch (JexlException xany) {
+            Assert.assertEquals(JexlException.Property.class, xany.getClass());            
+        }
+        Assert.assertEquals(null, result);
+        result = script.execute(ctxt, "stuff");
+        Assert.assertEquals(42, result);
+       
+        // protected navigation
+        script = jexl.createScript("$in[p]?.intValue()", "p");
+        result = script.execute(ctxt, "fail");
+        Assert.assertEquals(null, result);
+        result = script.execute(ctxt, "stuff");
+        Assert.assertEquals(42, result); 
+        
+        // unprotected navigation
+        script = jexl.createScript("$in.`${p}`.intValue()", "p");
+        try {
+            result = script.execute(ctxt, "fail");
+            Assert.fail("should have thrown a " + JexlException.Property.class);
+        } catch (JexlException xany) {
+            Assert.assertEquals(JexlException.Property.class, xany.getClass());            
+        }
+        result = script.execute(ctxt, "stuff");
+        Assert.assertEquals(42, result);
+        
+        // protected navigation
+        script = jexl.createScript("$in.`${p}`?.intValue()", "p");
+        result = script.execute(ctxt, "fail");
+        Assert.assertEquals(null, result);
+        result = script.execute(ctxt, "stuff");
+        Assert.assertEquals(42, result); 
+        
+    }
+     @Test
+    public void test275b() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(true).safe(true).create();
+        JexlContext ctxt = new MapContext();
+        JexlScript script;
+        Object result = null;
+        Prompt p0 = new Prompt();
+        p0.set("stuff", 42);
+        ctxt.set("$in", p0); 
+        
+        // unprotected navigation
+        script = jexl.createScript("$in[p].intValue()", "p");
+            result = script.execute(ctxt, "fail");
+        Assert.assertEquals(null, result);
+        
+        result = script.execute(ctxt, "stuff");
+        Assert.assertEquals(42, result);
+      
+        
+        // unprotected navigation
+        script = jexl.createScript("$in.`${p}`.intValue()", "p");
+        result = script.execute(ctxt, "fail");
+        Assert.assertEquals(null, result);
+        result = script.execute(ctxt, "stuff");
+        Assert.assertEquals(42, result);
+        
+        // protected navigation
+        script = jexl.createScript("$in.`${p}`?.intValue()", "p");
+        result = script.execute(ctxt, "fail");
+        Assert.assertEquals(null, result);
+        result = script.execute(ctxt, "stuff");
+        Assert.assertEquals(42, result); 
+        
+    }
+
 }
