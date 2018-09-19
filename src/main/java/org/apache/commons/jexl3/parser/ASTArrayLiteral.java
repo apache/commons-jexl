@@ -27,6 +27,9 @@ public final class ASTArrayLiteral extends JexlNode {
 
     private boolean extended = false;
 
+    /** Whether this array is immutable. */
+    private boolean immutable = false;
+
     ASTArrayLiteral(int id) {
         super(id);
     }
@@ -52,6 +55,14 @@ public final class ASTArrayLiteral extends JexlNode {
 
     public void setExtended(boolean value) {
         extended = value;
+    }
+
+    public boolean isImmutable() {
+        return immutable;
+    }
+
+    public void setImmutable(boolean value) {
+        immutable = value;
     }
 
     @Override

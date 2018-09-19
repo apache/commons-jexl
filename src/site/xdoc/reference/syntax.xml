@@ -455,6 +455,17 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Immutable List literal</td>
+                    <td>
+                        A <code>#[</code> followed by zero or more expressions separated by <code>,</code> and ending
+                        with <code>]</code>, e.g.
+                        <code>#[ 1, 2, "three"]</code>
+                        <p>This syntax creates an immutable <code>List&lt;Object&gt;</code>.</p>
+                        <p>Empty immutable list literal can be specified as <code>#[]</code></p>
+                        <p>List comprehentions can also be used like in conventional List literal syntax</p>
+                    </td>
+                </tr>
+                <tr>
                     <td>Set literal</td>
                     <td>
                         A <code>{</code> followed by zero or more expressions separated by <code>,</code> and ending
@@ -467,6 +478,17 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Immutable Set literal</td>
+                    <td>
+                        A <code>#{</code> followed by zero or more expressions separated by <code>,</code> and ending
+                        with <code>}</code>, e.g.
+                        <code>#{ "one" , 2, "more"}</code>
+                        <p>This syntax creates an immutable <code>Set&lt;Object&gt;</code>.</p>
+                        <p>Empty immutable set literal can be specified as <code>#{}</code></p>
+                        <p>Set comprehentions can also be used like in conventional Set literal syntax</p>
+                    </td>
+                </tr>
+                <tr>
                     <td>Map literal</td>
                     <td>
                         A <code>{</code> followed by zero or more sets of <code>key : value</code> pairs separated by <code>,</code> and ending
@@ -476,6 +498,17 @@
                         <p>Empty map literal can be specified as <code>{:}</code></p>
                         <p>Map comprehentions syntax can also be used to construct maps based on other maps,
                              e.g.<code>{1:1, 2:2, 3:3, *:...{4:4, 5:5, 6:6}}</code></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Immutable Map literal</td>
+                    <td>
+                        A <code>#{</code> followed by zero or more sets of <code>key : value</code> pairs separated by <code>,</code> and ending
+                        with <code>}</code>, e.g.
+                        <code>#{ "one" : 1, "two" : 2, "three" : 3, "more": "many more" }</code>
+                        <p>This syntax creates an immutable <code>Map&lt;Object,Object&gt;</code>.</p>
+                        <p>Empty immutable map literal can be specified as <code>#{:}</code></p>
+                        <p>Map comprehentions can also be used like in conventional Map literal syntax</p>
                     </td>
                 </tr>
                 <tr>

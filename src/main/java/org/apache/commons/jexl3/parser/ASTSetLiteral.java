@@ -21,6 +21,8 @@ import org.apache.commons.jexl3.internal.Debugger;
 public final class ASTSetLiteral extends JexlNode {
     /** Whether this set is constant or not. */
     private boolean constant = false;
+    /** Whether this set is immutable. */
+    private boolean immutable = false;
 
     ASTSetLiteral(int id) {
         super(id);
@@ -39,6 +41,14 @@ public final class ASTSetLiteral extends JexlNode {
     @Override
     protected boolean isConstant(boolean literal) {
         return constant;
+    }
+
+    public boolean isImmutable() {
+        return immutable;
+    }
+
+    public void setImmutable(boolean value) {
+        immutable = value;
     }
 
     @Override

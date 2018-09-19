@@ -154,6 +154,8 @@ TOKEN_MGR_DECLS : {
     | < DOT : "." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < QDOT : "?." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < ELLIPSIS : "..." | "\u2026">
+    | < HBRACKET : "#[" >
+    | < HCURLY : "#{" >
 }
 
 <*> TOKEN : { /* STREAMS */
@@ -871,6 +873,11 @@ void ArrayLiteral() : {}
    <RBRACKET>
 }
 
+void ImmutableArrayLiteral() #ArrayLiteral() : {}
+{
+   <HBRACKET> (Expression() (LOOKAHEAD(<COMMA> Expression()) <COMMA> Expression() )*)? <RBRACKET> { jjtThis.setImmutable(true); }
+}
+
 void MapLiteral() : {}
 {
     <LCURLY>
@@ -886,12 +893,31 @@ void MapElement() #void : {}
     LOOKAHEAD(<mult> <COLON> <ELLIPSIS>) <mult> <COLON> <ELLIPSIS> InlinePropertyExpression() #MapEnumerationNode(1)
     |
     MapEntry()
-
 }
 
 void MapEntry() : {}
 {
     Expression() <COLON> Expression()
+}
+
+void ImmutableMapLiteral() #MapLiteral() : {}
+{
+    <HCURLY>
+    (
+        MapElement() ( <COMMA> MapElement() )*
+    |
+        <COLON>
+    ) <RCURLY> { jjtThis.setImmutable(true); }
+}
+
+void SetLiteral() : {}
+{
+    <LCURLY> (Expression() ( <COMMA> Expression() )*)? <RCURLY>
+}
+
+void ImmutableSetLiteral() #SetLiteral : {}
+{
+    <HCURLY> (Expression() ( <COMMA> Expression() )*)? <RCURLY> { jjtThis.setImmutable(true); }
 }
 
 void InlinePropertyAssignment() : {}
@@ -933,11 +959,6 @@ void InlinePropertyEntry() : {}
 void InlinePropertyArrayEntry() : {}
 {
     <LBRACKET> Expression() <RBRACKET> <COLON> Expression()
-}
-
-void SetLiteral() : {}
-{
-    <LCURLY> (Expression() ( <COMMA> Expression() )*)? <RCURLY>
 }
 
 /***************************************
@@ -1084,13 +1105,23 @@ void PrimaryExpression() #void : {}
     |
     LOOKAHEAD( <LCURLY> <COLON>) MapLiteral()
     |
+    LOOKAHEAD( <HCURLY> MapElement() ) ImmutableMapLiteral()
+    |
+    LOOKAHEAD( <HCURLY> <COLON>) ImmutableMapLiteral()
+    |
     LOOKAHEAD( <LCURLY> Expression() ) SetLiteral()
     |
     LOOKAHEAD( <LCURLY> <RCURLY> ) SetLiteral()
     |
+    LOOKAHEAD( <HCURLY> Expression() ) ImmutableSetLiteral()
+    |
+    LOOKAHEAD( <HCURLY> <RCURLY> ) ImmutableSetLiteral()
+    |
     LOOKAHEAD( EmptyListLiteral() ) EmptyListLiteral()
     |
     LOOKAHEAD( <LBRACKET> ) ArrayLiteral()
+    |
+    LOOKAHEAD( <HBRACKET> ) ImmutableArrayLiteral()
     |
     LOOKAHEAD( <NEW> ) Constructor()
     |

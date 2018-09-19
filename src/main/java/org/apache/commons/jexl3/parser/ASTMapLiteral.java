@@ -21,6 +21,8 @@ import org.apache.commons.jexl3.internal.Debugger;
 public final class ASTMapLiteral extends JexlNode {
     /** Whether this array is constant or not. */
     private boolean constant = false;
+    /** Whether this array is immutable. */
+    private boolean immutable = false;
 
     ASTMapLiteral(int id) {
         super(id);
@@ -39,6 +41,14 @@ public final class ASTMapLiteral extends JexlNode {
     @Override
     protected boolean isConstant(boolean literal) {
         return constant;
+    }
+
+    public boolean isImmutable() {
+        return immutable;
+    }
+
+    public void setImmutable(boolean value) {
+        immutable = value;
     }
 
     @Override

@@ -452,6 +452,10 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTArrayLiteral node, Object data) {
         int num = node.jjtGetNumChildren();
+
+        if (node.isImmutable())
+            builder.append("#");
+
         builder.append("[ ");
         if (num > 0) {
             accept(node.jjtGetChild(0), data);
@@ -815,8 +819,10 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTSetLiteral node, Object data) {
-        int num = node.jjtGetNumChildren();
+        if (node.isImmutable())
+            builder.append("#");
         builder.append("{ ");
+        int num = node.jjtGetNumChildren();
         if (num > 0) {
             accept(node.jjtGetChild(0), data);
             for (int i = 1; i < num; ++i) {
@@ -830,8 +836,10 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTMapLiteral node, Object data) {
-        int num = node.jjtGetNumChildren();
+        if (node.isImmutable())
+            builder.append("#");
         builder.append("{ ");
+        int num = node.jjtGetNumChildren();
         if (num > 0) {
             accept(node.jjtGetChild(0), data);
             for (int i = 1; i < num; ++i) {

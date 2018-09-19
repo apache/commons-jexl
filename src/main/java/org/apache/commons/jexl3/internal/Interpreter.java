@@ -126,10 +126,12 @@ import org.apache.commons.jexl3.parser.ASTWhileStatement;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.Node;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.Map;
 import java.util.AbstractMap;
 import java.util.NoSuchElementException;
@@ -1078,6 +1080,12 @@ public class Interpreter extends InterpreterBase {
         int childCount = node.jjtGetNumChildren();
         JexlArithmetic.ArrayBuilder ab = arithmetic.arrayBuilder(childCount);
         boolean extended = node.isExtended();
+        boolean immutable = node.isImmutable();
+        final boolean cacheable = cache && immutable && node.isConstant();
+        Object cached = cacheable ? node.jjtGetValue() : null;
+        if (cached != null)
+            return cached;
+
         for (int i = 0; i < childCount; i++) {
             cancelCheck(node);
             JexlNode child = node.jjtGetChild(i);
@@ -1095,11 +1103,25 @@ public class Interpreter extends InterpreterBase {
                 ab.add(entry);
             }
         }
-        return ab.create(extended);
+        if (immutable) {
+            Object result = ab.create(true);
+            if (result instanceof List<?>)
+                result = Collections.unmodifiableList((List<?>) result);
+            if (cacheable)
+                node.jjtSetValue(result);
+            return result;
+        } else {
+            return ab.create(extended);
+        }
     }
 
     @Override
     protected Object visit(ASTSetLiteral node, Object data) {
+        boolean immutable = node.isImmutable();
+        final boolean cacheable = cache && immutable && node.isConstant();
+        Object cached = cacheable ? node.jjtGetValue() : null;
+        if (cached != null)
+            return cached;
         int childCount = node.jjtGetNumChildren();
         JexlArithmetic.SetBuilder mb = arithmetic.setBuilder(childCount);
         for (int i = 0; i < childCount; i++) {
@@ -1119,11 +1141,25 @@ public class Interpreter extends InterpreterBase {
                 mb.add(entry);
             }
         }
-        return mb.create();
+        if (immutable) {
+            Object result = mb.create();
+            if (result instanceof Set<?>)
+                result = Collections.unmodifiableSet((Set<?>) result);
+            if (cacheable)
+                node.jjtSetValue(result);
+            return result;
+        } else {
+            return mb.create();
+        }
     }
 
     @Override
     protected Object visit(ASTMapLiteral node, Object data) {
+        boolean immutable = node.isImmutable();
+        final boolean cacheable = cache && immutable && node.isConstant();
+        Object cached = cacheable ? node.jjtGetValue() : null;
+        if (cached != null)
+            return cached;
         int childCount = node.jjtGetNumChildren();
         JexlArithmetic.MapBuilder mb = arithmetic.mapBuilder(childCount);
         for (int i = 0; i < childCount; i++) {
@@ -1149,7 +1185,16 @@ public class Interpreter extends InterpreterBase {
                 }
             }
         }
-        return mb.create();
+        if (immutable) {
+            Object result = mb.create();
+            if (result instanceof Map<?,?>)
+                result = Collections.unmodifiableMap((Map<?,?>) result);
+            if (cacheable)
+                node.jjtSetValue(result);
+            return result;
+        } else {
+            return mb.create();
+        }
     }
 
     @Override
