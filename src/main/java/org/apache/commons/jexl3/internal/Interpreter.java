@@ -147,6 +147,8 @@ public class Interpreter extends InterpreterBase {
     protected final Operators operators;
     /** Cache executors. */
     protected final boolean cache;
+    /** Frame height. */
+    protected int fp = 0;
     /** Symbol values. */
     protected final Scope.Frame frame;
     /** The context to store/retrieve variables. */
@@ -155,6 +157,12 @@ public class Interpreter extends InterpreterBase {
     protected final Map<String, Object> functions;
     /** The map of dynamically creates namespaces, NamespaceFunctor or duck-types of those. */
     protected Map<String, Object> functors;
+
+    /**
+     * The thread local interpreter.
+     */
+    protected static final java.lang.ThreadLocal<Interpreter> INTER =
+                       new java.lang.ThreadLocal<Interpreter>();
 
     /**
      * Creates an interpreter.
@@ -192,6 +200,17 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
+     * Swaps the current thread local interpreter.
+     * @param inter the interpreter or null
+     * @return the previous thread local interpreter
+     */
+    protected Interpreter putThreadInterpreter(Interpreter inter) {
+        Interpreter pinter = INTER.get();
+        INTER.set(inter);
+        return pinter;
+    }
+
+    /**
      * Interpret the given script/expression.
      * <p>
      * If the underlying JEXL engine is silent, errors will be logged through
@@ -203,13 +222,29 @@ public class Interpreter extends InterpreterBase {
     public Object interpret(JexlNode node) {
         JexlContext.ThreadLocal tcontext = null;
         JexlEngine tjexl = null;
+        Interpreter tinter = null;
         try {
+            tinter = putThreadInterpreter(this);
+            if (tinter != null) {
+                fp = tinter.fp + 1;
+            }
             if (context instanceof JexlContext.ThreadLocal) {
                 tcontext = jexl.putThreadLocal((JexlContext.ThreadLocal) context);
             }
             tjexl = jexl.putThreadEngine(jexl);
+            if (fp > jexl.stackOverflow) {
+                throw new JexlException.StackOverflow(node.jexlInfo(), "jexl (" + jexl.stackOverflow + ")", null);
+            }
             cancelCheck(node);
             return node.jjtAccept(this, null);
+        } catch(StackOverflowError xstack) {
+            JexlException xjexl = new JexlException.StackOverflow(node.jexlInfo(), "jvm", xstack);
+            if (!isSilent()) {
+                throw xjexl.clean();
+            }
+            if (logger.isWarnEnabled()) {
+                logger.warn(xjexl.getMessage(), xjexl.getCause());
+            }
         } catch (JexlException.Return xreturn) {
             return xreturn.getValue();
         } catch (JexlException.Cancel xcancel) {
@@ -240,6 +275,10 @@ public class Interpreter extends InterpreterBase {
             if (context instanceof JexlContext.ThreadLocal) {
                 jexl.putThreadLocal(tcontext);
             }
+            if (tinter != null) {
+                fp = tinter.fp - 1;
+            }
+            putThreadInterpreter(tinter);
         }
         return null;
     }
@@ -1504,13 +1543,13 @@ public class Interpreter extends InterpreterBase {
             if (antish && ant != null) {
                 boolean undefined = !(context.has(ant.toString()) || isLocalVariable(node, 0));
                 // variable unknown in context and not a local
-                return node.isSafeLhs()
+                return node.isSafeLhs(jexl.safe)
                         ? null
                         : unsolvableVariable(node, ant.toString(), undefined);
             }
             if (ptyNode != null) {
                 // am I the left-hand side of a safe op ?
-                return ptyNode.isSafeLhs()
+                return ptyNode.isSafeLhs(jexl.safe)
                        ? null
                        : unsolvableProperty(node, stringifyProperty(ptyNode), false, null);
             }

@@ -25,6 +25,7 @@ import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParserVisitor;
@@ -249,6 +250,13 @@ public abstract class InterpreterBase extends ParserVisitor {
                        + "(...)";
             }
             return ".???(...)";
+        }
+        if (node instanceof ASTFunctionNode) {
+            if (node.jjtGetChild(0) != null) {
+                return node.jjtGetChild(0).toString()
+                       + "(...)";
+            }
+            return "???(...)";
         }
         return node.toString();
     }

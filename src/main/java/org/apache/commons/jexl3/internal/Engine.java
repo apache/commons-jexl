@@ -90,9 +90,17 @@ public class Engine extends JexlEngine {
      */
     protected final Map<String, Object> functions;
     /**
+     * The maximum stack height.
+     */
+    protected final int stackOverflow;
+    /**
      * Whether this engine considers unknown variables, methods and constructors as errors.
      */
     protected final boolean strict;
+    /**
+     * Whether this engine considers null in navigation expression as errors.
+     */
+    protected final boolean safe;
     /**
      * Whether expressions evaluated by this engine will throw exceptions (false) or return null (true) on errors.
      * Default is false.
@@ -156,9 +164,11 @@ public class Engine extends JexlEngine {
     public Engine(JexlBuilder conf) {
         // options:
         this.strict = conf.strict() == null ? true : conf.strict();
+        this.safe = conf.safe() == null ? false : conf.safe();
         this.silent = conf.silent() == null ? false : conf.silent();
         this.cancellable = conf.cancellable() == null ? !silent && strict : conf.cancellable();
         this.debug = conf.debug() == null ? true : conf.debug();
+        this.stackOverflow = conf.stackOverflow() > 0? conf.stackOverflow() : Integer.MAX_VALUE;
         // core properties:
         JexlUberspect uber = conf.uberspect() == null ? getUberspect(conf.logger(), conf.strategy()) : conf.uberspect();
         ClassLoader loader = conf.loader();

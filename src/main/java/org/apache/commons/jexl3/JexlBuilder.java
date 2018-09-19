@@ -82,6 +82,9 @@ public class JexlBuilder {
     /** Whether this engine is in lenient or strict mode; if unspecified, use the arithmetic lenient property. */
     private Boolean strict = null;
 
+    /** Whether this engine is in tolerant mode. */
+    private Boolean safe = false;
+    
     /** Whether error messages will carry debugging information. */
     private Boolean debug = null;
 
@@ -96,6 +99,9 @@ public class JexlBuilder {
 
     /** The cache size. */
     private int cache = -1;
+    
+    /** The stack overflow limit. */
+    private int stackOverflow = Integer.MAX_VALUE;
 
     /** The maximum expression length to hit the expression cache. */
     private int cacheThreshold = CACHE_THRESHOLD;
@@ -286,6 +292,25 @@ public class JexlBuilder {
     }
 
     /**
+     * Sets whether the engine considers dereferencing null in navigation expressions
+     * as errors or evaluates them as null.
+     * <p><code>x.y()</code> if x is null throws an exception when not safe,
+     * return null and warns if it is.<p>
+     *
+     * @param flag true means safe navigation, false throws exception when dereferencing null
+     * @return this builder
+     */
+    public JexlBuilder safe(boolean flag) {
+        this.safe = flag;
+        return this;
+    }
+
+    /** @return true if safe, false otherwise */
+    public Boolean safe() {
+        return this.safe;
+    }
+    
+    /**
      * Sets whether the engine will report debugging information when error occurs.
      *
      * @param flag true implies debug is on, false implies debug is off.
@@ -401,6 +426,23 @@ public class JexlBuilder {
         return cacheThreshold;
     }
 
+    /**
+     * Sets the number of script/expression evaluations that can be stacked.
+     * @param size if not strictly positive, limit is reached when java StackOverflow is thrown.
+     * @return this builder
+     */
+    public JexlBuilder stackOverflow(int size) {
+        this.stackOverflow = size;
+        return this;
+    }
+
+    /**
+     * @return the cache size
+     */
+    public int stackOverflow() {
+        return stackOverflow;
+    }
+    
     /**
      * @return a {@link JexlEngine} instance
      */
