@@ -102,6 +102,8 @@ import org.apache.commons.jexl3.parser.ASTSetSubNode;
 import org.apache.commons.jexl3.parser.ASTSetXorNode;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
 import org.apache.commons.jexl3.parser.ASTSizeMethod;
+import org.apache.commons.jexl3.parser.ASTStartCountNode;
+import org.apache.commons.jexl3.parser.ASTStopCountNode;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
@@ -1242,6 +1244,16 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         accept(node.jjtGetChild(0), data);
         builder.append(')');
         return data;
+    }
+
+    @Override
+    protected Object visit(ASTStartCountNode node, Object data) {
+        return prefixChild(node, ">", data);
+    }
+
+    @Override
+    protected Object visit(ASTStopCountNode node, Object data) {
+        return prefixChild(node, "<", data);
     }
 
     @Override

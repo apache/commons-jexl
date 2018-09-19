@@ -114,6 +114,8 @@ import org.apache.commons.jexl3.parser.ASTSetSubNode;
 import org.apache.commons.jexl3.parser.ASTSetXorNode;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
 import org.apache.commons.jexl3.parser.ASTSizeMethod;
+import org.apache.commons.jexl3.parser.ASTStartCountNode;
+import org.apache.commons.jexl3.parser.ASTStopCountNode;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
@@ -2608,19 +2610,79 @@ public class Interpreter extends InterpreterBase {
         }
     }
 
+    public class StartCountIterator extends IteratorBase {
+
+        protected StartCountIterator(Iterator<?> iterator, JexlNode node, int startCount) {
+            super(iterator, node);
+
+            if (startCount > 0)
+                skipItems(startCount);
+        }
+
+        protected void skipItems(int skipCount) {
+            while (i < skipCount) {
+                if (hasNext()) {
+                    next();
+                } else {
+                    break;
+                }
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return itemsIterator.hasNext();
+        }
+
+        @Override
+        public Object next() {
+            cancelCheck(node);
+
+            if (!hasNext())
+                throw new NoSuchElementException();
+
+            i += 1;
+
+            return itemsIterator.next();
+        }
+
+        @Override
+        public void remove() {
+            itemsIterator.remove();
+        }
+    }
+
     @Override
     protected Object visit(ASTSelectionNode node, Object data) {
         JexlNode child = node.jjtGetChild(0);
 
-        if (child instanceof ASTJexlLambda) {
-           ASTJexlLambda script = (ASTJexlLambda) child;
-           Iterator<?> itemsIterator = prepareIndexedIterator(child, data);
-           return itemsIterator != null ? new SelectionIterator(itemsIterator, script) : null;
-        } else {
-           int stopCount = arithmetic.toInteger(child.jjtAccept(this, null));
-           Iterator<?> itemsIterator = prepareIndexedIterator(child, data);
-           return itemsIterator != null ? new StopCountIterator(itemsIterator, node, stopCount) : null;
+        if (child instanceof ASTStopCountNode) {
+            int stopCount = (Integer) child.jjtAccept(this, null);
+            Iterator<?> itemsIterator = prepareIndexedIterator(child, data);
+            return itemsIterator != null ? new StopCountIterator(itemsIterator, node, stopCount) : null;
+        } else if (child instanceof ASTStartCountNode) {
+            int startCount = (Integer) child.jjtAccept(this, null);
+            Iterator<?> itemsIterator = prepareIndexedIterator(child, data);
+            return itemsIterator != null ? new StartCountIterator(itemsIterator, node, startCount) : null;
         }
+
+        ASTJexlLambda script = (ASTJexlLambda) child;
+        Iterator<?> itemsIterator = prepareIndexedIterator(child, data);
+        return itemsIterator != null ? new SelectionIterator(itemsIterator, script) : null;
+    }
+
+    @Override
+    protected Object visit(ASTStartCountNode node, Object data) {
+        JexlNode child = node.jjtGetChild(0);
+        Integer startCount = arithmetic.toInteger(child.jjtAccept(this, null));
+        return startCount;
+    }
+
+    @Override
+    protected Object visit(ASTStopCountNode node, Object data) {
+        JexlNode child = node.jjtGetChild(0);
+        Integer stopCount = arithmetic.toInteger(child.jjtAccept(this, null));
+        return stopCount;
     }
 
     @Override
