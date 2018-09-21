@@ -947,60 +947,39 @@ public class Interpreter extends InterpreterBase {
         Object result = null;
 
         int num = node.jjtGetNumChildren();
-        /* first objectNode is the try block */
-        JexlNode statement = node.jjtGetChild(0);
 
-        if (num == 2) {
-            try {
-                // execute statement
-                result = statement.jjtAccept(this, data);
-            } finally {
-                // execute finally block
+        try {
+
+            // execute try block
+            result = node.jjtGetChild(0).jjtAccept(this, data);
+
+        } catch (JexlException.Break | JexlException.Continue | JexlException.Remove | JexlException.Return | JexlException.Cancel e) {
+            throw e;
+        } catch (Throwable t) {
+
+            if (num < 3) 
+                throw t;
+
+            ASTCatchVar catchReference = (ASTCatchVar) node.jjtGetChild(1);
+            ASTIdentifier catchVariable = (ASTIdentifier) catchReference.jjtGetChild(0);
+
+            int symbol = catchVariable.getSymbol();
+
+            if (symbol < 0) {
+                context.set(catchVariable.getName(), t);
+            } else {
+                frame.set(symbol, t);
+            }
+
+            // execute catch block
+            node.jjtGetChild(2).jjtAccept(this, data);
+
+        } finally {
+
+            // execute finally block if any
+            if (num == 2) {
                 node.jjtGetChild(1).jjtAccept(this, data);
-            }
-        } else if (num == 3) {
-            try {
-                // execute statement
-                result = statement.jjtAccept(this, data);
-            } catch (JexlException.Break | JexlException.Continue | JexlException.Remove | JexlException.Return e) {
-                throw e;
-            } catch (Throwable t) {
-                ASTCatchVar catchReference = (ASTCatchVar) node.jjtGetChild(1);
-                ASTIdentifier catchVariable = (ASTIdentifier) catchReference.jjtGetChild(0);
-
-                int symbol = catchVariable.getSymbol();
-
-                if (symbol < 0) {
-                    context.set(catchVariable.getName(), t);
-                } else {
-                    frame.set(symbol, t);
-                }
-
-                // execute catch block
-                node.jjtGetChild(2).jjtAccept(this, data);
-            }
-        } else if (num == 4) {
-            try {
-                // execute statement
-                result = statement.jjtAccept(this, data);
-            } catch (JexlException.Break | JexlException.Continue | JexlException.Remove | JexlException.Return e) {
-                throw e;
-            } catch (Throwable t) {
-                ASTCatchVar catchReference = (ASTCatchVar) node.jjtGetChild(1);
-                ASTIdentifier catchVariable = (ASTIdentifier) catchReference.jjtGetChild(0);
-
-                int symbol = catchVariable.getSymbol();
-
-                if (symbol < 0) {
-                    context.set(catchVariable.getName(), t);
-                } else {
-                    frame.set(symbol, t);
-                }
-
-                // execute catch block
-                node.jjtGetChild(2).jjtAccept(this, data);
-            } finally {
-                // execute finally block
+            } else if (num > 3) {
                 node.jjtGetChild(3).jjtAccept(this, data);
             }
         }
