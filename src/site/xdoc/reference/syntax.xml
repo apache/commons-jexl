@@ -94,7 +94,7 @@
                         </p>
                         <p>
                             <strong>N.B.</strong> the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
-                            <code>or and eq ne lt gt le ge in div mod not this null true false new var do while break continue remove function return</code>
+                            <code>or and eq ne lt gt le ge in div mod not this null true false new var do while break continue remove function return try catch finally</code>
                             For example, the following is invalid:
                             <code>my.new.dotted.var // invalid ('new' is keyword)</code>
                             In such cases, quoted identifiers or the [ ] operator can be used, for example:
@@ -1118,6 +1118,40 @@
                     <td>break</td>
                     <td>
                         Allows to break from a loop (do/while/for) unconditionally.
+                    </td>
+                </tr>
+                <tr>
+                    <td>try/catch/finally</td>
+                    <td>
+                        Executes a try block and catches the exception, e.g.
+                        <code>try {
+                              return 42/0;
+                            } catch (e) {
+                              ...
+                            } </code>
+
+                        <p>The following syntax is also supported:
+                        <code>try {
+                              return 42/0;
+                            } catch (var e) {
+                              ...
+                            } </code>
+                        Where <code>e</code> is a local variable.</p>
+
+                        <p>Note that the catch variable <code>e</code> is accessible inside <code>finally</code> block and
+                          after the whole statement evaluation</p>
+
+                        <p>Either the <code>catch</code> block, the <code>finally</code> block or both can be specified for the
+                        statement</p>
+
+                        <p>The <code>finally</code> block executes always when the try block exits
+                        <code>try {
+                              return 41;
+                            } finally {
+                              return 42
+                            } </code>
+                        </p>
+
                     </td>
                 </tr>
             </table>

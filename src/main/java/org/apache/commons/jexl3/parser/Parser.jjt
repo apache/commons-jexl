@@ -123,6 +123,9 @@ TOKEN_MGR_DECLS : {
     | < FOR : "for" >
     | < WHILE : "while" >
     | < DO : "do" >
+    | < TRY : "try" >
+    | < CATCH : "catch" >
+    | < FINALLY : "finally" >
     | < NEW : "new" >
     | < VAR : "var" >
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
@@ -333,6 +336,7 @@ void Statement() #void : {}
     | ForeachStatement()
     | WhileStatement()
     | DoWhileStatement()
+    | TryStatement()
     | LOOKAHEAD(2) ExpressionStatement()
     | ReturnStatement()
     | Continue()
@@ -367,6 +371,18 @@ void WhileStatement() : {}
 void DoWhileStatement() : {}
 {
     <DO> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount -= 1; }
+}
+
+void TryStatement() : {}
+{
+    <TRY> Block() ( (<CATCH> <LPAREN> CatchVar() <RPAREN> Block() (<FINALLY> Block())?) | <FINALLY> Block() )
+}
+
+void CatchVar() : {}
+{
+    <VAR> DeclareVar()
+    |
+    Identifier()
 }
 
 void ReturnStatement() : {}

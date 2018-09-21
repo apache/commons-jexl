@@ -32,6 +32,7 @@ import org.apache.commons.jexl3.parser.ASTBitwiseOrNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseXorNode;
 import org.apache.commons.jexl3.parser.ASTBlock;
 import org.apache.commons.jexl3.parser.ASTBreak;
+import org.apache.commons.jexl3.parser.ASTCatchVar;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDivNode;
@@ -108,6 +109,7 @@ import org.apache.commons.jexl3.parser.ASTSubNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTThisNode;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
+import org.apache.commons.jexl3.parser.ASTTryStatement;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
 import org.apache.commons.jexl3.parser.ASTWhileStatement;
@@ -316,6 +318,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             || child instanceof ASTForeachStatement
             || child instanceof ASTWhileStatement
             || child instanceof ASTDoWhileStatement
+            || child instanceof ASTTryStatement
             || child instanceof ASTAnnotation)) {
             builder.append(';');
             if (indent > 0) {
@@ -623,6 +626,33 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             builder.append(", ");
             accept(node.jjtGetChild(1), data);
         }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTTryStatement node, Object data) {
+        int num = node.jjtGetNumChildren();
+        builder.append("try ");
+        accept(node.jjtGetChild(0), data);
+        if (num == 2) {
+           builder.append(" finally ");
+           accept(node.jjtGetChild(1), data);
+        } else if (num >= 3) {
+           builder.append(" catch (");
+           accept(node.jjtGetChild(1), data);
+           builder.append(") ");
+           accept(node.jjtGetChild(2), data);
+        } 
+        if (num == 4) {
+           builder.append(" finally ");
+           accept(node.jjtGetChild(3), data);
+        }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTCatchVar node, Object data) {
+        accept(node.jjtGetChild(0), data);
         return data;
     }
 

@@ -32,6 +32,7 @@ import org.apache.commons.jexl3.parser.ASTBitwiseOrNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseXorNode;
 import org.apache.commons.jexl3.parser.ASTBlock;
 import org.apache.commons.jexl3.parser.ASTBreak;
+import org.apache.commons.jexl3.parser.ASTCatchVar;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDivNode;
@@ -107,6 +108,7 @@ import org.apache.commons.jexl3.parser.ASTSubNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTThisNode;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
+import org.apache.commons.jexl3.parser.ASTTryStatement;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
 import org.apache.commons.jexl3.parser.ASTWhileStatement;
@@ -211,6 +213,16 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTReturnStatement node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTTryStatement node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTCatchVar node, Object data) {
         return visitNode(node, data);
     }
 

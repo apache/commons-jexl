@@ -43,6 +43,7 @@ import org.apache.commons.jexl3.parser.ASTBitwiseOrNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseXorNode;
 import org.apache.commons.jexl3.parser.ASTBlock;
 import org.apache.commons.jexl3.parser.ASTBreak;
+import org.apache.commons.jexl3.parser.ASTCatchVar;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDivNode;
@@ -120,6 +121,7 @@ import org.apache.commons.jexl3.parser.ASTSubNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTThisNode;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
+import org.apache.commons.jexl3.parser.ASTTryStatement;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
 import org.apache.commons.jexl3.parser.ASTWhileStatement;
@@ -937,6 +939,77 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTForeachVar node, Object data) {
+        return null;
+    }
+
+    @Override
+    protected Object visit(ASTTryStatement node, Object data) {
+        Object result = null;
+
+        int num = node.jjtGetNumChildren();
+        /* first objectNode is the try block */
+        JexlNode statement = node.jjtGetChild(0);
+
+        if (num == 2) {
+            try {
+                // execute statement
+                result = statement.jjtAccept(this, data);
+            } finally {
+                // execute finally block
+                node.jjtGetChild(1).jjtAccept(this, data);
+            }
+        } else if (num == 3) {
+            try {
+                // execute statement
+                result = statement.jjtAccept(this, data);
+            } catch (JexlException.Break | JexlException.Continue | JexlException.Remove | JexlException.Return e) {
+                throw e;
+            } catch (Throwable t) {
+                ASTCatchVar catchReference = (ASTCatchVar) node.jjtGetChild(1);
+                ASTIdentifier catchVariable = (ASTIdentifier) catchReference.jjtGetChild(0);
+
+                int symbol = catchVariable.getSymbol();
+
+                if (symbol < 0) {
+                    context.set(catchVariable.getName(), t);
+                } else {
+                    frame.set(symbol, t);
+                }
+
+                // execute catch block
+                node.jjtGetChild(2).jjtAccept(this, data);
+            }
+        } else if (num == 4) {
+            try {
+                // execute statement
+                result = statement.jjtAccept(this, data);
+            } catch (JexlException.Break | JexlException.Continue | JexlException.Remove | JexlException.Return e) {
+                throw e;
+            } catch (Throwable t) {
+                ASTCatchVar catchReference = (ASTCatchVar) node.jjtGetChild(1);
+                ASTIdentifier catchVariable = (ASTIdentifier) catchReference.jjtGetChild(0);
+
+                int symbol = catchVariable.getSymbol();
+
+                if (symbol < 0) {
+                    context.set(catchVariable.getName(), t);
+                } else {
+                    frame.set(symbol, t);
+                }
+
+                // execute catch block
+                node.jjtGetChild(2).jjtAccept(this, data);
+            } finally {
+                // execute finally block
+                node.jjtGetChild(3).jjtAccept(this, data);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    protected Object visit(ASTCatchVar node, Object data) {
         return null;
     }
 
