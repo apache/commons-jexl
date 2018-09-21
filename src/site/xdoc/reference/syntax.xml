@@ -1121,6 +1121,13 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>return</td>
+                    <td>
+                        Allows to return the value of the specified expression, or null, from script/function, e.g.
+                        <code>return 42</code>
+                    </td>
+                </tr>
+                <tr>
                     <td>try/catch/finally</td>
                     <td>
                         Executes a try block and catches the exception, e.g.
