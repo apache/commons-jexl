@@ -120,6 +120,7 @@ import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTThisNode;
+import org.apache.commons.jexl3.parser.ASTThrowStatement;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
 import org.apache.commons.jexl3.parser.ASTTryStatement;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
@@ -990,6 +991,20 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTCatchVar node, Object data) {
         return null;
+    }
+
+    @Override
+    protected Object visit(ASTThrowStatement node, Object data) {
+        Object val = node.jjtGetChild(0).jjtAccept(this, data);
+        cancelCheck(node);
+        if (val instanceof Throwable)
+            Interpreter.<RuntimeException>doThrow((Throwable) val);
+        throw new RuntimeException(arithmetic.toString(val));
+    }
+ 
+    @SuppressWarnings("unchecked")
+    private static <T extends Throwable> void doThrow(Throwable t) throws T {
+        throw (T) t;
     }
 
     @Override

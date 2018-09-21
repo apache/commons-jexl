@@ -126,6 +126,7 @@ TOKEN_MGR_DECLS : {
     | < TRY : "try" >
     | < CATCH : "catch" >
     | < FINALLY : "finally" >
+    | < THROW : "throw" >
     | < NEW : "new" >
     | < VAR : "var" >
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
@@ -337,6 +338,7 @@ void Statement() #void : {}
     | WhileStatement()
     | DoWhileStatement()
     | TryStatement()
+    | ThrowStatement()
     | LOOKAHEAD(2) ExpressionStatement()
     | ReturnStatement()
     | Continue()
@@ -383,6 +385,11 @@ void CatchVar() : {}
     <VAR> DeclareVar()
     |
     Identifier()
+}
+
+void ThrowStatement() : {}
+{
+    <THROW> Expression()
 }
 
 void ReturnStatement() : {}

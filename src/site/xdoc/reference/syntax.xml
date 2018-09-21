@@ -94,7 +94,7 @@
                         </p>
                         <p>
                             <strong>N.B.</strong> the following keywords are reserved, and cannot be used as a variable name or property when using the dot operator:
-                            <code>or and eq ne lt gt le ge in div mod not this null true false new var do while break continue remove function return try catch finally</code>
+                            <code>or and eq ne lt gt le ge in div mod not this null true false new var do while break continue remove function return try catch finally throw</code>
                             For example, the following is invalid:
                             <code>my.new.dotted.var // invalid ('new' is keyword)</code>
                             In such cases, quoted identifiers or the [ ] operator can be used, for example:
@@ -1152,6 +1152,15 @@
                             } </code>
                         </p>
 
+                    </td>
+                </tr>
+                <tr>
+                    <td>throw</td>
+                    <td>
+                        Throws an exception with the specified text message, e.g.
+                        <code>throw "Something wrong here"</code>
+                        <p>If the specified argument is the instance of the <code>Throwable</code> class, 
+                           the provided exception will be rethrown</p>
                     </td>
                 </tr>
             </table>
