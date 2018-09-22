@@ -954,10 +954,19 @@ public class Interpreter extends InterpreterBase {
             // execute try block
             result = node.jjtGetChild(0).jjtAccept(this, data);
 
-        } catch (JexlException.Break | JexlException.Continue | JexlException.Remove | JexlException.Return | JexlException.Cancel e) {
+        } catch (JexlException.Break e) {
+            throw e;
+        } catch (JexlException.Continue e) {
+            throw e;
+        } catch (JexlException.Remove e) {
+            throw e;
+        } catch (JexlException.Return e) {
+            throw e;
+        } catch(JexlException.Cancel e) {
             throw e;
         } catch (Throwable t) {
 
+            // if there is no a catch block just rethrow
             if (num < 3) 
                 throw t;
 
