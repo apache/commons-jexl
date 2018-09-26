@@ -765,9 +765,18 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTJexlScript node, Object data) {
         // if lambda, produce parameters
         if (node instanceof ASTJexlLambda) {
+            boolean expr = false;
+
+            if (node.jjtGetNumChildren() == 1) {
+               JexlNode child = node.jjtGetChild(0);
+
+               if (!(child instanceof ASTBlock))
+                   expr = true;
+            }
+
             JexlNode parent = node.jjtGetParent();
             // use lambda syntax if not assigned
-            boolean named = parent instanceof ASTAssignment;
+            boolean named = parent instanceof ASTAssignment && !expr;
             if (named) {
                 builder.append("function");
             }
@@ -794,16 +803,6 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             if (named) {
                 builder.append(' ');
             } else {
-
-                boolean expr = false;
-
-                if (node.jjtGetNumChildren() == 1) {
-                   JexlNode child = node.jjtGetChild(0);
-
-                   if (!(child instanceof ASTBlock))
-                       expr = true;
-                }
-
                 if (expr) {
                     builder.append("=>");
                 } else {
