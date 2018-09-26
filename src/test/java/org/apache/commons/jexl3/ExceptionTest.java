@@ -233,12 +233,12 @@ public class ExceptionTest extends JexlTestCase {
 
     @Test
     public void test206() throws Exception {
-        String src = "null.1 = 2; return 42";
+        String src = "(null).1 = 2; return 42";
         doTest206(src, false, false);
         doTest206(src, false, true);
         doTest206(src, true, false);
         doTest206(src, true, true);
-        src = "x = null.1; return 42";
+        src = "x = (null).1; return 42";
         doTest206(src, false, false);
         doTest206(src, false, true);
         doTest206(src, true, false);

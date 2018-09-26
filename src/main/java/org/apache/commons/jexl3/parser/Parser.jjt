@@ -492,22 +492,22 @@ void AssignmentExpression() #void : {}
 {
   ConditionalExpression()
   ( LOOKAHEAD(2) (
-    <plus_assign>  Expression() #SetAddNode(2)
-  |
-    <mult_assign>  Expression() #SetMultNode(2)
-  |
-    <div_assign>  Expression() #SetDivNode(2)
-  |
-    <mod_assign>  Expression() #SetModNode(2)
-  |
-    <and_assign>  Expression() #SetAndNode(2)
-  |
-    <or_assign>  Expression() #SetOrNode(2)
-  |
+    <plus_assign> Expression() #SetAddNode(2)
+    |
+    <mult_assign> Expression() #SetMultNode(2)
+    |
+    <div_assign> Expression() #SetDivNode(2)
+    |
+    <mod_assign> Expression() #SetModNode(2)
+    |
+    <and_assign> Expression() #SetAndNode(2)
+    |
+    <or_assign> Expression() #SetOrNode(2)
+    |
     <xor_assign> Expression() #SetXorNode(2)
-  |
-    <minus_assign>  Expression() #SetSubNode(2)
-  |
+    |
+    <minus_assign> Expression() #SetSubNode(2)
+    |
     <assign> Expression() #Assignment(2)
   ) )*
 }
@@ -808,8 +808,6 @@ void Literal() #void :
 |
   RegexLiteral()
 |
-  NullLiteral()
-|
   ThisLiteral()
 |
   NaNLiteral()
@@ -971,7 +969,6 @@ void InlinePropertyName() #void : {}
 void InlinePropertyNested() #void : {}
 {
     ( (LOOKAHEAD(<LBRACKET>)ArrayAccess() | Identifier()) (LOOKAHEAD(2) MemberAccess() )*) #Reference()
-
 }
 
 void InlinePropertyEntry() : {}
@@ -1173,5 +1170,7 @@ void MemberExpression() #void : {}
 
 void ValueExpression() #void : {}
 {
+    NullLiteral()
+    |
     ( PrimaryExpression() ( LOOKAHEAD(2) MemberExpression() )*) #Reference(>1)
 }
