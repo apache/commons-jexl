@@ -606,6 +606,24 @@ public class JexlArithmetic {
     }
 
     /**
+     * Checks if object is eligible for fast integer arithmetic.
+     *
+     * @param object  argument
+     */
+    protected boolean isIntegerPrecisionNumber(Object value) {
+       return value instanceof Integer || value instanceof Short || value instanceof Byte;
+    }
+
+    /**
+     * Checks if object is eligible for fast long arithmetic.
+     *
+     * @param object  argument
+     */
+    protected boolean isLongPrecisionNumber(Object value) {
+       return value instanceof Long || isIntegerPrecisionNumber(value);
+    }
+
+    /**
      * Add two values together.
      * <p>
      * If any numeric add fails on coercion to the appropriate type,
@@ -625,6 +643,17 @@ public class JexlArithmetic {
                             : left instanceof String && right instanceof String;
         if (!strconcat) {
             try {
+                // if either are no longer than integers use that type
+                if (isIntegerPrecisionNumber(left) && isIntegerPrecisionNumber(right)) {
+                    long l = ((Number) left).longValue();
+                    long r = ((Number) right).longValue();
+                    long result = l + r;
+                    if (result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
+                        return (int) result;
+                    } else {
+                        return result;
+                    }
+                }
                 // if either are bigdecimal use that type
                 if (left instanceof BigDecimal || right instanceof BigDecimal) {
                     BigDecimal l = toBigDecimal(left);
@@ -674,6 +703,21 @@ public class JexlArithmetic {
     public Object divide(Object left, Object right) {
         if (left == null && right == null) {
             return controlNullNullOperands();
+        }
+        // if either are no longer than long use that type
+        if (isLongPrecisionNumber(left) && isLongPrecisionNumber(right)) {
+            long l = ((Number) left).longValue();
+            long r = ((Number) right).longValue();
+            if (r == 0L) {
+                throw new ArithmeticException("/");
+            }
+            long result = l / r;
+            if (!(left instanceof Long || right instanceof Long) 
+                    && result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
+                return (int) result;
+            } else {
+                return result;
+            }
         }
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
@@ -727,6 +771,21 @@ public class JexlArithmetic {
         if (left == null && right == null) {
             return controlNullNullOperands();
         }
+        // if either are no longer than long use that type
+        if (isLongPrecisionNumber(left) && isLongPrecisionNumber(right)) {
+            long l = ((Number) left).longValue();
+            long r = ((Number) right).longValue();
+            if (r == 0L) {
+                throw new ArithmeticException("%");
+            }
+            long result = l % r;
+            if (!(left instanceof Long || right instanceof Long) 
+                    && result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
+                return (int) result;
+            } else {
+                return result;
+            }
+        }
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
@@ -778,6 +837,17 @@ public class JexlArithmetic {
         if (left == null && right == null) {
             return controlNullNullOperands();
         }
+        // if either are no longer than integers use that type
+        if (isIntegerPrecisionNumber(left) && isIntegerPrecisionNumber(right)) {
+            long l = ((Number) left).longValue();
+            long r = ((Number) right).longValue();
+            long result = l * r;
+            if (result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
+                return (int) result;
+            } else {
+                return result;
+            }
+        }
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
             BigDecimal l = toBigDecimal(left);
@@ -819,6 +889,17 @@ public class JexlArithmetic {
     public Object subtract(Object left, Object right) {
         if (left == null && right == null) {
             return controlNullNullOperands();
+        }
+        // if either are no longer than integers use that type
+        if (isIntegerPrecisionNumber(left) && isIntegerPrecisionNumber(right)) {
+            long l = ((Number) left).longValue();
+            long r = ((Number) right).longValue();
+            long result = l - r;
+            if (result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
+                return (int) result;
+            } else {
+                return result;
+            }
         }
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
