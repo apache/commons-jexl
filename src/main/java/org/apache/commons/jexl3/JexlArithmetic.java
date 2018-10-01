@@ -653,6 +653,17 @@ public class JexlArithmetic {
     }
 
     /**
+     * Default self assign implementation for Add.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left + right.
+     */
+    public Object selfAdd(Object left, Object right) {
+        return add(left, right);
+    }
+
+    /**
      * Divide the left value by the right.
      *
      * @param left  left argument
@@ -691,6 +702,17 @@ public class JexlArithmetic {
         }
         BigInteger result = l.divide(r);
         return narrowBigInteger(left, right, result);
+    }
+
+    /**
+     * Default self assign implementation for Divide.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left / right.
+     */
+    public Object selfDivide(Object left, Object right) {
+        return divide(left, right);
     }
 
     /**
@@ -735,6 +757,17 @@ public class JexlArithmetic {
     }
 
     /**
+     * Default self assign implementation for Mod.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left % right.
+     */
+    public Object selfMod(Object left, Object right) {
+        return mod(left, right);
+    }
+
+    /**
      * Multiply the left value by the right.
      *
      * @param left  left argument
@@ -766,6 +799,17 @@ public class JexlArithmetic {
     }
 
     /**
+     * Default self assign implementation for Multiply.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left * right.
+     */
+    public Object selfMultiply(Object left, Object right) {
+        return multiply(left, right);
+    }
+
+    /**
      * Subtract the right value from the left.
      *
      * @param left  left argument
@@ -794,6 +838,17 @@ public class JexlArithmetic {
         BigInteger r = toBigInteger(right);
         BigInteger result = l.subtract(r);
         return narrowBigInteger(left, right, result);
+    }
+
+    /**
+     * Default self assign implementation for Subtract.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left - right.
+     */
+    public Object selfSubtract(Object left, Object right) {
+        return subtract(left, right);
     }
 
     /**
@@ -980,6 +1035,17 @@ public class JexlArithmetic {
     }
 
     /**
+     * Default self assign implementation for bitwise and.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left &amp; right.
+     */
+    public Object selfAnd(Object left, Object right) {
+        return and(left, right);
+    }
+
+    /**
      * Performs a bitwise or.
      *
      * @param left  the left operand
@@ -993,6 +1059,17 @@ public class JexlArithmetic {
     }
 
     /**
+     * Default self assign implementation for bitwise or.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left | right.
+     */
+    public Object selfOr(Object left, Object right) {
+        return or(left, right);
+    }
+
+    /**
      * Performs a bitwise xor.
      *
      * @param left  the left operand
@@ -1003,6 +1080,17 @@ public class JexlArithmetic {
         long l = toLong(left);
         long r = toLong(right);
         return l ^ r;
+    }
+
+    /**
+     * Default self assign implementation for bitwise xor.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left ^ right.
+     */
+    public Object selfXor(Object left, Object right) {
+        return xor(left, right);
     }
 
     /**
