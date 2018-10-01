@@ -2578,11 +2578,11 @@ public class Interpreter extends InterpreterBase {
             if (numChildren == 1) {
                 return evaluateProjection(0, data);
             } else {
-                Object[] value = new Object[numChildren];
+                List<Object> value = new ArrayList(numChildren);
                 for (int child = 0; child < numChildren; child++) {
-                    value[child] = evaluateProjection(child, data);
+                    value.add(evaluateProjection(child, data));
                 }
-                return value;
+                return Collections.unmodifiableList(value);
             }
         }
 
@@ -2616,9 +2616,8 @@ public class Interpreter extends InterpreterBase {
             Object key = evaluateProjection(0, data);
             Object value = evaluateProjection(1, data);
 
-            return new AbstractMap.SimpleEntry<Object,Object> (key, value);
+            return new AbstractMap.SimpleImmutableEntry<Object,Object> (key, value);
         }
-
     }
 
     @Override
