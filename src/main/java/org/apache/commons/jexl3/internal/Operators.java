@@ -142,21 +142,21 @@ public class Operators {
         try {
             switch (operator) {
                 case SELF_ADD:
-                    return arithmetic.add(args[0], args[1]);
+                    return arithmetic.selfAdd(args[0], args[1]);
                 case SELF_SUBTRACT:
-                    return arithmetic.subtract(args[0], args[1]);
+                    return arithmetic.selfSubtract(args[0], args[1]);
                 case SELF_MULTIPLY:
-                    return arithmetic.multiply(args[0], args[1]);
+                    return arithmetic.selfMultiply(args[0], args[1]);
                 case SELF_DIVIDE:
-                    return arithmetic.divide(args[0], args[1]);
+                    return arithmetic.selfDivide(args[0], args[1]);
                 case SELF_MOD:
-                    return arithmetic.mod(args[0], args[1]);
+                    return arithmetic.selfMod(args[0], args[1]);
                 case SELF_AND:
-                    return arithmetic.and(args[0], args[1]);
+                    return arithmetic.selfAnd(args[0], args[1]);
                 case SELF_OR:
-                    return arithmetic.or(args[0], args[1]);
+                    return arithmetic.selfOr(args[0], args[1]);
                 case SELF_XOR:
-                    return arithmetic.xor(args[0], args[1]);
+                    return arithmetic.selfXor(args[0], args[1]);
                 default:
                     // unexpected, new operator added?
                     throw new UnsupportedOperationException(operator.getOperatorSymbol());
