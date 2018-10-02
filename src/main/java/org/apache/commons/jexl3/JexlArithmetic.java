@@ -611,7 +611,7 @@ public class JexlArithmetic {
      * @param object  argument
      */
     protected boolean isIntegerPrecisionNumber(Object value) {
-       return value instanceof Integer || value instanceof Short || value instanceof Byte;
+        return value instanceof Integer || value instanceof Short || value instanceof Byte;
     }
 
     /**
@@ -620,7 +620,17 @@ public class JexlArithmetic {
      * @param object  argument
      */
     protected boolean isLongPrecisionNumber(Object value) {
-       return value instanceof Long || isIntegerPrecisionNumber(value);
+        return value instanceof Long || isIntegerPrecisionNumber(value);
+    }
+
+    protected BigInteger extendedLong(long x, byte msb) {
+        byte[] bi = new byte[9];
+        bi[0] = msb;
+        for (int i = 8; i > 0; i--) {
+            bi[i] = (byte)(x & 0xFF);
+            x >>= 8;
+        }
+        return new BigInteger(bi);
     }
 
     /**
@@ -644,11 +654,19 @@ public class JexlArithmetic {
         if (!strconcat) {
             try {
                 // if either are no longer than integers use that type
-                if (isIntegerPrecisionNumber(left) && isIntegerPrecisionNumber(right)) {
+                if (isLongPrecisionNumber(left) && isLongPrecisionNumber(right)) {
                     long l = ((Number) left).longValue();
                     long r = ((Number) right).longValue();
                     long result = l + r;
-                    if (result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
+                    if (left instanceof Long || right instanceof Long) {
+                        if ((l & r & ~result) < 0) {
+                            return extendedLong(result, (byte) -1);
+                        } else if ((~l & ~r & result) < 0) {
+                            return extendedLong(result, (byte) -0);
+                        } else {
+                            return result;
+                        }
+                    } else if (result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
                         return (int) result;
                     } else {
                         return result;
@@ -891,11 +909,19 @@ public class JexlArithmetic {
             return controlNullNullOperands();
         }
         // if either are no longer than integers use that type
-        if (isIntegerPrecisionNumber(left) && isIntegerPrecisionNumber(right)) {
+        if (isLongPrecisionNumber(left) && isLongPrecisionNumber(right)) {
             long l = ((Number) left).longValue();
             long r = ((Number) right).longValue();
             long result = l - r;
-            if (result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
+            if (left instanceof Long || right instanceof Long) {
+                if ((l & r & ~result) > 0) {
+                    return extendedLong(result, (byte) 0);
+                } else if ((~l & ~r & result) > 0) {
+                    return extendedLong(result, (byte) -1);
+                } else {
+                    return result;
+                }
+            } else if (result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
                 return (int) result;
             } else {
                 return result;
