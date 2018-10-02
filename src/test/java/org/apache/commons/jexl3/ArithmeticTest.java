@@ -130,15 +130,12 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testOverflows() throws Exception {
-        asserter.setVariable("left", new Integer("1"));
-        asserter.setVariable("right", Integer.MAX_VALUE);
-        asserter.assertExpression("left + right", Long.valueOf("2147483648"));
-        asserter.setVariable("right", Integer.MIN_VALUE);
-        asserter.assertExpression("right - left", Long.valueOf("-2147483649"));
-        asserter.setVariable("right", Long.MAX_VALUE);
-        asserter.assertExpression("left + right", new BigInteger("9223372036854775808"));
-        asserter.setVariable("right", Long.MIN_VALUE);
-        asserter.assertExpression("right - left", new BigInteger("-9223372036854775809"));
+        asserter.assertExpression("1 + 2147483647", Long.valueOf("2147483648"));
+        asserter.assertExpression("-2147483648 - 1", Long.valueOf("-2147483649"));
+        asserter.assertExpression("1 + 9223372036854775807", new BigInteger("9223372036854775808"));
+        asserter.assertExpression("-1 + (-9223372036854775808)", new BigInteger("-9223372036854775809"));
+        asserter.assertExpression("-9223372036854775808 - 1", new BigInteger("-9223372036854775809"));
+        asserter.assertExpression("-1 - 9223372036854775808", new BigInteger("-9223372036854775809"));
     }
 
     /**
