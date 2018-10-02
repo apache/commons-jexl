@@ -128,6 +128,19 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("right % left", new BigInteger("0"));
     }
 
+    @Test
+    public void testOverflows() throws Exception {
+        asserter.setVariable("left", new Integer("1"));
+        asserter.setVariable("right", Integer.MAX_VALUE);
+        asserter.assertExpression("left + right", Long.valueOf("2147483648"));
+        asserter.setVariable("right", Integer.MIN_VALUE);
+        asserter.assertExpression("right - left", Long.valueOf("-2147483649"));
+        asserter.setVariable("right", Long.MAX_VALUE);
+        asserter.assertExpression("left + right", new BigInteger("9223372036854775808"));
+        asserter.setVariable("right", Long.MIN_VALUE);
+        asserter.assertExpression("right - left", new BigInteger("-9223372036854775809"));
+    }
+
     /**
      * test some simple mathematical calculations
      */
