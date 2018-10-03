@@ -339,6 +339,7 @@ void Statement() #void : {}
     | DoWhileStatement()
     | TryStatement()
     | ThrowStatement()
+    | LOOKAHEAD(MultipleAssignmentIdentifier() <assign>) MultipleAssignmentStatement()
     | LOOKAHEAD(2) ExpressionStatement()
     | ReturnStatement()
     | Continue()
@@ -356,6 +357,16 @@ void Block() #Block : {}
 void ExpressionStatement() : {}
 {
     Expression() (LOOKAHEAD(2) Expression() #Ambiguous())* (LOOKAHEAD(1) <SEMICOL>)?
+}
+
+void MultipleAssignmentStatement() #MultipleAssignment : {}
+{
+  MultipleAssignmentIdentifier() <assign> Expression()
+}
+
+void MultipleAssignmentIdentifier() #void : {}
+{
+  <LPAREN> Identifier() (LOOKAHEAD(1) <COMMA> Identifier())+ <RPAREN> 
 }
 
 void IfStatement() : {}
@@ -426,7 +437,12 @@ void ForeachVar() : {}
 
 void Var() #void : {}
 {
-    <VAR> DeclareVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    <VAR> 
+    (
+       LOOKAHEAD(1) ((<LPAREN> DeclareExtVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar())+ <RPAREN> <assign> Expression()) #MultipleAssignment()) 
+       |
+       DeclareVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    )
 }
 
 void DeclareVar() #Var :

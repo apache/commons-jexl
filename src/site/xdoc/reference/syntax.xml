@@ -125,7 +125,7 @@
                 <tr>
                     <td>Statements</td>
                     <td>
-                        A statement can be the empty statement, the semicolon (<code>;</code>), block, conditional, variable declaration or an expression.
+                        A statement can be the empty statement, the semicolon (<code>;</code>), block, conditional, variable declaration, multiple assignment, or an expression.
                         Statements are optionally terminated with a semicolon.
                         A single statement or a statement block can be annotated.
                     </td>
@@ -182,6 +182,23 @@
                         Assigns the value of a variable  (<code>my.var = 'a value'</code>) using a
                         <code>JexlContext</code> as initial resolver. Both <em>beans</em> and <em>ant-ish</em>
                         variables assignment are supported.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Multiple Assignment</td>
+                    <td>
+                        Assigns the values to the multiple variables (<code>(x,y) = [4,2]</code>). 
+                        Assignment can be combined with local variable declaration using the <code>var</code> keyword, e.g.
+                        <code>var (x,y) = [4,2]</code> will assign <code>4</code> and <code>2</code> to the variables <code>x</code> 
+                        and <code>y</code> respectively. The syntax can be used for arrays as well as lists and sets, 
+                        as well as other expressions that return either of these.
+                        <p>If the list of variables assigned to has more variables than values, excess ones are filled with null values.
+                        If the list of variables has less variables than values, the extra values are ignored.</p>
+                        <p>Multiple assignment can also be used as destructuring assignment when applied to maps and beans, e.g.
+                        <code>var (city,street) = {"city":"NY","street":"5th avenue"}</code> will assign <code>NY</code> and <code>5th avenue</code> to 
+                        the variables <code>city</code> and <code>street</code> respectively. The variable names should match
+                        those of bean properties, or map keys.
+                        </p> 
                     </td>
                 </tr>
                 <tr>

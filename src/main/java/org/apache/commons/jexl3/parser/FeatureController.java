@@ -200,6 +200,11 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
+    protected Object visit(ASTMultipleAssignment node, Object data) {
+        return controlSideEffect(node, data);
+    }
+
+    @Override
     protected Object visit(ASTSetAddNode node, Object data) {
         return controlSideEffect(node, data);
     }

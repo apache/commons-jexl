@@ -84,6 +84,7 @@ import org.apache.commons.jexl3.parser.ASTMapProjectionNode;
 import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTModNode;
 import org.apache.commons.jexl3.parser.ASTMulNode;
+import org.apache.commons.jexl3.parser.ASTMultipleAssignment;
 import org.apache.commons.jexl3.parser.ASTNENode;
 import org.apache.commons.jexl3.parser.ASTNEWNode;
 import org.apache.commons.jexl3.parser.ASTNRNode;
@@ -1673,63 +1674,143 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
+    protected Object visit(ASTMultipleAssignment node, Object data) {
+        final int num = node.jjtGetNumChildren();
+        Object result = null;
+        Object assignableValue = node.jjtGetChild(num - 1).jjtAccept(this, data);
+
+        // Use separate logic for maps and non-iterable objects for destructuring
+        if (assignableValue instanceof Map<?,?>) {
+            Map<?,?> assignableMap = (Map<?,?>) assignableValue;
+            for (int i = 0; i < num - 1; i++) {
+                JexlNode left = node.jjtGetChild(i);
+                ASTIdentifier var = (ASTIdentifier) left;
+                Object right = assignableMap.get(var.getName());
+                result = executeAssign(node, left, right, null, data);
+            }
+        } else if (assignableValue != null) {
+            Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH, assignableValue);
+            Iterator<?> itemsIterator = forEach instanceof Iterator
+                                    ? (Iterator<?>) forEach
+                                    : uberspect.getIterator(assignableValue);
+            if (itemsIterator != null) {
+                try {
+                    int i = -1;
+                    while (itemsIterator.hasNext()) {
+                        cancelCheck(node);
+                        i += 1;
+                        // Stop if we are out of variables to assign to
+                        if (i == num - 1)
+                            break;
+                        // The value to assign
+                        Object right = itemsIterator.next();
+                        // The identifier to assign to
+                        JexlNode left = node.jjtGetChild(i);
+                        result = executeAssign(node, left, right, null, data);
+                    }
+                    while (i < num - 1) {
+                        JexlNode left = node.jjtGetChild(i++);
+                        ASTIdentifier var = (ASTIdentifier) left;
+                        result = executeAssign(node, left, null, null, data);
+                    }
+                } finally {
+                    //  closeable iterator handling
+                    closeIfSupported(itemsIterator);
+                }
+            } else {
+                for (int i = 0; i < num - 1; i++) {
+                    JexlNode left = node.jjtGetChild(i);
+                    ASTIdentifier var = (ASTIdentifier) left;
+                    Object right = getAttribute(assignableValue, var.getName(), node);
+                    result = executeAssign(node, left, right, null, data);
+                }
+            }
+        } else {
+            for (int i = 0; i < num - 1; i++) {
+                JexlNode left = node.jjtGetChild(i);
+                ASTIdentifier var = (ASTIdentifier) left;
+                result = executeAssign(node, left, null, null, data);
+            }
+
+        }
+
+        return result;
+    }
+
+    @Override
     protected Object visit(ASTAssignment node, Object data) {
-        return executeAssign(node, null, data);
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, null, data);
     }
 
     @Override
     protected Object visit(ASTSetAddNode node, Object data) {
-        return executeAssign(node, JexlOperator.SELF_ADD, data);
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, JexlOperator.SELF_ADD, data);
     }
 
     @Override
     protected Object visit(ASTSetSubNode node, Object data) {
-        return executeAssign(node, JexlOperator.SELF_SUBTRACT, data);
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, JexlOperator.SELF_SUBTRACT, data);
     }
 
     @Override
     protected Object visit(ASTSetMultNode node, Object data) {
-        return executeAssign(node, JexlOperator.SELF_MULTIPLY, data);
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, JexlOperator.SELF_MULTIPLY, data);
     }
 
     @Override
     protected Object visit(ASTSetDivNode node, Object data) {
-        return executeAssign(node, JexlOperator.SELF_DIVIDE, data);
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, JexlOperator.SELF_DIVIDE, data);
     }
 
     @Override
     protected Object visit(ASTSetModNode node, Object data) {
-        return executeAssign(node, JexlOperator.SELF_MOD, data);
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, JexlOperator.SELF_MOD, data);
     }
 
     @Override
     protected Object visit(ASTSetAndNode node, Object data) {
-        return executeAssign(node, JexlOperator.SELF_AND, data);
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, JexlOperator.SELF_AND, data);
     }
 
     @Override
     protected Object visit(ASTSetOrNode node, Object data) {
-        return executeAssign(node, JexlOperator.SELF_OR, data);
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, JexlOperator.SELF_OR, data);
     }
 
     @Override
     protected Object visit(ASTSetXorNode node, Object data) {
-        return executeAssign(node, JexlOperator.SELF_XOR, data);
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, JexlOperator.SELF_XOR, data);
     }
 
     /**
      * Executes an assignment with an optional side-effect operator.
      * @param node     the node
+     * @param left     the reference to assign to
+     * @param right    the value expression to assign
      * @param assignop the assignment operator or null if simply assignment
      * @param data     the data
      * @return the left hand side
      */
-    protected Object executeAssign(JexlNode node, JexlOperator assignop, Object data) { // CSOFF: MethodLength
+    protected Object executeAssign(JexlNode node, JexlNode left, Object right, JexlOperator assignop, Object data) { // CSOFF: MethodLength
         cancelCheck(node);
-        // left contains the reference to assign to
-        final JexlNode left = node.jjtGetChild(0);
-        // right is the value expression to assign
-        Object right = node.jjtGetChild(1).jjtAccept(this, data);
         Object object = null;
         int symbol = -1;
         boolean antish = true;

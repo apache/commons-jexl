@@ -73,6 +73,7 @@ import org.apache.commons.jexl3.parser.ASTMapProjectionNode;
 import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTModNode;
 import org.apache.commons.jexl3.parser.ASTMulNode;
+import org.apache.commons.jexl3.parser.ASTMultipleAssignment;
 import org.apache.commons.jexl3.parser.ASTNENode;
 import org.apache.commons.jexl3.parser.ASTNEWNode;
 import org.apache.commons.jexl3.parser.ASTNRNode;
@@ -486,6 +487,25 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTAssignment node, Object data) {
         return infixChildren(node, " = ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTMultipleAssignment node, Object data) {
+        int num = node.jjtGetNumChildren();
+        boolean isVarDeclare = node.jjtGetChild(0) instanceof ASTExtVar;
+
+        if (isVarDeclare)
+            builder.append("var");
+
+        builder.append('(');
+        for (int i = 0; i < num - 1; ++i) {
+            if (i > 0)
+                builder.append(',');
+            accept(node.jjtGetChild(i), data);
+        }
+        builder.append(") = ");
+        accept(node.jjtGetChild(num - 1), data);
+        return data;
     }
 
     @Override
