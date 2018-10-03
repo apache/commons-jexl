@@ -17,14 +17,14 @@
 package org.apache.commons.jexl3.parser;
 
 /**
- * Declares a supplementary local variable inside for loop.
+ * Declares a supplementary local variable.
  */
-public class ASTForVar extends ASTVar {
-    public ASTForVar(int id) {
+public class ASTExtVar extends ASTVar {
+    public ASTExtVar(int id) {
         super(id);
     }
 
-    public ASTForVar(Parser p, int id) {
+    public ASTExtVar(Parser p, int id) {
         super(p, id);
     }
 

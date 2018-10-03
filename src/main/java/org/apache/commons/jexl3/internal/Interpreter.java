@@ -57,10 +57,10 @@ import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTEnumerationNode;
 import org.apache.commons.jexl3.parser.ASTEnumerationReference;
 import org.apache.commons.jexl3.parser.ASTExpressionStatement;
+import org.apache.commons.jexl3.parser.ASTExtVar;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
 import org.apache.commons.jexl3.parser.ASTForeachVar;
-import org.apache.commons.jexl3.parser.ASTForVar;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTGENode;
 import org.apache.commons.jexl3.parser.ASTGTNode;
@@ -1449,7 +1449,7 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
-    protected Object visit(ASTForVar node, Object data) {
+    protected Object visit(ASTExtVar node, Object data) {
         return visit((ASTIdentifier) node, data);
     }
 

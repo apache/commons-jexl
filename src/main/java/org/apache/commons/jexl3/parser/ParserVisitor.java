@@ -70,11 +70,13 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTReturnStatement node, Object data);
 
+    protected abstract Object visit(ASTMultipleAssignment node, Object data);
+
     protected abstract Object visit(ASTAssignment node, Object data);
 
     protected abstract Object visit(ASTVar node, Object data);
 
-    protected abstract Object visit(ASTForVar node, Object data);
+    protected abstract Object visit(ASTExtVar node, Object data);
 
     protected abstract Object visit(ASTReference node, Object data);
 
