@@ -834,25 +834,23 @@ public class Interpreter extends InterpreterBase {
         if (iterableValue != null && node.jjtGetNumChildren() >= 3) {
             /* third objectNode is the statement to execute */
             JexlNode statement = node.jjtGetChild(2);
-            // get an iterator for the collection/array etc via the introspector.
-            Object forEach = null;
-            try {
+            if (loopReference.jjtGetNumChildren() > 1) {
 
-                if (loopReference.jjtGetNumChildren() > 1) {
+                ASTIdentifier loopValueVariable = (ASTIdentifier) loopReference.jjtGetChild(1);
 
-                    ASTIdentifier loopValueVariable = (ASTIdentifier) loopReference.jjtGetChild(1);
+                int symbol = loopVariable.getSymbol();
+                int valueSymbol = loopValueVariable.getSymbol();
 
-                    int symbol = loopVariable.getSymbol();
-                    int valueSymbol = loopValueVariable.getSymbol();
+                // get an iterator for the collection/array etc via the introspector.
+                Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, iterableValue);
+                Iterator<?> itemsIterator = forEach instanceof Iterator
+                                        ? (Iterator<?>) forEach
+                                        : uberspect.getIndexedIterator(iterableValue);
 
-                    forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, iterableValue);
-                    Iterator<?> itemsIterator = forEach instanceof Iterator
-                                            ? (Iterator<?>) forEach
-                                            : uberspect.getIndexedIterator(iterableValue);
+                int i = -1;
 
-                    int i = -1;
-
-                    if (itemsIterator != null) {
+                if (itemsIterator != null) {
+                    try {
                         while (itemsIterator.hasNext()) {
                             cancelCheck(node);
                             i += 1;
@@ -897,16 +895,22 @@ public class Interpreter extends InterpreterBase {
                                 // and continue
                             }
                         }
+                    } finally {
+                        // closeable iterator handling
+                        closeIfSupported(itemsIterator);
                     }
+                }
 
-                } else {
-                    int symbol = loopVariable.getSymbol();
+            } else {
+                int symbol = loopVariable.getSymbol();
 
-                    forEach = operators.tryOverload(node, JexlOperator.FOR_EACH, iterableValue);
-                    Iterator<?> itemsIterator = forEach instanceof Iterator
-                                            ? (Iterator<?>) forEach
-                                            : uberspect.getIterator(iterableValue);
-                    if (itemsIterator != null) {
+                // get an iterator for the collection/array etc via the introspector.
+                Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH, iterableValue);
+                Iterator<?> itemsIterator = forEach instanceof Iterator
+                                        ? (Iterator<?>) forEach
+                                        : uberspect.getIterator(iterableValue);
+                if (itemsIterator != null) {
+                    try {
                         while (itemsIterator.hasNext()) {
                             cancelCheck(node);
                             // set loopVariable to value of iterator
@@ -928,12 +932,11 @@ public class Interpreter extends InterpreterBase {
                                 // and continue
                             }
                         }
+                    } finally {
+                        // closeable iterator handling
+                        closeIfSupported(itemsIterator);
                     }
                 }
-
-            } finally {
-                //  closeable iterator handling
-                closeIfSupported(forEach);
             }
         }
         return result;
@@ -1169,12 +1172,15 @@ public class Interpreter extends InterpreterBase {
             if (child instanceof ASTEnumerationNode || child instanceof ASTEnumerationReference) {
                 Iterator<?> it = (Iterator<?>) child.jjtAccept(this, data);
                 if (it != null) {
-                   while (it.hasNext()) {
-                       Object entry = it.next();
-                       ab.add(entry);
-                   }
+                    try {
+                        while (it.hasNext()) {
+                            Object entry = it.next();
+                            ab.add(entry);
+                        }
+                    } finally {
+                        closeIfSupported(it);
+                    }
                 }
-                closeIfSupported(it);
             } else {
                 Object entry = child.jjtAccept(this, data);
                 ab.add(entry);
@@ -1207,12 +1213,15 @@ public class Interpreter extends InterpreterBase {
             if (child instanceof ASTEnumerationNode || child instanceof ASTEnumerationReference) {
                 Iterator<?> it = (Iterator<?>) child.jjtAccept(this, data);
                 if (it != null) {
-                   while (it.hasNext()) {
-                       Object entry = it.next();
-                       mb.add(entry);
-                   }
+                    try {
+                        while (it.hasNext()) {
+                            Object entry = it.next();
+                            mb.add(entry);
+                        }
+                    } finally {
+                        closeIfSupported(it);
+                    }
                 }
-                closeIfSupported(it);
             } else {
                 Object entry = child.jjtAccept(this, data);
                 mb.add(entry);
@@ -1249,15 +1258,19 @@ public class Interpreter extends InterpreterBase {
                 Iterator<Object> it = (Iterator<Object>) (child).jjtAccept(this, data);
                 int j = 0;
                 if (it != null) {
-                    while (it.hasNext()) {
-                        Object value = it.next();
-                        if (value instanceof Map.Entry<?,?>) {
-                            Map.Entry<?,?> entry = (Map.Entry<?,?>) value;
-                            mb.put(entry.getKey(), entry.getValue());
-                        } else {
-                            mb.put(i, value);
+                    try {
+                        while (it.hasNext()) {
+                            Object value = it.next();
+                            if (value instanceof Map.Entry<?,?>) {
+                                Map.Entry<?,?> entry = (Map.Entry<?,?>) value;
+                                mb.put(entry.getKey(), entry.getValue());
+                            } else {
+                                mb.put(i, value);
+                            }
+                            i++;
                         }
-                        i++;
+                    } finally {
+                        closeIfSupported(it);
                     }
                 }
             }
@@ -1971,12 +1984,15 @@ public class Interpreter extends InterpreterBase {
                 if (child instanceof ASTEnumerationNode || child instanceof ASTEnumerationReference) {
                     Iterator<?> it = (Iterator<?>) child.jjtAccept(this, data);
                     if (it != null) {
-                       while (it.hasNext()) {
-                           Object entry = it.next();
-                           av.add(entry);
+                       try {
+                           while (it.hasNext()) {
+                               Object entry = it.next();
+                               av.add(entry);
+                           }
+                       } finally {
+                           closeIfSupported(it);
                        }
                     }
-                    closeIfSupported(it);
                 } else {
                     Object entry = child.jjtAccept(this, data);
                     av.add(entry);
@@ -2567,7 +2583,7 @@ public class Interpreter extends InterpreterBase {
         return null;
     }
 
-    protected abstract class IteratorBase implements Iterator<Object> {
+    protected abstract class IteratorBase implements Iterator<Object>, AutoCloseable {
 
         protected final Iterator<?> itemsIterator;
         protected final JexlNode node;
@@ -2608,6 +2624,11 @@ public class Interpreter extends InterpreterBase {
             }
 
             return argv;
+        }
+
+        @Override
+        public void close() {
+            closeIfSupported(itemsIterator);
         }
     }
 
@@ -2895,53 +2916,56 @@ public class Interpreter extends InterpreterBase {
         Iterator<?> itemsIterator = prepareIndexedIterator(node, data);
 
         if (itemsIterator != null) {
+            try {
+                Closure closure = new Closure(this, reduction);
 
-            Closure closure = new Closure(this, reduction);
+                boolean varArgs = reduction.isVarArgs();
+                int argCount = reduction.getArgCount();
 
-            boolean varArgs = reduction.isVarArgs();
-            int argCount = reduction.getArgCount();
+                int i = 0;
 
-            int i = 0;
+                while (itemsIterator.hasNext()) {
+                    Object value = itemsIterator.next();
 
-            while (itemsIterator.hasNext()) {
-                Object value = itemsIterator.next();
+                    Object[] argv = null;
 
-                Object[] argv = null;
+                    if (argCount == 0) {
+                        argv = EMPTY_PARAMS;
+                    } else if (argCount == 1) {
+                        argv = new Object[] {result};
+                    } else if (argCount == 2) {
+                        argv = new Object[] {result, value};
+                    } else if (argCount == 3) {
+                        argv = new Object[] {result, i, value};
+                    } else if (value instanceof Map.Entry<?,?>) {
+                        Map.Entry<?,?> entry = (Map.Entry<?,?>) value;
+                        argv = new Object[] {result, i, entry.getKey(), entry.getValue()};
+                    } else if (!varArgs && value instanceof Object[]) {
 
-                if (argCount == 0) {
-                    argv = EMPTY_PARAMS;
-                } else if (argCount == 1) {
-                    argv = new Object[] {result};
-                } else if (argCount == 2) {
-                    argv = new Object[] {result, value};
-                } else if (argCount == 3) {
-                    argv = new Object[] {result, i, value};
-                } else if (value instanceof Map.Entry<?,?>) {
-                    Map.Entry<?,?> entry = (Map.Entry<?,?>) value;
-                    argv = new Object[] {result, i, entry.getKey(), entry.getValue()};
-                } else if (!varArgs && value instanceof Object[]) {
+                        int len = ((Object[]) value).length;
+                        if (argCount > len + 1) {
+                           argv = new Object[len + 2];
+                           argv[0] = result;
+                           argv[2] = i;
+                           System.arraycopy(value, 0, argv, 2, len);
+                        } else if (argCount == len + 1) {
+                           argv = new Object[len + 1];
+                           argv[0] = result;
+                           System.arraycopy(value, 0, argv, 1, len);
+                        } else {
+                           argv = new Object[] {result, i, value};
+                        }
 
-                    int len = ((Object[]) value).length;
-                    if (argCount > len + 1) {
-                       argv = new Object[len + 2];
-                       argv[0] = result;
-                       argv[2] = i;
-                       System.arraycopy(value, 0, argv, 2, len);
-                    } else if (argCount == len + 1) {
-                       argv = new Object[len + 1];
-                       argv[0] = result;
-                       System.arraycopy(value, 0, argv, 1, len);
                     } else {
-                       argv = new Object[] {result, i, value};
+                        argv = new Object[] {result, i, value};
                     }
 
-                } else {
-                    argv = new Object[] {result, i, value};
+                    result = closure.execute(null, argv);
+
+                    i += 1;
                 }
-
-                result = closure.execute(null, argv);
-
-                i += 1;
+            } finally {
+                closeIfSupported(itemsIterator);
             }
         }
 
