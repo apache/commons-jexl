@@ -366,7 +366,7 @@ void MultipleAssignmentStatement() #MultipleAssignment : {}
 
 void MultipleAssignmentIdentifier() #void : {}
 {
-  <LPAREN> Identifier() (LOOKAHEAD(1) <COMMA> Identifier())+ <RPAREN> 
+  <LPAREN> Identifier() (LOOKAHEAD(1) <COMMA> Identifier())* <RPAREN> 
 }
 
 void IfStatement() : {}
@@ -439,7 +439,7 @@ void Var() #void : {}
 {
     <VAR> 
     (
-       LOOKAHEAD(1) ((<LPAREN> DeclareExtVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar())+ <RPAREN> <assign> Expression()) #MultipleAssignment()) 
+       LOOKAHEAD(1) ((<LPAREN> DeclareExtVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar())* <RPAREN> <assign> Expression()) #MultipleAssignment()) 
        |
        DeclareVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
     )

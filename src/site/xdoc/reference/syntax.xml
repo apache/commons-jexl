@@ -197,7 +197,8 @@
                         <p>Multiple assignment can also be used as destructuring assignment when applied to maps and beans, e.g.
                         <code>var (city,street) = {"city":"NY","street":"5th avenue"}</code> will assign <code>NY</code> and <code>5th avenue</code> to 
                         the variables <code>city</code> and <code>street</code> respectively. The variable names should match
-                        those of bean properties, or map keys.
+                        those of bean properties, or map keys, e.g.
+                        <code>var (city) = foo</code> and <code>var city = foo.city</code> are equivalent.
                         </p> 
                     </td>
                 </tr>
