@@ -192,7 +192,7 @@ public class ScriptVisitor extends ParserVisitor {
     }
 
     @Override
-    protected Object visit(ASTForVar node, Object data) {
+    protected Object visit(ASTExtVar node, Object data) {
         return visitNode(node, data);
     }
 

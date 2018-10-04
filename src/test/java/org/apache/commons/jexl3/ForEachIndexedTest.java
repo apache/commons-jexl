@@ -165,14 +165,4 @@ public class ForEachIndexedTest extends JexlTestCase {
         Assert.assertEquals("Result is not last evaluated expression", 15, o);
     }
 
-    @Test
-    public void testForEachRemoveMethod() throws Exception {
-        JexlScript e = JEXL.createScript(
-                "var set = {1, 2, 3 ,4 ,5, 6}; for(var i, item : set) { if (item <= 3) remove} size(set)"
-        );
-        JexlContext jc = new MapContext();
-        Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", 3, o);
-    }
-
 }
