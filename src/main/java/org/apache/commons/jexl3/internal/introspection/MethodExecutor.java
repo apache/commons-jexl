@@ -96,10 +96,9 @@ public final class MethodExecutor extends AbstractExecutor.Method {
 
     @Override
     public Object tryInvoke(String name, Object obj, Object... args) {
-        MethodKey tkey = new MethodKey(name, args);
         // let's assume that invocation will fly if the declaring class is the
         // same and arguments have the same type
-        if (objectClass.equals(obj.getClass()) && tkey.equals(key)) {
+        if (objectClass.equals(obj.getClass()) && key.equals(new MethodKey(name, args))) {
             try {
                 return invoke(obj, args);
             } catch (InvocationTargetException xinvoke) {
