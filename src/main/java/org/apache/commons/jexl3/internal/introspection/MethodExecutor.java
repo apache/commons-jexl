@@ -95,14 +95,12 @@ public final class MethodExecutor extends AbstractExecutor.Method {
     }
 
     @Override
-    public Object tryInvoke(String name, Object obj, Object... args) {
+    public Object tryInvoke(String name, Object obj, Object... args) throws InvocationTargetException {
         // let's assume that invocation will fly if the declaring class is the
         // same and arguments have the same type
         if (objectClass.equals(obj.getClass()) && key.equals(new MethodKey(name, args))) {
             try {
                 return invoke(obj, args);
-            } catch (InvocationTargetException xinvoke) {
-                return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
                 return TRY_FAILED;// fail
             } catch (IllegalArgumentException xarg) {

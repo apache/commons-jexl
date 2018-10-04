@@ -326,26 +326,27 @@ public class Interpreter extends InterpreterBase {
             if (namespace instanceof JexlContext.NamespaceFunctor) {
                 functor = ((JexlContext.NamespaceFunctor) namespace).createFunctor(context);
             } else if (namespace instanceof Class<?> || namespace instanceof String) {
-                // attempt to reuse last ctor cached in volatile JexlNode.value
-                if (cached instanceof JexlMethod) {
-                    Object eval = ((JexlMethod) cached).tryInvoke(null, context);
-                    if (JexlEngine.TRY_FAILED != eval) {
-                        functor = eval;
+                try {
+                    // attempt to reuse last ctor cached in volatile JexlNode.value
+                    if (cached instanceof JexlMethod) {
+                        Object eval = ((JexlMethod) cached).tryInvoke(null, context);
+                        if (JexlEngine.TRY_FAILED != eval) {
+                            functor = eval;
+                        }
                     }
-                }
-                if (functor == null) {
-                    JexlMethod ctor = uberspect.getConstructor(namespace, context);
-                    if (ctor != null) {
-                        try {
+                    if (functor == null) {
+                        JexlMethod ctor = uberspect.getConstructor(namespace, context);
+                        if (ctor != null) {
                             functor = ctor.invoke(namespace, context);
                             if (cacheable && ctor.isCacheable()) {
                                 node.jjtSetValue(ctor);
                             }
-                        } catch (Exception xinst) {
-                            throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
                         }
                     }
+                } catch (Exception xinst) {
+                    throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
                 }
+
             }
             // got a functor, store it and return it
             if (functor != null) {

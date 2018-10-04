@@ -425,7 +425,7 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @param args   the method arguments
          * @return the method invocation result (or JexlEngine.TRY_FAILED)
          */
-        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) {
+        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) throws Exception {
             return me.tryInvoke(name, target, ii.functionArguments(null, narrow, args));
         }
     }
@@ -444,7 +444,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
 
         @Override
-        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) {
+        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) throws Exception {
             return me.tryInvoke(name, ii.arithmetic, ii.functionArguments(target, narrow, args));
         }
     }
@@ -463,7 +463,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
 
         @Override
-        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) {
+        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) throws Exception {
             return me.tryInvoke(name, ii.context, ii.functionArguments(target, narrow, args));
         }
     }
@@ -482,7 +482,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
 
         @Override
-        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) {
+        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) throws Exception {
             return me.tryInvoke(name, target, ii.callArguments(ii.context, narrow, args));
         }
     }
@@ -603,7 +603,7 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @return TRY_FAILED if invocation was not possible or failed, the
          * result otherwise
          */
-        protected Object tryEval(final Object ntarget, final String mname, final Object[] arguments) {
+        protected Object tryEval(final Object ntarget, final String mname, final Object[] arguments) throws Exception {
             // do we have  a method/function name ?
             // attempt to reuse last funcall cached in volatile JexlNode.value (if it was not a variable)
             if (mname != null && cacheable && ntarget != null) {
