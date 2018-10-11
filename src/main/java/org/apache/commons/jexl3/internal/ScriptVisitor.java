@@ -58,7 +58,6 @@ import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
-import org.apache.commons.jexl3.parser.ASTInlinePropertyNode;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.ASTJxltLiteral;
@@ -475,11 +474,6 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTMapEnumerationNode node, Object data) {
-        return visitNode(node, data);
-    }
-
-    @Override
-    protected Object visit(ASTInlinePropertyNode node, Object data) {
         return visitNode(node, data);
     }
 

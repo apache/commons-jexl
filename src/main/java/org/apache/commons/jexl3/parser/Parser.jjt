@@ -361,12 +361,12 @@ void ExpressionStatement() : {}
 
 void MultipleAssignmentStatement() #MultipleAssignment : {}
 {
-  MultipleAssignmentIdentifier() <assign> Expression()
+    MultipleAssignmentIdentifier() <assign> Expression()
 }
 
 void MultipleAssignmentIdentifier() #void : {}
 {
-  <LPAREN> Identifier() (LOOKAHEAD(1) <COMMA> Identifier())* <RPAREN> 
+    <LPAREN> Identifier() (LOOKAHEAD(1) <COMMA> Identifier())* <RPAREN> 
 }
 
 void IfStatement() : {}
@@ -671,7 +671,7 @@ void UnaryExpression() #void : {}
   |
   <ELLIPSIS> EnumerationExpression()
   |
-  InlinePropertyExpression()
+  ValueExpression()
 }
 
 void EnumerationExpression() #void : {}
@@ -756,16 +756,7 @@ void IteratorExpression() #void : {}
 {
   LOOKAHEAD(<LPAREN> Expression() <COLON>) <LPAREN> Expression() <COLON> Lambda() <RPAREN> #EnumerationNode(2)
   |
-  InlinePropertyExpression() #EnumerationNode(1)
-}
-
-void InlinePropertyExpression() #void : {}
-{
-  ValueExpression()
-  ( LOOKAHEAD(<LCURLY>) (
-    InlinePropertyAssignment() #InlinePropertyNode(2)
-  ) )*
-
+  ValueExpression() #EnumerationNode(1)
 }
 
 /***************************************
@@ -927,7 +918,7 @@ void MapLiteral() : {}
 
 void MapElement() #void : {}
 {
-    LOOKAHEAD(<mult> <COLON> <ELLIPSIS>) <mult> <COLON> <ELLIPSIS> InlinePropertyExpression() #MapEnumerationNode(1)
+    LOOKAHEAD(<mult> <COLON> <ELLIPSIS>) <mult> <COLON> <ELLIPSIS> ValueExpression() #MapEnumerationNode(1)
     |
     MapEntry()
 }
@@ -955,46 +946,6 @@ void SetLiteral() : {}
 void ImmutableSetLiteral() #SetLiteral : {}
 {
     <HCURLY> (Expression() ( <COMMA> Expression() )*)? <RCURLY> { jjtThis.setImmutable(true); }
-}
-
-void InlinePropertyAssignment() : {}
-{
-    <LCURLY> (InlinePropertyBlock() ( <COMMA> InlinePropertyBlock() )* ) <RCURLY>
-}
-
-void InlinePropertyBlock() #void : {}
-{
-    (
-      LOOKAHEAD(InlinePropertyName() <COLON>) InlinePropertyEntry()
-      |
-      LOOKAHEAD(<LBRACKET> Expression() <RBRACKET> <COLON>) InlinePropertyArrayEntry()
-      |
-      InlinePropertyNested() InlinePropertyAssignment() #InlinePropertyNode(2)
-    )
-}
-
-void InlinePropertyName() #void : {}
-{
-    Identifier()
-    |
-    StringLiteral()
-    |
-    JxltLiteral()
-}
-
-void InlinePropertyNested() #void : {}
-{
-    ( (LOOKAHEAD(<LBRACKET>)ArrayAccess() | Identifier()) (LOOKAHEAD(2) MemberAccess() )*) #Reference()
-}
-
-void InlinePropertyEntry() : {}
-{
-    InlinePropertyName() <COLON> Expression()
-}
-
-void InlinePropertyArrayEntry() : {}
-{
-    <LBRACKET> Expression() <RBRACKET> <COLON> Expression()
 }
 
 /***************************************
@@ -1174,6 +1125,8 @@ void MethodCall() #void : {}
     |
     LOOKAHEAD(<DOT> <EMPTY>) (<DOT> <EMPTY> <LPAREN> <RPAREN>) #EmptyMethod(1)
     |
+    LOOKAHEAD(<LCURLY>) (InlinePropertyAssignment() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
+    |
     (MemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
 }
 
@@ -1181,7 +1134,42 @@ void MemberExpression() #void : {}
 {
     LOOKAHEAD(MethodCall()) MethodCall()
     |
+    LOOKAHEAD(<LCURLY>) InlinePropertyAssignment()
+    |
     MemberAccess()
+}
+
+void InlinePropertyAssignment() : {}
+{
+    <LCURLY> (InlinePropertyBlock() ( <COMMA> InlinePropertyBlock() )* ) <RCURLY>
+}
+
+void InlinePropertyBlock() #void : {}
+{
+    LOOKAHEAD(InlinePropertyName() <COLON>) InlinePropertyEntry()
+    |
+    LOOKAHEAD(<LBRACKET> Expression() <RBRACKET> <COLON>) InlinePropertyArrayEntry()
+    |
+    ((LOOKAHEAD(<LBRACKET>) ArrayAccess() | Identifier()) (LOOKAHEAD(2) MemberAccess() )* InlinePropertyAssignment()) #Reference()
+}
+
+void InlinePropertyName() #void : {}
+{
+    Identifier()
+    |
+    StringLiteral()
+    |
+    JxltLiteral()
+}
+
+void InlinePropertyEntry() : {}
+{
+    InlinePropertyName() <COLON> Expression()
+}
+
+void InlinePropertyArrayEntry() : {}
+{
+    <LBRACKET> Expression() <RBRACKET> <COLON> Expression()
 }
 
 void ValueExpression() #void : {}
