@@ -64,7 +64,6 @@ import org.apache.commons.jexl3.parser.ASTIdentifierAccessJxlt;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
-import org.apache.commons.jexl3.parser.ASTInlinePropertyNode;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
@@ -875,7 +874,7 @@ public class Interpreter extends InterpreterBase {
 
             } else {
 
-               // ASTInlinePropertyNode
+               // ASTReference
                p.jjtAccept(this, data);
             }
         }
@@ -899,22 +898,6 @@ public class Interpreter extends InterpreterBase {
         Object value = node.jjtGetChild(1).jjtAccept(this, data);
 
         return new Object[] {key, value};
-    }
-
-    @Override
-    protected Object visit(ASTInlinePropertyNode node, Object data) {
-
-        JexlNode object = node.jjtGetChild(0);
-
-        Object target = object.jjtAccept(this, data);
-
-        if (target == null)
-            return unsolvableProperty(node, "<null>{<?>}", null);
-
-        // evaluate ASTInlinePropertyAssignment with calculated target
-        node.jjtGetChild(1).jjtAccept(this, target);
-
-        return target;
     }
 
     @Override

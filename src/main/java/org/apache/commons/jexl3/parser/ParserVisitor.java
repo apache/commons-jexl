@@ -140,8 +140,6 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTMapEntry node, Object data);
 
-    protected abstract Object visit(ASTInlinePropertyNode node, Object data);
-
     protected abstract Object visit(ASTInlinePropertyAssignment node, Object data);
 
     protected abstract Object visit(ASTInlinePropertyArrayEntry node, Object data);
