@@ -30,13 +30,13 @@
             <li><a href="#extension">Extending JEXL</a></li>
         </ul>
 
-        <h2><a name="intro">Introduction</a></h2>
+        <h2><a id="intro">Introduction</a></h2>
         <p>
             JEXL is a library intended to facilitate the implementation of dynamic and scripting features in applications
             and frameworks.
         </p>
 
-        <h2><a name="example">A Brief Example</a></h2>
+        <h2><a id="example">A Brief Example</a></h2>
         <p>
             In its simplest form, JEXL merges an
             {@link org.apache.commons.jexl3.JexlExpression}
@@ -66,7 +66,7 @@
         </pre>
 
 
-        <h2><a name="usage">Using JEXL</a></h2>
+        <h2><a id="usage">Using JEXL</a></h2>
         The API is composed of three levels addressing different functional needs:
         <ul>
             <li>Dynamic invocation of setters, getters, methods and constructors</li>
@@ -74,7 +74,7 @@
             <li>JSP/JSF like expression known as JXLT expressions</li>
         </ul>
 
-        <h3><a name="usage_note">Important note</a></h3>
+        <h3><a id="usage_note">Important note</a></h3>
         The public API classes reside in the 2 packages:
         <ul>
             <li>org.apache.commons.jexl3</li>
@@ -94,7 +94,7 @@
             <li>org.apache.commons.jexl3.internal.introspection</li>
         </ul>
 
-        <h3><a name="usage_api">Dynamic Invocation</a></h3>
+        <h3><a id="usage_api">Dynamic Invocation</a></h3>
         <p>
             These functionalities are close to the core level utilities found in
             <a href="http://commons.apache.org/beanutils/">BeanUtils</a>.
@@ -140,7 +140,7 @@
             assertEquals("Result is not 1000", new Integer(1000), o);
         </pre>
 
-        <h3><a name="usage_jexl">Expressions and Scripts</a></h3>
+        <h3><a id="usage_jexl">Expressions and Scripts</a></h3>
         <p>
             If your needs require simple expression evaluation capabilities, the core JEXL features
             will most likely fit.
@@ -169,7 +169,7 @@
             assertEquals("Result is not 10", new Integer(10), o);
         </pre>
 
-        <h3><a name="usage_ujexl">Unified Expressions and Templates</a></h3>
+        <h3><a id="usage_ujexl">Unified Expressions and Templates</a></h3>
         <p>
             If you are looking for JSP-EL like and basic templating features, you can
             use Expression from a JxltEngine.
@@ -244,13 +244,13 @@
         &lt;/html&gt;
         </code></pre>
 
-        <h2><a name="configuration">JEXL Configuration</a></h2>
+        <h2><a id="configuration">JEXL Configuration</a></h2>
         <p>
             The JexlEngine can be configured through a few parameters that will drive how it reacts
             in case of errors.
             These configuration methods are embedded through a {@link org.apache.commons.jexl3.JexlBuilder}.
         </p>
-        <h3><a name="static_configuration">Static &amp; Shared Configuration</a></h3>
+        <h3><a id="static_configuration">Static &amp; Shared Configuration</a></h3>
         <p>
             Both JexlEngine and JxltEngine are thread-safe, most of their inner fields are final; the same instance can be shared between different
             threads and proper synchronization is enforced in critical areas (introspection caches).
@@ -315,7 +315,7 @@
             traces will carry the exact caller location the Expression was created from.
         </p>
 
-        <h3><a name="dynamic_configuration">Dynamic Configuration</a></h3>
+        <h3><a id="dynamic_configuration">Dynamic Configuration</a></h3>
         <p>
             Those configuration options can be overridden during evaluation by implementing a
             {@link org.apache.commons.jexl3.JexlContext}
@@ -342,7 +342,7 @@
         </p>
 
 
-        <h2><a name="customization">JEXL Customization</a></h2>
+        <h2><a id="customization">JEXL Customization</a></h2>
         <p>
             The {@link org.apache.commons.jexl3.JexlContext}, {@link org.apache.commons.jexl3.JexlBuilder} and
             {@link org.apache.commons.jexl3.JexlEngine$Options} are
@@ -504,7 +504,7 @@
             control.
         </p>
 
-        <h2><a name="extension">Extending JEXL</a></h2>
+        <h2><a id="extension">Extending JEXL</a></h2>
         If you need to make JEXL treat some objects in a specialized manner or tweak how it
         reacts to some settings, you can derive most of its inner-workings. The classes and methods are rarely private or
         final - only when the inner contract really requires it. However, using the protected methods
