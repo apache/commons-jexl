@@ -33,7 +33,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
-
+import static org.apache.commons.jexl3.parser.ParserConstants.EOF;
+import static org.apache.commons.jexl3.parser.ParserConstants.SEMICOL;
 
 /**
  * The base class for parsing, manages the parameter/local variable frame.
@@ -43,6 +44,10 @@ public abstract class JexlParser extends StringParser {
      * The associated controller.
      */
     protected final FeatureController featureController = new FeatureController(JexlEngine.DEFAULT_FEATURES);
+    /**
+     * The basic source info.
+     */
+    protected JexlInfo info = null;
     /**
      * The source being processed.
      */
@@ -82,8 +87,8 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
-     * Reading a given source line
-     * @parma src the source
+     * Read a given source line.
+     * @param src the source
      * @param lineno the line number
      * @return the line
      */
@@ -101,9 +106,10 @@ public abstract class JexlParser extends StringParser {
         }
         return msg;
     }
-
+    
     /**
      * Internal, for debug purpose only.
+     * @param registers whether register syntax is recognized by this parser
      */
     public void allowRegisters(boolean registers) {
         featureController.setFeatures(new JexlFeatures(featureController.getFeatures()).register(registers));
@@ -260,9 +266,37 @@ public abstract class JexlParser extends StringParser {
      */
     protected abstract Token getToken(int index);
 
+    /**
+     * Overridden in actual parser to access tokens stack.
+     * @return the next token on the stack
+     */
+    protected abstract Token getNextToken();
+    
+    /**
+     * Throws Ambiguous exception.
+     * <p>It seeks a ';' (or EOF) to recover.
+     * @param begin the first token in ambiguous expression
+     */
+    protected void throwAmbiguousException(Token begin) {
+        Token pt = null, end = null;
+        while((end = getNextToken()) != null) {
+            if (end.kind == EOF || end.kind == SEMICOL) {
+                if (pt != null) {
+                    end = pt;
+                }
+                break;
+            }
+            pt = end;
+        }
+        JexlInfo infob = info.at(begin.beginLine, begin.beginColumn);
+        JexlInfo infoe = end != null? info.at(end.endLine, end.endColumn) : null;
+        String msg = readSourceLine(source, begin.beginLine);
+        throw new JexlException.Ambiguous(infob, infoe, msg);
+    }
+    
     protected void jjtreeOpenNodeScope(JexlNode node) {
         if (node instanceof ASTAmbiguous) {
-            throwParsingException(JexlException.Ambiguous.class, node);
+            throwAmbiguousException(getToken(1));
         }
     }
 
@@ -304,7 +338,7 @@ public abstract class JexlParser extends StringParser {
         } else if (ASSIGN_NODES.contains(node.getClass())) {
             JexlNode lv = node.jjtGetChild(0);
             if (!lv.isLeftValue()) {
-                throwParsingException(JexlException.Assignment.class, lv);
+                throwParsingException(JexlException.Assignment.class, null);
             }
         }
         // heavy check
@@ -334,8 +368,8 @@ public abstract class JexlParser extends StringParser {
                 throw new JexlException.Parsing(null, JexlFeatures.stringify(feature));
             }
         }
-        JexlInfo info = new JexlInfo(token.image, token.beginLine, token.beginColumn);
-        throwFeatureException(feature, info);
+        JexlInfo xinfo = info.at(token.beginLine, token.beginColumn);
+        throwFeatureException(feature, xinfo);
     }
 
     /**
@@ -343,30 +377,35 @@ public abstract class JexlParser extends StringParser {
      * @param node the node that caused it
      */
     protected void throwParsingException(JexlNode node) {
-        throwParsingException(null, node);
+        throwParsingException(null, null);
     }
 
     /**
-     * Throws a parsing exception.
+     * Creates a parsing exception.
      * @param xclazz the class of exception
-     * @param node the node that caused it
+     * @param tok the token to report
+     * @param <T> the parsing exception subclass
      */
-    protected void throwParsingException(Class<? extends JexlException> xclazz, JexlNode node) {
-        Token tok = this.getToken(0);
+    protected <T extends JexlException.Parsing> void throwParsingException(Class<T> xclazz, Token tok) {
+        JexlInfo xinfo  = null;
+        String msg = "unrecoverable state";
+        JexlException.Parsing xparse = null;
         if (tok == null) {
-            throw new JexlException.Parsing(null, "unrecoverable state");
+            tok = this.getToken(0);
         }
-        JexlInfo dbgInfo = new JexlInfo(tok.image, tok.beginLine, tok.beginColumn);
-        String msg = readSourceLine(source, tok.beginLine);
-        JexlException xjexl = null;
-        if (xclazz != null) {
-            try {
-                Constructor<? extends JexlException> ctor = xclazz.getConstructor(JexlInfo.class, String.class);
-                xjexl = ctor.newInstance(dbgInfo, msg);
-            } catch (Exception xany) {
-                // ignore, very unlikely but then again..
+        if (tok != null) {
+            xinfo = info.at(tok.beginLine, tok.beginColumn);
+            msg = readSourceLine(source, tok.beginLine);
+            if (xclazz != null) {
+                try {
+                    Constructor<T> ctor = xclazz.getConstructor(JexlInfo.class, String.class);
+                    xparse = ctor.newInstance(xinfo, msg);
+                } catch (Exception xany) {
+                    // ignore, very unlikely but then again..
+                }
             }
         }
-        throw xjexl != null ? xjexl : new JexlException.Parsing(dbgInfo, msg);
+        // unlikely but safe
+        throw xparse != null ? xparse : new JexlException.Parsing(xinfo, msg);
     }
 }

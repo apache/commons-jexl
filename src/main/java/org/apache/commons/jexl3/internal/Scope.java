@@ -121,7 +121,7 @@ public final class Scope {
                 if (namedVariables == null) {
                     namedVariables = new LinkedHashMap<String, Integer>();
                 }
-                register = Integer.valueOf(namedVariables.size());
+                register = namedVariables.size();
                 namedVariables.put(name, register);
                 hoistedVariables.put(register, pr);
             }
@@ -153,7 +153,7 @@ public final class Scope {
         }
         Integer register = namedVariables.get(name);
         if (register == null) {
-            register = Integer.valueOf(namedVariables.size());
+            register = namedVariables.size();
             namedVariables.put(name, register);
             parms += 1;
         }
@@ -173,9 +173,19 @@ public final class Scope {
         }
         Integer register = namedVariables.get(name);
         if (register == null) {
-            register = Integer.valueOf(namedVariables.size());
+            register = namedVariables.size();
             namedVariables.put(name, register);
             vars += 1;
+//            // check if local is redefining hoisted
+//            if (parent != null) {
+//                Integer pr = parent.getSymbol(name, true);
+//                if (pr != null) {
+//                    if (hoistedVariables == null) {
+//                        hoistedVariables = new LinkedHashMap<Integer, Integer>();
+//                    }
+//                    hoistedVariables.put(register, pr);
+//                }
+//            }
         }
         return register;
     }
@@ -193,8 +203,8 @@ public final class Scope {
                 for (Map.Entry<Integer, Integer> hoist : hoistedVariables.entrySet()) {
                     Integer target = hoist.getKey();
                     Integer source = hoist.getValue();
-                    Object arg = frame.get(source.intValue());
-                    arguments[target.intValue()] = arg;
+                    Object arg = frame.get(source);
+                    arguments[target] = arg;
                 }
             }
             return new Frame(this, arguments, 0);
@@ -275,7 +285,7 @@ public final class Scope {
             String[] pa = new String[parms - (hoistedVariables == null? 0 : hoistedVariables.size())];
             int p = 0;
             for (Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
-                int symnum = entry.getValue().intValue();
+                int symnum = entry.getValue();
                 if (symnum >= parms && (hoistedVariables == null || !hoistedVariables.containsKey(symnum))) {
                     pa[p++] = entry.getKey();
                 }
