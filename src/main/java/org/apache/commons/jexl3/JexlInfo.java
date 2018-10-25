@@ -22,7 +22,7 @@ package org.apache.commons.jexl3;
  * debugging information reporting.
  */
 public class JexlInfo {
-
+    
     /** line number. */
     private final int line;
 
@@ -72,6 +72,36 @@ public class JexlInfo {
         name = source;
         line = l;
         column = c;
+    }
+                
+    /**
+     * Create an information structure for dynamic set/get/invoke/new.
+     * <p>This gathers the class, method and line number of the first calling method
+     * outside of o.a.c.jexl3.</p>
+     */
+    public JexlInfo() {
+        StackTraceElement[] stack = new Throwable().getStackTrace();
+        String cname = getClass().getName();
+        String pkgname = getClass().getPackage().getName();
+        StackTraceElement se = null;
+        for (int s = 1; s < stack.length; ++s) {
+            se = stack[s];
+            String className = se.getClassName();
+            if (!className.equals(cname)) {
+                // go deeper if called from jexl implementation classes
+                if (className.startsWith(pkgname + ".internal.")
+                    || className.startsWith(pkgname + ".Jexl")) {
+                    cname = className;
+                } else {
+                    break;
+                }
+            }
+        }
+        this.name = se != null
+             ? se.getClassName() + "." + se.getMethodName()  +":" + se.getLineNumber()
+                    : "?";
+        this.line = 0;
+        this.column = 0;
     }
 
     /**

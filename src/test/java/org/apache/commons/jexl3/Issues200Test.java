@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -384,7 +385,7 @@ public class Issues200Test extends JexlTestCase {
         result = script.execute(ctx);
         Assert.assertEquals(10, result);
     }
-
+      
     @Test
     public void test230() throws Exception {
         JexlEngine jexl = new JexlBuilder().cache(4).create();
@@ -594,6 +595,38 @@ public class Issues200Test extends JexlTestCase {
             // expected
             String sxs = xstack.toString();
             Assert.assertTrue(sxs.contains("jvm"));
+        }
+    } 
+               
+    @Test
+    public void test278() throws Exception {
+        String[] srcs = new String[]{
+            "return union x('arg',5,6) ",
+            "return union 143('arg',5,6)   ;",
+            "return union\n 143('arg',5,6)   ;",
+            "var f =()->{ return union 143; } foo[0]"
+        };
+        Object[] ctls = new Object[]{
+            "42","42","42", 42
+        };
+        JexlEngine jexl = new JexlBuilder().cache(4).create();
+        JexlContext ctxt = new MapContext();
+        int[] foo = {42};
+        ctxt.set("foo", foo);
+        ctxt.set("union", "42");
+        Object value;
+        JexlScript jc;
+        for(int i = 0; i < srcs.length; ++i) { 
+            String src = srcs[i];
+            try {
+                jc = jexl.createScript(src);
+                Assert.fail("should have failed, " + (jc != null));
+            } catch(JexlException.Ambiguous xa) {
+                src = xa.tryCleanSource(src);
+            }
+            jc = jexl.createScript(src);
+            value = jc.execute(ctxt);
+            Assert.assertEquals(src, ctls[i], value);
         }
     }
 }

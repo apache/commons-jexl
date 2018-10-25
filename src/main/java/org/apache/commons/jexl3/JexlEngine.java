@@ -579,27 +579,7 @@ public abstract class JexlEngine {
      * @return a JexlInfo instance
      */
     public JexlInfo createInfo() {
-        JexlInfo info = null;
-        StackTraceElement[] stack = new Throwable().getStackTrace();
-        StackTraceElement se = null;
-        String name = getClass().getName();
-        for (int s = 1; s < stack.length; ++s) {
-            se = stack[s];
-            String className = se.getClassName();
-            if (!className.equals(name)) {
-                // go deeper if called from jexl implementation classes
-                if (className.startsWith("org.apache.commons.jexl3.internal.")
-                    || className.startsWith("org.apache.commons.jexl3.J")) {
-                    name = className;
-                } else {
-                    break;
-                }
-            }
-        }
-        if (se != null) {
-            info = createInfo(se.getClassName() + "." + se.getMethodName(), se.getLineNumber(), 0);
-        }
-        return info;
+        return new JexlInfo();
     }
 
     /**

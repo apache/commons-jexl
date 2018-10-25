@@ -47,7 +47,7 @@ public final class Parser extends JexlParser
     private int loopCount = 0;
     private int forLoopCount = 0;
 
-    public ASTJexlScript parse(JexlInfo info, JexlFeatures jexlFeatures, String jexlSrc, Scope scope) {
+    public ASTJexlScript parse(JexlInfo jexlInfo, JexlFeatures jexlFeatures, String jexlSrc, Scope scope) {
         JexlFeatures previous = getFeatures();
         try {
             setFeatures(jexlFeatures);
@@ -56,6 +56,7 @@ public final class Parser extends JexlParser
                 token_source.defaultLexState = REGISTERS;
             }
             // lets do the 'Unique Init' in here to be safe - it's a pain to remember
+            info = jexlInfo != null? jexlInfo : new JexlInfo();
             source = jexlSrc;
             pragmas = null;
             frame = scope;
@@ -72,6 +73,7 @@ public final class Parser extends JexlParser
         } catch (ParseException xparse) {
             throw new JexlException.Parsing(info, xparse).clean();
         } finally {
+            info = null;
             source = null;
             frame = null;
             token_source.defaultLexState = DEFAULT;

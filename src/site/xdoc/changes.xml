@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-278">
+                Ambiguous exceptions should point to actual statement ambiguity
+            </action>
             <action dev="henrib" type="add" issue="JEXL-275">
                  Allow safe navigation as option
             </action>

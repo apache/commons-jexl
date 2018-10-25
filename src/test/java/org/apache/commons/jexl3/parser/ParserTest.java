@@ -17,9 +17,11 @@
 package org.apache.commons.jexl3.parser;
 
 import java.io.StringReader;
+import org.apache.commons.jexl3.JexlEngine;
 
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 

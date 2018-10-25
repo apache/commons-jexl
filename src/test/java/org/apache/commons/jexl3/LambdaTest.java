@@ -155,7 +155,7 @@ public class LambdaTest extends JexlTestCase {
     }
 
     @Test
-    public void testHoistLambada() throws Exception {
+    public void testHoistLambda() throws Exception {
         JexlEngine jexl = createEngine();
         JexlContext ctx = null;
         JexlScript s42;
@@ -352,4 +352,14 @@ public class LambdaTest extends JexlTestCase {
         Object result = y.execute(null, 2, 3);
         Assert.assertEquals(8, result);
     }
+    
+    // redefining an hoisted var is not resolved correctly in left hand side;
+    // declare the var in local frame, resolved in local frame instead of parent
+//    @Test
+//    public void test271e() throws Exception {
+//        JexlEngine jexl = createEngine();
+//        JexlScript base = jexl.createScript("var base = 1000; var f = (x, y)->{ var base = x + y + (base?:-1000); base; }; f(100, 20)");
+//        Object result = base.execute(null);
+//        Assert.assertEquals(-880, result);
+//    }
 }

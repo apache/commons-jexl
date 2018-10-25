@@ -29,6 +29,9 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 /**
  * Wraps any error that might occur during interpretation of a script or expression.
  *
@@ -232,6 +235,14 @@ public class JexlException extends RuntimeException {
                     + expr.substring(begin, end > length ? length : end) + " ...'";
         }
     }
+    
+    /**
+     * Pleasing checkstyle.
+     * @return the info
+     */
+    protected JexlInfo info() {
+        return info;
+    }
 
     /**
      * Thrown when tokenization fails.
@@ -306,19 +317,79 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Ambiguous extends Parsing {
+        /** The mark at which ambiguity might stop and recover. */
+        private JexlInfo recover = null;
         /**
          * Creates a new Ambiguous statement exception instance.
          * @param info  the location information
          * @param expr  the source expression line
          */
         public Ambiguous(JexlInfo info, String expr) {
-            super(info, expr);
+           this(info, null, expr);
         }
-
+                
+        /**
+         * Creates a new Ambiguous statement exception instance.
+         * @param begin  the start location information
+         * @param end the end location information
+         * @param expr  the source expression line
+         */
+        public Ambiguous(JexlInfo begin, JexlInfo end, String expr) {
+            super(begin, expr);
+            recover = end;
+        }
+        
         @Override
         protected String detailedMessage() {
             return parserError("ambiguous statement", getDetail());
         }
+
+        /**
+         * Tries to remove this ambiguity in the source.
+         * @param src the source that triggered this exception
+         * @return the source with the ambiguous statement removed 
+         *         or null if no recovery was possible
+         */
+        public String tryCleanSource(String src) {
+            JexlInfo ji = info();
+            return ji == null || recover == null
+                  ? src
+                  : sliceSource(src, ji.getLine(), ji.getColumn(), recover.getLine(), recover.getColumn());
+        }
+    }
+
+    /**
+     * Removes a slice from a source.
+     * @param src the source
+     * @param froml the begin line
+     * @param fromc the begin column
+     * @param tol the to line
+     * @param toc the to column
+     * @return the source with the (begin) to (to) zone removed
+     */
+    public static String sliceSource(String src, int froml, int fromc, int tol, int toc) {
+        BufferedReader reader = new BufferedReader(new StringReader(src));
+        StringBuilder buffer = new StringBuilder();
+        String line;
+        int cl = 1;
+        try {
+            while ((line = reader.readLine()) != null) {
+                if (cl < froml || cl > tol) {
+                    buffer.append(line).append('\n');
+                } else {
+                    if (cl == froml) {
+                        buffer.append(line.substring(0, fromc - 1));
+                    }
+                    if (cl == tol) {
+                        buffer.append(line.substring(toc));
+                    }
+                } // else ignore line
+                cl += 1;
+            }
+        } catch (IOException xignore) {
+            //damn the checked exceptions :-)
+        }
+        return buffer.toString();
     }
 
     /**
