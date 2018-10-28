@@ -990,6 +990,29 @@ public class JexlArithmetic {
     }
 
     /**
+     * Confirms a value (unary plus for numbers).
+     *
+     * @param val the value to confirm
+     * @return the confirmed value
+     */
+    public Object confirm(Object val) {
+        if (val instanceof Byte) {
+            return +(Byte) val;
+        } else if (val instanceof Short) {
+            return +(Short) val;
+        } else if (val instanceof Character) {
+            return +(Character) val;
+        } else if (val instanceof Number) {
+            return val;
+        } else if (val instanceof Boolean) {
+            return val;
+        } else if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get();
+        }
+        throw new ArithmeticException("Object confirmation:(" + val + ")");
+    }
+
+    /**
      * Test if left contains right (right matches/in left).
      * <p>Beware that this method arguments are the opposite of the operator arguments.
      * 'x in y' means 'y contains x'.</p>

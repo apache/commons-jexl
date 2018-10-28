@@ -193,6 +193,14 @@ public enum JexlOperator {
     NEGATE("-", "negate", 1),
 
     /**
+     * Confirm operator.
+     * <br><strong>Syntax:</strong> <code>+x</code>
+     * <br><strong>Method:</strong> <code>T confirm(L x);</code>.
+     * @see JexlArithmetic#confirm
+     */
+    CONFIRM("+", "confirm", 1),
+
+    /**
      * Empty operator.
      * <br><strong>Syntax:</strong> <code>empty x</code> or <code>empty(x)</code>
      * <br><strong>Method:</strong> <code>boolean isEmpty(L x);</code>.

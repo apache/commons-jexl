@@ -132,6 +132,8 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTUnaryMinusNode node, Object data);
 
+    protected abstract Object visit(ASTUnaryPlusNode node, Object data);
+
     protected abstract Object visit(ASTBitwiseComplNode node, Object data);
 
     protected abstract Object visit(ASTNotNode node, Object data);

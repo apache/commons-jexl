@@ -111,6 +111,7 @@ import org.apache.commons.jexl3.parser.ASTThrowStatement;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
 import org.apache.commons.jexl3.parser.ASTTryStatement;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
+import org.apache.commons.jexl3.parser.ASTUnaryPlusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
 import org.apache.commons.jexl3.parser.ASTWhileStatement;
 import org.apache.commons.jexl3.parser.JexlNode;
@@ -384,6 +385,11 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTUnaryMinusNode node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTUnaryPlusNode node, Object data) {
         return visitNode(node, data);
     }
 

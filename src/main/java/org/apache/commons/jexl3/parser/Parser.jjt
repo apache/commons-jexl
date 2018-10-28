@@ -663,6 +663,8 @@ void UnaryExpression() #void : {}
   |
   <unary_minus> UnaryExpression() #UnaryMinusNode(1)
   |
+  <plus> UnaryExpression() #UnaryPlusNode(1)
+  |
   <tilda> UnaryExpression() #BitwiseComplNode(1)
   |
   <not> UnaryExpression() #NotNode(1)

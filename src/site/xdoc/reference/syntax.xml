@@ -939,6 +939,14 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Confirmation</td>
+                    <td>
+                        The unary <code>+</code> operator is used.
+                        For example
+                        <code>+12</code>
+                    </td>
+                </tr>
+                <tr>
                     <td>Empty</td>
                     <td>
                         The unary <code>empty</code> operator behaves exactly as the corresponding function <code>empty()</code>.

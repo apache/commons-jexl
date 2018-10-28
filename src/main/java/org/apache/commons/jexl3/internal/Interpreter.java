@@ -124,6 +124,7 @@ import org.apache.commons.jexl3.parser.ASTThrowStatement;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
 import org.apache.commons.jexl3.parser.ASTTryStatement;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
+import org.apache.commons.jexl3.parser.ASTUnaryPlusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
 import org.apache.commons.jexl3.parser.ASTWhileStatement;
 import org.apache.commons.jexl3.parser.JexlNode;
@@ -625,6 +626,26 @@ public class Interpreter extends InterpreterBase {
             return number;
         } catch (ArithmeticException xrt) {
             throw new JexlException(valNode, "- error", xrt);
+        }
+    }
+
+    @Override
+    protected Object visit(ASTUnaryPlusNode node, Object data) {
+        JexlNode valNode = node.jjtGetChild(0);
+        Object val = valNode.jjtAccept(this, data);
+        try {
+            Object result = operators.tryOverload(node, JexlOperator.CONFIRM, val);
+            if (result != JexlEngine.TRY_FAILED) {
+                return result;
+            }
+            Object number = arithmetic.confirm(val);
+            // attempt to recoerce to literal class
+            if (valNode instanceof ASTNumberLiteral && number instanceof Number) {
+                number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
+            }
+            return number;
+        } catch (ArithmeticException xrt) {
+            throw new JexlException(valNode, "+ error", xrt);
         }
     }
 
