@@ -33,8 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
-import static org.apache.commons.jexl3.parser.ParserConstants.EOF;
-import static org.apache.commons.jexl3.parser.ParserConstants.SEMICOL;
+
 
 /**
  * The base class for parsing, manages the parameter/local variable frame.
@@ -271,34 +270,6 @@ public abstract class JexlParser extends StringParser {
      * @return the next token on the stack
      */
     protected abstract Token getNextToken();
-    
-    /**
-     * Throws Ambiguous exception.
-     * <p>It seeks a ';' (or EOF) to recover.
-     * @param begin the first token in ambiguous expression
-     */
-    protected void throwAmbiguousException(Token begin) {
-        Token pt = null, end = null;
-        while((end = getNextToken()) != null) {
-            if (end.kind == EOF || end.kind == SEMICOL) {
-                if (pt != null) {
-                    end = pt;
-                }
-                break;
-            }
-            pt = end;
-        }
-        JexlInfo infob = info.at(begin.beginLine, begin.beginColumn);
-        JexlInfo infoe = end != null? info.at(end.endLine, end.endColumn) : null;
-        String msg = readSourceLine(source, begin.beginLine);
-        throw new JexlException.Ambiguous(infob, infoe, msg);
-    }
-    
-    protected void jjtreeOpenNodeScope(JexlNode node) {
-        if (node instanceof ASTAmbiguous) {
-            throwAmbiguousException(getToken(1));
-        }
-    }
 
     /**
      * The set of assignment operators as classes.
@@ -318,6 +289,14 @@ public abstract class JexlParser extends StringParser {
     );
 
     /**
+     * Called by parser at beginning of node construction.
+     * @param node the node
+     */
+    protected void jjtreeOpenNodeScope(JexlNode node) {
+        // nothing
+    }
+
+    /**
      * Called by parser at end of node construction.
      * <p>
      * Detects "Ambiguous statement" and 'non-left value assignment'.</p>
@@ -325,6 +304,9 @@ public abstract class JexlParser extends StringParser {
      * @throws ParseException
      */
     protected void jjtreeCloseNodeScope(JexlNode node) throws ParseException {
+        if (node instanceof ASTAmbiguous) {
+            throwAmbiguousException(node);
+        }
         if (node instanceof ASTJexlScript) {
             if (node instanceof ASTJexlLambda && !getFeatures().supportsLambda()) {
                 throwFeatureException(JexlFeatures.LAMBDA, node.jexlInfo());
@@ -345,6 +327,18 @@ public abstract class JexlParser extends StringParser {
         featureController.controlNode(node);
     }
 
+    /**
+     * Throws Ambiguous exception.
+     * <p>Seeks the end of the ambiguous statement to recover.
+     * @param node the first token in ambiguous expression
+     */
+    protected void throwAmbiguousException(JexlNode node) {
+        JexlInfo begin = node.jexlInfo();
+        Token t = getToken(0);
+        JexlInfo end = info.at(t.beginLine, t.endColumn);
+        String msg = readSourceLine(source, end.getLine());
+        throw new JexlException.Ambiguous(begin, end, msg);
+    }
 
     /**
      * Throws a feature exception.

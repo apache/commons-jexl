@@ -601,10 +601,10 @@ public class Issues200Test extends JexlTestCase {
     @Test
     public void test278() throws Exception {
         String[] srcs = new String[]{
-            "return union x('arg',5,6) ",
-            "return union 143('arg',5,6)   ;",
-            "return union\n 143('arg',5,6)   ;",
-            "var f =()->{ return union 143; } foo[0]"
+            "return union x143('arg',5,6) ",
+            "return union y143('arg',5,6)   ;",
+            "return union\n z143('arg',5,6)   ;",
+            "var f =()->{ return union 143 } foo[0]"
         };
         Object[] ctls = new Object[]{
             "42","42","42", 42
@@ -622,6 +622,8 @@ public class Issues200Test extends JexlTestCase {
                 jc = jexl.createScript(src);
                 Assert.fail("should have failed, " + (jc != null));
             } catch(JexlException.Ambiguous xa) {
+                String str = xa.toString();
+                Assert.assertTrue(str.contains("143"));
                 src = xa.tryCleanSource(src);
             }
             jc = jexl.createScript(src);

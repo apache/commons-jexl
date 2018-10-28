@@ -381,7 +381,7 @@ public class JexlException extends RuntimeException {
                         buffer.append(line.substring(0, fromc - 1));
                     }
                     if (cl == tol) {
-                        buffer.append(line.substring(toc));
+                        buffer.append(line.substring(toc + 1));
                     }
                 } // else ignore line
                 cl += 1;
