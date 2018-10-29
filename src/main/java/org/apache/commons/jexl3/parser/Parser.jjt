@@ -358,7 +358,7 @@ void Block() #Block : {}
 
 void ExpressionStatement() : {}
 {
-    Expression() (LOOKAHEAD(2) Expression() #Ambiguous())* (LOOKAHEAD(1) <SEMICOL>)?
+    Expression() (LOOKAHEAD(2) Expression() #Ambiguous(1))* (LOOKAHEAD(1) <SEMICOL>)?
 }
 
 void MultipleAssignmentStatement() #MultipleAssignment : {}
@@ -368,7 +368,7 @@ void MultipleAssignmentStatement() #MultipleAssignment : {}
 
 void MultipleAssignmentIdentifier() #void : {}
 {
-    <LPAREN> Identifier() (LOOKAHEAD(1) <COMMA> Identifier())* <RPAREN> 
+    <LPAREN> Identifier() (LOOKAHEAD(1) <COMMA> Identifier())* <RPAREN>
 }
 
 void IfStatement() : {}
@@ -439,9 +439,9 @@ void ForeachVar() : {}
 
 void Var() #void : {}
 {
-    <VAR> 
+    <VAR>
     (
-       LOOKAHEAD(1) ((<LPAREN> DeclareExtVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar())* <RPAREN> <assign> Expression()) #MultipleAssignment()) 
+       LOOKAHEAD(1) ((<LPAREN> DeclareExtVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar())* <RPAREN> <assign> Expression()) #MultipleAssignment())
        |
        DeclareVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
     )
@@ -538,7 +538,7 @@ void ConditionalExpression() #void : {}
 {
   ConditionalOrExpression()
   ( LOOKAHEAD(2) (
-    <QMARK> TernaryExpression() 
+    <QMARK> TernaryExpression()
     |
     <ELVIS> Expression() #ElvisNode(2)
     |

@@ -385,7 +385,7 @@ public class Issues200Test extends JexlTestCase {
         result = script.execute(ctx);
         Assert.assertEquals(10, result);
     }
-      
+
     @Test
     public void test230() throws Exception {
         JexlEngine jexl = new JexlBuilder().cache(4).create();
@@ -568,8 +568,8 @@ public class Issues200Test extends JexlTestCase {
         result = script.execute(ctxt);
         Assert.assertTrue(result instanceof JexlScript);
     }
-    
-    
+
+
     @Test
     public void test274() throws Exception {
         JexlEngine jexl = new JexlBuilder().strict(true).safe(true).stackOverflow(5).create();
@@ -596,15 +596,15 @@ public class Issues200Test extends JexlTestCase {
             String sxs = xstack.toString();
             Assert.assertTrue(sxs.contains("jvm"));
         }
-    } 
-               
+    }
+
     @Test
     public void test278() throws Exception {
         String[] srcs = new String[]{
-            "return union x('arg',5,6) ",
-            "return union 143('arg',5,6)   ;",
-            "return union\n 143('arg',5,6)   ;",
-            "var f =()->{ return union 143; } foo[0]"
+            "return union x143('arg',5,6) ",
+            "return union y143('arg',5,6)   ;",
+            "return union\n z143('arg',5,6)   ;",
+            "var f =()->{ return union 143 } foo[0]"
         };
         Object[] ctls = new Object[]{
             "42","42","42", 42
@@ -616,12 +616,14 @@ public class Issues200Test extends JexlTestCase {
         ctxt.set("union", "42");
         Object value;
         JexlScript jc;
-        for(int i = 0; i < srcs.length; ++i) { 
+        for(int i = 0; i < srcs.length; ++i) {
             String src = srcs[i];
             try {
                 jc = jexl.createScript(src);
                 Assert.fail("should have failed, " + (jc != null));
             } catch(JexlException.Ambiguous xa) {
+                String str = xa.toString();
+                Assert.assertTrue(str.contains("143"));
                 src = xa.tryCleanSource(src);
             }
             jc = jexl.createScript(src);

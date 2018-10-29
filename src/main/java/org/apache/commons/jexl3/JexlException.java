@@ -235,7 +235,7 @@ public class JexlException extends RuntimeException {
                     + expr.substring(begin, end > length ? length : end) + " ...'";
         }
     }
-    
+
     /**
      * Pleasing checkstyle.
      * @return the info
@@ -327,7 +327,7 @@ public class JexlException extends RuntimeException {
         public Ambiguous(JexlInfo info, String expr) {
            this(info, null, expr);
         }
-                
+
         /**
          * Creates a new Ambiguous statement exception instance.
          * @param begin  the start location information
@@ -338,7 +338,7 @@ public class JexlException extends RuntimeException {
             super(begin, expr);
             recover = end;
         }
-        
+
         @Override
         protected String detailedMessage() {
             return parserError("ambiguous statement", getDetail());
@@ -347,7 +347,7 @@ public class JexlException extends RuntimeException {
         /**
          * Tries to remove this ambiguity in the source.
          * @param src the source that triggered this exception
-         * @return the source with the ambiguous statement removed 
+         * @return the source with the ambiguous statement removed
          *         or null if no recovery was possible
          */
         public String tryCleanSource(String src) {
@@ -381,7 +381,7 @@ public class JexlException extends RuntimeException {
                         buffer.append(line.substring(0, fromc - 1));
                     }
                     if (cl == tol) {
-                        buffer.append(line.substring(toc));
+                        buffer.append(line.substring(toc + 1));
                     }
                 } // else ignore line
                 cl += 1;
@@ -421,7 +421,7 @@ public class JexlException extends RuntimeException {
             return "stack overflow " + getDetail();
         }
     }
-    
+
     /**
      * Thrown when parsing fails due to an invalid assigment.
      *
@@ -543,7 +543,7 @@ public class JexlException extends RuntimeException {
          * Undefined variable flag.
          */
         private final boolean undefined;
-               
+
         /**
          * Creates a new Property exception instance.
          *
@@ -556,7 +556,7 @@ public class JexlException extends RuntimeException {
         public Property(JexlNode node, String pty, Throwable cause) {
             this(node, pty, true, cause);
         }
-        
+
         /**
          * Creates a new Property exception instance.
          *
