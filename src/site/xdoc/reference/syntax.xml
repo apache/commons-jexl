@@ -931,6 +931,24 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Increment operator</td>
+                    <td>
+                        The <code>++</code> operator is used. 
+                        The default behavior is to increment value and assign the operand with the result.
+                        For instance <code>++a</code> is equivalent to <code>a = a + 1</code>
+                        operator.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Decrement operator</td>
+                    <td>
+                        The <code>--</code> operator is used. 
+                        The default behavior is to decrement value and assign the operand with the result.
+                        For instance <code>--a</code> is equivalent to <code>a = a - 1</code>
+                        operator.
+                    </td>
+                </tr>
+                <tr>
                     <td>Negation</td>
                     <td>
                         The unary <code>-</code> operator is used.

@@ -711,6 +711,16 @@ public class JexlArithmetic {
     }
 
     /**
+     * Default self assign implementation for Increment.
+     *
+     * @param left  left argument
+     * @return ++left.
+     */
+    public Object increment(Object left) {
+        return selfAdd(left, 1);
+    }
+
+    /**
      * Divide the left value by the right.
      *
      * @param left  left argument
@@ -956,6 +966,16 @@ public class JexlArithmetic {
      */
     public Object selfSubtract(Object left, Object right) {
         return subtract(left, right);
+    }
+
+    /**
+     * Default self assign implementation for Decrement.
+     *
+     * @param left  left argument
+     * @return --left.
+     */
+    public Object decrement(Object left) {
+        return selfSubtract(left, 1);
     }
 
     /**

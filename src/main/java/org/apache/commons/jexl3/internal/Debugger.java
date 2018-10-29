@@ -35,6 +35,7 @@ import org.apache.commons.jexl3.parser.ASTBreak;
 import org.apache.commons.jexl3.parser.ASTCatchVar;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
+import org.apache.commons.jexl3.parser.ASTDecrementNode;
 import org.apache.commons.jexl3.parser.ASTDivNode;
 import org.apache.commons.jexl3.parser.ASTDoWhileStatement;
 import org.apache.commons.jexl3.parser.ASTEQNode;
@@ -53,6 +54,7 @@ import org.apache.commons.jexl3.parser.ASTForeachVar;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTGENode;
 import org.apache.commons.jexl3.parser.ASTGTNode;
+import org.apache.commons.jexl3.parser.ASTIncrementNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
@@ -1140,6 +1142,16 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTUnaryPlusNode node, Object data) {
         return prefixChild(node, "+", data);
+    }
+
+    @Override
+    protected Object visit(ASTIncrementNode node, Object data) {
+        return prefixChild(node, "++", data);
+    }
+
+    @Override
+    protected Object visit(ASTDecrementNode node, Object data) {
+        return prefixChild(node, "--", data);
     }
 
     @Override

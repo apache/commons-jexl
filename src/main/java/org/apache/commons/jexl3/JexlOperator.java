@@ -273,6 +273,20 @@ public enum JexlOperator {
     SELF_XOR("^=", "selfXor", XOR),
 
     /**
+     * Increment operator.
+     * <br><strong>Syntax:</strong> <code>++x</code>
+     * <br><strong>Method:</strong> <code>T increment(L x);</code>.
+     */
+    INCREMENT("++", "increment", 1),
+
+    /**
+     * Increment operator.
+     * <br><strong>Syntax:</strong> <code>--x</code>
+     * <br><strong>Method:</strong> <code>T decrement(L x);</code>.
+     */
+    DECREMENT("--", "decrement", 1),
+
+    /**
      * Marker for side effect.
      * <br>Returns this from 'self*' overload method to let the engine know the side effect has been performed and
      * there is no need to assign the result.

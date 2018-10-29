@@ -206,6 +206,8 @@ TOKEN_MGR_DECLS : {
     | < xor_assign : "^=" >
 
     | < assign : "=" >
+    | < increment : "++" >
+    | < decrement : "--" >
     | < plus : "+" >
     | < minus : "-" >
     | < unary_minus : "\u2212" >
@@ -671,6 +673,10 @@ void UnaryExpression() #void : {}
   <unary_minus> UnaryExpression() #UnaryMinusNode(1)
   |
   <plus> UnaryExpression() #UnaryPlusNode(1)
+  |
+  <increment> UnaryExpression() #IncrementNode(1)
+  |
+  <decrement> UnaryExpression() #DecrementNode(1)
   |
   <tilda> UnaryExpression() #BitwiseComplNode(1)
   |

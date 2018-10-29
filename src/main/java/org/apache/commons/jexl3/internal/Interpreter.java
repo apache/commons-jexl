@@ -46,6 +46,7 @@ import org.apache.commons.jexl3.parser.ASTBreak;
 import org.apache.commons.jexl3.parser.ASTCatchVar;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
+import org.apache.commons.jexl3.parser.ASTDecrementNode;
 import org.apache.commons.jexl3.parser.ASTDivNode;
 import org.apache.commons.jexl3.parser.ASTDoWhileStatement;
 import org.apache.commons.jexl3.parser.ASTEQNode;
@@ -67,6 +68,7 @@ import org.apache.commons.jexl3.parser.ASTGTNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccessJxlt;
+import org.apache.commons.jexl3.parser.ASTIncrementNode;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
@@ -1834,6 +1836,18 @@ public class Interpreter extends InterpreterBase {
         return executeAssign(node, left, right, JexlOperator.SELF_XOR, data);
     }
 
+    @Override
+    protected Object visit(ASTIncrementNode node, Object data) {
+        JexlNode left = node.jjtGetChild(0);
+        return executeAssign(node, left, 1, JexlOperator.INCREMENT, data);
+    }
+
+    @Override
+    protected Object visit(ASTDecrementNode node, Object data) {
+        JexlNode left = node.jjtGetChild(0);
+        return executeAssign(node, left, 1, JexlOperator.DECREMENT, data);
+    }
+
     /**
      * Executes an assignment with an optional side-effect operator.
      * @param node     the node
@@ -1858,7 +1872,8 @@ public class Interpreter extends InterpreterBase {
                 if (last < 0) {
                     if (assignop != null) {
                         Object self = frame.get(symbol);
-                        right = operators.tryAssignOverload(node, assignop, self, right);
+                        right = assignop.getArity() == 1 ? operators.tryAssignOverload(node, assignop, self) :
+                            operators.tryAssignOverload(node, assignop, self, right);
                         if (right == JexlOperator.ASSIGN) {
                             return self;
                         }
@@ -1878,7 +1893,8 @@ public class Interpreter extends InterpreterBase {
                 if (last < 0) {
                     if (assignop != null) {
                         Object self = context.get(var.getName());
-                        right = operators.tryAssignOverload(node, assignop, self, right);
+                        right = assignop.getArity() == 1 ? operators.tryAssignOverload(node, assignop, self) :
+                            operators.tryAssignOverload(node, assignop, self, right);
                         if (right == JexlOperator.ASSIGN) {
                             return self;
                         }
@@ -1946,7 +1962,8 @@ public class Interpreter extends InterpreterBase {
                 ant.append(String.valueOf(property));
                 if (assignop != null) {
                     Object self = context.get(ant.toString());
-                    right = operators.tryAssignOverload(node, assignop, self, right);
+                    right = assignop.getArity() == 1 ? operators.tryAssignOverload(node, assignop, self) :
+                        operators.tryAssignOverload(node, assignop, self, right);
                     if (right == JexlOperator.ASSIGN) {
                         return self;
                     }
@@ -1982,7 +1999,8 @@ public class Interpreter extends InterpreterBase {
         // 3: one before last, assign
         if (assignop != null) {
             Object self = getAttribute(object, property, propertyNode);
-            right = operators.tryAssignOverload(node, assignop, self, right);
+            right = assignop.getArity() == 1 ? operators.tryAssignOverload(node, assignop, self) :
+                operators.tryAssignOverload(node, assignop, self, right);
             if (right == JexlOperator.ASSIGN) {
                 return self;
             }

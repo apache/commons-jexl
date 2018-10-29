@@ -294,7 +294,9 @@ public abstract class JexlParser extends StringParser {
             ASTSetAndNode.class,
             ASTSetOrNode.class,
             ASTSetXorNode.class,
-            ASTSetSubNode.class
+            ASTSetSubNode.class,
+            ASTIncrementNode.class,
+            ASTDecrementNode.class
         )
     );
 

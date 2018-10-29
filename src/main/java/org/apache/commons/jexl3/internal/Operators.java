@@ -121,10 +121,7 @@ public class Operators {
         }
         // call base operator
         JexlOperator base = operator.getBaseOperator();
-        if (base == null) {
-            throw new IllegalArgumentException("must be called with a side-effect operator");
-        }
-        if (operators != null && operators.overloads(base)) {
+        if (operators != null && base != null && operators.overloads(base)) {
             // in case there is an overload
             try {
                 JexlMethod vm = operators.getOperator(base, args);
@@ -157,6 +154,10 @@ public class Operators {
                     return arithmetic.selfOr(args[0], args[1]);
                 case SELF_XOR:
                     return arithmetic.selfXor(args[0], args[1]);
+                case INCREMENT:
+                    return arithmetic.increment(args[0]);
+                case DECREMENT:
+                    return arithmetic.decrement(args[0]);
                 default:
                     // unexpected, new operator added?
                     throw new UnsupportedOperationException(operator.getOperatorSymbol());
