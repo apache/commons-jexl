@@ -118,6 +118,7 @@ import org.apache.commons.jexl3.parser.ASTStartCountNode;
 import org.apache.commons.jexl3.parser.ASTStopCountNode;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
+import org.apache.commons.jexl3.parser.ASTSynchronizedStatement;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTThisNode;
 import org.apache.commons.jexl3.parser.ASTThrowStatement;
@@ -1081,6 +1082,21 @@ public class Interpreter extends InterpreterBase {
 
         } while (arithmetic.toBoolean(expressionNode.jjtAccept(this, data)));
 
+        return result;
+    }
+
+    @Override
+    protected Object visit(ASTSynchronizedStatement node, Object data) {
+        Object result = null;
+        /* first objectNode is the synchronization expression */
+        Node expressionNode = node.jjtGetChild(0);
+        synchronized (expressionNode.jjtAccept(this, data)) {
+            cancelCheck(node);
+            if (node.jjtGetNumChildren() > 1) {
+                // execute statement
+                result = node.jjtGetChild(1).jjtAccept(this, data);
+            }
+        }
         return result;
     }
 

@@ -106,6 +106,7 @@ import org.apache.commons.jexl3.parser.ASTStartCountNode;
 import org.apache.commons.jexl3.parser.ASTStopCountNode;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
+import org.apache.commons.jexl3.parser.ASTSynchronizedStatement;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTThisNode;
 import org.apache.commons.jexl3.parser.ASTThrowStatement;
@@ -321,6 +322,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             || child instanceof ASTWhileStatement
             || child instanceof ASTDoWhileStatement
             || child instanceof ASTTryStatement
+            || child instanceof ASTSynchronizedStatement
             || child instanceof ASTAnnotation)) {
             builder.append(';');
             if (indent > 0) {
@@ -1203,6 +1205,19 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         accept(node.jjtGetChild(1), data);
 
         builder.append(")");
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTSynchronizedStatement node, Object data) {
+        builder.append("synchronized (");
+        accept(node.jjtGetChild(0), data);
+        builder.append(") ");
+        if (node.jjtGetNumChildren() > 1) {
+            acceptStatement(node.jjtGetChild(1), data);
+        } else {
+            builder.append(';');
+        }
         return data;
     }
 

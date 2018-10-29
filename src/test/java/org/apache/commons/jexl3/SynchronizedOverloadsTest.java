@@ -44,10 +44,10 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
     @Test
     public void testSynchronizer() throws Exception {
         Map<String, Object> ns = new TreeMap<String, Object>();
-        ns.put("synchronized", SynchronizedContext.class);
+        ns.put("sync", SynchronizedContext.class);
         JexlContext jc = new MapContext();
         JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
-        JexlScript js0 = jexl.createScript("synchronized:call(x, (y)->{y.size()})", "x");
+        JexlScript js0 = jexl.createScript("sync:call(x, (y)->{y.size()})", "x");
         Object size = js0.execute(jc, "foobar");
         Assert.assertEquals(6, size);
     }

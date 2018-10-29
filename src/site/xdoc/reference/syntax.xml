@@ -42,7 +42,7 @@
                         <a href="#Access">Access</a>
                     </li>
                     <li>
-                        <a href="#Conditional">Conditional Statements</a>
+                        <a href="#Control">Control Statements</a>
                     </li>
                 </ol>
             </p>
@@ -82,7 +82,7 @@
                         </ul>
                         <p>
                             <strong>N.B.</strong> the following keywords are reserved, and cannot be used as an identifier or the property name when using the dot operator:
-                            <code>or and eq ne lt gt le ge in div mod not this null true false new var do while break continue remove function return try catch finally throw</code>
+                            <code>or and eq ne lt gt le ge in div mod not this null true false new var do while break continue remove function return try catch finally throw synchronized</code>
                             For example, the following is invalid:
                             <code>my.new.dotted.var // invalid ('new' is keyword)</code>
                             In such cases, quoted identifiers or the [ ] operator can be used, for example:
@@ -125,7 +125,7 @@
                 <tr>
                     <td>Statements</td>
                     <td>
-                        A statement can be the empty statement, the semicolon (<code>;</code>), block, conditional, variable declaration, multiple assignment, or an expression.
+                        A statement can be the empty statement, the semicolon (<code>;</code>), block, control statement, variable declaration, multiple assignment, or an expression.
                         Statements are optionally terminated with a semicolon.
                         A single statement or a statement block can be annotated.
                     </td>
@@ -1078,7 +1078,7 @@
                 </tr>
             </table>
         </section>
-        <section name="Conditional">
+        <section name="Control">
             <table>
                 <tr>
                     <th width="15%">Statement</th>
@@ -1207,6 +1207,15 @@
                         <code>throw "Something wrong here"</code>
                         <p>If the specified argument is the instance of the <code>Throwable</code> class, 
                            the provided exception will be rethrown</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>synchronized</td>
+                    <td>
+                        Executes synchronized code, e.g.
+                        <code>synchronized (x) {
+                            y = x + 2;
+                            }</code>
                     </td>
                 </tr>
             </table>

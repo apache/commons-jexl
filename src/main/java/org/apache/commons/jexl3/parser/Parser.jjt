@@ -129,6 +129,7 @@ TOKEN_MGR_DECLS : {
     | < CATCH : "catch" >
     | < FINALLY : "finally" >
     | < THROW : "throw" >
+    | < SYNCHRONIZED : "synchronized" >
     | < NEW : "new" >
     | < VAR : "var" >
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
@@ -341,6 +342,7 @@ void Statement() #void : {}
     | DoWhileStatement()
     | TryStatement()
     | ThrowStatement()
+    | SynchronizedStatement()
     | LOOKAHEAD(MultipleAssignmentIdentifier() <assign>) MultipleAssignmentStatement()
     | LOOKAHEAD(2) ExpressionStatement()
     | ReturnStatement()
@@ -403,6 +405,11 @@ void CatchVar() : {}
 void ThrowStatement() : {}
 {
     <THROW> Expression()
+}
+
+void SynchronizedStatement() : {}
+{
+    <SYNCHRONIZED> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | Statement())
 }
 
 void ReturnStatement() : {}
