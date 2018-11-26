@@ -311,11 +311,10 @@
                     <td>@annotation</td>
                     <td>
                         Annotations in JEXL are 'meta-statements'; they allow to wrap the execution of the JEXL statement in a user provided
-                        caller; typical example would be: <code>@synchronized(x) x.someMethod();</code>
+                        caller; typical example would be: <code>@lenient x.someMethod();</code>
                         <p>
                             Annotations may be declared with zero or more parameters;
                             <code>@lenient x.someMethod();</code>
-                            <code>@synchronized(x) x.someMethod();</code>
                             <code>@parallel(pool, 8) x.someMethod();</code>
                         </p>
                         <p>
