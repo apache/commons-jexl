@@ -342,6 +342,7 @@ void Statement() #void : {}
     | ForeachStatement()
     | WhileStatement()
     | DoWhileStatement()
+    | LOOKAHEAD(<TRY> <LPAREN>) TryWithResourceStatement()
     | TryStatement()
     | ThrowStatement()
     | SynchronizedStatement()
@@ -394,10 +395,22 @@ void DoWhileStatement() : {}
 
 void TryStatement() : {}
 {
-    <TRY> Block() ( (<CATCH> <LPAREN> CatchVar() <RPAREN> Block() (<FINALLY> Block())?) | <FINALLY> Block() )
+    <TRY> Block() ( (<CATCH> <LPAREN> TryVar() <RPAREN> Block() (<FINALLY> Block())?) | <FINALLY> Block() )
 }
 
-void CatchVar() : {}
+void TryWithResourceStatement() : {}
+{
+    <TRY> <LPAREN> TryResource() <RPAREN> Block() ( (<CATCH> <LPAREN> TryVar() <RPAREN> Block() (<FINALLY> Block())?) | <FINALLY> Block() )?
+}
+
+void TryResource() : {}
+{
+     LOOKAHEAD(TryVar() <COLON>) TryVar() <COLON> Expression()
+     |
+     Expression()
+}
+
+void TryVar() : {}
 {
     <VAR> DeclareVar()
     |

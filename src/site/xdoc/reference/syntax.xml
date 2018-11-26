@@ -1193,7 +1193,6 @@
                             } catch (e) {
                               ...
                             } </code>
-
                         <p>The following syntax is also supported:
                         <code>try {
                               return 42/0;
@@ -1201,13 +1200,10 @@
                               ...
                             } </code>
                         Where <code>e</code> is a local variable.</p>
-
                         <p>Note that the catch variable <code>e</code> is accessible inside <code>finally</code> block and
                           after the whole statement evaluation</p>
-
                         <p>Either the <code>catch</code> block, the <code>finally</code> block or both can be specified for the
                         statement</p>
-
                         <p>The <code>finally</code> block executes always when the try block exits
                         <code>try {
                               return 41;
@@ -1215,7 +1211,29 @@
                               return 42
                             } </code>
                         </p>
-
+                    </td>
+                </tr>
+                <tr>
+                    <td>try-with-resources</td>
+                    <td>
+                        A try statement that declares a resource - the object that must be closed after the statement ends, e.g.
+                        <code>try (e : lock()) {
+                              return 42/0;
+                            } </code>
+                        <p>The following syntax is also supported:
+                        <code>try (var e : lock()) {
+                              return 42/0;
+                            } </code>
+                        Where <code>e</code> is a local variable.</p>
+                        <p>The <code>catch</code> block, the <code>finally</code> block or both can be specified for the
+                        statement as described for the <code>try</code> statement</p>
+                        <p>Note that the resource variable <code>e</code> is accessible inside the <code>catch</code> or <code>finally</code> block and
+                          after the whole statement evaluation</p>
+                        <p>The syntax without variable declaration is also supported:
+                        <code>try (lock()) {
+                              return 42/0;
+                            } </code>
+                        </p>
                     </td>
                 </tr>
                 <tr>

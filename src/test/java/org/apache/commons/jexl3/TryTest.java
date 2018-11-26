@@ -38,7 +38,7 @@ public class TryTest extends JexlTestCase {
     }
 
     @Test
-    public void testLastValueValue() throws Exception {
+    public void testLastValue() throws Exception {
         JexlScript e = JEXL.createScript("try {x = 1} finally {x = 2}");
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);

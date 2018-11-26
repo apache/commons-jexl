@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3.internal;
 
-
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -30,6 +29,7 @@ import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
+import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.logging.Log;
 
@@ -85,27 +85,19 @@ public abstract class InterpreterBase extends ParserVisitor {
         arithmetic = ii.arithmetic;
     }
 
-
-    /** Java7 AutoCloseable interface defined?. */
-    protected static final Class<?> AUTOCLOSEABLE;
-    static {
-        Class<?> c;
-        try {
-            c = Class.forName("java.lang.AutoCloseable");
-        } catch (ClassNotFoundException xclass) {
-            c = null;
-        }
-        AUTOCLOSEABLE = c;
-    }
-
     /**
      * Attempt to call close() if supported.
      * <p>This is used when dealing with auto-closeable (duck-like) objects
      * @param closeable the object we'd like to close
      */
     protected void closeIfSupported(Object closeable) {
-        if (closeable != null) {
-            //if (AUTOCLOSEABLE == null || AUTOCLOSEABLE.isAssignableFrom(closeable.getClass())) {
+        if (closeable instanceof AutoCloseable) {
+            try {
+                ((AutoCloseable)closeable).close();
+            } catch (Exception xignore) {
+                logger.warn(xignore);
+            }
+        } else if (closeable != null) {
             JexlMethod mclose = uberspect.getMethod(closeable, "close", EMPTY_PARAMS);
             if (mclose != null) {
                 try {
@@ -114,7 +106,35 @@ public abstract class InterpreterBase extends ParserVisitor {
                     logger.warn(xignore);
                 }
             }
-            //}
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected static <T extends Throwable> void doThrow(Throwable t) throws T {
+        throw (T) t;
+    }
+
+    protected class ResourceManager implements AutoCloseable {
+        protected Object r;
+
+        protected ResourceManager(Object resource) {
+            r = resource;
+        }
+
+        @Override
+        public void close() throws Exception {
+            if (r instanceof AutoCloseable) {
+                ((AutoCloseable)r).close();
+            } else if (r != null) {
+                JexlMethod mclose = uberspect.getMethod(r, "close", EMPTY_PARAMS);
+                if (mclose != null) {
+                    try {
+                        mclose.invoke(r, EMPTY_PARAMS);
+                    } catch (InvocationTargetException ex) {
+                        InterpreterBase.<RuntimeException>doThrow(ex.getCause());
+                    }
+                }
+            }
         }
     }
 

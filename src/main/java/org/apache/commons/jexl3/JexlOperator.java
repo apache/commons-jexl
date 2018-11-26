@@ -337,7 +337,16 @@ public enum JexlOperator {
      * <br><strong>Method:</strong> <code>Iterator&lt;Object&gt; forEachIndexed(R y);</code>.
      * @since 3.2
      */
-    FOR_EACH_INDEXED("for(i,j:y)", "forEachIndexed", 1);
+    FOR_EACH_INDEXED("for(i,j:y)", "forEachIndexed", 1),
+
+    /**
+     * Resource generator as in try(var x : y).
+     * If the returned Resource is AutoCloseable, close will be called after the execution of the statement.
+     * <br><strong>Syntax:</strong> <code>try(var x : y){...} </code>
+     * <br><strong>Method:</strong> <code>Object tryWith(R y);</code>.
+     * @since 3.2
+     */
+    TRY_WITH("try(x:y)", "tryWith", 1);
 
     /**
      * The operator symbol.

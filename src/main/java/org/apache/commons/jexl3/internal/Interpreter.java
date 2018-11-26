@@ -43,7 +43,6 @@ import org.apache.commons.jexl3.parser.ASTBitwiseOrNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseXorNode;
 import org.apache.commons.jexl3.parser.ASTBlock;
 import org.apache.commons.jexl3.parser.ASTBreak;
-import org.apache.commons.jexl3.parser.ASTCatchVar;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDecrementNode;
@@ -126,6 +125,9 @@ import org.apache.commons.jexl3.parser.ASTThisNode;
 import org.apache.commons.jexl3.parser.ASTThrowStatement;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
 import org.apache.commons.jexl3.parser.ASTTryStatement;
+import org.apache.commons.jexl3.parser.ASTTryVar;
+import org.apache.commons.jexl3.parser.ASTTryWithResourceStatement;
+import org.apache.commons.jexl3.parser.ASTTryResource;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
 import org.apache.commons.jexl3.parser.ASTUnaryPlusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
@@ -272,10 +274,8 @@ public class Interpreter extends InterpreterBase {
         } finally {
             synchronized(this) {
                 if (functors != null) {
-                    if (AUTOCLOSEABLE != null) {
-                        for (Object functor : functors.values()) {
-                            closeIfSupported(functor);
-                        }
+                    for (Object functor : functors.values()) {
+                        closeIfSupported(functor);
                     }
                     functors.clear();
                     functors = null;
@@ -974,14 +974,10 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTTryStatement node, Object data) {
         Object result = null;
-
         int num = node.jjtGetNumChildren();
-
         try {
-
             // execute try block
             result = node.jjtGetChild(0).jjtAccept(this, data);
-
         } catch (JexlException.Break e) {
             throw e;
         } catch (JexlException.Continue e) {
@@ -993,40 +989,87 @@ public class Interpreter extends InterpreterBase {
         } catch(JexlException.Cancel e) {
             throw e;
         } catch (Throwable t) {
-
-            // if there is no a catch block just rethrow
+            // if there is no catch block just rethrow
             if (num < 3) 
                 throw t;
-
-            ASTCatchVar catchReference = (ASTCatchVar) node.jjtGetChild(1);
-            ASTIdentifier catchVariable = (ASTIdentifier) catchReference.jjtGetChild(0);
-
-            int symbol = catchVariable.getSymbol();
-
-            if (symbol < 0) {
-                context.set(catchVariable.getName(), t);
-            } else {
-                frame.set(symbol, t);
-            }
-
+            // Set catch variable
+            node.jjtGetChild(1).jjtAccept(this, t);
             // execute catch block
             node.jjtGetChild(2).jjtAccept(this, data);
-
         } finally {
-
             // execute finally block if any
             if (num == 2) {
                 node.jjtGetChild(1).jjtAccept(this, data);
-            } else if (num > 3) {
+            } else if (num == 4) {
                 node.jjtGetChild(3).jjtAccept(this, data);
             }
         }
-
         return result;
     }
 
     @Override
-    protected Object visit(ASTCatchVar node, Object data) {
+    protected Object visit(ASTTryWithResourceStatement node, Object data) {
+        Object result = null;
+        int num = node.jjtGetNumChildren();
+        try {
+            ASTTryResource resReference = (ASTTryResource) node.jjtGetChild(0);
+            // Last child is expression that returns the resource
+            Object r = resReference.jjtGetChild(resReference.jjtGetNumChildren() - 1).jjtAccept(this, data);
+            // get a resource manager for the resource via the introspector
+            Object rman = operators.tryOverload(node, JexlOperator.TRY_WITH, r);
+            if (JexlEngine.TRY_FAILED != rman)
+                r = rman;
+            if (resReference.jjtGetNumChildren() == 2) {
+               // Set variable
+               resReference.jjtGetChild(0).jjtAccept(this, r);
+            }
+            try (ResourceManager rm = new ResourceManager(r)) {
+                // execute try block
+                result = node.jjtGetChild(1).jjtAccept(this, data);
+            }
+        } catch (JexlException.Break e) {
+            throw e;
+        } catch (JexlException.Continue e) {
+            throw e;
+        } catch (JexlException.Remove e) {
+            throw e;
+        } catch (JexlException.Return e) {
+            throw e;
+        } catch(JexlException.Cancel e) {
+            throw e;
+        } catch (Throwable t) {
+            // if there is no catch block just rethrow
+            if (num < 4) 
+                InterpreterBase.<RuntimeException>doThrow(t);
+            // set catch variable
+            node.jjtGetChild(2).jjtAccept(this, t);
+            // execute catch block
+            node.jjtGetChild(3).jjtAccept(this, data);
+        } finally {
+            // execute finally block if any
+            if (num == 3) {
+                node.jjtGetChild(2).jjtAccept(this, data);
+            } else if (num == 5) {
+                node.jjtGetChild(4).jjtAccept(this, data);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    protected Object visit(ASTTryVar node, Object data) {
+        ASTIdentifier variable = (ASTIdentifier) node.jjtGetChild(0);
+        int symbol = variable.getSymbol();
+        if (symbol < 0) {
+            context.set(variable.getName(), data);
+        } else {
+            frame.set(symbol, data);
+        }
+        return null;
+    }
+
+    @Override
+    protected Object visit(ASTTryResource node, Object data) {
         return null;
     }
 
@@ -1035,15 +1078,10 @@ public class Interpreter extends InterpreterBase {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
         cancelCheck(node);
         if (val instanceof Throwable)
-            Interpreter.<RuntimeException>doThrow((Throwable) val);
+            InterpreterBase.<RuntimeException>doThrow((Throwable) val);
         throw new RuntimeException(arithmetic.toString(val));
     }
  
-    @SuppressWarnings("unchecked")
-    private static <T extends Throwable> void doThrow(Throwable t) throws T {
-        throw (T) t;
-    }
-
     @Override
     protected Object visit(ASTWhileStatement node, Object data) {
         Object result = null;
