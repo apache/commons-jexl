@@ -114,6 +114,9 @@ import org.apache.commons.jexl3.parser.ASTSetMultNode;
 import org.apache.commons.jexl3.parser.ASTSetOrNode;
 import org.apache.commons.jexl3.parser.ASTSetSubNode;
 import org.apache.commons.jexl3.parser.ASTSetXorNode;
+import org.apache.commons.jexl3.parser.ASTShiftLeftNode;
+import org.apache.commons.jexl3.parser.ASTShiftRightNode;
+import org.apache.commons.jexl3.parser.ASTShiftRightUnsignedNode;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
 import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStartCountNode;
@@ -435,6 +438,45 @@ public class Interpreter extends InterpreterBase {
             }
             JexlNode xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "% error", xrt);
+        }
+    }
+
+    @Override
+    protected Object visit(ASTShiftLeftNode node, Object data) {
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        try {
+            Object result = operators.tryOverload(node, JexlOperator.SHL, left, right);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.leftShift(left, right);
+        } catch (ArithmeticException xrt) {
+            JexlNode xnode = findNullOperand(xrt, node, left, right);
+            throw new JexlException(xnode, "<< error", xrt);
+        }
+    }
+
+    @Override
+    protected Object visit(ASTShiftRightNode node, Object data) {
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        try {
+            Object result = operators.tryOverload(node, JexlOperator.SAR, left, right);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.rightShift(left, right);
+        } catch (ArithmeticException xrt) {
+            JexlNode xnode = findNullOperand(xrt, node, left, right);
+            throw new JexlException(xnode, ">> error", xrt);
+        }
+    }
+
+    @Override
+    protected Object visit(ASTShiftRightUnsignedNode node, Object data) {
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        try {
+            Object result = operators.tryOverload(node, JexlOperator.SHR, left, right);
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.rightShiftUnsigned(left, right);
+        } catch (ArithmeticException xrt) {
+            JexlNode xnode = findNullOperand(xrt, node, left, right);
+            throw new JexlException(xnode, ">>> error", xrt);
         }
     }
 

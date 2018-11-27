@@ -102,6 +102,9 @@ import org.apache.commons.jexl3.parser.ASTSetMultNode;
 import org.apache.commons.jexl3.parser.ASTSetOrNode;
 import org.apache.commons.jexl3.parser.ASTSetSubNode;
 import org.apache.commons.jexl3.parser.ASTSetXorNode;
+import org.apache.commons.jexl3.parser.ASTShiftLeftNode;
+import org.apache.commons.jexl3.parser.ASTShiftRightNode;
+import org.apache.commons.jexl3.parser.ASTShiftRightUnsignedNode;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
 import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStartCountNode;
@@ -431,6 +434,32 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         boolean paren = node.jjtGetParent() instanceof ASTMulNode
                 || node.jjtGetParent() instanceof ASTDivNode
                 || node.jjtGetParent() instanceof ASTModNode;
+        int num = node.jjtGetNumChildren();
+        if (paren) {
+            builder.append('(');
+        }
+        accept(node.jjtGetChild(0), data);
+        for (int i = 1; i < num; ++i) {
+            builder.append(op);
+            accept(node.jjtGetChild(i), data);
+        }
+        if (paren) {
+            builder.append(')');
+        }
+        return data;
+    }
+
+    /**
+     * Rebuilds a shift expression.
+     * @param node the node
+     * @param op   the operator
+     * @param data visitor pattern argument
+     * @return visitor pattern value
+     */
+    protected Object shiftNode(JexlNode node, String op, Object data) {
+        // need parenthesis if not in operator precedence order
+        boolean paren = node.jjtGetParent() instanceof ASTAddNode
+                || node.jjtGetParent() instanceof ASTSubNode;
         int num = node.jjtGetNumChildren();
         if (paren) {
             builder.append('(');
@@ -1036,6 +1065,21 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTMulNode node, Object data) {
         return infixChildren(node, " * ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTShiftLeftNode node, Object data) {
+        return shiftNode(node, " << ", data);
+    }
+
+    @Override
+    protected Object visit(ASTShiftRightNode node, Object data) {
+        return shiftNode(node, " >> ", data);
+    }
+
+    @Override
+    protected Object visit(ASTShiftRightUnsignedNode node, Object data) {
+        return shiftNode(node, " >>> ", data);
     }
 
     @Override

@@ -868,6 +868,30 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Left Shift</td>
+                    <td>
+                        The usual binary signed left shift <code>&lt;&lt;</code> operator is used.
+                        For example
+                        <code>val1 &lt;&lt; 2</code>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Right Shift</td>
+                    <td>
+                        The usual binary signed right shift <code>&gt;&gt;</code> operator is used.
+                        For example
+                        <code>val1 &gt;&gt; 2</code>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Unsigned Right Shift</td>
+                    <td>
+                        The usual binary unsigned right shift <code>&gt;&gt;&gt;&gt;</code> operator is used.
+                        For example
+                        <code>val1 &gt;&gt;&gt; 2</code>
+                    </td>
+                </tr>
+                <tr>
                     <td>Addition</td>
                     <td>
                         The usual <code>+</code> operator is used.

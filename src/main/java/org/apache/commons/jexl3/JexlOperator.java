@@ -105,6 +105,30 @@ public enum JexlOperator {
     XOR("^", "xor", 2),
 
     /**
+     * Left-shift operator.
+     * <br><strong>Syntax:</strong> <code>x << y</code>
+     * <br><strong>Method:</strong> <code>T leftShift(L x, R y);</code>.
+     * @see JexlArithmetic#leftShift
+     */
+    SHL("<<", "leftShift", 2),
+
+    /**
+     * Right-shift operator.
+     * <br><strong>Syntax:</strong> <code>x >> y</code>
+     * <br><strong>Method:</strong> <code>T rightShift(L x, R y);</code>.
+     * @see JexlArithmetic#rightShift
+     */
+    SAR(">>", "rightShift", 2),
+
+    /**
+     * Right-shift unsigned operator.
+     * <br><strong>Syntax:</strong> <code>x >>> y</code>
+     * <br><strong>Method:</strong> <code>T rightShiftUnsigned(L x, R y);</code>.
+     * @see JexlArithmetic#rightShiftUnsigned
+     */
+    SHR(">>>", "rightShiftUnsigned", 2),
+
+    /**
      * Equals operator.
      * <br><strong>Syntax:</strong> <code>x == y</code>
      * <br><strong>Method:</strong> <code>boolean equals(L x, R y);</code>.

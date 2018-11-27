@@ -218,6 +218,9 @@ TOKEN_MGR_DECLS : {
     | < and : "&" >
     | < or : "|" >
     | < xor : "^" >
+    | < shl : "<<" >
+    | < shr : ">>>" >
+    | < sar : ">>" >
 
     | < tilda : "~" >
     | < range : ".." | "\u2025" >
@@ -629,33 +632,45 @@ void EqualityExpression() #void : {}
 
 void RelationalExpression() #void : {}
 {
-  AdditiveExpression()
+  ShiftExpression()
   ( LOOKAHEAD(2) (
-    <lt> AdditiveExpression() #LTNode(2)
+    <lt> ShiftExpression() #LTNode(2)
    |
-    <gt> AdditiveExpression() #GTNode(2)
+    <gt> ShiftExpression() #GTNode(2)
    |
-    <le> AdditiveExpression() #LENode(2)
+    <le> ShiftExpression() #LENode(2)
    |
-    <ge> AdditiveExpression() #GENode(2)
+    <ge> ShiftExpression() #GENode(2)
    |
-    <req> AdditiveExpression() #ERNode(2) // equals regexp
+    <req> ShiftExpression() #ERNode(2) // equals regexp
    |
-    <rne> AdditiveExpression() #NRNode(2) // not equals regexp
+    <rne> ShiftExpression() #NRNode(2) // not equals regexp
    |
-    <seq> AdditiveExpression() #SWNode(2) // starts with
+    <seq> ShiftExpression() #SWNode(2) // starts with
    |
-    <sne> AdditiveExpression() #NSWNode(2) // not starts with
+    <sne> ShiftExpression() #NSWNode(2) // not starts with
    |
-    <eeq> AdditiveExpression() #EWNode(2) // ends with
+    <eeq> ShiftExpression() #EWNode(2) // ends with
    |
-    <ene> AdditiveExpression() #NEWNode(2) // not ends with
+    <ene> ShiftExpression() #NEWNode(2) // not ends with
   ) )?
 }
 
 /***************************************
  *      Arithmetic
  ***************************************/
+
+void ShiftExpression() #void : {}
+{
+  AdditiveExpression()
+  ( LOOKAHEAD(2) (
+    <shl> AdditiveExpression() #ShiftLeftNode(2)
+  |
+    <shr> AdditiveExpression() #ShiftRightUnsignedNode(2)
+  |
+    <sar> AdditiveExpression() #ShiftRightNode(2)
+  ) )*
+}
 
 void AdditiveExpression() #void : {}
 {

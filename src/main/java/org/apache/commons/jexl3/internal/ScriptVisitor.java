@@ -101,6 +101,9 @@ import org.apache.commons.jexl3.parser.ASTSetMultNode;
 import org.apache.commons.jexl3.parser.ASTSetOrNode;
 import org.apache.commons.jexl3.parser.ASTSetSubNode;
 import org.apache.commons.jexl3.parser.ASTSetXorNode;
+import org.apache.commons.jexl3.parser.ASTShiftLeftNode;
+import org.apache.commons.jexl3.parser.ASTShiftRightNode;
+import org.apache.commons.jexl3.parser.ASTShiftRightUnsignedNode;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
 import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStartCountNode;
@@ -401,6 +404,21 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTModNode node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTShiftLeftNode node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTShiftRightNode node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTShiftRightUnsignedNode node, Object data) {
         return visitNode(node, data);
     }
 

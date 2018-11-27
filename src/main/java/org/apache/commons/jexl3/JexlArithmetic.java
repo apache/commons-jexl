@@ -1040,6 +1040,95 @@ public class JexlArithmetic {
     }
 
     /**
+     * Shifts a bit pattern to the left.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left << right.
+     */
+    public Object leftShift(Object left, Object right) {
+        if (left == null && right == null) {
+            return controlNullNullOperands();
+        }
+        // if either are no longer than integers use that type
+        if (isIntegerPrecisionNumber(left)) {
+            int l = ((Number) left).intValue();
+            int r = toInteger(right);
+            int result = l << r;
+            return result;
+        }
+        // if either are no longer than long integers use that type
+        if (isLongPrecisionNumber(left)) {
+            long l = ((Number) left).longValue();
+            int r = toInteger(right);
+            long result = l << r;
+            return result;
+        }
+        // otherwise treat as integers
+        BigInteger l = toBigInteger(left);
+        int r = toInteger(right);
+        BigInteger result = l.shiftLeft(r);
+        return narrowBigInteger(left, right, result);
+    }
+
+    /**
+     * Shifts a bit pattern to the right.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left >> right.
+     */
+    public Object rightShift(Object left, Object right) {
+        if (left == null && right == null) {
+            return controlNullNullOperands();
+        }
+        // if either are no longer than integers use that type
+        if (isIntegerPrecisionNumber(left)) {
+            int l = ((Number) left).intValue();
+            int r = toInteger(right);
+            int result = l >> r;
+            return result;
+        }
+        // if either are no longer than long integers use that type
+        if (isLongPrecisionNumber(left)) {
+            long l = ((Number) left).longValue();
+            int r = toInteger(right);
+            long result = l >> r;
+            return result;
+        }
+        // otherwise treat as integers
+        BigInteger l = toBigInteger(left);
+        int r = toInteger(right);
+        BigInteger result = l.shiftRight(r);
+        return narrowBigInteger(left, right, result);
+    }
+
+    /**
+     * Shifts a bit pattern to the right unsigned.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left >>> right.
+     */
+    public Object rightShiftUnsigned(Object left, Object right) {
+        if (left == null && right == null) {
+            return controlNullNullOperands();
+        }
+        // if either are no longer than integers use that type
+        if (isIntegerPrecisionNumber(left)) {
+            int l = ((Number) left).intValue();
+            int r = toInteger(right);
+            int result = l >>> r;
+            return result;
+        }
+        // otherwise treat as integers
+        long l = toLong(left);
+        int r = toInteger(right);
+        long result = l >>> r;
+        return result;
+    }
+
+    /**
      * Test if left contains right (right matches/in left).
      * <p>Beware that this method arguments are the opposite of the operator arguments.
      * 'x in y' means 'y contains x'.</p>
