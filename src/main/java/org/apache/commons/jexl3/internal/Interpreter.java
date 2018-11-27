@@ -68,6 +68,7 @@ import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccessJxlt;
 import org.apache.commons.jexl3.parser.ASTIncrementNode;
+import org.apache.commons.jexl3.parser.ASTIndirectNode;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
@@ -650,6 +651,19 @@ public class Interpreter extends InterpreterBase {
         } catch (ArithmeticException xrt) {
             throw new JexlException(valNode, "+ error", xrt);
         }
+    }
+
+    @Override
+    protected Object visit(ASTIndirectNode node, Object data) {
+        Object val = node.jjtGetChild(0).jjtAccept(this, data);
+        if (val == null) {
+            if (isStrictEngine()) {
+                throw new JexlException(node, "Null dereference", null);
+            } else {
+                return null;
+            }
+        }
+        return operators.indirect(node, val);
     }
 
     @Override

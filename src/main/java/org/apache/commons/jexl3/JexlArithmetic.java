@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.introspection.JexlMethod;
 
+import java.lang.ref.Reference;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -29,6 +30,12 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Optional;
+
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Perform arithmetic, implements JexlOperator methods.
@@ -1169,6 +1176,37 @@ public class JexlArithmetic {
             return ((Map<?, ?>) object).size();
         }
         return null;
+    }
+
+    /**
+     * Dereferences various types: SoftReference, Optional
+     *
+     * @param object the object to be derefenced
+     * @return the object or TRY_FAILED if there is no dereference path
+     */
+    public Object indirect(Object object) {
+        if (object instanceof Reference) {
+            return ((Reference) object).get();
+        }
+        if (object instanceof ThreadLocal) {
+            return ((ThreadLocal) object).get();
+        }
+        if (object instanceof Optional) {
+            return ((Optional) object).get();
+        }
+        if (object instanceof AtomicReference) {
+            return ((AtomicReference) object).get();
+        }
+        if (object instanceof AtomicBoolean) {
+            return ((AtomicInteger) object).get();
+        }
+        if (object instanceof AtomicInteger) {
+            return ((AtomicInteger) object).get();
+        }
+        if (object instanceof AtomicLong) {
+            return ((AtomicLong) object).get();
+        }
+        return JexlEngine.TRY_FAILED;
     }
 
     /**

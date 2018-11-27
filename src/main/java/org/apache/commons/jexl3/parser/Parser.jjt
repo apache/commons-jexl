@@ -691,6 +691,8 @@ void UnaryExpression() #void : {}
   |
   <decrement> UnaryExpression() #DecrementNode(1)
   |
+  <mult> UnaryExpression() #IndirectNode(1)
+  |
   <tilda> UnaryExpression() #BitwiseComplNode(1)
   |
   <not> UnaryExpression() #NotNode(1)

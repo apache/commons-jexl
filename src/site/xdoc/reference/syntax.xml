@@ -964,6 +964,16 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Dereference</td>
+                    <td>
+                        The unary <code>*</code> operator is used.
+                        For example
+                        <code>*a</code>
+                        Note that through duck-typing, user classes exposing an 'get' method without arguments will allow their instances
+                        to behave as an operand of this operator.
+                    </td>
+                </tr>
+                <tr>
                     <td>Empty</td>
                     <td>
                         The unary <code>empty</code> operator behaves exactly as the corresponding function <code>empty()</code>.

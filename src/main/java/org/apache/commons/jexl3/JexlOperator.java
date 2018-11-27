@@ -287,6 +287,13 @@ public enum JexlOperator {
     DECREMENT("--", "decrement", 1),
 
     /**
+     * Indirect operator.
+     * <br><strong>Syntax:</strong> <code>*x</code>
+     * <br><strong>Method:</strong> <code>T indirect(L x);</code>.
+     */
+    INDIRECT("*", "indirect", 1),
+
+    /**
      * Marker for side effect.
      * <br>Returns this from 'self*' overload method to let the engine know the side effect has been performed and
      * there is no need to assign the result.

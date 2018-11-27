@@ -374,4 +374,36 @@ public class Operators {
         }
         return result;
     }
+
+    /**
+     * Dereferences anything that has an Object get() method.
+     *
+     * @param node   the node holding the object
+     * @param object the object to be dereferenced
+     * @return the evaluation result
+     */
+    protected Object indirect(JexlNode node, Object object) {
+        final JexlArithmetic arithmetic = interpreter.arithmetic;
+        final JexlUberspect uberspect = interpreter.uberspect;
+        Object result = tryOverload(node, JexlOperator.INDIRECT, object);
+        if (result != JexlEngine.TRY_FAILED) {
+            return result;
+        }
+        result = arithmetic.indirect(object);
+        if (result == JexlEngine.TRY_FAILED) {
+            result = null;
+            // check if there is an isEmpty method on the object that returns a
+            // boolean and if so, just use it
+            JexlMethod vm = uberspect.getMethod(object, "get", Interpreter.EMPTY_PARAMS);
+            if (vm != null) {
+                try {
+                    result = vm.invoke(object, Interpreter.EMPTY_PARAMS);
+                } catch (Exception xany) {
+                    interpreter.operatorError(node, JexlOperator.INDIRECT, xany);
+                }
+            }
+        }
+        return result;
+    }
+
 }
