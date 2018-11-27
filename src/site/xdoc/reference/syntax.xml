@@ -1226,11 +1226,11 @@
                     <td>try-with-resources</td>
                     <td>
                         A try statement that declares a resource - the object that must be closed after the statement ends, e.g.
-                        <code>try (e : lock()) {
+                        <code>try (e = lock()) {
                               return 42/0;
                             } </code>
                         <p>The following syntax is also supported:
-                        <code>try (var e : lock()) {
+                        <code>try (var e = lock()) {
                               return 42/0;
                             } </code>
                         Where <code>e</code> is a local variable.</p>

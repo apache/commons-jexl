@@ -117,7 +117,7 @@ public class TryWithResourcesTest extends JexlTestCase {
             Assert.assertEquals(42, jc.get("x"));
         }
 
-        e = JEXL.createScript("try (var r : 42/0) {} finally {x = 42}");
+        e = JEXL.createScript("try (var r = 42/0) {} finally {x = 42}");
         try {
             o = e.execute(jc);
             Assert.fail("should have thrown");
@@ -156,7 +156,7 @@ public class TryWithResourcesTest extends JexlTestCase {
         o = e.execute(jc);
         Assert.assertNull(jc.get("e"));
 
-        e = JEXL.createScript("try (r : 42/0) {} catch (var e) {x = e}");
+        e = JEXL.createScript("try (r = 42/0) {} catch (var e) {x = e}");
         jc = new MapContext();
         o = e.execute(jc);
         Assert.assertTrue(jc.get("x") instanceof Exception);

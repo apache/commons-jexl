@@ -405,7 +405,7 @@ void TryWithResourceStatement() : {}
 
 void TryResource() : {}
 {
-     LOOKAHEAD(TryVar() <COLON>) TryVar() <COLON> Expression()
+     LOOKAHEAD(TryVar() <assign>) TryVar() <assign> Expression()
      |
      Expression()
 }

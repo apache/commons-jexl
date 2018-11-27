@@ -713,7 +713,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTTryResource node, Object data) {
         accept(node.jjtGetChild(0), data);
         if (node.jjtGetNumChildren() > 1) {
-            builder.append(":");
+            builder.append("=");
             accept(node.jjtGetChild(1), data);
         }
         return data;
