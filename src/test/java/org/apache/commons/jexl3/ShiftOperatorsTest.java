@@ -238,4 +238,20 @@ public class ShiftOperatorsTest extends JexlTestCase {
         Assert.assertEquals("Result is not expected", "1right", c.toString());
     }
 
+    @Test
+    public void testPrecedence() throws Exception {
+        JexlContext jc = new MapContext();
+        JexlScript e = JEXL.createScript("40 + 2 << 1 + 1");
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 40 + 2 << 1 + 1, o);
+
+        e = JEXL.createScript("40 + (2 << 1) + 1");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 40 + (2 << 1) + 1, o);
+
+        e = JEXL.createScript("(40 + 2) << (1 + 1)");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", (40 + 2) << (1 + 1), o);
+    }
+
 }
