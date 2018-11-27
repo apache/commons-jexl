@@ -19,17 +19,19 @@ package org.apache.commons.jexl3;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Assert;
 import org.junit.Test;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Tests indirect reference operator.
+ * Tests dereferencing operator.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class IndirectTest extends JexlTestCase {
@@ -48,8 +50,14 @@ public class IndirectTest extends JexlTestCase {
     }
 
     public class DuckTypedRef {
+        protected int x = 42;
+
         public int get() {
-            return 42;
+            return x;
+        }
+
+        public void set(Integer value) {
+            x = value;
         }
     }
 
@@ -63,8 +71,14 @@ public class IndirectTest extends JexlTestCase {
     }
 
     public class OverloadedRef {
+        protected int x = 42;
+
         public int value() {
-            return 42;
+            return x;
+        }
+
+        public void setValue(int i) {
+            x = i;
         }
     }
 
@@ -75,6 +89,21 @@ public class IndirectTest extends JexlTestCase {
 
         public Object indirect(OverloadedRef f) {
             return f.value();
+        }
+
+        public void indirectAssign(OverloadedRef f, Integer value) {
+            f.setValue(value);
+        }
+        
+        public Object selfAdd(Collection<Object> c, Object value) {
+            if (value != null) {
+                if (value instanceof Collection<?>) {
+                    c.addAll((Collection<?>)value);
+                } else {
+                    c.add(value);
+                }
+            }
+            return JexlOperator.ASSIGN;
         }
     }
 
@@ -103,6 +132,52 @@ public class IndirectTest extends JexlTestCase {
         e = jexl.createScript("*x");
         Object o = e.execute(jc);
         Assert.assertNull(o);
+    }
+
+    @Test
+    public void testDereferencedAssign() throws Exception {
+        JexlEngine jexl = new JexlBuilder().arithmetic(new IndirectArithmetic(true)).create();
+        JexlScript e = jexl.createScript("*x = 42");
+        JexlContext jc = new MapContext();
+        AtomicInteger x = new AtomicInteger(0);
+        jc.set("x", x);
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, o);
+        Assert.assertEquals("Result is not expected", 42, x.get());
+
+        e = jexl.createScript("*x = 41");
+        jc = new MapContext();
+        OverloadedRef xxf = new OverloadedRef();
+        jc.set("x", xxf);
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 41, o);
+        Assert.assertEquals("Result is not expected", 41, xxf.value());
+
+        e = jexl.createScript("*x = 41");
+        jc = new MapContext();
+        DuckTypedRef xxd = new DuckTypedRef();
+        jc.set("x", xxd);
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 41, o);
+        Assert.assertEquals("Result is not expected", 41, xxd.get());
+
+        e = jexl.createScript("*x += 42");
+        jc = new MapContext();
+        x = new AtomicInteger(0);
+        jc.set("x", x);
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, o);
+        Assert.assertEquals("Result is not expected", 42, x.get());
+
+        e = jexl.createScript("*x += 42");
+        jc = new MapContext();
+        AtomicReference xx = new AtomicReference();
+        ArrayList xxv = new ArrayList();
+        xx.set(xxv);
+        jc.set("x", xx);
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", o, xxv);
+        Assert.assertEquals("Result is not expected", 1, xxv.size());
     }
 
 }

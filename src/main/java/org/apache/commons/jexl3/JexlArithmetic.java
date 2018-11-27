@@ -1179,7 +1179,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * Dereferences various types: SoftReference, Optional
+     * Dereferences various types: SoftReference, AtomicReference, Optional, ThreadLocal etc
      *
      * @param object the object to be derefenced
      * @return the object or TRY_FAILED if there is no dereference path
@@ -1198,13 +1198,44 @@ public class JexlArithmetic {
             return ((AtomicReference) object).get();
         }
         if (object instanceof AtomicBoolean) {
-            return ((AtomicInteger) object).get();
+            return ((AtomicBoolean) object).get();
         }
         if (object instanceof AtomicInteger) {
             return ((AtomicInteger) object).get();
         }
         if (object instanceof AtomicLong) {
             return ((AtomicLong) object).get();
+        }
+        return JexlEngine.TRY_FAILED;
+    }
+
+    /**
+     * Assigns value to various types: ThreadLocal, AtomicReference etc
+     *
+     * @param object the object to be derefenced
+     * @param value the value to assign
+     * @return JexlOperator.ASSIGN or null if there is no dereferenced assignment path
+     */
+    public Object indirectAssign(Object object, Object value) {
+        if (object instanceof ThreadLocal) {
+            ((ThreadLocal) object).set(value);
+            return value;
+        }
+        if (object instanceof AtomicReference) {
+            ((AtomicReference) object).set(value);
+            return value;
+        }
+        if (object instanceof AtomicBoolean) {
+            ((AtomicBoolean) object).set(toBoolean(value));
+            return value;
+        }
+        if (object instanceof AtomicInteger) {
+            ((AtomicInteger) object).set(toInteger(value));
+            return value;
+        }
+        if (object instanceof AtomicLong) {
+            ((AtomicLong) object).set(toLong(value));
+            return value;
         }
         return JexlEngine.TRY_FAILED;
     }

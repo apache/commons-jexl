@@ -294,6 +294,13 @@ public enum JexlOperator {
     INDIRECT("*", "indirect", 1),
 
     /**
+     * Indirect assign operator.
+     * <br><strong>Syntax:</strong> <code>*x = y</code>
+     * <br><strong>Method:</strong> <code>T indirectAssign(L x, R y);</code>.
+     */
+    INDIRECT_ASSIGN("*=", "indirectAssign", 2),
+
+    /**
      * Marker for side effect.
      * <br>Returns this from 'self*' overload method to let the engine know the side effect has been performed and
      * there is no need to assign the result.

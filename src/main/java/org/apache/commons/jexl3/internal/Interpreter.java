@@ -1964,6 +1964,28 @@ public class Interpreter extends InterpreterBase {
                     antish = false;
                 }
             }
+        } else if (left instanceof ASTIndirectNode) {
+            if (assignop == null) {
+                Object self = left.jjtGetChild(0).jjtAccept(this, data);
+                if (self == null)
+                    throw new JexlException(left, "illegal assignment form *0");
+                operators.indirectAssign(node, self, right);
+                return right;
+            } else {
+                Object self = left.jjtAccept(this, data);
+                if (self == null)
+                    throw new JexlException(left, "illegal assignment form *0");
+                Object result = operators.tryAssignOverload(node, assignop, self, right);
+                if (result == JexlOperator.ASSIGN) {
+                    return self;
+                } else {
+                    self = left.jjtGetChild(0).jjtAccept(this, data);
+                    if (self == null)
+                        throw new JexlException(left, "illegal assignment form *0");
+                    operators.indirectAssign(node, self, right);
+                }
+                return right;
+            }
         } else if (!(left instanceof ASTReference)) {
             throw new JexlException(left, "illegal assignment form 0");
         }

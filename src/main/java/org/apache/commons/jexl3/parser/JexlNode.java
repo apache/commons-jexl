@@ -148,7 +148,8 @@ public abstract class JexlNode extends SimpleNode {
         do {
             if (walk instanceof ASTIdentifier
                 || walk instanceof ASTIdentifierAccess
-                || walk instanceof ASTArrayAccess) {
+                || walk instanceof ASTArrayAccess
+                || walk instanceof ASTIndirectNode) {
                 return true;
             }
             int nc = walk.jjtGetNumChildren() - 1;
