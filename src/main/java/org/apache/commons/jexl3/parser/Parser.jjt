@@ -855,6 +855,11 @@ void RemoveIdentifier() #Identifier :
     t=<REMOVE> { jjtThis.setSymbol(t.image); }
 }
 
+void This() #void : {}
+{
+    <THIS> #ThisNode
+}
+
 void Literal() #void :
 {
    Token t;
@@ -872,14 +877,7 @@ void Literal() #void :
 |
   RegexLiteral()
 |
-  ThisLiteral()
-|
   NaNLiteral()
-}
-
-void ThisLiteral() #void : {}
-{
-    <THIS> #ThisNode
 }
 
 void NaNLiteral() #NumberLiteral : {}
@@ -1172,6 +1170,8 @@ void PrimaryExpression() #void : {}
     LOOKAHEAD( FunctionCallLookahead() ) FunctionCall()
     |
     Identifier(true)
+    |
+    This()
     |
     Literal()
 }
