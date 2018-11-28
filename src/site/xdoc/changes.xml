@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-279">
+                Null variables property access do not throw exceptions
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-278">
                 Ambiguous exceptions should point to actual statement ambiguity
             </action>

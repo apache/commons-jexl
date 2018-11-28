@@ -1117,6 +1117,13 @@ public class Interpreter extends InterpreterBase {
                 } else {
                     antish = false;
                 }
+            } else if (objectNode instanceof ASTArrayAccess) {
+                if (object == null) {
+                    ptyNode = objectNode;
+                    break;
+                } else {
+                    antish = false;
+                }
             }
             // attempt to evaluate the property within the object (visit(ASTIdentifierAccess node))
             object = objectNode.jjtAccept(this, object);
@@ -1129,14 +1136,10 @@ public class Interpreter extends InterpreterBase {
                     JexlNode first = node.jjtGetChild(0);
                     if (first instanceof ASTIdentifier) {
                         ASTIdentifier afirst = (ASTIdentifier) first;
-                        if (afirst.getSymbol() < 0) {
-                            ant = new StringBuilder(afirst.getName());
-                        } else {
-                            break main;
-                        }
+                        ant = new StringBuilder(afirst.getName());
                     } else {
                         ptyNode = objectNode;
-                        break main;
+                        break;
                     }
                 }
                 for (; v <= c; ++v) {

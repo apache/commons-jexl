@@ -90,7 +90,8 @@ public class JexlInfo {
             if (!className.equals(cname)) {
                 // go deeper if called from jexl implementation classes
                 if (className.startsWith(pkgname + ".internal.")
-                    || className.startsWith(pkgname + ".Jexl")) {
+                    || className.startsWith(pkgname + ".Jexl")
+                    || className.startsWith(pkgname + ".parser")) {
                     cname = className;
                 } else {
                     break;

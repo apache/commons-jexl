@@ -60,6 +60,7 @@ New Features in 3.2:
 Bugs Fixed in 3.2:
 ==================
 
+* JEXL-279:      Null variables property access do not throw exceptions
 * JEXL-278:      Ambiguous exceptions should point to actual statement ambiguity
 * JEXL-272:      Dereferencing null property not reported on method call
 * JEXL-271:      Hoisted variable is lost when currying lambda
