@@ -960,6 +960,7 @@
                         The default behavior is to increment value and assign the operand with the result.
                         For instance <code>++a</code> is equivalent to <code>a = a + 1</code>
                         operator.
+                        <p>The postfix form is also supported: <code>a++</code></p>
                     </td>
                 </tr>
                 <tr>
@@ -969,6 +970,7 @@
                         The default behavior is to decrement value and assign the operand with the result.
                         For instance <code>--a</code> is equivalent to <code>a = a - 1</code>
                         operator.
+                        <p>The postfix form is also supported: <code>a--</code></p>
                     </td>
                 </tr>
                 <tr>
