@@ -113,6 +113,9 @@ import org.apache.commons.jexl3.parser.ASTStartCountNode;
 import org.apache.commons.jexl3.parser.ASTStopCountNode;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
+import org.apache.commons.jexl3.parser.ASTSwitchStatement;
+import org.apache.commons.jexl3.parser.ASTSwitchStatementCase;
+import org.apache.commons.jexl3.parser.ASTSwitchStatementDefault;
 import org.apache.commons.jexl3.parser.ASTSynchronizedStatement;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTThisNode;
@@ -333,6 +336,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             || child instanceof ASTDoWhileStatement
             || child instanceof ASTTryStatement
             || child instanceof ASTTryWithResourceStatement
+            || child instanceof ASTSwitchStatement
             || child instanceof ASTSynchronizedStatement
             || child instanceof ASTAnnotation)) {
             builder.append(';');
@@ -1347,6 +1351,43 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         builder.append(") ");
         if (node.jjtGetNumChildren() > 1) {
             acceptStatement(node.jjtGetChild(1), data);
+        } else {
+            builder.append(';');
+        }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchStatement node, Object data) {
+        builder.append("switch (");
+        accept(node.jjtGetChild(0), data);
+        builder.append(") {");
+        for (int i = 1; i < node.jjtGetNumChildren(); i++)
+            accept(node.jjtGetChild(i), data);
+        builder.append("}");
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchStatementCase node, Object data) {
+        builder.append("case ");
+        accept(node.jjtGetChild(0), data);
+        builder.append(" : ");
+        if (node.jjtGetNumChildren() > 1) {
+            for (int i = 1; i < node.jjtGetNumChildren(); i++)
+                acceptStatement(node.jjtGetChild(i), data);
+        } else {
+            builder.append(';');
+        }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchStatementDefault node, Object data) {
+        builder.append("default : ");
+        if (node.jjtGetNumChildren() > 0) {
+            for (int i = 0; i < node.jjtGetNumChildren(); i++)
+                acceptStatement(node.jjtGetChild(i), data);
         } else {
             builder.append(';');
         }

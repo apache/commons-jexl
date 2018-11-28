@@ -46,6 +46,7 @@ public final class Parser extends JexlParser
 {
     private int loopCount = 0;
     private int forLoopCount = 0;
+    private int switchCount = 0;
 
     public ASTJexlScript parse(JexlInfo jexlInfo, JexlFeatures jexlFeatures, String jexlSrc, Scope scope) {
         JexlFeatures previous = getFeatures();
@@ -125,6 +126,9 @@ TOKEN_MGR_DECLS : {
     | < FOR : "for" >
     | < WHILE : "while" >
     | < DO : "do" >
+    | < SWITCH : "switch" >
+    | < CASE : "case" >
+    | < DCASE : "default" >
     | < TRY : "try" >
     | < CATCH : "catch" >
     | < FINALLY : "finally" >
@@ -349,6 +353,7 @@ void Statement() #void : {}
     | TryStatement()
     | ThrowStatement()
     | SynchronizedStatement()
+    | SwitchStatement()
     | LOOKAHEAD(MultipleAssignmentIdentifier() <assign>) MultipleAssignmentStatement()
     | LOOKAHEAD(2) ExpressionStatement()
     | ReturnStatement()
@@ -430,6 +435,28 @@ void SynchronizedStatement() : {}
     <SYNCHRONIZED> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | Statement())
 }
 
+void SwitchStatement() : {}
+{
+    <SWITCH> <LPAREN> Expression() <RPAREN> { switchCount += 1; } <LCURLY> SwitchStatementBlock() <RCURLY> { switchCount -= 1; }
+}
+
+void SwitchStatementBlock() #void : {}
+{
+    SwitchStatementCase() (LOOKAHEAD(SwitchStatementBlock()) SwitchStatementBlock())*
+    |
+    SwitchStatementDefault() (LOOKAHEAD(SwitchStatementCase()) SwitchStatementCase())*
+}
+
+void SwitchStatementCase() : {}
+{
+    <CASE> Literal() <COLON> ((LOOKAHEAD(1) Block() | Statement()) )*
+}
+
+void SwitchStatementDefault() : {}
+{
+    <DCASE> <COLON> ((LOOKAHEAD(1) Block() | Statement()) )*
+}
+
 void ReturnStatement() : {}
 {
     <RETURN> ExpressionStatement()
@@ -447,7 +474,7 @@ void Remove() #Remove : {}
 
 void Break() #Break : {}
 {
-    <BREAK> { if (loopCount == 0 && forLoopCount == 0) { throwParsingException(jjtThis); } }
+    <BREAK> { if (loopCount == 0 && forLoopCount == 0 && switchCount == 0) { throwParsingException(jjtThis); } }
 }
 
 void ForeachStatement() : {}
@@ -906,7 +933,6 @@ void IntegerLiteral() #NumberLiteral :
   { jjtThis.setNatural(t.image); }
 }
 
-
 void FloatLiteral() #NumberLiteral:
 {
   Token t;
@@ -924,7 +950,6 @@ void StringLiteral() :
   t=<STRING_LITERAL>
   { jjtThis.setLiteral(Parser.buildString(t.image, true)); }
 }
-
 
 void JxltLiteral() #JxltLiteral :
 {

@@ -125,6 +125,9 @@ import org.apache.commons.jexl3.parser.ASTStartCountNode;
 import org.apache.commons.jexl3.parser.ASTStopCountNode;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
+import org.apache.commons.jexl3.parser.ASTSwitchStatement;
+import org.apache.commons.jexl3.parser.ASTSwitchStatementCase;
+import org.apache.commons.jexl3.parser.ASTSwitchStatementDefault;
 import org.apache.commons.jexl3.parser.ASTSynchronizedStatement;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTThisNode;
@@ -1194,6 +1197,69 @@ public class Interpreter extends InterpreterBase {
                 // execute statement
                 result = node.jjtGetChild(1).jjtAccept(this, data);
             }
+        }
+        return result;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchStatement node, Object data) {
+        Object result = null;
+        /* first objectNode is the switch expression */
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        try {
+            int childCount = node.jjtGetNumChildren();
+            boolean matched = false;
+            // check all cases first
+            for (int i = 0; i < childCount; i++) {
+                JexlNode child = node.jjtGetChild(i);
+                if (!matched && child instanceof ASTSwitchStatementCase) {
+                    Object right = child.jjtGetChild(0).jjtAccept(this, data);
+                    try {
+                        Object caseMatched = operators.tryOverload(child, JexlOperator.EQ, left, right);
+                        if (caseMatched == JexlEngine.TRY_FAILED)
+                            caseMatched = arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
+                        matched = arithmetic.toBoolean(caseMatched);
+                    } catch (ArithmeticException xrt) {
+                        throw new JexlException(node, "== error", xrt);
+                    }
+                }
+                if (matched) 
+                    result = child.jjtAccept(this, data);
+            }
+            // otherwise jump to default case
+            if (!matched) {
+                for (int i = 0; i < childCount; i++) {
+                    JexlNode child = node.jjtGetChild(i);
+                    if (child instanceof ASTSwitchStatementDefault)
+                        matched = true;
+                    if (matched) 
+                        result = child.jjtAccept(this, data);
+                }
+            }
+        } catch (JexlException.Break stmtBreak) {
+            // break
+        }
+        return result;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchStatementCase node, Object data) {
+        Object result = null;
+        int childCount = node.jjtGetNumChildren();
+        for (int i = 1; i < childCount; i++) {
+            cancelCheck(node);
+            result = node.jjtGetChild(i).jjtAccept(this, data);
+        }
+        return result;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchStatementDefault node, Object data) {
+        Object result = null;
+        int childCount = node.jjtGetNumChildren();
+        for (int i = 0; i < childCount; i++) {
+            cancelCheck(node);
+            result = node.jjtGetChild(i).jjtAccept(this, data);
         }
         return result;
     }
