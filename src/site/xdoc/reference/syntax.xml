@@ -1147,6 +1147,17 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>switch</td>
+                    <td>
+                        The switch statement evaluates its expression, then executes all statements that follow the matching case label, e.g.
+                        <code>switch (a) {
+                              case 0: return "zero";
+                              case 1: return "one"
+                              default: return "-"
+                            } </code>
+                    </td>
+                </tr>
+                <tr>
                     <td>for</td>
                     <td>
                         <p>Loop through items of an Array, Collection, Map, Iterator or Enumeration, e.g.
