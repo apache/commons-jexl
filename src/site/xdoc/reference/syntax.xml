@@ -1209,7 +1209,7 @@
                 <tr>
                     <td>remove</td>
                     <td>
-                        Within for loops, allows to remove current element from underlying iterator collection and skip to the next iteration.
+                        Within 'for' loops, allows to remove current element from underlying iterator collection and skip to the next iteration.
                     </td>
                 </tr>
                 <tr>
