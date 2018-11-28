@@ -391,7 +391,6 @@ public class Operators {
         }
         result = arithmetic.indirect(object);
         if (result == JexlEngine.TRY_FAILED) {
-            result = null;
             // check if there is a get() method on the object if so, just use it
             JexlMethod vm = uberspect.getMethod(object, "get", Interpreter.EMPTY_PARAMS);
             if (vm != null) {

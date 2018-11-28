@@ -2011,7 +2011,10 @@ public class Interpreter extends InterpreterBase {
                 Object self = left.jjtGetChild(0).jjtAccept(this, data);
                 if (self == null)
                     throw new JexlException(left, "illegal assignment form *0");
-                operators.indirectAssign(node, self, right);
+                Object result = operators.indirectAssign(node, self, right);
+                if (result == JexlEngine.TRY_FAILED)
+                    throw new JexlException(left, "illegal dereferenced assignment");
+
                 return right;
             } else {
                 Object self = left.jjtAccept(this, data);
@@ -2024,7 +2027,9 @@ public class Interpreter extends InterpreterBase {
                     self = left.jjtGetChild(0).jjtAccept(this, data);
                     if (self == null)
                         throw new JexlException(left, "illegal assignment form *0");
-                    operators.indirectAssign(node, self, right);
+                    result = operators.indirectAssign(node, self, right);
+                    if (result == JexlEngine.TRY_FAILED)
+                        throw new JexlException(left, "illegal dereferenced assignment");
                 }
                 return right;
             }
