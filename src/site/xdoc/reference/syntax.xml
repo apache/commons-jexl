@@ -992,8 +992,7 @@
                 <tr>
                     <td>Dereference</td>
                     <td>
-                        The unary <code>*</code> operator is used.
-                        For example
+                        The unary <code>*</code> operator is used. e.g.
                         <code>*a</code>
                         Note that through duck-typing, user classes exposing an 'get' method without arguments will allow their instances
                         to behave as an operand of this operator.
