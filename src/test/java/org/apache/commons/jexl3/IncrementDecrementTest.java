@@ -101,4 +101,22 @@ public class IncrementDecrementTest extends JexlTestCase {
         Assert.assertEquals("Result is not 42", value, o);
     }
 
+    @Test
+    public void testIncrementPostfix() throws Exception {
+        JexlScript inc = JEXL.createScript("x = 1; x++");
+        JexlContext jc = new MapContext();
+        Object o = inc.execute(jc);
+        Assert.assertEquals("Variable is not 2", new Integer(2), jc.get("x"));
+        Assert.assertEquals("Result is not 1", new Integer(1), o);
+    }
+
+    @Test
+    public void testDecrementPostfix() throws Exception {
+        JexlScript dec = JEXL.createScript("x = 43; x--");
+        JexlContext jc = new MapContext();
+        Object o = dec.execute(jc);
+        Assert.assertEquals("Variable is not 42", new Integer(42), jc.get("x"));
+        Assert.assertEquals("Result is not 43", new Integer(43), o);
+    }
+
 }

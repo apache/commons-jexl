@@ -35,6 +35,7 @@ import org.apache.commons.jexl3.parser.ASTBreak;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDecrementNode;
+import org.apache.commons.jexl3.parser.ASTDecrementPostfixNode;
 import org.apache.commons.jexl3.parser.ASTDivNode;
 import org.apache.commons.jexl3.parser.ASTDoWhileStatement;
 import org.apache.commons.jexl3.parser.ASTEQNode;
@@ -56,6 +57,7 @@ import org.apache.commons.jexl3.parser.ASTGTNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
 import org.apache.commons.jexl3.parser.ASTIncrementNode;
+import org.apache.commons.jexl3.parser.ASTIncrementPostfixNode;
 import org.apache.commons.jexl3.parser.ASTIndirectNode;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
@@ -409,6 +411,27 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         if (paren) {
             builder.append(')');
         }
+        return data;
+    }
+
+    /**
+     * Checks if the child of a node using postfix notation is the cause to debug, adds their representation to the
+     * rebuilt expression.
+     * @param node   the node
+     * @param suffix the node token
+     * @param data   visitor pattern argument
+     * @return visitor pattern value
+     */
+    protected Object postfixChild(JexlNode node, String suffix, Object data) {
+        boolean paren = node.jjtGetChild(0).jjtGetNumChildren() > 1;
+        if (paren) {
+            builder.append('(');
+        }
+        accept(node.jjtGetChild(0), data);
+        if (paren) {
+            builder.append(')');
+        }
+        builder.append(suffix);
         return data;
     }
 
@@ -1234,6 +1257,16 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTDecrementNode node, Object data) {
         return prefixChild(node, "--", data);
+    }
+
+    @Override
+    protected Object visit(ASTIncrementPostfixNode node, Object data) {
+        return postfixChild(node, "++", data);
+    }
+
+    @Override
+    protected Object visit(ASTDecrementPostfixNode node, Object data) {
+        return postfixChild(node, "--", data);
     }
 
     @Override

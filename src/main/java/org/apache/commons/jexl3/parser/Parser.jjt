@@ -718,7 +718,17 @@ void UnaryExpression() #void : {}
   |
   <ELLIPSIS> EnumerationExpression()
   |
+  PostfixExpression()
+}
+
+void PostfixExpression() #void : {}
+{
   ValueExpression()
+  ( LOOKAHEAD(1) (
+    <increment> #IncrementPostfixNode(1)
+  |
+    <decrement> #DecrementPostfixNode(1)
+  ) )*
 }
 
 void EnumerationExpression() #void : {}
