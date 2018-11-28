@@ -1215,7 +1215,7 @@
                 <tr>
                     <td>break</td>
                     <td>
-                        Allows to break from a loop (do/while/for) unconditionally.
+                        Allows to break from a loop (do/while/for/switch) unconditionally.
                     </td>
                 </tr>
                 <tr>
