@@ -49,6 +49,10 @@ import org.apache.commons.jexl3.parser.ASTEnumerationReference;
 import org.apache.commons.jexl3.parser.ASTExpressionStatement;
 import org.apache.commons.jexl3.parser.ASTExtVar;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
+import org.apache.commons.jexl3.parser.ASTForStatement;
+import org.apache.commons.jexl3.parser.ASTForInitializationNode;
+import org.apache.commons.jexl3.parser.ASTForTerminationNode;
+import org.apache.commons.jexl3.parser.ASTForIncrementNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
 import org.apache.commons.jexl3.parser.ASTForeachVar;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
@@ -331,6 +335,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         if (!(child instanceof ASTJexlScript
             || child instanceof ASTBlock
             || child instanceof ASTIfStatement
+            || child instanceof ASTForStatement
             || child instanceof ASTForeachStatement
             || child instanceof ASTWhileStatement
             || child instanceof ASTDoWhileStatement
@@ -596,6 +601,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTBlock node, Object data) {
+        String label = node.getLabel();
+        if (label != null) {
+            builder.append(label);
+            builder.append(" : ");
+        }
         builder.append('{');
         if (indent > 0) {
             indentLevel += 1;
@@ -676,21 +686,87 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTContinue node, Object data) {
-        return check(node, "continue", data);
+        builder.append("continue");
+        String label = node.getLabel();
+        if (label != null) {
+            builder.append(' ');
+            builder.append(label);
+        }
+        return data;
     }
 
     @Override
     protected Object visit(ASTRemove node, Object data) {
-        return check(node, "remove", data);
+        builder.append("remove");
+        String label = node.getLabel();
+        if (label != null) {
+            builder.append(' ');
+            builder.append(label);
+        }
+        return data;
     }
 
     @Override
     protected Object visit(ASTBreak node, Object data) {
-        return check(node, "break", data);
+        builder.append("break");
+        String label = node.getLabel();
+        if (label != null) {
+            builder.append(' ');
+            builder.append(label);
+        }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTForStatement node, Object data) {
+        String label = node.getLabel();
+        if (label != null) {
+            builder.append(label);
+            builder.append(" : ");
+        }
+        builder.append("for(");
+        accept(node.jjtGetChild(0), data);
+        builder.append(" ; ");
+        accept(node.jjtGetChild(1), data);
+        builder.append(" ; ");
+        accept(node.jjtGetChild(2), data);
+        builder.append(") ");
+        if (node.jjtGetNumChildren() > 3) {
+            acceptStatement(node.jjtGetChild(3), data);
+        } else {
+            builder.append(';');
+        }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTForInitializationNode node, Object data) {
+        if (node.jjtGetNumChildren() > 0) 
+            accept(node.jjtGetChild(0), data);
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTForTerminationNode node, Object data) {
+        if (node.jjtGetNumChildren() > 0) 
+            accept(node.jjtGetChild(0), data);
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTForIncrementNode node, Object data) {
+        if (node.jjtGetNumChildren() > 0) 
+            accept(node.jjtGetChild(0), data);
+        return data;
     }
 
     @Override
     protected Object visit(ASTForeachStatement node, Object data) {
+        String label = node.getLabel();
+        if (label != null) {
+            builder.append(label);
+            builder.append(" : ");
+        }
         builder.append("for(");
         accept(node.jjtGetChild(0), data);
         builder.append(" : ");
@@ -1319,6 +1395,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTWhileStatement node, Object data) {
+        String label = node.getLabel();
+        if (label != null) {
+            builder.append(label);
+            builder.append(" : ");
+        }
         builder.append("while (");
         accept(node.jjtGetChild(0), data);
         builder.append(") ");
@@ -1332,14 +1413,15 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTDoWhileStatement node, Object data) {
+        String label = node.getLabel();
+        if (label != null) {
+            builder.append(label);
+            builder.append(" : ");
+        }
         builder.append("do ");
-
         acceptStatement(node.jjtGetChild(0), data);
-
         builder.append(" while (");
-
         accept(node.jjtGetChild(1), data);
-
         builder.append(")");
         return data;
     }
@@ -1359,6 +1441,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTSwitchStatement node, Object data) {
+        String label = node.getLabel();
+        if (label != null) {
+            builder.append(label);
+            builder.append(" : ");
+        }
         builder.append("switch (");
         accept(node.jjtGetChild(0), data);
         builder.append(") {");

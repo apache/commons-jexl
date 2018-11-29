@@ -134,6 +134,9 @@
                     <td>Block</td>
                     <td>
                         A block is simply multiple statements inside curly braces (<code>{, }</code>).
+                        <p>The labeled syntax is also supported:
+                        <code>foo : {...} </code>
+                        Where the label <code>foo</code> can be used in the inner <code>break</code> statements.</p>
                     </td>
                 </tr>
                 <tr>
@@ -1156,6 +1159,13 @@
                               case 1: return "one"
                               default: return "-"
                             } </code>
+                        <p>The labeled syntax is also supported:
+                        <code>foo : switch (a) {
+                              case 0: return "zero";
+                              case 1: return "one"
+                              default: return "-"
+                            } </code>
+                        Where the label <code>foo</code> can be used in the inner <code>break</code> statements.</p>
                     </td>
                 </tr>
                 <tr>
@@ -1172,6 +1182,11 @@
                             }</code>
 
                         Where <code>item</code> is a local variable.</p>
+                        <p>The labeled syntax is also supported:
+                        <code>foo : for (var item : list) {
+                            x = x + item;
+                            } </code>
+                        Where the label <code>foo</code> can be used in the inner <code>break</code>,<code>continue</code> and <code>remove</code> statements.</p>
                         <p>Note that the loop variable <code>item</code> is accessible after loop evaluation</p>
                         <p>The syntax with a key and a value variable is also supported:
                         <code>for (var i, item : list) {
@@ -1189,6 +1204,11 @@
                         <code>while (x lt 10) {
                             x = x + 2;
                             }</code>
+                        <p>The labeled syntax is also supported:
+                        <code>foo : while (x lt 10) {
+                            x = x + 2;
+                            } </code>
+                        Where the label <code>foo</code> can be used in the inner <code>break</code> and <code>continue</code> statements.</p>
                     </td>
                 </tr>
                 <tr>
@@ -1198,24 +1218,39 @@
                         <code>do {
                             x = x + 2;
                             } while (x lt 10)</code>
+                        <p>The labeled syntax is also supported:
+                        <code>foo : do {
+                            x = x + 2;
+                            } while (x lt 10)</code>
+                        Where the label <code>foo</code> can be used in the inner <code>break</code> and <code>continue</code> statements.</p>
                     </td>
                 </tr>
                 <tr>
                     <td>continue</td>
                     <td>
                         Within loops (do/while/for), allows to skip to the next iteration.
+                        <p>The labeled syntax is also supported:
+                        <code>continue foo</code>
+                        Where the label <code>foo</code> specifies the loop to which the operation should apply to.</p>
                     </td>
                 </tr>
                 <tr>
                     <td>remove</td>
                     <td>
                         Within 'for' loops, allows to remove current element from underlying iterator collection and skip to the next iteration.
+                        <p>The labeled syntax is also supported:
+                        <code>remove foo</code>
+                        Where the label <code>foo</code> specifies the loop to which the operation should apply to.</p>
                     </td>
                 </tr>
                 <tr>
                     <td>break</td>
                     <td>
-                        Allows to break from a loop (do/while/for/switch) unconditionally.
+                        Allows to break from a statement (do/while/for/switch/block) unconditionally.
+                        <p>The labeled syntax is also supported:
+                        <code>break foo</code>
+                        Where the label <code>foo</code> specifies the statement to which the operation should apply to.</p>
+                        <p>Note that the unlabelled <code>break</code> statement can not be applied to an unlabelled block</p>
                     </td>
                 </tr>
                 <tr>

@@ -128,6 +128,14 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
+    protected Object visit(ASTForStatement node, Object data) {
+        if (!features.supportsLoops()) {
+            throwFeatureException(JexlFeatures.LOOP, node);
+        }
+        return data;
+    }
+
+    @Override
     protected Object visit(ASTConstructorNode node, Object data) {
         if (!features.supportsNewInstance()) {
             throwFeatureException(JexlFeatures.NEW_INSTANCE, node);

@@ -805,18 +805,58 @@ public class JexlException extends RuntimeException {
     }
 
     /**
+     * Thrown to branch a script execution.
+     *
+     * @since 3.2
+     */
+    public static class LabelledException extends JexlException {
+
+        /** The label. */
+        private final String label;
+
+        /**
+         * Creates a new instance of LabeledException.
+         *
+         * @param node the node where the interruption was detected
+         * @param message the exception message
+         * @param label the target label
+         */
+        public LabelledException(JexlNode node, String message, String label) {
+            super(node, message, null);
+            this.label = label;
+        }
+
+        /**
+         * @return the statement target label
+         */
+        public String getLabel() {
+            return label;
+        }
+    }
+
+    /**
      * Thrown to break a loop.
      *
      * @since 3.0
      */
-    public static class Break extends JexlException {
+    public static class Break extends LabelledException {
+        /**
+         * Creates a new instance of Break.
+         *
+         * @param node the break
+         * @param label the target label
+         */
+        public Break(JexlNode node, String label) {
+            super(node, "break loop", label);
+        }
+
         /**
          * Creates a new instance of Break.
          *
          * @param node the break
          */
         public Break(JexlNode node) {
-            super(node, "break loop", null);
+            this(node, null);
         }
     }
 
@@ -825,14 +865,24 @@ public class JexlException extends RuntimeException {
      *
      * @since 3.0
      */
-    public static class Continue extends JexlException {
+    public static class Continue extends LabelledException {
+        /**
+         * Creates a new instance of Continue.
+         *
+         * @param node the continue
+         * @param label the target label
+         */
+        public Continue(JexlNode node, String label) {
+            super(node, "continue loop", label);
+        }
+
         /**
          * Creates a new instance of Continue.
          *
          * @param node the continue
          */
         public Continue(JexlNode node) {
-            super(node, "continue loop", null);
+            this(node, null);
         }
     }
 
@@ -841,14 +891,24 @@ public class JexlException extends RuntimeException {
      *
      * @since 3.2
      */
-    public static class Remove extends JexlException {
+    public static class Remove extends LabelledException {
+        /**
+         * Creates a new instance of Remove.
+         *
+         * @param node the remove
+         * @param label the target label
+         */
+        public Remove(JexlNode node, String label) {
+            super(node, "remove", label);
+        }
+
         /**
          * Creates a new instance of Remove.
          *
          * @param node the remove
          */
         public Remove(JexlNode node) {
-            super(node, "remove", null);
+            this(node, null);
         }
     }
 

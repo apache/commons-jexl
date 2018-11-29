@@ -49,6 +49,10 @@ import org.apache.commons.jexl3.parser.ASTEnumerationReference;
 import org.apache.commons.jexl3.parser.ASTExpressionStatement;
 import org.apache.commons.jexl3.parser.ASTExtVar;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
+import org.apache.commons.jexl3.parser.ASTForStatement;
+import org.apache.commons.jexl3.parser.ASTForInitializationNode;
+import org.apache.commons.jexl3.parser.ASTForTerminationNode;
+import org.apache.commons.jexl3.parser.ASTForIncrementNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
 import org.apache.commons.jexl3.parser.ASTForeachVar;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
@@ -214,6 +218,26 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTBreak node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTForStatement node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTForInitializationNode node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTForTerminationNode node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTForIncrementNode node, Object data) {
         return visitNode(node, data);
     }
 

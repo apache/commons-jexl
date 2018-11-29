@@ -514,7 +514,7 @@ public class Issues200Test extends JexlTestCase {
             Iterator266 i266 = queue.getFirst();
             if (i266 != null) {
                 i266.remove();
-                throw new JexlException.Continue(null);
+                throw new JexlException.Continue(null, null);
             } else {
                 throw new NoSuchElementException();
             }

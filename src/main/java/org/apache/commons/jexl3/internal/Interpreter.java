@@ -60,6 +60,10 @@ import org.apache.commons.jexl3.parser.ASTEnumerationReference;
 import org.apache.commons.jexl3.parser.ASTExpressionStatement;
 import org.apache.commons.jexl3.parser.ASTExtVar;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
+import org.apache.commons.jexl3.parser.ASTForStatement;
+import org.apache.commons.jexl3.parser.ASTForInitializationNode;
+import org.apache.commons.jexl3.parser.ASTForTerminationNode;
+import org.apache.commons.jexl3.parser.ASTForIncrementNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
 import org.apache.commons.jexl3.parser.ASTForeachVar;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
@@ -876,8 +880,17 @@ public class Interpreter extends InterpreterBase {
         int numChildren = node.jjtGetNumChildren();
         Object result = null;
         for (int i = 0; i < numChildren; i++) {
-            cancelCheck(node);
-            result = node.jjtGetChild(i).jjtAccept(this, data);
+            try {
+                cancelCheck(node);
+                result = node.jjtGetChild(i).jjtAccept(this, data);
+            } catch (JexlException.Break stmtBreak) {
+                String target = stmtBreak.getLabel();
+                if (target != null && target.equals(node.getLabel())) {
+                    break;
+                } else {
+                    throw stmtBreak;
+                }
+            }
         }
         return result;
     }
@@ -891,17 +904,71 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTContinue node, Object data) {
-        throw new JexlException.Continue(node);
+        throw new JexlException.Continue(node, node.getLabel());
     }
 
     @Override
     protected Object visit(ASTRemove node, Object data) {
-        throw new JexlException.Remove(node);
+        throw new JexlException.Remove(node, node.getLabel());
     }
 
     @Override
     protected Object visit(ASTBreak node, Object data) {
-        throw new JexlException.Break(node);
+        throw new JexlException.Break(node, node.getLabel());
+    }
+
+    @Override
+    protected Object visit(ASTForStatement node, Object data) {
+        // Initialize for-loop
+        Object result = node.jjtGetChild(0).jjtAccept(this, data);
+        boolean when = false;
+        while (when = (Boolean) node.jjtGetChild(1).jjtAccept(this, data)) {
+            try {
+                // Execute loop body
+                if (node.jjtGetNumChildren() > 3) 
+                    result = node.jjtGetChild(3).jjtAccept(this, data);
+            } catch (JexlException.Break stmtBreak) {
+                String target = stmtBreak.getLabel();
+                if (target == null || target.equals(node.getLabel())) {
+                    break;
+                } else {
+                    throw stmtBreak;
+                }
+            } catch (JexlException.Continue stmtContinue) {
+                String target = stmtContinue.getLabel();
+                if (target != null && !target.equals(node.getLabel())) {
+                    throw stmtContinue;
+                }
+                // continue;
+            }
+            // for-increment node
+            result = node.jjtGetChild(2).jjtAccept(this, data);
+        }
+        return result;
+    }
+
+    @Override
+    protected Object visit(ASTForInitializationNode node, Object data) {
+        Object result = null;
+        if (node.jjtGetNumChildren() > 0) 
+            result = node.jjtGetChild(0).jjtAccept(this, data);
+        return result;
+    }
+
+    @Override
+    protected Object visit(ASTForTerminationNode node, Object data) {
+        Boolean result = Boolean.TRUE;
+        if (node.jjtGetNumChildren() > 0) 
+            result = arithmetic.toBoolean(node.jjtGetChild(0).jjtAccept(this, data));
+        return result;
+    }
+
+    @Override
+    protected Object visit(ASTForIncrementNode node, Object data) {
+        Object result = null;
+        if (node.jjtGetNumChildren() > 0) 
+            result = node.jjtGetChild(0).jjtAccept(this, data);
+        return result;
     }
 
     @Override
@@ -971,10 +1038,23 @@ public class Interpreter extends InterpreterBase {
                                 // execute statement
                                 result = statement.jjtAccept(this, data);
                             } catch (JexlException.Break stmtBreak) {
-                                break;
+                                String target = stmtBreak.getLabel();
+                                if (target == null || target.equals(node.getLabel())) {
+                                    break;
+                                } else {
+                                    throw stmtBreak;
+                                }
                             } catch (JexlException.Continue stmtContinue) {
-                                //continue;
+                                String target = stmtContinue.getLabel();
+                                if (target != null && !target.equals(node.getLabel())) {
+                                    throw stmtContinue;
+                                }
+                                // continue
                             } catch (JexlException.Remove stmtRemove) {
+                                String target = stmtRemove.getLabel();
+                                if (target != null && !target.equals(node.getLabel())) {
+                                    throw stmtRemove;
+                                }
                                 itemsIterator.remove();
                                 i -= 1;
                                 // and continue
@@ -1009,10 +1089,23 @@ public class Interpreter extends InterpreterBase {
                                 // execute statement
                                 result = statement.jjtAccept(this, data);
                             } catch (JexlException.Break stmtBreak) {
-                                break;
+                                String target = stmtBreak.getLabel();
+                                if (target == null || target.equals(node.getLabel())) {
+                                    break;
+                                } else {
+                                    throw stmtBreak;
+                                }
                             } catch (JexlException.Continue stmtContinue) {
-                                //continue;
+                                String target = stmtContinue.getLabel();
+                                if (target != null && !target.equals(node.getLabel())) {
+                                    throw stmtContinue;
+                                }
+                                // continue
                             } catch (JexlException.Remove stmtRemove) {
+                                String target = stmtRemove.getLabel();
+                                if (target != null && !target.equals(node.getLabel())) {
+                                    throw stmtRemove;
+                                }
                                 itemsIterator.remove();
                                 // and continue
                             }
@@ -1155,9 +1248,18 @@ public class Interpreter extends InterpreterBase {
                     // execute statement
                     result = node.jjtGetChild(1).jjtAccept(this, data);
                 } catch (JexlException.Break stmtBreak) {
-                    break;
+                    String target = stmtBreak.getLabel();
+                    if (target == null || target.equals(node.getLabel())) {
+                        break;
+                    } else {
+                        throw stmtBreak;
+                    }
                 } catch (JexlException.Continue stmtContinue) {
-                    //continue;
+                    String target = stmtContinue.getLabel();
+                    if (target != null && !target.equals(node.getLabel())) {
+                        throw stmtContinue;
+                    }
+                    // continue
                 }
             }
         }
@@ -1176,11 +1278,19 @@ public class Interpreter extends InterpreterBase {
                 // execute statement
                 result = node.jjtGetChild(0).jjtAccept(this, data);
             } catch (JexlException.Break stmtBreak) {
-                break;
+                String target = stmtBreak.getLabel();
+                if (target == null || target.equals(node.getLabel())) {
+                    break;
+                } else {
+                    throw stmtBreak;
+                }
             } catch (JexlException.Continue stmtContinue) {
-                //continue;
+                String target = stmtContinue.getLabel();
+                if (target != null && !target.equals(node.getLabel())) {
+                    throw stmtContinue;
+                }
+                // continue
             }
-
         } while (arithmetic.toBoolean(expressionNode.jjtAccept(this, data)));
 
         return result;
@@ -1237,6 +1347,10 @@ public class Interpreter extends InterpreterBase {
                 }
             }
         } catch (JexlException.Break stmtBreak) {
+            String target = stmtBreak.getLabel();
+            if (target != null && !target.equals(node.getLabel())) {
+                throw stmtBreak;
+            }
             // break
         }
         return result;
