@@ -1064,11 +1064,11 @@ public class JexlArithmetic {
             long result = l << r;
             return result;
         }
-        // otherwise treat as integers
+        // otherwise treat as big integers
         BigInteger l = toBigInteger(left);
         int r = toInteger(right);
         BigInteger result = l.shiftLeft(r);
-        return narrowBigInteger(left, right, result);
+        return result;
     }
 
     /**
@@ -1096,11 +1096,11 @@ public class JexlArithmetic {
             long result = l >> r;
             return result;
         }
-        // otherwise treat as integers
+        // otherwise treat as big integers
         BigInteger l = toBigInteger(left);
         int r = toInteger(right);
         BigInteger result = l.shiftRight(r);
-        return narrowBigInteger(left, right, result);
+        return result;
     }
 
     /**
@@ -1121,7 +1121,7 @@ public class JexlArithmetic {
             int result = l >>> r;
             return result;
         }
-        // otherwise treat as integers
+        // otherwise treat as long integers
         long l = toLong(left);
         int r = toInteger(right);
         long result = l >>> r;
