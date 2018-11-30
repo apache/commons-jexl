@@ -718,30 +718,190 @@ public class Interpreter extends InterpreterBase {
                 return null;
             }
         }
+        if (val instanceof Pointer)
+            return ((Pointer) val).get();
+
         return operators.indirect(node, val);
     }
 
-    public class VarPointer {
-        protected JexlNode address;
-        protected Object data;
 
-        protected VarPointer(JexlNode address, Object data) {
-            this.address = address;
-            this.data = data;
+    /**
+     * Declares pointer dereference operators
+     */
+    public interface Pointer {
+        public Object get();
+        public void set(Object right);
+    }
+
+    public class VarPointer implements Pointer {
+
+        protected int symbol;
+
+        protected VarPointer(int symbol) {
+            this.symbol = symbol;
         }
 
+        @Override
         public Object get() {
-            return address.jjtAccept(Interpreter.this, data);
+            return frame.get(symbol);
         }
 
-        public void set(Object right) {
-            executeAssign(address, address, right, null, data);
+        @Override
+        public void set(Object value) {
+            frame.set(symbol, value);
+        }
+    }
+
+    public class ContextVarPointer implements Pointer {
+
+        protected String name;
+
+        protected ContextVarPointer(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public Object get() {
+            return context.get(name);
+        }
+
+        @Override
+        public void set(Object value) {
+            context.set(name, value);
+        }
+    }
+
+    public class PropertyPointer implements Pointer {
+
+        protected JexlNode propertyNode;
+        protected Object object;
+        protected String property;
+
+        protected PropertyPointer(JexlNode node, Object object, String property) {
+            this.propertyNode = node;
+            this.object = object;
+            this.property = property;
+        }
+
+        @Override
+        public Object get() {
+            return getAttribute(object, property, propertyNode);
+        }
+
+        @Override
+        public void set(Object value) {
+            setAttribute(object, property, value, propertyNode, JexlOperator.PROPERTY_SET);
+        }
+    }
+
+    public class ArrayPointer implements Pointer {
+
+        protected JexlNode propertyNode;
+        protected Object object;
+        protected Object index;
+
+        protected ArrayPointer(JexlNode node, Object object, Object index) {
+            this.propertyNode = node;
+            this.object = object;
+            this.index = index;
+        }
+
+        @Override
+        public Object get() {
+            return getAttribute(object, index, propertyNode);
+        }
+
+        @Override
+        public void set(Object value) {
+            setAttribute(object, index, value, propertyNode, JexlOperator.ARRAY_SET);
         }
     }
 
     @Override
     protected Object visit(ASTPointerNode node, Object data) {
-        return new VarPointer(node.jjtGetChild(0), data);
+        JexlNode left = node.jjtGetChild(0);
+        if (left instanceof ASTIdentifier) {
+            ASTIdentifier var = (ASTIdentifier) left;
+            if (data != null) {
+                return new PropertyPointer(var, data, var.getName());
+            } else {
+                int symbol = var.getSymbol();
+                if (symbol >= 0) {
+                    return new VarPointer(symbol);
+                } else {
+                    return new ContextVarPointer(var.getName());
+                }
+            }
+        } else {
+            Object object = data;
+            int last = left.jjtGetNumChildren() - 1;
+            boolean antish = true;
+            // 1: follow children till penultimate, resolve dot/array
+            JexlNode objectNode = null;
+            StringBuilder ant = null;
+            int v = 1;
+            // start at 1 if symbol
+            for (int c = 0; c < last; ++c) {
+                objectNode = left.jjtGetChild(c);
+                object = objectNode.jjtAccept(this, object);
+                if (object != null) {
+                    // disallow mixing antish variable & bean with same root; avoid ambiguity
+                    antish = false;
+                } else if (antish) {
+                    if (ant == null) {
+                        JexlNode first = left.jjtGetChild(0);
+                        if (first instanceof ASTIdentifier && ((ASTIdentifier) first).getSymbol() < 0) {
+                            ant = new StringBuilder(((ASTIdentifier) first).getName());
+                        } else {
+                            break;
+                        }
+                    }
+                    for (; v <= c; ++v) {
+                        JexlNode child = left.jjtGetChild(v);
+                        if (child instanceof ASTIdentifierAccess) {
+                            ant.append('.');
+                            ant.append(((ASTIdentifierAccess) objectNode).getName());
+                        } else {
+                            break;
+                        }
+                    }
+                    object = context.get(ant.toString());
+                } else {
+                    throw new JexlException(objectNode, "illegal address");
+                }
+            }
+            // 2: last objectNode will perform assignement in all cases
+            JexlNode propertyNode = left.jjtGetChild(last);
+            if (propertyNode instanceof ASTIdentifierAccess) {
+                String property = String.valueOf(evalIdentifier((ASTIdentifierAccess) propertyNode));
+                if (object == null) {
+                    // deal with antish variable
+                    if (ant != null) {
+                        if (last > 0) {
+                            ant.append('.');
+                        }
+                        ant.append(property);
+                        return new ContextVarPointer(ant.toString());
+                    } else {
+                        return new ContextVarPointer(property);
+                    }
+                }
+                return new PropertyPointer(propertyNode, object, property);
+            } else if (propertyNode instanceof ASTArrayAccess) {
+                // can have multiple nodes - either an expression, integer literal or reference
+                int numChildren = propertyNode.jjtGetNumChildren() - 1;
+                for (int i = 0; i < numChildren; i++) {
+                    JexlNode nindex = propertyNode.jjtGetChild(i);
+                    Object index = nindex.jjtAccept(this, null);
+                    object = getAttribute(object, index, nindex);
+                }
+                propertyNode = propertyNode.jjtGetChild(numChildren);
+                Object property = propertyNode.jjtAccept(this, null);
+                return new ArrayPointer(propertyNode, object, property);
+            }
+
+            return null;
+        }
     }
 
     @Override
@@ -2257,8 +2417,8 @@ public class Interpreter extends InterpreterBase {
                 Object self = left.jjtGetChild(0).jjtAccept(this, data);
                 if (self == null)
                     throw new JexlException(left, "illegal assignment form *0");
-                if (self instanceof VarPointer) {
-                    ((VarPointer) self).set(right);
+                if (self instanceof Pointer) {
+                    ((Pointer) self).set(right);
                 } else {
                     Object result = operators.indirectAssign(node, self, right);
                     if (result == JexlEngine.TRY_FAILED)
@@ -2276,8 +2436,8 @@ public class Interpreter extends InterpreterBase {
                     self = left.jjtGetChild(0).jjtAccept(this, data);
                     if (self == null)
                         throw new JexlException(left, "illegal assignment form *0");
-                    if (self instanceof VarPointer) {
-                        ((VarPointer) self).set(result);
+                    if (self instanceof Pointer) {
+                        ((Pointer) self).set(result);
                     } else {
                         result = operators.indirectAssign(node, self, result);
                         if (result == JexlEngine.TRY_FAILED)

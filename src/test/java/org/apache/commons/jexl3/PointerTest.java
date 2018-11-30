@@ -65,6 +65,33 @@ public class PointerTest extends JexlTestCase {
     }
 
     @Test
+    public void testContextVarPointerGet() throws Exception {
+        JexlScript e = JEXL.createScript("var y = &x; *y");
+        JexlContext jc = new MapContext();
+        jc.set("x",42);
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, o);
+    }
+
+    @Test
+    public void testContextVarPointerSet() throws Exception {
+        JexlScript e = JEXL.createScript("var y = &x; *y = 42");
+        JexlContext jc = new MapContext();
+        jc.set("x",1);
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, jc.get("x"));
+    }
+
+    @Test
+    public void testContextVarPointerSideEffects() throws Exception {
+        JexlScript e = JEXL.createScript("var y = &x; *y += 41");
+        JexlContext jc = new MapContext();
+        jc.set("x",1);
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, jc.get("x"));
+    }
+
+    @Test
     public void testBeanPointerGet() throws Exception {
         JexlScript e = JEXL.createScript("var x = {'a':2,'b':42}; var y = &x.b; *y");
         JexlContext jc = new MapContext();
@@ -77,6 +104,38 @@ public class PointerTest extends JexlTestCase {
         JexlScript e = JEXL.createScript("var x = {'a':2,'b':1}; var y = &x.b; *y = 42; x.b");
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, o);
+
+        e = JEXL.createScript("var x = {'a':2,'b':42}; var y = &x.b; x = {'a':2,'b':0}; *y");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, o);
+    }
+
+    @Test
+    public void testArrayPointerGet() throws Exception {
+        JexlScript e = JEXL.createScript("var x = [1,2,3,4,42]; var y = &x[4]; *y");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, o);
+
+        e = JEXL.createScript("var x = [1,2,3,4,42]; var i = 4; var y = &x[i]; i = 0; *y");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, o);
+
+        e = JEXL.createScript("var x = [1,2,3,4,42]; var i = 4; var y = &x[i]; x = [1,2,3,4,5]; *y");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, o);
+    }
+
+    @Test
+    public void testArrayPointerSet() throws Exception {
+        JexlScript e = JEXL.createScript("var x = [1,2,3,4,5]; var y = &x[4]; *y = 42; x[4]");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, o);
+
+        e = JEXL.createScript("var x = [1,2,3,4,5]; var i = 4; var y = &x[i]; i = 0; *y = 42; x[4]");
+        o = e.execute(jc);
         Assert.assertEquals("Result is not expected", 42, o);
     }
 
@@ -103,6 +162,5 @@ public class PointerTest extends JexlTestCase {
         Object o = e.execute(jc);
         Assert.assertEquals("Result is not expected", 42, o);
     }
-
 
 }
