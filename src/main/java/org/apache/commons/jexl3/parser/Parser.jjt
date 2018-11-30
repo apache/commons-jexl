@@ -214,6 +214,9 @@ TOKEN_MGR_DECLS : {
     | < and_assign : "&=" >
     | < or_assign : "|=" >
     | < xor_assign : "^=" >
+    | < shl_assign : "<<=" >
+    | < sar_assign : ">>=" >
+    | < shr_assign : ">>>=" >
 
     | < assign : "=" >
     | < increment : "++" >
@@ -656,6 +659,12 @@ void AssignmentExpression() #void : {}
     <xor_assign> Expression() #SetXorNode(2)
     |
     <minus_assign> Expression() #SetSubNode(2)
+    |
+    <shl_assign> Expression() #SetShlNode(2)
+    |
+    <sar_assign> Expression() #SetSarNode(2)
+    |
+    <shr_assign> Expression() #SetShrNode(2)
     |
     <assign> Expression() #Assignment(2)
   ) )*

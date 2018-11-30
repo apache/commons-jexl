@@ -154,6 +154,12 @@ public class Operators {
                     return arithmetic.selfOr(args[0], args[1]);
                 case SELF_XOR:
                     return arithmetic.selfXor(args[0], args[1]);
+                case SELF_SHL:
+                    return arithmetic.selfLeftShift(args[0], args[1]);
+                case SELF_SAR:
+                    return arithmetic.selfRightShift(args[0], args[1]);
+                case SELF_SHR:
+                    return arithmetic.selfRightShiftUnsigned(args[0], args[1]);
                 case INCREMENT:
                     return arithmetic.increment(args[0]);
                 case DECREMENT:

@@ -107,6 +107,9 @@ import org.apache.commons.jexl3.parser.ASTSetModNode;
 import org.apache.commons.jexl3.parser.ASTSetMultNode;
 import org.apache.commons.jexl3.parser.ASTSetOrNode;
 import org.apache.commons.jexl3.parser.ASTSetSubNode;
+import org.apache.commons.jexl3.parser.ASTSetShlNode;
+import org.apache.commons.jexl3.parser.ASTSetSarNode;
+import org.apache.commons.jexl3.parser.ASTSetShrNode;
 import org.apache.commons.jexl3.parser.ASTSetXorNode;
 import org.apache.commons.jexl3.parser.ASTShiftLeftNode;
 import org.apache.commons.jexl3.parser.ASTShiftRightNode;
@@ -1519,6 +1522,21 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTSetXorNode node, Object data) {
         return infixChildren(node, " ^= ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetShlNode node, Object data) {
+        return infixChildren(node, " <<= ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetSarNode node, Object data) {
+        return infixChildren(node, " >>= ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetShrNode node, Object data) {
+        return infixChildren(node, " >>>= ", false, data);
     }
 
     @Override

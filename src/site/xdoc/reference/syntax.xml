@@ -953,6 +953,9 @@
                             <li>&amp;=</li>
                             <li>|=</li>
                             <li>^=</li>
+                            <li>&lt;&lt;=</li>
+                            <li>&gt;&gt;=</li>
+                            <li>&gt;&gt;&gt;=</li>
                         </ul>
                     </td>
                 </tr>

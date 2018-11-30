@@ -297,6 +297,27 @@ public enum JexlOperator {
     SELF_XOR("^=", "selfXor", XOR),
 
     /**
+     * Self-shl operator.
+     * <br><strong>Syntax:</strong> <code>x <<= y</code>
+     * <br><strong>Method:</strong> <code>T selfLeftShift(L x, R y);</code>.
+     */
+    SELF_SHL("<<=", "selfLeftShift", SHL),
+
+    /**
+     * Self-sar operator.
+     * <br><strong>Syntax:</strong> <code>x >>= y</code>
+     * <br><strong>Method:</strong> <code>T selfRightShift(L x, R y);</code>.
+     */
+    SELF_SAR(">>=", "selfRightShift", SAR),
+
+    /**
+     * Self-shr operator.
+     * <br><strong>Syntax:</strong> <code>x >>>= y</code>
+     * <br><strong>Method:</strong> <code>T selfRightShiftUnsigned(L x, R y);</code>.
+     */
+    SELF_SHR(">>>=", "selfRightShiftUnsigned", SHR),
+
+    /**
      * Increment operator.
      * <br><strong>Syntax:</strong> <code>++x</code>
      * <br><strong>Method:</strong> <code>T increment(L x);</code>.

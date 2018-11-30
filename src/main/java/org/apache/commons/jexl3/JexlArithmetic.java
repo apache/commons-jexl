@@ -1072,6 +1072,17 @@ public class JexlArithmetic {
     }
 
     /**
+     * Default self assign implementation for Left Shift.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left << right.
+     */
+    public Object selfLeftShift(Object left, Object right) {
+        return leftShift(left, right);
+    }
+
+    /**
      * Shifts a bit pattern to the right.
      *
      * @param left  left argument
@@ -1104,6 +1115,17 @@ public class JexlArithmetic {
     }
 
     /**
+     * Default self assign implementation for Right Shift.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left >> right.
+     */
+    public Object selfRightShift(Object left, Object right) {
+        return rightShift(left, right);
+    }
+
+    /**
      * Shifts a bit pattern to the right unsigned.
      *
      * @param left  left argument
@@ -1126,6 +1148,17 @@ public class JexlArithmetic {
         int r = toInteger(right);
         long result = l >>> r;
         return result;
+    }
+
+    /**
+     * Default self assign implementation for Right Unsigned Shift.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left >>> right.
+     */
+    public Object selfRightShiftUnsigned(Object left, Object right) {
+        return rightShiftUnsigned(left, right);
     }
 
     /**

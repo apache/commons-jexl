@@ -119,6 +119,9 @@ import org.apache.commons.jexl3.parser.ASTSetModNode;
 import org.apache.commons.jexl3.parser.ASTSetMultNode;
 import org.apache.commons.jexl3.parser.ASTSetOrNode;
 import org.apache.commons.jexl3.parser.ASTSetSubNode;
+import org.apache.commons.jexl3.parser.ASTSetShlNode;
+import org.apache.commons.jexl3.parser.ASTSetSarNode;
+import org.apache.commons.jexl3.parser.ASTSetShrNode;
 import org.apache.commons.jexl3.parser.ASTSetXorNode;
 import org.apache.commons.jexl3.parser.ASTShiftLeftNode;
 import org.apache.commons.jexl3.parser.ASTShiftRightNode;
@@ -2110,6 +2113,27 @@ public class Interpreter extends InterpreterBase {
         JexlNode left = node.jjtGetChild(0);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         return executeAssign(node, left, right, JexlOperator.SELF_XOR, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetShlNode node, Object data) {
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, JexlOperator.SELF_SHL, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetSarNode node, Object data) {
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, JexlOperator.SELF_SAR, data);
+    }
+
+    @Override
+    protected Object visit(ASTSetShrNode node, Object data) {
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, JexlOperator.SELF_SHR, data);
     }
 
     @Override
