@@ -101,6 +101,7 @@ import org.apache.commons.jexl3.parser.ASTNullLiteral;
 import org.apache.commons.jexl3.parser.ASTNullpNode;
 import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
+import org.apache.commons.jexl3.parser.ASTPointerNode;
 import org.apache.commons.jexl3.parser.ASTProjectionNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReductionNode;
@@ -718,6 +719,29 @@ public class Interpreter extends InterpreterBase {
             }
         }
         return operators.indirect(node, val);
+    }
+
+    public class VarPointer {
+        protected JexlNode address;
+        protected Object data;
+
+        protected VarPointer(JexlNode address, Object data) {
+            this.address = address;
+            this.data = data;
+        }
+
+        public Object get() {
+            return address.jjtAccept(Interpreter.this, data);
+        }
+
+        public void set(Object right) {
+            executeAssign(address, address, right, null, data);
+        }
+    }
+
+    @Override
+    protected Object visit(ASTPointerNode node, Object data) {
+        return new VarPointer(node.jjtGetChild(0), data);
     }
 
     @Override
@@ -2233,10 +2257,13 @@ public class Interpreter extends InterpreterBase {
                 Object self = left.jjtGetChild(0).jjtAccept(this, data);
                 if (self == null)
                     throw new JexlException(left, "illegal assignment form *0");
-                Object result = operators.indirectAssign(node, self, right);
-                if (result == JexlEngine.TRY_FAILED)
-                    throw new JexlException(left, "illegal dereferenced assignment");
-
+                if (self instanceof VarPointer) {
+                    ((VarPointer) self).set(right);
+                } else {
+                    Object result = operators.indirectAssign(node, self, right);
+                    if (result == JexlEngine.TRY_FAILED)
+                        throw new JexlException(left, "illegal dereferenced assignment");
+                }
                 return right;
             } else {
                 Object self = left.jjtAccept(this, data);
@@ -2245,13 +2272,17 @@ public class Interpreter extends InterpreterBase {
                 Object result = operators.tryAssignOverload(node, assignop, self, right);
                 if (result == JexlOperator.ASSIGN) {
                     return self;
-                } else {
+                } else if (result != JexlEngine.TRY_FAILED) {
                     self = left.jjtGetChild(0).jjtAccept(this, data);
                     if (self == null)
                         throw new JexlException(left, "illegal assignment form *0");
-                    result = operators.indirectAssign(node, self, right);
-                    if (result == JexlEngine.TRY_FAILED)
-                        throw new JexlException(left, "illegal dereferenced assignment");
+                    if (self instanceof VarPointer) {
+                        ((VarPointer) self).set(result);
+                    } else {
+                        result = operators.indirectAssign(node, self, result);
+                        if (result == JexlEngine.TRY_FAILED)
+                            throw new JexlException(left, "illegal dereferenced assignment");
+                    }
                 }
                 return right;
             }

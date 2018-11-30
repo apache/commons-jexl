@@ -838,12 +838,19 @@ void UnaryExpression() #void : {}
 
 void PostfixExpression() #void : {}
 {
-  ValueExpression()
+  PointerExpression()
   ( LOOKAHEAD(1) (
     <increment> #IncrementPostfixNode(1)
   |
     <decrement> #DecrementPostfixNode(1)
   ) )*
+}
+
+void PointerExpression() #void : {}
+{
+  <and> ValueExpression() #PointerNode(1)
+  |
+  ValueExpression()
 }
 
 void EnumerationExpression() #void : {}

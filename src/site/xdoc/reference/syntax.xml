@@ -996,6 +996,15 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Pointer</td>
+                    <td>
+                        The unary <code>&amp;</code> operator is used to get a pointer of a variable or a property. e.g.
+                        <code>&amp;a</code>
+                        Pointer values can be dereferenced via dereference operator, e.g.
+                        <code>var x = 1; var y = &amp;x; *y = 2</code>
+                    </td>
+                </tr>
+                <tr>
                     <td>Dereference</td>
                     <td>
                         The unary <code>*</code> operator is used. e.g.

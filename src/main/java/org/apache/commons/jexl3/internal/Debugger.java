@@ -89,6 +89,7 @@ import org.apache.commons.jexl3.parser.ASTNotNode;
 import org.apache.commons.jexl3.parser.ASTNullLiteral;
 import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
+import org.apache.commons.jexl3.parser.ASTPointerNode;
 import org.apache.commons.jexl3.parser.ASTProjectionNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReductionNode;
@@ -1355,6 +1356,13 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTIndirectNode node, Object data) {
         return prefixChild(node, "*", data);
+    }
+
+    @Override
+    protected Object visit(ASTPointerNode node, Object data) {
+        builder.append("&");
+        accept(node.jjtGetChild(0), data);
+        return data;
     }
 
     @Override
