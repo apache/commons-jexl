@@ -1183,6 +1183,28 @@
                 <tr>
                     <td>for</td>
                     <td>
+                        <p>Classic, for(initialization; termination; increment) statement, e.g.
+                        <code>for (i = 0; i &lt; 10; i = i + 1) {
+                            x = x + item[i];
+                            }</code>
+                        Where <code>i</code> is a context variable.</p>
+                        <p>The following syntax is also supported:
+                        <code>for (var i = 0; i &lt; 10; i = i + 1) {
+                            x = x + item[i];
+                            }</code>
+
+                        Where <code>i</code> is a local variable.</p>
+                        <p>The labeled syntax is also supported:
+                        <code>foo : for (var i = 0; i &lt; 10; i = i + 1) {
+                            x = x + item;
+                            } </code>
+                        Where the label <code>foo</code> can be used in the inner <code>break</code> and <code>continue</code> statements.</p>
+                        <p>Note that the loop variable <code>i</code> is accessible after loop evaluation</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>foreach</td>
+                    <td>
                         <p>Loop through items of an Array, Collection, Map, Iterator or Enumeration, e.g.
                         <code>for (item : list) {
                             x = x + item;
