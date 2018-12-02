@@ -1009,8 +1009,12 @@
                     <td>
                         The unary <code>*</code> operator is used. e.g.
                         <code>*a</code>
-                        Note that through duck-typing, user classes exposing an 'get' method without arguments will allow their instances
+                        Note that through duck-typing, user classes exposing a <code>get()</code> method will allow their instances
                         to behave as an operand of this operator.
+                        <p>The assignment to a dereferenced object is also supported: <code>*a = 10</code>, 
+                        any user classes exposing a <code>set(Object)</code> method will allow their instances
+                        to accept such assignments.
+                        </p>
                     </td>
                 </tr>
                 <tr>
