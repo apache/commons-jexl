@@ -811,7 +811,7 @@ public class JexlException extends RuntimeException {
      */
     public static class LabelledException extends JexlException {
 
-        /** The label. */
+        /** The target label */
         private final String label;
 
         /**
@@ -835,7 +835,7 @@ public class JexlException extends RuntimeException {
     }
 
     /**
-     * Thrown to break a loop.
+     * Thrown to break a loop or a block.
      *
      * @since 3.0
      */

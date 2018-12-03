@@ -733,6 +733,10 @@ public class Interpreter extends InterpreterBase {
         public void set(Object right);
     }
 
+    /**
+     * Pointer to a local variable.
+     *
+     */
     public class VarPointer implements Pointer {
 
         protected int symbol;
@@ -752,6 +756,10 @@ public class Interpreter extends InterpreterBase {
         }
     }
 
+    /**
+     * Pointer to a context variable.
+     *
+     */
     public class ContextVarPointer implements Pointer {
 
         protected String name;
@@ -771,6 +779,10 @@ public class Interpreter extends InterpreterBase {
         }
     }
 
+    /**
+     * Pointer to a bean property.
+     *
+     */
     public class PropertyPointer implements Pointer {
 
         protected JexlNode propertyNode;
@@ -794,6 +806,10 @@ public class Interpreter extends InterpreterBase {
         }
     }
 
+    /**
+     * Pointer to an indexed element.
+     *
+     */
     public class ArrayPointer implements Pointer {
 
         protected JexlNode propertyNode;
@@ -898,9 +914,9 @@ public class Interpreter extends InterpreterBase {
                 propertyNode = propertyNode.jjtGetChild(numChildren);
                 Object property = propertyNode.jjtAccept(this, null);
                 return new ArrayPointer(propertyNode, object, property);
+            } else {
+                throw new JexlException(objectNode, "illegal pointer form");
             }
-
-            return null;
         }
     }
 

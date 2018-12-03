@@ -92,6 +92,33 @@ public class PointerTest extends JexlTestCase {
     }
 
     @Test
+    public void testAntishContextVarPointerGet() throws Exception {
+        JexlScript e = JEXL.createScript("var y = &x.z; *y");
+        JexlContext jc = new MapContext();
+        jc.set("x.z",42);
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, o);
+    }
+
+    @Test
+    public void testAntishContextVarPointerSet() throws Exception {
+        JexlScript e = JEXL.createScript("var y = &x.z; *y = 42");
+        JexlContext jc = new MapContext();
+        jc.set("x.z",1);
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, jc.get("x.z"));
+    }
+
+    @Test
+    public void testAntishContextVarPointerSideEffects() throws Exception {
+        JexlScript e = JEXL.createScript("var y = &x.z; *y += 41");
+        JexlContext jc = new MapContext();
+        jc.set("x.z",1);
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not expected", 42, jc.get("x.z"));
+    }
+
+    @Test
     public void testBeanPointerGet() throws Exception {
         JexlScript e = JEXL.createScript("var x = {'a':2,'b':42}; var y = &x.b; *y");
         JexlContext jc = new MapContext();
