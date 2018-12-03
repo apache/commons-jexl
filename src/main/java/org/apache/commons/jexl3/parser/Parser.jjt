@@ -36,7 +36,6 @@ package org.apache.commons.jexl3.parser;
 
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.ArrayDeque;
 
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlFeatures;
@@ -45,15 +44,6 @@ import org.apache.commons.jexl3.internal.Scope;
 
 public final class Parser extends JexlParser
 {
-    private int loopCount = 0;
-    private int foreachLoopCount = 0;
-    private int forLoopCount = 0;
-    private int switchCount = 0;
-
-    private ArrayDeque<String> breakLabels = new ArrayDeque<String> ();
-    private ArrayDeque<String> continueLabels = new ArrayDeque<String> ();
-    private ArrayDeque<String> removeLabels = new ArrayDeque<String> ();
-
     public ASTJexlScript parse(JexlInfo jexlInfo, JexlFeatures jexlFeatures, String jexlSrc, Scope scope) {
         JexlFeatures previous = getFeatures();
         try {
@@ -67,6 +57,7 @@ public final class Parser extends JexlParser
             source = jexlSrc;
             pragmas = null;
             frame = scope;
+            branchScope = new BranchScope();
             ReInit(new java.io.StringReader(jexlSrc));
             ASTJexlScript script = jexlFeatures.supportsScript()? JexlScript(scope) : JexlExpression(scope);
             script.jjtSetValue(info);
@@ -394,17 +385,17 @@ void LabelledStatement() #void :
 {
     t=<IDENTIFIER> { label = t.image; } <COLON>
     (
-        LOOKAHEAD(<LCURLY>) { breakLabels.push(label); } b = Block() { b.setLabel(label); breakLabels.pop(); }
+        LOOKAHEAD(<LCURLY>) { branchScope.pushBlockLabel(label); } b = Block() { b.setLabel(label); branchScope.popBlockLabel(); }
         |
-        LOOKAHEAD(<FOR> <LPAREN> ForeachVar() <COLON>) { breakLabels.push(label); continueLabels.push(label); removeLabels.push(label); } fe = ForeachStatement() { fe.setLabel(label); removeLabels.pop(); continueLabels.pop(); breakLabels.pop(); }
+        LOOKAHEAD(<FOR> <LPAREN> ForeachVar() <COLON>) { branchScope.pushForeachLabel(label); } fe = ForeachStatement() { fe.setLabel(label); branchScope.popForeachLabel(); }
         |
-        { breakLabels.push(label); continueLabels.push(label); } f = ForStatement() { f.setLabel(label); continueLabels.pop(); breakLabels.pop(); }
+        { branchScope.pushLoopLabel(label); } f = ForStatement() { f.setLabel(label); branchScope.popLoopLabel(); }
         |
-        { breakLabels.push(label); continueLabels.push(label); } w = WhileStatement() { w.setLabel(label); continueLabels.pop(); breakLabels.pop(); }
+        { branchScope.pushLoopLabel(label); } w = WhileStatement() { w.setLabel(label); branchScope.popLoopLabel(); }
         |
-        { breakLabels.push(label); continueLabels.push(label); } dw = DoWhileStatement() { dw.setLabel(label); continueLabels.pop(); breakLabels.pop(); }
+        { branchScope.pushLoopLabel(label); } dw = DoWhileStatement() { dw.setLabel(label); branchScope.popLoopLabel(); }
         |
-        { breakLabels.push(label); } s = SwitchStatement() { s.setLabel(label); breakLabels.pop(); }
+        { branchScope.pushBlockLabel(label); } s = SwitchStatement() { s.setLabel(label); branchScope.popBlockLabel(); }
     )
 }
 
@@ -438,13 +429,13 @@ void IfStatement() : {}
 
 ASTWhileStatement WhileStatement() : {}
 {
-    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount += 1; }  (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
+    <WHILE> <LPAREN> Expression() <RPAREN>  { branchScope.loopCount += 1; }  (LOOKAHEAD(1) Block() | Statement()) { branchScope.loopCount -= 1; }
     { return jjtThis; }
 }
 
 ASTDoWhileStatement DoWhileStatement() : {}
 {
-    <DO> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount -= 1; }
+    <DO> { branchScope.loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) <WHILE> <LPAREN> Expression() <RPAREN> { branchScope.loopCount -= 1; }
     { return jjtThis; }
 }
 
@@ -484,7 +475,7 @@ void SynchronizedStatement() : {}
 
 ASTSwitchStatement SwitchStatement() : {}
 {
-    <SWITCH> <LPAREN> Expression() <RPAREN> { switchCount += 1; } <LCURLY> SwitchStatementBlock() <RCURLY> { switchCount -= 1; }
+    <SWITCH> <LPAREN> Expression() <RPAREN> { branchScope.switchCount += 1; } <LCURLY> SwitchStatementBlock() <RCURLY> { branchScope.switchCount -= 1; }
     { return jjtThis; }
 }
 
@@ -515,8 +506,8 @@ void Continue() #Continue :
     Token t = null;
 }
 {
-    <CONTINUE> (LOOKAHEAD(<IDENTIFIER>) t = <IDENTIFIER> { if (!continueLabels.contains(t.image)) throwParsingException(jjtThis); jjtThis.setLabel(t.image); } )?
-    { if (t == null && loopCount == 0 && forLoopCount == 0 && foreachLoopCount == 0) { throwParsingException(jjtThis); } }
+    <CONTINUE> (LOOKAHEAD(<IDENTIFIER>) t = <IDENTIFIER> { if (!branchScope.continueSupported(t.image)) throwParsingException(jjtThis); jjtThis.setLabel(t.image); } )?
+    { if (t == null && !branchScope.continueSupported()) { throwParsingException(jjtThis); } }
 }
 
 void Remove() #Remove :
@@ -524,8 +515,8 @@ void Remove() #Remove :
     Token t = null;
 }
 {
-    <REMOVE> (LOOKAHEAD(<IDENTIFIER>) t = <IDENTIFIER> { if (!removeLabels.contains(t.image)) throwParsingException(jjtThis); jjtThis.setLabel(t.image); } )?
-    { if (t == null && foreachLoopCount == 0) { throwParsingException(jjtThis); } }
+    <REMOVE> (LOOKAHEAD(<IDENTIFIER>) t = <IDENTIFIER> { if (!branchScope.removeSupported(t.image)) throwParsingException(jjtThis); jjtThis.setLabel(t.image); } )?
+    { if (t == null && !branchScope.removeSupported()) { throwParsingException(jjtThis); } }
 }
 
 void Break() #Break :
@@ -533,13 +524,13 @@ void Break() #Break :
     Token t = null;
 }
 {
-    <BREAK> (LOOKAHEAD(<IDENTIFIER>) t = <IDENTIFIER> { if (!breakLabels.contains(t.image)) throwParsingException(jjtThis); jjtThis.setLabel(t.image); } )?
-    { if (t == null && loopCount == 0 && forLoopCount == 0 && foreachLoopCount == 0 && switchCount == 0) { throwParsingException(jjtThis); } }
+    <BREAK> (LOOKAHEAD(<IDENTIFIER>) t = <IDENTIFIER> { if (!branchScope.breakSupported(t.image)) throwParsingException(jjtThis); jjtThis.setLabel(t.image); } )?
+    { if (t == null && !branchScope.breakSupported()) { throwParsingException(jjtThis); } }
 }
 
 ASTForStatement ForStatement() : {}
 {
-    <FOR> <LPAREN> ForInitializationNode() <SEMICOL> ForTerminationNode() <SEMICOL> ForIncrementNode() <RPAREN> { forLoopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { forLoopCount -= 1; }
+    <FOR> <LPAREN> ForInitializationNode() <SEMICOL> ForTerminationNode() <SEMICOL> ForIncrementNode() <RPAREN> { branchScope.loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { branchScope.loopCount -= 1; }
     { return jjtThis; }
 }
 
@@ -560,7 +551,7 @@ void ForIncrementNode() : {}
 
 ASTForeachStatement ForeachStatement() : {}
 {
-    <FOR> <LPAREN> ForeachVar() <COLON> Expression() <RPAREN> { foreachLoopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { foreachLoopCount -= 1; }
+    <FOR> <LPAREN> ForeachVar() <COLON> Expression() <RPAREN> { branchScope.foreachLoopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { branchScope.foreachLoopCount -= 1; }
     { return jjtThis; }
 }
 

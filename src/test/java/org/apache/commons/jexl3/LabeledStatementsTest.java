@@ -58,6 +58,11 @@ public class LabeledStatementsTest extends JexlTestCase {
         } catch (Exception ex) {
         }
         try {
+            JEXL.createScript("egg : {x = function() {break egg}}");
+            Assert.fail("Undeclared break label should not be allowed");
+        } catch (Exception ex) {
+        }
+        try {
             JEXL.createScript("egg : {break}");
             Assert.fail("Unlabelled break inside block should not be allowed");
         } catch (Exception ex) {
@@ -80,12 +85,22 @@ public class LabeledStatementsTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
         Assert.assertEquals("Result is not as expected", 5, jc.get("x"));
+
+        e = JEXL.createScript("x = 0; foo : while (x < 7) {x = x + 1; if (x >= 5) break}");
+        jc = new MapContext();
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not as expected", 5, jc.get("x"));
     }
 
     @Test
     public void testBadWhile() throws Exception {
         try {
             JEXL.createScript("egg : while(true) break eggs");
+            Assert.fail("Undeclared break label should not be allowed");
+        } catch (Exception ex) {
+        }
+        try {
+            JEXL.createScript("egg : while(true) x = function() {break egg}");
             Assert.fail("Undeclared break label should not be allowed");
         } catch (Exception ex) {
         }
@@ -102,12 +117,22 @@ public class LabeledStatementsTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
         Assert.assertEquals("Result is not as expected", 5, jc.get("x"));
+
+        e = JEXL.createScript("x = 0; foo : do { x = x + 1; if (x >= 5) break} while (x < 7)");
+        jc = new MapContext();
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not as expected", 5, jc.get("x"));
     }
 
     @Test
     public void testBadDoWhile() throws Exception {
         try {
             JEXL.createScript("egg : do { break eggs } while(true)");
+            Assert.fail("Undeclared break label should not be allowed");
+        } catch (Exception ex) {
+        }
+        try {
+            JEXL.createScript("egg : do { x = function() {break egg}} while(true)");
             Assert.fail("Undeclared break label should not be allowed");
         } catch (Exception ex) {
         }
@@ -124,12 +149,22 @@ public class LabeledStatementsTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
         Assert.assertEquals("Result is not as expected", 0, jc.get("x"));
+
+        e = JEXL.createScript("x = 0; foo : switch(true) { default : break; x = 1}");
+        jc = new MapContext();
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not as expected", 0, jc.get("x"));
     }
 
     @Test
     public void testBadSwitch() throws Exception {
         try {
             JEXL.createScript("egg : switch(true) {default : break eggs}");
+            Assert.fail("Undeclared break label should not be allowed");
+        } catch (Exception ex) {
+        }
+        try {
+            JEXL.createScript("egg : switch(true) {default : x = function() {break egg}}");
             Assert.fail("Undeclared break label should not be allowed");
         } catch (Exception ex) {
         }
@@ -151,12 +186,22 @@ public class LabeledStatementsTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
         Assert.assertEquals("Result is not as expected", 5, jc.get("x"));
+
+        e = JEXL.createScript("x = 0; foo : for (; x < 7; ) {x = x + 1; if (x >= 5) break}");
+        jc = new MapContext();
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not as expected", 5, jc.get("x"));
     }
 
     @Test
     public void testBadFor() throws Exception {
         try {
             JEXL.createScript("egg : for(;;) break eggs");
+            Assert.fail("Undeclared break label should not be allowed");
+        } catch (Exception ex) {
+        }
+        try {
+            JEXL.createScript("egg : for(;;) x = function() {break egg}");
             Assert.fail("Undeclared break label should not be allowed");
         } catch (Exception ex) {
         }
@@ -173,12 +218,22 @@ public class LabeledStatementsTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
         Assert.assertEquals("Result is not as expected", 5, jc.get("x"));
+
+        e = JEXL.createScript("x = 0; foo : for (var i : 1..5) {x = x + 1; if (x >= 5) break}");
+        jc = new MapContext();
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not as expected", 5, jc.get("x"));
     }
 
     @Test
     public void testBadForeach() throws Exception {
         try {
             JEXL.createScript("egg : for(var i : 1..5) break eggs");
+            Assert.fail("Undeclared break label should not be allowed");
+        } catch (Exception ex) {
+        }
+        try {
+            JEXL.createScript("egg : for(var i : 1..5) x = function() {break egg}");
             Assert.fail("Undeclared break label should not be allowed");
         } catch (Exception ex) {
         }

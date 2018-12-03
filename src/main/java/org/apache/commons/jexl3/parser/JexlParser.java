@@ -157,12 +157,24 @@ public abstract class JexlParser extends StringParser {
             frames.push(frame);
         }
         frame = new Scope(frame, (String[]) null);
+
+        if (branchScope != null) {
+            branchScopes.push(branchScope);
+        }
+        branchScope = new BranchScope();
     }
 
     /**
      * Pops back to previous local variable frame.
      */
     protected void popFrame() {
+
+        if (!branchScopes.isEmpty()) {
+            branchScope = branchScopes.pop();
+        } else {
+            branchScope = null;
+        }
+
         if (!frames.isEmpty()) {
             frame = frames.pop();
         } else {
@@ -425,4 +437,83 @@ public abstract class JexlParser extends StringParser {
         // unlikely but safe
         throw xparse != null ? xparse : new JexlException.Parsing(xinfo, msg);
     }
+
+    /**
+     * The target scope class for break/continue/remove statements.
+     */
+    protected class BranchScope {
+
+        protected int loopCount = 0;
+        protected int foreachLoopCount = 0;
+        protected int switchCount = 0;
+
+        protected Stack<String> breakLabels = new Stack<String> ();
+        protected Stack<String> continueLabels = new Stack<String> ();
+        protected Stack<String> removeLabels = new Stack<String> ();
+
+        protected boolean breakSupported() {
+            return loopCount != 0 || foreachLoopCount != 0 || switchCount != 0;
+        }
+
+        protected boolean breakSupported(String label) {
+            return breakLabels.contains(label);
+        }
+
+        protected boolean continueSupported() {
+            return loopCount != 0 || foreachLoopCount != 0;
+        }
+
+        protected boolean continueSupported(String label) {
+            return continueLabels.contains(label);
+        }
+
+        protected boolean removeSupported() {
+            return foreachLoopCount != 0;
+        }
+
+        protected boolean removeSupported(String label) {
+            return removeLabels.contains(label);
+        }
+
+        protected void pushBlockLabel(String label) {
+            breakLabels.push(label);
+        }
+
+        protected void popBlockLabel() {
+            breakLabels.pop();
+        }
+
+        protected void pushLoopLabel(String label) {
+            breakLabels.push(label);
+            continueLabels.push(label);
+        }
+
+        protected void popLoopLabel() {
+            breakLabels.pop();
+            continueLabels.pop();
+        }
+
+        protected void pushForeachLabel(String label) {
+            breakLabels.push(label);
+            continueLabels.push(label);
+            removeLabels.push(label);
+        }
+
+        protected void popForeachLabel() {
+            breakLabels.pop();
+            continueLabels.pop();
+            removeLabels.pop();
+        }
+    }
+
+    /**
+     * The current scope for break/continue/remove statements.
+     */
+    protected BranchScope branchScope = null;
+
+    /**
+     * When parsing inner functions/lambda, need to stack the target scope
+     */
+    protected Stack<BranchScope> branchScopes = new Stack<BranchScope> ();
+
 }
