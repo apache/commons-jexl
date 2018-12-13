@@ -73,7 +73,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         if (method != null) {
             Class<?>[] formal = method.getParameterTypes();
             // if the last parameter is an array, the method is considered as vararg
-            if (formal != null && MethodKey.isVarArgs(method)) {
+            if (formal.length > 0 && MethodKey.isVarArgs(method)) {
                 vastart = formal.length - 1;
                 vaclass = formal[vastart].getComponentType();
             }
