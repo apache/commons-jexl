@@ -744,34 +744,40 @@ void EqualityExpression() #void : {}
      <eq> RelationalExpression() #EQNode(2)
    |
      <ne> RelationalExpression() #NENode(2)
-   |
-     <range> RelationalExpression() #RangeNode(2) // range
   ) )?
 }
 
 void RelationalExpression() #void : {}
 {
+  RangeExpression()
+  ( LOOKAHEAD(2) (
+    <lt> RangeExpression() #LTNode(2)
+   |
+    <gt> RangeExpression() #GTNode(2)
+   |
+    <le> RangeExpression() #LENode(2)
+   |
+    <ge> RangeExpression() #GENode(2)
+   |
+    <req> RangeExpression() #ERNode(2) // equals regexp
+   |
+    <rne> RangeExpression() #NRNode(2) // not equals regexp
+   |
+    <seq> RangeExpression() #SWNode(2) // starts with
+   |
+    <sne> RangeExpression() #NSWNode(2) // not starts with
+   |
+    <eeq> RangeExpression() #EWNode(2) // ends with
+   |
+    <ene> RangeExpression() #NEWNode(2) // not ends with
+  ) )?
+}
+
+void RangeExpression() #void : {}
+{
   ShiftExpression()
   ( LOOKAHEAD(2) (
-    <lt> ShiftExpression() #LTNode(2)
-   |
-    <gt> ShiftExpression() #GTNode(2)
-   |
-    <le> ShiftExpression() #LENode(2)
-   |
-    <ge> ShiftExpression() #GENode(2)
-   |
-    <req> ShiftExpression() #ERNode(2) // equals regexp
-   |
-    <rne> ShiftExpression() #NRNode(2) // not equals regexp
-   |
-    <seq> ShiftExpression() #SWNode(2) // starts with
-   |
-    <sne> ShiftExpression() #NSWNode(2) // not starts with
-   |
-    <eeq> ShiftExpression() #EWNode(2) // ends with
-   |
-    <ene> ShiftExpression() #NEWNode(2) // not ends with
+     <range> ShiftExpression() #RangeNode(2) // range
   ) )?
 }
 
