@@ -68,25 +68,6 @@ public abstract class JexlParser extends StringParser {
     protected Map<String, Object> pragmas = null;
 
     /**
-     * Utility function to create '.' separated string from a list of string.
-     * @param lstr the list of strings
-     * @return the dotted version
-     */
-    protected static String stringify(List<String> lstr) {
-        StringBuilder strb = new StringBuilder();
-        boolean dot = false;
-        for(String str : lstr) {
-            if (!dot) {
-               dot = true;
-            } else {
-               strb.append('.');
-            }
-            strb.append(str);
-        }
-        return strb.toString();
-    }
-
-    /**
      * Read a given source line.
      * @param src the source
      * @param lineno the line number

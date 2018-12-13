@@ -47,6 +47,7 @@ public class PragmaTest extends JexlTestCase {
             Assert.assertEquals("truth", pragmas.get("the.very.hard"));
         } catch (JexlException xjexl) {
             String s = xjexl.toString();
+            Assert.fail("Should not fail with: " + s);
         }
     }
 
@@ -63,6 +64,7 @@ public class PragmaTest extends JexlTestCase {
             Assert.assertEquals("truth", pragmas.get("the.very.hard"));
         } catch (JexlException xjexl) {
             String s = xjexl.toString();
+            Assert.fail("Should not fail with: " + s);
         }
     }
 

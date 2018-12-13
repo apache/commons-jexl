@@ -21,8 +21,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests for blocks
- * @since 1.1
+ * Tests for features
+ * @since 3.0
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class FeaturesTest extends JexlTestCase {
@@ -31,7 +31,7 @@ public class FeaturesTest extends JexlTestCase {
      * Create the test
      */
     public FeaturesTest() {
-        super("BlockTest");
+        super("FeaturesTest");
     }
 
     /**

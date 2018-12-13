@@ -99,6 +99,19 @@ TOKEN_MGR_DECLS : {
             dotLexState = defaultLexState;
         }
     }
+
+    public void pushQ() {
+        dotLexState = curLexState;
+        curLexState = QUALIFIED;
+    }
+
+    public void popQ() {
+        if (curLexState == QUALIFIED) {
+            curLexState = dotLexState;
+            dotLexState = defaultLexState;
+        }
+    }
+
 }
 /***************************************
  *     Skip & Number literal tokens
@@ -146,7 +159,7 @@ TOKEN_MGR_DECLS : {
     | < BREAK : "break" >
     | < CONTINUE : "continue" >
     | < REMOVE : "remove" > { popDot(); } /* Revert state to default if was DOT_ID. */
-    | < PRAGMA : "#pragma" >
+    | < PRAGMA : "#pragma" > { pushQ(); } /* Lexical state is now QUALIFIED */
 }
 
 <*> TOKEN : { /* SEPARATORS */
@@ -257,6 +270,13 @@ TOKEN_MGR_DECLS : {
   < #DIGIT: [ "0"-"9"] >
 |
   < #ESCAPE: "\\" [" ", "'", "\"", "\\"] >
+}
+
+<QUALIFIED> TOKEN : /* IDENTIFIERS */
+{
+  < QUALIFIED_IDENTIFIER: <QNAME> ("." <QNAME>)* > { popQ(); } /* Revert state to default. */
+|
+  < #QNAME: [ "a"-"z", "A"-"Z", "_", "$", "@" ] ([ "a"-"z", "A"-"Z", "_", "$", "@", "0"-"9" ])* >
 }
 
 <REGISTERS> TOKEN : /* REGISTERS: parser.ALLOW_REGISTER must be set to true before calling parse */
@@ -590,31 +610,22 @@ void DeclareExtVar() #ExtVar :
 
 void Pragma() #void :
 {
-    LinkedList<String> lstr = new LinkedList<String>();
+    Token t;
     Object value;
 }
 {
-<PRAGMA> pragmaKey(lstr)  value=pragmaValue() { declarePragma(stringify(lstr), value); }
-}
-
-void pragmaKey(LinkedList<String> lstr) #void :
-{
-    Token t;
-}
-{
-    t=<IDENTIFIER> (LOOKAHEAD(2) <DOT> pragmaKey(lstr) )* { lstr.addFirst(t.image); }
+    <PRAGMA> t=<QUALIFIED_IDENTIFIER> value=pragmaValue() { declarePragma(t.image, value); }
 }
 
 Object pragmaValue() #void :
 {
-Token v;
-LinkedList<String> lstr = new LinkedList<String>();
+    Token v;
 }
 {
       LOOKAHEAD(1) v=<INTEGER_LITERAL> { return NumberParser.parseInteger(v.image); }
     | LOOKAHEAD(1) v=<FLOAT_LITERAL> { return NumberParser.parseDouble(v.image); }
     | LOOKAHEAD(1) v=<STRING_LITERAL> { return Parser.buildString(v.image, true); }
-    | LOOKAHEAD(1)  pragmaKey(lstr) { return stringify(lstr); }
+    | LOOKAHEAD(1) v=<QUALIFIED_IDENTIFIER> { return v.image; }
     | LOOKAHEAD(1) <TRUE> { return true; }
     | LOOKAHEAD(1) <FALSE> { return false; }
     | LOOKAHEAD(1) <NULL> { return null; }
