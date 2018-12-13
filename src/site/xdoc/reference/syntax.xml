@@ -96,7 +96,7 @@
                     <td>
                         <p>
                             A script in JEXL is made up of zero or more statements, optionally enclosed in a function definition block.
-                            Scripts can include one or more pragmas.
+                            One or more pragmas can be specified at the beginning of the script.
                         </p>
                         <p>
                             Scripts can be read from a String, File or URL.

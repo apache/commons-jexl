@@ -261,7 +261,7 @@ public class FeaturesTest extends JexlTestCase {
         JexlFeatures f = new JexlFeatures().pragma(false);
         String[] scripts = new String[]{
             "#pragma foo 42",
-            "@two var x = 3; #pragma foo 'bar'"
+            "#pragma foo 'bar' @two var x = 3; "
         };
         checkFeature(f, scripts);
     }

@@ -331,9 +331,12 @@ ASTJexlScript JexlScript(Scope frame) : {
     jjtThis.setScope(frame);
 }
 {
-   LOOKAHEAD( LambdaLookahead() ) Lambda() (LOOKAHEAD(1) <SEMICOL>)? <EOF> { return jjtThis.script(); }
-   |
-   ( ( Statement() )*) <EOF> { return jjtThis.script(); }
+   (LOOKAHEAD(<PRAGMA>) Pragma())*
+   (
+      LOOKAHEAD( LambdaLookahead() ) Lambda() (LOOKAHEAD(1) <SEMICOL>)? <EOF> { return jjtThis.script(); }
+      |
+      ( ( Statement() )*) <EOF> { return jjtThis.script(); }
+   )
 }
 
 ASTJexlScript JexlExpression(Scope frame) #JexlScript : {
@@ -383,7 +386,6 @@ void Statement() #void : {}
     | Remove()
     | Break()
     | Var()
-    | Pragma()
 }
 
 void LabelledStatementLookahead() #void() : {}
@@ -614,10 +616,10 @@ void Pragma() #void :
     Object value;
 }
 {
-    <PRAGMA> t=<QUALIFIED_IDENTIFIER> value=pragmaValue() { declarePragma(t.image, value); }
+    <PRAGMA> t=<QUALIFIED_IDENTIFIER> value=PragmaValue() { declarePragma(t.image, value); }
 }
 
-Object pragmaValue() #void :
+Object PragmaValue() #void :
 {
     Token v;
 }
