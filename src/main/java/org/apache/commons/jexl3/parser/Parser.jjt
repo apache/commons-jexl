@@ -167,7 +167,7 @@ TOKEN_MGR_DECLS : {
     | < RPAREN : ")" >
     | < LCURLY : "{" >
     | < RCURLY : "}" >
-    | < LBRACKET : "[" >
+    | < LBRACKET : "[" > { popQ(); } /* Revert state to default. */
     | < RBRACKET : "]" >
     | < SEMICOL : ";" >
     | < COLON : ":" >
@@ -1092,6 +1092,8 @@ void ClassLiteral() :
    Class value;
 }
 {
+  LOOKAHEAD(<LBRACKET>) <LBRACKET> <RBRACKET> { jjtThis.setArray(); }
+  |
   t=<QUALIFIED_IDENTIFIER>
   { value = Parser.resolveClassName(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
   (LOOKAHEAD(<LBRACKET>) <LBRACKET> <RBRACKET> { jjtThis.setArray(); })?

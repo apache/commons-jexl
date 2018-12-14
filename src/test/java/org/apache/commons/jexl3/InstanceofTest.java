@@ -106,4 +106,12 @@ public class InstanceofTest extends JexlTestCase {
         Assert.assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
+    @Test
+    public void testUntypedArray() throws Exception {
+        JexlScript e = JEXL.createScript("var x = [123,'456']; x instanceof []");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+    }
+
 }

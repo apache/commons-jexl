@@ -683,6 +683,8 @@ public class Interpreter extends InterpreterBase {
             Class type = right.getLiteral();
             if (k.isArray()) {
                 if (right.isArray()) {
+                   if (type == null)
+                       return true;
                    Class componentType = k.getComponentType();
                    return type.isAssignableFrom(componentType);
                 }
