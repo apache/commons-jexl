@@ -744,6 +744,10 @@ void EqualityExpression() #void : {}
      <eq> RelationalExpression() #EQNode(2)
    |
      <ne> RelationalExpression() #NENode(2)
+   |
+     <req> RelationalExpression() #ERNode(2) // equals regexp
+   |
+     <rne> RelationalExpression() #NRNode(2) // not equals regexp
   ) )?
 }
 
@@ -758,10 +762,6 @@ void RelationalExpression() #void : {}
     <le> RangeExpression() #LENode(2)
    |
     <ge> RangeExpression() #GENode(2)
-   |
-    <req> RangeExpression() #ERNode(2) // equals regexp
-   |
-    <rne> RangeExpression() #NRNode(2) // not equals regexp
    |
     <seq> RangeExpression() #SWNode(2) // starts with
    |
