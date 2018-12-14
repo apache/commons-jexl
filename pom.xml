@@ -24,7 +24,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-jexl3</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
     <name>Apache Commons JEXL</name>
     <inceptionYear>2001</inceptionYear>
     <description>The Apache Commons JEXL library is an implementation of the JSTL Expression Language with extensions.</description>
@@ -113,11 +113,11 @@
     </dependencies>
 
     <properties>
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <commons.componentid>jexl3</commons.componentid>
         <commons.module.name>org.apache.commons.jexl3</commons.module.name>
-        <commons.release.version>3.1</commons.release.version>
+        <commons.release.version>3.2</commons.release.version>
         <commons.site.path>jexl</commons.site.path>
         <commons.scmPubUrl>https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl</commons.scmPubUrl>
         <commons.scmPubCheckoutDirectory>site-content</commons.scmPubCheckoutDirectory>
