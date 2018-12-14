@@ -804,6 +804,30 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Identity</td>
+                    <td>
+                        The <code>===</code> operator can be used to test that left and right arguments are the same object.
+                        For example
+                        <code>val1 === val2</code>.
+                        <ol>
+                            <li>
+                                <code>null</code> is considered to be identical only to null, that is if you compare null
+                                to any non-null value, the result is false.
+                            </li>
+                            <li>Identity differs from equality that it does not use the java <code>equals</code> method</li>
+                        </ol>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Difference</td>
+                    <td>
+                        The <code>!==</code> operator can be used to test that left and right arguments are different objects.
+                        For example
+                        <code>val1 !== val2</code>.
+                        This is the reverse of the identity operator.
+                    </td>
+                </tr>
+                <tr>
                     <td>Less Than</td>
                     <td>
                         The usual <code>&lt;</code> operator can be used as well as the abbreviation <code>lt</code>.

@@ -81,6 +81,7 @@ import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTIOFNode;
+import org.apache.commons.jexl3.parser.ASTISNode;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.ASTJxltLiteral;
@@ -96,6 +97,7 @@ import org.apache.commons.jexl3.parser.ASTMulNode;
 import org.apache.commons.jexl3.parser.ASTMultipleAssignment;
 import org.apache.commons.jexl3.parser.ASTNENode;
 import org.apache.commons.jexl3.parser.ASTNEWNode;
+import org.apache.commons.jexl3.parser.ASTNINode;
 import org.apache.commons.jexl3.parser.ASTNRNode;
 import org.apache.commons.jexl3.parser.ASTNSWNode;
 import org.apache.commons.jexl3.parser.ASTNotNode;
@@ -529,6 +531,20 @@ public class Interpreter extends InterpreterBase {
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "^ error", xrt);
         }
+    }
+
+    @Override
+    protected Object visit(ASTISNode node, Object data) {
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return left == right;
+    }
+
+    @Override
+    protected Object visit(ASTNINode node, Object data) {
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return left != right;
     }
 
     @Override

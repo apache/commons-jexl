@@ -116,6 +116,10 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTBitwiseAndNode node, Object data);
 
+    protected abstract Object visit(ASTISNode node, Object data);
+
+    protected abstract Object visit(ASTNINode node, Object data);
+
     protected abstract Object visit(ASTEQNode node, Object data);
 
     protected abstract Object visit(ASTNENode node, Object data);

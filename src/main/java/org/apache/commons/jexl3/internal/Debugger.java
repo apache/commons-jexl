@@ -68,6 +68,7 @@ import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
 import org.apache.commons.jexl3.parser.ASTIOFNode;
+import org.apache.commons.jexl3.parser.ASTISNode;
 import org.apache.commons.jexl3.parser.ASTMapLiteral;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
@@ -85,6 +86,7 @@ import org.apache.commons.jexl3.parser.ASTMulNode;
 import org.apache.commons.jexl3.parser.ASTMultipleAssignment;
 import org.apache.commons.jexl3.parser.ASTNENode;
 import org.apache.commons.jexl3.parser.ASTNEWNode;
+import org.apache.commons.jexl3.parser.ASTNINode;
 import org.apache.commons.jexl3.parser.ASTNRNode;
 import org.apache.commons.jexl3.parser.ASTNSWNode;
 import org.apache.commons.jexl3.parser.ASTNotNode;
@@ -653,6 +655,16 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         accept(node.jjtGetChild(0), data);
         check(node, ".empty()", data);
         return data;
+    }
+
+    @Override
+    protected Object visit(ASTISNode node, Object data) {
+        return infixChildren(node, " === ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTNINode node, Object data) {
+        return infixChildren(node, " !== ", false, data);
     }
 
     @Override

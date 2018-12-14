@@ -199,6 +199,8 @@ TOKEN_MGR_DECLS : {
     | < ne : "!=" | "ne" | "\u2260" >
     | < req : "=~" | "in" | "\u2208" > // regexp equal
     | < rne : "!~" | "!in" | "\u2209" > // regexp not equal
+    | < is : "===" > // identitical
+    | < ni : "!==" > // not identitical
     | < seq : "=^" > // starts equal
     | < eeq : "=$" > // ends equal
     | < sne : "!^" > // start not equal
@@ -750,6 +752,11 @@ void EqualityExpression() #void : {}
      <req> RelationalExpression() #ERNode(2) // equals regexp
    |
      <rne> RelationalExpression() #NRNode(2) // not equals regexp
+   |
+     <is> RelationalExpression() #ISNode(2) // identical
+   |
+     <ni> RelationalExpression() #NINode(2) // not identical
+
   ) )?
 }
 
