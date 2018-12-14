@@ -776,6 +776,34 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>In or Match<code>=~</code></td>
+                    <td>
+                        The syntactically Perl inspired <code>=~</code> operator can be used to check that a <code>string</code> matches
+                        a regular expression (expressed either a Java String or a java.util.regex.Pattern).
+                        For example
+                        <code>"abcdef" =~ "abc.*</code> returns <code>true</code>.
+                        It also checks whether any collection, set or map (on keys) contains a value or not; in that case, it behaves
+                        as an "in" operator.
+                        Note that arrays and user classes exposing a public 'contains' method will allow their instances
+                        to behave as right-hand side operands of this operator.
+                        <code> "a" =~ ["a","b","c","d","e",f"]</code> returns <code>true</code>.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Not-In or Not-Match<code>!~</code></td>
+                    <td>
+                        The syntactically Perl inspired <code>!~</code> operator can be used to check that a <code>string</code> does not
+                        match a regular expression (expressed either a Java String or a java.util.regex.Pattern).
+                        For example
+                        <code>"abcdef" !~ "abc.*</code> returns <code>false</code>.
+                        It also checks whether any collection, set or map (on keys) does not contain a value; in that case, it behaves
+                        as "not in" operator.
+                        Note that arrays and user classes exposing a public 'contains' method will allow their instances
+                        to behave as right-hand side operands of this operator.
+                        <code> "a" !~ ["a","b","c","d","e",f"]</code> returns <code>true</code>.
+                    </td>
+                </tr>
+                <tr>
                     <td>Less Than</td>
                     <td>
                         The usual <code>&lt;</code> operator can be used as well as the abbreviation <code>lt</code>.
@@ -809,34 +837,6 @@
                         For example
                         <code>val1 &gt;= val2</code> and
                         <code>val1 ge val2</code> are equivalent.
-                    </td>
-                </tr>
-                <tr>
-                    <td>In or Match<code>=~</code></td>
-                    <td>
-                        The syntactically Perl inspired <code>=~</code> operator can be used to check that a <code>string</code> matches
-                        a regular expression (expressed either a Java String or a java.util.regex.Pattern).
-                        For example
-                        <code>"abcdef" =~ "abc.*</code> returns <code>true</code>.
-                        It also checks whether any collection, set or map (on keys) contains a value or not; in that case, it behaves
-                        as an "in" operator.
-                        Note that arrays and user classes exposing a public 'contains' method will allow their instances
-                        to behave as right-hand side operands of this operator.
-                        <code> "a" =~ ["a","b","c","d","e",f"]</code> returns <code>true</code>.
-                    </td>
-                </tr>
-                <tr>
-                    <td>Not-In or Not-Match<code>!~</code></td>
-                    <td>
-                        The syntactically Perl inspired <code>!~</code> operator can be used to check that a <code>string</code> does not
-                        match a regular expression (expressed either a Java String or a java.util.regex.Pattern).
-                        For example
-                        <code>"abcdef" !~ "abc.*</code> returns <code>false</code>.
-                        It also checks whether any collection, set or map (on keys) does not contain a value; in that case, it behaves
-                        as "not in" operator.
-                        Note that arrays and user classes exposing a public 'contains' method will allow their instances
-                        to behave as right-hand side operands of this operator.
-                        <code> "a" !~ ["a","b","c","d","e",f"]</code> returns <code>true</code>.
                     </td>
                 </tr>
                  <tr>
