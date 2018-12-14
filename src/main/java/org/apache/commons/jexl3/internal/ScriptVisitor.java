@@ -32,6 +32,7 @@ import org.apache.commons.jexl3.parser.ASTBitwiseOrNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseXorNode;
 import org.apache.commons.jexl3.parser.ASTBlock;
 import org.apache.commons.jexl3.parser.ASTBreak;
+import org.apache.commons.jexl3.parser.ASTClassLiteral;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDecrementNode;
@@ -67,6 +68,7 @@ import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
+import org.apache.commons.jexl3.parser.ASTIOFNode;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.ASTJxltLiteral;
 import org.apache.commons.jexl3.parser.ASTLENode;
@@ -427,8 +429,13 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTNEWNode node, Object data) {
+        return visitNode(node, data);    
+    }
 
-        return visitNode(node, data);    }
+    @Override
+    protected Object visit(ASTIOFNode node, Object data) {
+        return visitNode(node, data);
+    }
 
     @Override
     protected Object visit(ASTAddNode node, Object data) {
@@ -567,6 +574,11 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTRegexLiteral node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTClassLiteral node, Object data) {
         return visitNode(node, data);
     }
 

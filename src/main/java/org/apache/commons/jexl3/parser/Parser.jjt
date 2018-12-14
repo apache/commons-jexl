@@ -207,6 +207,8 @@ TOKEN_MGR_DECLS : {
     | < ge : ">=" | "ge" | "\u2265" >
     | < lt : "<" | "lt" >
     | < le : "<=" | "le" | "\u2264" >
+    | < iof : "instanceof" > { pushQ(); }
+
 }
 
 <*> TOKEN : { /* OPERATORS */
@@ -770,6 +772,9 @@ void RelationalExpression() #void : {}
     <eeq> RangeExpression() #EWNode(2) // ends with
    |
     <ene> RangeExpression() #NEWNode(2) // not ends with
+   |
+    <iof> ClassLiteral() #IOFNode(2) // instanceof 
+
   ) )?
 }
 
@@ -1072,6 +1077,17 @@ void RegexLiteral() :
 {
   t=<REGEX_LITERAL>
   { jjtThis.setLiteral(Parser.buildRegex(t.image)); }
+}
+
+void ClassLiteral() :
+{
+   Token t; 
+   Class value;
+}
+{
+  t=<QUALIFIED_IDENTIFIER>
+  { value = Parser.resolveClassName(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
+  (LOOKAHEAD(<LBRACKET>) <LBRACKET> <RBRACKET> { jjtThis.setArray(); })?
 }
 
 void EmptyListLiteral() #ArrayLiteral() : {}

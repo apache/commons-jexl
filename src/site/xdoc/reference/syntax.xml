@@ -871,6 +871,26 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Type comparison <code>instanceof</code></td>
+                    <td>
+                        The 'instanceof' operator is used to test whether the object is an instance of the specified type (class or subclass or interface).
+                        For example <code>"abc" instanceof String</code> returns <code>true</code>.
+                        The type name can be either a java primitive type name, a simple name, or a fully qualified name, e.g.
+                        <code>"abc" instanceof String</code> and <code>"abc" instanceof java.lang.String</code> are equivalent.
+                        A simple class name can be used in the following cases: 
+                        <ol>
+                            <li>for the classes in package java.lang.*</li>
+                            <li>for the classes in package java.util.*</li>
+                            <li>for the classes in package java.io.*</li>
+                            <li>for the classes in package java.net.*</li>
+                            <li>for classes without packages</li>
+                            <li>for java.math.BigDecimal and java.math.BigInteger classes</li>
+                        </ol>
+                        The array syntax is also supported, e.g.
+                        <code>["abc", "def"] instanceof String[]</code>, or <code>[1,2,3] instanceof int[]</code>.
+                    </td>
+                </tr>
+                <tr>
                     <td>Left Shift</td>
                     <td>
                         The usual binary signed left shift <code>&lt;&lt;</code> operator is used.

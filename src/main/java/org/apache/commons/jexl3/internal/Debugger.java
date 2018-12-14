@@ -32,6 +32,7 @@ import org.apache.commons.jexl3.parser.ASTBitwiseOrNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseXorNode;
 import org.apache.commons.jexl3.parser.ASTBlock;
 import org.apache.commons.jexl3.parser.ASTBreak;
+import org.apache.commons.jexl3.parser.ASTClassLiteral;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDecrementNode;
@@ -66,6 +67,7 @@ import org.apache.commons.jexl3.parser.ASTIndirectNode;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
+import org.apache.commons.jexl3.parser.ASTIOFNode;
 import org.apache.commons.jexl3.parser.ASTMapLiteral;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
@@ -1033,6 +1035,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
+    protected Object visit(ASTIOFNode node, Object data) {
+        return infixChildren(node, " instanceof ", false, data);
+    }
+
+    @Override
     protected Object visit(ASTMapEntry node, Object data) {
         accept(node.jjtGetChild(0), data);
         builder.append(" : ");
@@ -1281,6 +1288,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTRegexLiteral node, Object data) {
         String img = node.toString().replace("/", "\\/");
         return check(node, "~/" + img + "/", data);
+    }
+
+    @Override
+    protected Object visit(ASTClassLiteral node, Object data) {
+        builder.append(node.toString());
+        return data;
     }
 
     @Override

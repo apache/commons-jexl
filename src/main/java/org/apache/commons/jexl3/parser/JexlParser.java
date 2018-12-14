@@ -33,6 +33,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.math.BigInteger;
+import java.math.BigDecimal;
+
 import static org.apache.commons.jexl3.parser.ParserConstants.EOF;
 import static org.apache.commons.jexl3.parser.ParserConstants.SEMICOL;
 
@@ -417,6 +420,54 @@ public abstract class JexlParser extends StringParser {
         }
         // unlikely but safe
         throw xparse != null ? xparse : new JexlException.Parsing(xinfo, msg);
+    }
+
+    protected static String[] implicitPackages = {"java.lang.","java.util.","java.io.","java.net."};
+
+    /**
+     * Resolves a class by its name.
+     * @param name the qualified name of the class
+     */
+    protected static Class resolveClassName(String name) {
+        if (name == null)
+            return null;
+        switch (name) {
+            case "char" : return Character.TYPE;
+            case "boolean" : return Boolean.TYPE;
+            case "byte" : return Byte.TYPE;
+            case "short" : return Short.TYPE;
+            case "int" : return Integer.TYPE;
+            case "long" : return Long.TYPE;
+            case "float" : return Float.TYPE;
+            case "double" : return Double.TYPE;
+            case "Character" : return Character.class;
+            case "Boolean" : return Boolean.class;
+            case "Byte" : return Byte.class;
+            case "Short" : return Short.class;
+            case "Integer" : return Integer.class;
+            case "Long" : return Long.class;
+            case "Float" : return Float.class;
+            case "Double" : return Double.class;
+            case "BigInteger" : return BigInteger.class;
+            case "BigDecimal" : return BigDecimal.class;
+        }
+
+        if (name.indexOf(".") == -1) {
+            for (String prefix : implicitPackages) {
+                String className = prefix + name;
+                try {
+                    return Class.forName(className);
+                } catch (ClassNotFoundException ex) {
+                }
+            }
+            return null;
+        } else {
+            try {
+                return Class.forName(name);
+            } catch (ClassNotFoundException ex) {
+                return null;
+            }
+        }
     }
 
     /**

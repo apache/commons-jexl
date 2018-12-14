@@ -43,6 +43,7 @@ import org.apache.commons.jexl3.parser.ASTBitwiseOrNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseXorNode;
 import org.apache.commons.jexl3.parser.ASTBlock;
 import org.apache.commons.jexl3.parser.ASTBreak;
+import org.apache.commons.jexl3.parser.ASTClassLiteral;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
 import org.apache.commons.jexl3.parser.ASTDecrementNode;
@@ -79,6 +80,7 @@ import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
+import org.apache.commons.jexl3.parser.ASTIOFNode;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.ASTJxltLiteral;
@@ -654,6 +656,25 @@ public class Interpreter extends InterpreterBase {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         return operators.contains(node, "!~", right, left) ? Boolean.FALSE : Boolean.TRUE;
+    }
+
+    @Override
+    protected Object visit(ASTIOFNode node, Object data) {
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        if (left != null) {
+            ASTClassLiteral right = (ASTClassLiteral) node.jjtGetChild(1);
+            Class k = left.getClass();
+            Class type = right.getLiteral();
+            if (k.isArray()) {
+                if (right.isArray()) {
+                   Class componentType = k.getComponentType();
+                   return type.isAssignableFrom(componentType);
+                }
+            } else {
+                return type.isAssignableFrom(k);
+            }
+        }
+        return false;
     }
 
     @Override
@@ -1670,6 +1691,11 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTRegexLiteral node, Object data) {
+        return node.getLiteral();
+    }
+
+    @Override
+    protected Object visit(ASTClassLiteral node, Object data) {
         return node.getLiteral();
     }
 
