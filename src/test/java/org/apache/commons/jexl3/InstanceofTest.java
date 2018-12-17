@@ -112,6 +112,10 @@ public class InstanceofTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
         Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+
+        e = JEXL.createScript("var x = 100H; x instanceof []");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is true", Boolean.FALSE, o);
     }
 
 }

@@ -692,7 +692,7 @@ public class Interpreter extends InterpreterBase {
                    Class componentType = k.getComponentType();
                    return type.isAssignableFrom(componentType);
                 }
-            } else {
+            } else if (type != null) {
                 return type.isAssignableFrom(k);
             }
         }
