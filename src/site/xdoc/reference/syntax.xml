@@ -915,6 +915,20 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Object creation<code>new</code></td>
+                    <td>
+                        Creates a new instance using a class name:
+                        <code>new Double(10)</code> returns 10.0.
+                        The type name can be either a simple name, or a fully qualified name, e.g.
+                        <code>new String("abc")</code> and <code> new java.lang.String("abc")</code> are equivalent.
+                        A simple class name can be used in the same cases as specified for the <code>instanceof</code> operator.
+                        <p>In case of multiple constructors, JEXL will make the best effort to find
+                            the most appropriate non ambiguous constructor to call.</p>
+                        <p>The array syntax is also supported, e.g.
+                           <code>new String[5]</code>, or <code>new int[5][7]</code></p>
+                    </td>
+                </tr>
+                <tr>
                     <td>Left Shift</td>
                     <td>
                         The usual binary signed left shift <code>&lt;&lt;</code> operator is used.

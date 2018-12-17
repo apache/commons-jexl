@@ -35,6 +35,7 @@ import org.apache.commons.jexl3.parser.ASTAnnotatedStatement;
 import org.apache.commons.jexl3.parser.ASTAnnotation;
 import org.apache.commons.jexl3.parser.ASTArguments;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTArrayLiteral;
 import org.apache.commons.jexl3.parser.ASTAssignment;
 import org.apache.commons.jexl3.parser.ASTBitwiseAndNode;
@@ -107,6 +108,7 @@ import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
 import org.apache.commons.jexl3.parser.ASTPointerNode;
 import org.apache.commons.jexl3.parser.ASTProjectionNode;
+import org.apache.commons.jexl3.parser.ASTQualifiedConstructorNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReductionNode;
 import org.apache.commons.jexl3.parser.ASTReference;
@@ -166,6 +168,8 @@ import java.util.Map;
 import java.util.AbstractMap;
 import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
+
+import java.lang.reflect.Array;
 
 import org.apache.commons.jexl3.JxltEngine;
 
@@ -2936,6 +2940,103 @@ public class Interpreter extends InterpreterBase {
             return unsolvableMethod(node, tstr);
         } catch (JexlException.Method xmethod) {
             throw xmethod;
+        } catch (Exception xany) {
+            String tstr = target != null ? target.toString() : "?";
+            throw invocationException(node, tstr, xany);
+        }
+    }
+
+    @Override
+    protected Object visit(ASTQualifiedConstructorNode node, Object data) {
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
+        }
+        // first child is class or class name
+        final Class target = (Class) node.jjtGetChild(0).jjtAccept(this, data);
+        // get the ctor args
+        int argc = node.jjtGetNumChildren() - 1;
+        Object[] argv = argc > 0 ? new Object[argc] : EMPTY_PARAMS;
+        for (int i = 0; i < argc; i++) {
+            argv[i] = node.jjtGetChild(i + 1).jjtAccept(this, data);
+        }
+
+        try {
+            boolean cacheable = cache;
+            // attempt to reuse last funcall cached in volatile JexlNode.value
+            if (cacheable) {
+                Object cached = node.jjtGetValue();
+                if (cached instanceof Funcall) {
+                    Object eval = ((Funcall) cached).tryInvoke(this, null, target, argv);
+                    if (JexlEngine.TRY_FAILED != eval) {
+                        return eval;
+                    }
+                }
+            }
+            boolean narrow = false;
+            JexlMethod ctor = null;
+            Funcall funcall = null;
+            while (true) {
+                // try as stated
+                ctor = uberspect.getConstructor(target, argv);
+                if (ctor != null) {
+                    if (cacheable && ctor.isCacheable()) {
+                        funcall = new Funcall(ctor, narrow);
+                    }
+                    break;
+                }
+                // try with prepending context as first argument
+                Object[] nargv = callArguments(context, narrow, argv);
+                ctor = uberspect.getConstructor(target, nargv);
+                if (ctor != null) {
+                    if (cacheable && ctor.isCacheable()) {
+                        funcall = new ContextualCtor(ctor, narrow);
+                    }
+                    argv = nargv;
+                    break;
+                }
+                // if we did not find an exact method by name and we haven't tried yet,
+                // attempt to narrow the parameters and if this succeeds, try again in next loop
+                if (!narrow && arithmetic.narrowArguments(argv)) {
+                    narrow = true;
+                    continue;
+                }
+                // we are done trying
+                break;
+            }
+            // we have either evaluated and returned or might have found a ctor
+            if (ctor != null) {
+                Object eval = ctor.invoke(target, argv);
+                // cache executor in volatile JexlNode.value
+                if (funcall != null) {
+                    node.jjtSetValue(funcall);
+                }
+                return eval;
+            }
+            String tstr = target != null ? target.toString() : "?";
+            return unsolvableMethod(node, tstr);
+        } catch (JexlException.Method xmethod) {
+            throw xmethod;
+        } catch (Exception xany) {
+            String tstr = target != null ? target.toString() : "?";
+            throw invocationException(node, tstr, xany);
+        }
+    }
+
+    @Override
+    protected Object visit(ASTArrayConstructorNode node, Object data) {
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
+        }
+        // first child is class or class name
+        final Class target = (Class) node.jjtGetChild(0).jjtAccept(this, data);
+        // get the dimensions
+        int argc = node.jjtGetNumChildren() - 1;
+        int[] argv = new int[argc];
+        for (int i = 0; i < argc; i++) {
+            argv[i] = arithmetic.toInteger(node.jjtGetChild(i + 1).jjtAccept(this, data));
+        }
+        try {
+            return Array.newInstance(target, argv);
         } catch (Exception xany) {
             String tstr = target != null ? target.toString() : "?";
             throw invocationException(node, tstr, xany);

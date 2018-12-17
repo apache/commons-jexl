@@ -144,7 +144,7 @@ TOKEN_MGR_DECLS : {
     | < FINALLY : "finally" >
     | < THROW : "throw" >
     | < SYNCHRONIZED : "synchronized" >
-    | < NEW : "new" >
+    | < NEW : "new" > { pushQ(); } /* Lexical state is now QUALIFIED */
     | < VAR : "var" >
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < SIZE : "size" > { popDot(); } /* Revert state to default if was DOT_ID. */
@@ -163,7 +163,7 @@ TOKEN_MGR_DECLS : {
 }
 
 <*> TOKEN : { /* SEPARATORS */
-      < LPAREN : "(" >
+      < LPAREN : "(" > { popQ(); } /* Revert state to default. */
     | < RPAREN : ")" >
     | < LCURLY : "{" >
     | < RCURLY : "}" >
@@ -780,7 +780,7 @@ void RelationalExpression() #void : {}
    |
     <ene> RangeExpression() #NEWNode(2) // not ends with
    |
-    <iof> ClassLiteral() #IOFNode(2) // instanceof 
+    <iof> TypeReference() #IOFNode(2) // instanceof 
 
   ) )?
 }
@@ -1086,7 +1086,7 @@ void RegexLiteral() :
   { jjtThis.setLiteral(Parser.buildRegex(t.image)); }
 }
 
-void ClassLiteral() :
+void TypeReference() #ClassLiteral() :
 {
    Token t; 
    Class value;
@@ -1095,8 +1095,28 @@ void ClassLiteral() :
   LOOKAHEAD(<LBRACKET>) <LBRACKET> <RBRACKET> { jjtThis.setArray(); }
   |
   t=<QUALIFIED_IDENTIFIER>
-  { value = Parser.resolveClassName(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
+  { value = Parser.resolveType(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
   (LOOKAHEAD(<LBRACKET>) <LBRACKET> <RBRACKET> { jjtThis.setArray(); })?
+}
+
+void NewTypeReference() #ClassLiteral() :
+{
+   Token t; 
+   Class value;
+}
+{
+  t=<QUALIFIED_IDENTIFIER>
+  { value = Parser.resolveInstantiableType(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
+}
+
+void ArrayTypeReference() #ClassLiteral() :
+{
+   Token t; 
+   Class value;
+}
+{
+  t=<QUALIFIED_IDENTIFIER>
+  { value = Parser.resolveType(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
 }
 
 void EmptyListLiteral() #ArrayLiteral() : {}
@@ -1197,9 +1217,31 @@ void FunctionCall() #void : {}
     LOOKAHEAD(2) RemoveIdentifier() Arguments() #FunctionNode(2)
 }
 
-void Constructor() #ConstructorNode() : {}
+void Constructor() #void : {}
 {
-  <NEW> <LPAREN> [ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+    <NEW> 
+    (
+       LOOKAHEAD(<LPAREN>) ForNameConstructor()
+       |
+       LOOKAHEAD(<QUALIFIED_IDENTIFIER> <LPAREN>) QualifiedConstructor()
+       |
+       LOOKAHEAD(<QUALIFIED_IDENTIFIER> <LBRACKET>) ArrayConstructor()
+    )
+}
+
+void ForNameConstructor() #ConstructorNode() : {}
+{
+    <LPAREN> [ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+}
+
+void QualifiedConstructor() #QualifiedConstructorNode() : {}
+{
+    NewTypeReference() <LPAREN> [ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+}
+
+void ArrayConstructor() #ArrayConstructorNode() : {}
+{
+    ArrayTypeReference() (LOOKAHEAD(2) <LBRACKET> Expression() <RBRACKET>)+ 
 }
 
 void Parameter() #void :
@@ -1212,9 +1254,8 @@ void Parameter() #void :
 
 void Parameters() #void : {}
 {
-     <LPAREN> [Parameter() (LOOKAHEAD(2) <COMMA> Parameter())* (<ELLIPSIS> { declareVarArgSupport(); })? ] <RPAREN>
+    <LPAREN> [Parameter() (LOOKAHEAD(2) <COMMA> Parameter())* (<ELLIPSIS> { declareVarArgSupport(); })? ] <RPAREN>
 }
-
 
 void LambdaLookahead() #void() : {}
 {

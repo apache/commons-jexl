@@ -24,6 +24,7 @@ import org.apache.commons.jexl3.parser.ASTAnnotatedStatement;
 import org.apache.commons.jexl3.parser.ASTAnnotation;
 import org.apache.commons.jexl3.parser.ASTArguments;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTArrayLiteral;
 import org.apache.commons.jexl3.parser.ASTAssignment;
 import org.apache.commons.jexl3.parser.ASTBitwiseAndNode;
@@ -94,6 +95,7 @@ import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
 import org.apache.commons.jexl3.parser.ASTPointerNode;
 import org.apache.commons.jexl3.parser.ASTProjectionNode;
+import org.apache.commons.jexl3.parser.ASTQualifiedConstructorNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReductionNode;
 import org.apache.commons.jexl3.parser.ASTReference;
@@ -671,6 +673,16 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTConstructorNode node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTQualifiedConstructorNode node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTArrayConstructorNode node, Object data) {
         return visitNode(node, data);
     }
 

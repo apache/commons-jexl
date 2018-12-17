@@ -24,6 +24,7 @@ import org.apache.commons.jexl3.parser.ASTAddNode;
 import org.apache.commons.jexl3.parser.ASTAndNode;
 import org.apache.commons.jexl3.parser.ASTArguments;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTArrayLiteral;
 import org.apache.commons.jexl3.parser.ASTAssignment;
 import org.apache.commons.jexl3.parser.ASTBitwiseAndNode;
@@ -95,6 +96,7 @@ import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
 import org.apache.commons.jexl3.parser.ASTPointerNode;
 import org.apache.commons.jexl3.parser.ASTProjectionNode;
+import org.apache.commons.jexl3.parser.ASTQualifiedConstructorNode;
 import org.apache.commons.jexl3.parser.ASTRangeNode;
 import org.apache.commons.jexl3.parser.ASTReductionNode;
 import org.apache.commons.jexl3.parser.ASTReference;
@@ -1140,6 +1142,34 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             accept(node.jjtGetChild(i), data);
         }
         builder.append(")");
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTQualifiedConstructorNode node, Object data) {
+        int num = node.jjtGetNumChildren();
+        builder.append("new ");
+        accept(node.jjtGetChild(0), data);
+        builder.append("(");
+        for (int i = 1; i < num; ++i) {
+            if (i > 1)
+                builder.append(", ");
+            accept(node.jjtGetChild(i), data);
+        }
+        builder.append(")");
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTArrayConstructorNode node, Object data) {
+        int num = node.jjtGetNumChildren();
+        builder.append("new ");
+        accept(node.jjtGetChild(0), data);
+        for (int i = 1; i < num; ++i) {
+            builder.append("[");
+            accept(node.jjtGetChild(i), data);
+            builder.append("]");
+        }
         return data;
     }
 

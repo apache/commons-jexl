@@ -26,6 +26,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -425,10 +426,11 @@ public abstract class JexlParser extends StringParser {
     protected static String[] implicitPackages = {"java.lang.","java.util.","java.io.","java.net."};
 
     /**
-     * Resolves a class by its name.
-     * @param name the qualified name of the class
+     * Resolves a type by its name.
+     * @param name the name of the type
+     * @return the Class
      */
-    protected static Class resolveClassName(String name) {
+    protected static Class resolveType(String name) {
         if (name == null)
             return null;
         switch (name) {
@@ -461,13 +463,63 @@ public abstract class JexlParser extends StringParser {
                 }
             }
             return null;
-        } else {
+        }
+        try {
+            return Class.forName(name);
+        } catch (ClassNotFoundException ex) {
+            return null;
+        }
+    }
+
+    /**
+     * Resolves an instantiable type by its name.
+     * @param name the name of the type
+     * @return the Class
+     */
+    protected static Class resolveInstantiableType(String name) {
+        if (name == null)
+            return null;
+        switch (name) {
+            case "char" : 
+            case "boolean" : 
+            case "byte" : 
+            case "short" : 
+            case "int" : 
+            case "long" : 
+            case "float" : 
+            case "double" : return null;
+            case "Character" : return Character.class;
+            case "Boolean" : return Boolean.class;
+            case "Byte" : return Byte.class;
+            case "Short" : return Short.class;
+            case "Integer" : return Integer.class;
+            case "Long" : return Long.class;
+            case "Float" : return Float.class;
+            case "Double" : return Double.class;
+            case "BigInteger" : return BigInteger.class;
+            case "BigDecimal" : return BigDecimal.class;
+        }
+
+        Class result = null;
+
+        if (name.indexOf(".") == -1) {
+            for (String prefix : implicitPackages) {
+                String className = prefix + name;
+                try {
+                    result = Class.forName(className);
+                    break;                   
+                } catch (ClassNotFoundException ex) {
+                }
+            }
+        }
+        if (result == null) {
             try {
-                return Class.forName(name);
+                result = Class.forName(name);
             } catch (ClassNotFoundException ex) {
                 return null;
             }
         }
+        return (result.isInterface() || Modifier.isAbstract(result.getModifiers())) ? null : result;
     }
 
     /**
