@@ -201,7 +201,7 @@ public final class MethodKey {
         }
         // before climbing up the hierarchy, verify that the last parameter is an array
         final Class<?>[] ptypes = method.getParameterTypes();
-        if (ptypes.length > 0 && ptypes[ptypes.length - 1].getComponentType() == null) {
+        if (ptypes.length == 0 || ptypes[ptypes.length - 1].getComponentType() == null) {
             return false;
         }
         final String mname = method.getName();
