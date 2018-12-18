@@ -130,6 +130,13 @@ public abstract class JexlEngine {
          * @return true if strict, false otherwise
          */
         Boolean isStrict();
+
+        /**
+         * Checks whether the engine evaluates assertions
+         *
+         * @return true if assertions are enabled, false otherwise
+         */
+        default Boolean isAssertions() { return false; }
         
         /**
          * Checks whether the arithmetic triggers errors during evaluation when null is used as an operand.
@@ -257,6 +264,13 @@ public abstract class JexlEngine {
      * @return true if strict, false otherwise
      */
     public abstract boolean isStrict();
+
+    /**
+     * Checks whether this engine evaluates assertions.
+     *
+     * @return true if assertions are enabled, false otherwise
+     */
+    public abstract boolean isAssertions();
 
     /**
      * Checks whether this engine will throw JexlException.Cancel (true) or return null (false) when interrupted

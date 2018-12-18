@@ -1424,6 +1424,15 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>assert</td>
+                    <td>
+                        An assert is used to declare an expected boolean condition in a script, e.g.
+                        <code>assert x == 0</code> or <code>assert x == 0 : "Something wrong here"</code>
+                        If the script is evaluated with assertions enabled, then the condition is checked during evaluation. 
+                        If the condition is false, the assertion error is thrown.
+                    </td>
+                </tr>
+                <tr>
                     <td>synchronized</td>
                     <td>
                         Executes synchronized code, e.g.

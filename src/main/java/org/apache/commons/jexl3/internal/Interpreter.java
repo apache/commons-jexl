@@ -37,6 +37,7 @@ import org.apache.commons.jexl3.parser.ASTArguments;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
 import org.apache.commons.jexl3.parser.ASTArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTArrayLiteral;
+import org.apache.commons.jexl3.parser.ASTAssertStatement;
 import org.apache.commons.jexl3.parser.ASTAssignment;
 import org.apache.commons.jexl3.parser.ASTBitwiseAndNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseComplNode;
@@ -1475,11 +1476,28 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTThrowStatement node, Object data) {
-        Object val = node.jjtGetChild(0).jjtAccept(this, data);
         cancelCheck(node);
+        Object val = node.jjtGetChild(0).jjtAccept(this, data);
         if (val instanceof Throwable)
             InterpreterBase.<RuntimeException>doThrow((Throwable) val);
         throw new RuntimeException(arithmetic.toString(val));
+    }
+
+    @Override
+    protected Object visit(ASTAssertStatement node, Object data) {
+        if (isAssertions()) {
+            cancelCheck(node);
+            boolean test = arithmetic.toBoolean(node.jjtGetChild(0).jjtAccept(this, data));
+            if (!test) {
+                if (node.jjtGetNumChildren() > 1) {
+                    Object val = node.jjtGetChild(1).jjtAccept(this, data);
+                    throw new AssertionError(val);
+                } else {
+                    throw new AssertionError();
+                }
+            }
+        }
+        return null;
     }
  
     @Override

@@ -26,6 +26,7 @@ import org.apache.commons.jexl3.parser.ASTArguments;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
 import org.apache.commons.jexl3.parser.ASTArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTArrayLiteral;
+import org.apache.commons.jexl3.parser.ASTAssertStatement;
 import org.apache.commons.jexl3.parser.ASTAssignment;
 import org.apache.commons.jexl3.parser.ASTBitwiseAndNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseComplNode;
@@ -289,6 +290,11 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTThrowStatement node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTAssertStatement node, Object data) {
         return visitNode(node, data);
     }
 

@@ -88,6 +88,9 @@ public class JexlBuilder {
     /** Whether error messages will carry debugging information. */
     private Boolean debug = null;
 
+    /** Whether this engine evaluates assertions */
+    private Boolean assertions = null;
+
     /** Whether interrupt throws JexlException.Cancel. */
     private Boolean cancellable = null;
 
@@ -289,6 +292,22 @@ public class JexlBuilder {
     /** @return true if strict, false otherwise */
     public Boolean strict() {
         return this.strict;
+    }
+
+    /**
+     * Sets whether the engine evaluates assertions
+     *
+     * @param flag true means assertions are evaluated, false otherwise
+     * @return this builder
+     */
+    public JexlBuilder assertions(boolean flag) {
+        this.assertions = flag;
+        return this;
+    }
+
+    /** @return true if assertions are enabled, false otherwise */
+    public Boolean assertions() {
+        return this.assertions;
     }
 
     /**

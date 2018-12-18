@@ -107,6 +107,10 @@ public class Engine extends JexlEngine {
      */
     protected final boolean silent;
     /**
+     * Whether this engine evaluates assertions.
+     */
+    protected final boolean assertions;
+    /**
      * Whether expressions evaluated by this engine will throw JexlException.Cancel (true) or return null (false) when
      * interrupted.
      * Default is true when not silent and strict.
@@ -166,6 +170,7 @@ public class Engine extends JexlEngine {
         this.strict = conf.strict() == null ? true : conf.strict();
         this.safe = conf.safe() == null ? false : conf.safe();
         this.silent = conf.silent() == null ? false : conf.silent();
+        this.assertions = conf.assertions() == null ? false : conf.assertions();
         this.cancellable = conf.cancellable() == null ? !silent && strict : conf.cancellable();
         this.debug = conf.debug() == null ? true : conf.debug();
         this.stackOverflow = conf.stackOverflow() > 0? conf.stackOverflow() : Integer.MAX_VALUE;
@@ -238,6 +243,11 @@ public class Engine extends JexlEngine {
     @Override
     public boolean isStrict() {
         return strict;
+    }
+
+    @Override
+    public boolean isAssertions() {
+        return assertions;
     }
 
     @Override

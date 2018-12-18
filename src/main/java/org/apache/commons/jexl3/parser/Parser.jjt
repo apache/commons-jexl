@@ -143,6 +143,7 @@ TOKEN_MGR_DECLS : {
     | < CATCH : "catch" >
     | < FINALLY : "finally" >
     | < THROW : "throw" >
+    | < ASSERT : "assert" >
     | < SYNCHRONIZED : "synchronized" >
     | < NEW : "new" > { pushQ(); } /* Lexical state is now QUALIFIED */
     | < VAR : "var" >
@@ -381,6 +382,7 @@ void Statement() #void : {}
     | LOOKAHEAD(<TRY> <LPAREN>) TryWithResourceStatement()
     | TryStatement()
     | ThrowStatement()
+    | AssertStatement()
     | SynchronizedStatement()
     | SwitchStatement()
     | LOOKAHEAD(MultipleAssignmentIdentifier() <assign>) MultipleAssignmentStatement()
@@ -492,6 +494,11 @@ void TryVar() : {}
 void ThrowStatement() : {}
 {
     <THROW> Expression()
+}
+
+void AssertStatement() : {}
+{
+    <ASSERT> Expression() [ <COLON> Expression() ]
 }
 
 void SynchronizedStatement() : {}
