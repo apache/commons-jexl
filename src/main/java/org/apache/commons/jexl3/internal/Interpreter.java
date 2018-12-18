@@ -685,16 +685,15 @@ public class Interpreter extends InterpreterBase {
             ASTClassLiteral right = (ASTClassLiteral) node.jjtGetChild(1);
             Class k = left.getClass();
             Class type = right.getLiteral();
-            if (k.isArray()) {
-                if (right.isArray()) {
-                   if (type == null)
-                       return true;
-                   Class componentType = k.getComponentType();
-                   return type.isAssignableFrom(componentType);
+            int i = right.getArray();
+            while (i-- > 0) {
+                if (k.isArray()) {
+                    k = k.getComponentType();
+                } else {
+                    return false;
                 }
-            } else if (type != null) {
-                return type.isAssignableFrom(k);
             }
+            return type != null ? type.isAssignableFrom(k) : true;
         }
         return false;
     }

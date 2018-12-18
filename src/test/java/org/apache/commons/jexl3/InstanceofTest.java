@@ -118,4 +118,29 @@ public class InstanceofTest extends JexlTestCase {
         Assert.assertEquals("Result is true", Boolean.FALSE, o);
     }
 
+    @Test
+    public void testMultidimensionalArray() throws Exception {
+        JexlScript e = JEXL.createScript("x instanceof []");
+        JexlContext jc = new MapContext();
+        jc.set("x", new int[5][6]);
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+
+        e = JEXL.createScript("x instanceof [][]");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+
+        e = JEXL.createScript("x instanceof int[][]");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+
+        e = JEXL.createScript("x instanceof long[][]");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is true", Boolean.FALSE, o);
+
+        e = JEXL.createScript("x instanceof [][][]");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is true", Boolean.FALSE, o);
+    }
+
 }

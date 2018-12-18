@@ -21,7 +21,7 @@ public final class ASTClassLiteral extends JexlNode implements JexlNode.Constant
     /** The actual literal value; the inherited 'value' member may host a cached getter. */
 
     private Class literal = null;
-    private boolean array = false;
+    private int array = 0;
 
     ASTClassLiteral(int id) {
         super(id);
@@ -45,7 +45,7 @@ public final class ASTClassLiteral extends JexlNode implements JexlNode.Constant
                 result.append(literal.getName());
             }
         }
-        if (array)
+        for (int i = 0; i < array; i++)
             result.append("[]");
         return result.toString();
     }
@@ -69,10 +69,10 @@ public final class ASTClassLiteral extends JexlNode implements JexlNode.Constant
     }
 
     void setArray() {
-        array = true;
+        array++;
     }
 
-    public boolean isArray() {
+    public int getArray() {
         return array;
     }
 

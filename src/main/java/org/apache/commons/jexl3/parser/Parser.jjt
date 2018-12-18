@@ -1092,11 +1092,11 @@ void TypeReference() #ClassLiteral() :
    Class value;
 }
 {
-  LOOKAHEAD(<LBRACKET>) <LBRACKET> <RBRACKET> { jjtThis.setArray(); }
+  (LOOKAHEAD(<LBRACKET>) <LBRACKET> <RBRACKET> { jjtThis.setArray(); })+
   |
   t=<QUALIFIED_IDENTIFIER>
   { value = Parser.resolveType(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
-  (LOOKAHEAD(<LBRACKET>) <LBRACKET> <RBRACKET> { jjtThis.setArray(); })?
+  (LOOKAHEAD(<LBRACKET>) <LBRACKET> <RBRACKET> { jjtThis.setArray(); })*
 }
 
 void NewTypeReference() #ClassLiteral() :
