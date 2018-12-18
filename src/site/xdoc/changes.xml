@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-282" due-to="Dmitri Blinov">
+                Pragmas with antish names are broken
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-281" due-to="Mirek Hankus">
                 MethodExecutor incorrectly tests for empty parameters list
             </action>

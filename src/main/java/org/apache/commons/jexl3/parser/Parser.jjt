@@ -399,7 +399,7 @@ void LabelledStatementLookahead() #void() : {}
   <IDENTIFIER> <COLON> ( <LCURLY> | <FOR> | <WHILE> | <DO> | <SWITCH> )
 }
 
-void LabelledStatement() #void : 
+void LabelledStatement() #void :
 {
     Token t = null;
     String label = null;
@@ -534,7 +534,7 @@ void ReturnStatement() : {}
     <RETURN> ExpressionStatement()
 }
 
-void Continue() #Continue : 
+void Continue() #Continue :
 {
     Token t = null;
 }
@@ -787,7 +787,7 @@ void RelationalExpression() #void : {}
    |
     <ene> RangeExpression() #NEWNode(2) // not ends with
    |
-    <iof> TypeReference() #IOFNode(2) // instanceof 
+    <iof> TypeReference() #IOFNode(2) // instanceof
 
   ) )?
 }
@@ -1095,7 +1095,7 @@ void RegexLiteral() :
 
 void TypeReference() #ClassLiteral() :
 {
-   Token t; 
+   Token t;
    Class value;
 }
 {
@@ -1108,7 +1108,7 @@ void TypeReference() #ClassLiteral() :
 
 void NewTypeReference() #ClassLiteral() :
 {
-   Token t; 
+   Token t;
    Class value;
 }
 {
@@ -1118,7 +1118,7 @@ void NewTypeReference() #ClassLiteral() :
 
 void ArrayTypeReference() #ClassLiteral() :
 {
-   Token t; 
+   Token t;
    Class value;
 }
 {
@@ -1226,7 +1226,7 @@ void FunctionCall() #void : {}
 
 void Constructor() #void : {}
 {
-    <NEW> 
+    <NEW>
     (
        LOOKAHEAD(<LPAREN>) ForNameConstructor()
        |
@@ -1250,7 +1250,7 @@ void QualifiedConstructor() #QualifiedConstructorNode() : {}
 
 void ArrayConstructor() #ArrayConstructorNode() : {}
 {
-    ArrayTypeReference() (LOOKAHEAD(2) <LBRACKET> Expression() <RBRACKET>)+ 
+    ArrayTypeReference() (LOOKAHEAD(2) <LBRACKET> Expression() <RBRACKET>)+
 }
 
 void InitializedArrayConstructor() #InitializedArrayConstructorNode() : {}
