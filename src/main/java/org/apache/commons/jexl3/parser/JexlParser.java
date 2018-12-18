@@ -28,8 +28,10 @@ import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -65,6 +67,15 @@ public abstract class JexlParser extends StringParser {
      * The list of pragma declarations.
      */
     protected Map<String, Object> pragmas = null;
+    /**
+     * The number of imbricated loops.
+     */
+    protected int loopCount = 0;
+    /**
+     * Stack of parsing loop counts.
+     */
+    protected Queue<Integer> loopCounts = null;
+
 
     /**
      * Utility function to create '.' separated string from a list of string.
@@ -156,6 +167,11 @@ public abstract class JexlParser extends StringParser {
             frames.push(frame);
         }
         frame = new Scope(frame, (String[]) null);
+        if (loopCounts == null) {
+            loopCounts = new LinkedList<Integer>();
+        }
+        loopCounts.add(loopCount);
+        loopCount = 0;
     }
 
     /**
@@ -166,6 +182,9 @@ public abstract class JexlParser extends StringParser {
             frame = frames.pop();
         } else {
             frame = null;
+        }
+        if (loopCounts != null && !loopCounts.isEmpty()) {
+            loopCount = loopCounts.remove();
         }
     }
 

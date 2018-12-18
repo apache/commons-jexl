@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+import org.apache.commons.jexl3.internal.Debugger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -77,5 +78,26 @@ public class DoWhileTest extends JexlTestCase {
         Assert.assertEquals("x is wrong", new Integer(10), jc.get("x"));
         Assert.assertEquals("y is wrong", new Integer(512), jc.get("y"));
     }
-
+    
+    @Test
+    public void testForEachBreakInsideFunction() throws Exception {
+        try {
+            JexlScript e = JEXL.createScript("for (i : 1..2) {  y = function() { break; } }");
+            Assert.fail("break is out of loop!");
+        } catch (JexlException.Parsing xparse) {
+            String str = xparse.detailedMessage();
+            Assert.assertTrue(str.contains("break"));
+        }
+    }
+        
+    @Test
+    public void testForEachContinueInsideFunction() throws Exception {
+        try {
+            JexlScript e = JEXL.createScript("for (i : 1..2) {  y = function() { continue; } }");
+            Assert.fail("continue is out of loop!");
+        } catch (JexlException.Parsing xparse) {
+            String str = xparse.detailedMessage();
+            Assert.assertTrue(str.contains("continue"));
+        }
+    }
 }

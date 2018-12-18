@@ -44,8 +44,6 @@ import org.apache.commons.jexl3.internal.Scope;
 
 public final class Parser extends JexlParser
 {
-    private int loopCount = 0;
-
     public ASTJexlScript parse(JexlInfo jexlInfo, JexlFeatures jexlFeatures, String jexlSrc, Scope scope) {
         JexlFeatures previous = getFeatures();
         try {
@@ -364,14 +362,18 @@ void ReturnStatement() : {}
     <RETURN> ExpressionStatement()
 }
 
-void Continue() #Continue : {}
+void Continue() #Continue : {
+    Token t;
+}
 {
-    <CONTINUE> { if (loopCount == 0) { throwParsingException(jjtThis); } }
+    t=<CONTINUE> { if (loopCount == 0) { throwParsingException(null, t); } }
 }
 
-void Break() #Break : {}
+void Break() #Break : {
+    Token t;
+}
 {
-    <BREAK> { if (loopCount == 0) { throwParsingException(jjtThis); } }
+    t=<BREAK> { if (loopCount == 0) { throwParsingException(null, t); } }
 }
 
 void ForeachStatement() : {}
