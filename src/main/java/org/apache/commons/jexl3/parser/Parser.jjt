@@ -413,7 +413,9 @@ void pragmaKey(LinkedList<String> lstr) #void :
     Token t;
 }
 {
-    t=<IDENTIFIER> (LOOKAHEAD(2) <DOT> pragmaKey(lstr) )* { lstr.addFirst(t.image); }
+    t=<IDENTIFIER>  { lstr.add(t.image); } ( LOOKAHEAD(<DOT>) pragmaKey(lstr) )*
+   |
+    <DOT> t=<DOT_IDENTIFIER> { lstr.add(t.image); }
 }
 
 Object pragmaValue() #void :
