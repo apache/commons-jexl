@@ -65,6 +65,7 @@ import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
 import org.apache.commons.jexl3.parser.ASTIncrementNode;
 import org.apache.commons.jexl3.parser.ASTIncrementPostfixNode;
 import org.apache.commons.jexl3.parser.ASTIndirectNode;
+import org.apache.commons.jexl3.parser.ASTInitializedArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
@@ -1170,6 +1171,22 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             accept(node.jjtGetChild(i), data);
             builder.append("]");
         }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTInitializedArrayConstructorNode node, Object data) {
+        int num = node.jjtGetNumChildren();
+        builder.append("new ");
+        accept(node.jjtGetChild(0), data);
+        builder.append("[]");
+        builder.append("{");
+        for (int i = 1; i < num; ++i) {
+            if (i > 1)
+                builder.append(", ");
+            accept(node.jjtGetChild(i), data);
+        }
+        builder.append("}");
         return data;
     }
 

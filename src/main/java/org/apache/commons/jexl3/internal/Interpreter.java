@@ -77,6 +77,7 @@ import org.apache.commons.jexl3.parser.ASTIdentifierAccessJxlt;
 import org.apache.commons.jexl3.parser.ASTIncrementNode;
 import org.apache.commons.jexl3.parser.ASTIncrementPostfixNode;
 import org.apache.commons.jexl3.parser.ASTIndirectNode;
+import org.apache.commons.jexl3.parser.ASTInitializedArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
@@ -3036,6 +3037,27 @@ public class Interpreter extends InterpreterBase {
         }
         try {
             return Array.newInstance(target, argv);
+        } catch (Exception xany) {
+            String tstr = target != null ? target.toString() : "?";
+            throw invocationException(node, tstr, xany);
+        }
+    }
+
+    @Override
+    protected Object visit(ASTInitializedArrayConstructorNode node, Object data) {
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
+        }
+        // first child is class or class name
+        final Class target = (Class) node.jjtGetChild(0).jjtAccept(this, data);
+        // get the length of the array
+        int argc = node.jjtGetNumChildren() - 1;
+        try {
+            Object result = Array.newInstance(target, argc);
+            for (int i = 0; i < argc; i++) {
+                Array.set(result, i, node.jjtGetChild(i + 1).jjtAccept(this, data));
+            }
+            return result;
         } catch (Exception xany) {
             String tstr = target != null ? target.toString() : "?";
             throw invocationException(node, tstr, xany);

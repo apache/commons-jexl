@@ -1225,6 +1225,8 @@ void Constructor() #void : {}
        |
        LOOKAHEAD(<QUALIFIED_IDENTIFIER> <LPAREN>) QualifiedConstructor()
        |
+       LOOKAHEAD(<QUALIFIED_IDENTIFIER> <LBRACKET> <RBRACKET>) InitializedArrayConstructor()
+       |
        LOOKAHEAD(<QUALIFIED_IDENTIFIER> <LBRACKET>) ArrayConstructor()
     )
 }
@@ -1242,6 +1244,11 @@ void QualifiedConstructor() #QualifiedConstructorNode() : {}
 void ArrayConstructor() #ArrayConstructorNode() : {}
 {
     ArrayTypeReference() (LOOKAHEAD(2) <LBRACKET> Expression() <RBRACKET>)+ 
+}
+
+void InitializedArrayConstructor() #InitializedArrayConstructorNode() : {}
+{
+    ArrayTypeReference() <LBRACKET> <RBRACKET> <LCURLY> [ Expression() ( <COMMA> Expression() )* ] <RCURLY>
 }
 
 void Parameter() #void :

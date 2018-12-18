@@ -118,5 +118,14 @@ public class ConstructorTest extends JexlTestCase {
         Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Object[]);
         Assert.assertEquals("Result is not as expected", 6, ((Object[])o).length);
     }
+
+    @Test
+    public void testInitializedArray() throws Exception {
+        JexlScript e = JEXL.createScript("new String[] {'abc','def'}");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof String[]);
+        Assert.assertEquals("Result is not as expected", 2, ((String[])o).length);
+    }
     
 }

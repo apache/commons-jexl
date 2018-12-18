@@ -926,6 +926,8 @@
                             the most appropriate non ambiguous constructor to call.</p>
                         <p>The array syntax is also supported, e.g.
                            <code>new String[5]</code>, or <code>new int[5][7]</code></p>
+                        <p>The array initialization syntax is also supported for single-dimension arrays, e.g.
+                           <code>new String[] {'abc','def'}</code></p>
                     </td>
                 </tr>
                 <tr>
