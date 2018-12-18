@@ -73,6 +73,8 @@ New features
 
 + Java-like `for` classical loop statement is introduced
 
++ Java-like `assert` statement is introduced
+
 + New `remove` flow-control statement is introduced
 
 + New `this` literal is introduced to allow easier access to the current evaluation context
