@@ -70,13 +70,11 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         super(c, m, k);
         int vastart = -1;
         Class<?> vaclass = null;
-        if (method != null) {
-            Class<?>[] formal = method.getParameterTypes();
+        if (MethodKey.isVarArgs(method)) {
             // if the last parameter is an array, the method is considered as vararg
-            if (formal.length > 0 && MethodKey.isVarArgs(method)) {
-                vastart = formal.length - 1;
-                vaclass = formal[vastart].getComponentType();
-            }
+            Class<?>[] formal = method.getParameterTypes();
+            vastart = formal.length - 1;
+            vaclass = formal[vastart].getComponentType();
         }
         vaStart = vastart;
         vaClass = vaclass;
@@ -153,5 +151,3 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         return actual;
     }
 }
-
-

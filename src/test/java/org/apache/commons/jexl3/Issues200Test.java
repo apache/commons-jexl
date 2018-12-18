@@ -631,4 +631,39 @@ public class Issues200Test extends JexlTestCase {
             Assert.assertEquals(src, ctls[i], value);
         }
     }
+
+    @Test
+    public void test279() throws Exception {
+        Object result;
+        JexlScript script;
+        JexlContext ctxt = new MapContext();
+        ctxt.set("y.z", null);
+        ctxt.set("z", null);
+        String[] srcs = new String[]{
+             "var x = null; x[0];",
+             "var x = null; x.0;",
+             "z[0]",
+             "z.0",
+             "y.z[0]",
+             "y.z.0",
+        };
+        for(boolean strict : new boolean[]{ true, false} ) {
+            JexlEngine jexl = new JexlBuilder().safe(false).strict(strict).create();
+            for (String src : srcs) {
+                script = jexl.createScript(src);
+                try {
+                    result = script.execute(ctxt);
+                    if (strict) {
+                        Assert.fail("should have failed: " + src);
+                    }
+                    // not reachable
+                    Assert.assertNull("non-null result ?!", result);
+                } catch (JexlException xany) {
+                   if (!strict) {
+                       Assert.fail(src + ", should not have thrown " + xany);
+                   }
+                }
+            }
+        }
+    }
 }
