@@ -1456,6 +1456,36 @@ public class JexlArithmetic {
     }
 
     /**
+     * Performs a type cast.
+     *
+     * @param c the type
+     * @param val the operand
+     * @return cast value
+     */
+    public Object cast(Class type, Object val) {
+        if (type == Integer.TYPE) {
+            return toInteger(val);
+        } else if (type == Long.TYPE) {
+            return toLong(val);
+        } else if (type == Float.TYPE) {
+            return toFloat(val);
+        } else if (type == Double.TYPE) {
+            return toDouble(val);
+        } else if (type == Boolean.TYPE) {
+            return toBoolean(val);
+        } else if (type == Byte.TYPE) {
+            return toByte(val);
+        } else if (type == Short.TYPE) {
+            return toShort(val);
+        } else if (type == Character.TYPE) {
+            return toCharacter(val);
+        }
+        if (type.isInstance(val))
+            return val;
+        throw new ArithmeticException("type cast:(" + type + ")" + val);
+    }
+
+    /**
      * Performs a comparison.
      *
      * @param left     the left operand
@@ -1625,10 +1655,91 @@ public class JexlArithmetic {
         } else if (val instanceof String) {
             String strval = val.toString();
             return strval.length() > 0 && !"false".equals(strval);
+        } else if (val instanceof Character) {
+            char c = (Character) val;
+            return 'T' == c || 't' == c;
         } else {
             // non null value is true
             return true;
         }
+    }
+
+    /**
+     * Coerce to a primitive byte.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param val value to coerce
+     * @return the value coerced to byte
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    public byte toByte(Object val) {
+        if (val == null) {
+            controlNullOperand();
+            return 0;
+        } else if (val instanceof Double) {
+            Double dval = (Double) val;
+            if (Double.isNaN(dval)) {
+                return 0;
+            } else {
+                return dval.byteValue();
+            }
+        } else if (val instanceof Number) {
+            return ((Number) val).byteValue();
+        } else if (val instanceof String) {
+            if ("".equals(val)) {
+                return 0;
+            }
+            return Byte.parseByte((String) val);
+        } else if (val instanceof Boolean) {
+            return ((Boolean) val) ? BigInteger.ONE.byteValue() : BigInteger.ZERO.byteValue();
+        } else if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get() ? BigInteger.ONE.byteValue() : BigInteger.ZERO.byteValue();
+        } else if (val instanceof Character) {
+            return (byte)(char)val;
+        }
+
+        throw new ArithmeticException("Byte coercion: "
+                + val.getClass().getName() + ":(" + val + ")");
+    }
+
+    /**
+     * Coerce to a primitive short.
+     * <p>Double.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param val value to coerce
+     * @return the value coerced to short
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    public short toShort(Object val) {
+        if (val == null) {
+            controlNullOperand();
+            return 0;
+        } else if (val instanceof Double) {
+            Double dval = (Double) val;
+            if (Double.isNaN(dval)) {
+                return 0;
+            } else {
+                return dval.shortValue();
+            }
+        } else if (val instanceof Number) {
+            return ((Number) val).shortValue();
+        } else if (val instanceof String) {
+            if ("".equals(val)) {
+                return 0;
+            }
+            return Short.parseShort((String) val);
+        } else if (val instanceof Boolean) {
+            return ((Boolean) val) ? BigInteger.ONE.shortValue() : BigInteger.ZERO.shortValue();
+        } else if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get() ? BigInteger.ONE.shortValue() : BigInteger.ZERO.shortValue();
+        } else if (val instanceof Character) {
+            return (short)(char)val;
+        }
+
+        throw new ArithmeticException("Short coercion: "
+                + val.getClass().getName() + ":(" + val + ")");
     }
 
     /**
@@ -1834,6 +1945,68 @@ public class JexlArithmetic {
         }
         throw new ArithmeticException("Double coercion: "
                 + val.getClass().getName() + ":(" + val + ")");
+    }
+
+    /**
+     * Coerce to a primitive float.
+     * <p>Float.NaN, null and empty string coerce to zero.</p>
+     * <p>Boolean false is 0, true is 1.</p>
+     *
+     * @param val value to coerce.
+     * @return The float coerced value.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    public float toFloat(Object val) {
+        if (val == null) {
+            controlNullOperand();
+            return 0;
+        } else if (val instanceof Float) {
+            return ((Float) val);
+        } else if (val instanceof Number) {
+            //The below construct is used rather than ((Number)val).floatValue() to ensure
+            //equality between comparing new Float( 6.4 / 3 ) and the jexl expression of 6.4 / 3
+            return Float.parseFloat(String.valueOf(val));
+        } else if (val instanceof Boolean) {
+            return ((Boolean) val) ? 1.f : 0.f;
+        } else if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get() ? 1.f : 0.f;
+        } else if (val instanceof String) {
+            String string = (String) val;
+            if ("".equals(string)) {
+                return Float.NaN;
+            } else {
+                // the spec seems to be iffy about this.  Going to give it a wack anyway
+                return Float.parseFloat(string);
+            }
+        } else if (val instanceof Character) {
+            int i = ((Character) val);
+            return i;
+        }
+        throw new ArithmeticException("Float coercion: "
+                + val.getClass().getName() + ":(" + val + ")");
+    }
+
+    /**
+     * Coerce to a char.
+     *
+     * @param val value to coerce.
+     * @return The char coerced value.
+     * @throws ArithmeticException if val is null and mode is strict or if coercion is not possible
+     */
+    public char toCharacter(Object val) {
+        if (val == null) {
+            controlNullOperand();
+            return '\0';
+        } else if (val instanceof Number) {
+            int i = ((Number) val).intValue();
+            return (char) i;
+        } else if (val instanceof CharSequence) {
+            CharSequence cs = (CharSequence) val;
+            return cs.length() > 0 ? cs.charAt(0) : '\0';
+        } else {
+            String s = toString(val);
+            return s.length() > 0 ? s.charAt(0) : '\0';
+        }
     }
 
     /**

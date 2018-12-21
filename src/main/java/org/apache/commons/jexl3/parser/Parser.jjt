@@ -180,6 +180,17 @@ TOKEN_MGR_DECLS : {
     | < HCURLY : "#{" >
 }
 
+<*> TOKEN : { /* PRIMITIVE TYPES */
+      < CHAR :    "char" >
+    | < BYTE :    "byte" >
+    | < SHORT :   "short" >
+    | < INT :     "int" >
+    | < LONG :    "long" >
+    | < FLOAT :   "float" >
+    | < DOUBLE :  "double" >
+    | < BOOLEAN : "boolean" >
+}
+
 <*> TOKEN : { /* STREAMS */
       < DOTP : ".(" >
     | < DOTB : ".[" >
@@ -856,6 +867,8 @@ void UnaryExpression() #void : {}
   |
   <not> UnaryExpression() #NotNode(1)
   |
+  LOOKAHEAD(<LPAREN> PrimitiveType()) (<LPAREN> PrimitiveType() <RPAREN> UnaryExpression() #CastNode(2))
+  |
   <EMPTY> UnaryExpression() #EmptyFunction(1)
   |
   <SIZE> UnaryExpression() #SizeFunction(1)
@@ -1101,8 +1114,17 @@ void TypeReference() #ClassLiteral() :
 {
   (LOOKAHEAD(<LBRACKET>) <LBRACKET> <RBRACKET> { jjtThis.setArray(); })+
   |
-  t=<QUALIFIED_IDENTIFIER>
-  { value = Parser.resolveType(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
+  ( 
+      t=<QUALIFIED_IDENTIFIER> { value = Parser.resolveType(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
+    | t=<INT> { jjtThis.setLiteral(Integer.TYPE); }
+    | t=<LONG> { jjtThis.setLiteral(Long.TYPE); }
+    | t=<SHORT> { jjtThis.setLiteral(Short.TYPE); }
+    | t=<BYTE> { jjtThis.setLiteral(Byte.TYPE); }
+    | t=<CHAR> { jjtThis.setLiteral(Character.TYPE); }
+    | t=<BOOLEAN> { jjtThis.setLiteral(Boolean.TYPE); }
+    | t=<FLOAT> { jjtThis.setLiteral(Float.TYPE); }
+    | t=<DOUBLE> { jjtThis.setLiteral(Double.TYPE); }
+  )
   (LOOKAHEAD(<LBRACKET>) <LBRACKET> <RBRACKET> { jjtThis.setArray(); })*
 }
 
@@ -1116,7 +1138,14 @@ void NewTypeReference() #ClassLiteral() :
   { value = Parser.resolveInstantiableType(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
 }
 
-void ArrayTypeReference() #ClassLiteral() :
+void ArrayTypeReference() #void : {}
+{
+    PrimitiveType()
+    |
+    ObjectType()
+}
+
+void ObjectType() #ClassLiteral() :
 {
    Token t;
    Class value;
@@ -1124,6 +1153,21 @@ void ArrayTypeReference() #ClassLiteral() :
 {
   t=<QUALIFIED_IDENTIFIER>
   { value = Parser.resolveType(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
+}
+
+void PrimitiveType() #ClassLiteral() :
+{
+   Token t;
+}
+{
+      LOOKAHEAD(1) t=<INT> { jjtThis.setLiteral(Integer.TYPE); }
+    | LOOKAHEAD(1) t=<LONG> { jjtThis.setLiteral(Long.TYPE); }
+    | LOOKAHEAD(1) t=<SHORT> { jjtThis.setLiteral(Short.TYPE); }
+    | LOOKAHEAD(1) t=<BYTE> { jjtThis.setLiteral(Byte.TYPE); }
+    | LOOKAHEAD(1) t=<CHAR> { jjtThis.setLiteral(Character.TYPE); }
+    | LOOKAHEAD(1) t=<BOOLEAN> { jjtThis.setLiteral(Boolean.TYPE); }
+    | LOOKAHEAD(1) t=<FLOAT> { jjtThis.setLiteral(Float.TYPE); }
+    | LOOKAHEAD(1) t=<DOUBLE> { jjtThis.setLiteral(Double.TYPE); }
 }
 
 void EmptyListLiteral() #ArrayLiteral() : {}
@@ -1232,9 +1276,9 @@ void Constructor() #void : {}
        |
        LOOKAHEAD(<QUALIFIED_IDENTIFIER> <LPAREN>) QualifiedConstructor()
        |
-       LOOKAHEAD(<QUALIFIED_IDENTIFIER> <LBRACKET> <RBRACKET>) InitializedArrayConstructor()
+       LOOKAHEAD(ArrayTypeReference() <LBRACKET> <RBRACKET>) InitializedArrayConstructor()
        |
-       LOOKAHEAD(<QUALIFIED_IDENTIFIER> <LBRACKET>) ArrayConstructor()
+       LOOKAHEAD(ArrayTypeReference() <LBRACKET>) ArrayConstructor()
     )
 }
 

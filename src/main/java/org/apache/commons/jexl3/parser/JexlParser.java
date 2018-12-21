@@ -519,7 +519,8 @@ public abstract class JexlParser extends StringParser {
                 return null;
             }
         }
-        return (result.isInterface() || Modifier.isAbstract(result.getModifiers())) ? null : result;
+        return (result.isInterface() || result.isMemberClass() || result.isAnnotation() || result.isEnum() || result.isArray() || 
+                Modifier.isAbstract(result.getModifiers())) ? null : result;
     }
 
     /**

@@ -81,7 +81,7 @@ public class ASTJexlScript extends JexlNode {
     }
 
     /**
-     * @return this script scope
+     * @return this script features
      */
     public JexlFeatures getFeatures() {
         return features;

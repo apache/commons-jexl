@@ -435,7 +435,7 @@ public class ArithmeticTest extends JexlTestCase {
     @Test
     public void testNaN() throws Exception {
         Map<String, Object> ns = new HashMap<String, Object>();
-        ns.put("double", Double.class);
+        ns.put("d", Double.class);
         JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
         JexlScript script;
         Object result;
@@ -445,10 +445,10 @@ public class ArithmeticTest extends JexlTestCase {
         script = jexl.createScript("NaN");
         result = script.execute(null);
         Assert.assertTrue(Double.isNaN((Double) result));
-        script = jexl.createScript("double:isNaN(#NaN)");
+        script = jexl.createScript("d:isNaN(#NaN)");
         result = script.execute(null);
         Assert.assertTrue((Boolean) result);
-        script = jexl.createScript("double:isNaN(NaN)");
+        script = jexl.createScript("d:isNaN(NaN)");
         result = script.execute(null);
         Assert.assertTrue((Boolean) result);
     }

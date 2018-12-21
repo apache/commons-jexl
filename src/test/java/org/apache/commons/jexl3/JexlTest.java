@@ -265,11 +265,11 @@ public class JexlTest extends JexlTestCase {
     @Test
     public void testNew() throws Exception {
         JexlContext jc = new MapContext();
-        jc.set("double", Double.class);
+        jc.set("duble", Double.class);
         jc.set("foo", "org.apache.commons.jexl3.Foo");
         JexlExpression expr;
         Object value;
-        expr = JEXL.createExpression("new(double, 1)");
+        expr = JEXL.createExpression("new(duble, 1)");
         value = expr.evaluate(jc);
         Assert.assertEquals(expr.toString(), new Double(1.0), value);
         expr = JEXL.createExpression("new('java.lang.Float', 100)");

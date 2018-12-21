@@ -45,6 +45,7 @@ import org.apache.commons.jexl3.parser.ASTBitwiseOrNode;
 import org.apache.commons.jexl3.parser.ASTBitwiseXorNode;
 import org.apache.commons.jexl3.parser.ASTBlock;
 import org.apache.commons.jexl3.parser.ASTBreak;
+import org.apache.commons.jexl3.parser.ASTCastNode;
 import org.apache.commons.jexl3.parser.ASTClassLiteral;
 import org.apache.commons.jexl3.parser.ASTConstructorNode;
 import org.apache.commons.jexl3.parser.ASTContinue;
@@ -983,6 +984,20 @@ public class Interpreter extends InterpreterBase {
             return result != JexlEngine.TRY_FAILED ? result : arithmetic.not(val);
         } catch (ArithmeticException xrt) {
             throw new JexlException(node, "! error", xrt);
+        }
+    }
+
+    @Override
+    protected Object visit(ASTCastNode node, Object data) {
+        // Type
+        ASTClassLiteral type = (ASTClassLiteral) node.jjtGetChild(0);
+        Class c = type.getLiteral();
+        // Value
+        Object val = node.jjtGetChild(1).jjtAccept(this, data);
+        try {
+            return arithmetic.cast(c, val);
+        } catch (ArithmeticException xrt) {
+            throw new JexlException(node, "cast error", xrt);
         }
     }
 
