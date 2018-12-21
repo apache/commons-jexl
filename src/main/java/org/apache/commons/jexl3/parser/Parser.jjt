@@ -402,6 +402,7 @@ void Statement() #void : {}
     | Continue()
     | Remove()
     | Break()
+    | LOOKAHEAD(<VAR> <LPAREN>) MultipleVar()
     | Var()
 }
 
@@ -497,7 +498,7 @@ void TryResource() : {}
 
 void TryVar() : {}
 {
-    <VAR> DeclareVar()
+    DeclareVar()
     |
     Identifier()
 }
@@ -601,19 +602,19 @@ ASTForeachStatement ForeachStatement() : {}
 
 void ForeachVar() : {}
 {
-    <VAR> DeclareVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar())?
+    DeclareVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar())?
     |
     Identifier() (LOOKAHEAD(1) <COMMA> Identifier())?
 }
 
+void MultipleVar() #void : {}
+{
+    <VAR> <LPAREN> (DeclareExtVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar())* <RPAREN> <assign> Expression()) #MultipleAssignment()
+}
+
 void Var() #void : {}
 {
-    <VAR>
-    (
-       LOOKAHEAD(1) ((<LPAREN> DeclareExtVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar())* <RPAREN> <assign> Expression()) #MultipleAssignment())
-       |
-       DeclareVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
-    )
+    DeclareVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
 }
 
 void DeclareVar() #Var :
@@ -621,7 +622,7 @@ void DeclareVar() #Var :
     Token t;
 }
 {
-    t=<IDENTIFIER> { declareVariable(jjtThis, t); }
+    <VAR> t=<IDENTIFIER> { declareVariable(jjtThis, t); }
 }
 
 void DeclareExtVar() #ExtVar :
