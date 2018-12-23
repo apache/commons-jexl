@@ -375,7 +375,7 @@ void Annotation() #Annotation :
 
 void AnnotatedStatement() #AnnotatedStatement() : {}
 {
-    (LOOKAHEAD(<ANNOTATION>) Annotation())+ (LOOKAHEAD(<VAR>) Var() | LOOKAHEAD(1) Block() | Expression())
+    (LOOKAHEAD(<ANNOTATION>) Annotation())+ (LOOKAHEAD(1) Block() | Statement())
 }
 
 void Statement() #void : {}
