@@ -2042,6 +2042,11 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTVar node, Object data) {
+        cancelCheck(node);
+        Class type = node.getType();
+        if (type != null) {
+            executeAssign(node, node, null, null, data);
+        }
         return visit((ASTIdentifier) node, data);
     }
 
@@ -2477,6 +2482,17 @@ public class Interpreter extends InterpreterBase {
                         if (right == JexlOperator.ASSIGN) {
                             return self;
                         }
+                    }
+                    // check if we need to typecast result
+                    Class type = frame.typeof(symbol);
+                    if (type != null) {
+                        if (arithmetic.isStrict()) {
+                            right = arithmetic.implicitCast(type, right);
+                        } else {
+                            right = arithmetic.cast(type, right);
+                        }
+                        if (type.isPrimitive() && right == null)
+                            throw new JexlException(node, "not null value required");
                     }
                     frame.set(symbol, right);
                     // make the closure accessible to itself, ie hoist the currently set variable after frame creation

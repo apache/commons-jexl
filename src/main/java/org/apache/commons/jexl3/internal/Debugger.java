@@ -1488,7 +1488,14 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTVar node, Object data) {
-        builder.append("var ");
+        Class type = node.getType();
+        if (type == null) {
+           builder.append("var ");
+        } else if (type.isPrimitive()) {
+           builder.append(type.getSimpleName()).append(" ");
+        } else {
+           builder.append(type.getName()).append(" ");
+        }
         check(node, node.getName(), data);
         return data;
     }

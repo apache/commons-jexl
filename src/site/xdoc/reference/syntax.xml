@@ -153,19 +153,23 @@
                 </tr>
                 <tr>
                     <td>Local variables</td>
-                    <td>Can be defined using the <code>var</code> keyword; the local variable name should be a valid identifier.
+                    <td>Can be defined untyped using the <code>var</code> keyword or strongly typed specifying one of java primitive types :
+                        <code>boolean char byte short int long float double</code> 
+                        The local variable name should be a valid identifier.
                         <ul>
-                            <li>Basic declaration: <code>var x;</code></li>
-                            <li>Declaration with assignment: <code>var theAnswer = 42;</code></li>
+                            <li>Basic declaration: <code>var x;</code> or <code>int x;</code></li>
+                            <li>Declaration with assignment: <code>var theAnswer = 42;</code> or <code>int theAnswer = 42;</code></li>
                             <li>Invalid declaration: <code>var x.y;</code></li>
                         </ul>
                         Their scope is either the entire script scope or the function definition block;
                         Local variables take precedence in resolution over contextual variables.
+                        The values assigned to the strongly typed variables are implicitly cast to the defined type.
+                        Primitive type variables are non-null, so it is impossible to declare a primitive type variable without non-null initialization in the strict arithmetic mode.
                         When scripts are created with named parameters, those behave as local variables.
                         <p>Variable names are <strong>case-sensitive</strong>, e.g. <code>var1</code> and <code>Var1</code> are different variables.
                         </p>
                         <p>
-                            <strong>NOTE:</strong> JEXL does not support variables with hyphens in them, e.g.
+                            <strong>NOTE:</strong> JEXL does not support variable names with hyphens, e.g.
                             <code>commons-logging // invalid variable name (hyphenated)</code> is not a valid variable, but instead is treated as a
                             subtraction of the variable <code>logging</code> from the variable <code>commons</code>
                         </p>

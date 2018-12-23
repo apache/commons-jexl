@@ -1456,33 +1456,94 @@ public class JexlArithmetic {
     }
 
     /**
-     * Performs a type cast.
+     * Performs an explicit type cast.
      *
-     * @param c the type
+     * @param type the type
      * @param val the operand
      * @return cast value
      */
     public Object cast(Class type, Object val) {
-        if (type == Integer.TYPE) {
-            return toInteger(val);
-        } else if (type == Long.TYPE) {
-            return toLong(val);
-        } else if (type == Float.TYPE) {
-            return toFloat(val);
-        } else if (type == Double.TYPE) {
-            return toDouble(val);
-        } else if (type == Boolean.TYPE) {
-            return toBoolean(val);
-        } else if (type == Byte.TYPE) {
-            return toByte(val);
-        } else if (type == Short.TYPE) {
-            return toShort(val);
-        } else if (type == Character.TYPE) {
-            return toCharacter(val);
-        }
+        type = getWrapperClass(type);
         if (type.isInstance(val))
             return val;
-        throw new ArithmeticException("type cast:(" + type + ")" + val);
+        if (type == Integer.class) {
+            return toInteger(val);
+        } else if (type == Long.class) {
+            return toLong(val);
+        } else if (type == Float.class) {
+            return toFloat(val);
+        } else if (type == Double.class) {
+            return toDouble(val);
+        } else if (type == Boolean.class) {
+            return toBoolean(val);
+        } else if (type == Byte.class) {
+            return toByte(val);
+        } else if (type == Short.class) {
+            return toShort(val);
+        } else if (type == Character.class) {
+            return toCharacter(val);
+        }
+        return type.cast(val);
+    }
+
+    /**
+     * Performs an implicit type cast.
+     *
+     * @param type the type
+     * @param val the operand
+     * @return cast value
+     */
+    public Object implicitCast(Class type, Object val) {
+        type = getWrapperClass(type);
+        if (type.isInstance(val))
+            return val;
+        if (type == Short.class && val instanceof Byte)
+            return ((Number) val).shortValue();
+        if (type == Integer.class && (val instanceof Byte || val instanceof Short || val instanceof AtomicInteger))
+            return ((Number) val).intValue();
+        if (type == Long.class && (val instanceof Byte || val instanceof Short || val instanceof Integer ||
+                                   val instanceof AtomicInteger || val instanceof AtomicLong))
+            return ((Number) val).longValue();
+        if (type == Float.class && (val instanceof Byte || val instanceof Short || val instanceof Integer || val instanceof Long ||
+                                   val instanceof AtomicInteger || val instanceof AtomicLong))
+            return ((Number) val).floatValue();
+        if (type == Double.class) 
+            return ((Number) val).doubleValue();
+        if (val instanceof CharSequence && type == Character.class) {
+            CharSequence cs = (CharSequence) val;
+            if (cs.length() == 1) 
+                return cs.charAt(0);
+        }
+        if (type == Boolean.class && val instanceof AtomicBoolean) 
+            return ((AtomicBoolean) val).get();
+        return type.cast(val);
+    }
+
+    /**
+     * Returns a wrapper class of the type.
+     *
+     * @param type the type
+     * @return wrapper class
+     */
+    public static Class getWrapperClass(Class type) {
+        if (type == Integer.TYPE) {
+            return Integer.class;
+        } else if (type == Long.TYPE) {
+            return Long.class;
+        } else if (type == Float.TYPE) {
+            return Float.class;
+        } else if (type == Double.TYPE) {
+            return Double.class;
+        } else if (type == Boolean.TYPE) {
+            return Boolean.class;
+        } else if (type == Byte.TYPE) {
+            return Byte.class;
+        } else if (type == Short.TYPE) {
+            return Short.class;
+        } else if (type == Character.TYPE) {
+            return Character.class;
+        }
+        return type;
     }
 
     /**

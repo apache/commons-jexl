@@ -622,7 +622,17 @@ void DeclareVar() #Var :
     Token t;
 }
 {
-    <VAR> t=<IDENTIFIER> { declareVariable(jjtThis, t); }
+    ( <VAR> 
+    | <INT> { jjtThis.setType(Integer.TYPE); }
+    | <LONG> { jjtThis.setType(Long.TYPE); }
+    | <SHORT> { jjtThis.setType(Short.TYPE); }
+    | <BYTE> { jjtThis.setType(Byte.TYPE); }
+    | <CHAR> { jjtThis.setType(Character.TYPE); }
+    | <BOOLEAN> { jjtThis.setType(Boolean.TYPE); }
+    | <FLOAT> { jjtThis.setType(Float.TYPE); }
+    | <DOUBLE> { jjtThis.setType(Double.TYPE); }
+    )
+    t=<IDENTIFIER> { declareVariable(jjtThis, t); }
 }
 
 void DeclareExtVar() #ExtVar :

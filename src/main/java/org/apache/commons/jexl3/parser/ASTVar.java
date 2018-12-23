@@ -20,6 +20,10 @@ package org.apache.commons.jexl3.parser;
  * Declares a local variable.
  */
 public class ASTVar extends ASTIdentifier {
+
+    /** The optional variable type. */
+    private Class type = null;
+
     public ASTVar(int id) {
         super(id);
     }
@@ -28,6 +32,14 @@ public class ASTVar extends ASTIdentifier {
         super(p, id);
     }
 
+    void setType(Class c) {
+        type = c;
+    }
+
+    public Class getType() {
+        return type;
+    }
+    
     @Override
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);

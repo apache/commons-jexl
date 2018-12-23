@@ -208,7 +208,7 @@ public abstract class JexlParser extends StringParser {
         if (frame == null) {
             frame = new Scope(null, (String[]) null);
         }
-        Integer register = frame.declareVariable(identifier);
+        Integer register = frame.declareVariable(identifier, var.getType());
         var.setSymbol(register.intValue(), identifier);
     }
 

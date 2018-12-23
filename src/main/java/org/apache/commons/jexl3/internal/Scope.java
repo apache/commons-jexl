@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -51,6 +52,12 @@ public final class Scope {
      * The map of local hoisted variables to parent scope variables, ie closure.
      */
     private Map<Integer, Integer> hoistedVariables = null;
+    /**
+     * The map of named variable types.
+     * Each variable may be associated with specific type
+     */
+    private Map<Integer, Class> variableTypes = null;
+
     /**
      * The empty string array.
      */
@@ -98,7 +105,13 @@ public final class Scope {
         if (namedVariables == null) {
             return scope.namedVariables == null;
         }
-        return namedVariables.equals(scope.namedVariables);
+        if (!namedVariables.equals(scope.namedVariables)) {
+            return false;
+        }
+        if (variableTypes == null) {
+            return scope.variableTypes == null;
+        }
+        return variableTypes.equals(scope.variableTypes);
     }
 
     /**
@@ -131,6 +144,13 @@ public final class Scope {
                 register = namedVariables.size();
                 namedVariables.put(name, register);
                 hoistedVariables.put(register, pr);
+                Class type = parent.getVariableType(pr);
+                if (type != null) {
+                    if (variableTypes == null) {
+                        variableTypes = new HashMap<Integer, Class>();
+                    }
+                    variableTypes.put(pr, type);
+                }
             }
         }
         return register;
@@ -143,6 +163,15 @@ public final class Scope {
      */
     public boolean isHoistedSymbol(int symbol) {
         return hoistedVariables != null && hoistedVariables.containsKey(symbol);
+    }
+
+    /**
+     * Returns the local variable type if any.
+     * @param register the symbol index
+     * @return the variable class 
+     */
+    public Class getVariableType(int register) {
+        return variableTypes == null ? null : variableTypes.get(register);
     }
 
     /**
@@ -182,6 +211,19 @@ public final class Scope {
      * @return the register index storing this variable
      */
     public Integer declareVariable(String name) {
+        return declareVariable(name, null);
+    }
+
+    /**
+     * Declares a local variable.
+     * <p>
+     * This method creates an new entry in the symbol map.
+     * </p>
+     * @param name the variable name
+     * @param name the variable class
+     * @return the register index storing this variable
+     */
+    public Integer declareVariable(String name, Class type) {
         if (namedVariables == null) {
             namedVariables = new LinkedHashMap<String, Integer>();
         }
@@ -190,16 +232,12 @@ public final class Scope {
             register = namedVariables.size();
             namedVariables.put(name, register);
             vars += 1;
-//            // check if local is redefining hoisted
-//            if (parent != null) {
-//                Integer pr = parent.getSymbol(name, true);
-//                if (pr != null) {
-//                    if (hoistedVariables == null) {
-//                        hoistedVariables = new LinkedHashMap<Integer, Integer>();
-//                    }
-//                    hoistedVariables.put(register, pr);
-//                }
-//            }
+            if (type != null) {
+                if (variableTypes == null) {
+                    variableTypes = new HashMap<Integer, Class>();
+                }
+                variableTypes.put(register, type);
+            }
         }
         return register;
     }
@@ -391,6 +429,15 @@ public final class Scope {
          */
         public void set(int r, Object value) {
             stack[r] = value;
+        }
+
+        /**
+         * Gets a symbol type.
+         * @param s the offset in this frame
+         * @return the type if any
+         */
+        public Class typeof(int s) {
+            return scope.getVariableType(s);
         }
 
         /**
