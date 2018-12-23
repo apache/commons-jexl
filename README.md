@@ -89,6 +89,8 @@ New features
 
 + Java-like `+` unary promotion operator is introduced.
 
++ Java-like `()` type-cast operator is introduced.
+
 + Javascript-like `===` and `!==` identity operators are introduced
 
 + C-like `&` pointer and `*` pointer dereference operators are introduced
@@ -111,6 +113,8 @@ Enhancements
 + Single expression lambdas can be defined by using `=>` fat arrow operator
 
 + Variable argument lambdas can be defined by using `...` syntax after the last lambda argument
+
++ Local variables can be declared using java primitive type `int i = 0`
 
 + Last part of the ternary expression (along with the separating `:`) can be omitted, implying `null` as a result
 
