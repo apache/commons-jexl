@@ -614,10 +614,18 @@ void MultipleVar() #void : {}
 
 void Var() #void : {}
 {
-    DeclareVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    DeclareLocalVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
 }
 
 void DeclareVar() #Var :
+{
+    Token t;
+}
+{
+    <VAR> t=<IDENTIFIER> { declareVariable(jjtThis, t); }
+}
+
+void DeclareLocalVar() #Var :
 {
     Token t;
 }
