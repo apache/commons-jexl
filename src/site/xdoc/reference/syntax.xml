@@ -226,7 +226,7 @@
                         Function can also take arbitraty number arguments, in that case the following syntax can be used
                         <code>var fun = (x, y...) -> {x + y[0] + y[1]}</code>
                         <p>Note that functions can use local variables and parameters from their declaring script.
-                            Those variables values are bound to the function environment at definition time.</p>
+                            Those variables values are bound to the function environment at definition time and are effectively final.</p>
                         <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
                         The function closure hoists 't' when defined; the result of the evaluation will
                         lead to <code>15 + 7 + 20 = 42</code>.

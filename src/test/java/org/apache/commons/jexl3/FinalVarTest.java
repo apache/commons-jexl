@@ -84,4 +84,16 @@ public class FinalVarTest extends JexlTestCase {
         }
     }
 
+    @Test
+    public void testHoisted() throws Exception {
+        try {
+           JexlScript e = JEXL.createScript("var x = 42; var y = () -> {x = 0}; y()");
+           Object o = e.execute(null);
+           Assert.fail("Should have failed");
+        } catch (JexlException ex) {
+           // OK
+        }
+    }
+
+
 }

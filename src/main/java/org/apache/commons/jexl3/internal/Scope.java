@@ -154,8 +154,13 @@ public final class Scope {
                     if (variableTypes == null) {
                         variableTypes = new HashMap<Integer, Class>();
                     }
-                    variableTypes.put(pr, type);
+                    variableTypes.put(register, type);
                 }
+                // Make hoisted variables final by default
+                if (finalVariables == null) {
+                    finalVariables = new HashSet<Integer>();
+                }
+                finalVariables.add(register);
             }
         }
         return register;

@@ -203,16 +203,6 @@ public class PrimitivesTest extends JexlTestCase {
     }
 
     @Test
-    public void testHoisted() throws Exception {
-        JexlContext jc = new MapContext();
-
-        JexlScript e = jexl.createScript("double x = 0; var y = () -> {x = 42}; y()");
-        Object o = e.execute(jc);
-        Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Double);
-        Assert.assertEquals("Result is not true", 42., o);
-    }
-
-    @Test
     public void testStrictLong() throws Exception {
         JexlContext jc = new MapContext();
         jc.set("s", (short) 42);
