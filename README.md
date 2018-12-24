@@ -59,6 +59,9 @@ Incompatible changes
 
 + Passing a lambda more arguments than is specified in the lambda declaration now results in error in a strict mode
 
++ Hoisted variables are effectively final. The reason is hoisted variables are in fact copies of the original variables,
+  so assigning a new value to the hoisted variable did not affect the original one, which is misleading.
+
 New features
 ------------
 + Java-like `switch` statement is introduced
@@ -115,6 +118,8 @@ Enhancements
 + Variable argument lambdas can be defined by using `...` syntax after the last lambda argument
 
 + Local variables can be declared using java primitive type `int i = 0`
+
++ Local variables can be declared final `final var i = 0`
 
 + Last part of the ternary expression (along with the separating `:`) can be omitted, implying `null` as a result
 
