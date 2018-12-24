@@ -135,7 +135,7 @@ public final class Scope {
      * @param hoist whether solving by hoisting parent stacked is allowed
      * @return the symbol index
      */
-    private Integer getSymbol(String name, boolean hoist) {
+    public Integer getSymbol(String name, boolean hoist) {
         Integer register = namedVariables != null ? namedVariables.get(name) : null;
         if (register == null && hoist && parent != null) {
             Integer pr = parent.getSymbol(name, true);
@@ -262,6 +262,16 @@ public final class Scope {
                     finalVariables = new HashSet<Integer>();
                 }
                 finalVariables.add(register);
+            }
+        } else {
+            if (isVariableFinal(register)) {
+                throw new IllegalStateException("final variable can not be redeclared");
+            }
+            if (type != null) {
+                if (variableTypes == null) {
+                    variableTypes = new HashMap<Integer, Class>();
+                }
+                variableTypes.put(register, type);
             }
         }
         return register;

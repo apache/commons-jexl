@@ -95,5 +95,15 @@ public class FinalVarTest extends JexlTestCase {
         }
     }
 
+    @Test
+    public void testRedefined() throws Exception {
+        try {
+           JexlScript e = JEXL.createScript("final var x = 42; var x = 43");
+           Object o = e.execute(null);
+           Assert.fail("Should have failed");
+        } catch (JexlException ex) {
+           // OK
+        }
+    }
 
 }
