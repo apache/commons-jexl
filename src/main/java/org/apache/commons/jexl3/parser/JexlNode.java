@@ -146,7 +146,7 @@ public abstract class JexlNode extends SimpleNode {
     public boolean isLeftValue() {
         JexlNode walk = this;
         do {
-            if (walk instanceof ASTIdentifier
+            if (walk instanceof ASTIdentifier && !((ASTIdentifier) walk).isFinal()
                 || walk instanceof ASTIdentifierAccess
                 || walk instanceof ASTArrayAccess
                 || walk instanceof ASTIndirectNode) {

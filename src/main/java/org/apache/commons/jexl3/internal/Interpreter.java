@@ -79,6 +79,7 @@ import org.apache.commons.jexl3.parser.ASTIdentifierAccessJxlt;
 import org.apache.commons.jexl3.parser.ASTIncrementNode;
 import org.apache.commons.jexl3.parser.ASTIncrementPostfixNode;
 import org.apache.commons.jexl3.parser.ASTIndirectNode;
+import org.apache.commons.jexl3.parser.ASTInitialization;
 import org.apache.commons.jexl3.parser.ASTInitializedArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
@@ -763,18 +764,24 @@ public class Interpreter extends InterpreterBase {
                 return null;
             }
         }
-        if (val instanceof Pointer)
-            return ((Pointer) val).get();
+        if (val instanceof GetPointer)
+            return ((GetPointer) val).get();
 
         return operators.indirect(node, val);
     }
 
 
     /**
-     * Declares pointer dereference operators
+     * Declares pointer dereference operator
      */
-    public interface Pointer {
+    public interface GetPointer {
         public Object get();
+    }
+
+    /**
+     * Declares pointer dereference assignment operator
+     */
+    public interface SetPointer {
         public void set(Object right);
     }
 
@@ -782,7 +789,7 @@ public class Interpreter extends InterpreterBase {
      * Pointer to a local variable.
      *
      */
-    public class VarPointer implements Pointer {
+    public class VarPointer implements GetPointer, SetPointer {
 
         protected int symbol;
 
@@ -802,10 +809,28 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
+     * Pointer to a final local variable.
+     *
+     */
+    public class FinalVarPointer implements GetPointer {
+
+        protected int symbol;
+
+        protected FinalVarPointer(int symbol) {
+            this.symbol = symbol;
+        }
+
+        @Override
+        public Object get() {
+            return frame.get(symbol);
+        }
+    }
+
+    /**
      * Pointer to a context variable.
      *
      */
-    public class ContextVarPointer implements Pointer {
+    public class ContextVarPointer implements GetPointer, SetPointer {
 
         protected String name;
 
@@ -828,7 +853,7 @@ public class Interpreter extends InterpreterBase {
      * Pointer to a bean property.
      *
      */
-    public class PropertyPointer implements Pointer {
+    public class PropertyPointer implements GetPointer, SetPointer {
 
         protected JexlNode propertyNode;
         protected Object object;
@@ -855,7 +880,7 @@ public class Interpreter extends InterpreterBase {
      * Pointer to an indexed element.
      *
      */
-    public class ArrayPointer implements Pointer {
+    public class ArrayPointer implements GetPointer, SetPointer {
 
         protected JexlNode propertyNode;
         protected Object object;
@@ -888,7 +913,7 @@ public class Interpreter extends InterpreterBase {
             } else {
                 int symbol = var.getSymbol();
                 if (symbol >= 0) {
-                    return new VarPointer(symbol);
+                    return var.isFinal() ? new FinalVarPointer(symbol) : new VarPointer(symbol);
                 } else {
                     return new ContextVarPointer(var.getName());
                 }
@@ -2342,6 +2367,13 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
+    protected Object visit(ASTInitialization node, Object data) {
+        JexlNode left = node.jjtGetChild(0);
+        Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeAssign(node, left, right, null, data);
+    }
+
+    @Override
     protected Object visit(ASTAssignment node, Object data) {
         JexlNode left = node.jjtGetChild(0);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
@@ -2533,8 +2565,8 @@ public class Interpreter extends InterpreterBase {
                 Object self = left.jjtGetChild(0).jjtAccept(this, data);
                 if (self == null)
                     throw new JexlException(left, "illegal assignment form *0");
-                if (self instanceof Pointer) {
-                    ((Pointer) self).set(right);
+                if (self instanceof SetPointer) {
+                    ((SetPointer) self).set(right);
                 } else {
                     Object result = operators.indirectAssign(node, self, right);
                     if (result == JexlEngine.TRY_FAILED)
@@ -2552,8 +2584,8 @@ public class Interpreter extends InterpreterBase {
                     self = left.jjtGetChild(0).jjtAccept(this, data);
                     if (self == null)
                         throw new JexlException(left, "illegal assignment form *0");
-                    if (self instanceof Pointer) {
-                        ((Pointer) self).set(result);
+                    if (self instanceof SetPointer) {
+                        ((SetPointer) self).set(result);
                     } else {
                         result = operators.indirectAssign(node, self, result);
                         if (result == JexlEngine.TRY_FAILED)

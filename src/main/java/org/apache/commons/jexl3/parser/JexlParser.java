@@ -183,6 +183,21 @@ public abstract class JexlParser extends StringParser {
         return image;
     }
 
+    /**
+     * Checks whether a local variable is final.
+     * @param image      the identifier image
+     * @return true if final, false otherwise
+     */
+    protected boolean isFinalVariable(String image) {
+        if (frame != null) {
+            Integer register = frame.getSymbol(image);
+            if (register != null) {
+                return frame.isVariableFinal(register);
+            }
+        }
+        return false;
+    }
+
     protected boolean allowVariable(String image) {
         JexlFeatures features = getFeatures();
         if (!features.supportsLocalVar()) {
@@ -208,7 +223,7 @@ public abstract class JexlParser extends StringParser {
         if (frame == null) {
             frame = new Scope(null, (String[]) null);
         }
-        Integer register = frame.declareVariable(identifier, var.getType());
+        Integer register = frame.declareVariable(identifier, var.getType(), var.isFinal());
         var.setSymbol(register.intValue(), identifier);
     }
 

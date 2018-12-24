@@ -147,6 +147,7 @@ TOKEN_MGR_DECLS : {
     | < SYNCHRONIZED : "synchronized" >
     | < NEW : "new" > { pushQ(); } /* Lexical state is now QUALIFIED */
     | < VAR : "var" >
+    | < FINAL : "final" >
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < SIZE : "size" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < THIS : "this" >
@@ -614,7 +615,9 @@ void MultipleVar() #void : {}
 
 void Var() #void : {}
 {
-    DeclareLocalVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    LOOKAHEAD(<FINAL>) DeclareLocalVar() (<assign> Expression() #Initialization(2))
+    |
+    DeclareLocalVar() (LOOKAHEAD(1) <assign> Expression() #Initialization(2))?
 }
 
 void DeclareVar() #Var :
@@ -630,6 +633,7 @@ void DeclareLocalVar() #Var :
     Token t;
 }
 {
+    ( LOOKAHEAD(1) <FINAL> { jjtThis.setFinal(); } )?
     ( <VAR> 
     | <INT> { jjtThis.setType(Integer.TYPE); }
     | <LONG> { jjtThis.setType(Long.TYPE); }
@@ -1008,7 +1012,7 @@ void Identifier(boolean top) :
     Token t;
 }
 {
-    t=<IDENTIFIER> { jjtThis.setSymbol(top? checkVariable(jjtThis, t.image) : t.image); }
+    t=<IDENTIFIER> { jjtThis.setSymbol(top? checkVariable(jjtThis, t.image) : t.image); if (top && isFinalVariable(t.image)) jjtThis.setFinal(); }
 |
     t=<REGISTER> { jjtThis.setSymbol(t.image); }
 }

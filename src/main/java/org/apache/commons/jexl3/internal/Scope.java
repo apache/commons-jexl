@@ -20,6 +20,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * A script scope, stores the declaration of parameters and local variables as symbols.
@@ -53,11 +55,14 @@ public final class Scope {
      */
     private Map<Integer, Integer> hoistedVariables = null;
     /**
-     * The map of named variable types.
+     * The map of variable types.
      * Each variable may be associated with specific type
      */
     private Map<Integer, Class> variableTypes = null;
-
+    /**
+     * The set of final variables.
+     */
+    private Set<Integer> finalVariables = null;
     /**
      * The empty string array.
      */
@@ -167,11 +172,20 @@ public final class Scope {
 
     /**
      * Returns the local variable type if any.
-     * @param register the symbol index
+     * @param symbol the symbol index
      * @return the variable class 
      */
-    public Class getVariableType(int register) {
-        return variableTypes == null ? null : variableTypes.get(register);
+    public Class getVariableType(int symbol) {
+        return variableTypes == null ? null : variableTypes.get(symbol);
+    }
+
+    /**
+     * Returns if the local variable is declared final.
+     * @param symbol the symbol index
+     * @return true if final, false otherwise
+     */
+    public boolean isVariableFinal(int symbol) {
+        return finalVariables == null ? false : finalVariables.contains(symbol);
     }
 
     /**
@@ -211,7 +225,7 @@ public final class Scope {
      * @return the register index storing this variable
      */
     public Integer declareVariable(String name) {
-        return declareVariable(name, null);
+        return declareVariable(name, null, false);
     }
 
     /**
@@ -223,7 +237,7 @@ public final class Scope {
      * @param name the variable class
      * @return the register index storing this variable
      */
-    public Integer declareVariable(String name, Class type) {
+    public Integer declareVariable(String name, Class type, boolean isFinal) {
         if (namedVariables == null) {
             namedVariables = new LinkedHashMap<String, Integer>();
         }
@@ -237,6 +251,12 @@ public final class Scope {
                     variableTypes = new HashMap<Integer, Class>();
                 }
                 variableTypes.put(register, type);
+            }
+            if (isFinal) {
+                if (finalVariables == null) {
+                    finalVariables = new HashSet<Integer>();
+                }
+                finalVariables.add(register);
             }
         }
         return register;

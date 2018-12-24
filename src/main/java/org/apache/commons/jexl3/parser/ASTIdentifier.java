@@ -22,6 +22,7 @@ package org.apache.commons.jexl3.parser;
 public class ASTIdentifier extends JexlNode {
     protected String name = null;
     protected int symbol = -1;
+    protected boolean isFinal;
 
     ASTIdentifier(int id) {
         super(id);
@@ -54,6 +55,14 @@ public class ASTIdentifier extends JexlNode {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isFinal() {
+        return isFinal;
+    }
+
+    void setFinal() {
+        isFinal = true;
     }
     
     public String getNamespace() {

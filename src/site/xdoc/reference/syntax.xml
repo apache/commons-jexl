@@ -82,7 +82,7 @@
                         </ul>
                         <p>
                             <strong>N.B.</strong> the following keywords are reserved, and cannot be used as an identifier or the property name when using the dot operator:
-                            <code>or and eq ne lt gt le ge in div mod not this null true false instanceof new var do while break continue remove function return try catch finally throw synchronized switch case default byte short int long char boolean float double</code>
+                            <code>or and eq ne lt gt le ge in div mod not this null true false instanceof new var final do while break continue remove function return try catch finally throw synchronized switch case default byte short int long char boolean float double</code>
                             For example, the following is invalid:
                             <code>my.new.dotted.var1 // invalid ('new' is keyword)</code>
                             In such cases, quoted identifiers or the [ ] operator can be used, for example:
@@ -153,19 +153,22 @@
                 </tr>
                 <tr>
                     <td>Local variables</td>
-                    <td>Can be defined untyped using the <code>var</code> keyword or strongly typed specifying one of java primitive types :
+                    <td>Can be defined untyped using the <code>var</code> keyword or strongly typed specifying one of java primitive types:
                         <code>boolean char byte short int long float double</code> 
                         The local variable name should be a valid identifier.
                         <ul>
                             <li>Basic declaration: <code>var x;</code> or <code>int x;</code></li>
-                            <li>Declaration with assignment: <code>var theAnswer = 42;</code> or <code>int theAnswer = 42;</code></li>
+                            <li>Declaration with initialization: <code>var theAnswer = 42;</code> or <code>int theAnswer = 42;</code></li>
                             <li>Invalid declaration: <code>var x.y;</code></li>
                         </ul>
-                        Their scope is either the entire script scope or the function definition block;
+                        Variable scope is either the entire script scope or the function definition block;
                         Local variables take precedence in resolution over contextual variables.
-                        The values assigned to the strongly typed variables are implicitly cast to the defined type.
+                        The values assigned to the strongly typed variables are implicitly cast to the defined type in non-strict arithmetic mode.
                         Primitive type variables are non-null, so it is impossible to declare a primitive type variable without non-null initialization in the strict arithmetic mode.
                         When scripts are created with named parameters, those behave as local variables.
+                        <p>Variables can be defined as final using <code>final var x = 42</code>, 
+                           it is impossible to declare a final variable without initialization.
+                        </p>
                         <p>Variable names are <strong>case-sensitive</strong>, e.g. <code>var1</code> and <code>Var1</code> are different variables.
                         </p>
                         <p>
