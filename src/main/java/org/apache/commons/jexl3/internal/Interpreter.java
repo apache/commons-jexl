@@ -1426,8 +1426,12 @@ public class Interpreter extends InterpreterBase {
         try {
             // execute try block
             result = node.jjtGetChild(0).jjtAccept(this, data);
-        } catch (JexlException.Break e) {
-            throw e;
+        } catch (JexlException.Break stmtBreak) {
+            String target = stmtBreak.getLabel();
+            if (target == null || !target.equals(node.getLabel())) {
+                throw stmtBreak;
+            }
+            // break
         } catch (JexlException.Continue e) {
             throw e;
         } catch (JexlException.Remove e) {
@@ -1475,8 +1479,12 @@ public class Interpreter extends InterpreterBase {
                 // execute try block
                 result = node.jjtGetChild(1).jjtAccept(this, data);
             }
-        } catch (JexlException.Break e) {
-            throw e;
+        } catch (JexlException.Break stmtBreak) {
+            String target = stmtBreak.getLabel();
+            if (target == null || !target.equals(node.getLabel())) {
+                throw stmtBreak;
+            }
+            // break
         } catch (JexlException.Continue e) {
             throw e;
         } catch (JexlException.Remove e) {

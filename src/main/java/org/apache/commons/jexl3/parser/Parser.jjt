@@ -416,33 +416,30 @@ void LabelledStatement() #void :
 {
     Token t = null;
     String label = null;
-    ASTBlock b;
-    ASTForStatement f;
-    ASTForeachStatement fe;
-    ASTWhileStatement w;
-    ASTDoWhileStatement dw;
-    ASTSwitchStatement s;
-    ASTIfStatement i;
-    ASTSynchronizedStatement sy;
+    ASTLabelledStatement s;
 }
 {
     t=<IDENTIFIER> { label = t.image; } <COLON>
     (
-        LOOKAHEAD(<LCURLY>) { branchScope.pushBlockLabel(label); } b = Block() { b.setLabel(label); branchScope.popBlockLabel(); }
+        LOOKAHEAD(<LCURLY>) { branchScope.pushBlockLabel(label); } s = Block() { s.setLabel(label); branchScope.popBlockLabel(); }
         |
-        LOOKAHEAD(<FOR> <LPAREN> ForeachVar() <COLON>) { branchScope.pushForeachLabel(label); } fe = ForeachStatement() { fe.setLabel(label); branchScope.popForeachLabel(); }
+        LOOKAHEAD(<FOR> <LPAREN> ForeachVar() <COLON>) { branchScope.pushForeachLabel(label); } s = ForeachStatement() { s.setLabel(label); branchScope.popForeachLabel(); }
         |
-        { branchScope.pushLoopLabel(label); } f = ForStatement() { f.setLabel(label); branchScope.popLoopLabel(); }
+        { branchScope.pushLoopLabel(label); } s = ForStatement() { s.setLabel(label); branchScope.popLoopLabel(); }
         |
-        { branchScope.pushLoopLabel(label); } w = WhileStatement() { w.setLabel(label); branchScope.popLoopLabel(); }
+        { branchScope.pushLoopLabel(label); } s = WhileStatement() { s.setLabel(label); branchScope.popLoopLabel(); }
         |
-        { branchScope.pushLoopLabel(label); } dw = DoWhileStatement() { dw.setLabel(label); branchScope.popLoopLabel(); }
+        { branchScope.pushLoopLabel(label); } s = DoWhileStatement() { s.setLabel(label); branchScope.popLoopLabel(); }
         |
         { branchScope.pushBlockLabel(label); } s = SwitchStatement() { s.setLabel(label); branchScope.popBlockLabel(); }
         |
-        { branchScope.pushBlockLabel(label); } i = IfStatement() { i.setLabel(label); branchScope.popBlockLabel(); }
+        { branchScope.pushBlockLabel(label); } s = IfStatement() { s.setLabel(label); branchScope.popBlockLabel(); }
         |
-        { branchScope.pushBlockLabel(label); } sy = SynchronizedStatement() { sy.setLabel(label); branchScope.popBlockLabel(); }
+        { branchScope.pushBlockLabel(label); } s = SynchronizedStatement() { s.setLabel(label); branchScope.popBlockLabel(); }
+        |
+        LOOKAHEAD(<TRY> <LPAREN>) { branchScope.pushBlockLabel(label); } s = TryWithResourceStatement() { s.setLabel(label); branchScope.popBlockLabel(); }
+        |
+        { branchScope.pushBlockLabel(label); } s = TryStatement() { s.setLabel(label); branchScope.popBlockLabel(); }
     )
 }
 
@@ -487,14 +484,16 @@ ASTDoWhileStatement DoWhileStatement() : {}
     { return jjtThis; }
 }
 
-void TryStatement() : {}
+ASTTryStatement TryStatement() : {}
 {
     <TRY> Block() ( (<CATCH> <LPAREN> TryVar() <RPAREN> Block() (<FINALLY> Block())?) | <FINALLY> Block() )
+    { return jjtThis; }
 }
 
-void TryWithResourceStatement() : {}
+ASTTryWithResourceStatement TryWithResourceStatement() : {}
 {
     <TRY> <LPAREN> TryResource() <RPAREN> Block() ( (<CATCH> <LPAREN> TryVar() <RPAREN> Block() (<FINALLY> Block())?) | <FINALLY> Block() )?
+    { return jjtThis; }
 }
 
 void TryResource() : {}
