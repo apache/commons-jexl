@@ -1157,6 +1157,13 @@ public class Interpreter extends InterpreterBase {
                 result = node.jjtGetChild(numChildren - 1).jjtAccept(this, null);
             }
             return result;
+        } catch (JexlException.Break stmtBreak) {
+            String target = stmtBreak.getLabel();
+            if (target == null || !target.equals(node.getLabel())) {
+                throw stmtBreak;
+            }
+            // break
+            return null;
         } catch (ArithmeticException xrt) {
             throw new JexlException(node.jjtGetChild(n), "if error", xrt);
         }
@@ -1605,12 +1612,20 @@ public class Interpreter extends InterpreterBase {
         Object result = null;
         /* first objectNode is the synchronization expression */
         Node expressionNode = node.jjtGetChild(0);
-        synchronized (expressionNode.jjtAccept(this, data)) {
-            cancelCheck(node);
-            if (node.jjtGetNumChildren() > 1) {
-                // execute statement
-                result = node.jjtGetChild(1).jjtAccept(this, data);
+        try {
+            synchronized (expressionNode.jjtAccept(this, data)) {
+                cancelCheck(node);
+                if (node.jjtGetNumChildren() > 1) {
+                    // execute statement
+                    result = node.jjtGetChild(1).jjtAccept(this, data);
+                }
             }
+        } catch (JexlException.Break stmtBreak) {
+            String target = stmtBreak.getLabel();
+            if (target == null || !target.equals(node.getLabel())) {
+                throw stmtBreak;
+            }
+            // break
         }
         return result;
     }

@@ -422,6 +422,8 @@ void LabelledStatement() #void :
     ASTWhileStatement w;
     ASTDoWhileStatement dw;
     ASTSwitchStatement s;
+    ASTIfStatement i;
+    ASTSynchronizedStatement sy;
 }
 {
     t=<IDENTIFIER> { label = t.image; } <COLON>
@@ -437,6 +439,10 @@ void LabelledStatement() #void :
         { branchScope.pushLoopLabel(label); } dw = DoWhileStatement() { dw.setLabel(label); branchScope.popLoopLabel(); }
         |
         { branchScope.pushBlockLabel(label); } s = SwitchStatement() { s.setLabel(label); branchScope.popBlockLabel(); }
+        |
+        { branchScope.pushBlockLabel(label); } i = IfStatement() { i.setLabel(label); branchScope.popBlockLabel(); }
+        |
+        { branchScope.pushBlockLabel(label); } sy = SynchronizedStatement() { sy.setLabel(label); branchScope.popBlockLabel(); }
     )
 }
 
@@ -461,11 +467,12 @@ void MultipleAssignmentIdentifier() #void : {}
     <LPAREN> Identifier() (LOOKAHEAD(1) <COMMA> Identifier())* <RPAREN>
 }
 
-void IfStatement() : {}
+ASTIfStatement IfStatement() : {}
 {
     <IF> <LPAREN> Expression() <RPAREN>  (LOOKAHEAD(1) Block() | Statement())
     ( LOOKAHEAD(2) <ELSE> <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | Statement()) )*
     ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | Statement()) )?
+    { return jjtThis; }
 }
 
 ASTWhileStatement WhileStatement() : {}
@@ -514,9 +521,10 @@ void AssertStatement() : {}
     <ASSERT> Expression() [ <COLON> Expression() ]
 }
 
-void SynchronizedStatement() : {}
+ASTSynchronizedStatement SynchronizedStatement() : {}
 {
     <SYNCHRONIZED> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | Statement())
+    { return jjtThis; }
 }
 
 ASTSwitchStatement SwitchStatement() : {}

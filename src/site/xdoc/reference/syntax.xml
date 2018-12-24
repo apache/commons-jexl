@@ -1243,6 +1243,13 @@
                             } else {
                             y = 2;
                             }</code>
+                        <p>The labeled syntax is also supported:
+                        <code>foo : if ((x * 2) == 5) {
+                            y = 1;
+                            } else {
+                            y = 2;
+                            } </code>
+                        Where the label <code>foo</code> can be used in the inner <code>break</code> statements.</p>
                     </td>
                 </tr>
                 <tr>
@@ -1367,7 +1374,7 @@
                         <p>The labeled syntax is also supported:
                         <code>break foo</code>
                         Where the label <code>foo</code> specifies the statement to which the operation should apply to.</p>
-                        <p>Note that the unlabelled <code>break</code> statement can not be applied to an unlabelled block</p>
+                        <p>Note that the unlabeled <code>break</code> statement can not be applied to an unlabeled block</p>
                     </td>
                 </tr>
                 <tr>
@@ -1458,6 +1465,11 @@
                         <code>synchronized (x) {
                             y = x + 2;
                             }</code>
+                        <p>The labeled syntax is also supported:
+                        <code>foo : synchronized (x) {
+                            y = x + 2;
+                            }</code>
+                        Where the label <code>foo</code> can be used in the inner <code>break</code> statements.</p>
                     </td>
                 </tr>
             </table>
