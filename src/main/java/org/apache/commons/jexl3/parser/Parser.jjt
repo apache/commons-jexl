@@ -397,13 +397,13 @@ void Statement() #void : {}
     | AssertStatement()
     | SynchronizedStatement()
     | SwitchStatement()
-    | LOOKAHEAD(MultipleAssignmentIdentifier() <assign>) MultipleAssignmentStatement()
+    | LOOKAHEAD(MultipleIdentifier() <assign>) MultipleAssignmentStatement()
     | LOOKAHEAD(2) ExpressionStatement()
     | ReturnStatement()
     | Continue()
     | Remove()
     | Break()
-    | LOOKAHEAD(<VAR> <LPAREN>) MultipleVar()
+    | LOOKAHEAD(<VAR> <LPAREN> | <FINAL> <VAR> <LPAREN>) MultipleVar()
     | Var()
 }
 
@@ -456,10 +456,10 @@ void ExpressionStatement() : {}
 
 void MultipleAssignmentStatement() #MultipleAssignment : {}
 {
-    MultipleAssignmentIdentifier() <assign> Expression()
+    MultipleIdentifier() <assign> Expression()
 }
 
-void MultipleAssignmentIdentifier() #void : {}
+void MultipleIdentifier() #MultipleIdentifier : {}
 {
     <LPAREN> Identifier() (LOOKAHEAD(1) <COMMA> Identifier())* <RPAREN>
 }
@@ -610,14 +610,23 @@ ASTForeachStatement ForeachStatement() : {}
 
 void ForeachVar() : {}
 {
-    DeclareVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar())?
+    DeclareVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar(false))?
     |
     Identifier() (LOOKAHEAD(1) <COMMA> Identifier())?
 }
 
 void MultipleVar() #void : {}
 {
-    <VAR> <LPAREN> (DeclareExtVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar())* <RPAREN> <assign> Expression()) #MultipleAssignment()
+    (MultipleDeclareVar() <assign> Expression()) #MultipleInitialization()
+}
+
+void MultipleDeclareVar() #MultipleIdentifier : 
+{
+    boolean isFinal = false;
+}
+{
+    ( LOOKAHEAD(1) <FINAL> { isFinal = true; jjtThis.setFinal(); } )?
+    <VAR> <LPAREN> DeclareExtVar(isFinal) (LOOKAHEAD(1) <COMMA> DeclareExtVar(isFinal))* <RPAREN>
 }
 
 void Var() #void : {}
@@ -654,11 +663,12 @@ void DeclareLocalVar() #Var :
     t=<IDENTIFIER> { declareVariable(jjtThis, t); }
 }
 
-void DeclareExtVar() #ExtVar :
+void DeclareExtVar(boolean isFinal) #ExtVar :
 {
     Token t;
 }
 {
+    { if (isFinal) jjtThis.setFinal(); }
     t=<IDENTIFIER> { declareVariable(jjtThis, t); }
 }
 

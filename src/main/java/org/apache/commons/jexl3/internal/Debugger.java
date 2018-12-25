@@ -89,6 +89,8 @@ import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTModNode;
 import org.apache.commons.jexl3.parser.ASTMulNode;
 import org.apache.commons.jexl3.parser.ASTMultipleAssignment;
+import org.apache.commons.jexl3.parser.ASTMultipleIdentifier;
+import org.apache.commons.jexl3.parser.ASTMultipleInitialization;
 import org.apache.commons.jexl3.parser.ASTNENode;
 import org.apache.commons.jexl3.parser.ASTNEWNode;
 import org.apache.commons.jexl3.parser.ASTNINode;
@@ -578,7 +580,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTMultipleAssignment node, Object data) {
+    protected Object visit(ASTMultipleIdentifier node, Object data) {
         int num = node.jjtGetNumChildren();
         boolean isVarDeclare = node.jjtGetChild(0) instanceof ASTExtVar;
 
@@ -586,13 +588,28 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             builder.append("var");
 
         builder.append('(');
-        for (int i = 0; i < num - 1; ++i) {
+        for (int i = 0; i < num; ++i) {
             if (i > 0)
                 builder.append(',');
             accept(node.jjtGetChild(i), data);
         }
-        builder.append(") = ");
-        accept(node.jjtGetChild(num - 1), data);
+        builder.append(")");
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTMultipleAssignment node, Object data) {
+        accept(node.jjtGetChild(0), data);
+        builder.append(" = ");
+        accept(node.jjtGetChild(1), data);
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTMultipleInitialization node, Object data) {
+        accept(node.jjtGetChild(0), data);
+        builder.append(" = ");
+        accept(node.jjtGetChild(1), data);
         return data;
     }
 

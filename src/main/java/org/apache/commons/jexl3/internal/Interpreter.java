@@ -100,6 +100,8 @@ import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTModNode;
 import org.apache.commons.jexl3.parser.ASTMulNode;
 import org.apache.commons.jexl3.parser.ASTMultipleAssignment;
+import org.apache.commons.jexl3.parser.ASTMultipleIdentifier;
+import org.apache.commons.jexl3.parser.ASTMultipleInitialization;
 import org.apache.commons.jexl3.parser.ASTNENode;
 import org.apache.commons.jexl3.parser.ASTNEWNode;
 import org.apache.commons.jexl3.parser.ASTNINode;
@@ -2326,25 +2328,56 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
-    protected Object visit(ASTMultipleAssignment node, Object data) {
-        final int num = node.jjtGetNumChildren();
-        Object result = null;
-        Object assignableValue = node.jjtGetChild(num - 1).jjtAccept(this, data);
+    protected Object visit(ASTMultipleIdentifier node, Object data) {
+        return null;
+    }
 
+    @Override
+    protected Object visit(ASTMultipleAssignment node, Object data) {
+        cancelCheck(node);
+        // Vector of identifiers to assign values to
+        JexlNode identifiers = node.jjtGetChild(0);
+        // Assignable values
+        Object assignableValue = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeMultipleAssign(node, identifiers, assignableValue, data);
+    }
+
+    @Override
+    protected Object visit(ASTMultipleInitialization node, Object data) {
+        cancelCheck(node);
+        // Vector of identifiers to assign values to
+        JexlNode identifiers = node.jjtGetChild(0);
+        // Assignable values
+        Object assignableValue = node.jjtGetChild(1).jjtAccept(this, data);
+        return executeMultipleAssign(node, identifiers, assignableValue, data);
+    }
+
+    /**
+     * Executes a multiple assignment.
+     * @param node        the node
+     * @param identifiers the reference to assign to
+     * @param value       the value expression to assign
+     * @param data        the data
+     * @return the left hand side
+     */
+    protected Object executeMultipleAssign(JexlNode node, JexlNode identifiers, Object value, Object data) { // CSOFF: MethodLength
+        Object result = null;
+        final int num = identifiers.jjtGetNumChildren();
         // Use separate logic for maps and non-iterable objects for destructuring
-        if (assignableValue instanceof Map<?,?>) {
-            Map<?,?> assignableMap = (Map<?,?>) assignableValue;
-            for (int i = 0; i < num - 1; i++) {
-                JexlNode left = node.jjtGetChild(i);
+        if (value instanceof Map<?,?>) {
+            Map<?,?> assignableMap = (Map<?,?>) value;
+            for (int i = 0; i < num; i++) {
+                cancelCheck(node);
+                JexlNode left = identifiers.jjtGetChild(i);
                 ASTIdentifier var = (ASTIdentifier) left;
                 Object right = assignableMap.get(var.getName());
-                result = executeAssign(node, left, right, null, data);
+                result = executeAssign(left, left, right, null, data);
             }
-        } else if (assignableValue != null) {
-            Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH, assignableValue);
+        } else if (value != null) {
+            Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH, value);
             Iterator<?> itemsIterator = forEach instanceof Iterator
                                     ? (Iterator<?>) forEach
-                                    : uberspect.getIterator(assignableValue);
+                                    : uberspect.getIterator(value);
             if (itemsIterator != null) {
                 try {
                     int i = -1;
@@ -2352,40 +2385,40 @@ public class Interpreter extends InterpreterBase {
                         cancelCheck(node);
                         i += 1;
                         // Stop if we are out of variables to assign to
-                        if (i == num - 1)
+                        if (i == num)
                             break;
                         // The value to assign
                         Object right = itemsIterator.next();
                         // The identifier to assign to
-                        JexlNode left = node.jjtGetChild(i);
-                        result = executeAssign(node, left, right, null, data);
+                        JexlNode left = identifiers.jjtGetChild(i);
+                        result = executeAssign(left, left, right, null, data);
                     }
-                    while (i < num - 1) {
-                        JexlNode left = node.jjtGetChild(i++);
+                    while (i + 1 < num) {
+                        JexlNode left = identifiers.jjtGetChild(++i);
                         ASTIdentifier var = (ASTIdentifier) left;
-                        result = executeAssign(node, left, null, null, data);
+                        result = executeAssign(left, left, null, null, data);
                     }
                 } finally {
                     //  closeable iterator handling
                     closeIfSupported(itemsIterator);
                 }
             } else {
-                for (int i = 0; i < num - 1; i++) {
-                    JexlNode left = node.jjtGetChild(i);
+                for (int i = 0; i < num; i++) {
+                    cancelCheck(node);
+                    JexlNode left = identifiers.jjtGetChild(i);
                     ASTIdentifier var = (ASTIdentifier) left;
-                    Object right = getAttribute(assignableValue, var.getName(), node);
-                    result = executeAssign(node, left, right, null, data);
+                    Object right = getAttribute(value, var.getName(), node);
+                    result = executeAssign(left, left, right, null, data);
                 }
             }
         } else {
-            for (int i = 0; i < num - 1; i++) {
-                JexlNode left = node.jjtGetChild(i);
+            for (int i = 0; i < num; i++) {
+                cancelCheck(node);
+                JexlNode left = identifiers.jjtGetChild(i);
                 ASTIdentifier var = (ASTIdentifier) left;
-                result = executeAssign(node, left, null, null, data);
+                result = executeAssign(left, left, null, null, data);
             }
-
         }
-
         return result;
     }
 

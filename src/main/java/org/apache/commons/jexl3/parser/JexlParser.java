@@ -360,6 +360,11 @@ public abstract class JexlParser extends StringParser {
             if (!lv.isLeftValue()) {
                 throwParsingException(JexlException.Assignment.class, null);
             }
+        } else if (node instanceof ASTMultipleAssignment) {
+            JexlNode lv = node.jjtGetChild(0);
+            if (!lv.isLeftValue()) {
+                throwParsingException(JexlException.Assignment.class, null);
+            }
         }
 
         // heavy check

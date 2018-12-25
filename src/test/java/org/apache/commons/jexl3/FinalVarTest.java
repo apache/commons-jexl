@@ -54,6 +54,13 @@ public class FinalVarTest extends JexlTestCase {
     }
 
     @Test
+    public void testMultiple() throws Exception {
+        JexlScript e = JEXL.createScript("final var (x,y) = [41,42]");
+        Object o = e.execute(null);
+        Assert.assertEquals("Result is not 42", 42, o);
+    }
+
+    @Test
     public void testUninitialized() throws Exception {
         try {
            JexlScript e = JEXL.createScript("final var x");
@@ -71,6 +78,14 @@ public class FinalVarTest extends JexlTestCase {
         } catch (JexlException ex) {
            // OK
         }
+
+        try {
+           JexlScript e = JEXL.createScript("final var (x,y) = [41,42]; x = 41");
+           Assert.fail("Should have failed");
+        } catch (JexlException ex) {
+           // OK
+        }
+
     }
 
     @Test
@@ -99,7 +114,13 @@ public class FinalVarTest extends JexlTestCase {
     public void testRedefined() throws Exception {
         try {
            JexlScript e = JEXL.createScript("final var x = 42; var x = 43");
-           Object o = e.execute(null);
+           Assert.fail("Should have failed");
+        } catch (JexlException ex) {
+           // OK
+        }
+
+        try {
+           JexlScript e = JEXL.createScript("final var x = 42; var (x,y) = [43,44]");
            Assert.fail("Should have failed");
         } catch (JexlException ex) {
            // OK

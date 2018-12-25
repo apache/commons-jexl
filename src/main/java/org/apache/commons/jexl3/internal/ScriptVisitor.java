@@ -87,6 +87,8 @@ import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTModNode;
 import org.apache.commons.jexl3.parser.ASTMulNode;
 import org.apache.commons.jexl3.parser.ASTMultipleAssignment;
+import org.apache.commons.jexl3.parser.ASTMultipleIdentifier;
+import org.apache.commons.jexl3.parser.ASTMultipleInitialization;
 import org.apache.commons.jexl3.parser.ASTNENode;
 import org.apache.commons.jexl3.parser.ASTNEWNode;
 import org.apache.commons.jexl3.parser.ASTNINode;
@@ -322,6 +324,11 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTMultipleAssignment node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTMultipleInitialization node, Object data) {
         return visitNode(node, data);
     }
 
@@ -572,6 +579,11 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTIdentifier node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTMultipleIdentifier node, Object data) {
         return visitNode(node, data);
     }
 

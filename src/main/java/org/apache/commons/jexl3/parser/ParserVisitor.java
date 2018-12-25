@@ -96,6 +96,8 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTAssignment node, Object data);
 
+    protected abstract Object visit(ASTMultipleInitialization node, Object data);
+
     protected abstract Object visit(ASTInitialization node, Object data);
 
     protected abstract Object visit(ASTVar node, Object data);
@@ -189,6 +191,8 @@ public abstract class ParserVisitor {
     protected abstract Object visit(ASTCastNode node, Object data);
 
     protected abstract Object visit(ASTIdentifier node, Object data);
+
+    protected abstract Object visit(ASTMultipleIdentifier node, Object data);
 
     protected abstract Object visit(ASTNullLiteral node, Object data);
 

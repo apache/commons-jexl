@@ -200,8 +200,8 @@
                         Assigns the values to the multiple variables (<code>(x,y) = [4,2]</code>). 
                         Assignment can be combined with local variable declaration using the <code>var</code> keyword, e.g.
                         <code>var (x,y) = [4,2]</code> will assign <code>4</code> and <code>2</code> to the variables <code>x</code> 
-                        and <code>y</code> respectively. The syntax can be used for arrays as well as lists and sets, 
-                        as well as other expressions that return either of these.
+                        and <code>y</code> respectively. Variables can be defined as final using <code>final var (x,y) = [4,2]</code>.
+                        The syntax can be used for arrays as well as lists and sets, as well as other expressions that return either of these.
                         <p>If the list of variables assigned to has more variables than values, excess ones are filled with null values.
                         If the list of variables has less variables than values, the extra values are ignored.</p>
                         <p>Multiple assignment can also be used as destructuring assignment when applied to maps and beans, e.g.
