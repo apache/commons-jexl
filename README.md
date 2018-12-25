@@ -42,14 +42,15 @@ Incompatible changes
 + Java 8 is the new minimum supported version 
 
 + New reserved words are introduced. Those are:
-  `switch` `case` `default` `try` `catch` `finally` `throw` `synchronized` `this` `instanceof` `in` `remove`.
+  `switch` `case` `default` `try` `catch` `finally` `throw` `synchronized` `this` `instanceof` `in` `remove`
+  `final` `boolean` `char` `byte` `int` `long` `float` `double`.
   You may not longer use them as the names of the variables and methods. The exception is made to the `remove` identifer,
   as it is still may be used in method invocations.
 
 + Pragmas can only be defined at the beginning of the script. The reason is the pragmas are not executable constructs, 
   so it is pointless and misleading to have them incorporated in flow-control structures somewhere in the middle.
 
-+ Literal `null` can no longer have any properies, so it is forbidden to use it in expressions like `null.prop`.
++ Literal `null` can not have any properies, so it is forbidden to use it in expressions like `null.prop`.
   If, for some reason, you still want to do this, use parentheses like `(null).prop`.
 
 + Precedence of the `range` operator (`..`) is changed to be higher than that of relational operators, 
@@ -60,7 +61,7 @@ Incompatible changes
 + Passing a lambda more arguments than is specified in the lambda declaration now results in error in a strict mode
 
 + Hoisted variables are effectively final. The reason is hoisted variables are in fact copies of the original variables,
-  so assigning a new value to the hoisted variable did not affect the original one, which is misleading.
+  so assigning a new value to the hoisted variable does not affect the original one. Such behaviour is misleading and thus restricted.
 
 New features
 ------------
@@ -108,7 +109,7 @@ New features
 
 Enhancements
 ------------
-+ Labeled blocks and statements like `switch`, `for`, `while`, `do` can be used. 
++ Labeled blocks and statements like `switch`, `for`, `while`, `do`, `if`, `try`, `synchronized` can be used. 
   The defined labels can be further specified for inner `break`, `continue` and `remove` flow-control statements
 
 + Multidimensional arrays can be accessed by using new syntax `arr[x,y]` as well as by using older syntax `arr[x][y]`
