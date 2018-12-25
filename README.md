@@ -44,7 +44,7 @@ Incompatible changes
 + New reserved words are introduced. Those are:
   `switch` `case` `default` `try` `catch` `finally` `throw` `synchronized` `this` `instanceof` `in` `remove`
   `final` `boolean` `char` `byte` `int` `long` `float` `double`.
-  You may not longer use them as the names of the variables and methods. The exception is made to the `remove` identifer,
+  You may not longer use them as the names of the variables and methods. The exception is made for the `remove` identifer,
   as it is still may be used in method invocations.
 
 + Pragmas can only be defined at the beginning of the script. The reason is the pragmas are not executable constructs, 
@@ -56,7 +56,7 @@ Incompatible changes
 + Precedence of the `range` operator (`..`) is changed to be higher than that of relational operators, 
   but lower than that of arithmetic operators.
 
-+ Precedence of the match(`=~`) and not-match(`!~`) operators is changed to be that of equality operators.
++ Precedence of the `match` operator (`=~`) and `not-match` operator (`!~`) is changed to be that of other equality operators.
 
 + Passing a lambda more arguments than is specified in the lambda declaration now results in error in a strict mode
 
@@ -103,7 +103,7 @@ New features
 
 + New iterator processing (selection/projection/reduction) operators are introduced
 
-+ New multiple assignment statement is introduced
++ New multiple assignment statement `(x,y) = [2,3]` is introduced
 
 + New inline property assignment `a{b:3,c:4}` construct is introduced
 
@@ -114,7 +114,7 @@ Enhancements
 
 + Multidimensional arrays can be accessed by using new syntax `arr[x,y]` as well as by using older syntax `arr[x][y]`
 
-+ Single expression lambdas can be defined by using `=>` fat arrow operator
++ Single expression lambdas can be defined by using `=>` fat arrow operator without outer curly braces
 
 + Variable argument lambdas can be defined by using `...` syntax after the last lambda argument
 
@@ -122,15 +122,15 @@ Enhancements
 
 + Local variables can be declared final `final var i = 0`
 
-+ Last part of the ternary expression (along with the separating `:`) can be omitted, implying `null` as a result
++ Last part of the ternary expression `x?y:z` (along with the separating `:`) can be omitted, implying `null` as a result
 
 + Pattern matching operators `=~` and `!~` can use new `in` and `!in` aliases 
 
 + Operator `new` can use Java-like syntax `new String()`
 
-+ Foreach statement may also define additional `counter` variable along with current variable
++ Foreach statement may also define additional `counter` variable `for (var x,i : list)` along with the current value variable
 
-+ Immutable arraylist `#[1,2,3]` literal constructs can be used 
++ Immutable list `#[1,2,3]` literal constructs can be used 
 
 + Immutable set `#{1,2,3}` literal constructs can be used
 
