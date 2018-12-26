@@ -266,10 +266,10 @@ public class IssuesTest extends JexlTestCase {
         e = jexl.createExpression("c.e");
         try {
             /* Object o = */ e.evaluate(ctxt);
-            Assert.fail("c.e not declared as variable");
+            Assert.fail("c not declared as variable");
         } catch (JexlException.Variable xjexl) {
             String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("c.e") > 0);
+            Assert.assertTrue(msg.indexOf("c") > 0);
         }
 
         ctxt.set("c", "{ 'a' : 3, 'b' : 5}");
