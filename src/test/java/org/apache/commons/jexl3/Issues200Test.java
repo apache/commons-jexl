@@ -32,6 +32,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -622,39 +624,80 @@ public class Issues200Test extends JexlTestCase {
             Assert.assertEquals(src, ctls[i], value);
         }
     }
+    
+    public static class Context279 extends MapContext {
+        public String identity(String x) {
+            return x;
+        }
+        public Number identity(Number x) {
+            return x;
+        }
+    }
 
     @Test
     public void test279() throws Exception {
+        final Log logger = null;//LogFactory.getLog(Issues200Test.class);
         Object result;
         JexlScript script;
-        JexlContext ctxt = new MapContext();
-        ctxt.set("y.z", null);
-        ctxt.set("z", null);
+        JexlContext ctxt = new Context279();
         String[] srcs = new String[]{
-             "var x = null; x[0];",
-             "var x = null; x.0;",
+            "var z = null; identity(z[0]);",
+             "var z = null; z.0;",
+             "var z = null; z.foo();",
+            "z['y']['z']",
+            "z.y.any()",
+             "identity(z.any())",
              "z[0]",
              "z.0",
-             "y.z[0]",
-             "y.z.0",
+             "z.foo()",
+             "z.y[0]",
+             "z.y[0].foo()",
+             "z.y.0",
+             "z.y.foo()",
+             "var z = { 'y' : [42] }; z.y[1]",
+             "var z = { 'y' : [42] }; z.y.1",
+             "var z = { 'y' : [-42] }; z.y[1].foo()",
+             "var z = { 'y' : [42] }; z.y.1.foo()",
+             "var z = { 'y' : [null, null] }; z.y[1].foo()",
+             "var z = { 'y' : [null, null] }; z.y.1.foo()"
         };
-        for(boolean strict : new boolean[]{ true, false} ) {
-            JexlEngine jexl = new JexlBuilder().safe(false).strict(strict).create();
-            for (String src : srcs) {
-                script = jexl.createScript(src);
-                try {
-                    result = script.execute(ctxt);
-                    if (strict) {
-                        Assert.fail("should have failed: " + src);
+        for (int i = 0; i < 2; ++i) {
+            for (boolean strict : new boolean[]{true, false}) {
+                JexlEngine jexl = new JexlBuilder().safe(false).strict(strict).create();
+                for (String src : srcs) {
+                    script = jexl.createScript(src);
+                    try {
+                        result = script.execute(ctxt);
+                        if (strict) {
+                            if (logger != null) {
+                                logger.warn(ctxt.has("z") + ": " + src + ": no fail, " + result);
+                            }
+                            Assert.fail("should have failed: " + src);
+                        }
+                        // not reachable
+                        Assert.assertNull("non-null result ?!", result);
+                    } catch (JexlException.Variable xvar) {
+                        if (logger != null) {
+                            logger.warn(ctxt.has("z") + ": " + src + ": fail, " + xvar);
+                        }
+                        if (!strict) {
+                            Assert.fail(src + ", should not have thrown " + xvar);
+                        } else {
+                            Assert.assertTrue(src + ": " + xvar.toString(), xvar.toString().contains("z"));
+                        }
+                    } catch (JexlException.Property xprop) {
+                        if (logger != null) {
+                            logger.warn(ctxt.has("z") + ": " + src + ": fail, " + xprop);
+                        }
+                        if (!strict) {
+                            Assert.fail(src + ", should not have thrown " + xprop);
+                        } else {
+                            Assert.assertTrue(src + ": " + xprop.toString(), xprop.toString().contains("1"));
+                        }
                     }
-                    // not reachable
-                    Assert.assertNull("non-null result ?!", result);
-                } catch (JexlException xany) {
-                   if (!strict) {
-                       Assert.fail(src + ", should not have thrown " + xany);
-                   }
                 }
             }
+            ctxt.set("z.y", null);
         }
     }
 }

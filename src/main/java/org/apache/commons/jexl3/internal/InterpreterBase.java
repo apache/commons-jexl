@@ -25,7 +25,9 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
+import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTMethodNode;
+import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
@@ -271,29 +273,33 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected String stringifyProperty(JexlNode node) {
         if (node instanceof ASTArrayAccess) {
-            if (node.jjtGetChild(0) != null) {
-                return "["
-                       + node.jjtGetChild(0).toString()
-                       + "]";
-            }
-            return "[???]";
+            return "["
+                    + stringifyPropertyValue(node.jjtGetChild(0))
+                    + "]";
         }
         if (node instanceof ASTMethodNode) {
-            if (node.jjtGetChild(0) != null) {
-                return "."
-                       + node.jjtGetChild(0).toString()
-                       + "(...)";
-            }
-            return ".???(...)";
+            return stringifyPropertyValue(node.jjtGetChild(0));
         }
         if (node instanceof ASTFunctionNode) {
-            if (node.jjtGetChild(0) != null) {
-                return node.jjtGetChild(0).toString()
-                       + "(...)";
-            }
-            return "???(...)";
+            return stringifyPropertyValue(node.jjtGetChild(0));
         }
-        return node.toString();
+        if (node instanceof ASTIdentifier) {
+            return ((ASTIdentifier) node).getName();
+        }
+        if (node instanceof ASTReference) {
+            return stringifyPropertyValue(node.jjtGetChild(0));
+        }
+        return stringifyPropertyValue(node);
+    }
+        
+    /**
+     * Pretty-prints a failing property value (de)reference.
+     * <p>Used by calls to unsolvableProperty(...).</p>
+     * @param node the property node
+     * @return the (pretty) string value
+     */
+    protected static String stringifyPropertyValue(JexlNode node) {
+        return node != null? new Debugger().depth(1).data(node) : "???";
     }
 
     /**

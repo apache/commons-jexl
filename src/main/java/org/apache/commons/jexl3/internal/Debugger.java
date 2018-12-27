@@ -180,6 +180,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected int indentLevel = 0;
     /** Perform indentation?. */
     protected int indent = 2;
+    /** accept() relative depth. */
+    protected int depth = Integer.MAX_VALUE;
 
     /**
      * Creates a Debugger.
@@ -197,6 +199,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         end = 0;
         indentLevel = 0;
         indent = 2;
+        depth = 0;
     }
 
     /**
@@ -306,12 +309,32 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param level the number of spaces for indentation, none if less or equal to zero
      */
     public void setIndentation(int level) {
+        indentation(level);
+    }
+    
+    /**
+     * Sets the indentation level.
+     * @param level the number of spaces for indentation, none if less or equal to zero
+     * @return this debugger instance
+     */
+    public Debugger indentation(int level) {
         if (level <= 0) {
             indent = 0;
         } else {
             indent = level;
         }
         indentLevel = 0;
+        return this;
+    }
+    
+    /**
+     * Sets this debugger relative maximum depth.
+     * @param rdepth the maximum relative depth from the debugged node
+     * @return this debugger instance
+     */
+    public Debugger depth(int rdepth) {
+        this.depth = rdepth;
+        return this;
     }
 
     /**
@@ -321,10 +344,16 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @return visitor pattern value
      */
     protected Object accept(JexlNode node, Object data) {
+        if (depth <= 0) {
+            builder.append("...");
+            return data;
+        }
         if (node == cause) {
             start = builder.length();
         }
+        depth -= 1;
         Object value = node.jjtAccept(this, data);
+        depth += 1;
         if (node == cause) {
             end = builder.length();
         }
@@ -346,7 +375,9 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 }
             }
         }
+        depth -= 1;
         Object value = accept(child, data);
+        depth += 1;
         // blocks, if, for & while dont need a ';' at end
         if (!(child instanceof ASTJexlScript
             || child instanceof ASTBlock

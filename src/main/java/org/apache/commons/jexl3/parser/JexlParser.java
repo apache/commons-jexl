@@ -29,8 +29,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -70,6 +72,15 @@ public abstract class JexlParser extends StringParser {
      * The list of pragma declarations.
      */
     protected Map<String, Object> pragmas = null;
+    /**
+     * The number of imbricated loops.
+     */
+    protected int loopCount = 0;
+    /**
+     * Stack of parsing loop counts.
+     */
+    protected Queue<Integer> loopCounts = null;
+
 
     /**
      * Read a given source line.
@@ -164,6 +175,9 @@ public abstract class JexlParser extends StringParser {
             frame = frames.pop();
         } else {
             frame = null;
+        }
+        if (loopCounts != null && !loopCounts.isEmpty()) {
+            loopCount = loopCounts.remove();
         }
     }
 
@@ -504,13 +518,13 @@ public abstract class JexlParser extends StringParser {
         if (name == null)
             return null;
         switch (name) {
-            case "char" : 
-            case "boolean" : 
-            case "byte" : 
-            case "short" : 
-            case "int" : 
-            case "long" : 
-            case "float" : 
+            case "char" :
+            case "boolean" :
+            case "byte" :
+            case "short" :
+            case "int" :
+            case "long" :
+            case "float" :
             case "double" : return null;
             case "Character" : return Character.class;
             case "Boolean" : return Boolean.class;
@@ -531,7 +545,7 @@ public abstract class JexlParser extends StringParser {
                 String className = prefix + name;
                 try {
                     result = Class.forName(className);
-                    break;                   
+                    break;
                 } catch (ClassNotFoundException ex) {
                 }
             }
@@ -543,7 +557,7 @@ public abstract class JexlParser extends StringParser {
                 return null;
             }
         }
-        return (result.isInterface() || result.isMemberClass() || result.isAnnotation() || result.isEnum() || result.isArray() || 
+        return (result.isInterface() || result.isMemberClass() || result.isAnnotation() || result.isEnum() || result.isArray() ||
                 Modifier.isAbstract(result.getModifiers())) ? null : result;
     }
 

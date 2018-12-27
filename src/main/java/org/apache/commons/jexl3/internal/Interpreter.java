@@ -1221,7 +1221,7 @@ public class Interpreter extends InterpreterBase {
         while (when = (Boolean) node.jjtGetChild(1).jjtAccept(this, data)) {
             try {
                 // Execute loop body
-                if (node.jjtGetNumChildren() > 3) 
+                if (node.jjtGetNumChildren() > 3)
                     result = node.jjtGetChild(3).jjtAccept(this, data);
             } catch (JexlException.Break stmtBreak) {
                 String target = stmtBreak.getLabel();
@@ -1246,7 +1246,7 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTForInitializationNode node, Object data) {
         Object result = null;
-        if (node.jjtGetNumChildren() > 0) 
+        if (node.jjtGetNumChildren() > 0)
             result = node.jjtGetChild(0).jjtAccept(this, data);
         return result;
     }
@@ -1254,7 +1254,7 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTForTerminationNode node, Object data) {
         Boolean result = Boolean.TRUE;
-        if (node.jjtGetNumChildren() > 0) 
+        if (node.jjtGetNumChildren() > 0)
             result = arithmetic.toBoolean(node.jjtGetChild(0).jjtAccept(this, data));
         return result;
     }
@@ -1262,7 +1262,7 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTForIncrementNode node, Object data) {
         Object result = null;
-        if (node.jjtGetNumChildren() > 0) 
+        if (node.jjtGetNumChildren() > 0)
             result = node.jjtGetChild(0).jjtAccept(this, data);
         return result;
     }
@@ -1444,7 +1444,7 @@ public class Interpreter extends InterpreterBase {
             throw e;
         } catch (Throwable t) {
             // if there is no catch block just rethrow
-            if (num < 3) 
+            if (num < 3)
                 throw t;
             // Set catch variable
             node.jjtGetChild(1).jjtAccept(this, t);
@@ -1497,7 +1497,7 @@ public class Interpreter extends InterpreterBase {
             throw e;
         } catch (Throwable t) {
             // if there is no catch block just rethrow
-            if (num < 4) 
+            if (num < 4)
                 InterpreterBase.<RuntimeException>doThrow(t);
             // set catch variable
             node.jjtGetChild(2).jjtAccept(this, t);
@@ -1556,7 +1556,7 @@ public class Interpreter extends InterpreterBase {
         }
         return null;
     }
- 
+
     @Override
     protected Object visit(ASTWhileStatement node, Object data) {
         Object result = null;
@@ -1662,7 +1662,7 @@ public class Interpreter extends InterpreterBase {
                         throw new JexlException(node, "== error", xrt);
                     }
                 }
-                if (matched) 
+                if (matched)
                     result = child.jjtAccept(this, data);
             }
             // otherwise jump to default case
@@ -1671,7 +1671,7 @@ public class Interpreter extends InterpreterBase {
                     JexlNode child = node.jjtGetChild(i);
                     if (child instanceof ASTSwitchStatementDefault)
                         matched = true;
-                    if (matched) 
+                    if (matched)
                         result = child.jjtAccept(this, data);
                 }
             }
@@ -2166,7 +2166,7 @@ public class Interpreter extends InterpreterBase {
         for (int i = 0; i < numChildren; i++) {
             JexlNode nindex = node.jjtGetChild(i);
             if (object == null) {
-                return null;
+                return unsolvableProperty(nindex, stringifyProperty(nindex), false, null);
             }
             Object index = nindex.jjtAccept(this, null);
             cancelCheck(node);
@@ -2251,13 +2251,17 @@ public class Interpreter extends InterpreterBase {
                     if (ant != null) {
                         JexlNode child = objectNode.jjtGetChild(0);
                         if (child instanceof ASTIdentifierAccess) {
+                            int alen = ant.length();
                             ant.append('.');
                             ant.append(((ASTIdentifierAccess) child).getName());
                             object = context.get(ant.toString());
                             if (object != null) {
                                 object = visit((ASTMethodNode) objectNode, object, context);
+                                continue;
+                            } else {
+                                // remove method name from antish
+                                ant.delete(alen, ant.length());
                             }
-                            continue;
                         }
                     }
                     break;
@@ -2266,7 +2270,6 @@ public class Interpreter extends InterpreterBase {
                 }
             } else if (objectNode instanceof ASTArrayAccess) {
                 if (object == null) {
-                    ptyNode = objectNode;
                     break;
                 } else {
                     antish = false;
@@ -2278,50 +2281,60 @@ public class Interpreter extends InterpreterBase {
             if (object != null) {
                 // disallow mixing antish variable & bean with same root; avoid ambiguity
                 antish = false;
-            } else if (antish) {  // if we still have a null object, check for an antish variable
-                if (ant == null) {
-                    JexlNode first = node.jjtGetChild(0);
-                    if (first instanceof ASTIdentifier) {
-                        ASTIdentifier afirst = (ASTIdentifier) first;
-                        ant = new StringBuilder(afirst.getName());
-                    } else {
-                        ptyNode = objectNode;
-                        break;
-                    }
-                }
-                for (; v <= c; ++v) {
-                    JexlNode child = node.jjtGetChild(v);
-                    if (child instanceof ASTIdentifierAccess) {
-                        ASTIdentifierAccess achild = (ASTIdentifierAccess) child;
-                        if (achild.isSafe() || achild.isExpression()) {
-                           break main;
+            } else if (antish) {
+                // skip the first node case since it was trialed in jjtAccept above and returned null
+                if (c > 0) {
+                    // create first from first node
+                    if (ant == null) {
+                        // if we still have a null object, check for an antish variable
+                        JexlNode first = node.jjtGetChild(0);
+                        if (first instanceof ASTIdentifier) {
+                            ASTIdentifier afirst = (ASTIdentifier) first;
+                            ant = new StringBuilder(afirst.getName());
+                        } else {
+                            // not an identifier, not antish
+                            ptyNode = objectNode;
+                            break main;
                         }
-                        ant.append('.');
-                        ant.append(((ASTIdentifierAccess) objectNode).getName());
-                    } else {
-                        break main;
                     }
+                    // catch up
+                    for (; v <= c; ++v) {
+                        JexlNode child = node.jjtGetChild(v);
+                        if (child instanceof ASTIdentifierAccess) {
+                            ASTIdentifierAccess achild = (ASTIdentifierAccess) child;
+                            if (achild.isSafe() || achild.isExpression()) {
+                                break main;
+                            }
+                            ant.append('.');
+                            ant.append(((ASTIdentifierAccess) objectNode).getName());
+                        } else {
+                            // not an identifier, not antish
+                            ptyNode = objectNode;
+                            break main;
+                        }
+                    }
+                    object = context.get(ant.toString());
                 }
-                object = context.get(ant.toString());
-            } else {
-                // the last one may be null
-                ptyNode = c != numChildren - 1? objectNode : null;
+            } else if (c != numChildren - 1) {
+                // only the last one may be null
+                ptyNode = objectNode;
                 break; //
             }
         }
         if (object == null && !node.isTernaryProtected()) {
-            if (antish && ant != null) {
-                boolean undefined = !(context.has(ant.toString()) || isLocalVariable(node, 0));
-                // variable unknown in context and not a local
-                return node.isSafeLhs(jexl.safe)
-                        ? null
-                        : unsolvableVariable(node, ant.toString(), undefined);
-            }
             if (ptyNode != null) {
                 // am I the left-hand side of a safe op ?
                 return ptyNode.isSafeLhs(jexl.safe)
                        ? null
                        : unsolvableProperty(node, stringifyProperty(ptyNode), false, null);
+            }
+            if (antish) {
+                String aname = ant != null? ant.toString() : stringifyProperty(node);
+                boolean undefined = !(context.has(aname) || isLocalVariable(node, 0));
+                // variable unknown in context and not a local
+                return node.isSafeLhs(jexl.safe)
+                        ? null
+                        : unsolvableVariable(node, undefined? stringifyProperty(node) : aname, undefined);
             }
         }
         return object;
