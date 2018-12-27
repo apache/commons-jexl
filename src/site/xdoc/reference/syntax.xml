@@ -154,7 +154,7 @@
                 <tr>
                     <td>Local variables</td>
                     <td>Can be defined untyped using the <code>var</code> keyword or strongly typed specifying one of java primitive types:
-                        <code>boolean char byte short int long float double</code> 
+                        <code>boolean char byte short int long float double</code>
                         The local variable name should be a valid identifier.
                         <ul>
                             <li>Basic declaration: <code>var x;</code> or <code>int x;</code></li>
@@ -166,7 +166,7 @@
                         The values assigned to the strongly typed variables are implicitly cast to the defined type in non-strict arithmetic mode.
                         Primitive type variables are non-null, so it is impossible to declare a primitive type variable without non-null initialization in the strict arithmetic mode.
                         When scripts are created with named parameters, those behave as local variables.
-                        <p>Variables can be defined as final using <code>final var x = 42</code>, 
+                        <p>Variables can be defined as final using <code>final var x = 42</code>,
                            it is impossible to declare a final variable without initialization.
                         </p>
                         <p>Variable names are <strong>case-sensitive</strong>, e.g. <code>var1</code> and <code>Var1</code> are different variables.
@@ -197,19 +197,19 @@
                 <tr>
                     <td>Multiple Assignment</td>
                     <td>
-                        Assigns the values to the multiple variables (<code>(x,y) = [4,2]</code>). 
+                        Assigns the values to the multiple variables (<code>(x,y) = [4,2]</code>).
                         Assignment can be combined with local variable declaration using the <code>var</code> keyword, e.g.
-                        <code>var (x,y) = [4,2]</code> will assign <code>4</code> and <code>2</code> to the variables <code>x</code> 
+                        <code>var (x,y) = [4,2]</code> will assign <code>4</code> and <code>2</code> to the variables <code>x</code>
                         and <code>y</code> respectively. Variables can be defined as final using <code>final var (x,y) = [4,2]</code>.
                         The syntax can be used for arrays as well as lists and sets, as well as other expressions that return either of these.
                         <p>If the list of variables assigned to has more variables than values, excess ones are filled with null values.
                         If the list of variables has less variables than values, the extra values are ignored.</p>
                         <p>Multiple assignment can also be used as destructuring assignment when applied to maps and beans, e.g.
-                        <code>var (city,street) = {"city":"NY","street":"5th avenue"}</code> will assign <code>NY</code> and <code>5th avenue</code> to 
+                        <code>var (city,street) = {"city":"NY","street":"5th avenue"}</code> will assign <code>NY</code> and <code>5th avenue</code> to
                         the variables <code>city</code> and <code>street</code> respectively. The variable names should match
                         those of bean properties, or map keys, e.g.
                         <code>var (city) = foo</code> and <code>var city = foo.city</code> are equivalent.
-                        </p> 
+                        </p>
                     </td>
                 </tr>
                 <tr>
@@ -262,7 +262,7 @@
                         of the <code>foo</code> Object.
                         <code>arr1[0]</code> will access the first element of the
                         of the <code>arr1</code> array.</p>
-                        <p>Multidimensional array access operator form <code>arr1[x,y]</code> can be used instead of 
+                        <p>Multidimensional array access operator form <code>arr1[x,y]</code> can be used instead of
                         sequential <code>arr1[x][y]</code> form</p>
                         <p>The safe-access operator <code>foo?.bar</code> shortcuts any null or non-existent references
                         along the navigation path, allowing a safe-navigation free of errors. In the previous expression,
@@ -910,7 +910,7 @@
                         For example <code>"abc" instanceof String</code> returns <code>true</code>.
                         The type name can be either a java primitive type name, a simple name, or a fully qualified name, e.g.
                         <code>"abc" instanceof String</code> and <code>"abc" instanceof java.lang.String</code> are equivalent.
-                        A simple class name can be used in the following cases: 
+                        A simple class name can be used in the following cases:
                         <ol>
                             <li>for the classes in package java.lang.*</li>
                             <li>for the classes in package java.util.*</li>
@@ -1041,7 +1041,7 @@
                 <tr>
                     <td>Increment operator</td>
                     <td>
-                        The <code>++</code> operator is used. 
+                        The <code>++</code> operator is used.
                         The default behavior is to increment value and assign the operand with the result.
                         For instance <code>++a</code> is equivalent to <code>a = a + 1</code>
                         operator.
@@ -1051,7 +1051,7 @@
                 <tr>
                     <td>Decrement operator</td>
                     <td>
-                        The <code>--</code> operator is used. 
+                        The <code>--</code> operator is used.
                         The default behavior is to decrement value and assign the operand with the result.
                         For instance <code>--a</code> is equivalent to <code>a = a - 1</code>
                         operator.
@@ -1090,7 +1090,7 @@
                         <code>*a</code>
                         Note that through duck-typing, user classes exposing a <code>get()</code> method will allow their instances
                         to behave as an operand of this operator.
-                        <p>The assignment to a dereferenced object is also supported: <code>*a = 10</code>, 
+                        <p>The assignment to a dereferenced object is also supported: <code>*a = 10</code>,
                         any user classes exposing a <code>set(Object)</code> method will allow their instances
                         to accept such assignments.
                         </p>
@@ -1445,7 +1445,7 @@
                     <td>
                         Throws an exception with the specified text message, e.g.
                         <code>throw "Something wrong here"</code>
-                        <p>If the specified argument is the instance of the <code>Throwable</code> class, 
+                        <p>If the specified argument is the instance of the <code>Throwable</code> class,
                            the provided exception will be rethrown</p>
                     </td>
                 </tr>
@@ -1454,7 +1454,7 @@
                     <td>
                         An assert is used to declare an expected boolean condition in a script, e.g.
                         <code>assert x == 0</code> or <code>assert x == 0 : "Something wrong here"</code>
-                        If the script is evaluated with assertions enabled, then the condition is checked during evaluation. 
+                        If the script is evaluated with assertions enabled, then the condition is checked during evaluation.
                         If the condition is false, the assertion error is thrown.
                     </td>
                 </tr>

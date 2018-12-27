@@ -620,7 +620,7 @@ void MultipleVar() #void : {}
     (MultipleDeclareVar() <assign> Expression()) #MultipleInitialization()
 }
 
-void MultipleDeclareVar() #MultipleIdentifier : 
+void MultipleDeclareVar() #MultipleIdentifier :
 {
     boolean isFinal = false;
 }
@@ -650,7 +650,7 @@ void DeclareLocalVar() #Var :
 }
 {
     ( LOOKAHEAD(1) <FINAL> { jjtThis.setFinal(); } )?
-    ( <VAR> 
+    ( <VAR>
     | <INT> { jjtThis.setType(Integer.TYPE); }
     | <LONG> { jjtThis.setType(Long.TYPE); }
     | <SHORT> { jjtThis.setType(Short.TYPE); }
@@ -1154,7 +1154,7 @@ void TypeReference() #ClassLiteral() :
 {
   (LOOKAHEAD(<LBRACKET>) <LBRACKET> <RBRACKET> { jjtThis.setArray(); })+
   |
-  ( 
+  (
       t=<QUALIFIED_IDENTIFIER> { value = Parser.resolveType(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
     | t=<INT> { jjtThis.setLiteral(Integer.TYPE); }
     | t=<LONG> { jjtThis.setLiteral(Long.TYPE); }
