@@ -467,7 +467,6 @@ void MultipleIdentifier() #MultipleIdentifier : {}
 ASTIfStatement IfStatement() : {}
 {
     <IF> <LPAREN> Expression() <RPAREN>  (LOOKAHEAD(1) Block() | Statement())
-    ( LOOKAHEAD(2) <ELSE> <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | Statement()) )*
     ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | Statement()) )?
     { return jjtThis; }
 }

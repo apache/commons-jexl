@@ -1000,17 +1000,10 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         accept(node.jjtGetChild(0), data);
         builder.append(") ");
         acceptStatement(node.jjtGetChild(1), data);
-        //.. else if (...) ...
-        for(int c = 2; c <  numChildren - 1; c += 2) {
-            builder.append(" else if (");
-            accept(node.jjtGetChild(c), data);
-            builder.append(") ");
-            acceptStatement(node.jjtGetChild(c + 1), data);
-        }
-        // else... (if odd)
-        if ((numChildren & 1) == 1) {
+        // else... 
+        if (numChildren > 2) {
             builder.append(" else ");
-            acceptStatement(node.jjtGetChild(numChildren - 1), data);
+            acceptStatement(node.jjtGetChild(2), data);
         } else {
             builder.append(';');
         }

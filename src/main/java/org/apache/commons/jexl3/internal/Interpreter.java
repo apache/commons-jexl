@@ -1140,25 +1140,20 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTIfStatement node, Object data) {
-        int n = 0;
         final int numChildren = node.jjtGetNumChildren();
         try {
-            Object result = null;
-            // pairs of { conditions , 'then' statement }
-            for(int ifElse = 0; ifElse < (numChildren - 1); ifElse += 2) {
-                Object condition = node.jjtGetChild(ifElse).jjtAccept(this, null);
-                if (arithmetic.toBoolean(condition)) {
-                    // first objectNode is true statement
-                    return node.jjtGetChild(ifElse + 1).jjtAccept(this, null);
-                }
+            Object condition = node.jjtGetChild(0).jjtAccept(this, null);
+            if (arithmetic.toBoolean(condition)) {
+                // first objectNode is true statement
+                return node.jjtGetChild(1).jjtAccept(this, null);
             }
-            // if odd...
-            if ((numChildren & 1) == 1) {
+            // else...
+            if (numChildren > 2) {
                 // if there is an else, there are an odd number of children in the statement and it is the last child,
                 // execute it.
-                result = node.jjtGetChild(numChildren - 1).jjtAccept(this, null);
+                return node.jjtGetChild(2).jjtAccept(this, null);
             }
-            return result;
+            return null;
         } catch (JexlException.Break stmtBreak) {
             String target = stmtBreak.getLabel();
             if (target == null || !target.equals(node.getLabel())) {
@@ -1167,7 +1162,7 @@ public class Interpreter extends InterpreterBase {
             // break
             return null;
         } catch (ArithmeticException xrt) {
-            throw new JexlException(node.jjtGetChild(n), "if error", xrt);
+            throw new JexlException(node.jjtGetChild(0), "if error", xrt);
         }
     }
 
