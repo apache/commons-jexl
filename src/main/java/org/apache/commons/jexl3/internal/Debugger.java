@@ -142,7 +142,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         end = 0;
         indentLevel = 0;
         indent = 2;
-        depth = 0;
+        depth = Integer.MAX_VALUE;
     }
     
     /**
