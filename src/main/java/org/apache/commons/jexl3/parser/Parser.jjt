@@ -419,7 +419,7 @@ void LabelledStatement() #void :
     ASTLabelledStatement s;
 }
 {
-    t=<IDENTIFIER> { label = t.image; } <COLON>
+    t=<IDENTIFIER> { label = t.image; if (branchScope.breakSupported(label)) throwParsingException(null, t); } <COLON>
     (
         LOOKAHEAD(<LCURLY>) { branchScope.pushBlockLabel(label); } s = Block() { s.setLabel(label); branchScope.popBlockLabel(); }
         |

@@ -239,4 +239,13 @@ public class LabeledStatementsTest extends JexlTestCase {
         }
     }
 
+    @Test
+    public void testRepeatedLabeld() throws Exception {
+        try {
+            JEXL.createScript("egg : { egg : {} }");
+            Assert.fail("Already declared labels should not be allowed");
+        } catch (Exception ex) {
+        }
+    }
+
 }

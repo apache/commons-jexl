@@ -570,16 +570,16 @@ public abstract class JexlParser extends StringParser {
         protected int foreachLoopCount = 0;
         protected int switchCount = 0;
 
-        protected Stack<String> breakLabels = new Stack<String> ();
-        protected Stack<String> continueLabels = new Stack<String> ();
-        protected Stack<String> removeLabels = new Stack<String> ();
+        protected Stack<String> blockLabels = new Stack<String> ();
+        protected Stack<String> loopLabels = new Stack<String> ();
+        protected Stack<String> foreachLabels = new Stack<String> ();
 
         protected boolean breakSupported() {
             return loopCount != 0 || foreachLoopCount != 0 || switchCount != 0;
         }
 
         protected boolean breakSupported(String label) {
-            return breakLabels.contains(label);
+            return blockLabels.contains(label);
         }
 
         protected boolean continueSupported() {
@@ -587,7 +587,7 @@ public abstract class JexlParser extends StringParser {
         }
 
         protected boolean continueSupported(String label) {
-            return continueLabels.contains(label);
+            return loopLabels.contains(label);
         }
 
         protected boolean removeSupported() {
@@ -595,37 +595,37 @@ public abstract class JexlParser extends StringParser {
         }
 
         protected boolean removeSupported(String label) {
-            return removeLabels.contains(label);
+            return foreachLabels.contains(label);
         }
 
         protected void pushBlockLabel(String label) {
-            breakLabels.push(label);
+            blockLabels.push(label);
         }
 
         protected void popBlockLabel() {
-            breakLabels.pop();
+            blockLabels.pop();
         }
 
         protected void pushLoopLabel(String label) {
-            breakLabels.push(label);
-            continueLabels.push(label);
+            blockLabels.push(label);
+            loopLabels.push(label);
         }
 
         protected void popLoopLabel() {
-            breakLabels.pop();
-            continueLabels.pop();
+            blockLabels.pop();
+            loopLabels.pop();
         }
 
         protected void pushForeachLabel(String label) {
-            breakLabels.push(label);
-            continueLabels.push(label);
-            removeLabels.push(label);
+            blockLabels.push(label);
+            loopLabels.push(label);
+            foreachLabels.push(label);
         }
 
         protected void popForeachLabel() {
-            breakLabels.pop();
-            continueLabels.pop();
-            removeLabels.pop();
+            blockLabels.pop();
+            loopLabels.pop();
+            foreachLabels.pop();
         }
     }
 
