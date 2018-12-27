@@ -118,8 +118,8 @@ public class ExceptionTest extends JexlTestCase {
         }
     }
 
-
     // Unknown vars and properties versus null operands
+    // JEXL-73
     @Test
     public void testEx() throws Exception {
         JexlEngine jexl = createEngine(false);
@@ -135,7 +135,7 @@ public class ExceptionTest extends JexlTestCase {
             Assert.fail("c not defined as variable should throw");
         } catch (JexlException.Variable xjexl) {
             String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("c") > 0);
+            Assert.assertTrue(msg.indexOf("variable c") > 0);
         }
 
         // disallow null operands
@@ -146,7 +146,7 @@ public class ExceptionTest extends JexlTestCase {
             Assert.fail("c.e as null operand should throw");
         } catch (JexlException.Variable xjexl) {
             String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("c.e") > 0);
+            Assert.assertTrue(msg.indexOf("variable c.e") > 0);
         }
 
         // allow null operands
@@ -166,7 +166,7 @@ public class ExceptionTest extends JexlTestCase {
             Assert.fail("c.e not accessible as property should throw");
         } catch (JexlException.Property xjexl) {
             String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("e") > 0);
+            Assert.assertTrue(msg.indexOf("property e") > 0);
         }
     }
 
@@ -215,7 +215,7 @@ public class ExceptionTest extends JexlTestCase {
             Assert.fail("c not declared as variable should throw");
         } catch (JexlException.Variable xjexl) {
             String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("c") > 0);
+            Assert.assertTrue(msg.indexOf("variable c") > 0);
         }
 
         // disallow null operands
@@ -226,10 +226,9 @@ public class ExceptionTest extends JexlTestCase {
             Assert.fail("c.e as null operand should throw");
         } catch (JexlException xjexl) {
             String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("c.e") > 0);
+            Assert.assertTrue(msg.indexOf("variable c.e") > 0);
         }
     }
-
 
     @Test
     public void test206() throws Exception {
