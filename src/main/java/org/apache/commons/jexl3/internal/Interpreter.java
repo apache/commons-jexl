@@ -1147,10 +1147,8 @@ public class Interpreter extends InterpreterBase {
                 // first objectNode is true statement
                 return node.jjtGetChild(1).jjtAccept(this, null);
             }
-            // else...
             if (numChildren > 2) {
-                // if there is an else, there are an odd number of children in the statement and it is the last child,
-                // execute it.
+                // if there is an else, execute it.
                 return node.jjtGetChild(2).jjtAccept(this, null);
             }
             return null;
@@ -1532,7 +1530,12 @@ public class Interpreter extends InterpreterBase {
         Object val = node.jjtGetChild(0).jjtAccept(this, data);
         if (val instanceof Throwable)
             InterpreterBase.<RuntimeException>doThrow((Throwable) val);
-        throw new RuntimeException(arithmetic.toString(val));
+        String message = arithmetic.toString(val);
+        if (message != null) {
+            throw new RuntimeException(message);
+        } else {
+            throw new RuntimeException();
+        }
     }
 
     @Override
