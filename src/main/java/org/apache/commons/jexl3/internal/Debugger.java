@@ -787,21 +787,21 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTForInitializationNode node, Object data) {
-        if (node.jjtGetNumChildren() > 0) 
+        if (node.jjtGetNumChildren() > 0)
             accept(node.jjtGetChild(0), data);
         return data;
     }
 
     @Override
     protected Object visit(ASTForTerminationNode node, Object data) {
-        if (node.jjtGetNumChildren() > 0) 
+        if (node.jjtGetNumChildren() > 0)
             accept(node.jjtGetChild(0), data);
         return data;
     }
 
     @Override
     protected Object visit(ASTForIncrementNode node, Object data) {
-        if (node.jjtGetNumChildren() > 0) 
+        if (node.jjtGetNumChildren() > 0)
             accept(node.jjtGetChild(0), data);
         return data;
     }

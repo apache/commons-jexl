@@ -62,7 +62,7 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void testParameterlessFunction() throws Exception {
-        JexlEngine jexl = createEngine();
+        JexlEngine jexl = new Engine();
         String strs = "var s = function { 21 + 21 }; s()";
         JexlScript s42 = jexl.createScript(strs);
         Object result = s42.execute(null);
@@ -352,7 +352,7 @@ public class LambdaTest extends JexlTestCase {
         Object result = y.execute(null, 2, 3);
         Assert.assertEquals(8, result);
     }
-    
+
     // redefining an hoisted var is not resolved correctly in left hand side;
     // declare the var in local frame, resolved in local frame instead of parent
 //    @Test
