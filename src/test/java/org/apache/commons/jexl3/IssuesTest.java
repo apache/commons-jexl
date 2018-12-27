@@ -254,36 +254,6 @@ public class IssuesTest extends JexlTestCase {
         Assert.assertEquals(jexpr.toString(), null, jexpr.evaluate(ctxt)); // OK
     }
 
-    // JEXL-73
-    @Test
-    public void test73() throws Exception {
-        JexlEngine jexl = createEngine(false);
-        JexlEvalContext ctxt = new JexlEvalContext();
-        // ensure errors will throw
-        ctxt.setSilent(false);
-        ctxt.setStrict(true);
-        JexlExpression e;
-        e = jexl.createExpression("c.e");
-        try {
-            /* Object o = */ e.evaluate(ctxt);
-            Assert.fail("c not declared as variable");
-        } catch (JexlException.Variable xjexl) {
-            String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("c") > 0);
-        }
-
-        ctxt.set("c", "{ 'a' : 3, 'b' : 5}");
-        ctxt.set("e", Integer.valueOf(2));
-        try {
-            /* Object o = */ e.evaluate(ctxt);
-            Assert.fail("c.e not accessible as property");
-        } catch (JexlException.Property xjexl) {
-            String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("e") > 0);
-        }
-
-    }
-
     // JEXL-87
     @Test
     public void test87() throws Exception {
