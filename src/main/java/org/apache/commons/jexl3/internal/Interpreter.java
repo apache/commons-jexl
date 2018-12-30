@@ -788,43 +788,36 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
-     * Pointer to a local variable.
-     *
-     */
-    public class VarPointer implements GetPointer, SetPointer {
-
-        protected int symbol;
-
-        protected VarPointer(int symbol) {
-            this.symbol = symbol;
-        }
-
-        @Override
-        public Object get() {
-            return frame.get(symbol);
-        }
-
-        @Override
-        public void set(Object value) {
-            frame.set(symbol, value);
-        }
-    }
-
-    /**
      * Pointer to a final local variable.
      *
      */
     public class FinalVarPointer implements GetPointer {
 
-        protected int symbol;
+        protected ASTIdentifier node;
 
-        protected FinalVarPointer(int symbol) {
-            this.symbol = symbol;
+        protected FinalVarPointer(ASTIdentifier node) {
+            this.node = node;
         }
 
         @Override
         public Object get() {
-            return frame.get(symbol);
+            return frame.get(node.getSymbol());
+        }
+    }
+
+    /**
+     * Pointer to a local variable.
+     *
+     */
+    public class VarPointer extends FinalVarPointer implements SetPointer {
+
+        protected VarPointer(ASTIdentifier node) {
+            super(node);
+        }
+
+        @Override
+        public void set(Object value) {
+            executeAssign(node, node, value, null, null);
         }
     }
 
@@ -915,7 +908,7 @@ public class Interpreter extends InterpreterBase {
             } else {
                 int symbol = var.getSymbol();
                 if (symbol >= 0) {
-                    return var.isFinal() ? new FinalVarPointer(symbol) : new VarPointer(symbol);
+                    return var.isFinal() ? new FinalVarPointer(var) : new VarPointer(var);
                 } else {
                     return new ContextVarPointer(var.getName());
                 }

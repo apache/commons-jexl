@@ -341,7 +341,16 @@ public class PrimitivesTest extends JexlTestCase {
         o = e.execute(jc);
         Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Long);
         Assert.assertEquals("Result is not true", 42L, o);
+    }
 
+    @Test
+    public void testPointer() throws Exception {
+        JexlContext jc = new MapContext();
+
+        JexlScript e = JEXL.createScript("long x = 1; var y = &x; *y = 42; x");
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Long);
+        Assert.assertEquals("Result is not true", 42L, o);
     }
 
 }
