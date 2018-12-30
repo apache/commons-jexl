@@ -120,6 +120,9 @@ public class Permissions {
         if (!Modifier.isPublic(method.getModifiers())) {
             return false;
         }
+        if (method.isSynthetic()) {
+            return false;
+        }
         // is method annotated with nojexl ?
         NoJexl nojexl = method.getAnnotation(NoJexl.class);
         if (nojexl != null) {
