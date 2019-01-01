@@ -491,8 +491,7 @@ public class JexlArithmetic {
                     // ignore, no exact value possible
                 }
             }
-        }
-        if (original instanceof Double || original instanceof Float) {
+        } else if (original instanceof Double || original instanceof Float) {
             double value = original.doubleValue();
             if (narrowAccept(narrow, Float.class)
                     && value <= Float.MAX_VALUE
