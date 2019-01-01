@@ -27,7 +27,8 @@ import org.apache.commons.jexl3.parser.JexlNode;
 public class Closure extends Script {
     /** The frame. */
     protected final Scope.Frame frame;
-
+    /** The context. */
+    protected final JexlContext context;
     /** The number of arguments being curried. */
     protected final int argCount;
 
@@ -39,6 +40,7 @@ public class Closure extends Script {
     protected Closure(Interpreter theCaller, ASTJexlLambda lambda) {
         super(theCaller.jexl, null, lambda);
         frame = lambda.createFrame(theCaller.frame);
+        context = theCaller.context;
         argCount = 0;
     }
 
@@ -51,10 +53,11 @@ public class Closure extends Script {
         super(base.jexl, base.source, base.script);
 
         if (base instanceof Closure) {
-            Scope.Frame sf = ((Closure) base).frame;
+            Closure closure = (Closure) base;
+            Scope.Frame sf = closure.frame;
 
             boolean varArgs = script.isVarArgs();
-            int baseArgCount = ((Closure) base).argCount;
+            int baseArgCount = closure.argCount;
 
             if (varArgs) {
                 if (baseArgCount >= script.getArgCount()) {
@@ -65,9 +68,11 @@ public class Closure extends Script {
             } else {
                 frame = sf.assign(args);
             }
+            context = closure.context;
             argCount = baseArgCount + args.length;
         } else {
             frame = script.createFrame(scriptArgs(args));
+            context = null;
             argCount = args.length;
         }
     }
@@ -164,12 +169,12 @@ public class Closure extends Script {
 
     @Override
     public Object evaluate(JexlContext context) {
-        return execute(context, (Object[])null);
+        return execute(context != null ? context : this.context, (Object[])null);
     }
 
     @Override
     public Object execute(JexlContext context) {
-        return execute(context, (Object[])null);
+        return execute(context != null ? context : this.context, (Object[])null);
     }
 
     @Override
@@ -195,7 +200,7 @@ public class Closure extends Script {
             callFrame = script.createFrame(scriptArgs(args));
         }
 
-        Interpreter interpreter = jexl.createInterpreter(context, callFrame);
+        Interpreter interpreter = jexl.createInterpreter(context != null ? context : this.context, callFrame);
         JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
         return interpreter.interpret(block);
     }
@@ -206,7 +211,7 @@ public class Closure extends Script {
         if (frame != null) {
             local = frame.assign(scriptArgs(args));
         }
-        return new Callable(jexl.createInterpreter(context, local)) {
+        return new Callable(jexl.createInterpreter(context != null ? context : this.context, local)) {
             @Override
             public Object interpret() {
                 JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
