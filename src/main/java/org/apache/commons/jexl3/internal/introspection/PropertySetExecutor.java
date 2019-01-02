@@ -28,6 +28,8 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
     private static final int SET_START_INDEX = 3;
     /** The property. */
     protected final String property;
+    /** The property value class. */
+    protected final Class<?> valueClass;
 
     /**
      * Discovers a PropertySetExecutor.
@@ -36,15 +38,15 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @param is       the introspector
      * @param clazz    the class to find the get method from
      * @param property the property name to find
-     * @param arg      the value to assign to the property
+     * @param value      the value to assign to the property
      * @return the executor if found, null otherwise
      */
-    public static PropertySetExecutor discover(Introspector is, Class<?> clazz, String property, Object arg) {
+    public static PropertySetExecutor discover(Introspector is, Class<?> clazz, String property, Object value) {
         if (property == null || property.isEmpty()) {
             return null;
         }
-        java.lang.reflect.Method method = discoverSet(is, clazz, property, arg);
-        return method != null? new PropertySetExecutor(clazz, method, property) : null;
+        java.lang.reflect.Method method = discoverSet(is, clazz, property, value);
+        return method != null? new PropertySetExecutor(clazz, method, property, value) : null;
     }
 
     /**
@@ -52,10 +54,12 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @param clazz  the class the set method applies to
      * @param method the method called through this executor
      * @param key    the key to use as 1st argument to the set method
+     * @param value    the value
      */
-    protected PropertySetExecutor(Class<?> clazz, java.lang.reflect.Method method, String key) {
+    protected PropertySetExecutor(Class<?> clazz, java.lang.reflect.Method method, String key, Object value) {
         super(clazz, method);
         property = key;
+        valueClass = classOf(value);
     }
 
     @Override
@@ -81,14 +85,16 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
     }
 
     @Override
-    public Object tryInvoke(Object o, Object identifier, Object arg) {
+    public Object tryInvoke(Object o, Object identifier, Object value) {
         if (o != null && method != null
             // ensure method name matches the property name
             && property.equals(castString(identifier))
             // object class should be same as executor's method declaring class
-            && objectClass.equals(o.getClass())) {
+            && objectClass.equals(o.getClass())
+            // argument class should be eq
+            && valueClass.equals(classOf(value))) {
             try {
-                return invoke(o, arg);
+                return invoke(o, value);
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {

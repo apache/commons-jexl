@@ -543,7 +543,18 @@ public class JexlException extends RuntimeException {
          * Undefined variable flag.
          */
         private final boolean undefined;
-               
+                          
+        /**
+         * Creates a new Property exception instance.
+         *
+         * @param node the offending ASTnode
+         * @param pty  the unknown property
+         * @deprecated 3.2
+         */
+        @Deprecated
+        public Property(JexlNode node, String pty) {
+            this(node, pty, true, null);
+        }    
         /**
          * Creates a new Property exception instance.
          *
@@ -610,6 +621,19 @@ public class JexlException extends RuntimeException {
         msg.append(" property ");
         msg.append(pty);
         return msg.toString();
+    }
+    
+    /**
+     * Generates a message for an unsolvable property error.
+     *
+     * @param node the node where the error occurred
+     * @param var the variable
+     * @return the error message
+     * @deprecated 3.2
+     */
+    @Deprecated
+    public static String propertyError(JexlNode node, String var) {
+        return propertyError(node, var, true);
     }
 
     /**

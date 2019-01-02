@@ -38,6 +38,8 @@ import java.lang.reflect.InvocationTargetException;
 public final class DuckSetExecutor extends AbstractExecutor.Set {
     /** The property, may be null. */
     private final Object property;
+    /** The property value class. */
+    private final Class<?> valueClass;
 
     /**
      * Discovers a DuckSetExecutor.
@@ -53,7 +55,7 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
         if (method == null) {
             method = is.getMethod(clazz, "put", makeArgs(key, value));
         }
-        return method == null? null : new DuckSetExecutor(clazz, method, key);
+        return method == null? null : new DuckSetExecutor(clazz, method, key, value);
     }
 
     /**
@@ -61,10 +63,12 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
      * @param clazz the class the set method applies to
      * @param method the method called through this executor
      * @param key the key to use as 1st argument to the set method
+     * @param value the value to use as 2nd argument to the set method
      */
-    private DuckSetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object key) {
+    private DuckSetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object key, Object value) {
         super(clazz, method);
         property = key;
+        valueClass = classOf(value);
     }
 
     @Override
@@ -87,7 +91,8 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
             && objectClass.equals(obj.getClass())
             && method !=  null
             && ((property != null && property.equals(key))
-                || (property == null && key == null))) {
+                || (property == null && key == null))
+            && valueClass.equals(classOf(value))) {
             try {
                 Object[] args = {property, value};
                 method.invoke(obj, args);

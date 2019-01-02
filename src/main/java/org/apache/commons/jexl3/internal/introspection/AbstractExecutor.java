@@ -73,6 +73,15 @@ abstract class AbstractExecutor {
     static Object[] makeArgs(Object... args) {
         return args;
     }
+    
+    /**
+     * Gets the class of an object or Object if null.
+     * @param instance the instance
+     * @return the class
+     */
+    static Class<?> classOf(Object instance) {
+        return instance == null? Object.class : instance.getClass();
+    }
 
     /** The class this executor applies to. */
     protected final Class<?> objectClass;
