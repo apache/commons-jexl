@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<differences>
+    <!-- 3.2 differences: Jexl{Engine, Script, Uberspect} are not used as user implementation contracts
+    but only as JEXL API contracts. Adding new methods or final modifier to those is very unlikely to have
+    any impact on actual binary compatiblity.An equivalent set of changes occured on 3.1 without complaints. -->
+    <difference>
+        <className>org/apache/commons/jexl3/JexlEngine</className>
+        <differenceType>7014</differenceType> <!-- final method on abstract class not meant for the user to derive -->
+        <method>org.apache.commons.jexl3.JexlScript createScript(org.apache.commons.jexl3.JexlInfo, java.lang.String, java.lang.String[])</method>
+        <to>org.apache.commons.jexl3.JexlScript createScript(org.apache.commons.jexl3.JexlInfo, java.lang.String, java.lang.String[])</to>
+    </difference>
+    
+    <difference>
+        <className>org/apache/commons/jexl3/JexlEngine</className>
+        <differenceType>7013</differenceType> <!-- added abstract method on abstract class not meant for the user to derive -->
+        <method>org.apache.commons.jexl3.JexlScript createScript(org.apache.commons.jexl3.JexlFeatures, org.apache.commons.jexl3.JexlInfo, java.lang.String, java.lang.String[])</method>
+        <to>org.apache.commons.jexl3.JexlScript createScript(org.apache.commons.jexl3.JexlFeatures, org.apache.commons.jexl3.JexlInfo, java.lang.String, java.lang.String[])</to>
+    </difference>
+    
+    <difference>
+        <className>org/apache/commons/jexl3/JexlScript</className>
+        <differenceType>7012</differenceType> <!-- method added to interface that is not meant for the user to implement -->
+        <method>java.lang.String[] getUnboundParameters()</method>
+        <to>java.lang.String[] getUnboundParameters()</to>
+    </difference>
+    
+    <difference>
+        <className>org/apache/commons/jexl3/introspection/JexlUberspect</className>
+        <differenceType>7012</differenceType> <!-- method added to interface that is not meant for the user to implement -->
+        <method>java.lang.ClassLoader getClassLoader()</method>
+        <to>java.lang.ClassLoader getClassLoader()</to>
+    </difference>
+</differences>

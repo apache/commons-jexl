@@ -25,6 +25,15 @@ Release 3.2
 
 Version 3.2 is a minor release.
 
+Compatibility with previous releases
+====================================
+Version 3.2 is binary compatible with 3.1.
+
+Unfortunately, it is not strictly source compatible. This release does break source compatibility by adding methods to existing
+interfaces and an abstract method to an abstract class. However, since these interfaces and class are not expected to be implemented
+or derived by code external to the JEXL project, this compatibility break should remain unnoticeable.
+It is nevertheless possible and we are sorry if it causes problems to any of you.
+
 What's new in 3.2:
 ==================
 

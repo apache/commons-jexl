@@ -169,6 +169,11 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>javacc-maven-plugin</artifactId>
                 <version>2.6</version>
+                <!--
+        <groupId>com.helger.maven</groupId>
+        <artifactId>ph-javacc-maven-plugin</artifactId>
+        <version>4.0.3</version>
+                -->
                 <executions>
                     <execution>
                         <id>jexl-jjtree</id>
@@ -254,6 +259,7 @@
                 <artifactId>clirr-maven-plugin</artifactId>
                 <version>2.8</version>
                 <configuration>
+                    <ignoredDifferencesFile>${basedir}/src/main/config/clirr-ignored.xml</ignoredDifferencesFile>
                     <excludes>
                         <exclude>org/apache/commons/jexl3/parser/**</exclude>
                         <exclude>org/apache/commons/jexl3/internal/**</exclude>
@@ -345,6 +351,7 @@
                 <artifactId>clirr-maven-plugin</artifactId>
                 <version>2.8</version>
                 <configuration>
+                    <ignoredDifferencesFile>${basedir}/src/main/config/clirr-ignored.xml</ignoredDifferencesFile>
                     <excludes>
                         <exclude>org/apache/commons/jexl3/parser/**</exclude>
                         <exclude>org/apache/commons/jexl3/internal/**</exclude>
