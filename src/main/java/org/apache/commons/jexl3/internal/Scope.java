@@ -273,6 +273,12 @@ public final class Scope {
                 }
                 variableTypes.put(register, type);
             }
+            if (isFinal) {
+                if (finalVariables == null) {
+                    finalVariables = new HashSet<Integer>();
+                }
+                finalVariables.add(register);
+            }
         }
         return register;
     }

@@ -817,7 +817,13 @@ public class Interpreter extends InterpreterBase {
 
         @Override
         public void set(Object value) {
-            executeAssign(node, node, value, null, null);
+            int symbol = node.getSymbol();
+            boolean isFinal = frame.getScope().isVariableFinal(symbol);
+            if (!isFinal) {
+                executeAssign(node, node, value, null, null);
+            } else {
+                throw new JexlException(node, "can not assign a value to the final variable", null);
+            }
         }
     }
 

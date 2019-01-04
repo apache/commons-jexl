@@ -127,4 +127,15 @@ public class FinalVarTest extends JexlTestCase {
         }
     }
 
+    @Test
+    public void testRedefinedPointer() throws Exception {
+        try {
+           JexlScript e = JEXL.createScript("var x = null; var y = &x; final var x = 42; *y = 41");
+           Object o = e.execute(null);
+           Assert.fail("Should have failed");
+        } catch (JexlException ex) {
+           // OK
+        }
+    }
+
 }
