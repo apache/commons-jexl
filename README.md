@@ -118,6 +118,8 @@ Enhancements
 
 + Variable argument lambdas can be defined by using `...` syntax after the last lambda argument
 
++ Lambdas support basic java8 `@FunctionalInterface` interface implementations, so it is possible to pass lambdas as arguments
+
 + Local variables can be declared using java primitive type `int i = 0`
 
 + Local variables can be declared final `final var i = 0`
