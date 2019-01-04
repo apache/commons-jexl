@@ -2068,7 +2068,7 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTJexlScript node, Object data) {
         if (node instanceof ASTJexlLambda && !((ASTJexlLambda) node).isTopLevel()) {
-            return new Closure(this, (ASTJexlLambda) node);
+            return Closure.createClosure(this, (ASTJexlLambda) node);
         } else {
             final int numChildren = node.jjtGetNumChildren();
             Object result = null;

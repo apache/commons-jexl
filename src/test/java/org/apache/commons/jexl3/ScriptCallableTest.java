@@ -73,7 +73,7 @@ public class ScriptCallableTest extends JexlTestCase {
         ctxt.set("latch", latch);
 
         JexlScript e = JEXL.createScript("latch.release(); while(true);");
-        final Script.Callable c = (Script.Callable) e.callable(ctxt);
+        final Script.CallableScript c = (Script.CallableScript) e.callable(ctxt);
         Object t = 42;
         Callable<Object> kc = new Callable<Object>() {
             @Override
@@ -374,7 +374,7 @@ public class ScriptCallableTest extends JexlTestCase {
             // run an interrupt
             JexlScript sint = jexl.createScript("interrupt(); return 42");
             Object t = null;
-            Script.Callable c = (Script.Callable) sint.callable(ctxt);
+            Script.CallableScript c = (Script.CallableScript) sint.callable(ctxt);
             try {
                 t = c.call();
                 if (c.isCancellable()) {
@@ -390,7 +390,7 @@ public class ScriptCallableTest extends JexlTestCase {
 
             // self interrupt
             Future<Object> f = null;
-            c = (Script.Callable) sint.callable(ctxt);
+            c = (Script.CallableScript) sint.callable(ctxt);
             try {
                 f = exec.submit(c);
                 t = f.get();

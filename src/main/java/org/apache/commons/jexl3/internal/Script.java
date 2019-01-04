@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.concurrent.Callable;
+
 /**
  * <p>A JexlScript implementation.</p>
  * @since 1.1
@@ -233,10 +235,10 @@ public class Script implements JexlScript, JexlExpression {
 
     @Override
     public JexlScript curry(Object... args) {
-        String[] parms = script.getParameters();
+        String[] parms = getUnboundParameters();
         if (parms == null || parms.length == 0 || args == null || args.length == 0)
             return this;
-        return new Closure(this, args);
+        return Closure.createClosure(this, args);
     }
 
     @Override
@@ -311,13 +313,13 @@ public class Script implements JexlScript, JexlExpression {
      */
     @Override
     public Callable callable(JexlContext context, Object... args) {
-        return new Callable(jexl.createInterpreter(context, script.createFrame(scriptArgs(args))));
+        return new CallableScript(jexl.createInterpreter(context, script.createFrame(scriptArgs(args))));
     }
 
     /**
      * Implements the Future and Callable interfaces to help delegation.
      */
-    public class Callable implements java.util.concurrent.Callable<Object> {
+    public class CallableScript implements Callable<Object> {
         /** The actual interpreter. */
         protected final Interpreter interpreter;
         /** Use interpreter as marker for not having run. */
@@ -327,7 +329,7 @@ public class Script implements JexlScript, JexlExpression {
          * The base constructor.
          * @param intrprtr the interpreter to use
          */
-        protected Callable(Interpreter intrprtr) {
+        protected CallableScript(Interpreter intrprtr) {
             this.interpreter = intrprtr;
             this.result = intrprtr;
         }
@@ -373,4 +375,5 @@ public class Script implements JexlScript, JexlExpression {
             return interpreter.isCancellable();
         }
     }
+
 }

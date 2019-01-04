@@ -20,6 +20,10 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.JexlNode;
 
+import java.util.Comparator;
+import java.util.concurrent.Callable;
+import java.util.function.*;
+
 
 /**
  * A Script closure.
@@ -75,6 +79,25 @@ public class Closure extends Script {
             context = null;
             argCount = args.length;
         }
+    }
+
+    protected static Closure createClosure(Interpreter theCaller, ASTJexlLambda lambda) {
+        int argCount = lambda.getArgCount();
+        return argCount == 0 ? new ClosureSupplier(theCaller, lambda) :
+               argCount == 1 ? new ClosureFunction(theCaller, lambda) : 
+               argCount == 2 ? new ClosureBiFunction(theCaller, lambda) : 
+               new Closure(theCaller, lambda);
+    }
+
+    protected static Closure createClosure(Script base, Object[] args) {
+        String[] parms = base.getUnboundParameters();
+        int argCount = parms != null ? parms.length : 0;
+        if (args != null)
+            argCount -= args.length;
+        return argCount <= 0 ? new ClosureSupplier(base, args) : 
+               argCount == 1 ? new ClosureFunction(base, args) : 
+               argCount == 2 ? new ClosureBiFunction(base, args) : 
+               new Closure(base, args);
     }
 
     protected Scope.Frame createNewVarArgFrame(Scope.Frame sf, Object[] args) {
@@ -211,13 +234,285 @@ public class Closure extends Script {
         if (frame != null) {
             local = frame.assign(scriptArgs(args));
         }
-        return new Callable(jexl.createInterpreter(context != null ? context : this.context, local)) {
+        return new CallableScript(jexl.createInterpreter(context != null ? context : this.context, local)) {
             @Override
             public Object interpret() {
                 JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
                 return interpreter.interpret(block);
             }
         };
+    }
+
+    /**
+     * Implements the @FunctionalInterface interfaces with no arguments to help delegation.
+     */
+    public static class ClosureSupplier extends Closure implements 
+          Supplier<Object>, BooleanSupplier, DoubleSupplier, IntSupplier, LongSupplier,
+          Callable<Object>, Runnable {
+        /**
+         * The base constructor.
+         * @param intrprtr the interpreter to use
+         */
+        protected ClosureSupplier(Interpreter intrprtr, ASTJexlLambda lambda) {
+            super(intrprtr, lambda);
+        }
+
+        protected ClosureSupplier(Script base, Object[] args) {
+            super(base, args);
+        }
+
+        protected Object eval() {
+            return execute(null);
+        }
+
+        @Override
+        public void run() {
+            eval();
+        }
+
+        @Override
+        public Object call() {
+            return eval();
+        }
+
+        @Override
+        public Object get() {
+            return eval();
+        }
+
+        @Override
+        public boolean getAsBoolean() {
+            return jexl.getArithmetic().toBoolean(eval());
+        }
+
+        @Override
+        public double getAsDouble() {
+            return jexl.getArithmetic().toDouble(eval());
+        }
+
+        @Override
+        public int getAsInt() {
+            return jexl.getArithmetic().toInteger(eval());
+        }
+
+        @Override
+        public long getAsLong() {
+            return jexl.getArithmetic().toLong(eval());
+        }
+
+    }
+
+    /**
+     * Implements the @FunctionalInterface interfaces with one argument to help delegation.
+     */
+    public static class ClosureFunction extends Closure implements 
+          Function<Object, Object>, DoubleFunction<Object>, LongFunction<Object>, IntFunction<Object>,
+          UnaryOperator<Object>, Predicate<Object>, 
+          ToDoubleFunction<Object>, ToIntFunction<Object>, ToLongFunction<Object>,
+          LongToDoubleFunction, LongToIntFunction, IntToDoubleFunction, IntToLongFunction,
+          DoubleUnaryOperator, LongUnaryOperator, IntUnaryOperator,
+          Consumer<Object>, DoubleConsumer, IntConsumer, LongConsumer {
+        /**
+         * The base constructor.
+         * @param intrprtr the interpreter to use
+         */
+        protected ClosureFunction(Interpreter intrprtr, ASTJexlLambda lambda) {
+            super(intrprtr, lambda);
+        }
+
+        protected ClosureFunction(Script base, Object[] args) {
+            super(base, args);
+        }
+
+        protected Object eval(Object arg) {
+            return execute(null, arg);
+        }
+
+        @Override
+        public Object apply(Object arg) {
+            return eval(arg);
+        }
+
+        @Override
+        public Object apply(double arg) {
+            return eval(arg);
+        }
+
+        @Override
+        public Object apply(int arg) {
+            return eval(arg);
+        }
+
+        @Override
+        public Object apply(long arg) {
+            return eval(arg);
+        }
+
+        @Override
+        public double applyAsDouble(double arg) {
+            return jexl.getArithmetic().toDouble(eval(arg));
+        }
+
+        @Override
+        public long applyAsLong(long arg) {
+            return jexl.getArithmetic().toLong(eval(arg));
+        }
+
+        @Override
+        public int applyAsInt(int arg) {
+            return jexl.getArithmetic().toInteger(eval(arg));
+        }
+
+        @Override
+        public boolean test(Object arg) {
+            return jexl.getArithmetic().toBoolean(eval(arg));
+        }
+
+        @Override
+        public double applyAsDouble(Object arg) {
+            return jexl.getArithmetic().toDouble(eval(arg));
+        }
+
+        @Override
+        public int applyAsInt(Object arg) {
+            return jexl.getArithmetic().toInteger(eval(arg));
+        }
+
+        @Override
+        public long applyAsLong(Object arg) {
+            return jexl.getArithmetic().toLong(eval(arg));
+        }
+
+        @Override
+        public double applyAsDouble(long arg) {
+            return jexl.getArithmetic().toDouble(eval(arg));
+        }
+
+        @Override
+        public int applyAsInt(long arg) {
+            return jexl.getArithmetic().toInteger(eval(arg));
+        }
+
+        @Override
+        public double applyAsDouble(int arg) {
+            return jexl.getArithmetic().toDouble(eval(arg));
+        }
+
+        @Override
+        public long applyAsLong(int arg) {
+            return jexl.getArithmetic().toLong(eval(arg));
+        }
+
+        @Override
+        public void accept(Object arg) {
+            eval(arg);
+        }
+
+        @Override
+        public void accept(double arg) {
+            eval(arg);
+        }
+
+        @Override
+        public void accept(int arg) {
+            eval(arg);
+        }
+
+        @Override
+        public void accept(long arg) {
+            eval(arg);
+        }
+    }
+
+    /**
+     * Implements the @FunctionalInterface interfaces with two arguments to help delegation.
+     */
+    public static class ClosureBiFunction extends Closure implements 
+          Comparator<Object>, BiFunction<Object, Object, Object>, BiPredicate<Object, Object>, 
+          BinaryOperator<Object>, DoubleBinaryOperator, LongBinaryOperator, IntBinaryOperator,
+          BiConsumer<Object, Object>, ObjDoubleConsumer<Object>, ObjLongConsumer<Object>, ObjIntConsumer<Object>,
+          ToDoubleBiFunction<Object, Object>, ToLongBiFunction<Object, Object>, ToIntBiFunction<Object, Object> {
+        /**
+         * The base constructor.
+         * @param intrprtr the interpreter to use
+         */
+        protected ClosureBiFunction(Interpreter intrprtr, ASTJexlLambda lambda) {
+            super(intrprtr, lambda);
+        }
+
+        protected ClosureBiFunction(Script base, Object[] args) {
+            super(base, args);
+        }
+
+        protected Object eval(Object arg1, Object arg2) {
+            return execute(null, arg1, arg2);
+        }
+
+        @Override
+        public int compare(Object arg1, Object arg2) {
+            return jexl.getArithmetic().toInteger(eval(arg1, arg2));
+        }
+
+        @Override
+        public Object apply(Object arg1, Object arg2) {
+            return eval(arg1, arg2);
+        }
+
+        @Override
+        public void accept(Object arg1, Object arg2) {
+            eval(arg1, arg2);
+        }
+
+        @Override
+        public void accept(Object arg1, double arg2) {
+            eval(arg1, arg2);
+        }
+
+        @Override
+        public void accept(Object arg1, long arg2) {
+            eval(arg1, arg2);
+        }
+
+        @Override
+        public void accept(Object arg1, int arg2) {
+            eval(arg1, arg2);
+        }
+
+        @Override
+        public double applyAsDouble(Object arg1, Object arg2) {
+            return jexl.getArithmetic().toDouble(eval(arg1, arg2));
+        }
+
+        @Override
+        public double applyAsDouble(double arg1, double arg2) {
+            return jexl.getArithmetic().toDouble(eval(arg1, arg2));
+        }
+
+        @Override
+        public long applyAsLong(Object arg1, Object arg2) {
+            return jexl.getArithmetic().toLong(eval(arg1, arg2));
+        }
+
+        @Override
+        public long applyAsLong(long arg1, long arg2) {
+            return jexl.getArithmetic().toLong(eval(arg1, arg2));
+        }
+
+        @Override
+        public int applyAsInt(Object arg1, Object arg2) {
+            return jexl.getArithmetic().toInteger(eval(arg1, arg2));
+        }
+
+        @Override
+        public int applyAsInt(int arg1, int arg2) {
+            return jexl.getArithmetic().toInteger(eval(arg1, arg2));
+        }
+
+        @Override
+        public boolean test(Object arg1, Object arg2) {
+            return jexl.getArithmetic().toBoolean(eval(arg1, arg2));
+        }
+
     }
 
 }
