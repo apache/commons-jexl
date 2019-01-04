@@ -28,6 +28,8 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     private static final java.lang.reflect.Method MAP_SET = initMarker(Map.class, "put", Object.class, Object.class);
     /** The property. */
     private final Object property;
+    /** The property value class. */
+    private final Class<?> valueClass;
 
     /**
      * Attempts to discover a MapSetExecutor.
@@ -40,7 +42,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
      */
     public static MapSetExecutor discover(Introspector is, Class<?> clazz, Object identifier, Object value) {
         if (Map.class.isAssignableFrom(clazz)) {
-            return new MapSetExecutor(clazz, MAP_SET, identifier);
+            return new MapSetExecutor(clazz, MAP_SET, identifier, value);
         } else {
             return null;
         }
@@ -51,10 +53,12 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
      * @param clazz the class the set method applies to
      * @param method the method called through this executor
      * @param key the key to use as 1st argument to the set method
+     * @param value the value to use as 2nd argument to the set method
      */
-    private MapSetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object key) {
+    private MapSetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object key, Object arg) {
         super(clazz, method);
         property = key;
+        valueClass = classOf(arg);
     }
 
     @Override
@@ -76,7 +80,8 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
             && method != null
             && objectClass.equals(obj.getClass())
             && ((property == null && key == null)
-                || (property != null && key != null && property.getClass().equals(key.getClass())))) {
+                || (property != null && key != null && property.getClass().equals(key.getClass())))
+            && valueClass.equals(classOf(value))) {
             @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
             final Map<Object,Object> map = ((Map<Object, Object>) obj);
             map.put(key, value);
