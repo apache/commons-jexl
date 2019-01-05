@@ -630,7 +630,8 @@ void MultipleDeclareVar() #MultipleIdentifier :
 
 void Var() #void : {}
 {
-    LOOKAHEAD(<FINAL>) DeclareLocalVar() (<assign> Expression() #Initialization(2))
+    LOOKAHEAD(<FINAL> | <BYTE> | <SHORT> | <INT> | <LONG> | <CHAR> | <BOOLEAN> | <FLOAT> | <DOUBLE>) 
+    DeclareLocalVar() (<assign> Expression() #Initialization(2))
     |
     DeclareLocalVar() (LOOKAHEAD(1) <assign> Expression() #Initialization(2))?
 }

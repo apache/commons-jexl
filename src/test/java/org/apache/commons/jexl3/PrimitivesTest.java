@@ -38,51 +38,6 @@ public class PrimitivesTest extends JexlTestCase {
     }
 
     @Test
-    public void testUninitializedDeclaration() throws Exception {
-        JexlContext jc = new MapContext();
-
-        JexlScript e = jexl.createScript("boolean x");
-        Object o = e.execute(jc);
-        Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Boolean);
-        Assert.assertEquals("Result is not true", Boolean.FALSE, o);
-
-        e = jexl.createScript("char x");
-        o = e.execute(jc);
-        Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Character);
-        Assert.assertEquals("Result is not true", '\0', o);
-
-        e = jexl.createScript("byte x");
-        o = e.execute(jc);
-        Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Byte);
-        Assert.assertEquals("Result is not true", (byte) 0, o);
-
-        e = jexl.createScript("short x");
-        o = e.execute(jc);
-        Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Short);
-        Assert.assertEquals("Result is not true", (short) 0, o);
-
-        e = jexl.createScript("int x");
-        o = e.execute(jc);
-        Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Integer);
-        Assert.assertEquals("Result is not true", 0, o);
-
-        e = jexl.createScript("long x");
-        o = e.execute(jc);
-        Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Long);
-        Assert.assertEquals("Result is not true", 0L, o);
-
-        e = jexl.createScript("float x");
-        o = e.execute(jc);
-        Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Float);
-        Assert.assertEquals("Result is not true", 0.f, o);
-
-        e = jexl.createScript("double x");
-        o = e.execute(jc);
-        Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Double);
-        Assert.assertEquals("Result is not true", 0., o);
-    }
-
-    @Test
     public void testBoolean() throws Exception {
         JexlContext jc = new MapContext();
 
