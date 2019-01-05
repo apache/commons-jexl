@@ -156,6 +156,7 @@ import org.apache.commons.jexl3.parser.ASTNullpNode;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 import org.apache.commons.jexl3.parser.StringParser;
 
@@ -1027,6 +1028,25 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(ASTJexlScript node, Object data) {
+        // dump pragmas
+        Map<String, Object> pragmas = node.getPragmas();
+        if (pragmas != null) {
+            for (Map.Entry<String, Object> entry : pragmas.entrySet()) {
+                String name = entry.getKey();
+                Object value = entry.getValue();
+                builder.append("#pragma ");
+                builder.append(name);
+                builder.append(' ');
+                if (value instanceof String) {
+                    String img = ((String)value).replace("'", "\\'");
+                    builder.append("'").append(img).append("'");
+                } else {
+                    builder.append(value);
+                }
+                builder.append('\r');
+            }
+        }
+
         // if lambda, produce parameters
         if (node instanceof ASTJexlLambda) {
             boolean expr = false;
