@@ -219,16 +219,20 @@
                         <code>var fun = function(x, y) { x + y }</code>
                         Function parameters can use optional <code>var</code> keyword in parameter declaration
                         <code>var fun = function(var x, var y) { x + y }</code>
+                        A parameter can be defined as final by using <code>final</code> keyword in parameter declaration,
+                        in that case the usage of <code>var</code> keyword is required for all parameters
+                        <code>var fun = function(final var x, var y) { x + y }</code>
                         The following syntax is also supported
                         <code>var fun = (x, y) -> { x + y }</code>
                         If the function has only one argument then the parentheses may be omitted
                         <code>var fun = x -> { x * x }</code>
                         If the function is a simple expression then the following syntax can also be used
                         <code>var fun = (x, y) => x + y</code>
-                        Function can also take arbitraty number arguments, in that case the following syntax can be used
+                        Function can also take arbitraty number of arguments, in that case the following syntax can be used
                         <code>var fun = (x, y...) -> {x + y[0] + y[1]}</code>
                         <p>Note that functions can use local variables and parameters from the scope they are declared in.
-                            Those variables values are bound to the function environment at definition time and are effectively final.</p>
+                            Those variables values are bound to the function environment at definition time.
+                            Such variables become implicitly final within the function scope.</p>
                         <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
                         The function closure hoists 't' when defined; the result of the evaluation will
                         lead to <code>15 + 7 + 20 = 42</code>.

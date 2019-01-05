@@ -1353,15 +1353,16 @@ void Parameter() #void :
 void VarParameter() #void :
 {
     Token t;
+    boolean isFinal = false;
 }
 {
-    <VAR> t=<IDENTIFIER> { declareParameter(t); }
+    ( LOOKAHEAD(1) <FINAL> { isFinal = true; } )? <VAR> t=<IDENTIFIER> { declareParameter(t, isFinal); }
 }
 
 void Parameters() #void : {}
 {
     <LPAREN> [
-      (LOOKAHEAD(<VAR>) VarParameter() (LOOKAHEAD(2) <COMMA> VarParameter())* | Parameter() (LOOKAHEAD(2) <COMMA> Parameter())*) 
+      (LOOKAHEAD(<VAR> | <FINAL>) VarParameter() (LOOKAHEAD(2) <COMMA> VarParameter())* | Parameter() (LOOKAHEAD(2) <COMMA> Parameter())*) 
       (<ELLIPSIS> { declareVarArgSupport(); })?
     ] <RPAREN>
 }

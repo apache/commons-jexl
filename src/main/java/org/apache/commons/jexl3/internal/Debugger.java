@@ -1065,23 +1065,44 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 builder.append("function");
             }
 
-            String[] params = node.getParameters();
+            Scope scope = node.getScope();
 
-            if (named || params == null || params.length != 1 || node.isVarArgs())
+            String[] params = node.getParameters();
+            boolean varSyntax = false;
+            if (params != null) {
+                for (String param : params) {
+                    int symbol = scope.getSymbol(param);
+                    boolean isFinal = scope.isVariableFinal(symbol);
+                    if (isFinal) {
+                        varSyntax = true;
+                        break;
+                    }
+                }
+            }
+
+            if (named || params == null || params.length != 1 || node.isVarArgs() || varSyntax)
                 builder.append('(');
 
             if (params != null && params.length > 0) {
-                builder.append(visitParameter(params[0], data));
-                for (int p = 1; p < params.length; ++p) {
-                    builder.append(", ");
-                    builder.append(visitParameter(params[p], data));
+                for (int p = 0; p < params.length; ++p) {
+                    if (p > 0)
+                        builder.append(", ");
+                    String param = params[p];
+                    int symbol = scope.getSymbol(param);
+                    boolean isFinal = scope.isVariableFinal(symbol);
+                    if (isFinal) {
+                        builder.append("final ");
+                    }
+                    if (varSyntax) {
+                        builder.append("var ");
+                    }
+                    builder.append(visitParameter(param, data));
                 }
-
                 if (node.isVarArgs())
                     builder.append("...");
             }
 
-            if (named || params == null || params.length != 1 || node.isVarArgs())
+            if (named || params == null || params.length != 1 || node.isVarArgs() || varSyntax)
                 builder.append(')');
 
             if (named) {

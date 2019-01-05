@@ -107,16 +107,25 @@ public final class Scope {
         if (varArgs != scope.varArgs) {
             return false;
         }
-        if (namedVariables == null) {
-            return scope.namedVariables == null;
-        }
-        if (!namedVariables.equals(scope.namedVariables)) {
+        if (namedVariables == null && scope.namedVariables != null) {
             return false;
         }
-        if (variableTypes == null) {
-            return scope.variableTypes == null;
+        if (namedVariables != null && !namedVariables.equals(scope.namedVariables)) {
+            return false;
         }
-        return variableTypes.equals(scope.variableTypes);
+        if (variableTypes == null && scope.variableTypes != null) {
+            return false;
+        }
+        if (variableTypes != null && !variableTypes.equals(scope.variableTypes)) {
+            return false;
+        }
+        if (finalVariables == null && scope.finalVariables != null) {
+            return false;
+        }
+        if (finalVariables != null && !finalVariables.equals(scope.finalVariables)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -201,6 +210,18 @@ public final class Scope {
      * @param name the parameter name
      */
     public void declareParameter(String name) {
+        declareParameter(name, false);
+    }
+
+    /**
+     * Declares a parameter.
+     * <p>
+     * This method creates an new entry in the symbol map.
+     * </p>
+     * @param name the parameter name
+     * @param isFinal if the declared parameter is final
+     */
+    public void declareParameter(String name, boolean isFinal) {
         if (namedVariables == null) {
             namedVariables = new LinkedHashMap<String, Integer>();
         } else if (vars > 0) {
@@ -211,6 +232,12 @@ public final class Scope {
             register = namedVariables.size();
             namedVariables.put(name, register);
             parms += 1;
+            if (isFinal) {
+                if (finalVariables == null) {
+                    finalVariables = new HashSet<Integer>();
+                }
+                finalVariables.add(register);
+            }
         }
     }
 
@@ -239,7 +266,8 @@ public final class Scope {
      * This method creates an new entry in the symbol map.
      * </p>
      * @param name the variable name
-     * @param name the variable class
+     * @param type the variable class
+     * @param isFinal if the declared variable is final
      * @return the register index storing this variable
      */
     public Integer declareVariable(String name, Class type, boolean isFinal) {

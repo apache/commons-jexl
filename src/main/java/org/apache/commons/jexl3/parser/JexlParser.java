@@ -263,9 +263,19 @@ public abstract class JexlParser extends StringParser {
     /**
      * Declares a local parameter.
      * <p> This method creates an new entry in the symbol map. </p>
-     * @param token the parameter name toekn
+     * @param token the parameter name token
      */
     protected void declareParameter(Token token) {
+        declareParameter(token, false);
+    }
+
+    /**
+     * Declares a local parameter.
+     * <p> This method creates an new entry in the symbol map. </p>
+     * @param token the parameter name token
+     * @param isFinal whether the declared parameter is final
+     */
+    protected void declareParameter(Token token, boolean isFinal) {
         String identifier =  token.image;
         if (!allowVariable(identifier)) {
             throwFeatureException(JexlFeatures.LOCAL_VAR, token);
@@ -273,7 +283,7 @@ public abstract class JexlParser extends StringParser {
         if (frame == null) {
             frame = new Scope(null, (String[]) null);
         }
-        frame.declareParameter(identifier);
+        frame.declareParameter(identifier, isFinal);
     }
 
     /**

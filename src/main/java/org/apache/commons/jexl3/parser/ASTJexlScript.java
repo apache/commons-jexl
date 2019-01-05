@@ -175,4 +175,14 @@ public class ASTJexlScript extends JexlNode {
     public boolean isHoistedSymbol(int symbol) {
         return scope != null? scope.isHoistedSymbol(symbol) : false;
     }
+
+    /**
+     * Checks whether a given symbol is final.
+     * @param symbol the symbol number
+     * @return true if final, false otherwise
+     */
+    public boolean isVariableFinal(int symbol) {
+        return scope != null? scope.isVariableFinal(symbol) : false;
+    }
+
 }

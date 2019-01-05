@@ -85,7 +85,6 @@ public class FinalVarTest extends JexlTestCase {
         } catch (JexlException ex) {
            // OK
         }
-
     }
 
     @Test
