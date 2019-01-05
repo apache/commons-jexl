@@ -217,15 +217,17 @@
                     <td>
                         Defines a function within the script, usually associated with a local variable assignment.
                         <code>var fun = function(x, y) { x + y }</code>
+                        Function parameters can use optional <code>var</code> keyword in parameter declaration
+                        <code>var fun = function(var x, var y) { x + y }</code>
                         The following syntax is also supported
                         <code>var fun = (x, y) -> { x + y }</code>
-                        If the function has only one argument the parentheses may be ommited
+                        If the function has only one argument then the parentheses may be omitted
                         <code>var fun = x -> { x * x }</code>
-                        If the function is a simple expression the following syntax can also be used
+                        If the function is a simple expression then the following syntax can also be used
                         <code>var fun = (x, y) => x + y</code>
                         Function can also take arbitraty number arguments, in that case the following syntax can be used
                         <code>var fun = (x, y...) -> {x + y[0] + y[1]}</code>
-                        <p>Note that functions can use local variables and parameters from their declaring script.
+                        <p>Note that functions can use local variables and parameters from the scope they are declared in.
                             Those variables values are bound to the function environment at definition time and are effectively final.</p>
                         <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
                         The function closure hoists 't' when defined; the result of the evaluation will

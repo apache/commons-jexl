@@ -1350,9 +1350,20 @@ void Parameter() #void :
     t=<IDENTIFIER> { declareParameter(t); }
 }
 
+void VarParameter() #void :
+{
+    Token t;
+}
+{
+    <VAR> t=<IDENTIFIER> { declareParameter(t); }
+}
+
 void Parameters() #void : {}
 {
-    <LPAREN> [Parameter() (LOOKAHEAD(2) <COMMA> Parameter())* (<ELLIPSIS> { declareVarArgSupport(); })? ] <RPAREN>
+    <LPAREN> [
+      (LOOKAHEAD(<VAR>) VarParameter() (LOOKAHEAD(2) <COMMA> VarParameter())* | Parameter() (LOOKAHEAD(2) <COMMA> Parameter())*) 
+      (<ELLIPSIS> { declareVarArgSupport(); })?
+    ] <RPAREN>
 }
 
 void LambdaLookahead() #void() : {}
