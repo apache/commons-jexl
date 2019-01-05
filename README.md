@@ -120,6 +120,8 @@ Enhancements
 
 + Lambdas support basic java8 `@FunctionalInterface` interface implementations, so it is possible to pass lambdas as arguments
 
++ Lambda parameters can use `var` keyword for parameter definition
+
 + Local variables can be declared using java primitive type `int i = 0`
 
 + Local variables can be declared final `final var i = 0`
@@ -128,7 +130,7 @@ Enhancements
 
 + Pattern matching operators `=~` and `!~` can use new `in` and `!in` aliases 
 
-+ Operator `new` can use Java-like syntax `new String()`
++ Operator `new` can use Java-like syntax `new String()` or `new String[] {'abc','def'}`
 
 + Foreach statement may also define additional `counter` variable `for (var x,i : list)` along with the current value variable
 
