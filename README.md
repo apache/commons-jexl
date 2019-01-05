@@ -122,6 +122,8 @@ Enhancements
 
 + Lambda parameters can use `var` keyword for parameter definition
 
++ Lambda parameters can be declared as `final`
+
 + Local variables can be declared using java primitive type `int i = 0`
 
 + Local variables can be declared final `final var i = 0`
