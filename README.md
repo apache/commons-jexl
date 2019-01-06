@@ -58,7 +58,7 @@ Incompatible changes
 
 + Precedence of the `match` operator (`=~`) and `not-match` operator (`!~`) is changed to be that of other equality operators.
 
-+ Passing a lambda more arguments than is specified in the lambda declaration now results in error in a strict mode
++ Passing a function more arguments than is specified in the function declaration now results in error in a strict mode
 
 + Hoisted variables are effectively final. The reason is hoisted variables are in fact copies of the original variables,
   so assigning a new value to the hoisted variable does not affect the original one. Such behaviour is misleading and thus restricted.
@@ -114,17 +114,20 @@ Enhancements
 
 + Multidimensional arrays can be accessed by using new syntax `arr[x,y]` as well as by using older syntax `arr[x][y]`
 
-+ Single expression lambdas can be defined by using `=>` fat arrow operator without outer curly braces
++ Single expression functions can be defined by using `=>` fat arrow operator without outer curly braces
 
-+ Variable argument lambdas can be defined by using `...` syntax after the last lambda argument
++ Variable argument functions can be defined by using `...` syntax after the last function argument
 
-+ Lambdas support basic java8 `@FunctionalInterface` interface implementations, so it is possible to pass lambdas as arguments
++ Functions now implement almost all basic java8 `@FunctionalInterface` interfaces, 
+  so it is possible to pass a function as an argument to java methods that accept such interfaces
 
-+ Lambda parameters can use `var` keyword for parameter definition
++ Function parameters can use `var` keyword for parameter definition
 
-+ Lambda parameters can be declared as `final`
++ Function parameters can be declared strongly typed by using java primitive types `function(int a, int b) {a+b}`
 
-+ Local variables can be declared using java primitive type `int i = 0`
++ Function parameters can be declared as `final`
+
++ Local variables can be declared strongly typed by using java primitive types `int i = 0`
 
 + Local variables can be declared final `final var i = 0`
 
@@ -132,9 +135,9 @@ Enhancements
 
 + Pattern matching operators `=~` and `!~` can use new `in` and `!in` aliases 
 
-+ Operator `new` can use Java-like syntax `new String()` or `new String[] {'abc','def'}`
++ Operator `new` can use Java-like object syntax `new String()` or array syntax `new String[] {'abc','def'}`
 
-+ Foreach statement may also define additional `counter` variable `for (var x,i : list)` along with the current value variable
++ Foreach statement may also define additional `counter` variable `for (var x,i : list)` along with the current loop value variable
 
 + Immutable list `#[1,2,3]` literal constructs can be used 
 
