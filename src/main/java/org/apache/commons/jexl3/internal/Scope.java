@@ -210,7 +210,7 @@ public final class Scope {
      * @param name the parameter name
      */
     public void declareParameter(String name) {
-        declareParameter(name, false);
+        declareParameter(name, null, false);
     }
 
     /**
@@ -219,9 +219,10 @@ public final class Scope {
      * This method creates an new entry in the symbol map.
      * </p>
      * @param name the parameter name
+     * @param type the parameter class
      * @param isFinal if the declared parameter is final
      */
-    public void declareParameter(String name, boolean isFinal) {
+    public void declareParameter(String name, Class type, boolean isFinal) {
         if (namedVariables == null) {
             namedVariables = new LinkedHashMap<String, Integer>();
         } else if (vars > 0) {
@@ -232,6 +233,12 @@ public final class Scope {
             register = namedVariables.size();
             namedVariables.put(name, register);
             parms += 1;
+            if (type != null) {
+                if (variableTypes == null) {
+                    variableTypes = new HashMap<Integer, Class>();
+                }
+                variableTypes.put(register, type);
+            }
             if (isFinal) {
                 if (finalVariables == null) {
                     finalVariables = new HashSet<Integer>();

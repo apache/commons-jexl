@@ -907,7 +907,7 @@ void UnaryExpression() #void : {}
   |
   <not> UnaryExpression() #NotNode(1)
   |
-  LOOKAHEAD(<LPAREN> PrimitiveType()) (<LPAREN> PrimitiveType() <RPAREN> UnaryExpression() #CastNode(2))
+  LOOKAHEAD(<LPAREN> PrimitiveType() <RPAREN>) (<LPAREN> PrimitiveType() <RPAREN> UnaryExpression() #CastNode(2))
   |
   <EMPTY> UnaryExpression() #EmptyFunction(1)
   |
@@ -1353,16 +1353,30 @@ void Parameter() #void :
 void VarParameter() #void :
 {
     Token t;
+    Class type = null;
     boolean isFinal = false;
 }
 {
-    ( LOOKAHEAD(1) <FINAL> { isFinal = true; } )? <VAR> t=<IDENTIFIER> { declareParameter(t, isFinal); }
+    ( <FINAL> { isFinal = true; } )? 
+    ( <VAR> 
+      | <INT> { type = Integer.TYPE; }
+      | <LONG> { type = Long.TYPE; }
+      | <SHORT> { type = Short.TYPE; }
+      | <BYTE> { type = Byte.TYPE; }
+      | <CHAR> { type = Character.TYPE; }
+      | <BOOLEAN> { type = Boolean.TYPE; }
+      | <FLOAT> { type = Float.TYPE; }
+      | <DOUBLE> { type = Double.TYPE; }
+    )
+    t=<IDENTIFIER> { declareParameter(t, type, isFinal); }
 }
 
 void Parameters() #void : {}
 {
     <LPAREN> [
-      (LOOKAHEAD(<VAR> | <FINAL>) VarParameter() (LOOKAHEAD(2) <COMMA> VarParameter())* | Parameter() (LOOKAHEAD(2) <COMMA> Parameter())*) 
+      (LOOKAHEAD(<FINAL> | <VAR> | <BYTE> | <SHORT> | <INT> | <LONG> | <FLOAT> | <DOUBLE> | <BOOLEAN> | <CHAR> ) VarParameter() (LOOKAHEAD(2) <COMMA> VarParameter())* 
+       | 
+       Parameter() (LOOKAHEAD(2) <COMMA> Parameter())*) 
       (<ELLIPSIS> { declareVarArgSupport(); })?
     ] <RPAREN>
 }

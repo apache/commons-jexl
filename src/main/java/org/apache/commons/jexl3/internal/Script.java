@@ -16,12 +16,15 @@
  */
 package org.apache.commons.jexl3.internal;
 
+import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -194,43 +197,171 @@ public class Script implements JexlScript, JexlExpression {
         return interpreter.interpret(script);
     }
 
-    /**
-     * @return the script parameter list with regard to vararg option
-     */
+    protected boolean isArray(Object o) {
+        return o != null ? (o.getClass().isArray()) : false;
+    }
 
+    /**
+     * Prepares arguments list with regard to type-casting and vararg option.
+     * @param args the passed arguments list
+     * @return the script parameter list 
+     */
     protected Object[] scriptArgs(Object[] args) {
         return args != null && args.length > 0 ? scriptArgs(0, args) : args;
     }
 
+    /**
+     * Prepares arguments list with regard to type-casting and vararg option.
+     * @param curried the number of arguments that are already curried for the script
+     * @param args the passed arguments list
+     * @return the script parameter list 
+     */
     protected Object[] scriptArgs(int curried, Object[] args) {
 
-        boolean varArgs = script.isVarArgs();
+        String[] params = getParameters();
+        boolean varArgs = isVarArgs();
+        Scope frame = script.getScope();
+        JexlArithmetic arithmetic = jexl.getArithmetic();
+
+        Object[] result = null;
+
+        // remaining uncurried arguments count
         int argCount = script.getArgCount() - curried;
-        Object[] params = null;
 
         if (varArgs && args != null && args.length > 0 && args.length >= argCount) {
+            // Class type of the last argument if any
+            String name = params[params.length - 1];
+            int symbol = frame.getSymbol(name);
+            Class type = frame.getVariableType(symbol);
 
             if (argCount > 0) {
-                params = new Object[argCount];
-                System.arraycopy(args, 0, params, 0, argCount - 1);
+                result = new Object[argCount];
+                System.arraycopy(args, 0, result, 0, argCount - 1);
+                // The number of passed arguments that should be wrapped to vararg array
                 int varArgCount = args.length - argCount + 1;
+                // Create last vararg parameter, cast elements to the specified type if needed
                 Object[] varg = null;
 
-                if (varArgCount == 1 && args[args.length-1] instanceof Object[]) {
-                    varg = (Object[]) args[args.length-1];
-                } else {
+                // Check if the only passed vararg argument is already an array, reuse it if possible
+                if (varArgCount == 1) {
+                    if (type == null && args[args.length-1] instanceof Object[]) {
+                        varg = (Object[]) args[args.length-1];
+                    } else if (isArray(args[args.length-1])) {
+                        // Process via untyped array to cover primitive type arrays
+                        Object arr = args[args.length-1];
+                        int len = Array.getLength(arr);
+                        varg = new Object[len];
+                        for (int i = 0; i < len; i++) {
+                            Object arg = Array.get(arr, i);
+                            if (type != null && !arithmetic.getWrapperClass(type).isInstance(arg)) {
+                                if (arithmetic.isStrict()) {
+                                    arg = arithmetic.implicitCast(type, arg);
+                                } else {
+                                    arg = arithmetic.cast(type, arg);
+                                }
+                                if (type.isPrimitive() && arg == null)
+                                    throw new JexlException(script, "not null value required for: " + name);
+                            }
+                            varg[i] = arg;
+                        }
+                    }
+                } 
+
+                if (varg == null) {
                     varg = new Object[varArgCount];
-                    System.arraycopy(args, argCount - 1, varg, 0, varArgCount);
+                    for (int i = 0; i < varArgCount; i++) {
+                        Object arg = args[argCount - 1 + i];
+                        if (type != null && !arithmetic.getWrapperClass(type).isInstance(arg)) {
+                            if (arithmetic.isStrict()) {
+                                arg = arithmetic.implicitCast(type, arg);
+                            } else {
+                                arg = arithmetic.cast(type, arg);
+                            }
+                            if (type.isPrimitive() && arg == null)
+                                throw new JexlException(script, "not null value required for: " + name);
+                        }
+                        varg[i] = arg;
+                    }
                 }
-                params[argCount-1] = varg;
+                result[argCount-1] = varg;
             } else {
-                params = (args.length == 1 && args[0] instanceof Object[]) ? (Object[]) args[0] : new Object[] {args};
+                // All arguments have been curried
+                if (args.length == 1) {
+                    if (type == null && args[0] instanceof Object[]) {
+                        result = (Object[]) args[0];
+                    } else if (isArray(args[0])) {
+                        // Process via untyped array to cover primitive type arrays
+                        Object arr = args[0];
+                        int len = Array.getLength(arr);
+                        result = new Object[len];
+                        for (int i = 0; i < len; i++) {
+                            Object arg = Array.get(arr, i);
+                            if (type != null && !arithmetic.getWrapperClass(type).isInstance(arg)) {
+                                if (arithmetic.isStrict()) {
+                                    arg = arithmetic.implicitCast(type, arg);
+                                } else {
+                                    arg = arithmetic.cast(type, arg);
+                                }
+                                if (type.isPrimitive() && arg == null)
+                                    throw new JexlException(script, "not null value required for: " + name);
+                            }
+                            result[i] = arg;
+                        }
+                    }
+                } 
+
+                if (result == null) {
+                    if (type != null) {
+                        result = new Object[args.length];
+                        for (int i = 0; i < args.length; i++) {
+                            Object arg = args[i];
+                            if (!arithmetic.getWrapperClass(type).isInstance(arg)) {
+                                if (arithmetic.isStrict()) {
+                                    arg = arithmetic.implicitCast(type, arg);
+                                } else {
+                                    arg = arithmetic.cast(type, arg);
+                                }
+                                if (type.isPrimitive() && arg == null)
+                                    throw new JexlException(script, "not null value required for: " + name);
+                            }
+                            result[i] = arg;
+                        }
+                    } else {
+                        result = args;
+                    }  
+                }
             }
         } else {
-            params = args;
+            result = args;
         }
 
-        return params;
+        // Check if type-casting of all the arguments (except the vararg) is needed
+        if (result != null && params != null) {
+            for (int i = curried; i < params.length - (varArgs ? 1 : 0); i++) {
+                int pos = i - curried;
+                // Check if the passed arguments list is shorter than the parameters list
+                if (pos >= result.length)
+                    break;
+                String name = params[i];
+                int symbol = frame.getSymbol(name);
+                Class type = frame.getVariableType(symbol);
+                if (type != null) {
+                    Object arg = result[pos];
+                    if (!arithmetic.getWrapperClass(type).isInstance(arg)) {
+                        if (arithmetic.isStrict()) {
+                            arg = arithmetic.implicitCast(type, arg);
+                        } else {
+                            arg = arithmetic.cast(type, arg);
+                        }
+                        if (type.isPrimitive() && arg == null)
+                            throw new JexlException(script, "not null value required for: " + name);
+                        result[pos] = arg;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override
@@ -238,7 +369,7 @@ public class Script implements JexlScript, JexlExpression {
         String[] parms = getUnboundParameters();
         if (parms == null || parms.length == 0 || args == null || args.length == 0)
             return this;
-        return Closure.createClosure(this, args);
+        return Closure.create(this, args);
     }
 
     @Override

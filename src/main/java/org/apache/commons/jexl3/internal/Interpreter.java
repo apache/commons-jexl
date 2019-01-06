@@ -2074,7 +2074,7 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTJexlScript node, Object data) {
         if (node instanceof ASTJexlLambda && !((ASTJexlLambda) node).isTopLevel()) {
-            return Closure.createClosure(this, (ASTJexlLambda) node);
+            return Closure.create(this, (ASTJexlLambda) node);
         } else {
             final int numChildren = node.jjtGetNumChildren();
             Object result = null;
@@ -2089,11 +2089,6 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTVar node, Object data) {
-        cancelCheck(node);
-        Class type = node.getType();
-        if (type != null) {
-            executeAssign(node, node, null, null, data);
-        }
         return visit((ASTIdentifier) node, data);
     }
 

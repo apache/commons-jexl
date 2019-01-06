@@ -34,7 +34,7 @@ public class Closure extends Script {
     /** The context. */
     protected final JexlContext context;
     /** The number of arguments being curried. */
-    protected final int argCount;
+    protected final int curried;
 
     /**
      * Creates a closure.
@@ -45,7 +45,7 @@ public class Closure extends Script {
         super(theCaller.jexl, null, lambda);
         frame = lambda.createFrame(theCaller.frame);
         context = theCaller.context;
-        argCount = 0;
+        curried = 0;
     }
 
     /**
@@ -61,27 +61,27 @@ public class Closure extends Script {
             Scope.Frame sf = closure.frame;
 
             boolean varArgs = script.isVarArgs();
-            int baseArgCount = closure.argCount;
+            int baseCurried = closure.curried;
 
             if (varArgs) {
-                if (baseArgCount >= script.getArgCount()) {
-                   frame = createNewVarArgFrame(sf, args);
+                if (baseCurried >= script.getArgCount()) {
+                   frame = createNewVarArgFrame(sf, scriptArgs(baseCurried, args));
                 } else {
-                   frame = sf.assign(scriptArgs(baseArgCount, args));
+                   frame = sf.assign(scriptArgs(baseCurried, args));
                 }
             } else {
-                frame = sf.assign(args);
+                frame = sf.assign(scriptArgs(args));
             }
             context = closure.context;
-            argCount = baseArgCount + args.length;
+            curried = baseCurried + args.length;
         } else {
             frame = script.createFrame(scriptArgs(args));
             context = null;
-            argCount = args.length;
+            curried = args.length;
         }
     }
 
-    protected static Closure createClosure(Interpreter theCaller, ASTJexlLambda lambda) {
+    protected static Closure create(Interpreter theCaller, ASTJexlLambda lambda) {
         int argCount = lambda.getArgCount();
         return argCount == 0 ? new ClosureSupplier(theCaller, lambda) :
                argCount == 1 ? new ClosureFunction(theCaller, lambda) : 
@@ -89,7 +89,7 @@ public class Closure extends Script {
                new Closure(theCaller, lambda);
     }
 
-    protected static Closure createClosure(Script base, Object[] args) {
+    protected static Closure create(Script base, Object[] args) {
         String[] parms = base.getUnboundParameters();
         int argCount = parms != null ? parms.length : 0;
         if (args != null)
@@ -100,13 +100,20 @@ public class Closure extends Script {
                new Closure(base, args);
     }
 
+    /**
+     * Appends additional arguments to the existing variable arguments parameter, creates new call frame if needed.
+     * @param sf the call frame to append additional arguments to
+     * @param args the parameters
+     * @return the adjusted local frame
+     */
     protected Scope.Frame createNewVarArgFrame(Scope.Frame sf, Object[] args) {
 
         if (args != null && args.length > 0) {
            int varArgPos = script.getArgCount() - 1;
            Scope.Frame frame = sf.clone();
-
+           // Previous vararg array
            Object[] carg = (Object[]) frame.get(varArgPos);
+           // New varar array
            Object[] varg = new Object[carg.length + args.length];
 
            System.arraycopy(carg, 0, varg, 0, carg.length);
@@ -117,6 +124,30 @@ public class Closure extends Script {
         } else {
            return sf;
         }
+    }
+
+    /**
+     * Creates call frame for the specified argument list.
+     * @param args the parameters
+     * @return the new local frame
+     */
+    protected Scope.Frame getCallFrame(Object[] args) {
+        Scope.Frame local = null;
+        if (frame != null) {
+            boolean varArgs = script.isVarArgs();
+            if (varArgs) {
+                if (curried >= script.getArgCount()) {
+                   local = createNewVarArgFrame(frame, scriptArgs(curried, args));
+                } else {
+                   local = frame.assign(scriptArgs(curried, args));
+                }
+            } else {
+                local = frame.assign(scriptArgs(args));
+            }
+        } else {
+            local = script.createFrame(scriptArgs(args));
+        }
+        return local;
     }
 
     @Override
@@ -202,38 +233,15 @@ public class Closure extends Script {
 
     @Override
     public Object execute(JexlContext context, Object... args) {
-        Scope.Frame callFrame = null;
-
-        if (frame != null) {
-
-            boolean varArgs = script.isVarArgs();
-
-            if (varArgs) {
-
-                if (argCount >= script.getArgCount()) {
-                   callFrame = createNewVarArgFrame(frame, args);
-                } else {
-                   callFrame = frame.assign(scriptArgs(argCount, args));
-                }
-
-            } else {
-                callFrame = frame.assign(args);
-            }
-        } else {
-            callFrame = script.createFrame(scriptArgs(args));
-        }
-
-        Interpreter interpreter = jexl.createInterpreter(context != null ? context : this.context, callFrame);
+        Scope.Frame local = getCallFrame(args);
+        Interpreter interpreter = jexl.createInterpreter(context != null ? context : this.context, local);
         JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
         return interpreter.interpret(block);
     }
 
     @Override
     public Callable callable(JexlContext context, Object... args) {
-        Scope.Frame local = null;
-        if (frame != null) {
-            local = frame.assign(scriptArgs(args));
-        }
+        Scope.Frame local = getCallFrame(args);
         return new CallableScript(jexl.createInterpreter(context != null ? context : this.context, local)) {
             @Override
             public Object interpret() {
@@ -512,7 +520,6 @@ public class Closure extends Script {
         public boolean test(Object arg1, Object arg2) {
             return jexl.getArithmetic().toBoolean(eval(arg1, arg2));
         }
-
     }
 
 }

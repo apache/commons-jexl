@@ -153,7 +153,7 @@
                 </tr>
                 <tr>
                     <td>Local variables</td>
-                    <td>Can be defined untyped using the <code>var</code> keyword or strongly typed specifying one of java primitive types:
+                    <td>Can be defined untyped by using the <code>var</code> keyword or strongly typed by specifying one of java primitive types:
                         <code>boolean char byte short int long float double</code>
                         The local variable name should be a valid identifier.
                         <ul>
@@ -217,22 +217,27 @@
                     <td>
                         Defines a function within the script, usually associated with a local variable assignment.
                         <code>var fun = function(x, y) { x + y }</code>
-                        Function parameters can use optional <code>var</code> keyword in parameter declaration
+                        Function parameters can be declared by using optional <code>var</code> keyword in parameter declaration list
                         <code>var fun = function(var x, var y) { x + y }</code>
                         A parameter can be defined as final by using <code>final</code> keyword in parameter declaration,
-                        in that case the usage of <code>var</code> keyword is required for all parameters
+                        in that case the usage of <code>var</code> keyword is mandatory in parameter declaration list
                         <code>var fun = function(final var x, var y) { x + y }</code>
-                        The following syntax is also supported
+                        A parameter can be defined as a strongly typed by specifying one of java primitive types
+                        <code>boolean char byte short int long float double</code> instead of <code>var</code> keyword:
+                        <code>var fun = function(int x, int y) { x + y }</code>. 
+                        The actual values passed to the function during invocation will be implicitly cast to the specified parameter types.
+                        The following function definition syntax is also supported
                         <code>var fun = (x, y) -> { x + y }</code>
-                        If the function has only one argument then the parentheses may be omitted
-                        <code>var fun = x -> { x * x }</code>
-                        If the function is a simple expression then the following syntax can also be used
+                        If the function body is a simple expression then the following syntax without curly braces can also be used
                         <code>var fun = (x, y) => x + y</code>
-                        Function can also take arbitraty number of arguments, in that case the following syntax can be used
+                        A function can accept the variable number of arguments, in that case the following syntax can be used
                         <code>var fun = (x, y...) -> {x + y[0] + y[1]}</code>
-                        <p>Note that functions can use local variables and parameters from the scope they are declared in.
-                            Those variables values are bound to the function environment at definition time.
-                            Such variables become implicitly final within the function scope.</p>
+                        If a function has only one untyped non-final argument and does not accept variable number of arguments 
+                        then the parentheses around that argument may be omitted
+                        <code>var fun = x -> { x * x }</code>
+                        <p>Note that functions can also use local variables and parameters from the outer scope they are declared in.
+                            The values of those variables are bound to the function context at a definition time and 
+                            remain unchanged afterwards. Such variables are also considered implicitly final inside the function scope.</p>
                         <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
                         The function closure hoists 't' when defined; the result of the evaluation will
                         lead to <code>15 + 7 + 20 = 42</code>.
