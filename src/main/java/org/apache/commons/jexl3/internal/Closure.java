@@ -20,6 +20,8 @@ import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.JexlNode;
 
+import java.lang.reflect.Array;
+
 import java.util.Comparator;
 import java.util.concurrent.Callable;
 import java.util.function.*;
@@ -101,29 +103,38 @@ public class Closure extends Script {
     }
 
     /**
-     * Appends additional arguments to the existing variable arguments parameter, creates new call frame if needed.
+     * Appends additional arguments to the existing vararg parameter, creates new call frame if needed.
      * @param sf the call frame to append additional arguments to
      * @param args the parameters
      * @return the adjusted local frame
      */
     protected Scope.Frame createNewVarArgFrame(Scope.Frame sf, Object[] args) {
-
+        Scope.Frame frame = sf;
         if (args != null && args.length > 0) {
-           int varArgPos = script.getArgCount() - 1;
-           Scope.Frame frame = sf.clone();
+           String[] params = getParameters();
+           String name = params[params.length - 1];
+           int varArgPos = frame.getScope().getSymbol(name);
+           Class type = frame.getScope().getVariableType(varArgPos);
+           if (type == null)
+               type = Object.class;
            // Previous vararg array
-           Object[] carg = (Object[]) frame.get(varArgPos);
-           // New varar array
-           Object[] varg = new Object[carg.length + args.length];
-
-           System.arraycopy(carg, 0, varg, 0, carg.length);
-           System.arraycopy(args, 0, varg, carg.length, args.length);
-           frame.set(varArgPos, varg);
-
-           return frame;
-        } else {
-           return sf;
+           Object carg = frame.get(varArgPos);
+           int len = carg != null ? Array.getLength(carg) : 0;
+           // Added vararg array
+           Object varg = args[0];
+           int alen = varg != null ? Array.getLength(varg) : 0;
+           int newlen = len + alen;
+           if (newlen > 0) {
+               // Clope frame
+               frame = sf.clone();
+               // Merge arrays
+               Object result = Array.newInstance(type, newlen);
+               System.arraycopy(carg, 0, result, 0, len);
+               System.arraycopy(varg, 0, result, len, alen);
+               frame.set(varArgPos, result);
+           }
         }
+        return frame;
     }
 
     /**

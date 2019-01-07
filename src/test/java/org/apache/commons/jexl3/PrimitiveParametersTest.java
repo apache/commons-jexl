@@ -64,6 +64,19 @@ public class PrimitiveParametersTest extends JexlTestCase {
     }
 
     @Test
+    public void testVarargsType() throws Exception {
+        JexlContext jc = new MapContext();
+
+        JexlScript e = jexl.createScript("var x = function(long i...) {i}; x(42, 43, 44)");
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not as expected", Boolean.TRUE, o instanceof long[]);
+
+        e = jexl.createScript("var x = function(char i...) {i}; var y = x.curry(41, 42); y(43)");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not as expected", Boolean.TRUE, o instanceof char[]);
+    }
+
+    @Test
     public void testVarargs() throws Exception {
         JexlContext jc = new MapContext();
 
