@@ -127,9 +127,13 @@ Enhancements
 
 + Function parameters can be declared as `final`
 
++ Function parameters can be declared as non-null `function(var &x)`
+
 + Local variables can be declared strongly typed by using java primitive types `int i = 0`
 
 + Local variables can be declared final `final var i = 0`
+
++ Local variables can be declared as non-null `var &i = 0`
 
 + Last part of the ternary expression `x?y:z` (along with the separating `:`) can be omitted, implying `null` as a result
 
