@@ -461,7 +461,7 @@ void MultipleAssignmentStatement() #MultipleAssignment : {}
 
 void MultipleIdentifier() #MultipleIdentifier : {}
 {
-    <LPAREN> Identifier() (LOOKAHEAD(1) <COMMA> Identifier())* <RPAREN>
+    <LPAREN> Identifier(true) (<COMMA> Identifier(true))* <RPAREN>
 }
 
 ASTIfStatement IfStatement() : {}

@@ -61,8 +61,8 @@ public class MultiAssignTest extends JexlTestCase {
         jc.set("x", 10);
         jc.set("y", 20);
         Object o = assign.execute(jc);
-        Assert.assertEquals("Result is not 40", new Integer(40), jc.get("x"));
-        Assert.assertEquals("Result is not 2", new Integer(2), jc.get("y"));
+        Assert.assertEquals("Result is not 40", 40, jc.get("x"));
+        Assert.assertEquals("Result is not 2", 2, jc.get("y"));
     }
 
     @Test
@@ -72,8 +72,8 @@ public class MultiAssignTest extends JexlTestCase {
         jc.set("x", 10);
         jc.set("y", 20);
         Object o = assign.execute(jc);
-        Assert.assertEquals("Result is not 40", new Integer(40), jc.get("x"));
-        Assert.assertEquals("Result is not 2", new Integer(2), jc.get("y"));
+        Assert.assertEquals("Result is not 40", 40, jc.get("x"));
+        Assert.assertEquals("Result is not 2", 2, jc.get("y"));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class MultiAssignTest extends JexlTestCase {
         jc.set("quux", new Quux("bar",42));
         Object o = assign.execute(jc);
         Assert.assertEquals("Result is not bar", "bar", jc.get("str"));
-        Assert.assertEquals("Result is not 42", new Integer(42), jc.get("value"));
+        Assert.assertEquals("Result is not 42", 42, jc.get("value"));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class MultiAssignTest extends JexlTestCase {
         jc.set("x", 10);
         jc.set("y", 20);
         Object o = assign.execute(jc);
-        Assert.assertEquals("Result is not null", new Integer(2), o);
+        Assert.assertEquals("Result is not null", 2, o);
     }
 
     @Test
@@ -127,7 +127,17 @@ public class MultiAssignTest extends JexlTestCase {
         jc.set("x", 10);
         jc.set("y", 20);
         Object o = assign.execute(jc);
-        Assert.assertEquals("Result is not 2", new Integer(2), o);
+        Assert.assertEquals("Result is not 2", 2, o);
+    }
+
+    @Test
+    public void testVarAssignment() throws Exception {
+        JexlScript assign = JEXL.createScript("var (x,y) = [0,1,2]; (x,y) = [40,2]; y");
+        JexlContext jc = new MapContext();
+        jc.set("x", 10);
+        jc.set("y", 20);
+        Object o = assign.execute(jc);
+        Assert.assertEquals("Result is not 2", 2, o);
     }
 
 }
