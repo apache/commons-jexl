@@ -241,7 +241,7 @@ public abstract class JexlParser extends StringParser {
         if (register != null && frame.isVariableFinal(register)) {
             throwParsingException(var);
         }
-        register = frame.declareVariable(identifier, var.getType(), var.isFinal());
+        register = frame.declareVariable(identifier, var.getType(), var.isFinal(), var.isRequired());
         var.setSymbol(register, identifier);
     }
 
@@ -266,7 +266,7 @@ public abstract class JexlParser extends StringParser {
      * @param token the parameter name token
      */
     protected void declareParameter(Token token) {
-        declareParameter(token, null, false);
+        declareParameter(token, null, false, false);
     }
 
     /**
@@ -276,7 +276,7 @@ public abstract class JexlParser extends StringParser {
      * @param type the parameter class if any
      * @param isFinal whether the declared parameter is final
      */
-    protected void declareParameter(Token token, Class type, boolean isFinal) {
+    protected void declareParameter(Token token, Class type, boolean isFinal, boolean isRequired) {
         String identifier =  token.image;
         if (!allowVariable(identifier)) {
             throwFeatureException(JexlFeatures.LOCAL_VAR, token);
@@ -284,7 +284,7 @@ public abstract class JexlParser extends StringParser {
         if (frame == null) {
             frame = new Scope(null, (String[]) null);
         }
-        frame.declareParameter(identifier, type, isFinal);
+        frame.declareParameter(identifier, type, isFinal, isRequired);
     }
 
     /**

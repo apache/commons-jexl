@@ -64,6 +64,10 @@ public final class Scope {
      */
     private Set<Integer> finalVariables = null;
     /**
+     * The set of non-null variables.
+     */
+    private Set<Integer> requiredVariables = null;
+    /**
      * The empty string array.
      */
     private static final String[] EMPTY_STRS = new String[0];
@@ -123,6 +127,12 @@ public final class Scope {
             return false;
         }
         if (finalVariables != null && !finalVariables.equals(scope.finalVariables)) {
+            return false;
+        }
+        if (requiredVariables == null && scope.requiredVariables != null) {
+            return false;
+        }
+        if (requiredVariables != null && !requiredVariables.equals(scope.requiredVariables)) {
             return false;
         }
         return true;
@@ -203,6 +213,15 @@ public final class Scope {
     }
 
     /**
+     * Returns if the local variable is declared non-null.
+     * @param symbol the symbol index
+     * @return true if non-null, false otherwise
+     */
+    public boolean isVariableRequired(int symbol) {
+        return requiredVariables == null ? false : requiredVariables.contains(symbol);
+    }
+
+    /**
      * Declares a parameter.
      * <p>
      * This method creates an new entry in the symbol map.
@@ -210,7 +229,7 @@ public final class Scope {
      * @param name the parameter name
      */
     public void declareParameter(String name) {
-        declareParameter(name, null, false);
+        declareParameter(name, null, false, false);
     }
 
     /**
@@ -221,8 +240,9 @@ public final class Scope {
      * @param name the parameter name
      * @param type the parameter class
      * @param isFinal if the declared parameter is final
+     * @param isRequired if the declared parameter is non-null
      */
-    public void declareParameter(String name, Class type, boolean isFinal) {
+    public void declareParameter(String name, Class type, boolean isFinal, boolean isRequired) {
         if (namedVariables == null) {
             namedVariables = new LinkedHashMap<String, Integer>();
         } else if (vars > 0) {
@@ -245,6 +265,12 @@ public final class Scope {
                 }
                 finalVariables.add(register);
             }
+            if (isRequired) {
+                if (requiredVariables == null) {
+                    requiredVariables = new HashSet<Integer>();
+                }
+                requiredVariables.add(register);
+            }
         }
     }
 
@@ -264,7 +290,7 @@ public final class Scope {
      * @return the register index storing this variable
      */
     public Integer declareVariable(String name) {
-        return declareVariable(name, null, false);
+        return declareVariable(name, null, false, false);
     }
 
     /**
@@ -275,9 +301,10 @@ public final class Scope {
      * @param name the variable name
      * @param type the variable class
      * @param isFinal if the declared variable is final
+     * @param isRequired if the declared variable is non-null
      * @return the register index storing this variable
      */
-    public Integer declareVariable(String name, Class type, boolean isFinal) {
+    public Integer declareVariable(String name, Class type, boolean isFinal, boolean isRequired) {
         if (namedVariables == null) {
             namedVariables = new LinkedHashMap<String, Integer>();
         }
@@ -298,6 +325,12 @@ public final class Scope {
                 }
                 finalVariables.add(register);
             }
+            if (isRequired) {
+                if (requiredVariables == null) {
+                    requiredVariables = new HashSet<Integer>();
+                }
+                requiredVariables.add(register);
+            }
         } else {
             if (isVariableFinal(register)) {
                 throw new IllegalStateException("final variable can not be redeclared");
@@ -313,6 +346,12 @@ public final class Scope {
                     finalVariables = new HashSet<Integer>();
                 }
                 finalVariables.add(register);
+            }
+            if (isRequired) {
+                if (requiredVariables == null) {
+                    requiredVariables = new HashSet<Integer>();
+                }
+                requiredVariables.add(register);
             }
         }
         return register;

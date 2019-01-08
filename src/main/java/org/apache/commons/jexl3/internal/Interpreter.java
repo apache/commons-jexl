@@ -2587,6 +2587,10 @@ public class Interpreter extends InterpreterBase {
                         if (type.isPrimitive() && right == null)
                             throw new JexlException(node, "not null value required");
                     }
+                    boolean isRequired = frame.getScope().isVariableRequired(symbol);
+                    if (isRequired && right == null)
+                        throw new JexlException(node, "not null value required");
+
                     frame.set(symbol, right);
                     // make the closure accessible to itself, ie hoist the currently set variable after frame creation
                     if (right instanceof Closure) {

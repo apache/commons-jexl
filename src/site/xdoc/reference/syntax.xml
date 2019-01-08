@@ -166,8 +166,11 @@
                         The values assigned to the strongly typed variables are implicitly cast to the defined type in non-strict arithmetic mode.
                         Primitive type variables are non-null, so it is impossible to declare a primitive type variable without initialization.
                         When scripts are created with named parameters, those behave as local variables.
-                        <p>Variables can be defined as final using <code>final var x = 42</code>,
-                           it is impossible to declare a final variable without initialization.
+                        <p>Variables can be declared as final using <code>final var x = 42</code>,
+                           it is required to declare a final variable with initialization.
+                        </p>
+                        <p>Untyped variables can be declared as non-null using a <code>&amp;</code> declarator before the variable name <code>var &amp;x = 42</code>,
+                           it is required to declare a non-null variable with initialization.
                         </p>
                         <p>Variable names are <strong>case-sensitive</strong>, e.g. <code>var1</code> and <code>Var1</code> are different variables.
                         </p>
@@ -222,6 +225,9 @@
                         A parameter can be defined as final by using <code>final</code> keyword in parameter declaration,
                         in that case the usage of <code>var</code> keyword is mandatory in parameter declaration list
                         <code>var fun = function(final var x, var y) { x + y }</code>
+                        A parameter can be defined as required by using <code>&amp;</code> declarator before the parameter name,
+                        in that case the usage of <code>var</code> keyword is mandatory in parameter declaration list
+                        <code>var fun = function(var &amp;x, var y) { x + y }</code>
                         A parameter can be defined as a strongly typed by specifying one of java primitive types
                         <code>boolean char byte short int long float double</code> instead of <code>var</code> keyword:
                         <code>var fun = function(int x, int y) { x + y }</code>. 

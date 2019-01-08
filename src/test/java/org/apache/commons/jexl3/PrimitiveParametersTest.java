@@ -127,6 +127,7 @@ public class PrimitiveParametersTest extends JexlTestCase {
         Assert.assertEquals("Result is not as expected", '*', o);
     }
 
+    @Test
     public void testNulls() throws Exception {
         JexlContext jc = new MapContext();
 

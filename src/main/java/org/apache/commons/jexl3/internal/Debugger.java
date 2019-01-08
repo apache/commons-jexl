@@ -1074,7 +1074,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                     int symbol = scope.getSymbol(param);
                     Class type = scope.getVariableType(symbol);
                     boolean isFinal = scope.isVariableFinal(symbol);
-                    if (isFinal || type != null) {
+                    boolean isRequired = scope.isVariableRequired(symbol);
+                    if (isFinal || isRequired || type != null) {
                         varSyntax = true;
                         break;
                     }
@@ -1103,6 +1104,10 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                         } else {
                             builder.append(type.getName()).append(" ");
                         }
+                    }
+                    boolean isRequired = scope.isVariableRequired(symbol);
+                    if (isRequired) {
+                        builder.append("&");
                     }
                     builder.append(visitParameter(param, data));
                 }
@@ -1585,6 +1590,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTVar node, Object data) {
         boolean isFinal = node.isFinal();
+        boolean isRequired = node.isRequired();
         if (isFinal) {
            builder.append("final ");
         }
@@ -1595,6 +1601,9 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
            builder.append(type.getSimpleName()).append(" ");
         } else {
            builder.append(type.getName()).append(" ");
+        }
+        if (isRequired) {
+           builder.append("&");
         }
         check(node, node.getName(), data);
         return data;

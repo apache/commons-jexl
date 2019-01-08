@@ -333,6 +333,23 @@ public class Script implements JexlScript, JexlExpression {
             }
         }
 
+        // Check required argument
+        if (result != null && params != null) {
+            for (int i = curried; i < params.length; i++) {
+                int pos = i - curried;
+                // Check if the passed arguments list is shorter than the parameters list
+                Object arg = (pos >= result.length) ? null : result[pos];
+                if (arg != null)
+                    continue;
+                String name = params[i];
+                int symbol = frame.getSymbol(name);
+                boolean isRequired = frame.isVariableRequired(symbol);
+                if (isRequired) {
+                    throw new JexlException(script, "not null value required for: " + name);
+                }
+            }
+        }
+
         return result;
     }
 

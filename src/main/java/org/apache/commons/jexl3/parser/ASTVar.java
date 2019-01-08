@@ -23,6 +23,7 @@ public class ASTVar extends ASTIdentifier {
 
     /** The optional variable type. */
     private Class type = null;
+    protected boolean isRequired;
 
     public ASTVar(int id) {
         super(id);
@@ -38,6 +39,14 @@ public class ASTVar extends ASTIdentifier {
 
     public Class getType() {
         return type;
+    }
+
+    public boolean isRequired() {
+        return isRequired;
+    }
+
+    void setRequired() {
+        isRequired = true;
     }
     
     @Override

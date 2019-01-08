@@ -609,9 +609,9 @@ ASTForeachStatement ForeachStatement() : {}
 
 void ForeachVar() : {}
 {
-    DeclareVar() (LOOKAHEAD(1) <COMMA> DeclareExtVar(false))?
+    DeclareVar() (<COMMA> DeclareExtVar(false))?
     |
-    Identifier() (LOOKAHEAD(1) <COMMA> Identifier())?
+    Identifier() (<COMMA> Identifier())?
 }
 
 void MultipleVar() #void : {}
@@ -624,16 +624,16 @@ void MultipleDeclareVar() #MultipleIdentifier :
     boolean isFinal = false;
 }
 {
-    ( LOOKAHEAD(1) <FINAL> { isFinal = true; jjtThis.setFinal(); } )?
-    <VAR> <LPAREN> DeclareExtVar(isFinal) (LOOKAHEAD(1) <COMMA> DeclareExtVar(isFinal))* <RPAREN>
+    ( <FINAL> { isFinal = true; jjtThis.setFinal(); } )?
+    <VAR> <LPAREN> DeclareExtVar(isFinal) (<COMMA> DeclareExtVar(isFinal))* <RPAREN>
 }
 
 void Var() #void : {}
 {
-    LOOKAHEAD(<FINAL> | <BYTE> | <SHORT> | <INT> | <LONG> | <CHAR> | <BOOLEAN> | <FLOAT> | <DOUBLE>) 
-    DeclareLocalVar() (<assign> Expression() #Initialization(2))
+    LOOKAHEAD(<FINAL> | <BYTE> | <SHORT> | <INT> | <LONG> | <CHAR> | <BOOLEAN> | <FLOAT> | <DOUBLE> | (<VAR> <and>)) 
+    DeclareLocalVar() <assign> Expression() #Initialization(2)
     |
-    DeclareLocalVar() (LOOKAHEAD(1) <assign> Expression() #Initialization(2))?
+    DeclareLocalVar() (<assign> Expression() #Initialization(2))?
 }
 
 void DeclareVar() #Var :
@@ -649,8 +649,8 @@ void DeclareLocalVar() #Var :
     Token t;
 }
 {
-    ( LOOKAHEAD(1) <FINAL> { jjtThis.setFinal(); } )?
-    ( <VAR>
+    ( <FINAL> { jjtThis.setFinal(); } )?
+    ( <VAR> ( <and> { jjtThis.setRequired(); } )?
     | <INT> { jjtThis.setType(Integer.TYPE); }
     | <LONG> { jjtThis.setType(Long.TYPE); }
     | <SHORT> { jjtThis.setType(Short.TYPE); }
@@ -669,6 +669,7 @@ void DeclareExtVar(boolean isFinal) #ExtVar :
 }
 {
     { if (isFinal) jjtThis.setFinal(); }
+    ( <and> { jjtThis.setRequired(); } )?
     t=<IDENTIFIER> { declareVariable(jjtThis, t); }
 }
 
@@ -1355,10 +1356,11 @@ void VarParameter() #void :
     Token t;
     Class type = null;
     boolean isFinal = false;
+    boolean isRequired = false;
 }
 {
     ( <FINAL> { isFinal = true; } )? 
-    ( <VAR> 
+    ( <VAR> ( <and> { isRequired = true; } )?
       | <INT> { type = Integer.TYPE; }
       | <LONG> { type = Long.TYPE; }
       | <SHORT> { type = Short.TYPE; }
@@ -1368,15 +1370,15 @@ void VarParameter() #void :
       | <FLOAT> { type = Float.TYPE; }
       | <DOUBLE> { type = Double.TYPE; }
     )
-    t=<IDENTIFIER> { declareParameter(t, type, isFinal); }
+    t=<IDENTIFIER> { declareParameter(t, type, isFinal, isRequired); }
 }
 
 void Parameters() #void : {}
 {
     <LPAREN> [
-      (LOOKAHEAD(<FINAL> | <VAR> | <BYTE> | <SHORT> | <INT> | <LONG> | <FLOAT> | <DOUBLE> | <BOOLEAN> | <CHAR> ) VarParameter() (LOOKAHEAD(2) <COMMA> VarParameter())* 
+      (LOOKAHEAD(<FINAL> | <VAR> | <BYTE> | <SHORT> | <INT> | <LONG> | <FLOAT> | <DOUBLE> | <BOOLEAN> | <CHAR> ) VarParameter() (<COMMA> VarParameter())* 
        | 
-       Parameter() (LOOKAHEAD(2) <COMMA> Parameter())*) 
+       Parameter() (<COMMA> Parameter())*) 
       (<ELLIPSIS> { declareVarArgSupport(); })?
     ] <RPAREN>
 }
