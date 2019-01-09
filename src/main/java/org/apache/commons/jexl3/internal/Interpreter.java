@@ -2585,11 +2585,11 @@ public class Interpreter extends InterpreterBase {
                             right = arithmetic.cast(type, right);
                         }
                         if (type.isPrimitive() && right == null)
-                            throw new JexlException(node, "not null value required");
+                            throw new JexlException(node, "not null value required for: " + var.getName());
                     }
                     boolean isRequired = frame.getScope().isVariableRequired(symbol);
                     if (isRequired && right == null)
-                        throw new JexlException(node, "not null value required");
+                        throw new JexlException(node, "not null value required for: " + var.getName());
 
                     frame.set(symbol, right);
                     // make the closure accessible to itself, ie hoist the currently set variable after frame creation
@@ -3315,6 +3315,18 @@ public class Interpreter extends InterpreterBase {
         }
         Exception xcause = null;
         try {
+            // check if we need to typecast value first
+            Class type = object != null ? object.getClass() : null;
+            if (type != null && type.isArray()) {
+                type = arithmetic.getWrapperClass(type.getComponentType());
+                if (!type.isInstance(value)) {
+                    if (arithmetic.isStrict()) {
+                        value = arithmetic.implicitCast(type, value);
+                    } else {
+                        value = arithmetic.cast(type, value);
+                    }
+                }
+            }
             // attempt to reuse last executor cached in volatile JexlNode.value
             if (node != null && cache) {
                 Object cached = node.jjtGetValue();
