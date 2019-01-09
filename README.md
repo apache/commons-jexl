@@ -114,6 +114,8 @@ Enhancements
 
 + Multidimensional arrays can be accessed by using new syntax `arr[x,y]` as well as by using older syntax `arr[x][y]`
 
++ Array element assignment operator `x[0] = value` now tries to perform implicit type cast of the assigned value
+
 + Single expression functions can be defined by using `=>` fat arrow operator without outer curly braces
 
 + Variable argument functions can be defined by using `...` syntax after the last function argument
