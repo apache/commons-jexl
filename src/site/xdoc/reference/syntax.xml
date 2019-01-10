@@ -565,6 +565,14 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Map entry literal</td>
+                    <td>
+                        A <code>[</code> followed by a <code>key : value</code> pair and ending with <code>]</code>, e.g.
+                        <code>[ "one" : 1]</code>
+                        <p>This syntax creates a <code>Map.Entry&lt;Object,Object&gt;</code>.</p>
+                    </td>
+                </tr>
+                <tr>
                     <td>Range literal</td>
                     <td>
                         A value followed by <code>..</code> and ending with other value, e.g.

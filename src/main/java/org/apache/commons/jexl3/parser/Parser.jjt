@@ -1250,6 +1250,11 @@ void MapEntry() : {}
     Expression() <COLON> Expression()
 }
 
+void MapEntryLiteral() : {}
+{
+    <LBRACKET> Expression() <COLON> Expression() <RBRACKET>
+}
+
 void ImmutableMapLiteral() #MapLiteral() : {}
 {
     <HCURLY>
@@ -1482,6 +1487,8 @@ void PrimaryExpression() #void : {}
     LOOKAHEAD( <HCURLY> <RCURLY> ) ImmutableSetLiteral()
     |
     LOOKAHEAD( EmptyListLiteral() ) EmptyListLiteral()
+    |
+    LOOKAHEAD( <LBRACKET> Expression() <COLON> ) MapEntryLiteral()
     |
     LOOKAHEAD( <LBRACKET> ) ArrayLiteral()
     |

@@ -26,6 +26,7 @@ import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Collection;
 import java.util.Map;
+import java.util.AbstractMap;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -311,6 +312,18 @@ public class JexlArithmetic {
         } else {
             return org.apache.commons.jexl3.internal.LongRange.create(lfrom, lto);
         }
+    }
+
+    /**
+     * Creates a map entry literal.
+     *
+     * @param key the entry key
+     * @param value the entry value
+     * @return the map entry
+     * @throws ArithmeticException as an option if creation fails
+     */
+    public Map.Entry<Object,Object> createMapEntry(Object key, Object value) throws ArithmeticException {
+        return new AbstractMap.SimpleEntry<Object, Object> (key, value);
     }
 
     /**
