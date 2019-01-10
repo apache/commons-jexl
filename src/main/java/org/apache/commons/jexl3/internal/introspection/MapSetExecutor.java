@@ -55,10 +55,10 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
      * @param key the key to use as 1st argument to the set method
      * @param value the value to use as 2nd argument to the set method
      */
-    private MapSetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object key, Object arg) {
+    private MapSetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object key, Object value) {
         super(clazz, method);
         property = key;
-        valueClass = classOf(arg);
+        valueClass = classOf(value);
     }
 
     @Override

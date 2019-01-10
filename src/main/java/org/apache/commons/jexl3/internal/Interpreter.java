@@ -1041,6 +1041,16 @@ public class Interpreter extends InterpreterBase {
     }
     
     /**
+     * Checks whether a reference child node holds a function call.
+     * @param node  the reference node
+     * @return true if child is function call, false otherwise
+     */
+    protected boolean isFunctionCall(ASTReference node) {
+        return (node.jjtGetNumChildren() > 0
+                && node.jjtGetChild(0) instanceof ASTFunctionNode);
+    }
+    
+    /**
      * Evaluates an access identifier based on the 2 main implementations;
      * static (name or numbered identifier) or dynamic (jxlt).
      * @param node the identifier access node
@@ -1090,7 +1100,7 @@ public class Interpreter extends InterpreterBase {
         final JexlNode parent = node.jjtGetParent();
         // pass first piece of data in and loop through children
         Object object = null;
-        JexlNode objectNode;
+        JexlNode objectNode = null;
         JexlNode ptyNode = null;
         StringBuilder ant = null;
         boolean antish = !(parent instanceof ASTReference);
@@ -1127,7 +1137,7 @@ public class Interpreter extends InterpreterBase {
                 } else {
                     antish = false;
                 }
-            }
+            } 
             // attempt to evaluate the property within the object (visit(ASTIdentifierAccess node))
             object = objectNode.jjtAccept(this, object);
             cancelCheck(node);
@@ -1179,15 +1189,16 @@ public class Interpreter extends InterpreterBase {
                 // am I the left-hand side of a safe op ?
                 return ptyNode.isSafeLhs(jexl.safe)
                        ? null
-                       : unsolvableProperty(node, stringifyProperty(ptyNode), false, null);
+                       : unsolvableProperty(node, stringifyProperty(ptyNode), ptyNode == objectNode, null);
             }
             if (antish) {
-                String aname = ant != null? ant.toString() : stringifyProperty(node);
-                boolean undefined = !(context.has(aname) || isLocalVariable(node, 0));
+                String pstr = stringifyProperty(node);
+                String aname = ant != null? ant.toString() : pstr;
+                boolean undefined = !(context.has(aname) || isLocalVariable(node, 0) || isFunctionCall(node));
                 // variable unknown in context and not a local
                 return node.isSafeLhs(jexl.safe)
                         ? null
-                        : unsolvableVariable(node, undefined? stringifyProperty(node) : aname, undefined);
+                        : unsolvableVariable(node, undefined? pstr : aname, undefined);
             }
         }
         return object;
