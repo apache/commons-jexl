@@ -99,6 +99,8 @@ New features
 
 + C-like `&` pointer and `*` pointer dereference operators are introduced
 
++ New Map.Entry literal `[a : b]` is introduced
+
 + New iterator `...` operator is introduced
 
 + New iterator processing (selection/projection/reduction) operators are introduced
