@@ -69,6 +69,7 @@ New Features in 3.2:
 Bugs Fixed in 3.2:
 ==================
 
+* JEXL-285:      For statement variable may seem unaffected by iteration
 * JEXL-282:      Pragmas with antish names are broken
 * JEXL-281:      MethodExecutor incorrectly tests for empty parameters list
 * JEXL-280:      break/continue statements outside of the loop

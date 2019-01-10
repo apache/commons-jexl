@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-285"> 
+                For statement variable may seem unaffected by iteration
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-282" due-to="Dmitri Blinov">
                 Pragmas with antish names are broken
             </action>

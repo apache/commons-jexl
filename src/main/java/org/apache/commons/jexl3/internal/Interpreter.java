@@ -682,6 +682,13 @@ public class Interpreter extends InterpreterBase {
         ASTReference loopReference = (ASTReference) node.jjtGetChild(0);
         ASTIdentifier loopVariable = (ASTIdentifier) loopReference.jjtGetChild(0);
         int symbol = loopVariable.getSymbol();
+        // the loop var may be reusing a local var without declaring it properly using 'var...'
+        if (symbol < 0 && frame != null && frame.getScope() != null) {
+            int s = frame.getScope().getSymbol(loopVariable.getName());
+            if (s >= 0) {
+                symbol = s;
+            }
+        }
         /* second objectNode is the variable to iterate */
         Object iterableValue = node.jjtGetChild(1).jjtAccept(this, data);
         // make sure there is a value to iterate on and a statement to execute
