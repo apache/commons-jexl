@@ -385,7 +385,7 @@ void ForEachVar() #Reference : {}
 {
     <VAR> DeclareVar()
 |
-    Identifier()
+    Identifier(true)
 }
 
 void Var() #void : {}
