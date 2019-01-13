@@ -236,6 +236,9 @@ public abstract class JexlNode extends SimpleNode {
                 && (((ASTIdentifierAccess) rsibling).isSafe() || safe)) {
                 return true;
             }
+            if (rsibling instanceof ASTArrayAccess) {
+                return safe;
+            }
         }
         return false;
     }

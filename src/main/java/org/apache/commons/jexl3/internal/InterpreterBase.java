@@ -287,7 +287,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             return ((ASTIdentifier) node).getName();
         }
         if (node instanceof ASTReference) {
-            return stringifyPropertyValue(node.jjtGetChild(0));
+            return stringifyProperty(node.jjtGetChild(0));
         }
         return stringifyPropertyValue(node);
     }

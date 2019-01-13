@@ -632,6 +632,16 @@ public class Issues200Test extends JexlTestCase {
         public Number identity(Number x) {
             return x;
         }
+        public String[] spread(String str) {
+            if (str == null) {
+                return null;
+            }
+             String[] a = new String[str.length()];
+             for(int i = 0; i < str.length(); ++i) {
+                 a[i] = "" + str.charAt(i);
+             }
+             return a;
+        }
     }
 
     @Test
@@ -699,5 +709,81 @@ public class Issues200Test extends JexlTestCase {
             }
             ctxt.set("z.y", null);
         }
+    }
+    
+    @Test
+    public void test279b() throws Exception {
+        final Log logger = null;//LogFactory.getLog(Issues200Test.class);
+        Object result;
+        JexlScript script;
+        JexlContext ctxt = new Context279();
+        ctxt.set("ctxt", ctxt);
+        String src = "(x)->{ spread(x)[0].toString() }";
+        JexlEngine jexl = new JexlBuilder().safe(true).strict(true).create();
+        script = jexl.createScript(src);
+        result = script.execute(ctxt, "abc");
+        Assert.assertEquals("a", result);
+        result = script.execute(ctxt, (Object) null);
+        Assert.assertNull(result);
+    }
+    
+    @Test
+    public void test285() throws Exception {
+        List<String> out = new ArrayList<String>(6);
+        JexlContext ctxt = new MapContext();
+        ctxt.set("$out", out);
+        String src = "for(var b: ['g','h','i']) {\n"
+                + "  var c = b;\n"
+                + "  $out.add(c);\n"
+                + "}\n"
+                + " \n"
+                + "for(c: ['j','k','l']) {\n"
+                + "  $out.add(c);\n"
+                + "}"
+                + " \n"
+                + "$out.size()";
+
+        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(ctxt, (Object) null);
+        Assert.assertEquals(6, result);
+        List<String> ctl = Arrays.asList("g", "h", "i", "j", "k", "l");
+        Assert.assertEquals(ctl, out);
+    }
+ 
+    @Test
+    public void test285a() throws Exception {
+        List<String> out = new ArrayList<String>(6);
+        JexlContext ctxt = new MapContext();
+        ctxt.set("$out", out);
+        String src =
+                  "for(var b: ['g','h','i']) { $out.add(b); }\n"
+                + "for(b: ['j','k','l']) { $out.add(b);}\n"
+                + "$out.size()";
+
+        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(ctxt, (Object) null);
+        Assert.assertEquals(6, result);
+        List<String> ctl = Arrays.asList("g", "h", "i", "j", "k", "l");
+        Assert.assertEquals(ctl, out);
+    }
+    
+    @Test
+    public void test285b() throws Exception {
+        List<String> out = new ArrayList<String>(6);
+        JexlContext ctxt = new MapContext();
+        ctxt.set("$out", out);
+        String src = 
+                  "for(b: ['g','h','i']) { $out.add(b); }\n"
+                + "for(var b: ['j','k','l']) { $out.add(b);}\n"
+                + "$out.size()";
+
+        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(ctxt, (Object) null);
+        Assert.assertEquals(6, result);
+        List<String> ctl = Arrays.asList("g", "h", "i", "j", "k", "l");
+        Assert.assertEquals(ctl, out);
     }
 }

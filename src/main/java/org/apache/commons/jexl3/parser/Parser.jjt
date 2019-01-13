@@ -611,7 +611,7 @@ void ForeachVar() : {}
 {
     DeclareVar() (<COMMA> DeclareExtVar(false))?
     |
-    Identifier() (<COMMA> Identifier())?
+    Identifier(true) (<COMMA> Identifier(true))?
 }
 
 void MultipleVar() #void : {}
@@ -630,7 +630,7 @@ void MultipleDeclareVar() #MultipleIdentifier :
 
 void Var() #void : {}
 {
-    LOOKAHEAD(<FINAL> | <BYTE> | <SHORT> | <INT> | <LONG> | <CHAR> | <BOOLEAN> | <FLOAT> | <DOUBLE> | (<VAR> <and>)) 
+    LOOKAHEAD(<FINAL> | <BYTE> | <SHORT> | <INT> | <LONG> | <CHAR> | <BOOLEAN> | <FLOAT> | <DOUBLE> | (<VAR> <and>))
     DeclareLocalVar() <assign> Expression() #Initialization(2)
     |
     DeclareLocalVar() (<assign> Expression() #Initialization(2))?
@@ -1364,7 +1364,7 @@ void VarParameter() #void :
     boolean isRequired = false;
 }
 {
-    ( <FINAL> { isFinal = true; } )? 
+    ( <FINAL> { isFinal = true; } )?
     ( <VAR> ( <and> { isRequired = true; } )?
       | <INT> { type = Integer.TYPE; }
       | <LONG> { type = Long.TYPE; }
@@ -1381,9 +1381,9 @@ void VarParameter() #void :
 void Parameters() #void : {}
 {
     <LPAREN> [
-      (LOOKAHEAD(<FINAL> | <VAR> | <BYTE> | <SHORT> | <INT> | <LONG> | <FLOAT> | <DOUBLE> | <BOOLEAN> | <CHAR> ) VarParameter() (<COMMA> VarParameter())* 
-       | 
-       Parameter() (<COMMA> Parameter())*) 
+      (LOOKAHEAD(<FINAL> | <VAR> | <BYTE> | <SHORT> | <INT> | <LONG> | <FLOAT> | <DOUBLE> | <BOOLEAN> | <CHAR> ) VarParameter() (<COMMA> VarParameter())*
+       |
+       Parameter() (<COMMA> Parameter())*)
       (<ELLIPSIS> { declareVarArgSupport(); })?
     ] <RPAREN>
 }
