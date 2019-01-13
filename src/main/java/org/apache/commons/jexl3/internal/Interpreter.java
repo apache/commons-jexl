@@ -1277,9 +1277,6 @@ public class Interpreter extends InterpreterBase {
 
                 ASTIdentifier loopValueVariable = (ASTIdentifier) loopReference.jjtGetChild(1);
 
-                int symbol = loopVariable.getSymbol();
-                int valueSymbol = loopValueVariable.getSymbol();
-
                 // get an iterator for the collection/array etc via the introspector.
                 Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH_INDEXED, iterableValue);
                 Iterator<?> itemsIterator = forEach instanceof Iterator
@@ -1297,30 +1294,13 @@ public class Interpreter extends InterpreterBase {
                             i += 1;
                             // set loopVariable to value of iterator
                             Object value = itemsIterator.next();
-
                             if (value instanceof Map.Entry<?,?>) {
                                 Map.Entry<?,?> entry = (Map.Entry<?,?>) value;
-                                if (symbol < 0) {
-                                    context.set(loopVariable.getName(), entry.getKey());
-                                } else {
-                                    frame.set(symbol, entry.getKey());
-                                }
-                                if (valueSymbol < 0) {
-                                    context.set(loopValueVariable.getName(), entry.getValue());
-                                } else {
-                                    frame.set(valueSymbol, entry.getValue());
-                                }
+                                executeAssign(node, loopVariable, entry.getKey(), null, data);
+                                executeAssign(node, loopValueVariable, entry.getValue(), null, data);
                             } else {
-                                if (symbol < 0) {
-                                    context.set(loopVariable.getName(), i);
-                                } else {
-                                    frame.set(symbol, i);
-                                }
-                                if (valueSymbol < 0) {
-                                    context.set(loopValueVariable.getName(), value);
-                                } else {
-                                    frame.set(valueSymbol, value);
-                                }
+                                executeAssign(node, loopVariable, i, null, data);
+                                executeAssign(node, loopValueVariable, value, null, data);
                             }
                             if (statement != null) {
                                 try {
@@ -1357,8 +1337,6 @@ public class Interpreter extends InterpreterBase {
                 }
 
             } else {
-                int symbol = loopVariable.getSymbol();
-
                 // get an iterator for the collection/array etc via the introspector.
                 Object forEach = operators.tryOverload(node, JexlOperator.FOR_EACH, iterableValue);
                 Iterator<?> itemsIterator = forEach instanceof Iterator
@@ -1374,11 +1352,7 @@ public class Interpreter extends InterpreterBase {
                             cancelCheck(node);
                             // set loopVariable to value of iterator
                             Object value = itemsIterator.next();
-                            if (symbol < 0) {
-                                context.set(loopVariable.getName(), value);
-                            } else {
-                                frame.set(symbol, value);
-                            }
+                            executeAssign(node, loopVariable, value, null, data);
 
                             if (statement != null) {
                                 try {
