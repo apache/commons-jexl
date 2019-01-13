@@ -1271,10 +1271,8 @@ public class Interpreter extends InterpreterBase {
         /* second objectNode is the variable to iterate */
         Object iterableValue = node.jjtGetChild(1).jjtAccept(this, data);
 
-        // make sure there is a value to iterate on and a statement to execute
-        if (iterableValue != null && node.jjtGetNumChildren() >= 3) {
-            /* third objectNode is the statement to execute */
-            JexlNode statement = node.jjtGetChild(2);
+        // make sure there is a value to iterate on
+        if (iterableValue != null) {
             if (loopReference.jjtGetNumChildren() > 1) {
 
                 ASTIdentifier loopValueVariable = (ASTIdentifier) loopReference.jjtGetChild(1);
@@ -1289,9 +1287,11 @@ public class Interpreter extends InterpreterBase {
                                         : uberspect.getIndexedIterator(iterableValue);
 
                 int i = -1;
-
                 if (itemsIterator != null) {
                     try {
+                        /* third objectNode is the statement to execute */
+                        JexlNode statement = node.jjtGetNumChildren() >= 3 ? node.jjtGetChild(2) : null;
+
                         while (itemsIterator.hasNext()) {
                             cancelCheck(node);
                             i += 1;
@@ -1322,31 +1322,32 @@ public class Interpreter extends InterpreterBase {
                                     frame.set(valueSymbol, value);
                                 }
                             }
-
-                            try {
-                                // execute statement
-                                result = statement.jjtAccept(this, data);
-                            } catch (JexlException.Break stmtBreak) {
-                                String target = stmtBreak.getLabel();
-                                if (target == null || target.equals(node.getLabel())) {
-                                    break;
-                                } else {
-                                    throw stmtBreak;
+                            if (statement != null) {
+                                try {
+                                    // execute statement
+                                    result = statement.jjtAccept(this, data);
+                                } catch (JexlException.Break stmtBreak) {
+                                    String target = stmtBreak.getLabel();
+                                    if (target == null || target.equals(node.getLabel())) {
+                                        break;
+                                    } else {
+                                        throw stmtBreak;
+                                    }
+                                } catch (JexlException.Continue stmtContinue) {
+                                    String target = stmtContinue.getLabel();
+                                    if (target != null && !target.equals(node.getLabel())) {
+                                        throw stmtContinue;
+                                    }
+                                    // continue
+                                } catch (JexlException.Remove stmtRemove) {
+                                    String target = stmtRemove.getLabel();
+                                    if (target != null && !target.equals(node.getLabel())) {
+                                        throw stmtRemove;
+                                    }
+                                    itemsIterator.remove();
+                                    i -= 1;
+                                    // and continue
                                 }
-                            } catch (JexlException.Continue stmtContinue) {
-                                String target = stmtContinue.getLabel();
-                                if (target != null && !target.equals(node.getLabel())) {
-                                    throw stmtContinue;
-                                }
-                                // continue
-                            } catch (JexlException.Remove stmtRemove) {
-                                String target = stmtRemove.getLabel();
-                                if (target != null && !target.equals(node.getLabel())) {
-                                    throw stmtRemove;
-                                }
-                                itemsIterator.remove();
-                                i -= 1;
-                                // and continue
                             }
                         }
                     } finally {
@@ -1365,6 +1366,10 @@ public class Interpreter extends InterpreterBase {
                                         : uberspect.getIterator(iterableValue);
                 if (itemsIterator != null) {
                     try {
+
+                        /* third objectNode is the statement to execute */
+                        JexlNode statement = node.jjtGetNumChildren() >= 3 ? node.jjtGetChild(2) : null;
+
                         while (itemsIterator.hasNext()) {
                             cancelCheck(node);
                             // set loopVariable to value of iterator
@@ -1374,29 +1379,32 @@ public class Interpreter extends InterpreterBase {
                             } else {
                                 frame.set(symbol, value);
                             }
-                            try {
-                                // execute statement
-                                result = statement.jjtAccept(this, data);
-                            } catch (JexlException.Break stmtBreak) {
-                                String target = stmtBreak.getLabel();
-                                if (target == null || target.equals(node.getLabel())) {
-                                    break;
-                                } else {
-                                    throw stmtBreak;
+
+                            if (statement != null) {
+                                try {
+                                    // execute statement
+                                    result = statement.jjtAccept(this, data);
+                                } catch (JexlException.Break stmtBreak) {
+                                    String target = stmtBreak.getLabel();
+                                    if (target == null || target.equals(node.getLabel())) {
+                                        break;
+                                    } else {
+                                        throw stmtBreak;
+                                    }
+                                } catch (JexlException.Continue stmtContinue) {
+                                    String target = stmtContinue.getLabel();
+                                    if (target != null && !target.equals(node.getLabel())) {
+                                        throw stmtContinue;
+                                    }
+                                    // continue
+                                } catch (JexlException.Remove stmtRemove) {
+                                    String target = stmtRemove.getLabel();
+                                    if (target != null && !target.equals(node.getLabel())) {
+                                        throw stmtRemove;
+                                    }
+                                    itemsIterator.remove();
+                                    // and continue
                                 }
-                            } catch (JexlException.Continue stmtContinue) {
-                                String target = stmtContinue.getLabel();
-                                if (target != null && !target.equals(node.getLabel())) {
-                                    throw stmtContinue;
-                                }
-                                // continue
-                            } catch (JexlException.Remove stmtRemove) {
-                                String target = stmtRemove.getLabel();
-                                if (target != null && !target.equals(node.getLabel())) {
-                                    throw stmtRemove;
-                                }
-                                itemsIterator.remove();
-                                // and continue
                             }
                         }
                     } finally {
