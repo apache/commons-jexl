@@ -506,7 +506,7 @@ void TryVar() : {}
 {
     DeclareVar()
     |
-    Identifier()
+    Identifier(true)
 }
 
 void ThrowStatement() : {}

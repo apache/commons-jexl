@@ -1492,12 +1492,7 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTTryVar node, Object data) {
         ASTIdentifier variable = (ASTIdentifier) node.jjtGetChild(0);
-        int symbol = variable.getSymbol();
-        if (symbol < 0) {
-            context.set(variable.getName(), data);
-        } else {
-            frame.set(symbol, data);
-        }
+        executeAssign(node, variable, data, null, null);
         return null;
     }
 
