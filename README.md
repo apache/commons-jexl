@@ -58,7 +58,7 @@ Incompatible changes
 
 + Precedence of the `match` operator (`=~`) and `not-match` operator (`!~`) is changed to be that of other equality operators.
 
-+ Passing a function more arguments than is specified in the function declaration now results in error in a strict mode
++ Passing a function more arguments than is specified in the function declaration now results in error
 
 + Hoisted variables are effectively final. The reason is hoisted variables are in fact copies of the original variables,
   so assigning a new value to the hoisted variable does not affect the original one. Such behaviour is misleading and thus restricted.
