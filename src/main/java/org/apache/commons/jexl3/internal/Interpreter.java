@@ -2961,14 +2961,13 @@ public class Interpreter extends InterpreterBase {
                     if (functor instanceof JexlScript) {
                         JexlScript s = (JexlScript) functor;
                         boolean varArgs = s.isVarArgs();
-                        if (!varArgs && isStrictEngine()) {
+                        if (!varArgs) {
                             String[] params = s.getUnboundParameters();
                             int paramCount = params != null ? params.length : 0;
                             int argCount = argv != null ? argv.length : 0;
                             if (argCount > paramCount)
                                 return unsolvableMethod(node, "(...)");
                         }
-
                         return s.execute(context, argv);
                     }
                     if (functor instanceof JexlMethod) {
