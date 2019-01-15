@@ -304,8 +304,12 @@ public class Script implements JexlScript, JexlExpression {
                 result[0] = varg;
             }
         } else if (args != null && args.length > 0 && args.length > argCount) {
-            result = new Object[argCount];
-            System.arraycopy(args, 0, result, 0, argCount);
+            if (argCount == 0) {
+                result = InterpreterBase.EMPTY_PARAMS;
+            } else {
+                result = new Object[argCount];
+                System.arraycopy(args, 0, result, 0, argCount);
+            }
         } else {
             result = args;
         }
