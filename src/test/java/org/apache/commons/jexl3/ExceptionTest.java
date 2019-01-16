@@ -185,9 +185,9 @@ public class ExceptionTest extends JexlTestCase {
         try {
             /* Object o = */ e.execute(ctxt);
             Assert.fail("x is null, should throw");
-        } catch (JexlException.Variable xjexl) {
+        } catch (JexlException xjexl) {
             String msg = xjexl.getMessage();
-            Assert.assertTrue(msg.indexOf("x") > 0);
+            Assert.assertTrue(msg.indexOf("null") > 0);
         }
 
         // allow null operands
