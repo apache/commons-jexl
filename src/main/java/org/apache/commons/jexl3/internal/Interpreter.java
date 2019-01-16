@@ -981,15 +981,21 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
-    protected Object visit(ASTVar node, Object data) {
-        return visit((ASTIdentifier) node, data);
-    }
-
-    @Override
     protected Object visit(ASTReferenceExpression node, Object data) {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
 
+    @Override
+    protected Object visit(ASTVar node, Object data) {
+        int symbol = node.getSymbol();
+        if (frame.has(symbol)) {
+            return frame.get(symbol);
+        } else {
+            frame.set(symbol, null);
+            return null;
+        }
+    }
+    
     @Override
     protected Object visit(ASTIdentifier node, Object data) {
         cancelCheck(node);
@@ -997,7 +1003,12 @@ public class Interpreter extends InterpreterBase {
         if (data == null) {
             int symbol = node.getSymbol();
             if (symbol >= 0) {
-                return frame.get(symbol);
+                if (frame.has(symbol)) {
+                    return frame.get(symbol);
+                } else if (node instanceof ASTVar) {
+                    // empty declaration
+                    return null;
+                }
             }
             Object value = context.get(name);
             if (value == null
@@ -1276,7 +1287,7 @@ public class Interpreter extends InterpreterBase {
                 // check we are not assigning a symbol itself
                 if (last < 0) {
                     if (assignop != null) {
-                        Object self = frame.get(symbol);
+                        Object self = getVariable(frame, var);
                         right = operators.tryAssignOverload(node, assignop, self, right);
                         if (right == JexlOperator.ASSIGN) {
                             return self;
@@ -1289,7 +1300,7 @@ public class Interpreter extends InterpreterBase {
                     }
                     return right; // 1
                 }
-                object = frame.get(symbol);
+                object = getVariable(frame, var);
                 // top level is a symbol, can not be an antish var
                 antish = false;
             } else {
@@ -1512,7 +1523,7 @@ public class Interpreter extends InterpreterBase {
             functor = null;
             // is it a global or local variable ?
             if (target == context) {
-                if (symbol >= 0) {
+                if (symbol >= 0 && frame.has(symbol)) {
                     functor = frame.get(symbol);
                     isavar = functor != null;
                 } else if (context.has(methodName)) {

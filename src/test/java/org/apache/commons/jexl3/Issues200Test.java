@@ -801,7 +801,44 @@ public class Issues200Test extends JexlTestCase {
         JexlEngine jexl = new JexlBuilder().strict(true).create();
         Assert.assertEquals(2, jexl.createScript(s286).execute(null));
     }
-        
+    
+    @Test
+    public void test287() {
+        JexlContext ctxt = new MapContext();
+        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        String src;
+        JexlScript script;
+        Object result;
+        // declared, not defined
+        src = "x = 1; if (false) var x = 2; x";
+        script = jexl.createScript(src);
+        result = script.execute(ctxt);
+        Assert.assertEquals(1, result);
+        // declared and defined
+        src = "x = 1; if (true) var x = 2; x";
+        script = jexl.createScript(src);
+        result = script.execute(ctxt);
+        Assert.assertEquals(2,result);
+        // definition using shadowed global
+        src = "x = 1; var x = x + 41; x";
+        script = jexl.createScript(src);
+        result = script.execute(ctxt);
+        Assert.assertEquals(42,result);
+    }
+            
+    @Test
+    public void test289() {
+        JexlContext ctxt = new MapContext();
+        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        String src;
+        JexlScript script;
+        Object result;
+        src = "var x = function(a) { var b; return b}; x(1,2)";
+        script = jexl.createScript(src);
+        result = script.execute(ctxt);
+        Assert.assertNull(result);
+    }
+    
     @Test
     public void test290a() throws Exception {
         Object result;

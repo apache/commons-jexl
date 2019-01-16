@@ -99,7 +99,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         AUTOCLOSEABLE = c;
     }
-
+    
     /**
      * Attempt to call close() if supported.
      * <p>This is used when dealing with auto-closeable (duck-like) objects
@@ -119,7 +119,21 @@ public abstract class InterpreterBase extends ParserVisitor {
             //}
         }
     }
-
+              
+    /**
+     * Gets a value of a defined local variable or from the context.
+     * @param frame the local frame
+     * @param node the variable node
+     * @return the value
+     */
+    protected Object getVariable(Scope.Frame frame, ASTIdentifier node) {
+        int symbol = node.getSymbol();
+        if (frame.has(symbol)) {
+            return frame.get(symbol);
+        }
+        return context.get(node.getName());
+    }
+    
     /**
      * Whether this interpreter is currently evaluating with a strict engine flag.
      * @return true if strict engine, false otherwise
