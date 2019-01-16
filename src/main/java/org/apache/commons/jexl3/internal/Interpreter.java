@@ -3014,7 +3014,9 @@ public class Interpreter extends InterpreterBase {
                 }
             }
             // we have either evaluated and returned or no method was found
-            return unsolvableMethod(node, methodName);
+            return node.isSafeLhs(jexl.safe)
+                    ? null
+                    : unsolvableMethod(node, methodName);
         } catch (JexlException xthru) {
             throw xthru;
         } catch (Exception xany) {
@@ -3079,10 +3081,17 @@ public class Interpreter extends InterpreterBase {
                 // we are done trying
                 break;
             }
-            // we have either evaluated and returned or no method was found
-            return node.isSafeLhs(jexl.safe)
-                    ? null
-                    : unsolvableMethod(node, methodName);
+            // we have either evaluated and returned or might have found a ctor
+            if (ctor != null) {
+                Object eval = ctor.invoke(target, argv);
+                // cache executor in volatile JexlNode.value
+                if (funcall != null) {
+                    node.jjtSetValue(funcall);
+                }
+                return eval;
+            }
+            String tstr = target != null ? target.toString() : "?";
+            return unsolvableMethod(node, tstr);
         } catch (JexlException xthru) {
             throw xthru;
         } catch (Exception xany) {
