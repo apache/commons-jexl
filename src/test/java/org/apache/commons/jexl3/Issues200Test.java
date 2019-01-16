@@ -796,14 +796,13 @@ public class Issues200Test extends JexlTestCase {
     }
         
     @Test
-    public void test290() throws Exception {
+    public void test290a() throws Exception {
         Object result;
         JexlScript script;
         String[] srcs = new String[]{
-            "(x)->{ x.nothing().nothing() }",
+            "(x)->{ x.nothing().toString() }",
             "(x)->{ x.toString().nothing() }",
             "(x)->{ x.nothing().nothing() }",
-            "(x)->{ (x.nothing()).nothing() }"
         };
         for (boolean safe : new boolean[]{true, false}) {
             JexlEngine jexl = new JexlBuilder().safe(safe).strict(true).create();
@@ -824,6 +823,22 @@ public class Issues200Test extends JexlTestCase {
                     }
                 } 
             }
+        }
+    }
+
+    @Test
+    public void test290b() throws Exception {
+        Object result;
+        JexlScript script;
+        String[] srcs = new String[]{
+            "(x)->{ x?.nothing()?.toString() }",
+            "(x)->{ x.toString()?.nothing() }",
+            "(x)->{ x?.nothing().nothing() }",};
+        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        for (String src : srcs) {
+            script = jexl.createScript(src);
+            result = script.execute(null, "abc");
+            Assert.assertNull(result);
         }
     }
 }
