@@ -1441,7 +1441,9 @@ public class Interpreter extends InterpreterBase {
                 object = data;
                 if (object == null) {
                     // no object, we fail
-                    return unsolvableMethod(methodNode, "<null>.<?>(...)");
+                    return node.isSafeLhs(jexl.safe)
+                        ? null
+                        : unsolvableMethod(methodNode, "<null>.<?>(...)");
                 }
             } else {
                 // edge case of antish var used as functor
@@ -1453,8 +1455,10 @@ public class Interpreter extends InterpreterBase {
         Object result = method;
         for (int a = 1; a < node.jjtGetNumChildren(); ++a) {
             if (result == null) {
-                // no method, we fail
-                return unsolvableMethod(methodNode, "<?>.<null>(...)");
+                // no method, we fail// variable unknown in context and not a local
+                return node.isSafeLhs(jexl.safe)
+                        ? null
+                        : unsolvableMethod(methodNode, "<?>.<null>(...)");
             }
             ASTArguments argNode = (ASTArguments) node.jjtGetChild(a);
             result = call(node, object, result, argNode);
@@ -1527,8 +1531,11 @@ public class Interpreter extends InterpreterBase {
             symbol = -1 - 1; // -2;
             methodName = null;
             cacheable = false;
+        } else if (!node.isSafeLhs(jexl.safe)) {
+            return unsolvableMethod(node, "?(...)");
         } else {
-            return unsolvableMethod(node, "?");
+            // safe lhs
+            return null;
         }
         
         // solving the call site
@@ -1629,7 +1636,9 @@ public class Interpreter extends InterpreterBase {
                 }
             }
             // we have either evaluated and returned or no method was found
-            return unsolvableMethod(node, methodName);
+            return node.isSafeLhs(jexl.safe)
+                    ? null
+                    : unsolvableMethod(node, methodName);
         } catch (JexlException xthru) {
             throw xthru;
         } catch (Exception xany) {

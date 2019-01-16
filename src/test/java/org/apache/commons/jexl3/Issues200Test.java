@@ -722,7 +722,6 @@ public class Issues200Test extends JexlTestCase {
     
     @Test
     public void test279b() throws Exception {
-        final Log logger = null;//LogFactory.getLog(Issues200Test.class);
         Object result;
         JexlScript script;
         JexlContext ctxt = new Context279();
@@ -734,7 +733,7 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertEquals("a", result);
         result = script.execute(ctxt, (Object) null);
         Assert.assertNull(result);
-    }
+    } 
     
     @Test
     public void test285() throws Exception {
@@ -794,5 +793,37 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertEquals(6, result);
         List<String> ctl = Arrays.asList("g", "h", "i", "j", "k", "l");
         Assert.assertEquals(ctl, out);
+    }
+        
+    @Test
+    public void test290() throws Exception {
+        Object result;
+        JexlScript script;
+        String[] srcs = new String[]{
+            "(x)->{ x.nothing().nothing() }",
+            "(x)->{ x.toString().nothing() }",
+            "(x)->{ x.nothing().nothing() }",
+            "(x)->{ (x.nothing()).nothing() }"
+        };
+        for (boolean safe : new boolean[]{true, false}) {
+            JexlEngine jexl = new JexlBuilder().safe(safe).strict(true).create();
+            for (String src : srcs) {
+                script = jexl.createScript(src);
+                try {
+                    result = script.execute(null, "abc");
+                    if (!safe) {
+                        Assert.fail("should have failed: " + src);
+                    } else {
+                        Assert.assertNull("non-null result ?!", result);
+                    }
+                } catch (JexlException.Method xmethod) {
+                    if (safe) {
+                        Assert.fail(src + ", should not have thrown " + xmethod);
+                    } else {
+                        Assert.assertTrue(src + ": " + xmethod.toString(), xmethod.toString().contains("nothing"));
+                    }
+                } 
+            }
+        }
     }
 }
