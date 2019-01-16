@@ -69,6 +69,8 @@ New Features in 3.2:
 Bugs Fixed in 3.2:
 ==================
 
+* JEXL-290:      Safe navigation fails on chained method calls
+* JEXL-286:      For statement without a body should update its variable
 * JEXL-285:      For statement variable may seem unaffected by iteration
 * JEXL-282:      Pragmas with antish names are broken
 * JEXL-281:      MethodExecutor incorrectly tests for empty parameters list

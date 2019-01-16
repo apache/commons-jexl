@@ -26,6 +26,12 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-290"> 
+                Safe navigation fails on chained method calls
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-286" due-to="Dmitri Blinov"> 
+                For statement without a body should update its variable
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-285"> 
                 For statement variable may seem unaffected by iteration
             </action>

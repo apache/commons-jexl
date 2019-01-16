@@ -211,6 +211,13 @@ public abstract class JexlNode extends SimpleNode {
         if (this instanceof ASTReference) {
             return jjtGetChild(0).isSafeLhs(safe);
         }
+        if (this instanceof ASTMethodNode) {
+            if (this.jjtGetNumChildren() > 1
+                && this.jjtGetChild(0) instanceof ASTIdentifierAccess
+                && (((ASTIdentifierAccess) this.jjtGetChild(0)).isSafe() || safe)) {
+                return true;
+            }
+        }
         JexlNode parent = this.jjtGetParent();
         if (parent == null) {
             return false;
