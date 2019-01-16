@@ -794,6 +794,13 @@ public class Issues200Test extends JexlTestCase {
         List<String> ctl = Arrays.asList("g", "h", "i", "j", "k", "l");
         Assert.assertEquals(ctl, out);
     }
+    
+    @Test
+    public void test286() {
+        String s286 = "var x = 0; for(x : 1..2){}; return x";
+        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        Assert.assertEquals(2, jexl.createScript(s286).execute(null));
+    }
         
     @Test
     public void test290a() throws Exception {

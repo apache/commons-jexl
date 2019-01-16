@@ -684,10 +684,10 @@ public class Interpreter extends InterpreterBase {
         int symbol = loopVariable.getSymbol();
         /* second objectNode is the variable to iterate */
         Object iterableValue = node.jjtGetChild(1).jjtAccept(this, data);
-        // make sure there is a value to iterate on and a statement to execute
-        if (iterableValue != null && node.jjtGetNumChildren() >= 3) {
+        // make sure there is a value to iterate upon
+        if (iterableValue != null) {
             /* third objectNode is the statement to execute */
-            JexlNode statement = node.jjtGetChild(2);
+            JexlNode statement = node.jjtGetNumChildren() >= 3? node.jjtGetChild(2) : null;
             // get an iterator for the collection/array etc via the introspector.
             Object forEach = null;
             try {
@@ -705,13 +705,15 @@ public class Interpreter extends InterpreterBase {
                         } else {
                             frame.set(symbol, value);
                         }
-                        try {
-                            // execute statement
-                            result = statement.jjtAccept(this, data);
-                        } catch (JexlException.Break stmtBreak) {
-                            break;
-                        } catch (JexlException.Continue stmtContinue) {
-                            //continue;
+                        if (statement != null) {
+                            try {
+                                // execute statement
+                                result = statement.jjtAccept(this, data);
+                            } catch (JexlException.Break stmtBreak) {
+                                break;
+                            } catch (JexlException.Continue stmtContinue) {
+                                //continue;
+                            }
                         }
                     }
                 }
