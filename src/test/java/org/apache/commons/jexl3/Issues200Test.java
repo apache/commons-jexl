@@ -818,12 +818,33 @@ public class Issues200Test extends JexlTestCase {
         src = "x = 1; if (true) var x = 2; x";
         script = jexl.createScript(src);
         result = script.execute(ctxt);
-        Assert.assertEquals(2,result);
+        Assert.assertEquals(2, result);
         // definition using shadowed global
         src = "x = 1; var x = x + 41; x";
         script = jexl.createScript(src);
         result = script.execute(ctxt);
-        Assert.assertEquals(42,result);
+        Assert.assertEquals(42, result);
+        // definition using shadowed global
+        src = "(x)->{ if (x==1) { var y = 2; } else if (x==2) { var y = 3; }; y }";
+        script = jexl.createScript(src);
+        result = script.execute(ctxt, 1);
+        Assert.assertEquals(2, result);
+        result = script.execute(ctxt, 2);
+        Assert.assertEquals(3, result);
+        try {
+            result = script.execute(ctxt, 0);
+            Assert.fail("should have failed!");
+        } catch (JexlException.Variable xvar) {
+            Assert.assertTrue(xvar.getMessage().contains("y"));
+        }
+        jexl = new JexlBuilder().strict(true).safe(true).create();
+        script = jexl.createScript(src);
+        try {
+            result = script.execute(ctxt, 0);
+        } catch (JexlException xvar) {
+            Assert.fail("should not have failed!");
+        }
+        Assert.assertNull(result);
     }
             
     @Test
