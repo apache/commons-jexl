@@ -193,7 +193,7 @@ public class ExceptionTest extends JexlTestCase {
         // allow null operands
         ctxt.setStrictArithmetic(false);
         try {
-            Object o = e.execute(ctxt);
+            Object o = e.execute(ctxt, (Object) null);
         } catch (JexlException.Variable xjexl) {
             Assert.fail("arithmetic allows null operands, should not throw");
         }

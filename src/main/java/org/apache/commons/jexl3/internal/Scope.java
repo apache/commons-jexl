@@ -27,7 +27,15 @@ import java.util.HashSet;
  * A script scope, stores the declaration of parameters and local variables as symbols.
  * @since 3.0
  */
-public final class Scope {
+public final class Scope {    
+    /**
+     * The value of a declared but undefined variable, for instance: var x;.
+     */
+    private static final Object UNDEFINED = new Object() {
+        @Override public String toString() {
+            return "?";
+        }
+    };
     /**
      * The parent scope.
      */
@@ -366,6 +374,7 @@ public final class Scope {
     public Frame createFrame(Frame frame) {
         if (namedVariables != null) {
             Object[] arguments = new Object[namedVariables.size()];
+            Arrays.fill(arguments, UNDEFINED);
             if (frame != null && hoistedVariables != null && parent != null) {
                 for (Map.Entry<Integer, Integer> hoist : hoistedVariables.entrySet()) {
                     Integer target = hoist.getKey();
@@ -536,7 +545,16 @@ public final class Scope {
         public Object get(int s) {
             return stack[s];
         }
-
+        
+        /**
+         * Whether this frame defines a symbol, ie declared it and assigned it a value.
+         * @param s the offset in this frame
+         * @return true if this symbol has been assigned a value, false otherwise
+         */
+        public boolean has(int s) {
+            return s >= 0 && s < stack.length && stack[s] != UNDEFINED;
+        }
+            
         /**
          * Sets a value.
          * @param r the offset in this frame
@@ -561,10 +579,16 @@ public final class Scope {
          * @return this frame
          */
         public Frame assign(Object... values) {
-            if (stack != null && values != null && values.length > 0) {
+            if (stack != null) {
+                int nparm = scope.getArgCount();
                 Object[] copy = stack.clone();
-                int ncopy = Math.min(copy.length - curried, values.length);
-                System.arraycopy(values, 0, copy, curried, ncopy);
+                int ncopy = 0;
+                if (values != null && values.length > 0) {
+                    ncopy = Math.min(nparm - curried, Math.min(nparm, values.length));
+                    System.arraycopy(values, 0, copy, curried, ncopy);
+                }
+                // unbound parameters are defined as null
+                Arrays.fill(copy, curried + ncopy, nparm, null);
                 return new Frame(scope, copy, curried + ncopy);
             }
             return this;

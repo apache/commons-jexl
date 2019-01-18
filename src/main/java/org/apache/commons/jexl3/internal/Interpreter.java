@@ -2074,11 +2074,6 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
-    protected Object visit(ASTVar node, Object data) {
-        return visit((ASTIdentifier) node, data);
-    }
-
-    @Override
     protected Object visit(ASTExtVar node, Object data) {
         return visit((ASTIdentifier) node, data);
     }
@@ -2089,12 +2084,25 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
+    protected Object visit(ASTVar node, Object data) {
+        int symbol = node.getSymbol();
+        // if we have a var, we have a scope thus a frame
+        if (frame.has(symbol)) {
+            return frame.get(symbol);
+        } else {
+            frame.set(symbol, null);
+            return null;
+        }
+    }
+
+    @Override
     protected Object visit(ASTIdentifier node, Object data) {
         cancelCheck(node);
         String name = node.getName();
         if (data == null) {
             int symbol = node.getSymbol();
-            if (symbol >= 0) {
+            // if we have a symbol, we have a scope thus a frame
+            if (symbol >= 0 && frame.has(symbol)) {
                 return frame.get(symbol);
             }
             Object value = context.get(name);
@@ -2124,10 +2132,12 @@ public class Interpreter extends InterpreterBase {
             }
 
             if (value == null
-                    && !(node.jjtGetParent() instanceof ASTReference)
-                    && !context.has(name)
-                    && !node.isTernaryProtected()) {
-                return unsolvableVariable(node, name, true);
+                && !(node.jjtGetParent() instanceof ASTReference)
+                && !(context.has(name))
+                && !node.isTernaryProtected()) {
+                return jexl.safe
+                        ? null
+                        : unsolvableVariable(node, name, !(node.getSymbol() >= 0 || context.has(name)));
             }
             return value;
         } else {
@@ -2566,7 +2576,7 @@ public class Interpreter extends InterpreterBase {
                 // check we are not assigning a symbol itself
                 if (last < 0) {
                     if (assignop != null) {
-                        Object self = frame.get(symbol);
+                        Object self = getVariable(frame, var);
                         right = assignop.getArity() == 1 ? operators.tryAssignOverload(node, assignop, self) :
                             operators.tryAssignOverload(node, assignop, self, right);
                         if (right == JexlOperator.ASSIGN) {
@@ -2595,7 +2605,7 @@ public class Interpreter extends InterpreterBase {
                     }
                     return right; // 1
                 }
-                object = frame.get(symbol);
+                object = getVariable(frame, var);
                 // top level is a symbol, can not be an antish var
                 antish = false;
             } else {
@@ -2879,7 +2889,7 @@ public class Interpreter extends InterpreterBase {
             functor = null;
             // is it a global or local variable ?
             if (target == context) {
-                if (symbol >= 0) {
+                if (symbol >= 0 && frame.has(symbol)) {
                     functor = frame.get(symbol);
                     isavar = functor != null;
                 } else if (context.has(methodName)) {

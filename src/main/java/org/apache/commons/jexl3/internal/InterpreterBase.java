@@ -141,6 +141,20 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
 
     /**
+     * Gets a value of a defined local variable or from the context.
+     * @param frame the local frame
+     * @param node the variable node
+     * @return the value
+     */
+    protected Object getVariable(Scope.Frame frame, ASTIdentifier node) {
+        int symbol = node.getSymbol();
+        if (frame.has(symbol)) {
+            return frame.get(symbol);
+        }
+        return context.get(node.getName());
+    }
+
+    /**
      * Whether this interpreter is currently evaluating with a strict engine flag.
      * @return true if strict engine, false otherwise
      */
@@ -264,7 +278,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         return null;
     }
-    
+
     /**
      * Pretty-prints a failing property (de)reference.
      * <p>Used by calls to unsolvableProperty(...).</p>
@@ -291,7 +305,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         return stringifyPropertyValue(node);
     }
-        
+
     /**
      * Pretty-prints a failing property value (de)reference.
      * <p>Used by calls to unsolvableProperty(...).</p>
@@ -377,7 +391,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             throw new JexlException.Cancel(node);
         }
     }
-    
+
     /**
      * Concatenate arguments in call(...).
      * <p>When target == context, we are dealing with a global namespace function call
@@ -429,7 +443,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         return nargv;
     }
-    
+
     /**
      * Optionally narrows an argument for a function call.
      * @param narrow whether narrowing should occur
@@ -508,7 +522,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             return me.tryInvoke(name, ii.context, ii.functionArguments(target, narrow, args));
         }
     }
-    
+
     /**
      * A ctor that needs a context as 1st argument.
      */
@@ -527,7 +541,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             return me.tryInvoke(name, target, ii.callArguments(ii.context, narrow, args));
         }
     }
-    
+
     /**
      * Helping dispatch function calls.
      */

@@ -792,7 +792,65 @@ public class Issues200Test extends JexlTestCase {
         JexlEngine jexl = new JexlBuilder().strict(true).create();
         Assert.assertEquals(2, jexl.createScript(s286).execute(null));
     }
-        
+    
+    @Test
+    public void test287() {
+        JexlContext ctxt = new MapContext();
+        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        String src;
+        JexlScript script;
+        Object result;
+        // declared, not defined
+        src = "x = 1; if (false) var x = 2; x";
+        script = jexl.createScript(src);
+        result = script.execute(ctxt);
+        Assert.assertEquals(1, result);
+        // declared and defined
+        src = "x = 1; if (true) var x = 2; x";
+        script = jexl.createScript(src);
+        result = script.execute(ctxt);
+        Assert.assertEquals(2, result);
+        // definition using shadowed global
+        src = "x = 1; var x = x + 41; x";
+        script = jexl.createScript(src);
+        result = script.execute(ctxt);
+        Assert.assertEquals(42, result);
+        // definition using shadowed global
+        src = "(x)->{ if (x==1) { var y = 2; } else if (x==2) { var y = 3; }; y }";
+        script = jexl.createScript(src);
+        result = script.execute(ctxt, 1);
+        Assert.assertEquals(2, result);
+        result = script.execute(ctxt, 2);
+        Assert.assertEquals(3, result);
+        try {
+            result = script.execute(ctxt, 0);
+            Assert.fail("should have failed!");
+        } catch (JexlException.Variable xvar) {
+            Assert.assertTrue(xvar.getMessage().contains("y"));
+        }
+        jexl = new JexlBuilder().strict(true).safe(true).create();
+        script = jexl.createScript(src);
+        try {
+            result = script.execute(ctxt, 0);
+        } catch (JexlException xvar) {
+            Assert.fail("should not have failed!");
+        }
+        Assert.assertNull(result);
+    }
+            
+    @Test
+    public void test289() {
+        JexlContext ctxt = new MapContext();
+        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        String src;
+        JexlScript script;
+        Object result;
+        src = "var x = function(a) { var b; return b}; x(1,2)";
+        script = jexl.createScript(src);
+        result = script.execute(ctxt);
+        Assert.assertNull(result);
+    }
+    
     @Test
     public void test290a() throws Exception {
         Object result;
