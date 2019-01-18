@@ -837,20 +837,7 @@ public class Issues200Test extends JexlTestCase {
         }
         Assert.assertNull(result);
     }
-            
-    @Test
-    public void test289() {
-        JexlContext ctxt = new MapContext();
-        JexlEngine jexl = new JexlBuilder().strict(true).create();
-        String src;
-        JexlScript script;
-        Object result;
-        src = "var x = function(a) { var b; return b}; x(1,2)";
-        script = jexl.createScript(src);
-        result = script.execute(ctxt);
-        Assert.assertNull(result);
-    }
-    
+
     @Test
     public void test290a() throws Exception {
         Object result;
