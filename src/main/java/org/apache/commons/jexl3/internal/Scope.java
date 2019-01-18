@@ -481,18 +481,59 @@ public final class Scope {
     }
 
     /**
+     * A variable modifier, stores additional variable attributes.
+     * @since 3.2
+     */
+    protected static final class VariableModifier {
+        /** The var 'final' modifier. */
+        private final boolean isFinal;
+        /** The var 'required' modifier. */
+        private final boolean isRequired;
+        /** The var 'type' modifier. */
+        private final Class type;
+
+        /**
+         * Creates a new variable modifier.
+         * @param c the variable type
+         * @param fin whether the variable is final
+         * @param req whether the variable is required
+         */
+        protected VariableModifier(Class c, boolean fin, boolean req) {
+            type = c;
+            isFinal = fin;
+            isRequired = req;
+        }
+
+        public Class getType() {
+            return type;
+        }
+
+        public boolean isFinal() {
+            return isFinal;
+        }
+
+        public boolean isRequired() {
+            return isRequired;
+        }
+
+        /**
+         * Creates a clone of this modifier.
+         * @return new modifier
+         */
+        public VariableModifier clone() {
+            return new VariableModifier(this.type, this.isFinal, this.isRequired);
+        }
+    }
+
+    /**
      * A call frame, created from a scope, stores the arguments and local variables in a "stack frame" (sic).
      * @since 3.0
      */
     public static final class Frame {
         /** The scope. */
         private final Scope scope;
-        /** The actual var 'final' modifiers. */
-        private final boolean[] isFinal;
-        /** The actual var 'required' modifiers. */
-        private final boolean[] isRequired;
-        /** The actual var 'type' modifiers. */
-        private final Class[] type;
+        /** The actual var modifiers. */
+        private final VariableModifier[] modifiers;
         /** The actual stack frame. */
         private final Object[] stack;
         /** Number of curried parameters. */
@@ -509,9 +550,7 @@ public final class Scope {
             stack = r;
             curried = c;
 
-            isFinal = stack != null ? new boolean[stack.length] : null;
-            isRequired = stack != null ? new boolean[stack.length] : null;
-            type = stack != null ? new Class[stack.length] : null;
+            modifiers = stack != null ? new VariableModifier[stack.length] : null;
         }
 
         /**
@@ -523,9 +562,7 @@ public final class Scope {
             stack = f.stack != null ? f.stack.clone() : null;
             curried = f.curried;
 
-            isFinal = f.isFinal != null ? f.isFinal.clone() : null;
-            isRequired = f.isRequired != null ? f.isRequired.clone() : null;
-            type = f.type != null ? f.type.clone() : null;
+            modifiers = f.modifiers != null ? f.modifiers.clone() : null;
 
             if (stack != null) {
                 int nparm = scope.getArgCount();
@@ -608,9 +645,7 @@ public final class Scope {
          * @param req whether the variable is required
          */
         public void setModifiers(int r, Class c, boolean fin, boolean req) {
-            type[r] = c;
-            isFinal[r] = fin;
-            isRequired[r] = req;
+            modifiers[r] = new VariableModifier(c, fin, req);
         }
 
         /**
@@ -619,25 +654,25 @@ public final class Scope {
          * @return the type if any
          */
         public Class typeof(int s) {
-            return type != null && type[s] != null ? type[s] : scope.getVariableType(s);
+            return modifiers != null && modifiers[s] != null ? modifiers[s].getType() : scope.getVariableType(s);
         }
 
         /**
          * Returns if the local variable is declared final.
-         * @param symbol the symbol index
+         * @param s the symbol index
          * @return true if final, false otherwise
          */
-        public boolean isVariableFinal(int symbol) {
-            return isFinal != null && isFinal[symbol] ? true : scope.isVariableFinal(symbol);
+        public boolean isVariableFinal(int s) {
+            return modifiers != null && modifiers[s] != null ? modifiers[s].isFinal() : scope.isVariableFinal(s);
         }
 
         /**
          * Returns if the local variable is declared non-null.
-         * @param symbol the symbol index
+         * @param s the symbol index
          * @return true if non-null, false otherwise
          */
-        public boolean isVariableRequired(int symbol) {
-            return isRequired != null && isRequired[symbol] ? true : scope.isVariableRequired(symbol);
+        public boolean isVariableRequired(int s) {
+            return modifiers != null && modifiers[s] != null ? modifiers[s].isRequired() : scope.isVariableRequired(s);
         }
 
         /**
