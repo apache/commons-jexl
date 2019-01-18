@@ -487,6 +487,12 @@ public final class Scope {
     public static final class Frame {
         /** The scope. */
         private final Scope scope;
+        /** The actual var 'final' modifiers. */
+        private final boolean[] isFinal;
+        /** The actual var 'required' modifiers. */
+        private final boolean[] isRequired;
+        /** The actual var 'type' modifiers. */
+        private final Class[] type;
         /** The actual stack frame. */
         private final Object[] stack;
         /** Number of curried parameters. */
@@ -498,10 +504,40 @@ public final class Scope {
          * @param r the stack frame
          * @param c the number of curried parameters
          */
-        public Frame(Scope s, Object[] r, int c) {
+        protected Frame(Scope s, Object[] r, int c) {
             scope = s;
             stack = r;
             curried = c;
+
+            isFinal = stack != null ? new boolean[stack.length] : null;
+            isRequired = stack != null ? new boolean[stack.length] : null;
+            type = stack != null ? new Class[stack.length] : null;
+        }
+
+        /**
+         * Creates a new frame.
+         * @param f the parent frame
+         */
+        protected Frame(Frame f, Object... values) {
+            scope = f.scope;
+            stack = f.stack != null ? f.stack.clone() : null;
+            curried = f.curried;
+
+            isFinal = f.isFinal != null ? f.isFinal.clone() : null;
+            isRequired = f.isRequired != null ? f.isRequired.clone() : null;
+            type = f.type != null ? f.type.clone() : null;
+
+            if (stack != null) {
+                int nparm = scope.getArgCount();
+                int ncopy = 0;
+                if (values != null && values.length > 0) {
+                    ncopy = Math.min(nparm - curried, Math.min(nparm, values.length));
+                    System.arraycopy(values, 0, stack, curried, ncopy);
+                }
+                // unbound parameters are defined as null
+                Arrays.fill(stack, curried + ncopy, nparm, null);
+                curried += ncopy;
+            }
         }
 
         /**
@@ -565,12 +601,43 @@ public final class Scope {
         }
 
         /**
+         * Sets a variable modifiers.
+         * @param r the offset in this frame
+         * @param c the variable type
+         * @param fin whether the variable is final
+         * @param req whether the variable is required
+         */
+        public void setModifiers(int r, Class c, boolean fin, boolean req) {
+            type[r] = c;
+            isFinal[r] = fin;
+            isRequired[r] = req;
+        }
+
+        /**
          * Gets a symbol type.
          * @param s the offset in this frame
          * @return the type if any
          */
         public Class typeof(int s) {
-            return scope.getVariableType(s);
+            return type != null && type[s] != null ? type[s] : scope.getVariableType(s);
+        }
+
+        /**
+         * Returns if the local variable is declared final.
+         * @param symbol the symbol index
+         * @return true if final, false otherwise
+         */
+        public boolean isVariableFinal(int symbol) {
+            return isFinal != null && isFinal[symbol] ? true : scope.isVariableFinal(symbol);
+        }
+
+        /**
+         * Returns if the local variable is declared non-null.
+         * @param symbol the symbol index
+         * @return true if non-null, false otherwise
+         */
+        public boolean isVariableRequired(int symbol) {
+            return isRequired != null && isRequired[symbol] ? true : scope.isVariableRequired(symbol);
         }
 
         /**
@@ -580,16 +647,7 @@ public final class Scope {
          */
         public Frame assign(Object... values) {
             if (stack != null) {
-                int nparm = scope.getArgCount();
-                Object[] copy = stack.clone();
-                int ncopy = 0;
-                if (values != null && values.length > 0) {
-                    ncopy = Math.min(nparm - curried, Math.min(nparm, values.length));
-                    System.arraycopy(values, 0, copy, curried, ncopy);
-                }
-                // unbound parameters are defined as null
-                Arrays.fill(copy, curried + ncopy, nparm, null);
-                return new Frame(scope, copy, curried + ncopy);
+                return new Frame(this, values);
             }
             return this;
         }
@@ -599,8 +657,7 @@ public final class Scope {
          * @return new frame
          */
         public Frame clone() {
-            Object[] copy = stack != null ? stack.clone() : null;
-            return new Frame(scope, copy, curried);
+            return new Frame(this);
         }
 
     }

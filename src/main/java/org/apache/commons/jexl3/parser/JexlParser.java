@@ -241,7 +241,7 @@ public abstract class JexlParser extends StringParser {
         if (register != null && frame.isVariableFinal(register)) {
             throwParsingException(var);
         }
-        register = frame.declareVariable(identifier, var.getType(), var.isFinal(), var.isRequired());
+        register = frame.declareVariable(identifier);
         var.setSymbol(register, identifier);
     }
 

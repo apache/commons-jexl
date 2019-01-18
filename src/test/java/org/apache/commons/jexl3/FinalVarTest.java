@@ -74,6 +74,7 @@ public class FinalVarTest extends JexlTestCase {
     public void testOverwritten() throws Exception {
         try {
            JexlScript e = JEXL.createScript("final var x = 42; x = 41");
+           Object o = e.execute(null);
            Assert.fail("Should have failed");
         } catch (JexlException ex) {
            // OK
@@ -81,6 +82,7 @@ public class FinalVarTest extends JexlTestCase {
 
         try {
            JexlScript e = JEXL.createScript("final var (x,y) = [41,42]; x = 41");
+           Object o = e.execute(null);
            Assert.fail("Should have failed");
         } catch (JexlException ex) {
            // OK
@@ -113,6 +115,7 @@ public class FinalVarTest extends JexlTestCase {
     public void testRedefined() throws Exception {
         try {
            JexlScript e = JEXL.createScript("final var x = 42; var x = 43");
+           Object o = e.execute(null);
            Assert.fail("Should have failed");
         } catch (JexlException ex) {
            // OK
@@ -120,6 +123,7 @@ public class FinalVarTest extends JexlTestCase {
 
         try {
            JexlScript e = JEXL.createScript("final var x = 42; var (x,y) = [43,44]");
+           Object o = e.execute(null);
            Assert.fail("Should have failed");
         } catch (JexlException ex) {
            // OK

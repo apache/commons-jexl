@@ -818,13 +818,7 @@ public class Interpreter extends InterpreterBase {
 
         @Override
         public void set(Object value) {
-            int symbol = node.getSymbol();
-            boolean isFinal = frame.getScope().isVariableFinal(symbol);
-            if (!isFinal) {
-                executeAssign(node, node, value, null, null);
-            } else {
-                throw new JexlException(node, "can not assign a value to the final variable", null);
-            }
+            executeAssign(node, node, value, null, null);
         }
     }
 
@@ -2074,11 +2068,6 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
-    protected Object visit(ASTExtVar node, Object data) {
-        return visit((ASTIdentifier) node, data);
-    }
-
-    @Override
     protected Object visit(ASTReferenceExpression node, Object data) {
         return node.jjtGetChild(0).jjtAccept(this, data);
     }
@@ -2086,6 +2075,12 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTVar node, Object data) {
         int symbol = node.getSymbol();
+        boolean isFinal = frame.isVariableFinal(symbol);
+        if (isFinal) {
+            throw new JexlException(node, "can not redefine a final variable: " + node.getName());
+        }
+        // Adjust frame variable modifiers
+        frame.setModifiers(symbol, node.getType(), node.isFinal(), node.isRequired());
         // if we have a var, we have a scope thus a frame
         if (frame.has(symbol)) {
             return frame.get(symbol);
@@ -2093,6 +2088,11 @@ public class Interpreter extends InterpreterBase {
             frame.set(symbol, null);
             return null;
         }
+    }
+
+    @Override
+    protected Object visit(ASTExtVar node, Object data) {
+        return visit((ASTVar) node, data);
     }
 
     @Override
@@ -2359,6 +2359,12 @@ public class Interpreter extends InterpreterBase {
         cancelCheck(node);
         // Vector of identifiers to assign values to
         JexlNode identifiers = node.jjtGetChild(0);
+        // Initialize variables
+        final int num = identifiers.jjtGetNumChildren();
+        for (int i = 0; i < num; i++) {
+            JexlNode left = identifiers.jjtGetChild(i);
+            left.jjtAccept(this, data);
+        }
         // Assignable values
         Object assignableValue = node.jjtGetChild(1).jjtAccept(this, data);
         return executeMultipleAssign(node, identifiers, assignableValue, data);
@@ -2438,6 +2444,8 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(ASTInitialization node, Object data) {
         JexlNode left = node.jjtGetChild(0);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
+        // Initialize variable
+        left.jjtAccept(this, data);
         return executeAssign(node, left, right, null, data);
     }
 
@@ -2575,6 +2583,10 @@ public class Interpreter extends InterpreterBase {
             if (symbol >= 0) {
                 // check we are not assigning a symbol itself
                 if (last < 0) {
+                    boolean isFinal = frame.isVariableFinal(symbol);
+                    if (isFinal && !(var instanceof ASTVar || var instanceof ASTExtVar)) {
+                        throw new JexlException(node, "can not assign a value to the final variable: " + var.getName());
+                    }
                     if (assignop != null) {
                         Object self = getVariable(frame, var);
                         right = assignop.getArity() == 1 ? operators.tryAssignOverload(node, assignop, self) :
@@ -2594,7 +2606,7 @@ public class Interpreter extends InterpreterBase {
                         if (type.isPrimitive() && right == null)
                             throw new JexlException(node, "not null value required for: " + var.getName());
                     }
-                    boolean isRequired = frame.getScope().isVariableRequired(symbol);
+                    boolean isRequired = frame.isVariableRequired(symbol);
                     if (isRequired && right == null)
                         throw new JexlException(node, "not null value required for: " + var.getName());
 

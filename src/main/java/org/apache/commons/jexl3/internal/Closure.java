@@ -125,7 +125,7 @@ public class Closure extends Script {
            int alen = varg != null ? Array.getLength(varg) : 0;
            int newlen = len + alen;
            if (newlen > 0) {
-               // Clope frame
+               // Clone frame
                frame = sf.clone();
                // Merge arrays
                Object result = Array.newInstance(type, newlen);
