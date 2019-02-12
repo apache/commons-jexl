@@ -26,14 +26,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 import java.util.TreeMap;
 
 
@@ -62,7 +61,7 @@ public abstract class JexlParser extends StringParser {
     /**
      * When parsing inner functions/lambda, need to stack the scope (sic).
      */
-    protected Stack<Scope> frames = new Stack<Scope>();
+    protected Deque<Scope> frames = new ArrayDeque<Scope>();
     /**
      * The list of pragma declarations.
      */
@@ -74,9 +73,22 @@ public abstract class JexlParser extends StringParser {
     /**
      * Stack of parsing loop counts.
      */
-    protected Queue<Integer> loopCounts = null;
+    protected Deque<Integer> loopCounts = new ArrayDeque<Integer>();
 
 
+    /**
+     * Cleanup.
+     * @param features the feature set to restore if any
+     */
+    protected void cleanup(JexlFeatures features) {
+        info = null;
+        source = null;
+        frame = null;
+        frames.clear();
+        pragmas = null;
+        loopCounts.clear();
+        loopCount = 0;
+    }
     /**
      * Utility function to create '.' separated string from a list of string.
      * @param lstr the list of strings
@@ -167,10 +179,7 @@ public abstract class JexlParser extends StringParser {
             frames.push(frame);
         }
         frame = new Scope(frame, (String[]) null);
-        if (loopCounts == null) {
-            loopCounts = new LinkedList<Integer>();
-        }
-        loopCounts.add(loopCount);
+        loopCounts.push(loopCount);
         loopCount = 0;
     }
 
@@ -183,8 +192,8 @@ public abstract class JexlParser extends StringParser {
         } else {
             frame = null;
         }
-        if (loopCounts != null && !loopCounts.isEmpty()) {
-            loopCount = loopCounts.remove();
+        if (!loopCounts.isEmpty()) {
+            loopCount = loopCounts.pop();
         }
     }
 

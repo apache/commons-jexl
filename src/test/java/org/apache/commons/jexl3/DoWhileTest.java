@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.internal.Debugger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -99,5 +98,11 @@ public class DoWhileTest extends JexlTestCase {
             String str = xparse.detailedMessage();
             Assert.assertTrue(str.contains("continue"));
         }
+    }
+            
+    @Test
+    public void testForEachLambda() throws Exception {
+        JexlScript e = JEXL.createScript("(x)->{ for (i : 1..2) {  continue; var y = function() { 42; } break; } }");
+        Assert.assertNotNull(e);
     }
 }
