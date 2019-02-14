@@ -27,12 +27,12 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -72,16 +72,6 @@ public abstract class JexlParser extends StringParser {
      * The list of pragma declarations.
      */
     protected Map<String, Object> pragmas = null;
-    /**
-     * The number of imbricated loops.
-     */
-    protected int loopCount = 0;
-    /**
-     * Stack of parsing loop counts.
-     */
-    protected Queue<Integer> loopCounts = null;
-
-
     /**
      * Read a given source line.
      * @param src the source
@@ -155,7 +145,7 @@ public abstract class JexlParser extends StringParser {
         frame = new Scope(frame, (String[]) null);
 
         if (branchScope != null) {
-            branchScopes.push(branchScope);
+            branchScopes.add(branchScope);
         }
         branchScope = new BranchScope();
     }
@@ -166,7 +156,7 @@ public abstract class JexlParser extends StringParser {
     protected void popFrame() {
 
         if (!branchScopes.isEmpty()) {
-            branchScope = branchScopes.pop();
+            branchScope = branchScopes.remove();
         } else {
             branchScope = null;
         }
@@ -175,9 +165,6 @@ public abstract class JexlParser extends StringParser {
             frame = frames.pop();
         } else {
             frame = null;
-        }
-        if (loopCounts != null && !loopCounts.isEmpty()) {
-            loopCount = loopCounts.remove();
         }
     }
 
@@ -581,9 +568,9 @@ public abstract class JexlParser extends StringParser {
         protected int foreachLoopCount = 0;
         protected int switchCount = 0;
 
-        protected Stack<String> blockLabels = new Stack<String> ();
-        protected Stack<String> loopLabels = new Stack<String> ();
-        protected Stack<String> foreachLabels = new Stack<String> ();
+        protected Deque<String> blockLabels = new ArrayDeque<String> ();
+        protected Deque<String> loopLabels = new ArrayDeque<String> ();
+        protected Deque<String> foreachLabels = new ArrayDeque<String> ();
 
         protected boolean breakSupported() {
             return loopCount != 0 || foreachLoopCount != 0 || switchCount != 0;
@@ -610,33 +597,33 @@ public abstract class JexlParser extends StringParser {
         }
 
         protected void pushBlockLabel(String label) {
-            blockLabels.push(label);
+            blockLabels.add(label);
         }
 
         protected void popBlockLabel() {
-            blockLabels.pop();
+            blockLabels.remove();
         }
 
         protected void pushLoopLabel(String label) {
-            blockLabels.push(label);
-            loopLabels.push(label);
+            blockLabels.add(label);
+            loopLabels.add(label);
         }
 
         protected void popLoopLabel() {
-            blockLabels.pop();
-            loopLabels.pop();
+            blockLabels.remove();
+            loopLabels.remove();
         }
 
         protected void pushForeachLabel(String label) {
-            blockLabels.push(label);
-            loopLabels.push(label);
+            blockLabels.add(label);
+            loopLabels.add(label);
             foreachLabels.push(label);
         }
 
         protected void popForeachLabel() {
-            blockLabels.pop();
-            loopLabels.pop();
-            foreachLabels.pop();
+            blockLabels.remove();
+            loopLabels.remove();
+            foreachLabels.remove();
         }
     }
 
@@ -648,6 +635,6 @@ public abstract class JexlParser extends StringParser {
     /**
      * When parsing inner functions/lambda, need to stack the target scope
      */
-    protected Stack<BranchScope> branchScopes = new Stack<BranchScope> ();
+    protected Deque<BranchScope> branchScopes = new ArrayDeque<BranchScope> ();
 
 }
