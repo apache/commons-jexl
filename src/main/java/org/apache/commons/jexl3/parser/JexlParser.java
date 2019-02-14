@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.TreeMap;
 import java.math.BigInteger;
 import java.math.BigDecimal;
@@ -67,11 +66,42 @@ public abstract class JexlParser extends StringParser {
     /**
      * When parsing inner functions/lambda, need to stack the scope (sic).
      */
-    protected Stack<Scope> frames = new Stack<Scope>();
+    protected Deque<Scope> frames = new ArrayDeque<Scope>();
     /**
      * The list of pragma declarations.
      */
     protected Map<String, Object> pragmas = null;
+    /**
+     * Cleanup.
+     * @param features the feature set to restore if any
+     */
+    protected void cleanup(JexlFeatures features) {
+        info = null;
+        source = null;
+        frame = null;
+        frames.clear();
+        pragmas = null;
+        branchScopes.clear();
+    }
+    /**
+     * Utility function to create '.' separated string from a list of string.
+     * @param lstr the list of strings
+     * @return the dotted version
+     */
+    protected static String stringify(List<String> lstr) {
+        StringBuilder strb = new StringBuilder();
+        boolean dot = false;
+        for(String str : lstr) {
+            if (!dot) {
+               dot = true;
+            } else {
+               strb.append('.');
+            }
+            strb.append(str);
+        }
+        return strb.toString();
+    }
+
     /**
      * Read a given source line.
      * @param src the source

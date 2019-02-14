@@ -64,18 +64,14 @@ public final class Parser extends JexlParser
             script.setPragmas(pragmas != null
                              ? Collections.<String,Object>unmodifiableMap(pragmas)
                              : Collections.<String,Object>emptyMap());
-            pragmas = null;
             return script;
         } catch (TokenMgrError xtme) {
             throw new JexlException.Tokenization(info, xtme).clean();
         } catch (ParseException xparse) {
             throw new JexlException.Parsing(info, xparse).clean();
         } finally {
-            info = null;
-            source = null;
-            frame = null;
             token_source.defaultLexState = DEFAULT;
-            setFeatures(previous);
+            cleanup(previous);
         }
     }
 }
