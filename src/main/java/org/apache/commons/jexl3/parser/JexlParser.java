@@ -81,6 +81,7 @@ public abstract class JexlParser extends StringParser {
         frame = null;
         frames.clear();
         pragmas = null;
+        branchScope = null;
         branchScopes.clear();
     }
     /**
@@ -175,7 +176,7 @@ public abstract class JexlParser extends StringParser {
         frame = new Scope(frame, (String[]) null);
 
         if (branchScope != null) {
-            branchScopes.add(branchScope);
+            branchScopes.push(branchScope);
         }
         branchScope = new BranchScope();
     }
@@ -186,7 +187,7 @@ public abstract class JexlParser extends StringParser {
     protected void popFrame() {
 
         if (!branchScopes.isEmpty()) {
-            branchScope = branchScopes.remove();
+            branchScope = branchScopes.pop();
         } else {
             branchScope = null;
         }
@@ -627,33 +628,33 @@ public abstract class JexlParser extends StringParser {
         }
 
         protected void pushBlockLabel(String label) {
-            blockLabels.add(label);
+            blockLabels.push(label);
         }
 
         protected void popBlockLabel() {
-            blockLabels.remove();
+            blockLabels.pop();
         }
 
         protected void pushLoopLabel(String label) {
-            blockLabels.add(label);
-            loopLabels.add(label);
+            blockLabels.push(label);
+            loopLabels.push(label);
         }
 
         protected void popLoopLabel() {
-            blockLabels.remove();
-            loopLabels.remove();
+            blockLabels.pop();
+            loopLabels.pop();
         }
 
         protected void pushForeachLabel(String label) {
-            blockLabels.add(label);
-            loopLabels.add(label);
+            blockLabels.push(label);
+            loopLabels.push(label);
             foreachLabels.push(label);
         }
 
         protected void popForeachLabel() {
-            blockLabels.remove();
-            loopLabels.remove();
-            foreachLabels.remove();
+            blockLabels.pop();
+            loopLabels.pop();
+            foreachLabels.pop();
         }
     }
 
