@@ -28,8 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This basic function of this class is to return a Method object for a
@@ -71,21 +70,17 @@ public final class Introspector {
      */
     private final Permissions permissions;
     /**
-     * The read/write lock.
-     */
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    /**
      * Holds the method maps for the classes we know about, keyed by Class.
      */
-    private final Map<Class<?>, ClassMap> classMethodMaps = new HashMap<Class<?>, ClassMap>();
+    private final Map<Class<?>, ClassMap> classMethodMaps = new ConcurrentHashMap<Class<?>, ClassMap>();
     /**
      * Holds the map of classes ctors we know about as well as unknown ones.
      */
-    private final Map<MethodKey, Constructor<?>> constructorsMap = new HashMap<MethodKey, Constructor<?>>();
+    private final Map<MethodKey, Constructor<?>> constructorsMap = new ConcurrentHashMap<MethodKey, Constructor<?>>();
     /**
      * Holds the set of classes we have introspected.
      */
-    private final Map<String, Class<?>> constructibleClasses = new HashMap<String, Class<?>>();
+    private final Map<String, Class<?>> constructibleClasses = new ConcurrentHashMap<String, Class<?>>();
 
     /**
      * Create the introspector.
@@ -207,6 +202,37 @@ public final class Introspector {
     }
 
     /**
+     * Gets the array of accessible constructors known for a given class.
+     * @param c          the class
+     * @param methodName the method name
+     * @return the array of methods (null or not empty)
+     */
+    public Constructor<?>[] getConstructors(Class<?> c, String methodName) {
+        Class<?> clazz = constructibleClasses.computeIfAbsent(methodName, x -> {
+            try {
+                return (c != null && c.getName().equals(x)) ? c : loader.loadClass(x);
+            } catch (ClassNotFoundException xnotfound) {
+                if (rlog != null && rlog.isDebugEnabled()) {
+                    rlog.debug("unable to find class: "
+                            + x, xnotfound);
+                }
+                return null;
+            }
+        });
+
+        if (clazz != null) {
+            List<Constructor<?>> l = new ArrayList<Constructor<?>>();
+            for (Constructor<?> ictor : clazz.getConstructors()) {
+                if (permissions.allow(ictor)) {
+                    l.add(ictor);
+                }
+            }
+            return l.toArray(new Constructor<?>[l.size()]);
+        }
+        return null;
+    }
+
+    /**
      * Gets the constructor defined by the <code>MethodKey</code>.
      *
      * @param key Key of the constructor being searched for
@@ -225,72 +251,25 @@ public final class Introspector {
      * or null if no unambiguous constructor could be found through introspection.
      */
     public Constructor<?> getConstructor(final Class<?> c, final MethodKey key) {
-        Constructor<?> ctor;
-        try {
-            lock.readLock().lock();
-            ctor = constructorsMap.get(key);
-            if (ctor != null) {
-                // miss or not?
-                return CTOR_MISS.equals(ctor) ? null : ctor;
-            }
-        } finally {
-            lock.readLock().unlock();
-        }
-        // let's introspect...
-        try {
-            lock.writeLock().lock();
-            // again for kicks
-            ctor = constructorsMap.get(key);
-            if (ctor != null) {
-                // miss or not?
-                return CTOR_MISS.equals(ctor) ? null : ctor;
-            }
-            final String cname = key.getMethod();
-            // do we know about this class?
-            Class<?> clazz = constructibleClasses.get(cname);
+        Constructor<?> ctor = constructorsMap.computeIfAbsent(key, x -> {
+            final String cname = x.getMethod();
             try {
-                // do find the most specific ctor
-                if (clazz == null) {
-                    if (c != null && c.getName().equals(key.getMethod())) {
-                        clazz = c;
-                    } else {
-                        clazz = loader.loadClass(cname);
-                    }
-                    // add it to list of known loaded classes
-                    constructibleClasses.put(cname, clazz);
-                }
-                List<Constructor<?>> l = new ArrayList<Constructor<?>>();
-                for (Constructor<?> ictor : clazz.getConstructors()) {
-                    if (permissions.allow(ictor)) {
-                        l.add(ictor);
-                    }
-                }
-                // try to find one
-                ctor = key.getMostSpecificConstructor(l.toArray(new Constructor<?>[l.size()]));
-                if (ctor != null) {
-                    constructorsMap.put(key, ctor);
-                } else {
-                    constructorsMap.put(key, CTOR_MISS);
-                }
-            } catch (ClassNotFoundException xnotfound) {
-                if (rlog != null && rlog.isDebugEnabled()) {
-                    rlog.debug("unable to find class: "
-                            + cname + "."
-                            + key.debugString(), xnotfound);
-                }
-                ctor = null;
+                Constructor<?>[] constructors = getConstructors(c, cname);
+                if (constructors == null)
+                    return null;
+                Constructor<?> result = x.getMostSpecificConstructor(constructors);
+                return result != null ? result : CTOR_MISS;
             } catch (MethodKey.AmbiguousException xambiguous) {
                 if (rlog != null  && xambiguous.isSevere() &&  rlog.isInfoEnabled()) {
                     rlog.info("ambiguous constructor invocation: "
                             + cname + "."
-                            + key.debugString(), xambiguous);
+                            + x.debugString(), xambiguous);
                 }
-                ctor = null;
+                return null;
             }
-            return ctor;
-        } finally {
-            lock.writeLock().unlock();
-        }
+        });
+        // miss or not?
+        return ctor == null || CTOR_MISS.equals(ctor) ? null : ctor;
     }
 
     /**
@@ -299,28 +278,7 @@ public final class Introspector {
      * @return the class map
      */
     private ClassMap getMap(Class<?> c) {
-        ClassMap classMap;
-        try {
-            lock.readLock().lock();
-            classMap = classMethodMaps.get(c);
-        } finally {
-            lock.readLock().unlock();
-        }
-        if (classMap == null) {
-            try {
-                lock.writeLock().lock();
-                // try again
-                classMap = classMethodMaps.get(c);
-                if (classMap == null) {
-                    classMap = new ClassMap(c, permissions, rlog);
-                    classMethodMaps.put(c, classMap);
-                }
-            } finally {
-                lock.writeLock().unlock();
-            }
-
-        }
-        return classMap;
+        return classMethodMaps.computeIfAbsent(c, x -> new ClassMap(x, permissions, rlog));
     }
 
     /**
@@ -334,32 +292,27 @@ public final class Introspector {
             cloader = getClass().getClassLoader();
         }
         if (!cloader.equals(loader)) {
-            try {
-                lock.writeLock().lock();
-                // clean up constructor and class maps
-                Iterator<Map.Entry<MethodKey, Constructor<?>>> mentries = constructorsMap.entrySet().iterator();
-                while (mentries.hasNext()) {
-                    Map.Entry<MethodKey, Constructor<?>> entry = mentries.next();
-                    Class<?> clazz = entry.getValue().getDeclaringClass();
-                    if (isLoadedBy(previous, clazz)) {
-                        mentries.remove();
-                        // the method name is the name of the class
-                        constructibleClasses.remove(entry.getKey().getMethod());
-                    }
+            // clean up constructor and class maps
+            Iterator<Map.Entry<MethodKey, Constructor<?>>> mentries = constructorsMap.entrySet().iterator();
+            while (mentries.hasNext()) {
+                Map.Entry<MethodKey, Constructor<?>> entry = mentries.next();
+                Class<?> clazz = entry.getValue().getDeclaringClass();
+                if (isLoadedBy(previous, clazz)) {
+                    mentries.remove();
+                    // the method name is the name of the class
+                    constructibleClasses.remove(entry.getKey().getMethod());
                 }
-                // clean up method maps
-                Iterator<Map.Entry<Class<?>, ClassMap>> centries = classMethodMaps.entrySet().iterator();
-                while (centries.hasNext()) {
-                    Map.Entry<Class<?>, ClassMap> entry = centries.next();
-                    Class<?> clazz = entry.getKey();
-                    if (isLoadedBy(previous, clazz)) {
-                        centries.remove();
-                    }
-                }
-                loader = cloader;
-            } finally {
-                lock.writeLock().unlock();
             }
+            // clean up method maps
+            Iterator<Map.Entry<Class<?>, ClassMap>> centries = classMethodMaps.entrySet().iterator();
+            while (centries.hasNext()) {
+                Map.Entry<Class<?>, ClassMap> entry = centries.next();
+                Class<?> clazz = entry.getKey();
+                if (isLoadedBy(previous, clazz)) {
+                    centries.remove();
+                }
+            }
+            loader = cloader;
         }
     }
 
