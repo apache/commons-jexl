@@ -110,7 +110,7 @@ public final class MethodKey {
     MethodKey(String aMethod, Class<?>[] args) {
         super();
         // !! keep this in sync with the other ctor (hash code) !!
-        this.method = aMethod.intern();
+        this.method = aMethod;
         int hash = this.method.hashCode();
         final int size;
         // CSOFF: InnerAssignment
