@@ -129,7 +129,8 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
     private static java.lang.reflect.Method discoverSet(Introspector is, Class<?> clazz, String property, Object arg) {
         // first, we introspect for the set<identifier> setter method
         Object[] params = {arg};
-        StringBuilder sb = new StringBuilder("set");
+        StringBuilder sb = new StringBuilder(property.length() + SET_START_INDEX);
+        sb.append("set");
         sb.append(property);
         // uppercase nth char
         char c = sb.charAt(SET_START_INDEX);

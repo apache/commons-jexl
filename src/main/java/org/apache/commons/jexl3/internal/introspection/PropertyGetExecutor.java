@@ -96,9 +96,10 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
         }
         //  this is gross and linear, but it keeps it straightforward.
         java.lang.reflect.Method method;
-        final int start = which.length(); // "get" or "is" so 3 or 2 for char case switch
+        final int start = which.length();
         // start with get<Property>
-        StringBuilder sb = new StringBuilder(which);
+        StringBuilder sb = new StringBuilder(property.length() + start);
+        sb.append(which);
         sb.append(property);
         // uppercase nth char
         char c = sb.charAt(start);
