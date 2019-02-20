@@ -166,30 +166,19 @@ final class ClassMap {
      */
     Method getMethod(final MethodKey methodKey) throws MethodKey.AmbiguousException {
         // Look up by key
-        Method cacheEntry = byKey.get(methodKey);
+        Method cacheEntry = byKey.computeIfAbsent(methodKey, x -> {
+            Method result = null;
+            // That one is expensive...
+            Method[] methodList = byName.get(x.getMethod());
+            if (methodList != null) {
+                result = methodKey.getMostSpecificMethod(methodList);
+            }
+            return (result == null) ? CACHE_MISS : result;
+        });
         // We looked this up before and failed.
         if (cacheEntry == CACHE_MISS) {
             return null;
-        } else if (cacheEntry == null) {
-            try {
-                // That one is expensive...
-                Method[] methodList = byName.get(methodKey.getMethod());
-                if (methodList != null) {
-                    cacheEntry = methodKey.getMostSpecificMethod(methodList);
-                }
-                if (cacheEntry == null) {
-                    byKey.put(methodKey, CACHE_MISS);
-                } else {
-                    byKey.put(methodKey, cacheEntry);
-                }
-            } catch (MethodKey.AmbiguousException ae) {
-                // that's a miss :-)
-                byKey.put(methodKey, CACHE_MISS);
-                throw ae;
-            }
         }
-
-        // Yes, this might just be null.
         return cacheEntry;
     }
 
