@@ -41,11 +41,12 @@ public final class FieldGetExecutor extends AbstractExecutor.Get {
      * @return the executor if found, null otherwise
      */
     public static JexlPropertyGet discover(Introspector is, Class<?> clazz, String identifier) {
-        if (identifier != null) {
-            Field field = is.getField(clazz, identifier);
-            if (field != null) {
-                return new FieldGetExecutor(field);
-            }
+        if (identifier == null || identifier.isEmpty()) {
+            return null;
+        }
+        Field field = is.getField(clazz, identifier);
+        if (field != null) {
+            return new FieldGetExecutor(field);
         }
         return null;
     }

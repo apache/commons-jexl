@@ -43,13 +43,14 @@ public final class FieldSetExecutor extends AbstractExecutor.Set {
      * @return the executor if found, null otherwise
      */
     public static JexlPropertySet discover(Introspector is, Class<?> clazz, String identifier, Object value) {
-        if (identifier != null) {
-            Field field = is.getField(clazz, identifier);
-            if (field != null
-                && !Modifier.isFinal(field.getModifiers())
-                && (value == null || MethodKey.isInvocationConvertible(field.getType(), value.getClass(), false))) {
-                return new FieldSetExecutor(field);
-            }
+        if (identifier == null || identifier.isEmpty()) {
+            return null;
+        }
+        Field field = is.getField(clazz, identifier);
+        if (field != null
+            && !Modifier.isFinal(field.getModifiers())
+            && (value == null || MethodKey.isInvocationConvertible(field.getType(), value.getClass(), false))) {
+            return new FieldSetExecutor(field);
         }
         return null;
     }

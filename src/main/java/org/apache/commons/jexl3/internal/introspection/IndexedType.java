@@ -55,7 +55,7 @@ public final class IndexedType implements JexlPropertyGet {
      */
     public static JexlPropertyGet discover(Introspector is, Object object, String name) {
         if (object != null && name != null && !name.isEmpty()) {
-            String base = name.substring(0, 1).toUpperCase() + name.substring(1);
+            String base = Character.isUpperCase(name.charAt(0)) ? name : name.substring(0, 1).toUpperCase() + name.substring(1);
             final String container = name;
             final Class<?> clazz = object.getClass();
             final Method[] getters = is.getMethods(object.getClass(), "get" + base);
@@ -142,7 +142,7 @@ public final class IndexedType implements JexlPropertyGet {
 
     @Override
     public Object invoke(Object obj) throws Exception {
-        if (obj != null && clazz.equals(obj.getClass())) {
+        if (obj != null && clazz == obj.getClass()) {
             return new IndexedContainer(this, obj);
         } else {
             throw new IntrospectionException("property resolution error");
@@ -152,7 +152,7 @@ public final class IndexedType implements JexlPropertyGet {
     @Override
     public Object tryInvoke(Object obj, Object key) {
         if (obj != null && key != null
-            && clazz.equals(obj.getClass())
+            && clazz == obj.getClass()
             && container.equals(key.toString())) {
             return new IndexedContainer(this, obj);
         } else {

@@ -38,6 +38,9 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
      * @return the executor if found, null otherwise
      */
     public static PropertyGetExecutor discover(Introspector is, Class<?> clazz, String property) {
+        if (property == null || property.isEmpty()) {
+            return null;
+        }
         java.lang.reflect.Method m = is.getPropertyGet(clazz, property);
         return m == null ? null : new PropertyGetExecutor(clazz, m, property);
     }
