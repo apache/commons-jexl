@@ -217,8 +217,6 @@ public class DiscoveryTest extends JexlTestCase {
         Assert.assertEquals("quux", quux);
         // getter should return last value
         Assert.assertEquals("quux", get.invoke(map));
-        // tryExecute should fail on different property class
-        Assert.assertEquals(AbstractExecutor.TRY_FAILED, set.tryInvoke(map, Integer.valueOf(1), "nope"));
     }
 
 }

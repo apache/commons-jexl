@@ -162,6 +162,29 @@ public final class Introspector {
     }
 
     /**
+     * Gets a property getter defined by a class, and a name.
+     * @param c      the class
+     * @param name   the property name
+     * @return the desired Method object
+     * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
+     */
+    public Method getPropertyGet(Class<?> c, String name) {
+        return getMap(c).getPropertyGet(name);
+    }
+
+    /**
+     * Gets a property setter defined by a class, a name and a value type.
+     * @param c      the class
+     * @param name   the property name
+     * @param aClass the asigned value class
+     * @return the desired method object
+     * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
+     */
+    public Method getPropertySet(Class<?> c, String name, Class aClass) {
+        return getMap(c).getPropertySet(name, aClass);
+    }
+
+    /**
      * Gets the array of accessible field names known for a given class.
      * @param c the class
      * @return the class field names
@@ -343,4 +366,16 @@ public final class Introspector {
         }
         return false;
     }
+
+    /**
+     * Finds an empty array property setter method by <code>propertyName</code>.
+     * <p>This checks only one method with that name accepts an array as sole parameter.
+     * @param c        the class to find the get method from
+     * @param name     the property name to find
+     * @return         the sole method that accepts an array as parameter
+     */
+    public Method lookupSetEmptyArrayProperty(final Class<?> c, final String name) {
+        return getMap(c).lookupSetEmptyArrayProperty(name);
+    }
+
 }

@@ -71,11 +71,7 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
 
     @Override
     public Object tryInvoke(final Object obj, Object key) {
-        if (obj != null
-            && method != null
-            && objectClass.equals(obj.getClass())
-            && ((property == null && key == null)
-                || (property != null && key != null && property.getClass().equals(key.getClass())))) {
+        if (obj != null && obj instanceof Map) {
             @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
             final Map<Object, ?> map = (Map<Object, ?>) obj;
             return map.get(key);

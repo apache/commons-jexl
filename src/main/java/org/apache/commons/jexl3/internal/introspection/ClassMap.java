@@ -59,6 +59,10 @@ final class ClassMap {
 
     /** The cache miss marker method. */
     private static final Method CACHE_MISS = cacheMiss();
+    /** A marker for getter parameter list. **/
+    private static final Class<?>[] GETTER_ARGS = new Class<?>[0];
+    /** The Class. */
+    private final Class aClass;
     /**
      * This is the cache to store and look up the method information.
      * <p>
@@ -82,6 +86,14 @@ final class ClassMap {
      * Cache of fields.
      */
     private final Map<String, Field> fieldCache;
+    /**
+     * Cache of property getters.
+     */
+    private final Map<String, Method> propertyGetters;
+    /**
+     * Cache of property setters.
+     */
+    private final Map<String, Map<Class, Method>> propertySetters;
 
     /**
      * Standard constructor.
@@ -92,21 +104,25 @@ final class ClassMap {
      */
     @SuppressWarnings("LeakingThisInConstructor")
     ClassMap(Class<?> aClass, Permissions permissions, Log log) {
+        this.aClass = aClass;
         // eagerly cache methods
         create(this, permissions, aClass, log);
         // eagerly cache public fields
         Field[] fields = aClass.getFields();
         if (fields.length > 0) {
-            Map<String, Field> cache = new HashMap<String, Field>();
+            fieldCache = new HashMap<String, Field>();
             for (Field field : fields) {
                 if (permissions.allow(field)) {
-                    cache.put(field.getName(), field);
+                    fieldCache.put(field.getName(), field);
                 }
             }
-            fieldCache = cache;
         } else {
             fieldCache = Collections.emptyMap();
         }
+        // Property getters
+        propertyGetters = new ConcurrentHashMap<String, Method> ();
+        // Property setters
+        propertySetters = new ConcurrentHashMap<String, Map<Class, Method>> ();
     }
 
     /**
@@ -180,6 +196,151 @@ final class ClassMap {
             return null;
         }
         return cacheEntry;
+    }
+
+    /**
+     * Find a Property accessor method.
+     * @param name the property name
+     * @return A Method object representing the property to invoke or null.
+     * @throws MethodKey.AmbiguousException When more than one method is a match for the parameters.
+     */
+    Method getPropertyGetMethod(final String accessor, final String name) throws MethodKey.AmbiguousException {
+        int start = accessor.length();
+        StringBuilder sb = new StringBuilder(name.length() + start);
+        sb.append(accessor).append(name);
+        // uppercase nth char
+        char c = sb.charAt(start);
+        sb.setCharAt(start, Character.toUpperCase(c));
+        Method result = getMethod(new MethodKey(sb.toString(), GETTER_ARGS));
+        if (result == null) {
+            // lowercase nth char
+            sb.setCharAt(start, Character.toLowerCase(c));
+            result = getMethod(new MethodKey(sb.toString(), GETTER_ARGS));
+        }
+        return result;
+    }
+    /**
+     * Find a Property setter method.
+     * @param name the property name
+     * @return A Method object representing the property to invoke or null.
+     * @throws MethodKey.AmbiguousException When more than one method is a match for the parameters.
+     */
+    Method getPropertySetMethod(final String accessor, final String name, final Class aClass) throws MethodKey.AmbiguousException {
+        int start = accessor.length();
+        StringBuilder sb = new StringBuilder(name.length() + start);
+        sb.append(accessor).append(name);
+        // uppercase nth char
+        char c = sb.charAt(start);
+        sb.setCharAt(start, Character.toUpperCase(c));
+        String upper = sb.toString();
+        Class[] args = {aClass};
+        Method method = getMethod(new MethodKey(upper, args));
+        if (method == null) {
+            // lowercase nth char
+            sb.setCharAt(start, Character.toLowerCase(c));
+            String lower = sb.toString();
+            method = getMethod(new MethodKey(lower, args));
+        }
+        return method;
+    }
+
+    /**
+     * Find a Property get accessor.
+     * @param name the property name
+     * @return A Method object representing the interface to invoke or null.
+     * @throws MethodKey.AmbiguousException When more than one method is a match for the parameters.
+     */
+    Method getPropertyGet(final String name) throws MethodKey.AmbiguousException {
+        // Look up by name
+        Method cacheEntry = propertyGetters.computeIfAbsent(name, x -> {
+            Method m = getPropertyGetMethod("get", name);
+            if (m == null) {
+               m = getPropertyGetMethod("is", name);
+               if (m != null && !(m.getReturnType() == Boolean.TYPE || m.getReturnType() == Boolean.class))
+                  m = null;
+            }
+            return m != null ? m : CACHE_MISS;
+        });
+        // We looked this up before and failed.
+        if (cacheEntry == CACHE_MISS) {
+            return null;
+        }
+        return cacheEntry;
+    }
+
+    /**
+     * Find a Property set accessor.
+     * @param name the property name
+     * @param aClass the assigned value class type
+     * @return A Method object representing the interface to invoke or null.
+     * @throws MethodKey.AmbiguousException When more than one method is a match for the parameters.
+     */
+    Method getPropertySet(final String name, Class<?> aClass) throws MethodKey.AmbiguousException {
+        // Look up by name
+
+        Map<Class, Method> setters = propertySetters.computeIfAbsent(name, x -> {
+            return new ConcurrentHashMap<Class, Method> ();
+        });
+
+        Method cacheEntry = setters.computeIfAbsent(aClass, x -> {
+            Method m = getPropertySetMethod("set", name, x);
+            return m != null ? m : CACHE_MISS;
+        });
+        // We looked this up before and failed.
+        if (cacheEntry == CACHE_MISS) {
+            return null;
+        }
+        return cacheEntry;
+    }
+
+    /**
+     * Finds an empty array property setter method by <code>property name</code>.
+     * <p>This checks only one method with that name accepts an array as sole parameter.
+     * @param name    the property name setter to find
+     * @return        the sole method that accepts an array as parameter
+     */
+    Method lookupSetEmptyArrayProperty(final String name) {
+        final String accessor = "set";
+        int start = accessor.length();
+        StringBuilder sb = new StringBuilder(name.length() + start);
+        sb.append(accessor).append(name);
+        // uppercase nth char
+        char c = sb.charAt(start);
+        sb.setCharAt(start, Character.toUpperCase(c));
+        String upper = sb.toString();
+        Method method = lookupSetEmptyArray(upper);
+        if (method == null) {
+            // lowercase nth char
+            sb.setCharAt(start, Character.toLowerCase(c));
+            String lower = sb.toString();
+            method = lookupSetEmptyArray(lower);
+        }
+        return method;
+    }
+
+    /**
+     * Finds an empty array property setter method by <code>methodName</code>.
+     * <p>This checks only one method with that name accepts an array as sole parameter.
+     * @param mname    the method name to find
+     * @return         the sole method that accepts an array as parameter
+     */
+    Method lookupSetEmptyArray(String mname) {
+        Method candidate = null;
+        Method[] methods = getMethods(mname);
+        if (methods != null) {
+            for (Method method : methods) {
+                Class<?>[] paramTypes = method.getParameterTypes();
+                if (paramTypes.length == 1 && paramTypes[0].isArray()) {
+                    if (candidate != null) {
+                        // because the setter method is overloaded for different parameter type,
+                        // return null here to report the ambiguity.
+                        return null;
+                    }
+                    candidate = method;
+                }
+            }
+        }
+        return candidate;
     }
 
     /**

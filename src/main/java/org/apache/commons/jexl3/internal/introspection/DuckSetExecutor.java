@@ -79,20 +79,17 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
     @Override
     public Object invoke(Object obj, Object value) throws IllegalAccessException, InvocationTargetException {
         Object[] pargs = {property, value};
-        if (method != null) {
-            method.invoke(obj, pargs);
-        }
+        method.invoke(obj, pargs);
         return value;
     }
 
     @Override
     public Object tryInvoke(Object obj, Object key, Object value) {
         if (obj != null
-            && objectClass.equals(obj.getClass())
-            && method !=  null
+            && objectClass == obj.getClass()
             && ((property != null && property.equals(key))
                 || (property == null && key == null))
-            && valueClass.equals(classOf(value))) {
+            && valueClass == classOf(value)) {
             try {
                 Object[] args = {property, value};
                 method.invoke(obj, args);

@@ -93,9 +93,7 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
     @Override
     public Object tryInvoke(final Object obj, Object key, Object value) {
         Integer index = castInteger(key);
-        if (obj != null && method != null
-                && objectClass.equals(obj.getClass())
-                && index != null) {
+        if (obj != null && objectClass == obj.getClass() && index != null) {
             if (method == ARRAY_SET) {
                 Array.set(obj, index.intValue(), value);
             } else {

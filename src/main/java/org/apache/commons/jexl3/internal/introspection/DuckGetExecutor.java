@@ -32,6 +32,8 @@ import java.lang.reflect.InvocationTargetException;
 public final class DuckGetExecutor extends AbstractExecutor.Get {
     /** The property, may be null. */
     private final Object property;
+    /** The arguments list */
+    private final Object[] args;
 
     /**
      * Attempts to discover a DuckGetExecutor.
@@ -54,6 +56,7 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
     private DuckGetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object identifier) {
         super(clazz, method);
         property = identifier;
+        args = new Object[] {property};
     }
 
     @Override
@@ -63,20 +66,17 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
 
     @Override
     public Object invoke(Object obj) throws IllegalAccessException, InvocationTargetException {
-        Object[] args = {property};
-        return method == null ? null : method.invoke(obj, args);
+        return method.invoke(obj, args);
     }
 
     @Override
     public Object tryInvoke(Object obj, Object key) {
         if (obj != null
-            && objectClass.equals(obj.getClass())
+            && objectClass == obj.getClass()
             // ensure method name matches the property name
-            && method != null
             && ((property == null && key == null)
                  || (property != null && property.equals(key)))) {
             try {
-                Object[] args = {property};
                 return method.invoke(obj, args);
             } catch (InvocationTargetException xinvoke) {
                 return TRY_FAILED; // fail

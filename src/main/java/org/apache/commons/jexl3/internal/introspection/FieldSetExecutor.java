@@ -19,12 +19,15 @@ package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 
 /**
  * A JexlPropertySet for public fields.
  */
-public final class FieldSetExecutor implements JexlPropertySet {
+public final class FieldSetExecutor extends AbstractExecutor.Set {
+    /** The java.lang.reflect.Method.set method used as an active marker in FieldSet. */
+    private static final java.lang.reflect.Method FIELD_SET = null;
     /**
      * The public field.
      */
@@ -56,6 +59,7 @@ public final class FieldSetExecutor implements JexlPropertySet {
      * @param theField the class public field
      */
     private FieldSetExecutor(Field theField) {
+        super(theField.getDeclaringClass(), FIELD_SET);
         field = theField;
     }
 
@@ -67,26 +71,22 @@ public final class FieldSetExecutor implements JexlPropertySet {
 
     @Override
     public Object tryInvoke(Object obj, Object key, Object value) {
-        if (obj.getClass().equals(field.getDeclaringClass())
-            && key.equals(field.getName())
+        if (objectClass == obj.getClass()
+            && field.getName().equals(castString(key))
             && (value == null || MethodKey.isInvocationConvertible(field.getType(), value.getClass(), false))) {
             try {
                 field.set(obj, value);
                 return value;
             } catch (IllegalAccessException xill) {
-                return Uberspect.TRY_FAILED;
+                return TRY_FAILED;
             }
         }
-        return Uberspect.TRY_FAILED;
-    }
-
-    @Override
-    public boolean tryFailed(Object rval) {
-        return rval == Uberspect.TRY_FAILED;
+        return TRY_FAILED;
     }
 
     @Override
     public boolean isCacheable() {
         return true;
     }
+
 }

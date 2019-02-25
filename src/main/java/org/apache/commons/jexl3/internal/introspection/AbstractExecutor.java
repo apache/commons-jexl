@@ -80,7 +80,16 @@ abstract class AbstractExecutor {
      * @return the class
      */
     static Class<?> classOf(Object instance) {
-        return instance == null? Object.class : instance.getClass();
+        return instance == null ? Object.class : instance.getClass();
+    }
+
+    /**
+     * Gets the class of an object or Void.class if null.
+     * @param instance the instance
+     * @return the class
+     */
+    static Class<?> typeOf(Object instance) {
+        return instance == null ? Void.class : instance.getClass();
     }
 
     /** The class this executor applies to. */
@@ -105,7 +114,7 @@ abstract class AbstractExecutor {
 
     @Override
     public int hashCode() {
-        return method.hashCode();
+        return method != null ? method.hashCode() : 0;
     }
 
     /**
@@ -115,13 +124,13 @@ abstract class AbstractExecutor {
      */
     public boolean equals(AbstractExecutor arg) {
         // common equality check
-        if (!this.getClass().equals(arg.getClass())) {
+        if (this.getClass() != arg.getClass()) {
             return false;
         }
-        if (!this.getMethod().equals(arg.getMethod())) {
+        if (this.getMethod() != arg.getMethod()) {
             return false;
         }
-        if (!this.getTargetClass().equals(arg.getTargetClass())) {
+        if (this.getTargetClass() != arg.getTargetClass()) {
             return false;
         }
         // specific equality check
@@ -185,7 +194,7 @@ abstract class AbstractExecutor {
      * @return method name
      */
     public final String getMethodName() {
-        return method.getName();
+        return method != null ? method.getName() : "";
     }
 
     /**
@@ -194,7 +203,7 @@ abstract class AbstractExecutor {
      * @return true if tryExecute failed, false otherwise
      */
     public final boolean tryFailed(Object exec) {
-        return exec == JexlEngine.TRY_FAILED;
+        return exec == TRY_FAILED;
     }
 
     /**

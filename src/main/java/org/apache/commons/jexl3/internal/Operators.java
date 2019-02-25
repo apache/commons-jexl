@@ -67,32 +67,97 @@ public class Operators {
      * @param args     the arguments
      * @return the result of the operator evaluation or TRY_FAILED
      */
-    protected Object tryOverload(JexlNode node, JexlOperator operator, Object... args) {
+    protected Object tryOverload(JexlNode node, JexlOperator operator, Object[] args) {
         if (operators != null && operators.overloads(operator)) {
-            final JexlArithmetic arithmetic = interpreter.arithmetic;
-            final boolean cache = interpreter.cache && node != null;
-            try {
-                if (cache) {
-                    Object cached = node.jjtGetValue();
-                    if (cached instanceof JexlMethod) {
-                        JexlMethod me = (JexlMethod) cached;
-                        Object eval = me.tryInvoke(operator.getMethodName(), arithmetic, args);
-                        if (!me.tryFailed(eval)) {
-                            return eval;
-                        }
+            return callOverload(node, operator, args);
+        }
+        return JexlEngine.TRY_FAILED;
+    }
+
+    /**
+     * Attempts to call an operator.
+     * <p>
+     * This takes care of finding and caching the operator method when appropriate
+     * @param node     the syntactic node
+     * @param operator the operator
+     * @param arg1     the first argument
+     * @return the result of the operator evaluation or TRY_FAILED
+     */
+    protected Object tryOverload(JexlNode node, JexlOperator operator, Object arg1) {
+        if (operators != null && operators.overloads(operator)) {
+            return callOverload(node, operator, arg1);
+        }
+        return JexlEngine.TRY_FAILED;
+    }
+
+    /**
+     * Attempts to call an operator.
+     * <p>
+     * This takes care of finding and caching the operator method when appropriate
+     * @param node     the syntactic node
+     * @param operator the operator
+     * @param arg1     the first argument
+     * @param arg2     the second argument
+     * @return the result of the operator evaluation or TRY_FAILED
+     */
+    protected Object tryOverload(JexlNode node, JexlOperator operator, Object arg1, Object arg2) {
+        if (operators != null && operators.overloads(operator)) {
+            return callOverload(node, operator, arg1, arg2);
+        }
+        return JexlEngine.TRY_FAILED;
+    }
+
+    /**
+     * Attempts to call an operator.
+     * <p>
+     * This takes care of finding and caching the operator method when appropriate
+     * @param node     the syntactic node
+     * @param operator the operator
+     * @param arg1     the first argument
+     * @param arg2     the second argument
+     * @param arg3     the third argument
+     * @return the result of the operator evaluation or TRY_FAILED
+     */
+    protected Object tryOverload(JexlNode node, JexlOperator operator, Object arg1, Object arg2, Object arg3) {
+        if (operators != null && operators.overloads(operator)) {
+            return callOverload(node, operator, arg1, arg2, arg3);
+        }
+        return JexlEngine.TRY_FAILED;
+    }
+
+    /**
+     * Call an operator.
+     * <p>
+     * This takes care of finding and caching the operator method when appropriate
+     * @param node     the syntactic node
+     * @param operator the operator
+     * @param args     the arguments
+     * @return the result of the operator evaluation or TRY_FAILED
+     */
+    protected Object callOverload(JexlNode node, JexlOperator operator, Object... args) {
+        final JexlArithmetic arithmetic = interpreter.arithmetic;
+        final boolean cache = interpreter.cache && node != null;
+        try {
+            if (cache) {
+                Object cached = node.jjtGetValue();
+                if (cached instanceof JexlMethod) {
+                    JexlMethod me = (JexlMethod) cached;
+                    Object eval = me.tryInvoke(operator.getMethodName(), arithmetic, args);
+                    if (!me.tryFailed(eval)) {
+                        return eval;
                     }
                 }
-                JexlMethod vm = operators.getOperator(operator, args);
-                if (vm != null) {
-                    Object result = vm.invoke(arithmetic, args);
-                    if (cache) {
-                        node.jjtSetValue(vm);
-                    }
-                    return result;
-                }
-            } catch (Exception xany) {
-                return interpreter.operatorError(node, operator, xany);
             }
+            JexlMethod vm = operators.getOperator(operator, args);
+            if (vm != null) {
+                Object result = vm.invoke(arithmetic, args);
+                if (cache) {
+                    node.jjtSetValue(vm);
+                }
+                return result;
+            }
+        } catch (Exception xany) {
+            return interpreter.operatorError(node, operator, xany);
         }
         return JexlEngine.TRY_FAILED;
     }

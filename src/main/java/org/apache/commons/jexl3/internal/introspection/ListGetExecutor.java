@@ -81,9 +81,7 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
     @Override
     public Object tryInvoke(final Object obj, Object identifier) {
         Integer index = castInteger(identifier);
-        if (obj != null && method != null
-            && objectClass.equals(obj.getClass())
-            && index != null) {
+        if (obj != null && objectClass == obj.getClass() && index != null) {
             if (method == ARRAY_GET) {
                 return Array.get(obj, index.intValue());
             } else {

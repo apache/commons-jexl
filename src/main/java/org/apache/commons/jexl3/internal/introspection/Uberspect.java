@@ -248,9 +248,6 @@ public class Uberspect implements JexlUberspect {
                     case PROPERTY:
                         // first try for a getFoo() type of property (also getfoo() )
                         executor = PropertyGetExecutor.discover(is, claz, property);
-                        if (executor == null) {
-                            executor = BooleanGetExecutor.discover(is, claz, property);
-                        }
                         break;
                     case MAP:
                         // let's see if we are a map...

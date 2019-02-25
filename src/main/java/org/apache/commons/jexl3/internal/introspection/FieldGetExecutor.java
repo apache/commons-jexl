@@ -18,12 +18,15 @@
 package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.Field;
+import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 
 /**
  * A JexlPropertyGet for public fields.
  */
-public final class FieldGetExecutor implements JexlPropertyGet {
+public final class FieldGetExecutor extends AbstractExecutor.Get {
+    /** The java.lang.reflect.Method.get method used as an active marker in FieldGet. */
+    private static final java.lang.reflect.Method FIELD_GET = null;
     /**
      * The public field.
      */
@@ -51,6 +54,7 @@ public final class FieldGetExecutor implements JexlPropertyGet {
      * @param theField the class public field
      */
     private FieldGetExecutor(Field theField) {
+        super(theField.getDeclaringClass(), FIELD_GET);
         field = theField;
     }
 
@@ -61,19 +65,14 @@ public final class FieldGetExecutor implements JexlPropertyGet {
 
     @Override
     public Object tryInvoke(Object obj, Object key) {
-        if (obj.getClass().equals(field.getDeclaringClass()) && key.equals(field.getName())) {
+        if (objectClass == obj.getClass() && field.getName().equals(castString(key))) {
             try {
                 return field.get(obj);
             } catch (IllegalAccessException xill) {
-                return Uberspect.TRY_FAILED;
+                return TRY_FAILED;
             }
         }
-        return Uberspect.TRY_FAILED;
-    }
-
-    @Override
-    public boolean tryFailed(Object rval) {
-        return rval == Uberspect.TRY_FAILED;
+        return TRY_FAILED;
     }
 
     @Override

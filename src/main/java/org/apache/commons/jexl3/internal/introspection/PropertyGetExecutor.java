@@ -38,8 +38,8 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
      * @return the executor if found, null otherwise
      */
     public static PropertyGetExecutor discover(Introspector is, Class<?> clazz, String property) {
-        java.lang.reflect.Method method = discoverGet(is, "get", clazz, property);
-        return method == null? null : new PropertyGetExecutor(clazz, method, property);
+        java.lang.reflect.Method m = is.getPropertyGet(clazz, property);
+        return m == null ? null : new PropertyGetExecutor(clazz, m, property);
     }
 
     /**
@@ -61,14 +61,12 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
     @Override
     public Object invoke(Object o)
         throws IllegalAccessException, InvocationTargetException {
-        return method == null ? null : method.invoke(o, (Object[]) null);
+        return method.invoke(o, (Object[]) null);
     }
 
     @Override
     public Object tryInvoke(Object o, Object identifier) {
-        if (o != null && method !=  null
-            && property.equals(castString(identifier))
-            && objectClass.equals(o.getClass())) {
+        if (o != null && objectClass == o.getClass() && property.equals(castString(identifier))) {
             try {
                 return method.invoke(o, (Object[]) null);
             } catch (InvocationTargetException xinvoke) {
@@ -80,37 +78,6 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
             }
         }
         return TRY_FAILED;
-    }
-
-    /**
-     * Base method for boolean and object property get.
-     * @param is the introspector
-     * @param which "is" or "get" for boolean or object
-     * @param clazz The class being examined.
-     * @param property The property being addressed.
-     * @return The {get,is}{p,P}roperty method if one exists, null otherwise.
-     */
-    static java.lang.reflect.Method discoverGet(Introspector is, String which, Class<?> clazz, String property) {
-        if (property == null || property.isEmpty()) {
-            return null;
-        }
-        //  this is gross and linear, but it keeps it straightforward.
-        java.lang.reflect.Method method;
-        final int start = which.length();
-        // start with get<Property>
-        StringBuilder sb = new StringBuilder(property.length() + start);
-        sb.append(which);
-        sb.append(property);
-        // uppercase nth char
-        char c = sb.charAt(start);
-        sb.setCharAt(start, Character.toUpperCase(c));
-        method = is.getMethod(clazz, sb.toString(), EMPTY_PARAMS);
-        //lowercase nth char
-        if (method == null) {
-            sb.setCharAt(start, Character.toLowerCase(c));
-            method = is.getMethod(clazz, sb.toString(), EMPTY_PARAMS);
-        }
-        return method;
     }
 }
 
