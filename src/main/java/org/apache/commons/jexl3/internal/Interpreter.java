@@ -1621,7 +1621,9 @@ public class Interpreter extends InterpreterBase {
             for (int i = 0; i < childCount; i++) {
                 JexlNode child = node.jjtGetChild(i);
                 if (!matched && child instanceof ASTSwitchStatementCase) {
-                    Object right = child.jjtGetChild(0).jjtAccept(this, data);
+                    Class scope = left != null ? left.getClass() : Object.class;
+                    JexlNode label = child.jjtGetChild(0);
+                    Object right = label instanceof ASTIdentifier ? label.jjtAccept(this, scope) : label.jjtAccept(this, data);
                     try {
                         Object caseMatched = operators.tryOverload(child, JexlOperator.EQ, left, right);
                         if (caseMatched == JexlEngine.TRY_FAILED)

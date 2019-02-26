@@ -115,4 +115,13 @@ public class SwitchTest extends JexlTestCase {
         Assert.assertEquals("Result is not as expected", 5, o);
     }
 
+    @Test
+    public void testIdentifier() throws Exception {
+        JexlScript e = JEXL.createScript("switch (x) {case MAX_VALUE : return 1; default: return 0}");
+        JexlContext jc = new MapContext();
+        jc.set("x", Integer.MAX_VALUE);
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not as expected", 1, o);
+    }
+
 }

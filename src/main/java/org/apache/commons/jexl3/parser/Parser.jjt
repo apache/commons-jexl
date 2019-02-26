@@ -536,7 +536,7 @@ void SwitchStatementBlock() #void : {}
 
 void SwitchStatementCase() : {}
 {
-    <CASE> Literal() <COLON> ((LOOKAHEAD(1) Block() | Statement()) )*
+    <CASE> (Literal() | Identifier()) <COLON> ((LOOKAHEAD(1) Block() | Statement()) )*
 }
 
 void SwitchStatementDefault() : {}
