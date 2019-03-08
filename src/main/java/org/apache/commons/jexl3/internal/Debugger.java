@@ -966,7 +966,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             builder.append(" : ");
             accept(node.jjtGetChild(2), data);
         } else {
-            builder.append("?:");
+            builder.append("?: ");
             accept(node.jjtGetChild(1), data);
 
         }
