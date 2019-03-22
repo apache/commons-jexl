@@ -69,6 +69,7 @@ New Features in 3.2:
 Bugs Fixed in 3.2:
 ==================
 
+* JEXL-291:      Using sandbox prevents array-syntax lookup by number in Map
 * JEXL-290:      Safe navigation fails on chained method calls
 * JEXL-289:      Passing undeclared function parameter can overwrite a local function variable
 * JEXL-287:      Wrong resolution of local variables
