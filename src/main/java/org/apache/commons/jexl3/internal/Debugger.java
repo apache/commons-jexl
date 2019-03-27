@@ -100,6 +100,7 @@ import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParserVisitor;
 
 import java.util.regex.Pattern;
+import org.apache.commons.jexl3.parser.ASTUnaryPlusNode;
 import org.apache.commons.jexl3.parser.StringParser;
 
 /**
@@ -992,6 +993,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         return prefixChild(node, "-", data);
     }
 
+    @Override
+    protected Object visit(ASTUnaryPlusNode node, Object data) {
+        return prefixChild(node, "+", data);
+    }
+    
     @Override
     protected Object visit(ASTVar node, Object data) {
         builder.append("var ");

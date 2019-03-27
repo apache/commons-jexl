@@ -153,7 +153,33 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("-aBigInteger", new BigInteger("-7"));
         asserter.assertExpression("-aBigDecimal", new BigDecimal("-8.8"));
     }
+    
+    /**
+     * test some simple mathematical calculations
+     */
+    @Test
+    public void testUnaryPlusus() throws Exception {
+        asserter.setVariable("aByte", new Byte((byte) -1));
+        asserter.setVariable("aShort", new Short((short) -2));
+        asserter.setVariable("anInteger", new Integer(-3));
+        asserter.setVariable("aLong", new Long(-4));
+        asserter.setVariable("aFloat", new Float(-5.5));
+        asserter.setVariable("aDouble", new Double(-6.6));
+        asserter.setVariable("aBigInteger", new BigInteger("-7"));
+        asserter.setVariable("aBigDecimal", new BigDecimal("-8.8"));
 
+        asserter.assertExpression("+3", new Integer("3"));
+        asserter.assertExpression("+3.0", new Double("3.0"));
+        asserter.assertExpression("+aByte", new Byte((byte) 1));
+        asserter.assertExpression("+aShort", new Short((short) 2));
+        asserter.assertExpression("+anInteger", new Integer(3));
+        asserter.assertExpression("+aLong", new Long(4));
+        asserter.assertExpression("+aFloat", new Float(5.5));
+        asserter.assertExpression("+aDouble", new Double(6.6));
+        asserter.assertExpression("+aBigInteger", new BigInteger("7"));
+        asserter.assertExpression("+aBigDecimal", new BigDecimal("8.8"));
+    }
+    
     /**
      * test some simple mathematical calculations
      */

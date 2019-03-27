@@ -827,6 +827,37 @@ public class JexlArithmetic {
     }
 
     /**
+     * Absolute (positive) value (unary plus for numbers).
+     *
+     * @param val the value to get the absolute value from
+     * @return the positive value
+     */
+    public Object positivize(Object val) {
+        if (val instanceof Integer) {
+            return Math.abs((Integer) val);
+        } else if (val instanceof Double) {
+            return Math.abs((Double) val);
+        } else if (val instanceof Long) {
+            return Math.abs((Long) val);
+        } else if (val instanceof BigDecimal) {
+            return ((BigDecimal) val).abs();
+        } else if (val instanceof BigInteger) {
+            return ((BigInteger) val).abs();
+        } else if (val instanceof Float) {
+            return Math.abs((Float) val);
+        } else if (val instanceof Short) {
+            return (short) Math.abs((Short) val);
+        } else if (val instanceof Byte) {
+            return (byte) Math.abs((Byte) val);
+        } else if (val instanceof Boolean) {
+            return Boolean.TRUE;
+        } else if (val instanceof AtomicBoolean) {
+            return Boolean.TRUE;
+        }
+        throw new ArithmeticException("Object abs:(" + val + ")");
+    }
+    
+    /**
      * Test if left contains right (right matches/in left).
      * <p>Beware that this method arguments are the opposite of the operator arguments.
      * 'x in y' means 'y contains x'.</p>

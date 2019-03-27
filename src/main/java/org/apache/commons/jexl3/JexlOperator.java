@@ -191,6 +191,14 @@ public enum JexlOperator {
      * @see JexlArithmetic#negate
      */
     NEGATE("-", "negate", 1),
+    
+    /**
+     * Absolute operator.
+     * <br><strong>Syntax:</strong> <code>+x</code>
+     * <br><strong>Method:</strong> <code>T plus(L x);</code>.
+     * @see JexlArithmetic#positivize
+     */
+    POSITIVIZE("+", "positivize", 1),
 
     /**
      * Empty operator.

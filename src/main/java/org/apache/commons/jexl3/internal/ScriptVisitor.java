@@ -90,6 +90,7 @@ import org.apache.commons.jexl3.parser.ASTSubNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
+import org.apache.commons.jexl3.parser.ASTUnaryPlusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
 import org.apache.commons.jexl3.parser.ASTWhileStatement;
 import org.apache.commons.jexl3.parser.JexlNode;
@@ -288,8 +289,8 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTNEWNode node, Object data) {
-
-        return visitNode(node, data);    }
+        return visitNode(node, data);
+    }
 
     @Override
     protected Object visit(ASTAddNode node, Object data) {
@@ -321,6 +322,11 @@ public class ScriptVisitor extends ParserVisitor {
         return visitNode(node, data);
     }
 
+    @Override
+    protected Object visit(ASTUnaryPlusNode node, Object data) {
+        return visitNode(node, data);
+    }
+    
     @Override
     protected Object visit(ASTBitwiseComplNode node, Object data) {
         return visitNode(node, data);

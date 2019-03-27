@@ -113,6 +113,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import org.apache.commons.jexl3.parser.ASTUnaryPlusNode;
 
 
 /**
@@ -598,7 +599,27 @@ public class Interpreter extends InterpreterBase {
             throw new JexlException(valNode, "- error", xrt);
         }
     }
-
+    
+    @Override
+    protected Object visit(ASTUnaryPlusNode node, Object data) {
+        JexlNode valNode = node.jjtGetChild(0);
+        Object val = valNode.jjtAccept(this, data);
+        try {
+            Object result = operators.tryOverload(node, JexlOperator.POSITIVIZE, val);
+            if (result != JexlEngine.TRY_FAILED) {
+                return result;
+            }
+            Object number = arithmetic.positivize(val);
+            // attempt to recoerce to literal class
+            if (valNode instanceof ASTNumberLiteral && number instanceof Number) {
+                number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
+            }
+            return number;
+        } catch (ArithmeticException xrt) {
+            throw new JexlException(valNode, "- error", xrt);
+        }
+    }
+    
     @Override
     protected Object visit(ASTBitwiseComplNode node, Object data) {
         Object arg = node.jjtGetChild(0).jjtAccept(this, data);
