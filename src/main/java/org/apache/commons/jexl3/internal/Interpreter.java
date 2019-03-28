@@ -582,6 +582,11 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTUnaryMinusNode node, Object data) {
+        // use cached value if literal
+        Object value = node.jjtGetValue();
+        if (value != null && !(value instanceof JexlMethod)) {
+            return value;
+        }
         JexlNode valNode = node.jjtGetChild(0);
         Object val = valNode.jjtAccept(this, data);
         try {
@@ -591,8 +596,12 @@ public class Interpreter extends InterpreterBase {
             }
             Object number = arithmetic.negate(val);
             // attempt to recoerce to literal class
-            if (valNode instanceof ASTNumberLiteral && number instanceof Number) {
-                number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
+            if ((number instanceof Number)) {
+                // cache it
+                if (valNode instanceof ASTNumberLiteral) {
+                    number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
+                    node.jjtSetValue(number);
+                }
             }
             return number;
         } catch (ArithmeticException xrt) {
@@ -602,6 +611,11 @@ public class Interpreter extends InterpreterBase {
     
     @Override
     protected Object visit(ASTUnaryPlusNode node, Object data) {
+        // use cached value if literal
+        Object value = node.jjtGetValue();
+        if (value != null && !(value instanceof JexlMethod)) {
+            return value;
+        }
         JexlNode valNode = node.jjtGetChild(0);
         Object val = valNode.jjtAccept(this, data);
         try {
@@ -610,9 +624,8 @@ public class Interpreter extends InterpreterBase {
                 return result;
             }
             Object number = arithmetic.positivize(val);
-            // attempt to recoerce to literal class
             if (valNode instanceof ASTNumberLiteral && number instanceof Number) {
-                number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
+                node.jjtSetValue(number);
             }
             return number;
         } catch (ArithmeticException xrt) {

@@ -466,7 +466,7 @@ public class JexlArithmetic {
             BigDecimal bigd = (BigDecimal) original;
             // if it's bigger than a double it can't be narrowed
             if (bigd.compareTo(BIGD_DOUBLE_MAX_VALUE) > 0
-                    || bigd.compareTo(BIGD_DOUBLE_MIN_VALUE) < 0) {
+                || bigd.compareTo(BIGD_DOUBLE_MIN_VALUE) < 0) {
                 return original;
             } else {
                 try {
@@ -827,34 +827,32 @@ public class JexlArithmetic {
     }
 
     /**
-     * Absolute (positive) value (unary plus for numbers).
-     *
-     * @param val the value to get the absolute value from
+     * Positivize value (unary plus for numbers).
+     * <p>C/C++/C#/Java perform integral promotion of the operand, ie
+     * cast to int if type can represented as int without loss of precision.
+     * @param val the value to positivize
      * @return the positive value
      */
     public Object positivize(Object val) {
-        if (val instanceof Integer) {
-            return Math.abs((Integer) val);
-        } else if (val instanceof Double) {
-            return Math.abs((Double) val);
-        } else if (val instanceof Long) {
-            return Math.abs((Long) val);
-        } else if (val instanceof BigDecimal) {
-            return ((BigDecimal) val).abs();
-        } else if (val instanceof BigInteger) {
-            return ((BigInteger) val).abs();
-        } else if (val instanceof Float) {
-            return Math.abs((Float) val);
-        } else if (val instanceof Short) {
-            return (short) Math.abs((Short) val);
-        } else if (val instanceof Byte) {
-            return (byte) Math.abs((Byte) val);
-        } else if (val instanceof Boolean) {
-            return Boolean.TRUE;
-        } else if (val instanceof AtomicBoolean) {
-            return Boolean.TRUE;
+        if (val instanceof Short) {
+            return ((Short) val).intValue();
         }
-        throw new ArithmeticException("Object abs:(" + val + ")");
+        if (val instanceof Byte) {
+            return ((Byte) val).intValue();
+        }
+        if (val instanceof Number) {
+            return val;
+        }
+        if (val instanceof Character) {
+            return (int) (Character) val;
+        }
+        if (val instanceof Boolean) {
+            return val;
+        }
+        if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get();
+        }
+        throw new ArithmeticException("Object positivize:(" + val + ")");
     }
     
     /**
