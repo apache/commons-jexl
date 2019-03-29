@@ -48,6 +48,7 @@ What's new in 3.2:
 New Features in 3.2:
 ====================
 
+* JEXL-295:      Add unary plus operator
 * JEXL-275:      Allow safe navigation as option
 * JEXL-274:      Handle soft and hard stack overflow
 * JEXL-273:      Add do...while(...) loops

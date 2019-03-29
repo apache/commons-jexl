@@ -802,11 +802,18 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Negation</td>
+                    <td>Negate</td>
                     <td>
-                        The unary <code>-</code> operator is used.
-                        For example
-                        <code>-12</code>
+                        The unary <code>-</code> operator is used. It changes the sign of its numeric argument.
+                        For example <code>-12</code> or <code>-(a * b)</code>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Positivize</td>
+                    <td>
+                        The unary <code>+</code> operator is used. It performs an integral promotion meaning
+                        that byte, short, char arguments will be promoted to integer as a result.
+                        For example  <code>+12</code> or <code>-(a * b)</code>
                     </td>
                 </tr>
                 <tr>

@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-295"> 
+                Add unary plus operator
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-291" due-to="David Costanzo"> 
                 Using sandbox prevents array-syntax lookup by number in Map
             </action>
