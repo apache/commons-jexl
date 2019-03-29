@@ -597,10 +597,12 @@ public class Interpreter extends InterpreterBase {
             Object number = arithmetic.negate(val);
             // attempt to recoerce to literal class
             if ((number instanceof Number)) {
-                // cache it
-                if (valNode instanceof ASTNumberLiteral) {
+                // cache if number literal and negate is idempotent
+                if (valNode instanceof ASTNumberLiteral ) {
                     number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
-                    node.jjtSetValue(number);
+                    if (arithmetic.isNegateStable()) {
+                        node.jjtSetValue(number);
+                    }
                 }
             }
             return number;
@@ -624,7 +626,9 @@ public class Interpreter extends InterpreterBase {
                 return result;
             }
             Object number = arithmetic.positivize(val);
-            if (valNode instanceof ASTNumberLiteral && number instanceof Number) {
+            if (valNode instanceof ASTNumberLiteral
+                && number instanceof Number
+                && arithmetic.isPositivizeStable()) {
                 node.jjtSetValue(number);
             }
             return number;

@@ -823,13 +823,26 @@ public class JexlArithmetic {
         } else if (val instanceof AtomicBoolean) {
             return ((AtomicBoolean) val).get() ? Boolean.FALSE : Boolean.TRUE;
         }
-        throw new ArithmeticException("Object negation:(" + val + ")");
+        throw new ArithmeticException("Object negate:(" + val + ")");
+    }
+    
+    /**
+     * Whether negate called with a given argument will always return the same result.
+     * <p>This is used to determine whether negate results on number literals can be cached.
+     * If the result on calling negate with the same constant argument may change between calls,
+     * which means the function is not deterministic, this method must return false.
+     * @see #isNegateStable() 
+     * @return true if negate is idempotent, false otherwise
+     */
+    public boolean isNegateStable() {
+        return true;
     }
 
     /**
      * Positivize value (unary plus for numbers).
      * <p>C/C++/C#/Java perform integral promotion of the operand, ie
      * cast to int if type can represented as int without loss of precision.
+     * @see #isPositivizeStable()
      * @param val the value to positivize
      * @return the positive value
      */
@@ -853,6 +866,17 @@ public class JexlArithmetic {
             return ((AtomicBoolean) val).get();
         }
         throw new ArithmeticException("Object positivize:(" + val + ")");
+    }
+        
+    /**
+     * Whether positivize called with a given argument will always return the same result.
+     * <p>This is used to determine whether positivize results on number literals can be cached.
+     * If the result on calling positivize with the same constant argument may change between calls,
+     * which means the function is not deterministic, this method must return false.
+     * @return true if positivize is idempotent, false otherwise
+     */
+    public boolean isPositivizeStable() {
+        return true;
     }
     
     /**
