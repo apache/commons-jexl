@@ -185,7 +185,7 @@
                 <tr>
                     <td>Expression</td>
                     <td>
-                        An expression can be the literal, variable, assignment, access operator, iterator operator, stream operator, function definition, function call, method call or
+                        An expression can be the literal, variable, assignment, access operator, switch operator, iterator operator, stream operator, function definition, function call, method call or
                         an evaluation operator.
                     </td>
                 </tr>
@@ -306,6 +306,24 @@
                         <p>The generator function can also take two arguments <code>(index, value) -> {index &lt; 10 ? value + 2 : null}</code>
                         with the first argument <code>index</code> being the zero based index of the next generated element of the sequence,
                         and the second <code>value</code> is the previously generated element.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Switch Operator</td>
+                    <td>
+                        The switch operator evaluates its expression, then returns value of statement block that follow the matching case label, e.g.
+                        <code>switch (a) {
+                              case 0 -> "zero";
+                              case 1 -> "one"
+                              default -> "-"
+                            } </code>
+                        <p>The multilabeled syntax is also supported:
+                        <code>switch (a) {
+                              case 0, 1 -> "zero";
+                              case 2 -> "one"
+                              default -> "-"
+                            } </code>
+                        </p>
                     </td>
                 </tr>
                 <tr>

@@ -133,6 +133,10 @@ import org.apache.commons.jexl3.parser.ASTStartCountNode;
 import org.apache.commons.jexl3.parser.ASTStopCountNode;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
+import org.apache.commons.jexl3.parser.ASTSwitchExpression;
+import org.apache.commons.jexl3.parser.ASTSwitchExpressionCase;
+import org.apache.commons.jexl3.parser.ASTSwitchExpressionCaseLabel;
+import org.apache.commons.jexl3.parser.ASTSwitchExpressionDefault;
 import org.apache.commons.jexl3.parser.ASTSwitchStatement;
 import org.apache.commons.jexl3.parser.ASTSwitchStatementCase;
 import org.apache.commons.jexl3.parser.ASTSwitchStatementDefault;
@@ -725,6 +729,26 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTInitializedArrayConstructorNode node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTSwitchExpression node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTSwitchExpressionCase node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTSwitchExpressionCaseLabel node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTSwitchExpressionDefault node, Object data) {
         return visitNode(node, data);
     }
 

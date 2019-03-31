@@ -134,6 +134,10 @@ import org.apache.commons.jexl3.parser.ASTStartCountNode;
 import org.apache.commons.jexl3.parser.ASTStopCountNode;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
+import org.apache.commons.jexl3.parser.ASTSwitchExpression;
+import org.apache.commons.jexl3.parser.ASTSwitchExpressionCase;
+import org.apache.commons.jexl3.parser.ASTSwitchExpressionCaseLabel;
+import org.apache.commons.jexl3.parser.ASTSwitchExpressionDefault;
 import org.apache.commons.jexl3.parser.ASTSwitchStatement;
 import org.apache.commons.jexl3.parser.ASTSwitchStatementCase;
 import org.apache.commons.jexl3.parser.ASTSwitchStatementDefault;
@@ -1705,6 +1709,53 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTSwitchStatementDefault node, Object data) {
         builder.append("default : ");
+        if (node.jjtGetNumChildren() > 0) {
+            for (int i = 0; i < node.jjtGetNumChildren(); i++)
+                acceptStatement(node.jjtGetChild(i), data);
+        } else {
+            builder.append(';');
+        }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchExpression node, Object data) {
+        builder.append("switch (");
+        accept(node.jjtGetChild(0), data);
+        builder.append(") {");
+        for (int i = 1; i < node.jjtGetNumChildren(); i++)
+            accept(node.jjtGetChild(i), data);
+        builder.append("}");
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchExpressionCase node, Object data) {
+        builder.append("case ");
+        accept(node.jjtGetChild(0), data);
+        builder.append(" -> ");
+        if (node.jjtGetNumChildren() > 1) {
+            for (int i = 1; i < node.jjtGetNumChildren(); i++)
+                acceptStatement(node.jjtGetChild(i), data);
+        } else {
+            builder.append(';');
+        }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchExpressionCaseLabel node, Object data) {
+        for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+            if (i > 0)
+                builder.append(',');
+            accept(node.jjtGetChild(i), data);
+        }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchExpressionDefault node, Object data) {
+        builder.append("default -> ");
         if (node.jjtGetNumChildren() > 0) {
             for (int i = 0; i < node.jjtGetNumChildren(); i++)
                 acceptStatement(node.jjtGetChild(i), data);

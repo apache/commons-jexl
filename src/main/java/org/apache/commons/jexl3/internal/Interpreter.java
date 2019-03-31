@@ -146,6 +146,10 @@ import org.apache.commons.jexl3.parser.ASTStartCountNode;
 import org.apache.commons.jexl3.parser.ASTStopCountNode;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
+import org.apache.commons.jexl3.parser.ASTSwitchExpression;
+import org.apache.commons.jexl3.parser.ASTSwitchExpressionCase;
+import org.apache.commons.jexl3.parser.ASTSwitchExpressionCaseLabel;
+import org.apache.commons.jexl3.parser.ASTSwitchExpressionDefault;
 import org.apache.commons.jexl3.parser.ASTSwitchStatement;
 import org.apache.commons.jexl3.parser.ASTSwitchStatementCase;
 import org.apache.commons.jexl3.parser.ASTSwitchStatementDefault;
@@ -1617,11 +1621,11 @@ public class Interpreter extends InterpreterBase {
         try {
             int childCount = node.jjtGetNumChildren();
             boolean matched = false;
+            Class scope = left != null ? left.getClass() : Void.class;
             // check all cases first
-            for (int i = 0; i < childCount; i++) {
+            for (int i = 1; i < childCount; i++) {
                 JexlNode child = node.jjtGetChild(i);
                 if (!matched && child instanceof ASTSwitchStatementCase) {
-                    Class scope = left != null ? left.getClass() : Object.class;
                     JexlNode label = child.jjtGetChild(0);
                     Object right = label instanceof ASTIdentifier ? label.jjtAccept(this, scope) : label.jjtAccept(this, data);
                     try {
@@ -1638,7 +1642,7 @@ public class Interpreter extends InterpreterBase {
             }
             // otherwise jump to default case
             if (!matched) {
-                for (int i = 0; i < childCount; i++) {
+                for (int i = 1; i < childCount; i++) {
                     JexlNode child = node.jjtGetChild(i);
                     if (child instanceof ASTSwitchStatementDefault)
                         matched = true;
@@ -1669,6 +1673,73 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTSwitchStatementDefault node, Object data) {
+        Object result = null;
+        int childCount = node.jjtGetNumChildren();
+        for (int i = 0; i < childCount; i++) {
+            cancelCheck(node);
+            result = node.jjtGetChild(i).jjtAccept(this, data);
+        }
+        return result;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchExpression node, Object data) {
+        /* first objectNode is the switch expression */
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        int childCount = node.jjtGetNumChildren();
+        Class scope = left != null ? left.getClass() : Void.class;
+        // check all cases first
+        for (int i = 1; i < childCount; i++) {
+            JexlNode child = node.jjtGetChild(i);
+            if (child instanceof ASTSwitchExpressionCase) {
+                JexlNode labels = child.jjtGetChild(0);
+                boolean matched = false;
+                // check all labels
+                for (int j = 0; j < labels.jjtGetNumChildren(); j++) {
+                    JexlNode label = labels.jjtGetChild(j);
+                    Object right = label instanceof ASTIdentifier ? label.jjtAccept(this, scope) : label.jjtAccept(this, data);
+                    try {
+                        Object caseMatched = operators.tryOverload(child, JexlOperator.EQ, left, right);
+                        if (caseMatched == JexlEngine.TRY_FAILED)
+                            caseMatched = arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
+                        matched = arithmetic.toBoolean(caseMatched);
+                    } catch (ArithmeticException xrt) {
+                        throw new JexlException(node, "== error", xrt);
+                    }
+                    if (matched) {
+                        return child.jjtAccept(this, data);
+                    }
+                }
+            }
+        }
+        // otherwise jump to default case
+        for (int i = 1; i < childCount; i++) {
+            JexlNode child = node.jjtGetChild(i);
+            if (child instanceof ASTSwitchExpressionDefault) {
+                return child.jjtAccept(this, data);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchExpressionCase node, Object data) {
+        Object result = null;
+        int childCount = node.jjtGetNumChildren();
+        for (int i = 1; i < childCount; i++) {
+            cancelCheck(node);
+            result = node.jjtGetChild(i).jjtAccept(this, data);
+        }
+        return result;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchExpressionCaseLabel node, Object data) {
+        return null;
+    }
+
+    @Override
+    protected Object visit(ASTSwitchExpressionDefault node, Object data) {
         Object result = null;
         int childCount = node.jjtGetNumChildren();
         for (int i = 0; i < childCount; i++) {

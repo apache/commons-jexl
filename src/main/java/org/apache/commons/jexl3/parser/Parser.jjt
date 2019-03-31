@@ -392,7 +392,7 @@ void Statement() #void : {}
     | ThrowStatement()
     | AssertStatement()
     | SynchronizedStatement()
-    | SwitchStatement()
+    | LOOKAHEAD(SwitchStatementLookahead()) SwitchStatement()
     | LOOKAHEAD(MultipleIdentifier() <assign>) MultipleAssignmentStatement()
     | LOOKAHEAD(2) ExpressionStatement()
     | ReturnStatement()
@@ -519,6 +519,11 @@ ASTSynchronizedStatement SynchronizedStatement() : {}
 {
     <SYNCHRONIZED> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | Statement())
     { return jjtThis; }
+}
+
+void SwitchStatementLookahead() : {}
+{
+    <SWITCH> <LPAREN> Expression() <RPAREN> <LCURLY> (<CASE> (Literal() | Identifier()) <COLON> | <DCASE> <COLON>) 
 }
 
 ASTSwitchStatement SwitchStatement() : {}
@@ -1017,6 +1022,33 @@ void IteratorExpression() #void : {}
   ValueExpression() #EnumerationNode(1)
 }
 
+void SwitchExpression() : {}
+{
+    <SWITCH> <LPAREN> Expression() <RPAREN> <LCURLY> SwitchExpressionBlock() <RCURLY>
+}
+
+void SwitchExpressionBlock() #void : {}
+{
+    SwitchExpressionCase() (LOOKAHEAD(SwitchExpressionBlock()) SwitchExpressionBlock())*
+    |
+    SwitchExpressionDefault() (LOOKAHEAD(SwitchExpressionCase()) SwitchExpressionCase())*
+}
+
+void SwitchExpressionCase() : {}
+{
+    <CASE> SwitchExpressionCaseLabel() <LAMBDA> ((LOOKAHEAD(1) Block() | Statement()) )+
+}
+
+void SwitchExpressionCaseLabel() : {}
+{
+    (Literal() | Identifier()) (<COMMA> (Literal() | Identifier()))*
+}
+
+void SwitchExpressionDefault() : {}
+{
+    <DCASE> <LAMBDA> ((LOOKAHEAD(1) Block() | Statement()) )+
+}
+
 /***************************************
  *      Identifier & Literals
  ***************************************/
@@ -1491,6 +1523,8 @@ void PrimaryExpression() #void : {}
     LOOKAHEAD( <HBRACKET> ) ImmutableArrayLiteral()
     |
     LOOKAHEAD( <NEW> ) Constructor()
+    |
+    LOOKAHEAD( <SWITCH> ) SwitchExpression()
     |
     LOOKAHEAD( FunctionCallLookahead() ) FunctionCall()
     |
