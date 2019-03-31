@@ -83,17 +83,19 @@ New features
 
 + New `this` literal is introduced to allow easier access to the current evaluation context
 
-+ Java-like `<<`,`>>`,`>>>` bitwise shift operators are introduced. 
++ Java-like `<<`,`>>`,`>>>` bitwise shift operators are introduced 
 
-+ Java-like `<<=`,`>>=`,`>>>=` self-assignment operators are introduced. 
++ Java-like `<<=`,`>>=`,`>>>=` self-assignment operators are introduced 
 
-+ Java-like `++` and `--` increment/decrement operators are introduced. Prefix and postfix forms are supported.
++ Java-like `++` and `--` increment/decrement operators are introduced. Prefix and postfix forms are supported
 
 + Java-like `instanceof` operator is introduced
 
-+ Java-like `+` unary promotion operator is introduced.
++ Java-like `+` unary promotion operator is introduced
 
-+ Java-like `()` type-cast operator is introduced.
++ Java-like `()` type-cast operator is introduced
+
++ Java-like `switch` expression operator is introduced
 
 + Javascript-like `===` and `!==` identity operators are introduced
 
