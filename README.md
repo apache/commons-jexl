@@ -163,6 +163,10 @@ Enhancements
 
 + Function argument comprehensions `func(...a)` can be used 
 
++ Binary format `0b...` for natural literals 
+
++ Java-like support for underscores in numeric literals
+
 + Corresponding unicode characters may be used for the operators like `!=`, `>=` etc
 
 License
