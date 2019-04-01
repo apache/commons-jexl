@@ -28,7 +28,7 @@ import org.apache.commons.jexl3.annotations.NoJexl;
  * Default implementation does this by checking if element has been annotated with NoJexl.
  */
 public class Permissions {
-    /** Make non instantiable. */
+    /** Allow inheritance. */
     protected Permissions() {
     }
     /**
