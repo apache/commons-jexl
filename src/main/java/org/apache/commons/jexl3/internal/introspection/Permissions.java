@@ -29,7 +29,7 @@ import org.apache.commons.jexl3.annotations.NoJexl;
  */
 public class Permissions {
     /** Make non instantiable. */
-    private Permissions() {
+    protected Permissions() {
     }
     /**
      * The default singleton.
@@ -156,7 +156,7 @@ public class Permissions {
      * @param interf whether interfaces should be checked as well
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    private static boolean allow(Class<?> clazz, boolean interf) {
+    protected boolean allow(Class<?> clazz, boolean interf) {
         if (clazz == null) {
             return false;
         }
@@ -194,7 +194,7 @@ public class Permissions {
      * @param method the method
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    private static boolean allow(Class<?> clazz, Method method) {
+    protected boolean allow(Class<?> clazz, Method method) {
         if (clazz != null) {
             try {
                 // check if method in that class is different from the method argument
