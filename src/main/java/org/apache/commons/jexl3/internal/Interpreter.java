@@ -17,7 +17,6 @@
 //CSOFF: FileLength
 package org.apache.commons.jexl3.internal;
 
-
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -29,6 +28,7 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect.PropertyResolver;
+
 import org.apache.commons.jexl3.parser.ASTAddNode;
 import org.apache.commons.jexl3.parser.ASTAndNode;
 import org.apache.commons.jexl3.parser.ASTAnnotatedStatement;
@@ -103,6 +103,7 @@ import org.apache.commons.jexl3.parser.ASTSubNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
 import org.apache.commons.jexl3.parser.ASTTrueNode;
 import org.apache.commons.jexl3.parser.ASTUnaryMinusNode;
+import org.apache.commons.jexl3.parser.ASTUnaryPlusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
 import org.apache.commons.jexl3.parser.ASTWhileStatement;
 import org.apache.commons.jexl3.parser.JexlNode;
@@ -113,8 +114,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import org.apache.commons.jexl3.parser.ASTUnaryPlusNode;
-
 
 /**
  * An interpreter of JEXL syntax.
@@ -598,7 +597,7 @@ public class Interpreter extends InterpreterBase {
             // attempt to recoerce to literal class
             if ((number instanceof Number)) {
                 // cache if number literal and negate is idempotent
-                if (valNode instanceof ASTNumberLiteral ) {
+                if (valNode instanceof ASTNumberLiteral) {
                     number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
                     if (arithmetic.isNegateStable()) {
                         node.jjtSetValue(number);
