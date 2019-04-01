@@ -66,7 +66,20 @@ public class UnderscoredLiteralTest extends JexlTestCase {
         Assert.assertEquals(1_0.e1_0d, o);
         o = JEXL.createExpression("1_0.1_0e1_0d").evaluate(jc);
         Assert.assertEquals(1_0.1_0e1_0d, o);
-        o = JEXL.createExpression("1e10d").evaluate(jc);
-        Assert.assertEquals(1e10d, o);
+        o = JEXL.createExpression("1e10").evaluate(jc);
+        Assert.assertEquals(1e10, o);
+        o = JEXL.createExpression(".1e1d").evaluate(jc);
+        Assert.assertEquals(.1e1d, o);
     }
+
+    @Test
+    public void testRealLiteral2() throws Exception {
+        JexlContext jc = new MapContext();
+        Object o;
+        o = JEXL.createExpression("1e10").evaluate(jc);
+        Assert.assertEquals(1e10, o);
+        o = JEXL.createExpression(".1e1d").evaluate(jc);
+        Assert.assertEquals(.1e1d, o);
+    }
+
 }
