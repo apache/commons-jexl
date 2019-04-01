@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-296" due-to="Dmitri Blinov">
+                Real literal in scientific format is not parsed without suffix
+            </action>
             <action dev="henrib" type="add" issue="JEXL-295"> 
                 Add unary plus operator
             </action>

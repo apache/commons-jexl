@@ -341,13 +341,16 @@ public class ArithmeticTest extends JexlTestCase {
     public void test2DoubleLiterals() throws Exception {
         JexlEvalContext ctxt = new JexlEvalContext();
         ctxt.setStrictArithmetic(true);
-        String stmt = "{a = 42.0e1D; b = 42.0E+2D; c = 42.0e-1d; d = 42.0E-2d;}";
+        String stmt = "{a = 42.0e1D; b = 42.0E+2D; c = 42.0e-1d; d = 42.0E-2d; e=10e10; f= +1.e1; g=1e1; }";
         JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertEquals(Double.valueOf("42.0e+1"), ctxt.get("a"));
         Assert.assertEquals(Double.valueOf("42.0e+2"), ctxt.get("b"));
         Assert.assertEquals(Double.valueOf("42.0e-1"), ctxt.get("c"));
         Assert.assertEquals(Double.valueOf("42.0e-2"), ctxt.get("d"));
+        Assert.assertEquals(Double.valueOf("10e10"), ctxt.get("e"));
+        Assert.assertEquals(Double.valueOf("10"), ctxt.get("f"));
+        Assert.assertEquals(Double.valueOf("10"), ctxt.get("g"));
     }
 
     /**

@@ -232,18 +232,25 @@ TOKEN_MGR_DECLS : {
 
 <DEFAULT, REGISTERS> TOKEN : /* LITERALS */
 {
-  < INTEGER_LITERAL:
-      ( "0" (["0"-"7"])* | ["1"-"9"] (["0"-"9"])* | "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ )
-      (["l","L","h","H"])?
-  >
- |
-  < FLOAT_LITERAL:
-    "#NaN"
-    |
-    (<DIGIT>)+ "." (<DIGIT>)+ ((["e","E"])(["+","-"])?(<DIGIT>)+)? (["d","D","f","F","b","B"])?
-    |
-    (<DIGIT>)+ (".")? ((["e","E"])(["+","-"])?(<DIGIT>)+)? ["d","D","f","F","b","B"]
-  >
+ <INTEGER_LITERAL:
+      <DECIMAL_LITERAL> (<INT_SFX>)? 
+    | <HEX_LITERAL> (<INT_SFX>)?
+    | <OCTAL_LITERAL> (<INT_SFX>)?
+ >
+    | <#DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])*>
+    | <#HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+>
+    | <#OCTAL_LITERAL: "0" (["0"-"7"])*>
+    | <#INT_SFX : ["l","L","h","H"]>
+| 
+<FLOAT_LITERAL:
+      (["0"-"9"])+ "." (["0"-"9"])+ (<FLT_SFX>)?
+    | (["0"-"9"])+ (".")? (<FLT_SFX>)
+    | "." (["0"-"9"])+ (<FLT_SFX>)
+    | "#NaN"
+>
+    |  <#EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+>
+    |  <#FLT_CLS : ["f","F","d","D","b","B"]>
+    |  <#FLT_SFX : <EXPONENT> (<FLT_CLS>)? | <FLT_CLS> >
 }
 
 <*> TOKEN :
