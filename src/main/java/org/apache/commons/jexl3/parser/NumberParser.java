@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 public final class NumberParser {
     /** The type literal value. */
@@ -29,6 +30,7 @@ public final class NumberParser {
     private Class<? extends Number> clazz = null;
     /** JEXL locale-neutral big decimal format. */
     static final DecimalFormat BIGDF = new DecimalFormat("0.0b", new DecimalFormatSymbols(Locale.ENGLISH));
+    static final Pattern underscores = Pattern.compile("[_]");
 
     @Override
     public String toString() {
@@ -92,12 +94,16 @@ public final class NumberParser {
             if ((s.length() > 1 && (s.charAt(1) == 'x' || s.charAt(1) == 'X'))) {
                 base = 16;
                 s = s.substring(2); // Trim the 0x off the front
+            } else if ((s.length() > 1 && (s.charAt(1) == 'b' || s.charAt(1) == 'B'))) {
+                base = 2;
+                s = s.substring(2); // Trim the 0b off the front
             } else {
                 base = 8;
             }
         } else {
             base = 10;
         }
+        s = underscores.matcher(s).replaceAll("");
         final int last = s.length() - 1;
         switch (s.charAt(last)) {
             case 'l':
@@ -141,6 +147,7 @@ public final class NumberParser {
             result = Double.NaN;
             rclass = Double.class;
         } else {
+            s = underscores.matcher(s).replaceAll("");
             final int last = s.length() - 1;
             switch (s.charAt(last)) {
                 case 'b':

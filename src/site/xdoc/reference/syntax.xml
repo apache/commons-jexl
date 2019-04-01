@@ -428,20 +428,23 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Natural literals - octal and hex support</td>
+                    <td>Natural literals - binary, octal and hex support</td>
                     <td>
-                        Natural numbers (i.e. Integer, Long, BigInteger) can also be expressed as octal or hexadecimal using the same format as Java.
-                        i.e. prefix the number with <code>0</code> for octal, and prefix with <code>0x</code> or <code>0X</code> for hexadecimal.
-                        For example <code>010</code> or <code>0x10</code>.
+                        Natural numbers (i.e. Integer, Long, BigInteger) can also be expressed as binary, octal or hexadecimal number systems using the same format as Java.
+                        i.e. prefix with <code>0b</code> or <code>0B</code> for binary, prefix the number with <code>0</code> for octal, 
+                        and prefix with <code>0x</code> or <code>0X</code> for hexadecimal.
+                        For example <code>0b1000</code>, <code>010</code> or <code>0x10</code>.
+                        <p>In natural numbers any number of underscore characters <code>_</code> can appear anywhere between digits</p>
                     </td>
                 </tr>
                 <tr>
                     <td>Real literals - exponent support</td>
                     <td>
                         Real numbers (i.e. Float, Double, BigDecimal) can also be expressed using standard Java exponent notation.
-                        i.e. suffix the number with <code>e</code> or <code>E</code> followed by the sign <code>+</code> or <code>-</code>
+                        i.e. suffix the number with <code>e</code> or <code>E</code> optionally followed by the sign <code>+</code> or <code>-</code>
                         followed by one or more decimal digits.
                         For example <code>42.0E-1D</code> or <code>42.0E+3B</code>.
+                        <p>In real numbers any number of underscore characters <code>_</code> can appear anywhere between digits</p>
                     </td>
                 </tr>
                 <tr>
