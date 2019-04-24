@@ -152,18 +152,50 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.setVariable("aBigInteger", new BigInteger("7"));
         asserter.setVariable("aBigDecimal", new BigDecimal("8.8"));
 
-        asserter.assertExpression("-3", new Integer("-3"));
-        asserter.assertExpression("-3.0", new Double("-3.0"));
-        asserter.assertExpression("-aByte", new Byte((byte) -1));
-        asserter.assertExpression("-aShort", new Short((short) -2));
-        asserter.assertExpression("-anInteger", new Integer(-3));
-        asserter.assertExpression("-aLong", new Long(-4));
-        asserter.assertExpression("-aFloat", new Float(-5.5));
-        asserter.assertExpression("-aDouble", new Double(-6.6));
-        asserter.assertExpression("-aBigInteger", new BigInteger("-7"));
-        asserter.assertExpression("-aBigDecimal", new BigDecimal("-8.8"));
+        // loop to allow checking caching of constant numerals (debug)
+        for(int i = 0 ; i < 2; ++i) {
+            asserter.assertExpression("-3", new Integer("-3"));
+            asserter.assertExpression("-3.0", new Double("-3.0"));
+            asserter.assertExpression("-aByte", new Byte((byte) -1));
+            asserter.assertExpression("-aShort", new Short((short) -2));
+            asserter.assertExpression("-anInteger", new Integer(-3));
+            asserter.assertExpression("-aLong", new Long(-4));
+            asserter.assertExpression("-aFloat", new Float(-5.5));
+            asserter.assertExpression("-aDouble", new Double(-6.6));
+            asserter.assertExpression("-aBigInteger", new BigInteger("-7"));
+            asserter.assertExpression("-aBigDecimal", new BigDecimal("-8.8"));
+        }
     }
+    
+    /**
+     * test some simple mathematical calculations
+     */
+    @Test
+    public void testUnaryPlus() throws Exception {
+        asserter.setVariable("aByte", new Byte((byte) 1));
+        asserter.setVariable("aShort", new Short((short) 2));
+        asserter.setVariable("anInteger", new Integer(3));
+        asserter.setVariable("aLong", new Long(4));
+        asserter.setVariable("aFloat", new Float(5.5));
+        asserter.setVariable("aDouble", new Double(6.6));
+        asserter.setVariable("aBigInteger", new BigInteger("7"));
+        asserter.setVariable("aBigDecimal", new BigDecimal("8.8"));
 
+        // loop to allow checking caching of constant numerals (debug)
+        for(int i = 0 ; i < 2; ++i) {
+            asserter.assertExpression("+3", new Integer("3"));
+            asserter.assertExpression("+3.0", new Double("3.0"));
+            asserter.assertExpression("+aByte", new Integer(1));
+            asserter.assertExpression("+aShort", new Integer(2));
+            asserter.assertExpression("+anInteger", new Integer(3));
+            asserter.assertExpression("+aLong", new Long(4));
+            asserter.assertExpression("+aFloat", new Float(5.5));
+            asserter.assertExpression("+aDouble", new Double(6.6));
+            asserter.assertExpression("+aBigInteger", new BigInteger("7"));
+            asserter.assertExpression("+aBigDecimal", new BigDecimal("8.8"));
+        }
+    }
+    
     /**
      * test some simple mathematical calculations
      */
@@ -347,13 +379,16 @@ public class ArithmeticTest extends JexlTestCase {
     public void test2DoubleLiterals() throws Exception {
         JexlEvalContext ctxt = new JexlEvalContext();
         ctxt.setStrictArithmetic(true);
-        String stmt = "{a = 42.0e1D; b = 42.0E+2D; c = 42.0e-1d; d = 42.0E-2d;}";
+        String stmt = "{a = 42.0e1D; b = 42.0E+2D; c = 42.0e-1d; d = 42.0E-2d; e=10e10; f= +1.e1; g=1e1; }";
         JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertEquals(Double.valueOf("42.0e+1"), ctxt.get("a"));
         Assert.assertEquals(Double.valueOf("42.0e+2"), ctxt.get("b"));
         Assert.assertEquals(Double.valueOf("42.0e-1"), ctxt.get("c"));
         Assert.assertEquals(Double.valueOf("42.0e-2"), ctxt.get("d"));
+        Assert.assertEquals(Double.valueOf("10e10"), ctxt.get("e"));
+        Assert.assertEquals(Double.valueOf("10"), ctxt.get("f"));
+        Assert.assertEquals(Double.valueOf("10"), ctxt.get("g"));
     }
 
     /**

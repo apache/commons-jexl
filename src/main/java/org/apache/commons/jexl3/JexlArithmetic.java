@@ -487,7 +487,7 @@ public class JexlArithmetic {
             BigDecimal bigd = (BigDecimal) original;
             // if it's bigger than a double it can't be narrowed
             if (bigd.compareTo(BIGD_DOUBLE_MAX_VALUE) > 0
-                    || bigd.compareTo(BIGD_DOUBLE_MIN_VALUE) < 0) {
+                || bigd.compareTo(BIGD_DOUBLE_MIN_VALUE) < 0) {
                 return original;
             } else {
                 try {
@@ -759,7 +759,7 @@ public class JexlArithmetic {
                 throw new ArithmeticException("/");
             }
             long result = l / r;
-            if (!(left instanceof Long || right instanceof Long) 
+            if (!(left instanceof Long || right instanceof Long)
                     && result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
                 return (int) result;
             } else {
@@ -826,7 +826,7 @@ public class JexlArithmetic {
                 throw new ArithmeticException("%");
             }
             long result = l % r;
-            if (!(left instanceof Long || right instanceof Long) 
+            if (!(left instanceof Long || right instanceof Long)
                     && result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
                 return (int) result;
             } else {
@@ -1025,31 +1025,22 @@ public class JexlArithmetic {
         } else if (val instanceof AtomicBoolean) {
             return ((AtomicBoolean) val).get() ? Boolean.FALSE : Boolean.TRUE;
         }
-        throw new ArithmeticException("Object negation:(" + val + ")");
+        throw new ArithmeticException("Object negate:(" + val + ")");
     }
 
     /**
-     * Confirms a value (unary plus for numbers).
-     *
-     * @param val the value to confirm
-     * @return the confirmed value
+     * Whether negate called with a given argument will always return the same result.
+     * <p>This is used to determine whether negate results on number literals can be cached.
+     * If the result on calling negate with the same constant argument may change between calls,
+     * which means the function is not deterministic, this method must return false.
+     * @see #isNegateStable()
+     * @return true if negate is idempotent, false otherwise
      */
-    public Object confirm(Object val) {
-        if (val instanceof Byte) {
-            return +(Byte) val;
-        } else if (val instanceof Short) {
-            return +(Short) val;
-        } else if (val instanceof Character) {
-            return +(Character) val;
-        } else if (val instanceof Number) {
-            return val;
-        } else if (val instanceof Boolean) {
-            return val;
-        } else if (val instanceof AtomicBoolean) {
-            return ((AtomicBoolean) val).get();
-        }
-        throw new ArithmeticException("Object confirmation:(" + val + ")");
+    public boolean isNegateStable() {
+        return true;
     }
+
+    /**
 
     /**
      * Shifts a bit pattern to the left.
@@ -1171,6 +1162,43 @@ public class JexlArithmetic {
      */
     public Object selfRightShiftUnsigned(Object left, Object right) {
         return rightShiftUnsigned(left, right);
+    }
+
+    /**
+     * Positivize value (unary plus for numbers).
+     * <p>C/C++/C#/Java perform integral promotion of the operand, ie
+     * cast to int if type can represented as int without loss of precision.
+     * @see #isPositivizeStable()
+     * @param val the value to positivize
+     * @return the positive value
+     */
+    public Object positivize(Object val) {
+        if (val instanceof Byte) {
+            return +(Byte) val;
+        } else if (val instanceof Short) {
+            return +(Short) val;
+        } else if (val instanceof Character) {
+            return +(Character) val;
+        } else if (val instanceof Number) {
+            return val;
+        } else if (val instanceof Boolean) {
+            return val;
+        } else if (val instanceof AtomicBoolean) {
+            return ((AtomicBoolean) val).get();
+        }
+
+        throw new ArithmeticException("Object positivize:(" + val + ")");
+    }
+
+    /**
+     * Whether positivize called with a given argument will always return the same result.
+     * <p>This is used to determine whether positivize results on number literals can be cached.
+     * If the result on calling positivize with the same constant argument may change between calls,
+     * which means the function is not deterministic, this method must return false.
+     * @return true if positivize is idempotent, false otherwise
+     */
+    public boolean isPositivizeStable() {
+        return true;
     }
 
     /**
@@ -1519,14 +1547,14 @@ public class JexlArithmetic {
         if (type == Float.class && (val instanceof Byte || val instanceof Short || val instanceof Integer || val instanceof Long ||
                                    val instanceof AtomicInteger || val instanceof AtomicLong))
             return ((Number) val).floatValue();
-        if (type == Double.class) 
+        if (type == Double.class)
             return ((Number) val).doubleValue();
         if (val instanceof CharSequence && type == Character.class) {
             CharSequence cs = (CharSequence) val;
-            if (cs.length() == 1) 
+            if (cs.length() == 1)
                 return cs.charAt(0);
         }
-        if (type == Boolean.class && val instanceof AtomicBoolean) 
+        if (type == Boolean.class && val instanceof AtomicBoolean)
             return ((AtomicBoolean) val).get();
         return type.cast(val);
     }

@@ -163,6 +163,7 @@ import org.apache.commons.jexl3.parser.ParserVisitor;
 
 import java.util.Map;
 import java.util.regex.Pattern;
+import org.apache.commons.jexl3.parser.ASTUnaryPlusNode;
 import org.apache.commons.jexl3.parser.StringParser;
 
 /**
@@ -317,7 +318,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     public void setIndentation(int level) {
         indentation(level);
     }
-    
+
     /**
      * Sets the indentation level.
      * @param level the number of spaces for indentation, none if less or equal to zero
@@ -332,7 +333,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         indentLevel = 0;
         return this;
     }
-    
+
     /**
      * Sets this debugger relative maximum depth.
      * @param rdepth the maximum relative depth from the debugged node
@@ -1006,7 +1007,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         accept(node.jjtGetChild(0), data);
         builder.append(") ");
         acceptStatement(node.jjtGetChild(1), data);
-        // else... 
+        // else...
         if (numChildren > 2) {
             builder.append(" else ");
             acceptStatement(node.jjtGetChild(2), data);
@@ -1509,7 +1510,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTElvisNode node, Object data) {
         accept(node.jjtGetChild(0), data);
-        builder.append("?:");
+        builder.append("?: ");
         accept(node.jjtGetChild(1), data);
         return data;
     }

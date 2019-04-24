@@ -172,22 +172,27 @@ public class Operators {
      * @param node     the syntactic node
      * @param operator the operator
      * @param args     the arguments, the first one being the target of assignment
-     * @return the result of the operator evaluation
+     * @return JexlOperator.ASSIGN if operation assignment has been performed,
+     *         JexlEngine.TRY_FAILED if no operation was performed,
+     *         the value to use as the side effect argument otherwise
      */
     protected Object tryAssignOverload(JexlNode node, JexlOperator operator, Object...args) {
         final JexlArithmetic arithmetic = interpreter.arithmetic;
         if (args.length != operator.getArity()) {
             return JexlEngine.TRY_FAILED;
         }
-        // try to call overload on side effect
+        // try to call overload with side effect
         Object result = tryOverload(node, operator, args);
         if (result != JexlEngine.TRY_FAILED) {
             return result;
         }
         // call base operator
         JexlOperator base = operator.getBaseOperator();
-        if (operators != null && base != null && operators.overloads(base)) {
-            // in case there is an overload
+        if (base == null) {
+            throw new IllegalArgumentException("must be called with a side-effect operator");
+        }
+        if (operators != null && operators.overloads(base)) {
+            // in case there is an overload on the base operator
             try {
                 JexlMethod vm = operators.getOperator(base, args);
                 if (vm != null) {

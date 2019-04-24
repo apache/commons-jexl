@@ -26,11 +26,23 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-296" due-to="Dmitri Blinov">
+                Real literal in scientific format is not parsed without suffix
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-295"> 
+                Add unary plus operator
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-291" due-to="David Costanzo"> 
+                Using sandbox prevents array-syntax lookup by number in Map
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-290"> 
                 Safe navigation fails on chained method calls
             </action>
             <action dev="henrib" type="fix" issue="JEXL-289" due-to="Dmitri Blinov">
                 Passing undeclared function parameter can overwrite a local function variable
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-288" due-to="Dmitri Blinov">
+                Annotation can not be specified for a standalone statement
             </action>
             <action dev="henrib" type="fix" issue="JEXL-287" due-to="Dmitri Blinov">
                 Wrong resolution of local variables

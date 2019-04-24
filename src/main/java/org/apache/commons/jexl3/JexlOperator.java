@@ -215,6 +215,14 @@ public enum JexlOperator {
      * @see JexlArithmetic#negate
      */
     NEGATE("-", "negate", 1),
+    
+    /**
+     * Positivize operator.
+     * <br><strong>Syntax:</strong> <code>+x</code>
+     * <br><strong>Method:</strong> <code>T positivize(L x);</code>.
+     * @see JexlArithmetic#positivize
+     */
+    POSITIVIZE("+", "positivize", 1),
 
     /**
      * Confirm operator.

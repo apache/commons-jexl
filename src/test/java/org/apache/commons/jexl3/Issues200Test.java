@@ -32,8 +32,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -883,5 +883,22 @@ public class Issues200Test extends JexlTestCase {
             result = script.execute(null, "abc");
             Assert.assertNull(result);
         }
+    }
+    
+    @Test
+    public void test291() throws Exception {
+        final String str = "{1:'one'}[1]";
+        JexlContext ctxt = new MapContext();
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlExpression e = jexl.createExpression(str);
+        Object value = e.evaluate(ctxt);
+        Assert.assertEquals("one", value);
+
+        JexlEngine sandboxedJexlEngine = new JexlBuilder().
+                sandbox(new JexlSandbox(true)). // add a whitebox sandbox
+                create();
+         e = sandboxedJexlEngine.createExpression(str);
+        value = e.evaluate(ctxt);
+        Assert.assertEquals("one", value);
     }
 }

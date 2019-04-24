@@ -17,7 +17,6 @@
 //CSOFF: FileLength
 package org.apache.commons.jexl3.internal;
 
-
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -29,6 +28,7 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect.PropertyResolver;
+
 import org.apache.commons.jexl3.parser.ASTAddNode;
 import org.apache.commons.jexl3.parser.ASTAndNode;
 import org.apache.commons.jexl3.parser.ASTAnnotatedStatement;
@@ -181,10 +181,6 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 
 import java.lang.reflect.Array;
-
-import org.apache.commons.jexl3.JxltEngine;
-
-
 /**
  * An interpreter of JEXL syntax.
  *
@@ -723,6 +719,11 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTUnaryMinusNode node, Object data) {
+        // use cached value if literal
+        Object value = node.jjtGetValue();
+        if (value != null && !(value instanceof JexlMethod)) {
+            return value;
+        }
         JexlNode valNode = node.jjtGetChild(0);
         Object val = valNode.jjtAccept(this, data);
         try {
@@ -732,8 +733,14 @@ public class Interpreter extends InterpreterBase {
             }
             Object number = arithmetic.negate(val);
             // attempt to recoerce to literal class
-            if (valNode instanceof ASTNumberLiteral && number instanceof Number) {
-                number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
+            if ((number instanceof Number)) {
+                // cache if number literal and negate is idempotent
+                if (valNode instanceof ASTNumberLiteral) {
+                    number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
+                    if (arithmetic.isNegateStable()) {
+                        node.jjtSetValue(number);
+                    }
+                }
             }
             return number;
         } catch (ArithmeticException xrt) {
@@ -743,21 +750,27 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTUnaryPlusNode node, Object data) {
+        // use cached value if literal
+        Object value = node.jjtGetValue();
+        if (value != null && !(value instanceof JexlMethod)) {
+            return value;
+        }
         JexlNode valNode = node.jjtGetChild(0);
         Object val = valNode.jjtAccept(this, data);
         try {
-            Object result = operators.tryOverload(node, JexlOperator.CONFIRM, val);
+            Object result = operators.tryOverload(node, JexlOperator.POSITIVIZE, val);
             if (result != JexlEngine.TRY_FAILED) {
                 return result;
             }
-            Object number = arithmetic.confirm(val);
-            // attempt to recoerce to literal class
-            if (valNode instanceof ASTNumberLiteral && number instanceof Number) {
-                number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
+            Object number = arithmetic.positivize(val);
+            if (valNode instanceof ASTNumberLiteral
+                && number instanceof Number
+                && arithmetic.isPositivizeStable()) {
+                node.jjtSetValue(number);
             }
             return number;
         } catch (ArithmeticException xrt) {
-            throw new JexlException(valNode, "+ error", xrt);
+            throw new JexlException(valNode, "- error", xrt);
         }
     }
 

@@ -299,29 +299,28 @@ TOKEN_MGR_DECLS : {
 
 <DEFAULT, REGISTERS> TOKEN : /* LITERALS */
 {
-  < INTEGER_LITERAL:
-      ( "0" ((["0"-"7","_"])* ["0"-"7"] | (["0"-"7"])*) 
-        |
-        ["1"-"9"] ((["0"-"9","_"])* <DIGIT> | (<DIGIT>)*)
-        | 
-        "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"] (["0"-"9","a"-"f","A"-"F","_"])* ["0"-"9","a"-"f","A"-"F"] | (["0"-"9","a"-"f","A"-"F"])+)
-        |
-        "0" ["b","B"] (["0"-"1"] (["0"-"1","_"])* ["0"-"1"] | (["0"-"1"])+)
-      )
-      (["l","L","h","H"])?
-  >
-  |
-  < FLOAT_LITERAL:
-    "#NaN"
-    |
-    (<DIGIT> (["0"-"9","_"])* <DIGIT> | (<DIGIT>)+) "." (<DIGIT> (["0"-"9","_"])* <DIGIT> | (<DIGIT>)+) ((["e","E"])(["+","-"])?(<DIGIT> (["0"-"9","_"])* <DIGIT> | (<DIGIT>)+))? (["d","D","f","F","b","B"])?
-    |
-    (<DIGIT> (["0"-"9","_"])* <DIGIT> | (<DIGIT>)+) ((["e","E"])(["+","-"])?(<DIGIT> (["0"-"9","_"])* <DIGIT> | (<DIGIT>)+))? (["d","D","f","F","b","B"])?
-    |
-    (<DIGIT> (["0"-"9","_"])* <DIGIT> | (<DIGIT>)+) (".")? ((["e","E"])(["+","-"])?(<DIGIT> (["0"-"9","_"])* <DIGIT> | (<DIGIT>)+))? ["d","D","f","F","b","B"]
-    |
-    (".") (<DIGIT> (["0"-"9","_"])* <DIGIT> | (<DIGIT>)+) ((["e","E"])(["+","-"])?(<DIGIT> (["0"-"9","_"])* <DIGIT> | (<DIGIT>)+))? ["d","D","f","F","b","B"]
-  >
+ <INTEGER_LITERAL:
+      <DECIMAL_LITERAL> (<INT_SFX>)?
+    | <HEX_LITERAL> (<INT_SFX>)?
+    | <OCTAL_LITERAL> (<INT_SFX>)?
+    | <BINARY_LITERAL> (<INT_SFX>)?
+ >
+    | <#DECIMAL_LITERAL: ["1"-"9"] ((["0"-"9","_"])* <DIGIT> | (<DIGIT>)*) >
+    | <#HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"] (["0"-"9","a"-"f","A"-"F","_"])* ["0"-"9","a"-"f","A"-"F"] | (["0"-"9","a"-"f","A"-"F"])+) >
+    | <#BINARY_LITERAL: "0" ["b","B"] (["0"-"1"] (["0"-"1","_"])* ["0"-"1"] | (["0"-"1"])+) >
+    | <#OCTAL_LITERAL: "0" ((["0"-"7","_"])* ["0"-"7"] | (["0"-"7"])*) >
+    | <#INT_SFX : ["l","L","h","H"]>
+|
+<FLOAT_LITERAL:
+      <FLT_NUM> "." <FLT_NUM> (<FLT_SFX>)?
+    | <FLT_NUM> (".")? (<FLT_SFX>)
+    | "." <FLT_NUM> (<FLT_SFX>)
+    | "#NaN"
+>
+    |  <#FLT_NUM: (<DIGIT> (["0"-"9","_"])* <DIGIT> | (<DIGIT>)+) >
+    |  <#EXPONENT: ["e","E"] (["+","-"])? <FLT_NUM> >
+    |  <#FLT_CLS : ["f","F","d","D","b","B"]>
+    |  <#FLT_SFX : <EXPONENT> (<FLT_CLS>)? | <FLT_CLS> >
 }
 
 <*> TOKEN :
@@ -534,7 +533,7 @@ ASTSynchronizedStatement SynchronizedStatement() : {}
 
 void SwitchStatementLookahead() : {}
 {
-    <SWITCH> <LPAREN> Expression() <RPAREN> <LCURLY> (<CASE> (Literal() | Identifier()) <COLON> | <DCASE> <COLON>) 
+    <SWITCH> <LPAREN> Expression() <RPAREN> <LCURLY> (<CASE> (Literal() | Identifier()) <COLON> | <DCASE> <COLON>)
 }
 
 ASTSwitchStatement SwitchStatement() : {}
