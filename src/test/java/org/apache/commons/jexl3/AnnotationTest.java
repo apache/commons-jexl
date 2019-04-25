@@ -189,7 +189,28 @@ public class AnnotationTest extends JexlTestCase {
         Assert.assertTrue(jc.getNames().contains("synchronized"));
     }
 
-
+    @Test
+    public void testNoArgStatement() throws Exception {
+        AnnotationContext jc = new AnnotationContext();
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript e = jexl.createScript("@synchronized if (true) 2 * 3 * 7; else -42;");
+        Object r = e.execute(jc);
+        Assert.assertEquals(42, r);
+        Assert.assertEquals(1, jc.getCount());
+        Assert.assertTrue(jc.getNames().contains("synchronized"));
+    }
+    
+    @Test
+    public void testHoistingStatement() throws Exception {
+        AnnotationContext jc = new AnnotationContext();
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript e = jexl.createScript("var t = 1; @synchronized for(var x : [2,3,7]) t *= x; t");
+        Object r = e.execute(jc);
+        Assert.assertEquals(42, r);
+        Assert.assertEquals(1, jc.getCount());
+        Assert.assertTrue(jc.getNames().contains("synchronized"));
+    }
+    
     @Test
     public void testOneArg() throws Exception {
         AnnotationContext jc = new AnnotationContext();
