@@ -56,6 +56,8 @@ public class Uberspect implements JexlUberspect {
     protected final Log rlog;
     /** The resolver strategy. */
     private final JexlUberspect.ResolverStrategy strategy;
+    /** The permissions. */
+    private final Permissions permissions;
     /** The introspector version. */
     private final AtomicInteger version;
     /** The soft reference to the introspector currently in use. */
@@ -76,8 +78,19 @@ public class Uberspect implements JexlUberspect {
      * @param sty the resolver strategy
      */
     public Uberspect(Log runtimeLogger, JexlUberspect.ResolverStrategy sty) {
+        this(runtimeLogger, sty, null);
+    }
+
+    /**
+     * Creates a new Uberspect.
+     * @param runtimeLogger the logger used for all logging needs
+     * @param sty the resolver strategy
+     * @param permissions the introspector permissions
+     */
+    public Uberspect(Log runtimeLogger, JexlUberspect.ResolverStrategy sty, Permissions perms) {
         rlog = runtimeLogger;
         strategy = sty == null? JexlUberspect.JEXL_STRATEGY : sty;
+        permissions  = perms;
         ref = new SoftReference<Introspector>(null);
         loader = new SoftReference<ClassLoader>(getClass().getClassLoader());
         operatorMap = new ConcurrentHashMap<Class<? extends JexlArithmetic>, Set<JexlOperator>>();
@@ -98,7 +111,7 @@ public class Uberspect implements JexlUberspect {
             synchronized (this) {
                 intro = ref.get();
                 if (intro == null) {
-                    intro = new Introspector(rlog, loader.get());
+                    intro = new Introspector(rlog, loader.get(), permissions);
                     ref = new SoftReference<Introspector>(intro);
                     loader = new SoftReference<ClassLoader>(intro.getLoader());
                     version.incrementAndGet();
@@ -116,7 +129,7 @@ public class Uberspect implements JexlUberspect {
             if (intro != null) {
                 intro.setLoader(nloader);
             } else {
-                intro = new Introspector(rlog, nloader);
+                intro = new Introspector(rlog, nloader, permissions);
                 ref = new SoftReference<Introspector>(intro);
             }
             loader = new SoftReference<ClassLoader>(intro.getLoader());
@@ -124,7 +137,7 @@ public class Uberspect implements JexlUberspect {
             version.incrementAndGet();
         }
     }
-    
+
     @Override
     public ClassLoader getClassLoader() {
         return loader.get();
