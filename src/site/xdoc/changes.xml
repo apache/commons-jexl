@@ -32,6 +32,9 @@
             <action dev="henrib" type="add" issue="JEXL-295"> 
                 Add unary plus operator
             </action>
+            <action dev="henrib" type="add" issue="JEXL-292" due-to="Dmitri Blinov">
+                Allow specifying custom Permissions class for Uberspect to be used later by Introspector
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-291" due-to="David Costanzo"> 
                 Using sandbox prevents array-syntax lookup by number in Map
             </action>

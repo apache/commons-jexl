@@ -49,6 +49,7 @@ New Features in 3.2:
 ====================
 
 * JEXL-295:      Add unary plus operator
+* JEXL-292:      Allow specifying custom Permissions class for Uberspect to be used later by Introspector
 * JEXL-288:      Annotation can not be specified for a standalone statement
 * JEXL-275:      Allow safe navigation as option
 * JEXL-274:      Handle soft and hard stack overflow
