@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A sandbox describes permissions on a class by explicitly allowing or forbidding access to methods and properties
@@ -60,6 +61,10 @@ public final class JexlSandbox {
      * The map from class names to permissions.
      */
     private final Map<String, Permissions> sandbox;
+    /**
+     * Whether permissions can be inherited (through implementation or extension).
+     */
+    private final boolean inherit;
     /**
      * Default behavior, black or white.
      */
@@ -101,7 +106,19 @@ public final class JexlSandbox {
      * @since 3.1
      */
     protected JexlSandbox(boolean wb, Map<String, Permissions> map) {
+        this(wb, false, map);
+    }
+
+    /**
+     * Creates a sandbox based on an existing permissions map.
+     * @param wb whether this sandbox is white (true) or black (false)
+     * @param inh whether permissions are inherited, default false
+     * @param map the permissions map
+     * @since 3.2
+     */
+    protected JexlSandbox(boolean wb, boolean inh, Map<String, Permissions> map) {
         white = wb;
+        inherit = inh;
         sandbox = map;
     }
 
@@ -109,11 +126,25 @@ public final class JexlSandbox {
      * @return a copy of this sandbox
      */
     public JexlSandbox copy() {
-        Map<String, Permissions> map = new HashMap<String, Permissions>();
+        // modified concurently at runtime so...
+        Map<String, Permissions> map = new ConcurrentHashMap<String, Permissions>();
         for (Map.Entry<String, Permissions> entry : sandbox.entrySet()) {
             map.put(entry.getKey(), entry.getValue().copy());
         }
-        return new JexlSandbox(white, map);
+        return new JexlSandbox(white, inherit, map);
+    }
+
+    /**
+     * Gets a class by name, crude mechanism for backwards (&lt;3.2 ) compatibility.
+     * @param cname the class name
+     * @return the class
+     */
+    static Class<?> forName(String cname) {
+        try {
+            return Class.forName(cname);
+        } catch(Exception xany) {
+            return null;
+        }
     }
 
     /**
@@ -124,7 +155,7 @@ public final class JexlSandbox {
      * @return null if not allowed, the name of the property to use otherwise
      */
     public String read(Class<?> clazz, String name) {
-        return read(clazz.getName(), name);
+        return get(clazz).read().get(name);
     }
 
     /**
@@ -134,13 +165,9 @@ public final class JexlSandbox {
      * @param name the property name
      * @return null if not allowed, the name of the property to use otherwise
      */
+    @Deprecated
     public String read(String clazz, String name) {
-        Permissions permissions = sandbox.get(clazz);
-        if (permissions == null) {
-            return white? name : null;
-        } else {
-            return permissions.read().get(name);
-        }
+        return get(clazz).read().get(name);
     }
 
     /**
@@ -151,7 +178,7 @@ public final class JexlSandbox {
      * @return null if not allowed, the name of the property to use otherwise
      */
     public String write(Class<?> clazz, String name) {
-        return write(clazz.getName(), name);
+        return get(clazz).write().get(name);
     }
 
     /**
@@ -161,13 +188,9 @@ public final class JexlSandbox {
      * @param name the property name
      * @return null if not allowed, the name of the property to use otherwise
      */
+    @Deprecated
     public String write(String clazz, String name) {
-        Permissions permissions = sandbox.get(clazz);
-        if (permissions == null) {
-            return white ? name : null;
-        } else {
-            return permissions.write().get(name);
-        }
+        return get(clazz).write().get(name);
     }
 
     /**
@@ -178,7 +201,8 @@ public final class JexlSandbox {
      * @return null if not allowed, the name of the method to use otherwise
      */
     public String execute(Class<?> clazz, String name) {
-        return execute(clazz.getName(), name);
+        String m = get(clazz).execute().get(name);
+        return "".equals(name) && m != null? clazz.getName() : m;
     }
 
     /**
@@ -188,13 +212,10 @@ public final class JexlSandbox {
      * @param name the method name
      * @return null if not allowed, the name of the method to use otherwise
      */
+    @Deprecated
     public String execute(String clazz, String name) {
-        Permissions permissions = sandbox.get(clazz);
-        if (permissions == null) {
-            return white ? name : null;
-        } else {
-            return permissions.execute().get(name);
-        }
+        String m = get(clazz).execute().get(name);
+        return "".equals(name) && m != null? clazz : m;
     }
 
     /**
@@ -252,6 +273,26 @@ public final class JexlSandbox {
         @Override
         protected Names copy() {
             return this;
+        }
+    };
+
+    /*
+     * The block-all name set.
+     */
+    private static final Names BLACK_NAMES = new Names() {
+        @Override
+        public boolean add(String name) {
+            return false;
+        }
+
+        @Override
+        protected Names copy() {
+            return this;
+        }
+
+        @Override
+        public String get(String name) {
+            return null;
         }
     };
 
@@ -327,13 +368,12 @@ public final class JexlSandbox {
      * Contains the white or black lists for properties and methods for a given class.
      */
     public static final class Permissions {
-
+        /** Whether these permissions are inheritable, ie can be used by derived classes. */
+        private final boolean inheritable;
         /** The controlled readable properties. */
         private final Names read;
-
         /** The controlled  writable properties. */
         private final Names write;
-
         /** The controlled methods. */
         private final Names execute;
 
@@ -361,6 +401,7 @@ public final class JexlSandbox {
             this.read = nread != null ? nread : WHITE_NAMES;
             this.write = nwrite != null ? nwrite : WHITE_NAMES;
             this.execute = nexecute != null ? nexecute : WHITE_NAMES;
+            this.inheritable = false;
         }
 
         /**
@@ -368,6 +409,14 @@ public final class JexlSandbox {
          */
         Permissions copy() {
             return new Permissions(read.copy(), write.copy(), execute.copy());
+        }
+
+        /**
+         * Whether this permission applies to derived classes.
+         * @return true
+         */
+        public boolean isInheritable() {
+            return inheritable;
         }
 
         /**
@@ -437,10 +486,15 @@ public final class JexlSandbox {
             return execute;
         }
     }
+
     /**
      * The pass-thru permissions.
      */
     private static final Permissions ALL_WHITE = new Permissions(WHITE_NAMES, WHITE_NAMES, WHITE_NAMES);
+    /**
+     * The block-all permissions.
+     */
+    private static final Permissions ALL_BLACK = new Permissions(BLACK_NAMES, BLACK_NAMES, BLACK_NAMES);
 
     /**
      * Creates the set of permissions for a given class.
@@ -484,11 +538,44 @@ public final class JexlSandbox {
      * @return the defined permissions or an all-white permission instance if none were defined
      */
     public Permissions get(String clazz) {
+        if (inherit) {
+            return get(forName(clazz));
+        }
         Permissions permissions = sandbox.get(clazz);
         if (permissions == null) {
-            return ALL_WHITE;
+            return white ? ALL_WHITE : ALL_BLACK;
         } else {
             return permissions;
         }
     }
+
+    /**
+     * Get the permissions associated to a class.
+     * @param clazz the class
+     * @return the permissions
+     */
+    public Permissions get(Class<?> clazz) {
+        Permissions permissions = clazz == null? ALL_BLACK : sandbox.get(clazz.getName());
+        if (permissions == null) {
+            if (inherit) {
+                // clazz can not be null since permissions would be not null and black;
+                // find first inheritable class that defined permissions
+                for (Class<?> ii : clazz.getClasses()) {
+                    permissions = sandbox.get(ii.getName());
+                    if (permissions != null && permissions.isInheritable()) {
+                        break;
+                    }
+                }
+                if (permissions == null) {
+                    permissions = white ? ALL_WHITE : ALL_BLACK;
+                }
+                // store the info to avoid doing this costly look up
+                sandbox.put(clazz.getName(), permissions);
+            } else {
+                permissions = white ? ALL_WHITE : ALL_BLACK;
+            }
+        }
+        return permissions;
+    }
+
 }
