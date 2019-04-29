@@ -82,7 +82,7 @@
                         </ul>
                         <p>
                             <strong>N.B.</strong> the following keywords are reserved, and cannot be used as an identifier or the property name when using the dot operator:
-                            <code>or and eq ne lt gt le ge in div mod not this null true false instanceof new var final do while break continue remove function return try catch finally throw synchronized switch case default byte short int long char boolean float double</code>
+                            <code>or and eq ne lt gt le ge in div mod not this null true false instanceof new var final do while break continue remove function return try catch finally throw assert synchronized switch case default byte short int long char boolean float double</code>
                             For example, the following is invalid:
                             <code>my.new.dotted.var1 // invalid ('new' is keyword)</code>
                             In such cases, quoted identifiers or the [ ] operator can be used, for example:
@@ -312,13 +312,13 @@
                     <td>Switch Operator</td>
                     <td>
                         The switch operator evaluates its expression, then returns value of statement block that follow the matching case label, e.g.
-                        <code>switch (a) {
+                        <code>var x = switch (a) {
                               case 0 -> "zero";
                               case 1 -> "one"
                               default -> "-"
                             } </code>
                         <p>The multilabeled syntax is also supported:
-                        <code>switch (a) {
+                        <code>var x = switch (a) {
                               case 0, 1 -> "zero";
                               case 2 -> "one"
                               default -> "-"
