@@ -43,7 +43,7 @@ Incompatible changes
 
 + New reserved words are introduced. Those are:
   `switch` `case` `default` `try` `catch` `finally` `throw` `synchronized` `this` `instanceof` `in` `remove`
-  `final` `boolean` `char` `byte` `int` `long` `float` `double`.
+  `assert` `final` `boolean` `char` `byte` `short` `int` `long` `float` `double`.
   You may not longer use them as the names of the variables and methods. The exception is made for the `remove` identifer,
   as it is still may be used in method invocations.
 
@@ -93,9 +93,9 @@ New features
 
 + Java-like `+` unary promotion operator is introduced
 
-+ Java-like `()` type-cast operator is introduced
-
 + Java-like `switch` expression operator is introduced
+
++ Java-like `()` type-cast operator is introduced
 
 + Javascript-like `===` and `!==` identity operators are introduced
 
