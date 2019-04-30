@@ -254,7 +254,6 @@ public class Operators {
      */
     protected boolean startsWith(JexlNode node, String operator, Object left, Object right) {
         final JexlArithmetic arithmetic = interpreter.arithmetic;
-        final JexlUberspect uberspect = interpreter.uberspect;
         try {
             // try operator overload
             Object result = tryOverload(node, JexlOperator.STARTSWITH, left, right);
@@ -269,6 +268,7 @@ public class Operators {
             // try a startsWith method (duck type)
             try {
                 Object[] argv = {right};
+                final JexlUberspect uberspect = interpreter.uberspect;
                 JexlMethod vm = uberspect.getMethod(left, "startsWith", argv);
                 if (returnsBoolean(vm)) {
                     return (Boolean) vm.invoke(left, argv);
@@ -298,7 +298,6 @@ public class Operators {
      */
     protected boolean endsWith(JexlNode node, String operator, Object left, Object right) {
         final JexlArithmetic arithmetic = interpreter.arithmetic;
-        final JexlUberspect uberspect = interpreter.uberspect;
         try {
             // try operator overload
             Object result = tryOverload(node, JexlOperator.ENDSWITH, left, right);
@@ -313,6 +312,7 @@ public class Operators {
             // try a endsWith method (duck type)
             try {
                 Object[] argv = {right};
+                final JexlUberspect uberspect = interpreter.uberspect;
                 JexlMethod vm = uberspect.getMethod(left, "endsWith", argv);
                 if (returnsBoolean(vm)) {
                     return (Boolean) vm.invoke(left, argv);
@@ -346,7 +346,6 @@ public class Operators {
      */
     protected boolean contains(JexlNode node, String op, Object left, Object right) {
         final JexlArithmetic arithmetic = interpreter.arithmetic;
-        final JexlUberspect uberspect = interpreter.uberspect;
         try {
             // try operator overload
             Object result = tryOverload(node, JexlOperator.CONTAINS, left, right);
@@ -361,6 +360,7 @@ public class Operators {
             // try a contains method (duck type set)
             try {
                 Object[] argv = {right};
+                final JexlUberspect uberspect = interpreter.uberspect;
                 JexlMethod vm = uberspect.getMethod(left, "contains", argv);
                 if (returnsBoolean(vm)) {
                     return (Boolean) vm.invoke(left, argv);
@@ -394,7 +394,6 @@ public class Operators {
             return Boolean.TRUE;
         }
         final JexlArithmetic arithmetic = interpreter.arithmetic;
-        final JexlUberspect uberspect = interpreter.uberspect;
         Object result = tryOverload(node, JexlOperator.EMPTY, object);
         if (result != JexlEngine.TRY_FAILED) {
             return result;
@@ -404,6 +403,7 @@ public class Operators {
             result = false;
             // check if there is an isEmpty method on the object that returns a
             // boolean and if so, just use it
+            final JexlUberspect uberspect = interpreter.uberspect;
             JexlMethod vm = uberspect.getMethod(object, "isEmpty", Interpreter.EMPTY_PARAMS);
             if (returnsBoolean(vm)) {
                 try {
@@ -430,7 +430,6 @@ public class Operators {
             return 0;
         }
         final JexlArithmetic arithmetic = interpreter.arithmetic;
-        final JexlUberspect uberspect = interpreter.uberspect;
         Object result = tryOverload(node, JexlOperator.SIZE, object);
         if (result != JexlEngine.TRY_FAILED) {
             return result;
@@ -439,6 +438,7 @@ public class Operators {
         if (result == null) {
             // check if there is a size method on the object that returns an
             // integer and if so, just use it
+            final JexlUberspect uberspect = interpreter.uberspect;
             JexlMethod vm = uberspect.getMethod(object, "size", Interpreter.EMPTY_PARAMS);
             if (vm != null && (Integer.TYPE.equals(vm.getReturnType()) || Integer.class.equals(vm.getReturnType()))) {
                 try {
@@ -460,7 +460,6 @@ public class Operators {
      */
     protected Object indirect(JexlNode node, Object object) {
         final JexlArithmetic arithmetic = interpreter.arithmetic;
-        final JexlUberspect uberspect = interpreter.uberspect;
         Object result = tryOverload(node, JexlOperator.INDIRECT, object);
         if (result != JexlEngine.TRY_FAILED) {
             return result;
@@ -468,6 +467,7 @@ public class Operators {
         result = arithmetic.indirect(object);
         if (result == JexlEngine.TRY_FAILED) {
             // check if there is a get() method on the object if so, just use it
+            final JexlUberspect uberspect = interpreter.uberspect;
             JexlMethod vm = uberspect.getMethod(object, "get", Interpreter.EMPTY_PARAMS);
             if (vm != null) {
                 try {
@@ -490,7 +490,6 @@ public class Operators {
      */
     protected Object indirectAssign(JexlNode node, Object object, Object right) {
         final JexlArithmetic arithmetic = interpreter.arithmetic;
-        final JexlUberspect uberspect = interpreter.uberspect;
         Object result = tryOverload(node, JexlOperator.INDIRECT_ASSIGN, object, right);
         if (result != JexlEngine.TRY_FAILED) {
             return result;
@@ -499,6 +498,7 @@ public class Operators {
         if (result == JexlEngine.TRY_FAILED) {
             // check if there is a set(Object) method on the object and if so, just use it
             Object[] argv = {right};
+            final JexlUberspect uberspect = interpreter.uberspect;
             JexlMethod vm = uberspect.getMethod(object, "set", argv);
             if (vm != null) {
                 try {
