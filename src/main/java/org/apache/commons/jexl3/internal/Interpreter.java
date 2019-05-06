@@ -3267,12 +3267,7 @@ public class Interpreter extends InterpreterBase {
         // first child is class or class name
         final Class target = (Class) node.jjtGetChild(0).jjtAccept(this, data);
         // get the ctor args
-        int argc = node.jjtGetNumChildren() - 1;
-        Object[] argv = argc > 0 ? new Object[argc] : EMPTY_PARAMS;
-        for (int i = 0; i < argc; i++) {
-            argv[i] = node.jjtGetChild(i + 1).jjtAccept(this, data);
-        }
-
+        Object[] argv = (Object[]) node.jjtGetChild(1).jjtAccept(this, data); 
         try {
             boolean cacheable = cache;
             // attempt to reuse last funcall cached in volatile JexlNode.value

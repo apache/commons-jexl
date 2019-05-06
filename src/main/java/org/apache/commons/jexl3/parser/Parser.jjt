@@ -1381,7 +1381,7 @@ void ForNameConstructor() #ConstructorNode() : {}
 
 void QualifiedConstructor() #QualifiedConstructorNode() : {}
 {
-    NewTypeReference() <LPAREN> [ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+    NewTypeReference() Arguments()
 }
 
 void ArrayConstructor() #ArrayConstructorNode() : {}

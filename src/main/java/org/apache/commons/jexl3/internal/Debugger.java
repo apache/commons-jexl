@@ -1272,13 +1272,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         int num = node.jjtGetNumChildren();
         builder.append("new ");
         accept(node.jjtGetChild(0), data);
-        builder.append("(");
-        for (int i = 1; i < num; ++i) {
-            if (i > 1)
-                builder.append(", ");
-            accept(node.jjtGetChild(i), data);
-        }
-        builder.append(")");
+        accept(node.jjtGetChild(1), data);
         return data;
     }
 
