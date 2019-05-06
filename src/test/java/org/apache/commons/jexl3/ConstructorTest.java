@@ -111,6 +111,15 @@ public class ConstructorTest extends JexlTestCase {
     }
 
     @Test
+    public void testOpenArray() throws Exception {
+        JexlScript e = JEXL.createScript("new String[6][]");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o instanceof Object[]);
+        Assert.assertEquals("Result is not as expected", 6, ((Object[])o).length);
+    }
+
+    @Test
     public void testMultidimensionalPrimitiveArray() throws Exception {
         JexlScript e = JEXL.createScript("new int[6][5]");
         JexlContext jc = new MapContext();

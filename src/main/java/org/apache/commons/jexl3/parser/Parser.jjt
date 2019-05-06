@@ -1378,7 +1378,17 @@ void QualifiedConstructor() #QualifiedConstructorNode() : {}
 
 void ArrayConstructor() #ArrayConstructorNode() : {}
 {
-    ArrayTypeReference() (LOOKAHEAD(2) <LBRACKET> Expression() <RBRACKET>)+
+    ArrayTypeReference() (LOOKAHEAD(2) ArrayQualifiedDimension())+ (LOOKAHEAD(2) ArrayOpenDimension())*
+}
+
+void ArrayQualifiedDimension() #void : {}
+{
+    <LBRACKET> Expression() <RBRACKET>
+}
+
+void ArrayOpenDimension() : {}
+{
+    <LBRACKET> <RBRACKET>
 }
 
 void InitializedArrayConstructor() #InitializedArrayConstructorNode() : {}

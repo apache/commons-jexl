@@ -248,6 +248,8 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTArrayConstructorNode node, Object data);
 
+    protected abstract Object visit(ASTArrayOpenDimension node, Object data);
+
     protected abstract Object visit(ASTInitializedArrayConstructorNode node, Object data);
 
     protected abstract Object visit(ASTSwitchExpression node, Object data);

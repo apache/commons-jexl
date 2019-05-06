@@ -26,6 +26,7 @@ import org.apache.commons.jexl3.parser.ASTArguments;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
 import org.apache.commons.jexl3.parser.ASTArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTArrayLiteral;
+import org.apache.commons.jexl3.parser.ASTArrayOpenDimension;
 import org.apache.commons.jexl3.parser.ASTAssertStatement;
 import org.apache.commons.jexl3.parser.ASTAssignment;
 import org.apache.commons.jexl3.parser.ASTBitwiseAndNode;
@@ -1290,6 +1291,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             accept(node.jjtGetChild(i), data);
             builder.append("]");
         }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTArrayOpenDimension node, Object data) {
         return data;
     }
 
