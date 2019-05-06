@@ -145,7 +145,9 @@ Enhancements
 
 + Pattern matching operators `=~` and `!~` can use new `in` and `!in` aliases 
 
-+ Operator `new` can use Java-like object syntax `new String()` or array syntax `new String[] {'abc','def'}`
++ Operator `new` supports Java-like object creation syntax `new String()` or array creation syntax `new String[] {'abc','def'}`
+
++ Operator `new` supports Java-like inner object creation syntax `outerObject.new InnerClass()`
 
 + Foreach statement may also define additional `counter` variable `for (var x,i : list)` along with the current loop value variable
 
