@@ -242,6 +242,8 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTSizeMethod node, Object data);
 
+    protected abstract Object visit(ASTInnerConstructorNode node, Object data);
+
     protected abstract Object visit(ASTConstructorNode node, Object data);
 
     protected abstract Object visit(ASTQualifiedConstructorNode node, Object data);

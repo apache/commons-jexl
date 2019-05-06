@@ -988,8 +988,10 @@
                         A simple class name can be used in the same cases as specified for the <code>instanceof</code> operator.
                         <p>In case of multiple constructors, JEXL will make the best effort to find
                             the most appropriate non ambiguous constructor to call.</p>
+                        <p>The inner class creation syntax is also supported, e.g.
+                           <code>outerObject.new InnerClass()</code></p>
                         <p>The array syntax is also supported, e.g.
-                           <code>new String[5]</code>, or <code>new int[5][7]</code></p>
+                           <code>new String[5]</code>, <code>new int[5][7]</code> or <code>new int[5][]</code></p>
                         <p>The array initialization syntax is also supported for single-dimension arrays, e.g.
                            <code>new String[] {'abc','def'}</code></p>
                         <p>Note that this operator can not be overloaded</p>

@@ -80,7 +80,7 @@ PARSER_END(Parser)
 
 TOKEN_MGR_DECLS : {
     /**
-     *   A stack of 1 for keeping state to deal with doted identifiers
+     *   A stack of 1 for keeping state to deal with dotted identifiers
      */
     int dotLexState = DEFAULT;
 
@@ -141,7 +141,7 @@ TOKEN_MGR_DECLS : {
     | < THROW : "throw" >
     | < ASSERT : "assert" >
     | < SYNCHRONIZED : "synchronized" >
-    | < NEW : "new" > { pushQ(); } /* Lexical state is now QUALIFIED */
+    | < NEW : "new" > { popDot(); pushQ(); } /* Lexical state is now QUALIFIED */
     | < VAR : "var" >
     | < FINAL : "final" >
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
@@ -1234,6 +1234,14 @@ void ObjectType() #ClassLiteral() :
   { value = Parser.resolveType(t.image); if (value == null) throwParsingException(jjtThis); jjtThis.setLiteral(value); }
 }
 
+void InnerType() #Identifier() :
+{
+   Token t;
+}
+{
+  t=<QUALIFIED_IDENTIFIER> { jjtThis.setSymbol(t.image); }
+}
+
 void PrimitiveType() #ClassLiteral() :
 {
    Token t;
@@ -1560,6 +1568,8 @@ void MethodCall() #void : {}
     LOOKAHEAD(<DOT> <SIZE>) (<DOT> <SIZE> <LPAREN> <RPAREN>) #SizeMethod(1)
     |
     LOOKAHEAD(<DOT> <EMPTY>) (<DOT> <EMPTY> <LPAREN> <RPAREN>) #EmptyMethod(1)
+    |
+    LOOKAHEAD(<DOT> <NEW>) (<DOT> <NEW> InnerType() Arguments()) #InnerConstructorNode()
     |
     LOOKAHEAD(<LCURLY>) (InlinePropertyAssignment() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
     |

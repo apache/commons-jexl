@@ -85,6 +85,7 @@ import org.apache.commons.jexl3.parser.ASTInitializedArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
+import org.apache.commons.jexl3.parser.ASTInnerConstructorNode;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTIOFNode;
 import org.apache.commons.jexl3.parser.ASTISNode;
@@ -2893,6 +2894,55 @@ public class Interpreter extends InterpreterBase {
             return av.toArray();
         } else {
             return EMPTY_PARAMS;
+        }
+    }
+
+    @Override
+    protected Object visit(final ASTInnerConstructorNode node, Object data) {
+        if (isCancelled()) {
+            throw new JexlException.Cancel(node);
+        }
+
+        String enclosingClass = data == null ? null : data.getClass().getCanonicalName();
+        if (enclosingClass == null) {
+            String tstr = data != null ? data.toString() : "?";
+            return unsolvableMethod(node, tstr);
+        }
+        ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
+        // get the ctor args
+        Object[] argv = callArguments(data, false, (Object[]) argNode.jjtAccept(this, data));
+
+        ASTIdentifier classNode = (ASTIdentifier) node.jjtGetChild(0);
+        String target  = enclosingClass + "$" + classNode.getName();
+        try {
+            boolean narrow = false;
+            JexlMethod ctor = null;
+            while (true) {
+                // try as stated
+                ctor = uberspect.getConstructor(target, argv);
+                if (ctor != null) {
+                    break;
+                }
+                // if we did not find an exact method by name and we haven't tried yet,
+                // attempt to narrow the parameters and if this succeeds, try again in next loop
+                if (!narrow && arithmetic.narrowArguments(argv)) {
+                    narrow = true;
+                    continue;
+                }
+                // we are done trying
+                break;
+            }
+            // we have either evaluated and returned or might have found a ctor
+            if (ctor != null) {
+                return ctor.invoke(target, argv);
+            }
+            String tstr = target != null ? target.toString() : "?";
+            return unsolvableMethod(node, tstr);
+        } catch (JexlException xthru) {
+            throw xthru;
+        } catch (Exception xany) {
+            String tstr = target != null ? target.toString() : "?";
+            throw invocationException(node, tstr, xany);
         }
     }
 
