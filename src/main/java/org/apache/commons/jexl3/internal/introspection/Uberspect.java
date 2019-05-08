@@ -227,13 +227,18 @@ public class Uberspect implements JexlUberspect {
      * @param methodName the seeked methods name
      * @return the array of methods
      */
-    public final Method[] getMethods(Class<?> c, final String methodName) {
+    public final Method[] getClassMethods(Class<?> c, final String methodName) {
         return base().getMethods(c, methodName);
     }
 
     @Override
     public JexlMethod getMethod(Object obj, String method, Object... args) {
         return MethodExecutor.discover(base(), obj, method, args);
+    }
+
+    @Override
+    public JexlMethod[] getMethods(Object obj, String method) {
+        return MethodExecutor.discover(base(), obj, method);
     }
 
     @Override
@@ -433,6 +438,11 @@ public class Uberspect implements JexlUberspect {
         return ConstructorMethod.discover(base(), ctorHandle, args);
     }
 
+    @Override
+    public JexlMethod[] getConstructors(Object ctorHandle) {
+        return ConstructorMethod.discover(base(), ctorHandle);
+    }
+
     /**
      * The concrete uberspect Arithmetic class.
      */
@@ -476,7 +486,7 @@ public class Uberspect implements JexlUberspect {
                 // deal only with derived classes
                 if (!JexlArithmetic.class.equals(aclass)) {
                     for (JexlOperator op : JexlOperator.values()) {
-                        Method[] methods = getMethods(arithmetic.getClass(), op.getMethodName());
+                        Method[] methods = getClassMethods(arithmetic.getClass(), op.getMethodName());
                         if (methods != null) {
                             mloop:
                             for (Method method : methods) {

@@ -35,7 +35,7 @@ public final class ConstructorMethod implements JexlMethod {
      * @param args constructor arguments
      * @return a {@link JexlMethod}
      */
-    public static ConstructorMethod discover(Introspector is, Object ctorHandle, Object... args) {
+    public static ConstructorMethod discover(Introspector is, Object ctorHandle, Object[] args) {
         String className;
         Class<?> clazz = null;
         if (ctorHandle instanceof Class<?>) {
@@ -53,6 +53,36 @@ public final class ConstructorMethod implements JexlMethod {
             return null;
         }
     }
+
+    /**
+     * Discovers a class constructor and wrap it as a JexlMethod.
+     * @param is the introspector
+     * @param ctorHandle a class or class name
+     * @param args constructor arguments
+     * @return a {@link JexlMethod}
+     */
+    public static ConstructorMethod[] discover(Introspector is, Object ctorHandle) {
+        String className;
+        Class<?> clazz = null;
+        if (ctorHandle instanceof Class<?>) {
+            clazz = (Class<?>) ctorHandle;
+            className = clazz.getName();
+        } else if (ctorHandle != null) {
+            className = ctorHandle.toString();
+        } else {
+            return null;
+        }
+        Constructor<?>[] ctors = is.getConstructors(clazz);
+        if (ctors == null || ctors.length == 0) {
+            return null;
+        }
+        ConstructorMethod[] result = new ConstructorMethod[ctors.length];
+        for (int i = 0; i < ctors.length; i++) {
+            result[i] = new ConstructorMethod(ctors[i]);
+        }
+        return result;
+    }
+
     /**
      * Creates a constructor method.
      * @param theCtor the constructor to wrap
@@ -120,5 +150,16 @@ public final class ConstructorMethod implements JexlMethod {
     public Class<?> getReturnType() {
         return ctor.getDeclaringClass();
     }
+
+    @Override
+    public Class<?>[] getParameterTypes() {
+        return ctor.getParameterTypes();
+    }
+
+    @Override
+    public final boolean isStatic() {
+        return true;
+    }
+
     
 }

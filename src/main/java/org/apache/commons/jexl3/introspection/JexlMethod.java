@@ -74,4 +74,22 @@ public interface JexlMethod {
      * @return return type
      */
     Class<?> getReturnType();
+
+    /**
+     * returns the parameter types of the method invoked.
+     * 
+     * @return return an array of parameter types
+     * @since 3.2
+     */
+    Class<?>[] getParameterTypes();
+
+    /**
+     * Specifies if this JexlMethod is static and able to be used without
+     * object it was returned for.
+     *
+     * @return true if can be used as static, false if not
+     * @since 3.2
+     */
+    boolean isStatic();
+
 }

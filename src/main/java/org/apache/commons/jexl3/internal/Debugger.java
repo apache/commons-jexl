@@ -89,6 +89,7 @@ import org.apache.commons.jexl3.parser.ASTMapEnumerationNode;
 import org.apache.commons.jexl3.parser.ASTMapLiteral;
 import org.apache.commons.jexl3.parser.ASTMapProjectionNode;
 import org.apache.commons.jexl3.parser.ASTMethodNode;
+import org.apache.commons.jexl3.parser.ASTMethodReference;
 import org.apache.commons.jexl3.parser.ASTModNode;
 import org.apache.commons.jexl3.parser.ASTMulNode;
 import org.apache.commons.jexl3.parser.ASTMultipleAssignment;
@@ -1332,6 +1333,13 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             accept(node.jjtGetChild(0), data);
             accept(node.jjtGetChild(1), data);
         }
+        return data;
+    }
+
+    @Override
+    protected Object visit(ASTMethodReference node, Object data) {
+        builder.append("::");
+        accept(node.jjtGetChild(0), data);
         return data;
     }
 

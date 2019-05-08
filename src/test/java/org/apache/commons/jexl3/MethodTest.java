@@ -601,6 +601,17 @@ public class MethodTest extends JexlTestCase {
             public Class<?> getReturnType() {
                 return Object.class;
             }
+
+            @Override
+            public Class<?>[] getParameterTypes() {
+                return new Class<?>[] {Object.class, Object.class};
+            }
+
+            @Override
+            public final boolean isStatic() {
+                return false;
+            }
+
         };
 
         foo.put("PLUS", mplus);

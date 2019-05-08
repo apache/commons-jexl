@@ -227,11 +227,20 @@ public final class Introspector {
     /**
      * Gets the array of accessible constructors known for a given class.
      * @param c          the class
-     * @param methodName the method name
      * @return the array of methods (null or not empty)
      */
-    public Constructor<?>[] getConstructors(Class<?> c, String methodName) {
-        Class<?> clazz = constructibleClasses.computeIfAbsent(methodName, x -> {
+    public Constructor<?>[] getConstructors(Class<?> c) {
+        return getConstructors(c, c.getName());
+    }
+
+    /**
+     * Gets the array of accessible constructors known for a given class.
+     * @param c          the class
+     * @param className  the class name
+     * @return the array of methods (null or not empty)
+     */
+    public Constructor<?>[] getConstructors(Class<?> c, String className) {
+        Class<?> clazz = constructibleClasses.computeIfAbsent(className, x -> {
             try {
                 return (c != null && c.getName().equals(x)) ? c : loader.loadClass(x);
             } catch (ClassNotFoundException xnotfound) {

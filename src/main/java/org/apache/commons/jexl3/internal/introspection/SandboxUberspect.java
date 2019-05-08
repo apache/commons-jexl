@@ -86,12 +86,41 @@ public final class SandboxUberspect implements JexlUberspect {
     }
 
     @Override
+    public JexlMethod[] getConstructors(Object ctorHandle) {
+        final String className;
+        if (ctorHandle instanceof Class<?>) {
+            Class<?> clazz = (Class<?>) ctorHandle;
+            className = clazz.getName();
+        } else if (ctorHandle != null) {
+            className = ctorHandle.toString();
+        } else {
+            return null;
+        }
+        if (sandbox.execute(className, "") != null) {
+            return uberspect.getConstructors(className);
+        }
+        return null;
+    }
+
+    @Override
     public JexlMethod getMethod(final Object obj, final String method, final Object... args) {
         if (obj != null && method != null) {
             String objClassName = (obj instanceof Class) ? ((Class<?>)obj).getName() : obj.getClass().getName();
             String actual = sandbox.execute(objClassName, method);
             if (actual != null) {
                 return uberspect.getMethod(obj, actual, args);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public JexlMethod[] getMethods(final Object obj, final String method) {
+        if (obj != null && method != null) {
+            String objClassName = (obj instanceof Class) ? ((Class<?>)obj).getName() : obj.getClass().getName();
+            String actual = sandbox.execute(objClassName, method);
+            if (actual != null) {
+                return uberspect.getMethods(obj, actual);
             }
         }
         return null;

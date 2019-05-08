@@ -162,14 +162,15 @@ TOKEN_MGR_DECLS : {
 
 <*> TOKEN : { /* SEPARATORS */
       < LPAREN : "(" > { popQ(); } /* Revert state to default. */
-    | < RPAREN : ")" >
+    | < RPAREN : ")" > { popQ(); } /* Revert state to default. */
     | < LCURLY : "{" >
     | < RCURLY : "}" >
     | < LBRACKET : "[" > { popQ(); } /* Revert state to default. */
     | < RBRACKET : "]" >
-    | < SEMICOL : ";" >
+    | < SEMICOL : ";" > { popQ(); } /* Revert state to default. */
     | < COLON : ":" >
-    | < COMMA : "," >
+    | < DCOLON : "::" >
+    | < COMMA : "," > { popQ(); } /* Revert state to default. */
     | < DOT : "." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < QDOT : "?." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < ELLIPSIS : "..." | "\u2026">
@@ -1098,6 +1099,24 @@ void RemoveIdentifier() #Identifier :
     t=<REMOVE> { jjtThis.setSymbol(t.image); }
 }
 
+void MethodReferenceIdentifier() #Identifier :
+{
+    Token t;
+}
+{
+    t=<SIZE> { jjtThis.setSymbol(t.image); }
+    |
+    t=<EMPTY> { jjtThis.setSymbol(t.image); }
+    |
+    t=<REMOVE> { jjtThis.setSymbol(t.image); }
+    |
+    t=<NEW> { jjtThis.setSymbol(t.image); }
+    |
+    t=<FUNCTION> { jjtThis.setSymbol(t.image); }
+    |
+    t=<IDENTIFIER> { jjtThis.setSymbol(t.image); }
+}
+
 void This() #void : {}
 {
     <THIS> #ThisNode
@@ -1506,15 +1525,6 @@ void ArrayAccess() : {}
     (LOOKAHEAD(1) <LBRACKET> Expression() ( <COMMA> Expression() )* <RBRACKET>)+
 }
 
-void MemberAccess() #void : {}
-{
-    LOOKAHEAD(<LBRACKET>) ArrayAccess()
-    |
-    LOOKAHEAD(<DOT>) IdentifierAccess()
-    |
-    LOOKAHEAD(<QDOT>) IdentifierAccess()
-}
-
 void ReferenceExpression() #MethodNode(>1) : {}
 {
     ( <LPAREN> Expression() <RPAREN> #ReferenceExpression(1) ) ( LOOKAHEAD(<LPAREN>) Arguments() )*
@@ -1563,6 +1573,15 @@ void PrimaryExpression() #void : {}
     Literal()
 }
 
+void MemberAccess() #void : {}
+{
+    LOOKAHEAD(<LBRACKET>) ArrayAccess()
+    |
+    LOOKAHEAD(<DOT>) IdentifierAccess()
+    |
+    LOOKAHEAD(<QDOT>) IdentifierAccess()
+}
+
 void MethodCall() #void : {}
 {
     LOOKAHEAD(<DOT> <SIZE>) (<DOT> <SIZE> <LPAREN> <RPAREN>) #SizeMethod(1)
@@ -1583,6 +1602,11 @@ void MemberExpression() #void : {}
     LOOKAHEAD(<LCURLY>) InlinePropertyAssignment()
     |
     MemberAccess()
+}
+
+void MethodReference() : {}
+{
+    <DCOLON> MethodReferenceIdentifier()
 }
 
 void InlinePropertyAssignment() : {}
@@ -1622,5 +1646,5 @@ void ValueExpression() #void : {}
 {
     NullLiteral()
     |
-    ( PrimaryExpression() ( LOOKAHEAD(2) MemberExpression() )*) #Reference(>1)
+    ( PrimaryExpression() ( LOOKAHEAD(2) MemberExpression() )* [LOOKAHEAD(2) MethodReference()] ) #Reference(>1)
 }

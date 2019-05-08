@@ -973,7 +973,7 @@
                 <tr>
                     <td>Type cast <code>()</code></td>
                     <td>
-                        The 'cast' operator is used to the conversion of one data type to another.
+                        The 'cast' operator is used for the conversion of one data type to another.
                         For example <code>(char)42</code> returns <code>'*'</code>.
                         The type name to cast the value to can be any java primitive type name.
                     </td>
@@ -994,6 +994,14 @@
                            <code>new String[5]</code>, <code>new int[5][7]</code> or <code>new int[5][]</code></p>
                         <p>The array initialization syntax is also supported for single-dimension arrays, e.g.
                            <code>new String[] {'abc','def'}</code></p>
+                        <p>Note that this operator can not be overloaded</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Method reference<code>::</code></td>
+                    <td>
+                        Creates a method reference using a type/instance and a method name:
+                        <code>Double::valueOf</code>
                         <p>Note that this operator can not be overloaded</p>
                     </td>
                 </tr>

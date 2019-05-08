@@ -100,6 +100,7 @@ import org.apache.commons.jexl3.parser.ASTMapEnumerationNode;
 import org.apache.commons.jexl3.parser.ASTMapLiteral;
 import org.apache.commons.jexl3.parser.ASTMapProjectionNode;
 import org.apache.commons.jexl3.parser.ASTMethodNode;
+import org.apache.commons.jexl3.parser.ASTMethodReference;
 import org.apache.commons.jexl3.parser.ASTModNode;
 import org.apache.commons.jexl3.parser.ASTMulNode;
 import org.apache.commons.jexl3.parser.ASTMultipleAssignment;
@@ -2947,6 +2948,16 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
+    protected Object visit(final ASTMethodReference node, Object data) {
+        ASTIdentifier methodNode = (ASTIdentifier) node.jjtGetChild(0);
+        String methodName = methodNode.getName();
+        if (data == null)
+            return unsolvableMethod(methodNode, "<null>::" + methodName);
+        Object result = MethodReference.create(this, data, methodName);
+        return result != null ? result : unsolvableMethod(methodNode, "::" + methodName);
+    }
+
+    @Override
     protected Object visit(final ASTMethodNode node, Object data) {
         return visit(node, null, data);
     }
@@ -3138,6 +3149,9 @@ public class Interpreter extends InterpreterBase {
                     }
                     if (functor instanceof JexlMethod) {
                         return ((JexlMethod) functor).invoke(target, argv);
+                    }
+                    if (functor instanceof MethodReference) {
+                        return ((MethodReference) functor).invoke(argv);
                     }
                     final String mCALL = "call";
                     // may be a generic callable, try a 'call' method

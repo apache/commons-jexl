@@ -239,6 +239,15 @@ public interface JexlUberspect {
     JexlMethod getConstructor(Object ctorHandle, Object... args);
 
     /**
+     * Returns a class constructors.
+     * 
+     * @param ctorHandle a class or class name
+     * @return a {@link JexlMethod}
+     * @since 3.2
+     */
+    JexlMethod[] getConstructors(Object ctorHandle);
+
+    /**
      * Returns a JexlMethod.
      * 
      * @param obj    the object
@@ -247,6 +256,16 @@ public interface JexlUberspect {
      * @return a {@link JexlMethod}
      */
     JexlMethod getMethod(Object obj, String method, Object... args);
+
+    /**
+     * Returns an array of JexlMethod.
+     * 
+     * @param obj    the object
+     * @param method the method name
+     * @return a {@link JexlMethod} array
+     * @since 3.2
+     */
+    JexlMethod[] getMethods(Object obj, String method);
 
     /**
      * Property getter.

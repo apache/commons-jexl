@@ -261,5 +261,15 @@ abstract class AbstractExecutor {
         public final Class<?> getReturnType() {
             return method.getReturnType();
         }
+
+        @Override
+        public final Class<?>[] getParameterTypes() {
+            return method.getParameterTypes();
+        }
+
+        @Override
+        public final boolean isStatic() {
+            return java.lang.reflect.Modifier.isStatic(method.getModifiers());
+        }
     }
 }

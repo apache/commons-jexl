@@ -61,6 +61,37 @@ public final class MethodExecutor extends AbstractExecutor.Method {
     }
 
     /**
+     * Discovers all {@link MethodExecutor}.
+     * <p>
+     * If the object is a class, an attempt will be made to find the
+     * methods as a static method of that class.
+     * </p>
+     * @param is the introspector used to discover the method
+     * @param obj the object to introspect
+     * @param method the name of the method to find
+     * @return an array of executors or null
+     */
+    public static MethodExecutor[] discover(Introspector is, Object obj, String method) {
+        final Class<?> clazz = obj.getClass();
+        java.lang.reflect.Method[] methods = is.getMethods(clazz, method);
+        if ((methods == null || methods.length == 0) && clazz.isArray()) {
+            methods = is.getMethods(ArrayListWrapper.class, method);
+        }
+        if ((methods == null || methods.length == 0) && obj instanceof Class<?>) {
+            methods = is.getMethods((Class<?>) obj, method);
+        }
+        if (methods == null || methods.length == 0) {
+            return null;
+        }
+        MethodExecutor[] result = new MethodExecutor[methods.length];
+        for (int i = 0; i < methods.length; i++) {
+            java.lang.reflect.Method m = methods[i];
+            result[i] = new MethodExecutor(clazz, m, new MethodKey(m));
+        }
+        return result;
+    }
+
+    /**
      * Creates a new instance.
      * @param c the class this executor applies to
      * @param m the method
