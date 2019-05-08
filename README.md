@@ -91,7 +91,9 @@ New features
 
 + Java-like `instanceof` operator is introduced
 
-+ Java-like `+` unary promotion operator is introduced
++ Groovy-like `!instanceof` operator is introduced
+
++ Java-like `::` method reference operator is introduced
 
 + Java-like `switch` expression operator is introduced
 
