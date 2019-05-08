@@ -109,6 +109,7 @@ import org.apache.commons.jexl3.parser.ASTMultipleInitialization;
 import org.apache.commons.jexl3.parser.ASTNENode;
 import org.apache.commons.jexl3.parser.ASTNEWNode;
 import org.apache.commons.jexl3.parser.ASTNINode;
+import org.apache.commons.jexl3.parser.ASTNIOFNode;
 import org.apache.commons.jexl3.parser.ASTNRNode;
 import org.apache.commons.jexl3.parser.ASTNSWNode;
 import org.apache.commons.jexl3.parser.ASTNotNode;
@@ -692,20 +693,40 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(ASTIOFNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
         if (left != null) {
-            ASTClassLiteral right = (ASTClassLiteral) node.jjtGetChild(1);
             Class k = left.getClass();
+            ASTClassLiteral right = (ASTClassLiteral) node.jjtGetChild(1);
             Class type = right.getLiteral();
             int i = right.getArray();
             while (i-- > 0) {
                 if (k.isArray()) {
                     k = k.getComponentType();
                 } else {
-                    return false;
+                    return Boolean.FALSE;
                 }
             }
-            return type != null ? type.isAssignableFrom(k) : true;
+            return type == null ? Boolean.TRUE : type.isAssignableFrom(k);
         }
-        return false;
+        return Boolean.FALSE;
+    }
+
+    @Override
+    protected Object visit(ASTNIOFNode node, Object data) {
+        Object left = node.jjtGetChild(0).jjtAccept(this, data);
+        if (left != null) {
+            Class k = left.getClass();
+            ASTClassLiteral right = (ASTClassLiteral) node.jjtGetChild(1);
+            Class type = right.getLiteral();
+            int i = right.getArray();
+            while (i-- > 0) {
+                if (k.isArray()) {
+                    k = k.getComponentType();
+                } else {
+                    return Boolean.TRUE;
+                }
+            }
+            return type == null ? Boolean.FALSE : !type.isAssignableFrom(k);
+        }
+        return Boolean.TRUE;
     }
 
     @Override

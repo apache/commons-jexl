@@ -98,6 +98,7 @@ import org.apache.commons.jexl3.parser.ASTMultipleInitialization;
 import org.apache.commons.jexl3.parser.ASTNENode;
 import org.apache.commons.jexl3.parser.ASTNEWNode;
 import org.apache.commons.jexl3.parser.ASTNINode;
+import org.apache.commons.jexl3.parser.ASTNIOFNode;
 import org.apache.commons.jexl3.parser.ASTNRNode;
 import org.apache.commons.jexl3.parser.ASTNSWNode;
 import org.apache.commons.jexl3.parser.ASTNotNode;
@@ -1164,6 +1165,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(ASTIOFNode node, Object data) {
         return infixChildren(node, " instanceof ", false, data);
+    }
+
+    @Override
+    protected Object visit(ASTNIOFNode node, Object data) {
+        return infixChildren(node, " !instanceof ", false, data);
     }
 
     @Override

@@ -20,7 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Test cases for the instanceof operator.
+ * Test cases for the instanceof/!instanceof operator.
  *
  * @since 3.2
  */
@@ -39,8 +39,24 @@ public class InstanceofTest extends JexlTestCase {
     }
 
     @Test
+    public void testNotSimpleName() throws Exception {
+        JexlScript e = JEXL.createScript("var x = 123; x !instanceof String");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+    }
+
+    @Test
     public void testArray() throws Exception {
         JexlScript e = JEXL.createScript("var x = ['123','456']; x instanceof String[]");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+    }
+
+    @Test
+    public void testNotArray() throws Exception {
+        JexlScript e = JEXL.createScript("var x = {'123','456'}; x !instanceof String[]");
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
         Assert.assertEquals("Result is not true", Boolean.TRUE, o);
@@ -59,11 +75,31 @@ public class InstanceofTest extends JexlTestCase {
     }
 
     @Test
+    public void testNotPrimitiveArray() throws Exception {
+        JexlScript e = JEXL.createScript("var x = [123,456]; x !instanceof int[]");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not false", Boolean.FALSE, o);
+
+        e = JEXL.createScript("var x = [123,456]; x !instanceof int");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+    }
+
+    @Test
     public void testQualifiedName() throws Exception {
         JexlScript e = JEXL.createScript("var x = new('java.util.concurrent.atomic.AtomicLong'); x instanceof java.util.concurrent.atomic.AtomicLong");
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
         Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+    }
+
+    @Test
+    public void testNotQualifiedName() throws Exception {
+        JexlScript e = JEXL.createScript("var x = new('java.util.concurrent.atomic.AtomicLong'); x !instanceof java.util.concurrent.atomic.AtomicLong");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not false", Boolean.FALSE, o);
     }
 
     @Test
@@ -75,6 +111,14 @@ public class InstanceofTest extends JexlTestCase {
     }
 
     @Test
+    public void testNotQualifiedArray() throws Exception {
+        JexlScript e = JEXL.createScript("var a = new('java.util.concurrent.atomic.AtomicLong'); var x = [a,a,a]; x !instanceof java.util.concurrent.atomic.AtomicLong[]");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not false", Boolean.FALSE, o);
+    }
+
+    @Test
     public void testPrimitive() throws Exception {
         JexlScript e = JEXL.createScript("var x = 123; x instanceof int");
         JexlContext jc = new MapContext();
@@ -83,11 +127,27 @@ public class InstanceofTest extends JexlTestCase {
     }
 
     @Test
+    public void testNotPrimitive() throws Exception {
+        JexlScript e = JEXL.createScript("var x = 123; x !instanceof int");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+    }
+
+    @Test
     public void testNull() throws Exception {
         JexlScript e = JEXL.createScript("var x = null; x instanceof Object");
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
         Assert.assertEquals("Result is true", Boolean.FALSE, o);
+    }
+
+    @Test
+    public void testNotNull() throws Exception {
+        JexlScript e = JEXL.createScript("var x = null; x !instanceof Object");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
     @Test
@@ -119,6 +179,18 @@ public class InstanceofTest extends JexlTestCase {
     }
 
     @Test
+    public void testNotUntypedArray() throws Exception {
+        JexlScript e = JEXL.createScript("var x = {123,'456'}; x !instanceof []");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+
+        e = JEXL.createScript("var x = 100H; x !instanceof []");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+    }
+
+    @Test
     public void testMultidimensionalArray() throws Exception {
         JexlScript e = JEXL.createScript("x instanceof []");
         JexlContext jc = new MapContext();
@@ -141,6 +213,31 @@ public class InstanceofTest extends JexlTestCase {
         e = JEXL.createScript("x instanceof [][][]");
         o = e.execute(jc);
         Assert.assertEquals("Result is true", Boolean.FALSE, o);
+    }
+
+    @Test
+    public void testNotMultidimensionalArray() throws Exception {
+        JexlScript e = JEXL.createScript("x !instanceof []");
+        JexlContext jc = new MapContext();
+        jc.set("x", new int[5][6]);
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.FALSE, o);
+
+        e = JEXL.createScript("x !instanceof [][]");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is true", Boolean.FALSE, o);
+
+        e = JEXL.createScript("x !instanceof int[][]");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is true", Boolean.FALSE, o);
+
+        e = JEXL.createScript("x !instanceof long[][]");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
+
+        e = JEXL.createScript("x !instanceof [][][]");
+        o = e.execute(jc);
+        Assert.assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
 }

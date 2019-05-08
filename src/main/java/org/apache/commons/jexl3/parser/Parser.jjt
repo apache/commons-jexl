@@ -220,6 +220,7 @@ TOKEN_MGR_DECLS : {
     | < lt : "<" | "lt" >
     | < le : "<=" | "le" | "\u2264" >
     | < iof : "instanceof" > { pushQ(); }
+    | < niof : "!instanceof" > { pushQ(); }
 
 }
 
@@ -852,6 +853,8 @@ void RelationalExpression() #void : {}
     <ene> RangeExpression() #NEWNode(2) // not ends with
    |
     <iof> TypeReference() #IOFNode(2) // instanceof
+   |
+    <niof> TypeReference() #NIOFNode(2) // not instanceof
 
   ) )?
 }

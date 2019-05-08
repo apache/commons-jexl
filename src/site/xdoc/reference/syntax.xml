@@ -971,6 +971,14 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Type comparison negation <code>!instanceof</code></td>
+                    <td>
+                        The '!instanceof' operator is inline variant of negated 'instanceof' operator, e.g.
+                        <code>"abc" !instanceof Integer</code> and <code>!("abc" instanceof Integer)</code> are equivalent.
+                        <p>Note that this operator can not be overloaded</p>
+                    </td>
+                </tr>
+                <tr>
                     <td>Type cast <code>()</code></td>
                     <td>
                         The 'cast' operator is used for the conversion of one data type to another.
