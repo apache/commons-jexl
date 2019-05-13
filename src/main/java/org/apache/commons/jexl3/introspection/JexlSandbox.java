@@ -569,18 +569,32 @@ public final class JexlSandbox {
      * @param clazz the class
      * @return the permissions
      */
+    @SuppressWarnings("null") // clazz can not be null since permissions would be not null and black;
     public Permissions get(Class<?> clazz) {
-        Permissions permissions = clazz == null? ALL_BLACK : sandbox.get(clazz.getName());
+        Permissions permissions = clazz == null ? ALL_BLACK : sandbox.get(clazz.getName());
         if (permissions == null) {
             if (inherit) {
-                // clazz can not be null since permissions would be not null and black;
-                // find first inheritable class that defined permissions
-                for (Class<?> ii : clazz.getClasses()) {
-                    permissions = sandbox.get(ii.getName());
+                // find first inherited interface that defines permissions
+                for (Class<?> inter : clazz.getInterfaces()) {
+                    permissions = sandbox.get(inter.getName());
                     if (permissions != null && permissions.isInheritable()) {
                         break;
                     }
                 }
+                // nothing defined yet, find first superclass that defines permissions
+                if (permissions == null) {
+                    // lets walk all super classes
+                    Class<?> zuper = clazz.getSuperclass();
+                    // walk all superclasses
+                    while (zuper != null) {
+                        permissions = sandbox.get(zuper.getName());
+                        if (permissions != null && permissions.isInheritable()) {
+                            break;
+                        }
+                        zuper = zuper.getSuperclass();
+                    }
+                }
+                // nothing was inheritable
                 if (permissions == null) {
                     permissions = white ? ALL_WHITE : ALL_BLACK;
                 }

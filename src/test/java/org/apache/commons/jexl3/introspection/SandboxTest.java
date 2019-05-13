@@ -16,6 +16,10 @@
  */
 package org.apache.commons.jexl3.introspection;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -66,6 +70,10 @@ public class SandboxTest extends JexlTestCase {
         @NoJexl
         public void callMeNot() {
             throw new RuntimeException("should not be callable!");
+        }
+        
+        public String allowInherit() {
+            return "this is allowed";
         }
     }
 
@@ -373,5 +381,39 @@ public class SandboxTest extends JexlTestCase {
         script = sjexl.createScript("System.currentTimeMillis()");
         result = script.execute(context);
         Assert.assertNotNull(result);
+    }
+
+    @Test
+    public void testSandboxInherit() throws Exception {
+        Object result;
+        JexlContext ctxt = null;
+        Map<String, JexlSandbox.Permissions> perms = new HashMap<String, JexlSandbox.Permissions>();
+        List<String> foo = new ArrayList<String>();
+        JexlSandbox sandbox = new JexlSandbox(false, true, perms);
+        sandbox.white(java.util.List.class.getName());
+        //sandbox.black(Foo.class.getName()).execute();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlScript method = sjexl.createScript("foo.add(y)", "foo", "y");
+        JexlScript set = sjexl.createScript("foo[x] = y", "foo", "x", "y");
+        JexlScript get = sjexl.createScript("foo[x]", "foo", "x");
+        try {
+            result = method.execute(ctxt, foo, "nothing");
+            Assert.assertEquals(true, result);
+            result = null;
+            result = get.execute(null, foo, 0);
+            Assert.assertEquals("nothing", result);
+            result = null;
+            result = set.execute(null, foo, 0, "42");
+            Assert.assertEquals("42", result);
+
+            result = null;
+            result = get.execute(null, foo, 0);
+            Assert.assertEquals("42", result);
+            //Assert.fail("should have not been possible");
+        } catch (JexlException xjm) {
+            // ok
+            LOGGER.info(xjm.toString());
+        }
+
     }
 }
