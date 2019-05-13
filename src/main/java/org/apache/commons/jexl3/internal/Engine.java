@@ -398,12 +398,12 @@ public class Engine extends JexlEngine {
             if (method != null) {
                 result = method.invoke(obj, args);
             } else {
-                xjexl = new JexlException.Method(info, meth, null);
+                xjexl = new JexlException.Method(info, meth, args);
             }
         } catch (JexlException xany) {
             xjexl = xany;
         } catch (Exception xany) {
-            xjexl = new JexlException.Method(info, meth, xany);
+            xjexl = new JexlException.Method(info, meth, args, xany);
         }
         if (xjexl != null) {
             if (silent) {
@@ -445,12 +445,12 @@ public class Engine extends JexlEngine {
             if (ctor != null) {
                 result = ctor.invoke(clazz, args);
             } else {
-                xjexl = new JexlException.Method(info, clazz.toString(), null);
+                xjexl = new JexlException.Method(info, clazz.toString(), args);
             }
         } catch (JexlException xany) {
             xjexl = xany;
         } catch (Exception xany) {
-            xjexl = new JexlException.Method(info, clazz.toString(), xany);
+            xjexl = new JexlException.Method(info, clazz.toString(), args, xany);
         }
         if (xjexl != null) {
             if (silent) {
