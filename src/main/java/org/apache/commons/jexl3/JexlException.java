@@ -97,7 +97,7 @@ public class JexlException extends RuntimeException {
     public JexlInfo getInfo() {
         return getInfo(mark, info);
     }
-
+    
     /**
      * Creates a string builder pre-filled with common error information (if possible).
      *
@@ -176,13 +176,12 @@ public class JexlException extends RuntimeException {
      * @return the cause
      */
     private static Throwable unwrap(Throwable xthrow) {
-        if (xthrow instanceof InvocationTargetException) {
+        if (xthrow instanceof TryFailed
+            || xthrow instanceof InvocationTargetException
+            || xthrow instanceof UndeclaredThrowableException) {
             return xthrow.getCause();
-        } else if (xthrow instanceof UndeclaredThrowableException) {
-            return xthrow.getCause();
-        } else {
-            return xthrow;
         }
+        return xthrow;
     }
 
     /**
@@ -647,33 +646,111 @@ public class JexlException extends RuntimeException {
          *
          * @param node  the offending ASTnode
          * @param name  the method name
+         * @deprecated as of 3.2, use call with method arguments
          */
+        @Deprecated
         public Method(JexlNode node, String name) {
-            super(node, name);
+            this(node, name, null);
         }
-
+         
         /**
          * Creates a new Method exception instance.
          *
          * @param info  the location information
          * @param name  the unknown method
          * @param cause the exception causing the error
+         * @deprecated as of 3.2, use call with method arguments
          */
+        @Deprecated
         public Method(JexlInfo info, String name, Throwable cause) {
-            super(info, name, cause);
+            this(info, name, null, cause);
+        }
+        
+        /**
+         * Creates a new Method exception instance.
+         *
+         * @param node  the offending ASTnode
+         * @param name  the method name
+         * @param args  the method arguments
+         * @since 3.2
+         */
+        public Method(JexlNode node, String name, Object[] args) {
+            super(node, methodSignature(name, args));
+        }
+        
+        /**
+         * Creates a new Method exception instance.
+         *
+         * @param info  the location information
+         * @param name  the method name
+         * @param args  the method arguments
+         * @since 3.2
+         */
+        public Method(JexlInfo info, String name, Object[] args) {
+            this(info, name, args, null);
         }
 
+                
+        /**
+         * Creates a new Method exception instance.
+         *
+         * @param info  the location information
+         * @param name  the method name
+         * @param cause the exception causing the error
+         * @param args  the method arguments
+         * @since 3.2
+         */
+        public Method(JexlInfo info, String name, Object[] args, Throwable cause) {
+            super(info, methodSignature(name, args), cause);
+        }
+        
         /**
          * @return the method name
          */
         public String getMethod() {
+            String signature = getMethodSignature();
+            int lparen = signature.indexOf('(');
+            return lparen > 0? signature.substring(0, lparen) : signature;
+        }  
+        
+        /**
+         * @return the method signature
+         * @since 3.2
+         */
+        public String getMethodSignature() {
             return super.detailedMessage();
         }
 
         @Override
         protected String detailedMessage() {
-            return "unsolvable function/method '" + getMethod() + "'";
+            return "unsolvable function/method '" + getMethodSignature() + "'";
         }
+    }
+
+    /**
+     * Creates a signed-name for a given method name and arguments.
+     * @param name the method name
+     * @param args the method arguments
+     * @return a suitable signed name
+     */
+    private static String methodSignature(String name, Object[] args) {
+        if (args != null && args.length > 0) {
+            StringBuilder strb = new StringBuilder(name);
+            strb.append('(');
+            for (int a = 0; a < args.length; ++a) {
+                if (a > 0) {
+                    strb.append(", ");
+                }
+                Class<?> clazz = args[a] == null ? Object.class : args[a].getClass();
+                strb.append(clazz.getSimpleName());
+                if (clazz.isArray()) {
+                    strb.append("[]");
+                }
+            }
+            strb.append(')');
+            return strb.toString();
+        }
+        return name;
     }
 
     /**
@@ -684,9 +761,21 @@ public class JexlException extends RuntimeException {
      * @return the error message
      */
     public static String methodError(JexlNode node, String method) {
+        return methodError(node, method, null);
+    }
+    
+    /**
+     * Generates a message for a unsolvable method error.
+     *
+     * @param node the node where the error occurred
+     * @param method the method name
+     * @param args the method arguments
+     * @return the error message
+     */
+    public static String methodError(JexlNode node, String method, Object[] args) {
         StringBuilder msg = errorAt(node);
         msg.append("unsolvable function/method '");
-        msg.append(method);
+        msg.append(methodSignature(method, args));
         msg.append('\'');
         return msg.toString();
     }
@@ -860,6 +949,32 @@ public class JexlException extends RuntimeException {
         }
     }
 
+    /**
+     * Thrown when method/ctor invocation fails.
+     * <p>These wrap InvocationTargetException as runtime exception
+     * allowing to go through without signature modifications.
+     * @since 3.2
+     */
+    public static class TryFailed extends JexlException {
+        /**
+         * Creates a new instance.
+         * @param xany the original invocation target exception
+         */
+        private TryFailed(InvocationTargetException xany) {
+            super((JexlInfo) null, "tryFailed", xany.getCause());
+        }
+    }
+    
+    /**
+     * Wrap an invocation exception.
+     * <p>Return the cause if it is already a JexlException.
+     * @param xinvoke the invocation exception
+     * @return a JexlException
+     */
+    public static RuntimeException tryFailed(InvocationTargetException xinvoke) {
+        return new JexlException.TryFailed(xinvoke); // fail
+    }
+    
     /**
      * Detailed info message about this error.
      * Format is "debug![begin,end]: string \n msg" where:

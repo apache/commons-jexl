@@ -123,8 +123,6 @@ import java.util.concurrent.Callable;
 public class Interpreter extends InterpreterBase {
     /** The operators evaluation delegate. */
     protected final Operators operators;
-    /** Cache executors. */
-    protected final boolean cache;
     /** Frame height. */
     protected int fp = 0;
     /** Symbol values. */
@@ -151,7 +149,6 @@ public class Interpreter extends InterpreterBase {
     protected Interpreter(Engine engine, JexlContext aContext, Scope.Frame eFrame) {
         super(engine, aContext);
         this.operators = new Operators(this);
-        this.cache = jexl.cache != null;
         this.frame = eFrame;
         if (this.context instanceof JexlContext.NamespaceResolver) {
             ns = ((JexlContext.NamespaceResolver) context);
@@ -170,7 +167,6 @@ public class Interpreter extends InterpreterBase {
     protected Interpreter(Interpreter ii, JexlArithmetic jexla) {
         super(ii, jexla);
         operators = ii.operators;
-        cache = ii.cache;
         frame = ii.frame;
         ns = ii.ns;
         functions = ii.functions;
@@ -1078,28 +1074,6 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
-     * Checks whether a reference child node holds a local variable reference.
-     * @param node  the reference node
-     * @param which the child we are checking
-     * @return true if child is local variable, false otherwise
-     */
-    protected boolean isLocalVariable(ASTReference node, int which) {
-        return (node.jjtGetNumChildren() > which
-                && node.jjtGetChild(which) instanceof ASTIdentifier
-                && ((ASTIdentifier) node.jjtGetChild(which)).getSymbol() >= 0);
-    }
-    
-    /**
-     * Checks whether a reference child node holds a function call.
-     * @param node  the reference node
-     * @return true if child is function call, false otherwise
-     */
-    protected boolean isFunctionCall(ASTReference node) {
-        return (node.jjtGetNumChildren() > 0
-                && node.jjtGetChild(0) instanceof ASTFunctionNode);
-    }
-    
-    /**
      * Evaluates an access identifier based on the 2 main implementations;
      * static (name or numbered identifier) or dynamic (jxlt).
      * @param node the identifier access node
@@ -1679,7 +1653,7 @@ public class Interpreter extends InterpreterBase {
                 // attempt to narrow the parameters and if this succeeds, try again in next loop
                 if (!narrow && arithmetic.narrowArguments(argv)) {
                     narrow = true;
-                    continue;
+                    // continue;
                 } else {
                     break;
                 }
@@ -1687,7 +1661,9 @@ public class Interpreter extends InterpreterBase {
             // we have either evaluated and returned or no method was found
             return node.isSafeLhs(jexl.safe)
                     ? null
-                    : unsolvableMethod(node, methodName);
+                    : unsolvableMethod(node, methodName, argv);
+        } catch (JexlException.TryFailed xany) {
+            throw invocationException(node, methodName, xany.getCause());
         } catch (JexlException xthru) {
             throw xthru;
         } catch (Exception xany) {
@@ -1762,7 +1738,7 @@ public class Interpreter extends InterpreterBase {
                 return eval;
             }
             String tstr = target != null ? target.toString() : "?";
-            return unsolvableMethod(node, tstr);
+            return unsolvableMethod(node, tstr, argv);
         } catch (JexlException.Method xmethod) {
             throw xmethod;
         } catch (Exception xany) {

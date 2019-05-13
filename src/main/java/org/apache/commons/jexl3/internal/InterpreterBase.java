@@ -50,6 +50,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected final JexlArithmetic arithmetic;
     /** The context to store/retrieve variables. */
     protected final JexlContext context;
+    /** Cache executors. */
+    protected final boolean cache;
     /** Cancellation support. */
     protected volatile boolean cancelled = false;
     /** Empty parameters for method matching. */
@@ -65,6 +67,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         this.logger = jexl.logger;
         this.uberspect = jexl.uberspect;
         this.context = aContext != null ? aContext : Engine.EMPTY_CONTEXT;
+        this.cache = engine.cache != null;
         JexlArithmetic jexla = jexl.arithmetic;
         this.arithmetic = jexla.options(context);
         if (arithmetic != jexla && !arithmetic.getClass().equals(jexla.getClass())) {
@@ -85,6 +88,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         uberspect = ii.uberspect;
         context = ii.context;
         arithmetic = ii.arithmetic;
+        cache = ii.cache;
     }
 
 
@@ -219,10 +223,21 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @return throws JexlException if strict and not silent, null otherwise
      */
     protected Object unsolvableMethod(JexlNode node, String method) {
+        return unsolvableMethod(node, method, null);
+    }
+   
+    /**
+     * Triggered when a method can not be resolved.
+     * @param node   the node where the error originated from
+     * @param method the method name
+     * @param args the method arguments
+     * @return throws JexlException if strict and not silent, null otherwise
+     */
+    protected Object unsolvableMethod(JexlNode node, String method, Object[] args) {
         if (isStrictEngine()) {
-            throw new JexlException.Method(node, method);
+            throw new JexlException.Method(node, method, args);
         } else if (logger.isDebugEnabled()) {
-            logger.debug(JexlException.methodError(node, method));
+            logger.debug(JexlException.methodError(node, method, args));
         }
         return null;
     }
@@ -242,6 +257,28 @@ public abstract class InterpreterBase extends ParserVisitor {
             logger.debug(JexlException.propertyError(node, property, undef));
         }
         return null;
+    }
+    
+    /**
+     * Checks whether a reference child node holds a local variable reference.
+     * @param node  the reference node
+     * @param which the child we are checking
+     * @return true if child is local variable, false otherwise
+     */
+    protected boolean isLocalVariable(ASTReference node, int which) {
+        return (node.jjtGetNumChildren() > which
+                && node.jjtGetChild(which) instanceof ASTIdentifier
+                && ((ASTIdentifier) node.jjtGetChild(which)).getSymbol() >= 0);
+    }
+    
+    /**
+     * Checks whether a reference child node holds a function call.
+     * @param node  the reference node
+     * @return true if child is function call, false otherwise
+     */
+    protected boolean isFunctionCall(ASTReference node) {
+        return (node.jjtGetNumChildren() > 0
+                && node.jjtGetChild(0) instanceof ASTFunctionNode);
     }
     
     /**
@@ -320,7 +357,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param xany       the cause
      * @return a JexlException that will be thrown
      */
-    protected JexlException invocationException(JexlNode node, String methodName, Exception xany) {
+    protected JexlException invocationException(JexlNode node, String methodName, Throwable xany) {
         Throwable cause = xany.getCause();
         if (cause instanceof JexlException) {
             return (JexlException) cause;
@@ -653,8 +690,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                 }
                 return eval;
             }
-            return unsolvableMethod(node, mname);
+            return unsolvableMethod(node, mname, argv);
         }
     }
-
 }
