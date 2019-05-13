@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-299" due-to="Jarek Cecho">
+                Improve message error when method could not be found
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-296" due-to="Dmitri Blinov">
                 Real literal in scientific format is not parsed without suffix
             </action>
@@ -95,7 +98,10 @@
             <action dev="henrib" type="add" issue="JEXL-261">
                 JexlEngine.setClassLoader(...) should reload namespaces that are classes
             </action>
-            <action dev="henrib" type="add" issue="JEXL-260">
+            <action dev="henrib" type="fix" issue="JEXL-257" due-to="Dmitri Blinov">
+                Function throwing IllegalArgumentException may be called twice
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-260" due-to="Dmitri Blinov">
                 Automatically inject JexlContext in constructor call when possible
             </action>
             <action dev="henrib" type="add" issue="JEXL-252" due-to="Dmitri Blinov">
