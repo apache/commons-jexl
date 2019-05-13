@@ -1426,7 +1426,12 @@ void ArrayOpenDimension() : {}
 
 void InitializedArrayConstructor() #InitializedArrayConstructorNode() : {}
 {
-    ArrayTypeReference() <LBRACKET> <RBRACKET> <LCURLY> [ Expression() ( <COMMA> Expression() )* ] <RCURLY>
+    ArrayTypeReference() <LBRACKET> <RBRACKET> InitializedArrayLiteral()
+}
+
+void InitializedArrayLiteral() #void() : {}
+{
+    <LCURLY> [ Expression() ( <COMMA> Expression() )* ] <RCURLY>
 }
 
 void Parameter() #void :
