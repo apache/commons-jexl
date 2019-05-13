@@ -18,10 +18,13 @@ package org.apache.commons.jexl3;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.junit.Asserter;
 import java.util.Arrays;
 import java.util.Date;
+import org.apache.commons.jexl3.introspection.JexlMethod;
+import org.apache.commons.jexl3.introspection.JexlPropertyGet;
+import org.apache.commons.jexl3.introspection.JexlPropertySet;
+import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -173,6 +176,13 @@ public class MethodTest extends JexlTestCase {
     }
 
     public static class Functor {
+        private boolean overKill = false;
+        private String under = null;
+        
+        void setKill(boolean ok) {
+            overKill = ok;
+        }
+        
         public int ten() {
             return 10;
         }
@@ -194,6 +204,9 @@ public class MethodTest extends JexlTestCase {
         }
 
         public Object over(String f, int i) {
+            if (overKill) {
+                throw new UnsupportedOperationException("kill " + f + " + " + i);
+            }
             return f + " + " + i;
         }
 
@@ -203,6 +216,20 @@ public class MethodTest extends JexlTestCase {
 
         public Object over(String f, String g) {
             return f + " + " + g;
+        }
+
+        public void setUnder(String str) {
+            if (overKill) {
+                throw new UnsupportedOperationException("kill " + str);
+            }
+            under = str;
+        }
+
+        public String getUnder() {
+            if (overKill) {
+                throw new UnsupportedOperationException("kill " + under);
+            }
+            return under;
         }
     }
 
@@ -255,6 +282,150 @@ public class MethodTest extends JexlTestCase {
         } catch (Exception xj0) {
             Assert.fail("method should not have thrown!");
         }
+    }
+    
+    @Test
+    public void testAmbiguousInvoke() throws Exception {
+        // JEXL-299
+        Functor func = new Functor();
+        JexlContext ctxt = new MapContext();
+        ctxt.set("func", func);
+        Object result;
+        // basic call works
+        result = JEXL.invokeMethod(func, "over", "foo", 42);
+        Assert.assertEquals("foo + 42", result);
+        // ambiguous call fails
+        try {
+            JEXL.invokeMethod(func, "over", "not null", null);
+            Assert.fail("should be ambiguous");
+        } catch (JexlException.Method xinvoke) {
+            Assert.assertEquals("over(String, Object)", xinvoke.getMethodSignature());
+        }
+
+        // another ambiguous call fails
+        try {
+            String[] arg2 = new String[]{"more", "than", "one"};
+            JEXL.invokeMethod(func, "over", "not null", arg2);
+            Assert.fail("should be ambiguous");
+        } catch (JexlException.Method xinvoke) {
+            Assert.assertEquals("over(String, String[])", xinvoke.getMethodSignature());
+        }
+    }
+
+    @Test
+    public void testTryFailed() throws Exception {
+        // JEXL-257
+        Functor func = new Functor();
+        JexlContext ctxt = new MapContext();
+        ctxt.set("func", func);
+        Object result;
+        JexlUberspect uber = JEXL.getUberspect();
+        // tryInvoke 
+        JexlMethod method = uber.getMethod(func, "over", "foo", 42);
+        Assert.assertNotNull(method);
+        // tryInvoke succeeds 
+        result = method.tryInvoke("over", func, "foo", 42);
+        Assert.assertEquals("foo + 42", result);
+        // tryInvoke fails 
+        func.setKill(true);
+        try {
+            /*result = */method.tryInvoke("over", func, "foo", 42);
+            Assert.fail("should throw TryFailed");
+        } catch (JexlException.TryFailed xfail) {
+            Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+        }
+
+        func.setKill(false);
+        JexlPropertySet setter = uber.getPropertySet(func, "under", "42");
+        result = setter.tryInvoke(func, "under", "42");
+        Assert.assertFalse(setter.tryFailed(result));
+        Assert.assertEquals("42", result);
+
+        JexlPropertyGet getter = uber.getPropertyGet(func, "under");
+        result = getter.tryInvoke(func, "under");
+        Assert.assertFalse(getter.tryFailed(result));
+        Assert.assertEquals("42", result);
+
+        func.setKill(true);
+        try {
+            /*result = */setter.tryInvoke(func, "under", "42");
+            Assert.fail("should throw TryFailed");
+        } catch (JexlException.TryFailed xfail) {
+            Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+        }
+        func.setKill(false);
+        result = setter.tryInvoke(func, "under", "-42");
+        Assert.assertEquals("-42", result);
+
+        func.setKill(true);
+        try {
+            /*result = */getter.tryInvoke(func, "under");
+            Assert.fail("should throw TryFailed");
+        } catch (JexlException.TryFailed xfail) {
+            Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+        }
+
+        func.setKill(false);
+        result = getter.tryInvoke(func, "under");
+        Assert.assertFalse(getter.tryFailed(result));
+        Assert.assertEquals("-42", result);
+    }
+    
+    @Test
+    public void testTryFailedScript() throws Exception {
+        // JEXL-257
+        Functor func = new Functor();
+        JexlContext ctxt = new MapContext();
+        ctxt.set("func", func);
+        Object result;
+        JexlUberspect uber = JEXL.getUberspect();
+        JexlScript method = JEXL.createScript("(x, y)->{ func.over(x, y) }");
+        // tryInvoke 
+        //JexlMethod method = uber.getMethod(func, "over", "foo", 42);
+        Assert.assertNotNull(method);
+        // tryInvoke succeeds 
+        result = method.execute(ctxt, "foo", 42);
+        Assert.assertEquals("foo + 42", result);
+        // tryInvoke fails 
+        func.setKill(true);
+        try {
+            /*result = */method.execute(ctxt, "foo", 42);
+            Assert.fail("should throw TryFailed");
+        } catch (JexlException xfail) {
+            Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+        }
+
+        func.setKill(false);
+        JexlScript setter = JEXL.createScript("(x)->{ func.under = x }");
+        //JexlPropertySet setter = uber.getPropertySet(func, "under", "42");
+        result = setter.execute(ctxt, "42");
+        Assert.assertEquals("42", result);
+
+        JexlScript getter = JEXL.createScript("func.under");
+        Assert.assertEquals("42", result);
+
+        func.setKill(true);
+        try {
+            /*result = */setter.execute(ctxt, "42");
+            Assert.fail("should throw TryFailed");
+        } catch (JexlException xfail) {
+            Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+        }
+        func.setKill(false);
+        result = setter.execute(ctxt, "-42");
+        Assert.assertEquals("-42", result);
+
+        func.setKill(true);
+        try {
+            /*result = */getter.execute(ctxt);
+            Assert.fail("should throw TryFailed");
+        } catch (JexlException xfail) {
+            Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
+        }
+
+        func.setKill(false);
+        result = getter.execute(ctxt);
+        Assert.assertEquals("-42", result);
     }
 
     /**
