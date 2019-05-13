@@ -93,6 +93,8 @@ New features
 
 + Groovy-like `!instanceof` operator is introduced
 
++ Groovy-like `?=` conditional assignemtn operator is introduced
+
 + Java-like `::` method reference operator is introduced
 
 + Java-like `switch` expression operator is introduced
