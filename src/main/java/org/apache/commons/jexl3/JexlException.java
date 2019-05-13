@@ -743,9 +743,6 @@ public class JexlException extends RuntimeException {
                 }
                 Class<?> clazz = args[a] == null ? Object.class : args[a].getClass();
                 strb.append(clazz.getSimpleName());
-                if (clazz.isArray()) {
-                    strb.append("[]");
-                }
             }
             strb.append(')');
             return strb.toString();
