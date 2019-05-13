@@ -237,6 +237,7 @@ TOKEN_MGR_DECLS : {
     | < sar_assign : ">>=" >
     | < shr_assign : ">>>=" >
 
+    | < null_assign : "?=" >
     | < assign : "=" >
     | < increment : "++" >
     | < decrement : "--" >
@@ -745,6 +746,8 @@ void AssignmentExpression() #void : {}
     <sar_assign> Expression() #SetSarNode(2)
     |
     <shr_assign> Expression() #SetShrNode(2)
+    |
+    <null_assign> Expression() #NullAssignment(2)
     |
     <assign> Expression() #Assignment(2)
   ) )*

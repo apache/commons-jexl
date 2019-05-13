@@ -102,6 +102,7 @@ import org.apache.commons.jexl3.parser.ASTNIOFNode;
 import org.apache.commons.jexl3.parser.ASTNRNode;
 import org.apache.commons.jexl3.parser.ASTNSWNode;
 import org.apache.commons.jexl3.parser.ASTNotNode;
+import org.apache.commons.jexl3.parser.ASTNullAssignment;
 import org.apache.commons.jexl3.parser.ASTNullLiteral;
 import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTOrNode;
@@ -617,6 +618,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
+    protected Object visit(ASTNullAssignment node, Object data) {
+        return infixChildren(node, " ?= ", false, data);
+    }
+
+    @Override
     protected Object visit(ASTInitialization node, Object data) {
         return infixChildren(node, " = ", false, data);
     }
@@ -1070,7 +1076,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
             JexlNode parent = node.jjtGetParent();
             // use lambda syntax if not assigned
-            boolean named = parent instanceof ASTAssignment && !expr;
+            boolean named = (parent instanceof ASTAssignment || parent instanceof ASTNullAssignment) && !expr;
             if (named) {
                 builder.append("function");
             }

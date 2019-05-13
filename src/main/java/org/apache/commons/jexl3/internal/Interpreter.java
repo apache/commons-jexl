@@ -113,6 +113,7 @@ import org.apache.commons.jexl3.parser.ASTNIOFNode;
 import org.apache.commons.jexl3.parser.ASTNRNode;
 import org.apache.commons.jexl3.parser.ASTNSWNode;
 import org.apache.commons.jexl3.parser.ASTNotNode;
+import org.apache.commons.jexl3.parser.ASTNullAssignment;
 import org.apache.commons.jexl3.parser.ASTNullLiteral;
 import org.apache.commons.jexl3.parser.ASTNullpNode;
 import org.apache.commons.jexl3.parser.ASTNumberLiteral;
@@ -2564,6 +2565,17 @@ public class Interpreter extends InterpreterBase {
         JexlNode left = node.jjtGetChild(0);
         Object right = node.jjtGetChild(1).jjtAccept(this, data);
         return executeAssign(node, left, right, null, data);
+    }
+
+    @Override
+    protected Object visit(ASTNullAssignment node, Object data) {
+        JexlNode left = node.jjtGetChild(0);
+        Object value = left.jjtAccept(this, data);
+        if (value == null) {
+           Object right = node.jjtGetChild(1).jjtAccept(this, data);
+           return executeAssign(node, left, right, null, data);
+        }
+        return value;
     }
 
     @Override

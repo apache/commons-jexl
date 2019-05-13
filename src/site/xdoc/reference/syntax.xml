@@ -192,9 +192,18 @@
                 <tr>
                     <td>Assignment</td>
                     <td>
-                        Assigns the value of a variable  (<code>my.var = 'a value'</code>) using a
+                        Assigns the value to a variable, context variable or property (<code>my.var = 'a value'</code>) using a
                         <code>JexlContext</code> as initial resolver. Both <em>beans</em> and <em>ant-ish</em>
                         variables assignment are supported.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Conditional assignment</td>
+                    <td>
+                        Assigns the value to a variable, context variable or property (<code>my.var ?= 'a value'</code>) if a 
+                        variable or a property is null, e.g. 
+                        <code>city ?= foo</code> and <code>if (city == null) city = foo</code> are equivalent.
+                        Both <em>beans</em> and <em>ant-ish</em> variables assignment are supported.
                     </td>
                 </tr>
                 <tr>
