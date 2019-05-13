@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.InvocationTargetException;
+import org.apache.commons.jexl3.JexlException;
 
 /**
  * Specialized executor to get a property from an object.
@@ -70,21 +71,21 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
     @Override
     public Object tryInvoke(Object obj, Object key) {
         if (obj != null
-            && objectClass.equals(obj.getClass())
-            // ensure method name matches the property name
-            && method != null
-            && ((property == null && key == null)
-                 || (property != null && property.equals(key)))) {
+                && objectClass.equals(obj.getClass())
+                // ensure method name matches the property name
+                && method != null
+                && ((property == null && key == null)
+                || (property != null && property.equals(key)))) {
             try {
                 Object[] args = {property};
                 return method.invoke(obj, args);
-            } catch (InvocationTargetException xinvoke) {
-                return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
                 return TRY_FAILED;// fail
             } catch (IllegalArgumentException xarg) {
                 return TRY_FAILED;// fail
-            }
+            } catch (InvocationTargetException xinvoke) {
+                throw JexlException.tryFailed(xinvoke); // throw
+            }  
         }
         return TRY_FAILED;
     }

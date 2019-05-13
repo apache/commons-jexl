@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import org.apache.commons.jexl3.JexlException;
 
 /**
  * Specialized executor to set a property in an object.
@@ -79,8 +80,8 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
                     arg = Array.newInstance(componentType, 0);
                 }
             }
-            method.invoke(o, arg);
-        }
+                method.invoke(o, arg);
+            } 
         return arg;
     }
 
@@ -95,13 +96,13 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
             && valueClass.equals(classOf(value))) {
             try {
                 return invoke(o, value);
-            } catch (InvocationTargetException xinvoke) {
-                return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
                 return TRY_FAILED;// fail
             } catch (IllegalArgumentException xarg) {
                 return TRY_FAILED;// fail
-            }
+            } catch (InvocationTargetException xinvoke) {
+                throw JexlException.tryFailed(xinvoke); // throw
+            } 
         }
         return TRY_FAILED;
     }

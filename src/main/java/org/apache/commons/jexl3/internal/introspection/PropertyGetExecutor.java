@@ -17,6 +17,7 @@
 
 package org.apache.commons.jexl3.internal.introspection;
 import java.lang.reflect.InvocationTargetException;
+import org.apache.commons.jexl3.JexlException;
 
 /**
  * Specialized executor to get a property from an object.
@@ -59,25 +60,24 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
     }
 
     @Override
-    public Object invoke(Object o)
-        throws IllegalAccessException, InvocationTargetException {
+    public Object invoke(Object o) throws IllegalAccessException, InvocationTargetException {
         return method == null ? null : method.invoke(o, (Object[]) null);
     }
 
     @Override
     public Object tryInvoke(Object o, Object identifier) {
-        if (o != null && method !=  null
+        if (o != null && method != null
             && property.equals(castString(identifier))
             && objectClass.equals(o.getClass())) {
             try {
                 return method.invoke(o, (Object[]) null);
-            } catch (InvocationTargetException xinvoke) {
-                return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
                 return TRY_FAILED;// fail
             } catch (IllegalArgumentException xarg) {
                 return TRY_FAILED;// fail
-            }
+            } catch (InvocationTargetException xinvoke) {
+                throw JexlException.tryFailed(xinvoke); // throw
+            } 
         }
         return TRY_FAILED;
     }
