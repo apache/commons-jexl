@@ -276,7 +276,7 @@ public final class JexlSandbox {
         }
     };
 
-    /*
+    /**
      * The block-all name set.
      */
     private static final Names BLACK_NAMES = new Names() {
@@ -328,11 +328,7 @@ public final class JexlSandbox {
 
         @Override
         public String get(String name) {
-            if (names == null) {
-                return name;
-            } else {
-                return names.get(name);
-            }
+            return names == null ? name : names.get(name);
         }
     }
 
@@ -380,12 +376,14 @@ public final class JexlSandbox {
         /**
          * Creates a new permissions instance.
          *
+         * @param inherit whether these permissions are inheritable
          * @param readFlag whether the read property list is white or black
          * @param writeFlag whether the write property list is white or black
          * @param executeFlag whether the method list is white of black
          */
-        Permissions(boolean readFlag, boolean writeFlag, boolean executeFlag) {
-            this(readFlag ? new WhiteSet() : new BlackSet(),
+        Permissions(boolean inherit, boolean readFlag, boolean writeFlag, boolean executeFlag) {
+            this(inherit,
+                    readFlag ? new WhiteSet() : new BlackSet(),
                     writeFlag ? new WhiteSet() : new BlackSet(),
                     executeFlag ? new WhiteSet() : new BlackSet());
         }
@@ -393,27 +391,27 @@ public final class JexlSandbox {
         /**
          * Creates a new permissions instance.
          *
+         * @param inherit whether these permissions are inheritable
          * @param nread the read set
          * @param nwrite the write set
          * @param nexecute the method set
          */
-        Permissions(Names nread, Names nwrite, Names nexecute) {
+        Permissions(boolean inherit, Names nread, Names nwrite, Names nexecute) {
             this.read = nread != null ? nread : WHITE_NAMES;
             this.write = nwrite != null ? nwrite : WHITE_NAMES;
             this.execute = nexecute != null ? nexecute : WHITE_NAMES;
-            this.inheritable = false;
+            this.inheritable = inherit;
         }
 
         /**
          * @return a copy of these permissions
          */
         Permissions copy() {
-            return new Permissions(read.copy(), write.copy(), execute.copy());
+            return new Permissions(inheritable, read.copy(), write.copy(), execute.copy());
         }
 
         /**
-         * Whether this permission applies to derived classes.
-         * @return true
+         * @return whether these permissions applies to derived classes.
          */
         public boolean isInheritable() {
             return inheritable;
@@ -490,14 +488,15 @@ public final class JexlSandbox {
     /**
      * The pass-thru permissions.
      */
-    private static final Permissions ALL_WHITE = new Permissions(WHITE_NAMES, WHITE_NAMES, WHITE_NAMES);
+    private static final Permissions ALL_WHITE = new Permissions(false, WHITE_NAMES, WHITE_NAMES, WHITE_NAMES);
     /**
      * The block-all permissions.
      */
-    private static final Permissions ALL_BLACK = new Permissions(BLACK_NAMES, BLACK_NAMES, BLACK_NAMES);
+    private static final Permissions ALL_BLACK = new Permissions(false, BLACK_NAMES, BLACK_NAMES, BLACK_NAMES);
 
     /**
      * Creates the set of permissions for a given class.
+     * <p>The sandbox inheritance property will apply to the permissions created by this method
      *
      * @param clazz the class for which these permissions apply
      * @param readFlag whether the readable property list is white - true - or black - false -
@@ -506,14 +505,29 @@ public final class JexlSandbox {
      * @return the set of permissions
      */
     public Permissions permissions(String clazz, boolean readFlag, boolean writeFlag, boolean executeFlag) {
-        Permissions box = new Permissions(readFlag, writeFlag, executeFlag);
+        return permissions(clazz, inherit, readFlag, writeFlag, executeFlag);
+    }
+        
+    /**
+     * Creates the set of permissions for a given class.
+     *
+     * @param clazz the class for which these permissions apply
+     * @param inhf whether these permissions are inheritable
+     * @param readf whether the readable property list is white - true - or black - false -
+     * @param writef whether the writable property list is white - true - or black - false -
+     * @param execf whether the executable method list is white white - true - or black - false -
+     * @return the set of permissions
+     */
+    public Permissions permissions(String clazz, boolean inhf,  boolean readf, boolean writef, boolean execf) {
+        Permissions box = new Permissions(inhf, readf, writef, execf);
         sandbox.put(clazz, box);
         return box;
     }
 
     /**
      * Creates a new set of permissions based on white lists for methods and properties for a given class.
-     *
+     * <p>The sandbox inheritance property will apply to the permissions created by this method
+     * 
      * @param clazz the whitened class name
      * @return the permissions instance
      */
@@ -523,6 +537,7 @@ public final class JexlSandbox {
 
     /**
      * Creates a new set of permissions based on black lists for methods and properties for a given class.
+     * <p>The sandbox inheritance property will apply to the permissions created by this method
      *
      * @param clazz the blackened class name
      * @return the permissions instance
