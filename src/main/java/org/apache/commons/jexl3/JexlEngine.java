@@ -358,7 +358,7 @@ public abstract class JexlEngine {
      * @throws JexlException if there is a problem parsing the script
      */
     public final JexlScript createScript(JexlInfo info, String source, String[] names) {
-        return createScript(null, null, source, names);
+        return createScript(null, info, source, names);
     }
 
     /**

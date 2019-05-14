@@ -42,6 +42,15 @@ public class TemplateDebugger extends Debugger {
     private TemplateExpression[] exprs;
 
     /**
+     * Line states.
+     */
+    enum Type {
+        START,
+        TMPL_LINE,
+        EXPR_LINE
+    }
+
+    /**
      * Default ctor.
      */
     public TemplateDebugger() {
@@ -86,9 +95,11 @@ public class TemplateDebugger extends Debugger {
             builder.setLength(0);
             cause = script;
             int num = script.jjtGetNumChildren();
+            Type last = Type.START;
             for (int i = 0; i < num; ++i) {
                 JexlNode child = script.jjtGetChild(i);
-                acceptStatement(child, null);
+                //acceptStatement(child, null);
+                last = debugStatement(child, last);
             }
             if (builder.length() > 0 && builder.charAt(builder.length() - 1) != '\n') {
                 builder.append('\n');
@@ -149,6 +160,34 @@ public class TemplateDebugger extends Debugger {
             newJexlLine();
         }
         return super.acceptStatement(child, data);
+    }
+
+    /**
+     * Recreate a statement from an expression node.
+     * @param child the template expression
+     * @param lastSeen the state before this child node 
+     * @return the new state after the child node
+     */
+    private Type debugStatement(JexlNode child, Type lastSeen) {
+        // if not really a template, use super impl
+        Type t = Type.EXPR_LINE;
+        if (exprs != null) {
+            int printe = getPrintStatement(child);
+            if (printe >= 0) {
+                if (Type.TMPL_LINE == lastSeen && (builder.charAt(builder.length() - 1) != '\n')) {
+                    builder.append('\n');
+                }
+                // statement is an expr
+                TemplateExpression te = exprs[printe];
+                visit(te, null);
+                return t;
+            }
+            // if statement is not a jexl:print(...), need to prepend '$$'
+            newJexlLine();
+            t = Type.TMPL_LINE;
+        }
+        super.acceptStatement(child, null);
+        return t;
     }
 
     /**
