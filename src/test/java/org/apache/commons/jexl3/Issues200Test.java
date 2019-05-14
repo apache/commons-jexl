@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,6 +33,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.apache.commons.jexl3.internal.TemplateDebugger;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.logging.Log;
 import org.junit.Assert;
@@ -923,4 +925,28 @@ public class Issues200Test extends JexlTestCase {
         value = e.evaluate(ctxt);
         Assert.assertEquals("one", value);
     }
+        
+    @Test
+    public void testTemplate6565a() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JxltEngine jexlt = jexl.createJxltEngine();
+        String source =
+            "$$ var res = '';\n" +
+            "$$ var meta = session.data['METADATA'];\n" +
+            "$$ if (meta) {\n" +
+            "$$   var entry = meta['ID'];\n" +
+            "$$   if (entry) {\n" +
+            "$$     var value = session.data[entry];\n" +
+            "$$     res = value?: '';\n" +
+            "$$   }\n" +
+            "$$ }\n" +
+            "${res}\n";
+        JxltEngine.Template script = jexlt.createTemplate("$$", new StringReader(source));
+        Assert.assertNotNull(script);
+        TemplateDebugger dbg = new TemplateDebugger();
+        String refactored = dbg.debug(script) ? dbg.toString() : "";
+        Assert.assertNotNull(refactored);
+        Assert.assertEquals(source, refactored);
+    }
+
 }
