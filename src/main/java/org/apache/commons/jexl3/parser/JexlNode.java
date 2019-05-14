@@ -271,6 +271,9 @@ public abstract class JexlNode extends SimpleNode {
             if (walk instanceof ASTNullpNode) {
                 return true;
             }
+            if (walk instanceof ASTNullAssignment) {
+                return true;
+            }
             if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {
                 break;
             }

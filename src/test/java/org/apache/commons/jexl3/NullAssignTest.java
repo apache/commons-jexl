@@ -95,6 +95,16 @@ public class NullAssignTest extends JexlTestCase {
     }
 
     @Test
+    public void testStrict() throws Exception {
+        JexlEngine jexl = new JexlBuilder().cache(512).strict(true).silent(false).create();
+        JexlScript assign = jexl.createScript("froboz.value ?= 10");
+        JexlContext jc = new MapContext();
+        Object o = assign.execute(jc);
+        Assert.assertEquals("Result is not 10", 10, o);
+        Assert.assertEquals("Result is not 10", 10, jc.get("froboz.value"));
+    }
+
+    @Test
     public void testBean() throws Exception {
         JexlScript assign = JEXL.createScript("froboz.value ?= 10");
         JexlContext jc = new MapContext();
