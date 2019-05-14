@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal.introspection;
 
 import java.lang.reflect.InvocationTargetException;
+import org.apache.commons.jexl3.JexlException;
 
 /**
  * Specialized executor to set a property of an object.
@@ -94,12 +95,12 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
                 Object[] args = {property, value};
                 method.invoke(obj, args);
                 return value;
-            } catch (InvocationTargetException xinvoke) {
-                return TRY_FAILED; // fail
             } catch (IllegalAccessException xill) {
                 return TRY_FAILED;// fail
             } catch (IllegalArgumentException xarg) {
                 return TRY_FAILED;// fail
+            } catch (InvocationTargetException xinvoke) {
+                throw JexlException.tryFailed(xinvoke); // throw
             }
         }
         return TRY_FAILED;

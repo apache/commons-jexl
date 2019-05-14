@@ -17,7 +17,6 @@
 
 package org.apache.commons.jexl3.internal.introspection;
 import java.util.Map;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Specialized executor to set a property in a Map.
@@ -67,7 +66,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     }
 
     @Override
-    public Object invoke(final Object obj, Object value) throws IllegalAccessException, InvocationTargetException {
+    public Object invoke(final Object obj, Object value) {
         @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
         final Map<Object,Object> map = ((Map<Object, Object>) obj);
         map.put(property, value);

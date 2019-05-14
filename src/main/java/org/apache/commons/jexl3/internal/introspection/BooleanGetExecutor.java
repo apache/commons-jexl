@@ -18,43 +18,42 @@
 package org.apache.commons.jexl3.internal.introspection;
 import java.lang.reflect.InvocationTargetException;
 import org.apache.commons.jexl3.JexlException;
-
 /**
- * Specialized executor to get a property from an object.
+ * Specialized executor to get a boolean property from an object.
  * @since 2.0
  */
-public final class PropertyGetExecutor extends AbstractExecutor.Get {
-    /** A static signature for method(). */
-    private static final Object[] EMPTY_PARAMS = {};
+public final class BooleanGetExecutor extends AbstractExecutor.Get {
     /** The property. */
     private final String property;
 
     /**
-     * Discovers a PropertyGetExecutor.
-     * <p>The method to be found should be named "get{P,p}property.</p>
+     * Discovers a BooleanGetExecutor.
+     * <p>The method to be found should be named "is{P,p}property and return a boolean.</p>
      *
      * @param is the introspector
      * @param clazz the class to find the get method from
-     * @param property the property name to find
+     * @param property the the property name
      * @return the executor if found, null otherwise
      */
-    public static PropertyGetExecutor discover(Introspector is, Class<?> clazz, String property) {
-        if (property == null || property.isEmpty()) {
-            return null;
+    public static BooleanGetExecutor discover(Introspector is, final Class<?> clazz, String property) {
+        if (property != null && !property.isEmpty()) {
+            java.lang.reflect.Method m = PropertyGetExecutor.discoverGet(is, "is", clazz, property);
+            if (m != null && (m.getReturnType() == Boolean.TYPE || m.getReturnType() == Boolean.class)) {
+                return new BooleanGetExecutor(clazz, m, property);
+            }
         }
-        java.lang.reflect.Method m = is.getPropertyGet(clazz, property);
-        return m == null ? null : new PropertyGetExecutor(clazz, m, property);
+        return null;
     }
 
     /**
-     * Creates an instance.
-     * @param clazz he class the get method applies to
+     * Creates an instance by attempting discovery of the get method.
+     * @param clazz the class to introspect
      * @param method the method held by this executor
-     * @param identifier the property to get
+     * @param key the property to get
      */
-    private PropertyGetExecutor(Class<?> clazz, java.lang.reflect.Method method, String identifier) {
+    private BooleanGetExecutor(Class<?> clazz, java.lang.reflect.Method method, String key) {
         super(clazz, method);
-        property = identifier;
+        property = key;
     }
 
     @Override
@@ -63,18 +62,19 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
     }
 
     @Override
-    public Object invoke(Object o) throws IllegalAccessException, InvocationTargetException {
-        return method == null ? null : method.invoke(o, (Object[]) null);
+    public Object invoke(Object obj) throws IllegalAccessException, InvocationTargetException {
+        return method == null ? null : method.invoke(obj, (Object[]) null);
     }
 
     @Override
-    public Object tryInvoke(Object o, Object identifier) {
-        if (o != null && objectClass == o.getClass() && property.equals(castString(identifier))) {
+    public Object tryInvoke(Object obj, Object key) {
+        if (obj != null && method !=  null
+            // ensure method name matches the property name
+            && property.equals(key)
+            && objectClass.equals(obj.getClass())) {
             try {
-                return method.invoke(o, (Object[]) null);
+                return method.invoke(obj, (Object[]) null);
             } catch (IllegalAccessException xill) {
-                return TRY_FAILED;// fail
-            } catch (IllegalArgumentException xarg) {
                 return TRY_FAILED;// fail
             } catch (InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw

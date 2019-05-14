@@ -17,6 +17,8 @@
 
 package org.apache.commons.jexl3.introspection;
 
+import org.apache.commons.jexl3.JexlException;
+
 /**
  * Interface used for setting values that appear to be properties.
  * Ex.
@@ -46,8 +48,10 @@ public interface JexlPropertySet {
      * @param value the property value to set
      * @return the result of the method invocation that should be checked by tryFailed to determine if it succeeded
      * or failed.
+     * @throws JexlException.TryFailed if the underlying method was invoked but threw an exception
+     * ({@link java.lang.reflect.InvocationTargetException})
      */
-    Object tryInvoke(Object obj, Object key, Object value);
+    Object tryInvoke(Object obj, Object key, Object value) throws JexlException.TryFailed;
 
     /**
      * Checks whether a tryInvoke failed or not.

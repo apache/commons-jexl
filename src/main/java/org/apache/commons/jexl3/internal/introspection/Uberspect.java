@@ -85,7 +85,7 @@ public class Uberspect implements JexlUberspect {
      * Creates a new Uberspect.
      * @param runtimeLogger the logger used for all logging needs
      * @param sty the resolver strategy
-     * @param permissions the introspector permissions
+     * @param perms the introspector permissions
      */
     public Uberspect(Log runtimeLogger, JexlUberspect.ResolverStrategy sty, Permissions perms) {
         rlog = runtimeLogger;

@@ -19,6 +19,7 @@ package org.apache.commons.jexl3.internal.introspection;
 import org.apache.commons.jexl3.JexlEngine;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import org.apache.commons.jexl3.JexlException;
 
 /**
  * Specialized executor to invoke a method on an object.
@@ -112,7 +113,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
     }
 
     @Override
-    public Object invoke(Object o, Object... args) throws IllegalAccessException, InvocationTargetException  {
+    public Object invoke(Object o, Object... args) throws IllegalAccessException, InvocationTargetException {
         if (vaClass != null) {
             args = handleVarArg(args);
         }
@@ -134,6 +135,8 @@ public final class MethodExecutor extends AbstractExecutor.Method {
                 return TRY_FAILED;// fail
             } catch (IllegalArgumentException xarg) {
                 return TRY_FAILED;// fail
+            } catch (InvocationTargetException xinvoke) {
+                throw JexlException.tryFailed(xinvoke); // throw
             }
         }
         return JexlEngine.TRY_FAILED;

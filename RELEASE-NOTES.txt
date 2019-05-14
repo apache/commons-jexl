@@ -72,6 +72,7 @@ New Features in 3.2:
 Bugs Fixed in 3.2:
 ==================
 
+* JEXL-299:      Improve message error when method could not be found
 * JEXL-296:      Real literal in scientific format is not parsed without suffix
 * JEXL-291:      Using sandbox prevents array-syntax lookup by number in Map
 * JEXL-290:      Safe navigation fails on chained method calls
@@ -88,6 +89,7 @@ Bugs Fixed in 3.2:
 * JEXL-271:      Hoisted variable is lost when currying lambda
 * JEXL-270:      Wrong Script$Curried creation when script.curry() method is called inside script
 * JEXL-261:      JexlEngine.setClassLoader(...) should reload namespaces that are classes
+* JEXL-257:      Function throwing IllegalArgumentException may be called twice
 * JEXL-246:      Intermittent ambiguous method invocation when processing assignOverload
 * JEXL-245:      Engine in strict mode fails to fail on unsolvable variables or properties
 * JEXL-244:      Webapp classloader memory leaks

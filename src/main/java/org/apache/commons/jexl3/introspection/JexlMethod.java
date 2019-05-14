@@ -16,6 +16,7 @@
  */
 
 package org.apache.commons.jexl3.introspection;
+import org.apache.commons.jexl3.JexlException;
 
 /**
  * Interface used for regular method invocation.
@@ -42,19 +43,21 @@ public interface JexlMethod {
      * Attempts to reuse this JexlMethod, checking that it is compatible with
      * the actual set of arguments.
      * Related to isCacheable since this method is often used with cached JexlMethod instances.
-     * 
+     *
      * @param name the method name
      * @param obj the object to invoke the method upon
      * @param params the method arguments
      * @return the result of the method invocation that should be checked by tryFailed to determine if it succeeded
      * or failed.
+     * @throws JexlException.TryFailed if the underlying method was invoked but threw an exception
+     * ({@link java.lang.reflect.InvocationTargetException})
      */
-    Object tryInvoke(String name, Object obj, Object... params) throws Exception;
+    Object tryInvoke(String name, Object obj, Object... params) throws JexlException.TryFailed;
 
     /**
      * Checks whether a tryInvoke return value indicates a failure or not.
      * <p>Usage is : <code>Object r = tryInvoke(...); if (tryFailed(r) {...} else {...}</code>
-     * 
+     *
      * @param rval the value returned by tryInvoke
      * @return true if tryInvoke failed, false otherwise
      */
@@ -70,14 +73,14 @@ public interface JexlMethod {
 
     /**
      * returns the return type of the method invoked.
-     * 
+     *
      * @return return type
      */
     Class<?> getReturnType();
 
     /**
      * returns the parameter types of the method invoked.
-     * 
+     *
      * @return return an array of parameter types
      * @since 3.2
      */
