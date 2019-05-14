@@ -1591,6 +1591,8 @@ void MemberAccess() #void : {}
     LOOKAHEAD(<DOT>) IdentifierAccess()
     |
     LOOKAHEAD(<QDOT>) IdentifierAccess()
+    |
+    LOOKAHEAD(<LCURLY>) InlinePropertyAssignment()
 }
 
 void MethodCall() #void : {}
@@ -1601,16 +1603,12 @@ void MethodCall() #void : {}
     |
     LOOKAHEAD(<DOT> <NEW>) (<DOT> <NEW> InnerType() Arguments()) #InnerConstructorNode()
     |
-    LOOKAHEAD(<LCURLY>) (InlinePropertyAssignment() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
-    |
     (MemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
 }
 
 void MemberExpression() #void : {}
 {
     LOOKAHEAD(MethodCall()) MethodCall()
-    |
-    LOOKAHEAD(<LCURLY>) InlinePropertyAssignment()
     |
     MemberAccess()
 }
@@ -1625,13 +1623,20 @@ void InlinePropertyAssignment() : {}
     <LCURLY> (InlinePropertyBlock() ( <COMMA> InlinePropertyBlock() )* ) <RCURLY>
 }
 
+void InlineMemberAccess() #void : {}
+{
+    LOOKAHEAD(<LBRACKET>) ArrayAccess()
+    |
+    LOOKAHEAD(<DOT>) IdentifierAccess()
+}
+
 void InlinePropertyBlock() #void : {}
 {
     LOOKAHEAD(InlinePropertyName() <COLON>) InlinePropertyEntry()
     |
     LOOKAHEAD(<LBRACKET> Expression() <RBRACKET> <COLON>) InlinePropertyArrayEntry()
     |
-    ((LOOKAHEAD(<LBRACKET>) ArrayAccess() | Identifier()) (LOOKAHEAD(2) MemberAccess() )* InlinePropertyAssignment()) #Reference()
+    ((LOOKAHEAD(<LBRACKET>) ArrayAccess() | Identifier()) (LOOKAHEAD(2) InlineMemberAccess() )* InlinePropertyAssignment()) #Reference()
 }
 
 void InlinePropertyName() #void : {}
