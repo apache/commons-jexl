@@ -232,7 +232,11 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTInlinePropertyArrayEntry node, Object data);
 
+    protected abstract Object visit(ASTInlinePropertyArrayNullEntry node, Object data);
+
     protected abstract Object visit(ASTInlinePropertyEntry node, Object data);
+
+    protected abstract Object visit(ASTInlinePropertyNullEntry node, Object data);
 
     protected abstract Object visit(ASTEmptyFunction node, Object data);
 

@@ -60,6 +60,12 @@ public class InlinePropertyTest extends JexlTestCase {
            keys.add(new AbstractMap.SimpleEntry(2, "Test 2"));
         }
 
+        public Address(String value) {
+           this();
+
+           setPostalCode(value);
+        }
+
         public String getPostalCode() {
            return postalCode;
         }
@@ -96,7 +102,7 @@ public class InlinePropertyTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         jc.set("addr", new Address());
         Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "123456", o);
+        Assert.assertEquals("Result is not as expected", "123456", o);
     }
 
     @Test
@@ -105,7 +111,7 @@ public class InlinePropertyTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         jc.set("addr", new Address());
         Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "123456", o);
+        Assert.assertEquals("Result is not as expected", "123456", o);
     }
 
     @Test
@@ -114,7 +120,7 @@ public class InlinePropertyTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         jc.set("addr", new Address());
         Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "123456", o);
+        Assert.assertEquals("Result is not as expected", "123456", o);
     }
 
     @Test
@@ -123,7 +129,7 @@ public class InlinePropertyTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         jc.set("addr", new Address());
         Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "123456", o);
+        Assert.assertEquals("Result is not as expected", "123456", o);
     }
 
     @Test
@@ -132,7 +138,7 @@ public class InlinePropertyTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         jc.set("addr", new Address());
         Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "123456", o);
+        Assert.assertEquals("Result is not as expected", "123456", o);
     }
 
     @Test
@@ -141,7 +147,7 @@ public class InlinePropertyTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         jc.set("addr", new Address());
         Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "123456", o);
+        Assert.assertEquals("Result is not as expected", "123456", o);
     }
 
     @Test
@@ -150,8 +156,47 @@ public class InlinePropertyTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         jc.set("addr", new Address());
         Object o = e.execute(jc);
-        Assert.assertEquals("Result is not last evaluated expression", "123456", o);
+        Assert.assertEquals("Result is not as expected", "123456", o);
     }
 
+    @Test
+    public void inlinePropertyNullSimple() throws Exception {
+        JexlScript e = JEXL.createScript("addr { PostalCode ?: '123456'}; addr.PostalCode");
+        JexlContext jc = new MapContext();
+        jc.set("addr", new Address());
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not as expected", "123456", o);
+    }
+
+    @Test
+    public void inlinePropertyNotNullSimple() throws Exception {
+        JexlScript e = JEXL.createScript("addr { PostalCode ?: '123456'}; addr.PostalCode");
+        JexlContext jc = new MapContext();
+        jc.set("addr", new Address("111111"));
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not as expected", "111111", o);
+    }
+
+    @Test
+    public void inlinePropertyNullArray() throws Exception {
+        JexlScript e = JEXL.createScript("var i = 1; addr.lines{[i] ?: '123456'}; addr.lines[1]");
+        JexlContext jc = new MapContext();
+        Address addr = new Address();
+        addr.getLines().add(null);
+        jc.set("addr", addr);
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not as expected", "123456", o);
+    }
+
+    @Test
+    public void inlinePropertyNotNullArray() throws Exception {
+        JexlScript e = JEXL.createScript("var i = 1; addr.lines{[i] ?: '123456'}; addr.lines[1]");
+        JexlContext jc = new MapContext();
+        Address addr = new Address();
+        addr.getLines().add("111111");
+        jc.set("addr", addr);
+        Object o = e.execute(jc);
+        Assert.assertEquals("Result is not as expected", "111111", o);
+    }
 
 }

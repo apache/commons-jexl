@@ -84,7 +84,9 @@ import org.apache.commons.jexl3.parser.ASTInitialization;
 import org.apache.commons.jexl3.parser.ASTInitializedArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyAssignment;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayEntry;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyArrayNullEntry;
 import org.apache.commons.jexl3.parser.ASTInlinePropertyEntry;
+import org.apache.commons.jexl3.parser.ASTInlinePropertyNullEntry;
 import org.apache.commons.jexl3.parser.ASTInnerConstructorNode;
 import org.apache.commons.jexl3.parser.ASTIfStatement;
 import org.apache.commons.jexl3.parser.ASTIOFNode;
@@ -2071,6 +2073,33 @@ public class Interpreter extends InterpreterBase {
 
                setAttribute(data, key, value, p, JexlOperator.ARRAY_SET);
 
+            } else if (p instanceof ASTInlinePropertyNullEntry) {
+
+               ASTInlinePropertyNullEntry entry = (ASTInlinePropertyNullEntry) p;
+
+               JexlNode name = entry.jjtGetChild(0);
+               Object key = name instanceof ASTIdentifier ? ((ASTIdentifier) name).getName() : name.jjtAccept(this, null);
+               String property = String.valueOf(key);
+
+               Object value = getAttribute(data, property, p);
+
+               if (value == null) {
+                  value = entry.jjtAccept(this, null);
+                  setAttribute(data, property, value, p, JexlOperator.PROPERTY_SET);
+               }
+
+            } else if (p instanceof ASTInlinePropertyArrayNullEntry) {
+
+               ASTInlinePropertyArrayNullEntry entry = (ASTInlinePropertyArrayNullEntry) p;
+
+               Object key = entry.jjtGetChild(0).jjtAccept(this, null);
+               Object value = getAttribute(data, key, p);
+
+               if (value == null) {
+                  value = entry.jjtAccept(this, null);
+                  setAttribute(data, key, value, p, JexlOperator.ARRAY_SET);
+               }
+
             } else {
 
                // ASTReference
@@ -2097,6 +2126,16 @@ public class Interpreter extends InterpreterBase {
         Object value = node.jjtGetChild(1).jjtAccept(this, data);
 
         return new Object[] {key, value};
+    }
+
+    @Override
+    protected Object visit(ASTInlinePropertyNullEntry node, Object data) {
+        return node.jjtGetChild(1).jjtAccept(this, data);
+    }
+
+    @Override
+    protected Object visit(ASTInlinePropertyArrayNullEntry node, Object data) {
+        return node.jjtGetChild(1).jjtAccept(this, data);
     }
 
     @Override

@@ -185,7 +185,7 @@
                 <tr>
                     <td>Expression</td>
                     <td>
-                        An expression can be the literal, variable, assignment, access operator, switch operator, iterator operator, stream operator, function definition, function call, method call or
+                        An expression can be the literal, variable, assignment, access operator, inline assignment operator, switch operator, iterator operator, stream operator, function definition, function call, method call or
                         an evaluation operator.
                     </td>
                 </tr>
@@ -301,6 +301,22 @@
                             foo?.`${bar}`.quux</code>.</p>
                         <p>Access operators can be overloaded in <code>JexlArithmetic</code>, so that
                            the operator behaviour will differ depending on the type of the operator arguments</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Inline assignment operator</td>
+                    <td>
+                        <p>Allows to set a property of an object, a value of the collection or an array
+                        by using curly brackets, e.g.
+                        <code>foo {bar : 10}</code> will set the <code>bar</code> property
+                        of the <code>foo</code> Object to the <code>10</code>.
+                        <code>arr1 {[0] : 10}</code> will set the first element of the
+                        of the <code>arr1</code> array to the <code>10</code>.</p>
+                        <p>Properties can also be quoted as in <code>foo {'b a r' : 10}</code> and can be dynamic
+                        back-quoted interpolation strings as in <code>cal {`${dd.year}-${dd.month}-${dd.day}` : '1990-01-01'}</code>.</p>
+                        <p>Nested properties can also be assigned as in <code>foo {bar {quux: 10}}</code>.</p>
+                        <p>The conditional assignment operator <code>foo {bar ?: 10}</code> can be specified, 
+                        which assigns a value to the property only if property is null.</p>
                     </td>
                 </tr>
                 <tr>
