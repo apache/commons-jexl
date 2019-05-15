@@ -42,15 +42,6 @@ public class TemplateDebugger extends Debugger {
     private TemplateExpression[] exprs;
 
     /**
-     * Line states.
-     */
-    enum Type {
-        START,
-        TMPL_LINE,
-        EXPR_LINE
-    }
-
-    /**
      * Default ctor.
      */
     public TemplateDebugger() {
@@ -95,12 +86,11 @@ public class TemplateDebugger extends Debugger {
             builder.setLength(0);
             cause = script;
             int num = script.jjtGetNumChildren();
-            Type last = Type.START;
             for (int i = 0; i < num; ++i) {
                 JexlNode child = script.jjtGetChild(i);
-                //acceptStatement(child, null);
-                last = debugStatement(child, last);
+                acceptStatement(child, null);
             }
+            // the last line
             if (builder.length() > 0 && builder.charAt(builder.length() - 1) != '\n') {
                 builder.append('\n');
             }
@@ -148,46 +138,15 @@ public class TemplateDebugger extends Debugger {
 
     @Override
     protected Object acceptStatement(JexlNode child, Object data) {
-        // if not really a template, use super impl
-        if (exprs != null) {
-            int printe = getPrintStatement(child);
-            if (printe >= 0) {
-                // statement is an expr
-                TemplateExpression te = exprs[printe];
-                return visit(te, data);
-            }
+        TemplateExpression te = getPrintStatement(child);
+        if (te != null) {
+            newJxltLine();
+            return visit(te, data);
+        } else {
             // if statement is not a jexl:print(...), need to prepend '$$'
             newJexlLine();
+            return super.acceptStatement(child, data);
         }
-        return super.acceptStatement(child, data);
-    }
-
-    /**
-     * Recreate a statement from an expression node.
-     * @param child the template expression
-     * @param lastSeen the state before this child node 
-     * @return the new state after the child node
-     */
-    private Type debugStatement(JexlNode child, Type lastSeen) {
-        // if not really a template, use super impl
-        Type t = Type.EXPR_LINE;
-        if (exprs != null) {
-            int printe = getPrintStatement(child);
-            if (printe >= 0) {
-                if (Type.TMPL_LINE == lastSeen && (builder.charAt(builder.length() - 1) != '\n')) {
-                    builder.append('\n');
-                }
-                // statement is an expr
-                TemplateExpression te = exprs[printe];
-                visit(te, null);
-                return t;
-            }
-            // if statement is not a jexl:print(...), need to prepend '$$'
-            newJexlLine();
-            t = Type.TMPL_LINE;
-        }
-        super.acceptStatement(child, null);
-        return t;
     }
 
     /**
@@ -195,8 +154,8 @@ public class TemplateDebugger extends Debugger {
      * @param child the node to check
      * @return the expression number or -1 if the node is not a jexl:print
      */
-    private int getPrintStatement(JexlNode child) {
-        if (child instanceof ASTFunctionNode) {
+    private TemplateExpression getPrintStatement(JexlNode child) {
+        if (exprs != null && child instanceof ASTFunctionNode) {
             ASTFunctionNode node = (ASTFunctionNode) child;
             ASTIdentifier ns = (ASTIdentifier) node.jjtGetChild(0);
             JexlNode args = node.jjtGetChild(1);
@@ -206,12 +165,12 @@ public class TemplateDebugger extends Debugger {
                 && args.jjtGetChild(0) instanceof ASTNumberLiteral) {
                 ASTNumberLiteral exprn = (ASTNumberLiteral) args.jjtGetChild(0);
                 int n = exprn.getLiteral().intValue();
-                if (exprs != null && n >= 0 && n < exprs.length) {
-                    return n;
+                if (n >= 0 && n < exprs.length) {
+                    return exprs[n];
                 }
             }
         }
-        return -1;
+        return null;
     }
 
     /**
@@ -224,21 +183,39 @@ public class TemplateDebugger extends Debugger {
         } else {
             for (int i = length - 1; i >= 0; --i) {
                 char c = builder.charAt(i);
-                if (c == '\n') {
-                    builder.append("$$ ");
-                    break;
-                }
-                if (c == '}') {
-                    builder.append("\n$$ ");
-                    break;
-                }
-                if (c != ' ') {
-                    break;
+                switch (c) {
+                    case '\n':
+                        builder.append("$$ ");
+                        return;
+                    case '}':
+                        builder.append("\n$$ ");
+                        return;
+                    case ' ':
+                    case ';':
+                        return;
                 }
             }
         }
     }
-
+    
+    /**
+     * Insert \n when needed.
+     */
+    private void newJxltLine() {
+        int length = builder.length();
+        for (int i = length - 1; i >= 0; --i) {
+            char c = builder.charAt(i);
+            switch (c) {
+                case '\n':
+                case ';':
+                    return;
+                case '}':
+                    builder.append('\n');
+                    return;
+            }
+        }
+    }
+    
     /**
      * Visit a template expression.
      * @param expr the constant expression

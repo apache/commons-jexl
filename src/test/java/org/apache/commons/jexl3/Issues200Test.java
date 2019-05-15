@@ -948,5 +948,27 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertNotNull(refactored);
         Assert.assertEquals(source, refactored);
     }
-
+    
+    @Test
+    public void testTemplate6565b() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JxltEngine jexlt = jexl.createJxltEngine();
+        String source =
+            "$$ var res = '';\n" +
+            "$$ var meta = session.data['METADATA'];\n" +
+            "$$ if (meta) {\n" +
+            "$$   var entry = meta['ID'];\n" +
+            "$$   if (entry) {\n" +
+            "$$     var value = session.data[entry];\n" +
+            "$$     res = value?: '';\n" +
+            "${res}\n" +
+            "$$   }\n" +
+            "$$ }\n";
+        JxltEngine.Template script = jexlt.createTemplate("$$", new StringReader(source));
+        Assert.assertNotNull(script);
+        TemplateDebugger dbg = new TemplateDebugger();
+        String refactored = dbg.debug(script) ? dbg.toString() : "";
+        Assert.assertNotNull(refactored);
+        Assert.assertEquals(source, refactored);
+    }
 }
