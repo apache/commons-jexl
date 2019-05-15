@@ -17,16 +17,22 @@
 package org.apache.commons.jexl3.internal;
 
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.introspection.JexlMethod;
+import org.apache.commons.jexl3.introspection.JexlPropertyGet;
+import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
+import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
 import org.apache.commons.jexl3.parser.ASTMethodNode;
 import org.apache.commons.jexl3.parser.ASTReference;
 import org.apache.commons.jexl3.parser.JexlNode;
@@ -56,6 +62,14 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected volatile boolean cancelled = false;
     /** Empty parameters for method matching. */
     protected static final Object[] EMPTY_PARAMS = new Object[0];
+    /** The context to store/retrieve variables. */
+    protected final JexlContext.NamespaceResolver ns;
+    /** The map of 'prefix:function' to object resolving as namespaces. */
+    protected final Map<String, Object> functions;
+    /** The map of dynamically creates namespaces, NamespaceFunctor or duck-types of those. */
+    protected Map<String, Object> functors;
+    /** The operators evaluation delegate. */
+    protected final Operators operators;
 
     /**
      * Creates an interpreter base.
@@ -75,6 +89,14 @@ public abstract class InterpreterBase extends ParserVisitor {
                           + ", got " + arithmetic.getClass().getSimpleName()
             );
         }
+        if (this.context instanceof JexlContext.NamespaceResolver) {
+            ns = ((JexlContext.NamespaceResolver) context);
+        } else {
+            ns = Engine.EMPTY_NS;
+        }
+        this.functions = jexl.functions;
+        this.functors = null;
+        this.operators = new Operators(this);
     }
 
     /**
@@ -89,6 +111,10 @@ public abstract class InterpreterBase extends ParserVisitor {
         context = ii.context;
         arithmetic = ii.arithmetic;
         cache = ii.cache;
+        ns = ii.ns;
+        functions = ii.functions;
+        functors = ii.functors;
+        operators = ii.operators;
     }
 
 
@@ -124,6 +150,80 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
     }
               
+    /**
+     * Resolves a namespace, eventually allocating an instance using context as constructor argument.
+     * <p>
+     * The lifetime of such instances span the current expression or script evaluation.</p>
+     * @param prefix the prefix name (may be null for global namespace)
+     * @param node   the AST node
+     * @return the namespace instance
+     */
+    protected Object resolveNamespace(String prefix, JexlNode node) {
+        Object namespace;
+        // check whether this namespace is a functor
+        synchronized (this) {
+            if (functors != null) {
+                namespace = functors.get(prefix);
+                if (namespace != null) {
+                    return namespace;
+                }
+            }
+        }
+        // check if namespace is a resolver
+        namespace = ns.resolveNamespace(prefix);
+        if (namespace == null) {
+            namespace = functions.get(prefix);
+            if (prefix != null && namespace == null) {
+                throw new JexlException(node, "no such function namespace " + prefix, null);
+            }
+        }
+        // shortcut if ns is known to be not-a-functor
+        final boolean cacheable = cache;
+        Object cached = cacheable ? node.jjtGetValue() : null;
+        if (cached != JexlContext.NamespaceFunctor.class) {
+            // allow namespace to instantiate a functor with context if possible, not an error otherwise
+            Object functor = null;
+            if (namespace instanceof JexlContext.NamespaceFunctor) {
+                functor = ((JexlContext.NamespaceFunctor) namespace).createFunctor(context);
+            } else if (namespace instanceof Class<?> || namespace instanceof String) {
+                // attempt to reuse last ctor cached in volatile JexlNode.value
+                if (cached instanceof JexlMethod) {
+                    Object eval = ((JexlMethod) cached).tryInvoke(null, context);
+                    if (JexlEngine.TRY_FAILED != eval) {
+                        functor = eval;
+                    }
+                }
+                if (functor == null) {
+                    JexlMethod ctor = uberspect.getConstructor(namespace, context);
+                    if (ctor != null) {
+                        try {
+                            functor = ctor.invoke(namespace, context);
+                            if (cacheable && ctor.isCacheable()) {
+                                node.jjtSetValue(ctor);
+                            }
+                        } catch (Exception xinst) {
+                            throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
+                        }
+                    }
+                }
+            }
+            // got a functor, store it and return it
+            if (functor != null) {
+                synchronized (this) {
+                    if (functors == null) {
+                        functors = new HashMap<String, Object>();
+                    }
+                    functors.put(prefix, functor);
+                }
+                return functor;
+            } else {
+                // use the NamespaceFunctor class to tag this node as not-a-functor
+                node.jjtSetValue(JexlContext.NamespaceFunctor.class);
+            }
+        }
+        return namespace;
+    }
+
     /**
      * Gets a value of a defined local variable or from the context.
      * @param frame the local frame
@@ -691,6 +791,134 @@ public abstract class InterpreterBase extends ParserVisitor {
                 return eval;
             }
             return unsolvableMethod(node, mname, argv);
+        }
+    }
+
+    /**
+     * Gets an attribute of an object.
+     *
+     * @param object    to retrieve value from
+     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
+     * @param node      the node that evaluated as the object
+     * @return the attribute value
+     */
+    protected Object getAttribute(Object object, Object attribute, JexlNode node) {
+        if (object == null) {
+            throw new JexlException(node, "object is null");
+        }
+        cancelCheck(node);
+        final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
+                ? JexlOperator.ARRAY_GET : JexlOperator.PROPERTY_GET;
+        Object result = operators.tryOverload(node, operator, object, attribute);
+        if (result != JexlEngine.TRY_FAILED) {
+            return result;
+        }
+        Exception xcause = null;
+        try {
+            // attempt to reuse last executor cached in volatile JexlNode.value
+            if (node != null && cache) {
+                Object cached = node.jjtGetValue();
+                if (cached instanceof JexlPropertyGet) {
+                    JexlPropertyGet vg = (JexlPropertyGet) cached;
+                    Object value = vg.tryInvoke(object, attribute);
+                    if (!vg.tryFailed(value)) {
+                        return value;
+                    }
+                }
+            }
+            // resolve that property
+            List<JexlUberspect.PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
+            JexlPropertyGet vg = uberspect.getPropertyGet(resolvers, object, attribute);
+            if (vg != null) {
+                Object value = vg.invoke(object);
+                // cache executor in volatile JexlNode.value
+                if (node != null && cache && vg.isCacheable()) {
+                    node.jjtSetValue(vg);
+                }
+                return value;
+            }
+        } catch (Exception xany) {
+            xcause = xany;
+        }
+        // lets fail
+        if (node != null) {
+            boolean safe = (node instanceof ASTIdentifierAccess) && ((ASTIdentifierAccess) node).isSafe();
+            if (safe) {
+                return null;
+            } else {
+                String attrStr = attribute != null ? attribute.toString() : null;
+                return unsolvableProperty(node, attrStr, true, xcause);
+            }
+        } else {
+            // direct call
+            String error = "unable to get object property"
+                    + ", class: " + object.getClass().getName()
+                    + ", property: " + attribute;
+            throw new UnsupportedOperationException(error, xcause);
+        }
+    }
+
+    /**
+     * Sets an attribute of an object.
+     *
+     * @param object    to set the value to
+     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
+     * @param value     the value to assign to the object's attribute
+     * @param node      the node that evaluated as the object
+     */
+    protected void setAttribute(Object object, Object attribute, Object value, JexlNode node) {
+        cancelCheck(node);
+        final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
+                                      ? JexlOperator.ARRAY_SET : JexlOperator.PROPERTY_SET;
+        Object result = operators.tryOverload(node, operator, object, attribute, value);
+        if (result != JexlEngine.TRY_FAILED) {
+            return;
+        }
+        Exception xcause = null;
+        try {
+            // attempt to reuse last executor cached in volatile JexlNode.value
+            if (node != null && cache) {
+                Object cached = node.jjtGetValue();
+                if (cached instanceof JexlPropertySet) {
+                    JexlPropertySet setter = (JexlPropertySet) cached;
+                    Object eval = setter.tryInvoke(object, attribute, value);
+                    if (!setter.tryFailed(eval)) {
+                        return;
+                    }
+                }
+            }
+            List<JexlUberspect.PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
+            JexlPropertySet vs = uberspect.getPropertySet(resolvers, object, attribute, value);
+            // if we can't find an exact match, narrow the value argument and try again
+            if (vs == null) {
+                // replace all numbers with the smallest type that will fit
+                Object[] narrow = {value};
+                if (arithmetic.narrowArguments(narrow)) {
+                    vs = uberspect.getPropertySet(resolvers, object, attribute, narrow[0]);
+                }
+            }
+            if (vs != null) {
+                // cache executor in volatile JexlNode.value
+                vs.invoke(object, value);
+                if (node != null && cache && vs.isCacheable()) {
+                    node.jjtSetValue(vs);
+                }
+                return;
+            }
+        } catch (Exception xany) {
+            xcause = xany;
+        }
+        // lets fail
+        if (node != null) {
+            String attrStr = attribute != null ? attribute.toString() : null;
+            unsolvableProperty(node, attrStr, true, xcause);
+        } else {
+            // direct call
+            String error = "unable to set object property"
+                    + ", class: " + object.getClass().getName()
+                    + ", property: " + attribute
+                    + ", argument: " + value.getClass().getSimpleName();
+            throw new UnsupportedOperationException(error, xcause);
         }
     }
 }
