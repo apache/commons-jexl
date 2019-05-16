@@ -93,7 +93,7 @@ New features
 
 + Groovy-like `!instanceof` operator is introduced
 
-+ Groovy-like `?=` conditional assignemtn operator is introduced
++ Groovy-like `?=` conditional assignment operator is introduced
 
 + Java-like `::` method reference operator is introduced
 
@@ -104,6 +104,8 @@ New features
 + Javascript-like `===` and `!==` identity operators are introduced
 
 + C-like `&` pointer and `*` pointer dereference operators are introduced
+
++ C#-like `?[]` safe array access operator is introduced
 
 + New Map.Entry literal `[a : b]` is introduced
 
