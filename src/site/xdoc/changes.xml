@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-296" due-to="Dmitri Blinov">
+                Ant-ish variables should not use safe-access operator syntax
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-299" due-to="Jarek Cecho">
                 Improve message error when method could not be found
             </action>

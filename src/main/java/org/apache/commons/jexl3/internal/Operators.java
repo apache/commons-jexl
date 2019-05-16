@@ -30,7 +30,7 @@ import org.apache.commons.jexl3.parser.JexlNode;
  */
 public class Operators {
     /** The owner. */
-    protected final Interpreter interpreter;
+    protected final InterpreterBase interpreter;
     /** The overloaded arithmetic operators. */
     protected final JexlArithmetic.Uberspect operators;
 
@@ -38,7 +38,7 @@ public class Operators {
      * Constructor.
      * @param owner the owning interpreter
      */
-    protected Operators(Interpreter owner) {
+    protected Operators(InterpreterBase owner) {
         final JexlArithmetic arithmetic = owner.arithmetic;
         final JexlUberspect uberspect = owner.uberspect;
         this.interpreter = owner;

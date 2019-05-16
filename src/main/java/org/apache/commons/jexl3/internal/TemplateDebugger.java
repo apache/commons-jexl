@@ -55,7 +55,7 @@ public class TemplateDebugger extends Debugger {
         exprs = null;
         script = null;
     }
-    
+
     /**
      * Position the debugger on the root of a template expression.
      * @param je the expression
@@ -91,6 +91,7 @@ public class TemplateDebugger extends Debugger {
                 JexlNode child = script.jjtGetChild(i);
                 acceptStatement(child, null);
             }
+            // the last line
             if (builder.length() > 0 && builder.charAt(builder.length() - 1) != '\n') {
                 builder.append('\n');
             }
@@ -138,18 +139,15 @@ public class TemplateDebugger extends Debugger {
 
     @Override
     protected Object acceptStatement(JexlNode child, Object data) {
-        // if not really a template, use super impl
-        if (exprs != null) {
-            int printe = getPrintStatement(child);
-            if (printe >= 0) {
-                // statement is an expr
-                TemplateExpression te = exprs[printe];
-                return visit(te, data);
-            }
+        TemplateExpression te = getPrintStatement(child);
+        if (te != null) {
+            newJxltLine();
+            return visit(te, data);
+        } else {
             // if statement is not a jexl:print(...), need to prepend '$$'
             newJexlLine();
+            return super.acceptStatement(child, data);
         }
-        return super.acceptStatement(child, data);
     }
 
     /**
@@ -157,13 +155,13 @@ public class TemplateDebugger extends Debugger {
      * @param child the node to check
      * @return the expression number or -1 if the node is not a jexl:print
      */
-    private int getPrintStatement(JexlNode child) {
+    private TemplateExpression getPrintStatement(JexlNode child) {
 
         if (child instanceof ASTExpressionStatement && child.jjtGetNumChildren() == 1) {
             child = child.jjtGetChild(0);
         }
 
-        if (child instanceof ASTFunctionNode) {
+        if (exprs != null && child instanceof ASTFunctionNode) {
             ASTFunctionNode node = (ASTFunctionNode) child;
             ASTIdentifier ns = (ASTIdentifier) node.jjtGetChild(0);
             JexlNode args = node.jjtGetChild(1);
@@ -173,12 +171,12 @@ public class TemplateDebugger extends Debugger {
                 && args.jjtGetChild(0) instanceof ASTNumberLiteral) {
                 ASTNumberLiteral exprn = (ASTNumberLiteral) args.jjtGetChild(0);
                 int n = exprn.getLiteral().intValue();
-                if (exprs != null && n >= 0 && n < exprs.length) {
-                    return n;
+                if (n >= 0 && n < exprs.length) {
+                    return exprs[n];
                 }
             }
         }
-        return -1;
+        return null;
     }
 
     /**
@@ -191,17 +189,35 @@ public class TemplateDebugger extends Debugger {
         } else {
             for (int i = length - 1; i >= 0; --i) {
                 char c = builder.charAt(i);
-                if (c == '\n') {
-                    builder.append("$$ ");
-                    break;
+                switch (c) {
+                    case '\n':
+                        builder.append("$$ ");
+                        return;
+                    case '}':
+                        builder.append("\n$$ ");
+                        return;
+                    case ' ':
+                    case ';':
+                        return;
                 }
-                if (c == '}') {
-                    builder.append("\n$$ ");
-                    break;
-                }
-                if (c != ' ') {
-                    break;
-                }
+            }
+        }
+    }
+
+    /**
+     * Insert \n when needed.
+     */
+    private void newJxltLine() {
+        int length = builder.length();
+        for (int i = length - 1; i >= 0; --i) {
+            char c = builder.charAt(i);
+            switch (c) {
+                case '\n':
+                case ';':
+                    return;
+                case '}':
+                    builder.append('\n');
+                    return;
             }
         }
     }

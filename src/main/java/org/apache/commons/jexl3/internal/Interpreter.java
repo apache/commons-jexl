@@ -26,8 +26,6 @@ import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
-import org.apache.commons.jexl3.introspection.JexlPropertySet;
-import org.apache.commons.jexl3.introspection.JexlUberspect.PropertyResolver;
 
 import org.apache.commons.jexl3.parser.ASTAddNode;
 import org.apache.commons.jexl3.parser.ASTAndNode;
@@ -194,18 +192,10 @@ import java.lang.reflect.Array;
  * @since 2.0
  */
 public class Interpreter extends InterpreterBase {
-    /** The operators evaluation delegate. */
-    protected final Operators operators;
     /** Frame height. */
     protected int fp = 0;
     /** Symbol values. */
     protected final Scope.Frame frame;
-    /** The context to store/retrieve variables. */
-    protected final JexlContext.NamespaceResolver ns;
-    /** The map of 'prefix:function' to object resolving as namespaces. */
-    protected final Map<String, Object> functions;
-    /** The map of dynamically creates namespaces, NamespaceFunctor or duck-types of those. */
-    protected Map<String, Object> functors;
 
     /**
      * The thread local interpreter.
@@ -221,15 +211,7 @@ public class Interpreter extends InterpreterBase {
      */
     protected Interpreter(Engine engine, JexlContext aContext, Scope.Frame eFrame) {
         super(engine, aContext);
-        this.operators = new Operators(this);
         this.frame = eFrame;
-        if (this.context instanceof JexlContext.NamespaceResolver) {
-            ns = ((JexlContext.NamespaceResolver) context);
-        } else {
-            ns = Engine.EMPTY_NS;
-        }
-        this.functions = jexl.functions;
-        this.functors = null;
     }
 
     /**
@@ -239,11 +221,7 @@ public class Interpreter extends InterpreterBase {
      */
     protected Interpreter(Interpreter ii, JexlArithmetic jexla) {
         super(ii, jexla);
-        operators = ii.operators;
         frame = ii.frame;
-        ns = ii.ns;
-        functions = ii.functions;
-        functors = ii.functors;
     }
 
     /**
@@ -329,78 +307,24 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
-     * Resolves a namespace, eventually allocating an instance using context as constructor argument.
-     * <p>
-     * The lifetime of such instances span the current expression or script evaluation.</p>
-     * @param prefix the prefix name (may be null for global namespace)
-     * @param node   the AST node
-     * @return the namespace instance
+     * Gets an attribute of an object.
+     *
+     * @param object    to retrieve value from
+     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
+     * @return the attribute value
      */
-    protected Object resolveNamespace(String prefix, JexlNode node) {
-        Object namespace;
-        // check whether this namespace is a functor
-        synchronized (this) {
-            if (functors != null) {
-                namespace = functors.get(prefix);
-                if (namespace != null) {
-                    return namespace;
-                }
-            }
-        }
-        // check if namespace is a resolver
-        namespace = ns.resolveNamespace(prefix);
-        if (namespace == null) {
-            namespace = functions.get(prefix);
-            if (prefix != null && namespace == null) {
-                throw new JexlException(node, "no such function namespace " + prefix, null);
-            }
-        }
-        // shortcut if ns is known to be not-a-functor
-        final boolean cacheable = cache;
-        Object cached = cacheable ? node.jjtGetValue() : null;
-        if (cached != JexlContext.NamespaceFunctor.class) {
-            // allow namespace to instantiate a functor with context if possible, not an error otherwise
-            Object functor = null;
-            if (namespace instanceof JexlContext.NamespaceFunctor) {
-                functor = ((JexlContext.NamespaceFunctor) namespace).createFunctor(context);
-            } else if (namespace instanceof Class<?> || namespace instanceof String) {
-                try {
-                    // attempt to reuse last ctor cached in volatile JexlNode.value
-                    if (cached instanceof JexlMethod) {
-                        Object eval = ((JexlMethod) cached).tryInvoke(null, context);
-                        if (JexlEngine.TRY_FAILED != eval) {
-                            functor = eval;
-                        }
-                    }
-                    if (functor == null) {
-                        JexlMethod ctor = uberspect.getConstructor(namespace, context);
-                        if (ctor != null) {
-                            functor = ctor.invoke(namespace, context);
-                            if (cacheable && ctor.isCacheable()) {
-                                node.jjtSetValue(ctor);
-                            }
-                        }
-                    }
-                } catch (Exception xinst) {
-                    throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
-                }
-
-            }
-            // got a functor, store it and return it
-            if (functor != null) {
-                synchronized (this) {
-                    if (functors == null) {
-                        functors = new HashMap<String, Object>();
-                    }
-                    functors.put(prefix, functor);
-                }
-                return functor;
-            } else {
-                // use the NamespaceFunctor class to tag this node as not-a-functor
-                node.jjtSetValue(JexlContext.NamespaceFunctor.class);
-            }
-        }
-        return namespace;
+    public Object getAttribute(Object object, Object attribute) {
+        return getAttribute(object, attribute, null);
+    }
+    /**
+     * Sets an attribute of an object.
+     *
+     * @param object    to set the value to
+     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
+     * @param value     the value to assign to the object's attribute
+     */
+    public void setAttribute(Object object, Object attribute, Object value) {
+        setAttribute(object, attribute, value, null);
     }
 
     @Override
@@ -2419,7 +2343,7 @@ public class Interpreter extends InterpreterBase {
                             break main;
                         }
                     }
-                    // catch up
+                    // catch up to current node
                     for (; v <= c; ++v) {
                         JexlNode child = node.jjtGetChild(v);
                         if (child instanceof ASTIdentifierAccess) {
@@ -2428,13 +2352,14 @@ public class Interpreter extends InterpreterBase {
                                 break main;
                             }
                             ant.append('.');
-                            ant.append(((ASTIdentifierAccess) objectNode).getName());
+                            ant.append(achild.getName());
                         } else {
                             // not an identifier, not antish
                             ptyNode = objectNode;
                             break main;
                         }
                     }
+                    // solve antish
                     object = context.get(ant.toString());
                 }
             } else if (c != numChildren - 1) {
@@ -2821,30 +2746,43 @@ public class Interpreter extends InterpreterBase {
         StringBuilder ant = null;
         int v = 1;
         // start at 1 if symbol
-        for (int c = symbol >= 0 ? 1 : 0; c < last; ++c) {
+        main: for (int c = symbol >= 0 ? 1 : 0; c < last; ++c) {
             objectNode = left.jjtGetChild(c);
             object = objectNode.jjtAccept(this, object);
             if (object != null) {
                 // disallow mixing antish variable & bean with same root; avoid ambiguity
                 antish = false;
             } else if (antish) {
+                // initialize if first time
                 if (ant == null) {
                     JexlNode first = left.jjtGetChild(0);
-                    if (first instanceof ASTIdentifier && ((ASTIdentifier) first).getSymbol() < 0) {
-                        ant = new StringBuilder(((ASTIdentifier) first).getName());
+                    ASTIdentifier firstId = first instanceof ASTIdentifier
+                            ? (ASTIdentifier) first
+                            : null;
+                    if (firstId != null && firstId.getSymbol() < 0) {
+                        ant = new StringBuilder(firstId.getName());
                     } else {
-                        break;
+                        // ant remains null, object is null, stop solving
+                        antish = false;
+                        break main;
                     }
                 }
+                // catch up to current child
                 for (; v <= c; ++v) {
                     JexlNode child = left.jjtGetChild(v);
-                    if (child instanceof ASTIdentifierAccess) {
+                    ASTIdentifierAccess aid = child instanceof ASTIdentifierAccess
+                            ? (ASTIdentifierAccess) child
+                            : null;
+                    // remain antish only if unsafe navigation
+                    if (aid != null && !aid.isSafe() && !aid.isExpression()) {
                         ant.append('.');
-                        ant.append(((ASTIdentifierAccess) objectNode).getName());
+                        ant.append(aid.getName());
                     } else {
-                        break;
+                        antish = false;
+                        break main;
                     }
                 }
+                // solve antish
                 object = context.get(ant.toString());
             } else {
                 throw new JexlException(objectNode, "illegal assignment form");
@@ -2853,14 +2791,16 @@ public class Interpreter extends InterpreterBase {
         // 2: last objectNode will perform assignement in all cases
         Object property = null;
         JexlNode propertyNode = left.jjtGetChild(last);
-        if (propertyNode instanceof ASTIdentifierAccess) {
-            property = evalIdentifier((ASTIdentifierAccess) propertyNode);
-            // deal with antish variable
-            if (ant != null && object == null) {
+        ASTIdentifierAccess propertyId = propertyNode instanceof ASTIdentifierAccess
+                ? (ASTIdentifierAccess) propertyNode
+                : null;
+        if (propertyId != null) {
+            // deal with creating/assignining antish variable
+            if (antish && ant != null && object == null && !propertyId.isSafe() && !propertyId.isExpression()) {
                 if (last > 0) {
                     ant.append('.');
                 }
-                ant.append(String.valueOf(property));
+                ant.append(propertyId.getName());
                 if (assignop != null) {
                     Object self = context.get(ant.toString());
                     right = assignop.getArity() == 1 ? operators.tryAssignOverload(node, assignop, self) :
@@ -2876,6 +2816,8 @@ public class Interpreter extends InterpreterBase {
                 }
                 return right; // 3
             }
+            // property of an object ?
+            property = evalIdentifier(propertyId);
         } else if (propertyNode instanceof ASTArrayAccess) {
             // can have multiple nodes - either an expression, integer literal or reference
             int numChildren = propertyNode.jjtGetNumChildren() - 1;
@@ -3444,17 +3386,6 @@ public class Interpreter extends InterpreterBase {
      *
      * @param object    to retrieve value from
      * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
-     * @return the attribute value
-     */
-    public Object getAttribute(Object object, Object attribute) {
-        return getAttribute(object, attribute, null);
-    }
-
-    /**
-     * Gets an attribute of an object.
-     *
-     * @param object    to retrieve value from
-     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
      * @param node      the node that evaluated as the object
      * @return the attribute value
      */
@@ -3512,17 +3443,6 @@ public class Interpreter extends InterpreterBase {
                     + ", property: " + attribute;
             throw new UnsupportedOperationException(error, xcause);
         }
-    }
-
-    /**
-     * Sets an attribute of an object.
-     *
-     * @param object    to set the value to
-     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
-     * @param value     the value to assign to the object's attribute
-     */
-    public void setAttribute(Object object, Object attribute, Object value) {
-        setAttribute(object, attribute, value, null, JexlOperator.PROPERTY_SET);
     }
 
     /**
