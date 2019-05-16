@@ -316,6 +316,7 @@ public class Interpreter extends InterpreterBase {
     public Object getAttribute(Object object, Object attribute) {
         return getAttribute(object, attribute, null);
     }
+
     /**
      * Sets an attribute of an object.
      *
@@ -324,7 +325,7 @@ public class Interpreter extends InterpreterBase {
      * @param value     the value to assign to the object's attribute
      */
     public void setAttribute(Object object, Object attribute, Object value) {
-        setAttribute(object, attribute, value, null);
+        setAttribute(object, attribute, value, null, JexlOperator.PROPERTY_SET);
     }
 
     @Override
@@ -3378,144 +3379,6 @@ public class Interpreter extends InterpreterBase {
         } catch (Exception xany) {
             String tstr = target != null ? target.toString() : "?";
             throw invocationException(node, tstr, xany);
-        }
-    }
-
-    /**
-     * Gets an attribute of an object.
-     *
-     * @param object    to retrieve value from
-     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
-     * @param node      the node that evaluated as the object
-     * @return the attribute value
-     */
-    protected Object getAttribute(Object object, Object attribute, JexlNode node) {
-        if (object == null) {
-            throw new JexlException(node, "object is null");
-        }
-        cancelCheck(node);
-        final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
-                ? JexlOperator.ARRAY_GET : JexlOperator.PROPERTY_GET;
-        Object result = operators.tryOverload(node, operator, object, attribute);
-        if (result != JexlEngine.TRY_FAILED) {
-            return result;
-        }
-        Exception xcause = null;
-        try {
-            // attempt to reuse last executor cached in volatile JexlNode.value
-            if (node != null && cache) {
-                Object cached = node.jjtGetValue();
-                if (cached instanceof JexlPropertyGet) {
-                    JexlPropertyGet vg = (JexlPropertyGet) cached;
-                    Object value = vg.tryInvoke(object, attribute);
-                    if (!vg.tryFailed(value)) {
-                        return value;
-                    }
-                }
-            }
-            // resolve that property
-            List<PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
-            JexlPropertyGet vg = uberspect.getPropertyGet(resolvers, object, attribute);
-            if (vg != null) {
-                Object value = vg.invoke(object);
-                // cache executor in volatile JexlNode.value
-                if (node != null && cache && vg.isCacheable()) {
-                    node.jjtSetValue(vg);
-                }
-                return value;
-            }
-        } catch (Exception xany) {
-            xcause = xany;
-        }
-        // lets fail
-        if (node != null) {
-            boolean safe = (node instanceof ASTIdentifierAccess) && ((ASTIdentifierAccess) node).isSafe();
-            if (safe) {
-                return null;
-            } else {
-                String attrStr = attribute != null ? attribute.toString() : null;
-                return unsolvableProperty(node, attrStr, true, xcause);
-            }
-        } else {
-            // direct call
-            String error = "unable to get object property"
-                    + ", class: " + object.getClass().getName()
-                    + ", property: " + attribute;
-            throw new UnsupportedOperationException(error, xcause);
-        }
-    }
-
-    /**
-     * Sets an attribute of an object.
-     *
-     * @param object    to set the value to
-     * @param attribute the attribute of the object, e.g. an index (1, 0, 2) or key for a map
-     * @param value     the value to assign to the object's attribute
-     * @param node      the node that evaluated as the object
-     */
-    protected void setAttribute(Object object, Object attribute, Object value, JexlNode node, JexlOperator operator) {
-        cancelCheck(node);
-        Object result = operators.tryOverload(node, operator, object, attribute, value);
-        if (result != JexlEngine.TRY_FAILED) {
-            return;
-        }
-        Exception xcause = null;
-        try {
-            // check if we need to typecast value first
-            Class type = object != null ? object.getClass() : null;
-            if (type != null && type.isArray()) {
-                type = arithmetic.getWrapperClass(type.getComponentType());
-                if (!type.isInstance(value)) {
-                    if (arithmetic.isStrict()) {
-                        value = arithmetic.implicitCast(type, value);
-                    } else {
-                        value = arithmetic.cast(type, value);
-                    }
-                }
-            }
-            // attempt to reuse last executor cached in volatile JexlNode.value
-            if (node != null && cache) {
-                Object cached = node.jjtGetValue();
-                if (cached instanceof JexlPropertySet) {
-                    JexlPropertySet setter = (JexlPropertySet) cached;
-                    Object eval = setter.tryInvoke(object, attribute, value);
-                    if (!setter.tryFailed(eval)) {
-                        return;
-                    }
-                }
-            }
-            List<PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
-            JexlPropertySet vs = uberspect.getPropertySet(resolvers, object, attribute, value);
-            // if we can't find an exact match, narrow the value argument and try again
-            if (vs == null) {
-                // replace all numbers with the smallest type that will fit
-                Object[] narrow = {value};
-                if (arithmetic.narrowArguments(narrow)) {
-                    vs = uberspect.getPropertySet(resolvers, object, attribute, narrow[0]);
-                }
-            }
-            if (vs != null) {
-                // cache executor in volatile JexlNode.value
-                vs.invoke(object, value);
-                if (node != null && cache && vs.isCacheable()) {
-                    node.jjtSetValue(vs);
-                }
-                return;
-            }
-        } catch (Exception xany) {
-            xcause = xany;
-        }
-        // lets fail
-        if (node != null) {
-            String attrStr = attribute != null ? attribute.toString() : null;
-            unsolvableProperty(node, attrStr, true, xcause);
-        } else {
-            // direct call
-            String error = "unable to set object property"
-                    + ", class: " + object.getClass().getName()
-                    + ", property: " + attribute
-                    + ", argument: " + value.getClass().getSimpleName();
-            throw new UnsupportedOperationException(error, xcause);
         }
     }
 

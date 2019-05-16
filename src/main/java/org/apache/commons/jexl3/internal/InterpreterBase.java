@@ -29,6 +29,7 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.apache.commons.jexl3.introspection.JexlUberspect.PropertyResolver;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
@@ -863,7 +864,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                 }
             }
             // resolve that property
-            List<JexlUberspect.PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
+            List<PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
             JexlPropertyGet vg = uberspect.getPropertyGet(resolvers, object, attribute);
             if (vg != null) {
                 Object value = vg.invoke(object);
@@ -902,22 +903,20 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param value     the value to assign to the object's attribute
      * @param node      the node that evaluated as the object
      */
-    protected void setAttribute(Object object, Object attribute, Object value, JexlNode node) {
+    protected void setAttribute(Object object, Object attribute, Object value, JexlNode node, JexlOperator operator) {
         cancelCheck(node);
-        final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
-                                      ? JexlOperator.ARRAY_SET : JexlOperator.PROPERTY_SET;
         // check if we need to typecast value first
         Class type = object != null ? object.getClass() : null;
         if (type != null && type.isArray()) {
-              type = arithmetic.getWrapperClass(type.getComponentType());
-              if (!type.isInstance(value)) {
-                    if (arithmetic.isStrict()) {
-                           value = arithmetic.implicitCast(type, value);
-                    } else {
-                           value = arithmetic.cast(type, value);
-                    }
-              }
-        }                                      
+            type = arithmetic.getWrapperClass(type.getComponentType());
+            if (!type.isInstance(value)) {
+                if (arithmetic.isStrict()) {
+                    value = arithmetic.implicitCast(type, value);
+                } else {
+                    value = arithmetic.cast(type, value);
+                }
+            }
+        }
         Object result = operators.tryOverload(node, operator, object, attribute, value);
         if (result != JexlEngine.TRY_FAILED) {
             return;
@@ -935,7 +934,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                     }
                 }
             }
-            List<JexlUberspect.PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
+            List<PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
             JexlPropertySet vs = uberspect.getPropertySet(resolvers, object, attribute, value);
             // if we can't find an exact match, narrow the value argument and try again
             if (vs == null) {
