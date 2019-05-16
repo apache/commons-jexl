@@ -173,6 +173,7 @@ TOKEN_MGR_DECLS : {
     | < COMMA : "," > { popQ(); } /* Revert state to default. */
     | < DOT : "." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < QDOT : "?." > { pushDot(); } /* Lexical state is now DOT_ID */
+    | < QLBRACKET : "?[" > { popDot(); } /* Revert state to default */
     | < ELLIPSIS : "..." | "\u2026">
     | < HBRACKET : "#[" >
     | < HCURLY : "#{" >
@@ -1022,6 +1023,8 @@ void ProjectionMemberAccess() #void : {}
 {
     LOOKAHEAD(<LBRACKET>) ArrayAccess()
     |
+    LOOKAHEAD(<QLBRACKET>) ArrayAccessSafe()
+    |
     LOOKAHEAD(<DOT>) IdentifierAccess()
     |
     LOOKAHEAD(<QDOT>) IdentifierAccess()
@@ -1533,7 +1536,12 @@ void IdentifierAccess() #void :
 
 void ArrayAccess() : {}
 {
-    (LOOKAHEAD(1) <LBRACKET> Expression() ( <COMMA> Expression() )* <RBRACKET>)+
+    <LBRACKET> Expression() ( <COMMA> Expression() )* <RBRACKET>
+}
+
+void ArrayAccessSafe() : {}
+{
+    <QLBRACKET> Expression() ( <COMMA> Expression() )* <RBRACKET>
 }
 
 void ReferenceExpression() #MethodNode(>1) : {}
@@ -1588,9 +1596,9 @@ void MemberAccess() #void : {}
 {
     LOOKAHEAD(<LBRACKET>) ArrayAccess()
     |
-    LOOKAHEAD(<DOT>) IdentifierAccess()
+    LOOKAHEAD(<QLBRACKET>) ArrayAccessSafe()
     |
-    LOOKAHEAD(<QDOT>) IdentifierAccess()
+    LOOKAHEAD(<DOT> | <QDOT>) IdentifierAccess()
     |
     LOOKAHEAD(<LCURLY>) InlinePropertyAssignment()
 }

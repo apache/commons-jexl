@@ -24,7 +24,7 @@ import java.util.Map;
 import org.apache.commons.jexl3.junit.Asserter;
 import org.junit.Before;
 import org.junit.Test;
-
+import org.junit.Assert;
 
 /**
  * Tests for array access operator []
@@ -329,4 +329,15 @@ public class ArrayAccessTest extends JexlTestCase {
         asserter.assertExpression("bar.foo = []", new int[0]);
         //asserter.assertExpression("bar.foo[0]", 42);
     }
+
+    @Test
+    public void testSafeArrayAccess() throws Exception {
+
+        /*
+         * test List access
+         */
+
+        asserter.assertExpression("var list = null; list?[1]", null);
+    }
+
 }

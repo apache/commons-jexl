@@ -274,6 +274,8 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTArrayAccess node, Object data);
 
+    protected abstract Object visit(ASTArrayAccessSafe node, Object data);
+
     protected abstract Object visit(ASTIdentifierAccess node, Object data);
 
     protected abstract Object visit(ASTArguments node, Object data);

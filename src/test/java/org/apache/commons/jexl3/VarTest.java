@@ -226,7 +226,7 @@ public class VarTest extends JexlTestCase {
 
         e = JEXL.createScript("e[f]['g']");
         vars = e.getVariables();
-        expect = mkref(new String[][]{{"e"},{"f"}});
+        expect = mkref(new String[][]{{"e"}, {"f", "g"}});
         Assert.assertTrue(eq(expect, vars));
 
         e = JEXL.createScript("e['f']['g']");

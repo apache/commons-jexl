@@ -31,6 +31,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.introspection.JexlUberspect.PropertyResolver;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTArrayAccessSafe;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
@@ -427,6 +428,11 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected String stringifyProperty(JexlNode node) {
         if (node instanceof ASTArrayAccess) {
             return "["
+                    + stringifyPropertyValue(node.jjtGetChild(0))
+                    + "]";
+        }
+        if (node instanceof ASTArrayAccessSafe) {
+            return "?["
                     + stringifyPropertyValue(node.jjtGetChild(0))
                     + "]";
         }
@@ -844,7 +850,9 @@ public abstract class InterpreterBase extends ParserVisitor {
             throw new JexlException(node, "object is null");
         }
         cancelCheck(node);
-        final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
+        final JexlOperator operator = node != null && 
+                (node.jjtGetParent() instanceof ASTArrayAccess ||
+                 node.jjtGetParent() instanceof ASTArrayAccessSafe)
                 ? JexlOperator.ARRAY_GET : JexlOperator.PROPERTY_GET;
         Object result = operators.tryOverload(node, operator, object, attribute);
         if (result != JexlEngine.TRY_FAILED) {

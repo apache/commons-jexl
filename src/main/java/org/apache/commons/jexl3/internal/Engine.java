@@ -30,6 +30,7 @@ import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTArrayAccessSafe;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
@@ -595,7 +596,7 @@ public class Engine extends JexlEngine {
             if (collector.isCollecting()) {
                 collector.add(((ASTIdentifierAccess) node).getName());
             }
-        } else if (node instanceof ASTArrayAccess) {
+        } else if (node instanceof ASTArrayAccess || node instanceof ASTArrayAccessSafe) {
             int num = node.jjtGetNumChildren();
             // collect only if array access is const and follows an identifier
             boolean collecting = collector.isCollecting();

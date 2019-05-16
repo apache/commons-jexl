@@ -24,6 +24,7 @@ import org.apache.commons.jexl3.parser.ASTAnnotatedStatement;
 import org.apache.commons.jexl3.parser.ASTAnnotation;
 import org.apache.commons.jexl3.parser.ASTArguments;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTArrayAccessSafe;
 import org.apache.commons.jexl3.parser.ASTArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTArrayLiteral;
 import org.apache.commons.jexl3.parser.ASTArrayOpenDimension;
@@ -796,6 +797,11 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTArrayAccess node, Object data) {
+        return visitNode(node, data);
+    }
+
+    @Override
+    protected Object visit(ASTArrayAccessSafe node, Object data) {
         return visitNode(node, data);
     }
 

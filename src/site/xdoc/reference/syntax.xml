@@ -290,7 +290,7 @@
                         of the <code>arr1</code> array.</p>
                         <p>Multidimensional array access operator form <code>arr1[x,y]</code> can be used instead of
                         sequential <code>arr1[x][y]</code> form</p>
-                        <p>The safe-access operator <code>foo?.bar</code> shortcuts any null or non-existent references
+                        <p>The safe-access operators <code>foo?.bar</code> and <code>foo?[0]</code> shortcuts any null or non-existent references
                         along the navigation path, allowing a safe-navigation free of errors. In the previous expression,
                         if 'foo' is null, the whole expression will evaluate as null. This is an efficient shortcut
                         to defensive expressions such as <code>x?.y?.z</code> that would otherwise be expressed as

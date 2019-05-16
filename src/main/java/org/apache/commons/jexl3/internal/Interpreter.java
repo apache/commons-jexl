@@ -33,6 +33,7 @@ import org.apache.commons.jexl3.parser.ASTAnnotatedStatement;
 import org.apache.commons.jexl3.parser.ASTAnnotation;
 import org.apache.commons.jexl3.parser.ASTArguments;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTArrayAccessSafe;
 import org.apache.commons.jexl3.parser.ASTArrayConstructorNode;
 import org.apache.commons.jexl3.parser.ASTArrayLiteral;
 import org.apache.commons.jexl3.parser.ASTArrayOpenDimension;
@@ -2234,6 +2235,24 @@ public class Interpreter extends InterpreterBase {
         return object;
     }
 
+    @Override
+    protected Object visit(ASTArrayAccessSafe node, Object data) {
+        // first objectNode is the identifier
+        Object object = data;
+        // can have multiple nodes - either an expression, integer literal or reference
+        int numChildren = node.jjtGetNumChildren();
+        for (int i = 0; i < numChildren; i++) {
+            JexlNode nindex = node.jjtGetChild(i);
+            if (object == null) {
+                return null;
+            }
+            Object index = nindex.jjtAccept(this, null);
+            cancelCheck(node);
+            object = getAttribute(object, index, nindex);
+        }
+        return object;
+    }
+
     /**
      * Evaluates an access identifier based on the 2 main implementations;
      * static (name or numbered identifier) or dynamic (jxlt).
@@ -2315,7 +2334,7 @@ public class Interpreter extends InterpreterBase {
                 } else {
                     antish = false;
                 }
-            } else if (objectNode instanceof ASTArrayAccess) {
+            } else if (objectNode instanceof ASTArrayAccess || objectNode instanceof ASTArrayAccessSafe) {
                 if (object == null) {
                     break;
                 } else {
