@@ -154,7 +154,11 @@ public abstract class JexlNode extends SimpleNode {
                 }
                 return true;
             }
-            if (walk instanceof ASTIdentifier && !((ASTIdentifier) walk).isFinal()
+            if ((walk instanceof ASTIdentifier && ((ASTIdentifier) walk).isFinal())
+                || (walk instanceof ASTIdentifierAccess && ((ASTIdentifierAccess) walk).isSafe())) {
+                return false;
+            }
+            if (walk instanceof ASTIdentifier
                 || walk instanceof ASTIdentifierAccess
                 || walk instanceof ASTArrayAccess
                 || walk instanceof ASTIndirectNode) {

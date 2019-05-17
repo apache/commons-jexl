@@ -191,8 +191,8 @@ public class AntishCallTest extends JexlTestCase {
         Assert.assertNull(result); // safe navigation, null
         
         result = null;
-        script = jexl.createScript("x?.y?.z = 3");
         try {
+             script = jexl.createScript("x?.y?.z = 3");
              result = script.execute(ctxt);
              Assert.fail("not antish assign");
         } catch(JexlException xjexl) {
@@ -209,8 +209,8 @@ public class AntishCallTest extends JexlTestCase {
         }
         
         result = null;
-        script = jexl.createScript("x.y?.z = 3");
         try {
+             script = jexl.createScript("x.y?.z = 3");
              result = script.execute(ctxt);
              Assert.fail("not antish assign");
         } catch(JexlException xjexl) {
