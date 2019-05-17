@@ -65,6 +65,8 @@ Incompatible changes
 
 + Object methods `x.empty()` and `x.size()` are treated like ordinary method calls and are no longer equivalent to operators `empty(x)` and `size(x)`
 
++ Left-hand assignment expression can not use safe access operator `?.`
+
 New features
 ------------
 + Java-like `switch` statement is introduced
