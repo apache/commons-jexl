@@ -63,6 +63,8 @@ Incompatible changes
 + Hoisted variables are effectively final. The reason is hoisted variables are in fact copies of the original variables,
   so assigning a new value to the hoisted variable does not affect the original one. Such behaviour is misleading and thus restricted.
 
++ Object methods `x.empty()` and `x.size()` are treated like ordinary method calls and are no longer equivalent to operators `empty(x)` and `size(x)`
+
 New features
 ------------
 + Java-like `switch` statement is introduced
