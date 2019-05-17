@@ -913,24 +913,24 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected void setAttribute(Object object, Object attribute, Object value, JexlNode node, JexlOperator operator) {
         cancelCheck(node);
-        // check if we need to typecast value first
-        Class type = object != null ? object.getClass() : null;
-        if (type != null && type.isArray()) {
-            type = arithmetic.getWrapperClass(type.getComponentType());
-            if (!type.isInstance(value)) {
-                if (arithmetic.isStrict()) {
-                    value = arithmetic.implicitCast(type, value);
-                } else {
-                    value = arithmetic.cast(type, value);
-                }
-            }
-        }
         Object result = operators.tryOverload(node, operator, object, attribute, value);
         if (result != JexlEngine.TRY_FAILED) {
             return;
         }
         Exception xcause = null;
         try {
+            // check if we need to typecast value first
+            Class type = object != null ? object.getClass() : null;
+            if (type != null && type.isArray()) {
+                type = arithmetic.getWrapperClass(type.getComponentType());
+                if (!type.isInstance(value)) {
+                    if (arithmetic.isStrict()) {
+                        value = arithmetic.implicitCast(type, value);
+                    } else {
+                        value = arithmetic.cast(type, value);
+                    }
+                }
+            }
             // attempt to reuse last executor cached in volatile JexlNode.value
             if (node != null && cache) {
                 Object cached = node.jjtGetValue();
