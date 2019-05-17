@@ -1353,16 +1353,6 @@ void ImmutableSetLiteral() #SetLiteral : {}
  *      Functions & Methods
  ***************************************/
 
-void EmptyMethod() #EmptyMethod() : {}
-{
-    <EMPTY> <LPAREN> <RPAREN>
-}
-
-void SizeMethod() #SizeMethod() : {}
-{
-    <SIZE> <LPAREN> <RPAREN>
-}
-
 void Arguments() #Arguments : {}
 {
      <LPAREN> (Expression() (<COMMA> Expression())* )? <RPAREN>
@@ -1521,6 +1511,10 @@ void IdentifierAccess() #void :
         t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessJxlt
     |
         t=<REMOVE> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
+    |
+        t=<EMPTY> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
+    |
+        t=<SIZE> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
     )
     |
     <QDOT> (
@@ -1531,6 +1525,10 @@ void IdentifierAccess() #void :
         t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafeJxlt
     |
         t=<REMOVE> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
+    |
+        t=<EMPTY> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
+    |
+        t=<SIZE> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
     )
 }
 
@@ -1605,10 +1603,6 @@ void MemberAccess() #void : {}
 
 void MethodCall() #void : {}
 {
-    LOOKAHEAD(<DOT> <SIZE>) (<DOT> <SIZE> <LPAREN> <RPAREN>) #SizeMethod(1)
-    |
-    LOOKAHEAD(<DOT> <EMPTY>) (<DOT> <EMPTY> <LPAREN> <RPAREN>) #EmptyMethod(1)
-    |
     LOOKAHEAD(<DOT> <NEW>) (<DOT> <NEW> InnerType() Arguments()) #InnerConstructorNode()
     |
     (MemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)

@@ -49,7 +49,6 @@ import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
 import org.apache.commons.jexl3.parser.ASTElvisNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
-import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTEnumerationNode;
 import org.apache.commons.jexl3.parser.ASTEnumerationReference;
 import org.apache.commons.jexl3.parser.ASTExpressionStatement;
@@ -137,7 +136,6 @@ import org.apache.commons.jexl3.parser.ASTShiftLeftNode;
 import org.apache.commons.jexl3.parser.ASTShiftRightNode;
 import org.apache.commons.jexl3.parser.ASTShiftRightUnsignedNode;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
-import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStartCountNode;
 import org.apache.commons.jexl3.parser.ASTStopCountNode;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
@@ -741,13 +739,6 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTEmptyFunction node, Object data) {
         builder.append("empty ");
         accept(node.jjtGetChild(0), data);
-        return data;
-    }
-
-    @Override
-    protected Object visit(ASTEmptyMethod node, Object data) {
-        accept(node.jjtGetChild(0), data);
-        check(node, ".empty()", data);
         return data;
     }
 
@@ -1532,13 +1523,6 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTSizeFunction node, Object data) {
         builder.append("size ");
         accept(node.jjtGetChild(0), data);
-        return data;
-    }
-
-    @Override
-    protected Object visit(ASTSizeMethod node, Object data) {
-        accept(node.jjtGetChild(0), data);
-        check(node, ".size()", data);
         return data;
     }
 

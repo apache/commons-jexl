@@ -1284,9 +1284,6 @@ public class ArithmeticTest extends JexlTestCase {
         JexlScript s1 = JEXL.createScript("empty x", "x");
         empty = (Boolean) s1.execute(null, x);
         Assert.assertEquals(expect, empty);
-        JexlScript s2 = JEXL.createScript("x.empty()", "x");
-        empty = (Boolean) s2.execute(null, x);
-        Assert.assertEquals(expect, empty);
     }
 
     @Test

@@ -49,7 +49,6 @@ import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
 import org.apache.commons.jexl3.parser.ASTElvisNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
-import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTEnumerationNode;
 import org.apache.commons.jexl3.parser.ASTEnumerationReference;
 import org.apache.commons.jexl3.parser.ASTExpressionStatement;
@@ -136,7 +135,6 @@ import org.apache.commons.jexl3.parser.ASTShiftLeftNode;
 import org.apache.commons.jexl3.parser.ASTShiftRightNode;
 import org.apache.commons.jexl3.parser.ASTShiftRightUnsignedNode;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
-import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStartCountNode;
 import org.apache.commons.jexl3.parser.ASTStopCountNode;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
@@ -716,11 +714,6 @@ public class ScriptVisitor extends ParserVisitor {
     }
 
     @Override
-    protected Object visit(ASTEmptyMethod node, Object data) {
-        return visitNode(node, data);
-    }
-
-    @Override
     protected Object visit(ASTSizeFunction node, Object data) {
         return visitNode(node, data);
     }
@@ -742,11 +735,6 @@ public class ScriptVisitor extends ParserVisitor {
 
     @Override
     protected Object visit(ASTInnerConstructorNode node, Object data) {
-        return visitNode(node, data);
-    }
-
-    @Override
-    protected Object visit(ASTSizeMethod node, Object data) {
         return visitNode(node, data);
     }
 
