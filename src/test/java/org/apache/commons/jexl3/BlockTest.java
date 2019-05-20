@@ -82,4 +82,13 @@ public class BlockTest extends JexlTestCase {
         Object o = e.execute(jc);
         Assert.assertEquals("Block result is wrong", "world", o);
     }
+
+    @Test
+    public void testValueBlock() throws Exception {
+        JexlScript e = JEXL.createScript("var a = ({ x = 'Hello'; y = 'World';}); a");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals("Block result is wrong", "World", o);
+    }
+
 }

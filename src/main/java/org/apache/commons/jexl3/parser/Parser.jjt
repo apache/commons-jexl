@@ -1544,7 +1544,13 @@ void ArrayAccessSafe() : {}
 
 void ReferenceExpression() #MethodNode(>1) : {}
 {
-    ( <LPAREN> Expression() <RPAREN> #ReferenceExpression(1) ) ( LOOKAHEAD(<LPAREN>) Arguments() )*
+    ( <LPAREN> (
+      LOOKAHEAD(<LCURLY> Expression() <SEMICOL>) Block() // to disambiguate the set literals
+      |
+      LOOKAHEAD(<LCURLY> Statement() <SEMICOL>) Block() //  to disambiguate the set literals
+      |
+      Expression() 
+      ) <RPAREN> #ReferenceExpression(1) ) ( LOOKAHEAD(<LPAREN>) Arguments() )*
 }
 
 void PrimaryExpression() #void : {}

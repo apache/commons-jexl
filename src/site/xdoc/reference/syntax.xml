@@ -1106,6 +1106,13 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Block evaluation operator <code>({})</code></td>
+                    <td>
+                        The block evaluation operator executes a block and returns last evaluated statement as a result.
+                        <p>Note that this operator can not be overloaded</p>
+                    </td>
+                </tr>
+                <tr>
                     <td>Side-effect operators</td>
                     <td>
                         Some operators exist in side-effect forms.
