@@ -113,6 +113,8 @@ New features
 
 + New Map.Entry literal `[a : b]` is introduced
 
++ New block evaluation `({})` operator is introduced
+
 + New iterator `...` operator is introduced
 
 + New iterator processing (selection/projection/reduction) operators are introduced
