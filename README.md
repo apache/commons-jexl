@@ -147,6 +147,8 @@ Enhancements
 
 + Function parameters can be declared as non-null `function(var &x)`
 
++ Return statement expression can be omitted, implying `null` as a result
+
 + Local variables can be declared strongly typed by using java primitive types `int i = 0`
 
 + Local variables can be declared final `final var i = 0`
