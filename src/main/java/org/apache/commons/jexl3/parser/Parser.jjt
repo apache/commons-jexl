@@ -565,7 +565,7 @@ void SwitchStatementDefault() : {}
 
 void ReturnStatement() : {}
 {
-    <RETURN> ExpressionStatement()
+    <RETURN> [ LOOKAHEAD(2) ExpressionStatement() ]
 }
 
 void Continue() #Continue :

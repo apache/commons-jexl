@@ -1144,7 +1144,8 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTReturnStatement node, Object data) {
-        Object val = node.jjtGetChild(0).jjtAccept(this, data);
+        final int numChildren = node.jjtGetNumChildren();    
+        Object val = numChildren > 0 ? node.jjtGetChild(0).jjtAccept(this, data) : null;
         cancelCheck(node);
         throw new JexlException.Return(node, null, val);
     }
