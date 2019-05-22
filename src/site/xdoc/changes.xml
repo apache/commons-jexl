@@ -26,6 +26,18 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-305 due-to="Dmitri Blinov">
+                Script debugger produces incorrect syntax
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-304" due-to="Marcus Warm">
+                Error parsing overview.limit.var
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-303" due-to="Dmitri Blinov">
+                Block syntax is broken
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-301" due-to="Dmitri Blinov">
+                Array access operator does not fail on null object in non-strict arithmetic mode
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-296" due-to="Dmitri Blinov">
                 Ant-ish variables should not use safe-access operator syntax
             </action>

@@ -16,15 +16,17 @@
  */
 package org.apache.commons.jexl3;
 
+import java.util.HashMap;
 import org.junit.Assert;
-import org.junit.Ignore;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  * Test cases for reported issue between JEXL-300 and JEXL-399.
  */
 public class Issues300Test {
-    @Ignore
-    public void testNullArrayAccess301a() throws Exception {
+    @Test
+    public void testIssue301a() throws Exception {
         JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new JexlArithmetic(false)).create();
         String[] srcs = new String[]{
             "var x = null; x.0", "var x = null; x[0]", "var x = [null,1]; x[0][0]"
@@ -43,8 +45,8 @@ public class Issues300Test {
         }
     }
 
-    @Ignore
-    public void testNullArrayAccess301b() throws Exception {
+    @Test
+    public void testIssues301b() throws Exception {
         JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new JexlArithmetic(false)).create();
         Object[] xs = new Object[]{null, null, new Object[]{null, 1}};
         String[] srcs = new String[]{
@@ -63,4 +65,57 @@ public class Issues300Test {
             }
         }
     }
+ 
+     @Test
+    public void testIssue302() throws Exception {
+        JexlContext jc = new MapContext();
+        String[] strs = new String[]{
+            "{if (0) 1 else 2; var x = 4;}",
+            "if (0) 1; else 2; ",
+            "{ if (0) 1; else 2; }"
+        };
+        JexlEngine jexl = new JexlBuilder().create();
+        for(String str : strs) {
+        JexlScript e = jexl.createScript(str);
+        Object o = e.execute(jc);
+        int oo = ((Number) o).intValue() % 2;
+        Assert.assertEquals("Block result is wrong " + str, 0, oo);
+        }
+    }  
+    
+    @Test
+    public void testIssue304() {
+        JexlEngine jexlEngine = new JexlBuilder().strict(false).create();
+        JexlExpression jexlExpresssion = jexlEngine.createExpression("overview.limit.var");
+
+        HashMap<String,Object> map3 = new HashMap<String,Object>();
+        map3.put("var", "4711");
+        HashMap<String,Object> map2 = new HashMap<String,Object>();
+        map2.put("limit", map3);
+        HashMap<String,Object> map = new HashMap<String,Object>();
+        map.put("overview", map2);
+
+        JexlContext context = new MapContext(map);
+        Object value = jexlExpresssion.evaluate(context);
+        assertEquals("4711", value); // fails
+        
+        map.clear();
+        map.put("overview.limit.var", 42);
+        value = jexlExpresssion.evaluate(context);
+        assertEquals(42, value); // fails
+        
+    }
+    
+    @Test
+    public void testIssue305() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript e;
+        e = jexl.createScript("{while(false) {}; var x = 1;}");
+        String str0 = e.getParsedText();
+        e =  jexl.createScript(str0);
+        Assert.assertNotNull(e);
+        String str1 = e.getParsedText();
+        Assert.assertEquals(str0, str1);
+    }
+
 }
