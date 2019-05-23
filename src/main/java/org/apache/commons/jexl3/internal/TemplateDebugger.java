@@ -199,6 +199,7 @@ public class TemplateDebugger extends Debugger {
                     case ' ':
                     case ';':
                         return;
+                    default: // continue
                 }
             }
         }
@@ -218,6 +219,7 @@ public class TemplateDebugger extends Debugger {
                 case '}':
                     builder.append('\n');
                     return;
+                default: // continue
             }
         }
     }

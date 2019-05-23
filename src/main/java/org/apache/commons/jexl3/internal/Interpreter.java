@@ -2323,6 +2323,7 @@ public class Interpreter extends InterpreterBase {
                 }
             } else if (objectNode instanceof ASTArrayAccess || objectNode instanceof ASTArrayAccessSafe) {
                 if (object == null) {
+                    ptyNode = objectNode;
                     break;
                 } else {
                     antish = false;
@@ -2335,61 +2336,69 @@ public class Interpreter extends InterpreterBase {
                 // disallow mixing antish variable & bean with same root; avoid ambiguity
                 antish = false;
             } else if (antish) {
-                // skip the first node case since it was trialed in jjtAccept above and returned null
-                if (c > 0) {
-                    // create first from first node
-                    if (ant == null) {
-                        // if we still have a null object, check for an antish variable
-                        JexlNode first = node.jjtGetChild(0);
-                        if (first instanceof ASTIdentifier) {
-                            ASTIdentifier afirst = (ASTIdentifier) first;
-                            ant = new StringBuilder(afirst.getName());
-                        } else {
-                            // not an identifier, not antish
-                            ptyNode = objectNode;
-                            break main;
+                // create first from first node
+                if (ant == null) {
+                    // if we still have a null object, check for an antish variable
+                    JexlNode first = node.jjtGetChild(0);
+                    if (first instanceof ASTIdentifier) {
+                        ASTIdentifier afirst = (ASTIdentifier) first;
+                        ant = new StringBuilder(afirst.getName());
+                        // skip the first node case since it was trialed in jjtAccept above and returned null
+                        if (c == 0) {
+                            continue;
                         }
+                    } else {
+                        // not an identifier, not antish
+                        ptyNode = objectNode;
+                        break main;
                     }
-                    // catch up to current node
-                    for (; v <= c; ++v) {
-                        JexlNode child = node.jjtGetChild(v);
-                        if (child instanceof ASTIdentifierAccess) {
-                            ASTIdentifierAccess achild = (ASTIdentifierAccess) child;
-                            if (achild.isSafe() || achild.isExpression()) {
-                                break main;
-                            }
-                            ant.append('.');
-                            ant.append(achild.getName());
-                        } else {
-                            // not an identifier, not antish
-                            ptyNode = objectNode;
-                            break main;
-                        }
-                    }
-                    // solve antish
-                    object = context.get(ant.toString());
                 }
+                // catch up to current node
+                for (; v <= c; ++v) {
+                    JexlNode child = node.jjtGetChild(v);
+                    if (child instanceof ASTIdentifierAccess) {
+                        ASTIdentifierAccess achild = (ASTIdentifierAccess) child;
+                        if (achild.isSafe() || achild.isExpression()) {
+                            break main;
+                        }
+                        ant.append('.');
+                        ant.append(achild.getName());
+                    } else {
+                        // not an identifier, not antish
+                        ptyNode = objectNode;
+                        break main;
+                    }
+                }
+                // solve antish
+                object = context.get(ant.toString());
             } else if (c != numChildren - 1) {
                 // only the last one may be null
                 ptyNode = objectNode;
                 break; //
             }
         }
+        // am I the left-hand side of a safe op ?
         if (object == null && !node.isTernaryProtected()) {
             if (ptyNode != null) {
-                // am I the left-hand side of a safe op ?
-                return ptyNode.isSafeLhs(jexl.safe)
-                       ? null
-                       : unsolvableProperty(node, stringifyProperty(ptyNode), ptyNode == objectNode, null);
+                if (ptyNode.isSafeLhs(jexl.safe)) {
+                    return null;
+                }
+                if (ant != null) {
+                    String aname = ant.toString();
+                    boolean undefined = !(context.has(aname) || isLocalVariable(node, 0) || isFunctionCall(node));
+                    return unsolvableVariable(node, aname, undefined);
+                }
+                return unsolvableProperty(node, stringifyProperty(ptyNode), ptyNode == objectNode, null);
             }
             if (antish) {
-                String pstr = stringifyProperty(node);
-                String aname = ant != null? ant.toString() : pstr;
+                if (node.isSafeLhs(jexl.safe)) {
+                    return null;
+                }
+                String aname = ant != null ? ant.toString() : "?";
                 boolean undefined = !(context.has(aname) || isLocalVariable(node, 0) || isFunctionCall(node));
-                // variable unknown in context and not a local
-                return node.isSafeLhs(jexl.safe)
-                        ? null
-                        : unsolvableVariable(node, undefined? pstr : aname, undefined);
+                if (undefined || arithmetic.isStrict()) {
+                    return unsolvableVariable(node, aname, undefined);
+                }
             }
         }
         return object;

@@ -346,7 +346,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @return throws JexlException if strict and not silent, null otherwise
      */
     protected Object unsolvableVariable(JexlNode node, String var, boolean undef) {
-        if (isStrictEngine() && (undef || arithmetic.isStrict())) {
+        if (isStrictEngine()) {
             throw new JexlException.Variable(node, var, undef);
         } else if (logger.isDebugEnabled()) {
             logger.debug(JexlException.variableError(node, var, undef));

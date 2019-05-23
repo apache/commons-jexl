@@ -55,6 +55,14 @@ public abstract class JexlNode extends SimpleNode {
     public void jjtSetLastToken(Token t) {
         // nothing
     }
+    
+    public int getLine() {
+        return this.lc >>> 0xc;
+    }
+    
+    public int getColumn() {
+        return this.lc & 0xfff;
+    }
 
     /**
      * Gets the associated JexlInfo instance.
