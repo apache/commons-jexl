@@ -275,7 +275,7 @@ TOKEN_MGR_DECLS : {
 
 <DOT_ID> TOKEN : /* IDENTIFIERS */
 {
-  < DOT_IDENTIFIER: ( [ "0"-"9", "a"-"z", "A"-"Z", "_", "$", "@" ])+ | "var" > { popDot(); } /* Revert state to default. */
+  < DOT_IDENTIFIER: ( [ "0"-"9", "a"-"z", "A"-"Z", "_", "$", "@" ])+ > { popDot(); } /* Revert state to default. */
 }
 
 <DEFAULT, REGISTERS> TOKEN : /* IDENTIFIERS */
@@ -389,11 +389,6 @@ void AnnotatedStatement() #AnnotatedStatement() : {}
     (LOOKAHEAD(<ANNOTATION>) Annotation())+ (LOOKAHEAD(1) Block() | Statement())
 }
 
-void StatementLookahead() #void : {}
-{
-    <SEMICOL> | <IF> | <FOR> | <DO> | <WHILE> | <RETURN> | <BREAK> | <CONTINUE> | <VAR> | <PRAGMA>
-}
-
 void Statement() #void : {}
 {
     <SEMICOL>
@@ -413,7 +408,6 @@ void Statement() #void : {}
     | SynchronizedStatement()
     | LOOKAHEAD(SwitchStatementLookahead()) SwitchStatement()
     | LOOKAHEAD(MultipleIdentifier() <assign>) MultipleAssignmentStatement()
-    | LOOKAHEAD(2) ExpressionStatement()
     | ReturnStatement()
     | Continue()
     | Remove()
@@ -1313,9 +1307,9 @@ void MapLiteral() : {}
 {
     <LCURLY>
     (
-        MapElement() ( <COMMA> MapElement() )*
-    |
         <COLON>
+        |
+        MapElement() ( <COMMA> MapElement() )*
     ) <RCURLY>
 }
 
@@ -1513,8 +1507,6 @@ void IdentifierAccess() #void :
     <DOT> (
         t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
     |
-        <VAR> { jjtThis.setIdentifier("var"); } #IdentifierAccess
-    |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccess
     |
         t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessJxlt
@@ -1532,8 +1524,6 @@ void IdentifierAccess() #void :
     |
     <QDOT> (
         t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
-    |
-        <VAR> { jjtThis.setIdentifier("var"); } #IdentifierAccessSafe
     |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafe
     |
@@ -1564,35 +1554,29 @@ void ArrayAccessSafe() : {}
 void ReferenceExpression() #MethodNode(>1) : {}
 {
     ( <LPAREN> (
-      LOOKAHEAD(<LCURLY> Expression() <SEMICOL>) Block() // to disambiguate the set literals
-      |
-      LOOKAHEAD(<LCURLY> Statement() <SEMICOL>) Block() //  to disambiguate the set literals
-      |
-      Expression()
-      ) <RPAREN> #ReferenceExpression(1) ) ( LOOKAHEAD(<LPAREN>) Arguments() )*
+      LOOKAHEAD(Expression()) Expression() | Block()
+    ) <RPAREN> #ReferenceExpression(1) ) ( LOOKAHEAD(<LPAREN>) Arguments() )*
 }
 
 void PrimaryExpression() #void : {}
 {
     LOOKAHEAD( LambdaLookahead() ) Lambda()
     |
-    LOOKAHEAD( <LPAREN> ) ReferenceExpression()
-    |
     LOOKAHEAD( <LCURLY> MapElement() ) MapLiteral()
     |
-    LOOKAHEAD( <LCURLY> <COLON> ) MapLiteral()
+    LOOKAHEAD( <LCURLY> <COLON>) MapLiteral()
     |
     LOOKAHEAD( <HCURLY> MapElement() ) ImmutableMapLiteral()
     |
-    LOOKAHEAD( <HCURLY> <COLON> ) ImmutableMapLiteral()
+    LOOKAHEAD( <HCURLY> <COLON>) ImmutableMapLiteral()
+    |
+    LOOKAHEAD( <LCURLY> Expression() (<COMMA> | <RCURLY>)) SetLiteral()
     |
     LOOKAHEAD( <LCURLY> <RCURLY> ) SetLiteral()
     |
-    LOOKAHEAD( <LCURLY> Expression() (<COMMA> | <RCURLY>) ) SetLiteral()
+    LOOKAHEAD( <HCURLY> Expression() (<COMMA> | <RCURLY>)) ImmutableSetLiteral()
     |
     LOOKAHEAD( <HCURLY> <RCURLY> ) ImmutableSetLiteral()
-    |
-    LOOKAHEAD( <HCURLY> Expression() (<COMMA> | <RCURLY>) ) ImmutableSetLiteral()
     |
     LOOKAHEAD( EmptyListLiteral() ) EmptyListLiteral()
     |
@@ -1607,6 +1591,8 @@ void PrimaryExpression() #void : {}
     LOOKAHEAD( <SWITCH> ) SwitchExpression()
     |
     LOOKAHEAD( FunctionCallLookahead() ) FunctionCall()
+    |
+    LOOKAHEAD( <LPAREN> ) ReferenceExpression()
     |
     Identifier(true)
     |
