@@ -113,28 +113,28 @@ TOKEN_MGR_DECLS : {
 
 <*> TOKEN : /* KEYWORDS */
 {
-      < IF : "if" >
-    | < ELSE : "else" >
-    | < FOR : "for" >
-    | < WHILE : "while" >
-    | < DO : "do" >
-    | < NEW : "new" >
-    | < VAR : "var" >
+      < IF : "if" > { popDot(); } 
+    | < ELSE : "else" > { popDot(); } 
+    | < FOR : "for" > { popDot(); } 
+    | < WHILE : "while" > { popDot(); } 
+    | < DO : "do" > { popDot(); } 
+    | < NEW : "new" >  { popDot(); } 
+    | < VAR : "var" >  { popDot(); } 
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < SIZE : "size" > { popDot(); } /* Revert state to default if was DOT_ID. */
-    | < NULL : "null" >
-    | < TRUE : "true" >
-    | < FALSE : "false" >
-    | < RETURN : "return" >
-    | < FUNCTION : "function" >
+    | < NULL : "null" >  { popDot(); } 
+    | < TRUE : "true" > { popDot(); } 
+    | < FALSE : "false" >  { popDot(); } 
+    | < RETURN : "return" > { popDot(); } 
+    | < FUNCTION : "function" >  { popDot(); } 
     | < LAMBDA : "->" >
-    | < BREAK : "break" >
-    | < CONTINUE : "continue" >
-    | < PRAGMA : "#pragma" >
+    | < BREAK : "break" > { popDot(); } 
+    | < CONTINUE : "continue" > { popDot(); } 
+    | < PRAGMA : "#pragma" > { popDot(); } 
 }
 
 <*> TOKEN : { /* SEPARATORS */
-      < LPAREN : "(">
+      < LPAREN : "(">  
     | < RPAREN : ")">
     | < LCURLY : "{" >
     | < RCURLY : "}" >
@@ -152,23 +152,31 @@ TOKEN_MGR_DECLS : {
       < QMARK : "?" >
     | < ELVIS : "?:" >
     | < NULLP : "??" >
-    | < AND : "&&" | "and" >
-    | < OR : "||" | "or" >
+    | < AND : "&&" >
+    | < _AND :  "and" >  { popDot(); }
+    | < OR : "||" >
+    | < _OR: "or" > { popDot(); }
 }
 
 <*> TOKEN : { /* COMPARISONS */
-      < eq : "==" | "eq" >
-    | < ne : "!=" | "ne" >
+      < eq : "==" >
+    | < EQ : "eq" > { popDot(); }
+    | < ne : "!=" >
+    | < NE : "ne" > { popDot(); }
+    | < gt : ">" >
+    | < GT : "gt" > { popDot(); }
+    | < ge : ">=" >
+    | < GE : "ge" > { popDot(); }
+    | < lt : "<" >
+    | < LT : "lt" > { popDot(); }
+    | < le : "<=" >
+    | < LE : "le"  > { popDot(); }
     | < req : "=~" > // regexp equal
     | < rne : "!~" > // regexp not equal
     | < seq : "=^" > // starts equal
     | < eeq : "=$" > // ends equal
     | < sne : "!^" > // start not equal
     | < ene : "!$" > // ends not equal
-    | < gt : ">" | "gt" >
-    | < ge : ">=" | "ge" >
-    | < lt : "<" | "lt" >
-    | < le : "<=" | "le" >
 }
 
 <*> TOKEN : { /* OPERATORS */
@@ -185,9 +193,12 @@ TOKEN_MGR_DECLS : {
     | < plus : "+" >
     | < minus : "-" >
     | < mult : "*" >
-    | < div : "/" | "div" >
-    | < mod : "%" | "mod" >
-    | < not : "!" | "not" >
+    | < div : "/" >
+    | < DIV : "div" > { popDot(); }
+    | < mod : "%"  >
+    | < MOD : "mod" > { popDot(); }
+    | < not : "!" >
+    | < NOT : "not" > { popDot(); }
     | < and : "&" >
     | < or : "|" >
     | < xor : "^" >
@@ -211,7 +222,7 @@ TOKEN_MGR_DECLS : {
 
 <DOT_ID> TOKEN : /* IDENTIFIERS */
 {
-  < DOT_IDENTIFIER: ( [ "0"-"9", "a"-"z", "A"-"Z", "_", "$", "@" ])+ | "var" > { popDot(); } /* Revert state to default. */
+  < DOT_IDENTIFIER: ( [ "0"-"9", "a"-"z", "A"-"Z", "_", "$", "@" ])+ > { popDot(); } /* Revert state to default. */
 }
 
 <DEFAULT, REGISTERS> TOKEN : /* IDENTIFIERS */
@@ -313,22 +324,16 @@ void AnnotatedStatement() #AnnotatedStatement() : {}
     (LOOKAHEAD(<ANNOTATION>) Annotation())+ (LOOKAHEAD(1) Block() | Statement())
  }
 
-void StatementLookahead() #void : {}
-{
-    <SEMICOL> | <IF> | <FOR> | <DO> | <WHILE> | <RETURN> | <BREAK> | <CONTINUE> | <VAR> | <PRAGMA>
-}
-
 void Statement() #void : {}
 {
     <SEMICOL>
     | LOOKAHEAD(<ANNOTATION>) AnnotatedStatement()
-    | LOOKAHEAD(<LCURLY> StatementLookahead()) Block() // to disambiguate the set literals
-    | LOOKAHEAD(<LCURLY> Expression() <SEMICOL>) Block() //  to disambiguate the set literals
+    | LOOKAHEAD(Expression()) ExpressionStatement() 
+    | Block() 
     | IfStatement()
     | ForeachStatement()
     | WhileStatement()
     | DoWhileStatement()
-    | ExpressionStatement()
     | ReturnStatement()
     | Continue()
     | Break()
@@ -497,13 +502,13 @@ void ConditionalExpression() #void : {}
 void ConditionalOrExpression() #void : {}
 {
   ConditionalAndExpression()
-  ( <OR> ConditionalAndExpression() #OrNode(2) )*
+  ( (<OR>|<_OR>) ConditionalAndExpression() #OrNode(2) )*
 }
 
 void ConditionalAndExpression() #void : {}
 {
   InclusiveOrExpression()
-  ( <AND> InclusiveOrExpression() #AndNode(2) )*
+  ( (<AND>|<_AND>) InclusiveOrExpression() #AndNode(2) )*
 }
 
 void InclusiveOrExpression() #void : {}
@@ -528,9 +533,9 @@ void EqualityExpression() #void : {}
 {
   RelationalExpression()
   (
-     <eq> RelationalExpression() #EQNode(2)
+     (<eq> | <EQ>) RelationalExpression() #EQNode(2)
    |
-     <ne> RelationalExpression() #NENode(2)
+     (<ne> | <NE>) RelationalExpression() #NENode(2)
    |
      <range> RelationalExpression() #RangeNode(2) // range
   )?
@@ -540,13 +545,13 @@ void RelationalExpression() #void : {}
 {
   AdditiveExpression()
   (
-    <lt> AdditiveExpression() #LTNode(2)
+    (<lt> |<LT>)  AdditiveExpression() #LTNode(2)
    |
-    <gt> AdditiveExpression() #GTNode(2)
+    (<gt> | <GT>) AdditiveExpression() #GTNode(2)
    |
-    <le> AdditiveExpression() #LENode(2)
+    (<le> | <LE>) AdditiveExpression() #LENode(2)
    |
-    <ge> AdditiveExpression() #GENode(2)
+    (<ge> | <GE>) AdditiveExpression() #GENode(2)
    |
     <req> AdditiveExpression() #ERNode(2) // equals regexp
    |
@@ -582,9 +587,9 @@ void MultiplicativeExpression() #void : {}
   (
     <mult> UnaryExpression() #MulNode(2)
   |
-    <div> UnaryExpression() #DivNode(2)
+    (<div>|<DIV>) UnaryExpression() #DivNode(2)
   |
-    <mod> UnaryExpression() #ModNode(2)
+    (<mod>|<MOD>) UnaryExpression() #ModNode(2)
   )*
 }
 
@@ -596,7 +601,7 @@ void UnaryExpression() #void : {}
   |
     <tilda> UnaryExpression() #BitwiseComplNode(1)
   |
-    <not> UnaryExpression() #NotNode(1)
+    (<not>|<NOT>) UnaryExpression() #NotNode(1)
   |
     <EMPTY> UnaryExpression() #EmptyFunction(1)
   |
@@ -844,15 +849,23 @@ void Lambda() #JexlLambda() :
  *     References
  ***************************************/
 
+Token dotName() #void :
+{
+    Token t ;
+}
+{
+   ( t = <DOT_IDENTIFIER> | t=<IF> | t=<ELSE> | t=<FOR> | t=<WHILE> | t=<DO> | t=<NEW>| t=<EMPTY> | t=<SIZE> | t=<TRUE> | t=<FALSE> | t=<NULL>
+   | t=<_OR> | t=<_AND>| t=<NOT> | t=<NE> | t=<EQ> | t=<GT> | t=<GE> | t=<LT> | t=<LE> 
+   | t=<VAR> | t=<FUNCTION> ) { return t ;}
+}
+
 void IdentifierAccess() #void :
 {
     Token t;
 }
 {
     <DOT> (
-        t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
-    |
-        <VAR> { jjtThis.setIdentifier("var"); } #IdentifierAccess
+        t=dotName() { jjtThis.setIdentifier(t.image); } #IdentifierAccess
     |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccess
     |
@@ -860,9 +873,7 @@ void IdentifierAccess() #void :
     )
     |
     <QDOT> (
-        t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
-    |
-        <VAR> { jjtThis.setIdentifier("var"); } #IdentifierAccessSafe
+        t=dotName() { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
     |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafe
     |
@@ -899,7 +910,7 @@ void PrimaryExpression() #void : {}
     |
        LOOKAHEAD( <LCURLY> <COLON>) MapLiteral()
     |
-       LOOKAHEAD( <LCURLY> Expression() ) SetLiteral()
+       LOOKAHEAD( <LCURLY> Expression() (<COMMA> | <RCURLY>)) SetLiteral()
     |
        LOOKAHEAD( <LCURLY> <RCURLY> ) SetLiteral()
     |

@@ -77,19 +77,7 @@ public class ScriptTest extends JexlTestCase {
         Assert.assertNotNull("No result", result);
         Assert.assertEquals("Wrong result", new Integer(7), result);
     }
-
-    @Ignore
-    public void testScriptFromFile2() throws Exception {
-        File testScript = new File("/Users/henri.biestro/Downloads/sts8689.jexl");
-//        String testScript = "cube(()->{ while (true) { if (true) { if (true) {"
-//                + "montantTTL_7_tempo +=  montantTVANonDeductibleParMois) * exchangeRate_entite / exchangeRate_contrat;\n"
-//                + "}}}})";
-
-        JexlScript s = JEXL.createScript(testScript);
-        Assert.assertNotNull("No result", s);
-    }
-
-    
+  
     @Test
     public void testArgScriptFromFile() throws Exception {
         File testScript = new File(TEST_ADD);
