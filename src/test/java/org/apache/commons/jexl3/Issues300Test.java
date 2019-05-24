@@ -72,7 +72,8 @@ public class Issues300Test {
         String[] strs = new String[]{
             "{if (0) 1 else 2; var x = 4;}",
             "if (0) 1; else 2; ",
-            "{ if (0) 1; else 2; }"
+            "{ if (0) 1; else 2; }",
+            "{ if (0) { if (false) 1 else -3 } else 2; }"
         };
         JexlEngine jexl = new JexlBuilder().create();
         for(String str : strs) {
@@ -86,7 +87,7 @@ public class Issues300Test {
     @Test
     public void testIssue304() {
         JexlEngine jexlEngine = new JexlBuilder().strict(false).create();
-        JexlExpression jexlExpresssion = jexlEngine.createExpression("overview.limit.var");
+        JexlExpression e304 = jexlEngine.createExpression("overview.limit.var");
 
         HashMap<String,Object> map3 = new HashMap<String,Object>();
         map3.put("var", "4711");
@@ -96,14 +97,19 @@ public class Issues300Test {
         map.put("overview", map2);
 
         JexlContext context = new MapContext(map);
-        Object value = jexlExpresssion.evaluate(context);
+        Object value = e304.evaluate(context);
         assertEquals("4711", value); // fails
         
         map.clear();
         map.put("overview.limit.var", 42);
-        value = jexlExpresssion.evaluate(context);
-        assertEquals(42, value); // fails
+        value = e304.evaluate(context);
+        assertEquals(42, value); 
         
+        String allkw = "e304.if.else.do.while.new.true.false.null.var.function.empty.size.not.and.or.ne.eq.le.lt.gt.ge";
+        map.put(allkw, 42);
+        e304 = jexlEngine.createExpression(allkw);
+        value = e304.evaluate(context);
+        assertEquals(42, value); 
     }
     
     @Test

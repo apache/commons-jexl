@@ -127,35 +127,35 @@ TOKEN_MGR_DECLS : {
 
 <*> TOKEN : /* KEYWORDS */
 {
-      < IF : "if" >
-    | < ELSE : "else" >
-    | < FOR : "for" >
-    | < WHILE : "while" >
-    | < DO : "do" >
-    | < SWITCH : "switch" >
-    | < CASE : "case" >
-    | < DCASE : "default" >
-    | < TRY : "try" >
-    | < CATCH : "catch" >
-    | < FINALLY : "finally" >
-    | < THROW : "throw" >
-    | < ASSERT : "assert" >
-    | < SYNCHRONIZED : "synchronized" >
+      < IF : "if" > { popDot(); }
+    | < ELSE : "else" > { popDot(); }
+    | < FOR : "for" > { popDot(); }
+    | < WHILE : "while" > { popDot(); }
+    | < DO : "do" > { popDot(); }
+    | < SWITCH : "switch" > { popDot(); }
+    | < CASE : "case" > { popDot(); }
+    | < DCASE : "default" > { popDot(); }
+    | < TRY : "try" > { popDot(); }
+    | < CATCH : "catch" > { popDot(); }
+    | < FINALLY : "finally" > { popDot(); }
+    | < THROW : "throw" > { popDot(); }
+    | < ASSERT : "assert" > { popDot(); }
+    | < SYNCHRONIZED : "synchronized" > { popDot(); }
     | < NEW : "new" > { popDot(); pushQ(); } /* Lexical state is now QUALIFIED */
     | < VAR : "var" > { popDot(); } /* Revert state to default if was DOT_ID. */
-    | < FINAL : "final" >
+    | < FINAL : "final" > { popDot(); }
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < SIZE : "size" > { popDot(); } /* Revert state to default if was DOT_ID. */
-    | < THIS : "this" >
-    | < NULL : "null" | "\u2205" >
-    | < TRUE : "true" >
-    | < FALSE : "false" >
-    | < RETURN : "return" >
+    | < THIS : "this" > { popDot(); }
+    | < NULL : "null" | "\u2205" > { popDot(); }
+    | < TRUE : "true" > { popDot(); }
+    | < FALSE : "false" > { popDot(); }
+    | < RETURN : "return" > { popDot(); }
     | < FUNCTION : "function" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < LAMBDA : "->" | "\u2192" >
     | < LAMBDAE : "=>" | "\u21D2" >
-    | < BREAK : "break" >
-    | < CONTINUE : "continue" >
+    | < BREAK : "break" > { popDot(); }
+    | < CONTINUE : "continue" > { popDot(); }
     | < REMOVE : "remove" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < PRAGMA : "#pragma" > { pushQ(); } /* Lexical state is now QUALIFIED */
 }
@@ -201,13 +201,17 @@ TOKEN_MGR_DECLS : {
       < QMARK : "?" >
     | < ELVIS : "?:" >
     | < NULLP : "??" >
-    | < AND : "&&" | "and" | "\u2227" >
-    | < OR : "||" | "or" | "\u2228" >
+    | < AND : "&&" | "\u2227" >
+    | < _AND :  "and" >  { popDot(); }
+    | < OR : "||" | "\u2228" >
+    | < _OR: "or" > { popDot(); }
 }
 
 <*> TOKEN : { /* COMPARISONS */
-      < eq : "==" | "eq" | "\u2261">
-    | < ne : "!=" | "ne" | "\u2260" >
+      < eq : "==" | "\u2261">
+    | < EQ : "eq" > { popDot(); }
+    | < ne : "!=" | "\u2260" >
+    | < NE : "ne" > { popDot(); }
     | < req : "=~" | "in" | "\u2208" > // regexp equal
     | < rne : "!~" | "!in" | "\u2209" > // regexp not equal
     | < is : "===" > // identitical
@@ -216,10 +220,14 @@ TOKEN_MGR_DECLS : {
     | < eeq : "=$" > // ends equal
     | < sne : "!^" > // start not equal
     | < ene : "!$" > // ends not equal
-    | < gt : ">" | "gt" >
-    | < ge : ">=" | "ge" | "\u2265" >
-    | < lt : "<" | "lt" >
-    | < le : "<=" | "le" | "\u2264" >
+    | < gt : ">" >
+    | < GT : "gt" > { popDot(); }
+    | < ge : ">=" | "\u2265" >
+    | < GE : "ge" > { popDot(); }
+    | < lt : "<" >
+    | < LT : "lt" > { popDot(); }
+    | < le : "<=" | "\u2264" >
+    | < LE : "le"  > { popDot(); }
     | < iof : "instanceof" > { pushQ(); }
     | < niof : "!instanceof" > { pushQ(); }
 
@@ -246,9 +254,12 @@ TOKEN_MGR_DECLS : {
     | < minus : "-" >
     | < unary_minus : "\u2212" >
     | < mult : "*" | "\u22C5" >
-    | < div : "/" | "div" >
-    | < mod : "%" | "mod" >
-    | < not : "!" | "not" | "\u00AC" >
+    | < div : "/" >
+    | < DIV : "div" > { popDot(); }
+    | < mod : "%" >
+    | < MOD : "mod" > { popDot(); }
+    | < not : "!" | "\u00AC" >
+    | < NOT : "not" > { popDot(); }
     | < and : "&" >
     | < or : "|" >
     | < xor : "^" >
@@ -780,7 +791,7 @@ void ConditionalOrExpression() #void : {}
 {
   ConditionalAndExpression()
   ( LOOKAHEAD(2) (
-     <OR> ConditionalAndExpression() #OrNode(2)
+     (<OR>|<_OR>) ConditionalAndExpression() #OrNode(2)
   ) )*
 }
 
@@ -788,7 +799,7 @@ void ConditionalAndExpression() #void : {}
 {
   InclusiveOrExpression()
   ( LOOKAHEAD(2) (
-     <AND> InclusiveOrExpression() #AndNode(2)
+     (<AND>|<_AND>) InclusiveOrExpression() #AndNode(2)
   ) )*
 }
 
@@ -820,9 +831,9 @@ void EqualityExpression() #void : {}
 {
   RelationalExpression()
   ( LOOKAHEAD(2) (
-     <eq> RelationalExpression() #EQNode(2)
+     (<eq> | <EQ>) RelationalExpression() #EQNode(2)
    |
-     <ne> RelationalExpression() #NENode(2)
+     (<ne> | <NE>) RelationalExpression() #NENode(2)
    |
      <req> RelationalExpression() #ERNode(2) // equals regexp
    |
@@ -839,13 +850,13 @@ void RelationalExpression() #void : {}
 {
   RangeExpression()
   ( LOOKAHEAD(2) (
-    <lt> RangeExpression() #LTNode(2)
+    (<lt> |<LT>) RangeExpression() #LTNode(2)
    |
-    <gt> RangeExpression() #GTNode(2)
+    (<gt> | <GT>) RangeExpression() #GTNode(2)
    |
-    <le> RangeExpression() #LENode(2)
+    (<le> | <LE>) RangeExpression() #LENode(2)
    |
-    <ge> RangeExpression() #GENode(2)
+    (<ge> | <GE>) RangeExpression() #GENode(2)
    |
     <seq> RangeExpression() #SWNode(2) // starts with
    |
@@ -902,9 +913,9 @@ void MultiplicativeExpression() #void : {}
   ( LOOKAHEAD(2) (
     <mult> UnaryExpression() #MulNode(2)
   |
-    <div> UnaryExpression() #DivNode(2)
+    (<div>|<DIV>) UnaryExpression() #DivNode(2)
   |
-    <mod> UnaryExpression() #ModNode(2)
+    (<mod>|<MOD>) UnaryExpression() #ModNode(2)
   ) )*
 }
 
@@ -924,7 +935,7 @@ void UnaryExpression() #void : {}
   |
   <tilda> UnaryExpression() #BitwiseComplNode(1)
   |
-  <not> UnaryExpression() #NotNode(1)
+  (<not>|<NOT>) UnaryExpression() #NotNode(1)
   |
   LOOKAHEAD(<LPAREN> PrimitiveType() <RPAREN>) (<LPAREN> PrimitiveType() <RPAREN> UnaryExpression() #CastNode(2))
   |
@@ -1499,45 +1510,38 @@ void Lambda() #JexlLambda() :
  *     References
  ***************************************/
 
+Token dotName() #void :
+{
+    Token t ;
+}
+{
+   ( t = <DOT_IDENTIFIER> | t=<IF> | t=<ELSE> | t=<FOR> | t=<WHILE> | t=<DO>
+   | t=<TRY> | t=<CATCH> | t=<THROW> | t=<ASSERT> | t=<SYNCHRONIZED> | t=<REMOVE> | t=<THIS>
+   | t=<SWITCH> | t=<CASE> | t=<DCASE> | t=<FINAL>
+   | t=<NEW>| t=<EMPTY> | t=<SIZE> | t=<TRUE> | t=<FALSE> | t=<NULL>
+   | t=<_OR> | t=<_AND>| t=<NOT> | t=<NE> | t=<EQ> | t=<GT> | t=<GE> | t=<LT> | t=<LE>
+   | t=<VAR> | t=<FUNCTION> ) { return t ;}
+}
+
 void IdentifierAccess() #void :
 {
     Token t;
 }
 {
     <DOT> (
-        t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
+        t=dotName() { jjtThis.setIdentifier(t.image); } #IdentifierAccess
     |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccess
     |
         t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessJxlt
-    |
-        t=<REMOVE> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
-    |
-        t=<FUNCTION> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
-    |
-        t=<VAR> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
-    |
-        t=<EMPTY> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
-    |
-        t=<SIZE> { jjtThis.setIdentifier(t.image); } #IdentifierAccess
     )
     |
     <QDOT> (
-        t=<DOT_IDENTIFIER> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
+        t=dotName() { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
     |
         t=<STRING_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafe
     |
         t=<JXLT_LITERAL> { jjtThis.setIdentifier(Parser.buildString(t.image, true)); } #IdentifierAccessSafeJxlt
-    |
-        t=<REMOVE> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
-    |
-        t=<FUNCTION> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
-    |
-        t=<VAR> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
-    |
-        t=<EMPTY> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
-    |
-        t=<SIZE> { jjtThis.setIdentifier(t.image); } #IdentifierAccessSafe
     )
 }
 
