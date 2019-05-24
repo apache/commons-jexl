@@ -180,14 +180,14 @@ TOKEN_MGR_DECLS : {
 }
 
 <*> TOKEN : { /* PRIMITIVE TYPES */
-      < CHAR :    "char" >
-    | < BYTE :    "byte" >
-    | < SHORT :   "short" >
-    | < INT :     "int" >
-    | < LONG :    "long" >
-    | < FLOAT :   "float" >
-    | < DOUBLE :  "double" >
-    | < BOOLEAN : "boolean" >
+      < CHAR :    "char" > { popDot(); }
+    | < BYTE :    "byte" > { popDot(); }
+    | < SHORT :   "short" > { popDot(); }
+    | < INT :     "int" > { popDot(); }
+    | < LONG :    "long" > { popDot(); }
+    | < FLOAT :   "float" > { popDot(); }
+    | < DOUBLE :  "double" > { popDot(); }
+    | < BOOLEAN : "boolean" > { popDot(); }
 }
 
 <*> TOKEN : { /* STREAMS */
@@ -212,7 +212,8 @@ TOKEN_MGR_DECLS : {
     | < EQ : "eq" > { popDot(); }
     | < ne : "!=" | "\u2260" >
     | < NE : "ne" > { popDot(); }
-    | < req : "=~" | "in" | "\u2208" > // regexp equal
+    | < req : "=~" | "\u2208" > // regexp equal
+    | < IN : "in" > { popDot(); }
     | < rne : "!~" | "!in" | "\u2209" > // regexp not equal
     | < is : "===" > // identitical
     | < ni : "!==" > // not identitical
@@ -228,7 +229,7 @@ TOKEN_MGR_DECLS : {
     | < LT : "lt" > { popDot(); }
     | < le : "<=" | "\u2264" >
     | < LE : "le"  > { popDot(); }
-    | < iof : "instanceof" > { pushQ(); }
+    | < iof : "instanceof" > { popDot(); pushQ(); }
     | < niof : "!instanceof" > { pushQ(); }
 
 }
@@ -835,7 +836,7 @@ void EqualityExpression() #void : {}
    |
      (<ne> | <NE>) RelationalExpression() #NENode(2)
    |
-     <req> RelationalExpression() #ERNode(2) // equals regexp
+     (<req> | <IN>) RelationalExpression() #ERNode(2) // equals regexp
    |
      <rne> RelationalExpression() #NRNode(2) // not equals regexp
    |
@@ -997,12 +998,12 @@ void Selection() #SelectionNode : {}
 
 void StopCountSelection() #StopCountNode : {}
 {
-    <lt> Expression()
+    (<lt> | <LT>) Expression()
 }
 
 void StartCountSelection() #StartCountNode : {}
 {
-    <gt> Expression()
+    (<gt> | <GT>) Expression()
 }
 
 void ArrayProjection() #ProjectionNode : {}
@@ -1345,9 +1346,9 @@ void ImmutableMapLiteral() #MapLiteral() : {}
 {
     <HCURLY>
     (
-        MapElement() ( <COMMA> MapElement() )*
-    |
         <COLON>
+        |
+        MapElement() ( <COMMA> MapElement() )*
     ) <RCURLY> { jjtThis.setImmutable(true); }
 }
 
@@ -1517,7 +1518,8 @@ Token dotName() #void :
 {
    ( t = <DOT_IDENTIFIER> | t=<IF> | t=<ELSE> | t=<FOR> | t=<WHILE> | t=<DO>
    | t=<TRY> | t=<CATCH> | t=<THROW> | t=<ASSERT> | t=<SYNCHRONIZED> | t=<REMOVE> | t=<THIS>
-   | t=<SWITCH> | t=<CASE> | t=<DCASE> | t=<FINAL>
+   | t=<CHAR> | t=<BOOLEAN> | t=<BYTE> | t=<SHORT> | t=<INT> | t=<LONG> | t=<FLOAT> | t=<DOUBLE>
+   | t=<SWITCH> | t=<CASE> | t=<DCASE> | t=<FINAL> | t=<IN> | t=<iof> 
    | t=<NEW>| t=<EMPTY> | t=<SIZE> | t=<TRUE> | t=<FALSE> | t=<NULL>
    | t=<_OR> | t=<_AND>| t=<NOT> | t=<NE> | t=<EQ> | t=<GT> | t=<GE> | t=<LT> | t=<LE>
    | t=<VAR> | t=<FUNCTION> ) { return t ;}
