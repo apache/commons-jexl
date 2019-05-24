@@ -2321,9 +2321,15 @@ public class Interpreter extends InterpreterBase {
                 } else {
                     antish = false;
                 }
-            } else if (objectNode instanceof ASTArrayAccess || objectNode instanceof ASTArrayAccessSafe) {
+            } else if (objectNode instanceof ASTArrayAccess) {
                 if (object == null) {
                     ptyNode = objectNode;
+                    break;
+                } else {
+                    antish = false;
+                }
+            } else if (objectNode instanceof ASTArrayAccessSafe) {
+                if (object == null) {
                     break;
                 } else {
                     antish = false;
