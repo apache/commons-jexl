@@ -43,21 +43,23 @@
 Apache Commons JEXL
 ===================
 
-[![Build Status](https://travis-ci.org/apache/commons-jexl.svg?branch=trunk)](https://travis-ci.org/apache/commons-jexl)
+[![Build Status](https://travis-ci.org/apache/commons-jexl3.svg?branch=master)](https://travis-ci.org/apache/commons-jexl3)
+[![Coverage Status](https://coveralls.io/repos/apache/commons-jexl3/badge.svg?branch=master)](https://coveralls.io/r/apache/commons-jexl3)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/)
+[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 The Apache Commons JEXL library is an implementation of the JSTL Expression Language with extensions.
 
 Documentation
 -------------
 
-More information can be found on the [Apache Commons JEXL homepage](https://commons.apache.org/proper/commons-jexl).
-The [JavaDoc](https://commons.apache.org/proper/commons-jexl/javadocs/api-release) can be browsed.
+More information can be found on the [Apache Commons JEXL homepage](https://commons.apache.org/proper/commons-jexl3).
+The [JavaDoc](https://commons.apache.org/proper/commons-jexl3/javadocs/api-release) can be browsed.
 Questions related to the usage of Apache Commons JEXL should be posted to the [user mailing list][ml].
 
 Where can I get the latest release?
 -----------------------------------
-You can download source and binaries from our [download page](https://commons.apache.org/proper/commons-jexl/download_jexl.cgi).
+You can download source and binaries from our [download page](https://commons.apache.org/proper/commons-jexl3/download_jexl3.cgi).
 
 Alternatively you can pull it from the central Maven repositories:
 
