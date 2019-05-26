@@ -78,6 +78,7 @@ Bugs Fixed in 3.2:
 * JEXL-301:      Array access operator does not fail on null object in non-strict arithmetic mode
 * JEXL-300:      Ant-ish variables should not use safe-access operator syntax
 * JEXL-299:      Improve message error when method could not be found
+* JEXL-298:      Unable to call 'empty' and 'size' member methods with parameters
 * JEXL-296:      Real literal in scientific format is not parsed without suffix
 * JEXL-291:      Using sandbox prevents array-syntax lookup by number in Map
 * JEXL-290:      Safe navigation fails on chained method calls

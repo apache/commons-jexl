@@ -191,7 +191,7 @@ public enum JexlOperator {
      * @see JexlArithmetic#negate
      */
     NEGATE("-", "negate", 1),
-    
+
     /**
      * Positivize operator.
      * <br><strong>Syntax:</strong> <code>+x</code>
@@ -203,8 +203,8 @@ public enum JexlOperator {
     /**
      * Empty operator.
      * <br><strong>Syntax:</strong> <code>empty x</code> or <code>empty(x)</code>
-     * <br><strong>Method:</strong> <code>boolean isEmpty(L x);</code>.
-     * @see JexlArithmetic#isEmpty
+     * <br><strong>Method:</strong> <code>boolean empty(L x);</code>.
+     * @see JexlArithmetic#empty
      */
     EMPTY("empty", "empty", 1),
 

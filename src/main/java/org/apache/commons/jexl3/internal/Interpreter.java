@@ -49,7 +49,6 @@ import org.apache.commons.jexl3.parser.ASTEQNode;
 import org.apache.commons.jexl3.parser.ASTERNode;
 import org.apache.commons.jexl3.parser.ASTEWNode;
 import org.apache.commons.jexl3.parser.ASTEmptyFunction;
-import org.apache.commons.jexl3.parser.ASTEmptyMethod;
 import org.apache.commons.jexl3.parser.ASTExtendedLiteral;
 import org.apache.commons.jexl3.parser.ASTFalseNode;
 import org.apache.commons.jexl3.parser.ASTForeachStatement;
@@ -95,7 +94,6 @@ import org.apache.commons.jexl3.parser.ASTSetOrNode;
 import org.apache.commons.jexl3.parser.ASTSetSubNode;
 import org.apache.commons.jexl3.parser.ASTSetXorNode;
 import org.apache.commons.jexl3.parser.ASTSizeFunction;
-import org.apache.commons.jexl3.parser.ASTSizeMethod;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.ASTSubNode;
 import org.apache.commons.jexl3.parser.ASTTernaryNode;
@@ -147,7 +145,7 @@ public class Interpreter extends InterpreterBase {
         super(ii, jexla);
         frame = ii.frame;
     }
-        
+
     /**
      * Swaps the current thread local interpreter.
      * @param inter the interpreter or null
@@ -231,7 +229,7 @@ public class Interpreter extends InterpreterBase {
         }
         return null;
     }
-    
+
     /**
      * Gets an attribute of an object.
      *
@@ -252,7 +250,7 @@ public class Interpreter extends InterpreterBase {
     public void setAttribute(Object object, Object attribute, Object value) {
         setAttribute(object, attribute, value, null);
     }
-    
+
     @Override
     protected Object visit(ASTAddNode node, Object data) {
         Object left = node.jjtGetChild(0).jjtAccept(this, data);
@@ -527,7 +525,7 @@ public class Interpreter extends InterpreterBase {
             throw new JexlException(valNode, "- error", xrt);
         }
     }
-    
+
     @Override
     protected Object visit(ASTUnaryPlusNode node, Object data) {
         // use cached value if literal
@@ -553,7 +551,7 @@ public class Interpreter extends InterpreterBase {
             throw new JexlException(valNode, "- error", xrt);
         }
     }
-    
+
     @Override
     protected Object visit(ASTBitwiseComplNode node, Object data) {
         Object arg = node.jjtGetChild(0).jjtAccept(this, data);
@@ -898,12 +896,6 @@ public class Interpreter extends InterpreterBase {
     }
 
     @Override
-    protected Object visit(ASTSizeMethod node, Object data) {
-        Object val = node.jjtGetChild(0).jjtAccept(this, data);
-        return operators.size(node, val);
-    }
-
-    @Override
     protected Object visit(ASTEmptyFunction node, Object data) {
         try {
             Object value = node.jjtGetChild(0).jjtAccept(this, data);
@@ -911,12 +903,6 @@ public class Interpreter extends InterpreterBase {
         } catch(JexlException xany) {
             return true;
         }
-    }
-
-    @Override
-    protected Object visit(ASTEmptyMethod node, Object data) {
-        Object val = node.jjtGetChild(0).jjtAccept(this, data);
-        return operators.empty(node, val);
     }
 
     @Override
@@ -951,7 +937,7 @@ public class Interpreter extends InterpreterBase {
             return null;
         }
     }
-    
+
     @Override
     protected Object visit(ASTIdentifier node, Object data) {
         cancelCheck(node);
@@ -968,7 +954,7 @@ public class Interpreter extends InterpreterBase {
                 && !(context.has(name))
                 && !node.isTernaryProtected()) {
                 return jexl.safe
-                        ? null 
+                        ? null
                         : unsolvableVariable(node, name, !(node.getSymbol() >= 0 || context.has(name)));
             }
             return value;
@@ -1037,7 +1023,7 @@ public class Interpreter extends InterpreterBase {
         Object id = evalIdentifier(node);
         return getAttribute(data, id, node);
     }
-    
+
     @Override
     protected Object visit(ASTReference node, Object data) {
         cancelCheck(node);
@@ -1083,7 +1069,7 @@ public class Interpreter extends InterpreterBase {
                 } else {
                     antish = false;
                 }
-            } 
+            }
             // attempt to evaluate the property within the object (visit(ASTIdentifierAccess node))
             object = objectNode.jjtAccept(this, object);
             cancelCheck(node);
@@ -1158,7 +1144,7 @@ public class Interpreter extends InterpreterBase {
         }
         return object;
     }
-    
+
     @Override
     protected Object visit(ASTAssignment node, Object data) {
         return executeAssign(node, null, data);
@@ -1488,7 +1474,7 @@ public class Interpreter extends InterpreterBase {
                 } else if (context.has(methodName)) {
                     functor = context.get(methodName);
                     isavar = functor != null;
-                } 
+                }
                 // name is a variable, cant be cached
                 cacheable &= !isavar;
             }
@@ -1509,7 +1495,7 @@ public class Interpreter extends InterpreterBase {
             // safe lhs
             return null;
         }
-        
+
         // solving the call site
         CallDispatcher call = new CallDispatcher(node, cacheable);
         try {
@@ -1517,7 +1503,7 @@ public class Interpreter extends InterpreterBase {
             Object eval = call.tryEval(target, methodName, argv);
             if (JexlEngine.TRY_FAILED != eval) {
                 return eval;
-            } 
+            }
             boolean functorp = false;
             boolean narrow = false;
             // pseudo loop to try acquiring methods without and with argument narrowing

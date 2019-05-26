@@ -101,7 +101,7 @@ public class ExceptionTest extends JexlTestCase {
             Throwable xth = xany.getCause();
             Assert.assertEquals(NullPointerException.class, xth.getClass());
         }
-        
+
         try {
             jexl.invokeMethod(npe, "foo", 42);
             Assert.fail("Should have thrown JexlException.Method");
@@ -262,16 +262,16 @@ public class ExceptionTest extends JexlTestCase {
             }
         } catch(JexlException xjexl) {
             if (!strict || silent) {
-                Assert.fail("should not have thrown an exception");
+                Assert.fail(src + ": should not have thrown an exception");
             }
         }
         if (strict) {
             if (silent && l.count("warn") == 0) {
-                Assert.fail("should have generated a warning");
+                Assert.fail(src + ": should have generated a warning");
             }
         } else {
             if (l.count("debug") == 0) {
-                Assert.fail("should have generated a debug");
+                Assert.fail(src + ": should have generated a debug");
             }
             Assert.assertEquals(42, r);
         }

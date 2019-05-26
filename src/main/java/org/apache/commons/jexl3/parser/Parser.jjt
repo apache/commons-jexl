@@ -113,35 +113,35 @@ TOKEN_MGR_DECLS : {
 
 <*> TOKEN : /* KEYWORDS */
 {
-      < IF : "if" > { popDot(); } 
-    | < ELSE : "else" > { popDot(); } 
-    | < FOR : "for" > { popDot(); } 
-    | < WHILE : "while" > { popDot(); } 
-    | < DO : "do" > { popDot(); } 
-    | < NEW : "new" >  { popDot(); } 
-    | < VAR : "var" >  { popDot(); } 
+      < IF : "if" > { popDot(); }
+    | < ELSE : "else" > { popDot(); }
+    | < FOR : "for" > { popDot(); }
+    | < WHILE : "while" > { popDot(); }
+    | < DO : "do" > { popDot(); }
+    | < NEW : "new" >  { popDot(); }
+    | < VAR : "var" >  { popDot(); }
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < SIZE : "size" > { popDot(); } /* Revert state to default if was DOT_ID. */
-    | < NULL : "null" >  { popDot(); } 
-    | < TRUE : "true" > { popDot(); } 
-    | < FALSE : "false" >  { popDot(); } 
-    | < RETURN : "return" > { popDot(); } 
-    | < FUNCTION : "function" >  { popDot(); } 
+    | < NULL : "null" >  { popDot(); }
+    | < TRUE : "true" > { popDot(); }
+    | < FALSE : "false" >  { popDot(); }
+    | < RETURN : "return" > { popDot(); }
+    | < FUNCTION : "function" >  { popDot(); }
     | < LAMBDA : "->" >
-    | < BREAK : "break" > { popDot(); } 
-    | < CONTINUE : "continue" > { popDot(); } 
-    | < PRAGMA : "#pragma" > { popDot(); } 
+    | < BREAK : "break" > { popDot(); }
+    | < CONTINUE : "continue" > { popDot(); }
+    | < PRAGMA : "#pragma" > { popDot(); }
 }
 
 <*> TOKEN : { /* SEPARATORS */
-      < LPAREN : "(">  
+      < LPAREN : "(">
     | < RPAREN : ")">
     | < LCURLY : "{" >
     | < RCURLY : "}" >
     | < LBRACKET : "[" >
     | < RBRACKET : "]" >
     | < SEMICOL : ";" >
-    | < COLON : ":" > 
+    | < COLON : ":" >
     | < COMMA : "," >
     | < DOT : "." > { pushDot(); } /* Lexical state is now DOT_ID */
     | < QDOT : "?." > { pushDot(); } /* Lexical state is now DOT_ID */
@@ -244,7 +244,7 @@ TOKEN_MGR_DECLS : {
 <DEFAULT, REGISTERS> TOKEN : /* LITERALS */
 {
  <INTEGER_LITERAL:
-      <DECIMAL_LITERAL> (<INT_SFX>)? 
+      <DECIMAL_LITERAL> (<INT_SFX>)?
     | <HEX_LITERAL> (<INT_SFX>)?
     | <OCTAL_LITERAL> (<INT_SFX>)?
  >
@@ -252,7 +252,7 @@ TOKEN_MGR_DECLS : {
     | <#HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+>
     | <#OCTAL_LITERAL: "0" (["0"-"7"])*>
     | <#INT_SFX : ["l","L","h","H"]>
-| 
+|
 <FLOAT_LITERAL:
       (["0"-"9"])+ "." (["0"-"9"])+ (<FLT_SFX>)?
     | (["0"-"9"])+ (".")? (<FLT_SFX>)
@@ -328,8 +328,8 @@ void Statement() #void : {}
 {
     <SEMICOL>
     | LOOKAHEAD(<ANNOTATION>) AnnotatedStatement()
-    | LOOKAHEAD(Expression()) ExpressionStatement() 
-    | Block() 
+    | LOOKAHEAD(Expression()) ExpressionStatement()
+    | Block()
     | IfStatement()
     | ForeachStatement()
     | WhileStatement()
@@ -768,19 +768,10 @@ void SetLiteral() : {}
     <LCURLY> (Expression() ( <COMMA> Expression() )*)? <RCURLY>
 }
 
+
 /***************************************
  *      Functions & Methods
  ***************************************/
-
-void EmptyMethod() #EmptyMethod() : {}
-{
-    <EMPTY> <LPAREN> <RPAREN>
-}
-
-void SizeMethod() #SizeMethod() : {}
-{
-    <SIZE> <LPAREN> <RPAREN>
-}
 
 void Arguments() #Arguments : {}
 {
@@ -855,7 +846,7 @@ Token dotName() #void :
 }
 {
    ( t = <DOT_IDENTIFIER> | t=<IF> | t=<ELSE> | t=<FOR> | t=<WHILE> | t=<DO> | t=<NEW>| t=<EMPTY> | t=<SIZE> | t=<TRUE> | t=<FALSE> | t=<NULL>
-   | t=<_OR> | t=<_AND>| t=<NOT> | t=<NE> | t=<EQ> | t=<GT> | t=<GE> | t=<LT> | t=<LE> 
+   | t=<_OR> | t=<_AND>| t=<NOT> | t=<NE> | t=<EQ> | t=<GT> | t=<GE> | t=<LT> | t=<LE>
    | t=<VAR> | t=<FUNCTION> ) { return t ;}
 }
 
@@ -927,10 +918,6 @@ void PrimaryExpression() #void : {}
 
 void MethodCall() #void : {}
 {
-    LOOKAHEAD(<DOT> <SIZE>) (<DOT> <SIZE> <LPAREN> <RPAREN>) #SizeMethod(1)
-    |
-    LOOKAHEAD(<DOT> <EMPTY>) (<DOT> <EMPTY> <LPAREN> <RPAREN>) #EmptyMethod(1)
-    |
     (MemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
 }
 

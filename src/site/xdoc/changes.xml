@@ -26,7 +26,7 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
-            <action dev="henrib" type="fix" issue="JEXL-305 due-to="Dmitri Blinov">
+            <action dev="henrib" type="fix" issue="JEXL-305" due-to="Dmitri Blinov">
                 Script debugger produces incorrect syntax
             </action>
             <action dev="henrib" type="fix" issue="JEXL-304" due-to="Marcus Warm">
@@ -38,25 +38,25 @@
             <action dev="henrib" type="fix" issue="JEXL-301" due-to="Dmitri Blinov">
                 Array access operator does not fail on null object in non-strict arithmetic mode
             </action>
-            <action dev="henrib" type="fix" issue="JEXL-296" due-to="Dmitri Blinov">
-                Ant-ish variables should not use safe-access operator syntax
-            </action>
             <action dev="henrib" type="fix" issue="JEXL-299" due-to="Jarek Cecho">
                 Improve message error when method could not be found
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-298" due-to="Dmitri Blinov">
+                Unable to call 'empty' and 'size' member methods with parameters
             </action>
             <action dev="henrib" type="fix" issue="JEXL-296" due-to="Dmitri Blinov">
                 Real literal in scientific format is not parsed without suffix
             </action>
-            <action dev="henrib" type="add" issue="JEXL-295"> 
+            <action dev="henrib" type="add" issue="JEXL-295">
                 Add unary plus operator
             </action>
             <action dev="henrib" type="add" issue="JEXL-292" due-to="Dmitri Blinov">
                 Allow specifying custom Permissions class for Uberspect to be used later by Introspector
             </action>
-            <action dev="henrib" type="fix" issue="JEXL-291" due-to="David Costanzo"> 
+            <action dev="henrib" type="fix" issue="JEXL-291" due-to="David Costanzo">
                 Using sandbox prevents array-syntax lookup by number in Map
             </action>
-            <action dev="henrib" type="fix" issue="JEXL-290"> 
+            <action dev="henrib" type="fix" issue="JEXL-290">
                 Safe navigation fails on chained method calls
             </action>
             <action dev="henrib" type="fix" issue="JEXL-289" due-to="Dmitri Blinov">
@@ -68,10 +68,10 @@
             <action dev="henrib" type="fix" issue="JEXL-287" due-to="Dmitri Blinov">
                 Wrong resolution of local variables
             </action>
-            <action dev="henrib" type="fix" issue="JEXL-286" due-to="Dmitri Blinov"> 
+            <action dev="henrib" type="fix" issue="JEXL-286" due-to="Dmitri Blinov">
                 For statement without a body should update its variable
             </action>
-            <action dev="henrib" type="fix" issue="JEXL-285"> 
+            <action dev="henrib" type="fix" issue="JEXL-285">
                 For statement variable may seem unaffected by iteration
             </action>
             <action dev="henrib" type="fix" issue="JEXL-282" due-to="Dmitri Blinov">

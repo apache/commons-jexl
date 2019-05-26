@@ -318,21 +318,21 @@ public class Operators {
         if (object == null) {
             return Boolean.TRUE;
         }
-        final JexlArithmetic arithmetic = interpreter.arithmetic;
-        final JexlUberspect uberspect = interpreter.uberspect;
         Object result = Operators.this.tryOverload(node, JexlOperator.EMPTY, object);
         if (result != JexlEngine.TRY_FAILED) {
             return result;
         }
+        final JexlArithmetic arithmetic = interpreter.arithmetic;
         result = arithmetic.isEmpty(object);
         if (result == null) {
+            final JexlUberspect uberspect = interpreter.uberspect;
             result = false;
             // check if there is an isEmpty method on the object that returns a
             // boolean and if so, just use it
             JexlMethod vm = uberspect.getMethod(object, "isEmpty", Interpreter.EMPTY_PARAMS);
             if (returnsBoolean(vm)) {
                 try {
-                    result = (Boolean) vm.invoke(object, Interpreter.EMPTY_PARAMS);
+                    result = vm.invoke(object, Interpreter.EMPTY_PARAMS);
                 } catch (Exception xany) {
                     interpreter.operatorError(node, JexlOperator.EMPTY, xany);
                 }
@@ -347,27 +347,27 @@ public class Operators {
      * <p>Note that the result may not be an integer.
      *
      * @param node   the node that gave the value to size
-     * @param object the object to get the size of.
+     * @param object the object to get the size of
      * @return the evaluation result
      */
     protected Object size(JexlNode node, Object object) {
         if (object == null) {
             return 0;
         }
-        final JexlArithmetic arithmetic = interpreter.arithmetic;
-        final JexlUberspect uberspect = interpreter.uberspect;
         Object result = Operators.this.tryOverload(node, JexlOperator.SIZE, object);
         if (result != JexlEngine.TRY_FAILED) {
             return result;
         }
+        final JexlArithmetic arithmetic = interpreter.arithmetic;
         result = arithmetic.size(object);
         if (result == null) {
+            final JexlUberspect uberspect = interpreter.uberspect;
             // check if there is a size method on the object that returns an
             // integer and if so, just use it
             JexlMethod vm = uberspect.getMethod(object, "size", Interpreter.EMPTY_PARAMS);
             if (vm != null && (Integer.TYPE.equals(vm.getReturnType()) || Integer.class.equals(vm.getReturnType()))) {
                 try {
-                    result = (Integer) vm.invoke(object, Interpreter.EMPTY_PARAMS);
+                    result = vm.invoke(object, Interpreter.EMPTY_PARAMS);
                 } catch (Exception xany) {
                     interpreter.operatorError(node, JexlOperator.SIZE, xany);
                 }

@@ -825,13 +825,13 @@ public class JexlArithmetic {
         }
         throw new ArithmeticException("Object negate:(" + val + ")");
     }
-    
+
     /**
      * Whether negate called with a given argument will always return the same result.
      * <p>This is used to determine whether negate results on number literals can be cached.
      * If the result on calling negate with the same constant argument may change between calls,
      * which means the function is not deterministic, this method must return false.
-     * @see #isNegateStable() 
+     * @see #isNegateStable()
      * @return true if negate is idempotent, false otherwise
      */
     public boolean isNegateStable() {
@@ -867,7 +867,7 @@ public class JexlArithmetic {
         }
         throw new ArithmeticException("Object positivize:(" + val + ")");
     }
-        
+
     /**
      * Whether positivize called with a given argument will always return the same result.
      * <p>This is used to determine whether positivize results on number literals can be cached.
@@ -878,7 +878,7 @@ public class JexlArithmetic {
     public boolean isPositivizeStable() {
         return true;
     }
-    
+
     /**
      * Test if left contains right (right matches/in left).
      * <p>Beware that this method arguments are the opposite of the operator arguments.
@@ -968,27 +968,41 @@ public class JexlArithmetic {
 
     /**
      * Check for emptiness of various types: Number, Collection, Array, Map, String.
+     * <p>Override or overload this method to add new signatures to the size operators.
+     * @param object the object to check the emptiness of
+     * @return the boolean or false if object is not null
+     * @since 3.2
+     */
+    public Boolean empty(Object object) {
+        Boolean e = isEmpty(object);
+        return e == null ? Boolean.TRUE  : e;
+    }
+
+    /**
+     * Check for emptiness of various types: Number, Collection, Array, Map, String.
      *
      * @param object the object to check the emptiness of
      * @return the boolean or null if there is no arithmetic solution
      */
     public Boolean isEmpty(Object object) {
-        if (object instanceof Number) {
-            double d = ((Number) object).doubleValue();
-            return Double.isNaN(d) || d == 0.d ? Boolean.TRUE : Boolean.FALSE;
-        }
-        if (object instanceof CharSequence) {
-            return ((CharSequence) object).length() == 0 ? Boolean.TRUE : Boolean.FALSE;
-        }
-        if (object.getClass().isArray()) {
-            return Array.getLength(object) == 0 ? Boolean.TRUE : Boolean.FALSE;
-        }
-        if (object instanceof Collection<?>) {
-            return ((Collection<?>) object).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
-        }
-        // Map isn't a collection
-        if (object instanceof Map<?, ?>) {
-            return ((Map<?, ?>) object).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
+        if (object != null) {
+            if (object instanceof Number) {
+                double d = ((Number) object).doubleValue();
+                return Double.isNaN(d) || d == 0.d ? Boolean.TRUE : Boolean.FALSE;
+            }
+            if (object instanceof CharSequence) {
+                return ((CharSequence) object).length() == 0 ? Boolean.TRUE : Boolean.FALSE;
+            }
+            if (object.getClass().isArray()) {
+                return Array.getLength(object) == 0 ? Boolean.TRUE : Boolean.FALSE;
+            }
+            if (object instanceof Collection<?>) {
+                return ((Collection<?>) object).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
+            }
+            // Map isn't a collection
+            if (object instanceof Map<?, ?>) {
+                return ((Map<?, ?>) object).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
+            }
         }
         return null;
     }

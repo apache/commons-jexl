@@ -113,7 +113,7 @@ public abstract class ParserVisitor {
     protected abstract Object visit(ASTModNode node, Object data);
 
     protected abstract Object visit(ASTUnaryMinusNode node, Object data);
-    
+
     protected abstract Object visit(ASTUnaryPlusNode node, Object data);
 
     protected abstract Object visit(ASTBitwiseComplNode node, Object data);
@@ -148,15 +148,11 @@ public abstract class ParserVisitor {
 
     protected abstract Object visit(ASTEmptyFunction node, Object data);
 
-    protected abstract Object visit(ASTEmptyMethod node, Object data);
-
     protected abstract Object visit(ASTSizeFunction node, Object data);
 
     protected abstract Object visit(ASTFunctionNode node, Object data);
 
     protected abstract Object visit(ASTMethodNode node, Object data);
-
-    protected abstract Object visit(ASTSizeMethod node, Object data);
 
     protected abstract Object visit(ASTConstructorNode node, Object data);
 
