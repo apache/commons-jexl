@@ -203,6 +203,16 @@ public class VarTest extends JexlTestCase {
         Set<List<String>> vars;
         Set<List<String>> expect;
 
+        e = JEXL.createScript("a[b]['c']");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"a"},{"b"}});
+        Assert.assertTrue(eq(expect, vars));
+
+        e = JEXL.createScript("a.'b + c'");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"a", "b + c"}});
+        Assert.assertTrue(eq(expect, vars));
+
         e = JEXL.createScript("e[f]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"e"},{"f"}});
@@ -278,12 +288,12 @@ public class VarTest extends JexlTestCase {
         vars = e.getVariables();
         expect = mkref(new String[][]{{"A"}});
         Assert.assertTrue(eq(expect, vars));
-        
+
         e = JEXL.createScript("a[b]['c']");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a"}, {"b"}});
         Assert.assertTrue(eq(expect, vars));
-        
+
         e = JEXL.createScript("a['b'][c]");
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a", "b"}, {"c"}});
