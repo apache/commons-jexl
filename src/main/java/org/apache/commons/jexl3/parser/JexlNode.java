@@ -55,11 +55,11 @@ public abstract class JexlNode extends SimpleNode {
     public void jjtSetLastToken(Token t) {
         // nothing
     }
-    
+
     public int getLine() {
         return this.lc >>> 0xc;
     }
-    
+
     public int getColumn() {
         return this.lc & 0xfff;
     }
@@ -89,11 +89,11 @@ public abstract class JexlNode extends SimpleNode {
             return info;
         }
     }
-    
+
     /**
      * Marker interface for cachable function calls.
      */
-    public interface Funcall {} 
+    public interface Funcall {}
 
     /**
      * Clears any cached value of type JexlProperty{G,S}et or JexlMethod.
@@ -261,15 +261,17 @@ public abstract class JexlNode extends SimpleNode {
     public boolean isTernaryProtected() {
         JexlNode node = this;
         for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
-            if (walk instanceof ASTTernaryNode) {
+            // protect only the condition part of the ternay
+            if (walk instanceof ASTTernaryNode && node == walk.jjtGetChild(0)) {
                 return true;
             }
-            if (walk instanceof ASTNullpNode) {
+            if (walk instanceof ASTNullpNode && node == walk.jjtGetChild(0)) {
                 return true;
             }
             if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {
                 break;
             }
+            node = walk;
         }
         return false;
     }

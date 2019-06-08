@@ -140,6 +140,7 @@ public class IfTest extends JexlTestCase {
         o = e.execute(null, 4);
         Assert.assertEquals(40, o);
     }
+
     @Test
     public void testIfElseIfReturnExpression() throws Exception {
         JexlScript e = JEXL.createScript(
@@ -425,5 +426,22 @@ public class IfTest extends JexlTestCase {
         o = yone.execute(jc);
         Assert.assertEquals("Should be 0", 0, o);
         debuggerCheck(JEXL);
+    }
+
+
+    @Test
+    public void testTernaryFail() throws Exception {
+        JexlEvalContext jc = new JexlEvalContext();
+        JexlExpression e = JEXL.createExpression("false ? bar : quux");
+        Object o;
+        jc.setStrict(true);
+        jc.setSilent(false);
+        try {
+           o = e.evaluate(jc);
+           Assert.fail("Should have failed");
+        } catch (JexlException xjexl) {
+           // OK
+           Assert.assertTrue(xjexl.toString().contains("quux"));
+        }
     }
 }
