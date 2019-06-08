@@ -32,9 +32,9 @@ import org.junit.Assert;
  */
 public class JexlTestCase {
     /** No parameters signature for test run. */
-    private static final Class<?>[] noParms = {};
+    private static final Class<?>[] NO_PARMS = {};
     /** String parameter signature for test run. */
-    private static final Class<?>[] stringParm = {String.class};
+    private static final Class<?>[] STRING_PARM = {String.class};
 
     /** A default JEXL engine instance. */
     protected final JexlEngine JEXL;
@@ -86,7 +86,7 @@ public class JexlTestCase {
         }
         Method method = null;
         try {
-            method = this.getClass().getDeclaredMethod(name, noParms);
+            method = this.getClass().getDeclaredMethod(name, NO_PARMS);
         }
         catch(Exception xany) {
             Assert.fail("no such test: " + name);
@@ -127,7 +127,7 @@ public class JexlTestCase {
         // find ctor & instantiate
         Constructor<JexlTestCase> ctor = null;
         try {
-            ctor = clazz.getConstructor(stringParm);
+            ctor = clazz.getConstructor(STRING_PARM);
             test = ctor.newInstance("debug");
         }
         catch(NoSuchMethodException xctor) {

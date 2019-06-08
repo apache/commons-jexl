@@ -149,6 +149,10 @@ public class Engine extends JexlEngine {
      * The default jxlt engine.
      */
     protected volatile TemplateEngine jxlt = null;
+    /**
+     * Collect all or only dot references.
+     */
+    protected final boolean collectAll;
 
     /**
      * Creates an engine with default arguments.
@@ -163,11 +167,12 @@ public class Engine extends JexlEngine {
      */
     public Engine(JexlBuilder conf) {
         // options:
-        this.strict = conf.strict() == null ? true : conf.strict();
-        this.safe = conf.safe() == null ? false : conf.safe();
-        this.silent = conf.silent() == null ? false : conf.silent();
-        this.cancellable = conf.cancellable() == null ? !silent && strict : conf.cancellable();
-        this.debug = conf.debug() == null ? true : conf.debug();
+        this.strict = option(conf.strict(), true);
+        this.safe = option(conf.safe(), false);
+        this.silent = option(conf.silent(), false);
+        this.cancellable = option(conf.cancellable(), !silent && strict );
+        this.debug = option(conf.debug(), true);
+        this.collectAll = option(conf.collectAll(), true);
         this.stackOverflow = conf.stackOverflow() > 0? conf.stackOverflow() : Integer.MAX_VALUE;
         // core properties:
         JexlUberspect uber = conf.uberspect() == null ? getUberspect(conf.logger(), conf.strategy()) : conf.uberspect();
@@ -195,6 +200,16 @@ public class Engine extends JexlEngine {
         if (uberspect == null) {
             throw new IllegalArgumentException("uberspect can not be null");
         }
+    }
+
+    /**
+     * Solves an optional option.
+     * @param conf the option as configured, may be null
+     * @param def the default value if null
+     * @return true or false
+     */
+    private boolean option(Boolean conf, boolean def) {
+        return conf == null? def : conf;
     }
 
     /**
@@ -493,9 +508,17 @@ public class Engine extends JexlEngine {
      *         or the empty set if no variables are used
      */
     protected Set<List<String>> getVariables(ASTJexlScript script) {
-        VarCollector collector = new VarCollector();
+        VarCollector collector = varCollector();
         getVariables(script, script, collector);
         return collector.collected();
+    }
+
+    /**
+     * Creates a collector instance.
+     * @return a collector instance
+     */
+    protected VarCollector varCollector() {
+        return new VarCollector(this.collectAll);
     }
 
     /**
@@ -514,6 +537,18 @@ public class Engine extends JexlEngine {
          * The node that started the collect.
          */
         private JexlNode root = null;
+        /**
+         * Whether constant array-access is considered equivalent to dot-access.
+         */
+        private boolean semantic = true;
+
+        /**
+         * Constructor.
+         * @param constaa whether constant array-access is considered equivalent to dot-access
+         */
+        protected VarCollector(boolean constaa) {
+            semantic = constaa;
+        }
 
         /**
          * Starts/stops a variable collect.
@@ -585,7 +620,7 @@ public class Engine extends JexlEngine {
             if (collector.isCollecting()) {
                 collector.add(((ASTIdentifierAccess) node).getName());
             }
-        } else if (node instanceof ASTArrayAccess) {
+        } else if (node instanceof ASTArrayAccess && collector.semantic) {
             int num = node.jjtGetNumChildren();
             // collect only if array access is const and follows an identifier
             boolean collecting = collector.isCollecting();
@@ -598,6 +633,7 @@ public class Engine extends JexlEngine {
                     collecting = false;
                     collector.collect(null);
                     getVariables(script, child, collector);
+                    collector.collect(null);
                 }
             }
         } else {

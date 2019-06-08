@@ -428,7 +428,7 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public Set<List<String>> getVariables() {
-            Engine.VarCollector collector = new Engine.VarCollector();
+            Engine.VarCollector collector = jexl.varCollector();
             getVariables(collector);
             return collector.collected();
         }
@@ -591,7 +591,7 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public Set<List<String>> getVariables() {
-            Engine.VarCollector collector = new Engine.VarCollector();
+            Engine.VarCollector collector = jexl.varCollector();
             for (TemplateExpression expr : exprs) {
                 expr.getVariables(collector);
             }

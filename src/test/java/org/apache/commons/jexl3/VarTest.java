@@ -298,6 +298,54 @@ public class VarTest extends JexlTestCase {
         vars = e.getVariables();
         expect = mkref(new String[][]{{"a", "b"}, {"c"}});
         Assert.assertTrue(eq(expect, vars));
+
+        e = JEXL.createScript("a[b].c");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"a"}, {"b"}});
+        Assert.assertTrue(eq(expect, vars));
+
+        e = JEXL.createScript("a[b].c[d]");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"a"}, {"b"}, {"d"}});
+        Assert.assertTrue(eq(expect, vars));
+
+        e = JEXL.createScript("a[b][e].c[d][f]");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"a"}, {"b"}, {"d"}, {"e"}, {"f"}});
+        Assert.assertTrue(eq(expect, vars));
+    }
+
+    @Test
+    public void testVarCollectNotAll() throws Exception {
+        JexlScript e;
+        Set<List<String>> vars;
+        Set<List<String>> expect;
+        JexlEngine jexl = new JexlBuilder().strict(true).silent(false).cache(32).collectAll(false).create();
+
+        e = jexl.createScript("a['b'][c]");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"a"}, {"c"}});
+        Assert.assertTrue(eq(expect, vars));
+
+        e = jexl.createScript(" A + B[C] + D[E[F]] + x[y[z]] ");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"A"}, {"B"}, {"C"}, {"D"}, {"E"}, {"F"}, {"x"} , {"y"}, {"z"}});
+        Assert.assertTrue(eq(expect, vars));
+
+        e = jexl.createScript("e['f']['g']");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"e"}});
+        Assert.assertTrue(eq(expect, vars));
+
+        e = jexl.createScript("a[b][e].c[d][f]");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"a"}, {"b"}, {"d"}, {"e"}, {"f"}});
+        Assert.assertTrue(eq(expect, vars));
+
+        e = jexl.createScript("a + b.c + b.c.d + e['f']");
+        vars = e.getVariables();
+        expect = mkref(new String[][]{{"a"}, {"b", "c"}, {"b", "c", "d"}, {"e"}});
+        Assert.assertTrue(eq(expect, vars));
     }
 
     @Test

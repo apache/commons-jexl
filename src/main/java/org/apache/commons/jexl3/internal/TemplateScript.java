@@ -195,7 +195,7 @@ public final class TemplateScript implements JxltEngine.Template {
 
     @Override
     public Set<List<String>> getVariables() {
-        Engine.VarCollector collector = new Engine.VarCollector();
+        Engine.VarCollector collector = jxlt.getEngine().varCollector();
         for (TemplateExpression expr : exprs) {
             expr.getVariables(collector);
         }
