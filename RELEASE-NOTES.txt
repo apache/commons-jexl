@@ -72,9 +72,11 @@ New Features in 3.2:
 Bugs Fixed in 3.2:
 ==================
 
+* JEXL-306:      Ternary operator ? protects also its branches from resolution errors
 * JEXL-305:      Script debugger produces incorrect syntax
 * JEXL-304:      Error parsing overview.limit.var
 * JEXL-303:      Block syntax is broken
+* JEXL-302:      JexlScript.getVariables returns strange values for array access
 * JEXL-301:      Array access operator does not fail on null object in non-strict arithmetic mode
 * JEXL-300:      Ant-ish variables should not use safe-access operator syntax
 * JEXL-299:      Improve message error when method could not be found

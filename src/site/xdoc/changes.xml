@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-306" due-to="Dmitri Blinov">
+                Ternary operator ? protects also its branches from resolution errors
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-305" due-to="Dmitri Blinov">
                 Script debugger produces incorrect syntax
             </action>
@@ -34,6 +37,9 @@
             </action>
             <action dev="henrib" type="fix" issue="JEXL-303" due-to="Dmitri Blinov">
                 Block syntax is broken
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-302" due-to="Dmitri Blinov">
+                JexlScript.getVariables returns strange values for array access
             </action>
             <action dev="henrib" type="fix" issue="JEXL-301" due-to="Dmitri Blinov">
                 Array access operator does not fail on null object in non-strict arithmetic mode

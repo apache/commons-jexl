@@ -170,7 +170,7 @@ public class Engine extends JexlEngine {
         this.strict = option(conf.strict(), true);
         this.safe = option(conf.safe(), false);
         this.silent = option(conf.silent(), false);
-        this.cancellable = option(conf.cancellable(), !silent && strict );
+        this.cancellable = option(conf.cancellable(), !silent && strict);
         this.debug = option(conf.debug(), true);
         this.collectAll = option(conf.collectAll(), true);
         this.stackOverflow = conf.stackOverflow() > 0? conf.stackOverflow() : Integer.MAX_VALUE;
