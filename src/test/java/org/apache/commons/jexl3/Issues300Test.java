@@ -65,7 +65,7 @@ public class Issues300Test {
             }
         }
     }
- 
+
      @Test
     public void testIssue302() throws Exception {
         JexlContext jc = new MapContext();
@@ -82,8 +82,8 @@ public class Issues300Test {
         int oo = ((Number) o).intValue() % 2;
         Assert.assertEquals("Block result is wrong " + str, 0, oo);
         }
-    }  
-    
+    }
+
     @Test
     public void testIssue304() {
         JexlEngine jexlEngine = new JexlBuilder().strict(false).create();
@@ -99,19 +99,19 @@ public class Issues300Test {
         JexlContext context = new MapContext(map);
         Object value = e304.evaluate(context);
         assertEquals("4711", value); // fails
-        
+
         map.clear();
         map.put("overview.limit.var", 42);
         value = e304.evaluate(context);
-        assertEquals(42, value); 
-        
+        assertEquals(42, value);
+
         String allkw = "e304.if.else.do.while.new.true.false.null.var.function.empty.size.not.and.or.ne.eq.le.lt.gt.ge";
         map.put(allkw, 42);
         e304 = jexlEngine.createExpression(allkw);
         value = e304.evaluate(context);
-        assertEquals(42, value); 
+        assertEquals(42, value);
     }
-    
+
     @Test
     public void testIssue305() throws Exception {
         JexlEngine jexl = new JexlBuilder().create();
@@ -123,31 +123,29 @@ public class Issues300Test {
         String str1 = e.getParsedText();
         Assert.assertEquals(str0, str1);
     }
-    
+
     @Test
     public void testIssue306() throws Exception {
+        JexlContext ctxt = new MapContext();
         JexlEngine jexl = new JexlBuilder().create();
         JexlScript e = jexl.createScript("x.y ?: 2");
         Object o1 = e.execute(null);
         Assert.assertEquals(2, o1);
-        Object o2 = e.execute(null);
+        ctxt.set("x.y", null);
+        Object o2 = e.execute(ctxt);
         Assert.assertEquals(2, o2);
     }
-    
+
     @Test
     public void testIssue306a() throws Exception {
         JexlEngine jexl = new JexlBuilder().create();
         JexlScript e = jexl.createScript("x.y ?: 2", "x");
-        try {
-            Object o = e.execute(null, new Object());
-            Assert.fail(e.toString());
-        } catch (JexlException xany) {
-            Assert.assertTrue(xany.toString().contains("y"));
-        }
-        Object o = e.execute(null);
+        Object o = e.execute(null, new Object());
+        Assert.assertEquals(2, o);
+        o = e.execute(null);
         Assert.assertEquals(2, o);
     }
-    
+
     @Test
     public void testIssue306b() throws Exception {
         JexlEngine jexl = new JexlBuilder().create();
@@ -157,7 +155,7 @@ public class Issues300Test {
         Object o2 = e.execute(null);
         Assert.assertEquals(2, o2);
     }
-    
+
     @Test
     public void testIssue306c() throws Exception {
         JexlEngine jexl = new JexlBuilder().safe(true).create();

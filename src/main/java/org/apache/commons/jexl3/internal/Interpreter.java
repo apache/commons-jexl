@@ -868,9 +868,6 @@ public class Interpreter extends InterpreterBase {
         try {
             condition = node.jjtGetChild(0).jjtAccept(this, data);
         } catch(JexlException.Property xprop) {
-            if (!jexl.safe) {
-                throw xprop;
-            }
             if (logger.isDebugEnabled()) {
                 logger.debug(node, xprop);
             }
@@ -901,9 +898,6 @@ public class Interpreter extends InterpreterBase {
         try {
             lhs = node.jjtGetChild(0).jjtAccept(this, data);
         } catch(JexlException.Property xprop) {
-            if (!jexl.safe) {
-                throw xprop;
-            }
             if (logger.isDebugEnabled()) {
                 logger.debug(node, xprop);
             }
