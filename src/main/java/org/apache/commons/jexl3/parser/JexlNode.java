@@ -262,19 +262,30 @@ public abstract class JexlNode extends SimpleNode {
         JexlNode node = this;
         for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
             // protect only the condition part of the ternay
-            if (walk instanceof ASTTernaryNode && node == walk.jjtGetChild(0)) {
-                return true;
-            }
-            if (walk instanceof ASTNullpNode && node == walk.jjtGetChild(0)) {
-                return true;
+            if (walk instanceof ASTTernaryNode || walk instanceof ASTNullpNode) {
+                if (node.isDescendantOf(walk.jjtGetChild(0))) {
+                    return true;
+                }
+                continue;
             }
             if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {
                 break;
             }
-            node = walk;
         }
         return false;
     }
 
-
+    /**
+     * Whether this node is descendant or self of another.
+     * @param asc the (potential) ascendant
+     * @return true if descendant or self, false otherwise
+     */
+    private boolean isDescendantOf(JexlNode asc) {
+        for (JexlNode walk = this; walk != null; walk = walk.jjtGetParent()) {
+            if (walk == asc) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

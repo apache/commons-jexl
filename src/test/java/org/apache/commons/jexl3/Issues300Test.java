@@ -123,5 +123,48 @@ public class Issues300Test {
         String str1 = e.getParsedText();
         Assert.assertEquals(str0, str1);
     }
-
+    
+    @Test
+    public void testIssue306() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript e = jexl.createScript("x.y ?: 2");
+        Object o1 = e.execute(null);
+        Assert.assertEquals(2, o1);
+        Object o2 = e.execute(null);
+        Assert.assertEquals(2, o2);
+    }
+    
+    @Test
+    public void testIssue306a() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript e = jexl.createScript("x.y ?: 2", "x");
+        try {
+            Object o = e.execute(null, new Object());
+            Assert.fail(e.toString());
+        } catch (JexlException xany) {
+            Assert.assertTrue(xany.toString().contains("y"));
+        }
+        Object o = e.execute(null);
+        Assert.assertEquals(2, o);
+    }
+    
+    @Test
+    public void testIssue306b() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript e = jexl.createScript("x?.y ?: 2", "x");
+        Object o1 = e.execute(null, new Object());
+        Assert.assertEquals(2, o1);
+        Object o2 = e.execute(null);
+        Assert.assertEquals(2, o2);
+    }
+    
+    @Test
+    public void testIssue306c() throws Exception {
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlScript e = jexl.createScript("x.y ?: 2", "x");
+        Object o = e.execute(null, new Object());
+        Assert.assertEquals(2, o);
+        o = e.execute(null);
+        Assert.assertEquals(2, o);
+    }
 }
