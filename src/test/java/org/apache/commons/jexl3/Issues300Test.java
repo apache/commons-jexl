@@ -165,4 +165,14 @@ public class Issues300Test {
         o = e.execute(null);
         Assert.assertEquals(2, o);
     }
+    
+    @Test
+    public void testIssue306d() throws Exception {
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlScript e = jexl.createScript("x.y[z.t] ?: 2", "x");
+        Object o = e.execute(null, new Object());
+        Assert.assertEquals(2, o);
+        o = e.execute(null);
+        Assert.assertEquals(2, o);
+    }
 }

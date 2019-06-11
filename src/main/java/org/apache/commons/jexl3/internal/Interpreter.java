@@ -864,18 +864,7 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTTernaryNode node, Object data) {
-        Object condition = null;
-        try {
-            condition = node.jjtGetChild(0).jjtAccept(this, data);
-        } catch(JexlException.Property xprop) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(node, xprop);
-            }
-        } catch(JexlException.Variable xvar) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(node, xvar);
-            }
-        }
+        Object condition = node.jjtGetChild(0).jjtAccept(this, data);
         // ternary as in "x ? y : z"
         if (node.jjtGetNumChildren() == 3) {
             if (condition != null && arithmetic.toBoolean(condition)) {
@@ -894,18 +883,7 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTNullpNode node, Object data) {
-        Object lhs = null;
-        try {
-            lhs = node.jjtGetChild(0).jjtAccept(this, data);
-        } catch(JexlException.Property xprop) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(node, xprop);
-            }
-        } catch(JexlException.Variable xvar) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(node, xvar);
-            }
-        }
+        Object lhs = node.jjtGetChild(0).jjtAccept(this, data);
         // null elision as in "x ?? z"
         return lhs != null? lhs : node.jjtGetChild(1).jjtAccept(this, data);
     }
@@ -976,8 +954,7 @@ public class Interpreter extends InterpreterBase {
             Object value = context.get(name);
             if (value == null
                 && !(node.jjtGetParent() instanceof ASTReference)
-                && !(context.has(name))
-                /*&& !node.isTernaryProtected()*/) {
+                && !(context.has(name))) {
                 return jexl.safe
                         ? null
                         : unsolvableVariable(node, name, !(node.getSymbol() >= 0 || context.has(name)));
@@ -1144,7 +1121,7 @@ public class Interpreter extends InterpreterBase {
             }
         }
         // am I the left-hand side of a safe op ?
-        if (object == null/* && !node.isTernaryProtected()*/) {
+        if (object == null) {
             if (ptyNode != null) {
                 if (ptyNode.isSafeLhs(jexl.safe)) {
                     return null;

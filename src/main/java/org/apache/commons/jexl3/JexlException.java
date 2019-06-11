@@ -123,7 +123,7 @@ public class JexlException extends RuntimeException {
      * @param info the information
      * @return the information or null
      */
-    public static JexlInfo getInfo(JexlNode node, JexlInfo info) {
+    private static JexlInfo getInfo(JexlNode node, JexlInfo info) {
         if (info != null && node != null) {
             final Debugger dbg = new Debugger();
             if (dbg.debug(node)) {
