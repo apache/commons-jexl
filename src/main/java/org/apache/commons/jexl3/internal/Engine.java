@@ -738,8 +738,8 @@ public class Engine extends JexlEngine {
                 while (start < end && Character.isSpaceChar(str.charAt(start))) {
                     ++start;
                 }
-                // trim ending spaces
-                while (end > 0 && Character.isSpaceChar(str.charAt(end - 1))) {
+                // trim ending spaces; end is > 0 since start >= 0
+                while (end > start && Character.isSpaceChar(str.charAt(end - 1))) {
                     --end;
                 }
                 return str.subSequence(start, end).toString();

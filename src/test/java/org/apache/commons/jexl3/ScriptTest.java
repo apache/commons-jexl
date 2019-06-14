@@ -53,6 +53,16 @@ public class ScriptTest extends JexlTestCase {
     }
 
     /**
+     * Test creating a script from spaces.
+     */
+    @Test
+    public void testSpacesScript() throws Exception {
+        String code = " ";
+        JexlScript s = JEXL.createScript(code);
+        Assert.assertTrue(s != null);
+    }
+    
+    /**
      * Test creating a script from a string.
      */
     @Test
