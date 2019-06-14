@@ -18,6 +18,8 @@ package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.TemplateDebugger;
 import org.apache.commons.jexl3.internal.TemplateScript;
+import org.apache.commons.jexl3.internal.Debugger;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -547,6 +549,22 @@ public class JXLTTest extends JexlTestCase {
         String refactored = refactor(td, (TemplateScript) t);
         Assert.assertNotNull(refactored);
         Assert.assertEquals(test42, refactored);
+    }
+    
+    @Test
+    public void testInheritedDebugger() throws Exception {
+        String src = "if ($A) { $B + 1; } else { $C - 2 }";
+        JexlEngine jexl = JXLT.getEngine();
+        JexlScript script = jexl.createScript(src);
+                
+        Debugger sd = new Debugger();
+        String rscript = sd.debug(script)? sd.toString() : null;
+        Assert.assertNotNull(rscript);
+        
+        TemplateDebugger td = new TemplateDebugger();
+        String refactored = td.debug(script)? td.toString() : null;
+        Assert.assertNotNull(refactored);
+        Assert.assertEquals(refactored, rscript);
     }
 
     public static class FrobozWriter extends PrintWriter {

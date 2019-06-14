@@ -104,9 +104,9 @@ public class TemplateDebugger extends Debugger {
 
     @Override
     protected Object visit(ASTBlock node, Object data) {
-        // if not really a template, use super impl
+        // if not really a template, must use super impl
         if (exprs == null) {
-            return super.visit(node, data);
+            return super.visit((ASTBlock) node, data);
         }
         // open the block
         builder.append('{');
@@ -138,8 +138,13 @@ public class TemplateDebugger extends Debugger {
 
     @Override
     protected Object acceptStatement(JexlNode child, Object data) {
+        // if not really a template, must use super impl
+        if (exprs == null) {
+            return super.acceptStatement(child, data);
+        }
         TemplateExpression te = getPrintStatement(child);
         if (te != null) {
+            // if statement is a jexl:print(...), may need to prepend '\n'
             newJxltLine();
             return visit(te, data);
         } else {
