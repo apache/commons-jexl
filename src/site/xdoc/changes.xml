@@ -119,11 +119,14 @@
             <action dev="henrib" type="add" issue="JEXL-261">
                 JexlEngine.setClassLoader(...) should reload namespaces that are classes
             </action>
+            <action dev="henrib" type="add" issue="JEXL-260" due-to="Dmitri Blinov">
+                Automatically inject JexlContext in constructor call when possible
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-257" due-to="Dmitri Blinov">
                 Function throwing IllegalArgumentException may be called twice
             </action>
-            <action dev="henrib" type="add" issue="JEXL-260" due-to="Dmitri Blinov">
-                Automatically inject JexlContext in constructor call when possible
+            <action dev="henrib" type="add" issue="JEXL-253" due-to="Woonsan Ko">
+                Permissions by super type in JexlSandbox
             </action>
             <action dev="henrib" type="add" issue="JEXL-252" due-to="Dmitri Blinov">
                 Allow for interpolated strings to be used in property access operators

@@ -17,9 +17,7 @@
 package org.apache.commons.jexl3.introspection;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -384,36 +382,78 @@ public class SandboxTest extends JexlTestCase {
     }
 
     @Test
-    public void testSandboxInherit() throws Exception {
+       public void testSandboxInherit0() throws Exception {
         Object result;
         JexlContext ctxt = null;
-        Map<String, JexlSandbox.Permissions> perms = new HashMap<String, JexlSandbox.Permissions>();
         List<String> foo = new ArrayList<String>();
-        JexlSandbox sandbox = new JexlSandbox(false, true, perms);
+        JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.white(java.util.List.class.getName());
-        //sandbox.black(Foo.class.getName()).execute();
+        
         JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
         JexlScript method = sjexl.createScript("foo.add(y)", "foo", "y");
         JexlScript set = sjexl.createScript("foo[x] = y", "foo", "x", "y");
         JexlScript get = sjexl.createScript("foo[x]", "foo", "x");
-        try {
-            result = method.execute(ctxt, foo, "nothing");
-            Assert.assertEquals(true, result);
-            result = null;
-            result = get.execute(null, foo, 0);
-            Assert.assertEquals("nothing", result);
-            result = null;
-            result = set.execute(null, foo, 0, "42");
-            Assert.assertEquals("42", result);
 
-            result = null;
-            result = get.execute(null, foo, 0);
-            Assert.assertEquals("42", result);
-            //Assert.fail("should have not been possible");
+        result = method.execute(ctxt, foo, "nothing");
+        Assert.assertEquals(true, result);
+        result = null;
+        result = get.execute(null, foo, 0);
+        Assert.assertEquals("nothing", result);
+        result = null;
+        result = set.execute(null, foo, 0, "42");
+        Assert.assertEquals("42", result);
+
+        result = null;
+        result = get.execute(null, foo, 0);
+        Assert.assertEquals("42", result);
+    }
+    
+    public abstract static class Operation {
+        protected final int base;
+        public Operation(int sz) {
+         base = sz;
+        }
+        
+        public abstract int someOp(int x);
+        public abstract int nonCallable(int y);
+    }
+
+    public static class Operation2 extends Operation {
+        public Operation2(int sz) {
+            super(sz);
+        }
+
+        @Override
+        public int someOp(int x) {
+            return base + x;
+        }
+
+        @Override
+        public int nonCallable(int y) {
+            throw new UnsupportedOperationException("do NOT call");
+        }
+    }
+
+    @Test
+    public void testSandboxInherit1() throws Exception {
+        Object result;
+        JexlContext ctxt = null;
+        Operation2 foo = new Operation2(12);
+        JexlSandbox sandbox = new JexlSandbox(false, true);
+        sandbox.white(Operation.class.getName());
+        sandbox.black(Operation.class.getName()).execute("nonCallable");
+        //sandbox.black(Foo.class.getName()).execute();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlScript someOp = sjexl.createScript("foo.someOp(y)", "foo", "y");
+        result = someOp.execute(ctxt, foo, 30);
+        Assert.assertEquals(42, result);
+        JexlScript nonCallable = sjexl.createScript("foo.nonCallable(y)", "foo", "y");
+        try {
+            result = nonCallable.execute(null, foo, 0);
+            Assert.fail("should not be possible");
         } catch (JexlException xjm) {
             // ok
             LOGGER.info(xjm.toString());
         }
-
     }
 }

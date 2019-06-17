@@ -96,7 +96,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
     /**
      * Implements engine and engine context properties for use by JEXL scripts.
-     * Those properties are allways bound to the default engine scope context.
+     * Those properties are always bound to the default engine scope context.
      *
      * <p>The following properties are defined:</p>
      * 

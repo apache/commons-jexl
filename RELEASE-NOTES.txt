@@ -56,6 +56,7 @@ New Features in 3.2:
 * JEXL-273:      Add do...while(...) loops
 * JEXL-264:      Allow space, quote & double-quote in identifiers
 * JEXL-260:      Automatically inject JexlContext in constructor call when possible
+* JEXL-253:      Permissions by super type in JexlSandbox
 * JEXL-252:      Allow for interpolated strings to be used in property access operators
 * JEXL-250:      Safe navigation operator (?.)
 * JEXL-248:      Allow range subexpression as an array property assignment identifier

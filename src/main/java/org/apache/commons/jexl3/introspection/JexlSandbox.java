@@ -24,8 +24,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A sandbox describes permissions on a class by explicitly allowing or forbidding access to methods and properties
- * through "whitelists" and "blacklists".
+ * A sandbox describes permissions on a class by explicitly allowing or forbidding
+ * access to methods and properties through "whitelists" and "blacklists".
  *
  * <p>A <b>whitelist</b> explicitly allows methods/properties for a class;</p>
  *
@@ -43,16 +43,25 @@ import java.util.concurrent.ConcurrentHashMap;
  *   <li>If it is not empty, the only forbidden properties/methods are the ones contained.</li>
  * </ul>
  *
- * <p>Permissions are composed of three lists, read, write, execute, each being "white" or "black":</p>
+ * <p>Permissions are composed of three lists, read, write, execute, each being
+ * "white" or "black":</p>
  *
  * <ul>
  *   <li><b>read</b> controls readable properties </li>
  *   <li><b>write</b> controls writable properties</li>
  *   <li><b>execute</b> controls executable methods and constructor</li>
  * </ul>
+ * 
+ * <p>When specified, permissions - white or black lists - can be created inheritable
+ * on interfaces or classes and thus applicable to their implementations or derived
+ * classes; the sandbox must be created with the 'inheritable' flag for this behavior
+ * to be triggered. Note that even in this configuration, it is still possible to
+ * add non-inheritable permissions.
+ * Adding inheritable lists to a non inheritable sandbox has no added effect;
+ * permissions only apply to their specified class.</p>
  *
- * <p>Note that a JexlUberspect always uses a copy of the JexlSandbox used to built it to avoid synchronization and/or
- * concurrent modifications at runtime.</p>
+ * <p>Note that a JexlUberspect always uses a <em>copy</em> of the JexlSandbox
+ * used to built it preventing permission changes after its instantiation.</p>
  *
  * @since 3.0
  */
@@ -76,7 +85,7 @@ public final class JexlSandbox {
      * sandbox is a white-box, white-listing that class for all permissions (read, write and execute).
      */
     public JexlSandbox() {
-        this(true, new HashMap<String, Permissions>());
+        this(true, false, null);
     }
 
     /**
@@ -88,15 +97,26 @@ public final class JexlSandbox {
      * @since 3.1
      */
     public JexlSandbox(boolean wb) {
-        this(wb, new HashMap<String, Permissions>());
+        this(wb, false, null);
+    }
+    
+    /**
+     * Creates a sandbox.
+     * @param wb whether this sandbox is white (true) or black (false)
+     * @param inh whether permissions on interfaces and classes are inherited (true) or not (false)
+     * @since 3.2
+     */
+    public JexlSandbox(boolean wb, boolean inh) {
+        this(wb, inh, null);
     }
 
     /**
      * Creates a sandbox based on an existing permissions map.
      * @param map the permissions map
      */
+    @Deprecated
     protected JexlSandbox(Map<String, Permissions> map) {
-        this(true, map);
+        this(true, false, map);
     }
 
     /**
@@ -105,6 +125,7 @@ public final class JexlSandbox {
      * @param map the permissions map
      * @since 3.1
      */
+    @Deprecated
     protected JexlSandbox(boolean wb, Map<String, Permissions> map) {
         this(wb, false, map);
     }
@@ -119,7 +140,7 @@ public final class JexlSandbox {
     protected JexlSandbox(boolean wb, boolean inh, Map<String, Permissions> map) {
         white = wb;
         inherit = inh;
-        sandbox = map;
+        sandbox = map != null? map : new HashMap<String, Permissions>();
     }
 
     /**
