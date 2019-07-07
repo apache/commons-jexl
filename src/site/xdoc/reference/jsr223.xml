@@ -45,7 +45,7 @@
       <li>Mime-types: "application/x-jexl2", "application/x-jexl3"</li>
       </ul>
       The implementation adds an instance of
-      <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/scripting/JexlScriptObject.html">JexlScriptObject</a>
+      <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl/scripting/JexlScriptObject.html">JexlScriptObject</a>
       to the engine context as the variable "JEXL".
       This gives scripts easier access to various items such as System.out and a logger.
       </p>
