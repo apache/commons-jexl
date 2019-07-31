@@ -84,13 +84,13 @@ working with enterprise platforms.
             <p>
             JEXL attempts to bring some of the lessons learned by the Velocity
             community about expression languages in templating to a wider audience.
-                <a href="http://commons.apache.org/jelly">Commons Jelly</a> needed
+                <a href="https://commons.apache.org/jelly">Commons Jelly</a> needed
             Velocity-ish method access, it just had to have it.
             </p>
             <p>
             It must be noted that JEXL is <strong>not</strong> a compatible implementation of EL as defined
             in JSTL 1.1 (JSR-052) or JSP 2.0 (JSR-152). For a compatible implementation of
-            these specifications, see the <a href="http://commons.apache.org/el">Commons EL</a> project.
+            these specifications, see the <a href="https://commons.apache.org/el">Commons EL</a> project.
             </p>
         </section>
 
@@ -167,7 +167,7 @@ working with enterprise platforms.
                 </li>
                 <li>
             Apache has an implementation of the expression language for JSP 2.0,
-            called <a href="http://commons.apache.org/el/index.html">EL</a>
+            called <a href="https://commons.apache.org/el/index.html">EL</a>
                 </li>
                 <li>
                     <a href="http://www.oracle.com/technetwork/java/index-jsp-135995.html">JSTL 1.1</a> is covered
@@ -193,13 +193,13 @@ working with enterprise platforms.
         <section name="Anyone Using It Yet?">
             <ul>
                 <li>
-                    <a href="http://commons.apache.org/configuration">Commons Configuration</a>
+                    <a href="https://commons.apache.org/configuration">Commons Configuration</a>
                 </li>
                 <li>
-                    <a href="http://commons.apache.org/scxml">Commons SCXML</a>
+                    <a href="https://commons.apache.org/scxml">Commons SCXML</a>
                 </li>
                 <li>
-                    <a href="http://commons.apache.org/jelly">Jelly</a>
+                    <a href="https://commons.apache.org/jelly">Jelly</a>
                 </li>
             </ul>
         </section>

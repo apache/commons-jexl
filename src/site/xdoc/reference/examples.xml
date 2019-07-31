@@ -45,7 +45,7 @@
         that evaluates its command line arguments as JEXL expressions when run.
       </p>
       <p>
-          The <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/package-summary.html#intro">
+          The <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/package-summary.html#intro">
           package javadoc</a> also contains useful information.
       </p>
     </section>
@@ -53,9 +53,9 @@
       <p>
         To evaluate expressions using JEXL, you need three things:
         <ul>
-          <li>An <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlEngine.html">engine</a> to create expressions,</li>
-          <li>A <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlContext.html">context</a> containing any variables, and</li>
-          <li>An <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/Expression.html">expression</a></li>
+          <li>An <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlEngine.html">engine</a> to create expressions,</li>
+          <li>A <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlContext.html">context</a> containing any variables, and</li>
+          <li>An <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/Expression.html">expression</a></li>
         </ul>
       </p>
       <p>
@@ -67,18 +67,18 @@
       </p>
       <p>
         The easiest way of obtaining a a context is to use the
-        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/MapContext.html#MapContext()">new MapContext()</a>
+        <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/MapContext.html#MapContext()">new MapContext()</a>
         statement. This creates a context implemented using an underlying
         <a href="https://docs.oracle.com/javase/6/docs/api/java/util/HashMap.html">HashMap</a>
       </p>
       <p>
-        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/Expression.html">Expressions</a> are
-        created using the <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlEngine.html#createExpression(java.lang.String)">JexlEngine.createExpression(String)</a>
+        <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/Expression.html">Expressions</a> are
+        created using the <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlEngine.html#createExpression(java.lang.String)">JexlEngine.createExpression(String)</a>
         method.
       </p>
       <p>
         Once you have your expression, you can then use use the
-        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/Expression.html#evaluate(org.apache.commons.jexl3.JexlContext)">evaluate</a>
+        <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/Expression.html#evaluate(org.apache.commons.jexl3.JexlContext)">evaluate</a>
         to execute it and obtain a result.
       </p>
       <p>
@@ -107,12 +107,12 @@
         Often you have the objects and values that are needed in the context available
         elsewhere. If those are already in a Map, instead of creating the default context and populating it
         manually in the code, you can wrap a MapContext around your own map using
-        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/MapContext.html#MapContext()">new MapContext(yourOwnMap)</a>
+        <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/MapContext.html#MapContext()">new MapContext(yourOwnMap)</a>
       </p>
       <p>
         In edge cases, it may be simpler to create a context implementation of your
         own.
-        The <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlContext.html">JexlContext</a>
+        The <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlContext.html">JexlContext</a>
         interface is very simple with only three methods, to set, get and check the existence of variables.
       </p>
     </section>
@@ -132,7 +132,7 @@ x * 1.1 + y
         <p>Arithmetic expressions can use variables. <code>null</code> can be treated as a zero for arithmetic;
         if you need stricter semantics and consider <code>null</code> as an erroneous operand for arithmetic and
         comparisons operations, you should initialize your JEXL engine using
-        <a href="http://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlEngine.html#setLenient(boolean)">JexlEngine.setLenient(false)</a>.
+        <a href="https://commons.apache.org/jexl/apidocs/org/apache/commons/jexl3/JexlEngine.html#setLenient(boolean)">JexlEngine.setLenient(false)</a>.
         </p>
       </subsection>
       <subsection name="Calling methods">
