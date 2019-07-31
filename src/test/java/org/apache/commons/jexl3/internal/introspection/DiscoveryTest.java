@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import java.io.Serializable;
 import org.apache.commons.jexl3.JexlTestCase;
 import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
@@ -25,6 +26,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.jexl3.introspection.JexlMethod;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -221,4 +225,95 @@ public class DiscoveryTest extends JexlTestCase {
         Assert.assertEquals(AbstractExecutor.TRY_FAILED, set.tryInvoke(map, Integer.valueOf(1), "nope"));
     }
 
+    public static class Bulgroz {
+        public Object list(int x) {
+            return 0;
+        }
+        public Object list(String x) {
+            return 1;
+        }
+        public Object list(Object x) {
+            return 2;
+        }
+        public Object list(int x, Object...y) {
+            return 3;
+        }
+        public Object list(int x, int y) {
+            return 4;
+        }
+        public Object list(String x, Object...y) {
+            return 5;
+        }
+        public Object list(String x, String y) {
+            return 6;
+        }
+        public Object list(Object x, Object...y) {
+            return 7;
+        }
+        public Object list(Object x, Object y) {
+            return 8;
+        }
+        public Object amb(Serializable x) {
+            return -1;
+        }
+        public Object amb(Number x) {
+            return -2;
+        }
+    }
+
+    @Test
+    public void testMethodIntrospection() throws Exception {
+        Uberspect uber = new Uberspect(null, null);
+        Bulgroz bulgroz = new Bulgroz();
+        JexlMethod jmethod;
+        Object result;
+        jmethod = uber.getMethod(bulgroz, "list", 0);
+        result = jmethod.invoke(bulgroz, 0);
+        Assert.assertEquals(0, result);
+        jmethod = uber.getMethod(bulgroz, "list", "1");
+        result = jmethod.invoke(bulgroz, "1");
+        Assert.assertEquals(1, result);
+        jmethod = uber.getMethod(bulgroz, "list", bulgroz);
+        result = jmethod.invoke(bulgroz, bulgroz);
+        Assert.assertEquals(2, result);
+        jmethod = uber.getMethod(bulgroz, "list", 1, bulgroz);
+        result = jmethod.invoke(bulgroz, 1, bulgroz);
+        Assert.assertEquals(3, result);
+        jmethod = uber.getMethod(bulgroz, "list", 1, bulgroz, bulgroz);
+        result = jmethod.invoke(bulgroz, 1, bulgroz, bulgroz);
+        Assert.assertEquals(3, result);
+        jmethod = uber.getMethod(bulgroz, "list", 1, 2);
+        result = jmethod.invoke(bulgroz, 1, 2);
+        Assert.assertEquals(4, result);
+        jmethod = uber.getMethod(bulgroz, "list", "1", bulgroz);
+        result = jmethod.invoke(bulgroz, "1", bulgroz);
+        Assert.assertEquals(5, result);
+        jmethod = uber.getMethod(bulgroz, "list", "1", "2");
+        result = jmethod.invoke(bulgroz, "1", "2");
+        Assert.assertEquals(6, result);
+        jmethod = uber.getMethod(bulgroz, "list", bulgroz, bulgroz);
+        result = jmethod.invoke(bulgroz, bulgroz, bulgroz);
+        Assert.assertEquals(8, result);
+        jmethod = uber.getMethod(bulgroz, "list", bulgroz, 1, bulgroz);
+        result = jmethod.invoke(bulgroz, bulgroz, 1, bulgroz);
+        Assert.assertEquals(7, result);
+        jmethod = uber.getMethod(bulgroz, "list", bulgroz, 1, "1");
+        result = jmethod.invoke(bulgroz, bulgroz, 1, "1");
+        Assert.assertEquals(7, result);
+        jmethod = uber.getMethod(bulgroz, "list", (Object) null);
+        result = jmethod.invoke(bulgroz,  (Object) null);
+        Assert.assertEquals(2, result);
+        jmethod = uber.getMethod(bulgroz, "list", bulgroz, (Object) null);
+        result = jmethod.invoke(bulgroz, bulgroz, (Object) null);
+        Assert.assertEquals(8, result);
+        jmethod = uber.getMethod(bulgroz, "list", null, "1");
+        result = jmethod.invoke(bulgroz, null, "1");
+        Assert.assertEquals(8, result);
+        jmethod = uber.getMethod(bulgroz, "list", bulgroz, null, null);
+        result = jmethod.invoke(bulgroz, bulgroz, null, null);
+        Assert.assertEquals(7, result);
+
+        jmethod = uber.getMethod(bulgroz, "amb", Double.valueOf(3));
+        Assert.assertNotNull(null, jmethod);
+    }
 }

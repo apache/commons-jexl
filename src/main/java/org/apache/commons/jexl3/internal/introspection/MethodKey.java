@@ -598,12 +598,15 @@ public final class MethodKey {
          *         c1 is less specific than c2, INCOMPARABLE if they are incomparable.
          */
          private int moreSpecific(final Class<?>[] a, final Class<?>[] c1, final Class<?>[] c2) {
-            boolean c1MoreSpecific = false;
-            boolean c2MoreSpecific = false;
-
             // compare lengths to handle comparisons where the size of the arrays
             // doesn't match, but the methods are both applicable due to the fact
             // that one is a varargs method
+            if (c1.length > a.length) {
+                return LESS_SPECIFIC;
+            }
+            if (c2.length > a.length) {
+                return MORE_SPECIFIC;
+            }
             if (c1.length > c2.length) {
                 return MORE_SPECIFIC;
             }
@@ -614,57 +617,35 @@ public final class MethodKey {
             final int length = c1.length;
             final int ultimate = c1.length - 1;
 
-            // ok, move on and compare those of equal lengths
-            for (int i = 0; i < length; ++i) {
-                if (c1[i] != c2[i]) {
-                    boolean last = (i == ultimate);
-                    if (a[i] == Void.class) {
-                        if (c1[i] == Object.class && c2[i] != Object.class) {
-                            c1MoreSpecific = true;
-                            continue;
-                        }
-                        if (c1[i] != Object.class && c2[i] == Object.class) {
-                            c2MoreSpecific = true;
-                            continue;
-                        }
-                    }
-                    c1MoreSpecific = c1MoreSpecific || isStrictConvertible(c2[i], c1[i], last);
-                    c2MoreSpecific = c2MoreSpecific || isStrictConvertible(c1[i], c2[i], last);
-                }
-            }
-
-            if (c1MoreSpecific) {
-                if (c2MoreSpecific) {
-                    // Incomparable due to cross-assignable arguments (i.e. foo(String, Object) vs. foo(Object, String))
-                    return INCOMPARABLE;
-                }
-                return MORE_SPECIFIC;
-            }
-            if (c2MoreSpecific) {
-                return LESS_SPECIFIC;
-            }
-
-            // attempt to choose by picking the one with the greater number of primitives or latest primitive parameter
-            int primDiff = 0;
-            for (int c = 0; c < length; ++c) {
-                boolean last = (c == ultimate);
-                if (isPrimitive(c1[c], last)) {
-                    primDiff += 1 << c;
-                }
-                if (isPrimitive(c2[c], last)) {
-                    primDiff -= 1 << c;
-                }
-            }
-            if (primDiff > 0) {
-                return MORE_SPECIFIC;
-            }
-            if (primDiff < 0) {
-                return LESS_SPECIFIC;
-            }
-            /*
-             * Incomparable due to non-related arguments (i.e.
-             * foo(Runnable) vs. foo(Serializable))
-             */
+             // ok, move on and compare those of equal lengths
+             for (int i = 0; i < length; ++i) {
+                 if (c1[i] != c2[i]) {
+                     boolean last = (i == ultimate);
+                     // argument is null, prefer an Object param
+                     if (a[i] == Void.class) {
+                         if (c1[i] == Object.class && c2[i] != Object.class) {
+                             return MORE_SPECIFIC;
+                         }
+                         if (c1[i] != Object.class && c2[i] == Object.class) {
+                             return LESS_SPECIFIC;
+                         }
+                     }
+                     // prefer primitive on non null arg, non primitive otherwise
+                     boolean c1s = isPrimitive(c1[i], last);
+                     boolean c2s = isPrimitive(c2[i], last);
+                     if (c1s != c2s) {
+                        return (c1s == (a[i] != Void.class))? MORE_SPECIFIC : LESS_SPECIFIC;
+                     }
+                     // if c2 can be converted to c1 but not the opposite,
+                     // c1 is more specific than c2
+                     c1s = isStrictConvertible(c2[i], c1[i], last);
+                     c2s = isStrictConvertible(c1[i], c2[i], last);
+                     if (c1s != c2s) {
+                         return c1s ? MORE_SPECIFIC : LESS_SPECIFIC;
+                     }
+                 }
+             }
+            // Incomparable due to non-related arguments (i.e.foo(Runnable) vs. foo(Serializable))
             return INCOMPARABLE;
         }
 
