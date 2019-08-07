@@ -77,18 +77,31 @@ public final class TemplateScript implements JxltEngine.Template {
         StringBuilder strb = new StringBuilder();
         int nuexpr = 0;
         int codeStart = -1;
+        int line = 1;
         for (int b = 0; b < blocks.size(); ++b) {
             Block block = blocks.get(b);
+            int bl = block.getLine();
+            while(line < bl) {
+                strb.append("//\n");
+                line += 1;
+            }
             if (block.getType() == BlockType.VERBATIM) {
                 strb.append("jexl:print(");
                 strb.append(nuexpr++);
                 strb.append(");\n");
+                line += 1;
             } else {
                 // keep track of first block of code, the frame creator
                 if (codeStart < 0) {
                     codeStart = b;
                 }
-                strb.append(block.getBody());
+                String body = block.getBody();
+                strb.append(body);
+                for(int c = 0; c < body.length(); ++c) {
+                    if (body.charAt(c) == '\n') {
+                        line += 1;
+                    }
+                }
             }
         }
         // create the script
@@ -96,7 +109,7 @@ public final class TemplateScript implements JxltEngine.Template {
             info = jxlt.getEngine().createInfo();
         }
         // allow lambda defining params
-        script = jxlt.getEngine().parse(info.at(0, 0), false, strb.toString(), scope).script();
+        script = jxlt.getEngine().parse(info.at(1, 1), false, strb.toString(), scope).script();
         scope = script.getScope();
         // create the exprs using the code frame for those appearing after the first block of code
         for (int b = 0; b < blocks.size(); ++b) {
@@ -104,7 +117,7 @@ public final class TemplateScript implements JxltEngine.Template {
             if (block.getType() == BlockType.VERBATIM) {
                 uexprs.add(
                         jxlt.parseExpression(
-                                info.at(block.getLine(), 0),
+                                info.at(block.getLine(), 1),
                                 block.getBody(),
                                 b > codeStart ? scope : null)
                 );
@@ -164,6 +177,7 @@ public final class TemplateScript implements JxltEngine.Template {
         for (Block block : source) {
             if (block.getType() == BlockType.DIRECTIVE) {
                 strb.append(prefix);
+                strb.append(block.getBody());
             } else {
                 exprs[e++].asString(strb);
             }

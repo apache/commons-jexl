@@ -1077,7 +1077,7 @@ public final class TemplateEngine extends JxltEngine {
         BlockType type = null;
         int prefixLen;
         Iterator<CharSequence> lines = readLines(reader);
-        int lineno = 0;
+        int lineno = 1;
         int start = 0;
         while (lines.hasNext()) {
             CharSequence line = lines.next();

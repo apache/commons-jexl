@@ -175,4 +175,63 @@ public class Issues300Test {
         o = e.execute(null);
         Assert.assertEquals(2, o);
     }
+    
+    @Test
+    public void testIssue309a() throws Exception {
+        String src = "<html lang=\"en\">\n"
+                + "  <body>\n"
+                + "    <h1>Hello World!</h1>\n"
+                + "$$ var i = 12++;\n"
+                + "  </body>\n"
+                + "</html>";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JxltEngine jxlt = jexl.createJxltEngine();
+        JexlInfo info = new JexlInfo("template", 1, 1);
+        try {
+            JxltEngine.Template tmplt = jxlt.createTemplate(info, src);
+            Assert.fail("shoud have thrown exception");
+        } catch (JexlException.Parsing xerror) {
+            Assert.assertEquals(4, xerror.getInfo().getLine());
+        }
+    }
+
+    @Test
+    public void testIssue309b() throws Exception {
+        String src = "<html lang=\"en\">\n"
+                + "  <body>\n"
+                + "    <h1>Hello World!</h1>\n"
+                + "$$ var i = a b c;\n"
+                + "  </body>\n"
+                + "</html>";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JxltEngine jxlt = jexl.createJxltEngine();
+        JexlInfo info = new JexlInfo("template", 1, 1);
+        try {
+            JxltEngine.Template tmplt = jxlt.createTemplate(info, src);
+            Assert.fail("shoud have thrown exception");
+        } catch (JexlException.Parsing xerror) {
+            Assert.assertEquals(4, xerror.getInfo().getLine());
+        }
+    }
+
+    @Test
+    public void testIssue309c() throws Exception {
+        String src = "<html lang=\"en\">\n"
+                + "  <body>\n"
+                + "    <h1>Hello World!</h1>\n"
+                + "$$ var i =12;\n"
+                + "  </body>\n"
+                + "</html>";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JxltEngine jxlt = jexl.createJxltEngine();
+        JexlInfo info = new JexlInfo("template", 1, 1);
+        try {
+            JxltEngine.Template tmplt = jxlt.createTemplate(info, src);
+            String src1 = tmplt.asString();
+            String src2 = tmplt.toString();
+            Assert.assertEquals(src1, src2);
+        } catch (JexlException.Parsing xerror) {
+            Assert.assertEquals(4, xerror.getInfo().getLine());
+        }
+    }
 }

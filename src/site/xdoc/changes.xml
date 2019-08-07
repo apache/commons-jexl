@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-309">
+                Line numbers are not correct when template report errors
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-306" due-to="Dmitri Blinov">
                 Ternary operator ? protects also its branches from resolution errors
             </action>
