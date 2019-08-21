@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-311">
+                Jxlt template scripts fail using verbatim expressions embedded in lambdas
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-309">
                 Line numbers are not correct when template report errors
             </action>

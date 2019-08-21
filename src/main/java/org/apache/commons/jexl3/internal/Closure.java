@@ -124,7 +124,7 @@ public class Closure extends Script {
         if (frame != null) {
             callFrame = frame.assign(args);
         }
-        Interpreter interpreter = jexl.createInterpreter(context, callFrame);
+        Interpreter interpreter = createInterpreter(context, callFrame);
         JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
         return interpreter.interpret(block);
     }
@@ -135,7 +135,7 @@ public class Closure extends Script {
         if (frame != null) {
             local = frame.assign(args);
         }
-        return new Callable(jexl.createInterpreter(context, local)) {
+        return new Callable(createInterpreter(context, local)) {
             @Override
             public Object interpret() {
                 JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
@@ -143,5 +143,4 @@ public class Closure extends Script {
             }
         };
     }
-
 }

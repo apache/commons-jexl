@@ -925,7 +925,7 @@ public final class TemplateEngine extends JxltEngine {
             line = theLine;
             body = theBlock;
         }
-
+        
         /**
          * @return type
          */
@@ -979,8 +979,6 @@ public final class TemplateEngine extends JxltEngine {
             }
         }
     }
-
-
 
     /**
      * Whether a sequence starts with a given set of characters (following spaces).

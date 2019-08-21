@@ -728,7 +728,8 @@ public class JXLTTest extends JexlTestCase {
         Object value = JEXL.createScript(expr).execute(context);
         Assert.assertEquals(expr, "H\"ello \nHenrib", value);
     }
-        @Test
+        
+    @Test
     public void testInterpolationLvsG2() throws Exception {
         String expr =  "user='Dimitri'; var user='Henrib'; `H\\`ello \n${user}`";
         Object value = JEXL.createScript(expr).execute(context);
@@ -764,4 +765,100 @@ public class JXLTTest extends JexlTestCase {
 //        Assert.assertEquals("fourty-two", output);
 //
 //    }
+    
+    public static class Executor311 {
+        private final String name;
+        
+        public Executor311(String name) {
+            this.name = name;
+        }
+        // Injects name as first arg of any called script
+        public Object execute(JexlScript script, Object ...args) {
+            Object[] actuals;
+            if (args != null && args.length > 0) {
+                actuals = new Object[args.length + 1] ;
+                System.arraycopy(args, 0, actuals, 1, args.length);
+                actuals[0] = name;
+            } else {
+                actuals = new Object[]{name};
+            }
+            return script.execute(JexlEngine.getThreadContext(), actuals);
+        }
+    }
+    
+    public static class Context311 extends MapContext {
+        public Executor311 exec(String name) {
+            return new Executor311(name);
+        }
+    }
+    
+    @Test
+    public void test311a() throws Exception {
+        JexlContext ctx = null;
+        String rpt
+                = "$$((a)->{\n"
+                + "<p>Universe ${a}</p>\n"
+                + "$$})(42)";
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
+        StringWriter strw = new StringWriter();
+        t.evaluate(ctx, strw);
+        String output = strw.toString();
+        Assert.assertEquals("<p>Universe 42</p>\n", output);
+    }
+
+    @Test
+    public void test311b() throws Exception {
+        JexlContext ctx311 = new Context311();
+        String rpt
+                = "$$ exec('42').execute(()->{\n"
+                + "<p>Universe 42</p>\n"
+                + "$$})";
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
+        StringWriter strw = new StringWriter();
+        t.evaluate(ctx311, strw, 42);
+        String output = strw.toString();
+        Assert.assertEquals("<p>Universe 42</p>\n", output);
+    }
+    
+    @Test
+    public void test311c() throws Exception {
+        JexlContext ctx311 = new Context311();
+        String rpt
+                = "$$ exec('42').execute((a)->{"
+                + "\n<p>Universe ${a}</p>"
+                + "\n$$})";
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
+        StringWriter strw = new StringWriter();
+        t.evaluate(ctx311, strw, 42);
+        String output = strw.toString();
+        Assert.assertEquals("<p>Universe 42</p>\n", output);
+    }
+       
+    @Test
+    public void test311d() throws Exception {
+        JexlContext ctx311 = new Context311();
+        String rpt
+                = "$$ exec('4').execute((a, b)->{"
+                + "\n<p>Universe ${a}${b}</p>"
+                + "\n$$}, '2')";
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
+        StringWriter strw = new StringWriter();
+        t.evaluate(ctx311, strw, 42);
+        String output = strw.toString();
+        Assert.assertEquals("<p>Universe 42</p>\n", output);
+    }
+           
+    @Test
+    public void test311e() throws Exception {
+        JexlContext ctx311 = new Context311();
+        String rpt
+                = "$$var u = 'Universe'; exec('4').execute((a, b)->{"
+                + "\n<p>${u} ${a}${b}</p>"
+                + "\n$$}, '2')";
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(rpt));
+        StringWriter strw = new StringWriter();
+        t.evaluate(ctx311, strw, 42);
+        String output = strw.toString();
+        Assert.assertEquals("<p>Universe 42</p>\n", output);
+    }
 }

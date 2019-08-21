@@ -29,6 +29,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import org.apache.commons.jexl3.parser.ASTArguments;
+import org.apache.commons.jexl3.parser.ASTFunctionNode;
+import org.apache.commons.jexl3.parser.ASTIdentifier;
+import org.apache.commons.jexl3.parser.ASTNumberLiteral;
+import org.apache.commons.jexl3.parser.JexlNode;
 
 /**
  * A Template instance.
@@ -70,8 +76,7 @@ public final class TemplateScript implements JxltEngine.Template {
             throw new NullPointerException("null input");
         }
         this.jxlt = engine;
-        Scope scope = parms == null ? null : new Scope(null, parms);
-        prefix = directive;
+        this.prefix = directive;
         List<Block> blocks = jxlt.readTemplate(prefix, reader);
         List<TemplateExpression> uexprs = new ArrayList<TemplateExpression>();
         StringBuilder strb = new StringBuilder();
@@ -109,9 +114,15 @@ public final class TemplateScript implements JxltEngine.Template {
             info = jxlt.getEngine().createInfo();
         }
         // allow lambda defining params
+        Scope scope = parms == null ? null : new Scope(null, parms);
         script = jxlt.getEngine().parse(info.at(1, 1), false, strb.toString(), scope).script();
-        scope = script.getScope();
-        // create the exprs using the code frame for those appearing after the first block of code
+        // seek the map of expression number to scope so we can parse Unified
+        // expression blocks with the appropriate symbols
+        Map<Integer, Scope> mscope = new TreeMap<Integer, Scope>();
+        collectPrintScope(script.script(), null, mscope);
+        // jexl:print(...) expression counter
+        int jpe = 0;
+        // create the exprs using the intended scopes
         for (int b = 0; b < blocks.size(); ++b) {
             Block block = blocks.get(b);
             if (block.getType() == BlockType.VERBATIM) {
@@ -119,7 +130,7 @@ public final class TemplateScript implements JxltEngine.Template {
                         jxlt.parseExpression(
                                 info.at(block.getLine(), 1),
                                 block.getBody(),
-                                b > codeStart ? scope : null)
+                                mscope.get(jpe++))
                 );
             }
         }
@@ -145,6 +156,41 @@ public final class TemplateScript implements JxltEngine.Template {
         source = theSource;
         script = theScript;
         exprs = theExprs;
+    }
+    
+    /**
+     * Collects the scope surrounding a call to jexl:print(i).
+     * <p>This allows to later parse the blocks with the known symbols 
+     * in the frame visible to the parser.
+     * @param node the visited node
+     * @param scope the current scope
+     * @param mscope the map of printed expression number to scope
+     */
+    static void collectPrintScope(JexlNode node, Scope scope, Map<Integer, Scope> mscope) {
+        int nc = node.jjtGetNumChildren();
+        if (node instanceof ASTFunctionNode) {
+            if (nc == 2) {
+                // 0 must be the prefix jexl:
+                ASTIdentifier nameNode = (ASTIdentifier) node.jjtGetChild(0);
+                if ("print".equals(nameNode.getName()) && "jexl".equals(nameNode.getNamespace())) {
+                    ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
+                    if (argNode.jjtGetNumChildren() == 1) {
+                        // seek the epression number
+                        JexlNode arg0 = argNode.jjtGetChild(0);
+                        if (arg0 instanceof ASTNumberLiteral) {
+                            int exprNumber = ((ASTNumberLiteral) arg0).getLiteral().intValue();
+                            mscope.put(exprNumber, scope);
+                            return;
+                        }
+                    }
+                }
+            }
+        } else if (node instanceof ASTJexlScript) {
+            scope = ((ASTJexlScript) node).getScope();
+        }
+        for (int c = 0; c < nc; ++c) {
+            collectPrintScope(node.jjtGetChild(c), scope, mscope);
+        }
     }
 
     /**

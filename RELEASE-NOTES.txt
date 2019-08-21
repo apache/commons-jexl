@@ -73,6 +73,7 @@ New Features in 3.2:
 Bugs Fixed in 3.2:
 ==================
 
+* JEXL-311:      Jxlt template scripts fail using verbatim expressions embedded in lambdas
 * JEXL-309:      Line numbers are not correct when template report errors
 * JEXL-306:      Ternary operator ? protects also its branches from resolution errors
 * JEXL-305:      Script debugger produces incorrect syntax
