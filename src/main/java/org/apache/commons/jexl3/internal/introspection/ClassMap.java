@@ -281,14 +281,12 @@ final class ClassMap {
             Method[] methods = clazz.getDeclaredMethods();
             for (int i = 0; i < methods.length; i++) {
                 Method mi = methods[i];
-                if (permissions.allow(mi)) {
-                    // add method to byKey cache; do not override
-                    MethodKey key = new MethodKey(mi);
-                    Method pmi = cache.byKey.putIfAbsent(key, mi);
-                    if (pmi != null && log.isDebugEnabled() && !key.equals(new MethodKey(pmi))) {
-                        // foo(int) and foo(Integer) have the same signature for JEXL
-                        log.debug("Method "+ pmi + " is already registered, key: " + key.debugString());
-                    }
+                // add method to byKey cache; do not override
+                MethodKey key = new MethodKey(mi);
+                Method pmi = cache.byKey.putIfAbsent(key, permissions.allow(mi) ? mi : CACHE_MISS);
+                if (pmi != null && log.isDebugEnabled() && !key.equals(new MethodKey(pmi))) {
+                    // foo(int) and foo(Integer) have the same signature for JEXL
+                    log.debug("Method " + pmi + " is already registered, key: " + key.debugString());
                 }
             }
         } catch (SecurityException se) {

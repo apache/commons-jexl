@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-312">
+                @NoJexl fails to disallow method call
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-311">
                 Jxlt template scripts fail using verbatim expressions embedded in lambdas
             </action>

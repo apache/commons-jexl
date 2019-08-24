@@ -456,4 +456,39 @@ public class SandboxTest extends JexlTestCase {
             LOGGER.info(xjm.toString());
         }
     }
+    
+    public static class Foo42 {
+        public int getFoo() {
+            return 42;
+        }
+    }
+
+    public static class Foo43 extends Foo42 {
+        @Override
+        @NoJexl
+        public int getFoo() {
+            return 43;
+        }
+    }
+
+    public static class Foo44 extends Foo43 {
+        @Override
+        public int getFoo() {
+            return 44;
+        }
+    }
+    
+    @Test
+    public void testNoJexl312() throws Exception {
+        JexlContext ctxt = new MapContext();
+        
+        JexlEngine sjexl = new JexlBuilder().strict(true).create();
+        JexlScript foo = sjexl.createScript("x.getFoo()", "x");
+        try {
+            foo.execute(ctxt, new Foo44());
+            Assert.fail("should have thrown");
+        } catch (JexlException xany) {
+            Assert.assertNotNull(xany);
+        }
+    }
 }
