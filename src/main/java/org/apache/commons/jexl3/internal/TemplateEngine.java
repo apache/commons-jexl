@@ -289,7 +289,7 @@ public final class TemplateEngine extends JxltEngine {
          * @return the expression value
          * @throws JexlException
          */
-        protected final TemplateExpression prepare(Scope.Frame frame, JexlContext context) {
+        protected final TemplateExpression prepare(Frame frame, JexlContext context) {
             try {
                 Interpreter interpreter = new TemplateInterpreter(jexl, context, frame, null, null);
                 return prepare(interpreter);
@@ -325,7 +325,7 @@ public final class TemplateEngine extends JxltEngine {
          * @return the expression value
          * @throws JexlException
          */
-        protected final Object evaluate(Scope.Frame frame, JexlContext context) {
+        protected final Object evaluate(Frame frame, JexlContext context) {
             try {
                 Interpreter interpreter = new TemplateInterpreter(jexl, context, frame, null, null);
                 return evaluate(interpreter);
@@ -883,7 +883,21 @@ public final class TemplateEngine extends JxltEngine {
         }
         // we should be in that state
         if (state != ParseState.CONST) {
-            throw new Exception(info.at(lineno, 0), "malformed expression: " + expr, null);
+            // otherwise, we ended a line with a \, $ or #
+            switch (state) {
+                case ESCAPE:
+                    strb.append('\\');
+                    strb.append('\\');
+                    break;
+                case DEFERRED0:
+                    strb.append(deferredChar);
+                    break;
+                case IMMEDIATE0:
+                    strb.append(immediateChar);
+                    break;
+                default:
+                    throw new Exception(info.at(lineno, 0), "malformed expression: " + expr, null);
+            }
         }
         // if any chars were buffered, add them as a constant
         if (strb.length() > 0) {
