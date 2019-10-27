@@ -29,6 +29,7 @@ import java.util.TreeSet;
  * <li>Registers: register syntax (#number), used internally for {g,s}etProperty
  * <li>Reserved Names: a set of reserved variable names that can not be used as local variable (or parameter) names
  * <li>Global Side Effect : assigning/modifying values on global variables (=, += , -=, ...)
+ * <li>Lexical: lexical scope, prevents redefining local variables 
  * <li>Side Effect : assigning/modifying values on any variables or left-value
  * <li>Constant Array Reference: ensures array references only use constants;they should be statically solvable.
  * <li>New Instance: creating an instance using new(...)
@@ -51,7 +52,7 @@ public final class JexlFeatures {
     private static final String[] F_NAMES = {
         "register", "reserved variable", "local variable", "assign/modify",
         "global assign/modify", "array reference", "create instance", "loop", "function",
-        "method call", "set/map/array literal", "pragma", "annotation", "script"
+        "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical"
     };
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
@@ -81,6 +82,8 @@ public final class JexlFeatures {
     public static final int ANNOTATION = 12;
     /** Script feature ordinal. */
     public static final int SCRIPT = 13;
+    /** Script feature ordinal. */
+    public static final int LEXICAL = 14;
 
     /**
      * Creates an all-features-enabled instance.
@@ -471,4 +474,20 @@ public final class JexlFeatures {
         return !getFeature(SCRIPT);
     }
 
+    /**
+     * Sets whether syntactic lexical mode is enabled.
+     *
+     * @param flag true means syntactic lexical function scope is in effect, false implies non-lexical scoping 
+     * @return this features instance
+     */
+    public JexlFeatures lexical(boolean flag) {
+        setFeature(LEXICAL, flag);
+        return this;
+    }
+    
+    
+    /** @return whether lexical scope feature is enabled */
+    public boolean isLexical() {
+        return getFeature(LEXICAL);
+    }
 }

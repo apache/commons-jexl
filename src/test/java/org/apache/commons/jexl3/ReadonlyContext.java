@@ -16,30 +16,30 @@
  */
 package org.apache.commons.jexl3;
 
-import java.math.MathContext;
-import java.nio.charset.Charset;
+import org.apache.commons.jexl3.annotations.NoJexl;
 
 /**
  * A readonly context wrapper.
  * @since 3.0
  */
-public final class ReadonlyContext implements JexlContext, JexlEngine.Options {
+public final class ReadonlyContext implements JexlContext, JexlContext.OptionsHandle {
     /** The wrapped context. */
     private final JexlContext wrapped;
     /** The wrapped engine options. */
-    private final JexlEngine.Options options;
+    private final JexlOptions options;
 
     /**
      * Creates a new readonly context.
      * @param context the wrapped context
      * @param eopts the engine evaluation options
      */
-    public ReadonlyContext(JexlContext context, JexlEngine.Options eopts) {
+    public ReadonlyContext(JexlContext context, JexlOptions eopts) {
         wrapped = context;
         options = eopts;
     }
 
     @Override
+    @NoJexl
     public Object get(String name) {
         return wrapped.get(name);
     }
@@ -50,47 +50,20 @@ public final class ReadonlyContext implements JexlContext, JexlEngine.Options {
      * @param value the unused variable value
      */
     @Override
+    @NoJexl
     public void set(String name, Object value) {
         throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
+    @NoJexl
     public boolean has(String name) {
         return wrapped.has(name);
     }
 
     @Override
-    public Boolean isSilent() {
-        return options == null? null : options.isSilent();
-    }
-
-    @Override
-    public Boolean isStrict() {
-        return options == null? null : options.isStrict();
-    }
-
-    @Override
-    public Boolean isCancellable() {
-        return options == null? null : options.isCancellable();
-    }
-
-    @Override
-    public Boolean isStrictArithmetic() {
-        return options == null? null : options.isStrict();
-    }
-
-    @Override
-    public MathContext getArithmeticMathContext() {
-        return options == null? null : options.getArithmeticMathContext();
-    }
-
-    @Override
-    public int getArithmeticMathScale() {
-        return options == null? -1 : options.getArithmeticMathScale();
-    }
-
-    @Override
-    public Charset getCharset() {
-        return options == null? Charset.defaultCharset() : options.getCharset();
+    @NoJexl
+    public JexlOptions getEngineOptions() {
+        return options;
     }
 }

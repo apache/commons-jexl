@@ -132,6 +132,9 @@
                         a value of <code>42</code>.
                         <p>Pragma keys can be identifiers or antish names, pragma values can be literals (boolean, integer,
                             real, string, null, NaN) and antish names</p>
+                        <p>Although pragmas are statements, they are <em>not</em> evaluated at runtime; they are constants
+                            associated to the script after parsing. It is expected that user code accesses the pragma map from 
+                            scripts to alter some functions behavior.</p>
                     </td>
                 </tr>
                 <tr>

@@ -83,7 +83,7 @@ public final class MethodExecutor extends AbstractExecutor.Method {
 
     @Override
     public Object invoke(Object o, Object... args) throws IllegalAccessException, InvocationTargetException {
-        if (vaClass != null) {
+        if (vaClass != null && args != null) {
             args = handleVarArg(args);
         }
         if (method.getDeclaringClass() == ArrayListWrapper.class && o.getClass().isArray()) {

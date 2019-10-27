@@ -84,9 +84,10 @@ public class IssuesTest extends JexlTestCase {
     public void test48() throws Exception {
         JexlEngine jexl = new Engine();
         JexlEvalContext jc = new JexlEvalContext();
+        JexlOptions options = jc.getEngineOptions();
         // ensure errors will throw
-        jc.setStrict(true);
-        jc.setSilent(false);
+        options.setStrict(true);
+        options.setSilent(false);
         try {
             String jexlExp = "(foo.getInner().foo() eq true) and (foo.getInner().goo() = (foo.getInner().goo()+1-1))";
             JexlExpression e = jexl.createExpression(jexlExp);
@@ -106,8 +107,9 @@ public class IssuesTest extends JexlTestCase {
     public void test47() throws Exception {
         JexlEngine jexl = new Engine();
         JexlEvalContext ctxt = new JexlEvalContext();
+        JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
-        ctxt.setSilent(false);
+        options.setSilent(false);
 
         JexlExpression expr = jexl.createExpression("true//false\n");
         Object value = expr.evaluate(ctxt);
@@ -131,7 +133,10 @@ public class IssuesTest extends JexlTestCase {
         // ensure errors will throw
         //jexl.setSilent(false);
         JexlEvalContext ctxt = new JexlEvalContext();
-        ctxt.setStrict(false);
+        JexlOptions options = ctxt.getEngineOptions();
+        options.setOptions(jexl);
+        options.setStrict(false);
+        options.setStrictArithmetic(false);
         ctxt.set("ax", "ok");
 
         JxltEngine.Expression expr = uel.createExpression("${ax+(bx)}");
@@ -156,8 +161,10 @@ public class IssuesTest extends JexlTestCase {
     public void test40() throws Exception {
         JexlEngine jexl = new Engine();
         JexlEvalContext ctxt = new JexlEvalContext();
+        JexlOptions options = ctxt.getEngineOptions();
+        options.setOptions(jexl);
         // ensure errors will throw
-        ctxt.setSilent(false);
+        options.setSilent(false);
 
         ctxt.set("derived", new Derived());
 
@@ -198,9 +205,10 @@ public class IssuesTest extends JexlTestCase {
     public void test11() throws Exception {
         JexlEngine jexl = createEngine(false);
         JexlEvalContext ctxt = new JexlEvalContext();
+        JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
-        ctxt.setSilent(false);
-        ctxt.setStrict(true);
+        options.setSilent(false);
+        options.setStrict(true);
 
         ctxt.set("a", null);
 
@@ -228,8 +236,9 @@ public class IssuesTest extends JexlTestCase {
         JexlEngine jexl = createEngine(false);
         MapContext vars = new MapContext();
         JexlEvalContext ctxt = new JexlEvalContext(vars);
-        ctxt.setStrict(true);
-        ctxt.setSilent(true);// to avoid throwing JexlException on null method call
+        JexlOptions options = ctxt.getEngineOptions();
+        options.setStrict(true);
+        options.setSilent(true);// to avoid throwing JexlException on null method call
 
         JexlScript jscript;
 
@@ -259,8 +268,9 @@ public class IssuesTest extends JexlTestCase {
     public void test87() throws Exception {
         JexlEngine jexl = createEngine(false);
         JexlEvalContext ctxt = new JexlEvalContext();
+        JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
-        ctxt.setSilent(false);
+        options.setSilent(false);
         JexlExpression divide = jexl.createExpression("l / r");
         JexlExpression modulo = jexl.createExpression("l % r");
 
@@ -280,8 +290,9 @@ public class IssuesTest extends JexlTestCase {
     public void test90() throws Exception {
         JexlEngine jexl = createEngine(false);
         JexlEvalContext ctxt = new JexlEvalContext();
+        JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
-        ctxt.setSilent(false);
+        options.setSilent(false);
         // ';' is necessary between expressions
         String[] fexprs = {
             "a=3 b=4",
@@ -320,8 +331,9 @@ public class IssuesTest extends JexlTestCase {
     public void test44() throws Exception {
         JexlEngine jexl = createEngine(false);
         JexlEvalContext ctxt = new JexlEvalContext();
+        JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
-        ctxt.setSilent(false);
+        options.setSilent(false);
         JexlScript script;
         script = jexl.createScript("'hello world!'//commented");
         Assert.assertEquals("hello world!", script.execute(ctxt));
@@ -337,8 +349,9 @@ public class IssuesTest extends JexlTestCase {
     public void test97() throws Exception {
         JexlEngine jexl = createEngine(false);
         JexlEvalContext ctxt = new JexlEvalContext();
+        JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
-        ctxt.setSilent(false);
+        options.setSilent(false);
         for (char v = 'a'; v <= 'z'; ++v) {
             ctxt.set(Character.toString(v), 10);
         }

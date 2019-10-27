@@ -212,13 +212,14 @@ public class IfTest extends JexlTestCase {
         JexlEngine jexl = JEXL;
 
         JexlEvalContext jc = new JexlEvalContext();
+        JexlOptions options = jc.getEngineOptions();
         JexlExpression e = jexl.createExpression("x.y.z = foo ?'bar':'quux'");
         Object o;
 
         // undefined foo
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
@@ -228,8 +229,8 @@ public class IfTest extends JexlTestCase {
         jc.set("foo", null);
 
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
@@ -239,8 +240,8 @@ public class IfTest extends JexlTestCase {
         jc.set("foo", Boolean.FALSE);
 
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
@@ -250,8 +251,8 @@ public class IfTest extends JexlTestCase {
         jc.set("foo", Boolean.TRUE);
 
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be bar", "bar", o);
             o = jc.get("x.y.z");
@@ -269,14 +270,15 @@ public class IfTest extends JexlTestCase {
     @Test
     public void testTernaryShorthand() throws Exception {
         JexlEvalContext jc = new JexlEvalContext();
+        JexlOptions options = jc.getEngineOptions();
         JexlExpression e = JEXL.createExpression("x.y.z = foo?:'quux'");
         JexlExpression f = JEXL.createExpression("foo??'quux'");
         Object o;
 
         // undefined foo
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
@@ -288,8 +290,8 @@ public class IfTest extends JexlTestCase {
         jc.set("foo", null);
 
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
@@ -301,8 +303,8 @@ public class IfTest extends JexlTestCase {
         jc.set("foo", Boolean.FALSE);
 
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
@@ -314,8 +316,8 @@ public class IfTest extends JexlTestCase {
         jc.set("foo", Double.NaN);
 
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
@@ -327,8 +329,8 @@ public class IfTest extends JexlTestCase {
         jc.set("foo", "");
 
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
@@ -340,8 +342,8 @@ public class IfTest extends JexlTestCase {
         jc.set("foo", "false");
 
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
@@ -353,8 +355,8 @@ public class IfTest extends JexlTestCase {
         jc.set("foo", 0d);
 
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
@@ -366,8 +368,8 @@ public class IfTest extends JexlTestCase {
         jc.set("foo", 0);
 
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be quux", "quux", o);
             o = jc.get("x.y.z");
@@ -379,8 +381,8 @@ public class IfTest extends JexlTestCase {
         jc.set("foo", "bar");
 
         for (int l = 0; l < 4; ++l) {
-            jc.setStrict((l & 1) == 0);
-            jc.setSilent((l & 2) != 0);
+            options.setStrict((l & 1) == 0);
+            options.setSilent((l & 2) != 0);
             o = e.evaluate(jc);
             Assert.assertEquals("Should be bar", "bar", o);
             o = jc.get("x.y.z");
@@ -432,10 +434,11 @@ public class IfTest extends JexlTestCase {
     @Test
     public void testTernaryFail() throws Exception {
         JexlEvalContext jc = new JexlEvalContext();
+        JexlOptions options = jc.getEngineOptions();
         JexlExpression e = JEXL.createExpression("false ? bar : quux");
         Object o;
-        jc.setStrict(true);
-        jc.setSilent(false);
+        options.setStrict(true);
+        options.setSilent(false);
         try {
            o = e.evaluate(jc);
            Assert.fail("Should have failed");

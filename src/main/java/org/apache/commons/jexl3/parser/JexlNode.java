@@ -162,10 +162,8 @@ public abstract class JexlNode extends SimpleNode {
             int nc = walk.jjtGetNumChildren() - 1;
             if (nc >= 0) {
                 walk = walk.jjtGetChild(nc);
-            } else if (walk.jjtGetParent() instanceof ASTReference) {
-                return true;
             } else {
-                return false;
+                return walk.jjtGetParent() instanceof ASTReference;
             }
         } while (walk != null);
         return false;
@@ -212,8 +210,8 @@ public abstract class JexlNode extends SimpleNode {
         }
         if (this instanceof ASTMethodNode) {
             if (this.jjtGetNumChildren() > 1
-                && this.jjtGetChild(0) instanceof ASTIdentifierAccess
-                && (((ASTIdentifierAccess) this.jjtGetChild(0)).isSafe() || safe)) {
+                    && this.jjtGetChild(0) instanceof ASTIdentifierAccess
+                    && (((ASTIdentifierAccess) this.jjtGetChild(0)).isSafe() || safe)) {
                 return true;
             }
         }
@@ -262,7 +260,7 @@ public abstract class JexlNode extends SimpleNode {
         JexlNode node = this;
         for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
             // protect only the condition part of the ternary
-            if (walk instanceof ASTTernaryNode || walk instanceof ASTNullpNode) {
+            if (walk instanceof ASTTernaryNode || walk instanceof ASTNullpNode || walk instanceof ASTEQNode || walk instanceof ASTNENode) {
                 return node == walk.jjtGetChild(0);
             }
             if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {

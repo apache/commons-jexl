@@ -72,19 +72,16 @@ public class Asserter extends Assert {
     }
 
     public void setStrict(boolean s) {
-        context.setStrict(s, s);
+        context.getEngineOptions().setStrict(s);
     }
 
     public void setStrict(boolean es, boolean as) {
-        context.setStrict(es, as);
+        context.getEngineOptions().setStrict(es);
+        context.getEngineOptions().setStrictArithmetic(as);
     }
 
     public void setSilent(boolean silent) {
-        context.setSilent(silent);
-    }
-
-    public void clearOptions() {
-        context.clearOptions();
+        context.getEngineOptions().setSilent(silent);
     }
 
     /**

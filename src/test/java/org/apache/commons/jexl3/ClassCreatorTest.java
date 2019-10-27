@@ -279,8 +279,9 @@ public class ClassCreatorTest extends JexlTestCase {
         JexlExpression expr = jexl.createExpression("foo.value");
         JexlExpression newx = jexl.createExpression("foo = new(clazz)");
         JexlEvalContext context = new JexlEvalContext();
-        context.setStrict(false);
-        context.setSilent(true);
+        JexlOptions options = context.getEngineOptions();
+        options.setStrict(false);
+        options.setSilent(true);
 
         ClassCreator cctor = new ClassCreator(jexl, base);
         for (int i = 0; i < LOOPS && gced < 0; ++i) {

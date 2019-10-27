@@ -18,15 +18,13 @@ package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
-import org.apache.commons.jexl3.parser.JexlNode;
-
 
 /**
  * A Script closure.
  */
 public class Closure extends Script {
     /** The frame. */
-    protected final Scope.Frame frame;
+    protected final Frame frame;
 
     /**
      * Creates a closure.
@@ -45,7 +43,7 @@ public class Closure extends Script {
      */
     protected Closure(Script base, Object[] args) {
         super(base.jexl, base.source, base.script);
-        Scope.Frame sf = (base instanceof Closure) ? ((Closure) base).frame :  null;
+        Frame sf = (base instanceof Closure) ? ((Closure) base).frame :  null;
         frame = sf == null
                 ? script.createFrame(args)
                 : sf.assign(args);
@@ -120,26 +118,18 @@ public class Closure extends Script {
 
     @Override
     public Object execute(JexlContext context, Object... args) {
-        Scope.Frame callFrame = null;
-        if (frame != null) {
-            callFrame = frame.assign(args);
-        }
-        Interpreter interpreter = createInterpreter(context, callFrame);
-        JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
-        return interpreter.interpret(block);
+        Frame local = frame != null? frame.assign(args) : null;
+        Interpreter interpreter = createInterpreter(context, local);
+        return interpreter.runClosure(this, null);
     }
 
     @Override
     public Callable callable(JexlContext context, Object... args) {
-        Scope.Frame local = null;
-        if (frame != null) {
-            local = frame.assign(args);
-        }
+        Frame local = frame != null? frame.assign(args) : null;
         return new Callable(createInterpreter(context, local)) {
             @Override
             public Object interpret() {
-                JexlNode block = script.jjtGetChild(script.jjtGetNumChildren() - 1);
-                return interpreter.interpret(block);
+                return interpreter.runClosure(Closure.this, null);
             }
         };
     }

@@ -295,8 +295,12 @@ ASTJexlScript JexlScript(Scope frame) : {
     jjtThis.setScope(frame);
 }
 {
-   ( ( Statement() )*) <EOF>
    {
+        pushUnit(jjtThis, frame != null && frame.getArgCount() > 0);
+   }
+        ( ( Statement() )*) <EOF>
+   {
+        popUnit(jjtThis);
         return jjtThis.script();
    }
 }
@@ -304,9 +308,13 @@ ASTJexlScript JexlScript(Scope frame) : {
 ASTJexlScript JexlExpression(Scope frame) #JexlScript : {
     jjtThis.setScope(frame);
 }
-{
+{   
+   {
+        pushUnit(jjtThis, true);
+   }
    ( Expression() )? <EOF>
    {
+        popUnit(jjtThis);
         return jjtThis.script();
    }
 }
@@ -343,7 +351,7 @@ void Statement() #void : {}
 
 void Block() #Block : {}
 {
-    <LCURLY> ( Statement() )* <RCURLY>
+    <LCURLY> { pushUnit(jjtThis); } ( Statement() )* { popUnit(jjtThis); } <RCURLY>
 }
 
 
@@ -391,7 +399,7 @@ void Break() #Break : {
 
 void ForeachStatement() : {}
 {
-    <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
+    { pushUnit(jjtThis, true); } <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; popUnit(jjtThis); }
 }
 
 void ForEachVar() #Reference : {}
@@ -610,7 +618,6 @@ void UnaryExpression() #void : {}
     ValueExpression()
 }
 
-
 /***************************************
  *      Identifier & Literals
  ***************************************/
@@ -809,7 +816,7 @@ void Parameter() #void :
 
 void Parameters() #void : {}
 {
-     <LPAREN> [Parameter() (<COMMA> Parameter())* ] <RPAREN>
+     <LPAREN> [(<VAR>)? Parameter() (<COMMA> (<VAR>)? Parameter())* ] <RPAREN>
 }
 
 
@@ -827,11 +834,11 @@ void Lambda() #JexlLambda() :
    pushFrame();
 }
 {
-  <FUNCTION> Parameters() Block()
+  { pushUnit(jjtThis, true); } <FUNCTION> Parameters() Block() { popUnit(jjtThis); }
   |
-  Parameters() <LAMBDA> Block()
+  { pushUnit(jjtThis, true); } Parameters() <LAMBDA> Block() { popUnit(jjtThis); }
   |
-  Parameter() <LAMBDA> Block()
+  { pushUnit(jjtThis, true); } Parameter() <LAMBDA> Block() { popUnit(jjtThis); }
 }
 
 

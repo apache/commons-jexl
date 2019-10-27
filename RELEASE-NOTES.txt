@@ -36,7 +36,8 @@ It is nevertheless possible and we are sorry if it causes problems to any of you
 
 What's new in 3.2:
 ==================
-
+* Lexical scoping for local variables and parameters allowing at parse and/or runtime to reduce scripting errors and bugs and align with
+  known development languages best practice (C, Java, ...).
 * Interpolated strings in identifiers, as in x.`${prefix}_${suffix}` that in many cases would be equivalent to
   x[prefix + '_' + suffix] or x[`${prefix}_${suffix}`].
 * Safe-navigation mode and operator '?.' allowing lenient handling of non-existent or null properties so that an expression
@@ -47,7 +48,7 @@ What's new in 3.2:
 
 New Features in 3.2:
 ====================
-
+* JEXL-307:      Variable redeclaration option
 * JEXL-295:      Add unary plus operator
 * JEXL-292:      Allow specifying custom Permissions class for Uberspect to be used later by Introspector
 * JEXL-288:      Annotation can not be specified for a standalone statement
@@ -72,7 +73,8 @@ New Features in 3.2:
 
 Bugs Fixed in 3.2:
 ==================
-
+* JEXL-315:      JxltEngine literal string strings ending in \ $ or # throw JxltEngine$Exception
+* JEXL-314:      Comparison NULL values of variables NAME1.NAME2
 * JEXL-312:      @NoJexl fails to disallow method call
 * JEXL-311:      Jxlt template scripts fail using verbatim expressions embedded in lambdas
 * JEXL-309:      Line numbers are not correct when template report errors

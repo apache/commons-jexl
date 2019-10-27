@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import java.math.MathContext;
+import java.nio.charset.Charset;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,5 +60,44 @@ public class PragmaTest extends JexlTestCase {
         Assert.assertEquals(1, pragmas.get("one"));
         Assert.assertEquals("truth", pragmas.get("the.very.hard"));
     }
+    
+    public static class SafeContext extends JexlEvalContext {
+        // @Override
+        public void processPragmas(Map<String, Object> pragmas) {
+            if (pragmas != null && !pragmas.isEmpty()) {
+                JexlOptions options = getEngineOptions();
+                for (Map.Entry<String, Object> pragma : pragmas.entrySet()) {
+                    String key = pragma.getKey();
+                    Object value = pragma.getValue();
+                    if ("jexl.safe".equals(key) && value instanceof Boolean) {
+                        options.setSafe(((Boolean) value).booleanValue());
+                    } else if ("jexl.strict".equals(key) && value instanceof Boolean) {
+                        options.setStrict(((Boolean) value).booleanValue());
+                    } else if ("jexl.silent".equals(key) && value instanceof Boolean) {
+                        options.setSilent(((Boolean) value).booleanValue());
+                    }
+                }
+            }
+        }
+    }
 
+    @Test
+    @SuppressWarnings("AssertEqualsBetweenInconvertibleTypes")
+    public void testSafePragma() throws Exception {
+        SafeContext jc = new SafeContext();
+        jc.set("foo", null);
+        JexlScript script = JEXL.createScript("#pragma jexl.safe true\nfoo.bar;");
+        Assert.assertTrue(script != null);
+        jc.processPragmas(script.getPragmas());
+        Object result = script.execute(jc);
+        Assert.assertNull(result);
+        jc = new SafeContext();
+        jc.set("foo", null);
+        try {
+            result = script.execute(jc);
+            Assert.fail("should have thrown");
+        } catch (JexlException xvar) {
+            // ok, expected
+        }
+    }
 }

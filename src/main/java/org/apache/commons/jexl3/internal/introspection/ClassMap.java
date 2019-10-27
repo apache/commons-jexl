@@ -284,7 +284,7 @@ final class ClassMap {
                 // add method to byKey cache; do not override
                 MethodKey key = new MethodKey(mi);
                 Method pmi = cache.byKey.putIfAbsent(key, permissions.allow(mi) ? mi : CACHE_MISS);
-                if (pmi != null && log.isDebugEnabled() && !key.equals(new MethodKey(pmi))) {
+                if (pmi != null && pmi != CACHE_MISS && log.isDebugEnabled() && !key.equals(new MethodKey(pmi))) {
                     // foo(int) and foo(Integer) have the same signature for JEXL
                     log.debug("Method " + pmi + " is already registered, key: " + key.debugString());
                 }

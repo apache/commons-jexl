@@ -121,7 +121,7 @@ public interface JexlContext {
     }
 
     /**
-     * A marker interface of the JexlContext that allows to process annotations.
+     * A marker interface of the JexlContext that processes annotations.
      * It is used by the interpreter during evaluation to execute annotation evaluations.
      * <p>If the JexlContext is not an instance of an AnnotationProcessor, encountering an annotation will generate
      * an error or a warning depending on the engine strictness.
@@ -143,5 +143,20 @@ public interface JexlContext {
          */
         Object processAnnotation(String name, Object[] args, Callable<Object> statement) throws Exception;
     }
-
+    
+    /**
+     * A marker interface of the JexlContext that exposes runtime evaluation options.
+     */
+    interface OptionsHandle {
+        /**
+         * Retrieves the current set of options though the context.
+         * <p>
+         * This method will be called once at beginning of evaluation and the
+         * JexlOptions instance kept as a property of the evaluator;
+         * the JexlOptions instance is free to alter its boolean flags during
+         * execution.
+         * @return the engine options
+         */
+        JexlOptions getEngineOptions();
+    }
 }

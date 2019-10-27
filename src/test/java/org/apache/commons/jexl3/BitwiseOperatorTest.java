@@ -32,7 +32,7 @@ public class BitwiseOperatorTest extends JexlTestCase {
     @Before
     public void setUp() {
         asserter = new Asserter(JEXL);
-        asserter.setStrict(false);
+        asserter.setStrict(false, false);
     }
 
     /**

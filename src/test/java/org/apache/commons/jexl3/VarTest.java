@@ -41,9 +41,10 @@ public class VarTest extends JexlTestCase {
     @Test
     public void testStrict() throws Exception {
         JexlEvalContext env = new JexlEvalContext();
-        JexlContext ctxt = new ReadonlyContext(env, env);
-        env.setStrict(true);
-        env.setSilent(false);
+        JexlOptions options = env.getEngineOptions();
+        JexlContext ctxt = new ReadonlyContext(env, options);
+        options.setStrict(true);
+        options.setSilent(false);
         JexlScript e;
 
         e = JEXL.createScript("x");

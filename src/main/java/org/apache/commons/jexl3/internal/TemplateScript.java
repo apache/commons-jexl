@@ -233,7 +233,7 @@ public final class TemplateScript implements JxltEngine.Template {
 
     @Override
     public TemplateScript prepare(JexlContext context) {
-        Scope.Frame frame = script.createFrame((Object[]) null);
+        Frame frame = script.createFrame((Object[]) null);
         TemplateExpression[] immediates = new TemplateExpression[exprs.length];
         for (int e = 0; e < exprs.length; ++e) {
             immediates[e] = exprs[e].prepare(frame, context);
@@ -248,7 +248,7 @@ public final class TemplateScript implements JxltEngine.Template {
 
     @Override
     public void evaluate(JexlContext context, Writer writer, Object... args) {
-        Scope.Frame frame = script.createFrame(args);
+        Frame frame = script.createFrame(args);
         Interpreter interpreter = new TemplateInterpreter(jxlt.getEngine(), context, frame, exprs, writer);
         interpreter.interpret(script);
     }

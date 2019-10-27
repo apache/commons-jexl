@@ -107,6 +107,7 @@ public abstract class JexlEngine {
     /**
      * Script evaluation options.
      * <p>The JexlContext used for evaluation can implement this interface to alter behavior.</p>
+     * @deprecated 3.2
      */
     public interface Options {
 
@@ -159,7 +160,7 @@ public abstract class JexlEngine {
          */
         int getArithmeticMathScale();
     }
-
+   
     /** Default features. */
     public static final JexlFeatures DEFAULT_FEATURES = new JexlFeatures();
 
@@ -257,6 +258,13 @@ public abstract class JexlEngine {
      * @return true if strict, false otherwise
      */
     public abstract boolean isStrict();
+    
+    /**
+     * Checks whether this engine uses safe navigation.
+     *
+     * @return true if safe, false otherwise
+     */
+    public abstract boolean isSafe();
 
     /**
      * Checks whether this engine will throw JexlException.Cancel (true) or return null (false) when interrupted

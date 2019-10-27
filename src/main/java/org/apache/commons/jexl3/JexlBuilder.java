@@ -18,6 +18,7 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine;
+import org.apache.commons.jexl3.internal.Options;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.logging.Log;
@@ -90,6 +91,9 @@ public class JexlBuilder {
 
     /** Whether interrupt throws JexlException.Cancel. */
     private Boolean cancellable = null;
+    
+    /** The options. */
+    private final Options options = new Options();
 
     /** Whether getVariables considers all potential equivalent syntactic forms. */
     private Boolean collectAll = null;
@@ -151,6 +155,11 @@ public class JexlBuilder {
         return this.strategy;
     }
 
+    /** @return the current set of options */
+    public JexlOptions options() {
+        return options;
+    }
+
     /**
      * Sets the JexlArithmetic instance the engine will use.
      *
@@ -159,6 +168,9 @@ public class JexlBuilder {
      */
     public JexlBuilder arithmetic(JexlArithmetic a) {
         this.arithmetic = a;
+        options.setStrictArithmetic(a.isStrict());
+        options.setMathContext(a.getMathContext());
+        options.setMathScale(a.getMathScale());
         return this;
     }
 
@@ -203,11 +215,11 @@ public class JexlBuilder {
     /**
      * Sets the o.a.c.Log instance to use.
      *
-     * @param l the logger
+     * @param log the logger
      * @return this builder
      */
-    public JexlBuilder logger(Log l) {
-        this.logger = l;
+    public JexlBuilder logger(Log log) {
+        this.logger = log;
         return this;
     }
 
@@ -260,7 +272,39 @@ public class JexlBuilder {
     public Charset charset() {
         return charset;
     }
-
+    
+   /**
+     * Sets whether the engine will resolve antish variable names.
+     *
+     * @param flag true means antish resolution is enabled, false disables it
+     * @return this builder
+     */
+    public JexlBuilder antish(boolean flag) {
+        options.setAntish(flag);
+        return this;
+    }
+    
+    /** @return whether antish resolution is enabled */
+    public boolean antish() {
+        return options.isAntish();
+    }
+       
+    /**
+     * Sets whether the engine is in lexical mode.
+     *
+     * @param flag true means lexical function scope is in effect, false implies non-lexical scoping 
+     * @return this builder
+     */
+    public JexlBuilder lexical(boolean flag) {
+        options.setLexical(true);
+        return this;
+    }
+    
+    /** @return whether lexical scope is enabled */
+    public boolean lexical() {
+        return options.isLexical();
+    }
+    
     /**
      * Sets whether the engine will throw JexlException during evaluation when an error is triggered.
      *
@@ -269,6 +313,7 @@ public class JexlBuilder {
      */
     public JexlBuilder silent(boolean flag) {
         this.silent = flag;
+        options.setSilent(flag);
         return this;
     }
 
@@ -286,6 +331,7 @@ public class JexlBuilder {
      */
     public JexlBuilder strict(boolean flag) {
         this.strict = flag;
+        options.setStrict(flag);
         return this;
     }
 
@@ -305,6 +351,7 @@ public class JexlBuilder {
      */
     public JexlBuilder safe(boolean flag) {
         this.safe = flag;
+        options.setSafe(flag);
         return this;
     }
 
@@ -339,6 +386,7 @@ public class JexlBuilder {
      */
     public JexlBuilder cancellable(boolean flag) {
         this.cancellable = flag;
+        options.setCancellable(flag);
         return this;
     }
 

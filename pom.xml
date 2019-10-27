@@ -16,101 +16,20 @@
    limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-parent</artifactId>
-        <version>48</version>
+        <version>49</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
+    
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-jexl3</artifactId>
     <version>3.2-SNAPSHOT</version>
     <name>Apache Commons JEXL</name>
-    <inceptionYear>2001</inceptionYear>
     <description>The Apache Commons JEXL library is an implementation of the JSTL Expression Language with extensions.</description>
     <url>https://commons.apache.org/proper/commons-jexl/</url>
-
-    <issueManagement>
-        <system>jira</system>
-        <url>https://issues.apache.org/jira/browse/JEXL</url>
-    </issueManagement>
-
-    <scm>
-        <connection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</connection>
-        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</developerConnection>
-        <url>https://gitbox.apache.org/repos/asf/commons-jexl.git</url>
-    </scm>
-
-    <distributionManagement>
-      <site>
-        <id>apache.website</id>
-        <name>Apache Commons Site</name>
-        <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl/</url>
-      </site>
-    </distributionManagement>
-
-    <developers>
-        <developer>
-            <name>dIon Gillard</name>
-            <id>dion</id>
-            <email>dion AT apache DOT org</email>
-            <organization>The Apache Software Foundation</organization>
-        </developer>
-        <developer>
-            <name>Geir Magnusson Jr.</name>
-            <id>geirm</id>
-            <email>geirm AT apache DOT org</email>
-            <organization>independent</organization>
-        </developer>
-        <developer>
-            <name>Tim O'Brien</name>
-            <id>tobrien</id>
-            <email>tobrien AT apache DOT org</email>
-            <organization>independent</organization>
-        </developer>
-        <developer>
-            <name>Peter Royal</name>
-            <id>proyal</id>
-            <email>proyal AT apache DOT org</email>
-            <organization>The Apache Software Foundation</organization>
-        </developer>
-        <developer>
-            <name>James Strachan</name>
-            <id>jstrachan</id>
-            <email>jstrachan AT apache DOT org</email>
-            <organization>SpiritSoft, Inc.</organization>
-        </developer>
-        <developer>
-            <name>Rahul Akolkar</name>
-            <id>rahul</id>
-            <email>rahul AT apache DOT org</email>
-            <organization>The Apache Software Foundation</organization>
-        </developer>
-        <developer>
-            <name>Sebastian Bazley</name>
-            <id>sebb</id>
-            <email>sebb AT apache DOT org</email>
-        </developer>
-        <developer>
-            <name>Henri Biestro</name>
-            <id>henrib</id>
-            <email>henrib AT apache DOT org</email>
-        </developer>
-    </developers>
-
-    <dependencies>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <inceptionYear>2001</inceptionYear>
 
     <properties>
         <maven.compiler.source>1.6</maven.compiler.source>
@@ -136,6 +55,37 @@
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
         <checksyle.version>6.13</checksyle.version>
     </properties>
+    
+    <scm>
+        <connection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</connection>
+        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</developerConnection>
+        <url>https://gitbox.apache.org/repos/asf/commons-jexl.git</url>
+    </scm> 
+    <issueManagement>
+        <system>jira</system>
+        <url>https://issues.apache.org/jira/browse/JEXL</url>
+    </issueManagement>
+    <distributionManagement>
+      <site>
+        <id>apache.website</id>
+        <name>Apache Commons Site</name>
+        <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl/</url>
+      </site>
+    </distributionManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -369,4 +319,59 @@
             </plugin>
         </plugins>
     </reporting>
+    
+    <developers>
+        <developer>
+            <name>dIon Gillard</name>
+            <id>dion</id>
+            <email>dion AT apache DOT org</email>
+            <organization>The Apache Software Foundation</organization>
+        </developer>
+        <developer>
+            <name>Geir Magnusson Jr.</name>
+            <id>geirm</id>
+            <email>geirm AT apache DOT org</email>
+            <organization>independent</organization>
+        </developer>
+        <developer>
+            <name>Tim O'Brien</name>
+            <id>tobrien</id>
+            <email>tobrien AT apache DOT org</email>
+            <organization>independent</organization>
+        </developer>
+        <developer>
+            <name>Peter Royal</name>
+            <id>proyal</id>
+            <email>proyal AT apache DOT org</email>
+            <organization>The Apache Software Foundation</organization>
+        </developer>
+        <developer>
+            <name>James Strachan</name>
+            <id>jstrachan</id>
+            <email>jstrachan AT apache DOT org</email>
+            <organization>SpiritSoft, Inc.</organization>
+        </developer>
+        <developer>
+            <name>Rahul Akolkar</name>
+            <id>rahul</id>
+            <email>rahul AT apache DOT org</email>
+            <organization>The Apache Software Foundation</organization>
+        </developer>
+        <developer>
+            <name>Sebastian Bazley</name>
+            <id>sebb</id>
+            <email>sebb AT apache DOT org</email>
+        </developer>
+        <developer>
+            <name>Henri Biestro</name>
+            <id>henrib</id>
+            <email>henrib AT apache DOT org</email>
+        </developer>
+    </developers>
+    
+    <contributors>
+        <contributor>
+            <name>Dmitri Blinov</name>
+        </contributor>
+    </contributors>
 </project>

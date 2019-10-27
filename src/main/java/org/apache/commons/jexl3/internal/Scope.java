@@ -22,13 +22,14 @@ import java.util.Map;
 
 /**
  * A script scope, stores the declaration of parameters and local variables as symbols.
+ * <p>This also acts as the functional scope and variable definition store.
  * @since 3.0
  */
 public final class Scope {    
     /**
      * The value of a declared but undefined variable, for instance: var x;.
      */
-    private static final Object UNDEFINED = new Object() {
+    static final Object UNDEFINED = new Object() {
         @Override public String toString() {
             return "?";
         }
@@ -152,8 +153,9 @@ public final class Scope {
      * This method creates an new entry in the symbol map.
      * </p>
      * @param name the parameter name
+     * @return the register index storing this variable
      */
-    public void declareParameter(String name) {
+    public int declareParameter(String name) {
         if (namedVariables == null) {
             namedVariables = new LinkedHashMap<String, Integer>();
         } else if (vars > 0) {
@@ -165,6 +167,7 @@ public final class Scope {
             namedVariables.put(name, register);
             parms += 1;
         }
+        return register;
     }
 
     /**
@@ -175,7 +178,7 @@ public final class Scope {
      * @param name the variable name
      * @return the register index storing this variable
      */
-    public Integer declareVariable(String name) {
+    public int declareVariable(String name) {
         if (namedVariables == null) {
             namedVariables = new LinkedHashMap<String, Integer>();
         }
@@ -202,9 +205,10 @@ public final class Scope {
      * Creates a frame by copying values up to the number of parameters.
      * <p>This captures the hoisted variables values.</p>
      * @param frame the caller frame
+     * @param args the arguments
      * @return the arguments array
      */
-    public Frame createFrame(Frame frame) {
+    public Frame createFrame(Frame frame, Object...args) {
         if (namedVariables != null) {
             Object[] arguments = new Object[namedVariables.size()];
             Arrays.fill(arguments, UNDEFINED);
@@ -216,7 +220,7 @@ public final class Scope {
                     arguments[target] = arg;
                 }
             }
-            return new Frame(this, arguments, 0);
+            return new Frame(this, arguments, 0).assign(args);
         } else {
             return null;
         }
@@ -305,109 +309,4 @@ public final class Scope {
         }
     }
 
-    /**
-     * A call frame, created from a scope, stores the arguments and local variables in a "stack frame" (sic).
-     * @since 3.0
-     */
-    public static final class Frame {
-        /** The scope. */
-        private final Scope scope;
-        /** The actual stack frame. */
-        private final Object[] stack;
-        /** Number of curried parameters. */
-        private int curried = 0;
-
-        /**
-         * Creates a new frame.
-         * @param s the scope
-         * @param r the stack frame
-         * @param c the number of curried parameters
-         */
-        public Frame(Scope s, Object[] r, int c) {
-            scope = s;
-            stack = r;
-            curried = c;
-        }
-
-        /**
-         * Gets this script unbound parameters, i.e. parameters not bound through curry().
-         * @return the parameter names
-         */
-        public String[] getUnboundParameters() {
-            return scope.getParameters(curried);
-        }
-
-        /**
-         * Gets the scope.
-         * @return this frame scope
-         */
-        public Scope getScope() {
-            return scope;
-        }
-
-        @Override
-        public int hashCode() {
-            return Arrays.deepHashCode(this.stack);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final Frame other = (Frame) obj;
-            return Arrays.deepEquals(this.stack, other.stack);
-        }
-
-        /**
-         * Gets a value.
-         * @param s the offset in this frame
-         * @return the stacked value
-         */
-        public Object get(int s) {
-            return stack[s];
-        }
-        
-        /**
-         * Whether this frame defines a symbol, ie declared it and assigned it a value.
-         * @param s the offset in this frame
-         * @return true if this symbol has been assigned a value, false otherwise
-         */
-        public boolean has(int s) {
-            return s >= 0 && s < stack.length && stack[s] != UNDEFINED;
-        }
-            
-        /**
-         * Sets a value.
-         * @param r the offset in this frame
-         * @param value the value to set in this frame
-         */
-        public void set(int r, Object value) {
-            stack[r] = value;
-        }
-
-        /**
-         * Assign values to this frame.
-         * @param values the values
-         * @return this frame
-         */
-        public Frame assign(Object... values) {
-            if (stack != null) {
-                int nparm = scope.getArgCount();
-                Object[] copy = stack.clone();
-                int ncopy = 0;
-                if (values != null && values.length > 0) {
-                    ncopy = Math.min(nparm - curried, Math.min(nparm, values.length));
-                    System.arraycopy(values, 0, copy, curried, ncopy);
-                }
-                // unbound parameters are defined as null
-                Arrays.fill(copy, curried + ncopy, nparm, null);
-                return new Frame(scope, copy, curried + ncopy);
-            }
-            return this;
-        }
-    }
 }

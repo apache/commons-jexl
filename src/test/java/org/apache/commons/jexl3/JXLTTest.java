@@ -389,19 +389,20 @@ public class JXLTTest extends JexlTestCase {
     @Test
     public void testCharAtBug() throws Exception {
         context.set("foo", "abcdef");
+        JexlOptions options = context.getEngineOptions();
         JxltEngine.Expression expr = JXLT.createExpression("${foo.substring(2,4)/*comment*/}");
         Object o = expr.evaluate(context);
         Assert.assertEquals("cd", o);
 
         context.set("bar", "foo");
         try {
-            context.setSilent(true);
+            options.setSilent(true);
             expr = JXLT.createExpression("#{${bar}+'.charAt(-2)'}");
             expr = expr.prepare(context);
             o = expr.evaluate(context);
             Assert.assertEquals(null, o);
         } finally {
-            context.setSilent(false);
+            options.setSilent(false);
         }
 
     }
@@ -860,5 +861,34 @@ public class JXLTTest extends JexlTestCase {
         t.evaluate(ctx311, strw, 42);
         String output = strw.toString();
         Assert.assertEquals("<p>Universe 42</p>\n", output);
+    }
+    
+    @Test
+    public void test315() throws Exception {
+        String s315;
+        StringWriter strw;
+        JxltEngine.Template t315;
+        String output;
+        
+        s315 = "<report/>$";
+        t315 = JXLT.createTemplate("$$", new StringReader(s315));
+        strw = new StringWriter();
+        t315.evaluate(context, strw);
+        output = strw.toString();
+        Assert.assertEquals(s315, output);
+        
+        s315 = "<foo/>#";
+        t315 = JXLT.createTemplate("$$", new StringReader(s315));
+         strw = new StringWriter();
+        t315.evaluate(context, strw);
+        output = strw.toString();
+        Assert.assertEquals(s315, output);
+        
+        s315 = "<bar/>\\";
+        t315 = JXLT.createTemplate("$$", new StringReader(s315));
+        strw = new StringWriter();
+        t315.evaluate(context, strw);
+        output = strw.toString();
+        Assert.assertEquals(s315, output);
     }
 }

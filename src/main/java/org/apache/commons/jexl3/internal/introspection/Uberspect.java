@@ -53,7 +53,7 @@ public class Uberspect implements JexlUberspect {
     /** Publicly exposed special failure object returned by tryInvoke. */
     public static final Object TRY_FAILED = JexlEngine.TRY_FAILED;
     /** The logger to use for all warnings and errors. */
-    protected final Log rlog;
+    protected final Log logger;
     /** The resolver strategy. */
     private final JexlUberspect.ResolverStrategy strategy;
     /** The permissions. */
@@ -88,7 +88,7 @@ public class Uberspect implements JexlUberspect {
      * @param perms the introspector permissions
      */
     public Uberspect(Log runtimeLogger, JexlUberspect.ResolverStrategy sty, Permissions perms) {
-        rlog = runtimeLogger;
+        logger = runtimeLogger;
         strategy = sty == null? JexlUberspect.JEXL_STRATEGY : sty;
         permissions  = perms;
         ref = new SoftReference<Introspector>(null);
@@ -111,7 +111,7 @@ public class Uberspect implements JexlUberspect {
             synchronized (this) {
                 intro = ref.get();
                 if (intro == null) {
-                    intro = new Introspector(rlog, loader.get(), permissions);
+                    intro = new Introspector(logger, loader.get(), permissions);
                     ref = new SoftReference<Introspector>(intro);
                     loader = new SoftReference<ClassLoader>(intro.getLoader());
                     version.incrementAndGet();
@@ -129,7 +129,7 @@ public class Uberspect implements JexlUberspect {
             if (intro != null) {
                 intro.setLoader(nloader);
             } else {
-                intro = new Introspector(rlog, nloader, permissions);
+                intro = new Introspector(logger, nloader, permissions);
                 ref = new SoftReference<Introspector>(intro);
             }
             loader = new SoftReference<ClassLoader>(intro.getLoader());
@@ -394,8 +394,8 @@ public class Uberspect implements JexlUberspect {
                 return (Iterator<Object>) it.invoke(obj, (Object[]) null);
             }
         } catch (Exception xany) {
-            if (rlog != null && rlog.isDebugEnabled()) {
-                rlog.info("unable to solve iterator()", xany);
+            if (logger != null && logger.isDebugEnabled()) {
+                logger.info("unable to solve iterator()", xany);
             }
         }
         return null;

@@ -47,7 +47,7 @@ public class TemplateInterpreter extends Interpreter {
      * @param out         the output writer
      */
     TemplateInterpreter(Engine jexl,
-            JexlContext jcontext, Scope.Frame jframe, TemplateExpression[] expressions, Writer out) {
+            JexlContext jcontext, Frame jframe, TemplateExpression[] expressions, Writer out) {
         super(jexl, jcontext, jframe);
         exprs = expressions;
         writer = out;
@@ -148,7 +148,7 @@ public class TemplateInterpreter extends Interpreter {
         if (node instanceof ASTJexlLambda && !((ASTJexlLambda) node).isTopLevel()) {
             return new Closure(this, (ASTJexlLambda) node) {
                 @Override
-                protected Interpreter createInterpreter(JexlContext context, Scope.Frame local) {
+                protected Interpreter createInterpreter(JexlContext context, Frame local) {
                     return new TemplateInterpreter(jexl, context, local, exprs, writer);
                 }
             };

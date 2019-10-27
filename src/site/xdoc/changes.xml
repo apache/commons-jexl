@@ -26,6 +26,12 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-315" due-to="Mike Bartlett">
+               JxltEngine literal string strings ending in \ $ or # throw JxltEngine$Exception
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-314" due-to="Osy">
+               Comparison NULL values of variables NAME1.NAME2
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-312">
                 @NoJexl fails to disallow method call
             </action>
@@ -34,6 +40,9 @@
             </action>
             <action dev="henrib" type="fix" issue="JEXL-309">
                 Line numbers are not correct when template report errors
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-307" due-to="Dmitri Blinov">
+                Variable redeclaration option
             </action>
             <action dev="henrib" type="fix" issue="JEXL-306" due-to="Dmitri Blinov">
                 Ternary operator ? protects also its branches from resolution errors

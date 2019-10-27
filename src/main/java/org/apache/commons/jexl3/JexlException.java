@@ -467,6 +467,32 @@ public class JexlException extends RuntimeException {
             return parserError(JexlFeatures.stringify(code), getDetail());
         }
     }
+    
+    /**
+     * The various type of variable issues.
+     */
+    public static enum VariableIssue {
+        /** The variable is undefined. */
+        UNDEFINED,
+        /** The variable is already declared. */
+        REDEFINED,
+        /** The variable has a null value. */
+        NULLVALUE;
+        
+        /**
+         * Stringifies the variable issue.
+         * @param var the variable name
+         * @return the issue message
+         */
+        public String message(String var) {
+            switch(this) {
+                case NULLVALUE : return "variable '" + var + "' is null";
+                case REDEFINED : return "variable '" + var + "' is already defined";
+                case UNDEFINED :
+                default: return "variable '" + var + "' is undefined";
+            }
+        }
+    }
 
     /**
      * Thrown when a variable is unknown.
@@ -477,7 +503,20 @@ public class JexlException extends RuntimeException {
         /**
          * Undefined variable flag.
          */
-        private final boolean undefined;
+        private final VariableIssue issue; 
+        
+        /**
+         * Creates a new Variable exception instance.
+         *
+         * @param node the offending ASTnode
+         * @param var  the unknown variable
+         * @param vi   the variable issue
+         */
+        public Variable(JexlNode node, String var, VariableIssue vi) {
+            super(node, var, null);
+            issue = vi;
+        }
+        
         /**
          * Creates a new Variable exception instance.
          *
@@ -486,8 +525,7 @@ public class JexlException extends RuntimeException {
          * @param undef whether the variable is undefined or evaluated as null
          */
         public Variable(JexlNode node, String var, boolean undef) {
-            super(node, var, null);
-            undefined = undef;
+            this(node, var,  undef ? VariableIssue.UNDEFINED : VariableIssue.NULLVALUE);
         }
 
         /**
@@ -496,7 +534,7 @@ public class JexlException extends RuntimeException {
          * @return true if undefined, false otherwise
          */
         public boolean isUndefined() {
-            return undefined;
+            return issue == VariableIssue.UNDEFINED;
         }
 
         /**
@@ -508,7 +546,7 @@ public class JexlException extends RuntimeException {
 
         @Override
         protected String detailedMessage() {
-            return (undefined? "undefined" : "null value") + " variable " + getVariable();
+            return issue.message(getVariable());
         }
     }
 
@@ -520,15 +558,22 @@ public class JexlException extends RuntimeException {
      * @param undef whether the variable is null or undefined
      * @return the error message
      */
+    @Deprecated
     public static String variableError(JexlNode node, String variable, boolean undef) {
+        return variableError(node, variable, undef? VariableIssue.UNDEFINED : VariableIssue.NULLVALUE);
+    }
+       
+    /**
+     * Generates a message for a variable error.
+     *
+     * @param node the node where the error occurred
+     * @param variable the variable
+     * @param issue  the variable kind of issue
+     * @return the error message
+     */
+    public static String variableError(JexlNode node, String variable, VariableIssue issue) {
         StringBuilder msg = errorAt(node);
-        if (undef) {
-            msg.append("undefined");
-        } else {
-            msg.append("null value");
-        }
-        msg.append(" variable ");
-        msg.append(variable);
+        msg.append(issue.message(variable));
         return msg.toString();
     }
 
@@ -598,7 +643,7 @@ public class JexlException extends RuntimeException {
 
         @Override
         protected String detailedMessage() {
-            return (undefined? "undefined" : "null value") + " property " + getProperty();
+            return (undefined? "undefined" : "null value") + " property '" + getProperty() + "'";
         }
     }
 
@@ -617,8 +662,9 @@ public class JexlException extends RuntimeException {
         } else {
             msg.append("null value");
         }
-        msg.append(" property ");
+        msg.append(" property '");
         msg.append(pty);
+        msg.append('\'');
         return msg.toString();
     }
     

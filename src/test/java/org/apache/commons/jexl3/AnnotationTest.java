@@ -77,38 +77,40 @@ public class AnnotationTest extends JexlTestCase {
     public class OptAnnotationContext extends JexlEvalContext implements JexlContext.AnnotationProcessor {
         @Override
         public Object processAnnotation(String name, Object[] args, Callable<Object> statement) throws Exception {
+            JexlOptions options = this.getEngineOptions();
             // transient side effect for strict
             if ("strict".equals(name)) {
                 boolean s = (Boolean) args[0];
-                boolean b = this.isStrict();
-                setStrict(s);
+                boolean b = options.isStrict();
+                options.setStrict(s);
                 Object r = statement.call();
-                setStrict(b);
+                options.setStrict(b);
                 return r;
             }
             // transient side effect for silent
             if ("silent".equals(name)) {
                 if (args == null || args.length == 0) {
-                    boolean b = this.isSilent();
+                    boolean b = options.isSilent();
                     try {
                         return statement.call();
                     } catch(JexlException xjexl) {
                         return null;
                     } finally {
-                        setSilent(b);
+                        options.setSilent(b);
                     }
                 } else {
                     boolean s = (Boolean) args[0];
-                    boolean b = this.isSilent();
-                    setSilent(s);
+                    boolean b = options.isSilent();
+                    options.setSilent(s);
+                    Assert.assertEquals(s, options.isSilent());
                     Object r = statement.call();
-                    setSilent(b);
+                    options.setSilent(b);
                     return r;
                 }
             }
             // durable side effect for scale
             if ("scale".equals(name)) {
-                this.setMathScale((Integer) args[0]);
+                options.setMathScale((Integer) args[0]);
                 return statement.call();
             }
             return statement.call();
@@ -118,8 +120,9 @@ public class AnnotationTest extends JexlTestCase {
     @Test
     public void testVarStmt() throws Exception {
         OptAnnotationContext jc = new OptAnnotationContext();
+        JexlOptions options = jc.getEngineOptions();
         JexlEngine jexl = new JexlBuilder().strict(true).silent(false).create();
-        jc.setOptions(jexl);
+        jc.getEngineOptions().setOptions(jexl);
         JexlScript e;
         Object r;
         e = jexl.createScript("(s, v)->{ @strict(s) @silent(v) var x = y ; 42; }");
@@ -159,12 +162,12 @@ public class AnnotationTest extends JexlTestCase {
             Assert.fail("should not have thrown");
         }
         //Assert.assertEquals(42, r);
-        Assert.assertTrue(jc.isStrict());
+        Assert.assertTrue(options.isStrict());
         e = jexl.createScript("@scale(5) 42;");
         r = e.execute(jc);
         Assert.assertEquals(42, r);
-        Assert.assertTrue(jc.isStrict());
-        Assert.assertEquals(5, jc.getArithmeticMathScale());
+        Assert.assertTrue(options.isStrict());
+        Assert.assertEquals(5, options.getMathScale());
     }
 
     @Test

@@ -114,7 +114,9 @@ public class Issues100Test extends JexlTestCase {
     @Test
     public void test106() throws Exception {
         JexlEvalContext context = new JexlEvalContext();
-        context.setStrict(true, true);
+        JexlOptions options = context.getEngineOptions();
+        options.setStrict(true);
+        options.setStrictArithmetic(true);
         context.set("a", new BigDecimal(1));
         context.set("b", new BigDecimal(3));
         JexlEngine jexl = new Engine();
@@ -124,8 +126,8 @@ public class Issues100Test extends JexlTestCase {
         } catch (JexlException xjexl) {
             Assert.fail("should not occur");
         }
-        context.setMathContext(MathContext.UNLIMITED);
-        context.setMathScale(2);
+        options.setMathContext(MathContext.UNLIMITED);
+        options.setMathScale(2);
         try {
             jexl.createExpression("a / b").evaluate(context);
             Assert.fail("should fail");
@@ -289,6 +291,7 @@ public class Issues100Test extends JexlTestCase {
         String expStr1 = "result == salary/month * work.percent/100.00";
         JexlExpression exp1 = jexlX.createExpression(expStr1);
         JexlEvalContext ctx = new JexlEvalContext();
+        JexlOptions options = ctx.getEngineOptions();
         ctx.set("result", new BigDecimal("9958.33"));
         ctx.set("salary", new BigDecimal("119500.00"));
         ctx.set("month", new BigDecimal("12.00"));
@@ -298,7 +301,7 @@ public class Issues100Test extends JexlTestCase {
         Assert.assertFalse((Boolean) exp1.evaluate(ctx));
 
         // will succeed with scale = 2
-        ctx.setMathScale(2);
+        options.setMathScale(2);
         Assert.assertTrue((Boolean) exp1.evaluate(ctx));
     }
 

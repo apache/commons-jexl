@@ -19,17 +19,21 @@ package org.apache.commons.jexl3.parser;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.internal.Scope;
 import java.util.Map;
+import org.apache.commons.jexl3.internal.Frame;
+import org.apache.commons.jexl3.internal.LexicalScope;
 
 /**
  * Enhanced script to allow parameters declaration.
  */
-public class ASTJexlScript extends JexlNode {
-    /** The script scope. */
-    private Scope scope = null;
+public class ASTJexlScript extends JexlNode implements JexlParser.LexicalUnit  {
     /** The pragmas. */
     private Map<String, Object> pragmas = null;
     /** Features. */
     private JexlFeatures features = null;
+    /** The script scope. */
+    private Scope scope = null;
+    /** The local symbol set. */
+    private LexicalScope locals =  null;
 
     public ASTJexlScript(int id) {
         super(id);
@@ -38,7 +42,30 @@ public class ASTJexlScript extends JexlNode {
     public ASTJexlScript(Parser p, int id) {
         super(p, id);
     }
+    
+    @Override
+    public boolean declareSymbol(int symbol) {
+        if (locals == null) {
+            locals  = new LexicalScope(null);
+        }
+        return locals.declareSymbol(symbol);
+    }
+    
+    @Override
+    public int getSymbolCount() {
+        return locals == null? 0 : locals.getSymbolCount();
+    }
 
+    @Override
+    public boolean hasSymbol(int symbol) {
+        return locals == null? false : locals.hasSymbol(symbol);
+    }
+    
+    @Override
+    public void clearUnit() {
+        locals = null;
+    }
+    
     /**
      * Consider script with no parameters that return lambda as parametric-scripts.
      * @return the script
@@ -93,6 +120,11 @@ public class ASTJexlScript extends JexlNode {
      */
     public void setScope(Scope theScope) {
         this.scope = theScope;
+        if (theScope != null) {
+            for(int a = 0; a < theScope.getArgCount(); ++a) {
+                this.declareSymbol(a);
+            }
+        }
     }
 
     /**
@@ -108,14 +140,8 @@ public class ASTJexlScript extends JexlNode {
      * @param values the argument values
      * @return the arguments array
      */
-    public Scope.Frame createFrame(Scope.Frame caller, Object... values) {
-        if (scope != null) {
-            Scope.Frame frame = scope.createFrame(caller);
-            if (frame != null) {
-                return frame.assign(values);
-            }
-        }
-        return null;
+    public Frame createFrame(Frame caller, Object... values) {
+        return scope != null? scope.createFrame(caller, values) : null;
     }
     
     /**
@@ -123,7 +149,7 @@ public class ASTJexlScript extends JexlNode {
      * @param values the argument values
      * @return the arguments array
      */
-    public Scope.Frame createFrame(Object... values) {
+    public Frame createFrame(Object... values) {
         return createFrame(null, values);
     }
 
