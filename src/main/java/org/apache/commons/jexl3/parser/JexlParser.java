@@ -336,7 +336,7 @@ public abstract class JexlParser extends StringParser {
                 }
             }
         }
-        return block.declareSymbol(symbol);
+        return block == null || block.declareSymbol(symbol);
     }
 
     /**
