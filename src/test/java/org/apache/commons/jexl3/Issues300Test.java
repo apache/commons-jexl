@@ -268,6 +268,9 @@ public class Issues300Test {
         script = jexl.createScript("cell('1', '2')");
         result = script.execute(ctxt);
         Assert.assertEquals(2, result);
+        script = jexl.createScript("x.cell('1', '2')", "x");
+        result = script.execute(ctxt, Arrays.asList(10, 20));
+        Assert.assertEquals(44, result);
         
         vars.put("TVALOGAR", null);
         String jexlExp = "TVALOGAR==null?'SIMON':'SIMONAZO'";
