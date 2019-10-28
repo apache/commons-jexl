@@ -540,7 +540,12 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @return false if already cancelled, true otherwise
      */
     protected  boolean cancel() {
-        return cancelled? false : (cancelled = true);
+        if (cancelled) {
+            return false;
+        } else {
+            cancelled = true;
+            return true;
+        }
     }
 
     /**

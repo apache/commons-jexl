@@ -207,13 +207,13 @@
         <module name="UpperEll"/>
         
         <!-- used for suppression comment filter -->
-        <module name="FileContentsHolder"/>
+
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="CSOFF\: ([\w\|]+)"/>
+            <property name="onCommentFormat" value="CSON\: ([\w\|]+)"/>
+            <property name="checkFormat" value="$1"/>
+        </module>
     </module>
 
-    <module name="SuppressionCommentFilter">
-        <property name="offCommentFormat" value="CSOFF\: ([\w\|]+)"/>
-        <property name="onCommentFormat" value="CSON\: ([\w\|]+)"/>
-        <property name="checkFormat" value="$1"/>
-    </module>
 
 </module>
