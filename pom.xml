@@ -134,7 +134,7 @@
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
-        <checksyle.version>6.13</checksyle.version>
+        <checksyle.version>8.18</checksyle.version>
     </properties>
 
     <build>
