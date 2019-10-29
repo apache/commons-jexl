@@ -120,7 +120,7 @@ public class Interpreter extends InterpreterBase {
     protected final Frame frame;
     /** Block micro-frames. */
     protected LexicalScope block = null;
-    
+
     /**
      * The thread local interpreter.
      */
@@ -158,7 +158,7 @@ public class Interpreter extends InterpreterBase {
         INTER.set(inter);
         return pinter;
     }
-  
+
     /**
      * Interpret the given script/expression.
      * <p>
@@ -605,18 +605,12 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTVar node, Object data) {
         int symbol = node.getSymbol();
-        // if we have a var, we have a scope thus a frame
-        Object value;
-        if (frame.has(symbol)) {
-            value = frame.get(symbol);
-        } else {
-            frame.set(symbol, null);
-            value = null;
-        }
         if (options.isLexical() && !block.declareSymbol(symbol)) {
             return redefinedVariable(node, node.getName());
         }
-        return value;
+        // if we have a var, we have a scope thus a frame
+        frame.set(symbol, null);
+        return null;
     }
 
     @Override
@@ -633,7 +627,7 @@ public class Interpreter extends InterpreterBase {
             block = lexical;
         }
     }
-    
+
     /**
      * Base visitation for blocks.
      * @param node the block
@@ -676,7 +670,7 @@ public class Interpreter extends InterpreterBase {
         final int symbol = loopVariable.getSymbol();
         final LexicalScope lexical = block;
         if (options.isLexical()) {
-            // the iteration variable can not be declared in parent block 
+            // the iteration variable can not be declared in parent block
             if (symbol >= 0 && block.hasSymbol(symbol)) {
                 return redefinedVariable(node, loopVariable.getName());
             }

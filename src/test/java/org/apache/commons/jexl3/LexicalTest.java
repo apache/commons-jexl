@@ -23,7 +23,7 @@ import org.junit.Test;
  * Test cases for lexical option and feature.
  */
 public class LexicalTest {
-   
+
     @Test
     public void testLexical0a() throws Exception {
         runLexical0(false);
@@ -112,7 +112,7 @@ public class LexicalTest {
             script.execute(ctxt, 42);
         }
     }
-        
+
     @Test
     public void testLexical1a() throws Exception {
         runLexical1(false);
@@ -156,7 +156,7 @@ public class LexicalTest {
             if (!shade) {
                 throw xany;
             }
-        }       
+        }
         try {
             // if local shade, x = 42 is undefined
             script = jexl.createScript("{ var x = 0; } y = 42");
@@ -177,7 +177,7 @@ public class LexicalTest {
         // y being defined as global
         ctxt.set("y", 4242);
         try {
-            // if no shade and global y being defined, 
+            // if no shade and global y being defined,
             script = jexl.createScript("{ var y = 0; } y = 42");
             result = script.execute(ctxt);
             if (!shade) {
@@ -189,9 +189,9 @@ public class LexicalTest {
             if (!shade) {
                 throw xany;
             }
-        }  
+        }
     }
-        
+
     @Test
     public void testLexical1() throws Exception {
         JexlEngine jexl = new JexlBuilder().strict(true).create();
@@ -201,7 +201,7 @@ public class LexicalTest {
         options.setLexical(true);
         JexlScript script;
         Object result;
-        
+
         script = jexl.createScript("var x = 0; for(var y : [1]) { var x = 42; return x; };");
         try {
         result = script.execute(ctxt);
@@ -210,7 +210,7 @@ public class LexicalTest {
         } catch (JexlException xany) {
             String ww = xany.toString();
         }
-        
+
         try {
             script = jexl.createScript("(x)->{ if (x) { var x = 7 * (x + x); x; } }");
             result = script.execute(ctxt, 3);
@@ -218,11 +218,26 @@ public class LexicalTest {
         } catch (JexlException xany) {
             String ww = xany.toString();
         }
-        
+
         script = jexl.createScript("{ var x = 0; } var x = 42; x");
         result = script.execute(ctxt, 21);
-        Assert.assertEquals(42, result); 
-        
+        Assert.assertEquals(42, result);
     }
-    
+
+    @Test
+    public void testLexical2() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        JexlEvalContext ctxt = new JexlEvalContext();
+        JexlOptions options = ctxt.getEngineOptions();
+        // ensure errors will throw
+        options.setLexical(true);
+
+        JexlScript script = jexl.createScript("{var x = 42}; {var x; return x; }");
+        try {
+            Object result = script.execute(ctxt);
+            Assert.assertNull(result);
+        } catch (JexlException xany) {
+            String ww = xany.toString();
+        }
+    }
 }
