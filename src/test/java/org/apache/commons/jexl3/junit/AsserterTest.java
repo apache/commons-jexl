@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* $Id$ */
+
 package org.apache.commons.jexl3.junit;
 
 import org.apache.commons.jexl3.Foo;
