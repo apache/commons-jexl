@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
@@ -247,5 +249,23 @@ public class LexicalTest {
         e = jexl.createScript(str);
         o = e.execute(jc);
         Assert.assertTrue(((Set)o).contains(1));
+    }
+
+    @Test
+    public void testLexical4() throws Exception {
+        JexlEngine Jexl = new JexlBuilder().silent(false).strict(true).lexical(true).create();
+        JxltEngine Jxlt = Jexl.createJxltEngine();
+        JexlContext ctxt = new MapContext();
+        String rpt
+                = "<report>\n"
+                + "\n$$var y = 1; var x = 2;"
+                + "\n${x + y}"
+                + "\n</report>\n";
+        JxltEngine.Template t = Jxlt.createTemplate("$$", new StringReader(rpt));
+        StringWriter strw = new StringWriter();
+        t.evaluate(ctxt, strw);
+        String output = strw.toString();
+        String ctl = "<report>\n\n3\n</report>\n";
+        Assert.assertEquals(ctl, output);
     }
 }

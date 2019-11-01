@@ -142,7 +142,7 @@ public class TemplateInterpreter extends Interpreter {
         }
         return super.visit(node, data);
     }
-    
+
     @Override
     protected Object visit(ASTJexlScript node, Object data) {
         if (node instanceof ASTJexlLambda && !((ASTJexlLambda) node).isTopLevel()) {
@@ -153,15 +153,21 @@ public class TemplateInterpreter extends Interpreter {
                 }
             };
         }
-        // otherwise...
-        final int numChildren = node.jjtGetNumChildren();
-        Object result = null;
-        for (int i = 0; i < numChildren; i++) {
-            JexlNode child = node.jjtGetChild(i);
-            result = child.jjtAccept(this, data);
-            cancelCheck(child);
+        final LexicalScope lexical = block;
+        block = new LexicalScope(frame, null);
+        try {
+            // otherwise...
+            final int numChildren = node.jjtGetNumChildren();
+            Object result = null;
+            for (int i = 0; i < numChildren; i++) {
+                JexlNode child = node.jjtGetChild(i);
+                result = child.jjtAccept(this, data);
+                cancelCheck(child);
+            }
+            return result;
+        } finally {
+            block = lexical;
         }
-        return result;
     }
-    
+
 }
