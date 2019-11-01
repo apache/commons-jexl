@@ -169,7 +169,7 @@ public class Issues300Test {
         o = e.execute(null);
         Assert.assertEquals(2, o);
     }
-    
+
     @Test
     public void testIssue306d() throws Exception {
         JexlEngine jexl = new JexlBuilder().safe(true).create();
@@ -179,7 +179,7 @@ public class Issues300Test {
         o = e.execute(null);
         Assert.assertEquals(2, o);
     }
-    
+
     @Test
     public void testIssue309a() throws Exception {
         String src = "<html lang=\"en\">\n"
@@ -238,7 +238,7 @@ public class Issues300Test {
             Assert.assertEquals(4, xerror.getInfo().getLine());
         }
     }
-    
+
     public static class VaContext extends MapContext {
         VaContext(Map<String, Object> vars) {
             super(vars);
@@ -246,7 +246,7 @@ public class Issues300Test {
         public int cell(String... ms) {
             return ms.length == 0 ? 0 : ms.length;
         }
-        
+
         public int cell(List<?> l, String...ms) {
             return 42 + cell(ms);
         }
@@ -271,28 +271,28 @@ public class Issues300Test {
         script = jexl.createScript("x.cell('1', '2')", "x");
         result = script.execute(ctxt, Arrays.asList(10, 20));
         Assert.assertEquals(44, result);
-        
+
         vars.put("TVALOGAR", null);
         String jexlExp = "TVALOGAR==null?'SIMON':'SIMONAZO'";
         script = jexl.createScript(jexlExp);
         result = script.execute(ctxt);
         Assert.assertEquals("SIMON", result);
-        
+
         jexlExp = "TVALOGAR.PEPITO==null?'SIMON':'SIMONAZO'";
         script = jexl.createScript(jexlExp);
-        
+
         Map<String, Object> tva = new LinkedHashMap<String, Object>();
         tva.put("PEPITO", null);
         vars.put("TVALOGAR", tva);
         result = script.execute(ctxt);
         Assert.assertEquals("SIMON", result);
-        
+
         vars.remove("TVALOGAR");
         ctxt.set("TVALOGAR.PEPITO", null);
         result = script.execute(ctxt);
         Assert.assertEquals("SIMON", result);
     }
-    
+
     @Test
     public void test315() throws Exception {
         JexlEngine jexl = new JexlBuilder().strict(true).create();
@@ -322,5 +322,27 @@ public class Issues300Test {
         Assert.assertEquals(32, result);
         result = script.execute(ctxt, (Object) null);
         Assert.assertEquals(52, result);
+    }
+
+    public static class ClazzB {
+        public int methodB()  {
+            return 42;
+        }
+    }
+    public static class ClazzA {
+        public ClazzB methodA() {
+            return new ClazzB();
+        }
+    }
+
+    @Test
+    public void test317Tentative() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        JexlContext ctxt = new MapContext();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript("x.methodA().methodB()", "x");
+        result = script.execute(ctxt, new ClazzA());
+        Assert.assertEquals(42, result);
     }
 }
