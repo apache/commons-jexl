@@ -227,32 +227,25 @@ public class LexicalTest {
 
     @Test
     public void testLexical2() throws Exception {
-        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
         JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
-        // ensure errors will throw
-        options.setLexical(true);
 
         JexlScript script = jexl.createScript("{var x = 42}; {var x; return x; }");
-        try {
-            Object result = script.execute(ctxt);
-            Assert.assertNull(result);
-        } catch (JexlException xany) {
-            String ww = xany.toString();
-        }
+        Object result = script.execute(ctxt);
+        Assert.assertNull(result);
     }
 
     @Test
     public void testLexical3() throws Exception {
         String str = "var s = {}; for (var i : [1]) s.add(i); s";
-        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
         JexlScript e = jexl.createScript(str);
         JexlContext jc = new MapContext();
         Object o = e.execute(jc);
-        Assert.assertEquals(Boolean.TRUE, ((Set)o).contains(1));
+        Assert.assertTrue(((Set)o).contains(1));
 
         e = jexl.createScript(str);
         o = e.execute(jc);
-        Assert.assertEquals(Boolean.TRUE, ((Set)o).contains(1));
+        Assert.assertTrue(((Set)o).contains(1));
     }
 }
