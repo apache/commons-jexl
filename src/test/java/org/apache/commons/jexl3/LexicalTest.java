@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -239,5 +240,19 @@ public class LexicalTest {
         } catch (JexlException xany) {
             String ww = xany.toString();
         }
+    }
+
+    @Test
+    public void testLexical3() throws Exception {
+        String str = "var s = {}; for (var i : [1]) s.add(i); s";
+        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        JexlScript e = jexl.createScript(str);
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals(Boolean.TRUE, ((Set)o).contains(1));
+
+        e = jexl.createScript(str);
+        o = e.execute(jc);
+        Assert.assertEquals(Boolean.TRUE, ((Set)o).contains(1));
     }
 }

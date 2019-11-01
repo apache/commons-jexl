@@ -98,25 +98,25 @@ public abstract class JexlParser extends StringParser {
          * @return true if declaration was successful, false if symbol was already declared
          */
         boolean declareSymbol(int symbol);
-        
+
         /**
          * Checks whether a symbol is declared in this lexical unit.
          * @param symbol the symbol
          * @return true if declared, false otherwise
          */
         boolean hasSymbol(int symbol);
-        
+
         /**
-         * @return the number of local variables declared in this unit 
+         * @return the number of local variables declared in this unit
          */
         int getSymbolCount();
-        
+
         /**
          * Clears this unit.
          */
         void clearUnit();
     }
-    
+
     /**
      * Cleanup.
      * @param features the feature set to restore if any
@@ -130,6 +130,8 @@ public abstract class JexlParser extends StringParser {
         loopCounts.clear();
         loopCount = 0;
         blocks.clear();
+        block = null;
+        mergeBlock = false;
     }
     /**
      * Utility function to create '.' separated string from a list of string.
@@ -170,7 +172,7 @@ public abstract class JexlParser extends StringParser {
         }
         return msg;
     }
-    
+
     /**
      * Internal, for debug purpose only.
      * @param registers whether register syntax is recognized by this parser
@@ -252,13 +254,13 @@ public abstract class JexlParser extends StringParser {
         } else if (mergeBlock) {
             mergeBlock = false;
             return;
-        } 
+        }
         if (block != null) {
             blocks.push(block);
         }
         block = unit;
     }
-    
+
     /**
      * Pushes a block as new lexical unit.
      * @param unit the lexical unit
@@ -272,7 +274,7 @@ public abstract class JexlParser extends StringParser {
      * @param unit restores the previous lexical scope
      */
     protected void popUnit(LexicalUnit unit) {
-        if (block == unit){ 
+        if (block == unit){
             if (!blocks.isEmpty()) {
                 block = blocks.pop();
             } else {
@@ -281,7 +283,7 @@ public abstract class JexlParser extends StringParser {
             //unit.clearUnit();
         }
     }
-    
+
     /**
      * Checks whether an identifier is a local variable or argument, ie a symbol, stored in a register.
      * @param identifier the identifier
@@ -317,11 +319,11 @@ public abstract class JexlParser extends StringParser {
         }
         return true;
     }
-    
+
     /**
      * Declares a symbol.
      * @param symbol the symbol index
-     * @return true if symbol can be declared in lexical scope, false (error) 
+     * @return true if symbol can be declared in lexical scope, false (error)
      * if it is already declared
      */
     private boolean declareSymbol(int symbol) {
