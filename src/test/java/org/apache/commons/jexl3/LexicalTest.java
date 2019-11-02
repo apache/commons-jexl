@@ -228,13 +228,25 @@ public class LexicalTest {
     }
 
     @Test
-    public void testLexical2() throws Exception {
-        JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
-        JexlEvalContext ctxt = new JexlEvalContext();
-
+    public void testLexical2a() throws Exception {
+        runLexical2(true);
+    } 
+    
+    @Test
+    public void testLexical2b() throws Exception {
+        runLexical2(false);
+    }
+    
+    protected void runLexical2(boolean lexical) throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(true).lexical(lexical).create();
+        JexlContext ctxt = new MapContext();
         JexlScript script = jexl.createScript("{var x = 42}; {var x; return x; }");
         Object result = script.execute(ctxt);
-        Assert.assertNull(result);
+        if (lexical) {
+            Assert.assertNull(result);
+        } else {
+            Assert.assertEquals(42, result);
+        }
     }
 
     @Test

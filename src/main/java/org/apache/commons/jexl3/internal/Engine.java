@@ -156,7 +156,7 @@ public class Engine extends JexlEngine {
     /**
      * A cached version of the options.
      */
-    protected final JexlOptions options =  new org.apache.commons.jexl3.internal.Options();
+    protected final JexlOptions options;
 
     /**
      * Creates an engine with default arguments.
@@ -204,7 +204,8 @@ public class Engine extends JexlEngine {
         if (uberspect == null) {
             throw new IllegalArgumentException("uberspect can not be null");
         }
-        options.setOptions(this);
+        // capture options
+        this.options = conf.options().copy().set(this);
     }
 
 

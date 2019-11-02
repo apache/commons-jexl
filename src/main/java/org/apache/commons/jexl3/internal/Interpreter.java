@@ -605,10 +605,14 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTVar node, Object data) {
         int symbol = node.getSymbol();
-        if (options.isLexical() && !block.declareSymbol(symbol)) {
+        // if we have a var, we have a scope thus a frame
+        if (!options.isLexical()) {
+            if (frame.has(symbol)) {
+                return frame.get(symbol);
+            }
+        } else if (!block.declareSymbol(symbol)) {
             return redefinedVariable(node, node.getName());
         }
-        // if we have a var, we have a scope thus a frame
         frame.set(symbol, null);
         return null;
     }

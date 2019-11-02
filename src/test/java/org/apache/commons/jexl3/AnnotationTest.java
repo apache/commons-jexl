@@ -122,7 +122,7 @@ public class AnnotationTest extends JexlTestCase {
         OptAnnotationContext jc = new OptAnnotationContext();
         JexlOptions options = jc.getEngineOptions();
         JexlEngine jexl = new JexlBuilder().strict(true).silent(false).create();
-        jc.getEngineOptions().setOptions(jexl);
+        jc.getEngineOptions().set(jexl);
         JexlScript e;
         Object r;
         e = jexl.createScript("(s, v)->{ @strict(s) @silent(v) var x = y ; 42; }");

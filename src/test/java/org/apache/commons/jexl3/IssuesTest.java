@@ -134,7 +134,7 @@ public class IssuesTest extends JexlTestCase {
         //jexl.setSilent(false);
         JexlEvalContext ctxt = new JexlEvalContext();
         JexlOptions options = ctxt.getEngineOptions();
-        options.setOptions(jexl);
+        options.set(jexl);
         options.setStrict(false);
         options.setStrictArithmetic(false);
         ctxt.set("ax", "ok");
@@ -162,7 +162,7 @@ public class IssuesTest extends JexlTestCase {
         JexlEngine jexl = new Engine();
         JexlEvalContext ctxt = new JexlEvalContext();
         JexlOptions options = ctxt.getEngineOptions();
-        options.setOptions(jexl);
+        options.set(jexl);
         // ensure errors will throw
         options.setSilent(false);
 

@@ -153,8 +153,9 @@ public interface JexlOptions {
     /**
      * Set options from engine.
      * @param jexl the engine
+     * @return this instance
      */
-    void setOptions(JexlEngine jexl);
+    JexlOptions set(JexlEngine jexl);
 
     /**
      * Sets whether the engine considers null in navigation expression as errors

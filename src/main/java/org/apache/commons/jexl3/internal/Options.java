@@ -83,18 +83,18 @@ public class Options implements JexlOptions {
     /**
      * Set options from engine.
      * @param jexl the engine
+     * @return this instance
      */
     @Override
-    public void setOptions(JexlEngine jexl) {
+    public Options set(JexlEngine jexl) {
         mathContext = jexl.getArithmetic().getMathContext();
         mathScale = jexl.getArithmetic().getMathScale();
         strictArithmetic = jexl.getArithmetic().isStrict();
-        int mask = DEFAULT;
-        mask = set(STRICT, mask, jexl.isStrict());
-        mask = set(SILENT, mask, jexl.isSilent());
-        mask = set(SAFE, mask, jexl.isSafe());
-        mask = set(CANCELLABLE, mask, jexl.isCancellable());
-        flags = mask;
+        set(STRICT, flags, jexl.isStrict());
+        set(SILENT, flags, jexl.isSilent());
+        set(SAFE, flags, jexl.isSafe());
+        set(CANCELLABLE, flags, jexl.isCancellable());
+        return this;
     }
     
     @Override

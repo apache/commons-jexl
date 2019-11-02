@@ -296,13 +296,29 @@ public class JexlBuilder {
      * @return this builder
      */
     public JexlBuilder lexical(boolean flag) {
-        options.setLexical(true);
+        options.setLexical(flag);
         return this;
     }
     
     /** @return whether lexical scope is enabled */
     public boolean lexical() {
         return options.isLexical();
+    }
+           
+    /**
+     * Sets whether the engine is in lexical shading mode.
+     *
+     * @param flag true means lexical shading is in effect, false implies no lexical shading 
+     * @return this builder
+     */
+    public JexlBuilder lexicalShade(boolean flag) {
+        options.setLexicalShade(flag);
+        return this;
+    }
+    
+    /** @return whether lexical shading is enabled */
+    public boolean lexicalShade() {
+        return options.isLexicalShade();
     }
     
     /**
