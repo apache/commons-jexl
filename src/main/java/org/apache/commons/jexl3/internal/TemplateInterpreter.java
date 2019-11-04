@@ -153,8 +153,7 @@ public class TemplateInterpreter extends Interpreter {
                 }
             };
         }
-        final LexicalScope lexical = block;
-        block = new LexicalScope(frame, null);
+        block = new LexicalFrame(frame, block).declareArgs();
         try {
             // otherwise...
             final int numChildren = node.jjtGetNumChildren();
@@ -166,7 +165,7 @@ public class TemplateInterpreter extends Interpreter {
             }
             return result;
         } finally {
-            block = lexical;
+            block = block.pop();
         }
     }
 

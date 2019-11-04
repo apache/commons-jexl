@@ -16,8 +16,10 @@
  */
 package org.apache.commons.jexl3.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,7 +27,15 @@ import java.util.Map;
  * <p>This also acts as the functional scope and variable definition store.
  * @since 3.0
  */
-public final class Scope {    
+public final class Scope {
+    /**
+     * The value of an as-yet  undeclared but variable, for instance: x; before var x;.
+     */
+    static final Object UNDECLARED = new Object() {
+        @Override public String toString() {
+            return "??";
+        }
+    };
     /**
      * The value of a declared but undefined variable, for instance: var x;.
      */
@@ -187,16 +197,16 @@ public final class Scope {
             register = namedVariables.size();
             namedVariables.put(name, register);
             vars += 1;
-//            // check if local is redefining hoisted
-//            if (parent != null) {
-//                Integer pr = parent.getSymbol(name, true);
-//                if (pr != null) {
-//                    if (hoistedVariables == null) {
-//                        hoistedVariables = new LinkedHashMap<Integer, Integer>();
-//                    }
-//                    hoistedVariables.put(register, pr);
-//                }
-//            }
+            // check if local is redefining hoisted
+            if (parent != null) {
+                Integer pr = parent.getSymbol(name, true);
+                if (pr != null) {
+                    if (hoistedVariables == null) {
+                        hoistedVariables = new LinkedHashMap<Integer, Integer>();
+                    }
+                    hoistedVariables.put(register, pr);
+                }
+            }
         }
         return register;
     }
@@ -211,7 +221,7 @@ public final class Scope {
     public Frame createFrame(Frame frame, Object...args) {
         if (namedVariables != null) {
             Object[] arguments = new Object[namedVariables.size()];
-            Arrays.fill(arguments, UNDEFINED);
+            Arrays.fill(arguments, UNDECLARED);
             if (frame != null && hoistedVariables != null && parent != null) {
                 for (Map.Entry<Integer, Integer> hoist : hoistedVariables.entrySet()) {
                     Integer target = hoist.getKey();
@@ -266,7 +276,7 @@ public final class Scope {
     public String[] getParameters() {
         return getParameters(0);
     }
-        
+
     /**
      * Gets this script parameters.
      * @param bound number of known bound parameters (curry)
@@ -295,15 +305,14 @@ public final class Scope {
      */
     public String[] getLocalVariables() {
         if (namedVariables != null && vars > 0) {
-            String[] pa = new String[parms - (hoistedVariables == null? 0 : hoistedVariables.size())];
-            int p = 0;
+            List<String> locals = new ArrayList<String>(vars);
             for (Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
                 int symnum = entry.getValue();
                 if (symnum >= parms && (hoistedVariables == null || !hoistedVariables.containsKey(symnum))) {
-                    pa[p++] = entry.getKey();
+                    locals.add(entry.getKey());
                 }
             }
-            return pa;
+            return locals.toArray(new String[locals.size()]);
         } else {
             return EMPTY_STRS;
         }

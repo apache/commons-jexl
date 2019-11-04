@@ -90,7 +90,7 @@ public final class Frame {
      * @return true if this symbol has been assigned a value, false otherwise
      */
     boolean has(int s) {
-        return s >= 0 && s < stack.length && stack[s] != Scope.UNDEFINED;
+        return s >= 0 && s < stack.length && stack[s] != Scope.UNDECLARED;
     }
 
     /**
@@ -122,5 +122,5 @@ public final class Frame {
         }
         return this;
     }
-    
+
 }

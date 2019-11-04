@@ -230,13 +230,13 @@ public class LexicalTest {
     @Test
     public void testLexical2a() throws Exception {
         runLexical2(true);
-    } 
-    
+    }
+
     @Test
     public void testLexical2b() throws Exception {
         runLexical2(false);
     }
-    
+
     protected void runLexical2(boolean lexical) throws Exception {
         JexlEngine jexl = new JexlBuilder().strict(true).lexical(lexical).create();
         JexlContext ctxt = new MapContext();
@@ -279,5 +279,21 @@ public class LexicalTest {
         String output = strw.toString();
         String ctl = "<report>\n\n3\n</report>\n";
         Assert.assertEquals(ctl, output);
+    }
+
+    @Test
+    public void testLexical5() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
+        JexlContext ctxt = new MapContext();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript("var x = 42; var z = 169; var y = () -> { {var x = -42; }; return x; }; y()");
+        try {
+            result = script.execute(ctxt);
+            Assert.assertEquals(42, result);
+        } catch (JexlException xany) {
+            String ww = xany.toString();
+            Assert.fail(ww);
+        }
     }
 }

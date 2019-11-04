@@ -22,7 +22,7 @@ import java.util.BitSet;
  * The set of symbols declared in a lexical scope.
  * <p>The symbol identifiers are determined by the functional scope.
  */
-public final class LexicalScope {
+public class LexicalScope {
     /** Number of bits in a long. */
     protected static final int LONGBITS = 64;
     /** The mask of symbols in the frame. */
@@ -32,26 +32,13 @@ public final class LexicalScope {
     /** Previous block. */
     protected final LexicalScope previous;
 
-    /**
-     * Default ctor.
-     * @param scope the previous scope
-     */
-    public LexicalScope(LexicalScope scope) {
-        this(null, scope);
-    }
 
     /**
      * Create a scope.
      * @param frame the current execution frame
      * @param scope the previous scope
      */
-    public LexicalScope(Frame frame, LexicalScope scope) {
-        if (frame != null) {
-            int argc = frame.getScope().getArgCount();
-            for(int a  = 0; a < argc; ++a) {
-                declareSymbol(a);
-            }
-        }
+    public LexicalScope(LexicalScope scope) {
         previous = scope;
     }
 
@@ -65,7 +52,7 @@ public final class LexicalScope {
         }
         return moreSymbols;
     }
-    
+
     /**
      * Checks whether a symbol has already been declared.
      * @param symbol the symbol
@@ -93,6 +80,10 @@ public final class LexicalScope {
             }
             walk = walk.previous;
         }
+        return registerSymbol(symbol);
+    }
+
+    protected final boolean registerSymbol(int symbol) {
         if (symbol < LONGBITS) {
             if ((symbols & (1L << symbol)) != 0L) {
                 return false;
