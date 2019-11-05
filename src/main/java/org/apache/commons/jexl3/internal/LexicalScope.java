@@ -35,7 +35,6 @@ public class LexicalScope {
 
     /**
      * Create a scope.
-     * @param frame the current execution frame
      * @param scope the previous scope
      */
     public LexicalScope(LexicalScope scope) {
@@ -80,10 +79,15 @@ public class LexicalScope {
             }
             walk = walk.previous;
         }
-        return registerSymbol(symbol);
+        return addSymbol(symbol);
     }
 
-    protected final boolean registerSymbol(int symbol) {
+    /**
+     * Adds a symbol in this scope.
+     * @param symbol the symbol
+     * @return true if registered, false if symbol was already registered
+     */
+    protected final boolean addSymbol(int symbol) {
         if (symbol < LONGBITS) {
             if ((symbols & (1L << symbol)) != 0L) {
                 return false;

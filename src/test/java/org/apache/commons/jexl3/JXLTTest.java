@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import org.apache.commons.jexl3.internal.TemplateDebugger;
 import org.apache.commons.jexl3.internal.TemplateScript;
 import org.apache.commons.jexl3.internal.Debugger;
+import org.apache.commons.jexl3.internal.Options;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -787,9 +788,26 @@ public class JXLTTest extends JexlTestCase {
         }
     }
     
-    public static class Context311 extends MapContext {
+    public static class Context311 extends MapContext 
+      implements JexlContext.OptionsHandle, JexlContext.ThreadLocal {
+        private JexlOptions options = null;
+        
+        public void setOptions(JexlOptions o) {
+            options = o;
+        }
+        
         public Executor311 exec(String name) {
             return new Executor311(name);
+        }
+
+        @Override
+        public JexlOptions getEngineOptions() {
+            return options;
+        }
+        
+        JexlOptions newOptions() {
+            options = new Options();
+            return options;
         }
     }
     
@@ -823,7 +841,8 @@ public class JXLTTest extends JexlTestCase {
     
     @Test
     public void test311c() throws Exception {
-        JexlContext ctx311 = new Context311();
+        Context311 ctx311 = new Context311();
+        ctx311.newOptions().setLexical(true);
         String rpt
                 = "$$ exec('42').execute((a)->{"
                 + "\n<p>Universe ${a}</p>"
@@ -837,7 +856,8 @@ public class JXLTTest extends JexlTestCase {
        
     @Test
     public void test311d() throws Exception {
-        JexlContext ctx311 = new Context311();
+        Context311 ctx311 = new Context311();
+        ctx311.newOptions().setLexical(true);
         String rpt
                 = "$$ exec('4').execute((a, b)->{"
                 + "\n<p>Universe ${a}${b}</p>"
@@ -848,9 +868,58 @@ public class JXLTTest extends JexlTestCase {
         String output = strw.toString();
         Assert.assertEquals("<p>Universe 42</p>\n", output);
     }
-           
+    
     @Test
     public void test311e() throws Exception {
+        Context311 ctx311 = new Context311();
+        ctx311.newOptions().setLexical(true);
+        String rpt
+                = "exec('4').execute((a, b)->{"
+                + " '<p>Universe ' + a + b + '</p>'"
+                + "}, '2')";
+        JexlScript script = JEXL.createScript(rpt);
+        String output = script.execute(ctx311, 42).toString();
+        Assert.assertEquals("<p>Universe 42</p>", output);
+    } 
+    
+    @Test
+    public void test311f() throws Exception {
+        Context311 ctx311 = new Context311();
+        ctx311.newOptions().setLexical(true);
+        String rpt
+                = "exec('4').execute((a, b)->{"
+                + " `<p>Universe ${a}${b}</p>`"
+                + "}, '2')";
+        JexlScript script = JEXL.createScript(rpt);
+        String output = script.execute(ctx311, 42).toString();
+        Assert.assertEquals("<p>Universe 42</p>", output);
+    }
+           
+    @Test
+    public void test311g() throws Exception {
+        Context311 ctx311 = new Context311();
+        ctx311.newOptions().setLexical(true);
+        String rpt
+                = "(a, b)->{"
+                + " `<p>Universe ${a}${b}</p>`"
+                + "}";
+        JexlScript script = JEXL.createScript(rpt);
+        String output = script.execute(ctx311, "4", "2").toString();
+        Assert.assertEquals("<p>Universe 42</p>", output);
+    }  
+               
+    @Test
+    public void test311h() throws Exception {
+        Context311 ctx311 = new Context311();
+        ctx311.newOptions().setLexical(true);
+        String rpt= " `<p>Universe ${a}${b}</p>`";
+        JexlScript script = JEXL.createScript(rpt, "a", "b");
+        String output = script.execute(ctx311, "4", "2").toString();
+        Assert.assertEquals("<p>Universe 42</p>", output);
+    }   
+    
+    @Test
+    public void test311i() throws Exception {
         JexlContext ctx311 = new Context311();
         String rpt
                 = "$$var u = 'Universe'; exec('4').execute((a, b)->{"

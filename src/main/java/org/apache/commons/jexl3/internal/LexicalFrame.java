@@ -30,19 +30,23 @@ public class LexicalFrame extends LexicalScope {
     private Deque<Object> stack = null;
     /**
      * Lexical frame ctor.
-     * @param frame the script frame
+     * @param scriptf the script frame
      * @param previous the previous lexical frame
      */
-    public LexicalFrame(Frame frame, LexicalFrame previous) {
+    public LexicalFrame(Frame scriptf, LexicalFrame previous) {
         super(previous);
-        this.frame = frame;
+        this.frame = scriptf;
     }
 
+    /**
+     * Declare the arguments.
+     * @return the number of arguments
+     */
     public LexicalFrame declareArgs() {
         if (frame != null) {
             int argc = frame.getScope().getArgCount();
             for(int a  = 0; a < argc; ++a) {
-                super.registerSymbol(a);
+                super.addSymbol(a);
             }
         }
         return this;
@@ -70,6 +74,19 @@ public class LexicalFrame extends LexicalScope {
      * @return the previous frame
      */
     public LexicalFrame pop() {
+        long clean = symbols;
+        // undefine symbols getting out of scope
+        while (clean != 0L) {
+            int s = Long.numberOfTrailingZeros(clean);
+            clean &= ~(1L << s);
+            frame.set(s, Scope.UNDEFINED);
+        }
+        if (moreSymbols != null) {
+            for (int s = moreSymbols.nextSetBit(0); s != -1; s = moreSymbols.nextSetBit(s + 1)) {
+                frame.set(s, Scope.UNDEFINED);
+            }
+        }
+        // restore values of hoisted symbols that were overwritten
         if (stack != null) {
             while(!stack.isEmpty()) {
                 Object value = stack.pop();

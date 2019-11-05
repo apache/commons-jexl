@@ -296,4 +296,52 @@ public class LexicalTest {
             Assert.fail(ww);
         }
     }
+        
+    @Test
+    public void testLexical6a() throws Exception {
+        String str = "i = 0; { var i = 32; }; i";
+        JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
+        JexlScript e = jexl.createScript(str);
+        JexlContext ctxt = new MapContext();
+        Object o = e.execute(ctxt);
+        Assert.assertEquals(0, o);
+    }   
+
+    @Test
+    public void testLexical6b() throws Exception {
+        String str = "i = 0; { var i = 32; }; i";
+        JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).lexicalShade(true).create();
+        JexlScript e = jexl.createScript(str);
+        JexlContext ctxt = new MapContext();
+        try {
+            Object o = e.execute(ctxt);
+            Assert.fail("i should be shaded");
+        } catch (JexlException xany) {
+            Assert.assertNotNull(xany);
+        }
+    }
+
+    @Test
+    public void testLexical6c() throws Exception {
+        String str = "i = 0; for (var i : [42]) i; i";
+        JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
+        JexlScript e = jexl.createScript(str);
+        JexlContext ctxt = new MapContext();
+        Object o = e.execute(ctxt);
+        Assert.assertEquals(0, o);
+    }
+
+    @Test
+    public void testLexical6d() throws Exception {
+        String str = "i = 0; for (var i : [42]) i;; i";
+        JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).lexicalShade(true).create();
+        JexlScript e = jexl.createScript(str);
+        JexlContext ctxt = new MapContext();
+        try {
+            Object o = e.execute(ctxt);
+            Assert.fail("i should be shaded");
+        } catch (JexlException xany) {
+            Assert.assertNotNull(xany);
+        }
+    }
 }

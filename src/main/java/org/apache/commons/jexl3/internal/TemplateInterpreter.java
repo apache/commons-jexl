@@ -51,6 +51,7 @@ public class TemplateInterpreter extends Interpreter {
         super(jexl, jcontext, jframe);
         exprs = expressions;
         writer = out;
+        block = new LexicalFrame(frame, null);
     }
 
     /**
@@ -153,20 +154,15 @@ public class TemplateInterpreter extends Interpreter {
                 }
             };
         }
-        block = new LexicalFrame(frame, block).declareArgs();
-        try {
-            // otherwise...
-            final int numChildren = node.jjtGetNumChildren();
-            Object result = null;
-            for (int i = 0; i < numChildren; i++) {
-                JexlNode child = node.jjtGetChild(i);
-                result = child.jjtAccept(this, data);
-                cancelCheck(child);
-            }
-            return result;
-        } finally {
-            block = block.pop();
+        // otherwise...
+        final int numChildren = node.jjtGetNumChildren();
+        Object result = null;
+        for (int i = 0; i < numChildren; i++) {
+            JexlNode child = node.jjtGetChild(i);
+            result = child.jjtAccept(this, data);
+            cancelCheck(child);
         }
+        return result;    
     }
 
 }

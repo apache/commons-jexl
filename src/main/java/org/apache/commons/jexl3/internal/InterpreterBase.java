@@ -252,7 +252,10 @@ public abstract class InterpreterBase extends ParserVisitor {
                         return undefinedVariable(identifier, identifier.getName());
                     }
                 }
-                return frame.get(symbol);
+                Object value = frame.get(symbol);
+                if (value != Scope.UNDEFINED) {
+                    return value;
+                }
             }
         }
         String name = identifier.getName();

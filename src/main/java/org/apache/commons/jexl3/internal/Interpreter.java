@@ -169,9 +169,6 @@ public class Interpreter extends InterpreterBase {
      * @throws JexlException if any error occurs during interpretation.
      */
     public Object interpret(JexlNode node) {
-        return interpret(node, false);
-    }
-    public Object interpret(JexlNode node, boolean rethrow) {
         JexlContext.ThreadLocal tcontext = null;
         JexlEngine tjexl = null;
         Interpreter tinter = null;
@@ -205,7 +202,7 @@ public class Interpreter extends InterpreterBase {
                 throw xcancel.clean();
             }
         } catch (JexlException xjexl) {
-            if (rethrow || !isSilent()) {
+            if (!isSilent()) {
                 throw xjexl.clean();
             }
             if (logger.isWarnEnabled()) {
@@ -674,14 +671,14 @@ public class Interpreter extends InterpreterBase {
         ASTReference loopReference = (ASTReference) node.jjtGetChild(0);
         ASTIdentifier loopVariable = (ASTIdentifier) loopReference.jjtGetChild(0);
         final int symbol = loopVariable.getSymbol();
-        final LexicalFrame lexical = block;
-        if (options.isLexical()) {
-            // the iteration variable can not be declared in parent block
-            if (symbol >= 0 && block.hasSymbol(symbol)) {
+        final boolean lexical = options.isLexical() && symbol >= 0;
+        if (lexical) {
+            // create lexical frame
+            LexicalFrame locals = new LexicalFrame(frame, block);
+            if (!locals.declareSymbol(symbol)) {
                 return redefinedVariable(node, loopVariable.getName());
             }
-            // create lexical frame
-            block = new LexicalFrame(frame, lexical);
+            block = locals;
         }
         Object forEach = null;
         try {
@@ -723,8 +720,8 @@ public class Interpreter extends InterpreterBase {
             //  closeable iterator handling
             closeIfSupported(forEach);
             // restore lexical frame
-            if (lexical != null && block != null) {
-                block = lexical;
+            if (lexical) {
+                block = block.pop();
             }
         }
         return result;
@@ -987,7 +984,7 @@ public class Interpreter extends InterpreterBase {
         block = new LexicalFrame(frame, block).declareArgs();
         try {
             JexlNode body = script.jjtGetChild(script.jjtGetNumChildren() - 1);
-            return interpret(body, true);
+            return interpret(body);
         } finally {
             block = block.pop();
         }
