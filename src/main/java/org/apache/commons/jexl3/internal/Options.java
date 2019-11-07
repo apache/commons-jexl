@@ -32,7 +32,7 @@ public class Options implements JexlOptions {
     /** The local shade bit. */
     protected static final int SHADE = 6;
     /** The antish var bit. */
-    protected static final int ANTISH_VAR = 5;
+    protected static final int ANTISH = 5;
     /** The lexical scope bit. */
     protected static final int LEXICAL = 4;
     /** The safe bit. */
@@ -48,7 +48,7 @@ public class Options implements JexlOptions {
         "cancellable", "strict", "silent", "safe", "lexical", "antish", "lexicalShade"
     };
     /** Default mask .*/
-    protected static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH_VAR | 1 << SAFE;
+    protected static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE;
     /** The arithmetic math context. */
     private MathContext mathContext = null;
     /** The arithmetic math scale. */
@@ -125,33 +125,24 @@ public class Options implements JexlOptions {
         return mask;
     }
 
-    /**
-     * Set options from engine.
-     * @param jexl the engine
-     * @return this instance
-     */
     @Override
     public Options set(JexlEngine jexl) {
-        mathContext = jexl.getArithmetic().getMathContext();
-        mathScale = jexl.getArithmetic().getMathScale();
-        strictArithmetic = jexl.getArithmetic().isStrict();
-        set(STRICT, flags, jexl.isStrict());
-        set(SILENT, flags, jexl.isSilent());
-        set(SAFE, flags, jexl.isSafe());
-        set(CANCELLABLE, flags, jexl.isCancellable());
+        if (jexl instanceof Engine) {
+            set(((Engine) jexl).options);
+        } else {
+            mathContext = jexl.getArithmetic().getMathContext();
+            mathScale = jexl.getArithmetic().getMathScale();
+            strictArithmetic = jexl.getArithmetic().isStrict();
+            set(STRICT, flags, jexl.isStrict());
+            set(SILENT, flags, jexl.isSilent());
+            set(SAFE, flags, jexl.isSafe());
+            set(CANCELLABLE, flags, jexl.isCancellable());
+        }
         return this;
     }
     
     @Override
-    public JexlOptions copy() {
-        return new Options(this);
-    }
-
-    /**
-     * Create a copy from another set of options.
-     * @param opts the source options to copy
-     */
-    public Options(JexlOptions opts) {
+    public Options set(JexlOptions opts) {
         if (opts instanceof Options) {
             Options src = (Options) opts;
             mathContext = src.mathContext;
@@ -167,13 +158,22 @@ public class Options implements JexlOptions {
             mask = set(SILENT, mask, opts.isSilent());
             mask = set(SAFE, mask, opts.isSafe());
             mask = set(CANCELLABLE, mask, opts.isCancellable());
+            mask = set(LEXICAL, mask, opts.isLexical());
+            mask = set(SHADE, mask, opts.isLexicalShade());
+            mask = set(ANTISH, mask, opts.isAntish());
             flags = mask;
         }
+        return this;
+    }
+    
+    @Override
+    public Options copy() {
+        return new Options().set(this);
     }
     
     @Override
     public void setAntish(boolean flag) {
-        flags = set(ANTISH_VAR, flags, flag);
+        flags = set(ANTISH, flags, flag);
     }
 
     @Override
@@ -223,7 +223,7 @@ public class Options implements JexlOptions {
     
     @Override
     public boolean isAntish() {
-        return isSet(ANTISH_VAR, flags);
+        return isSet(ANTISH, flags);
     }
     
     @Override

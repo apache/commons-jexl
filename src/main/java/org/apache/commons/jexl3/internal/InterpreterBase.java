@@ -120,7 +120,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         functions = ii.functions;
         functors = ii.functors;
         operators = ii.operators;
-        options = new org.apache.commons.jexl3.internal.Options(ii.options);
+        options = ii.options.copy();
     }
 
 

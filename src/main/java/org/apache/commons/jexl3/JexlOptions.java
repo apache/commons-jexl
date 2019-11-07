@@ -151,13 +151,6 @@ public interface JexlOptions {
     void setMathScale(int mscale);
 
     /**
-     * Set options from engine.
-     * @param jexl the engine
-     * @return this instance
-     */
-    JexlOptions set(JexlEngine jexl);
-
-    /**
      * Sets whether the engine considers null in navigation expression as errors
      * during evaluation.
      * @param flag true if safe, false otherwise
@@ -183,7 +176,21 @@ public interface JexlOptions {
      * @param stricta true or false
      */
     void setStrictArithmetic(boolean stricta);
-    
+
+    /**
+     * Set options from engine.
+     * @param jexl the engine
+     * @return this instance
+     */
+    JexlOptions set(JexlEngine jexl);
+
+    /**
+     * Set options from options.
+     * @param options the options
+     * @return this instance
+     */
+    JexlOptions set(JexlOptions options);
+        
     /**
      * Creates a copy of this instance.
      * @return a copy
