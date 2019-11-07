@@ -31,6 +31,12 @@ import org.junit.Assert;
  * Eases the implementation of main methods to debug.
  */
 public class JexlTestCase {
+    // The default options: all tests where engine must lexicality is
+    // important can be identified by the builder  calling lexical(...).
+    static {
+        //JexlBuilder.setDefaultOptions("+safe", "-lexical"); 
+        JexlBuilder.setDefaultOptions("-safe", "+lexical");
+    }
     /** No parameters signature for test run. */
     private static final Class<?>[] NO_PARMS = {};
     /** String parameter signature for test run. */
@@ -40,7 +46,7 @@ public class JexlTestCase {
     protected final JexlEngine JEXL;
 
     public JexlTestCase(String name) {
-        this(name, new JexlBuilder().strict(true).silent(false).cache(32).create());
+        this(name, new JexlBuilder().cache(128).create());
     }
 
     protected JexlTestCase(String name, JexlEngine jexl) {
@@ -62,7 +68,7 @@ public class JexlTestCase {
     }
     
     public static JexlEngine createEngine(boolean lenient) {
-        return new JexlBuilder().arithmetic(new JexlArithmetic(!lenient)).cache(512).create();
+        return new JexlBuilder().arithmetic(new JexlArithmetic(!lenient)).cache(128).create();
     }
 
     /**

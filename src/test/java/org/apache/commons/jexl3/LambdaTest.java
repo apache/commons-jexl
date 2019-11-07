@@ -148,7 +148,8 @@ public class LambdaTest extends JexlTestCase {
     @Test
     public void testHoistLambda() throws Exception {
         JexlEngine jexl = createEngine();
-        JexlContext ctx = null;
+        JexlEvalContext ctx = new JexlEvalContext();
+        ctx.getEngineOptions().setLexical(false);
         JexlScript s42;
         Object result;
         JexlScript s15;

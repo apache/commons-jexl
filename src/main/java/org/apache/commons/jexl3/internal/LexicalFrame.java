@@ -81,10 +81,12 @@ public class LexicalFrame extends LexicalScope {
             clean &= ~(1L << s);
             frame.set(s, Scope.UNDEFINED);
         }
+        symbols = 0L;
         if (moreSymbols != null) {
             for (int s = moreSymbols.nextSetBit(0); s != -1; s = moreSymbols.nextSetBit(s + 1)) {
                 frame.set(s, Scope.UNDEFINED);
             }
+            moreSymbols.clear();
         }
         // restore values of hoisted symbols that were overwritten
         if (stack != null) {
@@ -101,4 +103,5 @@ public class LexicalFrame extends LexicalScope {
         }
         return (LexicalFrame) previous;
     }
+
 }

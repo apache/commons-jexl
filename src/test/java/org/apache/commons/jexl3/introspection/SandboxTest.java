@@ -131,7 +131,7 @@ public class SandboxTest extends JexlTestCase {
 
         JexlSandbox sandbox = new JexlSandbox();
         sandbox.black(Foo.class.getName()).execute("");
-        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
         script = sjexl.createScript(expr);
         try {
@@ -154,7 +154,7 @@ public class SandboxTest extends JexlTestCase {
 
         JexlSandbox sandbox = new JexlSandbox();
         sandbox.black(Foo.class.getName()).execute("Quux");
-        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
         script = sjexl.createScript(expr, "foo");
         try {
@@ -177,7 +177,7 @@ public class SandboxTest extends JexlTestCase {
 
         JexlSandbox sandbox = new JexlSandbox();
         sandbox.black(Foo.class.getName()).read("alias");
-        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
         script = sjexl.createScript(expr, "foo");
         try {
@@ -200,7 +200,7 @@ public class SandboxTest extends JexlTestCase {
 
         JexlSandbox sandbox = new JexlSandbox();
         sandbox.black(Foo.class.getName()).write("alias");
-        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
         script = sjexl.createScript(expr, "foo", "$0");
         try {
@@ -221,7 +221,7 @@ public class SandboxTest extends JexlTestCase {
 
         JexlSandbox sandbox = new JexlSandbox(false);
         sandbox.white(Foo.class.getName());
-        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
         jc.set("foo", new CantSeeMe());
         script = sjexl.createScript(expr);
@@ -244,7 +244,7 @@ public class SandboxTest extends JexlTestCase {
 
         JexlSandbox sandbox = new JexlSandbox();
         sandbox.white(Foo.class.getName()).execute("");
-        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
         script = sjexl.createScript(expr);
         result = script.execute(null);
@@ -260,7 +260,7 @@ public class SandboxTest extends JexlTestCase {
 
         JexlSandbox sandbox = new JexlSandbox();
         sandbox.white(Foo.class.getName()).execute("Quux");
-        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).safe(false).create();
 
         script = sjexl.createScript(expr, "foo");
         result = script.execute(null, foo);
@@ -281,7 +281,7 @@ public class SandboxTest extends JexlTestCase {
         JexlScript script;
         Object result;
 
-        JexlEngine sjexl = new JexlBuilder().strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().strict(true).safe(false).create();
         for (String expr : exprs) {
             script = sjexl.createScript(expr, "foo");
             try {
@@ -307,7 +307,7 @@ public class SandboxTest extends JexlTestCase {
         JexlSandbox sandbox = new JexlSandbox();
         sandbox.white(Foo.class.getName()).read("alias");
         sandbox.get(Foo.class.getName()).read().alias("alias", "ALIAS");
-        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
 
         script = sjexl.createScript(expr, "foo");
         result = script.execute(null, foo);
@@ -327,7 +327,7 @@ public class SandboxTest extends JexlTestCase {
 
         JexlSandbox sandbox = new JexlSandbox();
         sandbox.white(Foo.class.getName()).write("alias");
-        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
 
         script = sjexl.createScript(expr, "foo", "$0");
         result = script.execute(null, foo, "43");
@@ -345,7 +345,7 @@ public class SandboxTest extends JexlTestCase {
         // can not create a new file
         sandbox.black(java.io.File.class.getName()).execute("");
 
-        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
 
         String expr;
         JexlScript script;
@@ -389,7 +389,7 @@ public class SandboxTest extends JexlTestCase {
         JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.white(java.util.List.class.getName());
         
-        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
         JexlScript method = sjexl.createScript("foo.add(y)", "foo", "y");
         JexlScript set = sjexl.createScript("foo[x] = y", "foo", "x", "y");
         JexlScript get = sjexl.createScript("foo[x]", "foo", "x");
@@ -443,7 +443,7 @@ public class SandboxTest extends JexlTestCase {
         sandbox.white(Operation.class.getName());
         sandbox.black(Operation.class.getName()).execute("nonCallable");
         //sandbox.black(Foo.class.getName()).execute();
-        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
         JexlScript someOp = sjexl.createScript("foo.someOp(y)", "foo", "y");
         result = someOp.execute(ctxt, foo, 30);
         Assert.assertEquals(42, result);
@@ -482,7 +482,7 @@ public class SandboxTest extends JexlTestCase {
     public void testNoJexl312() throws Exception {
         JexlContext ctxt = new MapContext();
         
-        JexlEngine sjexl = new JexlBuilder().strict(true).create();
+        JexlEngine sjexl = new JexlBuilder().safe(false).strict(true).create();
         JexlScript foo = sjexl.createScript("x.getFoo()", "x");
         try {
             foo.execute(ctxt, new Foo44());

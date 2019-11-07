@@ -131,20 +131,19 @@ public class AntishCallTest extends JexlTestCase {
 
     @Test
     public void testAntishContextVar() throws Exception {
-        JexlEngine jexl = new JexlBuilder().cache(512).strict(true).silent(false).create();
         Map<String,Object> lmap = new TreeMap<String,Object>();
-        JexlContext jc = new CallSupportContext(lmap).engine(jexl);
-        runTestCall(jexl, jc);
+        JexlContext jc = new CallSupportContext(lmap).engine(JEXL);
+        runTestCall(JEXL, jc);
         lmap.put("java.math.BigInteger", new ClassReference(java.math.BigInteger.class));
-        runTestCall(jexl, jc);
+        runTestCall(JEXL, jc);
         lmap.remove("java.math.BigInteger");
-        runTestCall(jexl, jc);
+        runTestCall(JEXL, jc);
     }
 
     @Test
     public void testAntishArithmetic() throws Exception {
         CallSupportArithmetic ja = new CallSupportArithmetic(true);
-        JexlEngine jexl = new JexlBuilder().cache(512).strict(true).silent(false).arithmetic(ja).create();
+        JexlEngine jexl = new JexlBuilder().cache(512).arithmetic(ja).create();
         Map<String,Object> lmap = new TreeMap<String,Object>();
         JexlContext jc = new MapContext(lmap);
         lmap.put("java.math.BigInteger", java.math.BigInteger.class);
@@ -174,24 +173,23 @@ public class AntishCallTest extends JexlTestCase {
     // JEXL-300
     @Test
     public void testSafeAnt() throws Exception {
-        JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
         JexlContext ctxt = new MapContext();
         ctxt.set("x.y.z", 42);
         JexlScript script;
         Object result;
         
-        script = jexl.createScript("x.y.z");
+        script = JEXL.createScript("x.y.z");
         result = script.execute(ctxt);
         Assert.assertEquals(42, result);
         Assert.assertEquals(42, ctxt.get("x.y.z"));
                 
         result = null;
-        script = jexl.createScript("x?.y?.z");
+        script = JEXL.createScript("x?.y?.z");
         result = script.execute(ctxt);
         Assert.assertNull(result); // safe navigation, null
         
         result = null;
-        script = jexl.createScript("x?.y?.z = 3");
+        script = JEXL.createScript("x?.y?.z = 3");
         try {
              result = script.execute(ctxt);
              Assert.fail("not antish assign");
@@ -200,7 +198,7 @@ public class AntishCallTest extends JexlTestCase {
         }
         
         result = null;
-        script = jexl.createScript("x.y?.z");
+        script = JEXL.createScript("x.y?.z");
         try {
              result = script.execute(ctxt);
              Assert.fail("x not defined");
@@ -209,7 +207,7 @@ public class AntishCallTest extends JexlTestCase {
         }
         
         result = null;
-        script = jexl.createScript("x.y?.z = 3");
+        script = JEXL.createScript("x.y?.z = 3");
         try {
              result = script.execute(ctxt);
              Assert.fail("not antish assign");
@@ -218,7 +216,7 @@ public class AntishCallTest extends JexlTestCase {
         } 
         
         result = null;
-        script = jexl.createScript("x.`'y'`.z = 3");
+        script = JEXL.createScript("x.`'y'`.z = 3");
         try {
              result = script.execute(ctxt);
              Assert.fail("not antish assign");

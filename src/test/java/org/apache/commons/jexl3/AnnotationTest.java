@@ -37,8 +37,7 @@ public class AnnotationTest extends JexlTestCase {
     @Test
     public void test197a() throws Exception {
         JexlContext jc = new MapContext();
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlScript e = jexl.createScript("@synchronized { return 42; }");
+        JexlScript e = JEXL.createScript("@synchronized { return 42; }");
         Object r = e.execute(jc);
         Assert.assertEquals(42, r);
     }
@@ -121,11 +120,10 @@ public class AnnotationTest extends JexlTestCase {
     public void testVarStmt() throws Exception {
         OptAnnotationContext jc = new OptAnnotationContext();
         JexlOptions options = jc.getEngineOptions();
-        JexlEngine jexl = new JexlBuilder().strict(true).silent(false).create();
-        jc.getEngineOptions().set(jexl);
+        jc.getEngineOptions().set(JEXL);
         JexlScript e;
         Object r;
-        e = jexl.createScript("(s, v)->{ @strict(s) @silent(v) var x = y ; 42; }");
+        e = JEXL.createScript("(s, v)->{ @strict(s) @silent(v) var x = y ; 42; }");
 
         // wont make an error
         try {
@@ -163,7 +161,7 @@ public class AnnotationTest extends JexlTestCase {
         }
         //Assert.assertEquals(42, r);
         Assert.assertTrue(options.isStrict());
-        e = jexl.createScript("@scale(5) 42;");
+        e = JEXL.createScript("@scale(5) 42;");
         r = e.execute(jc);
         Assert.assertEquals(42, r);
         Assert.assertTrue(options.isStrict());
@@ -173,8 +171,7 @@ public class AnnotationTest extends JexlTestCase {
     @Test
     public void testNoArg() throws Exception {
         AnnotationContext jc = new AnnotationContext();
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlScript e = jexl.createScript("@synchronized { return 42; }");
+        JexlScript e = JEXL.createScript("@synchronized { return 42; }");
         Object r = e.execute(jc);
         Assert.assertEquals(42, r);
         Assert.assertEquals(1, jc.getCount());
@@ -184,8 +181,7 @@ public class AnnotationTest extends JexlTestCase {
     @Test
     public void testNoArgExpression() throws Exception {
         AnnotationContext jc = new AnnotationContext();
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlScript e = jexl.createScript("@synchronized 42");
+        JexlScript e = JEXL.createScript("@synchronized 42");
         Object r = e.execute(jc);
         Assert.assertEquals(42, r);
         Assert.assertEquals(1, jc.getCount());
@@ -195,8 +191,7 @@ public class AnnotationTest extends JexlTestCase {
     @Test
     public void testNoArgStatement() throws Exception {
         AnnotationContext jc = new AnnotationContext();
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlScript e = jexl.createScript("@synchronized if (true) 2 * 3 * 7; else -42;");
+        JexlScript e = JEXL.createScript("@synchronized if (true) 2 * 3 * 7; else -42;");
         Object r = e.execute(jc);
         Assert.assertEquals(42, r);
         Assert.assertEquals(1, jc.getCount());
@@ -206,8 +201,7 @@ public class AnnotationTest extends JexlTestCase {
     @Test
     public void testHoistingStatement() throws Exception {
         AnnotationContext jc = new AnnotationContext();
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlScript e = jexl.createScript("var t = 1; @synchronized for(var x : [2,3,7]) t *= x; t");
+        JexlScript e = JEXL.createScript("var t = 1; @synchronized for(var x : [2,3,7]) t *= x; t");
         Object r = e.execute(jc);
         Assert.assertEquals(42, r);
         Assert.assertEquals(1, jc.getCount());
@@ -217,8 +211,7 @@ public class AnnotationTest extends JexlTestCase {
     @Test
     public void testOneArg() throws Exception {
         AnnotationContext jc = new AnnotationContext();
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlScript e = jexl.createScript("@one(1) { return 42; }");
+        JexlScript e = JEXL.createScript("@one(1) { return 42; }");
         Object r = e.execute(jc);
         Assert.assertEquals(42, r);
         Assert.assertEquals(1, jc.getCount());
@@ -229,8 +222,7 @@ public class AnnotationTest extends JexlTestCase {
     @Test
     public void testMultiple() throws Exception {
         AnnotationContext jc = new AnnotationContext();
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlScript e = jexl.createScript("@one(1) @synchronized { return 42; }");
+        JexlScript e = JEXL.createScript("@one(1) @synchronized { return 42; }");
         Object r = e.execute(jc);
         Assert.assertEquals(42, r);
         Assert.assertEquals(2, jc.getCount());

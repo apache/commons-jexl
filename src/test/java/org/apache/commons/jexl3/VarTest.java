@@ -45,6 +45,7 @@ public class VarTest extends JexlTestCase {
         JexlContext ctxt = new ReadonlyContext(env, options);
         options.setStrict(true);
         options.setSilent(false);
+        options.setSafe(false);
         JexlScript e;
 
         e = JEXL.createScript("x");

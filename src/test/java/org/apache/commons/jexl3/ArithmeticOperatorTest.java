@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -373,7 +374,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         }
 
         protected Object setDateValue(Date date, String key, Object value) throws Exception {
-            Calendar cal = Calendar.getInstance();
+            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
             cal.setTime(date);
             if ("yyyy".equals(key)) {
                 cal.set(Calendar.YEAR, toInteger(value));

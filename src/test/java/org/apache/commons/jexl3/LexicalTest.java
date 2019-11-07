@@ -324,7 +324,7 @@ public class LexicalTest {
     @Test
     public void testLexical6c() throws Exception {
         String str = "i = 0; for (var i : [42]) i; i";
-        JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
+        JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).lexicalShade(false).create();
         JexlScript e = jexl.createScript(str);
         JexlContext ctxt = new MapContext();
         Object o = e.execute(ctxt);
@@ -333,7 +333,7 @@ public class LexicalTest {
 
     @Test
     public void testLexical6d() throws Exception {
-        String str = "i = 0; for (var i : [42]) i;; i";
+        String str = "i = 0; for (var i : [42]) i; i";
         JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).lexicalShade(true).create();
         JexlScript e = jexl.createScript(str);
         JexlContext ctxt = new MapContext();

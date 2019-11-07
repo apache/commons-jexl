@@ -43,8 +43,12 @@ public class Options implements JexlOptions {
     protected static final int STRICT = 1;
     /** The cancellable bit. */
     protected static final int CANCELLABLE = 0;
+    /** The flags names ordered. */
+    private static final String[] NAMES = {
+        "cancellable", "strict", "silent", "safe", "lexical", "antish", "lexicalShade"
+    };
     /** Default mask .*/
-    protected static final int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH_VAR;
+    protected static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH_VAR | 1 << SAFE;
     /** The arithmetic math context. */
     private MathContext mathContext = null;
     /** The arithmetic math scale. */
@@ -79,6 +83,47 @@ public class Options implements JexlOptions {
      * Default ctor.
      */
     public Options() {}
+    
+    /**
+     * Sets the default flags.
+     * <p>Used by tests to force default options.
+     * @param flags the flags to set 
+     */
+    public static void setDefaultFlags(String...flags) {
+        DEFAULT = parseFlags(DEFAULT, flags);
+    }
+        
+    /**
+     * Parses flags by name.
+     * <p>A '+flag' or 'flag' will set flag as true, '-flag' set as false.
+     * The possible flag names are:
+     * cancellable, strict, silent, safe, lexical, antish, lexicalShade
+     * @param mask the initial mask state
+     * @param flags the flags to set 
+     * @return the flag mask updated
+     */
+    public static int parseFlags(int mask, String...flags) {
+        for(String name : flags) {
+            boolean b = true;
+            if (name.charAt(0) == '+') {
+                name = name.substring(1);
+            } else if (name.charAt(0) == '-') {
+                name = name.substring(1);
+                b = false;
+            }
+            for(int flag = 0; flag < NAMES.length; ++flag) {
+                if (NAMES[flag].equals(name)) {
+                    if (b) {
+                        mask |= (1 << flag);
+                    } else {
+                        mask &= ~(1 << flag);
+                    }
+                    break;
+                }
+            }
+        }
+        return mask;
+    }
 
     /**
      * Set options from engine.

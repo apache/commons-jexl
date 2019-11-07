@@ -82,7 +82,7 @@ public class Util {
 
     /**
      * Creates a list of all descendants of a script including itself.
-     * @param script the script to flatten
+     * @param node the script to flatten
      * @return the descendants-and-self list
      */
     protected static ArrayList<JexlNode> flatten(JexlNode node) {

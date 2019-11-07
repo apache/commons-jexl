@@ -171,9 +171,10 @@ public class Engine extends JexlEngine {
      */
     public Engine(JexlBuilder conf) {
         // options:
-        this.strict = option(conf.strict(), true);
-        this.safe = option(conf.safe(), false);
-        this.silent = option(conf.silent(), false);
+        JexlOptions opts = conf.options();
+        this.strict = opts.isStrict();
+        this.safe = opts.isSafe();
+        this.silent = opts.isSilent();
         this.cancellable = option(conf.cancellable(), !silent && strict);
         this.debug = option(conf.debug(), true);
         this.collectAll = option(conf.collectAll(), true);
@@ -205,7 +206,7 @@ public class Engine extends JexlEngine {
             throw new IllegalArgumentException("uberspect can not be null");
         }
         // capture options
-        this.options = conf.options().copy().set(this);
+        this.options = opts.copy().set(this);
     }
 
 
@@ -403,7 +404,7 @@ public class Engine extends JexlEngine {
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean);
             final Interpreter interpreter = createInterpreter(context, frame);
-            return node.jjtAccept(interpreter, null);
+            return interpreter.visitLexicalNode(node, null);
         } catch (JexlException xjexl) {
             if (silent) {
                 logger.warn(xjexl.getMessage(), xjexl.getCause());
@@ -432,7 +433,7 @@ public class Engine extends JexlEngine {
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean, value);
             final Interpreter interpreter = createInterpreter(context, frame);
-            node.jjtAccept(interpreter, null);
+            interpreter.visitLexicalNode(node, null);
         } catch (JexlException xjexl) {
             if (silent) {
                 logger.warn(xjexl.getMessage(), xjexl.getCause());

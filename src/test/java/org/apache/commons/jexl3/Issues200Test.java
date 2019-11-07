@@ -754,13 +754,17 @@ public class Issues200Test extends JexlTestCase {
                 + "  $out.add(c);\n"
                 + "}\n"
                 + " \n"
-                + "for(c: ['j','k','l']) {\n"
-                + "  $out.add(c);\n"
+                + "for(var dc: ['j','k','l']) {\n"
+                + "  $out.add(dc);\n"
                 + "}"
                 + " \n"
                 + "$out.size()";
 
-        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+        JexlFeatures features = new JexlFeatures();
+        features.lexical(true);
+        JexlEngine jexl = new JexlBuilder()
+                //.features(features)
+                .safe(false).strict(true).lexical(true).create();
         JexlScript script = jexl.createScript(src);
         Object result = script.execute(ctxt, (Object) null);
         Assert.assertEquals(6, result);
@@ -778,7 +782,7 @@ public class Issues200Test extends JexlTestCase {
                 + "for(b: ['j','k','l']) { $out.add(b);}\n"
                 + "$out.size()";
 
-        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).lexical(false).create();
         JexlScript script = jexl.createScript(src);
         Object result = script.execute(ctxt, (Object) null);
         Assert.assertEquals(6, result);
@@ -813,7 +817,8 @@ public class Issues200Test extends JexlTestCase {
 
     @Test
     public void test287() {
-        JexlContext ctxt = new MapContext();
+        JexlEvalContext ctxt = new JexlEvalContext();
+        JexlOptions options = ctxt.getEngineOptions();
         JexlEngine jexl = new JexlBuilder().strict(true).create();
         String src;
         JexlScript script;
@@ -834,20 +839,21 @@ public class Issues200Test extends JexlTestCase {
         result = script.execute(ctxt);
         Assert.assertEquals(42, result);
         // definition using shadowed global
+        options.setLexical(false);
         src = "(x)->{ if (x==1) { var y = 2; } else if (x==2) { var y = 3; }; y }";
         script = jexl.createScript(src);
         result = script.execute(ctxt, 1);
         Assert.assertEquals(2, result);
         result = script.execute(ctxt, 2);
         Assert.assertEquals(3, result);
+        options.setSafe(false);
         try {
             result = script.execute(ctxt, 0);
             Assert.fail("should have failed!");
         } catch (JexlException.Variable xvar) {
             Assert.assertTrue(xvar.getMessage().contains("y"));
         }
-        jexl = new JexlBuilder().strict(true).safe(true).create();
-        script = jexl.createScript(src);
+        options.setSafe(true);
         try {
             result = script.execute(ctxt, 0);
         } catch (JexlException xvar) {

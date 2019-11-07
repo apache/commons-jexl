@@ -671,11 +671,13 @@ public class Interpreter extends InterpreterBase {
         ASTReference loopReference = (ASTReference) node.jjtGetChild(0);
         ASTIdentifier loopVariable = (ASTIdentifier) loopReference.jjtGetChild(0);
         final int symbol = loopVariable.getSymbol();
-        final boolean lexical = options.isLexical() && symbol >= 0;
+        final boolean lexical = options.isLexical();// && node.getSymbolCount() > 0;
+        final boolean loopSymbol = symbol >= 0 && loopVariable instanceof ASTVar;
         if (lexical) {
             // create lexical frame
             LexicalFrame locals = new LexicalFrame(frame, block);
-            if (!locals.declareSymbol(symbol)) {
+            // it may be a local previously declared
+            if (loopSymbol && !locals.declareSymbol(symbol)) {
                 return redefinedVariable(node, loopVariable.getName());
             }
             block = locals;
@@ -694,8 +696,18 @@ public class Interpreter extends InterpreterBase {
                         ? (Iterator<?>) forEach
                         : uberspect.getIterator(iterableValue);
                 if (itemsIterator != null) {
+                    int cnt = 0;
                     while (itemsIterator.hasNext()) {
                         cancelCheck(node);
+                        // reset loop varaible
+                        if (lexical && cnt++ > 0) {
+                            // clean up but remain current
+                            block.pop();
+                            // unlikely to fail 
+                            if (loopSymbol && !block.declareSymbol(symbol)) {
+                                return redefinedVariable(node, loopVariable.getName());
+                            }
+                        }
                         // set loopVariable to value of iterator
                         Object value = itemsIterator.next();
                         if (symbol < 0) {
@@ -972,7 +984,22 @@ public class Interpreter extends InterpreterBase {
             return true;
         }
     }
-
+    
+    /**
+     * Runs a node.
+     * @param node the node
+     * @param data the usual data
+     * @return the return value
+     */
+    protected Object visitLexicalNode(JexlNode node, Object data) {
+        block = new LexicalFrame(frame, null);
+        try {
+            return node.jjtAccept(this, data);
+        } finally {
+            block = block.pop();
+        }
+    }
+    
     /**
      * Runs a closure.
      * @param closure the closure

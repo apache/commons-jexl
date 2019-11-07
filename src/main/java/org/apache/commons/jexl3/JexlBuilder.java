@@ -74,21 +74,9 @@ public class JexlBuilder {
     /** The Log to which all JexlEngine messages will be logged. */
     private Log logger = null;
 
-    /**
-     * Whether expressions evaluated by this engine will throw exceptions (false) or
-     * return null (true) on errors. Default is false.
-     */
-    private Boolean silent = null;
-
-    /** Whether this engine is in lenient or strict mode; if unspecified, use the arithmetic lenient property. */
-    private Boolean strict = null;
-
-    /** Whether this engine is in tolerant mode. */
-    private Boolean safe = false;
-
     /** Whether error messages will carry debugging information. */
     private Boolean debug = null;
-
+    
     /** Whether interrupt throws JexlException.Cancel. */
     private Boolean cancellable = null;
     
@@ -121,7 +109,23 @@ public class JexlBuilder {
 
     /** The features. */
     private JexlFeatures features = null;
-
+        
+    /**
+     * Sets the default (static, shared) option flags.
+     * <p>
+     * Whenever possible, we recommend using JexlBuilder methods to unambiguously instantiate a JEXL
+     * engine; this method should only be used for testing / validation.
+     * <p>A '+flag' or 'flag' will set the option named 'flag' as true, '-flag' set as false.
+     * The possible flag names are:
+     * cancellable, strict, silent, safe, lexical, antish, lexicalShade
+     * <p>Calling JexlBuilder.setDefaultOptions("+safe") once before JEXL engine creation 
+     * may ease validating JEXL3.2 in your environment.
+     * @param flags the flags to set 
+     */
+    public static void setDefaultOptions(String...flags) {
+        Options.setDefaultFlags(flags);
+    }
+    
     /**
      * Sets the JexlUberspect instance the engine will use.
      *
@@ -328,14 +332,13 @@ public class JexlBuilder {
      * @return this builder
      */
     public JexlBuilder silent(boolean flag) {
-        this.silent = flag;
         options.setSilent(flag);
         return this;
     }
 
     /** @return the silent error handling flag */
     public Boolean silent() {
-        return this.silent;
+        return options.isSilent();
     }
 
     /**
@@ -346,14 +349,13 @@ public class JexlBuilder {
      * @return this builder
      */
     public JexlBuilder strict(boolean flag) {
-        this.strict = flag;
         options.setStrict(flag);
         return this;
     }
 
     /** @return true if strict, false otherwise */
     public Boolean strict() {
-        return this.strict;
+        return options.isStrict();
     }
 
     /**
@@ -366,14 +368,13 @@ public class JexlBuilder {
      * @return this builder
      */
     public JexlBuilder safe(boolean flag) {
-        this.safe = flag;
         options.setSafe(flag);
         return this;
     }
 
     /** @return true if safe, false otherwise */
     public Boolean safe() {
-        return this.safe;
+        return options.isSafe();
     }
 
     /**
