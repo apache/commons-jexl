@@ -17,6 +17,8 @@
 
 package org.apache.commons.jexl3;
 
+import org.apache.commons.jexl3.internal.Script;
+
 /**
  * Helper class to carry information such as a url/file name, line and column for
  * debugging information reporting.
@@ -181,6 +183,15 @@ public class JexlInfo {
      */
     public final int getColumn() {
         return column;
+    }
+    
+    /**
+     * Gets the info from a script.
+     * @param script the script
+     * @return the info
+     */
+    public static JexlInfo from(JexlScript script) {
+        return script instanceof Script? ((Script) script).getInfo() :  null;
     }
 }
 

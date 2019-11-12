@@ -173,7 +173,8 @@ public class AntishCallTest extends JexlTestCase {
     // JEXL-300
     @Test
     public void testSafeAnt() throws Exception {
-        JexlContext ctxt = new MapContext();
+        JexlEvalContext ctxt = new JexlEvalContext();
+        JexlOptions options = ctxt.getEngineOptions();
         ctxt.set("x.y.z", 42);
         JexlScript script;
         Object result;
@@ -182,6 +183,18 @@ public class AntishCallTest extends JexlTestCase {
         result = script.execute(ctxt);
         Assert.assertEquals(42, result);
         Assert.assertEquals(42, ctxt.get("x.y.z"));
+        
+        options.setAntish(false);
+        try {
+            result = script.execute(ctxt);
+            Assert.fail("antish var shall not be resolved");
+        } catch(JexlException.Variable xvar) {
+            Assert.assertTrue("x".equals(xvar.getVariable()));
+        } catch(JexlException xother) {
+            Assert.assertTrue(xother != null);
+        } finally {
+            options.setAntish(true);
+        }
                 
         result = null;
         script = JEXL.createScript("x?.y?.z");

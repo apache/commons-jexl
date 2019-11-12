@@ -18,7 +18,6 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine;
-import org.apache.commons.jexl3.internal.Options;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.logging.Log;
@@ -81,7 +80,7 @@ public class JexlBuilder {
     private Boolean cancellable = null;
     
     /** The options. */
-    private final Options options = new Options();
+    private final JexlOptions options = new JexlOptions();
 
     /** Whether getVariables considers all potential equivalent syntactic forms. */
     private Boolean collectAll = null;
@@ -109,23 +108,7 @@ public class JexlBuilder {
 
     /** The features. */
     private JexlFeatures features = null;
-        
-    /**
-     * Sets the default (static, shared) option flags.
-     * <p>
-     * Whenever possible, we recommend using JexlBuilder methods to unambiguously instantiate a JEXL
-     * engine; this method should only be used for testing / validation.
-     * <p>A '+flag' or 'flag' will set the option named 'flag' as true, '-flag' set as false.
-     * The possible flag names are:
-     * cancellable, strict, silent, safe, lexical, antish, lexicalShade
-     * <p>Calling JexlBuilder.setDefaultOptions("+safe") once before JEXL engine creation 
-     * may ease validating JEXL3.2 in your environment.
-     * @param flags the flags to set 
-     */
-    public static void setDefaultOptions(String...flags) {
-        Options.setDefaultFlags(flags);
-    }
-    
+
     /**
      * Sets the JexlUberspect instance the engine will use.
      *

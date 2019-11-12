@@ -18,6 +18,7 @@
 package org.apache.commons.jexl3;
 
 import java.math.MathContext;
+import org.apache.commons.jexl3.internal.Engine;
 
 /**
  * Flags and properties that can alter the evaluation behavior.
@@ -35,31 +36,150 @@ import java.math.MathContext;
  * <p>This interface replaces the now deprecated JexlEngine.Options.
  * @since 3.2
  */
-public interface JexlOptions {
+public final class JexlOptions {
+    /** The local shade bit. */
+    private static final int SHADE = 6;
+    /** The antish var bit. */
+    private static final int ANTISH = 5;
+    /** The lexical scope bit. */
+    private static final int LEXICAL = 4;
+    /** The safe bit. */
+    private static final int SAFE = 3;
+    /** The silent bit. */
+    private static final int SILENT = 2;
+    /** The strict bit. */
+    private static final int STRICT = 1;
+    /** The cancellable bit. */
+    private static final int CANCELLABLE = 0;
+    /** The flags names ordered. */
+    private static final String[] NAMES = {
+        "cancellable", "strict", "silent", "safe", "lexical", "antish", "lexicalShade"
+    };
+    /** Default mask .*/
+    private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE;
+    /** The arithmetic math context. */
+    private MathContext mathContext = null;
+    /** The arithmetic math scale. */
+    private int mathScale = Integer.MIN_VALUE;
+    /** The arithmetic strict math flag. */
+    private boolean strictArithmetic = true;
+    /** The default flags, all but safe. */
+    private int flags = DEFAULT;
+
+    /**
+     * Sets the value of a flag in a mask.
+     * @param ordinal the flag ordinal
+     * @param mask the flags mask
+     * @param value true or false
+     * @return the new flags mask value
+     */
+    private static int set(int ordinal, int mask, boolean value) {
+        return value? mask | (1 << ordinal) : mask & ~(1 << ordinal);
+    }
+
+    /**
+     * Checks the value of a flag in the mask.
+     * @param ordinal the flag ordinal
+     * @param mask the flags mask
+     * @return the mask value with this flag or-ed in
+     */
+    private static boolean isSet(int ordinal, int mask) {
+        return (mask & 1 << ordinal) != 0;
+    }
+        
+    /**
+     * Default ctor.
+     */
+    public JexlOptions() {}
+            
+    /**
+     * Sets the default (static, shared) option flags.
+     * <p>
+     * Whenever possible, we recommend using JexlBuilder methods to unambiguously instantiate a JEXL
+     * engine; this method should only be used for testing / validation.
+     * <p>A '+flag' or 'flag' will set the option named 'flag' as true, '-flag' set as false.
+     * The possible flag names are:
+     * cancellable, strict, silent, safe, lexical, antish, lexicalShade
+     * <p>Calling JexlBuilder.setDefaultOptions("+safe") once before JEXL engine creation 
+     * may ease validating JEXL3.2 in your environment.
+     * @param flags the flags to set 
+     */
+    public static void setDefaultFlags(String...flags) {
+        DEFAULT = parseFlags(DEFAULT, flags);
+    }
+        
+    /**
+     * Parses flags by name.
+     * <p>A '+flag' or 'flag' will set flag as true, '-flag' set as false.
+     * The possible flag names are:
+     * cancellable, strict, silent, safe, lexical, antish, lexicalShade
+     * @param mask the initial mask state
+     * @param flags the flags to set 
+     * @return the flag mask updated
+     */
+    public static int parseFlags(int mask, String...flags) {
+        for(String name : flags) {
+            boolean b = true;
+            if (name.charAt(0) == '+') {
+                name = name.substring(1);
+            } else if (name.charAt(0) == '-') {
+                name = name.substring(1);
+                b = false;
+            }
+            for(int flag = 0; flag < NAMES.length; ++flag) {
+                if (NAMES[flag].equals(name)) {
+                    if (b) {
+                        mask |= (1 << flag);
+                    } else {
+                        mask &= ~(1 << flag);
+                    }
+                    break;
+                }
+            }
+        }
+        return mask;
+    }
+    
+    /**
+     * Sets this option flags using the +/- syntax.
+     * @param opts the option flags
+     */
+    public void setFlags(String[] opts) {
+        flags = parseFlags(flags, opts);
+    }
+    
     /**
      * The MathContext instance used for +,-,/,*,% operations on big decimals.
      * @return the math context
      */
-    MathContext getMathContext();
+    public MathContext getMathContext() {
+        return mathContext;
+    }
 
     /**
      * The BigDecimal scale used for comparison and coercion operations.
      * @return the scale
      */
-    int getMathScale();
+    public int getMathScale() {
+        return mathScale;
+    }
 
     /**
      * Checks whether evaluation will attempt resolving antish variable names.
      * @return true if antish variables are solved, false otherwise
      */
-    boolean isAntish();
+    public boolean isAntish() {
+        return isSet(ANTISH, flags);
+    }
     
     /**
      * Checks whether evaluation will throw JexlException.Cancel (true) or
      * return null (false) if interrupted.
      * @return true when cancellable, false otherwise
      */
-    boolean isCancellable();
+    public boolean isCancellable() {
+        return isSet(CANCELLABLE, flags);
+    }
 
     /**
      * Checks whether runtime variable scope is lexical.
@@ -67,7 +187,9 @@ public interface JexlOptions {
      * Redefining a variable in the same lexical unit will generate errors.
      * @return true if scope is lexical, false otherwise
      */
-    boolean isLexical();
+    public boolean isLexical() {
+        return isSet(LEXICAL, flags);
+    }
     
     /**
      * Checks whether local variables shade global ones.
@@ -79,122 +201,169 @@ public interface JexlOptions {
      * raise an error.
      * @return true if lexical shading is applied, false otherwise
      */
-    boolean isLexicalShade();
+    public boolean isLexicalShade() {
+        return isSet(SHADE, flags);
+    }
     
     /**
      * Checks whether the engine considers null in navigation expression as
      * errors during evaluation..
      * @return true if safe, false otherwise
      */
-    boolean isSafe();
+    public boolean isSafe() {
+        return isSet(SAFE, flags);
+    }
 
     /**
      * Checks whether the engine will throw a {@link JexlException} when an
      * error is encountered during evaluation.
      * @return true if silent, false otherwise
      */
-    boolean isSilent();
+    public boolean isSilent() {
+        return isSet(SILENT, flags);
+    }
 
     /**
      * Checks whether the engine considers unknown variables, methods and
      * constructors as errors during evaluation.
      * @return true if strict, false otherwise
      */
-    boolean isStrict();
+    public boolean isStrict() {
+        return isSet(STRICT, flags);
+    }
 
     /**
      * Checks whether the arithmetic triggers errors during evaluation when null
      * is used as an operand.
      * @return true if strict, false otherwise
      */
-    boolean isStrictArithmetic();
+    public boolean isStrictArithmetic() {
+        return strictArithmetic;
+    }
     
     /**
      * Sets whether the engine will attempt solving antish variable names from 
      * context.
      * @param flag true if antish variables are solved, false otherwise
      */
-    void setAntish(boolean flag);
+    public void setAntish(boolean flag) {
+        flags = set(ANTISH, flags, flag);
+    }
 
     /**
      * Sets whether the engine will throw JexlException.Cancel (true) or return
      * null (false) when interrupted during evaluation.
      * @param flag true when cancellable, false otherwise
      */
-    void setCancellable(boolean flag);
+    public void setCancellable(boolean flag) {
+        flags = set(CANCELLABLE, flags, flag);
+    }
     
     /**
      * Sets whether the engine uses a strict block lexical scope during
      * evaluation.
      * @param flag true if lexical scope is used, false otherwise
      */
-    void setLexical(boolean flag);
+    public void setLexical(boolean flag) {
+        flags = set(LEXICAL, flags, flag);
+    }   
     
     /**
      * Sets whether the engine strictly shades global variables.
      * Local symbols shade globals after definition and creating global
      * variables is prohibited evaluation.
+     * If setting to lexical shade, lexical is also set.
      * @param flag true if creation is allowed, false otherwise
      */
-    void setLexicalShade(boolean flag);
+    public void setLexicalShade(boolean flag) {
+        flags = set(SHADE, flags, flag);
+        if (flag) {
+            flags = set(LEXICAL, flags, true);
+        }
+    }
 
     /**
      * Sets the arithmetic math context.
      * @param mcontext the context
      */
-    void setMathContext(MathContext mcontext);
+    public void setMathContext(MathContext mcontext) {
+        this.mathContext = mcontext;
+    }
 
     /**
      * Sets the arithmetic math scale.
      * @param mscale the scale
      */
-    void setMathScale(int mscale);
+    public void setMathScale(int mscale) {
+        this.mathScale = mscale;
+    }
 
     /**
      * Sets whether the engine considers null in navigation expression as errors
      * during evaluation.
      * @param flag true if safe, false otherwise
      */
-    void setSafe(boolean flag);
+    public void setSafe(boolean flag) {
+        flags = set(SAFE, flags, flag);
+    } 
 
     /**
      * Sets whether the engine will throw a {@link JexlException} when an error
      * is encountered during evaluation.
      * @param flag true if silent, false otherwise
      */
-    void setSilent(boolean flag);
+    public void setSilent(boolean flag) {
+        flags = set(SILENT, flags, flag);
+    }
 
     /**
      * Sets whether the engine considers unknown variables, methods and
      * constructors as errors during evaluation.
      * @param flag true if strict, false otherwise
      */
-    void setStrict(boolean flag);
+    public void setStrict(boolean flag) {
+        flags = set(STRICT, flags, flag);
+    }
 
     /**
      * Sets the strict arithmetic flag.
      * @param stricta true or false
      */
-    void setStrictArithmetic(boolean stricta);
+    public void setStrictArithmetic(boolean stricta) {
+        this.strictArithmetic = stricta;
+    }
 
     /**
      * Set options from engine.
      * @param jexl the engine
      * @return this instance
-     */
-    JexlOptions set(JexlEngine jexl);
+     */        
+    public JexlOptions set(JexlEngine jexl) {
+        if (jexl instanceof Engine) {
+            ((Engine) jexl).optionsSet(this);
+        }
+        return this;
+    }
 
     /**
      * Set options from options.
-     * @param options the options
+     * @param src the options
      * @return this instance
      */
-    JexlOptions set(JexlOptions options);
-        
+    public JexlOptions set(JexlOptions src) {
+        mathContext = src.mathContext;
+        mathScale = src.mathScale;
+        strictArithmetic = src.strictArithmetic;
+        flags = src.flags;
+        return this;
+    }
+
     /**
      * Creates a copy of this instance.
      * @return a copy
      */
-    JexlOptions copy();
+    public JexlOptions copy() {
+        return new JexlOptions().set(this);
+    }
     
 }

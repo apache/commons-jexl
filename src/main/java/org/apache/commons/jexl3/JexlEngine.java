@@ -352,7 +352,7 @@ public abstract class JexlEngine {
      * @return A {@link JexlScript} which can be executed using a {@link JexlContext}
      * @throws JexlException if there is a problem parsing the script
      */
-    public abstract JexlScript createScript(JexlFeatures features, JexlInfo info, String source, String[] names);
+    public abstract JexlScript createScript(JexlFeatures features, JexlInfo info, String source, String... names);
 
     /**
      * Creates a JexlScript from a String containing valid JEXL syntax.
@@ -365,7 +365,7 @@ public abstract class JexlEngine {
      * @return A {@link JexlScript} which can be executed using a {@link JexlContext}
      * @throws JexlException if there is a problem parsing the script
      */
-    public final JexlScript createScript(JexlInfo info, String source, String[] names) {
+    public final JexlScript createScript(JexlInfo info, String source, String... names) {
         return createScript(null, info, source, names);
     }
 
@@ -378,7 +378,7 @@ public abstract class JexlEngine {
      * @throws JexlException if there is a problem parsing the script.
      */
     public final JexlScript createScript(String scriptText) {
-        return createScript(null, null, scriptText, null);
+        return createScript(null, null, scriptText, (String[]) null);
     }
 
     /**
@@ -404,7 +404,7 @@ public abstract class JexlEngine {
      * @throws JexlException if there is a problem reading or parsing the script.
      */
     public final JexlScript createScript(File scriptFile) {
-        return createScript(null, null, readSource(scriptFile), null);
+        return createScript(null, null, readSource(scriptFile), (String[]) null);
     }
 
     /**
@@ -445,7 +445,7 @@ public abstract class JexlEngine {
      * @throws JexlException if there is a problem reading or parsing the script.
      */
     public final JexlScript createScript(URL scriptUrl) {
-        return createScript(null, readSource(scriptUrl), null);
+        return createScript(null, readSource(scriptUrl), (String[]) null);
     }
 
     /**

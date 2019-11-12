@@ -19,6 +19,7 @@ package org.apache.commons.jexl3;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Set;
+import org.apache.commons.jexl3.internal.LexicalScope;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -344,4 +345,46 @@ public class LexicalTest {
             Assert.assertNotNull(xany);
         }
     }
+    
+    @Test
+    public void testPragmaOptions() throws Exception {
+        // same as 6d but using a pragma
+        String str = "#pragma jexl.options '+strict +lexical +lexicalShade -safe'\n"
+                + "i = 0; for (var i : [42]) i; i";
+        JexlEngine jexl = new JexlBuilder().strict(false).create();
+        JexlScript e = jexl.createScript(str);
+        JexlContext ctxt = new MapContext();
+        try {
+            Object o = e.execute(ctxt);
+            Assert.fail("i should be shaded");
+        } catch (JexlException xany) {
+            Assert.assertNotNull(xany);
+        }
+    }
+    
+    @Test
+    public void testPragmaNoop() throws Exception {
+        // unknow pragma
+        String str = "#pragma jexl.options 'no effect'\ni = -42; for (var i : [42]) i; i";
+        JexlEngine jexl = new JexlBuilder().lexical(false).strict(true).create();
+        JexlScript e = jexl.createScript(str);
+        JexlContext ctxt = new MapContext();
+        Object result = e.execute(ctxt);
+        Assert.assertEquals(42, result);
+    }
+    
+    
+    @Test
+    public void testScopeFrame() throws Exception {
+        LexicalScope scope = new LexicalScope(null);
+        for(int i = 0; i < 128; i += 2) {
+            Assert.assertTrue(scope.declareSymbol(i));
+            Assert.assertFalse(scope.declareSymbol(i));
+        }
+        for(int i = 0; i < 128; i += 2) {
+            Assert.assertTrue(scope.hasSymbol(i));
+            Assert.assertFalse(scope.hasSymbol(i + 1));
+        }
+    }
+    
 }

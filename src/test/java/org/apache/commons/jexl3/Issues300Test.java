@@ -324,25 +324,24 @@ public class Issues300Test {
         Assert.assertEquals(52, result);
     }
 
-    public static class ClazzB {
-        public int methodB()  {
-            return 42;
-        }
-    }
-    public static class ClazzA {
-        public ClazzB methodA() {
-            return new ClazzB();
-        }
-    }
 
     @Test
-    public void test317Tentative() throws Exception {
+    public void test317() throws Exception {
         JexlEngine jexl = new JexlBuilder().strict(true).create();
         JexlContext ctxt = new MapContext();
         JexlScript script;
         Object result;
-        script = jexl.createScript("x.methodA().methodB()", "x");
-        result = script.execute(ctxt, new ClazzA());
+        JexlInfo info = new JexlInfo("test317", 1, 1);
+        script = jexl.createScript(info, "var f = "
+                + "()-> {x + x }; f",
+                "x");
+        result = script.execute(ctxt, 21);
+        Assert.assertTrue(result instanceof JexlScript);
+        script = (JexlScript) result;
+        info = JexlInfo.from(script);
+        Assert.assertNotNull(info);
+        Assert.assertEquals("test317", info.getName());
+        result = script.execute(ctxt, 21);
         Assert.assertEquals(42, result);
     }
 }

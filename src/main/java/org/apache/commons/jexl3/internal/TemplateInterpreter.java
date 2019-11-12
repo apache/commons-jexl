@@ -48,7 +48,7 @@ public class TemplateInterpreter extends Interpreter {
      */
     TemplateInterpreter(Engine jexl,
             JexlContext jcontext, Frame jframe, TemplateExpression[] expressions, Writer out) {
-        super(jexl, jcontext, jframe);
+        super(jexl, null, jcontext, jframe);
         exprs = expressions;
         writer = out;
         block = new LexicalFrame(frame, null);

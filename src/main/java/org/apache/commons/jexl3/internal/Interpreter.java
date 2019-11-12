@@ -17,13 +17,18 @@
 //CSOFF: FileLength
 package org.apache.commons.jexl3.internal;
 
+import java.util.Iterator;
+import java.util.concurrent.Callable;
+
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlOperator;
+import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.JxltEngine;
+
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 
@@ -105,9 +110,6 @@ import org.apache.commons.jexl3.parser.ASTWhileStatement;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.Node;
 
-import java.util.Iterator;
-import java.util.concurrent.Callable;
-
 /**
  * An interpreter of JEXL syntax.
  *
@@ -130,11 +132,12 @@ public class Interpreter extends InterpreterBase {
     /**
      * Creates an interpreter.
      * @param engine   the engine creating this interpreter
-     * @param aContext the context to evaluate expression
-     * @param eFrame   the interpreter evaluation frame
+     * @param aContext the evaluation context, global variables, methods and functions
+     * @param opts     the evaluation options, flags modifying evaluation behavior
+     * @param eFrame   the evaluation frame, arguments and local variables
      */
-    protected Interpreter(Engine engine, JexlContext aContext, Frame eFrame) {
-        super(engine, aContext);
+    protected Interpreter(Engine engine, JexlOptions opts, JexlContext aContext, Frame eFrame) {
+        super(engine, opts, aContext);
         this.frame = eFrame;
     }
 
@@ -1122,7 +1125,7 @@ public class Interpreter extends InterpreterBase {
         JexlNode objectNode = null;
         JexlNode ptyNode = null;
         StringBuilder ant = null;
-        boolean antish = !(parent instanceof ASTReference) && options.isAntish();
+        boolean antish = !(parent instanceof ASTReference);
         int v = 1;
         main:
         for (int c = 0; c < numChildren; c++) {
@@ -1172,14 +1175,20 @@ public class Interpreter extends InterpreterBase {
                     if (first instanceof ASTIdentifier) {
                         ASTIdentifier afirst = (ASTIdentifier) first;
                         ant = new StringBuilder(afirst.getName());
-                        // skip the first node case since it was trialed in jjtAccept above and returned null
-                        if (c == 0) {
-                            continue;
-                        }
+                        // skip the else...*
                     } else {
                         // not an identifier, not antish
                         ptyNode = objectNode;
                         break main;
+                    }
+                    // *... and continue
+                    if (!options.isAntish()) {
+                        antish = false;
+                        continue;
+                    }
+                    // skip the first node case since it was trialed in jjtAccept above and returned null
+                    if (c == 0) {
+                        continue;
                     }
                 }
                 // catch up to current node

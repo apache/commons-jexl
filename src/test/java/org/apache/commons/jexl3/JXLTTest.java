@@ -19,7 +19,6 @@ package org.apache.commons.jexl3;
 import org.apache.commons.jexl3.internal.TemplateDebugger;
 import org.apache.commons.jexl3.internal.TemplateScript;
 import org.apache.commons.jexl3.internal.Debugger;
-import org.apache.commons.jexl3.internal.Options;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -806,7 +805,7 @@ public class JXLTTest extends JexlTestCase {
         }
         
         JexlOptions newOptions() {
-            options = new Options();
+            options = new JexlOptions();
             return options;
         }
     }

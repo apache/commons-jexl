@@ -159,4 +159,20 @@ public interface JexlContext {
          */
         JexlOptions getEngineOptions();
     }
+     
+    /**
+     * A marker interface of the JexlContext that processes pragmas.
+     * It is called by the engine before interpreter creation; as a marker of
+     * JexlContext, it is expected to have access and interact with the context
+     * instance.
+     * @since 3.2
+     */
+    interface PragmaProcessor {
+        /**
+         * Process one pragma.
+         * @param key the key
+         * @param value the value
+         */
+        void processPragma(String key, Object value);
+    }
 }

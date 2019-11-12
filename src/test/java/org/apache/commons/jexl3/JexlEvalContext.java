@@ -19,7 +19,6 @@ package org.apache.commons.jexl3;
 import java.util.Collections;
 import java.util.Map;
 import org.apache.commons.jexl3.annotations.NoJexl;
-import org.apache.commons.jexl3.internal.Options;
 
 /**
  * A JEXL evaluation environment wrapping variables, namespace and options.
@@ -35,7 +34,7 @@ public class JexlEvalContext implements
     /** The namespace. */
     private final JexlContext.NamespaceResolver ns; 
     /** The options. */
-    private final JexlOptions options = new Options();
+    private final JexlOptions options = new JexlOptions();
 
     
     

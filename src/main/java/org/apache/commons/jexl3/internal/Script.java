@@ -17,6 +17,8 @@
 package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.JexlExpression;
@@ -96,7 +98,39 @@ public class Script implements JexlScript, JexlExpression {
     protected Frame createFrame(Object[] args) {
         return script.createFrame(args);
     }
+    
+    /**
+     * Creates this script options for evaluation.
+     * <p>This also calls the pragma processor 
+     * @param context the context
+     * @return the options
+     */
+    protected JexlOptions createOptions(JexlContext context) {
+        return jexl.createOptions(this, context);
+    }
+    
+    /**
+     * A lexical script, ensures options are lexical.
+     */
+    public static class Lexical extends Script {
+        /**
+         * Sole ctor.
+         * @param engine the engine
+         * @param expr the source.
+         * @param ref the ast
+         */
+        protected Lexical(Engine engine, String expr, ASTJexlScript ref) {
+            super(engine, expr, ref);
+        }
 
+        @Override
+        public JexlOptions createOptions(JexlContext ctxt) {
+            JexlOptions opts = super.createOptions(ctxt);
+            opts.setLexical(true);
+            return opts;
+        }
+    }
+    
     /**
      * Creates this script interpreter.
      * @param context the context
@@ -104,7 +138,7 @@ public class Script implements JexlScript, JexlExpression {
      * @return  the interpreter
      */
     protected Interpreter createInterpreter(JexlContext context, Frame frame) {
-        return jexl.createInterpreter(context, frame);
+        return jexl.createInterpreter(context, frame, createOptions(context));
     }
 
     /**
@@ -215,6 +249,13 @@ public class Script implements JexlScript, JexlExpression {
     public String[] getLocalVariables() {
         return script.getLocalVariables();
     }
+    
+    /**
+     * @return the info
+     */
+    public JexlInfo getInfo() {
+        return script.jexlInfo();
+    }
 
     /**
      * Gets this script variables.
@@ -259,7 +300,7 @@ public class Script implements JexlScript, JexlExpression {
      */
     @Override
     public Callable callable(JexlContext context, Object... args) {
-        return new Callable(jexl.createInterpreter(context, script.createFrame(args)));
+        return new Callable(createInterpreter(context, script.createFrame(args)));
     }
 
     /**

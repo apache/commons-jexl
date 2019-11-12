@@ -35,7 +35,7 @@ public class JexlTestCase {
     // important can be identified by the builder  calling lexical(...).
     static {
         //JexlBuilder.setDefaultOptions("+safe", "-lexical"); 
-        JexlBuilder.setDefaultOptions("-safe", "+lexical");
+        JexlOptions.setDefaultFlags("-safe", "+lexical");
     }
     /** No parameters signature for test run. */
     private static final Class<?>[] NO_PARMS = {};

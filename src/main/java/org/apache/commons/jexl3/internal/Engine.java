@@ -74,6 +74,10 @@ public class Engine extends JexlEngine {
         private UberspectHolder() {}
     }
     /**
+     * The name of the options pragma.
+     */
+    protected static final String PRAGMA_OPTIONS = "jexl.options";
+    /**
      * The Log to which all JexlEngine messages will be logged.
      */
     protected final Log logger;
@@ -347,17 +351,61 @@ public class Engine extends JexlEngine {
             cache.clear();
         }
     }
-
+       
+    /**
+     * Sets options from this engine options.
+     * @param opts the options to set
+     * @return the options
+     */
+    public JexlOptions optionsSet(JexlOptions opts) {
+        if (opts != null) {
+            opts.set(options);
+        }
+        return opts;
+    }
+    
+    /**
+     * Creates a script evaluation options.
+     * <p>This also calls the pragma processor if any
+     * @param script the script
+     * @param context the context
+     * @return the options
+     */
+    protected JexlOptions createOptions(Script script, JexlContext context) {
+        JexlOptions opts = options(context);
+        Map<String, Object> pragmas = script.getPragmas();
+        if (pragmas != null) {
+            JexlContext.PragmaProcessor processor =
+                    context instanceof JexlContext.PragmaProcessor
+                    ? (JexlContext.PragmaProcessor) context
+                    : null;
+            for(Map.Entry<String, Object> pragma : pragmas.entrySet()) {
+                String key = pragma.getKey();
+                Object value = pragma.getValue();
+                if (PRAGMA_OPTIONS.equals(key) && opts != null) {
+                    if (value instanceof String) {
+                        String[] vs = ((String) value).split(" ");
+                        opts.setFlags(vs);
+                    }
+                }
+                if (processor != null) {
+                    processor.processPragma(key, value);
+                }
+            }
+        }
+        return opts;
+    }
+    
     /**
      * Creates an interpreter.
      * @param context a JexlContext; if null, the empty context is used instead.
      * @param frame   the interpreter frame
+     * @param opts    the evaluation options
      * @return an Interpreter
      */
-    protected Interpreter createInterpreter(JexlContext context, Frame frame) {
-        return new Interpreter(this, context, frame);
+    protected Interpreter createInterpreter(JexlContext context, Frame frame, JexlOptions opts) {
+        return new Interpreter(this, opts, context, frame);
     }
-
 
     @Override
     public Script createExpression(JexlInfo info, String expression) {
@@ -371,8 +419,12 @@ public class Engine extends JexlEngine {
         }
         String source = trimSource(scriptText);
         Scope scope = names == null ? null : new Scope(null, names);
-        ASTJexlScript tree = parse(info, features == null? scriptFeatures : features, source, scope);
-        return new Script(this, source, tree);
+        JexlFeatures ftrs = features == null? scriptFeatures : features;
+        ASTJexlScript tree = parse(info, ftrs, source, scope);
+        // when parsing lexical, try hard to run lexical
+        return ftrs.isLexical()
+            ? new Script.Lexical(this, source, tree)
+            : new Script(this, source, tree);
     }
 
     /**
@@ -405,7 +457,7 @@ public class Engine extends JexlEngine {
             final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean);
-            final Interpreter interpreter = createInterpreter(context, frame);
+            final Interpreter interpreter = createInterpreter(context, frame, null);
             return interpreter.visitLexicalNode(node, null);
         } catch (JexlException xjexl) {
             if (silent) {
@@ -434,7 +486,7 @@ public class Engine extends JexlEngine {
             final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean, value);
-            final Interpreter interpreter = createInterpreter(context, frame);
+            final Interpreter interpreter = createInterpreter(context, frame, null);
             interpreter.visitLexicalNode(node, null);
         } catch (JexlException xjexl) {
             if (silent) {

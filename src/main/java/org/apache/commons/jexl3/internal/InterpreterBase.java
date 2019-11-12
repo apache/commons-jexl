@@ -78,16 +78,17 @@ public abstract class InterpreterBase extends ParserVisitor {
     /**
      * Creates an interpreter base.
      * @param engine   the engine creating this interpreter
-     * @param aContext the context to evaluate expression
+     * @param opts     the evaluation options
+     * @param aContext the evaluation context
      */
-    protected InterpreterBase(Engine engine, JexlContext aContext) {
+    protected InterpreterBase(Engine engine, JexlOptions opts, JexlContext aContext) {
         this.jexl = engine;
         this.logger = jexl.logger;
         this.uberspect = jexl.uberspect;
         this.context = aContext != null ? aContext : Engine.EMPTY_CONTEXT;
         this.cache = engine.cache != null;
         JexlArithmetic jexla = jexl.arithmetic;
-        this.options = jexl.options(context);
+        this.options = opts == null? engine.options(aContext) : opts;
         this.arithmetic = jexla.options(options);
         if (arithmetic != jexla && !arithmetic.getClass().equals(jexla.getClass())) {
             logger.warn("expected arithmetic to be " + jexla.getClass().getSimpleName()
