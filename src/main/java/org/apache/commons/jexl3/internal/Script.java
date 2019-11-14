@@ -27,6 +27,7 @@ import org.apache.commons.jexl3.parser.ASTJexlScript;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.jexl3.JexlFeatures;
 
 /**
  * <p>A JexlScript implementation.</p>
@@ -106,29 +107,13 @@ public class Script implements JexlScript, JexlExpression {
      * @return the options
      */
     protected JexlOptions createOptions(JexlContext context) {
-        return jexl.createOptions(this, context);
-    }
-    
-    /**
-     * A lexical script, ensures options are lexical.
-     */
-    public static class Lexical extends Script {
-        /**
-         * Sole ctor.
-         * @param engine the engine
-         * @param expr the source.
-         * @param ref the ast
-         */
-        protected Lexical(Engine engine, String expr, ASTJexlScript ref) {
-            super(engine, expr, ref);
-        }
-
-        @Override
-        public JexlOptions createOptions(JexlContext ctxt) {
-            JexlOptions opts = super.createOptions(ctxt);
+        JexlOptions opts = jexl.createOptions(this, context);
+        // when parsing lexical, try hard to run lexical
+        JexlFeatures features = script.getFeatures();
+        if (features != null && features.isLexical()) {
             opts.setLexical(true);
-            return opts;
         }
+        return opts;
     }
     
     /**

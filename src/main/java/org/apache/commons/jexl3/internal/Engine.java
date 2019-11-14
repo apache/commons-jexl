@@ -421,10 +421,7 @@ public class Engine extends JexlEngine {
         Scope scope = names == null ? null : new Scope(null, names);
         JexlFeatures ftrs = features == null? scriptFeatures : features;
         ASTJexlScript tree = parse(info, ftrs, source, scope);
-        // when parsing lexical, try hard to run lexical
-        return ftrs.isLexical()
-            ? new Script.Lexical(this, source, tree)
-            : new Script(this, source, tree);
+        return new Script(this, source, tree);
     }
 
     /**
