@@ -59,7 +59,7 @@ public final class JexlOptions {
         "cancellable", "strict", "silent", "safe", "lexical", "antish", "lexicalShade", "sharedInstance"
     };
     /** Default mask .*/
-    private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE | 1 << SHARED;
+    private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE;
     /** The arithmetic math context. */
     private MathContext mathContext = null;
     /** The arithmetic math scale. */

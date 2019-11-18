@@ -393,10 +393,11 @@ public class LexicalTest {
         JexlEngine jexl = new JexlBuilder().features(f).strict(true).create();
         JexlEvalContext ctxt = new JexlEvalContext();
         JexlOptions options = ctxt.getEngineOptions();
+        options.setSharedInstance(false);
         options.setLexical(true);
         options.setLexicalShade(true);
         ctxt.set("options", options);
-        JexlScript script = jexl.createScript("{var x = 42;} options.lexical = false; x");
+        JexlScript script = jexl.createScript("{var x = 42;} options.lexical = false; options.lexicalShade=false; x");
         try {
         Object result = script.execute(ctxt);
         Assert.fail("setting options.lexical should have no effect during execution");
