@@ -31,12 +31,15 @@ import org.apache.commons.jexl3.internal.Engine;
  * <li>lexicalShade: whether local variables shade global ones even outside their scope</li>
  * <li>strict: whether unknown or unsolvable identifiers are errors</li>
  * <li>strictArithmetic: whether null as operand is an error</li>
+ * <li>immutable: whether these options can be modified at runtime during execution (expert)</li>
  * </ul>
  * The sensible default is cancellable, strict and strictArithmetic.
  * <p>This interface replaces the now deprecated JexlEngine.Options.
  * @since 3.2
  */
 public final class JexlOptions {
+    /** The shared isntance bit. */
+    private static final int SHARED = 7;
     /** The local shade bit. */
     private static final int SHADE = 6;
     /** The antish var bit. */
@@ -53,10 +56,10 @@ public final class JexlOptions {
     private static final int CANCELLABLE = 0;
     /** The flags names ordered. */
     private static final String[] NAMES = {
-        "cancellable", "strict", "silent", "safe", "lexical", "antish", "lexicalShade"
+        "cancellable", "strict", "silent", "safe", "lexical", "antish", "lexicalShade", "sharedInstance"
     };
     /** Default mask .*/
-    private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE;
+    private static int DEFAULT = 1 /*<< CANCELLABLE*/ | 1 << STRICT | 1 << ANTISH | 1 << SAFE | 1 << SHARED;
     /** The arithmetic math context. */
     private MathContext mathContext = null;
     /** The arithmetic math scale. */
@@ -333,6 +336,24 @@ public final class JexlOptions {
         this.strictArithmetic = stricta;
     }
 
+    /**
+     * Whether these options are immutable at runtime.
+     * <p>Expert mode; allows instance handled through context to be shared
+     * instead of copied.
+     * @param flag true if shared, false if not
+     */
+    public void setSharedInstance(boolean flag) {
+        flags = set(SHARED, flags, flag);
+    }
+    
+    /**
+     * @return false if a copy of these options is used during execution,
+     * true if those can potentially be modified 
+     */
+    public boolean isSharedInstance() {
+        return isSet(SHARED, flags);
+    }
+    
     /**
      * Set options from engine.
      * @param jexl the engine

@@ -151,10 +151,10 @@ public interface JexlContext {
         /**
          * Retrieves the current set of options though the context.
          * <p>
-         * This method will be called once at beginning of evaluation and the
-         * JexlOptions instance kept as a property of the evaluator;
-         * the JexlOptions instance is free to alter its boolean flags during
-         * execution.
+         * This method will be called once at beginning of evaluation and an interpreter private copy
+         * of the context handled JexlOptions instance used for the duration of the execution;
+         * the context handled JexlOptions instance being only used as the source of that copy,
+         * it can safely alter its boolean flags during execution with no effect, avoiding any behavior ambiguity.
          * @return the engine options
          */
         JexlOptions getEngineOptions();
