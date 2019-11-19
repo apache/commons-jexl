@@ -31,7 +31,7 @@ import org.apache.commons.jexl3.internal.Engine;
  * <li>lexicalShade: whether local variables shade global ones even outside their scope</li>
  * <li>strict: whether unknown or unsolvable identifiers are errors</li>
  * <li>strictArithmetic: whether null as operand is an error</li>
- * <li>immutable: whether these options can be modified at runtime during execution (expert)</li>
+ * <li>sharedInstance: whether these options can be modified at runtime during execution (expert)</li>
  * </ul>
  * The sensible default is cancellable, strict and strictArithmetic.
  * <p>This interface replaces the now deprecated JexlEngine.Options.

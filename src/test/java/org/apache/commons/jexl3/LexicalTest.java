@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.jexl3.internal.LexicalScope;
 import org.junit.Assert;
@@ -388,7 +389,7 @@ public class LexicalTest {
     }
     
     @Test
-    public void testLexicalOption() throws Exception {
+    public void testContextualOptions0() throws Exception {
         JexlFeatures f= new JexlFeatures();
         JexlEngine jexl = new JexlBuilder().features(f).strict(true).create();
         JexlEvalContext ctxt = new JexlEvalContext();
@@ -404,5 +405,59 @@ public class LexicalTest {
         } catch(JexlException xf) {
             Assert.assertNotNull(xf);
         }
+    }
+    
+    /**
+     * Context augmented with a tryCatch.
+     */
+    public static class TestContext extends JexlEvalContext {
+        public TestContext() {}
+        public TestContext(Map<String, Object> map) {
+            super(map);
+        }
+
+        /**
+         * Allows calling a script and catching its raised exception.
+         * @param tryFn the lambda to call
+         * @param catchFn the lambda catching the exception
+         * @param args the arguments to the lambda
+         * @return the tryFn result or the catchFn if an exception was raised
+         */
+        public Object tryCatch(JexlScript tryFn, JexlScript catchFn, Object... args) {
+            Object result;
+            try {
+                result = tryFn.execute(this, args);
+            } catch (Throwable xthrow) {
+                result = catchFn != null ? catchFn.execute(this, xthrow) : xthrow;
+            }
+            return result;
+        }
+    }
+
+    @Test
+    public void testContextualOptions1() throws Exception {
+        JexlFeatures f = new JexlFeatures();
+        JexlEngine jexl = new JexlBuilder().features(f).strict(true).create();
+        JexlEvalContext ctxt = new TestContext();
+        JexlOptions options = ctxt.getEngineOptions();
+        options.setSharedInstance(true);
+        options.setLexical(true);
+        options.setLexicalShade(true);
+        ctxt.set("options", options);
+        JexlScript runner = jexl.createScript(
+                "options.lexical = flag; options.lexicalShade = flag;"
+              + "tryCatch(test, catch, 42);",
+                "flag", "test", "catch");
+        JexlScript tested = jexl.createScript("(y)->{ {var x = y;} x }");
+        JexlScript catchFn = jexl.createScript("(xany)-> { xany }");
+        Object result;
+        // run it once, old 3.1 semantics, lexical/shade = false
+        result = runner.execute(ctxt, false, tested, catchFn);
+        // result 42
+        Assert.assertEquals(42, result);
+        // run it a second time, new 3.2 semantics, lexical/shade = true
+        result = runner.execute(ctxt, true, tested, catchFn);
+        // result is exception!
+        Assert.assertTrue(result instanceof JexlException.Variable);
     }
 }
