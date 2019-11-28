@@ -460,4 +460,24 @@ public class LexicalTest {
         // result is exception!
         Assert.assertTrue(result instanceof JexlException.Variable);
     }
+    
+    @Test
+    public void testParameter0() throws Exception {
+        String str = "function(u) {}";
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlScript e = jexl.createScript(str);
+        Assert.assertEquals(1, e.getParameters().length);
+        e = jexl.createScript(new JexlInfo("TestScript", 1, 1), str);
+        Assert.assertEquals(1, e.getParameters().length);
+    } 
+    
+    @Test
+    public void testParameter1() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
+        JexlContext jc = new MapContext();
+        String strs = "var s = function(x) { for (var i : 1..3) {if (i > 2) return x}}; s(42)";
+        JexlScript s42 = jexl.createScript(strs);
+        Object result = s42.execute(jc);
+        Assert.assertEquals(42, result);
+    }
 }
