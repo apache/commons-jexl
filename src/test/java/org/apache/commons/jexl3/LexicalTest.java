@@ -480,4 +480,18 @@ public class LexicalTest {
         Object result = s42.execute(jc);
         Assert.assertEquals(42, result);
     }
+        
+    @Test
+    public void testInnerAccess0() throws Exception {
+        JexlFeatures f = new JexlFeatures();
+        f.lexical(true);
+        JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
+        JexlScript script = jexl.createScript("var x = 32; (()->{ for(var x : null) { var c = 0; {return x; }} })();");
+    }
+    
+    @Test
+    public void testInnerAccess1() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
+        JexlScript script = jexl.createScript("var x = 32; (()->{ for(var x : null) { var c = 0; {return x; }} })();");
+    }
 }

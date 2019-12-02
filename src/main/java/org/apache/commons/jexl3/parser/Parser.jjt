@@ -296,7 +296,7 @@ ASTJexlScript JexlScript(Scope frame) : {
 }
 {
    {
-        pushUnit(jjtThis, frame != null && frame.getArgCount() > 0);
+        pushUnit(jjtThis);
    }
         ( ( Statement() )*) <EOF>
    {
@@ -310,7 +310,7 @@ ASTJexlScript JexlExpression(Scope frame) #JexlScript : {
 }
 {   
    {
-        pushUnit(jjtThis, true);
+        pushUnit(jjtThis);
    }
    ( Expression() )? <EOF>
    {
@@ -399,7 +399,10 @@ void Break() #Break : {
 
 void ForeachStatement() : {}
 {
-    { pushUnit(jjtThis, true); } <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; popUnit(jjtThis); }
+    <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN>
+    { loopCount += 1; }
+        (LOOKAHEAD(1) Block() | Statement())
+    { loopCount -= 1; }
 }
 
 void ForEachVar() #Reference : {}
@@ -834,11 +837,11 @@ void Lambda() #JexlLambda() :
    pushFrame();
 }
 {
-  { pushUnit(jjtThis, true); } <FUNCTION> Parameters() Block() { popUnit(jjtThis); }
+  { pushUnit(jjtThis); } <FUNCTION> Parameters() Block() { popUnit(jjtThis); }
   |
-  { pushUnit(jjtThis, true); } Parameters() <LAMBDA> Block() { popUnit(jjtThis); }
+  { pushUnit(jjtThis); } Parameters() <LAMBDA> Block() { popUnit(jjtThis); }
   |
-  { pushUnit(jjtThis, true); } Parameter() <LAMBDA> Block() { popUnit(jjtThis); }
+  { pushUnit(jjtThis); } Parameter() <LAMBDA> Block() { popUnit(jjtThis); }
 }
 
 
