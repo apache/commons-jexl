@@ -48,6 +48,7 @@ What's new in 3.2:
 
 New Features in 3.2:
 ====================
+* JEXL-317:      Support script cancellation through less invasive API
 * JEXL-307:      Variable redeclaration option
 * JEXL-295:      Add unary plus operator
 * JEXL-292:      Allow specifying custom Permissions class for Uberspect to be used later by Introspector

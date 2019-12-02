@@ -200,7 +200,8 @@ public class Interpreter extends InterpreterBase {
         } catch (JexlException.Return xreturn) {
             return xreturn.getValue();
         } catch (JexlException.Cancel xcancel) {
-            cancelled |= Thread.interrupted();
+            // cancelled |= Thread.interrupted();
+            cancelled.weakCompareAndSet(false, Thread.interrupted());
             if (isCancellable()) {
                 throw xcancel.clean();
             }

@@ -27,6 +27,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.jexl3.internal.Script;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,7 +68,6 @@ public class ScriptCallableTest extends JexlTestCase {
 
     @Test
     public void testCallableCancel() throws Exception {
-        List<Runnable> lr = null;
         final Semaphore latch = new Semaphore(0);
         JexlContext ctxt = new MapContext();
         ctxt.set("latch", latch);
@@ -85,6 +85,7 @@ public class ScriptCallableTest extends JexlTestCase {
         ExecutorService executor = Executors.newFixedThreadPool(2);
         Future<?> future = executor.submit(c);
         Future<?> kfc = executor.submit(kc);
+        List<Runnable> lr;
         try {
             Assert.assertTrue((Boolean) kfc.get());
             t = future.get();
@@ -98,7 +99,55 @@ public class ScriptCallableTest extends JexlTestCase {
         Assert.assertTrue(c.isCancelled());
         Assert.assertTrue(lr == null || lr.isEmpty());
     }
+    
+    public static class CancellationContext extends MapContext implements JexlContext.CancellationHandle {
+        private final AtomicBoolean cancellation;
+        
+        CancellationContext(AtomicBoolean c) {
+            cancellation = c;
+        }
+        @Override
+        public AtomicBoolean getCancellation() {
+            return cancellation;
+        }
+    }
+    
+    // JEXL-317
+    @Test
+    public void testCallableCancellation() throws Exception {
+        final Semaphore latch = new Semaphore(0);
+        final AtomicBoolean cancel = new AtomicBoolean(false);
+        JexlContext ctxt = new CancellationContext(cancel);
+        ctxt.set("latch", latch);
 
+        JexlScript e = JEXL.createScript("latch.release(); while(true);");
+        final Script.Callable c = (Script.Callable) e.callable(ctxt);
+        Object t = 42;
+        Callable<Object> kc = new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                latch.acquire();
+                return cancel.compareAndSet(false, true);
+            }
+        };
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        Future<?> future = executor.submit(c);
+        Future<?> kfc = executor.submit(kc);
+        List<Runnable> lr;
+        try {
+            Assert.assertTrue((Boolean) kfc.get());
+            t = future.get();
+            Assert.fail("should have been cancelled");
+        } catch (ExecutionException xexec) {
+            // ok, ignore
+            Assert.assertTrue(xexec.getCause() instanceof JexlException.Cancel);
+        } finally {
+            lr = executor.shutdownNow();
+        }
+        Assert.assertTrue(c.isCancelled());
+        Assert.assertTrue(lr == null || lr.isEmpty());
+    }
+    
     @Test
     public void testCallableTimeout() throws Exception {
         List<Runnable> lr = null;

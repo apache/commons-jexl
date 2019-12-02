@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-317">
+                Support script cancellation through less invasive API
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-315" due-to="Mike Bartlett">
                JxltEngine literal string strings ending in \ $ or # throw JxltEngine$Exception
             </action>

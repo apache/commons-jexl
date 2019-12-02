@@ -18,6 +18,7 @@
 package org.apache.commons.jexl3;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Manages variables which can be referenced in a JEXL expression.
@@ -174,5 +175,19 @@ public interface JexlContext {
          * @param value the value
          */
         void processPragma(String key, Object value);
+    }
+    
+    /**
+     * A marker interface of the JexlContext sharing a cancelling flag.
+     * <p>A script running in a thread can thus be notified through this reference
+     * of its cancellation through the context. It uses the same interpreter logic
+     * that reacts to cancellation and is an alternative to using callable() and/or
+     * interrupting script interpreter threads.
+     */
+    interface CancellationHandle {
+        /**
+         * @return a cancelable boolean used by the interpreter 
+         */
+        AtomicBoolean getCancellation();
     }
 }
