@@ -399,10 +399,11 @@ void Break() #Break : {
 
 void ForeachStatement() : {}
 {
+    { pushUnit(jjtThis); }
     <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN>
-    { loopCount += 1; }
+        { loopCount += 1; }
         (LOOKAHEAD(1) Block() | Statement())
-    { loopCount -= 1; }
+    { loopCount -= 1; popUnit(jjtThis); }
 }
 
 void ForEachVar() #Reference : {}
