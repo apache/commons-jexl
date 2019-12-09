@@ -486,7 +486,11 @@ public class LexicalTest {
         JexlFeatures f = new JexlFeatures();
         f.lexical(true);
         JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
-        JexlScript script = jexl.createScript("var x = 32; (()->{ for(var x : null) { var c = 0; {return x; }} })();");
+        JexlScript script = jexl.createScript(
+                "var x = 32; ("
+                        + "()->{ for(var x : null) { var c = 0; {return x; }} })"
+                        + "();");
+        Assert.assertNull(script.execute(null));
     }
     
     @Test
@@ -507,8 +511,7 @@ public class LexicalTest {
            // OK
         }
     }
-    
-            
+           
     @Test
     public void testForVariable1() throws Exception {
         JexlFeatures f = new JexlFeatures();

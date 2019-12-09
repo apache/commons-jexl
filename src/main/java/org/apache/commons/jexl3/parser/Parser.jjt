@@ -26,6 +26,8 @@ options
    UNICODE_INPUT=true;
    KEEP_LINE_COLUMN=true;
    TRACK_TOKENS=true;
+   CACHE_TOKENS=true;
+   ERROR_REPORTING=false;
    //DEBUG_PARSER=true;
    //DEBUG_TOKEN_MANAGER=true;
 }
@@ -67,7 +69,8 @@ public final class Parser extends JexlParser
         } catch (TokenMgrError xtme) {
             throw new JexlException.Tokenization(info, xtme).clean();
         } catch (ParseException xparse) {
-            throw new JexlException.Parsing(info, xparse).clean();
+            Token errortok = token.next;
+            throw new JexlException.Parsing(info.at(errortok.beginLine, errortok.beginColumn), token.image).clean();
         } finally {
             token_source.defaultLexState = DEFAULT;
             cleanup(previous);
@@ -346,7 +349,7 @@ void Statement() #void : {}
     | Continue()
     | Break()
     | Var()
-    | Pragma()
+    | Pragma() 
 }
 
 void Block() #Block : {}

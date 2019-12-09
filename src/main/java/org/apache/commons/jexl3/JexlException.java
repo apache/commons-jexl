@@ -193,7 +193,7 @@ public class JexlException extends RuntimeException {
      */
     private static JexlInfo merge(JexlInfo info, JavaccError cause) {
         JexlInfo dbgn = info != null ? info : null;
-        if (cause == null) {
+        if (cause == null || cause.getLine() < 0) {
             return dbgn;
         } else if (dbgn == null) {
             return new JexlInfo("", cause.getLine(), cause.getColumn());
