@@ -342,26 +342,27 @@ public class Operators {
      * @param object the object to check the emptyness of
      * @return the evaluation result
      */
-    protected boolean empty(JexlNode node, Object object) {
+    protected Object empty(JexlNode node, Object object) {
         if (object == null) {
             return true;
         }
         Object result = tryOverload(node, JexlOperator.EMPTY, object);
-        if (result == JexlEngine.TRY_FAILED) {
-            final JexlArithmetic arithmetic = interpreter.arithmetic;
-            result = arithmetic.isEmpty(object, null);
-            if (result == null) {
-                final JexlUberspect uberspect = interpreter.uberspect;
-                result = false;
-                // check if there is an isEmpty method on the object that returns a
-                // boolean and if so, just use it
-                JexlMethod vm = uberspect.getMethod(object, "isEmpty", Interpreter.EMPTY_PARAMS);
-                if (returnsBoolean(vm)) {
-                    try {
-                        result = vm.invoke(object, Interpreter.EMPTY_PARAMS);
-                    } catch (Exception xany) {
-                        interpreter.operatorError(node, JexlOperator.EMPTY, xany);
-                    }
+        if (result != JexlEngine.TRY_FAILED) {
+            return result;
+        }
+        final JexlArithmetic arithmetic = interpreter.arithmetic;
+        result = arithmetic.isEmpty(object, null);
+        if (result == null) {
+            final JexlUberspect uberspect = interpreter.uberspect;
+            result = false;
+            // check if there is an isEmpty method on the object that returns a
+            // boolean and if so, just use it
+            JexlMethod vm = uberspect.getMethod(object, "isEmpty", Interpreter.EMPTY_PARAMS);
+            if (returnsBoolean(vm)) {
+                try {
+                    result = vm.invoke(object, Interpreter.EMPTY_PARAMS);
+                } catch (Exception xany) {
+                    interpreter.operatorError(node, JexlOperator.EMPTY, xany);
                 }
             }
         }
@@ -377,25 +378,26 @@ public class Operators {
      * @param object the object to get the size of
      * @return the evaluation result
      */
-    protected int size(JexlNode node, Object object) {
+    protected Object size(JexlNode node, Object object) {
         if (object == null) {
             return 0;
         }
         Object result = tryOverload(node, JexlOperator.SIZE, object);
-        if (result == JexlEngine.TRY_FAILED) {
-            final JexlArithmetic arithmetic = interpreter.arithmetic;
-            result = arithmetic.size(object, null);
-            if (result == null) {
-                final JexlUberspect uberspect = interpreter.uberspect;
-                // check if there is a size method on the object that returns an
-                // integer and if so, just use it
-                JexlMethod vm = uberspect.getMethod(object, "size", Interpreter.EMPTY_PARAMS);
-                if (returnsInteger(vm)) {
-                    try {
-                        result = vm.invoke(object, Interpreter.EMPTY_PARAMS);
-                    } catch (Exception xany) {
-                        interpreter.operatorError(node, JexlOperator.SIZE, xany);
-                    }
+        if (result != JexlEngine.TRY_FAILED) {
+            return result;
+        }
+        final JexlArithmetic arithmetic = interpreter.arithmetic;
+        result = arithmetic.size(object, null);
+        if (result == null) {
+            final JexlUberspect uberspect = interpreter.uberspect;
+            // check if there is a size method on the object that returns an
+            // integer and if so, just use it
+            JexlMethod vm = uberspect.getMethod(object, "size", Interpreter.EMPTY_PARAMS);
+            if (returnsInteger(vm)) {
+                try {
+                    result = vm.invoke(object, Interpreter.EMPTY_PARAMS);
+                } catch (Exception xany) {
+                    interpreter.operatorError(node, JexlOperator.SIZE, xany);
                 }
             }
         }
