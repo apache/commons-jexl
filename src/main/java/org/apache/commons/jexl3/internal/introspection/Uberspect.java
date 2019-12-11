@@ -457,12 +457,16 @@ public class Uberspect implements JexlUberspect {
                                 if (parms.length != op.getArity()) {
                                     continue;
                                 }
-                                // keep only methods that are not overrides
-                                try {
-                                    JexlArithmetic.class.getMethod(method.getName(), method.getParameterTypes());
-                                } catch (NoSuchMethodException xmethod) {
-                                    // method was not found in JexlArithmetic; this is an operator definition
-                                    ops.add(op);
+                                // filter method that is an actual overload:
+                                // - not inherited (not declared by base class)
+                                // - nor overriden (not present in base class)
+                                if (!JexlArithmetic.class.equals(method.getDeclaringClass())) {
+                                    try {
+                                        JexlArithmetic.class.getMethod(method.getName(), method.getParameterTypes());
+                                    } catch (NoSuchMethodException xmethod) {
+                                        // method was not found in JexlArithmetic; this is an operator definition
+                                        ops.add(op);
+                                    }
                                 }
                             }
                         }

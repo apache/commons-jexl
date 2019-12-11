@@ -25,6 +25,7 @@ import java.util.Map;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -1153,8 +1154,12 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     public static class XmlArithmetic extends JexlArithmetic {
-        public XmlArithmetic(boolean lenient) {
-            super(lenient);
+        public XmlArithmetic(boolean astrict) {
+            super(astrict);
+        }
+        
+        public XmlArithmetic(boolean astrict, MathContext bigdContext, int bigdScale) {
+            super(astrict, bigdContext, bigdScale);
         }
 
         public boolean empty(org.w3c.dom.Element elt) {
@@ -1166,20 +1171,46 @@ public class ArithmeticTest extends JexlTestCase {
         }
     }
 
-    @Test
     /**
      * Inspired by JEXL-16{1,2}.
      */
+    @Test
     public void testXmlArithmetic() throws Exception {
-        JexlEngine jexl = new JexlBuilder().arithmetic(new XmlArithmetic(false)).create();
-        JexlScript e0 = jexl.createScript("x.empty()", "x");
-        JexlScript e1 = jexl.createScript("empty(x)", "x");
-        JexlScript s0 = jexl.createScript("x.size()", "x");
-        JexlScript s1 = jexl.createScript("size(x)", "x");
         Document xml;
         Node x;
         Boolean empty;
         int size;
+        JexlEvalContext ctxt = new JexlEvalContext();
+        JexlEngine jexl = new JexlBuilder().strict(true).safe(false).arithmetic(new XmlArithmetic(false)).create();
+        JexlScript e0 = jexl.createScript("x.empty()", "x");
+        JexlScript e1 = jexl.createScript("empty(x)", "x");
+        JexlScript s0 = jexl.createScript("x.size()", "x");
+        JexlScript s1 = jexl.createScript("size(x)", "x");
+        
+        empty = (Boolean) e1.execute(null, (Object) null);
+        Assert.assertTrue(empty);
+        size = (Integer) s1.execute(null, (Object) null);
+        Assert.assertEquals(0, size);
+            
+        try {
+            Object xx = e0.execute(null, (Object) null);
+            Assert.assertNull(xx);
+        } catch (JexlException.Variable xvar) {
+            Assert.assertNotNull(xvar);
+        }
+        try {
+            Object xx = s0.execute(null, (Object) null);
+            Assert.assertNull(xx);
+        } catch (JexlException.Variable xvar) {
+            Assert.assertNotNull(xvar);
+        }
+        JexlOptions options = ctxt.getEngineOptions();
+        options.setSafe(true);
+        Object x0 = e0.execute(ctxt, (Object) null);
+        Assert.assertNull(x0);
+        Object x1 = s0.execute(ctxt, (Object) null);
+        Assert.assertNull(x1);
+        
         xml = getDocument("<node info='123'/>");
         x = xml.getLastChild();
         empty = (Boolean) e0.execute(null, x);

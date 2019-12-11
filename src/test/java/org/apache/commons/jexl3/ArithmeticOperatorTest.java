@@ -55,7 +55,6 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
     /**
      * Create the named test.
-     * @param name test name
      */
     public ArithmeticOperatorTest() {
         super("ArithmeticOperatorTest");

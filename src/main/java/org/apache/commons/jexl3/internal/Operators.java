@@ -16,10 +16,12 @@
  */
 package org.apache.commons.jexl3.internal;
 
+import java.lang.reflect.Method;
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlOperator;
+import org.apache.commons.jexl3.internal.introspection.MethodExecutor;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.JexlNode;
@@ -59,6 +61,32 @@ public class Operators {
     }
 
     /**
+     * Checks whether a method returns an int or an Integer.
+     * @param vm the JexlMethod (may be null)
+     * @return true of false
+     */
+    private boolean returnsInteger(JexlMethod vm) {
+        if (vm !=null) {
+            Class<?> rc = vm.getReturnType();
+            return Integer.TYPE.equals(rc) || Integer.class.equals(rc);
+        }
+        return false;
+    }
+        
+    /**
+     * Checks whether a method is a JexlArithmetic method.
+     * @param vm the JexlMethod (may be null)
+     * @return true of false
+     */
+    private boolean isArithmetic(JexlMethod jm) {
+        if (jm instanceof MethodExecutor) {
+            Method method = ((MethodExecutor) jm).getMethod();
+            return JexlArithmetic.class.equals(method.getDeclaringClass());
+        }
+        return false;
+    }
+    
+    /**
      * Attempts to call an operator.
      * <p>
      * This takes care of finding and caching the operator method when appropriate
@@ -83,7 +111,7 @@ public class Operators {
                     }
                 }
                 JexlMethod vm = operators.getOperator(operator, args);
-                if (vm != null) {
+                if (vm != null && !isArithmetic(vm)) {
                     Object result = vm.invoke(arithmetic, args);
                     if (cache) {
                         node.jjtSetValue(vm);
@@ -314,31 +342,30 @@ public class Operators {
      * @param object the object to check the emptyness of
      * @return the evaluation result
      */
-    protected Object empty(JexlNode node, Object object) {
+    protected boolean empty(JexlNode node, Object object) {
         if (object == null) {
-            return Boolean.TRUE;
+            return true;
         }
-        Object result = Operators.this.tryOverload(node, JexlOperator.EMPTY, object);
-        if (result != JexlEngine.TRY_FAILED) {
-            return result;
-        }
-        final JexlArithmetic arithmetic = interpreter.arithmetic;
-        result = arithmetic.isEmpty(object);
-        if (result == null) {
-            final JexlUberspect uberspect = interpreter.uberspect;
-            result = false;
-            // check if there is an isEmpty method on the object that returns a
-            // boolean and if so, just use it
-            JexlMethod vm = uberspect.getMethod(object, "isEmpty", Interpreter.EMPTY_PARAMS);
-            if (returnsBoolean(vm)) {
-                try {
-                    result = vm.invoke(object, Interpreter.EMPTY_PARAMS);
-                } catch (Exception xany) {
-                    interpreter.operatorError(node, JexlOperator.EMPTY, xany);
+        Object result = tryOverload(node, JexlOperator.EMPTY, object);
+        if (result == JexlEngine.TRY_FAILED) {
+            final JexlArithmetic arithmetic = interpreter.arithmetic;
+            result = arithmetic.isEmpty(object, null);
+            if (result == null) {
+                final JexlUberspect uberspect = interpreter.uberspect;
+                result = false;
+                // check if there is an isEmpty method on the object that returns a
+                // boolean and if so, just use it
+                JexlMethod vm = uberspect.getMethod(object, "isEmpty", Interpreter.EMPTY_PARAMS);
+                if (returnsBoolean(vm)) {
+                    try {
+                        result = vm.invoke(object, Interpreter.EMPTY_PARAMS);
+                    } catch (Exception xany) {
+                        interpreter.operatorError(node, JexlOperator.EMPTY, xany);
+                    }
                 }
             }
         }
-        return result;
+        return result instanceof Boolean ? (Boolean) result : true;
     }
 
     /**
@@ -350,29 +377,28 @@ public class Operators {
      * @param object the object to get the size of
      * @return the evaluation result
      */
-    protected Object size(JexlNode node, Object object) {
+    protected int size(JexlNode node, Object object) {
         if (object == null) {
             return 0;
         }
-        Object result = Operators.this.tryOverload(node, JexlOperator.SIZE, object);
-        if (result != JexlEngine.TRY_FAILED) {
-            return result;
-        }
-        final JexlArithmetic arithmetic = interpreter.arithmetic;
-        result = arithmetic.size(object);
-        if (result == null) {
-            final JexlUberspect uberspect = interpreter.uberspect;
-            // check if there is a size method on the object that returns an
-            // integer and if so, just use it
-            JexlMethod vm = uberspect.getMethod(object, "size", Interpreter.EMPTY_PARAMS);
-            if (vm != null && (Integer.TYPE.equals(vm.getReturnType()) || Integer.class.equals(vm.getReturnType()))) {
-                try {
-                    result = vm.invoke(object, Interpreter.EMPTY_PARAMS);
-                } catch (Exception xany) {
-                    interpreter.operatorError(node, JexlOperator.SIZE, xany);
+        Object result = tryOverload(node, JexlOperator.SIZE, object);
+        if (result == JexlEngine.TRY_FAILED) {
+            final JexlArithmetic arithmetic = interpreter.arithmetic;
+            result = arithmetic.size(object, null);
+            if (result == null) {
+                final JexlUberspect uberspect = interpreter.uberspect;
+                // check if there is a size method on the object that returns an
+                // integer and if so, just use it
+                JexlMethod vm = uberspect.getMethod(object, "size", Interpreter.EMPTY_PARAMS);
+                if (returnsInteger(vm)) {
+                    try {
+                        result = vm.invoke(object, Interpreter.EMPTY_PARAMS);
+                    } catch (Exception xany) {
+                        interpreter.operatorError(node, JexlOperator.SIZE, xany);
+                    }
                 }
             }
         }
-        return result;
+        return result instanceof Number ? ((Number) result).intValue() : 0;
     }
 }
