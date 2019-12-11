@@ -276,23 +276,25 @@ public abstract class JexlParser extends StringParser {
         if (frame != null) {
             Integer symbol = frame.getSymbol(name);
             if (symbol != null) {
-                // can not reuse a local as a global
+                boolean declared = true;
                 if (getFeatures().isLexical()) {
-                    // one of the lexical blocks above must declare it
-                    if (!block.hasSymbol(symbol)) {
-                        boolean declared = false;
+                    declared = block.hasSymbol(symbol);
+                    // one of the lexical blocks above should declare it
+                    if (!declared) {
                         for (LexicalUnit u : blocks) {
                             if (u.hasSymbol(symbol)) {
                                 declared = true;
                                 break;
                             }
                         }
-                        if (!declared) {
-                            throw new JexlException(identifier, name + ": variable is not defined");
-                        }
                     }
                 }
-                identifier.setSymbol(symbol, name);
+                if (declared) {
+                    identifier.setSymbol(symbol, name);
+                } else if (getFeatures().isLexicalShade()) {
+                    // can not reuse a local as a global
+                    throw new JexlException(identifier, name + ": variable is not defined");
+                }
             }
         }
         return name;

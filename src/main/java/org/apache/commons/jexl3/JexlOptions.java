@@ -274,8 +274,8 @@ public final class JexlOptions {
     /**
      * Sets whether the engine strictly shades global variables.
      * Local symbols shade globals after definition and creating global
-     * variables is prohibited evaluation.
-     * If setting to lexical shade, lexical is also set.
+     * variables is prohibited during evaluation.
+     * If setting to lexical shade, lexical scope is also set.
      * @param flag true if creation is allowed, false otherwise
      */
     public void setLexicalShade(boolean flag) {

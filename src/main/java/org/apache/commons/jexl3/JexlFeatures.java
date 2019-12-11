@@ -30,6 +30,7 @@ import java.util.TreeSet;
  * <li>Reserved Names: a set of reserved variable names that can not be used as local variable (or parameter) names
  * <li>Global Side Effect : assigning/modifying values on global variables (=, += , -=, ...)
  * <li>Lexical: lexical scope, prevents redefining local variables 
+ * <li>Lexical Shade: local variables shade globals, prevents confusing a global variable with a local one
  * <li>Side Effect : assigning/modifying values on any variables or left-value
  * <li>Constant Array Reference: ensures array references only use constants;they should be statically solvable.
  * <li>New Instance: creating an instance using new(...)
@@ -52,7 +53,7 @@ public final class JexlFeatures {
     private static final String[] F_NAMES = {
         "register", "reserved variable", "local variable", "assign/modify",
         "global assign/modify", "array reference", "create instance", "loop", "function",
-        "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical"
+        "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade"
     };
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
@@ -82,8 +83,10 @@ public final class JexlFeatures {
     public static final int ANNOTATION = 12;
     /** Script feature ordinal. */
     public static final int SCRIPT = 13;
-    /** Script feature ordinal. */
+    /** Lexical feature ordinal. */
     public static final int LEXICAL = 14;
+    /** Lexical shade feature ordinal. */
+    public static final int LEXICAL_SHADE = 15;
 
     /**
      * Creates an all-features-enabled instance.
@@ -489,5 +492,25 @@ public final class JexlFeatures {
     /** @return whether lexical scope feature is enabled */
     public boolean isLexical() {
         return getFeature(LEXICAL);
+    }
+        
+    /**
+     * Sets whether syntactic lexical shade is enabled.
+     *
+     * @param flag true means syntactic lexical shade is in effect and implies lexical scope
+     * @return this features instance
+     */
+    public JexlFeatures lexicalShade(boolean flag) {
+        setFeature(LEXICAL_SHADE, flag);
+        if (flag) {
+            setFeature(LEXICAL, true);
+        }
+        return this;
+    }
+    
+    
+    /** @return whether lexical shade feature is enabled */
+    public boolean isLexicalShade() {
+        return getFeature(LEXICAL_SHADE);
     }
 }

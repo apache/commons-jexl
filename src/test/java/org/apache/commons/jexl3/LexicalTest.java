@@ -503,6 +503,7 @@ public class LexicalTest {
     public void testForVariable0() throws Exception {
         JexlFeatures f = new JexlFeatures();
         f.lexical(true);
+        f.lexicalShade(true);
         JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
         try {
             JexlScript script = jexl.createScript("for(var x : 1..3) { var c = 0}; return x");
@@ -516,6 +517,7 @@ public class LexicalTest {
     public void testForVariable1() throws Exception {
         JexlFeatures f = new JexlFeatures();
         f.lexical(true);
+        f.lexicalShade(true);
         JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
         try {
             JexlScript script = jexl.createScript("for(var x : 1..3) { var c = 0} for(var x : 1..3) { var c = 0}; return x");
@@ -530,6 +532,7 @@ public class LexicalTest {
     public void testUndeclaredVariable() throws Exception {
         JexlFeatures f = new JexlFeatures();
         f.lexical(true);
+        f.lexicalShade(true);
         JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
         try {
             JexlScript script = jexl.createScript("{var x = 0}; return x");
@@ -538,5 +541,17 @@ public class LexicalTest {
            // OK
            Assert.assertTrue(ex instanceof JexlException);
         }
+    }
+    
+    @Test
+    public void testLexical6a1() throws Exception {
+        String str = "i = 0; { var i = 32; }; i";
+        JexlFeatures f = new JexlFeatures();
+        f.lexical(true);
+        JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
+        JexlScript e = jexl.createScript(str);
+        JexlContext ctxt = new MapContext();
+        Object o = e.execute(ctxt);
+        Assert.assertEquals(0, o);
     }
 }

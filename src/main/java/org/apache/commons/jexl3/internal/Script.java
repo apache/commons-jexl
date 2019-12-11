@@ -110,8 +110,13 @@ public class Script implements JexlScript, JexlExpression {
         JexlOptions opts = jexl.createOptions(this, context);
         // when parsing lexical, try hard to run lexical
         JexlFeatures features = script.getFeatures();
-        if (features != null && features.isLexical()) {
-            opts.setLexical(true);
+        if (features != null) {
+            if (features.isLexical()) {
+                opts.setLexical(true);
+            }
+            if (features.isLexicalShade()) {
+                opts.setLexicalShade(true);
+            }
         }
         return opts;
     }
