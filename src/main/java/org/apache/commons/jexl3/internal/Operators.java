@@ -78,9 +78,9 @@ public class Operators {
      * @param vm the JexlMethod (may be null)
      * @return true of false
      */
-    private boolean isArithmetic(JexlMethod jm) {
-        if (jm instanceof MethodExecutor) {
-            Method method = ((MethodExecutor) jm).getMethod();
+    private boolean isArithmetic(JexlMethod vm) {
+        if (vm instanceof MethodExecutor) {
+            Method method = ((MethodExecutor) vm).getMethod();
             return JexlArithmetic.class.equals(method.getDeclaringClass());
         }
         return false;
