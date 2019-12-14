@@ -19,6 +19,7 @@ package org.apache.commons.jexl3.internal.introspection;
 import java.beans.IntrospectionException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 
 /**
@@ -101,7 +102,7 @@ public final class ConstructorMethod implements JexlMethod {
         } catch (IllegalArgumentException xargument) {
             return Uberspect.TRY_FAILED;
         } catch (InvocationTargetException xinvoke) {
-            return Uberspect.TRY_FAILED;
+            throw JexlException.tryFailed(xinvoke); // throw
         }
         return Uberspect.TRY_FAILED;
     }

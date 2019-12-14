@@ -354,7 +354,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
         protected Object getDateValue(Date date, String key) {
             try {
-                Calendar cal = Calendar.getInstance();
+                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
                 cal.setTime(date);
                 if ("yyyy".equals(key)) {
                     return cal.get(Calendar.YEAR);
@@ -473,7 +473,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
     @Test
     public void testFormatArithmetic() throws Exception {
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.set(1969, 7, 20);
         Date x0 = cal.getTime();
         String y0 =  "MM/yy/dd";
