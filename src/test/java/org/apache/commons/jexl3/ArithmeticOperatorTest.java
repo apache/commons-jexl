@@ -44,6 +44,7 @@ import org.junit.Test;
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class ArithmeticOperatorTest extends JexlTestCase {
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private Asserter asserter;
 
     @Before
@@ -354,7 +355,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
         protected Object getDateValue(Date date, String key) {
             try {
-                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                Calendar cal = Calendar.getInstance(UTC);
                 cal.setTime(date);
                 if ("yyyy".equals(key)) {
                     return cal.get(Calendar.YEAR);
@@ -373,7 +374,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         }
 
         protected Object setDateValue(Date date, String key, Object value) throws Exception {
-            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            Calendar cal = Calendar.getInstance(UTC);
             cal.setTime(date);
             if ("yyyy".equals(key)) {
                 cal.set(Calendar.YEAR, toInteger(value));
@@ -420,6 +421,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
         public String format(Date date, String fmt) {
             SimpleDateFormat sdf = new SimpleDateFormat(fmt, locale);
+            sdf.setTimeZone(UTC);
             return sdf.format(date);
         }
 
@@ -473,7 +475,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
     @Test
     public void testFormatArithmetic() throws Exception {
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        Calendar cal = Calendar.getInstance(UTC);
         cal.set(1969, 7, 20);
         Date x0 = cal.getTime();
         String y0 =  "MM/yy/dd";
@@ -519,7 +521,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     public void testFormatArithmeticJxlt() throws Exception {
         Map<String, Object> ns = new HashMap<String, Object>();
         ns.put("calc", Aggregate.class);
-        Calendar cal = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance(UTC);
         cal.set(1969, 7, 20);
         Date x0 = cal.getTime();
         String y0 =  "yyyy-MM-dd";
