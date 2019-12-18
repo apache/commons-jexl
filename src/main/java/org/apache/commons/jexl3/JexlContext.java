@@ -147,6 +147,7 @@ public interface JexlContext {
     
     /**
      * A marker interface of the JexlContext that exposes runtime evaluation options.
+     * @since 3.2
      */
     interface OptionsHandle {
         /**
@@ -183,6 +184,7 @@ public interface JexlContext {
      * of its cancellation through the context. It uses the same interpreter logic
      * that reacts to cancellation and is an alternative to using callable() and/or
      * interrupting script interpreter threads.
+     * @since 3.2
      */
     interface CancellationHandle {
         /**

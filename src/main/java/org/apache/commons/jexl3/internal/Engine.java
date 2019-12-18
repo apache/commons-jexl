@@ -301,14 +301,25 @@ public class Engine extends JexlEngine {
     }
  
     /**
+     * Solves an optional option.
+     * @param conf the option as configured, may be null
+     * @param def the default value if null, shall not be null
+     * @param <T> the option type
+     * @return conf or def
+     */
+    private static <T> T option(T conf, T def) {
+        return conf == null? def : conf;
+    }
+    
+    /**
      * Extracts the engine evaluation options from context if available, the engine
      * options otherwise.
-     * <p>This creates a copy of the options so they are immutable during
-     * execution.
+     * <p>If the context is a options handle and the handled options shared instance flag
+     * is false, this method creates a copy of the options making them immutable during execution.
      * @param context the context
      * @return the options if any
      */
-    JexlOptions options(JexlContext context) {
+    protected JexlOptions options(JexlContext context) {
         // Make a copy of the handled options if any
         if (context instanceof JexlContext.OptionsHandle) {
             JexlOptions jexlo = ((JexlContext.OptionsHandle) context).getEngineOptions();
@@ -333,14 +344,15 @@ public class Engine extends JexlEngine {
     }
 
     /**
-     * Solves an optional option.
-     * @param conf the option as configured, may be null
-     * @param def the default value if null, shall not be null
-     * @param <T> the option type
-     * @return conf or def
+     * Sets options from this engine options.
+     * @param opts the options to set
+     * @return the options
      */
-    private static <T> T option(T conf, T def) {
-        return conf == null? def : conf;
+    public JexlOptions optionsSet(JexlOptions opts) {
+        if (opts != null) {
+            opts.set(options);
+    }
+        return opts;
     }
     
     @Override
@@ -355,50 +367,6 @@ public class Engine extends JexlEngine {
         }
     }
        
-    /**
-     * Sets options from this engine options.
-     * @param opts the options to set
-     * @return the options
-     */
-    public JexlOptions optionsSet(JexlOptions opts) {
-        if (opts != null) {
-            opts.set(options);
-        }
-        return opts;
-    }
-    
-    /**
-     * Creates a script evaluation options.
-     * <p>This also calls the pragma processor if any
-     * @param script the script
-     * @param context the context
-     * @return the options
-     */
-    protected JexlOptions createOptions(Script script, JexlContext context) {
-        JexlOptions opts = options(context);
-        Map<String, Object> pragmas = script.getPragmas();
-        if (pragmas != null) {
-            JexlContext.PragmaProcessor processor =
-                    context instanceof JexlContext.PragmaProcessor
-                    ? (JexlContext.PragmaProcessor) context
-                    : null;
-            for(Map.Entry<String, Object> pragma : pragmas.entrySet()) {
-                String key = pragma.getKey();
-                Object value = pragma.getValue();
-                if (PRAGMA_OPTIONS.equals(key)) {
-                    if (value instanceof String) {
-                        String[] vs = ((String) value).split(" ");
-                        opts.setFlags(vs);
-                    }
-                }
-                if (processor != null) {
-                    processor.processPragma(key, value);
-                }
-            }
-        }
-        return opts;
-    }
-    
     /**
      * Creates an interpreter.
      * @param context a JexlContext; if null, the empty context is used instead.

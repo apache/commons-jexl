@@ -50,6 +50,10 @@ public class Script implements JexlScript, JexlExpression {
      * The engine version (as class loader change count) that last evaluated this script.
      */
     protected int version;
+    /**
+     * The name of the options pragma.
+     */
+    protected static final String PRAGMA_OPTIONS = "jexl.options";
 
     /**
      * @return the script AST
@@ -101,13 +105,13 @@ public class Script implements JexlScript, JexlExpression {
     }
     
     /**
-     * Creates this script options for evaluation.
+     * Compute this script options for evaluation.
      * <p>This also calls the pragma processor 
      * @param context the context
      * @return the options
      */
-    protected JexlOptions createOptions(JexlContext context) {
-        JexlOptions opts = jexl.createOptions(this, context);
+    protected JexlOptions options(JexlContext context) {
+        JexlOptions opts = jexl.options(context);
         // when parsing lexical, try hard to run lexical
         JexlFeatures features = script.getFeatures();
         if (features != null) {
@@ -116,6 +120,27 @@ public class Script implements JexlScript, JexlExpression {
             }
             if (features.isLexicalShade()) {
                 opts.setLexicalShade(true);
+            }
+        }
+        // process script pragmas if any
+        Map<String, Object> pragmas = script.getPragmas();
+        if (pragmas != null) {
+            JexlContext.PragmaProcessor processor =
+                    context instanceof JexlContext.PragmaProcessor
+                    ? (JexlContext.PragmaProcessor) context
+                    : null;
+            for(Map.Entry<String, Object> pragma : pragmas.entrySet()) {
+                String key = pragma.getKey();
+                Object value = pragma.getValue();
+                if (PRAGMA_OPTIONS.equals(key)) {
+                    if (value instanceof String) {
+                        String[] vs = ((String) value).split(" ");
+                        opts.setFlags(vs);
+                    }
+                }
+                if (processor != null) {
+                    processor.processPragma(key, value);
+                }
             }
         }
         return opts;
@@ -128,7 +153,7 @@ public class Script implements JexlScript, JexlExpression {
      * @return  the interpreter
      */
     protected Interpreter createInterpreter(JexlContext context, Frame frame) {
-        return jexl.createInterpreter(context, frame, createOptions(context));
+        return jexl.createInterpreter(context, frame, options(context));
     }
 
     /**

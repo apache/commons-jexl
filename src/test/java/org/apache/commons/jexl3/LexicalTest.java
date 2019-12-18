@@ -554,4 +554,64 @@ public class LexicalTest {
         Object o = e.execute(ctxt);
         Assert.assertEquals(0, o);
     }
+    
+    public static class VarContext extends MapContext implements JexlContext.PragmaProcessor, JexlContext.OptionsHandle {
+        private JexlOptions options = new JexlOptions();
+        
+        JexlOptions snatchOptions() {
+            JexlOptions o = options;
+            options = new JexlOptions();
+            return o;
+}
+
+        @Override
+        public void processPragma(String key, Object value) {
+            if ("jexl.options".equals(key) && "canonical".equals(value)) {
+                options.setStrict(true);
+                options.setLexical(true);
+                options.setLexicalShade(true);
+                options.setSafe(false);
+            }
+        }
+
+        @Override
+        public JexlOptions getEngineOptions() {
+            return options;
+        }
+    }
+
+        
+    @Test
+    public void testOptionsPragma() throws Exception {
+        try {
+            JexlOptions.setDefaultFlags("+safe", "-lexical", "-lexicalShade");
+            VarContext vars = new VarContext();
+            JexlEngine jexl = new JexlBuilder().create();
+            int n42;
+            JexlOptions o;
+
+            n42 = (Integer) jexl.createScript("#pragma jexl.options none\n-42").execute(vars);
+            Assert.assertEquals(-42, n42);
+            o = vars.snatchOptions();
+            Assert.assertNotNull(o);
+            Assert.assertTrue(o.isStrict());
+            Assert.assertTrue(o.isSafe());
+            Assert.assertTrue(o.isCancellable());
+            Assert.assertFalse(o.isLexical());
+            Assert.assertFalse(o.isLexicalShade());
+
+            n42 = (Integer) jexl.createScript("#pragma jexl.options canonical\n42").execute(vars);
+            Assert.assertEquals(42, n42);
+            o = vars.snatchOptions();
+            Assert.assertNotNull(o);
+            Assert.assertTrue(o.isStrict());
+            Assert.assertFalse(o.isSafe());
+            Assert.assertTrue(o.isCancellable());
+            Assert.assertTrue(o.isLexical());
+            Assert.assertTrue(o.isLexicalShade());
+            Assert.assertFalse(o.isSharedInstance());
+        } finally {
+            JexlOptions.setDefaultFlags("-safe", "+lexical");
+        }
+    }
 }
