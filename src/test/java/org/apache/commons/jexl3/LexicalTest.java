@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.jexl3.internal.LexicalScope;
+import org.apache.commons.jexl3.internal.Script;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -552,17 +553,17 @@ public class LexicalTest {
         JexlScript e = jexl.createScript(str);
         JexlContext ctxt = new MapContext();
         Object o = e.execute(ctxt);
-        Assert.assertEquals(0, o);
+        Assert.assertEquals(0, o);    
     }
-    
+
     public static class VarContext extends MapContext implements JexlContext.PragmaProcessor, JexlContext.OptionsHandle {
         private JexlOptions options = new JexlOptions();
-        
+
         JexlOptions snatchOptions() {
             JexlOptions o = options;
             options = new JexlOptions();
             return o;
-}
+        }
 
         @Override
         public void processPragma(String key, Object value) {
@@ -578,9 +579,30 @@ public class LexicalTest {
         public JexlOptions getEngineOptions() {
             return options;
         }
+    } 
+                
+    @Test
+    public void testInternalLexicalFeatures() throws Exception {
+        String str = "42";
+        JexlFeatures f = new JexlFeatures();
+        f.lexical(true);
+        f.lexicalShade(true);
+        JexlEngine jexl = new JexlBuilder().features(f).create();
+        JexlScript e = jexl.createScript(str);
+        VarContext vars = new VarContext();
+        JexlOptions opts = vars.getEngineOptions();
+        // so we can see the effect of features on options
+        opts.setSharedInstance(true);
+        Script script = (Script) e;
+        JexlFeatures features = script.getFeatures();
+        Assert.assertTrue(features.isLexical());
+        Assert.assertTrue(features.isLexicalShade());
+        Object result = e.execute(vars);
+        Assert.assertEquals(42, result);
+        Assert.assertTrue(opts.isLexical());
+        Assert.assertTrue(opts.isLexicalShade());
     }
-
-        
+    
     @Test
     public void testOptionsPragma() throws Exception {
         try {

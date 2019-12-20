@@ -271,6 +271,13 @@ public class Script implements JexlScript, JexlExpression {
     public JexlInfo getInfo() {
         return script.jexlInfo();
     }
+     
+    /**
+     * @return the script features
+     */
+    public JexlFeatures getFeatures() {
+        return script.getFeatures();
+    }
 
     /**
      * Gets this script variables.
