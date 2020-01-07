@@ -580,7 +580,7 @@ public class LexicalTest {
             return options;
         }
     } 
-                
+       
     @Test
     public void testInternalLexicalFeatures() throws Exception {
         String str = "42";
@@ -634,6 +634,62 @@ public class LexicalTest {
             Assert.assertFalse(o.isSharedInstance());
         } finally {
             JexlOptions.setDefaultFlags("-safe", "+lexical");
+        }
+    }
+
+    @Test
+    public void testVarLoop0() throws Exception {
+        String src = "var count = 10;\n"
+                + "for (var i : 0 .. count) {\n"
+                + "  $out.println(\"i:\" + i);\n"
+                + "}";
+        runVarLoop(src);
+    }
+
+    @Test
+    public void testVarLoop1() throws Exception {
+        String src = "var count = [0,1];\n"
+                + "for (var i : count) {\n"
+                + "  $out.println(\"i:\" + i);\n"
+                + "}";
+        runVarLoop(src);
+    }
+        
+    public static class Out {
+        StringBuilder strb = null;
+
+        public void println(Object o) {
+            if (o != null) {
+                if (strb == null) {
+                    strb = new StringBuilder();
+                }
+                strb.append(o.toString());
+            }
+        }
+
+        @Override
+        public String toString() {
+            return strb != null ? strb.toString() : "";
+        }
+    }
+         
+    private void runVarLoop(String src) throws Exception {
+        try {
+            //JexlOptions.setDefaultFlags("-safe", "+lexical", "+lexicalShade");
+            VarContext vars = new VarContext();
+            JexlOptions options = vars.getEngineOptions();
+            options.setLexical(true);
+            options.setLexicalShade(true);
+            options.setSafe(false);
+            JexlEngine jexl = new JexlBuilder().create();
+            JexlScript script = jexl.createScript(src);
+            Out out = new Out();
+            vars.set("$out", out);
+            Object result = script.execute(vars);
+        } catch(JexlException xany) {
+            throw xany;
+        }  finally {
+            //JexlOptions.setDefaultFlags("+safe", "-lexical", "-lexicalSafe");
         }
     }
 }

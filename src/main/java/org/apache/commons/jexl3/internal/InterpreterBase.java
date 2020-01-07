@@ -254,9 +254,13 @@ public abstract class InterpreterBase extends ParserVisitor {
         // if we have a symbol, we have a scope thus a frame
         if (symbol >= 0) {
             if (frame.has(symbol)) {
-                if (options.isLexical()) {
+                if (options.isLexical() && options.isLexicalShade()) {
                     // if not in lexical block, undefined if (in its symbol) shade
-                    if (!block.hasSymbol(symbol) && options.isLexicalShade()) {
+                    LexicalScope b = block;
+                    while(b != null && !b.hasSymbol(symbol)) {
+                        b = b.previous;
+                    }
+                    if (b == null) {
                         return undefinedVariable(identifier, identifier.getName());
                     }
                 }
