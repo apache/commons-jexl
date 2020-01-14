@@ -18,6 +18,8 @@ package org.apache.commons.jexl3;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.jexl3.internal.LexicalScope;
@@ -639,57 +641,51 @@ public class LexicalTest {
 
     @Test
     public void testVarLoop0() throws Exception {
-        String src = "var count = 10;\n"
-                + "for (var i : 0 .. count) {\n"
-                + "  $out.println(\"i:\" + i);\n"
+        String src0 = "var count = 10;\n"
+                + "for (var i : 0 .. count-1) {\n"
+                + "  $out.add(i);\n"
                 + "}";
-        runVarLoop(src);
-    }
-
-    @Test
-    public void testVarLoop1() throws Exception {
-        String src = "var count = [0,1];\n"
+        String src1 = "var count = [0,1,2,3,4,5,6,7,8,9];\n"
                 + "for (var i : count) {\n"
-                + "  $out.println(\"i:\" + i);\n"
+                + "  $out.add(i);\n"
                 + "}";
-        runVarLoop(src);
-    }
+        JexlFeatures ff0 = runVarLoop(false, src0);
+        JexlFeatures ft0= runVarLoop(true, src0);
+        JexlFeatures ff1 = runVarLoop(false, src1);
+        JexlFeatures ft1= runVarLoop(true, src1);
         
-    public static class Out {
-        StringBuilder strb = null;
-
-        public void println(Object o) {
-            if (o != null) {
-                if (strb == null) {
-                    strb = new StringBuilder();
-                }
-                strb.append(o.toString());
-            }
-        }
-
-        @Override
-        public String toString() {
-            return strb != null ? strb.toString() : "";
-        }
+        // and check some features features
+        Assert.assertEquals(ff0, ff1);
+        Assert.assertEquals(ft0, ft1);
+        Assert.assertNotEquals(ff0, ft0);
+        String sff0 = ff0.toString();
+        String sff1 = ff1.toString();
+        Assert.assertEquals(sff0, sff1);
+        String sft1 = ft1.toString();
+        Assert.assertNotEquals(sff0, sft1);
     }
-         
-    private void runVarLoop(String src) throws Exception {
+
+    private JexlFeatures runVarLoop(boolean flag, String src) throws Exception {
         try {
-            //JexlOptions.setDefaultFlags("-safe", "+lexical", "+lexicalShade");
             VarContext vars = new VarContext();
             JexlOptions options = vars.getEngineOptions();
             options.setLexical(true);
             options.setLexicalShade(true);
             options.setSafe(false);
-            JexlEngine jexl = new JexlBuilder().create();
+            JexlFeatures features = new JexlFeatures();
+            if (flag) {
+                features.lexical(true).lexicalShade(true);
+            }
+            JexlEngine jexl = new JexlBuilder().features(features).create();
             JexlScript script = jexl.createScript(src);
-            Out out = new Out();
+            List<Integer> out = new ArrayList<Integer>(10);
             vars.set("$out", out);
             Object result = script.execute(vars);
+            Assert.assertEquals(true, result);
+            Assert.assertEquals(10, out.size());
+            return features;
         } catch(JexlException xany) {
             throw xany;
-        }  finally {
-            //JexlOptions.setDefaultFlags("+safe", "-lexical", "-lexicalSafe");
         }
     }
 }
