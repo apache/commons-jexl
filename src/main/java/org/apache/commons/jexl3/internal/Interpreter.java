@@ -149,6 +149,7 @@ public class Interpreter extends InterpreterBase {
     protected Interpreter(Interpreter ii, JexlArithmetic jexla) {
         super(ii, jexla);
         frame = ii.frame;
+        block = ii.block != null? new LexicalFrame(ii.block) : null;
     }
 
     /**
@@ -1311,8 +1312,7 @@ public class Interpreter extends InterpreterBase {
                     if (!block.declareSymbol(symbol)) {
                         return redefinedVariable(var, var.getName());
                     }
-                // if not in lexical block, undefined if (in its symbol) shade
-                } else if (!block.hasSymbol(symbol) && options.isLexicalShade()) {
+                } else if (isSymbolShaded(symbol, block)) { 
                     return undefinedVariable(var, var.getName());
                 }
             }

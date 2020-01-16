@@ -69,12 +69,12 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected static final Object[] EMPTY_PARAMS = new Object[0];
     /** The context to store/retrieve variables. */
     protected final JexlContext.NamespaceResolver ns;
+    /** The operators evaluation delegate. */
+    protected final Operators operators;
     /** The map of 'prefix:function' to object resolving as namespaces. */
     protected final Map<String, Object> functions;
     /** The map of dynamically creates namespaces, NamespaceFunctor or duck-types of those. */
     protected Map<String, Object> functors;
-    /** The operators evaluation delegate. */
-    protected final Operators operators;
     
     /**
      * Creates an interpreter base.
@@ -120,15 +120,15 @@ public abstract class InterpreterBase extends ParserVisitor {
         jexl = ii.jexl;
         logger = ii.logger;
         uberspect = ii.uberspect;
+        arithmetic = jexla;
         context = ii.context;
-        arithmetic = ii.arithmetic;
+        options = ii.options.copy();
         cache = ii.cache;
         ns = ii.ns;
+        operators = ii.operators;
         cancelled = ii.cancelled;
         functions = ii.functions;
         functors = ii.functors;
-        operators = ii.operators;
-        options = ii.options.copy();
     }
 
 
@@ -243,6 +243,27 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
 
     /**
+     * Checks whether a symbol is a shade or actually accessible.
+     * @param symbol the symbol
+     * @param block the block to check from (canoot be null)
+     * @return true is symbol is just a shade, false otherwise
+     */
+    protected boolean isSymbolShaded(int symbol, LexicalScope block) {
+        if (!options.isLexicalShade()) {
+            return false;
+        }
+        // if not in lexical block, undefined if (in its symbol) shade
+        LexicalScope b = block;
+        while (b != null) {
+            if (b.hasSymbol(symbol)) {
+                return false;
+            }
+            b = b.previous;
+        }
+        return true;
+    }
+    
+    /**
      * Gets a value of a defined local variable or from the context.
      * @param frame the local frame
      * @param block the lexical block if any
@@ -254,15 +275,8 @@ public abstract class InterpreterBase extends ParserVisitor {
         // if we have a symbol, we have a scope thus a frame
         if (symbol >= 0) {
             if (frame.has(symbol)) {
-                if (options.isLexical() && options.isLexicalShade()) {
-                    // if not in lexical block, undefined if (in its symbol) shade
-                    LexicalScope b = block;
-                    while(b != null && !b.hasSymbol(symbol)) {
-                        b = b.previous;
-                    }
-                    if (b == null) {
-                        return undefinedVariable(identifier, identifier.getName());
-                    }
+                if (options.isLexical() && isSymbolShaded(symbol, block)) {
+                    return undefinedVariable(identifier, identifier.getName());
                 }
                 Object value = frame.get(symbol);
                 if (value != Scope.UNDEFINED) {
