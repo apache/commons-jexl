@@ -40,12 +40,24 @@ public class LexicalScope {
     public LexicalScope(LexicalScope scope) {
         previous = scope;
     }
+        
+    /**
+     * Frame copy ctor base.
+     * @param s the symbols mask
+     * @param ms the more symbols bitset
+     * @param pscope the previous scope
+     */
+    protected LexicalScope(long s, BitSet ms, LexicalScope pscope) {
+        previous = pscope;
+        symbols = s;
+        moreSymbols = ms != null? (BitSet) ms.clone() : null;
+    }
 
     /**
      * Ensure more symbpls can be stored.
      * @return the set of more symbols
      */
-    final BitSet moreSymbols() {
+    protected final BitSet moreSymbols() {
         if (moreSymbols == null) {
             moreSymbols = new BitSet();
         }

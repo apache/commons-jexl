@@ -37,6 +37,16 @@ public class LexicalFrame extends LexicalScope {
         super(previous);
         this.frame = scriptf;
     }
+    
+    /**
+     * Copy ctor.
+     * @param src the frame to copy
+     */
+    public LexicalFrame(LexicalFrame src) {
+        super(src.symbols, src.moreSymbols, src.previous);
+        frame = src.frame;
+        stack = src.stack != null? new ArrayDeque<Object>(src.stack) : null;
+    }
 
     /**
      * Declare the arguments.
