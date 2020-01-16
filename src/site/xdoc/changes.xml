@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-318" due-to="Dmitri Blinov">
+                Annotation processing may fail in lexical mode
+            </action>
             <action dev="henrib" type="add" issue="JEXL-317">
                 Support script cancellation through less invasive API
             </action>
