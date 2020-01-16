@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import org.apache.commons.jexl3.internal.LexicalScope;
 import org.apache.commons.jexl3.internal.Script;
 import org.junit.Assert;
@@ -649,10 +650,19 @@ public class LexicalTest {
                 + "for (var i : count) {\n"
                 + "  $out.add(i);\n"
                 + "}";
+        String src2 = "var count = 10;\n" +
+                "  var outer = 0;\n"
+                + "for (var i : 0 .. count-1) {\n"
+                + "  $out.add(i);\n"
+                + "  outer = i;"
+                + "}\n"
+                + "outer == 9";
         JexlFeatures ff0 = runVarLoop(false, src0);
         JexlFeatures ft0= runVarLoop(true, src0);
         JexlFeatures ff1 = runVarLoop(false, src1);
         JexlFeatures ft1= runVarLoop(true, src1);
+        JexlFeatures ff2 = runVarLoop(false, src2);
+        JexlFeatures ft2= runVarLoop(true, src2);
         
         // and check some features features
         Assert.assertEquals(ff0, ff1);
@@ -688,4 +698,35 @@ public class LexicalTest {
             throw xany;
         }
     }
+    
+    public static class OptAnnotationContext extends JexlEvalContext implements JexlContext.AnnotationProcessor {
+        @Override
+        public Object processAnnotation(String name, Object[] args, Callable<Object> statement) throws Exception {
+            // transient side effect for strict
+            if ("scale".equals(name)) {
+                JexlOptions options = this.getEngineOptions();
+                int scale = options.getMathScale();
+                int newScale = (Integer) args[0];
+                options.setMathScale(newScale);
+                try {
+                    return statement.call();
+                } finally {
+                    options.setMathScale(scale);
+                }
+            }
+            return statement.call();
+        }
+    }
+    
+    @Test
+    public void testAnnotation() throws Exception {
+        JexlFeatures f = new JexlFeatures();
+        f.lexical(true);
+        JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
+        JexlScript script = jexl.createScript("@scale(13) @test var i = 42");
+        JexlContext jc = new OptAnnotationContext();
+        Object result = script.execute(jc);
+        Assert.assertEquals(result, 42);
+    }
+ 
 }
