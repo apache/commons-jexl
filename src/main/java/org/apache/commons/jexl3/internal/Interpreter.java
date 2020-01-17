@@ -747,9 +747,9 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTWhileStatement node, Object data) {
         Object result = null;
-        /* first objectNode is the expression */
-        Node expressionNode = node.jjtGetChild(0);
-        while (arithmetic.toBoolean(expressionNode.jjtAccept(this, data))) {
+        /* first objectNode is the condition */
+        Node condition = node.jjtGetChild(0);
+        while (arithmetic.toBoolean(condition.jjtAccept(this, data))) {
             cancelCheck(node);
             if (node.jjtGetNumChildren() > 1) {
                 try {
@@ -768,22 +768,22 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(ASTDoWhileStatement node, Object data) {
         Object result = null;
-        /* last objectNode is the expression */
-        Node expressionNode = node.jjtGetChild(1);
+        int nc = node.jjtGetNumChildren();
+        /* last objectNode is the condition */
+        Node condition = node.jjtGetChild(nc - 1);
         do {
             cancelCheck(node);
-
-            try {
-                // execute statement
-                result = node.jjtGetChild(0).jjtAccept(this, data);
-            } catch (JexlException.Break stmtBreak) {
-                break;
-            } catch (JexlException.Continue stmtContinue) {
-                //continue;
+            if (nc > 1) {
+                try {
+                    // execute statement
+                    result = node.jjtGetChild(0).jjtAccept(this, data);
+                } catch (JexlException.Break stmtBreak) {
+                    break;
+                } catch (JexlException.Continue stmtContinue) {
+                    //continue;
+                }
             }
-
-        } while (arithmetic.toBoolean(expressionNode.jjtAccept(this, data)));
-
+        } while (arithmetic.toBoolean(condition.jjtAccept(this, data)));
         return result;
     }
 

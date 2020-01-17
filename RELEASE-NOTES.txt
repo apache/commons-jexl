@@ -74,6 +74,7 @@ New Features in 3.2:
 
 Bugs Fixed in 3.2:
 ==================
+* JEXL-321:      Empty do-while loop is broken
 * JEXL-318:      Annotation processing may fail in lexical mode
 * JEXL-315:      JxltEngine literal string strings ending in \ $ or # throw JxltEngine$Exception
 * JEXL-314:      Comparison NULL values of variables NAME1.NAME2

@@ -105,4 +105,36 @@ public class DoWhileTest extends JexlTestCase {
         JexlScript e = JEXL.createScript("(x)->{ for (i : 1..2) {  continue; var y = function() { 42; } break; } }");
         Assert.assertNotNull(e);
     }
+    
+    @Test
+    public void testEmptyBody() throws Exception {
+        JexlScript e = JEXL.createScript("var i = 0; do ; while((i+=1) < 10); i");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals(10, o);       
+    }
+    
+    @Test
+    public void testEmptyStmtBody() throws Exception {
+        JexlScript e = JEXL.createScript("var i = 0; do {} while((i+=1) < 10); i");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals(10, o);       
+    } 
+        
+    @Test
+    public void testWhileEmptyBody() throws Exception {
+        JexlScript e = JEXL.createScript("var i = 0; while((i+=1) < 10); i");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals(10, o);       
+    }
+    
+    @Test
+    public void testWhileEmptyStmtBody() throws Exception {
+        JexlScript e = JEXL.createScript("var i = 0; while((i+=1) < 10) {}; i");
+        JexlContext jc = new MapContext();
+        Object o = e.execute(jc);
+        Assert.assertEquals(10, o);       
+    }
 }

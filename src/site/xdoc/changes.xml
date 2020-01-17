@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-321" due-to="Dmitri Blinov">
+                Empty do-while loop is broken
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-318" due-to="Dmitri Blinov">
                 Annotation processing may fail in lexical mode
             </action>
