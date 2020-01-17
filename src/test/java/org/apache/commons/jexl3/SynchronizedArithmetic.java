@@ -16,12 +16,13 @@
  */
 package org.apache.commons.jexl3;
 
-import java.lang.reflect.Field;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
-import sun.misc.Unsafe;
+//import java.lang.reflect.Field;
+//import sun.misc.Unsafe;
 
 /**
  *
@@ -60,7 +61,6 @@ public class SynchronizedArithmetic extends JexlArithmetic {
          * @param o the monitored object
          */
         protected void monitorEnter(Object o) {
-            UNSAFE.monitorEnter(o);
             enters.incrementAndGet();
         }
 
@@ -69,7 +69,6 @@ public class SynchronizedArithmetic extends JexlArithmetic {
          * @param o the monitored object
          */
         protected void monitorExit(Object o) {
-            UNSAFE.monitorExit(o);
             exits.incrementAndGet();
         }
 
@@ -94,32 +93,75 @@ public class SynchronizedArithmetic extends JexlArithmetic {
     /**
      * You should know better than to use this...
      */
-    private static Unsafe UNSAFE;
-    static {
-        try {
-            Field f = Unsafe.class.getDeclaredField("theUnsafe");
-            f.setAccessible(true);
-            UNSAFE = (Unsafe) f.get(null);
-        } catch (Exception e) {
-            UNSAFE = null;
-        }
-    }
-
+//    private static Unsafe UNSAFE;
+//    static {
+//        try {
+//            Field f = Unsafe.class.getDeclaredField("theUnsafe");
+//            f.setAccessible(true);
+//            UNSAFE = (Unsafe) f.get(null);
+//        } catch (Exception e) {
+//            UNSAFE = null;
+//        }
+//    }
+//
+//    /**
+//     * Using the unsafe to enter & exit object intrinsic monitors.
+//     */
+//    static class UnsafeMonitor extends Monitor {
+//        @Override protected void monitorEnter(Object o) {
+//            UNSAFE.monitorEnter(o);
+//            super.monitorEnter(o);
+//        }
+//
+//        @Override protected void monitorExit(Object o) {
+//            UNSAFE.monitorExit(o);
+//            super.monitorExit(o);
+//        }
+//    }
+    
     /**
-     * Using the unsafe to enter & exit object intrinsic monitors.
+     * Crude monitor replacement...
      */
-    static class UnsafeMonitor extends Monitor {
-        @Override protected void monitorEnter(Object o) {
-            UNSAFE.monitorEnter(o);
-            super.monitorEnter(o);
+    static class SafeMonitor extends Monitor {
+         private final Map<Object, Object> monitored = new IdentityHashMap<Object, Object>();
+
+        @Override
+        protected void monitorEnter(Object o) {
+            Object guard;
+            try {
+                while (true) {
+                    synchronized (monitored) {
+                        guard = monitored.get(o);
+                        if (guard == null) {
+                            guard = new Object();
+                            monitored.put(o, guard);
+                            super.monitorEnter(o);
+                            break;
+                        }
+                    }
+                    synchronized (guard) {
+                        guard.wait();
+                    }
+                }
+            } catch (InterruptedException xint) {
+                // oops
+            }
         }
 
         @Override protected void monitorExit(Object o) {
-            UNSAFE.monitorExit(o);
-            super.monitorExit(o);
+            final Object guard;
+            synchronized(monitored) {
+                guard = monitored.remove(o);
+            }
+            if (guard != null) {
+                synchronized(guard) {
+                    guard.notifyAll();
+                }
+                super.monitorExit(o);
+            }
         }
     }
-
+    
     /**
      * An iterator that implements Closeable (at least implements a close method)
      * and uses monitors to protect iteration.

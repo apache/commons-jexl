@@ -64,7 +64,7 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
 
     @Test
     public void testUnsafeMonitor() throws Exception {
-        SynchronizedArithmetic.Monitor monitor = new SynchronizedArithmetic.UnsafeMonitor();
+        SynchronizedArithmetic.Monitor monitor = new SynchronizedArithmetic.SafeMonitor();
         Map<String, Object> foo = new TreeMap<String, Object>();
         foo.put("one", 1);
         foo.put("two", 2);
