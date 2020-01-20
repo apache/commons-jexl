@@ -390,7 +390,7 @@ public abstract class JexlParser extends StringParser {
         int symbol = frame.declareParameter(identifier);
         // not sure how declaring a parameter could fail...
         // lexical feature error
-        if (!declareSymbol(symbol) && getFeatures().isLexical()) {
+        if (!block.declareSymbol(symbol) && getFeatures().isLexical()) {
             JexlInfo xinfo = info.at(token.beginLine, token.beginColumn);
             throw new JexlException(xinfo,  identifier + ": variable is already declared", null);
         }
