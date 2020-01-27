@@ -801,10 +801,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected Object visit(ASTConstructorNode node, Object data) {
         int num = node.jjtGetNumChildren();
         builder.append("new(");
-        accept(node.jjtGetChild(0), data);
-        for (int i = 1; i < num; ++i) {
-            builder.append(", ");
-            accept(node.jjtGetChild(i), data);
+        if (num > 0) {
+            accept(node.jjtGetChild(0), data);
+            for (int i = 1; i < num; ++i) {
+                builder.append(", ");
+                accept(node.jjtGetChild(i), data);
+            }
         }
         builder.append(")");
         return data;
@@ -818,7 +820,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             builder.append(":");
             accept(node.jjtGetChild(1), data);
             accept(node.jjtGetChild(2), data);
-        } else {
+        } else if (num == 2) {
             accept(node.jjtGetChild(0), data);
             accept(node.jjtGetChild(1), data);
         }

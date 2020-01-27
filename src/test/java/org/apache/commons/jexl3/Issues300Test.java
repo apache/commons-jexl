@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -377,5 +378,42 @@ public class Issues300Test {
             Assert.assertEquals(ctls[i], output);
         }
     }
+    
+    @Ignore
+    public void test323() throws Exception {
+        // Create or retrieve an engine
+        JexlEngine jexl = new JexlBuilder().safe(false).create();
+        // on recent code: JexlEngine jexl = new JexlBuilder().safe(false).create();
 
+        // Populate to identical global variables
+        JexlContext jc = new MapContext();
+        jc.set("NormalVariable", null);
+        jc.set("ant.variable", null);
+
+        // Evaluate the value of the normal variable
+        JexlExpression expression1 = jexl.createExpression("NormalVariable");
+        Object o1 = expression1.evaluate(jc);
+        Assert.assertEquals(null, o1);
+
+        // Evaluate the value of the ant-style variable
+        JexlExpression expression2 = jexl.createExpression("ant.variable");
+        Object o2 = expression2.evaluate(jc); // <-- BUG: throws exception instead of returning null
+        Assert.assertEquals(null, o2);
+    }
+    
+    @Test
+    public void test324() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        String src42 = "new('java.lang.Integer', 42)";
+        JexlExpression expr0 = jexl.createExpression(src42);
+        Assert.assertEquals(42, expr0.evaluate(null));
+        String parsed = expr0.getParsedText();
+        Assert.assertEquals(src42, parsed);
+        try {
+            JexlExpression expr = jexl.createExpression("new()");
+            Assert.fail("should not parse");
+        } catch (JexlException.Parsing xparse) {
+            Assert.assertTrue(xparse.toString().contains("new"));
+        }
+    }
 }
