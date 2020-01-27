@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -344,4 +346,36 @@ public class Issues300Test {
         result = script.execute(ctxt, 21);
         Assert.assertEquals(42, result);
     }
+
+    @Test
+    public void test322() throws Exception {
+        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        JxltEngine jxlt = jexl.createJxltEngine();
+        JexlContext context = new MapContext();
+
+        String[] ins = new String[]{
+            "${'{'}", "${\"{\"}", "${\"{}\"}", "${'{42}'}", "${\"{\\\"\\\"}\"}"
+        };
+        String[] ctls = new String[]{
+            "{", "{", "{}", "{42}", "{\"\"}"
+        };
+        StringWriter strw;
+        JxltEngine.Template template;
+        String output;
+
+        for (int i = 0; i < ins.length; ++i) {
+            String src = ins[i];
+            try {
+                template = jxlt.createTemplate("$$", new StringReader(src));
+            } catch(JexlException xany) {
+                Assert.fail(src);
+                throw xany;
+            }
+            strw = new StringWriter();
+            template.evaluate(context, strw);
+            output = strw.toString();
+            Assert.assertEquals(ctls[i], output);
+        }
+    }
+
 }

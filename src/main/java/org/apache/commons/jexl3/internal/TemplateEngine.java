@@ -722,6 +722,37 @@ public final class TemplateEngine extends JxltEngine {
     }
 
     /**
+     * Helper for expression dealing with embedded strings.
+     * @param strb the expression buffer to copy characters into
+     * @param expr the source
+     * @param position the offset into the source
+     * @param c the separator character
+     * @return the new position to read the source from 
+     */
+    private static int append(StringBuilder strb, CharSequence expr, int position, char c) {
+        strb.append(c);
+        if (c != '"' && c != '\'') {
+            return position;
+        } 
+        // read thru strings
+        int end = expr.length();
+        boolean escape= false;
+        int index = position + 1;
+        for (; index < end; ++index) {
+            char ec = expr.charAt(index);
+            strb.append(ec);
+            if (ec == '\\') {
+                escape = !escape;
+            } else if (escape) {
+                escape = false;
+            } else if (ec == c) {
+                break;
+            }
+        }
+        return index;
+    }
+    
+    /**
      * Parses a unified expression.
      * @param info  the source info
      * @param expr  the string expression
@@ -755,7 +786,7 @@ public final class TemplateEngine extends JxltEngine {
                         state = ParseState.ESCAPE;
                     } else {
                         // do buildup expr
-                        strb.append(c);
+                        column = append(strb, expr, column, c);
                     }
                     break;
                 case IMMEDIATE0: // $
@@ -770,7 +801,7 @@ public final class TemplateEngine extends JxltEngine {
                     } else {
                         // revert to CONST
                         strb.append(immediateChar);
-                        strb.append(c);
+                        column = append(strb, expr, column, c);
                         state = ParseState.CONST;
                     }
                     break;
@@ -786,7 +817,7 @@ public final class TemplateEngine extends JxltEngine {
                     } else {
                         // revert to CONST
                         strb.append(deferredChar);
-                        strb.append(c);
+                        column = append(strb, expr, column, c);
                         state = ParseState.CONST;
                     }
                     break;
@@ -811,7 +842,7 @@ public final class TemplateEngine extends JxltEngine {
                             immediate1 += 1;
                         }
                         // do buildup expr
-                        strb.append(c);
+                        column = append(strb, expr, column, c);
                     }
                     break;
                 case DEFERRED1: // #{...
@@ -863,7 +894,7 @@ public final class TemplateEngine extends JxltEngine {
                         }
                     } else {
                         // do buildup expr
-                        strb.append(c);
+                        column = append(strb, expr, column, c);
                     }
                     break;
                 case ESCAPE:
