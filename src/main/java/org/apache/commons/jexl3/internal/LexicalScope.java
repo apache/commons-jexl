@@ -29,30 +29,22 @@ public class LexicalScope {
     protected long symbols = 0L;
     /** Symbols after 64. */
     protected BitSet moreSymbols = null;
-    /** Previous block. */
-    protected final LexicalScope previous;
-
 
     /**
      * Create a scope.
-     * @param scope the previous scope
      */
-    public LexicalScope(LexicalScope scope) {
-        previous = scope;
-    }
+    public LexicalScope() {}
         
     /**
      * Frame copy ctor base.
      * @param s the symbols mask
      * @param ms the more symbols bitset
-     * @param pscope the previous scope
      */
-    protected LexicalScope(long s, BitSet ms, LexicalScope pscope) {
-        previous = pscope;
+    protected LexicalScope(long s, BitSet ms) {
         symbols = s;
         moreSymbols = ms != null? (BitSet) ms.clone() : null;
     }
-
+    
     /**
      * Ensure more symbpls can be stored.
      * @return the set of more symbols
@@ -78,28 +70,11 @@ public class LexicalScope {
     }
 
     /**
-     * Declares a local symbol.
-     *
-     * @param symbol the symbol index
-     * @return true if was not already declared, false if lexical clash (error)
-     */
-    public boolean declareSymbol(int symbol) {
-        LexicalScope walk = previous;
-        while (walk != null) {
-            if (walk.hasSymbol(symbol)) {
-                return false;
-            }
-            walk = walk.previous;
-        }
-        return addSymbol(symbol);
-    }
-
-    /**
      * Adds a symbol in this scope.
      * @param symbol the symbol
      * @return true if registered, false if symbol was already registered
      */
-    protected final boolean addSymbol(int symbol) {
+    public final boolean addSymbol(int symbol) {
         if (symbol < LONGBITS) {
             if ((symbols & (1L << symbol)) != 0L) {
                 return false;

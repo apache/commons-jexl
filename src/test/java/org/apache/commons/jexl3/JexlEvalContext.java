@@ -36,8 +36,6 @@ public class JexlEvalContext implements
     /** The options. */
     private final JexlOptions options = new JexlOptions();
 
-    
-    
     /**
      * Default constructor.
      */

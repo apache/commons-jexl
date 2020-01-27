@@ -63,9 +63,9 @@ public final class Scope {
      */
     private Map<String, Integer> namedVariables = null;
     /**
-     * The map of local hoisted variables to parent scope variables, ie closure.
+     * The map of local captured variables to parent scope variables, ie closure.
      */
-    private Map<Integer, Integer> hoistedVariables = null;
+    private Map<Integer, Integer> capturedVariables = null;
     /**
      * The empty string array.
      */
@@ -115,7 +115,7 @@ public final class Scope {
 
     /**
      * Checks whether an identifier is a local variable or argument, ie a symbol.
-     * If this fails, attempt to solve by hoisting parent stacked.
+     * If this fails, look in parents for symbol that can be captured.
      * @param name the symbol name
      * @return the symbol index
      */
@@ -126,35 +126,35 @@ public final class Scope {
     /**
      * Checks whether an identifier is a local variable or argument, ie a symbol.
      * @param name the symbol name
-     * @param hoist whether solving by hoisting parent stacked is allowed
+     * @param capture whether solving by capturing a parent symbol is allowed
      * @return the symbol index
      */
-    private Integer getSymbol(String name, boolean hoist) {
+    private Integer getSymbol(String name, boolean capture) {
         Integer register = namedVariables != null ? namedVariables.get(name) : null;
-        if (register == null && hoist && parent != null) {
+        if (register == null && capture && parent != null) {
             Integer pr = parent.getSymbol(name, true);
             if (pr != null) {
-                if (hoistedVariables == null) {
-                    hoistedVariables = new LinkedHashMap<Integer, Integer>();
+                if (capturedVariables == null) {
+                    capturedVariables = new LinkedHashMap<Integer, Integer>();
                 }
                 if (namedVariables == null) {
                     namedVariables = new LinkedHashMap<String, Integer>();
                 }
                 register = namedVariables.size();
                 namedVariables.put(name, register);
-                hoistedVariables.put(register, pr);
+                capturedVariables.put(register, pr);
             }
         }
         return register;
     }
 
     /**
-     * Checks whether a given symbol is hoisted.
+     * Checks whether a given symbol is captured.
      * @param symbol the symbol number
-     * @return true if hoisted, false otherwise
+     * @return true if captured, false otherwise
      */
-    public boolean isHoistedSymbol(int symbol) {
-        return hoistedVariables != null && hoistedVariables.containsKey(symbol);
+    public boolean isCapturedSymbol(int symbol) {
+        return capturedVariables != null && capturedVariables.containsKey(symbol);
     }
 
     /**
@@ -197,14 +197,14 @@ public final class Scope {
             register = namedVariables.size();
             namedVariables.put(name, register);
             vars += 1;
-            // check if local is redefining hoisted
+            // check if local is redefining captured
             if (parent != null) {
                 Integer pr = parent.getSymbol(name, true);
                 if (pr != null) {
-                    if (hoistedVariables == null) {
-                        hoistedVariables = new LinkedHashMap<Integer, Integer>();
+                    if (capturedVariables == null) {
+                        capturedVariables = new LinkedHashMap<Integer, Integer>();
                     }
-                    hoistedVariables.put(register, pr);
+                    capturedVariables.put(register, pr);
                 }
             }
         }
@@ -213,7 +213,7 @@ public final class Scope {
 
     /**
      * Creates a frame by copying values up to the number of parameters.
-     * <p>This captures the hoisted variables values.</p>
+     * <p>This captures the captured variables values.</p>
      * @param frame the caller frame
      * @param args the arguments
      * @return the arguments array
@@ -222,10 +222,10 @@ public final class Scope {
         if (namedVariables != null) {
             Object[] arguments = new Object[namedVariables.size()];
             Arrays.fill(arguments, UNDECLARED);
-            if (frame != null && hoistedVariables != null && parent != null) {
-                for (Map.Entry<Integer, Integer> hoist : hoistedVariables.entrySet()) {
-                    Integer target = hoist.getKey();
-                    Integer source = hoist.getValue();
+            if (frame != null && capturedVariables != null && parent != null) {
+                for (Map.Entry<Integer, Integer> capture : capturedVariables.entrySet()) {
+                    Integer target = capture.getKey();
+                    Integer source = capture.getValue();
                     Object arg = frame.get(source);
                     arguments[target] = arg;
                 }
@@ -237,16 +237,16 @@ public final class Scope {
     }
 
     /**
-     * Gets the hoisted index of a given symbol, ie the target index of a symbol in a child frame.
+     * Gets the captured index of a given symbol, ie the target index of a symbol in a child frame.
      * @param symbol the symbol index
-     * @return the target symbol index or null if the symbol is not hoisted
+     * @return the target symbol index or null if the symbol is not captured
      */
-    public Integer getHoisted(int symbol) {
-        if (hoistedVariables != null) {
-            for (Map.Entry<Integer, Integer> hoist : hoistedVariables.entrySet()) {
-                Integer source = hoist.getValue();
+    public Integer getCaptured(int symbol) {
+        if (capturedVariables != null) {
+            for (Map.Entry<Integer, Integer> capture : capturedVariables.entrySet()) {
+                Integer source = capture.getValue();
                 if (source == symbol) {
-                    return hoist.getKey();
+                    return capture.getKey();
                 }
             }
         }
@@ -300,7 +300,7 @@ public final class Scope {
     }
 
     /**
-     * Gets this script local variable, i.e. symbols assigned to local variables excluding hoisted variables.
+     * Gets this script local variable, i.e. symbols assigned to local variables excluding captured variables.
      * @return the local variable names
      */
     public String[] getLocalVariables() {
@@ -308,7 +308,7 @@ public final class Scope {
             List<String> locals = new ArrayList<String>(vars);
             for (Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
                 int symnum = entry.getValue();
-                if (symnum >= parms && (hoistedVariables == null || !hoistedVariables.containsKey(symnum))) {
+                if (symnum >= parms && (capturedVariables == null || !capturedVariables.containsKey(symnum))) {
                     locals.add(entry.getKey());
                 }
             }

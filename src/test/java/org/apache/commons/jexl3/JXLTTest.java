@@ -16,10 +16,10 @@
  */
 package org.apache.commons.jexl3;
 
+import org.apache.commons.jexl3.internal.Debugger;
+import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.internal.TemplateDebugger;
 import org.apache.commons.jexl3.internal.TemplateScript;
-import org.apache.commons.jexl3.internal.Debugger;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,26 +27,54 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
  * Test cases for the UnifiedEL.
  */
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
+@RunWith(Parameterized.class)
 public class JXLTTest extends JexlTestCase {
-    private static final JexlEngine ENGINE = new JexlBuilder().silent(false).cache(128).strict(true).create();
-    private static final JxltEngine JXLT = ENGINE.createJxltEngine();
-    private static final Log LOG = LogFactory.getLog(JxltEngine.class);
+    private static final Log LOGGER = LogFactory.getLog(JxltEngine.class);
     private final MapContext vars = new MapContext();
     private JexlEvalContext context = null;
+    private final JexlEngine ENGINE;
+    private final JxltEngine JXLT;
+    
+    public JXLTTest(JexlEngine jexl) {
+        super("JXLTTest");
+        ENGINE = jexl;
+        JXLT = ENGINE.createJxltEngine();
+    }
 
+   @Parameterized.Parameters
+   public static List<JexlEngine> engines() {
+       JexlFeatures f = new JexlFeatures();
+       f.lexical(true).lexicalShade(true);
+      return Arrays.<JexlEngine>asList(new JexlEngine[] {
+         new JexlBuilder().silent(false)
+            .lexical(true).lexicalShade(true)
+            .cache(128).strict(true).create(),
+          
+         new JexlBuilder().features(f).silent(false)
+            .lexical(true).lexicalShade(true)
+            .cache(128).strict(true).create(),
+         
+         new JexlBuilder().silent(false)
+            .cache(128).strict(true).create(),
+      });
+   }
+    
     @Before
     @Override
     public void setUp() throws Exception {
@@ -60,6 +88,16 @@ public class JXLTTest extends JexlTestCase {
     public void tearDown() throws Exception {
         debuggerCheck(ENGINE);
         super.tearDown();
+    }
+    
+    private boolean isLexicalShade() {
+        JexlOptions options = context.getEngineOptions();
+        if (options.isLexicalShade()) {
+            return true;
+        }
+        options = new JexlOptions();
+        ((Engine) ENGINE).optionsSet(options);
+        return options.isLexicalShade();
     }
 
     private static String refactor(TemplateDebugger td, JxltEngine.Template ts) {
@@ -107,10 +145,6 @@ public class JXLTTest extends JexlTestCase {
             value += 10;
             return i;
         }
-    }
-
-    public JXLTTest() {
-        super("JXLTTest");
     }
 
     @Test
@@ -339,7 +373,7 @@ public class JXLTTest extends JexlTestCase {
         } catch (JxltEngine.Exception xjexl) {
             // expected
             String xmsg = xjexl.getMessage();
-            LOG.warn(xmsg);
+            LOGGER.warn(xmsg);
         }
     }
 
@@ -353,7 +387,7 @@ public class JXLTTest extends JexlTestCase {
         } catch (JxltEngine.Exception xjexl) {
             // expected
             String xmsg = xjexl.getMessage();
-            LOG.warn(xmsg);
+            LOGGER.warn(xmsg);
         }
     }
 
@@ -368,7 +402,7 @@ public class JXLTTest extends JexlTestCase {
         } catch (JxltEngine.Exception xjexl) {
             // expected
             String xmsg = xjexl.getMessage();
-            LOG.warn(xmsg);
+            LOGGER.warn(xmsg);
         }
     }
 
@@ -382,7 +416,7 @@ public class JXLTTest extends JexlTestCase {
         } catch (JxltEngine.Exception xjexl) {
             // expected
             String xmsg = xjexl.getMessage();
-            LOG.warn(xmsg);
+            LOGGER.warn(xmsg);
         }
     }
 
@@ -700,7 +734,7 @@ public class JXLTTest extends JexlTestCase {
     @Test
     public void testInterpolation() throws Exception {
         String expr =  "`Hello \n${user}`";
-        JexlScript script = JEXL.createScript(expr);
+        JexlScript script = ENGINE.createScript(expr);
         context.set("user", "Dimitri");
         Object value = script.execute(context);
         Assert.assertEquals(expr, "Hello \nDimitri", value);
@@ -711,62 +745,70 @@ public class JXLTTest extends JexlTestCase {
 
     @Test
     public void testInterpolationGlobal() throws Exception {
+        if (isLexicalShade()) {
+            context.set("user", null);
+        }
         String expr =  "user='Dimitri'; `Hello \n${user}`";
-        Object value = JEXL.createScript(expr).execute(context);
+        Object value = ENGINE.createScript(expr).execute(context);
         Assert.assertEquals(expr, "Hello \nDimitri", value);
     }
 
     @Test
     public void testInterpolationLocal() throws Exception {
         String expr =  "var user='Henrib'; `Hello \n${user}`";
-        Object value = JEXL.createScript(expr).execute(context);
+        Object value = ENGINE.createScript(expr).execute(context);
         Assert.assertEquals(expr, "Hello \nHenrib", value);
     }
 
     @Test
     public void testInterpolationLvsG() throws Exception {
+        if (isLexicalShade()) {
+            context.set("user", null);
+        }
         String expr =  "user='Dimitri'; var user='Henrib'; `H\\\"ello \n${user}`";
-        Object value = JEXL.createScript(expr).execute(context);
+        Object value = ENGINE.createScript(expr).execute(context);
         Assert.assertEquals(expr, "H\"ello \nHenrib", value);
     }
         
     @Test
     public void testInterpolationLvsG2() throws Exception {
+        if (isLexicalShade()) {
+            context.set("user", null);
+        }
         String expr =  "user='Dimitri'; var user='Henrib'; `H\\`ello \n${user}`";
-        Object value = JEXL.createScript(expr).execute(context);
+        Object value = ENGINE.createScript(expr).execute(context);
         Assert.assertEquals(expr, "H`ello \nHenrib", value);
     }
 
     @Test
     public void testInterpolationParameter() throws Exception {
         String expr =  "(user)->{`Hello \n${user}`}";
-        Object value = JEXL.createScript(expr).execute(context, "Henrib");
+        Object value = ENGINE.createScript(expr).execute(context, "Henrib");
         Assert.assertEquals(expr, "Hello \nHenrib", value);
-        value = JEXL.createScript(expr).execute(context, "Dimitri");
+        value = ENGINE.createScript(expr).execute(context, "Dimitri");
         Assert.assertEquals(expr, "Hello \nDimitri", value);
     }
-//
-//
-//    @Test
-//    public void testDeferredTemplate() throws Exception {
-//        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(
-//             "select * from \n"+
-//             "##for(var c : tables) {\n"+
-//             "#{c} \n"+
-//             "##}\n"+
-//             "where $(w}\n"
-//                ));
-//        StringWriter strw = new StringWriter();
-//        context.set("tables", new String[]{"table1", "table2"});
-//        t = t.prepare(context);
-//        vars.clear();
-//        context.set("w" ,"x=1");
-//        t.evaluate(context, strw);
-//        String output = strw.toString();
-//        Assert.assertEquals("fourty-two", output);
-//
-//    }
-    
+
+    @Test
+    public void testImmediateTemplate() throws Exception {
+        context.set("tables", new String[]{"table1", "table2"});
+        context.set("w" ,"x=1");
+        JxltEngine.Template t = JXLT.createTemplate("$$", new StringReader(
+             "select * from \n"+
+             "$$var comma = false; \n"+
+             "$$for(var c : tables) { \n"+
+             "$$  if (comma) $jexl.write(','); else comma = true;\n"+
+             "${c}"+
+             "\n$$}\n"+
+             "where ${w}\n"
+        ));
+        StringWriter strw = new StringWriter();
+        //vars.clear();
+        t.evaluate(context, strw);
+        String output = strw.toString();
+        Assert.assertTrue(output.contains("table1") && output.contains("table2"));
+    }  
+
     public static class Executor311 {
         private final String name;
         
@@ -959,4 +1001,5 @@ public class JXLTTest extends JexlTestCase {
         output = strw.toString();
         Assert.assertEquals(s315, output);
     }
+
 }

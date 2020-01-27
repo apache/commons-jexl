@@ -151,8 +151,9 @@ public class JexlArithmetic {
      *
      * @param options the {@link JexlEngine.Options} to use
      * @return an arithmetic with those options set
-     * @deprecated
+     * @deprecated 3.2
      */
+    @Deprecated
     public JexlArithmetic options(JexlEngine.Options options) {
         if (options != null) {
             Boolean ostrict = options.isStrictArithmetic();

@@ -20,20 +20,17 @@ import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.internal.Scope;
 import java.util.Map;
 import org.apache.commons.jexl3.internal.Frame;
-import org.apache.commons.jexl3.internal.LexicalScope;
 
 /**
  * Enhanced script to allow parameters declaration.
  */
-public class ASTJexlScript extends JexlNode implements JexlParser.LexicalUnit  {
+public class ASTJexlScript extends JexlLexicalNode  {
     /** The pragmas. */
     private Map<String, Object> pragmas = null;
     /** Features. */
     private JexlFeatures features = null;
     /** The script scope. */
     private Scope scope = null;
-    /** The local symbol set. */
-    private LexicalScope locals =  null;
 
     public ASTJexlScript(int id) {
         super(id);
@@ -42,30 +39,7 @@ public class ASTJexlScript extends JexlNode implements JexlParser.LexicalUnit  {
     public ASTJexlScript(Parser p, int id) {
         super(p, id);
     }
-    
-    @Override
-    public boolean declareSymbol(int symbol) {
-        if (locals == null) {
-            locals  = new LexicalScope(null);
-        }
-        return locals.declareSymbol(symbol);
-    }
-    
-    @Override
-    public int getSymbolCount() {
-        return locals == null? 0 : locals.getSymbolCount();
-    }
-
-    @Override
-    public boolean hasSymbol(int symbol) {
-        return locals == null? false : locals.hasSymbol(symbol);
-    }
-    
-    @Override
-    public void clearUnit() {
-        locals = null;
-    }
-    
+  
     /**
      * Consider script with no parameters that return lambda as parametric-scripts.
      * @return the script
@@ -84,7 +58,8 @@ public class ASTJexlScript extends JexlNode implements JexlParser.LexicalUnit  {
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
-      /**
+    
+    /**
      * Sets this script pragmas.
      * @param thePragmas the pragmas
      */
@@ -186,11 +161,11 @@ public class ASTJexlScript extends JexlNode implements JexlParser.LexicalUnit  {
     }
 
     /**
-     * Checks whether a given symbol is hoisted.
+     * Checks whether a given symbol is captured.
      * @param symbol the symbol number
-     * @return true if hoisted, false otherwise
+     * @return true if captured, false otherwise
      */
-    public boolean isHoistedSymbol(int symbol) {
-        return scope != null? scope.isHoistedSymbol(symbol) : false;
+    public boolean isCapturedSymbol(int symbol) {
+        return scope != null? scope.isCapturedSymbol(symbol) : false;
     }
 }

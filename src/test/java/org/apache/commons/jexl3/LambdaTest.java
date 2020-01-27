@@ -168,9 +168,9 @@ public class LambdaTest extends JexlTestCase {
         hvars = s15.getVariables();
         Assert.assertEquals(1, hvars.size());
 
-        // declaring a local that overrides hoisted
+        // declaring a local that overrides captured
         // in 3.1, such a local was considered local
-        // per 3.2, this local is considered hoisted
+        // per 3.2, this local is considered captured
         strs = "(x)->{ (y)->{ var z = 169; var x; x + y } }";
         s42 = jexl.createScript(strs);
         result = s42.execute(ctx, 15);
@@ -181,7 +181,7 @@ public class LambdaTest extends JexlTestCase {
         Assert.assertEquals(1, localv.length);
         hvars = s15.getVariables();
         Assert.assertEquals(1, hvars.size());
-        // evidence this is not (strictly) a local since it inherited a hoisted value
+        // evidence this is not (strictly) a local since it inherited a captured value
         result = ((JexlScript) s15).execute(ctx, 27);
         Assert.assertEquals(42, result);
     }
@@ -204,7 +204,7 @@ public class LambdaTest extends JexlTestCase {
     public void testRecurse2() throws Exception {
         JexlEngine jexl = createEngine();
         JexlContext jc = new MapContext();
-        // adding some hoisted vars to get it confused
+        // adding some captured vars to get it confused
         try {
             JexlScript script = jexl.createScript(
                     "var y = 1; var z = 1; "
@@ -221,7 +221,7 @@ public class LambdaTest extends JexlTestCase {
     public void testRecurse3() throws Exception {
         JexlEngine jexl = createEngine();
         JexlContext jc = new MapContext();
-        // adding some hoisted vars to get it confused
+        // adding some captured vars to get it confused
         try {
             JexlScript script = jexl.createScript(
                     "var y = 1; var z = 1;var foo = (x)->{y + z}; "
@@ -350,7 +350,7 @@ public class LambdaTest extends JexlTestCase {
         Assert.assertEquals(8, result);
     }
 
-    // redefining an hoisted var is not resolved correctly in left hand side;
+    // redefining an captured var is not resolved correctly in left hand side;
     // declare the var in local frame, resolved in local frame instead of parent
 //    @Test
 //    public void test271e() throws Exception {

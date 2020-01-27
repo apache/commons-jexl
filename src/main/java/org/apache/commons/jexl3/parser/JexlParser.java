@@ -21,6 +21,7 @@ import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.internal.Scope;
+import org.apache.commons.jexl3.internal.LexicalScope;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -75,10 +76,6 @@ public abstract class JexlParser extends StringParser {
      */
     protected final Deque<Integer> loopCounts = new ArrayDeque<Integer>();
     /**
-     * Lexical unit merge, next block push is swallowed.
-     */
-    protected boolean mergeBlock = false;
-    /**
      * The current lexical block.
      */
     protected LexicalUnit block = null;
@@ -105,16 +102,13 @@ public abstract class JexlParser extends StringParser {
          * @return true if declared, false otherwise
          */
         boolean hasSymbol(int symbol);
-
+        
         /**
          * @return the number of local variables declared in this unit
          */
         int getSymbolCount();
-
-        /**
-         * Clears this unit.
-         */
-        void clearUnit();
+        
+        LexicalScope getLexicalScope();
     }
 
     /**
@@ -131,7 +125,6 @@ public abstract class JexlParser extends StringParser {
         loopCount = 0;
         blocks.clear();
         block = null;
-        mergeBlock = false;
     }
     /**
      * Utility function to create '.' separated string from a list of string.
@@ -262,10 +255,34 @@ public abstract class JexlParser extends StringParser {
             } else {
                 block = null;
             }
-            //unit.clearUnit();
         }
     }
-
+    
+    /**
+     * Checks if a symbol is defined in lexical scopes.
+     * <p>This works with with parsed scripts in template resolution only.
+     * @param info an info linked to a node
+     * @param symbol
+     * @return true if symbol accessible in lexical scope
+     */
+    private boolean isSymbolDeclared(JexlNode.Info info, int symbol) {
+        JexlNode walk = info.getNode();
+        while(walk != null) {
+            if (walk instanceof JexlParser.LexicalUnit) {
+                LexicalScope scope = ((JexlParser.LexicalUnit) walk).getLexicalScope();
+                if (scope != null && scope.hasSymbol(symbol)) {
+                    return true;
+                }
+                // stop at first new scope reset, aka lambda
+                if (walk instanceof ASTJexlLambda) {
+                    break;
+                }
+            }
+            walk = walk.jjtGetParent();
+        }
+        return false;
+    }
+    
     /**
      * Checks whether an identifier is a local variable or argument, ie a symbol, stored in a register.
      * @param identifier the identifier
@@ -277,7 +294,10 @@ public abstract class JexlParser extends StringParser {
             Integer symbol = frame.getSymbol(name);
             if (symbol != null) {
                 boolean declared = true;
-                if (getFeatures().isLexical()) {
+                if (frame.isCapturedSymbol(symbol)) {
+                    // captured are declared in all cases
+                    identifier.setCaptured(true);
+                } else {
                     declared = block.hasSymbol(symbol);
                     // one of the lexical blocks above should declare it
                     if (!declared) {
@@ -288,12 +308,17 @@ public abstract class JexlParser extends StringParser {
                             }
                         }
                     }
+                    if (!declared && info instanceof JexlNode.Info) {
+                        declared = isSymbolDeclared((JexlNode.Info) info, symbol);
+                    }
                 }
-                if (declared) {
-                    identifier.setSymbol(symbol, name);
-                } else if (getFeatures().isLexicalShade()) {
-                    // can not reuse a local as a global
-                    throw new JexlException(identifier, name + ": variable is not defined");
+                identifier.setSymbol(symbol, name);
+                if (!declared) {
+                    identifier.setShaded(true);
+                    if (getFeatures().isLexicalShade()) {
+                        // can not reuse a local as a global
+                        throw new JexlException(identifier, name + ": variable is not defined");
+                    }
                 }
             }
         }
@@ -324,7 +349,7 @@ public abstract class JexlParser extends StringParser {
      */
     private boolean declareSymbol(int symbol) {
         if (blocks != null) {
-            for(LexicalUnit lu : blocks) {
+            for (LexicalUnit lu : blocks) {
                 if (lu.hasSymbol(symbol)) {
                     return false;
                 }
@@ -353,9 +378,16 @@ public abstract class JexlParser extends StringParser {
         }
         int symbol = frame.declareVariable(name);
         var.setSymbol(symbol, name);
+        if (frame.isCapturedSymbol(symbol)) {
+            var.setCaptured(true);
+        }
         // lexical feature error
-        if (!declareSymbol(symbol) && getFeatures().isLexical()) {
-            throw new JexlException(var,  name + ": variable is already declared");
+        if (!declareSymbol(symbol)) {
+            if (getFeatures().isLexical()) {
+                throw new JexlException(var, name + ": variable is already declared");
+            } else {
+                var.setRedefined(true);
+            }
         }
     }
 

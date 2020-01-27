@@ -26,8 +26,17 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-322" due-to="Constantin Hirsch">
+                JXLT String literals cannot contain curly braces
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-321" due-to="Dmitri Blinov">
                 Empty do-while loop is broken
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-320" due-to="David Costanzo">
+                "mvn test" fails with COMPILATION ERROR in SynchronizedArithmetic.java on Java 11
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-319" due-to="David Costanzo">
+                Apache project documentation gives instructions in subversion
             </action>
             <action dev="henrib" type="fix" issue="JEXL-318" due-to="Dmitri Blinov">
                 Annotation processing may fail in lexical mode

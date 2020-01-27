@@ -270,4 +270,60 @@ public abstract class JexlNode extends SimpleNode {
         }
         return false;
     } 
+
+    /**
+     * An info bound to its node.
+     * <p>Used to parse expressions for templates.
+     */
+    public static class Info extends JexlInfo {
+        JexlNode node = null;
+
+        /**
+         * Default ctor.
+         * @param jnode the node
+         */
+        public Info(JexlNode jnode) {
+            this(jnode, jnode.jexlInfo());
+        }
+        
+        /**
+         * Copy ctor.
+         * @param jnode the node
+         * @param info the 
+         */
+        public Info(JexlNode jnode, JexlInfo info) {
+            this(jnode, info.getName(), info.getLine(), info.getColumn());
+        }
+        
+        /**
+         * Full detail ctor.
+         * @param jnode the node
+         * @param name the file name
+         * @param l the line
+         * @param c the column
+         */
+        private Info(JexlNode jnode, String name, int l, int c) {
+            super(name, l, c);
+            node = jnode;
+        }
+
+        /**
+         * @return the node this info is bound to
+         */
+        public JexlNode getNode() {
+            return node;
+        }
+
+        @Override
+        public JexlInfo at(int l, int c) {
+            return new Info(node, getName(), l, c);
+        }
+
+        @Override
+        public JexlInfo detach() {
+            node = null;
+            return this;
+        }
+    }
+
 }

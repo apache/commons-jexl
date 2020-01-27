@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.parser.ASTArguments;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
@@ -118,20 +119,19 @@ public final class TemplateScript implements JxltEngine.Template {
         script = jxlt.getEngine().parse(info.at(1, 1), false, strb.toString(), scope).script();
         // seek the map of expression number to scope so we can parse Unified
         // expression blocks with the appropriate symbols
-        Map<Integer, Scope> mscope = new TreeMap<Integer, Scope>();
-        collectPrintScope(script.script(), null, mscope);
+        Map<Integer, JexlNode.Info> minfo = new TreeMap<Integer, JexlNode.Info>();
+        collectPrintScope(script.script(), minfo);
         // jexl:print(...) expression counter
         int jpe = 0;
         // create the exprs using the intended scopes
         for (int b = 0; b < blocks.size(); ++b) {
             Block block = blocks.get(b);
             if (block.getType() == BlockType.VERBATIM) {
+                JexlNode.Info ji = minfo.get(jpe);
                 uexprs.add(
-                        jxlt.parseExpression(
-                                info.at(block.getLine(), 1),
-                                block.getBody(),
-                                mscope.get(jpe++))
+                    jxlt.parseExpression(ji, block.getBody(), scopeOf(ji))
                 );
+                jpe += 1;
             }
         }
         source = blocks.toArray(new Block[blocks.size()]);
@@ -159,14 +159,29 @@ public final class TemplateScript implements JxltEngine.Template {
     }
     
     /**
+     * Gets the scope from an info.
+     * @param info the node info
+     * @return the scope
+     */
+    private static Scope scopeOf(JexlNode.Info info) {
+        JexlNode walk = info.getNode();
+        while(walk != null) {
+            if (walk instanceof ASTJexlScript) {
+                return ((ASTJexlScript) walk).getScope();
+            }
+            walk = walk.jjtGetParent();
+        }
+        return null;
+    }
+    
+    /**
      * Collects the scope surrounding a call to jexl:print(i).
      * <p>This allows to later parse the blocks with the known symbols 
      * in the frame visible to the parser.
      * @param node the visited node
-     * @param scope the current scope
-     * @param mscope the map of printed expression number to scope
+     * @param minfo the map of printed expression number to node info
      */
-    static void collectPrintScope(JexlNode node, Scope scope, Map<Integer, Scope> mscope) {
+    private static void collectPrintScope(JexlNode node, Map<Integer, JexlNode.Info> minfo) {
         int nc = node.jjtGetNumChildren();
         if (node instanceof ASTFunctionNode) {
             if (nc == 2) {
@@ -179,17 +194,15 @@ public final class TemplateScript implements JxltEngine.Template {
                         JexlNode arg0 = argNode.jjtGetChild(0);
                         if (arg0 instanceof ASTNumberLiteral) {
                             int exprNumber = ((ASTNumberLiteral) arg0).getLiteral().intValue();
-                            mscope.put(exprNumber, scope);
+                            minfo.put(exprNumber, new JexlNode.Info(nameNode));
                             return;
                         }
                     }
                 }
             }
-        } else if (node instanceof ASTJexlScript) {
-            scope = ((ASTJexlScript) node).getScope();
         }
         for (int c = 0; c < nc; ++c) {
-            collectPrintScope(node.jjtGetChild(c), scope, mscope);
+            collectPrintScope(node.jjtGetChild(c), minfo);
         }
     }
 
@@ -230,13 +243,24 @@ public final class TemplateScript implements JxltEngine.Template {
         }
         return strb.toString();
     }
-
+    
     @Override
     public TemplateScript prepare(JexlContext context) {
+        Engine jexl = jxlt.getEngine();
         Frame frame = script.createFrame((Object[]) null);
+        Interpreter interpreter = new TemplateInterpreter(jexl, context, frame, null, null);
         TemplateExpression[] immediates = new TemplateExpression[exprs.length];
         for (int e = 0; e < exprs.length; ++e) {
-            immediates[e] = exprs[e].prepare(frame, context);
+            try {
+                immediates[e] = exprs[e].prepare(interpreter);
+            } catch (JexlException xjexl) {
+                JexlException xuel = TemplateEngine.createException(xjexl.getInfo(), "prepare", exprs[e], xjexl);
+                if (jexl.isSilent()) {
+                    jexl.logger.warn(xuel.getMessage(), xuel.getCause());
+                    return null;
+                }
+                throw xuel;
+            }
         }
         return new TemplateScript(jxlt, prefix, source, script, immediates);
     }

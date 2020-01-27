@@ -286,14 +286,23 @@ public class LexicalTest {
         String ctl = "<report>\n\n3\n</report>\n";
         Assert.assertEquals(ctl, output);
     }
+    
+    public static class DebugContext extends MapContext {
+        public DebugContext() {
+            super();
+        }
+        public Object debug(Object arg) {
+            return arg;
+        }
+    }
 
     @Test
     public void testLexical5() throws Exception {
         JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
-        JexlContext ctxt = new MapContext();
+        JexlContext ctxt = new DebugContext();
         JexlScript script;
         Object result;
-        script = jexl.createScript("var x = 42; var z = 169; var y = () -> { {var x = -42; }; return x; }; y()");
+            script = jexl.createScript("var x = 42; var y = () -> { {var x = debug(-42); }; return x; }; y()");
         try {
             result = script.execute(ctxt);
             Assert.assertEquals(42, result);
@@ -381,10 +390,10 @@ public class LexicalTest {
     
     @Test
     public void testScopeFrame() throws Exception {
-        LexicalScope scope = new LexicalScope(null);
+        LexicalScope scope = new LexicalScope();
         for(int i = 0; i < 128; i += 2) {
-            Assert.assertTrue(scope.declareSymbol(i));
-            Assert.assertFalse(scope.declareSymbol(i));
+            Assert.assertTrue(scope.addSymbol(i));
+            Assert.assertFalse(scope.addSymbol(i));
         }
         for(int i = 0; i < 128; i += 2) {
             Assert.assertTrue(scope.hasSymbol(i));
@@ -739,4 +748,16 @@ public class LexicalTest {
         Object result = script.execute(null);
         Assert.assertEquals(result, 42);
     }
+      
+    @Test
+    public void testHoisted() throws Exception {
+        JexlFeatures f = new JexlFeatures();
+        f.lexical(true);
+        JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
+        JexlScript script = jexl.createScript("var x = 10; var a = function(var b) {for (var q : 1 ..10) {return x + b}}; a(32)");
+        JexlContext jc = new MapContext();
+        Object result = script.execute(null);
+        Assert.assertEquals(result, 42);
+    }
+    
 }

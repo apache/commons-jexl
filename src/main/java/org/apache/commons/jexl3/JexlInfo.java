@@ -186,6 +186,13 @@ public class JexlInfo {
     }
     
     /**
+     * @return this instance or a copy without any decorations
+     */
+    public JexlInfo detach() {
+        return this;
+    }
+    
+    /**
      * Gets the info from a script.
      * @param script the script
      * @return the info

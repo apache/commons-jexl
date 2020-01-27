@@ -87,18 +87,20 @@ public class Closure extends Script {
     }
 
     /**
-     * Sets the hoisted index of a given symbol, ie the target index of a parent hoisted symbol in this closure's frame.
-     * <p>This is meant to allow a locally defined function to "see" and call itself as a local (hoisted) variable;
+     * Sets the captured index of a given symbol, ie the target index of a parent
+     * captured symbol in this closure's frame.
+     * <p>This is meant to allow a locally defined function to "see" and call
+     * itself as a local (captured) variable;
      * in other words, this allows recursive call of a function.
      * @param symbol the symbol index (in the caller of this closure)
      * @param value the value to set in the local frame
      */
-    public void setHoisted(int symbol, Object value) {
+    public void setCaptured(int symbol, Object value) {
         if (script instanceof ASTJexlLambda) {
             ASTJexlLambda lambda = (ASTJexlLambda) script;
             Scope scope = lambda.getScope();
             if (scope != null) {
-                Integer reg = scope.getHoisted(symbol);
+                Integer reg = scope.getCaptured(symbol);
                 if (reg != null) {
                     frame.set(reg, value);
                 }

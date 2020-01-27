@@ -95,7 +95,7 @@ public class JexlException extends RuntimeException {
      * @return the information
      */
     public JexlInfo getInfo() {
-        return getInfo(mark, info);
+        return detailedInfo(mark, info);
     }
     
     /**
@@ -105,7 +105,7 @@ public class JexlException extends RuntimeException {
      * @return a string builder
      */
     private static StringBuilder errorAt(JexlNode node) {
-        JexlInfo info = node != null? getInfo(node, node.jexlInfo()) : null;
+        JexlInfo info = node != null? detailedInfo(node, node.jexlInfo()) : null;
         StringBuilder msg = new StringBuilder();
         if (info != null) {
             msg.append(info.toString());
@@ -122,8 +122,21 @@ public class JexlException extends RuntimeException {
      * @param node the node
      * @param info the information
      * @return the information or null
+     * @deprecated 3.2
      */
-    private static JexlInfo getInfo(JexlNode node, JexlInfo info) {
+    @Deprecated
+    public static JexlInfo getInfo(JexlNode node, JexlInfo info) {
+        return detailedInfo(node, info);
+    }
+    
+    /**
+     * Gets the most specific information attached to a node.
+     *
+     * @param node the node
+     * @param info the information
+     * @return the information or null
+     */
+    private static JexlInfo detailedInfo(JexlNode node, JexlInfo info) {
         if (info != null && node != null) {
             final Debugger dbg = new Debugger();
             if (dbg.debug(node)) {

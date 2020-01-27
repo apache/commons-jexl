@@ -139,15 +139,13 @@ public abstract class IntegerRange implements Collection<Integer> {
         T[] copy = array;
         if (ct.isAssignableFrom(Integer.class)) {
             if (array.length < length) {
-                copy = ct == Object.class
-                       ? (T[]) new Object[length]
-                       : (T[]) Array.newInstance(ct, length);
+                copy = (T[]) Array.newInstance(ct, length);
             }
             for (int a = 0; a < length; ++a) {
                 Array.set(copy, a, min + a);
             }
-            if (length < array.length) {
-                array[length] = null;
+            if (length < copy.length) {
+                copy[length] = null;
             }
             return copy;
         }

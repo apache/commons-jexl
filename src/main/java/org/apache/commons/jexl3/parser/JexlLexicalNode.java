@@ -16,21 +16,43 @@
  */
 package org.apache.commons.jexl3.parser;
 
-/**
- * Declares a block.
- */
-public class ASTBlock extends JexlLexicalNode {
+import org.apache.commons.jexl3.internal.LexicalScope;
 
-    public ASTBlock(int id) {
+/**
+ * Base class for AST nodes behaving as lexical units.
+ * @since 3.2
+ */
+public class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit {
+    private LexicalScope locals = null;
+    
+    public JexlLexicalNode(int id) {
         super(id);
     }
 
-    public ASTBlock(Parser p, int id) {
+    public JexlLexicalNode(Parser p, int id) {
         super(p, id);
+    }
+    
+    @Override
+    public boolean declareSymbol(int symbol) {
+        if (locals == null) {
+            locals  = new LexicalScope();
+        }
+        return locals.addSymbol(symbol);
+    }
+    
+    @Override
+    public int getSymbolCount() {
+        return locals == null? 0 : locals.getSymbolCount();
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
-        return visitor.visit(this, data);
+    public boolean hasSymbol(int symbol) {
+        return locals == null? false : locals.hasSymbol(symbol);
+    }    
+
+    @Override
+    public LexicalScope getLexicalScope() {
+        return locals;
     }
 }

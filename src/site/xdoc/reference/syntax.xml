@@ -192,7 +192,7 @@
                         <p>Note that functions can use local variables and parameters from their declaring script.
                             Those variables values are bound to the function environment at definition time.</p>
                         <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
-                        The function closure hoists 't' when defined; the result of the evaluation will
+                        The function closure captures 't' when defined; the result of the evaluation will
                         lead to <code>15 + 7 + 20 = 42</code>.
                     </td>
                 </tr>

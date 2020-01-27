@@ -22,6 +22,14 @@ package org.apache.commons.jexl3.parser;
 public class ASTIdentifier extends JexlNode {
     protected String name = null;
     protected int symbol = -1;
+    protected int flags = 0;
+    
+    /** The redefined variable flag. */
+    private static final int REDEFINED = 0;
+    /** The shaded variable flag. */
+    private static final int SHADED = 1;
+    /** The captured variable flag. */
+    private static final int CAPTURED = 2;
 
     ASTIdentifier(int id) {
         super(id);
@@ -47,11 +55,56 @@ public class ASTIdentifier extends JexlNode {
         symbol = r;
         name = identifier;
     }
-
+    
     public int getSymbol() {
         return symbol;
     }
+        
+    /**
+     * Sets the value of a flag in a mask.
+     * @param ordinal the flag ordinal
+     * @param mask the flags mask
+     * @param value true or false
+     * @return the new flags mask value
+     */
+    private static int set(int ordinal, int mask, boolean value) {
+        return value? mask | (1 << ordinal) : mask & ~(1 << ordinal);
+    }
 
+    /**
+     * Checks the value of a flag in the mask.
+     * @param ordinal the flag ordinal
+     * @param mask the flags mask
+     * @return the mask value with this flag or-ed in
+     */
+    private static boolean isSet(int ordinal, int mask) {
+        return (mask & 1 << ordinal) != 0;
+    }
+      
+    public void setRedefined(boolean f) {
+        flags = set(REDEFINED, flags, f);
+    }
+     
+    public boolean isRedefined() {
+        return isSet(REDEFINED, flags);
+    }
+    
+    public void setShaded(boolean f) {
+        flags = set(SHADED, flags, f);
+    }
+    
+    public boolean isShaded() {
+        return isSet(SHADED, flags);
+    }
+    
+    public void setCaptured(boolean f) {
+        flags = set(CAPTURED, flags, f);
+    }
+    
+    public boolean isCaptured() {
+        return isSet(CAPTURED, flags);
+    }
+    
     public String getName() {
         return name;
     }

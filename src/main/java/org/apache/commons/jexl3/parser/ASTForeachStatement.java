@@ -16,13 +16,10 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.internal.LexicalScope;
-
 /**
- * Declares a local variable.
+ * Declares a for each loop.
  */
-public class ASTForeachStatement extends JexlNode implements JexlParser.LexicalUnit {
-    private LexicalScope locals = null;
+public class ASTForeachStatement extends JexlLexicalNode {
     
     public ASTForeachStatement(int id) {
         super(id);
@@ -36,27 +33,5 @@ public class ASTForeachStatement extends JexlNode implements JexlParser.LexicalU
     public Object jjtAccept(ParserVisitor visitor, Object data) {
         return visitor.visit(this, data);
     }
-    
-    @Override
-    public boolean declareSymbol(int symbol) {
-        if (locals == null) {
-            locals  = new LexicalScope(null);
-        }
-        return locals.declareSymbol(symbol);
-    }
-    
-    @Override
-    public int getSymbolCount() {
-        return locals == null? 0 : locals.getSymbolCount();
-    }
 
-    @Override
-    public boolean hasSymbol(int symbol) {
-        return locals == null? false : locals.hasSymbol(symbol);
-    }    
-    
-    @Override
-    public void clearUnit() {
-        locals = null;
-    }
 }

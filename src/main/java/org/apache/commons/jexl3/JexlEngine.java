@@ -258,13 +258,6 @@ public abstract class JexlEngine {
      * @return true if strict, false otherwise
      */
     public abstract boolean isStrict();
-    
-    /**
-     * Checks whether this engine uses safe navigation.
-     *
-     * @return true if safe, false otherwise
-     */
-    public abstract boolean isSafe();
 
     /**
      * Checks whether this engine will throw JexlException.Cancel (true) or return null (false) when interrupted

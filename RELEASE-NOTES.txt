@@ -74,7 +74,10 @@ New Features in 3.2:
 
 Bugs Fixed in 3.2:
 ==================
+* JEXL-322:      JXLT String literals cannot contain curly brace
 * JEXL-321:      Empty do-while loop is broken
+* JEXL-320:      "mvn test" fails with COMPILATION ERROR in SynchronizedArithmetic.java on Java 11
+* JEXL-319:      Apache project documentation gives instructions in subversion
 * JEXL-318:      Annotation processing may fail in lexical mode
 * JEXL-315:      JxltEngine literal string strings ending in \ $ or # throw JxltEngine$Exception
 * JEXL-314:      Comparison NULL values of variables NAME1.NAME2

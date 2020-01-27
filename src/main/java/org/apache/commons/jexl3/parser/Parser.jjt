@@ -61,7 +61,7 @@ public final class Parser extends JexlParser
             frame = scope;
             ReInit(new java.io.StringReader(jexlSrc));
             ASTJexlScript script = jexlFeatures.supportsScript()? JexlScript(scope) : JexlExpression(scope);
-            script.jjtSetValue(info);
+            script.jjtSetValue(info.detach());
             script.setFeatures(jexlFeatures);
             script.setPragmas(pragmas != null
                              ? Collections.<String,Object>unmodifiableMap(pragmas)
