@@ -112,4 +112,17 @@ public class ParseFailuresTest extends JexlTestCase {
         }
     }
 
+    @Test
+    public void test324() throws Exception {
+        String badScript = "new()"; // malformed because new requires at least one argument
+        try {
+            JEXL.createScript(badScript);
+            Assert.fail("Parsing \"" + badScript
+                    + "\" should result in a JexlException.Parsing");
+        } catch (JexlException.Parsing pe) {
+            // expected
+            LOGGER.error(pe);
+        }
+    }
+
 }

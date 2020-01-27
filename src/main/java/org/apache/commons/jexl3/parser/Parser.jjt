@@ -811,7 +811,7 @@ void FunctionCall() #void : {}
 
 void Constructor() #ConstructorNode() : {}
 {
-  <NEW> <LPAREN> [ Expression() ( <COMMA> Expression() )* ] <RPAREN>
+  <NEW> <LPAREN> Expression() ( <COMMA> Expression() )* <RPAREN>
 }
 
 void Parameter() #void :
