@@ -48,7 +48,7 @@
             </p>
             <p>
                 For more technical information about the JEXL Grammar, you can find the
-                <a href="https://javacc.dev.java.net/">JavaCC</a> grammar for JEXL
+                <a href="https://javacc.github.io/javacc">JavaCC</a> grammar for JEXL
                 here: <a href="https://gitbox.apache.org/repos/asf?p=commons-jexl.git;a=blob;f=src/main/java/org/apache/commons/jexl3/parser/Parser.jjt">Parser.jjt</a>
             </p>
         </section>
