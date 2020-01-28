@@ -36,15 +36,15 @@ public final class NumberParser {
             return "NaN";
         }
         if (BigDecimal.class.equals(clazz)) {
-            return BIGDF.format(literal);
+            synchronized (BIGDF) {
+                return BIGDF.format(literal);
+            }
         }
         StringBuilder strb = new StringBuilder(literal.toString());
         if (Float.class.equals(clazz)) {
             strb.append('f');
         } else if (Double.class.equals(clazz)) {
             strb.append('d');
-        } else if (BigDecimal.class.equals(clazz)) {
-            strb.append('b');
         } else if (BigInteger.class.equals(clazz)) {
             strb.append('h');
         } else if (Long.class.equals(clazz)) {

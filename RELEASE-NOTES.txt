@@ -74,6 +74,7 @@ New Features in 3.2:
 
 Bugs Fixed in 3.2:
 ==================
+* JEXL-325:      Potential race-condition in NumberParser.toString()
 * JEXL-324:      JexlEngine.createExpression("new()").getParsedText() throws NPE
 * JEXL-322:      JXLT String literals cannot contain curly brace
 * JEXL-321:      Empty do-while loop is broken

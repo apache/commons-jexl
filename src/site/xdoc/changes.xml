@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="Dmitri Blinov" type="fix" issue="JEXL-325" due-to="Dmitri Blinov">
+                Potential race-condition in NumberParser.toString()
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-324" due-to="David Costanzo">
                 JexlEngine.createExpression("new()").getParsedText() throws NPE
             </action>
