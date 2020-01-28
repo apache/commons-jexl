@@ -70,7 +70,7 @@ public final class Parser extends JexlParser
         } catch (TokenMgrError xtme) {
             throw new JexlException.Tokenization(info, xtme).clean();
         } catch (ParseException xparse) {
-            Token errortok = jj_lastpos != null? jj_lastpos : jj_scanpos != null ? jj_scanpos : token;
+            Token errortok = errorToken(jj_lastpos, jj_scanpos, token.next, token);
             throw new JexlException.Parsing(info.at(errortok.beginLine, errortok.beginColumn), errortok.image).clean();
         } finally {
             token_source.defaultLexState = DEFAULT;

@@ -585,4 +585,18 @@ public abstract class JexlParser extends StringParser {
         // unlikely but safe
         throw xparse != null ? xparse : new JexlException.Parsing(xinfo, msg);
     }
+    
+    /**
+     * Pick the most significant token for error reporting.
+     * @param tokens the tokens to choose from
+     * @return the token
+     */
+    protected static Token errorToken(Token... tokens) {
+        for (Token token : tokens) {
+            if (token != null && token.image != null && !token.image.isEmpty()) {
+                return token;
+            }
+        }
+        return null;
+    }
 }
