@@ -786,7 +786,7 @@ public final class TemplateEngine extends JxltEngine {
                         state = ParseState.ESCAPE;
                     } else {
                         // do buildup expr
-                        column = append(strb, expr, column, c);
+                        strb.append(c);
                     }
                     break;
                 case IMMEDIATE0: // $
@@ -801,7 +801,7 @@ public final class TemplateEngine extends JxltEngine {
                     } else {
                         // revert to CONST
                         strb.append(immediateChar);
-                        column = append(strb, expr, column, c);
+                        strb.append(c);
                         state = ParseState.CONST;
                     }
                     break;
@@ -817,7 +817,7 @@ public final class TemplateEngine extends JxltEngine {
                     } else {
                         // revert to CONST
                         strb.append(deferredChar);
-                        column = append(strb, expr, column, c);
+                        strb.append(c);
                         state = ParseState.CONST;
                     }
                     break;

@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-324" due-to="David Costanzo">
+                JexlEngine.createExpression("new()").getParsedText() throws NPE
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-322" due-to="Constantin Hirsch">
                 JXLT String literals cannot contain curly braces
             </action>

@@ -349,7 +349,7 @@ public class Issues300Test {
     }
 
     @Test
-    public void test322() throws Exception {
+    public void test322a() throws Exception {
         JexlEngine jexl = new JexlBuilder().strict(true).create();
         JxltEngine jxlt = jexl.createJxltEngine();
         JexlContext context = new MapContext();
@@ -377,6 +377,48 @@ public class Issues300Test {
             output = strw.toString();
             Assert.assertEquals(ctls[i], output);
         }
+    }
+    
+    public static class User322 {
+        public String getName() {
+            return "user322";
+        }
+    }
+    
+    public static class Session322 {
+        public User322 getUser() {
+            return new User322();
+        }
+    }
+    
+    @Test
+    public void test322b() throws Exception {
+        MapContext ctxt = new MapContext();
+        String src = "L'utilisateur ${session.user.name} s'est connecte";
+        JexlEngine jexl = new JexlBuilder().strict(true).create();
+        JxltEngine jxlt = jexl.createJxltEngine();
+        StringWriter strw;
+        JxltEngine.Template template;
+        String output;
+        template = jxlt.createTemplate("$$", new StringReader(src));
+        
+        ctxt.set("session", new Session322());
+        strw = new StringWriter();
+        template.evaluate(ctxt, strw);
+        output = strw.toString();
+        Assert.assertEquals("L'utilisateur user322 s'est connecte", output);
+        
+        ctxt.set("session.user", new User322());
+        strw = new StringWriter();
+        template.evaluate(ctxt, strw);
+        output = strw.toString();
+        Assert.assertEquals("L'utilisateur user322 s'est connecte", output);
+        
+        ctxt.set("session.user.name", "user322");
+        strw = new StringWriter();
+        template.evaluate(ctxt, strw);
+        output = strw.toString();
+        Assert.assertEquals("L'utilisateur user322 s'est connecte", output);
     }
     
     @Ignore
@@ -416,4 +458,5 @@ public class Issues300Test {
             Assert.assertTrue(xparse.toString().contains("new"));
         }
     }
+    
 }
