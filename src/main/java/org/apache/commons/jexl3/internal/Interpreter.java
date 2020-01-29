@@ -1132,6 +1132,7 @@ public class Interpreter extends InterpreterBase {
         for (int c = 0; c < numChildren; c++) {
             objectNode = node.jjtGetChild(c);
             if (objectNode instanceof ASTMethodNode) {
+                antish = false;
                 if (object == null) {
                     // we may be performing a method call on an antish var
                     if (ant != null) {
@@ -1147,19 +1148,17 @@ public class Interpreter extends InterpreterBase {
                             } else {
                                 // remove method name from antish
                                 ant.delete(alen, ant.length());
+                                ptyNode = objectNode;
                             }
                         }
                     }
                     break;
-                } else {
-                    antish = false;
                 }
             } else if (objectNode instanceof ASTArrayAccess) {
+                antish = false;
                 if (object == null) {
                     ptyNode = objectNode;
                     break;
-                } else {
-                    antish = false;
                 }
             }
             // attempt to evaluate the property within the object (visit(ASTIdentifierAccess node))
@@ -1216,7 +1215,7 @@ public class Interpreter extends InterpreterBase {
                 break; //
             }
         }
-        // am I the left-hand side of a safe op ?
+        // dealing with null
         if (object == null) {
             if (ptyNode != null) {
                 if (ptyNode.isSafeLhs(isSafe())) {
@@ -1224,19 +1223,23 @@ public class Interpreter extends InterpreterBase {
                 }
                 if (ant != null) {
                     String aname = ant.toString();
-                    boolean undefined = !(context.has(aname) || isLocalVariable(node, 0) || isFunctionCall(node));
+                    boolean undefined = !(context.has(aname));
                     return unsolvableVariable(node, aname, undefined);
                 }
-                return unsolvableProperty(node, stringifyProperty(ptyNode), ptyNode == objectNode, null);
+                return unsolvableProperty(node,
+                        stringifyProperty(ptyNode), ptyNode == objectNode, null);
             }
             if (antish) {
                 if (node.isSafeLhs(isSafe())) {
                     return null;
                 }
                 String aname = ant != null ? ant.toString() : "?";
-                boolean undefined = !(context.has(aname) || isLocalVariable(node, 0) || isFunctionCall(node));
-                if (undefined || arithmetic.isStrict()) {
-                    return unsolvableVariable(node, aname, undefined);
+                boolean defined = context.has(aname);
+                if (defined && !arithmetic.isStrict()) {
+                    return null;
+                }
+                if (!defined || !(node.jjtGetParent() instanceof ASTJexlScript)) {
+                    return unsolvableVariable(node, aname, !defined);
                 }
             }
         }
@@ -1450,10 +1453,8 @@ public class Interpreter extends InterpreterBase {
         } else {
             throw new JexlException(objectNode, "illegal assignment form");
         }
-        if (property == null) {
-            // no property, we fail
-            return unsolvableProperty(propertyNode, "<?>.<null>", true, null);
-        }
+        // we may have a null property as in map[null], no check needed.
+        // we can not *have* a null object though.
         if (object == null) {
             // no object, we fail
             return unsolvableProperty(objectNode, "<null>.<?>", true, null);

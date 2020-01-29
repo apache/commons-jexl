@@ -18,6 +18,7 @@ package org.apache.commons.jexl3;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -47,7 +47,7 @@ public class Issues300Test {
                     Assert.fail(src + ": Should have failed");
                 }
             } catch (Exception ex) {
-                //
+                Assert.assertTrue(ex.getMessage().contains("x"));
             }
         }
     }
@@ -421,26 +421,68 @@ public class Issues300Test {
         Assert.assertEquals("L'utilisateur user322 s'est connecte", output);
     }
     
-    @Ignore
+    @Test
     public void test323() throws Exception {
-        // Create or retrieve an engine
         JexlEngine jexl = new JexlBuilder().safe(false).create();
-        // on recent code: JexlEngine jexl = new JexlBuilder().safe(false).create();
-
-        // Populate to identical global variables
-        JexlContext jc = new MapContext();
-        jc.set("NormalVariable", null);
-        jc.set("ant.variable", null);
-
-        // Evaluate the value of the normal variable
-        JexlExpression expression1 = jexl.createExpression("NormalVariable");
-        Object o1 = expression1.evaluate(jc);
-        Assert.assertEquals(null, o1);
-
-        // Evaluate the value of the ant-style variable
-        JexlExpression expression2 = jexl.createExpression("ant.variable");
-        Object o2 = expression2.evaluate(jc); // <-- BUG: throws exception instead of returning null
-        Assert.assertEquals(null, o2);
+        Map<String,Object> vars = new HashMap<String, Object>();
+        JexlContext jc = new MapContext(vars);
+        JexlScript script;
+        Object result;
+        
+        // nothing in context, ex
+        try {
+         script = jexl.createScript("a.n.t.variable");
+         result = script.execute(jc); 
+         Assert.fail("a.n.t.variable is undefined!");
+        } catch(JexlException.Variable xvar) {
+            Assert.assertTrue(xvar.toString().contains("a.n.t"));
+        }
+        
+        // defined and null
+        jc.set("a.n.t.variable", null);
+        script = jexl.createScript("a.n.t.variable");
+        result = script.execute(jc); 
+        Assert.assertEquals(null, result);
+        
+        // defined and null, dereference
+        jc.set("a.n.t", null);
+        try {
+         script = jexl.createScript("a.n.t[0].variable");
+         result = script.execute(jc); 
+         Assert.fail("a.n.t is null!");
+        } catch(JexlException.Variable xvar) {
+            Assert.assertTrue(xvar.toString().contains("a.n.t"));
+        }
+        
+        // undefined, dereference
+        vars.remove("a.n.t");
+        try {
+         script = jexl.createScript("a.n.t[0].variable");
+         result = script.execute(jc); 
+         Assert.fail("a.n.t is undefined!");
+        } catch(JexlException.Variable xvar) {
+            Assert.assertTrue(xvar.toString().contains("a.n.t"));
+        }
+        // defined, derefence undefined property
+        List<Object> inner = new ArrayList<Object>();
+        vars.put("a.n.t", inner);
+        try {
+            script = jexl.createScript("a.n.t[0].variable");
+            result = script.execute(jc); 
+            Assert.fail("a.n.t is null!");
+        } catch(JexlException.Property xprop) {
+            Assert.assertTrue(xprop.toString().contains("0"));
+        }
+        // defined, derefence undefined property
+        inner.add(42);
+        try {
+            script = jexl.createScript("a.n.t[0].variable");
+            result = script.execute(jc); 
+            Assert.fail("a.n.t is null!");
+        } catch(JexlException.Property xprop) {
+            Assert.assertTrue(xprop.toString().contains("variable"));
+        }
+        
     }
     
     @Test
@@ -458,5 +500,33 @@ public class Issues300Test {
             Assert.assertTrue(xparse.toString().contains("new"));
         }
     }
-    
+
+    @Test
+    public void test325() throws Exception {
+        JexlEngine jexl = new JexlBuilder().safe(false).create();
+        Map<String, Object> map = new HashMap<String, Object>() {
+            @Override
+            public Object get(Object key) {
+                return super.get(key == null ? "" : key);
+            }
+
+            @Override
+            public Object put(String key, Object value) {
+                return super.put(key == null ? "" : key, value);
+            }
+        };
+        map.put("42", 42);
+        JexlContext jc = new MapContext();
+        JexlScript script;
+        Object result;
+
+        script = jexl.createScript("map[null] = 42", "map");
+        result = script.execute(jc, map);
+        Assert.assertEquals(42, result);
+        script = jexl.createScript("map[key]", "map", "key");
+        result = script.execute(jc, map, null);
+        Assert.assertEquals(42, result);
+        result = script.execute(jc, map, "42");
+        Assert.assertEquals(42, result);
+    }
 }

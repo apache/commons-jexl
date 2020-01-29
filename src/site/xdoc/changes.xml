@@ -26,11 +26,20 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-327" due-to="David Costanzo">
+                map[null] does not work in assignment context
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-326" due-to="David Costanzo">
+                Link to "JavaCC" on syntax reference page is broken
+            </action>
             <action dev="Dmitri Blinov" type="fix" issue="JEXL-325" due-to="Dmitri Blinov">
                 Potential race-condition in NumberParser.toString()
             </action>
             <action dev="henrib" type="fix" issue="JEXL-324" due-to="David Costanzo">
                 JexlEngine.createExpression("new()").getParsedText() throws NPE
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-323" due-to="David Costanzo">
+                Ant-style variables can throw exception when evaluated for their value
             </action>
             <action dev="henrib" type="fix" issue="JEXL-322" due-to="Constantin Hirsch">
                 JXLT String literals cannot contain curly braces

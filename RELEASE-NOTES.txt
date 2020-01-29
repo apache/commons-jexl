@@ -74,8 +74,11 @@ New Features in 3.2:
 
 Bugs Fixed in 3.2:
 ==================
+* JEXL-327:      map[null] does not work in assignment context
+* JEXL-326:      Link to "JavaCC" on syntax reference page is broken
 * JEXL-325:      Potential race-condition in NumberParser.toString()
 * JEXL-324:      JexlEngine.createExpression("new()").getParsedText() throws NPE
+* JEXL-323:      Ant-style variables can throw exception when evaluated for their value
 * JEXL-322:      JXLT String literals cannot contain curly brace
 * JEXL-321:      Empty do-while loop is broken
 * JEXL-320:      "mvn test" fails with COMPILATION ERROR in SynchronizedArithmetic.java on Java 11
