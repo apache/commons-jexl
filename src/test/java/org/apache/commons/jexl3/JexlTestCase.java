@@ -34,7 +34,6 @@ public class JexlTestCase {
     // The default options: all tests where engine must lexicality is
     // important can be identified by the builder  calling lexical(...).
     static {
-        //JexlBuilder.setDefaultOptions("+safe", "-lexical"); 
         JexlOptions.setDefaultFlags("-safe", "+lexical");
     }
     /** No parameters signature for test run. */
