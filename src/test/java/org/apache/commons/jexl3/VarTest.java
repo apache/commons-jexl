@@ -16,12 +16,19 @@
  */
 package org.apache.commons.jexl3;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
+import org.apache.commons.jexl3.parser.JexlParser;
 import org.junit.Assert;
 import org.junit.Test;
 import org.apache.commons.logging.Log;
@@ -33,6 +40,10 @@ import org.apache.commons.logging.LogFactory;
 @SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
 public class VarTest extends JexlTestCase {
     static final Log LOGGER = LogFactory.getLog(VarTest.class.getName());
+    public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd");
+    static {
+        SDF.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     public VarTest() {
         super("VarTest");
@@ -366,6 +377,163 @@ public class VarTest extends JexlTestCase {
         Assert.assertEquals("z", locals[0]);
     }
 
+    /**
+     * Dates that can return multiple properties in one call.
+     */
+    public static class VarDate {
+        private final Calendar cal;
+
+        public VarDate(String date) throws Exception {
+            this(SDF.parse(date));
+        }
+        public VarDate(Date date) {
+            cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            cal.setTime(date);
+            cal.setLenient(true);
+        }
+        
+        /**
+         * Gets a date property
+         * @param property yyyy or MM or dd
+         * @return the string representation of year, month or day
+         */
+        public String get(String property) {
+            if ("yyyy".equals(property)) {
+                return Integer.toString(cal.get(Calendar.YEAR));
+            }
+            if ("MM".equals(property)) {
+                return Integer.toString(cal.get(Calendar.MONTH) + 1);
+            }
+
+            if ("dd".equals(property)) {
+                return Integer.toString(cal.get(Calendar.DAY_OF_MONTH));
+            }
+            return null;
+        }
+        
+        /**
+         * Gets a list of properties.
+         * @param keys the property names
+         * @return the property values
+         */
+        public List<String> get(String[] keys) {
+            return get(Arrays.asList(keys));
+        }
+               
+        /**
+         * Gets a list of properties.
+         * @param keys the property names
+         * @return the property values
+         */
+        public List<String> get(List<String> keys) {
+            List<String> values = new ArrayList<String>();
+            for(String key : keys) {
+                String value = get(key);
+                if (value != null) {
+                    values.add(value);
+                }
+            }
+            return values;
+        } 
+                       
+        /**
+         * Gets a map of properties.
+         * <p>Uses each map key as a property name and each value as an alias
+         * used to key the resulting property value.
+         * @param map a map of property name to alias
+         * @return the alia map
+         */
+        public Map<String,Object> get(Map<String,String> map) {
+            Map<String,Object> values = new LinkedHashMap<String,Object>();
+            for(Map.Entry<String,String> entry : map.entrySet()) {
+                String value = get(entry.getKey());
+                if (value != null) {
+                    values.put(entry.getValue(), value);
+                }
+            }
+            return values;
+        }
+    }
+
+    /**
+     * Getting properties from an array, set or map.
+     * @param str the stringified source
+     * @return the properties array
+     */
+    private static String[] readIdentifiers(String str) {
+        List<String> ids = new ArrayList<String>();
+        StringBuilder strb = null;
+        String id = null;
+        char kind = 0; // array, set or map kind using first char
+        for (int i = 0; i < str.length(); ++i) {
+            char c = str.charAt(i);
+            // strb != null when array,set or map deteced
+            if (strb == null) {
+                if (c == '{' || c == '(' || c == '[') {
+                    strb = new StringBuilder();
+                    kind = c;
+                }
+                continue;
+            }
+            // identifier pending to be added (only add map keys)  
+            if (id != null && c == ']' || c == ')'
+                || (kind != '{' && c == ',') // array or set
+                || (kind == '{' && c == ':')) // map key
+            {
+                ids.add(id);
+                id = null;
+            }
+            else if (c == '\'' || c == '"') {
+                strb.append(c);
+                int l = JexlParser.readString(strb, str, i + 1, c);
+                if (l > 0) {
+                    id = strb.substring(1, strb.length() - 1);
+                    strb.delete(0, l + 1);
+                    i = l;
+                }
+            }
+            // discard all chars not in identifier
+        }
+        return ids.toArray(new String[ids.size()]);
+    }
+    
+    @Test
+    public void testReferenceLiteral() throws Exception {
+        JexlScript script;
+        List<String> result;
+        Set<List<String>> vars;
+        // in collectAll mode, the collector grabs all syntactic variations of
+        // constant variable references including map/arry/set literals
+        JexlContext ctxt = new MapContext();
+        //d.yyyy = 1969; d.MM = 7; d.dd = 20
+        ctxt.set("moon.landing", new VarDate("1969-07-20"));
+        
+        script = JEXL.createScript("moon.landing[['yyyy', 'MM', 'dd']]");
+        result = (List<String>) script.execute(ctxt);
+        Assert.assertEquals(Arrays.asList("1969", "7", "20"), result);
+        
+        vars = script.getVariables();
+        Assert.assertEquals(1, vars.size());
+        List<String> var = vars.iterator().next();
+        Assert.assertEquals("moon", var.get(0));
+        Assert.assertEquals("landing", var.get(1));
+        Assert.assertArrayEquals(new String[]{"yyyy", "MM", "dd"}, readIdentifiers(var.get(2)));
+        
+        script = JEXL.createScript("moon.landing[ { 'yyyy' : 'year', 'MM' : 'month', 'dd' : 'day' } ]");
+        Map<String, String> mapr = (Map<String, String>) script.execute(ctxt);
+        Assert.assertEquals(3, mapr.size());
+        Assert.assertEquals("1969", mapr.get("year"));
+        Assert.assertEquals("7", mapr.get("month"));
+        Assert.assertEquals("20", mapr.get("day"));
+      
+        vars = script.getVariables();
+        Assert.assertEquals(1, vars.size());
+        var = vars.iterator().next();
+        Assert.assertEquals("moon", var.get(0));
+        Assert.assertEquals("landing", var.get(1));
+        Assert.assertArrayEquals(new String[]{"yyyy", "MM", "dd"}, readIdentifiers(var.get(2)));
+    }
+
     @Test
     public void testLiteral() throws Exception {
         JexlScript e = JEXL.createScript("x.y[['z', 't']]");
@@ -377,10 +545,22 @@ public class VarTest extends JexlTestCase {
         vars = e.getVariables();
         Assert.assertEquals(1, vars.size());
         Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
+        
         e = JEXL.createScript("x.y.'{ \\'z\\' : \\'t\\' }'");
         vars = e.getVariables();
         Assert.assertEquals(1, vars.size());
         Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
+        
+        JexlEngine jexld = new JexlBuilder().collectAll(false).create();
+        e = jexld.createScript("x.y[{'z': 't'}]");
+        vars = e.getVariables();
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y"}}), vars));
+        
+        e = jexld.createScript("x.y[['z', 't']]");
+        vars = e.getVariables();
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y"}}), vars));
     }
 
     @Test
