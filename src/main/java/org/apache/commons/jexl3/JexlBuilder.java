@@ -83,7 +83,7 @@ public class JexlBuilder {
     private final JexlOptions options = new JexlOptions();
 
     /** Whether getVariables considers all potential equivalent syntactic forms. */
-    private Boolean collectAll = null;
+    private int collectMode = 1;
 
     /** The map of 'prefix:function' to object implementing the namespaces. */
     private Map<String, Object> namespaces = null;
@@ -281,6 +281,7 @@ public class JexlBuilder {
      *
      * @param flag true means lexical function scope is in effect, false implies non-lexical scoping 
      * @return this builder
+     * @since 3.2
      */
     public JexlBuilder lexical(boolean flag) {
         options.setLexical(flag);
@@ -297,6 +298,7 @@ public class JexlBuilder {
      *
      * @param flag true means lexical shading is in effect, false implies no lexical shading 
      * @return this builder
+     * @since 3.2
      */
     public JexlBuilder lexicalShade(boolean flag) {
         options.setLexicalShade(flag);
@@ -403,15 +405,38 @@ public class JexlBuilder {
      *
      * @param flag true means var collections considers constant array accesses equivalent to dotted references
      * @return this builder
+     * @since 3.2
      */
     public JexlBuilder collectAll(boolean flag) {
-        this.collectAll = flag;
+        return collectMode(flag? 1 : 0);
+    }
+    
+    /**
+     * Experimental collector mode setter.
+     * 
+     * @param mode 0 or 1 as equivalents to false and true, other values are experimental
+     * @return this builder
+     * @since 3.2
+     */
+    public JexlBuilder collectMode(int mode) {
+        this.collectMode = mode;
         return this;
+    }  
+    
+    /** 
+     * @return true if variable collection follows strict syntactic rule 
+     * @since 3.2
+     */
+    public boolean collectAll() {
+        return this.collectMode != 0;
     }
 
-    /** @return true if collect all, false otherwise */
-    public Boolean collectAll() {
-        return this.collectAll;
+    /** 
+     * @return 0 if variable collection follows strict syntactic rule 
+     * @since 3.2
+     */
+    public int collectMode() {
+        return this.collectMode;
     }
 
     /**

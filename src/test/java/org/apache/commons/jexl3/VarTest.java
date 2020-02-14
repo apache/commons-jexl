@@ -499,6 +499,7 @@ public class VarTest extends JexlTestCase {
     
     @Test
     public void testReferenceLiteral() throws Exception {
+        JexlEngine jexld = new JexlBuilder().collectMode(2).create();
         JexlScript script;
         List<String> result;
         Set<List<String>> vars;
@@ -508,7 +509,7 @@ public class VarTest extends JexlTestCase {
         //d.yyyy = 1969; d.MM = 7; d.dd = 20
         ctxt.set("moon.landing", new VarDate("1969-07-20"));
         
-        script = JEXL.createScript("moon.landing[['yyyy', 'MM', 'dd']]");
+        script = jexld.createScript("moon.landing[['yyyy', 'MM', 'dd']]");
         result = (List<String>) script.execute(ctxt);
         Assert.assertEquals(Arrays.asList("1969", "7", "20"), result);
         
@@ -519,7 +520,7 @@ public class VarTest extends JexlTestCase {
         Assert.assertEquals("landing", var.get(1));
         Assert.assertArrayEquals(new String[]{"yyyy", "MM", "dd"}, readIdentifiers(var.get(2)));
         
-        script = JEXL.createScript("moon.landing[ { 'yyyy' : 'year', 'MM' : 'month', 'dd' : 'day' } ]");
+        script = jexld.createScript("moon.landing[ { 'yyyy' : 'year', 'MM' : 'month', 'dd' : 'day' } ]");
         Map<String, String> mapr = (Map<String, String>) script.execute(ctxt);
         Assert.assertEquals(3, mapr.size());
         Assert.assertEquals("1969", mapr.get("year"));
@@ -536,22 +537,32 @@ public class VarTest extends JexlTestCase {
 
     @Test
     public void testLiteral() throws Exception {
-        JexlScript e = JEXL.createScript("x.y[['z', 't']]");
+        JexlBuilder builder = new JexlBuilder().collectMode(2);
+        Assert.assertEquals(2, builder.collectMode());
+        Assert.assertTrue(builder.collectAll());
+        
+        JexlEngine jexld = builder.create();
+        JexlScript e = jexld.createScript("x.y[['z', 't']]");
         Set<List<String>> vars = e.getVariables();
         Assert.assertEquals(1, vars.size());
         Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "[ 'z', 't' ]"}}), vars));
 
-        e = JEXL.createScript("x.y[{'z': 't'}]");
+        e = jexld.createScript("x.y[{'z': 't'}]");
         vars = e.getVariables();
         Assert.assertEquals(1, vars.size());
         Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
         
-        e = JEXL.createScript("x.y.'{ \\'z\\' : \\'t\\' }'");
+        e = jexld.createScript("x.y.'{ \\'z\\' : \\'t\\' }'");
         vars = e.getVariables();
         Assert.assertEquals(1, vars.size());
         Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "{ 'z' : 't' }"}}), vars));
         
-        JexlEngine jexld = new JexlBuilder().collectAll(false).create();
+        // only string or number literals
+        builder = builder.collectAll(true);
+        Assert.assertEquals(1, builder.collectMode());
+        Assert.assertTrue(builder.collectAll());
+        
+        jexld = builder.create();
         e = jexld.createScript("x.y[{'z': 't'}]");
         vars = e.getVariables();
         Assert.assertEquals(1, vars.size());
@@ -561,6 +572,16 @@ public class VarTest extends JexlTestCase {
         vars = e.getVariables();
         Assert.assertEquals(1, vars.size());
         Assert.assertTrue(eq(mkref(new String[][]{{"x", "y"}}), vars));
+        
+        e = jexld.createScript("x.y['z']");
+        vars = e.getVariables();
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "z"}}), vars));
+        
+        e = jexld.createScript("x.y[42]");
+        vars = e.getVariables();
+        Assert.assertEquals(1, vars.size());
+        Assert.assertTrue(eq(mkref(new String[][]{{"x", "y", "42"}}), vars));
     }
 
     @Test

@@ -735,7 +735,7 @@ public class LexicalTest {
         JexlScript script = jexl.createScript("@scale(13) @test var i = 42");
         JexlContext jc = new OptAnnotationContext();
         Object result = script.execute(jc);
-        Assert.assertEquals(result, 42);
+        Assert.assertEquals(42, result);
     }
          
     @Test
@@ -755,22 +755,19 @@ public class LexicalTest {
         f.lexical(true);
         JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
         JexlScript script = jexl.createScript(
-              "var x = 10;"
-            + "var a = function(var b) {for (var q : 1 ..10) {return x + b}}; a(32)");
+                "var x = 10; (b->{ x + b })(32)");
         JexlContext jc = new MapContext();
         Object result = script.execute(jc);
         Assert.assertEquals(42, result);
     }
     
-        
     @Test
     public void testCaptured1() throws Exception {
         JexlFeatures f = new JexlFeatures();
         f.lexical(true);
         JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
         JexlScript script = jexl.createScript(
-              "{var x = 10; }"
-            + "var a = function(var b) {for (var q : 1 ..10) {return x + b}}; a(32)");
+                "{var x = 10; } (b->{ x + b })(32)");
         JexlContext jc = new MapContext();
         jc.set("x", 11);
         Object result = script.execute(jc);
