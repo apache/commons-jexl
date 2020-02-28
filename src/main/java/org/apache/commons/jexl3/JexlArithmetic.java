@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
@@ -635,7 +634,7 @@ public class JexlArithmetic {
         }
         return bigd;
     }
-
+    
     /**
      * Replace all numbers in an arguments array with the smallest type that will fit.
      *
@@ -660,25 +659,36 @@ public class JexlArithmetic {
         }
         return narrowed;
     }
-
+    
     /**
-     * Checks if value class is a number that can be represented exactly in an int.
-     *
-     * @param value  argument
-     * @return true if argument can be represented by an integer
+     * Given a long, attempt to narrow it to an int.
+     * <p>Narrowing will only occur if no operand is a Long.
+     * @param lhs  the left hand side operand that lead to the long result
+     * @param rhs  the right hand side operand that lead to the long result
+     * @param r the long to narrow
+     * @return an Integer if narrowing is possible, the original Long otherwise
      */
-    private static Number asIntegerNumber(Object value) {
-        return value instanceof Integer || value instanceof Short || value instanceof Byte ? (Number) value : null;
+    protected Number narrowLong(Object lhs, Object rhs, long r) {
+        if (!(lhs instanceof Long || rhs instanceof Long) && (int) r == r) {
+            return (int) r;
+        } else {
+            return r;
+        }
     }
-
+    
     /**
      * Checks if value class is a number that can be represented exactly in a long.
      *
      * @param value  argument
      * @return true if argument can be represented by a long
      */
-    private static Number asLongNumber(Object value) {
-        return value instanceof Long || value instanceof Integer || value instanceof Short || value instanceof Byte ? (Number) value : null;
+    protected Number asLongNumber(Object value) {
+        return value instanceof Long
+                || value instanceof Integer
+                || value instanceof Short
+                || value instanceof Byte
+                        ? (Number) value
+                        : null;
     }
 
     /**
@@ -707,15 +717,12 @@ public class JexlArithmetic {
                 if (ln != null && rn != null) {
                     long x = ln.longValue();
                     long y = rn.longValue();
-                    long r = x + y;
+                    long result = x + y;
                     // detect overflow, see java8 Math.addExact
-                    if (((x ^ r) & (y ^ r)) < 0) {
+                    if (((x ^ result) & (y ^ result)) < 0) {
                         return BigInteger.valueOf(x).add(BigInteger.valueOf(y));
                     }
-                    if (!(left instanceof Long || right instanceof Long) && (int) r == r) {
-                        return (int) r;
-                    }
-                    return r;
+                    return narrowLong(left, right, result);
                 }
                 // if either are bigdecimal use that type
                 if (left instanceof BigDecimal || right instanceof BigDecimal) {
@@ -760,16 +767,13 @@ public class JexlArithmetic {
         Number ln = asLongNumber(left);
         Number rn = asLongNumber(right);
         if (ln != null && rn != null) {
-            long l = ln.longValue();
-            long r = rn.longValue();
-            if (r == 0L) {
+            long x = ln.longValue();
+            long y = rn.longValue();
+            if (y == 0L) {
                 throw new ArithmeticException("/");
             }
-            long result = l / r;
-            if (!(left instanceof Long || right instanceof Long) && (int) result == result) {
-                return (int) result;
-            }
-            return result;
+            long result = x  / y;
+            return narrowLong(left, right, result);
         }
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
@@ -816,16 +820,13 @@ public class JexlArithmetic {
         Number ln = asLongNumber(left);
         Number rn = asLongNumber(right);
         if (ln != null && rn != null) {
-            long l = ln.longValue();
-            long r = rn.longValue();
-            if (r == 0L) {
+            long x = ln.longValue();
+            long y = rn.longValue();
+            if (y == 0L) {
                 throw new ArithmeticException("%");
             }
-            long result = l % r;
-            if (!(left instanceof Long || right instanceof Long) && (int) result == result) {
-                return (int) result;
-            }
-            return result;
+            long result = x % y;
+            return narrowLong(left, right,  result);
         }
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
@@ -864,12 +865,13 @@ public class JexlArithmetic {
      * @param r the product
      * @return true if product fits a long, false if it overflows
      */
+    @SuppressWarnings("MagicNumber")
     private static boolean isMultiplyExact(long x, long y, long r) {
         long ax = Math.abs(x);
         long ay = Math.abs(y);
-        return !(((ax | ay) >>> 31 != 0) &&
-                 (((y != 0) && (r / y != x)) ||
-                   (x == Long.MIN_VALUE && y == -1)));
+        return !(((ax | ay) >>> (Integer.SIZE - 1) != 0)
+                  && (((y != 0) && (r / y != x))
+                      || (x == Long.MIN_VALUE && y == -1)));
     }
     
     /**
@@ -884,20 +886,17 @@ public class JexlArithmetic {
             return controlNullNullOperands();
         }
         // if both (non null) args fit as int
-        Number ln = asIntegerNumber(left);
-        Number rn = asIntegerNumber(right);
+        Number ln = asLongNumber(left);
+        Number rn = asLongNumber(right);
         if (ln != null && rn != null) {
             long x = ln.longValue();
             long y = rn.longValue();
-            long r = x * y;
+            long result = x * y;
             // detect overflow
-            if (!isMultiplyExact(x, y, r)) {
+            if (!isMultiplyExact(x, y, result)) {
                 return BigInteger.valueOf(x).multiply(BigInteger.valueOf(y));
             }
-            if (!(left instanceof Long || right instanceof Long) && (int) r == r) {
-                return (int) r;
-            }
-            return r;
+            return narrowLong(left, right, result);
         }
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {
@@ -936,15 +935,12 @@ public class JexlArithmetic {
         if (ln != null && rn != null) {
             long x = ln.longValue();
             long y = rn.longValue();
-            long r = x - y;
+            long result = x - y;
             // detect overflow, see java8 Math.subtractExact
-            if (((x ^ y) & (x ^ r)) < 0) {
+            if (((x ^ y) & (x ^ result)) < 0) {
                 return BigInteger.valueOf(x).subtract(BigInteger.valueOf(y));
             }
-            if ((int) r == r) {
-                return (int) r;
-            }
-            return r;
+            return narrowLong(left, right, result);
         }
         // if either are bigdecimal use that type
         if (left instanceof BigDecimal || right instanceof BigDecimal) {

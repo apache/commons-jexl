@@ -132,11 +132,14 @@ public class ArithmeticTest extends JexlTestCase {
     @Test
     public void testOverflows() throws Exception {
         asserter.assertExpression("1 + 2147483647", Long.valueOf("2147483648"));
+        asserter.assertExpression("3 + " + (Long.MAX_VALUE - 2),  BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE));
         asserter.assertExpression("-2147483648 - 1", Long.valueOf("-2147483649"));
+        asserter.assertExpression("-3 + " + (Long.MIN_VALUE + 2),  BigInteger.valueOf(Long.MIN_VALUE).subtract(BigInteger.ONE));
         asserter.assertExpression("1 + 9223372036854775807", new BigInteger("9223372036854775808"));
         asserter.assertExpression("-1 + (-9223372036854775808)", new BigInteger("-9223372036854775809"));
         asserter.assertExpression("-9223372036854775808 - 1", new BigInteger("-9223372036854775809"));
-        asserter.assertExpression("-1 - 9223372036854775808", new BigInteger("-9223372036854775809"));
+        BigInteger maxl = BigInteger.valueOf(Long.MAX_VALUE);
+        asserter.assertExpression(maxl.toString() + " * " + maxl.toString() , maxl.multiply(maxl));
     }
 
     /**
