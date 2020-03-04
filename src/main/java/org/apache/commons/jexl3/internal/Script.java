@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.JexlEngine;
@@ -27,8 +28,6 @@ import org.apache.commons.jexl3.parser.ASTJexlScript;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.jexl3.JexlFeatures;
-
 /**
  * <p>A JexlScript implementation.</p>
  * @since 1.1
@@ -50,10 +49,6 @@ public class Script implements JexlScript, JexlExpression {
      * The engine version (as class loader change count) that last evaluated this script.
      */
     protected int version;
-    /**
-     * The name of the options pragma.
-     */
-    protected static final String PRAGMA_OPTIONS = "jexl.options";
 
     /**
      * @return the script AST
@@ -105,55 +100,14 @@ public class Script implements JexlScript, JexlExpression {
     }
     
     /**
-     * Compute this script options for evaluation.
-     * <p>This also calls the pragma processor 
-     * @param context the context
-     * @return the options
-     */
-    protected JexlOptions options(JexlContext context) {
-        JexlOptions opts = jexl.options(context);
-        // when parsing lexical, try hard to run lexical
-        JexlFeatures features = script.getFeatures();
-        if (features != null) {
-            if (features.isLexical()) {
-                opts.setLexical(true);
-            }
-            if (features.isLexicalShade()) {
-                opts.setLexicalShade(true);
-            }
-        }
-        // process script pragmas if any
-        Map<String, Object> pragmas = script.getPragmas();
-        if (pragmas != null) {
-            JexlContext.PragmaProcessor processor =
-                    context instanceof JexlContext.PragmaProcessor
-                    ? (JexlContext.PragmaProcessor) context
-                    : null;
-            for(Map.Entry<String, Object> pragma : pragmas.entrySet()) {
-                String key = pragma.getKey();
-                Object value = pragma.getValue();
-                if (PRAGMA_OPTIONS.equals(key)) {
-                    if (value instanceof String) {
-                        String[] vs = ((String) value).split(" ");
-                        opts.setFlags(vs);
-                    }
-                }
-                if (processor != null) {
-                    processor.processPragma(key, value);
-                }
-            }
-        }
-        return opts;
-    }
-    
-    /**
      * Creates this script interpreter.
      * @param context the context
      * @param frame the calling frame
      * @return  the interpreter
      */
     protected Interpreter createInterpreter(JexlContext context, Frame frame) {
-        return jexl.createInterpreter(context, frame, options(context));
+        JexlOptions opts = jexl.options(script, context);
+        return jexl.createInterpreter(context, frame, opts);
     }
 
     /**

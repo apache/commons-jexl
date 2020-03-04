@@ -23,6 +23,14 @@ import org.apache.commons.jexl3.internal.TemplateEngine.Block;
 import org.apache.commons.jexl3.internal.TemplateEngine.BlockType;
 import org.apache.commons.jexl3.internal.TemplateEngine.TemplateExpression;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlOptions;
+import org.apache.commons.jexl3.parser.ASTArguments;
+import org.apache.commons.jexl3.parser.ASTFunctionNode;
+import org.apache.commons.jexl3.parser.ASTIdentifier;
+import org.apache.commons.jexl3.parser.ASTNumberLiteral;
+import org.apache.commons.jexl3.parser.JexlNode;
+
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -30,12 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import org.apache.commons.jexl3.JexlException;
-import org.apache.commons.jexl3.parser.ASTArguments;
-import org.apache.commons.jexl3.parser.ASTFunctionNode;
-import org.apache.commons.jexl3.parser.ASTIdentifier;
-import org.apache.commons.jexl3.parser.ASTNumberLiteral;
-import org.apache.commons.jexl3.parser.JexlNode;
 
 /**
  * A Template instance.
@@ -246,9 +248,15 @@ public final class TemplateScript implements JxltEngine.Template {
     
     @Override
     public TemplateScript prepare(JexlContext context) {
-        Engine jexl = jxlt.getEngine();
+        final Engine jexl = jxlt.getEngine();
+        JexlOptions options = jexl.options(script, context);
         Frame frame = script.createFrame((Object[]) null);
-        Interpreter interpreter = new TemplateInterpreter(jexl, context, frame, null, null);
+        TemplateInterpreter.Arguments targs = new TemplateInterpreter
+                .Arguments(jxlt.getEngine())
+                .context(context)
+                .options(options)
+                .frame(frame);
+        Interpreter interpreter = new TemplateInterpreter(targs);
         TemplateExpression[] immediates = new TemplateExpression[exprs.length];
         for (int e = 0; e < exprs.length; ++e) {
             try {
@@ -272,8 +280,17 @@ public final class TemplateScript implements JxltEngine.Template {
 
     @Override
     public void evaluate(JexlContext context, Writer writer, Object... args) {
+        final Engine jexl = jxlt.getEngine();
+        JexlOptions options = jexl.options(script, context);
         Frame frame = script.createFrame(args);
-        Interpreter interpreter = new TemplateInterpreter(jxlt.getEngine(), context, frame, exprs, writer);
+        TemplateInterpreter.Arguments targs = new TemplateInterpreter
+                .Arguments(jexl)
+                .context(context)
+                .options(options)
+                .frame(frame)
+                .expressions(exprs)
+                .writer(writer);
+        Interpreter interpreter = new TemplateInterpreter(targs);
         interpreter.interpret(script);
     }
 

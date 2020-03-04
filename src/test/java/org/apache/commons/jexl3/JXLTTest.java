@@ -17,7 +17,6 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Debugger;
-import org.apache.commons.jexl3.internal.Engine;
 import org.apache.commons.jexl3.internal.TemplateDebugger;
 import org.apache.commons.jexl3.internal.TemplateScript;
 import org.apache.commons.logging.Log;
@@ -28,7 +27,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -95,8 +93,7 @@ public class JXLTTest extends JexlTestCase {
         if (options.isLexicalShade()) {
             return true;
         }
-        options = new JexlOptions();
-        ((Engine) ENGINE).optionsSet(options);
+        options = new JexlOptions().set(ENGINE);
         return options.isLexicalShade();
     }
 
@@ -161,12 +158,14 @@ public class JXLTTest extends JexlTestCase {
 
     @Test
     public void testAssign() throws Exception {
-        JxltEngine.Expression assign = JXLT.createExpression("${froboz.value = 10}");
+        Froboz froboz = new Froboz(32);
+        context.set("froboz", froboz);
+        JxltEngine.Expression assign = JXLT.createExpression("${froboz.value = 42}");
         JxltEngine.Expression check = JXLT.createExpression("${froboz.value}");
         Object o = assign.evaluate(context);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", new Integer(42), o);
         o = check.evaluate(context);
-        Assert.assertEquals("Result is not 10", new Integer(10), o);
+        Assert.assertEquals("Result is not 10", new Integer(42), o);
     }
 
     @Test
@@ -1001,5 +1000,90 @@ public class JXLTTest extends JexlTestCase {
         output = strw.toString();
         Assert.assertEquals(s315, output);
     }
+    
+        // define mode pro50
+    static final JexlOptions MODE_PRO50 = new JexlOptions();
+    static {
+        MODE_PRO50.setFlags( "+strict +cancellable +lexical +lexicalShade -safe".split(" "));
+    }
 
+    public static class PragmaticContext extends MapContext implements JexlContext.PragmaProcessor, JexlContext.OptionsHandle {
+        private final JexlOptions options;
+
+        public PragmaticContext(JexlOptions o) {
+            this.options = o;
+        }
+
+        @Override
+        public void processPragma(String key, Object value) {
+            if ("script.mode".equals(key) && "pro50".equals(value)) {
+                options.set(MODE_PRO50);
+            }
+        }
+
+        @Override
+        public Object get(String name) {
+            if ("$options".equals(name)) {
+                return options;
+            }
+            return super.get(name);
+        }
+
+        @Override
+        public JexlOptions getEngineOptions() {
+            return options;
+        }
+    }
+    @Test
+    public void testLexicalTemplate() throws Exception {
+        JexlOptions opts = new JexlOptions();
+        JexlContext ctxt = new PragmaticContext(opts);
+        opts.setCancellable(false);
+        opts.setStrict(false);
+        opts.setSafe(true);
+        opts.setLexical(false);
+        opts.setLexicalShade(false);
+        String src0 = "${$options.strict?'+':'-'}strict"
+                + " ${$options.cancellable?'+':'-'}cancellable"
+                + " ${$options.lexical?'+':'-'}lexical"
+                + " ${$options.lexicalShade?'+':'-'}lexicalShade"
+                + " ${$options.safe?'+':'-'}safe";
+        
+        JxltEngine.Template tmplt0 = JXLT.createTemplate("$$", new StringReader(src0));
+        Writer strw0 = new StringWriter();
+        tmplt0.evaluate(ctxt, strw0);
+        String output0 = strw0.toString();
+        Assert.assertEquals( "-strict -cancellable -lexical -lexicalShade +safe", output0);
+                
+        String src = "$$ #pragma script.mode pro50\n"
+                + "${$options.strict?'+':'-'}strict"
+                + " ${$options.cancellable?'+':'-'}cancellable"
+                + " ${$options.lexical?'+':'-'}lexical"
+                + " ${$options.lexicalShade?'+':'-'}lexicalShade"
+                + " ${$options.safe?'+':'-'}safe";
+            
+        JxltEngine.Template tmplt = JXLT.createTemplate("$$", new StringReader(src));
+        Writer strw = new StringWriter();
+        tmplt.evaluate(ctxt, strw);
+        String output = strw.toString();
+        Assert.assertEquals("+strict +cancellable +lexical +lexicalShade -safe", output);
+    }
+
+    @Test
+    public void testTemplatePragmaPro50() throws Exception {
+        JexlOptions opts = new JexlOptions();
+        JexlContext ctxt = new PragmaticContext(opts);
+        String src = "$$ #pragma script.mode pro50\n"
+                + "$$ var tab = null;\n"
+                + "$$ tab.dummy();";
+        JxltEngine.Template tmplt = JXLT.createTemplate("$$", new StringReader(src));
+        Writer strw = new StringWriter();
+        try {
+            tmplt.evaluate(ctxt, strw);
+            Assert.fail("tab var is null");
+        } catch (JexlException.Variable xvar) {
+            Assert.assertTrue("tab".equals(xvar.getVariable()));
+            Assert.assertFalse(xvar.isUndefined());
+        }
+    }
 }

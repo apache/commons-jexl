@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-328">
+                JXLT template scripts evaluation do not process pragmas
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-327" due-to="David Costanzo">
                 map[null] does not work in assignment context
             </action>

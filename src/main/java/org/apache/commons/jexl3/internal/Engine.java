@@ -341,6 +341,62 @@ public class Engine extends JexlEngine {
     }
 
     /**
+     * Compute a script options for evaluation.
+     * <p>This calls processPragma(...).
+     * @param script the script
+     * @param context the context
+     * @return the options
+     */
+    protected JexlOptions options(ASTJexlScript script, JexlContext context) {
+        final JexlOptions opts = options(context);
+        if (script != null) {
+            // when parsing lexical, try hard to run lexical
+           JexlFeatures features = script.getFeatures();
+           if (features != null) {
+               if (features.isLexical()) {
+                   opts.setLexical(true);
+               }
+               if (features.isLexicalShade()) {
+                   opts.setLexicalShade(true);
+               }
+           }
+           // process script pragmas if any
+           processPragmas(script, context, opts);
+        }
+        return opts;
+    }
+    
+    /**
+     * Processes a script pragmas.
+     * <p>Only called from options(...)
+     * @param script the script
+     * @param context the context
+     * @param opts the options
+     */
+    protected void processPragmas(ASTJexlScript script, JexlContext context, JexlOptions opts) {
+        Map<String, Object> pragmas = script.getPragmas();
+        if (pragmas != null && !pragmas.isEmpty()) {
+            JexlContext.PragmaProcessor processor =
+                    context instanceof JexlContext.PragmaProcessor
+                    ? (JexlContext.PragmaProcessor) context
+                    : null;
+            for(Map.Entry<String, Object> pragma : pragmas.entrySet()) {
+                String key = pragma.getKey();
+                Object value = pragma.getValue();
+                if (PRAGMA_OPTIONS.equals(key)) {
+                    if (value instanceof String) {
+                        String[] vs = ((String) value).split(" ");
+                        opts.setFlags(vs);
+                    }
+                }
+                if (processor != null) {
+                    processor.processPragma(key, value);
+                }
+            }
+        }
+    }
+    
+    /**
      * Sets options from this engine options.
      * @param opts the options to set
      * @return the options
@@ -348,7 +404,7 @@ public class Engine extends JexlEngine {
     public JexlOptions optionsSet(JexlOptions opts) {
         if (opts != null) {
             opts.set(options);
-    }
+        }
         return opts;
     }
     
@@ -375,6 +431,7 @@ public class Engine extends JexlEngine {
         return new Interpreter(this, opts, context, frame);
     }
 
+    
     @Override
     public Script createExpression(JexlInfo info, String expression) {
         return createScript(expressionFeatures, info, expression, null);

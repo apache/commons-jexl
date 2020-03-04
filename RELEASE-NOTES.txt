@@ -74,6 +74,7 @@ New Features in 3.2:
 
 Bugs Fixed in 3.2:
 ==================
+* JEXL-328:      JXLT template scripts evaluation do not process pragmas
 * JEXL-327:      map[null] does not work in assignment context
 * JEXL-326:      Link to "JavaCC" on syntax reference page is broken
 * JEXL-325:      Potential race-condition in NumberParser.toString()

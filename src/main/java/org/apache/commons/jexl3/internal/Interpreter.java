@@ -1223,8 +1223,8 @@ public class Interpreter extends InterpreterBase {
                 }
                 if (ant != null) {
                     String aname = ant.toString();
-                    boolean undefined = !(context.has(aname));
-                    return unsolvableVariable(node, aname, undefined);
+                    boolean defined = isVariableDefined(frame, block, aname);
+                    return unsolvableVariable(node, aname, !defined);
                 }
                 return unsolvableProperty(node,
                         stringifyProperty(ptyNode), ptyNode == objectNode, null);
@@ -1234,7 +1234,7 @@ public class Interpreter extends InterpreterBase {
                     return null;
                 }
                 String aname = ant != null ? ant.toString() : "?";
-                boolean defined = context.has(aname);
+                boolean defined = isVariableDefined(frame, block, aname);
                 if (defined && !arithmetic.isStrict()) {
                     return null;
                 }

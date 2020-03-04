@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
@@ -291,7 +292,7 @@ public final class TemplateEngine extends JxltEngine {
          */
         protected final TemplateExpression prepare(Frame frame, JexlContext context) {
             try {
-                Interpreter interpreter = new TemplateInterpreter(jexl, context, frame, null, null);
+                Interpreter interpreter = jexl.createInterpreter(context, frame, jexl.options(context));
                 return prepare(interpreter);
             } catch (JexlException xjexl) {
                 JexlException xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
@@ -319,6 +320,15 @@ public final class TemplateEngine extends JxltEngine {
         }
 
         /**
+         * The options to use during evaluation.
+         * @param context the context
+         * @return the options
+         */
+        protected JexlOptions options(JexlContext context) {
+            return jexl.options(null, context);
+        }
+        
+        /**
          * Evaluates this expression.
          * @param frame the frame storing parameters and local variables
          * @param context the context storing global variables
@@ -327,7 +337,13 @@ public final class TemplateEngine extends JxltEngine {
          */
         protected final Object evaluate(Frame frame, JexlContext context) {
             try {
-                Interpreter interpreter = new TemplateInterpreter(jexl, context, frame, null, null);
+                JexlOptions options = options(context);
+                TemplateInterpreter.Arguments args = new TemplateInterpreter
+                        .Arguments(jexl)
+                        .context(context)
+                        .options(options)
+                        .frame(frame);
+                Interpreter interpreter = new TemplateInterpreter(args);
                 return evaluate(interpreter);
             } catch (JexlException xjexl) {
                 JexlException xuel = createException(xjexl.getInfo(), "evaluate", this, xjexl);
@@ -419,6 +435,11 @@ public final class TemplateEngine extends JxltEngine {
             strb.append(expr);
             strb.append("}");
             return strb;
+        }
+        
+        @Override
+        protected JexlOptions options(JexlContext context) {
+            return jexl.options(node instanceof ASTJexlScript? (ASTJexlScript) node : null, context);
         }
 
         @Override

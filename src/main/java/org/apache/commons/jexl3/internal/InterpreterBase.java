@@ -246,6 +246,27 @@ public abstract class InterpreterBase extends ParserVisitor {
     }
     
     /**
+     * Checks whether a variable is defined.
+     * <p>The var may be either a local variable declared in the frame and
+     * visible from the block or defined in the context.
+     * @param frame the frame
+     * @param block the block
+     * @param name the variable name
+     * @return true if variable is defined, false otherwise
+     */
+    protected boolean isVariableDefined(Frame frame, LexicalScope block, String name) {
+        if (frame != null && block != null) {
+            Integer ref = frame.getScope().getSymbol(name);
+            int symbol = ref != null? ref : -1;
+            if (symbol >= 0  && block.hasSymbol(symbol)) {
+                Object value = frame.get(symbol);
+                return value != Scope.UNDEFINED && value != Scope.UNDECLARED;
+            }
+        }
+        return context.has(name);
+    }
+    
+    /**
      * Gets a value of a defined local variable or from the context.
      * @param frame the local frame
      * @param block the lexical block if any

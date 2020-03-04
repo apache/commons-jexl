@@ -18,14 +18,16 @@ package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.internal.TemplateEngine.TemplateExpression;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
-import org.apache.commons.jexl3.parser.JexlNode;
-import java.io.Writer;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
+import org.apache.commons.jexl3.parser.JexlNode;
+
+import java.io.Writer;
 
 /**
  * The type of interpreter to use during evaluation of templates.
@@ -39,18 +41,85 @@ public class TemplateInterpreter extends Interpreter {
     private final Writer writer;
 
     /**
-     * Creates a template interpreter instance.
-     * @param jexl        the engine instance
-     * @param jcontext    the base context
-     * @param jframe      the calling frame
-     * @param expressions the list of TemplateExpression from the TemplateScript to evaluate
-     * @param out         the output writer
+     * Helper ctor.
+     * <p>Stores the different properties required to create a Template interpreter.
      */
-    TemplateInterpreter(Engine jexl,
-            JexlContext jcontext, Frame jframe, TemplateExpression[] expressions, Writer out) {
-        super(jexl, null, jcontext, jframe);
-        exprs = expressions;
-        writer = out;
+    static class Arguments {
+        /** The engine. */
+        Engine jexl;
+        /** The options. */
+        JexlOptions options;
+        /** The context. */
+        JexlContext jcontext;
+        /** The frame. */
+        Frame jframe;
+        /** The expressions. */
+        TemplateExpression[] expressions;
+        /** The writer. */
+        Writer out;
+        
+        /**
+         * Sole ctor.
+         * @param e the JEXL engine
+         */  
+        Arguments(Engine e) {
+            this.jexl = e;
+        } 
+        /**
+         * Sets the options.
+         * @param o the options
+         * @return this instance
+         */         
+        Arguments options(JexlOptions o) {
+            this.options = o;
+            return this;
+        } 
+        /**
+         * Sets the context.
+         * @param j the context
+         * @return this instance
+         */      
+        Arguments context(JexlContext j) {
+            this.jcontext = j;
+            return this;
+        } 
+        /**
+         * Sets the frame.
+         * @param f the frame
+         * @return this instance
+         */        
+        Arguments frame(Frame f) {
+            this.jframe = f;
+            return this;
+        }  
+        /**
+         * Sets the expressions.
+         * @param e the expressions
+         * @return this instance
+         */  
+        Arguments expressions(TemplateExpression[] e) {
+            this.expressions = e;
+            return this;
+        }   
+        /**
+         * Sets the writer.
+         * @param o the writer
+         * @return this instance
+         */
+        Arguments writer(Writer o) {
+            this.out = o;
+            return this;
+        }
+    }
+    
+    /**
+     * Creates a template interpreter instance.
+     * @param args the template interpreter arguments
+     */
+    TemplateInterpreter(Arguments args) {
+        super(args.jexl, args.options, args.jcontext, args.jframe);
+        exprs = args.expressions;
+        writer = args.out;
         block = new LexicalFrame(frame, null);
     }
 
@@ -145,24 +214,31 @@ public class TemplateInterpreter extends Interpreter {
     }
 
     @Override
-    protected Object visit(ASTJexlScript node, Object data) {
-        if (node instanceof ASTJexlLambda && !((ASTJexlLambda) node).isTopLevel()) {
-            return new Closure(this, (ASTJexlLambda) node) {
+    protected Object visit(ASTJexlScript script, Object data) {
+        if (script instanceof ASTJexlLambda && !((ASTJexlLambda) script).isTopLevel()) {
+            return new Closure(this, (ASTJexlLambda) script) {
                 @Override
                 protected Interpreter createInterpreter(JexlContext context, Frame local) {
-                    return new TemplateInterpreter(jexl, context, local, exprs, writer);
+                    JexlOptions opts = jexl.options(script, context);
+                    TemplateInterpreter.Arguments targs = new TemplateInterpreter.Arguments(jexl)
+                            .context(context)
+                            .options(opts)
+                            .frame(local)
+                            .expressions(exprs)
+                            .writer(writer);
+                    return new TemplateInterpreter(targs);
                 }
             };
         }
         // otherwise...
-        final int numChildren = node.jjtGetNumChildren();
-        Object result = null;
-        for (int i = 0; i < numChildren; i++) {
-            JexlNode child = node.jjtGetChild(i);
-            result = child.jjtAccept(this, data);
-            cancelCheck(child);
+        final int numChildren = script.jjtGetNumChildren();
+            Object result = null;
+            for (int i = 0; i < numChildren; i++) {
+            JexlNode child = script.jjtGetChild(i);
+                result = child.jjtAccept(this, data);
+                cancelCheck(child);
+            }
+            return result;
         }
-        return result;    
-    }
 
 }
