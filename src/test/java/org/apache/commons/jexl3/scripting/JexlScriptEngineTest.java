@@ -92,7 +92,7 @@ public class JexlScriptEngineTest {
         Assert.assertEquals(initialValue,engine.get("old"));
         Assert.assertEquals(newValue,engine.get("value"));
         Assert.assertEquals(engine.getContext(),engine.get(JexlScriptEngine.CONTEXT_KEY));
-        // Check behaviour of JEXL object
+        // Check behavior of JEXL object
         Assert.assertEquals(engine.getContext().getReader(),engine.eval("JEXL.in"));
         Assert.assertEquals(engine.getContext().getWriter(),engine.eval("JEXL.out"));
         Assert.assertEquals(engine.getContext().getErrorWriter(),engine.eval("JEXL.err"));

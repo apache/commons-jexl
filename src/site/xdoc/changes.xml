@@ -628,7 +628,7 @@
             <action dev="dion" type="fix" issue="JEXL-32" due-to="Kedar Dave">BigDecimal values are treated as Long values which results in loss of precision</action>
             <action dev="dion" type="fix" issue="JEXL-33">Remove unnecessary throws Exception from various classes</action>
             <action dev="henrib" type="fix" issue="JEXL-50" due-to="sebb">Div operator does not do integer division</action>
-            <action dev="henrib" type="fix" issue="JEXL-87" due-to="sebb">Inconsistent behaviour of arithmetical operations</action>
+            <action dev="henrib" type="fix" issue="JEXL-87" due-to="sebb">Inconsistent behavior of arithmetical operations</action>
             <action dev="henrib" type="fix" issue="JEXL-21" due-to="AC">operator overloading / hooks on operator processing</action>
             <action dev="henrib" type="add">&quot;new&quot; operator support</action>
             <action dev="henrib" type="add">Support Unicode escapes in string literals</action>
