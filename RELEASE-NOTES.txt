@@ -349,7 +349,7 @@ Bugs fixed in 2.0:
 
 * JEXL-90:	JEXL parser allows invalid expressions, e.g. "a=1 b=2 3"
 * JEXL-88:	MethodKey.java - name clash getMostSpecific() with Java 1.5.0
-* JEXL-87:	Inconsistent behaviour of arithmetical operations
+* JEXL-87:	Inconsistent behavior of arithmetical operations
 * JEXL-81:	Introspector does not use ListGetExecutor for List
 * JEXL-80:	Lenient mode should not throw exception when {g,s}etting an undefined property
 * JEXL-78:	Ternary operator throws Exception when JexlEngine in strict mode
@@ -357,7 +357,7 @@ Bugs fixed in 2.0:
 * JEXL-71:	Parsing errors?
 * JEXL-67:	Potential NPE in util.introspection.MethodKey
 * JEXL-66:	testDottedNames expects map enumeration order
-* JEXL-64:	Inconsistent behaviour of dotted names
+* JEXL-64:	Inconsistent behavior of dotted names
 * JEXL-62:	NPE in Interpreter
 * JEXL-59:	ClassMap holds a reference to class
 * JEXL-56:	Logging wrongly uses java.util.logging

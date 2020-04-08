@@ -233,7 +233,7 @@
                         These syntaxes are mixable with safe-access as in <code>foo.'b a r'?.quux</code> or <code>
                             foo?.`${bar}`.quux</code>.</p>
                         <p>Access operators can be overloaded in <code>JexlArithmetic</code>, so that
-                           the operator behaviour will differ depending on the type of the operator arguments</p>
+                           the operator behavior will differ depending on the type of the operator arguments</p>
                     </td>
                 </tr>
                 <tr>
