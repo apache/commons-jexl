@@ -186,11 +186,21 @@ public class JexlBuilder {
      * Sets the features the engine will use as a base by default.
      * <p>Note that the script flag will be ignored; the engine will be able to parse expressions and scripts.
      * <p>Note also that these will apply to template expressions and scripts.
+     * <p>As a last remark, if lexical or lexicalShade are set as features, this
+     * method will also set the corresponding options.
      * @param f the features
      * @return this builder
      */
     public JexlBuilder features(JexlFeatures f) {
         this.features = f;
+        if (features != null) {
+            if (features.isLexical()) {
+                options.setLexical(true);
+            }
+            if (features.isLexicalShade()) {
+                options.setLexicalShade(true);
+            }
+        }
         return this;
     }
 

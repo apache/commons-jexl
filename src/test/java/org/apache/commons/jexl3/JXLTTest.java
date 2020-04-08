@@ -29,7 +29,6 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import org.apache.commons.jexl3.internal.Engine;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -67,7 +66,6 @@ public class JXLTTest extends JexlTestCase {
             .cache(128).strict(true).create(),
           
          new JexlBuilder().features(f).silent(false)
-            .lexical(true).lexicalShade(true)
             .cache(128).strict(true).create(),
          
          new JexlBuilder().silent(false)
@@ -1070,6 +1068,12 @@ public class JXLTTest extends JexlTestCase {
     @Test
     public void testTemplatePragmaPro50() throws Exception {
         JexlOptions opts = new JexlOptions();
+        opts.setCancellable(false);
+        opts.setStrict(false);
+        opts.setSafe(true);
+        opts.setLexical(false);
+        opts.setLexicalShade(false);
+        opts.setSharedInstance(true);
         JexlContext ctxt = new PragmaticContext(opts);
         String src = "$$ #pragma script.mode pro50\n"
                 + "$$ var tab = null;\n"
