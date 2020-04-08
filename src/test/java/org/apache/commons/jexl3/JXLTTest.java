@@ -29,6 +29,7 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.jexl3.internal.Engine;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -54,6 +55,7 @@ public class JXLTTest extends JexlTestCase {
         ENGINE = jexl;
         JXLT = ENGINE.createJxltEngine();
     }
+   
 
    @Parameterized.Parameters
    public static List<JexlEngine> engines() {
@@ -1034,6 +1036,7 @@ public class JXLTTest extends JexlTestCase {
             return options;
         }
     }
+    
     @Test
     public void testLexicalTemplate() throws Exception {
         JexlOptions opts = new JexlOptions();
@@ -1055,12 +1058,7 @@ public class JXLTTest extends JexlTestCase {
         String output0 = strw0.toString();
         Assert.assertEquals( "-strict -cancellable -lexical -lexicalShade +safe", output0);
                 
-        String src = "$$ #pragma script.mode pro50\n"
-                + "${$options.strict?'+':'-'}strict"
-                + " ${$options.cancellable?'+':'-'}cancellable"
-                + " ${$options.lexical?'+':'-'}lexical"
-                + " ${$options.lexicalShade?'+':'-'}lexicalShade"
-                + " ${$options.safe?'+':'-'}safe";
+        String src = "$$ #pragma script.mode pro50\n" + src0;
             
         JxltEngine.Template tmplt = JXLT.createTemplate("$$", new StringReader(src));
         Writer strw = new StringWriter();
