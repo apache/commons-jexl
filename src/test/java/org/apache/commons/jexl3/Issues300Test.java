@@ -529,4 +529,24 @@ public class Issues300Test {
         result = script.execute(jc, map, "42");
         Assert.assertEquals(42, result);
     }
+    
+    @Test
+    public void test330() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        // Extended form of: 'literal' + VARIABLE   'literal'
+        // missing + operator here ---------------^
+        String longExpression = ""
+                + //
+                "'THIS IS A VERY VERY VERY VERY VERY VERY VERY "
+                + //
+                "VERY VERY LONG STRING CONCATENATION ' + VARIABLE ' <--- "
+                + //
+                "error: missing + between VARIABLE and literal'";
+        try {
+            jexl.createExpression(longExpression);
+            Assert.fail("parsing malformed expression did not throw exception");
+        } catch (JexlException.Parsing exception) {
+            Assert.assertTrue(exception.getMessage().contains("VARIABLE"));
+        }
+    }
 }

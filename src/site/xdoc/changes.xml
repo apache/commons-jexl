@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-330" due-to="David Costanzo">
+                JexlException.Parsing.getMessage() throws exception when parse error is in long expression
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-328">
                 JXLT template scripts evaluation do not process pragmas
             </action>
