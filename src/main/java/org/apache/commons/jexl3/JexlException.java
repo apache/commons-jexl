@@ -236,15 +236,19 @@ public class JexlException extends RuntimeException {
         if (length < MAX_EXCHARLOC) {
             return prefix + " error in '" + expr + "'";
         } else {
-            int begin = info.getColumn();
-            int end = begin + (MAX_EXCHARLOC / 2);
-            begin -= (MAX_EXCHARLOC / 2);
-            if (begin < 0) {
-                end -= begin;
+            int me = MAX_EXCHARLOC / 2;
+            int begin = info.getColumn() - me;
+            if (begin < 0 || length < me) {
                 begin = 0;
+            } else if (begin > length) {
+                begin = me;
+            }
+            int end = begin + MAX_EXCHARLOC;
+            if (end > length) {
+                end = length;
             }
             return prefix + " error near '... "
-                    + expr.substring(begin, end > length ? length : end) + " ...'";
+                    + expr.substring(begin, end) + " ...'";
         }
     }
     
