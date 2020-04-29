@@ -292,9 +292,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         if (value == null
             && !(identifier.jjtGetParent() instanceof ASTReference)
             && !(context.has(name))) {
-                return isSafe()
-                    ? null
-                    : unsolvableVariable(identifier, name, true); // undefined
+                return unsolvableVariable(identifier, name, true); // undefined
         }
         return value;
     }

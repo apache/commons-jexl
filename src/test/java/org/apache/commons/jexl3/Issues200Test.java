@@ -603,7 +603,22 @@ public class Issues200Test extends JexlTestCase {
             Assert.assertTrue(sxs.contains("jvm"));
         }
     }
+    
+    @Test
+    public void test275a() throws Exception {
+        JexlContext ctxt = new MapContext();
+        ctxt.set("out", System.out);
+        JexlEngine jexl = new JexlBuilder().strict(true).safe(true).create();
 
+        JexlScript e = jexl.createScript("out.println(xyz)");
+        try {
+            Object o = e.execute(ctxt);
+            Assert.fail("should have thrown");
+        } catch (JexlException.Variable xvar) {
+            Assert.assertEquals("xyz", xvar.getVariable());
+        }
+    }
+    
     @Test
     public void test278() throws Exception {
         String[] srcs = new String[]{
@@ -846,14 +861,14 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertEquals(2, result);
         result = script.execute(ctxt, 2);
         Assert.assertEquals(3, result);
-        options.setSafe(false);
+        options.setStrict(true);
         try {
             result = script.execute(ctxt, 0);
             Assert.fail("should have failed!");
         } catch (JexlException.Variable xvar) {
             Assert.assertTrue(xvar.getMessage().contains("y"));
         }
-        options.setSafe(true);
+        options.setStrict(false);
         try {
             result = script.execute(ctxt, 0);
         } catch (JexlException xvar) {
