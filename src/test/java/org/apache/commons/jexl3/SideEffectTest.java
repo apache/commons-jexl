@@ -288,13 +288,13 @@ public class SideEffectTest extends JexlTestCase {
         Assert.assertEquals(foo.value, i41 % 2);
         foo.value = i41;
         asserter.assertExpression("foo.value &= 3", (long) (i41 & 3));
-        Assert.assertEquals(foo.value, (long)(i41 & 3));
+        Assert.assertEquals(foo.value, i41 & 3);
         foo.value = i41;
         asserter.assertExpression("foo.value |= 2", (long)(i41 | 2));
-        Assert.assertEquals(foo.value, (long)(i41 | 2));
+        Assert.assertEquals(foo.value, i41 | 2);
         foo.value = i41;
         asserter.assertExpression("foo.value ^= 2", (long)(i41 ^ 2));
-        Assert.assertEquals(foo.value, (long)(i41 ^ 2));
+        Assert.assertEquals(foo.value, i41 ^ 2);
     }
 
     @Test
@@ -322,13 +322,13 @@ public class SideEffectTest extends JexlTestCase {
         Assert.assertEquals(foo.value, i41 % 2);
         foo.value = i41;
         asserter.assertExpression("foo.bar[0] &= 3", (long) (i41 & 3));
-        Assert.assertEquals(foo.value, (long)(i41 & 3));
+        Assert.assertEquals(foo.value, i41 & 3);
         foo.value = i41;
         asserter.assertExpression("foo.bar[0] |= 2", (long)(i41 | 2));
-        Assert.assertEquals(foo.value, (long)(i41 | 2));
+        Assert.assertEquals(foo.value, i41 | 2);
         foo.value = i41;
         asserter.assertExpression("foo.bar[0] ^= 2", (long)(i41 ^ 2));
-        Assert.assertEquals(foo.value, (long)(i41 ^ 2));
+        Assert.assertEquals(foo.value, i41 ^ 2);
     }
 
     @Test

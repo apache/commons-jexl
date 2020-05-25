@@ -182,7 +182,7 @@ public class LambdaTest extends JexlTestCase {
         hvars = s15.getVariables();
         Assert.assertEquals(1, hvars.size());
         // evidence this is not (strictly) a local since it inherited a captured value
-        result = ((JexlScript) s15).execute(ctx, 27);
+        result = s15.execute(ctx, 27);
         Assert.assertEquals(42, result);
     }
 

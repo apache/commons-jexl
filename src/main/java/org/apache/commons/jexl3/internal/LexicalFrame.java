@@ -119,7 +119,7 @@ public class LexicalFrame extends LexicalScope {
                 frame.set(symbol, value);
             }
         }
-        return (LexicalFrame) previous;
+        return previous;
     }
 
 }

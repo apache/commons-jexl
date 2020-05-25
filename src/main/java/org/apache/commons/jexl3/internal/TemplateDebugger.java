@@ -106,7 +106,7 @@ public class TemplateDebugger extends Debugger {
     protected Object visit(ASTBlock node, Object data) {
         // if not really a template, must use super impl
         if (exprs == null) {
-            return super.visit((ASTBlock) node, data);
+            return super.visit(node, data);
         }
         // open the block
         builder.append('{');

@@ -320,7 +320,7 @@ public class ArithmeticTest extends JexlTestCase {
         String expr = "2.3*SO/100";
 
         Object evaluate = JEXL.createExpression(expr).evaluate(jc);
-        Assert.assertEquals(sevendot475, (BigDecimal) evaluate);
+        Assert.assertEquals(sevendot475, evaluate);
     }
 
     // JEXL-24: big integers and big decimals

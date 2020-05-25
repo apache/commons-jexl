@@ -98,7 +98,7 @@ public class JXLTTest extends JexlTestCase {
     }
 
     private static String refactor(TemplateDebugger td, JxltEngine.Template ts) {
-        boolean dbg = td.debug((TemplateScript)ts);
+        boolean dbg = td.debug(ts);
         if (dbg) {
             return td.toString();
         } else {
@@ -580,7 +580,7 @@ public class JXLTTest extends JexlTestCase {
         Assert.assertNotNull(dstr);
 
         TemplateDebugger td = new TemplateDebugger();
-        String refactored = refactor(td, (TemplateScript) t);
+        String refactored = refactor(td, t);
         Assert.assertNotNull(refactored);
         Assert.assertEquals(test42, refactored);
     }
@@ -647,7 +647,7 @@ public class JXLTTest extends JexlTestCase {
         Assert.assertEquals(ctl, output);
 
         TemplateDebugger td = new TemplateDebugger();
-        String refactored = refactor(td, (TemplateScript) t);
+        String refactored = refactor(td, t);
         Assert.assertNotNull(refactored);
         Assert.assertEquals(rpt, refactored);
     }
@@ -707,7 +707,7 @@ public class JXLTTest extends JexlTestCase {
         Assert.assertTrue(output.indexOf("45") > 0);
 
         TemplateDebugger td = new TemplateDebugger();
-        String xxx = refactor(td, (TemplateScript) t);
+        String xxx = refactor(td, t);
         Assert.assertNotNull(xxx);
         Assert.assertEquals(rpt, xxx);
     }
