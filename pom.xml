@@ -22,7 +22,7 @@
         <artifactId>commons-parent</artifactId>
         <version>50</version>
     </parent>
-    
+
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-jexl3</artifactId>
     <version>3.2-SNAPSHOT</version>
@@ -32,8 +32,8 @@
     <inceptionYear>2001</inceptionYear>
 
     <properties>
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <commons.componentid>jexl</commons.componentid>
         <commons.module.name>org.apache.commons.jexl3</commons.module.name>
         <commons.release.version>3.1</commons.release.version>
@@ -55,12 +55,12 @@
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
         <checksyle.version>8.18</checksyle.version>
     </properties>
-    
+
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</developerConnection>
         <url>https://gitbox.apache.org/repos/asf/commons-jexl.git</url>
-    </scm> 
+    </scm>
     <issueManagement>
         <system>jira</system>
         <url>https://issues.apache.org/jira/browse/JEXL</url>
@@ -318,7 +318,7 @@
             </plugin>
         </plugins>
     </reporting>
-    
+
     <developers>
         <developer>
             <name>dIon Gillard</name>
@@ -367,7 +367,7 @@
             <email>henrib AT apache DOT org</email>
         </developer>
     </developers>
-    
+
     <contributors>
         <contributor>
             <name>Dmitri Blinov</name>
