@@ -109,6 +109,7 @@ public abstract class JexlEngine {
      * <p>The JexlContext used for evaluation can implement this interface to alter behavior.</p>
      * @deprecated 3.2
      */
+    @Deprecated
     public interface Options {
 
         /**
