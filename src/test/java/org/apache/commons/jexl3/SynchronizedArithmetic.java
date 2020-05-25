@@ -90,7 +90,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
 
     }
 
-    /**
+    /*
      * You should know better than to use this...
      */
 //    private static Unsafe UNSAFE;

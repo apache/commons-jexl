@@ -155,7 +155,7 @@ public class CacheTest extends JexlTestCase {
         }
 
         public boolean isFlag() {
-            return flag.booleanValue();
+            return flag;
         }
     }
 

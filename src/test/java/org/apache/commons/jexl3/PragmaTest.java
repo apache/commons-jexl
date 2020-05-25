@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import java.math.MathContext;
-import java.nio.charset.Charset;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,7 +39,7 @@ public class PragmaTest extends JexlTestCase {
     public void testPragmas() throws Exception {
         JexlContext jc = new MapContext();
         JexlScript script = JEXL.createScript("#pragma one 1\n#pragma the.very.hard 'truth'\n2;");
-        Assert.assertTrue(script != null);
+        Assert.assertNotNull(script);
         Map<String, Object> pragmas = script.getPragmas();
         Assert.assertEquals(2, pragmas.size());
         Assert.assertEquals(1, pragmas.get("one"));
@@ -54,7 +52,7 @@ public class PragmaTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         JxltEngine engine = new JexlBuilder().create().createJxltEngine();
         JxltEngine.Template tscript = engine.createTemplate("$$ #pragma one 1\n$$ #pragma the.very.hard 'truth'\n2;");
-        Assert.assertTrue(tscript != null);
+        Assert.assertNotNull(tscript);
         Map<String, Object> pragmas = tscript.getPragmas();
         Assert.assertEquals(2, pragmas.size());
         Assert.assertEquals(1, pragmas.get("one"));
@@ -70,11 +68,11 @@ public class PragmaTest extends JexlTestCase {
                     String key = pragma.getKey();
                     Object value = pragma.getValue();
                     if ("jexl.safe".equals(key) && value instanceof Boolean) {
-                        options.setSafe(((Boolean) value).booleanValue());
+                        options.setSafe((Boolean) value);
                     } else if ("jexl.strict".equals(key) && value instanceof Boolean) {
-                        options.setStrict(((Boolean) value).booleanValue());
+                        options.setStrict((Boolean) value);
                     } else if ("jexl.silent".equals(key) && value instanceof Boolean) {
-                        options.setSilent(((Boolean) value).booleanValue());
+                        options.setSilent((Boolean) value);
                     }
                 }
             }
@@ -87,7 +85,7 @@ public class PragmaTest extends JexlTestCase {
         SafeContext jc = new SafeContext();
         jc.set("foo", null);
         JexlScript script = JEXL.createScript("#pragma jexl.safe true\nfoo.bar;");
-        Assert.assertTrue(script != null);
+        Assert.assertNotNull(script);
         jc.processPragmas(script.getPragmas());
         Object result = script.execute(jc);
         Assert.assertNull(result);

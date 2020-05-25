@@ -73,7 +73,7 @@ public class AnnotationTest extends JexlTestCase {
         }
     }
 
-    public class OptAnnotationContext extends JexlEvalContext implements JexlContext.AnnotationProcessor {
+    public static class OptAnnotationContext extends JexlEvalContext implements JexlContext.AnnotationProcessor {
         @Override
         public Object processAnnotation(String name, Object[] args, Callable<Object> statement) throws Exception {
             JexlOptions options = this.getEngineOptions();
@@ -147,7 +147,7 @@ public class AnnotationTest extends JexlTestCase {
         // will make an error and will not throw but result is null
         try {
             r = e.execute(jc, true, true);
-            Assert.assertEquals(null, r);
+            Assert.assertNull(r);
         } catch (JexlException.Variable xjexl) {
             Assert.fail("should not have thrown");
         }

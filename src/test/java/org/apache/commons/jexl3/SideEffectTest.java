@@ -17,13 +17,8 @@
 package org.apache.commons.jexl3;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import java.util.logging.Level;
 import org.apache.commons.jexl3.junit.Asserter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -556,7 +551,7 @@ public class SideEffectTest extends JexlTestCase {
 
         public Object selfAdd(Object c, String item) throws IOException {
             if (c == null) {
-                return new ArrayList<String>(Arrays.asList(item));
+                return new ArrayList<String>(Collections.singletonList(item));
             }
             if (c instanceof Appendable) {
                 ((Appendable) c).append(item);
@@ -590,7 +585,7 @@ public class SideEffectTest extends JexlTestCase {
         // no ambiguous, std case
         ctx.set("z", z);
         zz = script.execute(ctx, "42");
-        Assert.assertTrue(zz == z);
+        Assert.assertSame(zz, z);
         Assert.assertEquals(1, z.size());
         z.clear();
         ctx.clear();
@@ -603,19 +598,16 @@ public class SideEffectTest extends JexlTestCase {
             Assert.assertTrue(zz instanceof List<?>);
             z = (List<String>) zz;
             Assert.assertEquals(1, z.size());
-        } catch(JexlException xjexl) {
+        } catch(JexlException | ArithmeticException xjexl) {
             t246 = true;
-            Assert.assertTrue(j246.getClass().equals(Arithmetic246.class));
-        } catch(ArithmeticException xjexl) {
-            t246 = true;
-            Assert.assertTrue(j246.getClass().equals(Arithmetic246.class));
+            Assert.assertEquals(j246.getClass(), Arithmetic246.class);
         }
         ctx.clear();
 
         // a non ambiguous call still succeeds
         ctx.set("z", z);
         zz = script.execute(ctx, "-42");
-        Assert.assertTrue(zz == z);
+        Assert.assertSame(zz, z);
         Assert.assertEquals(t246? 1 : 2, z.size());
     }
 
@@ -644,8 +636,7 @@ public class SideEffectTest extends JexlTestCase {
     @Test
     public void test248() throws Exception {
         MapContext ctx = new MapContext();
-        List<Object> foo = new ArrayList<Object>();
-        foo.addAll(Arrays.asList(10, 20, 30, 40));
+        List<Object> foo = new ArrayList<Object>(Arrays.asList(10, 20, 30, 40));
         ctx.set("foo", foo);
 
         JexlEngine engine = new JexlBuilder().arithmetic(new Arithmetic248(true)).create();

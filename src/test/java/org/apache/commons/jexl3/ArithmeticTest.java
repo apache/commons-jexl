@@ -20,6 +20,7 @@ import org.apache.commons.jexl3.junit.Asserter;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -288,7 +289,7 @@ public class ArithmeticTest extends JexlTestCase {
         JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertEquals(10L, ctxt.get("a"));
-        Assert.assertEquals(10l, ctxt.get("b"));
+        Assert.assertEquals(10L, ctxt.get("b"));
         Assert.assertEquals(42.0D, ctxt.get("c"));
         Assert.assertEquals(42.0d, ctxt.get("d"));
         Assert.assertEquals(56.3f, ctxt.get("e"));
@@ -297,7 +298,7 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(0x10, ctxt.get("h"));
         Assert.assertEquals(010, ctxt.get("i"));
         Assert.assertEquals(0x10L, ctxt.get("j"));
-        Assert.assertEquals(010l, ctxt.get("k"));
+        Assert.assertEquals(010L, ctxt.get("k"));
     }
 
     @Test
@@ -441,11 +442,9 @@ public class ArithmeticTest extends JexlTestCase {
                 }
             }
             if (strict) {
-                Assert.assertTrue("All expressions should have thrown " + zthrow + "/" + PERMS,
-                        zthrow == PERMS);
+                Assert.assertEquals("All expressions should have thrown " + zthrow + "/" + PERMS, zthrow, PERMS);
             } else {
-                Assert.assertTrue("All expressions should have zeroed " + zeval + "/" + PERMS,
-                        zeval == PERMS);
+                Assert.assertEquals("All expressions should have zeroed " + zeval + "/" + PERMS, zeval, PERMS);
             }
         }
         debuggerCheck(jexl);
@@ -472,10 +471,10 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertTrue((Boolean) result);
     }
 
-    @Test
     /**
      * JEXL-156.
      */
+    @Test
     public void testMultClass() throws Exception {
         JexlEngine jexl = new JexlBuilder().create();
         JexlContext jc = new MapContext();
@@ -1025,7 +1024,7 @@ public class ArithmeticTest extends JexlTestCase {
         }
     }
 
-    public class Callable173 {
+    public static class Callable173 {
         public Object call(String... arg) {
             return 42;
         }
@@ -1162,7 +1161,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     private static Document getDocument(String xml) throws Exception {
         DocumentBuilder xmlBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        InputStream stringInputStream = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+        InputStream stringInputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
         return xmlBuilder.parse(stringInputStream);
     }
 

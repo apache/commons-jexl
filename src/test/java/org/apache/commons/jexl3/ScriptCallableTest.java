@@ -29,8 +29,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.jexl3.internal.Script;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -235,11 +233,7 @@ public class ScriptCallableTest extends JexlTestCase {
         }
 
         public void sleep(long millis) throws InterruptedException {
-            try {
-                Thread.sleep(millis);
-            } catch (InterruptedException xint) {
-                throw xint;
-            }
+            Thread.sleep(millis);
         }
 
         public int hangs(Object t) {
@@ -410,8 +404,6 @@ public class ScriptCallableTest extends JexlTestCase {
 
     /**
      * Redundant test with previous ones but impervious to JEXL engine configuation.
-     * @param silent silent engine flag
-     * @param strict strict (aka not lenient) engine flag
      * @throws Exception if there is a regression
      */
     private void runInterrupt(JexlEngine jexl) throws Exception {

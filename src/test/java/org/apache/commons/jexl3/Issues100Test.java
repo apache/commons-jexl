@@ -22,12 +22,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -558,7 +553,7 @@ public class Issues100Test extends JexlTestCase {
         o = assignArray.evaluate(jc);
         Assert.assertNotNull("Result is null", o);
         o = checkArray.evaluate(jc);
-        Assert.assertEquals("The array elements are not equal", Arrays.asList(new String[0]), Arrays.asList((String[]) o));
+        Assert.assertEquals("The array elements are not equal", Collections.emptyList(), Arrays.asList((String[]) o));
         Assert.assertEquals("The array size is not zero", 0, ((String[]) o).length);
 
         // test with an empty array on the overloaded setter for different types.
@@ -611,12 +606,8 @@ public class Issues100Test extends JexlTestCase {
                 + "  var x = \"A comment\";\n"
                 + "  var y = \"A comment\";\n"
                 + "}";
-        try {
-            JexlEngine jexl = new Engine();
-            JexlScript s = jexl.createScript(str);
-        } catch (JexlException.Parsing xparse) {
-            throw xparse;
-        }
+        JexlEngine jexl = new Engine();
+        JexlScript s = jexl.createScript(str);
     }
 
     @Test
@@ -624,12 +615,8 @@ public class Issues100Test extends JexlTestCase {
         String str = "{\n"
                 + "  var x = \"A comment\";\n"
                 + "}";
-        try {
-            JexlEngine jexl = new Engine();
-            JexlScript s = jexl.createScript(str);
-        } catch (JexlException.Parsing xparse) {
-            throw xparse;
-        }
+        JexlEngine jexl = new Engine();
+        JexlScript s = jexl.createScript(str);
     }
 
     static final String TESTA = "src/test/scripts/testA.jexl";
@@ -637,12 +624,8 @@ public class Issues100Test extends JexlTestCase {
     @Test
     public void test5115c() throws Exception {
         URL testUrl = new File(TESTA).toURI().toURL();
-        try {
-            JexlEngine jexl = new Engine();
-            JexlScript s = jexl.createScript(testUrl);
-        } catch (JexlException.Parsing xparse) {
-            throw xparse;
-        }
+        JexlEngine jexl = new Engine();
+        JexlScript s = jexl.createScript(testUrl);
     }
 
     public static class Utils {

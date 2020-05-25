@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlTestCase;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import org.junit.After;
@@ -125,9 +126,9 @@ public class RangeTest extends JexlTestCase {
                     case 10:  il0.remove(); Assert.fail(); break;
                     case 11: lr1.add(v0); Assert.fail(); break;
                     case 12: lr1.remove(v0); Assert.fail(); break;
-                    case 13: lr1.addAll(Arrays.asList(v0)); Assert.fail(); break;
-                    case 14: lr1.removeAll(Arrays.asList(v0)); Assert.fail(); break;
-                    case 15: lr1.retainAll(Arrays.asList(v0)); Assert.fail(); break;
+                    case 13: lr1.addAll(Collections.singletonList(v0)); Assert.fail(); break;
+                    case 14: lr1.removeAll(Collections.singletonList(v0)); Assert.fail(); break;
+                    case 15: lr1.retainAll(Collections.singletonList(v0)); Assert.fail(); break;
                 }
             } catch(UnsupportedOperationException xuo) {
                 // ok
@@ -152,9 +153,9 @@ public class RangeTest extends JexlTestCase {
                     case 10: ii0.remove(); Assert.fail(); break;
                     case 11: ir1.add(v0); Assert.fail(); break;
                     case 12: ir1.remove(v0); Assert.fail(); break;
-                    case 13: ir1.addAll(Arrays.asList(v0)); Assert.fail(); break;
-                    case 14: ir1.removeAll(Arrays.asList(v0)); Assert.fail(); break;
-                    case 15: ir1.retainAll(Arrays.asList(v0)); Assert.fail(); break;
+                    case 13: ir1.addAll(Collections.singletonList(v0)); Assert.fail(); break;
+                    case 14: ir1.removeAll(Collections.singletonList(v0)); Assert.fail(); break;
+                    case 15: ir1.retainAll(Collections.singletonList(v0)); Assert.fail(); break;
                 }
             } catch(UnsupportedOperationException xuo) {
                 // ok

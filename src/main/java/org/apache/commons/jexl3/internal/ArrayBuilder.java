@@ -19,10 +19,7 @@ package org.apache.commons.jexl3.internal;
 import org.apache.commons.jexl3.JexlArithmetic;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Helper class to create typed arrays.
@@ -114,9 +111,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
         if (untyped != null) {
             if (extended) {
                 List<Object> list = new ArrayList<Object>(added);
-                for(int i = 0; i < added; ++i) {
-                    list.add(untyped[i]);
-                }
+                list.addAll(Arrays.asList(untyped).subList(0, added));
                 return list;
             }
             // convert untyped array to the common class if not Object.class

@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.jexl3.introspection.JexlMethod;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -119,8 +117,8 @@ public class DiscoveryTest extends JexlTestCase {
         Assert.assertEquals(get, uber.getPropertyGet(bean, "value"));
         Assert.assertEquals(set, uber.getPropertySet(bean, "value", "foo"));
         // different property should return different setter/getter
-        Assert.assertFalse(get.equals(uber.getPropertyGet(bean, "eulav")));
-        Assert.assertFalse(set.equals(uber.getPropertySet(bean, "eulav", "foo")));
+        Assert.assertNotEquals(get, uber.getPropertyGet(bean, "eulav"));
+        Assert.assertNotEquals(set, uber.getPropertySet(bean, "eulav", "foo"));
         // setter returns argument
         Object bar = set.invoke(bean, "bar");
         Assert.assertEquals("bar", bar);
@@ -148,8 +146,8 @@ public class DiscoveryTest extends JexlTestCase {
         Assert.assertEquals(get, uber.getPropertyGet(duck, "value"));
         Assert.assertEquals(set, uber.getPropertySet(duck, "value", "foo"));
         // different property should return different setter/getter
-        Assert.assertFalse(get.equals(uber.getPropertyGet(duck, "eulav")));
-        Assert.assertFalse(set.equals(uber.getPropertySet(duck, "eulav", "foo")));
+        Assert.assertNotEquals(get, uber.getPropertyGet(duck, "eulav"));
+        Assert.assertNotEquals(set, uber.getPropertySet(duck, "eulav", "foo"));
         // setter returns argument
         Object bar = set.invoke(duck, "bar");
         Assert.assertEquals("bar", bar);
@@ -170,23 +168,23 @@ public class DiscoveryTest extends JexlTestCase {
         list.add("LIST");
         list.add("TSIL");
 
-        JexlPropertyGet get = uber.getPropertyGet(list, Integer.valueOf(1));
-        JexlPropertySet set = uber.getPropertySet(list, Integer.valueOf(1), "foo");
+        JexlPropertyGet get = uber.getPropertyGet(list, 1);
+        JexlPropertySet set = uber.getPropertySet(list, 1, "foo");
         Assert.assertTrue("list property getter", get instanceof ListGetExecutor);
         Assert.assertTrue("list property setter", set instanceof ListSetExecutor);
         // introspector and uberspect should return same result
-        Assert.assertEquals(get, uber.getPropertyGet(list, Integer.valueOf(1)));
-        Assert.assertEquals(set, uber.getPropertySet(list, Integer.valueOf(1), "foo"));
+        Assert.assertEquals(get, uber.getPropertyGet(list, 1));
+        Assert.assertEquals(set, uber.getPropertySet(list, 1, "foo"));
         // different property should return different setter/getter
-        Assert.assertFalse(get.equals(uber.getPropertyGet(list, Integer.valueOf(0))));
-        Assert.assertFalse(get.equals(uber.getPropertySet(list, Integer.valueOf(0), "foo")));
+        Assert.assertNotEquals(get, uber.getPropertyGet(list, 0));
+        Assert.assertNotEquals(get, uber.getPropertySet(list, 0, "foo"));
         // setter returns argument
         Object bar = set.invoke(list, "bar");
         Assert.assertEquals("bar", bar);
         // getter should return last value
         Assert.assertEquals("bar", get.invoke(list));
         // tryExecute should succeed on integer property
-        Object quux = set.tryInvoke(list, Integer.valueOf(1), "quux");
+        Object quux = set.tryInvoke(list, 1, "quux");
         Assert.assertEquals("quux", quux);
         // getter should return last value
         Assert.assertEquals("quux", get.invoke(list));
@@ -209,8 +207,8 @@ public class DiscoveryTest extends JexlTestCase {
         Assert.assertEquals(get, uber.getPropertyGet(map, "value"));
         Assert.assertEquals(set, uber.getPropertySet(map, "value", "foo"));
         // different property should return different setter/getter
-        Assert.assertFalse(get.equals(uber.getPropertyGet(map, "eulav")));
-        Assert.assertFalse(get.equals(uber.getPropertySet(map, "eulav", "foo")));
+        Assert.assertNotEquals(get, uber.getPropertyGet(map, "eulav"));
+        Assert.assertNotEquals(get, uber.getPropertySet(map, "eulav", "foo"));
         // setter returns argument
         Object bar = set.invoke(map, "bar");
         Assert.assertEquals("bar", bar);
@@ -222,7 +220,7 @@ public class DiscoveryTest extends JexlTestCase {
         // getter should return last value
         Assert.assertEquals("quux", get.invoke(map));
         // tryExecute should fail on different property class
-        Assert.assertEquals(AbstractExecutor.TRY_FAILED, set.tryInvoke(map, Integer.valueOf(1), "nope"));
+        Assert.assertEquals(AbstractExecutor.TRY_FAILED, set.tryInvoke(map, 1, "nope"));
     }
 
     public static class Bulgroz {
@@ -313,7 +311,7 @@ public class DiscoveryTest extends JexlTestCase {
         result = jmethod.invoke(bulgroz, bulgroz, null, null);
         Assert.assertEquals(7, result);
 
-        jmethod = uber.getMethod(bulgroz, "amb", Double.valueOf(3));
+        jmethod = uber.getMethod(bulgroz, "amb", 3d);
         Assert.assertNotNull(null, jmethod);
     }
 }

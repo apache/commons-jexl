@@ -39,13 +39,13 @@ public class MethodKeyTest {
     // A set of instances corresponding to the classes
     private static final Object[] ARGS = {
         Boolean.TRUE,
-        new Byte((byte) 1),
-        new Character('2'),
-        new Double(4d),
-        new Float(8f),
-        new Integer(16),
-        new Long(32l),
-        new Short((short) 64),
+            (byte) 1,
+            '2',
+            4d,
+            8f,
+            16,
+            32L,
+            (short) 64,
         "foobar",
         new java.util.Date()
     };
@@ -90,20 +90,19 @@ public class MethodKeyTest {
 
     }
 
-    /** Generate a list of method*(prims*), method(prims*, prims*), method*(prims*,prims*,prims*) */
+    /* Generate a list of method*(prims*), method(prims*, prims*), method*(prims*,prims*,prims*) */
     static {
         BY_KEY = new java.util.HashMap< MethodKey, String>();
         BY_STRING = new java.util.HashMap<String, MethodKey>();
-        for (int m = 0; m < METHODS.length; ++m) {
-            String method = METHODS[m];
-            for (int p0 = 0; p0 < PRIMS.length; ++p0) {
-                Class<?>[] arg0 = {PRIMS[p0]};
+        for (String method : METHODS) {
+            for (Class<?> value : PRIMS) {
+                Class<?>[] arg0 = {value};
                 setUpKey(method, arg0);
-                for (int p1 = 0; p1 < PRIMS.length; ++p1) {
-                    Class<?>[] arg1 = {PRIMS[p0], PRIMS[p1]};
+                for (Class<?> aClass : PRIMS) {
+                    Class<?>[] arg1 = {value, aClass};
                     setUpKey(method, arg1);
-                    for (int p2 = 0; p2 < PRIMS.length; ++p2) {
-                        Class<?>[] arg2 = {PRIMS[p0], PRIMS[p1], PRIMS[p2]};
+                    for (Class<?> prim : PRIMS) {
+                        Class<?>[] arg2 = {value, aClass, prim};
                         setUpKey(method, arg2);
                     }
                 }
@@ -115,8 +114,8 @@ public class MethodKeyTest {
     /** Builds a string key */
     String makeStringKey(String method, Class<?>... params) {
         StringBuilder builder = new StringBuilder(method);
-        for (int p = 0; p < params.length; ++p) {
-            builder.append(MethodKey.primitiveClass(params[p]).getName());
+        for (Class<?> param : params) {
+            builder.append(MethodKey.primitiveClass(param).getName());
         }
         return builder.toString();
     }
@@ -125,7 +124,7 @@ public class MethodKeyTest {
     void checkStringKey(String method, Class<?>... params) {
         String key = makeStringKey(method, params);
         MethodKey out = BY_STRING.get(key);
-        Assert.assertTrue(out != null);
+        Assert.assertNotNull(out);
     }
 
     /** Builds a method key */
@@ -137,7 +136,7 @@ public class MethodKeyTest {
     void checkKey(String method, Class<?>... params) {
         MethodKey key = makeKey(method, params);
         String out = BY_KEY.get(key);
-        Assert.assertTrue(out != null);
+        Assert.assertNotNull(out);
     }
 
     @Test
@@ -149,24 +148,22 @@ public class MethodKeyTest {
 
     @Test
     public void testObjectKey() throws Exception {
-        for (int k = 0; k < KEY_LIST.length; ++k) {
-            MethodKey ctl = KEY_LIST[k];
+        for (MethodKey ctl : KEY_LIST) {
             MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
             String out = BY_KEY.get(key);
-            Assert.assertTrue(out != null);
-            Assert.assertTrue(ctl.toString() + " != " + out, ctl.toString().equals(out));
+            Assert.assertNotNull(out);
+            Assert.assertEquals(ctl.toString() + " != " + out, ctl.toString(), out);
         }
 
     }
 
     @Test
     public void testStringKey() throws Exception {
-        for (int k = 0; k < KEY_LIST.length; ++k) {
-            MethodKey ctl = KEY_LIST[k];
+        for (MethodKey ctl : KEY_LIST) {
             String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
             MethodKey out = BY_STRING.get(key);
-            Assert.assertTrue(out != null);
-            Assert.assertTrue(ctl.toString() + " != " + key, ctl.equals(out));
+            Assert.assertNotNull(out);
+            Assert.assertEquals(ctl.toString() + " != " + key, ctl, out);
         }
 
     }
@@ -175,11 +172,10 @@ public class MethodKeyTest {
     @Test
     public void testPerfKey() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
-            for (int k = 0; k < KEY_LIST.length; ++k) {
-                MethodKey ctl = KEY_LIST[k];
+            for (MethodKey ctl : KEY_LIST) {
                 MethodKey key = makeKey(ctl.getMethod(), ctl.getParameters());
                 String out = BY_KEY.get(key);
-                Assert.assertTrue(out != null);
+                Assert.assertNotNull(out);
             }
         }
     }
@@ -187,11 +183,10 @@ public class MethodKeyTest {
     @Test
     public void testPerfString() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
-            for (int k = 0; k < KEY_LIST.length; ++k) {
-                MethodKey ctl = KEY_LIST[k];
+            for (MethodKey ctl : KEY_LIST) {
                 String key = makeStringKey(ctl.getMethod(), ctl.getParameters());
                 MethodKey out = BY_STRING.get(key);
-                Assert.assertTrue(out != null);
+                Assert.assertNotNull(out);
             }
         }
     }
@@ -199,14 +194,13 @@ public class MethodKeyTest {
     @Test
     public void testPerfKey2() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
-            for (int m = 0; m < METHODS.length; ++m) {
-                String method = METHODS[m];
-                for (int p0 = 0; p0 < ARGS.length; ++p0) {
-                    checkKey(method, ARGS[p0].getClass());
-                    for (int p1 = 0; p1 < ARGS.length; ++p1) {
-                        checkKey(method, ARGS[p0].getClass(), ARGS[p1].getClass());
-                        for (int p2 = 0; p2 < ARGS.length; ++p2) {
-                            checkKey(method, ARGS[p0].getClass(), ARGS[p1].getClass(), ARGS[p2].getClass());
+            for (String method : METHODS) {
+                for (Object value : ARGS) {
+                    checkKey(method, value.getClass());
+                    for (Object o : ARGS) {
+                        checkKey(method, value.getClass(), o.getClass());
+                        for (Object arg : ARGS) {
+                            checkKey(method, value.getClass(), o.getClass(), arg.getClass());
                         }
                     }
                 }
@@ -217,14 +211,13 @@ public class MethodKeyTest {
     @Test
     public void testPerfStringKey2() throws Exception {
         for (int l = 0; l < LOOP; ++l) {
-            for (int m = 0; m < METHODS.length; ++m) {
-                String method = METHODS[m];
-                for (int p0 = 0; p0 < ARGS.length; ++p0) {
-                    checkStringKey(method, ARGS[p0].getClass());
-                    for (int p1 = 0; p1 < ARGS.length; ++p1) {
-                        checkStringKey(method, ARGS[p0].getClass(), ARGS[p1].getClass());
-                        for (int p2 = 0; p2 < ARGS.length; ++p2) {
-                            checkStringKey(method, ARGS[p0].getClass(), ARGS[p1].getClass(), ARGS[p2].getClass());
+            for (String method : METHODS) {
+                for (Object value : ARGS) {
+                    checkStringKey(method, value.getClass());
+                    for (Object o : ARGS) {
+                        checkStringKey(method, value.getClass(), o.getClass());
+                        for (Object arg : ARGS) {
+                            checkStringKey(method, value.getClass(), o.getClass(), arg.getClass());
                         }
                     }
                 }

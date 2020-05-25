@@ -215,18 +215,16 @@ final class ClassMap {
                 populateWithClass(cache, permissions, classToReflect, log);
             }
             Class<?>[] interfaces = classToReflect.getInterfaces();
-            for (int i = 0; i < interfaces.length; i++) {
-                populateWithInterface(cache, permissions, interfaces[i], log);
+            for (Class<?> anInterface : interfaces) {
+                populateWithInterface(cache, permissions, anInterface, log);
             }
         }
         // now that we've got all methods keyed in, lets organize them by name
         if (!cache.byKey.isEmpty()) {
             List<Method> lm = new ArrayList<Method>(cache.byKey.size());
-            for (Method method : cache.byKey.values()) {
-                lm.add(method);
-            }
+            lm.addAll(cache.byKey.values());
             // sort all methods by name
-            Collections.sort(lm, new Comparator<Method>() {
+            lm.sort(new Comparator<Method>() {
                 @Override
                 public int compare(Method o1, Method o2) {
                     return o1.getName().compareTo(o2.getName());
@@ -263,8 +261,8 @@ final class ClassMap {
         if (Modifier.isPublic(iface.getModifiers())) {
             populateWithClass(cache, permissions, iface, log);
             Class<?>[] supers = iface.getInterfaces();
-            for (int i = 0; i < supers.length; i++) {
-                populateWithInterface(cache, permissions, supers[i], log);
+            for (Class<?> aSuper : supers) {
+                populateWithInterface(cache, permissions, aSuper, log);
             }
         }
     }
@@ -279,8 +277,7 @@ final class ClassMap {
     private static void populateWithClass(ClassMap cache, Permissions permissions, Class<?> clazz, Log log) {
         try {
             Method[] methods = clazz.getDeclaredMethods();
-            for (int i = 0; i < methods.length; i++) {
-                Method mi = methods[i];
+            for (Method mi : methods) {
                 // add method to byKey cache; do not override
                 MethodKey key = new MethodKey(mi);
                 Method pmi = cache.byKey.putIfAbsent(key, permissions.allow(mi) ? mi : CACHE_MISS);

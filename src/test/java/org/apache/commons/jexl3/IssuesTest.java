@@ -141,7 +141,7 @@ public class IssuesTest extends JexlTestCase {
 
         JxltEngine.Expression expr = uel.createExpression("${ax+(bx)}");
         Object value = expr.evaluate(ctxt);
-        Assert.assertTrue("should be ok", "ok".equals(value));
+        Assert.assertEquals("should be ok", "ok", value);
     }
 
     // JEXL-40: failed to discover all methods (non public class implements public method)
@@ -150,7 +150,7 @@ public class IssuesTest extends JexlTestCase {
         public abstract boolean foo();
     }
 
-    class Derived extends Base {
+    static class Derived extends Base {
         @Override
         public boolean foo() {
             return true;
@@ -187,7 +187,7 @@ public class IssuesTest extends JexlTestCase {
                 found += 1;
             }
         }
-        Assert.assertTrue("should have foo & goo", found == 2);
+        Assert.assertEquals("should have foo & goo", 2, found);
 
         names = uber.getFieldNames(Another.class);
         Assert.assertTrue("should find fields", names.length > 0);
@@ -197,7 +197,7 @@ public class IssuesTest extends JexlTestCase {
                 found += 1;
             }
         }
-        Assert.assertTrue("should have name", found == 1);
+        Assert.assertEquals("should have name", 1, found);
     }
 
     // JEXL-10/JEXL-11: variable checking, null operand is error
@@ -219,11 +219,12 @@ public class IssuesTest extends JexlTestCase {
             "a % b"//,
         //"1000 / a"
         };
-        for (int e = 0; e < exprs.length; ++e) {
+        for (String s : exprs) {
             try {
-                JexlExpression expr = jexl.createExpression(exprs[e]);
-                /* Object value = */ expr.evaluate(ctxt);
-                Assert.fail(exprs[e] + " : should have failed due to null argument");
+                JexlExpression expr = jexl.createExpression(s);
+                /* Object value = */
+                expr.evaluate(ctxt);
+                Assert.fail(s + " : should have failed due to null argument");
             } catch (JexlException xjexl) {
                 // expected
             }
@@ -243,24 +244,24 @@ public class IssuesTest extends JexlTestCase {
         JexlScript jscript;
 
         jscript = jexl.createScript("dummy.hashCode()");
-        Assert.assertEquals(jscript.getSourceText(), null, jscript.execute(ctxt)); // OK
+        Assert.assertNull(jscript.getSourceText(), jscript.execute(ctxt)); // OK
 
         ctxt.set("dummy", "abcd");
         Assert.assertEquals(jscript.getSourceText(), Integer.valueOf("abcd".hashCode()), jscript.execute(ctxt)); // OK
 
         jscript = jexl.createScript("dummy.hashCode");
-        Assert.assertEquals(jscript.getSourceText(), null, jscript.execute(ctxt)); // OK
+        Assert.assertNull(jscript.getSourceText(), jscript.execute(ctxt)); // OK
 
         JexlExpression jexpr;
         vars.clear();
         jexpr = jexl.createExpression("dummy.hashCode()");
-        Assert.assertEquals(jexpr.toString(), null, jexpr.evaluate(ctxt)); // OK
+        Assert.assertNull(jexpr.toString(), jexpr.evaluate(ctxt)); // OK
 
         ctxt.set("dummy", "abcd");
         Assert.assertEquals(jexpr.toString(), Integer.valueOf("abcd".hashCode()), jexpr.evaluate(ctxt)); // OK
 
         jexpr = jexl.createExpression("dummy.hashCode");
-        Assert.assertEquals(jexpr.toString(), null, jexpr.evaluate(ctxt)); // OK
+        Assert.assertNull(jexpr.toString(), jexpr.evaluate(ctxt)); // OK
     }
 
     // JEXL-87
@@ -301,10 +302,10 @@ public class IssuesTest extends JexlTestCase {
             "if (true) 2; 3 {}",
             "while (x) 1 if (y) 2 3"
         };
-        for (int f = 0; f < fexprs.length; ++f) {
+        for (String fexpr : fexprs) {
             try {
-                jexl.createScript(fexprs[f]);
-                Assert.fail(fexprs[f] + ": Should have failed in parse");
+                jexl.createScript(fexpr);
+                Assert.fail(fexpr + ": Should have failed in parse");
             } catch (JexlException xany) {
                 // expected to fail in createExpression
             }
@@ -319,8 +320,8 @@ public class IssuesTest extends JexlTestCase {
         };
         ctxt.set("x", Boolean.FALSE);
         ctxt.set("y", Boolean.TRUE);
-        for (int e = 0; e < exprs.length; ++e) {
-            JexlScript s = jexl.createScript(exprs[e]);
+        for (String expr : exprs) {
+            JexlScript s = jexl.createScript(expr);
             Assert.assertEquals(Integer.valueOf(2), s.execute(ctxt));
         }
         debuggerCheck(jexl);

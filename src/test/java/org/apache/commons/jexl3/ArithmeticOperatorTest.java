@@ -16,24 +16,13 @@
  */
 
 package org.apache.commons.jexl3;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
+
 import org.apache.commons.jexl3.junit.Asserter;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -196,7 +185,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         }
 
         public boolean contains(int[] i) {
-            return values.containsAll(Arrays.asList(i));
+            return values.containsAll(Collections.singletonList(i));
         }
 
         public boolean startsWith(int i) {
@@ -476,7 +465,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     @Test
     public void testFormatArithmetic() throws Exception {
         Calendar cal = Calendar.getInstance(UTC);
-        cal.set(1969, 7, 20);
+        cal.set(1969, Calendar.AUGUST, 20);
         Date x0 = cal.getTime();
         String y0 =  "MM/yy/dd";
         Number x1 = 42.12345;
@@ -522,7 +511,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         Map<String, Object> ns = new HashMap<String, Object>();
         ns.put("calc", Aggregate.class);
         Calendar cal = Calendar.getInstance(UTC);
-        cal.set(1969, 7, 20);
+        cal.set(1969, Calendar.AUGUST, 20);
         Date x0 = cal.getTime();
         String y0 =  "yyyy-MM-dd";
         DateContext jc = new DateContext();

@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.TreeMap;
 import org.junit.Assert;
@@ -35,7 +36,7 @@ public class AntishCallTest extends JexlTestCase {
     /**
      * Wraps a class.
      */
-    public class ClassReference {
+    public static class ClassReference {
         final Class<?> clazz;
         ClassReference(Class<?> c) {
             this.clazz = c;
@@ -45,7 +46,7 @@ public class AntishCallTest extends JexlTestCase {
     /**
      * Considers any call using a class reference as functor as a call to its constructor.
      * <p>Note that before 3.2, a class was not considered a functor.
-     * @param clazz the class we seek to instantiate
+     * @param ref the ClassReference of the class we seek to instantiate
      * @param args the constructor arguments
      * @return an instance if that was possible
      */
@@ -134,7 +135,7 @@ public class AntishCallTest extends JexlTestCase {
         Map<String,Object> lmap = new TreeMap<String,Object>();
         JexlContext jc = new CallSupportContext(lmap).engine(JEXL);
         runTestCall(JEXL, jc);
-        lmap.put("java.math.BigInteger", new ClassReference(java.math.BigInteger.class));
+        lmap.put("java.math.BigInteger", new ClassReference(BigInteger.class));
         runTestCall(JEXL, jc);
         lmap.remove("java.math.BigInteger");
         runTestCall(JEXL, jc);
@@ -148,7 +149,7 @@ public class AntishCallTest extends JexlTestCase {
         JexlContext jc = new MapContext(lmap);
         lmap.put("java.math.BigInteger", java.math.BigInteger.class);
         runTestCall(jexl, jc);
-        lmap.put("java.math.BigInteger", new ClassReference(java.math.BigInteger.class));
+        lmap.put("java.math.BigInteger", new ClassReference(BigInteger.class));
         runTestCall(jexl, jc);
         lmap.remove("java.math.BigInteger");
         try {
@@ -189,9 +190,9 @@ public class AntishCallTest extends JexlTestCase {
             result = script.execute(ctxt);
             Assert.fail("antish var shall not be resolved");
         } catch(JexlException.Variable xvar) {
-            Assert.assertTrue("x".equals(xvar.getVariable()));
+            Assert.assertEquals("x", xvar.getVariable());
         } catch(JexlException xother) {
-            Assert.assertTrue(xother != null);
+            Assert.assertNotNull(xother);
         } finally {
             options.setAntish(true);
         }

@@ -124,7 +124,7 @@ public class AssignTest extends JexlTestCase {
             Assert.assertTrue(str.contains("nosuchbean"));
         }
         finally {
-            Assert.assertEquals("Should have failed", null, o);
+            Assert.assertNull("Should have failed", o);
         }
     }
 

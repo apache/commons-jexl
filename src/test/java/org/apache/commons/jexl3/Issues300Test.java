@@ -247,7 +247,7 @@ public class Issues300Test {
             super(vars);
         }
         public int cell(String... ms) {
-            return ms.length == 0 ? 0 : ms.length;
+            return ms.length;
         }
 
         public int cell(List<?> l, String...ms) {
@@ -441,8 +441,8 @@ public class Issues300Test {
         // defined and null
         jc.set("a.n.t.variable", null);
         script = jexl.createScript("a.n.t.variable");
-        result = script.execute(jc); 
-        Assert.assertEquals(null, result);
+        result = script.execute(jc);
+        Assert.assertNull(result);
         
         // defined and null, dereference
         jc.set("a.n.t", null);

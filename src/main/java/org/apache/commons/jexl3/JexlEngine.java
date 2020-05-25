@@ -609,21 +609,13 @@ public abstract class JexlEngine {
         if (file == null) {
             throw new NullPointerException("source file is null");
         }
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), getCharset()));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
+                getCharset()))) {
             return toString(reader);
         } catch (IOException xio) {
             throw new JexlException(createInfo(file.toString(), 1, 1), "could not read source File", xio);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException xignore) {
-                    // cant do much
-                }
-            }
         }
+        // cant do much
     }
 
     /**
@@ -636,20 +628,10 @@ public abstract class JexlEngine {
         if (url == null) {
             throw new NullPointerException("source URL is null");
         }
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(url.openStream(), getCharset()));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), getCharset()))) {
             return toString(reader);
         } catch (IOException xio) {
             throw new JexlException(createInfo(url.toString(), 1, 1), "could not read source URL", xio);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException xignore) {
-                    // cant do much
-                }
-            }
         }
     }
 }

@@ -68,6 +68,7 @@ public class ArrayIterator implements Iterator<Object> {
      *
      * @return The next object in the array.
      */
+    @Override
     public Object next() {
         if (pos < size) {
             return Array.get(array, pos++);
@@ -82,6 +83,7 @@ public class ArrayIterator implements Iterator<Object> {
      *
      * @return Whether there is another element.
      */
+    @Override
     public boolean hasNext() {
         return (pos < size);
     }
@@ -89,6 +91,7 @@ public class ArrayIterator implements Iterator<Object> {
     /**
      * No op--merely added to satify the <code>Iterator</code> interface.
      */
+    @Override
     public void remove() {
         throw new UnsupportedOperationException();
     }

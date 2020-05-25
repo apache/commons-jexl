@@ -18,7 +18,6 @@ package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.TemplateDebugger;
-import org.apache.commons.jexl3.internal.TemplateScript;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,6 +26,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -201,14 +201,14 @@ public class JXLTTest extends JexlTestCase {
 
         Set<List<String>> evars = expr.getVariables();
         Assert.assertEquals(1, evars.size());
-        Assert.assertTrue(contains(evars, Arrays.asList("name")));
+        Assert.assertTrue(contains(evars, Collections.singletonList("name")));
         context.set("name", "Doe");
         JxltEngine.Expression phase1 = expr.prepare(context);
         String as = phase1.asString();
         Assert.assertEquals("Dear ${p} Doe;", as);
         Set<List<String>> evars1 = phase1.getVariables();
         Assert.assertEquals(1, evars1.size());
-        Assert.assertTrue(contains(evars1, Arrays.asList("p")));
+        Assert.assertTrue(contains(evars1, Collections.singletonList("p")));
         vars.clear();
         context.set("p", "Mr");
         context.set("name", "Should not be used in 2nd phase");
@@ -227,7 +227,7 @@ public class JXLTTest extends JexlTestCase {
 
         Set<List<String>> evars = expr.getVariables();
         Assert.assertEquals(1, evars.size());
-        Assert.assertTrue(contains(evars, Arrays.asList("hi")));
+        Assert.assertTrue(contains(evars, Collections.singletonList("hi")));
 
         context.set("hi", "greeting");
         context.set("greeting.world", "Hello World!");
@@ -271,7 +271,7 @@ public class JXLTTest extends JexlTestCase {
         JexlContext none = null;
         final String source = "Hello World!";
         JxltEngine.Expression expr = JXLT.createExpression(source);
-        Assert.assertTrue("prepare should return same expression", expr.prepare(none) == expr);
+        Assert.assertSame("prepare should return same expression", expr.prepare(none), expr);
         Object o = expr.evaluate(none);
         Assert.assertTrue("expression should be immediate", expr.isImmediate());
         Assert.assertEquals("Hello World!", o);
@@ -433,7 +433,7 @@ public class JXLTTest extends JexlTestCase {
             expr = JXLT.createExpression("#{${bar}+'.charAt(-2)'}");
             expr = expr.prepare(context);
             o = expr.evaluate(context);
-            Assert.assertEquals(null, o);
+            Assert.assertNull(o);
         } finally {
             options.setSilent(false);
         }
@@ -1084,7 +1084,7 @@ public class JXLTTest extends JexlTestCase {
             tmplt.evaluate(ctxt, strw);
             Assert.fail("tab var is null");
         } catch (JexlException.Variable xvar) {
-            Assert.assertTrue("tab".equals(xvar.getVariable()));
+            Assert.assertEquals("tab", xvar.getVariable());
             Assert.assertFalse(xvar.isUndefined());
         }
     }

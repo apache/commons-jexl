@@ -37,7 +37,7 @@ public class ArrayTest {
      * An example for array access.
      */
     static void example(Output out) throws Exception {
-        /**
+        /*
          * First step is to retrieve an instance of a JexlEngine;
          * it might be already existing and shared or created anew.
          */
@@ -49,7 +49,7 @@ public class ArrayTest {
 
         List<Object> l = new ArrayList<Object>();
         l.add("Hello from location 0");
-        Integer two = new Integer(2);
+        Integer two = 2;
         l.add(two);
         jc.set("array", l);
 
@@ -60,7 +60,7 @@ public class ArrayTest {
         e = jexl.createExpression("array[0].length()");
         o = e.evaluate(jc);
 
-        out.print("The length of the string at location 0 is : ", o, Integer.valueOf(21));
+        out.print("The length of the string at location 0 is : ", o, 21);
     }
 
     /**

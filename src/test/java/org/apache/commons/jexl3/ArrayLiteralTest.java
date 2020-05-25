@@ -51,7 +51,7 @@ public class ArrayLiteralTest extends JexlTestCase {
 
         Object o = e.evaluate(jc);
         Object[] check = {"foo", "bar"};
-        Assert.assertTrue(Arrays.equals(check, (Object[]) o));
+        Assert.assertArrayEquals(check, (Object[]) o);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class ArrayLiteralTest extends JexlTestCase {
 
         Object o = e.evaluate(jc);
         Object[] check = {"foo"};
-        Assert.assertTrue(Arrays.equals(check, (Object[]) o));
+        Assert.assertArrayEquals(check, (Object[]) o);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class ArrayLiteralTest extends JexlTestCase {
 
         Object o = e.evaluate(jc);
         Object[] check = {new Double(5), new Integer(10)};
-        Assert.assertTrue(Arrays.equals(check, (Object[]) o));
+        Assert.assertArrayEquals(check, (Object[]) o);
         Assert.assertTrue(o.getClass().isArray() && o.getClass().getComponentType().equals(Number.class));
     }
 
@@ -106,7 +106,7 @@ public class ArrayLiteralTest extends JexlTestCase {
         for (int t = 0; t < exprs.length; ++t) {
             JexlExpression e = JEXL.createExpression(exprs[t]);
             Object o = e.evaluate(jc);
-            Assert.assertTrue(exprs[t], Arrays.equals(checks[t], (Object[]) o));
+            Assert.assertArrayEquals(exprs[t], checks[t], (Object[]) o);
         }
 
     }
@@ -118,7 +118,7 @@ public class ArrayLiteralTest extends JexlTestCase {
 
         Object o = e.evaluate(jc);
         int[] check = {5, 10};
-        Assert.assertTrue(Arrays.equals(check, (int[]) o));
+        Assert.assertArrayEquals(check, (int[]) o);
     }
 
     @Test

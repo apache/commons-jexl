@@ -488,14 +488,14 @@ public class PropertyAccessTest extends JexlTestCase {
         } catch (JexlException xany) {
             Assert.assertEquals(JexlException.Property.class, xany.getClass());
         }
-        Assert.assertEquals(null, result);
+        Assert.assertNull(result);
         result = script.execute(ctxt, "stuff");
         Assert.assertEquals(42, result);
 
         // protected navigation
         script = jexl.createScript("$in[p]?.intValue()", "p");
         result = script.execute(ctxt, "fail");
-        Assert.assertEquals(null, result);
+        Assert.assertNull(result);
         result = script.execute(ctxt, "stuff");
         Assert.assertEquals(42, result);
 
@@ -513,7 +513,7 @@ public class PropertyAccessTest extends JexlTestCase {
         // protected navigation
         script = jexl.createScript("$in.`${p}`?.intValue()", "p");
         result = script.execute(ctxt, "fail");
-        Assert.assertEquals(null, result);
+        Assert.assertNull(result);
         result = script.execute(ctxt, "stuff");
         Assert.assertEquals(42, result);
 
@@ -531,7 +531,7 @@ public class PropertyAccessTest extends JexlTestCase {
         // unprotected navigation
         script = jexl.createScript("$in[p].intValue()", "p");
             result = script.execute(ctxt, "fail");
-        Assert.assertEquals(null, result);
+         Assert.assertNull(result);
 
         result = script.execute(ctxt, "stuff");
         Assert.assertEquals(42, result);
@@ -540,14 +540,14 @@ public class PropertyAccessTest extends JexlTestCase {
         // unprotected navigation
         script = jexl.createScript("$in.`${p}`.intValue()", "p");
         result = script.execute(ctxt, "fail");
-        Assert.assertEquals(null, result);
+         Assert.assertNull(result);
         result = script.execute(ctxt, "stuff");
         Assert.assertEquals(42, result);
 
         // protected navigation
         script = jexl.createScript("$in.`${p}`?.intValue()", "p");
         result = script.execute(ctxt, "fail");
-        Assert.assertEquals(null, result);
+         Assert.assertNull(result);
         result = script.execute(ctxt, "stuff");
         Assert.assertEquals(42, result);
 

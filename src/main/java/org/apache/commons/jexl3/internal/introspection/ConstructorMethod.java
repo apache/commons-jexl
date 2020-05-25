@@ -95,11 +95,7 @@ public final class ConstructorMethod implements JexlMethod {
             if (invoke) {
                 return ctor.newInstance(params);
             }
-        } catch (InstantiationException xinstance) {
-            return Uberspect.TRY_FAILED;
-        } catch (IllegalAccessException xaccess) {
-            return Uberspect.TRY_FAILED;
-        } catch (IllegalArgumentException xargument) {
+        } catch (InstantiationException | IllegalArgumentException | IllegalAccessException xinstance) {
             return Uberspect.TRY_FAILED;
         } catch (InvocationTargetException xinvoke) {
             throw JexlException.tryFailed(xinvoke); // throw

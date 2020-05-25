@@ -58,14 +58,12 @@ public class RangeTest extends JexlTestCase {
         Collection<?> c = (Collection<?>) o;
         Assert.assertEquals(32, c.size());
 
-        Assert.assertTrue(o0 != o);
+        Assert.assertNotSame(o0, o);
         Assert.assertEquals(o0.hashCode(), o.hashCode());
         Assert.assertEquals(o0, o);
 
         int i = 0;
-        Iterator<?> ii = c.iterator();
-        while (ii.hasNext()) {
-            Object v = ii.next();
+        for (Object v : c) {
             i += 1;
             Assert.assertEquals(i, ((Number) v).intValue());
         }
@@ -74,19 +72,19 @@ public class RangeTest extends JexlTestCase {
         Integer[] aa = c.<Integer>toArray(new Integer[32]);
         Assert.assertEquals(32, aa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertTrue(aa[l] == l + 1);
+            Assert.assertEquals((int) aa[l], l + 1);
         }
 
         aa = c.<Integer>toArray(new Integer[2]);
         Assert.assertEquals(32, aa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertTrue(aa[l] == l + 1);
+            Assert.assertEquals((int) aa[l], l + 1);
         }
 
         aa = c.<Integer>toArray(new Integer[34]);
         Assert.assertEquals(34, aa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertTrue(aa[l] == l + 1);
+            Assert.assertEquals((int) aa[l], l + 1);
         }
 
         Object[] oaa = c.toArray();
@@ -108,14 +106,12 @@ public class RangeTest extends JexlTestCase {
         Assert.assertEquals(32, c.size());
         Assert.assertFalse((Boolean) JEXL.createScript("empty x", "x").execute(null, e));
 
-        Assert.assertTrue(o0 != o);
+        Assert.assertNotSame(o0, o);
         Assert.assertEquals(o0.hashCode(), o.hashCode());
         Assert.assertEquals(o0, o);
 
         long i = 6789000000L;
-        Iterator<?> ii = c.iterator();
-        while (ii.hasNext()) {
-            Object v = ii.next();
+        for (Object v : c) {
             i += 1;
             Assert.assertEquals(i, ((Number) v).longValue());
         }
@@ -124,19 +120,19 @@ public class RangeTest extends JexlTestCase {
         Long[] aa = c.<Long>toArray(new Long[32]);
         Assert.assertEquals(32, aa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertTrue(aa[l] == 6789000001L + l);
+            Assert.assertEquals((long) aa[l], 6789000001L + l);
         }
 
         aa = c.<Long>toArray(new Long[2]);
         Assert.assertEquals(32, aa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertTrue(aa[l] == 6789000001L + l);
+            Assert.assertEquals((long) aa[l], 6789000001L + l);
         }
 
         aa = c.<Long>toArray(new Long[34]);
         Assert.assertEquals(34, aa.length);
         for (int l = 0; l < 32; ++l) {
-            Assert.assertTrue(aa[l] == 6789000001L + l);
+            Assert.assertEquals((long) aa[l], 6789000001L + l);
         }
 
         Object[] oaa = c.toArray();

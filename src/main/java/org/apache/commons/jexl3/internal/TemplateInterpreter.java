@@ -161,9 +161,9 @@ public class TemplateInterpreter extends Interpreter {
         TemplateEngine.TemplateExpression[] cexprs = composite.exprs;
         final int size = cexprs.length;
         Object value;
-        for (int e = 0; e < size; ++e) {
-            value = cexprs[e].evaluate(this);
-            doPrint(cexprs[e].getInfo(), value);
+        for (TemplateExpression cexpr : cexprs) {
+            value = cexpr.evaluate(this);
+            doPrint(cexpr.getInfo(), value);
         }
     }
 

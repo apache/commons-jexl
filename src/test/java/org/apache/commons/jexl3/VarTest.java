@@ -589,7 +589,7 @@ public class VarTest extends JexlTestCase {
         JexlScript script = JEXL.createScript("sum(TOTAL) - partial.sum() + partial['sub'].avg() - sum(partial.sub)");
         Set<List<String>> vars = script.getVariables();
 
-        Assert.assertTrue(vars.size() == 3);
+        Assert.assertEquals(3, vars.size());
     }
 
     public static class TheVarContext {

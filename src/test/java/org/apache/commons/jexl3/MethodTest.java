@@ -52,8 +52,8 @@ public class MethodTest extends JexlTestCase {
         public String callInts(Integer... args) {
             int result = 0;
             if (args != null) {
-                for (int i = 0; i < args.length; i++) {
-                    result += args[i] != null ? args[i].intValue() : -100;
+                for (Integer arg : args) {
+                    result += arg != null ? arg : -100;
                 }
             } else {
                 result = -1000;
@@ -62,10 +62,10 @@ public class MethodTest extends JexlTestCase {
         }
 
         public String callMixed(Integer fixed, Integer... args) {
-            int result = fixed.intValue();
+            int result = fixed;
             if (args != null) {
-                for (int i = 0; i < args.length; i++) {
-                    result += args[i] != null ? args[i].intValue() : -100;
+                for (Integer arg : args) {
+                    result += arg != null ? arg : -100;
                 }
             } else {
                 result -= 1000;
@@ -76,8 +76,8 @@ public class MethodTest extends JexlTestCase {
         public String callMixed(String mixed, Integer... args) {
             int result = 0;
             if (args != null) {
-                for (int i = 0; i < args.length; i++) {
-                    result += args[i] != null ? args[i].intValue() : -100;
+                for (Integer arg : args) {
+                    result += arg != null ? arg : -100;
                 }
             } else {
                 result = -1000;
