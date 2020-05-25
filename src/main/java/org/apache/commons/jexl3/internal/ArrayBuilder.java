@@ -19,7 +19,11 @@ package org.apache.commons.jexl3.internal;
 import org.apache.commons.jexl3.JexlArithmetic;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Arrays;
 
 /**
  * Helper class to create typed arrays.

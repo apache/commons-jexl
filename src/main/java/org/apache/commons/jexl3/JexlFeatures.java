@@ -16,7 +16,11 @@
  */
 package org.apache.commons.jexl3;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Objects;
 
 /**
  * A set of language feature options.
