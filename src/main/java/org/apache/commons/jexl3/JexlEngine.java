@@ -615,7 +615,6 @@ public abstract class JexlEngine {
         } catch (IOException xio) {
             throw new JexlException(createInfo(file.toString(), 1, 1), "could not read source File", xio);
         }
-        // cant do much
     }
 
     /**
