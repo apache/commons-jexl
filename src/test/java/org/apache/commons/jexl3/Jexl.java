@@ -36,9 +36,9 @@ public class Jexl {
             context.set(e.getKey().toString(), e.getValue());
         }
         try {
-            for (int i = 0; i < args.length; i++) {
-                JexlExpression e = JEXL.createExpression(args[i]);
-                System.out.println("evaluate(" + args[i] + ") = '" + e.evaluate(context) + "'");
+            for (String arg : args) {
+                JexlExpression e = JEXL.createExpression(arg);
+                System.out.println("evaluate(" + arg + ") = '" + e.evaluate(context) + "'");
             }
         } catch (Exception e) {
             e.printStackTrace();

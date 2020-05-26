@@ -788,7 +788,7 @@ public class Interpreter extends InterpreterBase {
 
     @Override
     protected Object visit(ASTAndNode node, Object data) {
-        /**
+        /*
          * The pattern for exception mgmt is to let the child*.jjtAccept out of the try/catch loop so that if one fails,
          * the ex will traverse up to the interpreter. In cases where this is not convenient/possible, JexlException
          * must be caught explicitly and rethrown.
@@ -1853,12 +1853,8 @@ public class Interpreter extends InterpreterBase {
                 processed[0] = true;
                 try {
                     return processAnnotation(stmt, index + 1, data);
-                } catch(JexlException.Return xreturn) {
+                } catch(JexlException.Return | JexlException.Continue | JexlException.Break xreturn) {
                     return xreturn;
-                } catch(JexlException.Break xbreak) {
-                    return xbreak;
-                } catch(JexlException.Continue xcontinue) {
-                    return xcontinue;
                 }
             }
         };

@@ -127,7 +127,7 @@ public class MapLiteralTest extends JexlTestCase {
         JexlContext jc = new MapContext();
 
         Object o = e.evaluate(jc);
-        Assert.assertFalse(((Boolean) o).booleanValue());
+        Assert.assertFalse((Boolean) o);
     }
 
     @Test

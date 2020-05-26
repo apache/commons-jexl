@@ -205,7 +205,7 @@ public class JexlException extends RuntimeException {
      * @return the info to use
      */
     private static JexlInfo merge(JexlInfo info, JavaccError cause) {
-        JexlInfo dbgn = info != null ? info : null;
+        JexlInfo dbgn = info;
         if (cause == null || cause.getLine() < 0) {
             return dbgn;
         } else if (dbgn == null) {
@@ -488,7 +488,7 @@ public class JexlException extends RuntimeException {
     /**
      * The various type of variable issues.
      */
-    public static enum VariableIssue {
+    public enum VariableIssue {
         /** The variable is undefined. */
         UNDEFINED,
         /** The variable is already declared. */

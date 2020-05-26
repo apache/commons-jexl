@@ -53,7 +53,7 @@ abstract class AbstractExecutor {
      * @return an Integer if it can be converted, null otherwise
      */
     static Integer castInteger(Object arg) {
-        return arg instanceof Number? Integer.valueOf(((Number) arg).intValue()) : null;
+        return arg instanceof Number? ((Number) arg).intValue() : null;
     }
 
     /**

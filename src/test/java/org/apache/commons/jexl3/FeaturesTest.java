@@ -48,11 +48,8 @@ public class FeaturesTest extends JexlTestCase {
             try {
                 JexlScript e = jexl.createScript(features, null, script);
                 Assert.fail("should fail parse: " + script);
-            } catch (JexlException.Feature xfeature) {
+            } catch (JexlException.Parsing xfeature) {
                 String msg = xfeature.getMessage();
-                Assert.assertNotNull(msg);
-            } catch (JexlException.Parsing xparsing) {
-                String msg = xparsing.getMessage();
                 Assert.assertNotNull(msg);
             }
         }

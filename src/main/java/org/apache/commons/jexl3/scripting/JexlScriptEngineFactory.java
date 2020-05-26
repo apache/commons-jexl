@@ -111,26 +111,27 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public Object getParameter(String key) {
-        if (key.equals(ScriptEngine.ENGINE)) {
-            return getEngineName();
-        } else if (key.equals(ScriptEngine.ENGINE_VERSION)) {
-            return getEngineVersion();
-        } else if (key.equals(ScriptEngine.NAME)) {
-            return getNames();
-        } else if (key.equals(ScriptEngine.LANGUAGE)) {
-            return getLanguageName();
-        } else if(key.equals(ScriptEngine.LANGUAGE_VERSION)) {
-            return getLanguageVersion();
-        } else if (key.equals("THREADING")) {
-            /*
-             * To implement multithreading, the scripting engine context (inherited from AbstractScriptEngine)
-             * would need to be made thread-safe; so would the setContext/getContext methods.
-             * It is easier to share the underlying Uberspect and JEXL engine instance, especially
-             * with an expression cache.
-             */
-            return null;
+        switch (key) {
+            case ScriptEngine.ENGINE:
+                return getEngineName();
+            case ScriptEngine.ENGINE_VERSION:
+                return getEngineVersion();
+            case ScriptEngine.NAME:
+                return getNames();
+            case ScriptEngine.LANGUAGE:
+                return getLanguageName();
+            case ScriptEngine.LANGUAGE_VERSION:
+                return getLanguageVersion();
+            case "THREADING":
+                /*
+                 * To implement multithreading, the scripting engine context (inherited from AbstractScriptEngine)
+                 * would need to be made thread-safe; so would the setContext/getContext methods.
+                 * It is easier to share the underlying Uberspect and JEXL engine instance, especially
+                 * with an expression cache.
+                 */
+            default:
+                return null;
         }
-        return null;
     }
 
     @Override

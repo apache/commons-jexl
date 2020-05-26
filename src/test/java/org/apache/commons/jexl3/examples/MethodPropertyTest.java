@@ -34,7 +34,7 @@ public class MethodPropertyTest {
      * An example for method access.
      */
     public static void example(final Output out) throws Exception {
-        /**
+        /*
          * First step is to retrieve an instance of a JexlEngine;
          * it might be already existing and shared or created anew.
          */
@@ -44,11 +44,11 @@ public class MethodPropertyTest {
          */
         JexlContext jc = new MapContext();
 
-        /**
+        /*
          * The Java equivalents of foo and number for comparison and checking
          */
         Foo foo = new Foo();
-        Integer number = new Integer(10);
+        Integer number = 10;
 
         jc.set("foo", foo);
         jc.set("number", number);
@@ -73,7 +73,7 @@ public class MethodPropertyTest {
 
         e = jexl.createExpression("foo.convert(1+number)");
         o = e.evaluate(jc);
-        out.print("value of " + e.getParsedText() + " is : ", o, foo.convert(1+number.intValue()));
+        out.print("value of " + e.getParsedText() + " is : ", o, foo.convert(1+ number));
 
         /*
          * access a property

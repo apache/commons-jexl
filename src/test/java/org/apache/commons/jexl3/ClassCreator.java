@@ -23,6 +23,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -126,7 +127,7 @@ public class ClassCreator {
             return clazz;
         }
         Object v = validate(clazz);
-        if (v instanceof Integer && ((Integer) v).intValue() == seed) {
+        if (v instanceof Integer && (Integer) v == seed) {
             return clazz;
         }
         throw new Exception("failed to validate foo" + seed);
@@ -194,7 +195,7 @@ public class ClassCreator {
         DiagnosticCollector<JavaFileObject> diagnosticsCollector = new DiagnosticCollector<JavaFileObject>();
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnosticsCollector, null, null);
         Iterable<? extends JavaFileObject> compilationUnits = fileManager
-                .getJavaFileObjectsFromStrings(Arrays.asList(source));
+                .getJavaFileObjectsFromStrings(Collections.singletonList(source));
 
         List<String> options = new ArrayList<String>();
         options.add("-classpath");
@@ -226,8 +227,8 @@ public class ClassCreator {
     }
 
     Object validate(Class<?> clazz) throws Exception {
-        Class<?> params[] = {};
-        Object paramsObj[] = {};
+        Class<?>[] params = {};
+        Object[] paramsObj = {};
         Object iClass = clazz.newInstance();
         Method thisMethod = clazz.getDeclaredMethod("getValue", params);
         return thisMethod.invoke(iClass, paramsObj);

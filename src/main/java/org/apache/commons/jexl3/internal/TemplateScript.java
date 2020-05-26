@@ -69,10 +69,13 @@ public final class TemplateScript implements JxltEngine.Template {
         if (directive == null) {
             throw new NullPointerException("null prefix");
         }
-        if (Character.toString(engine.getImmediateChar()).equals(directive)
-            || (Character.toString(engine.getImmediateChar()) + "{").equals(directive)
-            || Character.toString(engine.getDeferredChar()).equals(directive)
-            || (Character.toString(engine.getDeferredChar()) + "{").equals(directive)) {
+        final String engineImmediateCharString = Character.toString(engine.getImmediateChar());
+        final String engineDeferredCharString = Character.toString(engine.getDeferredChar());
+
+        if (engineImmediateCharString.equals(directive)
+                || engineDeferredCharString.equals(directive)
+                || (engineImmediateCharString + "{").equals(directive)
+                || (engineDeferredCharString + "{").equals(directive)) {
             throw new IllegalArgumentException(directive + ": is not a valid directive pattern");
         }
         if (reader == null) {
@@ -126,12 +129,11 @@ public final class TemplateScript implements JxltEngine.Template {
         // jexl:print(...) expression counter
         int jpe = 0;
         // create the exprs using the intended scopes
-        for (int b = 0; b < blocks.size(); ++b) {
-            Block block = blocks.get(b);
+        for (Block block : blocks) {
             if (block.getType() == BlockType.VERBATIM) {
                 JexlNode.Info ji = minfo.get(jpe);
                 uexprs.add(
-                    jxlt.parseExpression(ji, block.getBody(), scopeOf(ji))
+                        jxlt.parseExpression(ji, block.getBody(), scopeOf(ji))
                 );
                 jpe += 1;
             }
@@ -159,7 +161,7 @@ public final class TemplateScript implements JxltEngine.Template {
         script = theScript;
         exprs = theExprs;
     }
-    
+
     /**
      * Gets the scope from an info.
      * @param info the node info
@@ -175,7 +177,7 @@ public final class TemplateScript implements JxltEngine.Template {
         }
         return null;
     }
-    
+
     /**
      * Collects the scope surrounding a call to jexl:print(i).
      * <p>This allows to later parse the blocks with the known symbols 
@@ -245,7 +247,7 @@ public final class TemplateScript implements JxltEngine.Template {
         }
         return strb.toString();
     }
-    
+
     @Override
     public TemplateScript prepare(JexlContext context) {
         final Engine jexl = jxlt.getEngine();

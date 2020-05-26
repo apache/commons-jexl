@@ -166,6 +166,6 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @return true if captured, false otherwise
      */
     public boolean isCapturedSymbol(int symbol) {
-        return scope != null? scope.isCapturedSymbol(symbol) : false;
+        return scope != null && scope.isCapturedSymbol(symbol);
     }
 }

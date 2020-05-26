@@ -30,5 +30,5 @@ matrix:
   allow_failures:
     - jdk: openjdk-ea
 after_success:
-  - mvn -V -B -e clean cobertura:cobertura coveralls:report
+  - mvn clean test jacoco:report coveralls:report
 

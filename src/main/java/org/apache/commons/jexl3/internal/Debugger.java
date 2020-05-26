@@ -260,11 +260,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @return this debugger instance
      */
     public Debugger indentation(int level) {
-        if (level <= 0) {
-            indent = 0;
-        } else {
-            indent = level;
-        }
+        indent = Math.max(level, 0);
         indentLevel = 0;
         return this;
     }

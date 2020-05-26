@@ -19,6 +19,8 @@ package org.apache.commons.jexl3.internal;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 
+import java.util.Objects;
+
 /**
  * A Script closure.
  */
@@ -72,10 +74,10 @@ public class Closure extends Script {
         if (this.jexl != other.jexl) {
             return false;
         }
-        if ((this.source == null) ? (other.source != null) : !this.source.equals(other.source)) {
+        if (!Objects.equals(this.source, other.source)) {
             return false;
         }
-        if (this.frame != other.frame && (this.frame == null || !this.frame.equals(other.frame))) {
+        if (!Objects.equals(this.frame, other.frame)) {
             return false;
         }
         return true;

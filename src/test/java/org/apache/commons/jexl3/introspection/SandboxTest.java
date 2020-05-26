@@ -287,10 +287,7 @@ public class SandboxTest extends JexlTestCase {
             try {
                 result = script.execute(null, foo);
                 Assert.fail("should have not been possible");
-            } catch (JexlException.Method xjm) {
-                // ok
-                LOGGER.info(xjm.toString());
-            } catch (JexlException.Property xjm) {
+            } catch (JexlException.Method | JexlException.Property xjm) {
                 // ok
                 LOGGER.info(xjm.toString());
             }
