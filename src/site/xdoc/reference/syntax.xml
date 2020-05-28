@@ -346,14 +346,23 @@
                         Can start and end with either <code>'</code> or <code>"</code> delimiters, e.g.
                         <code>"Hello world"</code> and
                         <code>'Hello world'</code> are equivalent.
-                        <p>The escape character is <code>\</code> (backslash); it only escapes the string delimiter</p>
+                        <p>The escape character is <code>\</code> (backslash).
+                        Unicode characters can be used in string literals;
+                            <lu>Unicode escape sequences consist of:
+                                <li> a backslash '\' </li>
+                                <li>a 'u' </li>
+                                <li>4 hexadecimal digits ([0-9],[A-H],[a-h]).</li>
+                            </lu>
+                            Such sequences represent the UTF-16 encoding of a Unicode character,
+                            for example, <code>'a'</code> is equivalent to <code>'\u0061'</code>.
+                        </p>
                     </td>
                 </tr>
                 <tr>
                     <td>Multiline format literals</td>
                     <td>
                         Start and end with <code>`</code> delimiter - back-quote -, e.g. <code>`Hello world`</code>
-                        <p>The escape character is <code>\</code> (backslash); it only escapes the string delimiter.</p>
+                        <p>The escape character is <code>\</code> (backslash); Unicode escape sequences can also be used.</p>
                         These format literals can span multiple lines and allow Unified JEXL expressions (JSTL like expressions)
                         to be interpolated. If a variable <code>user</code> valued <code>JEXL</code>is present in the environment - whether
                         as a local or global variable -, the format <code>`Hello ${user}`</code> will evaluate as <code>Hello JEXL</code>.

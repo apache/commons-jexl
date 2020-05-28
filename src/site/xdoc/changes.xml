@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="fix" issue="JEXL-331" due-to="David Costanzo">
+                Please document \uXXXX escape sequence
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-330" due-to="David Costanzo">
                 JexlException.Parsing.getMessage() throws exception when parse error is in long expression
             </action>
