@@ -45,7 +45,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.evaluate(jc);
         Set<?> check = createSet("foo", "bar");
-        Assert.assertTrue(check.equals(o));
+        Assert.assertEquals(check, o);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.evaluate(jc);
         Set<?> check = createSet("foo");
-        Assert.assertTrue(check.equals(o));
+        Assert.assertEquals(check, o);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.execute(jc);
         Set<?> check = createSet("foo", "bar");
-        Assert.assertTrue(check.equals(o));
+        Assert.assertEquals(check, o);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.execute(jc);
         Set<?> check = createSet("foo");
-        Assert.assertTrue(check.equals(o));
+        Assert.assertEquals(check, o);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.execute(jc);
         Set<?> check = createSet("foo");
-        Assert.assertTrue(check.equals(o));
+        Assert.assertEquals(check, o);
     }
 
     @Test
@@ -95,7 +95,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.execute(jc);
         Set<?> check = createSet(createSet("foo"));
-        Assert.assertTrue(check.equals(o));
+        Assert.assertEquals(check, o);
     }
 
     @Test
@@ -105,7 +105,7 @@ public class SetLiteralTest extends JexlTestCase {
 
         Object o = e.evaluate(jc);
         Set<?> check = createSet(new Double(5.0), new Integer(10));
-        Assert.assertTrue(check.equals(o));
+        Assert.assertEquals(check, o);
     }
 
     @Test
@@ -130,7 +130,7 @@ public class SetLiteralTest extends JexlTestCase {
         for (int t = 0; t < exprs.length; ++t) {
             JexlScript e = JEXL.createScript(exprs[t]);
             Object o = e.execute(jc);
-            Assert.assertTrue(exprs[t], checks[t].equals(o));
+            Assert.assertEquals(exprs[t], checks[t], o);
         }
 
     }
@@ -150,7 +150,7 @@ public class SetLiteralTest extends JexlTestCase {
         JexlContext jc = new MapContext();
 
         Object o = e.evaluate(jc);
-        Assert.assertFalse(((Boolean) o).booleanValue());
+        Assert.assertFalse((Boolean) o);
     }
 
 }

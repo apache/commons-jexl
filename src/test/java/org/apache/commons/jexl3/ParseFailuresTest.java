@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -35,8 +35,6 @@ public class ParseFailuresTest extends JexlTestCase {
 
     /**
      * Create the test.
-     *
-     * @param testName name of the test
      */
     public ParseFailuresTest() {
         super("ParseFailuresTest");

@@ -685,27 +685,23 @@ public class LexicalTest {
     }
 
     private JexlFeatures runVarLoop(boolean flag, String src) throws Exception {
-        try {
-            VarContext vars = new VarContext();
-            JexlOptions options = vars.getEngineOptions();
-            options.setLexical(true);
-            options.setLexicalShade(true);
-            options.setSafe(false);
-            JexlFeatures features = new JexlFeatures();
-            if (flag) {
-                features.lexical(true).lexicalShade(true);
-            }
-            JexlEngine jexl = new JexlBuilder().features(features).create();
-            JexlScript script = jexl.createScript(src);
-            List<Integer> out = new ArrayList<Integer>(10);
-            vars.set("$out", out);
-            Object result = script.execute(vars);
-            Assert.assertEquals(true, result);
-            Assert.assertEquals(10, out.size());
-            return features;
-        } catch(JexlException xany) {
-            throw xany;
+        VarContext vars = new VarContext();
+        JexlOptions options = vars.getEngineOptions();
+        options.setLexical(true);
+        options.setLexicalShade(true);
+        options.setSafe(false);
+        JexlFeatures features = new JexlFeatures();
+        if (flag) {
+            features.lexical(true).lexicalShade(true);
         }
+        JexlEngine jexl = new JexlBuilder().features(features).create();
+        JexlScript script = jexl.createScript(src);
+        List<Integer> out = new ArrayList<Integer>(10);
+        vars.set("$out", out);
+        Object result = script.execute(vars);
+        Assert.assertEquals(true, result);
+        Assert.assertEquals(10, out.size());
+        return features;
     }
     
     public static class OptAnnotationContext extends JexlEvalContext implements JexlContext.AnnotationProcessor {

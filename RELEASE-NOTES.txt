@@ -27,7 +27,7 @@ Version 3.2 is a minor release.
 
 Compatibility with previous releases
 ====================================
-Version 3.2 is binary compatible with 3.1.
+Version 3.2 is binary compatible with 3.1. However, JEXL now requires Java 8.
 
 Unfortunately, it is not strictly source compatible. This release does break source compatibility by adding methods to existing
 interfaces and an abstract method to an abstract class. However, since these interfaces and class are not expected to be implemented

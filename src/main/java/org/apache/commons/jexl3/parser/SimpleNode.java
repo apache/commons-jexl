@@ -157,8 +157,8 @@ public class SimpleNode implements Node {
      **/
     public Object childrenAccept(ParserVisitor visitor, Object data) {
         if (children != null) {
-            for (int i = 0; i < children.length; ++i) {
-                children[i].jjtAccept(visitor, data);
+            for (JexlNode child : children) {
+                child.jjtAccept(visitor, data);
             }
         }
         return data;
@@ -183,8 +183,7 @@ public class SimpleNode implements Node {
     public void dump(String prefix) {
         System.out.println(toString(prefix));
         if (children != null) {
-            for (int i = 0; i < children.length; ++i) {
-                SimpleNode n = children[i];
+            for (SimpleNode n : children) {
                 if (n != null) {
                     n.dump(prefix + " ");
                 }

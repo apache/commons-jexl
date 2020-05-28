@@ -206,8 +206,7 @@ public class JexlTest extends JexlTestCase {
         jc.set("list", list);
 
         // 30652 - support for set
-        Set<String> set = new HashSet<String>();
-        set.addAll(list);
+        Set<String> set = new HashSet<String>(list);
         set.add("1");
 
         jc.set("set", set);
@@ -610,7 +609,7 @@ public class JexlTest extends JexlTestCase {
         jc.set("foo", tester);
         JexlExpression expr = JEXL.createExpression("first and foo.trueAndModify");
         expr.evaluate(jc);
-        Assert.assertTrue("Short circuit failure: rhs evaluated when lhs FALSE", !tester.getModified());
+        Assert.assertFalse("Short circuit failure: rhs evaluated when lhs FALSE", tester.getModified());
         // handle true for the left arg of 'and'
         tester = new Foo();
         jc.set("first", Boolean.TRUE);
@@ -638,7 +637,7 @@ public class JexlTest extends JexlTestCase {
         jc.set("first", Boolean.TRUE);
         jc.set("foo", tester);
         expr.evaluate(jc);
-        Assert.assertTrue("Short circuit failure: rhs evaluated when lhs TRUE", !tester.getModified());
+        Assert.assertFalse("Short circuit failure: rhs evaluated when lhs TRUE", tester.getModified());
     }
 
     /**

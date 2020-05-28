@@ -137,8 +137,8 @@ public class TokenMgrError extends Error implements JavaccError {
       * Replaces unprintable characters by their espaced (or unicode escaped)
       * equivalents in the given string
       */
-     protected static final String addEscapes(String str) {
-        StringBuffer retval = new StringBuffer();
+     protected static String addEscapes(String str) {
+        StringBuilder retval = new StringBuilder();
         char ch;
         for (int i = 0; i < str.length(); i++) {
           switch (str.charAt(i))
@@ -172,7 +172,7 @@ public class TokenMgrError extends Error implements JavaccError {
              default:
                 if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
                    String s = "0000" + Integer.toString(ch, 16);
-                   retval.append("//u" + s.substring(s.length() - 4, s.length()));
+                   retval.append("//u").append(s.substring(s.length() - 4, s.length()));
                 } else {
                    retval.append(ch);
                 }

@@ -641,8 +641,7 @@ public final class TemplateEngine extends JxltEngine {
             final ExpressionBuilder builder = new ExpressionBuilder(size);
             // tracking whether prepare will return a different expression
             boolean eq = true;
-            for (int e = 0; e < size; ++e) {
-                TemplateExpression expr = exprs[e];
+            for (TemplateExpression expr : exprs) {
                 TemplateExpression prepared = expr.prepare(interpreter);
                 // add it if not null
                 if (prepared != null) {
@@ -660,8 +659,8 @@ public final class TemplateEngine extends JxltEngine {
             Object value;
             // common case: evaluate all expressions & concatenate them as a string
             StringBuilder strb = new StringBuilder();
-            for (int e = 0; e < size; ++e) {
-                value = exprs[e].evaluate(interpreter);
+            for (TemplateExpression expr : exprs) {
+                value = expr.evaluate(interpreter);
                 if (value != null) {
                     strb.append(value.toString());
                 }

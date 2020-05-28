@@ -98,7 +98,8 @@ public class Asserter extends Assert {
         Object value = exp.execute(context);
         if (expected instanceof BigDecimal) {
             JexlArithmetic jexla = engine.getArithmetic();
-            Assert.assertTrue("expression: " + expression, ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)) == 0);
+            Assert.assertEquals("expression: " + expression, 0,
+                    ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)));
         }
         if (expected != null && value != null) {
             if (expected.getClass().isArray() && value.getClass().isArray()) {

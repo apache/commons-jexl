@@ -96,9 +96,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
             && valueClass.equals(classOf(value))) {
             try {
                 return invoke(o, value);
-            } catch (IllegalAccessException xill) {
-                return TRY_FAILED;// fail
-            } catch (IllegalArgumentException xarg) {
+            } catch (IllegalAccessException | IllegalArgumentException xill) {
                 return TRY_FAILED;// fail
             } catch (InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw
@@ -117,7 +115,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
     }
 
     /**
-     * Discovers the method for a {@link PropertySet}.
+     * Discovers the method for a {@link org.apache.commons.jexl3.introspection.JexlPropertySet}.
      * <p>The method to be found should be named "set{P,p}property.
      * As a special case, any empty array will try to find a valid array-setting non-ambiguous method.
      *

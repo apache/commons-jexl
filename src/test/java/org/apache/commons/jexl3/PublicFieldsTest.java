@@ -81,7 +81,7 @@ public class PublicFieldsTest extends JexlTestCase {
         Assert.assertEquals(42, JEXL.getProperty(pub, "anInt"));
         try {
             ctxt.set("value", UPPER42);
-            Assert.assertEquals(null, set.evaluate(ctxt));
+            Assert.assertNull(set.evaluate(ctxt));
             Assert.fail("should have thrown");
         } catch(JexlException xjexl) {}
     }
@@ -124,7 +124,7 @@ public class PublicFieldsTest extends JexlTestCase {
         Assert.assertEquals(42.0, JEXL.getProperty(pub, "inner.aDouble"));
         try {
             ctxt.set("value", UPPER42);
-            Assert.assertEquals(null, set.evaluate(ctxt));
+            Assert.assertNull(set.evaluate(ctxt));
             Assert.fail("should have thrown");
         } catch(JexlException xjexl) {}
     }

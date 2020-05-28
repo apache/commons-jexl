@@ -109,7 +109,7 @@ public class Issues200Test extends JexlTestCase {
         Assert.assertEquals(1, r);
     }
 
-    public class T210 {
+    public static class T210 {
         public void npe() {
             throw new NullPointerException("NPE210");
         }
@@ -152,7 +152,7 @@ public class Issues200Test extends JexlTestCase {
             Assert.fail("should have thrown an exception");
         } catch(JexlException xjexl) {
             Throwable th = xjexl.getCause();
-            Assert.assertTrue(ArrayIndexOutOfBoundsException.class.equals(th.getClass()));
+            Assert.assertEquals(ArrayIndexOutOfBoundsException.class, th.getClass());
         }
         //
         options.setStrict(false);
@@ -171,9 +171,9 @@ public class Issues200Test extends JexlTestCase {
         JexlScript e = jexl.createScript("(x)->{ map[x] }");
         Object r;
         r = e.execute(jc, (Object) null);
-        Assert.assertEquals(null, r);
+        Assert.assertNull(r);
         r = e.execute(jc, (Object) null);
-        Assert.assertEquals(null, r);
+        Assert.assertNull(r);
         r = e.execute(jc, "one");
         Assert.assertEquals(1, r);
     }
@@ -290,8 +290,9 @@ public class Issues200Test extends JexlTestCase {
         JexlEngine JEXL_ENGINE = new JexlBuilder().strict(true).silent(true).create();
         JexlExpression jsp = JEXL_ENGINE.createExpression("a + b");
         Double e = (Double) jsp.evaluate(context);
-        Assert.assertTrue(Double.doubleToLongBits(e) + " != " + Double.doubleToLongBits(c), c.doubleValue() == e.doubleValue());
-        Assert.assertTrue(Double.doubleToLongBits(e) + " != " + Double.doubleToLongBits(c), a + b == e);
+        Assert.assertEquals(Double.doubleToLongBits(e) + " != " + Double.doubleToLongBits(c), c,
+                e, 0.0);
+        Assert.assertEquals(Double.doubleToLongBits(e) + " != " + Double.doubleToLongBits(c), a + b, e, 0.0);
     }
 
 
@@ -302,9 +303,7 @@ public class Issues200Test extends JexlTestCase {
         try {
             JexlExpression expr = jexl.createExpression("while(true);");
             Assert.fail("should have failed!, expr do not allow 'while' statement");
-        } catch (JexlException.Parsing xparse) {
-            // ok
-        } catch (JexlException xother) {
+        } catch (JexlException xparse) {
             // ok
         }
     }

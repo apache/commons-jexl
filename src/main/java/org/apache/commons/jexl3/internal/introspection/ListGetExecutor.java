@@ -72,9 +72,9 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
     @Override
     public Object invoke(final Object obj) {
         if (method == ARRAY_GET) {
-            return Array.get(obj, property.intValue());
+            return Array.get(obj, property);
         } else {
-            return ((List<?>) obj).get(property.intValue());
+            return ((List<?>) obj).get(property);
         }
     }
 
@@ -85,9 +85,9 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
             && objectClass.equals(obj.getClass())
             && index != null) {
             if (method == ARRAY_GET) {
-                return Array.get(obj, index.intValue());
+                return Array.get(obj, index);
             } else {
-                return ((List<?>) obj).get(index.intValue());
+                return ((List<?>) obj).get(index);
             }
         }
         return TRY_FAILED;

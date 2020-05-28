@@ -76,7 +76,7 @@ public class JexlScriptEngineTest {
         ScriptEngineManager manager = new ScriptEngineManager();
         Assert.assertNotNull("Manager should not be null", manager);
         ScriptEngine engine = manager.getEngineByName("jexl3");
-        final Integer initialValue = Integer.valueOf(123);
+        final Integer initialValue = 123;
         Assert.assertEquals(initialValue,engine.eval("123"));
         Assert.assertEquals(initialValue,engine.eval("0;123"));// multiple statements
         long time1 = System.currentTimeMillis();
@@ -84,10 +84,10 @@ public class JexlScriptEngineTest {
              "sys=context.class.forName(\"java.lang.System\");"
             +"now=sys.currentTimeMillis();"
             );
-        Assert.assertTrue("Must take some time to process this",time1 <= time2.longValue());
+        Assert.assertTrue("Must take some time to process this",time1 <= time2);
         engine.put("value", initialValue);
         Assert.assertEquals(initialValue,engine.get("value"));
-        final Integer newValue = Integer.valueOf(124);
+        final Integer newValue = 124;
         Assert.assertEquals(newValue,engine.eval("old=value;value=value+1"));
         Assert.assertEquals(initialValue,engine.get("old"));
         Assert.assertEquals(newValue,engine.get("value"));
@@ -125,19 +125,19 @@ public class JexlScriptEngineTest {
         Assert.assertNotNull("Manager should not be null", manager);
         ScriptEngine engine = manager.getEngineByName("JEXL");
         Assert.assertNotNull("Engine should not be null (JEXL)", engine);
-        manager.put("global",Integer.valueOf(1));
-        engine.put("local", Integer.valueOf(10));
-        manager.put("both",Integer.valueOf(7));
-        engine.put("both", Integer.valueOf(7));
+        manager.put("global", 1);
+        engine.put("local", 10);
+        manager.put("both", 7);
+        engine.put("both", 7);
         engine.eval("local=local+1");
         engine.eval("global=global+1");
         engine.eval("both=both+1"); // should update engine value only
         engine.eval("newvar=42;");
-        Assert.assertEquals(Integer.valueOf(2),manager.get("global"));
-        Assert.assertEquals(Integer.valueOf(11),engine.get("local"));
-        Assert.assertEquals(Integer.valueOf(7),manager.get("both"));
-        Assert.assertEquals(Integer.valueOf(8),engine.get("both"));
-        Assert.assertEquals(Integer.valueOf(42),engine.get("newvar"));
+        Assert.assertEquals(2,manager.get("global"));
+        Assert.assertEquals(11,engine.get("local"));
+        Assert.assertEquals(7,manager.get("both"));
+        Assert.assertEquals(8,engine.get("both"));
+        Assert.assertEquals(42,engine.get("newvar"));
         Assert.assertNull(manager.get("newvar"));
     }
 
@@ -158,7 +158,7 @@ public class JexlScriptEngineTest {
     @Test
     public void testDirectNew() throws Exception {
         ScriptEngine engine = new JexlScriptEngine();
-        final Integer initialValue = Integer.valueOf(123);
+        final Integer initialValue = 123;
         Assert.assertEquals(initialValue,engine.eval("123"));
     }
 }

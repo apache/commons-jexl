@@ -37,7 +37,6 @@ public class BitwiseOperatorTest extends JexlTestCase {
 
     /**
      * Create the named test.
-     * @param name test name
      */
     public BitwiseOperatorTest() {
         super("BitwiseOperatorTest");

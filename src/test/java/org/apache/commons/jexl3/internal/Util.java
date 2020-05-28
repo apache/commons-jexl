@@ -46,9 +46,7 @@ public class Util {
         jdbg.parser.allowRegisters(true);
         Debugger dbg = new Debugger();
         // iterate over all expression in
-        Iterator<Map.Entry<Source, ASTJexlScript>> inodes = jexl.cache.entries().iterator();
-        while (inodes.hasNext()) {
-            Map.Entry<Source, ASTJexlScript> entry = inodes.next();
+        for (Map.Entry<Source, ASTJexlScript> entry : jexl.cache.entries()) {
             JexlNode node = entry.getValue();
             // recreate expr string from AST
             dbg.debug(node);
@@ -94,7 +92,7 @@ public class Util {
     /**
      * Recursively adds all children of a script to the list of descendants.
      * @param list   the list of descendants to add to
-     * @param script the script & descendants to add
+     * @param node the script & descendants to add
      */
     private static void flatten(List<JexlNode> list, JexlNode node) {
         int nc = node.jjtGetNumChildren();

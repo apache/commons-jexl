@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Objects;
 
 /**
  * A set of language feature options.
@@ -139,8 +140,7 @@ public final class JexlFeatures {
         if (this.flags != other.flags) {
             return false;
         }
-        if (this.reservedNames != other.reservedNames
-                && (this.reservedNames == null || !this.reservedNames.equals(other.reservedNames))) {
+        if (!Objects.equals(this.reservedNames, other.reservedNames)) {
             return false;
         }
         return true;

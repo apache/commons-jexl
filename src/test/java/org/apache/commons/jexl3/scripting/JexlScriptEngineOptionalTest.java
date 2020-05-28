@@ -58,7 +58,7 @@ public class JexlScriptEngineOptionalTest {
         Assert.assertTrue("Engine should implement Compilable", engine instanceof Compilable);
         Compilable cengine = (Compilable) engine;
         CompiledScript script = cengine.compile("40 + 2");
-        Assert.assertEquals(Integer.valueOf(42), script.eval());
-        Assert.assertEquals(Integer.valueOf(42), script.eval());
+        Assert.assertEquals(42, script.eval());
+        Assert.assertEquals(42, script.eval());
     }
 }

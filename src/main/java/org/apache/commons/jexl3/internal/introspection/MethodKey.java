@@ -376,7 +376,7 @@ public final class MethodKey {
         if (actual != null && formal.isAssignableFrom(actual) && actual.isArray() == formal.isArray()) {
             return true;
         }
-        /** catch all... */
+        /* catch all... */
         if (!strict && formal == Object.class) {
             return true;
         }
@@ -384,8 +384,8 @@ public final class MethodKey {
         if (formal.isPrimitive()) {
             Class<?>[] clist = strict ? STRICT_CONVERTIBLES.get(formal) : CONVERTIBLES.get(formal);
             if (clist != null) {
-                for (int c = 0; c < clist.length; ++c) {
-                    if (actual == clist[c]) {
+                for (Class<?> aClass : clist) {
+                    if (actual == aClass) {
                         return true;
                     }
                 }

@@ -19,7 +19,6 @@ package org.apache.commons.jexl3;
 import java.io.File;
 import java.net.URL;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -59,7 +58,7 @@ public class ScriptTest extends JexlTestCase {
     public void testSpacesScript() throws Exception {
         String code = " ";
         JexlScript s = JEXL.createScript(code);
-        Assert.assertTrue(s != null);
+        Assert.assertNotNull(s);
     }
     
     /**

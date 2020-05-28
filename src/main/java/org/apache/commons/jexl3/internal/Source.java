@@ -18,6 +18,8 @@ package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlFeatures;
 
+import java.util.Objects;
+
 /**
  * Maintains the set of allowed features associated with a script/expression source.
  * <p>This is meant for caching scripts using their 'source' as key but still distinguishing
@@ -69,11 +71,10 @@ public final class Source {
             return false;
         }
         final Source other = (Source) obj;
-        if (this.features != other.features
-            && (this.features == null || !this.features.equals(other.features))) {
+        if (!Objects.equals(this.features, other.features)) {
             return false;
         }
-        if ((this.str == null) ? (other.str != null) : !this.str.equals(other.str)) {
+        if (!Objects.equals(this.str, other.str)) {
             return false;
         }
         return true;
