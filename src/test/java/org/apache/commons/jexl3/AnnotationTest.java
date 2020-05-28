@@ -136,6 +136,7 @@ public class AnnotationTest extends JexlTestCase {
 
         r = null;
         // will make an error and throw
+        options.setSafe(false);
         try {
             r = e.execute(jc, true, false);
             Assert.fail("should have thrown");
@@ -151,6 +152,7 @@ public class AnnotationTest extends JexlTestCase {
         } catch (JexlException.Variable xjexl) {
             Assert.fail("should not have thrown");
         }
+        options.setSafe(true);
 
         r = null;
         // will not make an error and will not throw

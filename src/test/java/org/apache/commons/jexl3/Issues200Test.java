@@ -617,7 +617,39 @@ public class Issues200Test extends JexlTestCase {
             Assert.assertEquals("xyz", xvar.getVariable());
         }
     }
-    
+
+    @Test
+    public void test275b() throws Exception {
+        JexlContext ctxt = new MapContext();
+        //ctxt.set("out", System.out);
+        JexlEngine jexl = new JexlBuilder().strict(true).safe(true).create();
+        JexlScript e = jexl.createScript("var xyz = xyz");
+        try {
+            Object o = e.execute(ctxt);
+            Assert.assertNull(o);
+        } catch (JexlException.Variable xvar) {
+            Assert.fail("should not have thrown");
+            // Assert.assertEquals("xyz", xvar.getVariable());
+        }
+    }
+
+    @Test
+    public void test275c() throws Exception {
+        JexlContext ctxt = new MapContext();
+        //ctxt.set("out", System.out);
+        JexlEngine jexl = new JexlBuilder().strict(true).safe(true).silent(true).create();
+        JexlScript e;
+        Object r;
+        e = jexl.createScript("(s, v)->{  var x = y ; 42; }");
+        // wont make an error
+        try {
+            r = e.execute(ctxt, false, true);
+            Assert.assertEquals(42, r);
+        } catch (JexlException.Variable xjexl) {
+            Assert.fail("should not have thrown");
+        }
+    }
+
     @Test
     public void test278() throws Exception {
         String[] srcs = new String[]{

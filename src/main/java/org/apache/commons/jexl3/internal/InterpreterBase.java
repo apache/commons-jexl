@@ -33,6 +33,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
+import org.apache.commons.jexl3.parser.ASTAssignment;
 import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTIdentifierAccess;
@@ -289,10 +290,10 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         String name = identifier.getName();
         Object value = context.get(name);
-        if (value == null
-            && !(identifier.jjtGetParent() instanceof ASTReference)
-            && !(context.has(name))) {
-                return unsolvableVariable(identifier, name, true); // undefined
+        if (value == null && !context.has(name)
+            && !(identifier.jjtGetParent() instanceof ASTAssignment && isSafe())
+            && !(identifier.jjtGetParent() instanceof ASTReference)) {
+            return unsolvableVariable(identifier, name, true); // undefined
         }
         return value;
     }
