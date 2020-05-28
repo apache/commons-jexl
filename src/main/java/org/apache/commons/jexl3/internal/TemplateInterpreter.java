@@ -159,7 +159,6 @@ public class TemplateInterpreter extends Interpreter {
      */
     private void printComposite(TemplateEngine.CompositeExpression composite) {
         TemplateEngine.TemplateExpression[] cexprs = composite.exprs;
-        final int size = cexprs.length;
         Object value;
         for (TemplateExpression cexpr : cexprs) {
             value = cexpr.evaluate(this);

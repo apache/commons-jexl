@@ -655,7 +655,6 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         protected Object evaluate(Interpreter interpreter) {
-            final int size = exprs.length;
             Object value;
             // common case: evaluate all expressions & concatenate them as a string
             StringBuilder strb = new StringBuilder();
