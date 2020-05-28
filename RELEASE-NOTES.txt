@@ -61,6 +61,7 @@ New Features in 3.2:
 * JEXL-253:      Permissions by super type in JexlSandbox
 * JEXL-252:      Allow for interpolated strings to be used in property access operators
 * JEXL-250:      Safe navigation operator (?.)
+* JEXL-249:      Java 1.8 as minimum supported version
 * JEXL-248:      Allow range subexpression as an array property assignment identifier
 * JEXL-243:      Allow restricting available features in Script/Expressions
 * JEXL-238:      Restrict getLiteralClass to a Number for NumberLiterals

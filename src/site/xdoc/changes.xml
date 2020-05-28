@@ -191,6 +191,9 @@
             <action dev="henrib" type="add" issue="JEXL-250" due-to="Dmitri Blinov">
                 Safe navigation operator
             </action>
+            <action dev="henrib" type="add" issue="JEXL-249" due-to="Dmitri Blinov">
+                Java 1.8 as minimum supported version
+            </action>
             <action dev="henrib" type="add" issue="JEXL-248" due-to="Dmitri Blinov">
                 Allow range subexpression as an array property assignment identifier
             </action>
