@@ -34,7 +34,7 @@ public class SetLiteralTest extends JexlTestCase {
         super("SetLiteralTest");
     }
 
-    static private Set<?> createSet(Object... args) {
+    private static Set<?> createSet(Object... args) {
         return new HashSet<Object>(Arrays.asList(args));
     }
 
