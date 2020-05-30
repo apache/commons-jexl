@@ -145,7 +145,7 @@ public class Util {
         return "";//e.getText() + "\n" + flattenedStr(((Script)e).script);
     }
 
-    static private String indent(JexlNode node) {
+    private static String indent(JexlNode node) {
         StringBuilder strb = new StringBuilder();
         while (node != null) {
             strb.append("  ");

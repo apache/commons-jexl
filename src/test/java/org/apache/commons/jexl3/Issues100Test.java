@@ -221,7 +221,7 @@ public class Issues100Test extends JexlTestCase {
         Assert.assertEquals(-42, value);
     }
 
-    static public class RichContext extends ObjectContext<A105> {
+    public static class RichContext extends ObjectContext<A105> {
         RichContext(JexlEngine jexl, A105 a105) {
             super(jexl, a105);
         }

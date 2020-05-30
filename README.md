@@ -53,13 +53,13 @@ The Apache Commons JEXL library is an implementation of the JSTL Expression Lang
 Documentation
 -------------
 
-More information can be found on the [Apache Commons JEXL homepage](https://commons.apache.org/proper/commons-jexl3).
-The [JavaDoc](https://commons.apache.org/proper/commons-jexl3/javadocs/api-release) can be browsed.
+More information can be found on the [Apache Commons JEXL homepage](https://commons.apache.org/proper/commons-jexl).
+The [JavaDoc](https://commons.apache.org/proper/commons-jexl/apidocs/index.html) can be browsed.
 Questions related to the usage of Apache Commons JEXL should be posted to the [user mailing list][ml].
 
 Where can I get the latest release?
 -----------------------------------
-You can download source and binaries from our [download page](https://commons.apache.org/proper/commons-jexl3/download_jexl3.cgi).
+You can download source and binaries from our [download page](https://commons.apache.org/proper/commons-jexl/download_jexl.cgi).
 
 Alternatively you can pull it from the central Maven repositories:
 
