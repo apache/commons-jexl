@@ -651,6 +651,21 @@ public class Issues200Test extends JexlTestCase {
     }
 
     @Test
+    public void test275d() throws Exception {
+        JexlContext ctxt = new MapContext();
+        ctxt.set("out", System.out);
+        JexlEngine jexl = new JexlBuilder().strict(true).safe(true).create();
+
+        JexlScript e = jexl.createScript("{ var xyz = 42 } out.println(xyz)");
+        try {
+            Object o = e.execute(ctxt);
+            Assert.assertNull(o);
+        } catch (JexlException.Variable xvar) {
+            Assert.fail("should not have thrown" + xvar);
+        }
+    }
+    
+    @Test
     public void test278() throws Exception {
         String[] srcs = new String[]{
             "return union x143('arg',5,6) ",

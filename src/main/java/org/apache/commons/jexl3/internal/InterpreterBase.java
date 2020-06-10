@@ -290,10 +290,14 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         String name = identifier.getName();
         Object value = context.get(name);
-        if (value == null && !context.has(name)
-            && !(identifier.jjtGetParent() instanceof ASTAssignment && isSafe())
-            && !(identifier.jjtGetParent() instanceof ASTReference)) {
-            return unsolvableVariable(identifier, name, true); // undefined
+        if (value == null && !context.has(name)) {
+            boolean ignore = (isSafe()
+                    && (symbol >= 0
+                    || identifier.jjtGetParent() instanceof ASTAssignment))
+                    || (identifier.jjtGetParent() instanceof ASTReference);
+            if (!ignore) {
+                return unsolvableVariable(identifier, name, true); // undefined
+            }
         }
         return value;
     }

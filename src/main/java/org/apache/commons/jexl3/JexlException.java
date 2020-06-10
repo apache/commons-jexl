@@ -1031,9 +1031,13 @@ public class JexlException extends RuntimeException {
      * @param xinvoke the invocation exception
      * @return a JexlException
      */
-    public static RuntimeException tryFailed(InvocationTargetException xinvoke) {
-        return new JexlException.TryFailed(xinvoke); // fail
+    public static JexlException tryFailed(InvocationTargetException xinvoke) {
+        Throwable cause = xinvoke.getCause();
+        return cause instanceof JexlException
+                ? (JexlException) cause 
+                : new JexlException.TryFailed(xinvoke); // fail
     }
+
     
     /**
      * Detailed info message about this error.

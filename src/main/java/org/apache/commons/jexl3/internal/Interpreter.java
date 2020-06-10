@@ -1703,7 +1703,7 @@ public class Interpreter extends InterpreterBase {
                     ? null
                     : unsolvableMethod(node, methodName, argv);
         } catch (JexlException.TryFailed xany) {
-            throw invocationException(node, methodName, xany.getCause());
+            throw invocationException(node, methodName, xany);
         } catch (JexlException xthru) {
             throw xthru;
         } catch (Exception xany) {
