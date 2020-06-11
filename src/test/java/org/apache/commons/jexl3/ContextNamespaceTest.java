@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import org.apache.commons.jexl3.internal.Engine;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,9 +33,18 @@ public class ContextNamespaceTest extends JexlTestCase {
      * Accesses the thread context and cast it.
      */
     public static class Taxes {
+        private final double vat;
+        
+        public Taxes(TaxesContext ctxt) {
+            vat = ctxt.getVAT();
+        } 
+        
+        public Taxes(double d) {
+            vat = d;
+        }
+        
         public double vat(double n) {
-            TaxesContext context = (TaxesContext) JexlEngine.getThreadContext();
-            return n * context.getVAT() / 100.;
+            return (n * vat) / 100.;
         }
     }
 
@@ -44,7 +52,7 @@ public class ContextNamespaceTest extends JexlTestCase {
      * A thread local context carrying a namespace and some inner constants.
      */
     public static class TaxesContext extends MapContext implements JexlContext.ThreadLocal, JexlContext.NamespaceResolver {
-        private final Taxes taxes = new Taxes();
+        private Taxes taxes = null;
         private final double vat;
 
         TaxesContext(double vat) {
@@ -53,7 +61,13 @@ public class ContextNamespaceTest extends JexlTestCase {
 
         @Override
         public Object resolveNamespace(String name) {
-            return "taxes".equals(name) ? taxes : null;
+            if ("taxes".equals(name)) {
+                if (taxes == null) {
+                    taxes = new Taxes(vat);
+                }
+                return taxes;
+            }
+            return null;
         }
 
         public double getVAT() {
@@ -63,12 +77,39 @@ public class ContextNamespaceTest extends JexlTestCase {
 
     @Test
     public void testThreadedContext() throws Exception {
-        JexlEngine jexl = new Engine();
+        JexlEngine jexl = new JexlBuilder().create();
         TaxesContext context = new TaxesContext(18.6);
         String strs = "taxes:vat(1000)";
         JexlScript staxes = jexl.createScript(strs);
         Object result = staxes.execute(context);
         Assert.assertEquals(186., result);
+    }
+    
+    @Test
+    public void testNamespacePragma() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlContext context = new TaxesContext(18.6);
+        // local namespace tax declared
+        String strs =
+                  "#pragma jexl.namespace.tax org.apache.commons.jexl3.ContextNamespaceTest$Taxes\n"
+                + "tax:vat(2000)";
+        JexlScript staxes = jexl.createScript(strs);
+        Object result = staxes.execute(context);
+        Assert.assertEquals(372., result);
+    }
+
+        
+    @Test
+    public void testNamespacePragmaString() throws Exception {
+        JexlEngine jexl = new JexlBuilder().create();
+        JexlContext context = new MapContext();
+        // local namespace str declared
+        String strs =
+                  "#pragma jexl.namespace.str java.lang.String\n"
+                + "str:format('%04d', 42)";
+        JexlScript staxes = jexl.createScript(strs);
+        Object result = staxes.execute(context);
+        Assert.assertEquals("0042", result);
     }
 
     public static class Vat {

@@ -69,7 +69,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected final AtomicBoolean cancelled;
     /** Empty parameters for method matching. */
     protected static final Object[] EMPTY_PARAMS = new Object[0];
-    /** The context to store/retrieve variables. */
+    /** The namespace resolver. */
     protected final JexlContext.NamespaceResolver ns;
     /** The operators evaluation delegate. */
     protected final Operators operators;
@@ -108,7 +108,8 @@ public abstract class InterpreterBase extends ParserVisitor {
             acancel = ((JexlContext.CancellationHandle) context).getCancellation();
         }
         this.cancelled = acancel != null? acancel : new AtomicBoolean(false);
-        this.functions = jexl.functions;
+        Map<String,Object> ons = options.getNamespaces();
+        this.functions = ons.isEmpty()? jexl.functions : ons;
         this.functors = null;
         this.operators = new Operators(this);
     }
@@ -228,7 +229,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         return namespace;
     }
-    
+
     /**
      * Defines a variable.
      * @param var the variable to define

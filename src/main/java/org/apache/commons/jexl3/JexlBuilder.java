@@ -85,9 +85,6 @@ public class JexlBuilder {
     /** Whether getVariables considers all potential equivalent syntactic forms. */
     private int collectMode = 1;
 
-    /** The map of 'prefix:function' to object implementing the namespaces. */
-    private Map<String, Object> namespaces = null;
-
     /** The {@link JexlArithmetic} instance. */
     private JexlArithmetic arithmetic = null;
 
@@ -475,7 +472,7 @@ public class JexlBuilder {
      * @return this builder
      */
     public JexlBuilder namespaces(Map<String, Object> ns) {
-        this.namespaces = ns;
+        options.setNamespaces(ns);
         return this;
     }
 
@@ -483,7 +480,7 @@ public class JexlBuilder {
      * @return the map of namespaces.
      */
     public Map<String, Object> namespaces() {
-        return this.namespaces;
+        return options.getNamespaces();
     }
 
     /**

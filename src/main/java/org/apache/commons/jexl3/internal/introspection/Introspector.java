@@ -226,8 +226,8 @@ public final class Introspector {
      */
     public Constructor<?> getConstructor(final Class<?> c, final MethodKey key) {
         Constructor<?> ctor;
+        lock.readLock().lock();
         try {
-            lock.readLock().lock();
             ctor = constructorsMap.get(key);
             if (ctor != null) {
                 // miss or not?
@@ -237,8 +237,8 @@ public final class Introspector {
             lock.readLock().unlock();
         }
         // let's introspect...
+        lock.writeLock().lock();
         try {
-            lock.writeLock().lock();
             // again for kicks
             ctor = constructorsMap.get(key);
             if (ctor != null) {
@@ -259,7 +259,7 @@ public final class Introspector {
                     // add it to list of known loaded classes
                     constructibleClasses.put(cname, clazz);
                 }
-                List<Constructor<?>> l = new ArrayList<Constructor<?>>();
+                List<Constructor<?>> l = new ArrayList<>();
                 for (Constructor<?> ictor : clazz.getConstructors()) {
                     if (permissions.allow(ictor)) {
                         l.add(ictor);

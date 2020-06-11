@@ -49,6 +49,7 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +81,10 @@ public class Engine extends JexlEngine {
      * The name of the options pragma.
      */
     protected static final String PRAGMA_OPTIONS = "jexl.options";
+    /**
+     * The prefix of a namespace pragma.
+     */
+    protected static final String PRAGMA_JEXLNS = "jexl.namespace.";
     /**
      * The Log to which all JexlEngine messages will be logged.
      */
@@ -380,18 +385,34 @@ public class Engine extends JexlEngine {
                     context instanceof JexlContext.PragmaProcessor
                     ? (JexlContext.PragmaProcessor) context
                     : null;
+            Map<String, Object> ns = null;
             for(Map.Entry<String, Object> pragma : pragmas.entrySet()) {
                 String key = pragma.getKey();
                 Object value = pragma.getValue();
                 if (PRAGMA_OPTIONS.equals(key)) {
+                    // jexl.options
                     if (value instanceof String) {
                         String[] vs = ((String) value).split(" ");
                         opts.setFlags(vs);
                     }
                 }
+                else if (key.startsWith(PRAGMA_JEXLNS) && value instanceof String) {
+                    // jexl.namespace.***
+                    String nsname = key.substring(PRAGMA_JEXLNS.length());
+                    if (nsname != null && !nsname.isEmpty()) {
+                        String nsclass = value.toString();
+                        if (ns == null) {
+                            ns = new HashMap<>(functions);
+                        }
+                        ns.put(nsname, nsclass);
+                    }
+                }
                 if (processor != null) {
                     processor.processPragma(key, value);
                 }
+            }
+            if (ns != null) {
+                opts.setNamespaces(ns);
             }
         }
     }
@@ -479,7 +500,7 @@ public class Engine extends JexlEngine {
             final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean);
-            final Interpreter interpreter = createInterpreter(context, frame, null);
+            final Interpreter interpreter = createInterpreter(context, frame, options);
             return interpreter.visitLexicalNode(node, null);
         } catch (JexlException xjexl) {
             if (silent) {
@@ -508,7 +529,7 @@ public class Engine extends JexlEngine {
             final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean, value);
-            final Interpreter interpreter = createInterpreter(context, frame, null);
+            final Interpreter interpreter = createInterpreter(context, frame, options);
             interpreter.visitLexicalNode(node, null);
         } catch (JexlException xjexl) {
             if (silent) {
