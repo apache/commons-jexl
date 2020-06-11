@@ -62,7 +62,7 @@ public final class TemplateEngine extends JxltEngine {
      */
     public TemplateEngine(Engine aJexl, boolean noScript, int cacheSize, char immediate, char deferred) {
         this.jexl = aJexl;
-        this.cache = new SoftCache<String, TemplateExpression>(cacheSize);
+        this.cache = new SoftCache<>(cacheSize);
         immediateChar = immediate;
         deferredChar = deferred;
         noscript = noScript;
@@ -127,7 +127,7 @@ public final class TemplateEngine extends JxltEngine {
          */
         private ExpressionBuilder(int size) {
             counts = new int[]{0, 0, 0};
-            expressions = new ArrayList<TemplateExpression>(size <= 0 ? 3 : size);
+            expressions = new ArrayList<>(size <= 0 ? 3 : size);
         }
 
         /**

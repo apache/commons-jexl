@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3;
 
+import java.io.File;
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.TemplateDebugger;
 import org.apache.commons.logging.Log;
@@ -1129,7 +1130,42 @@ public class JXLTTest extends JexlTestCase {
         } catch (JexlException xany) {
             Assert.assertTrue(xany.getMessage().contains("tab"));
         }
+    }
+    
+    @Test
+    public void testCommentedTemplate0() throws Exception {
+        JexlContext ctxt = new MapContext();
+        JexlEngine jexl = new JexlBuilder().create();
+        JxltEngine jxlt = jexl.createJxltEngine();
+        JxltEngine.Template tmplt;
+        String src = "$$/*\n"
+                + "Hello\n"
+                + "$$*/";
+        tmplt = jxlt.createTemplate(src);
+        Assert.assertNotNull(tmplt);
+        Writer strw = new StringWriter();
+        tmplt.evaluate(ctxt, strw);
+        Assert.assertTrue(strw.toString().isEmpty());
+    }
 
+    @Test
+    public void testCommentedTemplate1() throws Exception {
+        JexlContext ctxt = new MapContext();
+        JexlEngine jexl = new JexlBuilder().create();
+        JxltEngine jxlt = jexl.createJxltEngine();
+        JxltEngine.Template tmplt;
+        String src = "$$/*\n"
+                + "one\n"
+                + "$$*/\n"
+                + "42\n"
+                + "$$/*\n"
+                + "three\n"
+                + "$$*/\n";
+        tmplt = jxlt.createTemplate(src);
+        Assert.assertNotNull(tmplt);
+        Writer strw = new StringWriter();
+        tmplt.evaluate(ctxt, strw);
+        Assert.assertEquals("42\n", strw.toString());
     }
 
 }

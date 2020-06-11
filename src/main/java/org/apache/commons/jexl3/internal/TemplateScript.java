@@ -84,7 +84,7 @@ public final class TemplateScript implements JxltEngine.Template {
         this.jxlt = engine;
         this.prefix = directive;
         List<Block> blocks = jxlt.readTemplate(prefix, reader);
-        List<TemplateExpression> uexprs = new ArrayList<TemplateExpression>();
+        List<TemplateExpression> uexprs = new ArrayList<>();
         StringBuilder strb = new StringBuilder();
         int nuexpr = 0;
         int codeStart = -1;
@@ -124,7 +124,7 @@ public final class TemplateScript implements JxltEngine.Template {
         script = jxlt.getEngine().parse(info.at(1, 1), false, strb.toString(), scope).script();
         // seek the map of expression number to scope so we can parse Unified
         // expression blocks with the appropriate symbols
-        Map<Integer, JexlNode.Info> minfo = new TreeMap<Integer, JexlNode.Info>();
+        Map<Integer, JexlNode.Info> minfo = new TreeMap<>();
         collectPrintScope(script.script(), minfo);
         // jexl:print(...) expression counter
         int jpe = 0;
@@ -132,9 +132,15 @@ public final class TemplateScript implements JxltEngine.Template {
         for (Block block : blocks) {
             if (block.getType() == BlockType.VERBATIM) {
                 JexlNode.Info ji = minfo.get(jpe);
-                uexprs.add(
-                        jxlt.parseExpression(ji, block.getBody(), scopeOf(ji))
-                );
+                TemplateExpression te;
+                // no node info means this verbatim is surrounded by comments markers;
+                // expr at this index is never called
+                if (ji != null) {
+                    te = jxlt.parseExpression(ji, block.getBody(), scopeOf(ji));
+                } else {
+                    te = jxlt.new ConstantExpression(block.getBody(), null);
+                }
+                uexprs.add(te);
                 jpe += 1;
             }
         }
