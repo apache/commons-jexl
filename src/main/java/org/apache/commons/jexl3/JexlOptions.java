@@ -393,7 +393,7 @@ public final class JexlOptions {
     }
 
     /**
-     * Sets the optional map of namespaces
+     * Sets the optional map of namespaces.
      * @param ns a namespaces map
      */
     public void setNamespaces(Map<String, Object> ns) {

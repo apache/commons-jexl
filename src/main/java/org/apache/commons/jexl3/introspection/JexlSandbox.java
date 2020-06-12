@@ -25,34 +25,34 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A sandbox describes permissions on a class by explicitly allowing or forbidding
- * access to methods and properties through "whitelists" and "blacklists".
+ * access to methods and properties through "allowlists" and "blocklists".
  *
- * <p>A <b>whitelist</b> explicitly allows methods/properties for a class;</p>
+ * <p>A <b>allowlist</b> explicitly allows methods/properties for a class;</p>
  *
  * <ul>
- *   <li>If a whitelist is empty and thus does not contain any names,
+ *   <li>If a allowlist is empty and thus does not contain any names,
  *       all properties/methods are allowed for its class.</li>
  *   <li>If it is not empty, the only allowed properties/methods are the ones contained.</li>
  * </ul>
  *
- * <p>A <b>blacklist</b> explicitly forbids methods/properties for a class;</p>
+ * <p>A <b>blocklist</b> explicitly forbids methods/properties for a class;</p>
  *
  * <ul>
- *   <li>If a blacklist is empty and thus does not contain any names,
+ *   <li>If a blocklist is empty and thus does not contain any names,
  *       all properties/methods are forbidden for its class.</li>
  *   <li>If it is not empty, the only forbidden properties/methods are the ones contained.</li>
  * </ul>
  *
  * <p>Permissions are composed of three lists, read, write, execute, each being
- * "white" or "black":</p>
+ * "allow" or "block":</p>
  *
  * <ul>
  *   <li><b>read</b> controls readable properties </li>
  *   <li><b>write</b> controls writable properties</li>
  *   <li><b>execute</b> controls executable methods and constructor</li>
  * </ul>
- * 
- * <p>When specified, permissions - white or black lists - can be created inheritable
+ *
+ * <p>When specified, permissions - allow or block lists - can be created inheritable
  * on interfaces or classes and thus applicable to their implementations or derived
  * classes; the sandbox must be created with the 'inheritable' flag for this behavior
  * to be triggered. Note that even in this configuration, it is still possible to
@@ -75,14 +75,14 @@ public final class JexlSandbox {
      */
     private final boolean inherit;
     /**
-     * Default behavior, black or white.
+     * Default behavior, block or allow.
      */
-    private final boolean white;
+    private final boolean allow;
 
     /**
      * Creates a new default sandbox.
      * <p>In the absence of explicit permissions on a class, the
-     * sandbox is a white-box, white-listing that class for all permissions (read, write and execute).
+     * sandbox is a allow-box, allow-listing that class for all permissions (read, write and execute).
      */
     public JexlSandbox() {
         this(true, false, null);
@@ -90,24 +90,24 @@ public final class JexlSandbox {
 
     /**
      * Creates a new default sandbox.
-     * <p>A white-box considers no permissions as &quot;everything is allowed&quot; when
-     * a black-box considers no permissions as &quot;nothing is allowed&quot;.
-     * @param wb whether this sandbox is white (true) or black (false)
+     * <p>A allow-box considers no permissions as &quot;everything is allowed&quot; when
+     * a block-box considers no permissions as &quot;nothing is allowed&quot;.
+     * @param ab whether this sandbox is allow (true) or block (false)
      * if no permission is explicitly defined for a class.
      * @since 3.1
      */
-    public JexlSandbox(boolean wb) {
-        this(wb, false, null);
+    public JexlSandbox(boolean ab) {
+        this(ab, false, null);
     }
-    
+
     /**
      * Creates a sandbox.
-     * @param wb whether this sandbox is white (true) or black (false)
+     * @param ab whether this sandbox is allow (true) or block (false)
      * @param inh whether permissions on interfaces and classes are inherited (true) or not (false)
      * @since 3.2
      */
-    public JexlSandbox(boolean wb, boolean inh) {
-        this(wb, inh, null);
+    public JexlSandbox(boolean ab, boolean inh) {
+        this(ab, inh, null);
     }
 
     /**
@@ -121,26 +121,26 @@ public final class JexlSandbox {
 
     /**
      * Creates a sandbox based on an existing permissions map.
-     * @param wb whether this sandbox is white (true) or black (false)
+     * @param ab whether this sandbox is allow (true) or block (false)
      * @param map the permissions map
      * @since 3.1
      */
     @Deprecated
-    protected JexlSandbox(boolean wb, Map<String, Permissions> map) {
-        this(wb, false, map);
+    protected JexlSandbox(boolean ab, Map<String, Permissions> map) {
+        this(ab, false, map);
     }
 
     /**
      * Creates a sandbox based on an existing permissions map.
-     * @param wb whether this sandbox is white (true) or black (false)
+     * @param ab whether this sandbox is allow (true) or block (false)
      * @param inh whether permissions are inherited, default false
      * @param map the permissions map
      * @since 3.2
      */
-    protected JexlSandbox(boolean wb, boolean inh, Map<String, Permissions> map) {
-        white = wb;
+    protected JexlSandbox(boolean ab, boolean inh, Map<String, Permissions> map) {
+        allow = ab;
         inherit = inh;
-        sandbox = map != null? map : new HashMap<String, Permissions>();
+        sandbox = map != null? map : new HashMap<>();
     }
 
     /**
@@ -148,11 +148,11 @@ public final class JexlSandbox {
      */
     public JexlSandbox copy() {
         // modified concurently at runtime so...
-        Map<String, Permissions> map = new ConcurrentHashMap<String, Permissions>();
+        Map<String, Permissions> map = new ConcurrentHashMap<>();
         for (Map.Entry<String, Permissions> entry : sandbox.entrySet()) {
             map.put(entry.getKey(), entry.getValue().copy());
         }
-        return new JexlSandbox(white, inherit, map);
+        return new JexlSandbox(allow, inherit, map);
     }
 
     /**
@@ -254,7 +254,7 @@ public final class JexlSandbox {
 
         /**
          * Adds an alias to a name to this set.
-         * <p>This only has an effect on white lists.</p>
+         * <p>This only has an effect on allow lists.</p>
          *
          * @param name the name to alias
          * @param alias the alias
@@ -285,7 +285,7 @@ public final class JexlSandbox {
     /**
      * The pass-thru name set.
      */
-    private static final Names WHITE_NAMES = new Names() {
+    private static final Names ALLOW_NAMES = new Names() {
         @Override
         public boolean add(String name) {
             return false;
@@ -300,7 +300,7 @@ public final class JexlSandbox {
     /**
      * The block-all name set.
      */
-    private static final Names BLACK_NAMES = new Names() {
+    private static final Names BLOCK_NAMES = new Names() {
         @Override
         public boolean add(String name) {
             return false;
@@ -318,23 +318,23 @@ public final class JexlSandbox {
     };
 
     /**
-     * A white set of names.
+     * A allow set of names.
      */
-    public static final class WhiteSet extends Names {
+    static class AllowSet extends Names {
         /** The map of controlled names and aliases. */
         private Map<String, String> names = null;
 
         @Override
         protected Names copy() {
-            WhiteSet copy = new WhiteSet();
-            copy.names = names == null ? null : new HashMap<String, String>(names);
+            AllowSet copy = new AllowSet();
+            copy.names = names == null ? null : new HashMap<>(names);
             return copy;
         }
 
         @Override
         public boolean add(String name) {
             if (names == null) {
-                names = new HashMap<String, String>();
+                names = new HashMap<>();
             }
             return names.put(name, name) == null;
         }
@@ -342,7 +342,7 @@ public final class JexlSandbox {
         @Override
         public boolean alias(String name, String alias) {
             if (names == null) {
-                names = new HashMap<String, String>();
+                names = new HashMap<>();
             }
             return names.put(alias, name) == null;
         }
@@ -354,23 +354,23 @@ public final class JexlSandbox {
     }
 
     /**
-     * A black set of names.
+     * A block set of names.
      */
-    public static final class BlackSet extends Names {
+    static class BlockSet extends Names {
         /** The set of controlled names. */
         private Set<String> names = null;
 
         @Override
         protected Names copy() {
-            BlackSet copy = new BlackSet();
-            copy.names = names == null ? null : new HashSet<String>(names);
+            BlockSet copy = new BlockSet();
+            copy.names = names == null ? null : new HashSet<>(names);
             return copy;
         }
 
         @Override
         public boolean add(String name) {
             if (names == null) {
-                names = new HashSet<String>();
+                names = new HashSet<>();
             }
             return names.add(name);
         }
@@ -380,9 +380,21 @@ public final class JexlSandbox {
             return names != null && !names.contains(name) ? name : null;
         }
     }
-
+    
     /**
-     * Contains the white or black lists for properties and methods for a given class.
+     * Unused.
+     */
+    @Deprecated
+    public static final class WhiteSet extends AllowSet {}
+    
+    /**
+     * Unused.
+     */
+    @Deprecated
+    public static final class BlackSet extends BlockSet {}
+    
+    /**
+     * Contains the allow or block lists for properties and methods for a given class.
      */
     public static final class Permissions {
         /** Whether these permissions are inheritable, ie can be used by derived classes. */
@@ -398,15 +410,15 @@ public final class JexlSandbox {
          * Creates a new permissions instance.
          *
          * @param inherit whether these permissions are inheritable
-         * @param readFlag whether the read property list is white or black
-         * @param writeFlag whether the write property list is white or black
-         * @param executeFlag whether the method list is white of black
+         * @param readFlag whether the read property list is allow or block
+         * @param writeFlag whether the write property list is allow or block
+         * @param executeFlag whether the method list is allow of block
          */
         Permissions(boolean inherit, boolean readFlag, boolean writeFlag, boolean executeFlag) {
             this(inherit,
-                    readFlag ? new WhiteSet() : new BlackSet(),
-                    writeFlag ? new WhiteSet() : new BlackSet(),
-                    executeFlag ? new WhiteSet() : new BlackSet());
+                    readFlag ? new AllowSet() : new BlockSet(),
+                    writeFlag ? new AllowSet() : new BlockSet(),
+                    executeFlag ? new AllowSet() : new BlockSet());
         }
 
         /**
@@ -418,9 +430,9 @@ public final class JexlSandbox {
          * @param nexecute the method set
          */
         Permissions(boolean inherit, Names nread, Names nwrite, Names nexecute) {
-            this.read = nread != null ? nread : WHITE_NAMES;
-            this.write = nwrite != null ? nwrite : WHITE_NAMES;
-            this.execute = nexecute != null ? nexecute : WHITE_NAMES;
+            this.read = nread != null ? nread : ALLOW_NAMES;
+            this.write = nwrite != null ? nwrite : ALLOW_NAMES;
+            this.execute = nexecute != null ? nexecute : ALLOW_NAMES;
             this.inheritable = inherit;
         }
 
@@ -509,20 +521,20 @@ public final class JexlSandbox {
     /**
      * The pass-thru permissions.
      */
-    private static final Permissions ALL_WHITE = new Permissions(false, WHITE_NAMES, WHITE_NAMES, WHITE_NAMES);
+    private static final Permissions ALLOW_ALL = new Permissions(false, ALLOW_NAMES, ALLOW_NAMES, ALLOW_NAMES);
     /**
      * The block-all permissions.
      */
-    private static final Permissions ALL_BLACK = new Permissions(false, BLACK_NAMES, BLACK_NAMES, BLACK_NAMES);
+    private static final Permissions BLOCK_ALL = new Permissions(false, BLOCK_NAMES, BLOCK_NAMES, BLOCK_NAMES);
 
     /**
      * Creates the set of permissions for a given class.
      * <p>The sandbox inheritance property will apply to the permissions created by this method
      *
      * @param clazz the class for which these permissions apply
-     * @param readFlag whether the readable property list is white - true - or black - false -
-     * @param writeFlag whether the writable property list is white - true - or black - false -
-     * @param executeFlag whether the executable method list is white white - true - or black - false -
+     * @param readFlag whether the readable property list is allow - true - or block - false -
+     * @param writeFlag whether the writable property list is allow - true - or block - false -
+     * @param executeFlag whether the executable method list is allow allow - true - or block - false -
      * @return the set of permissions
      */
     public Permissions permissions(String clazz, boolean readFlag, boolean writeFlag, boolean executeFlag) {
@@ -534,9 +546,9 @@ public final class JexlSandbox {
      *
      * @param clazz the class for which these permissions apply
      * @param inhf whether these permissions are inheritable
-     * @param readf whether the readable property list is white - true - or black - false -
-     * @param writef whether the writable property list is white - true - or black - false -
-     * @param execf whether the executable method list is white white - true - or black - false -
+     * @param readf whether the readable property list is allow - true - or block - false -
+     * @param writef whether the writable property list is allow - true - or block - false -
+     * @param execf whether the executable method list is allow allow - true - or block - false -
      * @return the set of permissions
      */
     public Permissions permissions(String clazz, boolean inhf,  boolean readf, boolean writef, boolean execf) {
@@ -546,32 +558,51 @@ public final class JexlSandbox {
     }
 
     /**
-     * Creates a new set of permissions based on white lists for methods and properties for a given class.
+     * Creates a new set of permissions based on allow lists for methods and properties for a given class.
      * <p>The sandbox inheritance property will apply to the permissions created by this method
      * 
-     * @param clazz the whitened class name
+     * @param clazz the allowed class name
      * @return the permissions instance
      */
-    public Permissions white(String clazz) {
+    public Permissions allow(String clazz) {
         return permissions(clazz, true, true, true);
+    }
+    /** 
+     * Use allow() instead.
+     * @param clazz the allowed class name
+     * @return the permissions instance
+     */
+    @Deprecated
+    public Permissions white(String clazz) {
+        return allow(clazz);
     }
 
     /**
-     * Creates a new set of permissions based on black lists for methods and properties for a given class.
+     * Creates a new set of permissions based on block lists for methods and properties for a given class.
      * <p>The sandbox inheritance property will apply to the permissions created by this method
      *
-     * @param clazz the blackened class name
+     * @param clazz the blocked class name
      * @return the permissions instance
      */
-    public Permissions black(String clazz) {
+    public Permissions block(String clazz) {
         return permissions(clazz, false, false, false);
+    }
+        
+    /** 
+     * Use block() instead.
+     * @param clazz the allowed class name
+     * @return the permissions instance
+     */
+    @Deprecated
+    public Permissions black(String clazz) {
+        return block(clazz);
     }
 
     /**
      * Gets the set of permissions associated to a class.
      *
      * @param clazz the class name
-     * @return the defined permissions or an all-white permission instance if none were defined
+     * @return the defined permissions or an all-allow permission instance if none were defined
      */
     public Permissions get(String clazz) {
         if (inherit) {
@@ -579,7 +610,7 @@ public final class JexlSandbox {
         }
         Permissions permissions = sandbox.get(clazz);
         if (permissions == null) {
-            return white ? ALL_WHITE : ALL_BLACK;
+            return allow ? ALLOW_ALL : BLOCK_ALL;
         } else {
             return permissions;
         }
@@ -590,9 +621,9 @@ public final class JexlSandbox {
      * @param clazz the class
      * @return the permissions
      */
-    @SuppressWarnings("null") // clazz can not be null since permissions would be not null and black;
+    @SuppressWarnings("null") // clazz can not be null since permissions would be not null and block;
     public Permissions get(Class<?> clazz) {
-        Permissions permissions = clazz == null ? ALL_BLACK : sandbox.get(clazz.getName());
+        Permissions permissions = clazz == null ? BLOCK_ALL : sandbox.get(clazz.getName());
         if (permissions == null) {
             if (inherit) {
                 // find first inherited interface that defines permissions
@@ -617,12 +648,12 @@ public final class JexlSandbox {
                 }
                 // nothing was inheritable
                 if (permissions == null) {
-                    permissions = white ? ALL_WHITE : ALL_BLACK;
+                    permissions = allow ? ALLOW_ALL : BLOCK_ALL;
                 }
                 // store the info to avoid doing this costly look up
                 sandbox.put(clazz.getName(), permissions);
             } else {
-                permissions = white ? ALL_WHITE : ALL_BLACK;
+                permissions = allow ? ALLOW_ALL : BLOCK_ALL;
             }
         }
         return permissions;

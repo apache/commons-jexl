@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2" date="unreleased">
+            <action dev="henrib" type="add" issue="JEXL-334">
+                Remove offensive terminology from code and API
+            </action>
             <action dev="henrib" type="add" issue="JEXL-333">
                 Allow declaration of namespace within script
             </action>
