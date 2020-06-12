@@ -135,6 +135,18 @@
                         <p>Although pragmas are statements, they are <em>not</em> evaluated at runtime; they are constants
                             associated to the script after parsing. It is expected that user code accesses the pragma map from 
                             scripts to alter some functions behavior.</p>
+                        <p>The are two built-in pragmas:</p>
+                        <p>
+                            <b>jexl.options</b> overrides the evaluation options using the option-flags syntax.
+                            <code>#pragma jexl.options "+strict -safe +lexical +lexicalShade"</code> will let the script run with
+                            the options strict being true, safe false, lexical true and lexical-shade true.</p>
+                                
+                        <p>
+                            <b>jexl.namespace.<i>ns_prefix</i></b> declares a namespace valid for the script
+                            execution lifetime, the value being the fully-qualified namespace class-name.
+                            <code>#pragma jexl.namespace.str java.lang.String</code> declare 'str' as the namespace using
+                            the String class.
+                        </p>
                     </td>
                 </tr>
                 <tr>

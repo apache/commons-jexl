@@ -389,22 +389,21 @@ public class Engine extends JexlEngine {
             for(Map.Entry<String, Object> pragma : pragmas.entrySet()) {
                 String key = pragma.getKey();
                 Object value = pragma.getValue();
-                if (PRAGMA_OPTIONS.equals(key)) {
-                    // jexl.options
-                    if (value instanceof String) {
-                        String[] vs = ((String) value).split(" ");
+                if (value instanceof String) {
+                    if (PRAGMA_OPTIONS.equals(key)) {
+                        // jexl.options
+                        String[] vs = value.toString().split(" ");
                         opts.setFlags(vs);
-                    }
-                }
-                else if (key.startsWith(PRAGMA_JEXLNS) && value instanceof String) {
-                    // jexl.namespace.***
-                    String nsname = key.substring(PRAGMA_JEXLNS.length());
-                    if (nsname != null && !nsname.isEmpty()) {
-                        String nsclass = value.toString();
-                        if (ns == null) {
-                            ns = new HashMap<>(functions);
+                    } else if (key.startsWith(PRAGMA_JEXLNS)) {
+                        // jexl.namespace.***
+                        String nsname = key.substring(PRAGMA_JEXLNS.length());
+                        if (nsname != null && !nsname.isEmpty()) {
+                            String nsclass = value.toString();
+                            if (ns == null) {
+                                ns = new HashMap<>(functions);
+                            }
+                            ns.put(nsname, nsclass);
                         }
-                        ns.put(nsname, nsclass);
                     }
                 }
                 if (processor != null) {
