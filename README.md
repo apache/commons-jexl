@@ -25,7 +25,7 @@
  | commons-build-plugin/trunk/src/main/resources/commons-xdoc-templates |
  +======================================================================+
  |                                                                      |
- | 1) Re-generate using: mvn commons:readme-md                          |
+ | 1) Re-generate using: mvn commons-build:readme-md                    |
  |                                                                      |
  | 2) Set the following properties in the component's pom:              |
  |    - commons.componentid (required, alphabetic, lower case)          |
@@ -43,18 +43,18 @@
 Apache Commons JEXL
 ===================
 
-[![Build Status](https://travis-ci.org/apache/commons-jexl3.svg?branch=master)](https://travis-ci.org/apache/commons-jexl3)
-[![Coverage Status](https://coveralls.io/repos/apache/commons-jexl3/badge.svg?branch=master)](https://coveralls.io/r/apache/commons-jexl3)
+[![Build Status](https://travis-ci.org/apache/commons-jexl.svg)](https://travis-ci.org/apache/commons-jexl)
+[![Coverage Status](https://coveralls.io/repos/apache/commons-jexl/badge.svg)](https://coveralls.io/r/apache/commons-jexl)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.apache.commons/commons-jexl3/)
-[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![Javadocs](https://javadoc.io/badge/org.apache.commons/commons-jexl3/3.2.svg)](https://javadoc.io/doc/org.apache.commons/commons-jexl3/3.2)
 
-The Apache Commons JEXL library is an implementation of the JSTL Expression Language with extensions.
+The Apache Commons JEXL library is an implementation of a Java-symbiotic Expression Language.
 
 Documentation
 -------------
 
 More information can be found on the [Apache Commons JEXL homepage](https://commons.apache.org/proper/commons-jexl).
-The [JavaDoc](https://commons.apache.org/proper/commons-jexl/apidocs/index.html) can be browsed.
+The [Javadoc](https://commons.apache.org/proper/commons-jexl/apidocs) can be browsed.
 Questions related to the usage of Apache Commons JEXL should be posted to the [user mailing list][ml].
 
 Where can I get the latest release?
@@ -67,7 +67,7 @@ Alternatively you can pull it from the central Maven repositories:
 <dependency>
   <groupId>org.apache.commons</groupId>
   <artifactId>commons-jexl3</artifactId>
-  <version>3.1</version>
+  <version>3.2</version>
 </dependency>
 ```
 

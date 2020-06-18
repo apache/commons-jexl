@@ -25,7 +25,7 @@
  | commons-build-plugin/trunk/src/main/resources/commons-xdoc-templates |
  +======================================================================+
  |                                                                      |
- | 1) Re-generate using: mvn commons:contributing-md                    |
+ | 1) Re-generate using: mvn commons-build:contributing-md              |
  |                                                                      |
  | 2) Set the following properties in the component's pom:              |
  |    - commons.jira.id  (required, alphabetic, upper case)             |
@@ -39,7 +39,7 @@
  +======================================================================+
 --->
 Contributing to Apache Commons JEXL
-===================================
+======================
 
 You have found a bug or you have an idea for a cool new feature? Contributing code is a great way to give something back to
 the open source community. Before you dig right into the code there are a few guidelines that we need contributors to
@@ -107,7 +107,7 @@ Additional Resources
 + [Apache Commons JEXL JIRA project page][jira]
 + [Contributor License Agreement][cla]
 + [General GitHub documentation](https://help.github.com/)
-+ [GitHub pull request documentation](https://help.github.com/send-pull-requests/)
++ [GitHub pull request documentation](https://help.github.com/articles/creating-a-pull-request/)
 + [Apache Commons Twitter Account](https://twitter.com/ApacheCommons)
 + `#apache-commons` IRC channel on `irc.freenode.net`
 

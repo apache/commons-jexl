@@ -26,7 +26,7 @@
     <artifactId>commons-jexl3</artifactId>
     <version>3.2-SNAPSHOT</version>
     <name>Apache Commons JEXL</name>
-    <description>The Apache Commons JEXL library is an implementation of the JSTL Expression Language with extensions.</description>
+    <description>The Apache Commons JEXL library is an implementation of a Java-symbiotic Expression Language.</description>
     <url>https://commons.apache.org/proper/commons-jexl/</url>
     <inceptionYear>2001</inceptionYear>
 
@@ -35,7 +35,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <commons.componentid>jexl</commons.componentid>
         <commons.module.name>org.apache.commons.jexl3</commons.module.name>
-        <commons.release.version>3.1</commons.release.version>
+        <commons.release.version>3.2</commons.release.version>
         <commons.site.path>jexl</commons.site.path>
         <commons.scmPubUrl>https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl</commons.scmPubUrl>
         <commons.scmPubCheckoutDirectory>site-content</commons.scmPubCheckoutDirectory>
@@ -53,6 +53,26 @@
         <commons.jira.pid>12310479</commons.jira.pid>
         <checkstyle.plugin.version>2.17</checkstyle.plugin.version>
         <checksyle.version>8.18</checksyle.version>
+        
+        <!--
+          Encoding of Java source files: ensures that the compiler and
+          the javadoc generator use the right encoding. Subprojects may
+          overwrite this, if they are using another encoding.
+        -->
+        <commons.encoding>iso-8859-1</commons.encoding>
+        <!-- used in this pom to provide the Javadoc HTML file encoding -->
+        <commons.docEncoding>${commons.encoding}</commons.docEncoding>
+        <!-- Define source encoding for filtering; used by general plugins -->
+        <project.build.sourceEncoding>${commons.encoding}</project.build.sourceEncoding>
+        <!-- This is used by reporting plugins -->
+        <project.reporting.outputEncoding>${commons.encoding}</project.reporting.outputEncoding>
+        
+        <commons.bc.version>1.5</commons.bc.version>
+        <commons.release-plugin.version>1.4</commons.release-plugin.version>
+        <commons.release.isDistModule>true</commons.release.isDistModule>
+        <commons.distSvnStagingUrl>scm:svn:https://dist.apache.org/repos/dist/dev/commons/${commons.componentid}</commons.distSvnStagingUrl>
+        <commons.releaseManagerName>Henri Biestro</commons.releaseManagerName>
+        <commons.releaseManagerKey>4E066E0459CD109B</commons.releaseManagerKey>
     </properties>
 
     <scm>
