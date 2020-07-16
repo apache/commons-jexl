@@ -1816,6 +1816,57 @@ public class Interpreter extends InterpreterBase {
     }
 
     /**
+     * An annotated call.
+     */
+    public class AnnotatedCall implements Callable<Object> {
+        /** The statement. */
+        private final ASTAnnotatedStatement stmt;
+        /** The child index. */
+        private final int index;
+        /** The data. */
+        private final Object data;
+        /** Tracking whether we processed the annotation. */
+        private boolean processed = false;
+
+        /**
+         * Simple ctor.
+         * @param astmt the statement
+         * @param aindex the index
+         * @param adata the data
+         */
+        AnnotatedCall(final ASTAnnotatedStatement astmt, final int aindex, final Object adata) {
+            stmt = astmt;
+            index = aindex;
+            data = adata;
+        }
+
+
+        @Override
+        public Object call() throws Exception {
+            processed = true;
+            try {
+                return processAnnotation(stmt, index, data);
+            } catch (JexlException.Return | JexlException.Break | JexlException.Continue xreturn) {
+                return xreturn;
+            }
+        }
+        
+        /**
+         * @return whether the statement has been processed
+         */
+        public boolean isProcessed() {
+            return processed;
+        }
+        
+        /**
+         * @return the actual statement.
+         */
+        public Object getStatement() {
+            return stmt;
+        }
+    }
+    
+    /**
      * Processes an annotated statement.
      * @param stmt the statement
      * @param index the index of the current annotation being processed
@@ -1846,18 +1897,7 @@ public class Interpreter extends InterpreterBase {
             }
         }
         // tracking whether we processed the annotation
-        final boolean[] processed = new boolean[]{false};
-        final Callable<Object> jstmt = new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
-                processed[0] = true;
-                try {
-                    return processAnnotation(stmt, index + 1, data);
-                } catch(JexlException.Return | JexlException.Continue | JexlException.Break xreturn) {
-                    return xreturn;
-                }
-            }
-        };
+        final AnnotatedCall jstmt = new AnnotatedCall(stmt, index + 1, data);
         // the annotation node and name
         final ASTAnnotation anode = (ASTAnnotation) stmt.jjtGetChild(index);
         final String aname = anode.getName();
@@ -1869,7 +1909,7 @@ public class Interpreter extends InterpreterBase {
         try {
             result = processAnnotation(aname, argv, jstmt);
             // not processing an annotation is an error
-            if (!processed[0]) {
+            if (!jstmt.isProcessed()) {
                 return annotationError(anode, aname, null);
             }
         } catch (JexlException xany) {
@@ -1893,7 +1933,7 @@ public class Interpreter extends InterpreterBase {
      * @throws Exception if anything goes wrong
      */
     protected Object processAnnotation(String annotation, Object[] args, Callable<Object> stmt) throws Exception {
-        return context instanceof JexlContext.AnnotationProcessor
+                return context instanceof JexlContext.AnnotationProcessor
                 ? ((JexlContext.AnnotationProcessor) context).processAnnotation(annotation, args, stmt)
                 : stmt.call();
     }

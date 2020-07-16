@@ -28,7 +28,7 @@ public final class Frame {
     /** The actual stack frame. */
     private final Object[] stack;
     /** Number of curried parameters. */
-    private int curried = 0;
+    private final int curried;
 
     /**
      * Creates a new frame.

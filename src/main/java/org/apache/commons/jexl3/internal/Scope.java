@@ -47,7 +47,7 @@ public final class Scope {
     /**
      * The parent scope.
      */
-    private Scope parent = null;
+    private final Scope parent;
     /**
      * The number of parameters.
      */

@@ -19,6 +19,10 @@ package org.apache.commons.jexl3;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import org.apache.commons.jexl3.internal.Interpreter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,6 +34,9 @@ import org.junit.Test;
 
 public class AnnotationTest extends JexlTestCase {
 
+    public final static int NUM_THREADS = 10;
+    public final static int NUM_ITERATIONS = 1000;
+    
     public AnnotationTest() {
         super("AnnotationTest");
     }
@@ -60,6 +67,21 @@ public class AnnotationTest extends JexlTestCase {
                 throw new IllegalArgumentException(args[0].toString());
             } else if ("unknown".equals(name)) {
                 return null;
+            } else if ("synchronized".equals(name)) {
+                if (statement instanceof Interpreter.AnnotatedCall) {
+                    Object sa = ((Interpreter.AnnotatedCall) statement).getStatement();
+                    if (sa != null) {
+                        synchronized (sa) {
+                            return statement.call();
+                        }
+                    }
+                }
+                final JexlEngine jexl = JexlEngine.getThreadEngine();
+                if (jexl != null) {
+                    synchronized (jexl) {
+                        return statement.call();
+                    }
+                }
             }
             return statement.call();
         }
@@ -290,5 +312,80 @@ public class AnnotationTest extends JexlTestCase {
         if (!silent) {
             Assert.assertEquals(0, log.count("warn"));
         }
+    }
+    
+    /**
+     * A counter whose inc method will misbehave if not mutex-ed.
+     */
+    public static class Counter {
+        private int value = 0;
+
+        public void inc() {
+            int v = value;
+            // introduce some concurency
+            for (int i = (int) System.currentTimeMillis() % 5; i >= 0; --i) {
+                Thread.yield();
+            }
+            value = v + 1;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
+    /**
+     * Runs a counter test with n-thread in //.
+     */
+    public static class TestRunner {
+        public final Counter syncCounter = new Counter();
+        public final Counter concCounter = new Counter();
+
+        public void run(Runnable runnable) throws InterruptedException {
+            ExecutorService executor = Executors.newFixedThreadPool(NUM_THREADS);
+            for (int i = 0; i < NUM_THREADS; i++) {
+                executor.submit(runnable);
+            }
+            executor.shutdown();
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+            Assert.assertEquals(NUM_THREADS * NUM_ITERATIONS, syncCounter.getValue());
+            Assert.assertNotEquals(NUM_THREADS * NUM_ITERATIONS, concCounter.getValue());
+        }
+    }    
+
+    @Test
+    /**
+     * A base test to ensure synchronized makes a difference. 
+     */
+    public void testSynchronized() throws InterruptedException {
+        final TestRunner tr = new TestRunner();
+        final Counter syncCounter = tr.syncCounter;
+        final Counter concCounter = tr.concCounter;
+        tr.run(() -> {
+            for (int i = 0; i < NUM_ITERATIONS; i++) {
+                synchronized (syncCounter) {
+                    syncCounter.inc();
+                }
+                concCounter.inc();
+            }
+        });
+    }
+
+    @Test
+    public void testJexlSynchronized0() throws InterruptedException {
+        final TestRunner tr = new TestRunner();
+        final AnnotationContext ctxt = new AnnotationContext();
+        final JexlScript script = JEXL.createScript(
+                "for(var i : 1..NUM_ITERATIONS) {"
+                + "@synchronized { syncCounter.inc(); }"
+                + "concCounter.inc();"
+                + "}",
+                "NUM_ITERATIONS",
+                "syncCounter",
+                "concCounter");
+        // will sync on syncCounter
+        tr.run(() -> {
+            script.execute(ctxt, NUM_ITERATIONS, tr.syncCounter, tr.concCounter);
+        });
     }
 }
