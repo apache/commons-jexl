@@ -40,7 +40,7 @@ import org.apache.commons.jexl3.internal.Engine;
  * @since 3.2
  */
 public final class JexlOptions {
-    /** The shared isntance bit. */
+    /** The shared instance bit. */
     private static final int SHARED = 7;
     /** The local shade bit. */
     private static final int SHADE = 6;

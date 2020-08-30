@@ -398,11 +398,15 @@ public class Engine extends JexlEngine {
                         // jexl.namespace.***
                         String nsname = key.substring(PRAGMA_JEXLNS.length());
                         if (nsname != null && !nsname.isEmpty()) {
-                            String nsclass = value.toString();
                             if (ns == null) {
                                 ns = new HashMap<>(functions);
                             }
-                            ns.put(nsname, nsclass);
+                            String nsclass = value.toString();
+                            try {
+                                ns.put(nsname, uberspect.getClassLoader().loadClass(nsclass));
+                            } catch (ClassNotFoundException e) {
+                                ns.put(nsname, nsclass);
+                            }
                         }
                     }
                 }
