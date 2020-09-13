@@ -199,8 +199,8 @@ public abstract class InterpreterBase extends ParserVisitor {
                         throw new JexlException(node, "unable to instantiate namespace " + prefix, xtry.getCause());
                     }
                 }
+                // find a ctor with that context class
                 if (functor == null) {
-                    // find a ctor with that context class
                     JexlMethod ctor = uberspect.getConstructor(namespace, context);
                     if (ctor != null) {
                         try {
@@ -212,7 +212,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                             throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
                         }
                     }
-                    // find a ctor with no arg
+                    // try again; find a ctor with no arg
                     if (functor == null) {
                         ctor = uberspect.getConstructor(namespace);
                         if (ctor != null) {
@@ -222,19 +222,17 @@ public abstract class InterpreterBase extends ParserVisitor {
                                 throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
                             }
                         }
-                        // use a class, namespace of static methods
+                        // try again; use a class, namespace of static methods
                         if (functor == null) {
                             // try to find a class with that name
                             if (namespace instanceof String) {
                                 try {
-                                    functor = uberspect.getClassLoader().loadClass((String) namespace);
+                                    namespace = uberspect.getClassLoader().loadClass((String) namespace);
                                 } catch (ClassNotFoundException xignore) {
                                     // not a class
                                     namespace = null;
                                 }
-                            } else { // we know its a class
-                                functor = (Class<?>) namespace;
-                            }
+                            } // we know its a class
                         }
                     }
                 }
