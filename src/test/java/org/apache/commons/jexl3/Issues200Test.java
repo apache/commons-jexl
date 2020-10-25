@@ -255,11 +255,7 @@ public class Issues200Test extends JexlTestCase {
     }
 
     private static void handle(ExecutorService pool, final JexlScript script, final Map<String, Object> payload) {
-       pool.submit(new Runnable() {
-            @Override public void run() {
-                script.execute(new MapContext(payload));
-            }
-        });
+       pool.submit(() -> script.execute(new MapContext(payload)));
     }
 
     @Test

@@ -24,7 +24,6 @@ import java.lang.reflect.Modifier;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -224,12 +223,7 @@ final class ClassMap {
             List<Method> lm = new ArrayList<Method>(cache.byKey.size());
             lm.addAll(cache.byKey.values());
             // sort all methods by name
-            lm.sort(new Comparator<Method>() {
-                @Override
-                public int compare(Method o1, Method o2) {
-                    return o1.getName().compareTo(o2.getName());
-                }
-            });
+            lm.sort((o1, o2) -> o1.getName().compareTo(o2.getName()));
             // put all lists of methods with same name in byName cache
             int start = 0;
             while (start < lm.size()) {

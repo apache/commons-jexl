@@ -159,20 +159,17 @@ public interface JexlUberspect {
      * If the operator is '[]' or if the operator is null and the object is a map, use the MAP list of resolvers;
      * Other cases use the POJO list of resolvers.
      */
-    ResolverStrategy JEXL_STRATEGY = new ResolverStrategy() {
-        @Override
-        public List<PropertyResolver> apply(JexlOperator op, Object obj) {
-            if (op == JexlOperator.ARRAY_GET) {
-                return MAP;
-            }
-            if (op == JexlOperator.ARRAY_SET) {
-                return MAP;
-            }
-            if (op == null && obj instanceof Map) {
-                return MAP;
-            }
-            return POJO;
+    ResolverStrategy JEXL_STRATEGY = (op, obj) -> {
+        if (op == JexlOperator.ARRAY_GET) {
+            return MAP;
         }
+        if (op == JexlOperator.ARRAY_SET) {
+            return MAP;
+        }
+        if (op == null && obj instanceof Map) {
+            return MAP;
+        }
+        return POJO;
     };
 
     /**
@@ -181,20 +178,17 @@ public interface JexlUberspect {
      * <p>If the operator is '[]' or if the object is a map, use the MAP list of resolvers.
      * Otherwise, use the POJO list of resolvers.</p>
      */
-    ResolverStrategy MAP_STRATEGY = new ResolverStrategy() {
-        @Override
-        public List<PropertyResolver> apply(JexlOperator op, Object obj) {
-            if (op == JexlOperator.ARRAY_GET) {
-                return MAP;
-            }
-            if (op == JexlOperator.ARRAY_SET) {
-                return MAP;
-            }
-            if (obj instanceof Map) {
-                return MAP;
-            }
-            return POJO;
+    ResolverStrategy MAP_STRATEGY = (op, obj) -> {
+        if (op == JexlOperator.ARRAY_GET) {
+            return MAP;
         }
+        if (op == JexlOperator.ARRAY_SET) {
+            return MAP;
+        }
+        if (obj instanceof Map) {
+            return MAP;
+        }
+        return POJO;
     };
 
     /**

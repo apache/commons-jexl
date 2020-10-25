@@ -73,12 +73,9 @@ public class ScriptCallableTest extends JexlTestCase {
         JexlScript e = JEXL.createScript("latch.release(); while(true);");
         final Script.Callable c = (Script.Callable) e.callable(ctxt);
         Object t = 42;
-        Callable<Object> kc = new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
-                latch.acquire();
-                return c.cancel();
-            }
+        Callable<Object> kc = () -> {
+            latch.acquire();
+            return c.cancel();
         };
         ExecutorService executor = Executors.newFixedThreadPool(2);
         Future<?> future = executor.submit(c);
@@ -121,12 +118,9 @@ public class ScriptCallableTest extends JexlTestCase {
         JexlScript e = JEXL.createScript("latch.release(); while(true);");
         final Script.Callable c = (Script.Callable) e.callable(ctxt);
         Object t = 42;
-        Callable<Object> kc = new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
-                latch.acquire();
-                return cancel.compareAndSet(false, true);
-            }
+        Callable<Object> kc = () -> {
+            latch.acquire();
+            return cancel.compareAndSet(false, true);
         };
         ExecutorService executor = Executors.newFixedThreadPool(2);
         Future<?> future = executor.submit(c);
@@ -462,16 +456,13 @@ public class ScriptCallableTest extends JexlTestCase {
             // cancel a sleep
             try {
                 final Future<Object> fc = exec.submit(ssleep.callable(ctxt));
-                Runnable cancels = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(200L);
-                        } catch (Exception xignore) {
+                Runnable cancels = () -> {
+                    try {
+                        Thread.sleep(200L);
+                    } catch (Exception xignore) {
 
-                        }
-                        fc.cancel(true);
                     }
+                    fc.cancel(true);
                 };
                 exec.submit(cancels);
                 t = f.get(100L, TimeUnit.MILLISECONDS);
@@ -496,16 +487,13 @@ public class ScriptCallableTest extends JexlTestCase {
             // cancel a while(true)
             try {
                 final Future<Object> fc = exec.submit(swhile.callable(ctxt));
-                Runnable cancels = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(200L);
-                        } catch (Exception xignore) {
+                Runnable cancels = () -> {
+                    try {
+                        Thread.sleep(200L);
+                    } catch (Exception xignore) {
 
-                        }
-                        fc.cancel(true);
                     }
+                    fc.cancel(true);
                 };
                 exec.submit(cancels);
                 t = fc.get();

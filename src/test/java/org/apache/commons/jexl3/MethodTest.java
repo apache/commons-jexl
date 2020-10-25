@@ -688,17 +688,14 @@ public class MethodTest extends JexlTestCase {
                 return nsScript;
             }
             if ("functor".equals(name)) {
-                return new JexlContext.NamespaceFunctor() {
-                    @Override
-                    public Object createFunctor(JexlContext context) {
-                        Map<String, Object> values = new HashMap<String, Object>();
-                        if ("gin".equals(context.get("base"))) {
-                            values.put("drink", "gin fizz");
-                        } else {
-                            values.put("drink", "champaign");
-                        }
-                        return values;
+                return (NamespaceFunctor) context -> {
+                    Map<String, Object> values = new HashMap<String, Object>();
+                    if ("gin".equals(context.get("base"))) {
+                        values.put("drink", "gin fizz");
+                    } else {
+                        values.put("drink", "champaign");
                     }
+                    return values;
                 };
             }
             return null;
