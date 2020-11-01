@@ -99,9 +99,19 @@ public class StringParser {
                     // if c is not an escapable character, re-emmit the backslash before it
                     boolean notSeparator = sep == 0 ? c != '\'' && c != '"' : c != sep;
                     if (notSeparator && c != '\\') {
-                        strb.append('\\');
+                        switch (c) {
+                            // http://es5.github.io/x7.html#x7.8.4
+                            case 'b': strb.append('\b'); break; // backspace \u0008
+                            case 't': strb.append('\t'); break; // horizontal tab \u0009
+                            case 'n': strb.append('\n'); break; // line feed \u000A
+                            // We don't support vertical tab. If needed, the unicode (\u000B) should be used instead
+                            case 'f': strb.append('\f'); break; // form feed \u000C
+                            case 'r': strb.append('\r'); break; // carriage return \u000D
+                            default: strb.append('\\').append(c);
+                        }
+                    } else {
+                        strb.append(c);
                     }
-                    strb.append(c);
                 }
                 escape = false;
                 continue;

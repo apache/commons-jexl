@@ -2,3 +2,7 @@ target/
 /.classpath
 /.project
 /.settings/
+
+# intellij files
+.idea/
+/*.iml

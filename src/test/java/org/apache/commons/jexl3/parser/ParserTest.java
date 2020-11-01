@@ -87,4 +87,26 @@ public class ParserTest {
             Assert.assertEquals(id, esc1);
         }
     }
+
+    /**
+     * Test the escaped control characters.
+     */
+    @Test
+    public void testControlCharacters() {
+        // Both '' and "" are valid JEXL string
+        // The array of tuples where the first element is an expected result and the second element is a test string.
+        String[][] strings = new String[][] {
+            new String[] {"a\nb\tc", "'a\nb\tc'"}, // we still honor the actual characters
+            new String[] {"a\nb\tc", "'a\\nb\\tc'"},
+            new String[] {"a\nb\tc", "\"a\\nb\\tc\""},
+            new String[] {"\b\t\n\f\r", "'\\b\\t\\n\\f\\r'"},
+            new String[] {"'hi'", "'\\'hi\\''"},
+            new String[] {"\"hi\"", "'\"hi\"'"},
+            new String[] {"\"hi\"", "'\"hi\"'"},
+        };
+        for(String[] pair: strings) {
+            String output = StringParser.buildString(pair[1], true);
+            Assert.assertEquals(pair[0], output);
+        }
+    }
 }
