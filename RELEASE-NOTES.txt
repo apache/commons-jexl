@@ -77,6 +77,7 @@ New Features in 3.2:
 
 Bugs Fixed in 3.2:
 ==================
+* JEXL-336:      Escape some control characters
 * JEXL-331:      Please document \uXXXX escape sequence
 * JEXL-330:      JexlException.Parsing.getMessage() throws exception when parse error is in long expression
 * JEXL-328:      JXLT template scripts evaluation do not process pragmas
