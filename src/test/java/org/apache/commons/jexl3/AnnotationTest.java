@@ -348,8 +348,12 @@ public class AnnotationTest extends JexlTestCase {
             }
             executor.shutdown();
             executor.awaitTermination(5, TimeUnit.SECONDS);
-            Assert.assertEquals(NUM_THREADS * NUM_ITERATIONS, syncCounter.getValue());
-            Assert.assertNotEquals(NUM_THREADS * NUM_ITERATIONS, concCounter.getValue());
+            // this may succeed concurrently if there is only one 'real' thread
+            // during execution; we can only prove the 'synchronized' if the unsync-ed
+            // version fails...
+            if (NUM_THREADS * NUM_ITERATIONS != concCounter.getValue()) {
+                Assert.assertEquals(NUM_THREADS * NUM_ITERATIONS, syncCounter.getValue());
+            }
         }
     }    
 
