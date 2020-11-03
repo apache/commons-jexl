@@ -54,7 +54,8 @@
         <commons.jira.pid>12310479</commons.jira.pid>
         <checkstyle.plugin.version>3.1.1</checkstyle.plugin.version>
         <checksyle.version>8.37</checksyle.version>
-        <jacoco.version>0.8.6</jacoco.version>
+        <!-- override of version defined in CP52 -->
+        <commons.jacoco.version>0.8.6</commons.jacoco.version>
 
         <!--
           Encoding of Java source files: ensures that the compiler and
@@ -175,7 +176,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
+                <version>${commons.jacoco.version}</version>
                 <configuration>
                     <excludes>
                             <exclude>**/generated-sources/**/*</exclude>
@@ -371,7 +372,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.6</version>
+                <version>${commons.jacoco.version}</version>
                 <configuration>
                     <excludes>
                             <exclude>**/generated-sources/**/*</exclude>
