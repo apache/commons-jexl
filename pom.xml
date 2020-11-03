@@ -27,7 +27,7 @@
     <version>3.2-SNAPSHOT</version>
     <name>Apache Commons JEXL</name>
     <description>JEXL is a library intended to facilitate the implementation of scripting features in
-    applications and frameworks written in Java.</description>
+        applications and frameworks written in Java.</description>
     <url>https://commons.apache.org/proper/commons-jexl/</url>
     <inceptionYear>2001</inceptionYear>
 
@@ -53,8 +53,9 @@
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
         <checkstyle.plugin.version>3.1.1</checkstyle.plugin.version>
-        <checksyle.version>8.18</checksyle.version>
-        
+        <checksyle.version>8.37</checksyle.version>
+        <jacoco.version>0.8.6</jacoco.version>
+
         <!--
           Encoding of Java source files: ensures that the compiler and
           the javadoc generator use the right encoding. Subprojects may
@@ -67,7 +68,7 @@
         <project.build.sourceEncoding>${commons.encoding}</project.build.sourceEncoding>
         <!-- This is used by reporting plugins -->
         <project.reporting.outputEncoding>${commons.encoding}</project.reporting.outputEncoding>
-        
+
         <commons.bc.version>1.5</commons.bc.version>
         <commons.release-plugin.version>1.4</commons.release-plugin.version>
         <commons.release.isDistModule>true</commons.release.isDistModule>
@@ -86,11 +87,11 @@
         <url>https://issues.apache.org/jira/browse/JEXL</url>
     </issueManagement>
     <distributionManagement>
-      <site>
-        <id>apache.website</id>
-        <name>Apache Commons Site</name>
-        <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl/</url>
-      </site>
+        <site>
+            <id>apache.website</id>
+            <name>Apache Commons Site</name>
+            <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl/</url>
+        </site>
     </distributionManagement>
 
     <dependencies>
@@ -117,13 +118,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <argLine>@{argLine} -Xmx128m</argLine>
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
-                    <!-- to increase memory for test on travis ci -->
-                    <argLine>-Xmx64m</argLine>
                 </configuration>
             </plugin>
+
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
@@ -135,6 +136,7 @@
                     <finalName>commons-jexl-${project.version}</finalName>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>javacc-maven-plugin</artifactId>
@@ -150,8 +152,6 @@
                         <configuration>
                             <sourceDirectory>${basedir}/src/main/java/org/apache/commons/jexl3/parser</sourceDirectory>
                             <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
-                            <timestampDirectory>${project.build.directory}/generated-sources/javacc-timestamp</timestampDirectory>
-                            <packageName>org.apache.commons.jexl3.parser</packageName>
                         </configuration>
                         <goals>
                             <goal>jjtree-javacc</goal>
@@ -159,6 +159,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -170,23 +171,34 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.7</version>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
                 <configuration>
-                    <instrumentation>
-                        <ignores>
-                            <ignore>**/generated-sources/**/*</ignore>
-                        </ignores>
-                        <excludes>
+                    <excludes>
                             <exclude>**/generated-sources/**/*</exclude>
-                            <exclude>org/apache/commons/jexl3/parser/*.class</exclude>
-                            <exclude>org/apache/commons/jexl3/**/*Test.class</exclude>
-                        </excludes>
-                    </instrumentation>
+                            <exclude>**/org/apache/commons/jexl3/parser/*.class</exclude>
+                            <exclude>**/org/apache/commons/jexl3/**/*Test.class</exclude>
+                    </excludes>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-scm-publish-plugin</artifactId>
@@ -196,6 +208,7 @@
                     </ignorePathsToDelete>
                 </configuration>
             </plugin>
+
             <!-- Allow checkstyle to be run from command-line. Must agree with config in report section. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -207,6 +220,8 @@
                     <excludes>org/apache/commons/jexl3/parser/*.java</excludes>
                     <headerLocation>${basedir}/src/main/config/header.txt</headerLocation>
                     <enableRulesSummary>true</enableRulesSummary>
+                    <!-- Needed to define config_loc for use by Eclipse -->
+                    <propertyExpansion>config_loc=${basedir}/src/main/config</propertyExpansion>
                 </configuration>
                 <!-- Update embedded checkstyle to latest -->
                 <dependencies>
@@ -216,13 +231,24 @@
                         <version>${checksyle.version}</version>
                         <exclusions><!-- MCHECKSTYLE-156 -->
                             <exclusion>
-                            <groupId>com.sun</groupId>
-                            <artifactId>tools</artifactId>
+                                <groupId>com.sun</groupId>
+                                <artifactId>tools</artifactId>
                             </exclusion>
                         </exclusions>
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <!-- Allow Spotbugs to be run from command-line. Must agree with config in report section. -->
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${commons.spotbugs.version}</version>
+                <configuration>
+                    <excludeFilterFile>${basedir}/src/main/config/findbugs-exclude-filter.xml</excludeFilterFile>
+                </configuration>
+            </plugin>
+
             <!-- Allow Clirr to be run from command-line. Must agree with config in report section. -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -235,6 +261,7 @@
                     </excludes>
                 </configuration>
             </plugin>
+
             <!-- Allow RAT to be run from command-line. Must agree with config in report section. -->
             <plugin>
                 <groupId>org.apache.rat</groupId>
@@ -258,6 +285,7 @@
                     <show>public</show>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-changes-plugin</artifactId>
@@ -269,6 +297,7 @@
                     </issueLinkTemplatePerSystem>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -279,42 +308,44 @@
                     <excludes>org/apache/commons/jexl3/parser/*.java</excludes>
                     <headerLocation>${basedir}/src/main/config/header.txt</headerLocation>
                     <enableRulesSummary>false</enableRulesSummary>
+                    <!-- Needed to define config_loc for use by Eclipse -->
+                    <propertyExpansion>config_loc=${basedir}/src/main/config</propertyExpansion>
                 </configuration>
             </plugin>
+
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.5</version>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${commons.spotbugs.version}</version>
                 <configuration>
                     <excludeFilterFile>${basedir}/src/main/config/findbugs-exclude-filter.xml</excludeFilterFile>
-                    <xmlOutput>true</xmlOutput>
-                    <!-- Optional directory to put findbugs xdoc xml report -->
                     <xmlOutputDirectory>target/site</xmlOutputDirectory>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.7</version>
+                <version>3.13.0</version>
                 <configuration>
                     <targetJdk>${maven.compiler.target}</targetJdk>
                     <excludes>
                         <excludes>**/generated-sources/**/*</excludes>
                     </excludes>
                     <rulesets>
-                        <ruleset>/rulesets/java/braces.xml</ruleset>
-                        <ruleset>/rulesets/java/unusedcode.xml</ruleset>
-                        <ruleset>/rulesets/java/imports.xml</ruleset>
-                        <ruleset>/rulesets/java/coupling.xml</ruleset>
-                        <ruleset>/rulesets/java/design.xml</ruleset>
-                        <ruleset>/rulesets/java/strings.xml</ruleset>
+                        <ruleset>/category/java/bestpractices.xml</ruleset>
                     </rulesets>
                 </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>pmd</report>
+                            <report>cpd</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>clirr-maven-plugin</artifactId>
@@ -333,6 +364,19 @@
                 <configuration>
                     <excludes>
                         <exclude>.travis.yml</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.6</version>
+                <configuration>
+                    <excludes>
+                            <exclude>**/generated-sources/**/*</exclude>
+                            <exclude>**/org/apache/commons/jexl3/parser/*.class</exclude>
+                            <exclude>**/org/apache/commons/jexl3/**/*Test.class</exclude>
                     </excludes>
                 </configuration>
             </plugin>

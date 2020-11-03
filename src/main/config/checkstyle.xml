@@ -1,219 +1,102 @@
 <?xml version="1.0"?>
-<!-- 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
- -->
-
-<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
-                        "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
-
 <!--
+Licensed to the Apache Software Foundation (ASF) under one or more
+contributor license agreements.  See the NOTICE file distributed with
+this work for additional information regarding copyright ownership.
+The ASF licenses this file to You under the Apache License, Version 2.0
+(the "License"); you may not use this file except in compliance with
+the License.  You may obtain a copy of the License at
 
-  Checkstyle configuration that checks the sun coding conventions from:
+     http://www.apache.org/licenses/LICENSE-2.0
 
-    - the Java Language Specification at
-      http://java.sun.com/docs/books/jls/second_edition/html/index.html
-
-    - the Sun Code Conventions at http://java.sun.com/docs/codeconv/
-
-    - the Javadoc guidelines at
-      http://java.sun.com/j2se/javadoc/writingdoccomments/index.html
-
-    - the JDK Api documentation http://java.sun.com/j2se/docs/api/index.html
-
-    - some best practices
-
-  Checkstyle is very configurable. Be sure to read the documentation at
-  http://checkstyle.sf.net (or in your downloaded distribution).
-
-  Most Checks are configurable, be sure to consult the documentation.
-
-  To completely disable a check, just comment it out or delete it from the file.
-
-  Finally, it is worth reading the documentation.
-
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 -->
 
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.1//EN"
+    "https://checkstyle.org/dtds/configuration_1_1.dtd">
+
+<!-- Commons Net customization of default Checkstyle behavior -->
 <module name="Checker">
 
-    <!-- Checks that a package.html file exists for each package.     -->
-    <!-- See http://checkstyle.sf.net/config_javadoc.html#PackageHtml -->
-    <module name="JavadocPackage">
-        <property name="allowLegacy" value="true"/>
+  <property name="localeLanguage" value="en"/>
+  <module name="JavadocPackage">
+    <!-- setting allowLegacy means it will check for package.html instead of just package-info.java -->
+    <property name="allowLegacy" value="true"/>
+  </module>
+
+  <module name="FileTabCharacter">
+    <property name="fileExtensions" value="java,xml"/>
+  </module>
+
+  <!-- Checks for white space at the end of the line -->
+  <!-- See http://checkstyle.sourceforge.net/config_regexp.html -->
+  <!--
+  <module name="RegexpSingleline">
+    <property name="format" value="\s$" />
+    <property name="message" value="Line has trailing spaces." />
+    <property name="fileExtensions" value="java" />
+  </module>
+ -->
+  <!-- @author tags are deprecated -->
+  <module name="RegexpSingleline">
+    <property name="format" value="^\s+\*\s+@author\s" />
+    <property name="message" value="Deprecated @author tag" />
+    <property name="fileExtensions" value="java" />
+  </module>
+
+  <module name="LineLength">
+    <property name="max" value="132"/>
+  </module>
+
+  <module name="TreeWalker">
+    <module name="AvoidStarImport">
+      <property name="excludes" value="org.junit.Assert"/>
+    </module>
+    <module name="RedundantImport"/>
+    <module name="UnusedImports"/>
+    <module name="NeedBraces"/>
+
+    <!-- Modifier Checks                                    -->
+    <!-- See http://checkstyle.sf.net/config_modifiers.html -->
+    <module name="ModifierOrder"/>
+
+    <!--module name="RedundantModifier"/-->
+
+    <!-- Checks for blocks. You know, those {}'s         -->
+    <!-- See http://checkstyle.sf.net/config_blocks.html -->
+    <!--module name="AvoidNestedBlocks"/-->
+    <module name="EmptyBlock">
+      <property name="option" value="text"/>
+    </module>
+    <module name="EmptyCatchBlock"></module>
+
+    <module name="JavadocMethod">
+      <property name="scope" value="public"/>
+      <property name="allowMissingParamTags" value="true"/>
     </module>
 
-    <!-- Checks whether files end with a new line.                        -->
-    <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
-    <!-- JEXL-20: tried every combination on a Mac to no avail...
-    <module name="NewlineAtEndOfFile">
-        <property name="lineSeparator" value="lf"/>
-    </module>
-    -->
+    <module name="SuppressionCommentFilter"/>
 
-    <!-- Checks that property files contain the same keys.         -->
-    <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
-    <module name="Translation"/>
-
-
-    <!-- Checks for Headers                              -->
-    <!-- See http://checkstyle.sf.net/config_header.html -->
-    <module name="Header">
-        <!-- The follow property value demonstrates the ability     -->
-        <!-- to have access to ANT properties. In this case it uses -->
-        <!-- the ${basedir} property to allow Checkstyle to be run  -->
-        <!-- from any directory within a project. See property      -->
-        <!-- expansion,                                             -->
-        <!-- http://checkstyle.sf.net/config.html#properties        -->
-        <!-- <property                                              -->
-        <!--     name="headerFile"                                  -->
-        <!--     value="${basedir}/java.header"/>                   -->
-        <property name="headerFile" value="${checkstyle.header.file}"/>
-        <property name="ignoreLines" value="2"/>
-        <property name="fileExtensions" value="java,xml"/>
-    </module>
-               
-    <!-- See http://checkstyle.sf.net/config_sizes.html -->
-    <module name="FileLength"/>
-
-    <module name="TreeWalker">
-
-        <property name="cacheFile" value="${checkstyle.cache.file}"/>
-
-        <!-- Checks for Javadoc comments.                     -->
-        <!-- See http://checkstyle.sf.net/config_javadoc.html -->
-        <!-- JEXL-20: many of those by API choice -->
-        <module name="JavadocMethod">
-           <property name="allowUndeclaredRTE" value="true"/>
-        </module>
-        <module name="JavadocType"/>
-        <module name="JavadocVariable"/>
-        <module name="JavadocStyle"/>
-
-
-        <!-- Checks for Naming Conventions.                  -->
-        <!-- See http://checkstyle.sf.net/config_naming.html -->
-        <module name="ConstantName"/>
-        <module name="LocalFinalVariableName"/>
-        <module name="LocalVariableName"/>
-        <module name="MemberName"/>
-        <module name="MethodName"/>
-        <module name="PackageName"/>
-        <module name="ParameterName"/>
-        <module name="StaticVariableName"/>
-        <module name="TypeName"/>
-        
-        <!-- Checks for imports                              -->
-        <!-- See http://checkstyle.sf.net/config_import.html -->
-        <module name="AvoidStarImport"/>
-        <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
-        <module name="RedundantImport"/>
-        <module name="UnusedImports"/>
-
-
-        <!-- Checks for Size Violations.                    -->
-        <!-- See http://checkstyle.sf.net/config_sizes.html -->
-        <module name="LineLength">
-            <!--  JEXL: added max, ignore @version and @see -->
-            <property name="max" value="120"/>
-            <property name="ignorePattern" value="@version"/>
-            <property name="ignorePattern" value="@see"/>
-        </module>
-        <module name="MethodLength"/>
-        <module name="ParameterNumber"/>
-
-
-        <!-- Checks for whitespace                               -->
-        <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-        <module name="EmptyForIteratorPad"/>
-        <module name="GenericWhitespace"/>
-        <!-- <module name="NoWhitespaceAfter"/> -->
-        <!-- <module name="NoWhitespaceBefore"/> -->
-        <!-- <module name="WhitespaceAfter"/> -->
-        <!-- <module name="WhitespaceAround"/> -->
-        <module name="OperatorWrap"/>
-        <module name="ParenPad"/>
-        <module name="TypecastParenPad"/>
-
-
-        <!-- Modifier Checks                                    -->
-        <!-- See http://checkstyle.sf.net/config_modifiers.html -->
-        <module name="ModifierOrder"/>
-        <!-- too agressive module name="RedundantModifier"/-->
-
-
-        <!-- Checks for blocks. You know, those {}'s         -->
-        <!-- See http://checkstyle.sf.net/config_blocks.html -->
-        <module name="AvoidNestedBlocks"/>
-        <module name="EmptyBlock">
-            <property name="option" value="text"/>
-        </module>
-        <module name="LeftCurly"/>
-        <module name="NeedBraces"/>
-        <module name="RightCurly"/>
-
-
-        <!-- Checks for common coding problems               -->
-        <!-- See http://checkstyle.sf.net/config_coding.html -->
-        <!-- JEXL: module name="AvoidInlineConditionals"/-->
-        <module name="EmptyStatement"/>
-        <module name="EqualsHashCode"/>
-        <module name="HiddenField"/>
-        <module name="IllegalInstantiation"/>
-        <module name="InnerAssignment"/>
-        <module name="MagicNumber">
-            <property name="ignoreNumbers" value="-1, 0, 1, 2, 3"/>
-        </module>
-        <module name="MissingSwitchDefault"/>
-        <!-- JEXL-20: used in introspection -->
-        <!--<module name="RedundantThrows"/>-->
-        <module name="SimplifyBooleanExpression"/>
-        <module name="SimplifyBooleanReturn"/>
-
-        <!-- Checks for class design                         -->
-        <!-- See http://checkstyle.sf.net/config_design.html -->
-        <!-- JEXL: module name="DesignForExtension"/-->
-        <!-- JEXL: module name="FinalClass"/-->
-        <!-- JEXL: module name="HideUtilityClassConstructor"/-->
-        <module name="InterfaceIsType"/>
-        <module name="VisibilityModifier">
-            <property name="packageAllowed" value="true"/>
-            <property name="protectedAllowed" value="false"/>
-        </module>
-
-
-        <!-- Miscellaneous other checks.                   -->
-        <!-- See http://checkstyle.sf.net/config_misc.html -->
-        <module name="ArrayTypeStyle"/>
-        <!-- JEXL: module name="FinalParameters"/-->
-        <!-- JEXL: module name="GenericIllegalRegexp">
-            <property name="format" value="\s+$"/>
-            <property name="message" value="Line has trailing spaces."/>
-        </module-->
-        <!--module name="TodoComment"/-->
-        <module name="UpperEll"/>
-        
-        <!-- used for suppression comment filter -->
-
-        <module name="SuppressionCommentFilter">
-            <property name="offCommentFormat" value="CSOFF\: ([\w\|]+)"/>
-            <property name="onCommentFormat" value="CSON\: ([\w\|]+)"/>
-            <property name="checkFormat" value="$1"/>
-        </module>
+    <!--
+        Allow comment to suppress checkstyle for a single line
+        e.g. // CHECKSTYLE IGNORE MagicNumber
+     -->
+    <module name="SuppressWithNearbyCommentFilter">
+      <property name="commentFormat" value="CHECKSTYLE IGNORE (\w+)"/>
+      <property name="checkFormat" value="$1"/>
     </module>
 
+  </module>
+
+  <module name="SuppressionFilter">
+    <!-- config_loc is used by Eclipse plugin -->
+    <property name="file" value="${config_loc}/checkstyle-suppressions.xml"/>
+  </module>
 
 </module>
+
