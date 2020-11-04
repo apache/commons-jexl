@@ -355,18 +355,6 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${commons.jacoco.version}</version>
-                <configuration>
-                    <excludes>
-                            <exclude>**/generated-sources/**/*</exclude>
-                            <exclude>**/org/apache/commons/jexl3/parser/*.class</exclude>
-                            <exclude>**/org/apache/commons/jexl3/**/*Test.class</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
         </plugins>
     </reporting>
 
