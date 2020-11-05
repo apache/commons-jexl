@@ -133,14 +133,14 @@
                         <p>Pragma keys can be identifiers or antish names, pragma values can be literals (boolean, integer,
                             real, string, null, NaN) and antish names</p>
                         <p>Although pragmas are statements, they are <em>not</em> evaluated at runtime; they are constants
-                            associated to the script after parsing. It is expected that user code accesses the pragma map from 
+                            associated to the script after parsing. It is expected that user code accesses the pragma map from
                             scripts to alter some functions behavior.</p>
                         <p>The are two built-in pragmas:</p>
                         <p>
                             <b>jexl.options</b> overrides the evaluation options using the option-flags syntax.
                             <code>#pragma jexl.options "+strict -safe +lexical +lexicalShade"</code> will let the script run with
                             the options strict being true, safe false, lexical true and lexical-shade true.</p>
-                                
+
                         <p>
                             <b>jexl.namespace.<i>ns_prefix</i></b> declares a namespace valid for the script
                             execution lifetime, the value being the fully-qualified namespace class-name.
@@ -360,11 +360,11 @@
                         <code>'Hello world'</code> are equivalent.
                         <p>The escape character is <code>\</code> (backslash).
                         Unicode characters can be used in string literals;
-                            <lu>Unicode escape sequences consist of:
+                            <ul>Unicode escape sequences consist of:
                                 <li> a backslash '\' </li>
                                 <li>a 'u' </li>
                                 <li>4 hexadecimal digits ([0-9],[A-H],[a-h]).</li>
-                            </lu>
+                            </ul>
                             Such sequences represent the UTF-16 encoding of a Unicode character,
                             for example, <code>'a'</code> is equivalent to <code>'\u0061'</code>.
                         </p>
