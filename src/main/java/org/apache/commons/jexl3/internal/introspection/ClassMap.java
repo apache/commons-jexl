@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentMap;
  * <p>
  * Originally taken from the Velocity tree so we can be self-sufficient.
  * </p>
+ *
  * @see MethodKey
  * @since 1.0
  */
@@ -46,6 +47,7 @@ final class ClassMap {
     /**
      * A method that returns itself used as a marker for cache miss,
      * allows the underlying cache map to be strongly typed.
+     *
      * @return itself as a method
      */
     public static Method cacheMiss() {
@@ -57,7 +59,9 @@ final class ClassMap {
         }
     }
 
-    /** The cache miss marker method. */
+    /**
+     * The cache miss marker method.
+     */
     private static final Method CACHE_MISS = cacheMiss();
     /**
      * This is the cache to store and look up the method information.
@@ -73,11 +77,11 @@ final class ClassMap {
      * </p>
      * Uses ConcurrentMap since 3.0, marginally faster than 2.1 under contention.
      */
-    private final ConcurrentMap<MethodKey, Method> byKey = new ConcurrentHashMap<MethodKey, Method>();
+    private final ConcurrentMap<MethodKey, Method> byKey = new ConcurrentHashMap<>();
     /**
      * Keep track of all methods with the same name; this is not modified after creation.
      */
-    private final Map<String, Method[]> byName = new HashMap<String, Method[]>();
+    private final Map<String, Method[]> byName = new HashMap<>();
     /**
      * Cache of fields.
      */
@@ -86,9 +90,9 @@ final class ClassMap {
     /**
      * Standard constructor.
      *
-     * @param aClass the class to deconstruct.
+     * @param aClass      the class to deconstruct.
      * @param permissions the permissions to apply during introspection
-     * @param log    the logger.
+     * @param log         the logger.
      */
     @SuppressWarnings("LeakingThisInConstructor")
     ClassMap(Class<?> aClass, Permissions permissions, Log log) {
@@ -97,7 +101,7 @@ final class ClassMap {
         // eagerly cache public fields
         Field[] fields = aClass.getFields();
         if (fields.length > 0) {
-            Map<String, Field> cache = new HashMap<String, Field>();
+            Map<String, Field> cache = new HashMap<>();
             for (Field field : fields) {
                 if (permissions.allow(field)) {
                     cache.put(field.getName(), field);
@@ -111,6 +115,7 @@ final class ClassMap {
 
     /**
      * Find a Field using its name.
+     *
      * @param fname the field name
      * @return A Field object representing the field to invoke or null.
      */
@@ -120,6 +125,7 @@ final class ClassMap {
 
     /**
      * Gets the field names cached by this map.
+     *
      * @return the array of field names
      */
     String[] getFieldNames() {
@@ -128,6 +134,7 @@ final class ClassMap {
 
     /**
      * Gets the methods names cached by this map.
+     *
      * @return the array of method names
      */
     String[] getMethodNames() {
@@ -136,6 +143,7 @@ final class ClassMap {
 
     /**
      * Gets all the methods with a given name from this map.
+     *
      * @param methodName the seeked methods name
      * @return the array of methods (null or non-empty)
      */
@@ -160,6 +168,7 @@ final class ClassMap {
      * If nothing is found, then we must actually go
      * and introspect the method from the MethodMap.
      * </p>
+     *
      * @param methodKey the method key
      * @return A Method object representing the method to invoke or null.
      * @throws MethodKey.AmbiguousException When more than one method is a match for the parameters.
@@ -196,6 +205,7 @@ final class ClassMap {
     /**
      * Populate the Map of direct hits. These are taken from all the public methods
      * that our class, its parents and their implemented interfaces provide.
+     *
      * @param cache          the ClassMap instance we create
      * @param permissions    the permissions to apply during introspection
      * @param classToReflect the class to cache
@@ -221,15 +231,10 @@ final class ClassMap {
         }
         // now that we've got all methods keyed in, lets organize them by name
         if (!cache.byKey.isEmpty()) {
-            List<Method> lm = new ArrayList<Method>(cache.byKey.size());
+            List<Method> lm = new ArrayList<>(cache.byKey.size());
             lm.addAll(cache.byKey.values());
             // sort all methods by name
-            lm.sort(new Comparator<Method>() {
-                @Override
-                public int compare(Method o1, Method o2) {
-                    return o1.getName().compareTo(o2.getName());
-                }
-            });
+            lm.sort(Comparator.comparing(Method::getName));
             // put all lists of methods with same name in byName cache
             int start = 0;
             while (start < lm.size()) {
@@ -252,10 +257,11 @@ final class ClassMap {
 
     /**
      * Recurses up interface hierarchy to get all super interfaces.
-     * @param cache the cache to fill
+     *
+     * @param cache       the cache to fill
      * @param permissions the permissions to apply during introspection
-     * @param iface the interface to populate the cache from
-     * @param log   the Log
+     * @param iface       the interface to populate the cache from
+     * @param log         the Log
      */
     private static void populateWithInterface(ClassMap cache, Permissions permissions, Class<?> iface, Log log) {
         if (Modifier.isPublic(iface.getModifiers())) {
@@ -269,10 +275,11 @@ final class ClassMap {
 
     /**
      * Recurses up class hierarchy to get all super classes.
-     * @param cache the cache to fill
+     *
+     * @param cache       the cache to fill
      * @param permissions the permissions to apply during introspection
-     * @param clazz the class to populate the cache from
-     * @param log   the Log
+     * @param clazz       the class to populate the cache from
+     * @param log         the Log
      */
     private static void populateWithClass(ClassMap cache, Permissions permissions, Class<?> clazz, Log log) {
         try {
