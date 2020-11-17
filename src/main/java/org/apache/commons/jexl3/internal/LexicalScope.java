@@ -23,30 +23,39 @@ import java.util.BitSet;
  * <p>The symbol identifiers are determined by the functional scope.
  */
 public class LexicalScope {
-    /** Number of bits in a long. */
+    /**
+     * Number of bits in a long.
+     */
     protected static final int LONGBITS = 64;
-    /** The mask of symbols in the frame. */
+    /**
+     * The mask of symbols in the frame.
+     */
     protected long symbols = 0L;
-    /** Symbols after 64. */
+    /**
+     * Symbols after 64.
+     */
     protected BitSet moreSymbols = null;
 
     /**
      * Create a scope.
      */
-    public LexicalScope() {}
-        
+    public LexicalScope() {
+    }
+
     /**
      * Frame copy ctor base.
-     * @param s the symbols mask
+     *
+     * @param s  the symbols mask
      * @param ms the more symbols bitset
      */
     protected LexicalScope(long s, BitSet ms) {
         symbols = s;
-        moreSymbols = ms != null? (BitSet) ms.clone() : null;
+        moreSymbols = ms != null ? (BitSet) ms.clone() : null;
     }
-    
+
     /**
      * Ensure more symbpls can be stored.
+     *
      * @return the set of more symbols
      */
     protected final BitSet moreSymbols() {
@@ -58,6 +67,7 @@ public class LexicalScope {
 
     /**
      * Checks whether a symbol has already been declared.
+     *
      * @param symbol the symbol
      * @return true if declared, false otherwise
      */
@@ -71,10 +81,11 @@ public class LexicalScope {
 
     /**
      * Adds a symbol in this scope.
+     *
      * @param symbol the symbol
      * @return true if registered, false if symbol was already registered
      */
-    public final boolean addSymbol(int symbol) {
+    public boolean addSymbol(int symbol) {
         if (symbol < LONGBITS) {
             if ((symbols & (1L << symbol)) != 0L) {
                 return false;
@@ -92,9 +103,35 @@ public class LexicalScope {
     }
 
     /**
+     * Clear all symbols.
+     *
+     * @param cleanSymbol a (optional, may be null) functor to call for each cleaned symbol
+     */
+    public final void clearSymbols(java.util.function.IntConsumer cleanSymbol) {
+        // undefine symbols getting out of scope
+        if (cleanSymbol != null) {
+            long clean = symbols;
+            while (clean != 0L) {
+                int s = Long.numberOfTrailingZeros(clean);
+                clean &= ~(1L << s);
+                cleanSymbol.accept(s);
+            }
+        }
+        symbols = 0L;
+        if (moreSymbols != null) {
+            if (cleanSymbol != null) {
+                for (int s = moreSymbols.nextSetBit(0); s != -1; s = moreSymbols.nextSetBit(s + 1)) {
+                    cleanSymbol.accept(s + LONGBITS);
+                }
+            }
+            moreSymbols.clear();
+        }
+    }
+
+    /**
      * @return the number of symbols defined in this scope.
      */
     public int getSymbolCount() {
-        return Long.bitCount(symbols) + (moreSymbols == null? 0 : moreSymbols.cardinality());
+        return Long.bitCount(symbols) + (moreSymbols == null ? 0 : moreSymbols.cardinality());
     }
 }

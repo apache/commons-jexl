@@ -57,50 +57,50 @@ public class TemplateInterpreter extends Interpreter {
         TemplateExpression[] expressions;
         /** The writer. */
         Writer out;
-        
+
         /**
          * Sole ctor.
          * @param e the JEXL engine
-         */  
+         */
         Arguments(Engine e) {
             this.jexl = e;
-        } 
+        }
         /**
          * Sets the options.
          * @param o the options
          * @return this instance
-         */         
+         */
         Arguments options(JexlOptions o) {
             this.options = o;
             return this;
-        } 
+        }
         /**
          * Sets the context.
          * @param j the context
          * @return this instance
-         */      
+         */
         Arguments context(JexlContext j) {
             this.jcontext = j;
             return this;
-        } 
+        }
         /**
          * Sets the frame.
          * @param f the frame
          * @return this instance
-         */        
+         */
         Arguments frame(Frame f) {
             this.jframe = f;
             return this;
-        }  
+        }
         /**
          * Sets the expressions.
          * @param e the expressions
          * @return this instance
-         */  
+         */
         Arguments expressions(TemplateExpression[] e) {
             this.expressions = e;
             return this;
-        }   
+        }
         /**
          * Sets the writer.
          * @param o the writer
@@ -111,7 +111,7 @@ public class TemplateInterpreter extends Interpreter {
             return this;
         }
     }
-    
+
     /**
      * Creates a template interpreter instance.
      * @param args the template interpreter arguments
