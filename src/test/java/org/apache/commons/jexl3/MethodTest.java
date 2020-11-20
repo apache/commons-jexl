@@ -104,7 +104,6 @@ public class MethodTest extends JexlTestCase {
         final Map<String, Object> funcs;
 
         EnhancedContext(Map<String, Object> funcs) {
-            super();
             this.funcs = funcs;
         }
 

@@ -289,7 +289,6 @@ public class LexicalTest {
     
     public static class DebugContext extends MapContext {
         public DebugContext() {
-            super();
         }
         public Object debug(Object arg) {
             return arg;

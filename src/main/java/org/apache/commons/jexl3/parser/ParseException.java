@@ -65,7 +65,6 @@ public class ParseException extends Exception implements JavaccError {
      * Default ctor.
      */
     public ParseException() {
-        super();
     }
 
     /** Constructor with message. */

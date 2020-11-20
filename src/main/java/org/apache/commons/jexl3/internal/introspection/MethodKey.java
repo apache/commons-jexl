@@ -65,7 +65,6 @@ public final class MethodKey {
      * @param args    the intended method arguments
      */
     public MethodKey(String aMethod, Object[] args) {
-        super();
         // !! keep this in sync with the other ctor (hash code) !!
         this.method = aMethod;
         int hash = this.method.hashCode();
@@ -108,7 +107,6 @@ public final class MethodKey {
      * @param args    the intended method parameters
      */
     MethodKey(String aMethod, Class<?>[] args) {
-        super();
         // !! keep this in sync with the other ctor (hash code) !!
         this.method = aMethod.intern();
         int hash = this.method.hashCode();
