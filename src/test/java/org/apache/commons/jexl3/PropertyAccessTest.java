@@ -523,15 +523,14 @@ public class PropertyAccessTest extends JexlTestCase {
         JexlEngine jexl = new JexlBuilder().strict(true).safe(true).create();
         JexlContext ctxt = new MapContext();
         JexlScript script;
-        Object result = null;
         Prompt p0 = new Prompt();
         p0.set("stuff", 42);
         ctxt.set("$in", p0);
 
         // unprotected navigation
         script = jexl.createScript("$in[p].intValue()", "p");
-            result = script.execute(ctxt, "fail");
-         Assert.assertNull(result);
+        Object result = script.execute(ctxt, "fail");
+        Assert.assertNull(result);
 
         result = script.execute(ctxt, "stuff");
         Assert.assertEquals(42, result);
@@ -540,17 +539,16 @@ public class PropertyAccessTest extends JexlTestCase {
         // unprotected navigation
         script = jexl.createScript("$in.`${p}`.intValue()", "p");
         result = script.execute(ctxt, "fail");
-         Assert.assertNull(result);
+        Assert.assertNull(result);
         result = script.execute(ctxt, "stuff");
         Assert.assertEquals(42, result);
 
         // protected navigation
         script = jexl.createScript("$in.`${p}`?.intValue()", "p");
         result = script.execute(ctxt, "fail");
-         Assert.assertNull(result);
+        Assert.assertNull(result);
         result = script.execute(ctxt, "stuff");
         Assert.assertEquals(42, result);
-
     }
 
 }

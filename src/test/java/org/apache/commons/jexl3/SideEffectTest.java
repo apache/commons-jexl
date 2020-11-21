@@ -585,11 +585,10 @@ public class SideEffectTest extends JexlTestCase {
         JexlScript script = jexl.createScript("z += x", "x");
         MapContext ctx = new MapContext();
         List<String> z = new ArrayList<String>(1);
-        Object zz = null;
 
         // no ambiguous, std case
         ctx.set("z", z);
-        zz = script.execute(ctx, "42");
+        Object zz = script.execute(ctx, "42");
         Assert.assertSame(zz, z);
         Assert.assertEquals(1, z.size());
         z.clear();

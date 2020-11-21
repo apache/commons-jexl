@@ -373,7 +373,6 @@ public class Issues200Test extends JexlTestCase {
         };
         ctx.set("java.version", 10);
         JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
-        Object result = null;
         JexlScript script;
         script = engine.createScript("java = 3");
         try {
@@ -383,8 +382,7 @@ public class Issues200Test extends JexlTestCase {
             // expected
         }
         script = engine.createScript("java.version");
-        result = script.execute(ctx);
-        Assert.assertEquals(10, result);
+        Assert.assertEquals(10, script.execute(ctx));
     }
 
     @Test
@@ -576,8 +574,7 @@ public class Issues200Test extends JexlTestCase {
         JexlEngine jexl = new JexlBuilder().strict(true).safe(true).stackOverflow(5).create();
         JexlContext ctxt = new MapContext();
         JexlScript script= jexl.createScript("var f = (x)->{ x > 1? x * f(x - 1) : x }; f(a)", "a");
-        Object result = null;
-        result = script.execute(ctxt, 3);
+        Object result = script.execute(ctxt, 3);
         Assert.assertEquals(6, result);
         try {
             result = script.execute(ctxt, 32);
@@ -879,7 +876,7 @@ public class Issues200Test extends JexlTestCase {
         JexlEngine jexl = new JexlBuilder().strict(true).create();
         String src;
         JexlScript script;
-        Object result = null;
+        Object result;
         // declared, not defined
         src = "x = 1; if (false) var x = 2; x";
         script = jexl.createScript(src);

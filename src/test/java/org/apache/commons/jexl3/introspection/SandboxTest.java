@@ -217,7 +217,7 @@ public class SandboxTest extends JexlTestCase {
         JexlContext jc = new MapContext();
         String expr = "foo.doIt()";
         JexlScript script;
-        Object result = null;
+        Object result;
 
         JexlSandbox sandbox = new JexlSandbox(false);
         sandbox.allow(Foo.class.getName());
