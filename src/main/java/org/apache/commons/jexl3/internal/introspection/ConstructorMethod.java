@@ -36,7 +36,7 @@ public final class ConstructorMethod implements JexlMethod {
      * @param args constructor arguments
      * @return a {@link JexlMethod}
      */
-    public static ConstructorMethod discover(Introspector is, Object ctorHandle, Object... args) {
+    public static ConstructorMethod discover(final Introspector is, final Object ctorHandle, final Object... args) {
         String className;
         Class<?> clazz = null;
         if (ctorHandle instanceof Class<?>) {
@@ -47,7 +47,7 @@ public final class ConstructorMethod implements JexlMethod {
         } else {
             return null;
         }
-        Constructor<?> ctor = is.getConstructor(clazz, new MethodKey(className, args));
+        final Constructor<?> ctor = is.getConstructor(clazz, new MethodKey(className, args));
         if (ctor != null) {
             return new ConstructorMethod(ctor);
         } else {
@@ -58,13 +58,13 @@ public final class ConstructorMethod implements JexlMethod {
      * Creates a constructor method.
      * @param theCtor the constructor to wrap
      */
-    ConstructorMethod(Constructor<?> theCtor) {
+    ConstructorMethod(final Constructor<?> theCtor) {
         this.ctor = theCtor;
     }
 
     @Override
-    public Object invoke(Object obj, Object... params) throws Exception {
-        Class<?> ctorClass = ctor.getDeclaringClass();
+    public Object invoke(final Object obj, final Object... params) throws Exception {
+        final Class<?> ctorClass = ctor.getDeclaringClass();
         boolean invoke = true;
         if (obj != null) {
             if (obj instanceof Class<?>) {
@@ -80,9 +80,9 @@ public final class ConstructorMethod implements JexlMethod {
     }
 
     @Override
-    public Object tryInvoke(String name, Object obj, Object... params) {
+    public Object tryInvoke(final String name, final Object obj, final Object... params) {
         try {
-            Class<?> ctorClass = ctor.getDeclaringClass();
+            final Class<?> ctorClass = ctor.getDeclaringClass();
             boolean invoke = true;
             if (obj != null) {
                 if (obj instanceof Class<?>) {
@@ -97,14 +97,14 @@ public final class ConstructorMethod implements JexlMethod {
             }
         } catch (InstantiationException | IllegalArgumentException | IllegalAccessException xinstance) {
             return Uberspect.TRY_FAILED;
-        } catch (InvocationTargetException xinvoke) {
+        } catch (final InvocationTargetException xinvoke) {
             throw JexlException.tryFailed(xinvoke); // throw
         }
         return Uberspect.TRY_FAILED;
     }
 
     @Override
-    public boolean tryFailed(Object rval) {
+    public boolean tryFailed(final Object rval) {
         return rval == Uberspect.TRY_FAILED;
     }
 

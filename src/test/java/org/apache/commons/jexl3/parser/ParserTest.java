@@ -36,7 +36,7 @@ public class ParserTest {
      */
     @Test
     public void testParse() throws Exception {
-        Parser parser = new Parser(new StringReader(";"));
+        final Parser parser = new Parser(new StringReader(";"));
         JexlNode sn;
         sn = parser.parse(null, FEATURES, "foo = 1;", null);
         Assert.assertNotNull("parsed node is null", sn);
@@ -50,40 +50,40 @@ public class ParserTest {
 
     @Test
     public void testErrorAssign() throws Exception {
-        String[] ops = { "=", "+=", "-=", "/=", "*=", "^=", "&=", "|=" };
-        for(String op : ops) {
-            Parser parser = new Parser(new StringReader(";"));
+        final String[] ops = { "=", "+=", "-=", "/=", "*=", "^=", "&=", "|=" };
+        for(final String op : ops) {
+            final Parser parser = new Parser(new StringReader(";"));
             try {
-                JexlNode sn = parser.parse(null, FEATURES, "foo() "+op+" 1;", null);
+                final JexlNode sn = parser.parse(null, FEATURES, "foo() "+op+" 1;", null);
                 Assert.fail("should have failed on invalid assignment " + op);
-            } catch (JexlException.Parsing xparse) {
+            } catch (final JexlException.Parsing xparse) {
                 // ok
-                String ss = xparse.getDetail();
-                String sss = xparse.toString();
+                final String ss = xparse.getDetail();
+                final String sss = xparse.toString();
             }
         }
     }
 
     @Test
     public void testErrorAmbiguous() throws Exception {
-        Parser parser = new Parser(new StringReader(";"));
+        final Parser parser = new Parser(new StringReader(";"));
         try {
-            JexlNode sn = parser.parse(null, FEATURES, "x = 1 y = 5", null);
+            final JexlNode sn = parser.parse(null, FEATURES, "x = 1 y = 5", null);
             Assert.fail("should have failed on ambiguous statement");
-        } catch (JexlException.Ambiguous xambiguous) {
+        } catch (final JexlException.Ambiguous xambiguous) {
             // ok
-        } catch(JexlException xother) {
+        } catch(final JexlException xother) {
             Assert.fail(xother.toString());
         }
     }
         
     @Test
     public void testIdentifierEscape() {
-        String[] ids = new String[]{"a\\ b", "a\\ b\\ c", "a\\'b\\\"c", "a\\ \\ c"};
-        for(String id : ids) {
-            String esc0 = StringParser.unescapeIdentifier(id);
+        final String[] ids = new String[]{"a\\ b", "a\\ b\\ c", "a\\'b\\\"c", "a\\ \\ c"};
+        for(final String id : ids) {
+            final String esc0 = StringParser.unescapeIdentifier(id);
             Assert.assertFalse(esc0.contains("\\"));
-            String esc1 = StringParser.escapeIdentifier(esc0);
+            final String esc1 = StringParser.escapeIdentifier(esc0);
             Assert.assertEquals(id, esc1);
         }
     }
@@ -95,7 +95,7 @@ public class ParserTest {
     public void testControlCharacters() {
         // Both '' and "" are valid JEXL string
         // The array of tuples where the first element is an expected result and the second element is a test string.
-        String[][] strings = new String[][] {
+        final String[][] strings = new String[][] {
             new String[] {"a\nb\tc", "'a\nb\tc'"}, // we still honor the actual characters
             new String[] {"a\nb\tc", "'a\\nb\\tc'"},
             new String[] {"a\nb\tc", "\"a\\nb\\tc\""},
@@ -104,8 +104,8 @@ public class ParserTest {
             new String[] {"\"hi\"", "'\"hi\"'"},
             new String[] {"\"hi\"", "'\"hi\"'"},
         };
-        for(String[] pair: strings) {
-            String output = StringParser.buildString(pair[1], true);
+        for(final String[] pair: strings) {
+            final String output = StringParser.buildString(pair[1], true);
             Assert.assertEquals(pair[0], output);
         }
     }

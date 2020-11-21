@@ -54,9 +54,9 @@ public class SideEffectTest extends JexlTestCase {
 
     @Test
     public void testSideEffectVar() throws Exception {
-        Map<String,Object> context = asserter.getVariables();
-        Integer i41 = Integer.valueOf(4141);
-        Object foo = i41;
+        final Map<String,Object> context = asserter.getVariables();
+        final Integer i41 = Integer.valueOf(4141);
+        final Object foo = i41;
 
         context.put("foo", foo);
         asserter.assertExpression("foo += 2", i41 + 2);
@@ -93,9 +93,9 @@ public class SideEffectTest extends JexlTestCase {
 
     @Test
     public void testSideEffectVarDots() throws Exception {
-        Map<String,Object> context = asserter.getVariables();
-        Integer i41 = Integer.valueOf(4141);
-        Object foo = i41;
+        final Map<String,Object> context = asserter.getVariables();
+        final Integer i41 = Integer.valueOf(4141);
+        final Object foo = i41;
 
         context.put("foo.bar.quux", foo);
         asserter.assertExpression("foo.bar.quux += 2", i41 + 2);
@@ -132,12 +132,12 @@ public class SideEffectTest extends JexlTestCase {
 
     @Test
     public void testSideEffectArray() throws Exception {
-        Integer i41 = Integer.valueOf(4141);
-        Integer i42 = Integer.valueOf(42);
-        Integer i43 = Integer.valueOf(43);
-        String s42 = "fourty-two";
-        String s43 = "fourty-three";
-        Object[] foo = new Object[3];
+        final Integer i41 = Integer.valueOf(4141);
+        final Integer i42 = Integer.valueOf(42);
+        final Integer i43 = Integer.valueOf(43);
+        final String s42 = "fourty-two";
+        final String s43 = "fourty-three";
+        final Object[] foo = new Object[3];
         foo[1] = i42;
         foo[2] = i43;
         asserter.setVariable("foo", foo);
@@ -169,12 +169,12 @@ public class SideEffectTest extends JexlTestCase {
 
     @Test
     public void testSideEffectDotArray() throws Exception {
-        Integer i41 = Integer.valueOf(4141);
-        Integer i42 = Integer.valueOf(42);
-        Integer i43 = Integer.valueOf(43);
-        String s42 = "fourty-two";
-        String s43 = "fourty-three";
-        Object[] foo = new Object[3];
+        final Integer i41 = Integer.valueOf(4141);
+        final Integer i42 = Integer.valueOf(42);
+        final Integer i43 = Integer.valueOf(43);
+        final String s42 = "fourty-two";
+        final String s43 = "fourty-three";
+        final Object[] foo = new Object[3];
         foo[1] = i42;
         foo[2] = i43;
         asserter.setVariable("foo", foo);
@@ -206,10 +206,10 @@ public class SideEffectTest extends JexlTestCase {
 
     @Test
     public void testSideEffectAntishArray() throws Exception {
-        Integer i41 = Integer.valueOf(4141);
-        Integer i42 = Integer.valueOf(42);
-        Integer i43 = Integer.valueOf(43);
-        Object[] foo = new Object[3];
+        final Integer i41 = Integer.valueOf(4141);
+        final Integer i42 = Integer.valueOf(42);
+        final Integer i43 = Integer.valueOf(43);
+        final Object[] foo = new Object[3];
         foo[1] = i42;
         foo[2] = i43;
         asserter.setVariable("foo.bar", foo);
@@ -241,7 +241,7 @@ public class SideEffectTest extends JexlTestCase {
 
     public static class Foo {
         int value;
-        Foo(int v) {
+        Foo(final int v) {
             value = v;
         }
 
@@ -250,26 +250,26 @@ public class SideEffectTest extends JexlTestCase {
             return Integer.toString(value);
         }
 
-        public void setValue(long v) {
+        public void setValue(final long v) {
             value = (int) v;
         }
         public int getValue() {
             return value;
         }
 
-        public void setBar(int x, long v) {
+        public void setBar(final int x, final long v) {
             value = (int) v + x;
         }
 
-        public int getBar(int x) {
+        public int getBar(final int x) {
             return value + x;
         }
     }
 
     @Test
     public void testSideEffectBean() throws Exception {
-        Integer i41 = Integer.valueOf(4141);
-        Foo foo = new Foo(0);
+        final Integer i41 = Integer.valueOf(4141);
+        final Foo foo = new Foo(0);
         asserter.setVariable("foo", foo);
         foo.value = i41;
         asserter.assertExpression("foo.value += 2", i41 + 2);
@@ -299,8 +299,8 @@ public class SideEffectTest extends JexlTestCase {
 
     @Test
     public void testSideEffectBeanContainer() throws Exception {
-        Integer i41 = Integer.valueOf(4141);
-        Foo foo = new Foo(0);
+        final Integer i41 = Integer.valueOf(4141);
+        final Foo foo = new Foo(0);
         asserter.setVariable("foo", foo);
         foo.value = i41;
         asserter.assertExpression("foo.bar[0] += 2", i41 + 2);
@@ -333,26 +333,26 @@ public class SideEffectTest extends JexlTestCase {
 
     @Test
     public void testArithmeticSelf() throws Exception {
-        JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
-        JexlContext jc = null;
+        final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
+        final JexlContext jc = null;
         runSelfOverload(jexl, jc);
         runSelfOverload(jexl, jc);
     }
 
     @Test
     public void testArithmeticSelfNoCache() throws Exception {
-        JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new SelfArithmetic(false)).create();
-        JexlContext jc = null;
+        final JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new SelfArithmetic(false)).create();
+        final JexlContext jc = null;
         runSelfOverload(jexl, jc);
     }
 
-    protected void runSelfOverload(JexlEngine jexl, JexlContext jc) {
+    protected void runSelfOverload(final JexlEngine jexl, final JexlContext jc) {
         JexlScript script;
         Object result;
         script = jexl.createScript("(x, y)->{ x += y }");
         result = script.execute(jc, 3115, 15);
         Assert.assertEquals(3115 + 15,  result);
-        Var v0 = new Var(3115);
+        final Var v0 = new Var(3115);
         result = script.execute(jc, v0, new Var(15));
         Assert.assertEquals(result, v0);
         Assert.assertEquals(3115 + 15,  v0.value);
@@ -360,7 +360,7 @@ public class SideEffectTest extends JexlTestCase {
         script = jexl.createScript("(x, y)->{ x -= y}");
         result = script.execute(jc, 3115, 15);
         Assert.assertEquals(3115 - 15,  result);
-        Var v1 = new Var(3115);
+        final Var v1 = new Var(3115);
         result = script.execute(jc, v1, new Var(15));
         Assert.assertNotEquals(result, v1); // not a real side effect
         Assert.assertEquals(3115 - 15,  ((Var) result).value);
@@ -368,7 +368,7 @@ public class SideEffectTest extends JexlTestCase {
         script = jexl.createScript("(x, y)->{ x *= y }");
         result = script.execute(jc, 3115, 15);
         Assert.assertEquals(3115 * 15,  result);
-        Var v2 = new Var(3115);
+        final Var v2 = new Var(3115);
         result = script.execute(jc, v2, new Var(15));
         Assert.assertEquals(result, v2);
         Assert.assertEquals(3115 * 15,  v2.value);
@@ -376,7 +376,7 @@ public class SideEffectTest extends JexlTestCase {
         script = jexl.createScript("(x, y)->{ x /= y }");
         result = script.execute(jc, 3115, 15);
         Assert.assertEquals(3115 / 15,  result);
-        Var v3 = new Var(3115);
+        final Var v3 = new Var(3115);
         result = script.execute(jc, v3, new Var(15));
         Assert.assertEquals(result, v3);
         Assert.assertEquals(3115 / 15,  v3.value);
@@ -384,7 +384,7 @@ public class SideEffectTest extends JexlTestCase {
         script = jexl.createScript("(x, y)->{ x %= y }");
         result = script.execute(jc, 3115, 15);
         Assert.assertEquals(3115 % 15,  result);
-        Var v4 = new Var(3115);
+        final Var v4 = new Var(3115);
         result = script.execute(jc, v4, new Var(15));
         Assert.assertEquals(result, v4);
         Assert.assertEquals(3115 % 15,  v4.value);
@@ -392,7 +392,7 @@ public class SideEffectTest extends JexlTestCase {
         script = jexl.createScript("(x, y)->{ x &= y }");
         result = script.execute(jc, 3115, 15);
         Assert.assertEquals(3115L & 15,  result);
-        Var v5 = new Var(3115);
+        final Var v5 = new Var(3115);
         result = script.execute(jc, v5, new Var(15));
         Assert.assertEquals(result, v5);
         Assert.assertEquals(3115 & 15,  v5.value);
@@ -400,7 +400,7 @@ public class SideEffectTest extends JexlTestCase {
         script = jexl.createScript("(x, y)->{ x |= y }");
         result = script.execute(jc, 3115, 15);
         Assert.assertEquals(3115L | 15,  result);
-        Var v6 = new Var(3115);
+        final Var v6 = new Var(3115);
         result = script.execute(jc, v6, new Var(15));
         Assert.assertEquals(result, v6);
         Assert.assertEquals(3115L | 15,  v6.value);
@@ -408,7 +408,7 @@ public class SideEffectTest extends JexlTestCase {
         script = jexl.createScript("(x, y)->{ x ^= y }");
         result = script.execute(jc, 3115, 15);
         Assert.assertEquals(3115L ^ 15,  result);
-        Var v7 = new Var(3115);
+        final Var v7 = new Var(3115);
         result = script.execute(jc, v7, new Var(15));
         Assert.assertEquals(result, v7);
         Assert.assertEquals(3115L ^ 15,  v7.value);
@@ -417,12 +417,12 @@ public class SideEffectTest extends JexlTestCase {
 
     @Test
     public void testOverrideGetSet() throws Exception {
-        JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
-        JexlContext jc = null;
+        final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new SelfArithmetic(false)).create();
+        final JexlContext jc = null;
 
         JexlScript script;
         Object result;
-        Var v0 = new Var(3115);
+        final Var v0 = new Var(3115);
         script = jexl.createScript("(x)->{ x.value}");
         result = script.execute(jc, v0);
         Assert.assertEquals(3115, result);
@@ -440,7 +440,7 @@ public class SideEffectTest extends JexlTestCase {
     public static class Var {
         int value;
 
-        Var(int v) {
+        Var(final int v) {
             value = v;
         }
 
@@ -452,74 +452,74 @@ public class SideEffectTest extends JexlTestCase {
 
     // an arithmetic that performs side effects
     public static class SelfArithmetic extends JexlArithmetic {
-        public SelfArithmetic(boolean strict) {
+        public SelfArithmetic(final boolean strict) {
             super(strict);
         }
 
-        public Object propertyGet(Var var, String property) {
+        public Object propertyGet(final Var var, final String property) {
             return "value".equals(property)? var.value : JexlEngine.TRY_FAILED;
         }
 
-        public Object propertySet(Var var, String property, int v) {
+        public Object propertySet(final Var var, final String property, final int v) {
             return "value".equals(property)? var.value = v : JexlEngine.TRY_FAILED;
         }
 
-        public Object arrayGet(Var var, String property) {
+        public Object arrayGet(final Var var, final String property) {
             return "VALUE".equals(property)? var.value : JexlEngine.TRY_FAILED;
         }
 
-        public Object arraySet(Var var, String property, int v) {
+        public Object arraySet(final Var var, final String property, final int v) {
             return "VALUE".equals(property)? var.value = v : JexlEngine.TRY_FAILED;
         }
 
-        public JexlOperator selfAdd(Var lhs, Var rhs) {
+        public JexlOperator selfAdd(final Var lhs, final Var rhs) {
             lhs.value += rhs.value;
             return JexlOperator.ASSIGN;
         }
 
         // for kicks, this one does not side effect but overloads nevertheless
-        public Var selfSubtract(Var lhs, Var rhs) {
+        public Var selfSubtract(final Var lhs, final Var rhs) {
             return new Var(lhs.value - rhs.value);
         }
 
-        public JexlOperator selfDivide(Var lhs, Var rhs) {
+        public JexlOperator selfDivide(final Var lhs, final Var rhs) {
             lhs.value /= rhs.value;
             return JexlOperator.ASSIGN;
         }
 
-        public JexlOperator selfMultiply(Var lhs, Var rhs) {
+        public JexlOperator selfMultiply(final Var lhs, final Var rhs) {
             lhs.value *= rhs.value;
             return JexlOperator.ASSIGN;
         }
 
-        public JexlOperator selfMod(Var lhs, Var rhs) {
+        public JexlOperator selfMod(final Var lhs, final Var rhs) {
             lhs.value %= rhs.value;
             return JexlOperator.ASSIGN;
         }
 
-        public Var and(Var lhs, Var rhs) {
+        public Var and(final Var lhs, final Var rhs) {
             return new Var(lhs.value & rhs.value);
         }
 
-        public JexlOperator selfAnd(Var lhs, Var rhs) {
+        public JexlOperator selfAnd(final Var lhs, final Var rhs) {
             lhs.value &= rhs.value;
             return JexlOperator.ASSIGN;
         }
 
-        public Var or(Var lhs, Var rhs) {
+        public Var or(final Var lhs, final Var rhs) {
             return new Var(lhs.value | rhs.value);
         }
 
-        public JexlOperator selfOr(Var lhs, Var rhs) {
+        public JexlOperator selfOr(final Var lhs, final Var rhs) {
             lhs.value |= rhs.value;
             return JexlOperator.ASSIGN;
         }
 
-        public Var xor(Var lhs, Var rhs) {
+        public Var xor(final Var lhs, final Var rhs) {
             return new Var(lhs.value ^ rhs.value);
         }
 
-        public JexlOperator selfXor(Var lhs, Var rhs) {
+        public JexlOperator selfXor(final Var lhs, final Var rhs) {
             lhs.value ^= rhs.value;
             return JexlOperator.ASSIGN;
         }
@@ -529,32 +529,32 @@ public class SideEffectTest extends JexlTestCase {
      * An arithmetic that implements 2 selfAdd methods.
      */
     public static class Arithmetic246 extends JexlArithmetic {
-        public Arithmetic246(boolean astrict) {
+        public Arithmetic246(final boolean astrict) {
             super(astrict);
         }
 
-        public JexlOperator selfAdd(Collection<String> c, String item) throws IOException {
+        public JexlOperator selfAdd(final Collection<String> c, final String item) throws IOException {
             c.add(item);
             return JexlOperator.ASSIGN;
         }
 
-        public JexlOperator selfAdd(Appendable c, String item) throws IOException {
+        public JexlOperator selfAdd(final Appendable c, final String item) throws IOException {
             c.append(item);
             return JexlOperator.ASSIGN;
         }
 
         @Override
-        public Object add(Object right, Object left) {
+        public Object add(final Object right, final Object left) {
             return super.add(left, right);
         }
     }
 
    public static class Arithmetic246b extends Arithmetic246 {
-        public Arithmetic246b(boolean astrict) {
+        public Arithmetic246b(final boolean astrict) {
             super(astrict);
         }
 
-        public Object selfAdd(Object c, String item) throws IOException {
+        public Object selfAdd(final Object c, final String item) throws IOException {
             if (c == null) {
                 return new ArrayList<String>(Collections.singletonList(item));
             }
@@ -576,14 +576,14 @@ public class SideEffectTest extends JexlTestCase {
         run246(new Arithmetic246b(true));
     }
 
-    private void run246(JexlArithmetic j246) throws Exception {
-        Log log246 = LogFactory.getLog(SideEffectTest.class);
+    private void run246(final JexlArithmetic j246) throws Exception {
+        final Log log246 = LogFactory.getLog(SideEffectTest.class);
         // quiesce the logger
-        java.util.logging.Logger ll246 = java.util.logging.LogManager.getLogManager().getLogger(SideEffectTest.class.getName());
+        final java.util.logging.Logger ll246 = java.util.logging.LogManager.getLogManager().getLogger(SideEffectTest.class.getName());
        // ll246.setLevel(Level.WARNING);
-        JexlEngine jexl = new JexlBuilder().arithmetic(j246).cache(32).debug(true).logger(log246).create();
-        JexlScript script = jexl.createScript("z += x", "x");
-        MapContext ctx = new MapContext();
+        final JexlEngine jexl = new JexlBuilder().arithmetic(j246).cache(32).debug(true).logger(log246).create();
+        final JexlScript script = jexl.createScript("z += x", "x");
+        final MapContext ctx = new MapContext();
         List<String> z = new ArrayList<String>(1);
 
         // no ambiguous, std case
@@ -617,20 +617,20 @@ public class SideEffectTest extends JexlTestCase {
 
     // an arithmetic that performs side effects
     public static class Arithmetic248 extends JexlArithmetic {
-        public Arithmetic248(boolean strict) {
+        public Arithmetic248(final boolean strict) {
             super(strict);
         }
 
-        public Object arrayGet(List<?> list, Collection<Integer> range) {
-            List<Object> rl = new ArrayList<Object>(range.size());
-            for(int i : range) {
+        public Object arrayGet(final List<?> list, final Collection<Integer> range) {
+            final List<Object> rl = new ArrayList<Object>(range.size());
+            for(final int i : range) {
                 rl.add(list.get(i));
             }
             return rl;
         }
 
-        public Object arraySet(List<Object> list, Collection<Integer> range, Object value) {
-            for(int i : range) {
+        public Object arraySet(final List<Object> list, final Collection<Integer> range, final Object value) {
+            for(final int i : range) {
                 list.set(i, value);
             }
             return list;
@@ -639,25 +639,25 @@ public class SideEffectTest extends JexlTestCase {
 
     @Test
     public void test248() throws Exception {
-        MapContext ctx = new MapContext();
-        List<Object> foo = new ArrayList<Object>(Arrays.asList(10, 20, 30, 40));
+        final MapContext ctx = new MapContext();
+        final List<Object> foo = new ArrayList<Object>(Arrays.asList(10, 20, 30, 40));
         ctx.set("foo", foo);
 
-        JexlEngine engine = new JexlBuilder().arithmetic(new Arithmetic248(true)).create();
-        JexlScript foo12 = engine.createScript("foo[1..2]");
+        final JexlEngine engine = new JexlBuilder().arithmetic(new Arithmetic248(true)).create();
+        final JexlScript foo12 = engine.createScript("foo[1..2]");
         try {
-            Object r = foo12.execute(ctx);
+            final Object r = foo12.execute(ctx);
             Assert.assertEquals(Arrays.asList(20, 30), r);
-        } catch (JexlException xp) {
+        } catch (final JexlException xp) {
             Assert.assertTrue(xp instanceof JexlException.Property);
         }
 
-        JexlScript foo12assign = engine.createScript("foo[1..2] = x", "x");
+        final JexlScript foo12assign = engine.createScript("foo[1..2] = x", "x");
         try {
-            Object r = foo12assign.execute(ctx, 25);
+            final Object r = foo12assign.execute(ctx, 25);
             Assert.assertEquals(25, r);
             Assert.assertEquals(Arrays.asList(10, 25, 25, 40), foo);
-        } catch (JexlException xp) {
+        } catch (final JexlException xp) {
             Assert.assertTrue(xp instanceof JexlException.Property);
         }
     }

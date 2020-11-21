@@ -44,11 +44,11 @@ public class JexlTestCase {
     /** A default JEXL engine instance. */
     protected final JexlEngine JEXL;
 
-    public JexlTestCase(String name) {
+    public JexlTestCase(final String name) {
         this(name, new JexlBuilder().cache(128).create());
     }
 
-    protected JexlTestCase(String name, JexlEngine jexl) {
+    protected JexlTestCase(final String name, final JexlEngine jexl) {
         //super(name);
         JEXL = jexl;
     }
@@ -66,7 +66,7 @@ public class JexlTestCase {
         return new JexlBuilder().create();
     }
     
-    public static JexlEngine createEngine(boolean lenient) {
+    public static JexlEngine createEngine(final boolean lenient) {
         return new JexlBuilder().arithmetic(new JexlArithmetic(!lenient)).cache(128).create();
     }
 
@@ -76,7 +76,7 @@ public class JexlTestCase {
      * testing them for equality with the origin.
      * @throws Exception
      */
-    public static void debuggerCheck(JexlEngine ijexl) throws Exception {
+    public static void debuggerCheck(final JexlEngine ijexl) throws Exception {
          Util.debuggerCheck(ijexl);
     }
 
@@ -85,7 +85,7 @@ public class JexlTestCase {
      * @param name the test method to run
      * @throws Exception if anything goes wrong
      */
-    public void runTest(String name) throws Exception {
+    public void runTest(final String name) throws Exception {
         if ("runTest".equals(name)) {
             return;
         }
@@ -93,7 +93,7 @@ public class JexlTestCase {
         try {
             method = this.getClass().getDeclaredMethod(name, NO_PARMS);
         }
-        catch(Exception xany) {
+        catch(final Exception xany) {
             Assert.fail("no such test: " + name);
             return;
         }
@@ -117,15 +117,15 @@ public class JexlTestCase {
      * @param mname the test class method
      * @throws Exception
      */
-    public static void runTest(String tname, String mname) throws Exception {
-        String testClassName = "org.apache.commons.jexl3."+tname;
+    public static void runTest(final String tname, final String mname) throws Exception {
+        final String testClassName = "org.apache.commons.jexl3."+tname;
         Class<JexlTestCase> clazz = null;
         JexlTestCase test = null;
         // find the class
         try {
             clazz = (Class<JexlTestCase>) Class.forName(testClassName);
         }
-        catch(ClassNotFoundException xclass) {
+        catch(final ClassNotFoundException xclass) {
             Assert.fail("no such class: " + testClassName);
             return;
         }
@@ -135,17 +135,17 @@ public class JexlTestCase {
             ctor = clazz.getConstructor(STRING_PARM);
             test = ctor.newInstance("debug");
         }
-        catch(NoSuchMethodException xctor) {
+        catch(final NoSuchMethodException xctor) {
             // instantiate default class ctor
             try {
                 test = clazz.newInstance();
             }
-            catch(Exception xany) {
+            catch(final Exception xany) {
                 Assert.fail("cant instantiate test: " + xany);
                 return;
             }
         }
-        catch(Exception xany) {
+        catch(final Exception xany) {
             Assert.fail("cant instantiate test: " + xany);
             return;
         }
@@ -158,7 +158,7 @@ public class JexlTestCase {
      * @param args where args[0] is the test class name and args[1] the test class method
      * @throws Exception
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         runTest(args[0], args[1]);
     }
 }

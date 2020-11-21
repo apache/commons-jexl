@@ -34,83 +34,83 @@ public class SetLiteralTest extends JexlTestCase {
         super("SetLiteralTest");
     }
 
-    private static Set<?> createSet(Object... args) {
+    private static Set<?> createSet(final Object... args) {
         return new HashSet<Object>(Arrays.asList(args));
     }
 
     @Test
     public void testSetLiteralWithStrings() throws Exception {
-        JexlExpression e = JEXL.createExpression("{ 'foo' , 'bar' }");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("{ 'foo' , 'bar' }");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
-        Set<?> check = createSet("foo", "bar");
+        final Object o = e.evaluate(jc);
+        final Set<?> check = createSet("foo", "bar");
         Assert.assertEquals(check, o);
     }
 
     @Test
     public void testLiteralWithOneEntry() throws Exception {
-        JexlExpression e = JEXL.createExpression("{ 'foo' }");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("{ 'foo' }");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
-        Set<?> check = createSet("foo");
+        final Object o = e.evaluate(jc);
+        final Set<?> check = createSet("foo");
         Assert.assertEquals(check, o);
     }
 
     @Test
     public void testSetLiteralWithStringsScript() throws Exception {
-        JexlScript e = JEXL.createScript("{ 'foo' , 'bar' }");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("{ 'foo' , 'bar' }");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.execute(jc);
-        Set<?> check = createSet("foo", "bar");
+        final Object o = e.execute(jc);
+        final Set<?> check = createSet("foo", "bar");
         Assert.assertEquals(check, o);
     }
 
     @Test
     public void testSetLiteralWithOneEntryScript() throws Exception {
-        JexlScript e = JEXL.createScript("{ 'foo' }");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("{ 'foo' }");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.execute(jc);
-        Set<?> check = createSet("foo");
+        final Object o = e.execute(jc);
+        final Set<?> check = createSet("foo");
         Assert.assertEquals(check, o);
     }
 
     @Test
     public void testSetLiteralWithOneEntryBlock() throws Exception {
-        JexlScript e = JEXL.createScript("{ { 'foo' }; }");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("{ { 'foo' }; }");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.execute(jc);
-        Set<?> check = createSet("foo");
+        final Object o = e.execute(jc);
+        final Set<?> check = createSet("foo");
         Assert.assertEquals(check, o);
     }
 
     @Test
     public void testSetLiteralWithOneNestedSet() throws Exception {
-        JexlScript e = JEXL.createScript("{ { 'foo' } }");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("{ { 'foo' } }");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.execute(jc);
-        Set<?> check = createSet(createSet("foo"));
+        final Object o = e.execute(jc);
+        final Set<?> check = createSet(createSet("foo"));
         Assert.assertEquals(check, o);
     }
 
     @Test
     public void testSetLiteralWithNumbers() throws Exception {
-        JexlExpression e = JEXL.createExpression("{ 5.0 , 10 }");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("{ 5.0 , 10 }");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
-        Set<?> check = createSet(new Double(5.0), new Integer(10));
+        final Object o = e.evaluate(jc);
+        final Set<?> check = createSet(new Double(5.0), new Integer(10));
         Assert.assertEquals(check, o);
     }
 
     @Test
     public void testSetLiteralWithNulls() throws Exception {
-        String[] exprs = {
+        final String[] exprs = {
             "{  }",
             "{ 10 }",
             "{ 10 , null }",
@@ -118,7 +118,7 @@ public class SetLiteralTest extends JexlTestCase {
             "{ '10' , null }",
             "{ null, '10' , 20 }"
         };
-        Set<?>[] checks = {
+        final Set<?>[] checks = {
             Collections.emptySet(),
             createSet(new Integer(10)),
             createSet(new Integer(10), null),
@@ -126,10 +126,10 @@ public class SetLiteralTest extends JexlTestCase {
             createSet("10", null),
             createSet(null, "10", new Integer(20))
         };
-        JexlContext jc = new MapContext();
+        final JexlContext jc = new MapContext();
         for (int t = 0; t < exprs.length; ++t) {
-            JexlScript e = JEXL.createScript(exprs[t]);
-            Object o = e.execute(jc);
+            final JexlScript e = JEXL.createScript(exprs[t]);
+            final Object o = e.execute(jc);
             Assert.assertEquals(exprs[t], checks[t], o);
         }
 
@@ -137,19 +137,19 @@ public class SetLiteralTest extends JexlTestCase {
 
     @Test
     public void testSizeOfSimpleSetLiteral() throws Exception {
-        JexlExpression e = JEXL.createExpression("size({ 'foo' , 'bar'})");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("size({ 'foo' , 'bar'})");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
+        final Object o = e.evaluate(jc);
         Assert.assertEquals(new Integer(2), o);
     }
 
     @Test
     public void testNotEmptySimpleSetLiteral() throws Exception {
-        JexlExpression e = JEXL.createExpression("empty({ 'foo' , 'bar' })");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("empty({ 'foo' , 'bar' })");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
+        final Object o = e.evaluate(jc);
         Assert.assertFalse((Boolean) o);
     }
 

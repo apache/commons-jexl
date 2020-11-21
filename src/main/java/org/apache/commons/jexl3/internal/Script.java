@@ -65,7 +65,7 @@ public class Script implements JexlScript, JexlExpression {
      * @param expr   the expression source.
      * @param ref    the parsed expression.
      */
-    protected Script(Engine engine, String expr, ASTJexlScript ref) {
+    protected Script(final Engine engine, final String expr, final ASTJexlScript ref) {
         jexl = engine;
         source = expr;
         script = ref;
@@ -81,7 +81,7 @@ public class Script implements JexlScript, JexlExpression {
      * </p>
      */
     protected void checkCacheVersion() {
-        int uberVersion = jexl.getUberspect().getVersion();
+        final int uberVersion = jexl.getUberspect().getVersion();
         if (version != uberVersion) {
             // version 0 of the uberSpect is an illusion due to order of construction; no need to clear cache
             if (version > 0) {
@@ -96,7 +96,7 @@ public class Script implements JexlScript, JexlExpression {
      * @param args the arguments to bind to parameters
      * @return the frame (may be null)
      */
-    protected Frame createFrame(Object[] args) {
+    protected Frame createFrame(final Object[] args) {
         return script.createFrame(args);
     }
     
@@ -106,8 +106,8 @@ public class Script implements JexlScript, JexlExpression {
      * @param frame the calling frame
      * @return  the interpreter
      */
-    protected Interpreter createInterpreter(JexlContext context, Frame frame) {
-        JexlOptions opts = jexl.options(script, context);
+    protected Interpreter createInterpreter(final JexlContext context, final Frame frame) {
+        final JexlOptions opts = jexl.options(script, context);
         return jexl.createInterpreter(context, frame, opts);
     }
 
@@ -129,8 +129,8 @@ public class Script implements JexlScript, JexlExpression {
     }
 
     @Override
-    public String getParsedText(int indent) {
-        Debugger debug = new Debugger();
+    public String getParsedText(final int indent) {
+        final Debugger debug = new Debugger();
         debug.setIndentation(indent);
         debug.debug(script, false);
         return debug.toString();
@@ -140,7 +140,7 @@ public class Script implements JexlScript, JexlExpression {
     public String toString() {
         CharSequence src = source;
         if (src == null) {
-            Debugger debug = new Debugger();
+            final Debugger debug = new Debugger();
             debug.debug(script, false);
             src = debug.toString();
         }
@@ -158,7 +158,7 @@ public class Script implements JexlScript, JexlExpression {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -176,29 +176,29 @@ public class Script implements JexlScript, JexlExpression {
     }
 
     @Override
-    public Object evaluate(JexlContext context) {
+    public Object evaluate(final JexlContext context) {
         return execute(context);
     }
 
     @Override
-    public Object execute(JexlContext context) {
+    public Object execute(final JexlContext context) {
         checkCacheVersion();
-        Frame frame = createFrame(null);
-        Interpreter interpreter = createInterpreter(context, frame);
+        final Frame frame = createFrame(null);
+        final Interpreter interpreter = createInterpreter(context, frame);
         return interpreter.interpret(script);
     }
 
     @Override
-    public Object execute(JexlContext context, Object... args) {
+    public Object execute(final JexlContext context, final Object... args) {
         checkCacheVersion();
-        Frame frame = createFrame(args != null && args.length > 0 ? args : null);
-        Interpreter interpreter = createInterpreter(context, frame);
+        final Frame frame = createFrame(args != null && args.length > 0 ? args : null);
+        final Interpreter interpreter = createInterpreter(context, frame);
         return interpreter.interpret(script);
     }
 
     @Override
-    public JexlScript curry(Object... args) {
-        String[] parms = script.getParameters();
+    public JexlScript curry(final Object... args) {
+        final String[] parms = script.getParameters();
         if (parms == null || parms.length == 0) {
             return this;
         }
@@ -263,7 +263,7 @@ public class Script implements JexlScript, JexlExpression {
      * @return the callable
      */
     @Override
-    public Callable callable(JexlContext context) {
+    public Callable callable(final JexlContext context) {
         return callable(context, (Object[]) null);
     }
 
@@ -276,7 +276,7 @@ public class Script implements JexlScript, JexlExpression {
      * @return the callable
      */
     @Override
-    public Callable callable(JexlContext context, Object... args) {
+    public Callable callable(final JexlContext context, final Object... args) {
         return new Callable(createInterpreter(context, script.createFrame(args)));
     }
 
@@ -293,7 +293,7 @@ public class Script implements JexlScript, JexlExpression {
          * The base constructor.
          * @param intrprtr the interpreter to use
          */
-        protected Callable(Interpreter intrprtr) {
+        protected Callable(final Interpreter intrprtr) {
             this.interpreter = intrprtr;
             this.result = intrprtr;
         }

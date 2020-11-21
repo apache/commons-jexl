@@ -115,7 +115,7 @@ public abstract class JexlParser extends StringParser {
      * Cleanup.
      * @param features the feature set to restore if any
      */
-    protected void cleanup(JexlFeatures features) {
+    protected void cleanup(final JexlFeatures features) {
         info = null;
         source = null;
         frame = null;
@@ -131,10 +131,10 @@ public abstract class JexlParser extends StringParser {
      * @param lstr the list of strings
      * @return the dotted version
      */
-    protected static String stringify(List<String> lstr) {
-        StringBuilder strb = new StringBuilder();
+    protected static String stringify(final List<String> lstr) {
+        final StringBuilder strb = new StringBuilder();
         boolean dot = false;
-        for(String str : lstr) {
+        for(final String str : lstr) {
             if (!dot) {
                dot = true;
             } else {
@@ -151,15 +151,15 @@ public abstract class JexlParser extends StringParser {
      * @param lineno the line number
      * @return the line
      */
-    protected static String readSourceLine(String src, int lineno) {
+    protected static String readSourceLine(final String src, final int lineno) {
         String msg = "";
         if (src != null && lineno >= 0) {
             try {
-                BufferedReader reader = new BufferedReader(new StringReader(src));
+                final BufferedReader reader = new BufferedReader(new StringReader(src));
                 for (int l = 0; l < lineno; ++l) {
                     msg = reader.readLine();
                 }
-            } catch (IOException xio) {
+            } catch (final IOException xio) {
                 // ignore, very unlikely but then again...
             }
         }
@@ -170,7 +170,7 @@ public abstract class JexlParser extends StringParser {
      * Internal, for debug purpose only.
      * @param registers whether register syntax is recognized by this parser
      */
-    public void allowRegisters(boolean registers) {
+    public void allowRegisters(final boolean registers) {
         featureController.setFeatures(new JexlFeatures(featureController.getFeatures()).register(registers));
     }
 
@@ -178,7 +178,7 @@ public abstract class JexlParser extends StringParser {
      * Sets a new set of options.
      * @param features
      */
-    protected void setFeatures(JexlFeatures features) {
+    protected void setFeatures(final JexlFeatures features) {
         this.featureController.setFeatures(features);
     }
 
@@ -237,7 +237,7 @@ public abstract class JexlParser extends StringParser {
      * Pushes a new lexical unit.
      * @param unit the new lexical unit
      */
-    protected void pushUnit(LexicalUnit unit) {
+    protected void pushUnit(final LexicalUnit unit) {
         if (block != null) {
             blocks.push(block);
         }
@@ -248,7 +248,7 @@ public abstract class JexlParser extends StringParser {
      * Restores the previous lexical unit.
      * @param unit restores the previous lexical scope
      */
-    protected void popUnit(LexicalUnit unit) {
+    protected void popUnit(final LexicalUnit unit) {
         if (block == unit){
             if (!blocks.isEmpty()) {
                 block = blocks.pop();
@@ -265,11 +265,11 @@ public abstract class JexlParser extends StringParser {
      * @param symbol
      * @return true if symbol accessible in lexical scope
      */
-    private boolean isSymbolDeclared(JexlNode.Info info, int symbol) {
+    private boolean isSymbolDeclared(final JexlNode.Info info, final int symbol) {
         JexlNode walk = info.getNode();
         while(walk != null) {
             if (walk instanceof JexlParser.LexicalUnit) {
-                LexicalScope scope = ((JexlParser.LexicalUnit) walk).getLexicalScope();
+                final LexicalScope scope = ((JexlParser.LexicalUnit) walk).getLexicalScope();
                 if (scope != null && scope.hasSymbol(symbol)) {
                     return true;
                 }
@@ -289,9 +289,9 @@ public abstract class JexlParser extends StringParser {
      * @param name      the identifier name
      * @return the image
      */
-    protected String checkVariable(ASTIdentifier identifier, String name) {
+    protected String checkVariable(final ASTIdentifier identifier, final String name) {
         if (frame != null) {
-            Integer symbol = frame.getSymbol(name);
+            final Integer symbol = frame.getSymbol(name);
             if (symbol != null) {
                 boolean declared = true;
                 if (frame.isCapturedSymbol(symbol)) {
@@ -301,7 +301,7 @@ public abstract class JexlParser extends StringParser {
                     declared = block.hasSymbol(symbol);
                     // one of the lexical blocks above should declare it
                     if (!declared) {
-                        for (LexicalUnit u : blocks) {
+                        for (final LexicalUnit u : blocks) {
                             if (u.hasSymbol(symbol)) {
                                 declared = true;
                                 break;
@@ -330,8 +330,8 @@ public abstract class JexlParser extends StringParser {
      * @param image the name
      * @return true if allowed, false if reserved
      */
-    protected boolean allowVariable(String image) {
-        JexlFeatures features = getFeatures();
+    protected boolean allowVariable(final String image) {
+        final JexlFeatures features = getFeatures();
         if (!features.supportsLocalVar()) {
             return false;
         }
@@ -347,9 +347,9 @@ public abstract class JexlParser extends StringParser {
      * @return true if symbol can be declared in lexical scope, false (error)
      * if it is already declared
      */
-    private boolean declareSymbol(int symbol) {
+    private boolean declareSymbol(final int symbol) {
         if (blocks != null) {
-            for (LexicalUnit lu : blocks) {
+            for (final LexicalUnit lu : blocks) {
                 if (lu.hasSymbol(symbol)) {
                     return false;
                 }
@@ -368,15 +368,15 @@ public abstract class JexlParser extends StringParser {
      * @param var the identifier used to declare
      * @param token      the variable name toekn
      */
-    protected void declareVariable(ASTVar var, Token token) {
-        String name = token.image;
+    protected void declareVariable(final ASTVar var, final Token token) {
+        final String name = token.image;
         if (!allowVariable(name)) {
             throwFeatureException(JexlFeatures.LOCAL_VAR, token);
         }
         if (frame == null) {
             frame = new Scope(null, (String[]) null);
         }
-        int symbol = frame.declareVariable(name);
+        final int symbol = frame.declareVariable(name);
         var.setSymbol(symbol, name);
         if (frame.isCapturedSymbol(symbol)) {
             var.setCaptured(true);
@@ -396,7 +396,7 @@ public abstract class JexlParser extends StringParser {
      * @param key the pragma key
      * @param value the pragma value
      */
-    protected void declarePragma(String key, Object value) {
+    protected void declarePragma(final String key, final Object value) {
         if (!getFeatures().supportsPragma()) {
             throwFeatureException(JexlFeatures.PRAGMA, getToken(0));
         }
@@ -411,19 +411,19 @@ public abstract class JexlParser extends StringParser {
      * <p> This method creates an new entry in the symbol map. </p>
      * @param token the parameter name toekn
      */
-    protected void declareParameter(Token token) {
-        String identifier =  token.image;
+    protected void declareParameter(final Token token) {
+        final String identifier =  token.image;
         if (!allowVariable(identifier)) {
             throwFeatureException(JexlFeatures.LOCAL_VAR, token);
         }
         if (frame == null) {
             frame = new Scope(null, (String[]) null);
         }
-        int symbol = frame.declareParameter(identifier);
+        final int symbol = frame.declareParameter(identifier);
         // not sure how declaring a parameter could fail...
         // lexical feature error
         if (!block.declareSymbol(symbol) && getFeatures().isLexical()) {
-            JexlInfo xinfo = info.at(token.beginLine, token.beginColumn);
+            final JexlInfo xinfo = info.at(token.beginLine, token.beginColumn);
             throw new JexlException(xinfo,  identifier + ": variable is already declared", null);
         }
     }
@@ -433,7 +433,7 @@ public abstract class JexlParser extends StringParser {
      * @param top whether the identifier is beginning an l/r value
      * @throws ParseException subclasses may throw this
      */
-    protected void Identifier(boolean top) throws ParseException {
+    protected void Identifier(final boolean top) throws ParseException {
         // Overriden by generated code
     }
 
@@ -475,7 +475,7 @@ public abstract class JexlParser extends StringParser {
      * Called by parser at beginning of node construction.
      * @param node the node
      */
-    protected void jjtreeOpenNodeScope(JexlNode node) {
+    protected void jjtreeOpenNodeScope(final JexlNode node) {
         // nothing
     }
 
@@ -486,7 +486,7 @@ public abstract class JexlParser extends StringParser {
      * @param node the node
      * @throws ParseException
      */
-    protected void jjtreeCloseNodeScope(JexlNode node) throws ParseException {
+    protected void jjtreeCloseNodeScope(final JexlNode node) throws ParseException {
         if (node instanceof ASTAmbiguous) {
             throwAmbiguousException(node);
         }
@@ -494,14 +494,14 @@ public abstract class JexlParser extends StringParser {
             if (node instanceof ASTJexlLambda && !getFeatures().supportsLambda()) {
                 throwFeatureException(JexlFeatures.LAMBDA, node.jexlInfo());
             }
-            ASTJexlScript script = (ASTJexlScript) node;
+            final ASTJexlScript script = (ASTJexlScript) node;
             // reaccess in case local variables have been declared
             if (script.getScope() != frame) {
                 script.setScope(frame);
             }
             popFrame();
         } else if (ASSIGN_NODES.contains(node.getClass())) {
-            JexlNode lv = node.jjtGetChild(0);
+            final JexlNode lv = node.jjtGetChild(0);
             if (!lv.isLeftValue()) {
                 throwParsingException(JexlException.Assignment.class, null);
             }
@@ -515,11 +515,11 @@ public abstract class JexlParser extends StringParser {
      * <p>Seeks the end of the ambiguous statement to recover.
      * @param node the first token in ambiguous expression
      */
-    protected void throwAmbiguousException(JexlNode node) {
-        JexlInfo begin = node.jexlInfo();
-        Token t = getToken(0);
-        JexlInfo end = info.at(t.beginLine, t.endColumn);
-        String msg = readSourceLine(source, end.getLine());
+    protected void throwAmbiguousException(final JexlNode node) {
+        final JexlInfo begin = node.jexlInfo();
+        final Token t = getToken(0);
+        final JexlInfo end = info.at(t.beginLine, t.endColumn);
+        final String msg = readSourceLine(source, end.getLine());
         throw new JexlException.Ambiguous(begin, end, msg);
     }
 
@@ -528,8 +528,8 @@ public abstract class JexlParser extends StringParser {
      * @param feature the feature code
      * @param info the exception surroundings
      */
-    protected void throwFeatureException(int feature, JexlInfo info) {
-        String msg = info != null? readSourceLine(source, info.getLine()) : null;
+    protected void throwFeatureException(final int feature, final JexlInfo info) {
+        final String msg = info != null? readSourceLine(source, info.getLine()) : null;
         throw new JexlException.Feature(info, feature, msg);
     }
 
@@ -538,14 +538,14 @@ public abstract class JexlParser extends StringParser {
      * @param feature the feature code
      * @param token the token that triggered it
      */
-    protected void throwFeatureException(int feature, Token token) {
+    protected void throwFeatureException(final int feature, Token token) {
         if (token == null) {
             token = this.getToken(0);
             if (token == null) {
                 throw new JexlException.Parsing(null, JexlFeatures.stringify(feature));
             }
         }
-        JexlInfo xinfo = info.at(token.beginLine, token.beginColumn);
+        final JexlInfo xinfo = info.at(token.beginLine, token.beginColumn);
         throwFeatureException(feature, xinfo);
     }
 
@@ -553,7 +553,7 @@ public abstract class JexlParser extends StringParser {
      * Throws a parsing exception.
      * @param node the node that caused it
      */
-    protected void throwParsingException(JexlNode node) {
+    protected void throwParsingException(final JexlNode node) {
         throwParsingException(null, null);
     }
 
@@ -563,7 +563,7 @@ public abstract class JexlParser extends StringParser {
      * @param tok the token to report
      * @param <T> the parsing exception subclass
      */
-    protected <T extends JexlException.Parsing> void throwParsingException(Class<T> xclazz, Token tok) {
+    protected <T extends JexlException.Parsing> void throwParsingException(final Class<T> xclazz, Token tok) {
         JexlInfo xinfo  = null;
         String msg = "unrecoverable state";
         JexlException.Parsing xparse = null;
@@ -575,9 +575,9 @@ public abstract class JexlParser extends StringParser {
             msg = tok.image;
             if (xclazz != null) {
                 try {
-                    Constructor<T> ctor = xclazz.getConstructor(JexlInfo.class, String.class);
+                    final Constructor<T> ctor = xclazz.getConstructor(JexlInfo.class, String.class);
                     xparse = ctor.newInstance(xinfo, msg);
-                } catch (Exception xany) {
+                } catch (final Exception xany) {
                     // ignore, very unlikely but then again..
                 }
             }
@@ -591,8 +591,8 @@ public abstract class JexlParser extends StringParser {
      * @param tokens the tokens to choose from
      * @return the token
      */
-    protected static Token errorToken(Token... tokens) {
-        for (Token token : tokens) {
+    protected static Token errorToken(final Token... tokens) {
+        for (final Token token : tokens) {
             if (token != null && token.image != null && !token.image.isEmpty()) {
                 return token;
             }

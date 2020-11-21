@@ -20,16 +20,16 @@ package org.apache.commons.jexl3.parser;
  * Declares a local variable.
  */
 public class ASTVar extends ASTIdentifier {
-    public ASTVar(int id) {
+    public ASTVar(final int id) {
         super(id);
     }
 
-    public ASTVar(Parser p, int id) {
+    public ASTVar(final Parser p, final int id) {
         super(p, id);
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 }

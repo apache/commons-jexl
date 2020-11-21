@@ -35,21 +35,21 @@ public class AsserterTest extends JexlTestCase {
 
     @Test
     public void testThis() throws Exception {
-        Asserter asserter = new Asserter(JEXL);
+        final Asserter asserter = new Asserter(JEXL);
         asserter.setVariable("this", new Foo());
         asserter.assertExpression("this.repeat('abc')", "Repeat : abc");
         try {
             asserter.assertExpression("this.count", "Wrong Value");
             Assert.fail("This method should have thrown an assertion exception");
         }
-        catch (AssertionError e) {
+        catch (final AssertionError e) {
             // it worked!
         }
     }
 
     @Test
     public void testVariable() throws Exception {
-        Asserter asserter = new Asserter(JEXL);
+        final Asserter asserter = new Asserter(JEXL);
         asserter.setSilent(true);
         asserter.setVariable("foo", new Foo());
         asserter.setVariable("person", "James");
@@ -64,7 +64,7 @@ public class AsserterTest extends JexlTestCase {
             asserter.assertExpression("bar.count", new Integer(5));
             Assert.fail("This method should have thrown an assertion exception");
         }
-        catch (AssertionError e) {
+        catch (final AssertionError e) {
             // it worked!
         }
     }

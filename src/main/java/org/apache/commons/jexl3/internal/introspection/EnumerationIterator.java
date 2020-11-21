@@ -38,7 +38,7 @@ public class EnumerationIterator<T> implements Iterator<T> {
      *
      * @param enumer  The Enumeration to wrap.
      */
-    public EnumerationIterator(Enumeration<T> enumer) {
+    public EnumerationIterator(final Enumeration<T> enumer) {
         enumeration = enumer;
     }
 

@@ -149,7 +149,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param jscript the expression
      * @return true if the expression was a {@link Script} instance, false otherwise
      */
-    public boolean debug(JexlExpression jscript) {
+    public boolean debug(final JexlExpression jscript) {
         if (jscript instanceof Script) {
             return debug(((Script) jscript).script);
         } else {
@@ -162,7 +162,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param jscript the script
      * @return true if the script was a {@link Script} instance, false otherwise
      */
-    public boolean debug(JexlScript jscript) {
+    public boolean debug(final JexlScript jscript) {
         if (jscript instanceof Script) {
             return debug(((Script) jscript).script);
         } else {
@@ -175,7 +175,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param node the node to debug
      * @return true if the cause was located, false otherwise
      */
-    public boolean debug(JexlNode node) {
+    public boolean debug(final JexlNode node) {
         return debug(node, true);
     }
 
@@ -185,7 +185,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param r whether we should actively find the root node of the debugged node
      * @return true if the cause was located, false otherwise
      */
-    public boolean debug(JexlNode node, boolean r) {
+    public boolean debug(final JexlNode node, final boolean r) {
         start = 0;
         end = 0;
         indentLevel = 0;
@@ -218,7 +218,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @return the rebuilt expression
      * @since 3.0
      */
-    public String data(JexlNode node) {
+    public String data(final JexlNode node) {
         start = 0;
         end = 0;
         indentLevel = 0;
@@ -250,7 +250,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * Sets the indentation level.
      * @param level the number of spaces for indentation, none if less or equal to zero
      */
-    public void setIndentation(int level) {
+    public void setIndentation(final int level) {
         indentation(level);
     }
 
@@ -259,7 +259,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param level the number of spaces for indentation, none if less or equal to zero
      * @return this debugger instance
      */
-    public Debugger indentation(int level) {
+    public Debugger indentation(final int level) {
         indent = Math.max(level, 0);
         indentLevel = 0;
         return this;
@@ -270,7 +270,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param rdepth the maximum relative depth from the debugged node
      * @return this debugger instance
      */
-    public Debugger depth(int rdepth) {
+    public Debugger depth(final int rdepth) {
         this.depth = rdepth;
         return this;
     }
@@ -281,7 +281,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param data visitor pattern argument
      * @return visitor pattern value
      */
-    protected Object accept(JexlNode node, Object data) {
+    protected Object accept(final JexlNode node, final Object data) {
         if (depth <= 0) {
             builder.append("...");
             return data;
@@ -290,7 +290,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             start = builder.length();
         }
         depth -= 1;
-        Object value = node.jjtAccept(this, data);
+        final Object value = node.jjtAccept(this, data);
         depth += 1;
         if (node == cause) {
             end = builder.length();
@@ -304,8 +304,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param data  visitor pattern argument
      * @return visitor pattern value
      */
-    protected Object acceptStatement(JexlNode child, Object data) {
-        JexlNode parent = child.jjtGetParent();
+    protected Object acceptStatement(final JexlNode child, final Object data) {
+        final JexlNode parent = child.jjtGetParent();
         if (indent > 0 && (parent instanceof ASTBlock || parent instanceof ASTJexlScript)) {
             for (int i = 0; i < indentLevel; ++i) {
                 for(int s = 0; s < indent; ++s) {
@@ -314,7 +314,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             }
         }
         depth -= 1;
-        Object value = accept(child, data);
+        final Object value = accept(child, data);
         depth += 1;
         // blocks, if, for & while dont need a ';' at end
         if (!(child instanceof ASTJexlScript
@@ -341,7 +341,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param data  visitor pattern argument
      * @return visitor pattern value
      */
-    protected Object check(JexlNode node, String image, Object data) {
+    protected Object check(final JexlNode node, final String image, final Object data) {
         if (node == cause) {
             start = builder.length();
         }
@@ -365,8 +365,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param data  visitor pattern argument
      * @return visitor pattern value
      */
-    protected Object infixChildren(JexlNode node, String infix, boolean paren, Object data) {
-        int num = node.jjtGetNumChildren(); //child.jjtGetNumChildren() > 1;
+    protected Object infixChildren(final JexlNode node, final String infix, final boolean paren, final Object data) {
+        final int num = node.jjtGetNumChildren(); //child.jjtGetNumChildren() > 1;
         if (paren) {
             builder.append('(');
         }
@@ -390,8 +390,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param data   visitor pattern argument
      * @return visitor pattern value
      */
-    protected Object prefixChild(JexlNode node, String prefix, Object data) {
-        boolean paren = node.jjtGetChild(0).jjtGetNumChildren() > 1;
+    protected Object prefixChild(final JexlNode node, final String prefix, final Object data) {
+        final boolean paren = node.jjtGetChild(0).jjtGetNumChildren() > 1;
         builder.append(prefix);
         if (paren) {
             builder.append('(');
@@ -404,12 +404,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTAddNode node, Object data) {
+    protected Object visit(final ASTAddNode node, final Object data) {
         return additiveNode(node, " + ", data);
     }
 
     @Override
-    protected Object visit(ASTSubNode node, Object data) {
+    protected Object visit(final ASTSubNode node, final Object data) {
         return additiveNode(node, " - ", data);
     }
 
@@ -420,12 +420,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param data visitor pattern argument
      * @return visitor pattern value
      */
-    protected Object additiveNode(JexlNode node, String op, Object data) {
+    protected Object additiveNode(final JexlNode node, final String op, final Object data) {
         // need parenthesis if not in operator precedence order
-        boolean paren = node.jjtGetParent() instanceof ASTMulNode
+        final boolean paren = node.jjtGetParent() instanceof ASTMulNode
                 || node.jjtGetParent() instanceof ASTDivNode
                 || node.jjtGetParent() instanceof ASTModNode;
-        int num = node.jjtGetNumChildren();
+        final int num = node.jjtGetNumChildren();
         if (paren) {
             builder.append('(');
         }
@@ -441,13 +441,13 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTAndNode node, Object data) {
+    protected Object visit(final ASTAndNode node, final Object data) {
         return infixChildren(node, " && ", false, data);
     }
 
     @Override
-    protected Object visit(ASTArrayAccess node, Object data) {
-        int num = node.jjtGetNumChildren();
+    protected Object visit(final ASTArrayAccess node, final Object data) {
+        final int num = node.jjtGetNumChildren();
         for (int i = 0; i < num; ++i) {
             builder.append('[');
             accept(node.jjtGetChild(i), data);
@@ -457,14 +457,14 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTExtendedLiteral node, Object data) {
+    protected Object visit(final ASTExtendedLiteral node, final Object data) {
         builder.append("...");
         return data;
     }
 
     @Override
-    protected Object visit(ASTArrayLiteral node, Object data) {
-        int num = node.jjtGetNumChildren();
+    protected Object visit(final ASTArrayLiteral node, final Object data) {
+        final int num = node.jjtGetNumChildren();
         builder.append("[ ");
         if (num > 0) {
             accept(node.jjtGetChild(0), data);
@@ -478,39 +478,39 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTRangeNode node, Object data) {
+    protected Object visit(final ASTRangeNode node, final Object data) {
         return infixChildren(node, " .. ", false, data);
     }
 
     @Override
-    protected Object visit(ASTAssignment node, Object data) {
+    protected Object visit(final ASTAssignment node, final Object data) {
         return infixChildren(node, " = ", false, data);
     }
 
     @Override
-    protected Object visit(ASTBitwiseAndNode node, Object data) {
+    protected Object visit(final ASTBitwiseAndNode node, final Object data) {
         return infixChildren(node, " & ", false, data);
     }
 
     @Override
-    protected Object visit(ASTBitwiseComplNode node, Object data) {
+    protected Object visit(final ASTBitwiseComplNode node, final Object data) {
         return prefixChild(node, "~", data);
     }
 
     @Override
-    protected Object visit(ASTBitwiseOrNode node, Object data) {
-        boolean paren = node.jjtGetParent() instanceof ASTBitwiseAndNode;
+    protected Object visit(final ASTBitwiseOrNode node, final Object data) {
+        final boolean paren = node.jjtGetParent() instanceof ASTBitwiseAndNode;
         return infixChildren(node, " | ", paren, data);
     }
 
     @Override
-    protected Object visit(ASTBitwiseXorNode node, Object data) {
-        boolean paren = node.jjtGetParent() instanceof ASTBitwiseAndNode;
+    protected Object visit(final ASTBitwiseXorNode node, final Object data) {
+        final boolean paren = node.jjtGetParent() instanceof ASTBitwiseAndNode;
         return infixChildren(node, " ^ ", paren, data);
     }
 
     @Override
-    protected Object visit(ASTBlock node, Object data) {
+    protected Object visit(final ASTBlock node, final Object data) {
         builder.append('{');
         if (indent > 0) {
             indentLevel += 1;
@@ -518,9 +518,9 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         } else {
             builder.append(' ');
         }
-        int num = node.jjtGetNumChildren();
+        final int num = node.jjtGetNumChildren();
         for (int i = 0; i < num; ++i) {
-            JexlNode child = node.jjtGetChild(i);
+            final JexlNode child = node.jjtGetChild(i);
             acceptStatement(child, data);
         }
         if (indent > 0) {
@@ -536,64 +536,64 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTDivNode node, Object data) {
+    protected Object visit(final ASTDivNode node, final Object data) {
         return infixChildren(node, " / ", false, data);
     }
 
     @Override
-    protected Object visit(ASTEmptyFunction node, Object data) {
+    protected Object visit(final ASTEmptyFunction node, final Object data) {
         builder.append("empty ");
         accept(node.jjtGetChild(0), data);
         return data;
     }
 
     @Override
-    protected Object visit(ASTEQNode node, Object data) {
+    protected Object visit(final ASTEQNode node, final Object data) {
         return infixChildren(node, " == ", false, data);
     }
 
     @Override
-    protected Object visit(ASTERNode node, Object data) {
+    protected Object visit(final ASTERNode node, final Object data) {
         return infixChildren(node, " =~ ", false, data);
     }
 
     @Override
-    protected Object visit(ASTSWNode node, Object data) {
+    protected Object visit(final ASTSWNode node, final Object data) {
         return infixChildren(node, " =^ ", false, data);
     }
 
     @Override
-    protected Object visit(ASTEWNode node, Object data) {
+    protected Object visit(final ASTEWNode node, final Object data) {
         return infixChildren(node, " =$ ", false, data);
     }
 
     @Override
-    protected Object visit(ASTNSWNode node, Object data) {
+    protected Object visit(final ASTNSWNode node, final Object data) {
         return infixChildren(node, " !^ ", false, data);
     }
 
     @Override
-    protected Object visit(ASTNEWNode node, Object data) {
+    protected Object visit(final ASTNEWNode node, final Object data) {
         return infixChildren(node, " !$ ", false, data);
     }
 
     @Override
-    protected Object visit(ASTFalseNode node, Object data) {
+    protected Object visit(final ASTFalseNode node, final Object data) {
         return check(node, "false", data);
     }
 
     @Override
-    protected Object visit(ASTContinue node, Object data) {
+    protected Object visit(final ASTContinue node, final Object data) {
         return check(node, "continue", data);
     }
 
     @Override
-    protected Object visit(ASTBreak node, Object data) {
+    protected Object visit(final ASTBreak node, final Object data) {
         return check(node, "break", data);
     }
 
     @Override
-    protected Object visit(ASTForeachStatement node, Object data) {
+    protected Object visit(final ASTForeachStatement node, final Object data) {
         builder.append("for(");
         accept(node.jjtGetChild(0), data);
         builder.append(" : ");
@@ -608,12 +608,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTGENode node, Object data) {
+    protected Object visit(final ASTGENode node, final Object data) {
         return infixChildren(node, " >= ", false, data);
     }
 
     @Override
-    protected Object visit(ASTGTNode node, Object data) {
+    protected Object visit(final ASTGTNode node, final Object data) {
         return infixChildren(node, " > ", false, data);
     }
 
@@ -628,28 +628,28 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param str the identifier
      * @return true if needing quotes, false otherwise
      */
-    protected boolean needQuotes(String str) {
+    protected boolean needQuotes(final String str) {
         return QUOTED_IDENTIFIER.matcher(str).find()
             || "size".equals(str)
             || "empty".equals(str);
     }
 
     @Override
-    protected Object visit(ASTIdentifier node, Object data) {
-        String ns = node.getNamespace();
-        String image = StringParser.escapeIdentifier(node.getName());
+    protected Object visit(final ASTIdentifier node, final Object data) {
+        final String ns = node.getNamespace();
+        final String image = StringParser.escapeIdentifier(node.getName());
         if (ns == null) {
             return check(node, image, data);
         } else {
-            String nsid = StringParser.escapeIdentifier(ns) + ":" + image;
+            final String nsid = StringParser.escapeIdentifier(ns) + ":" + image;
             return check(node, nsid, data);
         }
     }
 
     @Override
-    protected Object visit(ASTIdentifierAccess node, Object data) {
+    protected Object visit(final ASTIdentifierAccess node, final Object data) {
         builder.append(node.isSafe() ? "?." : ".");
-        String image = node.getName();
+        final String image = node.getName();
         if (node.isExpression()) {
             builder.append('`');
             builder.append(image.replace("`", "\\`"));
@@ -666,7 +666,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTIfStatement node, Object data) {
+    protected Object visit(final ASTIfStatement node, final Object data) {
         final int numChildren = node.jjtGetNumChildren();
         // if (...) ...
         builder.append("if (");
@@ -689,7 +689,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTNumberLiteral node, Object data) {
+    protected Object visit(final ASTNumberLiteral node, final Object data) {
         return check(node, node.toString(), data);
     }
 
@@ -699,22 +699,22 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      * @param data the visitor argument
      * @return the parameter name to use
      */
-    protected String visitParameter(String p, Object data) {
+    protected String visitParameter(final String p, final Object data) {
         return p;
     }
 
     @Override
-    protected Object visit(ASTJexlScript node, Object data) {
+    protected Object visit(final ASTJexlScript node, Object data) {
         // if lambda, produce parameters
         if (node instanceof ASTJexlLambda) {
-            JexlNode parent = node.jjtGetParent();
+            final JexlNode parent = node.jjtGetParent();
             // use lambda syntax if not assigned
-            boolean named = parent instanceof ASTAssignment;
+            final boolean named = parent instanceof ASTAssignment;
             if (named) {
                 builder.append("function");
             }
             builder.append('(');
-            String[] params = node.getParameters();
+            final String[] params = node.getParameters();
             if (params != null && params.length > 0) {
                 builder.append(visitParameter(params[0], data));
                 for (int p = 1; p < params.length; ++p) {
@@ -731,12 +731,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
             // we will need a block...
         }
         // no parameters or done with them
-        int num = node.jjtGetNumChildren();
+        final int num = node.jjtGetNumChildren();
         if (num == 1 && !(node instanceof ASTJexlLambda)) {
             data = accept(node.jjtGetChild(0), data);
         } else {
             for (int i = 0; i < num; ++i) {
-                JexlNode child = node.jjtGetChild(i);
+                final JexlNode child = node.jjtGetChild(i);
                 acceptStatement(child, data);
             }
         }
@@ -744,17 +744,17 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTLENode node, Object data) {
+    protected Object visit(final ASTLENode node, final Object data) {
         return infixChildren(node, " <= ", false, data);
     }
 
     @Override
-    protected Object visit(ASTLTNode node, Object data) {
+    protected Object visit(final ASTLTNode node, final Object data) {
         return infixChildren(node, " < ", false, data);
     }
 
     @Override
-    protected Object visit(ASTMapEntry node, Object data) {
+    protected Object visit(final ASTMapEntry node, final Object data) {
         accept(node.jjtGetChild(0), data);
         builder.append(" : ");
         accept(node.jjtGetChild(1), data);
@@ -762,8 +762,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTSetLiteral node, Object data) {
-        int num = node.jjtGetNumChildren();
+    protected Object visit(final ASTSetLiteral node, final Object data) {
+        final int num = node.jjtGetNumChildren();
         builder.append("{ ");
         if (num > 0) {
             accept(node.jjtGetChild(0), data);
@@ -777,8 +777,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTMapLiteral node, Object data) {
-        int num = node.jjtGetNumChildren();
+    protected Object visit(final ASTMapLiteral node, final Object data) {
+        final int num = node.jjtGetNumChildren();
         builder.append("{ ");
         if (num > 0) {
             accept(node.jjtGetChild(0), data);
@@ -794,8 +794,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTConstructorNode node, Object data) {
-        int num = node.jjtGetNumChildren();
+    protected Object visit(final ASTConstructorNode node, final Object data) {
+        final int num = node.jjtGetNumChildren();
         builder.append("new(");
         if (num > 0) {
             accept(node.jjtGetChild(0), data);
@@ -809,8 +809,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTFunctionNode node, Object data) {
-        int num = node.jjtGetNumChildren();
+    protected Object visit(final ASTFunctionNode node, final Object data) {
+        final int num = node.jjtGetNumChildren();
         if (num == 3) {
             accept(node.jjtGetChild(0), data);
             builder.append(":");
@@ -824,8 +824,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTMethodNode node, Object data) {
-        int num = node.jjtGetNumChildren();
+    protected Object visit(final ASTMethodNode node, final Object data) {
+        final int num = node.jjtGetNumChildren();
         if (num == 2) {
             accept(node.jjtGetChild(0), data);
             accept(node.jjtGetChild(1), data);
@@ -834,8 +834,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTArguments node, Object data) {
-        int num = node.jjtGetNumChildren();
+    protected Object visit(final ASTArguments node, final Object data) {
+        final int num = node.jjtGetNumChildren();
         builder.append("(");
         if (num > 0) {
             accept(node.jjtGetChild(0), data);
@@ -849,48 +849,48 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTModNode node, Object data) {
+    protected Object visit(final ASTModNode node, final Object data) {
         return infixChildren(node, " % ", false, data);
     }
 
     @Override
-    protected Object visit(ASTMulNode node, Object data) {
+    protected Object visit(final ASTMulNode node, final Object data) {
         return infixChildren(node, " * ", false, data);
     }
 
     @Override
-    protected Object visit(ASTNENode node, Object data) {
+    protected Object visit(final ASTNENode node, final Object data) {
         return infixChildren(node, " != ", false, data);
     }
 
     @Override
-    protected Object visit(ASTNRNode node, Object data) {
+    protected Object visit(final ASTNRNode node, final Object data) {
         return infixChildren(node, " !~ ", false, data);
     }
 
     @Override
-    protected Object visit(ASTNotNode node, Object data) {
+    protected Object visit(final ASTNotNode node, final Object data) {
         builder.append("!");
         accept(node.jjtGetChild(0), data);
         return data;
     }
 
     @Override
-    protected Object visit(ASTNullLiteral node, Object data) {
+    protected Object visit(final ASTNullLiteral node, final Object data) {
         check(node, "null", data);
         return data;
     }
 
     @Override
-    protected Object visit(ASTOrNode node, Object data) {
+    protected Object visit(final ASTOrNode node, final Object data) {
         // need parenthesis if not in operator precedence order
-        boolean paren = node.jjtGetParent() instanceof ASTAndNode;
+        final boolean paren = node.jjtGetParent() instanceof ASTAndNode;
         return infixChildren(node, " || ", paren, data);
     }
 
     @Override
-    protected Object visit(ASTReference node, Object data) {
-        int num = node.jjtGetNumChildren();
+    protected Object visit(final ASTReference node, final Object data) {
+        final int num = node.jjtGetNumChildren();
         for (int i = 0; i < num; ++i) {
             accept(node.jjtGetChild(i), data);
         }
@@ -898,12 +898,12 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTReferenceExpression node, Object data) {
-        JexlNode first = node.jjtGetChild(0);
+    protected Object visit(final ASTReferenceExpression node, final Object data) {
+        final JexlNode first = node.jjtGetChild(0);
         builder.append('(');
         accept(first, data);
         builder.append(')');
-        int num = node.jjtGetNumChildren();
+        final int num = node.jjtGetNumChildren();
         for (int i = 1; i < num; ++i) {
             builder.append("[");
             accept(node.jjtGetChild(i), data);
@@ -913,33 +913,33 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTReturnStatement node, Object data) {
+    protected Object visit(final ASTReturnStatement node, final Object data) {
         builder.append("return ");
         accept(node.jjtGetChild(0), data);
         return data;
     }
 
     @Override
-    protected Object visit(ASTSizeFunction node, Object data) {
+    protected Object visit(final ASTSizeFunction node, final Object data) {
         builder.append("size ");
         accept(node.jjtGetChild(0), data);
         return data;
     }
 
     @Override
-    protected Object visit(ASTStringLiteral node, Object data) {
-        String img = node.getLiteral().replace("'", "\\'");
+    protected Object visit(final ASTStringLiteral node, final Object data) {
+        final String img = node.getLiteral().replace("'", "\\'");
         return check(node, "'" + img + "'", data);
     }
 
     @Override
-    protected Object visit(ASTRegexLiteral node, Object data) {
-        String img = node.toString().replace("/", "\\/");
+    protected Object visit(final ASTRegexLiteral node, final Object data) {
+        final String img = node.toString().replace("/", "\\/");
         return check(node, "~/" + img + "/", data);
     }
 
     @Override
-    protected Object visit(ASTTernaryNode node, Object data) {
+    protected Object visit(final ASTTernaryNode node, final Object data) {
         accept(node.jjtGetChild(0), data);
         if (node.jjtGetNumChildren() > 2) {
             builder.append("? ");
@@ -955,7 +955,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTNullpNode node, Object data) {
+    protected Object visit(final ASTNullpNode node, final Object data) {
         accept(node.jjtGetChild(0), data);
         builder.append("??");
         accept(node.jjtGetChild(1), data);
@@ -963,30 +963,30 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTTrueNode node, Object data) {
+    protected Object visit(final ASTTrueNode node, final Object data) {
         check(node, "true", data);
         return data;
     }
 
     @Override
-    protected Object visit(ASTUnaryMinusNode node, Object data) {
+    protected Object visit(final ASTUnaryMinusNode node, final Object data) {
         return prefixChild(node, "-", data);
     }
 
     @Override
-    protected Object visit(ASTUnaryPlusNode node, Object data) {
+    protected Object visit(final ASTUnaryPlusNode node, final Object data) {
         return prefixChild(node, "+", data);
     }
 
     @Override
-    protected Object visit(ASTVar node, Object data) {
+    protected Object visit(final ASTVar node, final Object data) {
         builder.append("var ");
         check(node, node.getName(), data);
         return data;
     }
 
     @Override
-    protected Object visit(ASTWhileStatement node, Object data) {
+    protected Object visit(final ASTWhileStatement node, final Object data) {
         builder.append("while (");
         accept(node.jjtGetChild(0), data);
         builder.append(") ");
@@ -999,9 +999,9 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTDoWhileStatement node, Object data) {
+    protected Object visit(final ASTDoWhileStatement node, final Object data) {
         builder.append("do ");
-        int nc = node.jjtGetNumChildren();
+        final int nc = node.jjtGetNumChildren();
         if (nc > 1) {
             acceptStatement(node.jjtGetChild(0), data);
         } else {
@@ -1014,54 +1014,54 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTSetAddNode node, Object data) {
+    protected Object visit(final ASTSetAddNode node, final Object data) {
         return infixChildren(node, " += ", false, data);
     }
 
     @Override
-    protected Object visit(ASTSetSubNode node, Object data) {
+    protected Object visit(final ASTSetSubNode node, final Object data) {
         return infixChildren(node, " -= ", false, data);
     }
 
     @Override
-    protected Object visit(ASTSetMultNode node, Object data) {
+    protected Object visit(final ASTSetMultNode node, final Object data) {
         return infixChildren(node, " *= ", false, data);
     }
 
     @Override
-    protected Object visit(ASTSetDivNode node, Object data) {
+    protected Object visit(final ASTSetDivNode node, final Object data) {
         return infixChildren(node, " /= ", false, data);
     }
 
     @Override
-    protected Object visit(ASTSetModNode node, Object data) {
+    protected Object visit(final ASTSetModNode node, final Object data) {
         return infixChildren(node, " %= ", false, data);
     }
 
     @Override
-    protected Object visit(ASTSetAndNode node, Object data) {
+    protected Object visit(final ASTSetAndNode node, final Object data) {
         return infixChildren(node, " &= ", false, data);
     }
 
     @Override
-    protected Object visit(ASTSetOrNode node, Object data) {
+    protected Object visit(final ASTSetOrNode node, final Object data) {
         return infixChildren(node, " |= ", false, data);
     }
 
     @Override
-    protected Object visit(ASTSetXorNode node, Object data) {
+    protected Object visit(final ASTSetXorNode node, final Object data) {
         return infixChildren(node, " ^= ", false, data);
     }
 
     @Override
-    protected Object visit(ASTJxltLiteral node, Object data) {
-        String img = node.getLiteral().replace("`", "\\`");
+    protected Object visit(final ASTJxltLiteral node, final Object data) {
+        final String img = node.getLiteral().replace("`", "\\`");
         return check(node, "`" + img + "`", data);
     }
 
     @Override
-    protected Object visit(ASTAnnotation node, Object data) {
-        int num = node.jjtGetNumChildren();
+    protected Object visit(final ASTAnnotation node, final Object data) {
+        final int num = node.jjtGetNumChildren();
         builder.append('@');
         builder.append(node.getName());
         if (num > 0) {
@@ -1071,13 +1071,13 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(ASTAnnotatedStatement node, Object data) {
-        int num = node.jjtGetNumChildren();
+    protected Object visit(final ASTAnnotatedStatement node, final Object data) {
+        final int num = node.jjtGetNumChildren();
         for (int i = 0; i < num; ++i) {
             if (i > 0) {// && child instanceof ASTBlock) {
                 builder.append(' ');
             }
-            JexlNode child = node.jjtGetChild(i);
+            final JexlNode child = node.jjtGetChild(i);
             acceptStatement(child, data);
         }
         return data;

@@ -39,9 +39,9 @@ public final class FieldSetExecutor implements JexlPropertySet {
      * @param value the value to set the field to
      * @return the executor if found, null otherwise
      */
-    public static JexlPropertySet discover(Introspector is, Class<?> clazz, String identifier, Object value) {
+    public static JexlPropertySet discover(final Introspector is, final Class<?> clazz, final String identifier, final Object value) {
         if (identifier != null) {
-            Field field = is.getField(clazz, identifier);
+            final Field field = is.getField(clazz, identifier);
             if (field != null
                 && !Modifier.isFinal(field.getModifiers())
                 && (value == null || MethodKey.isInvocationConvertible(field.getType(), value.getClass(), false))) {
@@ -55,25 +55,25 @@ public final class FieldSetExecutor implements JexlPropertySet {
      * Creates a new instance of FieldPropertySet.
      * @param theField the class public field
      */
-    private FieldSetExecutor(Field theField) {
+    private FieldSetExecutor(final Field theField) {
         field = theField;
     }
 
     @Override
-    public Object invoke(Object obj, Object arg) throws Exception {
+    public Object invoke(final Object obj, final Object arg) throws Exception {
         field.set(obj, arg);
         return arg;
     }
 
     @Override
-    public Object tryInvoke(Object obj, Object key, Object value) {
+    public Object tryInvoke(final Object obj, final Object key, final Object value) {
         if (obj.getClass().equals(field.getDeclaringClass())
             && key.equals(field.getName())
             && (value == null || MethodKey.isInvocationConvertible(field.getType(), value.getClass(), false))) {
             try {
                 field.set(obj, value);
                 return value;
-            } catch (IllegalAccessException xill) {
+            } catch (final IllegalAccessException xill) {
                 return Uberspect.TRY_FAILED;
             }
         }
@@ -81,7 +81,7 @@ public final class FieldSetExecutor implements JexlPropertySet {
     }
 
     @Override
-    public boolean tryFailed(Object rval) {
+    public boolean tryFailed(final Object rval) {
         return rval == Uberspect.TRY_FAILED;
     }
 

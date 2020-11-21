@@ -80,7 +80,7 @@ public final class JexlOptions {
      * @param value true or false
      * @return the new flags mask value
      */
-    private static int set(int ordinal, int mask, boolean value) {
+    private static int set(final int ordinal, final int mask, final boolean value) {
         return value? mask | (1 << ordinal) : mask & ~(1 << ordinal);
     }
 
@@ -90,7 +90,7 @@ public final class JexlOptions {
      * @param mask the flags mask
      * @return the mask value with this flag or-ed in
      */
-    private static boolean isSet(int ordinal, int mask) {
+    private static boolean isSet(final int ordinal, final int mask) {
         return (mask & 1 << ordinal) != 0;
     }
         
@@ -111,7 +111,7 @@ public final class JexlOptions {
      * may ease validating JEXL3.2 in your environment.
      * @param flags the flags to set 
      */
-    public static void setDefaultFlags(String...flags) {
+    public static void setDefaultFlags(final String...flags) {
         DEFAULT = parseFlags(DEFAULT, flags);
     }
         
@@ -124,7 +124,7 @@ public final class JexlOptions {
      * @param flags the flags to set 
      * @return the flag mask updated
      */
-    public static int parseFlags(int mask, String...flags) {
+    public static int parseFlags(int mask, final String...flags) {
         for(String name : flags) {
             boolean b = true;
             if (name.charAt(0) == '+') {
@@ -151,7 +151,7 @@ public final class JexlOptions {
      * Sets this option flags using the +/- syntax.
      * @param opts the option flags
      */
-    public void setFlags(String[] opts) {
+    public void setFlags(final String[] opts) {
         flags = parseFlags(flags, opts);
     }
     
@@ -253,7 +253,7 @@ public final class JexlOptions {
      * context.
      * @param flag true if antish variables are solved, false otherwise
      */
-    public void setAntish(boolean flag) {
+    public void setAntish(final boolean flag) {
         flags = set(ANTISH, flags, flag);
     }
 
@@ -262,7 +262,7 @@ public final class JexlOptions {
      * null (false) when interrupted during evaluation.
      * @param flag true when cancellable, false otherwise
      */
-    public void setCancellable(boolean flag) {
+    public void setCancellable(final boolean flag) {
         flags = set(CANCELLABLE, flags, flag);
     }
     
@@ -271,7 +271,7 @@ public final class JexlOptions {
      * evaluation.
      * @param flag true if lexical scope is used, false otherwise
      */
-    public void setLexical(boolean flag) {
+    public void setLexical(final boolean flag) {
         flags = set(LEXICAL, flags, flag);
     }   
     
@@ -282,7 +282,7 @@ public final class JexlOptions {
      * If setting to lexical shade, lexical scope is also set.
      * @param flag true if creation is allowed, false otherwise
      */
-    public void setLexicalShade(boolean flag) {
+    public void setLexicalShade(final boolean flag) {
         flags = set(SHADE, flags, flag);
         if (flag) {
             flags = set(LEXICAL, flags, true);
@@ -293,7 +293,7 @@ public final class JexlOptions {
      * Sets the arithmetic math context.
      * @param mcontext the context
      */
-    public void setMathContext(MathContext mcontext) {
+    public void setMathContext(final MathContext mcontext) {
         this.mathContext = mcontext;
     }
 
@@ -301,7 +301,7 @@ public final class JexlOptions {
      * Sets the arithmetic math scale.
      * @param mscale the scale
      */
-    public void setMathScale(int mscale) {
+    public void setMathScale(final int mscale) {
         this.mathScale = mscale;
     }
 
@@ -310,7 +310,7 @@ public final class JexlOptions {
      * during evaluation.
      * @param flag true if safe, false otherwise
      */
-    public void setSafe(boolean flag) {
+    public void setSafe(final boolean flag) {
         flags = set(SAFE, flags, flag);
     } 
 
@@ -319,7 +319,7 @@ public final class JexlOptions {
      * is encountered during evaluation.
      * @param flag true if silent, false otherwise
      */
-    public void setSilent(boolean flag) {
+    public void setSilent(final boolean flag) {
         flags = set(SILENT, flags, flag);
     }
 
@@ -328,7 +328,7 @@ public final class JexlOptions {
      * constructors as errors during evaluation.
      * @param flag true if strict, false otherwise
      */
-    public void setStrict(boolean flag) {
+    public void setStrict(final boolean flag) {
         flags = set(STRICT, flags, flag);
     }
 
@@ -336,7 +336,7 @@ public final class JexlOptions {
      * Sets the strict arithmetic flag.
      * @param stricta true or false
      */
-    public void setStrictArithmetic(boolean stricta) {
+    public void setStrictArithmetic(final boolean stricta) {
         this.strictArithmetic = stricta;
     }
 
@@ -346,7 +346,7 @@ public final class JexlOptions {
      * instead of copied.
      * @param flag true if shared, false if not
      */
-    public void setSharedInstance(boolean flag) {
+    public void setSharedInstance(final boolean flag) {
         flags = set(SHARED, flags, flag);
     }
     
@@ -363,7 +363,7 @@ public final class JexlOptions {
      * @param jexl the engine
      * @return this instance
      */        
-    public JexlOptions set(JexlEngine jexl) {
+    public JexlOptions set(final JexlEngine jexl) {
         if (jexl instanceof Engine) {
             ((Engine) jexl).optionsSet(this);
         }
@@ -375,7 +375,7 @@ public final class JexlOptions {
      * @param src the options
      * @return this instance
      */
-    public JexlOptions set(JexlOptions src) {
+    public JexlOptions set(final JexlOptions src) {
         mathContext = src.mathContext;
         mathScale = src.mathScale;
         strictArithmetic = src.strictArithmetic;
@@ -396,7 +396,7 @@ public final class JexlOptions {
      * Sets the optional map of namespaces.
      * @param ns a namespaces map
      */
-    public void setNamespaces(Map<String, Object> ns) {
+    public void setNamespaces(final Map<String, Object> ns) {
         this.namespaces = ns == null? Collections.emptyMap() : ns;
     }
     

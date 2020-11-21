@@ -20,11 +20,11 @@ public final class ASTStringLiteral extends JexlNode implements JexlNode.Constan
     /** The actual literal value; the inherited 'value' member may host a cached getter. */
     private String literal = null;
 
-    ASTStringLiteral(int id) {
+    ASTStringLiteral(final int id) {
         super(id);
     }
 
-    ASTStringLiteral(Parser p, int id) {
+    ASTStringLiteral(final Parser p, final int id) {
         super(p, id);
     }
 
@@ -43,16 +43,16 @@ public final class ASTStringLiteral extends JexlNode implements JexlNode.Constan
     }
 
     @Override
-    protected boolean isConstant(boolean literal) {
+    protected boolean isConstant(final boolean literal) {
         return true;
     }
 
-    void setLiteral(String literal) {
+    void setLiteral(final String literal) {
         this.literal = literal;
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 }

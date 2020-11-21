@@ -32,11 +32,11 @@ public class ASTJexlScript extends JexlLexicalNode  {
     /** The script scope. */
     private Scope scope = null;
 
-    public ASTJexlScript(int id) {
+    public ASTJexlScript(final int id) {
         super(id);
     }
 
-    public ASTJexlScript(Parser p, int id) {
+    public ASTJexlScript(final Parser p, final int id) {
         super(p, id);
     }
   
@@ -46,7 +46,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      */
     public ASTJexlScript script() {
         if (scope == null && jjtGetNumChildren() == 1 && jjtGetChild(0) instanceof ASTJexlLambda) {
-            ASTJexlLambda lambda = (ASTJexlLambda) jjtGetChild(0);
+            final ASTJexlLambda lambda = (ASTJexlLambda) jjtGetChild(0);
             lambda.jjtSetParent(null);
             return lambda;
         } else {
@@ -55,7 +55,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
     
@@ -63,7 +63,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * Sets this script pragmas.
      * @param thePragmas the pragmas
      */
-    public void setPragmas(Map<String, Object> thePragmas) {
+    public void setPragmas(final Map<String, Object> thePragmas) {
         this.pragmas = thePragmas;
     }
 
@@ -78,7 +78,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * Sets this script features.
      * @param theFeatures the features
      */
-    public void setFeatures(JexlFeatures theFeatures) {
+    public void setFeatures(final JexlFeatures theFeatures) {
         this.features = theFeatures;
     }
 
@@ -93,7 +93,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * Sets this script scope.
      * @param theScope the scope
      */
-    public void setScope(Scope theScope) {
+    public void setScope(final Scope theScope) {
         this.scope = theScope;
         if (theScope != null) {
             for(int a = 0; a < theScope.getArgCount(); ++a) {
@@ -115,7 +115,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @param values the argument values
      * @return the arguments array
      */
-    public Frame createFrame(Frame caller, Object... values) {
+    public Frame createFrame(final Frame caller, final Object... values) {
         return scope != null? scope.createFrame(caller, values) : null;
     }
     
@@ -124,7 +124,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @param values the argument values
      * @return the arguments array
      */
-    public Frame createFrame(Object... values) {
+    public Frame createFrame(final Object... values) {
         return createFrame(null, values);
     }
 
@@ -165,7 +165,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
      * @param symbol the symbol number
      * @return true if captured, false otherwise
      */
-    public boolean isCapturedSymbol(int symbol) {
+    public boolean isCapturedSymbol(final int symbol) {
         return scope != null && scope.isCapturedSymbol(symbol);
     }
 }

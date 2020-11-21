@@ -40,7 +40,7 @@ public class ScriptTest extends JexlTestCase {
         public String getCode () {
             return code;
         }
-        public void setCode(String c) {
+        public void setCode(final String c) {
             code = c;
         }
     }
@@ -56,8 +56,8 @@ public class ScriptTest extends JexlTestCase {
      */
     @Test
     public void testSpacesScript() throws Exception {
-        String code = " ";
-        JexlScript s = JEXL.createScript(code);
+        final String code = " ";
+        final JexlScript s = JEXL.createScript(code);
         Assert.assertNotNull(s);
     }
     
@@ -66,68 +66,68 @@ public class ScriptTest extends JexlTestCase {
      */
     @Test
     public void testSimpleScript() throws Exception {
-        String code = "while (x < 10) x = x + 1;";
-        JexlScript s = JEXL.createScript(code);
-        JexlContext jc = new MapContext();
+        final String code = "while (x < 10) x = x + 1;";
+        final JexlScript s = JEXL.createScript(code);
+        final JexlContext jc = new MapContext();
         jc.set("x", new Integer(1));
 
-        Object o = s.execute(jc);
+        final Object o = s.execute(jc);
         Assert.assertEquals("Result is wrong", new Integer(10), o);
         Assert.assertEquals("getText is wrong", code, s.getSourceText());
     }
 
     @Test
     public void testScriptFromFile() throws Exception {
-        File testScript = new File(TEST1);
-        JexlScript s = JEXL.createScript(testScript);
-        JexlContext jc = new MapContext();
+        final File testScript = new File(TEST1);
+        final JexlScript s = JEXL.createScript(testScript);
+        final JexlContext jc = new MapContext();
         jc.set("out", System.out);
-        Object result = s.execute(jc);
+        final Object result = s.execute(jc);
         Assert.assertNotNull("No result", result);
         Assert.assertEquals("Wrong result", new Integer(7), result);
     }
   
     @Test
     public void testArgScriptFromFile() throws Exception {
-        File testScript = new File(TEST_ADD);
-        JexlScript s = JEXL.createScript(testScript,new String[]{"x","y"});
-        JexlContext jc = new MapContext();
+        final File testScript = new File(TEST_ADD);
+        final JexlScript s = JEXL.createScript(testScript,new String[]{"x","y"});
+        final JexlContext jc = new MapContext();
         jc.set("out", System.out);
-        Object result = s.execute(jc, 13, 29);
+        final Object result = s.execute(jc, 13, 29);
         Assert.assertNotNull("No result", result);
         Assert.assertEquals("Wrong result", new Integer(42), result);
     }
 
     @Test
     public void testScriptFromURL() throws Exception {
-        URL testUrl = new File(TEST1).toURI().toURL();
-        JexlScript s = JEXL.createScript(testUrl);
-        JexlContext jc = new MapContext();
+        final URL testUrl = new File(TEST1).toURI().toURL();
+        final JexlScript s = JEXL.createScript(testUrl);
+        final JexlContext jc = new MapContext();
         jc.set("out", System.out);
-        Object result = s.execute(jc);
+        final Object result = s.execute(jc);
         Assert.assertNotNull("No result", result);
         Assert.assertEquals("Wrong result", new Integer(7), result);
     }
 
     @Test
     public void testArgScriptFromURL() throws Exception {
-        URL testUrl = new File(TEST_ADD).toURI().toURL();
-        JexlScript s = JEXL.createScript(testUrl,new String[]{"x","y"});
-        JexlContext jc = new MapContext();
+        final URL testUrl = new File(TEST_ADD).toURI().toURL();
+        final JexlScript s = JEXL.createScript(testUrl,new String[]{"x","y"});
+        final JexlContext jc = new MapContext();
         jc.set("out", System.out);
-        Object result = s.execute(jc, 13, 29);
+        final Object result = s.execute(jc, 13, 29);
         Assert.assertNotNull("No result", result);
         Assert.assertEquals("Wrong result", new Integer(42), result);
     }
 
     @Test
     public void testScriptUpdatesContext() throws Exception {
-        String jexlCode = "resultat.setCode('OK')";
-        JexlExpression e = JEXL.createExpression(jexlCode);
-        JexlScript s = JEXL.createScript(jexlCode);
+        final String jexlCode = "resultat.setCode('OK')";
+        final JexlExpression e = JEXL.createExpression(jexlCode);
+        final JexlScript s = JEXL.createScript(jexlCode);
 
-        Tester resultatJexl = new Tester();
-        JexlContext jc = new MapContext();
+        final Tester resultatJexl = new Tester();
+        final JexlContext jc = new MapContext();
         jc.set("resultat", resultatJexl);
 
         resultatJexl.setCode("");

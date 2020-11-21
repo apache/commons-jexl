@@ -36,7 +36,7 @@ public abstract class IntegerRange implements Collection<Integer> {
      * @param to   the higher inclusive boundary
      * @return a range
      */
-    public static IntegerRange create(int from, int to) {
+    public static IntegerRange create(final int from, final int to) {
         if (from <= to) {
             return new IntegerRange.Ascending(from, to);
         } else {
@@ -48,7 +48,7 @@ public abstract class IntegerRange implements Collection<Integer> {
      * @param from the lower inclusive boundary
      * @param to  the higher inclusive boundary
      */
-    public IntegerRange(int from, int to) {
+    public IntegerRange(final int from, final int to) {
         min = from;
         max = to;
     }
@@ -81,7 +81,7 @@ public abstract class IntegerRange implements Collection<Integer> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -112,9 +112,9 @@ public abstract class IntegerRange implements Collection<Integer> {
     }
 
     @Override
-    public boolean contains(Object o) {
+    public boolean contains(final Object o) {
         if (o instanceof Number) {
-            long v = ((Number) o).intValue();
+            final long v = ((Number) o).intValue();
             return min <= v && v <= max;
         } else {
             return false;
@@ -124,7 +124,7 @@ public abstract class IntegerRange implements Collection<Integer> {
     @Override
     public Object[] toArray() {
         final int size = size();
-        Object[] array = new Object[size];
+        final Object[] array = new Object[size];
         for(int a = 0; a < size; ++a) {
             array[a] = min + a;
         }
@@ -133,7 +133,7 @@ public abstract class IntegerRange implements Collection<Integer> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T[] toArray(T[] array) {
+    public <T> T[] toArray(final T[] array) {
         final Class<?> ct = array.getClass().getComponentType();
         final int length = size();
         T[] copy = array;
@@ -153,8 +153,8 @@ public abstract class IntegerRange implements Collection<Integer> {
     }
 
     @Override
-    public boolean containsAll(Collection<?> c) {
-        for(Object cc : c) {
+    public boolean containsAll(final Collection<?> c) {
+        for(final Object cc : c) {
             if (!contains(cc)) {
                 return false;
             }
@@ -163,27 +163,27 @@ public abstract class IntegerRange implements Collection<Integer> {
     }
 
     @Override
-    public boolean add(Integer e) {
+    public boolean add(final Integer e) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean remove(Object o) {
+    public boolean remove(final Object o) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean addAll(Collection<? extends Integer> c) {
+    public boolean addAll(final Collection<? extends Integer> c) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean removeAll(Collection<?> c) {
+    public boolean removeAll(final Collection<?> c) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(final Collection<?> c) {
         throw new UnsupportedOperationException();
     }
 
@@ -201,7 +201,7 @@ public abstract class IntegerRange implements Collection<Integer> {
          * @param from lower boundary
          * @param to upper boundary
          */
-        protected Ascending(int from, int to) {
+        protected Ascending(final int from, final int to) {
             super(from, to);
         }
 
@@ -220,7 +220,7 @@ public abstract class IntegerRange implements Collection<Integer> {
          * @param from upper boundary
          * @param to lower boundary
          */
-        protected Descending(int from, int to) {
+        protected Descending(final int from, final int to) {
             super(from, to);
         }
 
@@ -246,7 +246,7 @@ class AscIntegerIterator implements Iterator<Integer> {
      * @param l low boundary
      * @param h high boundary
      */
-    public AscIntegerIterator(int l, int h) {
+    public AscIntegerIterator(final int l, final int h) {
         min = l;
         max = h;
         cursor = min;
@@ -286,7 +286,7 @@ class DescIntegerIterator implements Iterator<Integer> {
      * @param l low boundary
      * @param h high boundary
      */
-    public DescIntegerIterator(int l, int h) {
+    public DescIntegerIterator(final int l, final int h) {
         min = l;
         max = h;
         cursor = max;

@@ -43,7 +43,7 @@ public abstract class Output {
      */
     public static final Output JUNIT = new Output() {
         @Override
-        public void print(String expr, Object actual, Object expected) {
+        public void print(final String expr, final Object actual, final Object expected) {
             Assert.assertEquals(expr, expected, actual);
         }
     };
@@ -54,7 +54,7 @@ public abstract class Output {
      */
     public static final Output SYSTEM = new Output() {
         @Override
-        public void print(String expr, Object actual, Object expected) {
+        public void print(final String expr, final Object actual, final Object expected) {
             System.out.print(expr);
             System.out.println(actual);
         }

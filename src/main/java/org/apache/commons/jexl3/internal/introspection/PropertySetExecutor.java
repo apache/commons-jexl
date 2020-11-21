@@ -42,11 +42,11 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @param value      the value to assign to the property
      * @return the executor if found, null otherwise
      */
-    public static PropertySetExecutor discover(Introspector is, Class<?> clazz, String property, Object value) {
+    public static PropertySetExecutor discover(final Introspector is, final Class<?> clazz, final String property, final Object value) {
         if (property == null || property.isEmpty()) {
             return null;
         }
-        java.lang.reflect.Method method = discoverSet(is, clazz, property, value);
+        final java.lang.reflect.Method method = discoverSet(is, clazz, property, value);
         return method != null? new PropertySetExecutor(clazz, method, property, value) : null;
     }
 
@@ -57,7 +57,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @param key    the key to use as 1st argument to the set method
      * @param value    the value
      */
-    protected PropertySetExecutor(Class<?> clazz, java.lang.reflect.Method method, String key, Object value) {
+    protected PropertySetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final String key, final Object value) {
         super(clazz, method);
         property = key;
         valueClass = classOf(value);
@@ -69,13 +69,13 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
     }
 
     @Override
-    public Object invoke(Object o, Object arg) throws IllegalAccessException, InvocationTargetException {
+    public Object invoke(final Object o, Object arg) throws IllegalAccessException, InvocationTargetException {
         if (method != null) {
             // handle the empty array case
             if (isEmptyArray(arg)) {
                 // if array is empty but its component type is different from the method first parameter component type,
                 // replace argument with a new empty array instance (of the method first parameter component type)
-                Class<?> componentType = method.getParameterTypes()[0].getComponentType();
+                final Class<?> componentType = method.getParameterTypes()[0].getComponentType();
                 if (componentType != null && !componentType.equals(arg.getClass().getComponentType())) {
                     arg = Array.newInstance(componentType, 0);
                 }
@@ -86,7 +86,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
     }
 
     @Override
-    public Object tryInvoke(Object o, Object identifier, Object value) {
+    public Object tryInvoke(final Object o, final Object identifier, final Object value) {
         if (o != null && method != null
             // ensure method name matches the property name
             && property.equals(castString(identifier))
@@ -98,7 +98,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
                 return invoke(o, value);
             } catch (IllegalAccessException | IllegalArgumentException xill) {
                 return TRY_FAILED;// fail
-            } catch (InvocationTargetException xinvoke) {
+            } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw
             } 
         }
@@ -110,7 +110,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @param arg the argument
      * @return true if <code>arg</code> is an empty array
      */
-    private static boolean isEmptyArray(Object arg) {
+    private static boolean isEmptyArray(final Object arg) {
         return (arg != null && arg.getClass().isArray() && Array.getLength(arg) == 0);
     }
 
@@ -125,13 +125,13 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @param arg      the value to assign to the property
      * @return the method if found, null otherwise
      */
-    private static java.lang.reflect.Method discoverSet(Introspector is, Class<?> clazz, String property, Object arg) {
+    private static java.lang.reflect.Method discoverSet(final Introspector is, final Class<?> clazz, final String property, final Object arg) {
         // first, we introspect for the set<identifier> setter method
-        Object[] params = {arg};
-        StringBuilder sb = new StringBuilder("set");
+        final Object[] params = {arg};
+        final StringBuilder sb = new StringBuilder("set");
         sb.append(property);
         // uppercase nth char
-        char c = sb.charAt(SET_START_INDEX);
+        final char c = sb.charAt(SET_START_INDEX);
         sb.setCharAt(SET_START_INDEX, Character.toUpperCase(c));
         java.lang.reflect.Method method = is.getMethod(clazz, sb.toString(), params);
         // lowercase nth char
@@ -160,12 +160,12 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @param mname    the method name to find
      * @return         the sole method that accepts an array as parameter
      */
-    private static java.lang.reflect.Method lookupSetEmptyArray(Introspector is, final Class<?> clazz, String mname) {
+    private static java.lang.reflect.Method lookupSetEmptyArray(final Introspector is, final Class<?> clazz, final String mname) {
         java.lang.reflect.Method candidate = null;
-        java.lang.reflect.Method[] methods = is.getMethods(clazz, mname);
+        final java.lang.reflect.Method[] methods = is.getMethods(clazz, mname);
         if (methods != null) {
-            for (java.lang.reflect.Method method : methods) {
-                Class<?>[] paramTypes = method.getParameterTypes();
+            for (final java.lang.reflect.Method method : methods) {
+                final Class<?>[] paramTypes = method.getParameterTypes();
                 if (paramTypes.length == 1 && paramTypes[0].isArray()) {
                     if (candidate != null) {
                         // because the setter method is overloaded for different parameter type,

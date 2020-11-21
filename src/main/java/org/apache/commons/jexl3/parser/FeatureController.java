@@ -30,7 +30,7 @@ public class FeatureController extends ScriptVisitor {
     /**
      * Creates a features controller .
      */
-    public FeatureController(JexlFeatures features) {
+    public FeatureController(final JexlFeatures features) {
         this.features = features;
     }
 
@@ -38,7 +38,7 @@ public class FeatureController extends ScriptVisitor {
      * Sets the features to controlNode.
      * @param fdesc the features
      */
-    public void setFeatures(JexlFeatures fdesc) {
+    public void setFeatures(final JexlFeatures fdesc) {
         this.features = fdesc;
     }
 
@@ -55,12 +55,12 @@ public class FeatureController extends ScriptVisitor {
      * @param node the node to controlNode
      * @throws JexlException.Feature if required feature is disabled
      */
-    public void controlNode(JexlNode node) {
+    public void controlNode(final JexlNode node) {
         node.jjtAccept(this, null);
     }
 
     @Override
-    protected Object visitNode(JexlNode node, Object data) {
+    protected Object visitNode(final JexlNode node, final Object data) {
         // no need to visit them since we close them one by one
         return data;
     }
@@ -70,8 +70,8 @@ public class FeatureController extends ScriptVisitor {
      * @param feature the feature code
      * @param node    the node that caused it
      */
-    public void throwFeatureException(int feature, JexlNode node) {
-        JexlInfo dbgInfo = node.jexlInfo();
+    public void throwFeatureException(final int feature, final JexlNode node) {
+        final JexlInfo dbgInfo = node.jexlInfo();
         throw new JexlException.Feature(dbgInfo, feature, "");
     }
 
@@ -80,7 +80,7 @@ public class FeatureController extends ScriptVisitor {
      * @param child the child node
      * @return true if string / integer, false otherwise
      */
-    private boolean isArrayReferenceLiteral(JexlNode child) {
+    private boolean isArrayReferenceLiteral(final JexlNode child) {
         if (child instanceof ASTStringLiteral) {
             return true;
         }
@@ -91,10 +91,10 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
-    protected Object visit(ASTArrayAccess node, Object data) {
+    protected Object visit(final ASTArrayAccess node, final Object data) {
         if (!features.supportsArrayReferenceExpr()) {
             for (int i = 0; i < node.jjtGetNumChildren(); ++i) {
-                JexlNode child = node.jjtGetChild(i);
+                final JexlNode child = node.jjtGetChild(i);
                 if (!isArrayReferenceLiteral(child)) {
                     throwFeatureException(JexlFeatures.ARRAY_REF_EXPR, child);
                 }
@@ -104,7 +104,7 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
-    protected Object visit(ASTWhileStatement node, Object data) {
+    protected Object visit(final ASTWhileStatement node, final Object data) {
         if (!features.supportsLoops()) {
             throwFeatureException(JexlFeatures.LOOP, node);
         }
@@ -112,7 +112,7 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
-    protected Object visit(ASTDoWhileStatement node, Object data) {
+    protected Object visit(final ASTDoWhileStatement node, final Object data) {
         if (!features.supportsLoops()) {
             throwFeatureException(JexlFeatures.LOOP, node);
         }
@@ -120,7 +120,7 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
-    protected Object visit(ASTForeachStatement node, Object data) {
+    protected Object visit(final ASTForeachStatement node, final Object data) {
         if (!features.supportsLoops()) {
             throwFeatureException(JexlFeatures.LOOP, node);
         }
@@ -128,7 +128,7 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
-    protected Object visit(ASTConstructorNode node, Object data) {
+    protected Object visit(final ASTConstructorNode node, final Object data) {
         if (!features.supportsNewInstance()) {
             throwFeatureException(JexlFeatures.NEW_INSTANCE, node);
         }
@@ -136,7 +136,7 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
-    protected Object visit(ASTMethodNode node, Object data) {
+    protected Object visit(final ASTMethodNode node, final Object data) {
         if (!features.supportsMethodCall()) {
             throwFeatureException(JexlFeatures.METHOD_CALL, node);
         }
@@ -144,7 +144,7 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
-    protected Object visit(ASTAnnotation node, Object data) {
+    protected Object visit(final ASTAnnotation node, final Object data) {
         if (!features.supportsAnnotation()) {
             throwFeatureException(JexlFeatures.ANNOTATION, node);
         }
@@ -152,7 +152,7 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
-    protected Object visit(ASTArrayLiteral node, Object data) {
+    protected Object visit(final ASTArrayLiteral node, final Object data) {
         if (!features.supportsStructuredLiteral()) {
             throwFeatureException(JexlFeatures.STRUCTURED_LITERAL, node);
         }
@@ -160,7 +160,7 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
-    protected Object visit(ASTMapLiteral node, Object data) {
+    protected Object visit(final ASTMapLiteral node, final Object data) {
         if (!features.supportsStructuredLiteral()) {
             throwFeatureException(JexlFeatures.STRUCTURED_LITERAL, node);
         }
@@ -168,7 +168,7 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
-    protected Object visit(ASTSetLiteral node, Object data) {
+    protected Object visit(final ASTSetLiteral node, final Object data) {
         if (!features.supportsStructuredLiteral()) {
             throwFeatureException(JexlFeatures.STRUCTURED_LITERAL, node);
         }
@@ -176,15 +176,15 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
-    protected Object visit(ASTRangeNode node, Object data) {
+    protected Object visit(final ASTRangeNode node, final Object data) {
         if (!features.supportsStructuredLiteral()) {
             throwFeatureException(JexlFeatures.STRUCTURED_LITERAL, node);
         }
         return data;
     }
 
-    private Object controlSideEffect(JexlNode node, Object data) {
-        JexlNode lv = node.jjtGetChild(0);
+    private Object controlSideEffect(final JexlNode node, final Object data) {
+        final JexlNode lv = node.jjtGetChild(0);
         if (!features.supportsSideEffectGlobal() && lv.isGlobalVar()) {
             throwFeatureException(JexlFeatures.SIDE_EFFECT_GLOBAL, lv);
         }
@@ -195,42 +195,42 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
-    protected Object visit(ASTAssignment node, Object data) {
+    protected Object visit(final ASTAssignment node, final Object data) {
         return controlSideEffect(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetAddNode node, Object data) {
+    protected Object visit(final ASTSetAddNode node, final Object data) {
         return controlSideEffect(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetMultNode node, Object data) {
+    protected Object visit(final ASTSetMultNode node, final Object data) {
         return controlSideEffect(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetDivNode node, Object data) {
+    protected Object visit(final ASTSetDivNode node, final Object data) {
         return controlSideEffect(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetAndNode node, Object data) {
+    protected Object visit(final ASTSetAndNode node, final Object data) {
         return controlSideEffect(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetOrNode node, Object data) {
+    protected Object visit(final ASTSetOrNode node, final Object data) {
         return controlSideEffect(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetXorNode node, Object data) {
+    protected Object visit(final ASTSetXorNode node, final Object data) {
         return controlSideEffect(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetSubNode node, Object data) {
+    protected Object visit(final ASTSetSubNode node, final Object data) {
         return controlSideEffect(node, data);
     }
 

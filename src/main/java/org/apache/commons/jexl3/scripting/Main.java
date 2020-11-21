@@ -41,7 +41,7 @@ public class Main {
      * @return the reader
      * @throws Exception if anything goes wrong
      */
-    static BufferedReader read(Charset charset, String fileName) throws Exception {
+    static BufferedReader read(final Charset charset, final String fileName) throws Exception {
         return new BufferedReader(
             new InputStreamReader(
                     fileName == null
@@ -66,22 +66,22 @@ public class Main {
      *
      * @throws Exception if parsing or IO fail
      */
-    public static void main(String[] args) throws Exception {
-        JexlScriptEngineFactory fac = new JexlScriptEngineFactory();
-        ScriptEngine engine = fac.getScriptEngine();
+    public static void main(final String[] args) throws Exception {
+        final JexlScriptEngineFactory fac = new JexlScriptEngineFactory();
+        final ScriptEngine engine = fac.getScriptEngine();
         engine.put("args", args);
         if (args.length == 1){
-            Object value = engine.eval(read(null, args[0]));
+            final Object value = engine.eval(read(null, args[0]));
             System.out.println("Return value: "+value);
         } else {
-            BufferedReader console = read(null, null);
+            final BufferedReader console = read(null, null);
             String line;
             System.out.print("> ");
             while(null != (line=console.readLine())){
                 try {
-                    Object value = engine.eval(line);
+                    final Object value = engine.eval(line);
                     System.out.println("Return value: "+value);
-                } catch (ScriptException e) {
+                } catch (final ScriptException e) {
                     System.out.println(e.getLocalizedMessage());
                 }
                 System.out.print("> ");

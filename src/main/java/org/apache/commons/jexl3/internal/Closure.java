@@ -33,7 +33,7 @@ public class Closure extends Script {
      * @param theCaller the calling interpreter
      * @param lambda the lambda
      */
-    protected Closure(Interpreter theCaller, ASTJexlLambda lambda) {
+    protected Closure(final Interpreter theCaller, final ASTJexlLambda lambda) {
         super(theCaller.jexl, null, lambda);
         frame = lambda.createFrame(theCaller.frame);
     }
@@ -43,9 +43,9 @@ public class Closure extends Script {
      * @param base the base script
      * @param args the script arguments
      */
-    protected Closure(Script base, Object[] args) {
+    protected Closure(final Script base, final Object[] args) {
         super(base.jexl, base.source, base.script);
-        Frame sf = (base instanceof Closure) ? ((Closure) base).frame :  null;
+        final Frame sf = (base instanceof Closure) ? ((Closure) base).frame :  null;
         frame = sf == null
                 ? script.createFrame(args)
                 : sf.assign(args);
@@ -63,7 +63,7 @@ public class Closure extends Script {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -97,12 +97,12 @@ public class Closure extends Script {
      * @param symbol the symbol index (in the caller of this closure)
      * @param value the value to set in the local frame
      */
-    public void setCaptured(int symbol, Object value) {
+    public void setCaptured(final int symbol, final Object value) {
         if (script instanceof ASTJexlLambda) {
-            ASTJexlLambda lambda = (ASTJexlLambda) script;
-            Scope scope = lambda.getScope();
+            final ASTJexlLambda lambda = (ASTJexlLambda) script;
+            final Scope scope = lambda.getScope();
             if (scope != null) {
-                Integer reg = scope.getCaptured(symbol);
+                final Integer reg = scope.getCaptured(symbol);
                 if (reg != null) {
                     frame.set(reg, value);
                 }
@@ -111,25 +111,25 @@ public class Closure extends Script {
     }
 
     @Override
-    public Object evaluate(JexlContext context) {
+    public Object evaluate(final JexlContext context) {
         return execute(context, (Object[])null);
     }
 
     @Override
-    public Object execute(JexlContext context) {
+    public Object execute(final JexlContext context) {
         return execute(context, (Object[])null);
     }
 
     @Override
-    public Object execute(JexlContext context, Object... args) {
-        Frame local = frame != null? frame.assign(args) : null;
-        Interpreter interpreter = createInterpreter(context, local);
+    public Object execute(final JexlContext context, final Object... args) {
+        final Frame local = frame != null? frame.assign(args) : null;
+        final Interpreter interpreter = createInterpreter(context, local);
         return interpreter.runClosure(this, null);
     }
 
     @Override
-    public Callable callable(JexlContext context, Object... args) {
-        Frame local = frame != null? frame.assign(args) : null;
+    public Callable callable(final JexlContext context, final Object... args) {
+        final Frame local = frame != null? frame.assign(args) : null;
         return new Callable(createInterpreter(context, local)) {
             @Override
             public Object interpret() {

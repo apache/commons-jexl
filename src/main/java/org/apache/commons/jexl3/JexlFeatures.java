@@ -112,7 +112,7 @@ public final class JexlFeatures {
      * Copy constructor.
      * @param features the feature to copy from
      */
-    public JexlFeatures(JexlFeatures features) {
+    public JexlFeatures(final JexlFeatures features) {
         this.flags = features.flags;
         this.reservedNames = features.reservedNames;
     }
@@ -126,7 +126,7 @@ public final class JexlFeatures {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -151,7 +151,7 @@ public final class JexlFeatures {
      * @param feature the feature number
      * @return the feature name
      */
-    public static String stringify(int feature) {
+    public static String stringify(final int feature) {
         return feature >= 0 && feature < F_NAMES.length ? F_NAMES[feature] : "unsupported feature";
     }
 
@@ -160,7 +160,7 @@ public final class JexlFeatures {
      * @param names the names to reserve
      * @return this features instance
      */
-    public JexlFeatures reservedNames(Collection<String> names) {
+    public JexlFeatures reservedNames(final Collection<String> names) {
         if (names == null || names.isEmpty()) {
             reservedNames = Collections.emptySet();
         } else {
@@ -182,7 +182,7 @@ public final class JexlFeatures {
      * @param name the name to check
      * @return true if reserved, false otherwise
      */
-    public boolean isReservedName(String name) {
+    public boolean isReservedName(final String name) {
         return name != null && reservedNames.contains(name);
     }
 
@@ -191,7 +191,7 @@ public final class JexlFeatures {
      * @param feature the feature ordinal
      * @param flag    turn-on, turn off
      */
-    private void setFeature(int feature, boolean flag) {
+    private void setFeature(final int feature, final boolean flag) {
         if (flag) {
             flags |= (1 << feature);
         } else {
@@ -204,7 +204,7 @@ public final class JexlFeatures {
      * @param feature feature ordinal
      * @return true if on, false if off
      */
-    private boolean getFeature(int feature) {
+    private boolean getFeature(final int feature) {
         return (flags & (1L << feature)) != 0L;
     }
 
@@ -217,7 +217,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures register(boolean flag) {
+    public JexlFeatures register(final boolean flag) {
         setFeature(REGISTER, flag);
         return this;
     }
@@ -237,7 +237,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures localVar(boolean flag) {
+    public JexlFeatures localVar(final boolean flag) {
         setFeature(LOCAL_VAR, flag);
         return this;
     }
@@ -257,7 +257,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures sideEffectGlobal(boolean flag) {
+    public JexlFeatures sideEffectGlobal(final boolean flag) {
         setFeature(SIDE_EFFECT_GLOBAL, flag);
         return this;
     }
@@ -277,7 +277,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures sideEffect(boolean flag) {
+    public JexlFeatures sideEffect(final boolean flag) {
         setFeature(SIDE_EFFECT, flag);
         return this;
     }
@@ -297,7 +297,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures arrayReferenceExpr(boolean flag) {
+    public JexlFeatures arrayReferenceExpr(final boolean flag) {
         setFeature(ARRAY_REF_EXPR, flag);
         return this;
     }
@@ -317,7 +317,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures methodCall(boolean flag) {
+    public JexlFeatures methodCall(final boolean flag) {
         setFeature(METHOD_CALL, flag);
         return this;
     }
@@ -337,7 +337,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures structuredLiteral(boolean flag) {
+    public JexlFeatures structuredLiteral(final boolean flag) {
         setFeature(STRUCTURED_LITERAL, flag);
         return this;
     }
@@ -357,7 +357,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures newInstance(boolean flag) {
+    public JexlFeatures newInstance(final boolean flag) {
         setFeature(NEW_INSTANCE, flag);
         return this;
     }
@@ -377,7 +377,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures loops(boolean flag) {
+    public JexlFeatures loops(final boolean flag) {
         setFeature(LOOP, flag);
         return this;
     }
@@ -397,7 +397,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures lambda(boolean flag) {
+    public JexlFeatures lambda(final boolean flag) {
         setFeature(LAMBDA, flag);
         return this;
     }
@@ -417,7 +417,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures pragma(boolean flag) {
+    public JexlFeatures pragma(final boolean flag) {
         setFeature(PRAGMA, flag);
         return this;
     }
@@ -437,7 +437,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures annotation(boolean flag) {
+    public JexlFeatures annotation(final boolean flag) {
         setFeature(ANNOTATION, flag);
         return this;
     }
@@ -457,7 +457,7 @@ public final class JexlFeatures {
      * @param flag true to enable, false to disable
      * @return this features instance
      */
-    public JexlFeatures script(boolean flag) {
+    public JexlFeatures script(final boolean flag) {
         setFeature(SCRIPT, flag);
         return this;
     }
@@ -483,7 +483,7 @@ public final class JexlFeatures {
      * @param flag true means syntactic lexical function scope is in effect, false implies non-lexical scoping 
      * @return this features instance
      */
-    public JexlFeatures lexical(boolean flag) {
+    public JexlFeatures lexical(final boolean flag) {
         setFeature(LEXICAL, flag);
         return this;
     }
@@ -500,7 +500,7 @@ public final class JexlFeatures {
      * @param flag true means syntactic lexical shade is in effect and implies lexical scope
      * @return this features instance
      */
-    public JexlFeatures lexicalShade(boolean flag) {
+    public JexlFeatures lexicalShade(final boolean flag) {
         setFeature(LEXICAL_SHADE, flag);
         if (flag) {
             setFeature(LEXICAL, true);

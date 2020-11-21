@@ -43,12 +43,12 @@ public class ParseFailuresTest extends JexlTestCase {
     @Test
     public void testMalformedExpression1() throws Exception {
         // this will throw a JexlException
-        String badExpression = "eq";
+        final String badExpression = "eq";
         try {
             JEXL.createExpression(badExpression);
             Assert.fail("Parsing \"" + badExpression
                     + "\" should result in a JexlException");
-        } catch (JexlException pe) {
+        } catch (final JexlException pe) {
             // expected
             LOGGER.info(pe);
         }
@@ -57,12 +57,12 @@ public class ParseFailuresTest extends JexlTestCase {
     @Test
     public void testMalformedExpression2() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a JexlException
-        String badExpression = "?";
+        final String badExpression = "?";
         try {
             JEXL.createExpression(badExpression);
             Assert.fail("Parsing \"" + badExpression
                     + "\" should result in a JexlException");
-        } catch (JexlException pe) {
+        } catch (final JexlException pe) {
             // expected
             LOGGER.info(pe);
         }
@@ -71,12 +71,12 @@ public class ParseFailuresTest extends JexlTestCase {
     @Test
     public void testMalformedScript1() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a JexlException
-        String badScript = "eq";
+        final String badScript = "eq";
         try {
             JEXL.createScript(badScript);
             Assert.fail("Parsing \"" + badScript
                     + "\" should result in a JexlException");
-        } catch (JexlException pe) {
+        } catch (final JexlException pe) {
             // expected
             LOGGER.info(pe);
         }
@@ -85,12 +85,12 @@ public class ParseFailuresTest extends JexlTestCase {
     @Test
     public void testMalformedScript2() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a JexlException
-        String badScript = "?";
+        final String badScript = "?";
         try {
             JEXL.createScript(badScript);
             Assert.fail("Parsing \"" + badScript
                     + "\" should result in a JexlException");
-        } catch (JexlException pe) {
+        } catch (final JexlException pe) {
             // expected
             LOGGER.info(pe);
         }
@@ -99,12 +99,12 @@ public class ParseFailuresTest extends JexlTestCase {
     @Test
     public void testMalformedScript3() throws Exception {
         // this will throw a TokenMgrErr, which we rethrow as a JexlException
-        String badScript = "foo=1;bar=2;a?b:c:d;";
+        final String badScript = "foo=1;bar=2;a?b:c:d;";
         try {
             JEXL.createScript(badScript);
             Assert.fail("Parsing \"" + badScript
                     + "\" should result in a JexlException");
-        } catch (JexlException pe) {
+        } catch (final JexlException pe) {
             // expected
             LOGGER.error(pe);
         }

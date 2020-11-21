@@ -92,7 +92,7 @@ public final class Introspector {
      * @param log     the logger to use
      * @param cloader the class loader
      */
-    public Introspector(Log log, ClassLoader cloader) {
+    public Introspector(final Log log, final ClassLoader cloader) {
         this(log, cloader, null);
     }
 
@@ -102,7 +102,7 @@ public final class Introspector {
      * @param cloader the class loader
      * @param perms the permissions
      */
-    public Introspector(Log log, ClassLoader cloader, Permissions perms) {
+    public Introspector(final Log log, final ClassLoader cloader, final Permissions perms) {
         this.logger = log;
         this.loader = cloader;
         this.permissions = perms != null? perms : Permissions.DEFAULT;
@@ -113,10 +113,10 @@ public final class Introspector {
      * @param className the class name
      * @return the class instance or null if it could not be found
      */
-    public Class<?> getClassByName(String className) {
+    public Class<?> getClassByName(final String className) {
         try {
             return Class.forName(className, false, loader);
-        } catch (ClassNotFoundException xignore) {
+        } catch (final ClassNotFoundException xignore) {
             return null;
         }
     }
@@ -129,7 +129,7 @@ public final class Introspector {
      * @return the desired method object
      * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
      */
-    public Method getMethod(Class<?> c, String name, Object[] params) {
+    public Method getMethod(final Class<?> c, final String name, final Object[] params) {
         return getMethod(c, new MethodKey(name, params));
     }
 
@@ -141,10 +141,10 @@ public final class Introspector {
      * @return The desired method object
      * @throws MethodKey.AmbiguousException if no unambiguous method could be found through introspection
      */
-    public Method getMethod(Class<?> c, MethodKey key) {
+    public Method getMethod(final Class<?> c, final MethodKey key) {
         try {
             return getMap(c).getMethod(key);
-        } catch (MethodKey.AmbiguousException xambiguous) {
+        } catch (final MethodKey.AmbiguousException xambiguous) {
             // whoops. Ambiguous and not benign. Make a nice log message and return null...
             if (logger != null && xambiguous.isSevere() && logger.isInfoEnabled()) {
                 logger.info("ambiguous method invocation: "
@@ -162,7 +162,7 @@ public final class Introspector {
      * @param key Name of the field being searched for
      * @return the desired field or null if it does not exist or is not accessible
      * */
-    public Field getField(Class<?> c, String key) {
+    public Field getField(final Class<?> c, final String key) {
         return getMap(c).getField(key);
     }
 
@@ -171,11 +171,11 @@ public final class Introspector {
      * @param c the class
      * @return the class field names
      */
-    public String[] getFieldNames(Class<?> c) {
+    public String[] getFieldNames(final Class<?> c) {
         if (c == null) {
             return new String[0];
         }
-        ClassMap classMap = getMap(c);
+        final ClassMap classMap = getMap(c);
         return classMap.getFieldNames();
     }
 
@@ -184,11 +184,11 @@ public final class Introspector {
      * @param c the class
      * @return the class method names
      */
-    public String[] getMethodNames(Class<?> c) {
+    public String[] getMethodNames(final Class<?> c) {
         if (c == null) {
             return new String[0];
         }
-        ClassMap classMap = getMap(c);
+        final ClassMap classMap = getMap(c);
         return classMap.getMethodNames();
     }
 
@@ -198,11 +198,11 @@ public final class Introspector {
      * @param methodName the method name
      * @return the array of methods (null or not empty)
      */
-    public Method[] getMethods(Class<?> c, String methodName) {
+    public Method[] getMethods(final Class<?> c, final String methodName) {
         if (c == null) {
             return null;
         }
-        ClassMap classMap = getMap(c);
+        final ClassMap classMap = getMap(c);
         return classMap.getMethods(methodName);
     }
 
@@ -259,8 +259,8 @@ public final class Introspector {
                     // add it to list of known loaded classes
                     constructibleClasses.put(cname, clazz);
                 }
-                List<Constructor<?>> l = new ArrayList<>();
-                for (Constructor<?> ictor : clazz.getConstructors()) {
+                final List<Constructor<?>> l = new ArrayList<>();
+                for (final Constructor<?> ictor : clazz.getConstructors()) {
                     if (permissions.allow(ictor)) {
                         l.add(ictor);
                     }
@@ -272,14 +272,14 @@ public final class Introspector {
                 } else {
                     constructorsMap.put(key, CTOR_MISS);
                 }
-            } catch (ClassNotFoundException xnotfound) {
+            } catch (final ClassNotFoundException xnotfound) {
                 if (logger != null && logger.isDebugEnabled()) {
                     logger.debug("unable to find class: "
                             + cname + "."
                             + key.debugString(), xnotfound);
                 }
                 ctor = null;
-            } catch (MethodKey.AmbiguousException xambiguous) {
+            } catch (final MethodKey.AmbiguousException xambiguous) {
                 if (logger != null  && xambiguous.isSevere() &&  logger.isInfoEnabled()) {
                     logger.info("ambiguous constructor invocation: "
                             + cname + "."
@@ -298,7 +298,7 @@ public final class Introspector {
      * @param c the class
      * @return the class map
      */
-    private ClassMap getMap(Class<?> c) {
+    private ClassMap getMap(final Class<?> c) {
         ClassMap classMap;
         try {
             lock.readLock().lock();
@@ -329,7 +329,7 @@ public final class Introspector {
      * @param cloader the class loader; if null, use this instance class loader
      */
     public void setLoader(ClassLoader cloader) {
-        ClassLoader previous = loader;
+        final ClassLoader previous = loader;
         if (cloader == null) {
             cloader = getClass().getClassLoader();
         }
@@ -337,10 +337,10 @@ public final class Introspector {
             try {
                 lock.writeLock().lock();
                 // clean up constructor and class maps
-                Iterator<Map.Entry<MethodKey, Constructor<?>>> mentries = constructorsMap.entrySet().iterator();
+                final Iterator<Map.Entry<MethodKey, Constructor<?>>> mentries = constructorsMap.entrySet().iterator();
                 while (mentries.hasNext()) {
-                    Map.Entry<MethodKey, Constructor<?>> entry = mentries.next();
-                    Class<?> clazz = entry.getValue().getDeclaringClass();
+                    final Map.Entry<MethodKey, Constructor<?>> entry = mentries.next();
+                    final Class<?> clazz = entry.getValue().getDeclaringClass();
                     if (isLoadedBy(previous, clazz)) {
                         mentries.remove();
                         // the method name is the name of the class
@@ -348,10 +348,10 @@ public final class Introspector {
                     }
                 }
                 // clean up method maps
-                Iterator<Map.Entry<Class<?>, ClassMap>> centries = classMethodMaps.entrySet().iterator();
+                final Iterator<Map.Entry<Class<?>, ClassMap>> centries = classMethodMaps.entrySet().iterator();
                 while (centries.hasNext()) {
-                    Map.Entry<Class<?>, ClassMap> entry = centries.next();
-                    Class<?> clazz = entry.getKey();
+                    final Map.Entry<Class<?>, ClassMap> entry = centries.next();
+                    final Class<?> clazz = entry.getKey();
                     if (isLoadedBy(previous, clazz)) {
                         centries.remove();
                     }
@@ -377,7 +377,7 @@ public final class Introspector {
      * @param clazz  the class to check
      * @return true if clazz was loaded through the loader, false otherwise
      */
-    private static boolean isLoadedBy(ClassLoader loader, Class<?> clazz) {
+    private static boolean isLoadedBy(final ClassLoader loader, final Class<?> clazz) {
         if (loader != null) {
             ClassLoader cloader = clazz.getClassLoader();
             while (cloader != null) {

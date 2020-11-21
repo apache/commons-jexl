@@ -38,8 +38,8 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
      * @param property the property name to find
      * @return the executor if found, null otherwise
      */
-    public static PropertyGetExecutor discover(Introspector is, Class<?> clazz, String property) {
-        java.lang.reflect.Method method = discoverGet(is, "get", clazz, property);
+    public static PropertyGetExecutor discover(final Introspector is, final Class<?> clazz, final String property) {
+        final java.lang.reflect.Method method = discoverGet(is, "get", clazz, property);
         return method == null? null : new PropertyGetExecutor(clazz, method, property);
     }
 
@@ -49,7 +49,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
      * @param method the method held by this executor
      * @param identifier the property to get
      */
-    private PropertyGetExecutor(Class<?> clazz, java.lang.reflect.Method method, String identifier) {
+    private PropertyGetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final String identifier) {
         super(clazz, method);
         property = identifier;
     }
@@ -60,12 +60,12 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
     }
 
     @Override
-    public Object invoke(Object o) throws IllegalAccessException, InvocationTargetException {
+    public Object invoke(final Object o) throws IllegalAccessException, InvocationTargetException {
         return method == null ? null : method.invoke(o, (Object[]) null);
     }
 
     @Override
-    public Object tryInvoke(Object o, Object identifier) {
+    public Object tryInvoke(final Object o, final Object identifier) {
         if (o != null && method != null
             && property.equals(castString(identifier))
             && objectClass.equals(o.getClass())) {
@@ -73,7 +73,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
                 return method.invoke(o, (Object[]) null);
             } catch (IllegalAccessException | IllegalArgumentException xill) {
                 return TRY_FAILED;// fail
-            } catch (InvocationTargetException xinvoke) {
+            } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw
             } 
         }
@@ -88,7 +88,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
      * @param property The property being addressed.
      * @return The {get,is}{p,P}roperty method if one exists, null otherwise.
      */
-    static java.lang.reflect.Method discoverGet(Introspector is, String which, Class<?> clazz, String property) {
+    static java.lang.reflect.Method discoverGet(final Introspector is, final String which, final Class<?> clazz, final String property) {
         if (property == null || property.isEmpty()) {
             return null;
         }
@@ -96,10 +96,10 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
         java.lang.reflect.Method method;
         final int start = which.length(); // "get" or "is" so 3 or 2 for char case switch
         // start with get<Property>
-        StringBuilder sb = new StringBuilder(which);
+        final StringBuilder sb = new StringBuilder(which);
         sb.append(property);
         // uppercase nth char
-        char c = sb.charAt(start);
+        final char c = sb.charAt(start);
         sb.setCharAt(start, Character.toUpperCase(c));
         method = is.getMethod(clazz, sb.toString(), EMPTY_PARAMS);
         //lowercase nth char

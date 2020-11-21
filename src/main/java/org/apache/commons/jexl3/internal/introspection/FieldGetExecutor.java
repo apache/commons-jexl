@@ -37,9 +37,9 @@ public final class FieldGetExecutor implements JexlPropertyGet {
      * @param identifier the key to use as an argument to the get method
      * @return the executor if found, null otherwise
      */
-    public static JexlPropertyGet discover(Introspector is, Class<?> clazz, String identifier) {
+    public static JexlPropertyGet discover(final Introspector is, final Class<?> clazz, final String identifier) {
         if (identifier != null) {
-            Field field = is.getField(clazz, identifier);
+            final Field field = is.getField(clazz, identifier);
             if (field != null) {
                 return new FieldGetExecutor(field);
             }
@@ -50,21 +50,21 @@ public final class FieldGetExecutor implements JexlPropertyGet {
      * Creates a new instance of FieldPropertyGet.
      * @param theField the class public field
      */
-    private FieldGetExecutor(Field theField) {
+    private FieldGetExecutor(final Field theField) {
         field = theField;
     }
 
     @Override
-    public Object invoke(Object obj) throws Exception {
+    public Object invoke(final Object obj) throws Exception {
         return field.get(obj);
     }
 
     @Override
-    public Object tryInvoke(Object obj, Object key) {
+    public Object tryInvoke(final Object obj, final Object key) {
         if (obj.getClass().equals(field.getDeclaringClass()) && key.equals(field.getName())) {
             try {
                 return field.get(obj);
-            } catch (IllegalAccessException xill) {
+            } catch (final IllegalAccessException xill) {
                 return Uberspect.TRY_FAILED;
             }
         }
@@ -72,7 +72,7 @@ public final class FieldGetExecutor implements JexlPropertyGet {
     }
 
     @Override
-    public boolean tryFailed(Object rval) {
+    public boolean tryFailed(final Object rval) {
         return rval == Uberspect.TRY_FAILED;
     }
 

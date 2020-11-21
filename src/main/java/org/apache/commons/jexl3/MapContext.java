@@ -43,22 +43,22 @@ public class MapContext implements JexlContext {
      * 
      * @param vars the variable map
      */
-    public MapContext(Map<String, Object> vars) {
+    public MapContext(final Map<String, Object> vars) {
         map = vars == null ? new HashMap<String, Object>() : vars;
     }
 
     @Override
-    public boolean has(String name) {
+    public boolean has(final String name) {
         return map.containsKey(name);
     }
 
     @Override
-    public Object get(String name) {
+    public Object get(final String name) {
         return map.get(name);
     }
 
     @Override
-    public void set(String name, Object value) {
+    public void set(final String name, final Object value) {
         map.put(name, value);
     }
 

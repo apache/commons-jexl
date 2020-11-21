@@ -39,7 +39,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * @param monitor the synchronization monitor
      * @param strict  whether the arithmetic is strict or not
      */
-    protected SynchronizedArithmetic(Monitor monitor, boolean strict) {
+    protected SynchronizedArithmetic(final Monitor monitor, final boolean strict) {
         super(strict);
         this.monitor = monitor;
     }
@@ -60,7 +60,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
          * Enter an object monitor.
          * @param o the monitored object
          */
-        protected void monitorEnter(Object o) {
+        protected void monitorEnter(final Object o) {
             enters.incrementAndGet();
         }
 
@@ -68,7 +68,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
          * Exits an object monitor.
          * @param o the monitored object
          */
-        protected void monitorExit(Object o) {
+        protected void monitorExit(final Object o) {
             exits.incrementAndGet();
         }
 
@@ -126,7 +126,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
          private final Map<Object, Object> monitored = new IdentityHashMap<Object, Object>();
 
         @Override
-        protected void monitorEnter(Object o) {
+        protected void monitorEnter(final Object o) {
             Object guard;
             try {
                 while (true) {
@@ -143,12 +143,12 @@ public class SynchronizedArithmetic extends JexlArithmetic {
                         guard.wait();
                     }
                 }
-            } catch (InterruptedException xint) {
+            } catch (final InterruptedException xint) {
                 // oops
             }
         }
 
-        @Override protected void monitorExit(Object o) {
+        @Override protected void monitorExit(final Object o) {
             final Object guard;
             synchronized(monitored) {
                 guard = monitored.remove(o);
@@ -170,7 +170,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
         private final Object monitored;
         private Iterator<Object> iterator;
 
-        SynchronizedIterator(Object locked, Iterator<Object> ii) {
+        SynchronizedIterator(final Object locked, final Iterator<Object> ii) {
             monitored = locked;
             monitor.monitorEnter(monitored);
             try {
@@ -201,7 +201,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
             if (iterator == null) {
                 return false;
             }
-            boolean n = iterator.hasNext();
+            final boolean n = iterator.hasNext();
             if (!n) {
                 close();
             }
@@ -231,7 +231,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * @param key the key
      * @return the value associated to the key in the map
      */
-    public Object arrayGet(Map<?, ?> map, Object key) {
+    public Object arrayGet(final Map<?, ?> map, final Object key) {
         monitor.monitorEnter(map);
         try {
             return map.get(key);
@@ -246,7 +246,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * @param key the key
      * @param value the value
      */
-    public void arraySet(Map<Object, Object> map, Object key, Object value) {
+    public void arraySet(final Map<Object, Object> map, final Object key, final Object value) {
         monitor.monitorEnter(map);
         try {
             map.put(key, value);
@@ -262,7 +262,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * @param key the key
      * @return the value associated to the key in the map
      */
-    public Object propertyGet(Map<?, ?> map, Object key) {
+    public Object propertyGet(final Map<?, ?> map, final Object key) {
         monitor.monitorEnter(map);
         try {
             return map.get(key);
@@ -278,7 +278,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * @param key the key
      * @param value the value
      */
-    public void propertySet(Map<Object, Object> map, Object key, Object value) {
+    public void propertySet(final Map<Object, Object> map, final Object key, final Object value) {
         monitor.monitorEnter(map);
         try {
             map.put(key, value);
@@ -292,7 +292,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
      * @param map the map
      * @return the iterator
      */
-    public Iterator<Object> forEach(Map<Object, Object> map) {
+    public Iterator<Object> forEach(final Map<Object, Object> map) {
         return new SynchronizedIterator(map, map.values().iterator());
     }
 }

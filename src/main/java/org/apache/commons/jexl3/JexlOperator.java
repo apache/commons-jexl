@@ -343,7 +343,7 @@ public enum JexlOperator {
      * @param m    the method name associated to this operator in a JexlArithmetic
      * @param argc the number of parameters for the method
      */
-    JexlOperator(String o, String m, int argc) {
+    JexlOperator(final String o, final String m, final int argc) {
         this.operator = o;
         this.methodName = m;
         this.arity = argc;
@@ -357,7 +357,7 @@ public enum JexlOperator {
      * @param m the method name associated to this operator in a JexlArithmetic
      * @param b the base operator, ie + for +=
      */
-    JexlOperator(String o, String m, JexlOperator b) {
+    JexlOperator(final String o, final String m, final JexlOperator b) {
         this.operator = o;
         this.methodName = m;
         this.arity = 2;

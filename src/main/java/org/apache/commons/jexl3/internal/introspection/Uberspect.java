@@ -77,7 +77,7 @@ public class Uberspect implements JexlUberspect {
      * @param runtimeLogger the logger used for all logging needs
      * @param sty the resolver strategy
      */
-    public Uberspect(Log runtimeLogger, JexlUberspect.ResolverStrategy sty) {
+    public Uberspect(final Log runtimeLogger, final JexlUberspect.ResolverStrategy sty) {
         this(runtimeLogger, sty, null);
     }
 
@@ -87,7 +87,7 @@ public class Uberspect implements JexlUberspect {
      * @param sty the resolver strategy
      * @param perms the introspector permissions
      */
-    public Uberspect(Log runtimeLogger, JexlUberspect.ResolverStrategy sty, Permissions perms) {
+    public Uberspect(final Log runtimeLogger, final JexlUberspect.ResolverStrategy sty, final Permissions perms) {
         logger = runtimeLogger;
         strategy = sty == null? JexlUberspect.JEXL_STRATEGY : sty;
         permissions  = perms;
@@ -123,7 +123,7 @@ public class Uberspect implements JexlUberspect {
     // CSON: DoubleCheckedLocking
 
     @Override
-    public void setClassLoader(ClassLoader nloader) {
+    public void setClassLoader(final ClassLoader nloader) {
         synchronized (this) {
             Introspector intro = ref.get();
             if (intro != null) {
@@ -153,7 +153,7 @@ public class Uberspect implements JexlUberspect {
      * @param className the class name
      * @return the class instance or null if it could not be found
      */
-    public final Class<?> getClassByName(String className) {
+    public final Class<?> getClassByName(final String className) {
         return base().getClassByName(className);
     }
 
@@ -166,7 +166,7 @@ public class Uberspect implements JexlUberspect {
      * @param key Name of the field being searched for
      * @return a {@link java.lang.reflect.Field} or null if it does not exist or is not accessible
      * */
-    public final Field getField(Class<?> c, String key) {
+    public final Field getField(final Class<?> c, final String key) {
         return base().getField(c, key);
     }
 
@@ -175,7 +175,7 @@ public class Uberspect implements JexlUberspect {
      * @param c the class
      * @return the class field names
      */
-    public final String[] getFieldNames(Class<?> c) {
+    public final String[] getFieldNames(final Class<?> c) {
         return base().getFieldNames(c);
     }
 
@@ -193,7 +193,7 @@ public class Uberspect implements JexlUberspect {
      * @return a {@link java.lang.reflect.Method}
      *         or null if no unambiguous method could be found through introspection.
      */
-    public final Method getMethod(Class<?> c, String name, Object[] params) {
+    public final Method getMethod(final Class<?> c, final String name, final Object[] params) {
         return base().getMethod(c, new MethodKey(name, params));
     }
 
@@ -208,7 +208,7 @@ public class Uberspect implements JexlUberspect {
      * @return a {@link java.lang.reflect.Method}
      *         or null if no unambiguous method could be found through introspection.
      */
-    public final Method getMethod(Class<?> c, MethodKey key) {
+    public final Method getMethod(final Class<?> c, final MethodKey key) {
         return base().getMethod(c, key);
     }
 
@@ -217,7 +217,7 @@ public class Uberspect implements JexlUberspect {
      * @param c the class
      * @return the class method names
      */
-    public final String[] getMethodNames(Class<?> c) {
+    public final String[] getMethodNames(final Class<?> c) {
         return base().getMethodNames(c);
     }
 
@@ -227,22 +227,22 @@ public class Uberspect implements JexlUberspect {
      * @param methodName the seeked methods name
      * @return the array of methods
      */
-    public final Method[] getMethods(Class<?> c, final String methodName) {
+    public final Method[] getMethods(final Class<?> c, final String methodName) {
         return base().getMethods(c, methodName);
     }
 
     @Override
-    public JexlMethod getMethod(Object obj, String method, Object... args) {
+    public JexlMethod getMethod(final Object obj, final String method, final Object... args) {
         return MethodExecutor.discover(base(), obj, method, args);
     }
 
     @Override
-    public List<PropertyResolver> getResolvers(JexlOperator op, Object obj) {
+    public List<PropertyResolver> getResolvers(final JexlOperator op, final Object obj) {
         return strategy.apply(op, obj);
     }
 
     @Override
-    public JexlPropertyGet getPropertyGet(Object obj, Object identifier) {
+    public JexlPropertyGet getPropertyGet(final Object obj, final Object identifier) {
         return getPropertyGet(null, obj, identifier);
     }
 
@@ -255,7 +255,7 @@ public class Uberspect implements JexlUberspect {
         final Introspector is = base();
         final List<PropertyResolver> r = resolvers == null? strategy.apply(null, obj) : resolvers;
         JexlPropertyGet executor = null;
-        for (PropertyResolver resolver : r) {
+        for (final PropertyResolver resolver : r) {
             if (resolver instanceof JexlResolver) {
                 switch ((JexlResolver) resolver) {
                     case PROPERTY:
@@ -271,7 +271,7 @@ public class Uberspect implements JexlUberspect {
                         break;
                     case LIST:
                         // let's see if this is a list or array
-                        Integer index = AbstractExecutor.castInteger(identifier);
+                        final Integer index = AbstractExecutor.castInteger(identifier);
                         if (index != null) {
                             executor = ListGetExecutor.discover(is, claz, index);
                         }
@@ -323,7 +323,7 @@ public class Uberspect implements JexlUberspect {
         final Introspector is = base();
         final List<PropertyResolver> actual = resolvers == null? strategy.apply(null, obj) : resolvers;
         JexlPropertySet executor = null;
-        for (PropertyResolver resolver : actual) {
+        for (final PropertyResolver resolver : actual) {
             if (resolver instanceof JexlResolver) {
                 switch ((JexlResolver) resolver) {
                     case PROPERTY:
@@ -337,7 +337,7 @@ public class Uberspect implements JexlUberspect {
                     case LIST:
                     // let's see if we can convert the identifier to an int,
                         // if obj is an array or a list, we can still do something
-                        Integer index = AbstractExecutor.castInteger(identifier);
+                        final Integer index = AbstractExecutor.castInteger(identifier);
                         if (index != null) {
                             executor = ListSetExecutor.discover(is, claz, identifier, arg);
                         }
@@ -369,7 +369,7 @@ public class Uberspect implements JexlUberspect {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Iterator<?> getIterator(Object obj) {
+    public Iterator<?> getIterator(final Object obj) {
         if (obj instanceof Iterator<?>) {
             return ((Iterator<?>) obj);
         }
@@ -389,11 +389,11 @@ public class Uberspect implements JexlUberspect {
             // look for an iterator() method to support the JDK5 Iterable
             // interface or any user tools/DTOs that want to work in
             // foreach without implementing the Collection interface
-            JexlMethod it = getMethod(obj, "iterator", (Object[]) null);
+            final JexlMethod it = getMethod(obj, "iterator", (Object[]) null);
             if (it != null && Iterator.class.isAssignableFrom(it.getReturnType())) {
                 return (Iterator<Object>) it.invoke(obj, (Object[]) null);
             }
-        } catch (Exception xany) {
+        } catch (final Exception xany) {
             if (logger != null && logger.isDebugEnabled()) {
                 logger.info("unable to solve iterator()", xany);
             }
@@ -402,7 +402,7 @@ public class Uberspect implements JexlUberspect {
     }
 
     @Override
-    public JexlMethod getConstructor(Object ctorHandle, Object... args) {
+    public JexlMethod getConstructor(final Object ctorHandle, final Object... args) {
         return ConstructorMethod.discover(base(), ctorHandle, args);
     }
 
@@ -420,26 +420,26 @@ public class Uberspect implements JexlUberspect {
          * @param theArithmetic the arithmetic instance
          * @param theOverloads  the overloaded operators
          */
-        private ArithmeticUberspect(JexlArithmetic theArithmetic, Set<JexlOperator> theOverloads) {
+        private ArithmeticUberspect(final JexlArithmetic theArithmetic, final Set<JexlOperator> theOverloads) {
             this.arithmetic = theArithmetic;
             this.overloads = theOverloads;
         }
 
         @Override
-        public JexlMethod getOperator(JexlOperator operator, Object... args) {
+        public JexlMethod getOperator(final JexlOperator operator, final Object... args) {
             return overloads.contains(operator) && args != null
                    ? getMethod(arithmetic, operator.getMethodName(), args)
                    : null;
         }
 
         @Override
-        public boolean overloads(JexlOperator operator) {
+        public boolean overloads(final JexlOperator operator) {
             return overloads.contains(operator);
         }
     }
 
     @Override
-    public JexlArithmetic.Uberspect getArithmetic(JexlArithmetic arithmetic) {
+    public JexlArithmetic.Uberspect getArithmetic(final JexlArithmetic arithmetic) {
         JexlArithmetic.Uberspect jau = null;
         if (arithmetic != null) {
             final Class<? extends JexlArithmetic> aclass = arithmetic.getClass();
@@ -448,12 +448,12 @@ public class Uberspect implements JexlUberspect {
                 ops = EnumSet.noneOf(JexlOperator.class);
                 // deal only with derived classes
                 if (!JexlArithmetic.class.equals(aclass)) {
-                    for (JexlOperator op : JexlOperator.values()) {
-                        Method[] methods = getMethods(arithmetic.getClass(), op.getMethodName());
+                    for (final JexlOperator op : JexlOperator.values()) {
+                        final Method[] methods = getMethods(arithmetic.getClass(), op.getMethodName());
                         if (methods != null) {
                             mloop:
-                            for (Method method : methods) {
-                                Class<?>[] parms = method.getParameterTypes();
+                            for (final Method method : methods) {
+                                final Class<?>[] parms = method.getParameterTypes();
                                 if (parms.length != op.getArity()) {
                                     continue;
                                 }
@@ -463,7 +463,7 @@ public class Uberspect implements JexlUberspect {
                                 if (!JexlArithmetic.class.equals(method.getDeclaringClass())) {
                                     try {
                                         JexlArithmetic.class.getMethod(method.getName(), method.getParameterTypes());
-                                    } catch (NoSuchMethodException xmethod) {
+                                    } catch (final NoSuchMethodException xmethod) {
                                         // method was not found in JexlArithmetic; this is an operator definition
                                         ops.add(op);
                                     }

@@ -43,35 +43,35 @@ public class SynchronizedOverloadsTest extends JexlTestCase {
 
     @Test
     public void testSynchronizer() throws Exception {
-        Map<String, Object> ns = new TreeMap<String, Object>();
+        final Map<String, Object> ns = new TreeMap<String, Object>();
         ns.put("synchronized", SynchronizedContext.class);
-        JexlContext jc = new MapContext();
-        JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
-        JexlScript js0 = jexl.createScript("synchronized:call(x, (y)->{y.size()})", "x");
-        Object size = js0.execute(jc, "foobar");
+        final JexlContext jc = new MapContext();
+        final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
+        final JexlScript js0 = jexl.createScript("synchronized:call(x, (y)->{y.size()})", "x");
+        final Object size = js0.execute(jc, "foobar");
         Assert.assertEquals(6, size);
     }
 
     @Test
     public void testSynchronized() throws Exception {
-        Map<String, Object> ns = new TreeMap<String, Object>();
-        JexlContext jc = new SynchronizedContext(new MapContext());
-        JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
-        JexlScript js0 = jexl.createScript("@synchronized(y) {return y.size(); }", "y");
-        Object size = js0.execute(jc, "foobar");
+        final Map<String, Object> ns = new TreeMap<String, Object>();
+        final JexlContext jc = new SynchronizedContext(new MapContext());
+        final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
+        final JexlScript js0 = jexl.createScript("@synchronized(y) {return y.size(); }", "y");
+        final Object size = js0.execute(jc, "foobar");
         Assert.assertEquals(6, size);
     }
 
     @Test
     public void testUnsafeMonitor() throws Exception {
-        SynchronizedArithmetic.Monitor monitor = new SynchronizedArithmetic.SafeMonitor();
-        Map<String, Object> foo = new TreeMap<String, Object>();
+        final SynchronizedArithmetic.Monitor monitor = new SynchronizedArithmetic.SafeMonitor();
+        final Map<String, Object> foo = new TreeMap<String, Object>();
         foo.put("one", 1);
         foo.put("two", 2);
         foo.put("three", 3);
-        JexlContext jc = new SynchronizedContext(new MapContext());
-        JexlEngine jexl = new JexlBuilder().arithmetic(new SynchronizedArithmetic(monitor, true)).create();
-        JexlScript js0 = jexl.createScript("x['four'] = 4; var t = 0.0; for(var z: x) { t += z; }; call(t, (y)->{return y});", "x");
+        final JexlContext jc = new SynchronizedContext(new MapContext());
+        final JexlEngine jexl = new JexlBuilder().arithmetic(new SynchronizedArithmetic(monitor, true)).create();
+        final JexlScript js0 = jexl.createScript("x['four'] = 4; var t = 0.0; for(var z: x) { t += z; }; call(t, (y)->{return y});", "x");
         Object t = js0.execute(jc, foo);
         Assert.assertEquals(10.0d, t);
         Assert.assertTrue(monitor.isBalanced());

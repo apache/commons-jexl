@@ -44,12 +44,12 @@ public class DiscoveryTest extends JexlTestCase {
         private String value;
         private String eulav;
 
-        public Duck(String v, String e) {
+        public Duck(final String v, final String e) {
             value = v;
             eulav = e;
         }
 
-        public String get(String prop) {
+        public String get(final String prop) {
             if ("value".equals(prop)) {
                 return value;
             }
@@ -59,7 +59,7 @@ public class DiscoveryTest extends JexlTestCase {
             return "no such property";
         }
 
-        public void set(String prop, String v) {
+        public void set(final String prop, final String v) {
             if ("value".equals(prop)) {
                 value = v;
             } else if ("eulav".equals(prop)) {
@@ -73,7 +73,7 @@ public class DiscoveryTest extends JexlTestCase {
         private String eulav;
         private boolean flag;
 
-        public Bean(String v, String e) {
+        public Bean(final String v, final String e) {
             value = v;
             eulav = e;
             flag = true;
@@ -83,7 +83,7 @@ public class DiscoveryTest extends JexlTestCase {
             return value;
         }
 
-        public void setValue(String v) {
+        public void setValue(final String v) {
             value = v;
         }
 
@@ -91,7 +91,7 @@ public class DiscoveryTest extends JexlTestCase {
             return eulav;
         }
 
-        public void setEulav(String v) {
+        public void setEulav(final String v) {
             eulav = v;
         }
 
@@ -99,18 +99,18 @@ public class DiscoveryTest extends JexlTestCase {
             return flag;
         }
 
-        public void setFlag(boolean f) {
+        public void setFlag(final boolean f) {
             flag = f;
         }
     }
 
     @Test
     public void testBeanIntrospection() throws Exception {
-        Uberspect uber = Engine.getUberspect(null, null);
-        Bean bean = new Bean("JEXL", "LXEJ");
+        final Uberspect uber = Engine.getUberspect(null, null);
+        final Bean bean = new Bean("JEXL", "LXEJ");
 
-        JexlPropertyGet get = uber.getPropertyGet(bean, "value");
-        JexlPropertySet set = uber.getPropertySet(bean, "value", "foo");
+        final JexlPropertyGet get = uber.getPropertyGet(bean, "value");
+        final JexlPropertySet set = uber.getPropertySet(bean, "value", "foo");
         Assert.assertTrue("bean property getter", get instanceof PropertyGetExecutor);
         Assert.assertTrue("bean property setter", set instanceof PropertySetExecutor);
         // introspector and uberspect should return same result
@@ -120,12 +120,12 @@ public class DiscoveryTest extends JexlTestCase {
         Assert.assertNotEquals(get, uber.getPropertyGet(bean, "eulav"));
         Assert.assertNotEquals(set, uber.getPropertySet(bean, "eulav", "foo"));
         // setter returns argument
-        Object bar = set.invoke(bean, "bar");
+        final Object bar = set.invoke(bean, "bar");
         Assert.assertEquals("bar", bar);
         // getter should return last value
         Assert.assertEquals("bar", get.invoke(bean));
         // tryExecute should succeed on same property
-        Object quux = set.tryInvoke(bean, "value", "quux");
+        final Object quux = set.tryInvoke(bean, "value", "quux");
         Assert.assertEquals("quux", quux);
         Assert.assertEquals("quux", get.invoke(bean));
         // tryExecute should fail on different property
@@ -135,11 +135,11 @@ public class DiscoveryTest extends JexlTestCase {
 
     @Test
     public void testDuckIntrospection() throws Exception {
-        Uberspect uber = Engine.getUberspect(null, null);
-        Duck duck = new Duck("JEXL", "LXEJ");
+        final Uberspect uber = Engine.getUberspect(null, null);
+        final Duck duck = new Duck("JEXL", "LXEJ");
 
-        JexlPropertyGet get = uber.getPropertyGet(duck, "value");
-        JexlPropertySet set = uber.getPropertySet(duck, "value", "foo");
+        final JexlPropertyGet get = uber.getPropertyGet(duck, "value");
+        final JexlPropertySet set = uber.getPropertySet(duck, "value", "foo");
         Assert.assertTrue("duck property getter", get instanceof DuckGetExecutor);
         Assert.assertTrue("duck property setter", set instanceof DuckSetExecutor);
         // introspector and uberspect should return same result
@@ -149,12 +149,12 @@ public class DiscoveryTest extends JexlTestCase {
         Assert.assertNotEquals(get, uber.getPropertyGet(duck, "eulav"));
         Assert.assertNotEquals(set, uber.getPropertySet(duck, "eulav", "foo"));
         // setter returns argument
-        Object bar = set.invoke(duck, "bar");
+        final Object bar = set.invoke(duck, "bar");
         Assert.assertEquals("bar", bar);
         // getter should return last value
         Assert.assertEquals("bar", get.invoke(duck));
         // tryExecute should succeed on same property
-        Object quux = set.tryInvoke(duck, "value", "quux");
+        final Object quux = set.tryInvoke(duck, "value", "quux");
         Assert.assertEquals("quux", quux);
         Assert.assertEquals("quux", get.invoke(duck));
         // tryExecute should fail on different property
@@ -163,13 +163,13 @@ public class DiscoveryTest extends JexlTestCase {
 
     @Test
     public void testListIntrospection() throws Exception {
-        Uberspect uber = Engine.getUberspect(null, null);
-        List<Object> list = new ArrayList<Object>();
+        final Uberspect uber = Engine.getUberspect(null, null);
+        final List<Object> list = new ArrayList<Object>();
         list.add("LIST");
         list.add("TSIL");
 
-        JexlPropertyGet get = uber.getPropertyGet(list, 1);
-        JexlPropertySet set = uber.getPropertySet(list, 1, "foo");
+        final JexlPropertyGet get = uber.getPropertyGet(list, 1);
+        final JexlPropertySet set = uber.getPropertySet(list, 1, "foo");
         Assert.assertTrue("list property getter", get instanceof ListGetExecutor);
         Assert.assertTrue("list property setter", set instanceof ListSetExecutor);
         // introspector and uberspect should return same result
@@ -179,12 +179,12 @@ public class DiscoveryTest extends JexlTestCase {
         Assert.assertNotEquals(get, uber.getPropertyGet(list, 0));
         Assert.assertNotEquals(get, uber.getPropertySet(list, 0, "foo"));
         // setter returns argument
-        Object bar = set.invoke(list, "bar");
+        final Object bar = set.invoke(list, "bar");
         Assert.assertEquals("bar", bar);
         // getter should return last value
         Assert.assertEquals("bar", get.invoke(list));
         // tryExecute should succeed on integer property
-        Object quux = set.tryInvoke(list, 1, "quux");
+        final Object quux = set.tryInvoke(list, 1, "quux");
         Assert.assertEquals("quux", quux);
         // getter should return last value
         Assert.assertEquals("quux", get.invoke(list));
@@ -194,13 +194,13 @@ public class DiscoveryTest extends JexlTestCase {
 
     @Test
     public void testMapIntrospection() throws Exception {
-        Uberspect uber = Engine.getUberspect(null, null);
-        Map<String, Object> map = new HashMap<String, Object>();
+        final Uberspect uber = Engine.getUberspect(null, null);
+        final Map<String, Object> map = new HashMap<String, Object>();
         map.put("value", "MAP");
         map.put("eulav", "PAM");
 
-        JexlPropertyGet get = uber.getPropertyGet(map, "value");
-        JexlPropertySet set = uber.getPropertySet(map, "value", "foo");
+        final JexlPropertyGet get = uber.getPropertyGet(map, "value");
+        final JexlPropertySet set = uber.getPropertySet(map, "value", "foo");
         Assert.assertTrue("map property getter", get instanceof MapGetExecutor);
         Assert.assertTrue("map property setter", set instanceof MapSetExecutor);
         // introspector and uberspect should return same result
@@ -210,12 +210,12 @@ public class DiscoveryTest extends JexlTestCase {
         Assert.assertNotEquals(get, uber.getPropertyGet(map, "eulav"));
         Assert.assertNotEquals(get, uber.getPropertySet(map, "eulav", "foo"));
         // setter returns argument
-        Object bar = set.invoke(map, "bar");
+        final Object bar = set.invoke(map, "bar");
         Assert.assertEquals("bar", bar);
         // getter should return last value
         Assert.assertEquals("bar", get.invoke(map));
         // tryExecute should succeed on same property class
-        Object quux = set.tryInvoke(map, "value", "quux");
+        final Object quux = set.tryInvoke(map, "value", "quux");
         Assert.assertEquals("quux", quux);
         // getter should return last value
         Assert.assertEquals("quux", get.invoke(map));
@@ -224,45 +224,45 @@ public class DiscoveryTest extends JexlTestCase {
     }
 
     public static class Bulgroz {
-        public Object list(int x) {
+        public Object list(final int x) {
             return 0;
         }
-        public Object list(String x) {
+        public Object list(final String x) {
             return 1;
         }
-        public Object list(Object x) {
+        public Object list(final Object x) {
             return 2;
         }
-        public Object list(int x, Object...y) {
+        public Object list(final int x, final Object...y) {
             return 3;
         }
-        public Object list(int x, int y) {
+        public Object list(final int x, final int y) {
             return 4;
         }
-        public Object list(String x, Object...y) {
+        public Object list(final String x, final Object...y) {
             return 5;
         }
-        public Object list(String x, String y) {
+        public Object list(final String x, final String y) {
             return 6;
         }
-        public Object list(Object x, Object...y) {
+        public Object list(final Object x, final Object...y) {
             return 7;
         }
-        public Object list(Object x, Object y) {
+        public Object list(final Object x, final Object y) {
             return 8;
         }
-        public Object amb(Serializable x) {
+        public Object amb(final Serializable x) {
             return -1;
         }
-        public Object amb(Number x) {
+        public Object amb(final Number x) {
             return -2;
         }
     }
 
     @Test
     public void testMethodIntrospection() throws Exception {
-        Uberspect uber = new Uberspect(null, null);
-        Bulgroz bulgroz = new Bulgroz();
+        final Uberspect uber = new Uberspect(null, null);
+        final Bulgroz bulgroz = new Bulgroz();
         JexlMethod jmethod;
         Object result;
         jmethod = uber.getMethod(bulgroz, "list", 0);

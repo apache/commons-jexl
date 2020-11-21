@@ -48,7 +48,7 @@ public class LexicalScope {
      * @param s  the symbols mask
      * @param ms the more symbols bitset
      */
-    protected LexicalScope(long s, BitSet ms) {
+    protected LexicalScope(final long s, final BitSet ms) {
         symbols = s;
         moreSymbols = ms != null ? (BitSet) ms.clone() : null;
     }
@@ -71,7 +71,7 @@ public class LexicalScope {
      * @param symbol the symbol
      * @return true if declared, false otherwise
      */
-    public boolean hasSymbol(int symbol) {
+    public boolean hasSymbol(final int symbol) {
         if (symbol < LONGBITS) {
             return (symbols & (1L << symbol)) != 0L;
         } else {
@@ -85,15 +85,15 @@ public class LexicalScope {
      * @param symbol the symbol
      * @return true if registered, false if symbol was already registered
      */
-    public boolean addSymbol(int symbol) {
+    public boolean addSymbol(final int symbol) {
         if (symbol < LONGBITS) {
             if ((symbols & (1L << symbol)) != 0L) {
                 return false;
             }
             symbols |= (1L << symbol);
         } else {
-            int s = symbol - LONGBITS;
-            BitSet ms = moreSymbols();
+            final int s = symbol - LONGBITS;
+            final BitSet ms = moreSymbols();
             if (ms.get(s)) {
                 return false;
             }
@@ -107,12 +107,12 @@ public class LexicalScope {
      *
      * @param cleanSymbol a (optional, may be null) functor to call for each cleaned symbol
      */
-    public final void clearSymbols(java.util.function.IntConsumer cleanSymbol) {
+    public final void clearSymbols(final java.util.function.IntConsumer cleanSymbol) {
         // undefine symbols getting out of scope
         if (cleanSymbol != null) {
             long clean = symbols;
             while (clean != 0L) {
-                int s = Long.numberOfTrailingZeros(clean);
+                final int s = Long.numberOfTrailingZeros(clean);
                 clean &= ~(1L << s);
                 cleanSymbol.accept(s);
             }

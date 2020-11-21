@@ -65,7 +65,7 @@ public final class TemplateScript implements JxltEngine.Template {
      * @throws NullPointerException     if either the directive prefix or input is null
      * @throws IllegalArgumentException if the directive prefix is invalid
      */
-    public TemplateScript(TemplateEngine engine, JexlInfo info, String directive, Reader reader, String... parms) {
+    public TemplateScript(final TemplateEngine engine, JexlInfo info, final String directive, final Reader reader, final String... parms) {
         if (directive == null) {
             throw new NullPointerException("null prefix");
         }
@@ -83,15 +83,15 @@ public final class TemplateScript implements JxltEngine.Template {
         }
         this.jxlt = engine;
         this.prefix = directive;
-        List<Block> blocks = jxlt.readTemplate(prefix, reader);
-        List<TemplateExpression> uexprs = new ArrayList<>();
-        StringBuilder strb = new StringBuilder();
+        final List<Block> blocks = jxlt.readTemplate(prefix, reader);
+        final List<TemplateExpression> uexprs = new ArrayList<>();
+        final StringBuilder strb = new StringBuilder();
         int nuexpr = 0;
         int codeStart = -1;
         int line = 1;
         for (int b = 0; b < blocks.size(); ++b) {
-            Block block = blocks.get(b);
-            int bl = block.getLine();
+            final Block block = blocks.get(b);
+            final int bl = block.getLine();
             while(line < bl) {
                 strb.append("//\n");
                 line += 1;
@@ -106,7 +106,7 @@ public final class TemplateScript implements JxltEngine.Template {
                 if (codeStart < 0) {
                     codeStart = b;
                 }
-                String body = block.getBody();
+                final String body = block.getBody();
                 strb.append(body);
                 for(int c = 0; c < body.length(); ++c) {
                     if (body.charAt(c) == '\n') {
@@ -120,18 +120,18 @@ public final class TemplateScript implements JxltEngine.Template {
             info = jxlt.getEngine().createInfo();
         }
         // allow lambda defining params
-        Scope scope = parms == null ? null : new Scope(null, parms);
+        final Scope scope = parms == null ? null : new Scope(null, parms);
         script = jxlt.getEngine().parse(info.at(1, 1), false, strb.toString(), scope).script();
         // seek the map of expression number to scope so we can parse Unified
         // expression blocks with the appropriate symbols
-        Map<Integer, JexlNode.Info> minfo = new TreeMap<>();
+        final Map<Integer, JexlNode.Info> minfo = new TreeMap<>();
         collectPrintScope(script.script(), minfo);
         // jexl:print(...) expression counter
         int jpe = 0;
         // create the exprs using the intended scopes
-        for (Block block : blocks) {
+        for (final Block block : blocks) {
             if (block.getType() == BlockType.VERBATIM) {
-                JexlNode.Info ji = minfo.get(jpe);
+                final JexlNode.Info ji = minfo.get(jpe);
                 TemplateExpression te;
                 // no node info means this verbatim is surrounded by comments markers;
                 // expr at this index is never called
@@ -156,11 +156,11 @@ public final class TemplateScript implements JxltEngine.Template {
      * @param theScript the script
      * @param theExprs  the expressions
      */
-    TemplateScript(TemplateEngine engine,
-                   String thePrefix,
-                   Block[] theSource,
-                   ASTJexlScript theScript,
-                   TemplateExpression[] theExprs) {
+    TemplateScript(final TemplateEngine engine,
+                   final String thePrefix,
+                   final Block[] theSource,
+                   final ASTJexlScript theScript,
+                   final TemplateExpression[] theExprs) {
         jxlt = engine;
         prefix = thePrefix;
         source = theSource;
@@ -173,7 +173,7 @@ public final class TemplateScript implements JxltEngine.Template {
      * @param info the node info
      * @return the scope
      */
-    private static Scope scopeOf(JexlNode.Info info) {
+    private static Scope scopeOf(final JexlNode.Info info) {
         JexlNode walk = info.getNode();
         while(walk != null) {
             if (walk instanceof ASTJexlScript) {
@@ -191,19 +191,19 @@ public final class TemplateScript implements JxltEngine.Template {
      * @param node the visited node
      * @param minfo the map of printed expression number to node info
      */
-    private static void collectPrintScope(JexlNode node, Map<Integer, JexlNode.Info> minfo) {
-        int nc = node.jjtGetNumChildren();
+    private static void collectPrintScope(final JexlNode node, final Map<Integer, JexlNode.Info> minfo) {
+        final int nc = node.jjtGetNumChildren();
         if (node instanceof ASTFunctionNode) {
             if (nc == 2) {
                 // 0 must be the prefix jexl:
-                ASTIdentifier nameNode = (ASTIdentifier) node.jjtGetChild(0);
+                final ASTIdentifier nameNode = (ASTIdentifier) node.jjtGetChild(0);
                 if ("print".equals(nameNode.getName()) && "jexl".equals(nameNode.getNamespace())) {
-                    ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
+                    final ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
                     if (argNode.jjtGetNumChildren() == 1) {
                         // seek the epression number
-                        JexlNode arg0 = argNode.jjtGetChild(0);
+                        final JexlNode arg0 = argNode.jjtGetChild(0);
                         if (arg0 instanceof ASTNumberLiteral) {
-                            int exprNumber = ((ASTNumberLiteral) arg0).getLiteral().intValue();
+                            final int exprNumber = ((ASTNumberLiteral) arg0).getLiteral().intValue();
                             minfo.put(exprNumber, new JexlNode.Info(nameNode));
                             return;
                         }
@@ -232,8 +232,8 @@ public final class TemplateScript implements JxltEngine.Template {
 
     @Override
     public String toString() {
-        StringBuilder strb = new StringBuilder();
-        for (Block block : source) {
+        final StringBuilder strb = new StringBuilder();
+        for (final Block block : source) {
             block.toString(strb, prefix);
         }
         return strb.toString();
@@ -241,9 +241,9 @@ public final class TemplateScript implements JxltEngine.Template {
 
     @Override
     public String asString() {
-        StringBuilder strb = new StringBuilder();
+        final StringBuilder strb = new StringBuilder();
         int e = 0;
-        for (Block block : source) {
+        for (final Block block : source) {
             if (block.getType() == BlockType.DIRECTIVE) {
                 strb.append(prefix);
                 strb.append(block.getBody());
@@ -255,22 +255,22 @@ public final class TemplateScript implements JxltEngine.Template {
     }
 
     @Override
-    public TemplateScript prepare(JexlContext context) {
+    public TemplateScript prepare(final JexlContext context) {
         final Engine jexl = jxlt.getEngine();
-        JexlOptions options = jexl.options(script, context);
-        Frame frame = script.createFrame((Object[]) null);
-        TemplateInterpreter.Arguments targs = new TemplateInterpreter
+        final JexlOptions options = jexl.options(script, context);
+        final Frame frame = script.createFrame((Object[]) null);
+        final TemplateInterpreter.Arguments targs = new TemplateInterpreter
                 .Arguments(jxlt.getEngine())
                 .context(context)
                 .options(options)
                 .frame(frame);
-        Interpreter interpreter = new TemplateInterpreter(targs);
-        TemplateExpression[] immediates = new TemplateExpression[exprs.length];
+        final Interpreter interpreter = new TemplateInterpreter(targs);
+        final TemplateExpression[] immediates = new TemplateExpression[exprs.length];
         for (int e = 0; e < exprs.length; ++e) {
             try {
                 immediates[e] = exprs[e].prepare(interpreter);
-            } catch (JexlException xjexl) {
-                JexlException xuel = TemplateEngine.createException(xjexl.getInfo(), "prepare", exprs[e], xjexl);
+            } catch (final JexlException xjexl) {
+                final JexlException xuel = TemplateEngine.createException(xjexl.getInfo(), "prepare", exprs[e], xjexl);
                 if (jexl.isSilent()) {
                     jexl.logger.warn(xuel.getMessage(), xuel.getCause());
                     return null;
@@ -282,30 +282,30 @@ public final class TemplateScript implements JxltEngine.Template {
     }
 
     @Override
-    public void evaluate(JexlContext context, Writer writer) {
+    public void evaluate(final JexlContext context, final Writer writer) {
         evaluate(context, writer, (Object[]) null);
     }
 
     @Override
-    public void evaluate(JexlContext context, Writer writer, Object... args) {
+    public void evaluate(final JexlContext context, final Writer writer, final Object... args) {
         final Engine jexl = jxlt.getEngine();
-        JexlOptions options = jexl.options(script, context);
-        Frame frame = script.createFrame(args);
-        TemplateInterpreter.Arguments targs = new TemplateInterpreter
+        final JexlOptions options = jexl.options(script, context);
+        final Frame frame = script.createFrame(args);
+        final TemplateInterpreter.Arguments targs = new TemplateInterpreter
                 .Arguments(jexl)
                 .context(context)
                 .options(options)
                 .frame(frame)
                 .expressions(exprs)
                 .writer(writer);
-        Interpreter interpreter = new TemplateInterpreter(targs);
+        final Interpreter interpreter = new TemplateInterpreter(targs);
         interpreter.interpret(script);
     }
 
     @Override
     public Set<List<String>> getVariables() {
-        Engine.VarCollector collector = jxlt.getEngine().varCollector();
-        for (TemplateExpression expr : exprs) {
+        final Engine.VarCollector collector = jxlt.getEngine().varCollector();
+        for (final TemplateExpression expr : exprs) {
             expr.getVariables(collector);
         }
         return collector.collected();

@@ -25,7 +25,7 @@ import org.apache.commons.jexl3.parser.JexlNode;
  * Utility to dump AST, useful in debug sessions.
  */
 public class Dumper {
-    private StringBuilder strb = new StringBuilder();
+    private final StringBuilder strb = new StringBuilder();
     private int indent = 0;
 
     private void indent() {
@@ -34,7 +34,7 @@ public class Dumper {
         }
     }
 
-    private void dump(JexlNode node, Object data) {
+    private void dump(final JexlNode node, final Object data) {
         final int num = node.jjtGetNumChildren();
         indent();
         strb.append(node.getClass().getSimpleName());
@@ -48,7 +48,7 @@ public class Dumper {
         strb.append('(');
         indent += 1;
         for (int c = 0; c < num; ++c) {
-            JexlNode child = node.jjtGetChild(c);
+            final JexlNode child = node.jjtGetChild(c);
             if (c > 0) {
                 strb.append(',');
             }
@@ -63,7 +63,7 @@ public class Dumper {
         strb.append(')');
     }
 
-    private Dumper(JexlScript script) {
+    private Dumper(final JexlScript script) {
         dump(((Script) script).script, null);
     }
 
@@ -72,7 +72,7 @@ public class Dumper {
         return strb.toString();
     }
 
-    public static String toString(JexlScript script) {
+    public static String toString(final JexlScript script) {
         return new Dumper(script).toString();
     }
 }

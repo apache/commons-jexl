@@ -51,7 +51,7 @@ public class Asserter extends Assert {
      * Create an asserter.
      * @param jexl the JEXL engine to use
      */
-    public Asserter(JexlEngine jexl) {
+    public Asserter(final JexlEngine jexl) {
         engine = jexl;
     }
 
@@ -71,16 +71,16 @@ public class Asserter extends Assert {
         return context;
     }
 
-    public void setStrict(boolean s) {
+    public void setStrict(final boolean s) {
         context.getEngineOptions().setStrict(s);
     }
 
-    public void setStrict(boolean es, boolean as) {
+    public void setStrict(final boolean es, final boolean as) {
         context.getEngineOptions().setStrict(es);
         context.getEngineOptions().setStrictArithmetic(as);
     }
 
-    public void setSilent(boolean silent) {
+    public void setSilent(final boolean silent) {
         context.getEngineOptions().setSilent(silent);
     }
 
@@ -93,19 +93,19 @@ public class Asserter extends Assert {
      * @throws Exception if the expression could not be evaluationed or an assertion
      * fails
      */
-    public void assertExpression(String expression, Object expected) throws Exception {
-        JexlScript exp = engine.createScript(expression);
-        Object value = exp.execute(context);
+    public void assertExpression(final String expression, final Object expected) throws Exception {
+        final JexlScript exp = engine.createScript(expression);
+        final Object value = exp.execute(context);
         if (expected instanceof BigDecimal) {
-            JexlArithmetic jexla = engine.getArithmetic();
+            final JexlArithmetic jexla = engine.getArithmetic();
             Assert.assertEquals("expression: " + expression, 0,
                     ((BigDecimal) expected).compareTo(jexla.toBigDecimal(value)));
         }
         if (expected != null && value != null) {
             if (expected.getClass().isArray() && value.getClass().isArray()) {
-                int esz = Array.getLength(expected);
-                int vsz = Array.getLength(value);
-                String report = "expression: " + expression;
+                final int esz = Array.getLength(expected);
+                final int vsz = Array.getLength(value);
+                final String report = "expression: " + expression;
                 Assert.assertEquals(report + ", array size", esz, vsz);
                 for (int i = 0; i < vsz; ++i) {
                     Assert.assertEquals(report + ", value@[]" + i, Array.get(expected, i), Array.get(value, i));
@@ -130,12 +130,12 @@ public class Asserter extends Assert {
      * @param matchException the exception message pattern
      * @throws Exception if the expression did not fail or the exception did not match the expected pattern
      */
-    public void failExpression(String expression, String matchException) throws Exception {
+    public void failExpression(final String expression, final String matchException) throws Exception {
         try {
-            JexlScript exp = engine.createScript(expression);
+            final JexlScript exp = engine.createScript(expression);
             exp.execute(context);
             fail("expression: " + expression);
-        } catch (JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             if (matchException != null && !xjexl.getMessage().matches(matchException)) {
                 fail("expression: " + expression + ", expected: " + matchException + ", got " + xjexl.getMessage());
             }
@@ -149,7 +149,7 @@ public class Asserter extends Assert {
      * @param name variable name
      * @param value variable value
      */
-    public void setVariable(String name, Object value) {
+    public void setVariable(final String name, final Object value) {
         variables.put(name, value);
     }
 
@@ -158,7 +158,7 @@ public class Asserter extends Assert {
      * @param name variable name
      * @return variable value
      */
-    public Object removeVariable(String name) {
+    public Object removeVariable(final String name) {
         return variables.remove(name);
     }
 
@@ -168,7 +168,7 @@ public class Asserter extends Assert {
      * @param name variable name
      * @return value variable value
      */
-    public Object getVariable(String name) {
+    public Object getVariable(final String name) {
         return variables.get(name);
     }
 

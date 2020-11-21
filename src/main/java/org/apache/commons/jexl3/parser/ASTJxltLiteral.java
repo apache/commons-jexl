@@ -20,15 +20,15 @@ public final class ASTJxltLiteral extends JexlNode {
     /** The actual literal value; the inherited 'value' member may host a cached template expression. */
     private String literal = null;
 
-    ASTJxltLiteral(int id) {
+    ASTJxltLiteral(final int id) {
         super(id);
     }
 
-    ASTJxltLiteral(Parser p, int id) {
+    ASTJxltLiteral(final Parser p, final int id) {
         super(p, id);
     }
 
-    void setLiteral(String literal) {
+    void setLiteral(final String literal) {
         this.literal = literal;
     }
 
@@ -46,7 +46,7 @@ public final class ASTJxltLiteral extends JexlNode {
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 }

@@ -25,22 +25,22 @@ public final class ASTArrayLiteral extends JexlNode {
     /** Whether this array is constant or not. */
     private boolean constant = false;
 
-    ASTArrayLiteral(int id) {
+    ASTArrayLiteral(final int id) {
         super(id);
     }
 
-    ASTArrayLiteral(Parser p, int id) {
+    ASTArrayLiteral(final Parser p, final int id) {
         super(p, id);
     }
 
     @Override
     public String toString() {
-        Debugger dbg = new Debugger();
+        final Debugger dbg = new Debugger();
         return dbg.data(this);
     }
 
     @Override
-    protected boolean isConstant(boolean literal) {
+    protected boolean isConstant(final boolean literal) {
         return constant;
     }
 
@@ -48,7 +48,7 @@ public final class ASTArrayLiteral extends JexlNode {
     public void jjtClose() {
         constant = true;
         for (int c = 0; c < jjtGetNumChildren() && constant; ++c) {
-            JexlNode child = jjtGetChild(c);
+            final JexlNode child = jjtGetChild(c);
             if (child instanceof ASTReference) {
                 constant = child.isConstant(true);
             } else if (!child.isConstant()) {
@@ -58,7 +58,7 @@ public final class ASTArrayLiteral extends JexlNode {
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 }

@@ -57,7 +57,7 @@ public class SoftCache<K, V> {
      *
      * @param theSize the cache size
      */
-    SoftCache(int theSize) {
+    SoftCache(final int theSize) {
         size = theSize;
         lock = new ReentrantReadWriteLock();
     }
@@ -89,7 +89,7 @@ public class SoftCache<K, V> {
      * @param key the cache entry key
      * @return the cache entry value
      */
-    public V get(K key) {
+    public V get(final K key) {
         lock.readLock().lock();
         try {
             final Map<K, V> map = ref != null ? ref.get() : null;
@@ -105,7 +105,7 @@ public class SoftCache<K, V> {
      * @param key the cache entry key
      * @param script the cache entry value
      */
-    public void put(K key, V script) {
+    public void put(final K key, final V script) {
         lock.writeLock().lock();
         try {
             Map<K, V> map = ref != null ? ref.get() : null;
@@ -129,13 +129,13 @@ public class SoftCache<K, V> {
     public List<Map.Entry<K, V>> entries() {
         lock.readLock().lock();
         try {
-            Map<K, V> map = ref != null ? ref.get() : null;
+            final Map<K, V> map = ref != null ? ref.get() : null;
             if (map == null) {
                 return Collections.emptyList();
             }
             final Set<Map.Entry<K, V>> set = map.entrySet();
             final List<Map.Entry<K, V>> entries = new ArrayList<Map.Entry<K, V>>(set.size());
-            for (Map.Entry<K, V> e : set) {
+            for (final Map.Entry<K, V> e : set) {
                 entries.add(new SoftCacheEntry<K, V>(e));
             }
             return entries;
@@ -160,7 +160,7 @@ public class SoftCache<K, V> {
             private static final long serialVersionUID = 1L;
 
             @Override
-            protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+            protected boolean removeEldestEntry(final Map.Entry<K, V> eldest) {
                 return super.size() > cacheSize;
             }
         };
@@ -188,7 +188,7 @@ class SoftCacheEntry<K, V> implements Map.Entry<K, V> {
      *
      * @param e the entry to clone
      */
-    SoftCacheEntry(Map.Entry<K, V> e) {
+    SoftCacheEntry(final Map.Entry<K, V> e) {
         key = e.getKey();
         value = e.getValue();
     }
@@ -204,7 +204,7 @@ class SoftCacheEntry<K, V> implements Map.Entry<K, V> {
     }
 
     @Override
-    public V setValue(V v) {
+    public V setValue(final V v) {
         throw new UnsupportedOperationException("Not supported.");
     }
 }

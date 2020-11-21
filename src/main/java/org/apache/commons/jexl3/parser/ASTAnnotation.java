@@ -22,11 +22,11 @@ package org.apache.commons.jexl3.parser;
 public class ASTAnnotation extends JexlNode {
     private String name = null;
 
-    ASTAnnotation(int id) {
+    ASTAnnotation(final int id) {
         super(id);
     }
 
-    ASTAnnotation(Parser p, int id) {
+    ASTAnnotation(final Parser p, final int id) {
         super(p, id);
     }
 
@@ -35,7 +35,7 @@ public class ASTAnnotation extends JexlNode {
         return name;
     }
 
-    void setName(String identifier) {
+    void setName(final String identifier) {
         if (identifier.charAt(0) == '@') {
             name = identifier.substring(1);
         } else {
@@ -48,7 +48,7 @@ public class ASTAnnotation extends JexlNode {
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 }

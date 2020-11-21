@@ -51,9 +51,9 @@ public class VarTest extends JexlTestCase {
 
     @Test
     public void testStrict() throws Exception {
-        JexlEvalContext env = new JexlEvalContext();
-        JexlOptions options = env.getEngineOptions();
-        JexlContext ctxt = new ReadonlyContext(env, options);
+        final JexlEvalContext env = new JexlEvalContext();
+        final JexlOptions options = env.getEngineOptions();
+        final JexlContext ctxt = new ReadonlyContext(env, options);
         options.setStrict(true);
         options.setSilent(false);
         options.setSafe(false);
@@ -61,53 +61,53 @@ public class VarTest extends JexlTestCase {
 
         e = JEXL.createScript("x");
         try {
-            Object o = e.execute(ctxt);
+            final Object o = e.execute(ctxt);
             Assert.fail("should have thrown an unknown var exception");
-        } catch(JexlException xjexl) {
+        } catch(final JexlException xjexl) {
             // ok since we are strict and x does not exist
         }
         e = JEXL.createScript("x = 42");
         try {
-            Object o = e.execute(ctxt);
+            final Object o = e.execute(ctxt);
             Assert.fail("should have thrown a readonly context exception");
-        } catch(JexlException xjexl) {
+        } catch(final JexlException xjexl) {
             // ok since we are strict and context is readonly
         }
 
         env.set("x", "fourty-two");
         e = JEXL.createScript("x.theAnswerToEverything()");
         try {
-            Object o = e.execute(ctxt);
+            final Object o = e.execute(ctxt);
             Assert.fail("should have thrown an unknown method exception");
-        } catch(JexlException xjexl) {
+        } catch(final JexlException xjexl) {
             // ok since we are strict and method does not exist
         }
     }
 
     @Test
     public void testLocalBasic() throws Exception {
-        JexlScript e = JEXL.createScript("var x; x = 42");
-        Object o = e.execute(null);
+        final JexlScript e = JEXL.createScript("var x; x = 42");
+        final Object o = e.execute(null);
         Assert.assertEquals("Result is not 42", new Integer(42), o);
     }
 
     @Test
     public void testLocalSimple() throws Exception {
-        JexlScript e = JEXL.createScript("var x = 21; x + x");
-        Object o = e.execute(null);
+        final JexlScript e = JEXL.createScript("var x = 21; x + x");
+        final Object o = e.execute(null);
         Assert.assertEquals("Result is not 42", new Integer(42), o);
     }
 
     @Test
     public void testLocalFor() throws Exception {
-        JexlScript e = JEXL.createScript("var y  = 0; for(var x : [5, 17, 20]) { y = y + x; } y;");
-        Object o = e.execute(null);
+        final JexlScript e = JEXL.createScript("var y  = 0; for(var x : [5, 17, 20]) { y = y + x; } y;");
+        final Object o = e.execute(null);
         Assert.assertEquals("Result is not 42", new Integer(42), o);
     }
 
     public static class NumbersContext extends MapContext implements JexlContext.NamespaceResolver {
         @Override
-        public Object resolveNamespace(String name) {
+        public Object resolveNamespace(final String name) {
             return name == null ? this : null;
         }
 
@@ -118,17 +118,17 @@ public class VarTest extends JexlTestCase {
 
     @Test
     public void testLocalForFunc() throws Exception {
-        JexlContext jc = new NumbersContext();
-        JexlScript e = JEXL.createScript("var y  = 0; for(var x : numbers()) { y = y + x; } y;");
-        Object o = e.execute(jc);
+        final JexlContext jc = new NumbersContext();
+        final JexlScript e = JEXL.createScript("var y  = 0; for(var x : numbers()) { y = y + x; } y;");
+        final Object o = e.execute(jc);
         Assert.assertEquals("Result is not 42", new Integer(42), o);
     }
 
     @Test
     public void testLocalForFuncReturn() throws Exception {
-        JexlContext jc = new NumbersContext();
-        JexlScript e = JEXL.createScript("var y  = 42; for(var x : numbers()) { if (x > 10) return x } y;");
-        Object o = e.execute(jc);
+        final JexlContext jc = new NumbersContext();
+        final JexlScript e = JEXL.createScript("var y  = 42; for(var x : numbers()) { if (x > 10) return x } y;");
+        final Object o = e.execute(jc);
         Assert.assertEquals("Result is not 17", new Integer(17), o);
 
         Assert.assertTrue(toString(e.getVariables()), e.getVariables().isEmpty());
@@ -139,10 +139,10 @@ public class VarTest extends JexlTestCase {
      * @param refs the variable reference set
      * @return  the string representation
      */
-    String toString(Set<List<String>> refs) {
-        StringBuilder strb = new StringBuilder("{");
+    String toString(final Set<List<String>> refs) {
+        final StringBuilder strb = new StringBuilder("{");
         int r = 0;
-        for (List<String> strs : refs) {
+        for (final List<String> strs : refs) {
             if (r++ > 0) {
                 strb.append(", ");
             }
@@ -166,9 +166,9 @@ public class VarTest extends JexlTestCase {
      * @param refs the variable reference set
      * @return the set of variables
      */
-    Set<List<String>> mkref(String[][] refs) {
-        Set<List<String>> set = new HashSet<List<String>>();
-        for(String[] ref : refs) {
+    Set<List<String>> mkref(final String[][] refs) {
+        final Set<List<String>> set = new HashSet<List<String>>();
+        for(final String[] ref : refs) {
             set.add(Arrays.asList(ref));
         }
         return set;
@@ -180,15 +180,15 @@ public class VarTest extends JexlTestCase {
      * @param rhs the right set
      * @return true if equal, false otherwise
      */
-    boolean eq(Set<List<String>> lhs, Set<List<String>> rhs) {
+    boolean eq(final Set<List<String>> lhs, final Set<List<String>> rhs) {
         if (lhs.size() != rhs.size()) {
             return false;
         }
-        List<String> llhs = stringify(lhs);
-        List<String> lrhs = stringify(rhs);
+        final List<String> llhs = stringify(lhs);
+        final List<String> lrhs = stringify(rhs);
         for(int s = 0; s < llhs.size(); ++s) {
-            String l = llhs.get(s);
-            String r = lrhs.get(s);
+            final String l = llhs.get(s);
+            final String r = lrhs.get(s);
             if (!l.equals(r)) {
                 return false;
             }
@@ -196,11 +196,11 @@ public class VarTest extends JexlTestCase {
         return true;
     }
 
-    List<String> stringify(Set<List<String>> sls) {
-        List<String> ls = new ArrayList<String>();
-        for(List<String> l : sls) {
-        StringBuilder strb = new StringBuilder();
-        for(String s : l) {
+    List<String> stringify(final Set<List<String>> sls) {
+        final List<String> ls = new ArrayList<String>();
+        for(final List<String> l : sls) {
+        final StringBuilder strb = new StringBuilder();
+        for(final String s : l) {
             strb.append(s);
             strb.append('|');
         }
@@ -333,7 +333,7 @@ public class VarTest extends JexlTestCase {
         JexlScript e;
         Set<List<String>> vars;
         Set<List<String>> expect;
-        JexlEngine jexl = new JexlBuilder().strict(true).silent(false).cache(32).collectAll(false).create();
+        final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).cache(32).collectAll(false).create();
 
         e = jexl.createScript("a['b'][c]");
         vars = e.getVariables();
@@ -366,9 +366,9 @@ public class VarTest extends JexlTestCase {
         JexlScript e;
         // x is a parameter, y a context variable, z a local variable
         e = JEXL.createScript("if (x) { y } else { var z = 2 * x}", "x");
-        Set<List<String>> vars = e.getVariables();
-        String[] parms = e.getParameters();
-        String[] locals = e.getLocalVariables();
+        final Set<List<String>> vars = e.getVariables();
+        final String[] parms = e.getParameters();
+        final String[] locals = e.getLocalVariables();
 
         Assert.assertTrue(eq(mkref(new String[][]{{"y"}}), vars));
         Assert.assertEquals(1, parms.length);
@@ -383,10 +383,10 @@ public class VarTest extends JexlTestCase {
     public static class VarDate {
         private final Calendar cal;
 
-        public VarDate(String date) throws Exception {
+        public VarDate(final String date) throws Exception {
             this(SDF.parse(date));
         }
-        public VarDate(Date date) {
+        public VarDate(final Date date) {
             cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
             cal.setTime(date);
             cal.setLenient(true);
@@ -397,7 +397,7 @@ public class VarTest extends JexlTestCase {
          * @param property yyyy or MM or dd
          * @return the string representation of year, month or day
          */
-        public String get(String property) {
+        public String get(final String property) {
             if ("yyyy".equals(property)) {
                 return Integer.toString(cal.get(Calendar.YEAR));
             }
@@ -416,7 +416,7 @@ public class VarTest extends JexlTestCase {
          * @param keys the property names
          * @return the property values
          */
-        public List<String> get(String[] keys) {
+        public List<String> get(final String[] keys) {
             return get(Arrays.asList(keys));
         }
                
@@ -425,10 +425,10 @@ public class VarTest extends JexlTestCase {
          * @param keys the property names
          * @return the property values
          */
-        public List<String> get(List<String> keys) {
-            List<String> values = new ArrayList<String>();
-            for(String key : keys) {
-                String value = get(key);
+        public List<String> get(final List<String> keys) {
+            final List<String> values = new ArrayList<String>();
+            for(final String key : keys) {
+                final String value = get(key);
                 if (value != null) {
                     values.add(value);
                 }
@@ -443,10 +443,10 @@ public class VarTest extends JexlTestCase {
          * @param map a map of property name to alias
          * @return the alia map
          */
-        public Map<String,Object> get(Map<String,String> map) {
-            Map<String,Object> values = new LinkedHashMap<String,Object>();
-            for(Map.Entry<String,String> entry : map.entrySet()) {
-                String value = get(entry.getKey());
+        public Map<String,Object> get(final Map<String,String> map) {
+            final Map<String,Object> values = new LinkedHashMap<String,Object>();
+            for(final Map.Entry<String,String> entry : map.entrySet()) {
+                final String value = get(entry.getKey());
                 if (value != null) {
                     values.put(entry.getValue(), value);
                 }
@@ -460,13 +460,13 @@ public class VarTest extends JexlTestCase {
      * @param str the stringified source
      * @return the properties array
      */
-    private static String[] readIdentifiers(String str) {
-        List<String> ids = new ArrayList<String>();
+    private static String[] readIdentifiers(final String str) {
+        final List<String> ids = new ArrayList<String>();
         StringBuilder strb = null;
         String id = null;
         char kind = 0; // array, set or map kind using first char
         for (int i = 0; i < str.length(); ++i) {
-            char c = str.charAt(i);
+            final char c = str.charAt(i);
             // strb != null when array,set or map deteced
             if (strb == null) {
                 if (c == '{' || c == '(' || c == '[') {
@@ -485,7 +485,7 @@ public class VarTest extends JexlTestCase {
             }
             else if (c == '\'' || c == '"') {
                 strb.append(c);
-                int l = JexlParser.readString(strb, str, i + 1, c);
+                final int l = JexlParser.readString(strb, str, i + 1, c);
                 if (l > 0) {
                     id = strb.substring(1, strb.length() - 1);
                     strb.delete(0, l + 1);
@@ -499,13 +499,13 @@ public class VarTest extends JexlTestCase {
     
     @Test
     public void testReferenceLiteral() throws Exception {
-        JexlEngine jexld = new JexlBuilder().collectMode(2).create();
+        final JexlEngine jexld = new JexlBuilder().collectMode(2).create();
         JexlScript script;
         List<String> result;
         Set<List<String>> vars;
         // in collectAll mode, the collector grabs all syntactic variations of
         // constant variable references including map/arry/set literals
-        JexlContext ctxt = new MapContext();
+        final JexlContext ctxt = new MapContext();
         //d.yyyy = 1969; d.MM = 7; d.dd = 20
         ctxt.set("moon.landing", new VarDate("1969-07-20"));
         
@@ -521,7 +521,7 @@ public class VarTest extends JexlTestCase {
         Assert.assertArrayEquals(new String[]{"yyyy", "MM", "dd"}, readIdentifiers(var.get(2)));
         
         script = jexld.createScript("moon.landing[ { 'yyyy' : 'year', 'MM' : 'month', 'dd' : 'day' } ]");
-        Map<String, String> mapr = (Map<String, String>) script.execute(ctxt);
+        final Map<String, String> mapr = (Map<String, String>) script.execute(ctxt);
         Assert.assertEquals(3, mapr.size());
         Assert.assertEquals("1969", mapr.get("year"));
         Assert.assertEquals("7", mapr.get("month"));
@@ -586,8 +586,8 @@ public class VarTest extends JexlTestCase {
 
     @Test
     public void testSyntacticVariations() throws Exception {
-        JexlScript script = JEXL.createScript("sum(TOTAL) - partial.sum() + partial['sub'].avg() - sum(partial.sub)");
-        Set<List<String>> vars = script.getVariables();
+        final JexlScript script = JEXL.createScript("sum(TOTAL) - partial.sum() + partial['sub'].avg() - sum(partial.sub)");
+        final Set<List<String>> vars = script.getVariables();
 
         Assert.assertEquals(3, vars.size());
     }
@@ -596,11 +596,11 @@ public class VarTest extends JexlTestCase {
         private int x;
         private String color;
 
-        public void setX(int x) {
+        public void setX(final int x) {
             this.x = x;
         }
 
-        public void setColor(String color) {
+        public void setColor(final String color) {
             this.color = color;
         }
 
@@ -615,8 +615,8 @@ public class VarTest extends JexlTestCase {
 
     @Test
     public void testObjectContext() throws Exception {
-        TheVarContext vars = new TheVarContext();
-        JexlContext jc = new ObjectContext<TheVarContext>(JEXL, vars);
+        final TheVarContext vars = new TheVarContext();
+        final JexlContext jc = new ObjectContext<TheVarContext>(JEXL, vars);
         try {
             JexlScript script;
             Object result;
@@ -637,7 +637,7 @@ public class VarTest extends JexlTestCase {
             result = script.execute(jc);
             Assert.assertTrue((Boolean) result);
             Assert.assertTrue(jc.has("color"));
-        } catch (JexlException.Method ambiguous) {
+        } catch (final JexlException.Method ambiguous) {
             Assert.fail("total() is solvable");
         }
     }

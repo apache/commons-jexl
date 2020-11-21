@@ -40,7 +40,7 @@ public final class NumberParser {
                 return BIGDF.format(literal);
             }
         }
-        StringBuilder strb = new StringBuilder(literal.toString());
+        final StringBuilder strb = new StringBuilder(literal.toString());
         if (Float.class.equals(clazz)) {
             strb.append('f');
         } else if (Double.class.equals(clazz)) {
@@ -66,14 +66,14 @@ public final class NumberParser {
         return literal;
     }
 
-    static Number parseInteger(String s) {
-        NumberParser np  = new NumberParser();
+    static Number parseInteger(final String s) {
+        final NumberParser np  = new NumberParser();
         np.setNatural(s);
         return np.getLiteralValue();
     }
 
-    static Number parseDouble(String s) {
-        NumberParser np  = new NumberParser();
+    static Number parseDouble(final String s) {
+        final NumberParser np  = new NumberParser();
         np.setReal(s);
         return np.getLiteralValue();
     }
@@ -116,10 +116,10 @@ public final class NumberParser {
                 rclass = Integer.class;
                 try {
                     result = Integer.valueOf(s, base);
-                } catch (NumberFormatException take2) {
+                } catch (final NumberFormatException take2) {
                     try {
                         result = Long.valueOf(s, base);
-                    } catch (NumberFormatException take3) {
+                    } catch (final NumberFormatException take3) {
                         result = new BigInteger(s, base);
                     }
                 }
@@ -134,7 +134,7 @@ public final class NumberParser {
      * Originally from OGNL.
      * @param s the real as string
      */
-    void setReal(String s) {
+    void setReal(final String s) {
         Number result;
         Class<? extends Number> rclass;
         if ("#NaN".equals(s) || "NaN".equals(s)) {
@@ -164,7 +164,7 @@ public final class NumberParser {
                     rclass = Double.class;
                     try {
                         result = Double.valueOf(s);
-                    } catch (NumberFormatException take3) {
+                    } catch (final NumberFormatException take3) {
                         result = new BigDecimal(s);
                     }
                     break;

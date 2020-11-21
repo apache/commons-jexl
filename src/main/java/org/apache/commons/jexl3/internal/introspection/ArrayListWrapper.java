@@ -36,7 +36,7 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
      * Create the wrapper.
      * @param anArray {@link #array}
      */
-    public ArrayListWrapper(Object anArray) {
+    public ArrayListWrapper(final Object anArray) {
         if (!anArray.getClass().isArray()) {
             throw new IllegalArgumentException(anArray.getClass() + " is not an array");
         }
@@ -44,13 +44,13 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
     }
 
     @Override
-    public Object get(int index) {
+    public Object get(final int index) {
         return Array.get(array, index);
     }
 
     @Override
-    public Object set(int index, Object element) {
-        Object old = Array.get(array, index);
+    public Object set(final int index, final Object element) {
+        final Object old = Array.get(array, index);
         Array.set(array, index, element);
         return old;
     }
@@ -61,7 +61,7 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
     }
 
     @Override
-    public int indexOf(Object o) {
+    public int indexOf(final Object o) {
         final int size = size();
         if (o == null) {
             for (int i = 0; i < size; i++) {
@@ -80,7 +80,7 @@ public class ArrayListWrapper extends AbstractList<Object> implements RandomAcce
     }
 
     @Override
-    public boolean contains(Object o) {
+    public boolean contains(final Object o) {
         return indexOf(o) != -1;
     }
 }

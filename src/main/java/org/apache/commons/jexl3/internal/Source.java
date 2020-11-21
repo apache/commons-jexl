@@ -38,7 +38,7 @@ public final class Source {
      * @param theFeatures the features
      * @param theStr the script source
      */
-    Source(JexlFeatures theFeatures, String theStr) { // CSOFF: MagicNumber
+    Source(final JexlFeatures theFeatures, final String theStr) { // CSOFF: MagicNumber
         this.features = theFeatures;
         this.str = theStr;
         int hash = 3;
@@ -60,7 +60,7 @@ public final class Source {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

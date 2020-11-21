@@ -104,7 +104,7 @@ public class ScriptVisitor extends ParserVisitor {
      * @param data some data context
      * @return the visit result or null if jscript was not a Script implementation
      */
-    public Object visitExpression (JexlExpression jscript, Object data) {
+    public Object visitExpression (final JexlExpression jscript, final Object data) {
         if (jscript instanceof Script) {
             return ((Script) jscript).getScript().jjtAccept(this, data);
         }
@@ -117,7 +117,7 @@ public class ScriptVisitor extends ParserVisitor {
      * @param data some data context
      * @return the visit result or null if jscript was not a Script implementation
      */
-    public Object visitScript(JexlScript jscript, Object data) {
+    public Object visitScript(final JexlScript jscript, final Object data) {
         if (jscript instanceof Script) {
             return ((Script) jscript).getScript().jjtAccept(this, data);
         }
@@ -131,372 +131,372 @@ public class ScriptVisitor extends ParserVisitor {
      * @param data visitor pattern argument
      * @return visitor pattern value
      */
-    protected Object visitNode(JexlNode node, Object data) {
+    protected Object visitNode(final JexlNode node, final Object data) {
         return node.childrenAccept(this, data);
     }
 
     @Override
-    protected Object visit(ASTJexlScript node, Object data) {
+    protected Object visit(final ASTJexlScript node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTBlock node, Object data) {
+    protected Object visit(final ASTBlock node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTIfStatement node, Object data) {
+    protected Object visit(final ASTIfStatement node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTWhileStatement node, Object data) {
+    protected Object visit(final ASTWhileStatement node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTDoWhileStatement node, Object data) {
+    protected Object visit(final ASTDoWhileStatement node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTContinue node, Object data) {
+    protected Object visit(final ASTContinue node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTBreak node, Object data) {
+    protected Object visit(final ASTBreak node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTForeachStatement node, Object data) {
+    protected Object visit(final ASTForeachStatement node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTReturnStatement node, Object data) {
+    protected Object visit(final ASTReturnStatement node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTAssignment node, Object data) {
+    protected Object visit(final ASTAssignment node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTVar node, Object data) {
+    protected Object visit(final ASTVar node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTReference node, Object data) {
+    protected Object visit(final ASTReference node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTTernaryNode node, Object data) {
+    protected Object visit(final ASTTernaryNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTNullpNode node, Object data) {
+    protected Object visit(final ASTNullpNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTOrNode node, Object data) {
+    protected Object visit(final ASTOrNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTAndNode node, Object data) {
+    protected Object visit(final ASTAndNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTBitwiseOrNode node, Object data) {
+    protected Object visit(final ASTBitwiseOrNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTBitwiseXorNode node, Object data) {
+    protected Object visit(final ASTBitwiseXorNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTBitwiseAndNode node, Object data) {
+    protected Object visit(final ASTBitwiseAndNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTEQNode node, Object data) {
+    protected Object visit(final ASTEQNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTNENode node, Object data) {
+    protected Object visit(final ASTNENode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTLTNode node, Object data) {
+    protected Object visit(final ASTLTNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTGTNode node, Object data) {
+    protected Object visit(final ASTGTNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTLENode node, Object data) {
+    protected Object visit(final ASTLENode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTGENode node, Object data) {
+    protected Object visit(final ASTGENode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTERNode node, Object data) {
+    protected Object visit(final ASTERNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTNRNode node, Object data) {
+    protected Object visit(final ASTNRNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTSWNode node, Object data) {
+    protected Object visit(final ASTSWNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTNSWNode node, Object data) {
+    protected Object visit(final ASTNSWNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTEWNode node, Object data) {
+    protected Object visit(final ASTEWNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTNEWNode node, Object data) {
+    protected Object visit(final ASTNEWNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTAddNode node, Object data) {
+    protected Object visit(final ASTAddNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTSubNode node, Object data) {
+    protected Object visit(final ASTSubNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTMulNode node, Object data) {
+    protected Object visit(final ASTMulNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTDivNode node, Object data) {
+    protected Object visit(final ASTDivNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTModNode node, Object data) {
+    protected Object visit(final ASTModNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTUnaryMinusNode node, Object data) {
+    protected Object visit(final ASTUnaryMinusNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTUnaryPlusNode node, Object data) {
+    protected Object visit(final ASTUnaryPlusNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTBitwiseComplNode node, Object data) {
+    protected Object visit(final ASTBitwiseComplNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTNotNode node, Object data) {
+    protected Object visit(final ASTNotNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTIdentifier node, Object data) {
+    protected Object visit(final ASTIdentifier node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTNullLiteral node, Object data) {
+    protected Object visit(final ASTNullLiteral node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTTrueNode node, Object data) {
+    protected Object visit(final ASTTrueNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTFalseNode node, Object data) {
+    protected Object visit(final ASTFalseNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTNumberLiteral node, Object data) {
+    protected Object visit(final ASTNumberLiteral node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTStringLiteral node, Object data) {
+    protected Object visit(final ASTStringLiteral node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTRegexLiteral node, Object data) {
+    protected Object visit(final ASTRegexLiteral node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetLiteral node, Object data) {
+    protected Object visit(final ASTSetLiteral node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTExtendedLiteral node, Object data) {
+    protected Object visit(final ASTExtendedLiteral node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTArrayLiteral node, Object data) {
+    protected Object visit(final ASTArrayLiteral node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTRangeNode node, Object data) {
+    protected Object visit(final ASTRangeNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTMapLiteral node, Object data) {
+    protected Object visit(final ASTMapLiteral node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTMapEntry node, Object data) {
+    protected Object visit(final ASTMapEntry node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTEmptyFunction node, Object data) {
+    protected Object visit(final ASTEmptyFunction node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTSizeFunction node, Object data) {
+    protected Object visit(final ASTSizeFunction node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTFunctionNode node, Object data) {
+    protected Object visit(final ASTFunctionNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTMethodNode node, Object data) {
+    protected Object visit(final ASTMethodNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTConstructorNode node, Object data) {
+    protected Object visit(final ASTConstructorNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTArrayAccess node, Object data) {
+    protected Object visit(final ASTArrayAccess node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTIdentifierAccess node, Object data) {
+    protected Object visit(final ASTIdentifierAccess node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTArguments node, Object data) {
+    protected Object visit(final ASTArguments node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTReferenceExpression node, Object data) {
+    protected Object visit(final ASTReferenceExpression node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetAddNode node, Object data) {
+    protected Object visit(final ASTSetAddNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetSubNode node, Object data) {
+    protected Object visit(final ASTSetSubNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetMultNode node, Object data) {
+    protected Object visit(final ASTSetMultNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetDivNode node, Object data) {
+    protected Object visit(final ASTSetDivNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetModNode node, Object data) {
+    protected Object visit(final ASTSetModNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetAndNode node, Object data) {
+    protected Object visit(final ASTSetAndNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetOrNode node, Object data) {
+    protected Object visit(final ASTSetOrNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTSetXorNode node, Object data) {
+    protected Object visit(final ASTSetXorNode node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTJxltLiteral node, Object data) {
+    protected Object visit(final ASTJxltLiteral node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTAnnotation node, Object data) {
+    protected Object visit(final ASTAnnotation node, final Object data) {
         return visitNode(node, data);
     }
 
     @Override
-    protected Object visit(ASTAnnotatedStatement node, Object data) {
+    protected Object visit(final ASTAnnotatedStatement node, final Object data) {
         return visitNode(node, data);
     }
 }

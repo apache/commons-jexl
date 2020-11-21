@@ -25,11 +25,11 @@ import org.apache.commons.jexl3.JxltEngine;
 public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess {
     protected JxltEngine.Expression jxltExpr;
 
-    ASTIdentifierAccessJxlt(int id) {
+    ASTIdentifierAccessJxlt(final int id) {
         super(id);
     }
 
-    ASTIdentifierAccessJxlt(Parser p, int id) {
+    ASTIdentifierAccessJxlt(final Parser p, final int id) {
         super(p, id);
     }
 
@@ -38,7 +38,7 @@ public class ASTIdentifierAccessJxlt extends ASTIdentifierAccess {
         return true;
     }
 
-    public void setExpression(JxltEngine.Expression tp) {
+    public void setExpression(final JxltEngine.Expression tp) {
         jxltExpr = tp;
     }
 

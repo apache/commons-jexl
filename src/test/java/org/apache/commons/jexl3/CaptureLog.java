@@ -23,10 +23,10 @@ import org.apache.commons.logging.Log;
  * A log implementation to help control tests results.
  */
 public class CaptureLog implements Log {
-    private List<Object[]> captured = new ArrayList<Object[]>();
+    private final List<Object[]> captured = new ArrayList<Object[]>();
 
     static Object caller() {
-        StackTraceElement[] stack = new Exception().fillInStackTrace().getStackTrace();
+        final StackTraceElement[] stack = new Exception().fillInStackTrace().getStackTrace();
         return stack[2];
     }
    
@@ -34,7 +34,7 @@ public class CaptureLog implements Log {
         this("org.apache.commons.jexl3");
     }
     
-    public CaptureLog(String name) {
+    public CaptureLog(final String name) {
         //super(name);
     }
 
@@ -42,9 +42,9 @@ public class CaptureLog implements Log {
         return captured.isEmpty();
     }
 
-    public int count(String type) {
+    public int count(final String type) {
         int count = 0;
-        for (Object[] l : captured) {
+        for (final Object[] l : captured) {
             if (type.equals(l[0].toString())) {
                 count += 1;
             }
@@ -53,47 +53,47 @@ public class CaptureLog implements Log {
     }
         
     //@Override
-    public boolean isEnabledFor(int /*Priority*/ p) {
+    public boolean isEnabledFor(final int /*Priority*/ p) {
         return true;
     }
 
     @Override
-    public void debug(Object o) {
+    public void debug(final Object o) {
         captured.add(new Object[]{"debug", caller(), o});
     }
 
     @Override
-    public void debug(Object o, Throwable thrwbl) {
+    public void debug(final Object o, final Throwable thrwbl) {
         captured.add(new Object[]{"debug", caller(), o, thrwbl});
     }
 
     @Override
-    public void error(Object o) {
+    public void error(final Object o) {
         captured.add(new Object[]{"error", caller(), o});
     }
 
     @Override
-    public void error(Object o, Throwable thrwbl) {
+    public void error(final Object o, final Throwable thrwbl) {
         captured.add(new Object[]{"error", caller(), o, thrwbl});
     }
 
     @Override
-    public void fatal(Object o) {
+    public void fatal(final Object o) {
         captured.add(new Object[]{"fatal", caller(), o});
     }
 
     @Override
-    public void fatal(Object o, Throwable thrwbl) {
+    public void fatal(final Object o, final Throwable thrwbl) {
         captured.add(new Object[]{"fatal", caller(), o, thrwbl});
     }
 
     @Override
-    public void info(Object o) {
+    public void info(final Object o) {
         captured.add(new Object[]{"info", caller(), o});
     }
 
     @Override
-    public void info(Object o, Throwable thrwbl) {
+    public void info(final Object o, final Throwable thrwbl) {
         captured.add(new Object[]{"info", caller(), o, thrwbl});
     }
 
@@ -128,22 +128,22 @@ public class CaptureLog implements Log {
     }
 
     @Override
-    public void trace(Object o) {
+    public void trace(final Object o) {
         captured.add(new Object[]{"trace", caller(), o});
     }
 
     @Override
-    public void trace(Object o, Throwable thrwbl) {
+    public void trace(final Object o, final Throwable thrwbl) {
         captured.add(new Object[]{"trace", caller(), o, thrwbl});
     }
 
     @Override
-    public void warn(Object o) {
+    public void warn(final Object o) {
         captured.add(new Object[]{"warn", caller(), o});
     }
 
     @Override
-    public void warn(Object o, Throwable thrwbl) {
+    public void warn(final Object o, final Throwable thrwbl) {
         captured.add(new Object[]{"warn", caller(), o, thrwbl});
     }
 

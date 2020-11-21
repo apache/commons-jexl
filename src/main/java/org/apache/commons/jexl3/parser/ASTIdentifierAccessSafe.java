@@ -21,11 +21,11 @@ package org.apache.commons.jexl3.parser;
  * x?.identifier .
  */
 public class ASTIdentifierAccessSafe extends ASTIdentifierAccess {
-    ASTIdentifierAccessSafe(int id) {
+    ASTIdentifierAccessSafe(final int id) {
         super(id);
     }
 
-    ASTIdentifierAccessSafe(Parser p, int id) {
+    ASTIdentifierAccessSafe(final Parser p, final int id) {
         super(p, id);
     }
 

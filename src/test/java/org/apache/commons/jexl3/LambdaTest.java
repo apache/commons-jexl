@@ -34,22 +34,22 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void testScriptArguments() throws Exception {
-        JexlEngine jexl = createEngine();
-        JexlScript s = jexl.createScript(" x + x ", "x");
-        JexlScript s42 = jexl.createScript("s(21)", "s");
-        Object result = s42.execute(null, s);
+        final JexlEngine jexl = createEngine();
+        final JexlScript s = jexl.createScript(" x + x ", "x");
+        final JexlScript s42 = jexl.createScript("s(21)", "s");
+        final Object result = s42.execute(null, s);
         Assert.assertEquals(42, result);
     }
 
     @Test
     public void testScriptContext() throws Exception {
-        JexlEngine jexl = createEngine();
-        JexlScript s = jexl.createScript("function(x) { x + x }");
-        String fsstr = s.getParsedText(0);
+        final JexlEngine jexl = createEngine();
+        final JexlScript s = jexl.createScript("function(x) { x + x }");
+        final String fsstr = s.getParsedText(0);
         Assert.assertEquals("(x)->{ x + x; }", fsstr);
         Assert.assertEquals(42, s.execute(null, 21));
         JexlScript s42 = jexl.createScript("s(21)");
-        JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlEvalContext ctxt = new JexlEvalContext();
         ctxt.set("s", s);
         Object result = s42.execute(ctxt);
         Assert.assertEquals(42, result);
@@ -62,7 +62,7 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void testLambda() throws Exception {
-        JexlEngine jexl = createEngine();
+        final JexlEngine jexl = createEngine();
         String strs = "var s = function(x) { x + x }; s(21)";
         JexlScript s42 = jexl.createScript(strs);
         Object result = s42.execute(null);
@@ -75,7 +75,7 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void testLambdaClosure() throws Exception {
-        JexlEngine jexl = createEngine();
+        final JexlEngine jexl = createEngine();
         String strs = "var t = 20; var s = function(x, y) { x + y + t}; s(15, 7)";
         JexlScript s42 = jexl.createScript(strs);
         Object result = s42.execute(null);
@@ -96,7 +96,7 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void testLambdaLambda() throws Exception {
-        JexlEngine jexl = createEngine();
+        final JexlEngine jexl = createEngine();
         String strs = "var t = 19; ( (x, y)->{ var t = 20; x + y + t} )(15, 7);";
         JexlScript s42 = jexl.createScript(strs);
         Object result = s42.execute(null);
@@ -115,30 +115,30 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void testNestLambda() throws Exception {
-        JexlEngine jexl = createEngine();
-        String strs = "( (x)->{ (y)->{ x + y } })(15)(27)";
-        JexlScript s42 = jexl.createScript(strs);
-        Object result = s42.execute(null);
+        final JexlEngine jexl = createEngine();
+        final String strs = "( (x)->{ (y)->{ x + y } })(15)(27)";
+        final JexlScript s42 = jexl.createScript(strs);
+        final Object result = s42.execute(null);
         Assert.assertEquals(42, result);
     }
 
     @Test
     public void testNestLambada() throws Exception {
-        JexlEngine jexl = createEngine();
-        JexlContext ctx = null;
-        String strs = "(x)->{ (y)->{ x + y } }";
-        JexlScript s42 = jexl.createScript(strs);
-        JexlScript s42b = jexl.createScript(s42.toString());
+        final JexlEngine jexl = createEngine();
+        final JexlContext ctx = null;
+        final String strs = "(x)->{ (y)->{ x + y } }";
+        final JexlScript s42 = jexl.createScript(strs);
+        final JexlScript s42b = jexl.createScript(s42.toString());
         Assert.assertEquals(s42.hashCode(), s42b.hashCode());
         Assert.assertEquals(s42, s42b);
         Object result = s42.execute(ctx, 15);
         Assert.assertTrue(result instanceof JexlScript);
-        Object resultb = s42.execute(ctx, 15);
+        final Object resultb = s42.execute(ctx, 15);
         Assert.assertEquals(result.hashCode(), resultb.hashCode());
         Assert.assertEquals(result, resultb);
         Assert.assertEquals(result, jexl.createScript(resultb.toString(), "x").execute(ctx, 15));
-        JexlScript s15 = (JexlScript) result;
-        Callable<Object> s15b = s15.callable(ctx, 27);
+        final JexlScript s15 = (JexlScript) result;
+        final Callable<Object> s15b = s15.callable(ctx, 27);
         result = s15.execute(ctx, 27);
         Assert.assertEquals(42, result);
         result = s15b.call();
@@ -147,8 +147,8 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void testHoistLambda() throws Exception {
-        JexlEngine jexl = createEngine();
-        JexlEvalContext ctx = new JexlEvalContext();
+        final JexlEngine jexl = createEngine();
+        final JexlEvalContext ctx = new JexlEvalContext();
         ctx.getEngineOptions().setLexical(false);
         JexlScript s42;
         Object result;
@@ -188,55 +188,55 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void testRecurse() throws Exception {
-        JexlEngine jexl = createEngine();
-        JexlContext jc = new MapContext();
+        final JexlEngine jexl = createEngine();
+        final JexlContext jc = new MapContext();
         try {
-            JexlScript script = jexl.createScript("var fact = (x)->{ if (x <= 1) 1; else x * fact(x - 1) }; fact(5)");
-            int result = (Integer) script.execute(jc);
+            final JexlScript script = jexl.createScript("var fact = (x)->{ if (x <= 1) 1; else x * fact(x - 1) }; fact(5)");
+            final int result = (Integer) script.execute(jc);
             Assert.assertEquals(120, result);
-        } catch (JexlException xany) {
-            String msg = xany.toString();
+        } catch (final JexlException xany) {
+            final String msg = xany.toString();
             throw xany;
         }
     }
 
     @Test
     public void testRecurse2() throws Exception {
-        JexlEngine jexl = createEngine();
-        JexlContext jc = new MapContext();
+        final JexlEngine jexl = createEngine();
+        final JexlContext jc = new MapContext();
         // adding some captured vars to get it confused
         try {
-            JexlScript script = jexl.createScript(
+            final JexlScript script = jexl.createScript(
                     "var y = 1; var z = 1; "
                     +"var fact = (x)->{ if (x <= y) z; else x * fact(x - 1) }; fact(6)");
-            int result = (Integer) script.execute(jc);
+            final int result = (Integer) script.execute(jc);
             Assert.assertEquals(720, result);
-        } catch (JexlException xany) {
-            String msg = xany.toString();
+        } catch (final JexlException xany) {
+            final String msg = xany.toString();
             throw xany;
         }
     }
 
     @Test
     public void testRecurse3() throws Exception {
-        JexlEngine jexl = createEngine();
-        JexlContext jc = new MapContext();
+        final JexlEngine jexl = createEngine();
+        final JexlContext jc = new MapContext();
         // adding some captured vars to get it confused
         try {
-            JexlScript script = jexl.createScript(
+            final JexlScript script = jexl.createScript(
                     "var y = 1; var z = 1;var foo = (x)->{y + z}; "
                     +"var fact = (x)->{ if (x <= y) z; else x * fact(x - 1) }; fact(6)");
-            int result = (Integer) script.execute(jc);
+            final int result = (Integer) script.execute(jc);
             Assert.assertEquals(720, result);
-        } catch (JexlException xany) {
-            String msg = xany.toString();
+        } catch (final JexlException xany) {
+            final String msg = xany.toString();
             throw xany;
         }
     }
 
     @Test
     public void testIdentity() throws Exception {
-        JexlEngine jexl = createEngine();
+        final JexlEngine jexl = createEngine();
         JexlScript script;
         Object result;
 
@@ -248,12 +248,12 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void testCurry1() throws Exception {
-        JexlEngine jexl = createEngine();
+        final JexlEngine jexl = createEngine();
         JexlScript script;
         Object result;
         String[] parms;
 
-        JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");
+        final JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");
         parms = base.getUnboundParameters();
         Assert.assertEquals(3, parms.length);
         script = base.curry(5);
@@ -271,12 +271,12 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void testCurry2() throws Exception {
-        JexlEngine jexl = createEngine();
+        final JexlEngine jexl = createEngine();
         JexlScript script;
         Object result;
         String[] parms;
 
-        JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");
+        final JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");
         script = base.curry(5, 15);
         parms = script.getUnboundParameters();
         Assert.assertEquals(1, parms.length);
@@ -287,11 +287,11 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void testCurry3() throws Exception {
-        JexlEngine jexl = createEngine();
+        final JexlEngine jexl = createEngine();
         JexlScript script;
         Object result;
 
-        JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");
+        final JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");
         script = base.curry(5, 15);
         result = script.execute(null, 22);
         Assert.assertEquals(42, result);
@@ -299,13 +299,13 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void test270() throws Exception {
-        JexlEngine jexl = createEngine();
-        JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");
-        String text = base.toString();
+        final JexlEngine jexl = createEngine();
+        final JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");
+        final String text = base.toString();
         JexlScript script = base.curry(5, 15);
         Assert.assertEquals(text, script.toString());
 
-        JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlEvalContext ctxt = new JexlEvalContext();
         ctxt.set("s", base);
         script = jexl.createScript("return s");
         Object result = script.execute(ctxt);
@@ -318,35 +318,35 @@ public class LambdaTest extends JexlTestCase {
 
     @Test
     public void test271a() throws Exception {
-        JexlEngine jexl = createEngine();
-        JexlScript base = jexl.createScript("var base = 1; var x = (a)->{ var y = (b) -> {base + b}; return base + y(a)}; x(40)");
-        Object result = base.execute(null);
+        final JexlEngine jexl = createEngine();
+        final JexlScript base = jexl.createScript("var base = 1; var x = (a)->{ var y = (b) -> {base + b}; return base + y(a)}; x(40)");
+        final Object result = base.execute(null);
         Assert.assertEquals(42, result);
     }
 
     @Test
     public void test271b() throws Exception {
-        JexlEngine jexl = createEngine();
-        JexlScript base = jexl.createScript("var base = 2; var sum = (x, y, z)->{ base + x + y + z }; var y = sum.curry(1); y(2,3)");
-        Object result = base.execute(null);
+        final JexlEngine jexl = createEngine();
+        final JexlScript base = jexl.createScript("var base = 2; var sum = (x, y, z)->{ base + x + y + z }; var y = sum.curry(1); y(2,3)");
+        final Object result = base.execute(null);
         Assert.assertEquals(8, result);
     }
 
     @Test
     public void test271c() throws Exception {
-        JexlEngine jexl = createEngine();
-        JexlScript base = jexl.createScript("(x, y, z)->{ 2 + x + y + z };");
-        JexlScript y = base.curry(1);
-        Object result = y.execute(null, 2, 3);
+        final JexlEngine jexl = createEngine();
+        final JexlScript base = jexl.createScript("(x, y, z)->{ 2 + x + y + z };");
+        final JexlScript y = base.curry(1);
+        final Object result = y.execute(null, 2, 3);
         Assert.assertEquals(8, result);
     }
 
     @Test
     public void test271d() throws Exception {
-        JexlEngine jexl = createEngine();
-        JexlScript base = jexl.createScript("var base = 2; return (x, y, z)->{ base + x + y + z };");
-        JexlScript y = ((JexlScript) base.execute(null)).curry(1);
-        Object result = y.execute(null, 2, 3);
+        final JexlEngine jexl = createEngine();
+        final JexlScript base = jexl.createScript("var base = 2; return (x, y, z)->{ base + x + y + z };");
+        final JexlScript y = ((JexlScript) base.execute(null)).curry(1);
+        final Object result = y.execute(null, 2, 3);
         Assert.assertEquals(8, result);
     }
 

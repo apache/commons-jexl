@@ -24,15 +24,15 @@ public class ASTIdentifierAccess extends JexlNode {
     private String name = null;
     private Integer identifier = null;
 
-    ASTIdentifierAccess(int id) {
+    ASTIdentifierAccess(final int id) {
         super(id);
     }
 
-    ASTIdentifierAccess(Parser p, int id) {
+    ASTIdentifierAccess(final Parser p, final int id) {
         super(p, id);
     }
 
-    void setIdentifier(String id) {
+    void setIdentifier(final String id) {
         name = id;
         identifier = parseIdentifier(id);
     }
@@ -64,13 +64,13 @@ public class ASTIdentifierAccess extends JexlNode {
      * @param id the identifier
      * @return an integer or null
      */
-    public static Integer parseIdentifier(String id) {
+    public static Integer parseIdentifier(final String id) {
         // hand coded because the was no way to fail on leading '0's using NumberFormat
         if (id != null) {
             final int length = id.length();
             int val = 0;
             for (int i = 0; i < length; ++i) {
-                char c = id.charAt(i);
+                final char c = id.charAt(i);
                 // leading 0s but no just 0, NaN
                 if (c == '0') {
                     if (length == 1) {
@@ -99,7 +99,7 @@ public class ASTIdentifierAccess extends JexlNode {
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 

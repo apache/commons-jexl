@@ -50,7 +50,7 @@ public class TokenMgrError extends Error implements JavaccError {
      * Indicates the reason why the exception is thrown. It will have
      * one of the above 4 values.
      */
-    private int errorCode;
+    private final int errorCode;
     /**
      * The lexer state.
      */
@@ -94,13 +94,13 @@ public class TokenMgrError extends Error implements JavaccError {
 
 
     /** Constructor with message and reason. */
-    public TokenMgrError(String message, int reason) {
+    public TokenMgrError(final String message, final int reason) {
         super(message);
         errorCode = reason;
     }
 
     /** Full Constructor. */
-    public TokenMgrError(boolean EOFSeen, int lexState, int errorLine, int errorColumn, String errorAfter, char curChar, int reason) {
+    public TokenMgrError(final boolean EOFSeen, final int lexState, final int errorLine, final int errorColumn, final String errorAfter, final char curChar, final int reason) {
         eof = EOFSeen;
         state = lexState;
         line = errorLine;
@@ -137,8 +137,8 @@ public class TokenMgrError extends Error implements JavaccError {
       * Replaces unprintable characters by their espaced (or unicode escaped)
       * equivalents in the given string
       */
-     protected static String addEscapes(String str) {
-        StringBuilder retval = new StringBuilder();
+     protected static String addEscapes(final String str) {
+        final StringBuilder retval = new StringBuilder();
         char ch;
         for (int i = 0; i < str.length(); i++) {
           switch (str.charAt(i))
@@ -171,7 +171,7 @@ public class TokenMgrError extends Error implements JavaccError {
                 continue;
              default:
                 if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
-                   String s = "0000" + Integer.toString(ch, 16);
+                   final String s = "0000" + Integer.toString(ch, 16);
                    retval.append("//u").append(s.substring(s.length() - 4, s.length()));
                 } else {
                    retval.append(ch);

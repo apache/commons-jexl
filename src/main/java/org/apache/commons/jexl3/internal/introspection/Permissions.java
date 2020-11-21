@@ -41,7 +41,7 @@ public class Permissions {
      * @param pack the package
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    public boolean allow(Package pack) {
+    public boolean allow(final Package pack) {
         if (pack != null && pack.getAnnotation(NoJexl.class) != null) {
             return false;
         }
@@ -54,7 +54,7 @@ public class Permissions {
      * @param clazz the class to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    public boolean allow(Class<?> clazz) {
+    public boolean allow(final Class<?> clazz) {
         return clazz != null && allow(clazz.getPackage()) && allow(clazz, true);
     }
 
@@ -63,19 +63,19 @@ public class Permissions {
      * @param ctor the constructor to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    public boolean allow(Constructor<?> ctor) {
+    public boolean allow(final Constructor<?> ctor) {
         if (ctor == null) {
             return false;
         }
         if (!Modifier.isPublic(ctor.getModifiers())) {
             return false;
         }
-        Class<?> clazz = ctor.getDeclaringClass();
+        final Class<?> clazz = ctor.getDeclaringClass();
         if (!allow(clazz, false)) {
             return false;
         }
         // is ctor annotated with nojexl ?
-        NoJexl nojexl = ctor.getAnnotation(NoJexl.class);
+        final NoJexl nojexl = ctor.getAnnotation(NoJexl.class);
         if (nojexl != null) {
             return false;
         }
@@ -87,19 +87,19 @@ public class Permissions {
      * @param field the field to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    public boolean allow(Field field) {
+    public boolean allow(final Field field) {
         if (field == null) {
             return false;
         }
         if (!Modifier.isPublic(field.getModifiers())) {
             return false;
         }
-        Class<?> clazz = field.getDeclaringClass();
+        final Class<?> clazz = field.getDeclaringClass();
         if (!allow(clazz, false)) {
             return false;
         }
         // is field annotated with nojexl ?
-        NoJexl nojexl = field.getAnnotation(NoJexl.class);
+        final NoJexl nojexl = field.getAnnotation(NoJexl.class);
         if (nojexl != null) {
             return false;
         }
@@ -113,7 +113,7 @@ public class Permissions {
      * @param method the method to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    public boolean allow(Method method) {
+    public boolean allow(final Method method) {
         if (method == null) {
             return false;
         }
@@ -132,7 +132,7 @@ public class Permissions {
             return false;
         }
         // lets walk all interfaces
-        for (Class<?> inter : clazz.getInterfaces()) {
+        for (final Class<?> inter : clazz.getInterfaces()) {
             if (!allow(inter, method)) {
                 return false;
             }
@@ -156,7 +156,7 @@ public class Permissions {
      * @param interf whether interfaces should be checked as well
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    protected boolean allow(Class<?> clazz, boolean interf) {
+    protected boolean allow(Class<?> clazz, final boolean interf) {
         if (clazz == null) {
             return false;
         }
@@ -165,9 +165,9 @@ public class Permissions {
         }
         // lets walk all interfaces
         if (interf) {
-            for (Class<?> inter : clazz.getInterfaces()) {
+            for (final Class<?> inter : clazz.getInterfaces()) {
                 // is clazz annotated with nojexl ?
-                NoJexl nojexl = inter.getAnnotation(NoJexl.class);
+                final NoJexl nojexl = inter.getAnnotation(NoJexl.class);
                 if (nojexl != null) {
                     return false;
                 }
@@ -178,7 +178,7 @@ public class Permissions {
         // walk all superclasses
         while (clazz != null) {
             // is clazz annotated with nojexl ?
-            NoJexl nojexl = clazz.getAnnotation(NoJexl.class);
+            final NoJexl nojexl = clazz.getAnnotation(NoJexl.class);
             if (nojexl != null) {
                 return false;
             }
@@ -194,11 +194,11 @@ public class Permissions {
      * @param method the method
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    protected boolean allow(Class<?> clazz, Method method) {
+    protected boolean allow(final Class<?> clazz, final Method method) {
         if (clazz != null) {
             try {
                 // check if method in that class is different from the method argument
-                Method wmethod = clazz.getMethod(method.getName(), method.getParameterTypes());
+                final Method wmethod = clazz.getMethod(method.getName(), method.getParameterTypes());
                 if (wmethod != null) {
                     NoJexl nojexl = clazz.getAnnotation(NoJexl.class);
                     if (nojexl != null) {
@@ -210,10 +210,10 @@ public class Permissions {
                         return false;
                     }
                 }
-            } catch (NoSuchMethodException ex) {
+            } catch (final NoSuchMethodException ex) {
                 // unexpected, return no
                 return true;
-            } catch (SecurityException ex) {
+            } catch (final SecurityException ex) {
                 // unexpected, cant do much
                 return false;
             }

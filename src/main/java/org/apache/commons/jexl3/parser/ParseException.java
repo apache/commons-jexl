@@ -53,9 +53,9 @@ public class ParseException extends Exception implements JavaccError {
      * parser within which the parse error occurred.  This array is
      * defined in the generated ...Constants interface.
      */
-    public ParseException(Token currentToken, int[][] expectedTokenSequences, String[] tokenImage) {
+    public ParseException(final Token currentToken, final int[][] expectedTokenSequences, final String[] tokenImage) {
         super("parse error");
-        Token tok = currentToken.next;
+        final Token tok = currentToken.next;
         after = tok.image;
         line = tok.beginLine;
         column = tok.beginColumn;
@@ -68,7 +68,7 @@ public class ParseException extends Exception implements JavaccError {
     }
 
     /** Constructor with message. */
-    public ParseException(String message) {
+    public ParseException(final String message) {
         super(message);
     }
 

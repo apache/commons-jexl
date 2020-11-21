@@ -38,21 +38,21 @@ public abstract class JexlNode extends SimpleNode {
         T getLiteral();
     }
 
-    public JexlNode(int id) {
+    public JexlNode(final int id) {
         super(id);
     }
 
-    public JexlNode(Parser p, int id) {
+    public JexlNode(final Parser p, final int id) {
         super(p, id);
     }
 
-    public void jjtSetFirstToken(Token t) {
+    public void jjtSetFirstToken(final Token t) {
         // 0xc = 12, 12 bits -> 4096
         // 0xfff, 12 bits mask
         this.lc = (t.beginLine << 0xc) | (0xfff & t.beginColumn);
     }
 
-    public void jjtSetLastToken(Token t) {
+    public void jjtSetLastToken(final Token t) {
         // nothing
     }
 
@@ -80,8 +80,8 @@ public abstract class JexlNode extends SimpleNode {
             node = node.jjtGetParent();
         }
         if (lc >= 0) {
-            int c = lc & 0xfff;
-            int l = lc >> 0xc;
+            final int c = lc & 0xfff;
+            final int l = lc >> 0xc;
             // at least an info with line/column number
             return info != null? info.at(l, c) : new JexlInfo(null, l, c);
         } else {
@@ -124,17 +124,17 @@ public abstract class JexlNode extends SimpleNode {
         return isConstant(this instanceof JexlNode.Constant<?>);
     }
 
-    protected boolean isConstant(boolean literal) {
+    protected boolean isConstant(final boolean literal) {
         if (literal) {
             for (int n = 0; n < jjtGetNumChildren(); ++n) {
-                JexlNode child = jjtGetChild(n);
+                final JexlNode child = jjtGetChild(n);
                 if (child instanceof ASTReference) {
-                    boolean is = child.isConstant(true);
+                    final boolean is = child.isConstant(true);
                     if (!is) {
                         return false;
                     }
                 } else if (child instanceof ASTMapEntry) {
-                    boolean is = child.isConstant(true);
+                    final boolean is = child.isConstant(true);
                     if (!is) {
                         return false;
                     }
@@ -159,7 +159,7 @@ public abstract class JexlNode extends SimpleNode {
                 || walk instanceof ASTArrayAccess) {
                 return true;
             }
-            int nc = walk.jjtGetNumChildren() - 1;
+            final int nc = walk.jjtGetNumChildren() - 1;
             if (nc >= 0) {
                 walk = walk.jjtGetChild(nc);
             } else {
@@ -179,9 +179,9 @@ public abstract class JexlNode extends SimpleNode {
         if (this instanceof ASTIdentifier) {
             return ((ASTIdentifier) this).getSymbol() < 0;
         }
-        int nc = this.jjtGetNumChildren() - 1;
+        final int nc = this.jjtGetNumChildren() - 1;
         if (nc >= 0) {
-            JexlNode first = this.jjtGetChild(0);
+            final JexlNode first = this.jjtGetChild(0);
             return first.isGlobalVar();
         }
         if (jjtGetParent() instanceof ASTReference) {
@@ -204,7 +204,7 @@ public abstract class JexlNode extends SimpleNode {
      * @param safe whether the engine is in safe-navigation mode
      * @return true if safe lhs, false otherwise
      */
-    public boolean isSafeLhs(boolean safe) {
+    public boolean isSafeLhs(final boolean safe) {
         if (this instanceof ASTReference) {
             return jjtGetChild(0).isSafeLhs(safe);
         }
@@ -215,15 +215,15 @@ public abstract class JexlNode extends SimpleNode {
                 return true;
             }
         }
-        JexlNode parent = this.jjtGetParent();
+        final JexlNode parent = this.jjtGetParent();
         if (parent == null) {
             return false;
         }
         // find this node in its parent
-        int nsiblings = parent.jjtGetNumChildren();
+        final int nsiblings = parent.jjtGetNumChildren();
         int rhs = -1;
         for(int s = 0; s < nsiblings; ++s) {
-            JexlNode sibling = parent.jjtGetChild(s);
+            final JexlNode sibling = parent.jjtGetChild(s);
             if (sibling == this) {
                 // the next chid offset of this nodes parent
                 rhs = s + 1;
@@ -285,7 +285,7 @@ public abstract class JexlNode extends SimpleNode {
          * Default ctor.
          * @param jnode the node
          */
-        public Info(JexlNode jnode) {
+        public Info(final JexlNode jnode) {
             this(jnode, jnode.jexlInfo());
         }
         
@@ -294,7 +294,7 @@ public abstract class JexlNode extends SimpleNode {
          * @param jnode the node
          * @param info the 
          */
-        public Info(JexlNode jnode, JexlInfo info) {
+        public Info(final JexlNode jnode, final JexlInfo info) {
             this(jnode, info.getName(), info.getLine(), info.getColumn());
         }
         
@@ -305,7 +305,7 @@ public abstract class JexlNode extends SimpleNode {
          * @param l the line
          * @param c the column
          */
-        private Info(JexlNode jnode, String name, int l, int c) {
+        private Info(final JexlNode jnode, final String name, final int l, final int c) {
             super(name, l, c);
             node = jnode;
         }
@@ -318,7 +318,7 @@ public abstract class JexlNode extends SimpleNode {
         }
 
         @Override
-        public JexlInfo at(int l, int c) {
+        public JexlInfo at(final int l, final int c) {
             return new Info(node, getName(), l, c);
         }
 

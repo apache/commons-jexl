@@ -48,10 +48,10 @@ public class PropertyAccessTest extends JexlTestCase {
 
     @Test
     public void testPropertyProperty() throws Exception {
-        Integer i42 = Integer.valueOf(42);
-        Integer i43 = Integer.valueOf(43);
-        String s42 = "fourty-two";
-        Object[] foo = new Object[3];
+        final Integer i42 = Integer.valueOf(42);
+        final Integer i43 = Integer.valueOf(43);
+        final String s42 = "fourty-two";
+        final Object[] foo = new Object[3];
         foo[0] = foo;
         foo[1] = i42;
         foo[2] = s42;
@@ -97,12 +97,12 @@ public class PropertyAccessTest extends JexlTestCase {
         String value0;
         int value1;
 
-        public PropertyContainer(String name, int number) {
+        public PropertyContainer(final String name, final int number) {
             value0 = name;
             value1 = number;
         }
 
-        public Object getProperty(String name) {
+        public Object getProperty(final String name) {
             if ("name".equals(name)) {
                 return value0;
             } else if ("number".equals(name)) {
@@ -112,7 +112,7 @@ public class PropertyAccessTest extends JexlTestCase {
             }
         }
 
-        public void setProperty(String name, String value) {
+        public void setProperty(final String name, final String value) {
             if ("name".equals(name)) {
                 this.value0 = value.toUpperCase();
             }
@@ -129,17 +129,17 @@ public class PropertyAccessTest extends JexlTestCase {
     public static class PropertyArithmetic extends JexlArithmetic {
         int ncalls = 0;
 
-        public PropertyArithmetic(boolean astrict) {
+        public PropertyArithmetic(final boolean astrict) {
             super(astrict);
         }
 
-        public Object propertySet(IndexedType.IndexedContainer map, String key, Integer value) {
+        public Object propertySet(final IndexedType.IndexedContainer map, final String key, final Integer value) {
             if (map.getContainerClass().equals(PropertyContainer.class)
                 && map.getContainerName().equals("property")) {
                 try {
                     map.set(key, value.toString());
                     ncalls += 1;
-                } catch (Exception xany) {
+                } catch (final Exception xany) {
                     throw new JexlException.Operator(null, key + "." + value.toString(), xany);
                 }
                 return null;
@@ -154,16 +154,16 @@ public class PropertyAccessTest extends JexlTestCase {
 
     @Test
     public void testInnerViaArithmetic() throws Exception {
-        PropertyArithmetic pa = new PropertyArithmetic(true);
-        JexlEngine jexl = new JexlBuilder().arithmetic(pa).debug(true).strict(true).cache(32).create();
-        PropertyContainer quux = new PropertyContainer("bar", 169);
+        final PropertyArithmetic pa = new PropertyArithmetic(true);
+        final JexlEngine jexl = new JexlBuilder().arithmetic(pa).debug(true).strict(true).cache(32).create();
+        final PropertyContainer quux = new PropertyContainer("bar", 169);
         Object result;
 
-        JexlScript getName = jexl.createScript("foo.property.name", "foo");
+        final JexlScript getName = jexl.createScript("foo.property.name", "foo");
         result = getName.execute(null, quux);
         Assert.assertEquals("bar", result);
-        int calls = pa.getCalls();
-        JexlScript setName = jexl.createScript("foo.property.name = $0", "foo", "$0");
+        final int calls = pa.getCalls();
+        final JexlScript setName = jexl.createScript("foo.property.name = $0", "foo", "$0");
         setName.execute(null, quux, 123);
         result = getName.execute(null, quux);
         Assert.assertEquals("123", result);
@@ -176,10 +176,10 @@ public class PropertyAccessTest extends JexlTestCase {
         Assert.assertEquals("QUUX", result);
         Assert.assertEquals(calls + 2, pa.getCalls());
 
-        JexlScript getNumber = jexl.createScript("foo.property.number", "foo");
+        final JexlScript getNumber = jexl.createScript("foo.property.number", "foo");
         result = getNumber.execute(null, quux);
         Assert.assertEquals(169, result);
-        JexlScript setNumber = jexl.createScript("foo.property.number = $0", "foo", "$0");
+        final JexlScript setNumber = jexl.createScript("foo.property.number = $0", "foo", "$0");
         setNumber.execute(null, quux, 42);
         result = getNumber.execute(null, quux);
         Assert.assertEquals(1042, result);
@@ -194,11 +194,11 @@ public class PropertyAccessTest extends JexlTestCase {
     }
 
     public static class Container extends PropertyContainer {
-        public Container(String name, int number) {
+        public Container(final String name, final int number) {
             super(name, number);
         }
 
-        public Object getProperty(int ref) {
+        public Object getProperty(final int ref) {
             switch (ref) {
                 case 0:
                     return value0;
@@ -210,25 +210,25 @@ public class PropertyAccessTest extends JexlTestCase {
         }
 
         @Override
-        public void setProperty(String name, String value) {
+        public void setProperty(final String name, final String value) {
             if ("name".equals(name)) {
                 this.value0 = value;
             }
         }
 
-        public void setProperty(String name, int value) {
+        public void setProperty(final String name, final int value) {
             if ("number".equals(name)) {
                 this.value1 = value;
             }
         }
 
-        public void setProperty(int ref, String value) {
+        public void setProperty(final int ref, final String value) {
             if (0 == ref) {
                 this.value0 = value;
             }
         }
 
-        public void setProperty(int ref, int value) {
+        public void setProperty(final int ref, final int value) {
             if (1 == ref) {
                 this.value1 = value;
             }
@@ -237,51 +237,51 @@ public class PropertyAccessTest extends JexlTestCase {
 
     @Test
     public void testInnerProperty() throws Exception {
-        PropertyArithmetic pa = new PropertyArithmetic(true);
-        JexlEngine jexl = new JexlBuilder().arithmetic(pa).debug(true).strict(true).cache(32).create();
-        Container quux = new Container("quux", 42);
-        JexlScript get;
+        final PropertyArithmetic pa = new PropertyArithmetic(true);
+        final JexlEngine jexl = new JexlBuilder().arithmetic(pa).debug(true).strict(true).cache(32).create();
+        final Container quux = new Container("quux", 42);
+        final JexlScript get;
         Object result;
 
-        int calls = pa.getCalls();
-        JexlScript getName = JEXL.createScript("foo.property.name", "foo");
+        final int calls = pa.getCalls();
+        final JexlScript getName = JEXL.createScript("foo.property.name", "foo");
         result = getName.execute(null, quux);
         Assert.assertEquals("quux", result);
 
-        JexlScript get0 = JEXL.createScript("foo.property.0", "foo");
+        final JexlScript get0 = JEXL.createScript("foo.property.0", "foo");
         result = get0.execute(null, quux);
         Assert.assertEquals("quux", result);
 
-        JexlScript getNumber = JEXL.createScript("foo.property.number", "foo");
+        final JexlScript getNumber = JEXL.createScript("foo.property.number", "foo");
         result = getNumber.execute(null, quux);
         Assert.assertEquals(42, result);
 
-        JexlScript get1 = JEXL.createScript("foo.property.1", "foo");
+        final JexlScript get1 = JEXL.createScript("foo.property.1", "foo");
         result = get1.execute(null, quux);
         Assert.assertEquals(42, result);
 
-        JexlScript setName = JEXL.createScript("foo.property.name = $0", "foo", "$0");
+        final JexlScript setName = JEXL.createScript("foo.property.name = $0", "foo", "$0");
         setName.execute(null, quux, "QUUX");
         result = getName.execute(null, quux);
         Assert.assertEquals("QUUX", result);
         result = get0.execute(null, quux);
         Assert.assertEquals("QUUX", result);
 
-        JexlScript set0 = JEXL.createScript("foo.property.0 = $0", "foo", "$0");
+        final JexlScript set0 = JEXL.createScript("foo.property.0 = $0", "foo", "$0");
         set0.execute(null, quux, "BAR");
         result = getName.execute(null, quux);
         Assert.assertEquals("BAR", result);
         result = get0.execute(null, quux);
         Assert.assertEquals("BAR", result);
 
-        JexlScript setNumber = JEXL.createScript("foo.property.number = $0", "foo", "$0");
+        final JexlScript setNumber = JEXL.createScript("foo.property.number = $0", "foo", "$0");
         setNumber.execute(null, quux, -42);
         result = getNumber.execute(null, quux);
         Assert.assertEquals(-42, result);
         result = get1.execute(null, quux);
         Assert.assertEquals(-42, result);
 
-        JexlScript set1 = JEXL.createScript("foo.property.1 = $0", "foo", "$0");
+        final JexlScript set1 = JEXL.createScript("foo.property.1 = $0", "foo", "$0");
         set1.execute(null, quux, 24);
         result = getNumber.execute(null, quux);
         Assert.assertEquals(24, result);
@@ -294,9 +294,9 @@ public class PropertyAccessTest extends JexlTestCase {
 
     @Test
     public void testStringIdentifier() throws Exception {
-        Map<String, String> foo = new HashMap<String, String>();
+        final Map<String, String> foo = new HashMap<String, String>();
 
-        JexlContext jc = new MapContext();
+        final JexlContext jc = new MapContext();
         jc.set("foo", foo);
         foo.put("q u u x", "456");
         JexlExpression e = JEXL.createExpression("foo.\"q u u x\"");
@@ -312,16 +312,16 @@ public class PropertyAccessTest extends JexlTestCase {
         result = s.execute(jc);
         Assert.assertEquals("456", result);
 
-        Debugger dbg = new Debugger();
+        final Debugger dbg = new Debugger();
         dbg.debug(e);
-        String dbgdata = dbg.toString();
+        final String dbgdata = dbg.toString();
         Assert.assertEquals("foo.'q u u x'", dbgdata);
     }
 
     @Test
     public void testErroneousIdentifier() throws Exception {
-        MapContext ctx = new MapContext();
-        JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
+        final MapContext ctx = new MapContext();
+        final JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
 
         // base succeeds
         String stmt = "(x)->{ x?.class ?? 'oops' }";
@@ -375,11 +375,11 @@ public class PropertyAccessTest extends JexlTestCase {
 
     @Test
     public void test250() throws Exception {
-        MapContext ctx = new MapContext();
-        HashMap<Object, Object> x = new HashMap<Object, Object>();
+        final MapContext ctx = new MapContext();
+        final HashMap<Object, Object> x = new HashMap<Object, Object>();
         x.put(2, "123456789");
         ctx.set("x", x);
-        JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
+        final JexlEngine engine = new JexlBuilder().strict(true).silent(false).create();
         String stmt = "x.2.class.name";
         JexlScript script = engine.createScript(stmt);
         Object result = script.execute(ctx);
@@ -390,7 +390,7 @@ public class PropertyAccessTest extends JexlTestCase {
             script = engine.createScript(stmt);
             result = script.execute(ctx);
             Assert.assertNull(result);
-        } catch (JexlException xany) {
+        } catch (final JexlException xany) {
             Assert.fail("Should have evaluated to null");
         }
         try {
@@ -399,7 +399,7 @@ public class PropertyAccessTest extends JexlTestCase {
             result = script.execute(ctx);
             Assert.fail("Should have thrown, fail on 3");
             Assert.assertNull(result);
-        } catch (JexlException xany) {
+        } catch (final JexlException xany) {
             Assert.assertTrue(xany.detailedMessage().contains("3"));
         }
         try {
@@ -407,7 +407,7 @@ public class PropertyAccessTest extends JexlTestCase {
             script = engine.createScript(stmt);
             result = script.execute(ctx);
             Assert.assertNull(result);
-        } catch (JexlException xany) {
+        } catch (final JexlException xany) {
             Assert.fail("Should have evaluated to null");
         }
         try {
@@ -415,7 +415,7 @@ public class PropertyAccessTest extends JexlTestCase {
             script = engine.createScript(stmt);
             result = script.execute(ctx);
             Assert.assertNull(result);
-        } catch (JexlException xany) {
+        } catch (final JexlException xany) {
             Assert.fail("Should have evaluated to null");
         }
         try {
@@ -423,7 +423,7 @@ public class PropertyAccessTest extends JexlTestCase {
             script = engine.createScript(stmt);
             result = script.execute(ctx);
             Assert.assertNull(result);
-        } catch (JexlException xany) {
+        } catch (final JexlException xany) {
             Assert.fail("Should have evaluated to null");
         }
         try {
@@ -431,7 +431,7 @@ public class PropertyAccessTest extends JexlTestCase {
             script = engine.createScript(stmt);
             result = script.execute(ctx);
             Assert.assertNull(result);
-        } catch (JexlException xany) {
+        } catch (final JexlException xany) {
             Assert.fail("Should have evaluated to null");
         }
     }
@@ -439,12 +439,12 @@ public class PropertyAccessTest extends JexlTestCase {
     public static class Prompt {
         private final Map<String, PromptValue> values = new HashMap<String, PromptValue>();
 
-        public Object get(String name) {
-            PromptValue v = values.get(name);
+        public Object get(final String name) {
+            final PromptValue v = values.get(name);
             return v != null? v.getValue() : null;
         }
 
-        public void set(String name, Object value) {
+        public void set(final String name, final Object value) {
             values.put(name, new PromptValue(value));
         }
     }
@@ -457,7 +457,7 @@ public class PropertyAccessTest extends JexlTestCase {
         /** Prompt value. */
         private Object value;
 
-        public PromptValue(Object v) {
+        public PromptValue(final Object v) {
            value = v;
         }
 
@@ -465,18 +465,18 @@ public class PropertyAccessTest extends JexlTestCase {
             return value;
         }
 
-        public void setValue(Object value) {
+        public void setValue(final Object value) {
             this.value = value;
         }
     }
 
     @Test
     public void test275a() throws Exception {
-        JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
-        JexlContext ctxt = new MapContext();
+        final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
+        final JexlContext ctxt = new MapContext();
         JexlScript script;
         Object result = null;
-        Prompt p0 = new Prompt();
+        final Prompt p0 = new Prompt();
         p0.set("stuff", 42);
         ctxt.set("$in", p0);
 
@@ -485,7 +485,7 @@ public class PropertyAccessTest extends JexlTestCase {
         try {
             result = script.execute(ctxt, "fail");
             Assert.fail("should have thrown a " + JexlException.Property.class);
-        } catch (JexlException xany) {
+        } catch (final JexlException xany) {
             Assert.assertEquals(JexlException.Property.class, xany.getClass());
         }
         Assert.assertNull(result);
@@ -504,7 +504,7 @@ public class PropertyAccessTest extends JexlTestCase {
         try {
             result = script.execute(ctxt, "fail");
             Assert.fail("should have thrown a " + JexlException.Property.class);
-        } catch (JexlException xany) {
+        } catch (final JexlException xany) {
             Assert.assertEquals(JexlException.Property.class, xany.getClass());
         }
         result = script.execute(ctxt, "stuff");
@@ -520,10 +520,10 @@ public class PropertyAccessTest extends JexlTestCase {
     }
      @Test
     public void test275b() throws Exception {
-        JexlEngine jexl = new JexlBuilder().strict(true).safe(true).create();
-        JexlContext ctxt = new MapContext();
+        final JexlEngine jexl = new JexlBuilder().strict(true).safe(true).create();
+        final JexlContext ctxt = new MapContext();
         JexlScript script;
-        Prompt p0 = new Prompt();
+        final Prompt p0 = new Prompt();
         p0.set("stuff", 42);
         ctxt.set("$in", p0);
 

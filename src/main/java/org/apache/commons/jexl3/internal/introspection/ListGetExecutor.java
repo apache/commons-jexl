@@ -41,7 +41,7 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
      * @param index the index to use as an argument to the get method
      * @return the executor if found, null otherwise
      */
-    public static ListGetExecutor discover(Introspector is, Class<?> clazz, Integer index) {
+    public static ListGetExecutor discover(final Introspector is, final Class<?> clazz, final Integer index) {
         if (index != null) {
             if (clazz.isArray()) {
                 return new ListGetExecutor(clazz, ARRAY_GET, index);
@@ -59,7 +59,7 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
      * @param method the method held by this executor
      * @param index the index to use as an argument to the get method
      */
-    private ListGetExecutor(Class<?> clazz, java.lang.reflect.Method method, Integer index) {
+    private ListGetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final Integer index) {
         super(clazz, method);
         property = index;
     }
@@ -79,8 +79,8 @@ public final class ListGetExecutor extends AbstractExecutor.Get {
     }
 
     @Override
-    public Object tryInvoke(final Object obj, Object identifier) {
-        Integer index = castInteger(identifier);
+    public Object tryInvoke(final Object obj, final Object identifier) {
+        final Integer index = castInteger(identifier);
         if (obj != null && method != null
             && objectClass.equals(obj.getClass())
             && index != null) {

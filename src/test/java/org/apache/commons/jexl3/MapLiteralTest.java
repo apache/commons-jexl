@@ -34,30 +34,30 @@ public class MapLiteralTest extends JexlTestCase {
 
     @Test
     public void testLiteralWithStrings() throws Exception {
-        JexlExpression e = JEXL.createExpression("{ 'foo' : 'bar' }");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("{ 'foo' : 'bar' }");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
+        final Object o = e.evaluate(jc);
         Assert.assertEquals(Collections.singletonMap("foo", "bar"), o);
     }
 
     @Test
     public void testLiteralWithMultipleEntries() throws Exception {
-        JexlExpression e = JEXL.createExpression("{ 'foo' : 'bar', 'eat' : 'food' }");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("{ 'foo' : 'bar', 'eat' : 'food' }");
+        final JexlContext jc = new MapContext();
 
-        Map<String, String> expected = new HashMap<String, String>();
+        final Map<String, String> expected = new HashMap<String, String>();
         expected.put("foo", "bar");
         expected.put("eat", "food");
 
-        Object o = e.evaluate(jc);
+        final Object o = e.evaluate(jc);
         Assert.assertEquals(expected, o);
     }
 
     @Test
     public void testLiteralWithNumbers() throws Exception {
         JexlExpression e = JEXL.createExpression("{ 5 : 10 }");
-        JexlContext jc = new MapContext();
+        final JexlContext jc = new MapContext();
 
         Object o = e.evaluate(jc);
         Assert.assertEquals(Collections.singletonMap(new Integer(5), new Integer(10)), o);
@@ -105,35 +105,35 @@ public class MapLiteralTest extends JexlTestCase {
 
     @Test
     public void testSizeOfSimpleMapLiteral() throws Exception {
-        JexlExpression e = JEXL.createExpression("size({ 'foo' : 'bar' })");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("size({ 'foo' : 'bar' })");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
+        final Object o = e.evaluate(jc);
         Assert.assertEquals(new Integer(1), o);
     }
 
     @Test
     public void testCallingMethodsOnNewMapLiteral() throws Exception {
-        JexlExpression e = JEXL.createExpression("size({ 'foo' : 'bar' }.values())");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("size({ 'foo' : 'bar' }.values())");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
+        final Object o = e.evaluate(jc);
         Assert.assertEquals(new Integer(1), o);
     }
 
     @Test
     public void testNotEmptySimpleMapLiteral() throws Exception {
-        JexlExpression e = JEXL.createExpression("empty({ 'foo' : 'bar' })");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("empty({ 'foo' : 'bar' })");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
+        final Object o = e.evaluate(jc);
         Assert.assertFalse((Boolean) o);
     }
 
     @Test
     public void testMapMapLiteral() throws Exception {
         JexlExpression e = JEXL.createExpression("{'foo' : { 'inner' : 'bar' }}");
-        JexlContext jc = new MapContext();
+        final JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
         Assert.assertNotNull(o);
 
@@ -146,7 +146,7 @@ public class MapLiteralTest extends JexlTestCase {
     @Test
     public void testMapArrayLiteral() throws Exception {
         JexlExpression e = JEXL.createExpression("{'foo' : [ 'inner' , 'bar' ]}");
-        JexlContext jc = new MapContext();
+        final JexlContext jc = new MapContext();
         Object o = e.evaluate(jc);
         Assert.assertNotNull(o);
 
@@ -158,24 +158,24 @@ public class MapLiteralTest extends JexlTestCase {
 
     @Test
     public void testEmptyMap() throws Exception {
-        JexlScript script = JEXL.createScript("map['']", "map");
-        Object result = script.execute(null, Collections.singletonMap("", 42));
+        final JexlScript script = JEXL.createScript("map['']", "map");
+        final Object result = script.execute(null, Collections.singletonMap("", 42));
         Assert.assertEquals(42, result);
     }
 
     @Test
     public void testVariableMap() throws Exception {
-        JexlScript script = JEXL.createScript("{ ['1', '2'.toString()] : someValue }", "someValue");
-        Object result = script.execute(null, 42);
+        final JexlScript script = JEXL.createScript("{ ['1', '2'.toString()] : someValue }", "someValue");
+        final Object result = script.execute(null, 42);
         Assert.assertTrue(result instanceof Map);
         Object key = null;
         Object value = null;
-        for(Map.Entry<?,?> e : ((Map<?,?>) result).entrySet()) {
+        for(final Map.Entry<?,?> e : ((Map<?,?>) result).entrySet()) {
             key = e.getKey();
             value = e.getValue();
             break;
         }
-        Object gg = ((Map) result).get(key);
+        final Object gg = ((Map) result).get(key);
         Assert.assertEquals(42, ((Number) gg).intValue());
         Assert.assertEquals(value, ((Number) gg).intValue());
     }

@@ -49,8 +49,8 @@ public class RangeTest extends JexlTestCase {
         super.tearDown();
     }
 
-    private void checkIteration(LongRange lr, long first, long last) throws Exception {
-        Iterator<Long> ii = lr.iterator();
+    private void checkIteration(final LongRange lr, final long first, final long last) throws Exception {
+        final Iterator<Long> ii = lr.iterator();
         if (ii.hasNext()) {
             long l = ii.next();
             Assert.assertEquals(first, l);
@@ -63,8 +63,8 @@ public class RangeTest extends JexlTestCase {
         }
     }
 
-    private void checkIteration(IntegerRange ir, int first, int last) throws Exception {
-        Iterator<Integer> ii = ir.iterator();
+    private void checkIteration(final IntegerRange ir, final int first, final int last) throws Exception {
+        final Iterator<Integer> ii = ir.iterator();
         if (ii.hasNext()) {
             int l = ii.next();
             Assert.assertEquals(first, l);
@@ -79,7 +79,7 @@ public class RangeTest extends JexlTestCase {
 
     @Test
     public void testRanges() throws Exception {
-        LongRange lr0 = LongRange.create(20,10);
+        final LongRange lr0 = LongRange.create(20,10);
         Assert.assertEquals(10L, lr0.getMin());
         Assert.assertEquals(20L, lr0.getMax());
         Assert.assertFalse(lr0.isEmpty());
@@ -89,14 +89,14 @@ public class RangeTest extends JexlTestCase {
         Assert.assertFalse(lr0.contains(5L));
         Assert.assertFalse(lr0.contains(null));
         checkIteration(lr0, 20L, 10L);
-        LongRange lr1 = LongRange.create(10,20);
+        final LongRange lr1 = LongRange.create(10,20);
         checkIteration(lr1, 10L, 20L);
         Assert.assertTrue(lr0.containsAll(lr1));
-        LongRange lr2 = LongRange.create(10,15);
+        final LongRange lr2 = LongRange.create(10,15);
         Assert.assertNotEquals(lr0, lr2);
         Assert.assertTrue(lr0.containsAll(lr2));
         Assert.assertFalse(lr2.containsAll(lr1));
-        IntegerRange ir0 = IntegerRange.create(20,10);
+        final IntegerRange ir0 = IntegerRange.create(20,10);
         checkIteration(ir0, 20, 10);
         Assert.assertEquals(10, ir0.getMin());
         Assert.assertEquals(20, ir0.getMax());
@@ -106,20 +106,20 @@ public class RangeTest extends JexlTestCase {
         Assert.assertFalse(ir0.contains(30));
         Assert.assertFalse(ir0.contains(5));
         Assert.assertFalse(ir0.contains(null));
-        IntegerRange ir1 = IntegerRange.create(10,20);
+        final IntegerRange ir1 = IntegerRange.create(10,20);
         checkIteration(ir1, 10, 20);
         Assert.assertTrue(ir0.containsAll(ir1));
         Assert.assertNotEquals(ir0, lr0);
         Assert.assertNotEquals(ir1, lr1);
-        IntegerRange ir2 = IntegerRange.create(10,15);
+        final IntegerRange ir2 = IntegerRange.create(10,15);
         Assert.assertNotEquals(ir0, ir2);
         Assert.assertTrue(ir0.containsAll(ir2));
         Assert.assertFalse(ir2.containsAll(ir1));
 
         long lc0 = 20;
-        Iterator<Long> il0 = lr0.iterator();
+        final Iterator<Long> il0 = lr0.iterator();
         while(il0.hasNext()) {
-            long v0 = il0.next();
+            final long v0 = il0.next();
             Assert.assertEquals(lc0, v0);
             try {
                 switch((int)v0) {
@@ -130,7 +130,7 @@ public class RangeTest extends JexlTestCase {
                     case 14: lr1.removeAll(Collections.singletonList(v0)); Assert.fail(); break;
                     case 15: lr1.retainAll(Collections.singletonList(v0)); Assert.fail(); break;
                 }
-            } catch(UnsupportedOperationException xuo) {
+            } catch(final UnsupportedOperationException xuo) {
                 // ok
             }
             lc0 -= 1;
@@ -139,14 +139,14 @@ public class RangeTest extends JexlTestCase {
         try {
             il0.next();
             Assert.fail();
-        } catch(NoSuchElementException xns) {
+        } catch(final NoSuchElementException xns) {
             // ok
         }
 
         int ic0 = 20;
-        Iterator<Integer> ii0 = ir0.iterator();
+        final Iterator<Integer> ii0 = ir0.iterator();
         while(ii0.hasNext()) {
-            int v0 = ii0.next();
+            final int v0 = ii0.next();
             Assert.assertEquals(ic0, v0);
             try {
                 switch(v0) {
@@ -157,7 +157,7 @@ public class RangeTest extends JexlTestCase {
                     case 14: ir1.removeAll(Collections.singletonList(v0)); Assert.fail(); break;
                     case 15: ir1.retainAll(Collections.singletonList(v0)); Assert.fail(); break;
                 }
-            } catch(UnsupportedOperationException xuo) {
+            } catch(final UnsupportedOperationException xuo) {
                 // ok
             }
             ic0 -= 1;
@@ -166,7 +166,7 @@ public class RangeTest extends JexlTestCase {
         try {
             ii0.next();
             Assert.fail();
-        } catch(NoSuchElementException xns) {
+        } catch(final NoSuchElementException xns) {
             // ok
         }
 

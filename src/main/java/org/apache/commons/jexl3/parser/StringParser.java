@@ -44,11 +44,11 @@ public class StringParser {
      * @param eatsep whether the separator, the first character, should be considered
      * @return the built string
      */
-    public static String buildString(CharSequence str, boolean eatsep) {
-        StringBuilder strb = new StringBuilder(str.length());
-        char sep = eatsep ? str.charAt(0) : 0;
-        int end = str.length() - (eatsep ? 1 : 0);
-        int begin = (eatsep ? 1 : 0);
+    public static String buildString(final CharSequence str, final boolean eatsep) {
+        final StringBuilder strb = new StringBuilder(str.length());
+        final char sep = eatsep ? str.charAt(0) : 0;
+        final int end = str.length() - (eatsep ? 1 : 0);
+        final int begin = (eatsep ? 1 : 0);
         read(strb, str, begin, end, sep);
         return strb.toString();
     }
@@ -58,7 +58,7 @@ public class StringParser {
      * @param str the string to build from
      * @return the built string
      */
-    public static String buildRegex(CharSequence str) {
+    public static String buildRegex(final CharSequence str) {
         return buildString(str.subSequence(1, str.length()), true);
     }
 
@@ -71,7 +71,7 @@ public class StringParser {
      * @param sep the separator, single or double quote, marking end of string
      * @return the offset in origin
      */
-    public static int readString(StringBuilder strb, CharSequence str, int index, char sep) {
+    public static int readString(final StringBuilder strb, final CharSequence str, final int index, final char sep) {
         return read(strb, str, index, str.length(), sep);
     }
     /** The length of an escaped unicode sequence. */
@@ -87,17 +87,17 @@ public class StringParser {
      * @param sep the separator, single or double quote, marking end of string
      * @return the last character offset handled in origin
      */
-    private static int read(StringBuilder strb, CharSequence str, int begin, int end, char sep) {
+    private static int read(final StringBuilder strb, final CharSequence str, final int begin, final int end, final char sep) {
         boolean escape = false;
         int index = begin;
         for (; index < end; ++index) {
-            char c = str.charAt(index);
+            final char c = str.charAt(index);
             if (escape) {
                 if (c == 'u' && (index + UCHAR_LEN) < end && readUnicodeChar(strb, str, index + 1) > 0) {
                     index += UCHAR_LEN;
                 } else {
                     // if c is not an escapable character, re-emmit the backslash before it
-                    boolean notSeparator = sep == 0 ? c != '\'' && c != '"' : c != sep;
+                    final boolean notSeparator = sep == 0 ? c != '\'' && c != '"' : c != sep;
                     if (notSeparator && c != '\\') {
                         switch (c) {
                             // http://es5.github.io/x7.html#x7.8.4
@@ -139,12 +139,12 @@ public class StringParser {
      * @param begin the begin offset in sequence (after the '\\u')
      * @return 0 if char could not be read, 4 otherwise
      */
-    private static int readUnicodeChar(StringBuilder strb, CharSequence str, int begin) {
+    private static int readUnicodeChar(final StringBuilder strb, final CharSequence str, final int begin) {
         char xc = 0;
         int bits = SHIFT;
         int value = 0;
         for (int offset = 0; offset < UCHAR_LEN; ++offset) {
-            char c = str.charAt(begin + offset);
+            final char c = str.charAt(begin + offset);
             if (c >= '0' && c <= '9') {
                 value = (c - '0');
             } else if (c >= 'a' && c <= 'h') {
@@ -171,15 +171,15 @@ public class StringParser {
      * @param str the string to escape
      * @return the escaped representation
      */
-    public static String escapeString(String str, char delim) {
+    public static String escapeString(final String str, final char delim) {
         if (str == null) {
             return null;
         }
         final int length = str.length();
-        StringBuilder strb = new StringBuilder(length + 2);
+        final StringBuilder strb = new StringBuilder(length + 2);
         strb.append(delim);
         for (int i = 0; i < length; ++i) {
-            char c = str.charAt(i);
+            final char c = str.charAt(i);
             switch (c) {
                 case 0:
                     continue;
@@ -214,7 +214,7 @@ public class StringParser {
                         // convert to Unicode escape sequence
                         strb.append('\\');
                         strb.append('u');
-                        String hex = Integer.toHexString(c);
+                        final String hex = Integer.toHexString(c);
                         for (int h = hex.length(); h < UCHAR_LEN; ++h) {
                             strb.append('0');
                         }
@@ -231,13 +231,13 @@ public class StringParser {
      * @param str the identifier escaped string, ie with a backslash before space, quote, double-quote and backslash
      * @return the string with no '\\' character
      */
-    public static String unescapeIdentifier(String str) {
+    public static String unescapeIdentifier(final String str) {
         StringBuilder strb = null;
         if (str != null) {
             int n = 0;
-            int last = str.length();
+            final int last = str.length();
             while (n < last) {
-                char c = str.charAt(n);
+                final char c = str.charAt(n);
                 if (c == '\\') {
                     if (strb == null) {
                         strb = new StringBuilder(last);
@@ -257,13 +257,13 @@ public class StringParser {
      * @param str the identifier un-escaped string
      * @return the string with added  backslash character before space, quote, double-quote and backslash
      */
-    public static String escapeIdentifier(String str) {
+    public static String escapeIdentifier(final String str) {
         StringBuilder strb = null;
         if (str != null) {
             int n = 0;
-            int last = str.length();
+            final int last = str.length();
             while (n < last) {
-                char c = str.charAt(n);
+                final char c = str.charAt(n);
                 switch (c) {
                     case ' ':
                     case '\'':

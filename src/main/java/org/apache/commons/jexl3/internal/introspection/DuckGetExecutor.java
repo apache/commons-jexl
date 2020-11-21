@@ -41,8 +41,8 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
      * @param identifier the key to use as an argument to the get method
      * @return the executor if found, null otherwise
      */
-    public static DuckGetExecutor discover(Introspector is, Class<?> clazz, Object identifier) {
-        java.lang.reflect.Method method = is.getMethod(clazz, "get", makeArgs(identifier));
+    public static DuckGetExecutor discover(final Introspector is, final Class<?> clazz, final Object identifier) {
+        final java.lang.reflect.Method method = is.getMethod(clazz, "get", makeArgs(identifier));
         return method == null? null : new DuckGetExecutor(clazz, method, identifier);
     }
 
@@ -52,7 +52,7 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
      * @param method the method held by this executor
      * @param identifier the property to get
      */
-    private DuckGetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object identifier) {
+    private DuckGetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final Object identifier) {
         super(clazz, method);
         property = identifier;
     }
@@ -63,13 +63,13 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
     }
 
     @Override
-    public Object invoke(Object obj) throws IllegalAccessException, InvocationTargetException {
-        Object[] args = {property};
+    public Object invoke(final Object obj) throws IllegalAccessException, InvocationTargetException {
+        final Object[] args = {property};
         return method == null ? null : method.invoke(obj, args);
     }
 
     @Override
-    public Object tryInvoke(Object obj, Object key) {
+    public Object tryInvoke(final Object obj, final Object key) {
         if (obj != null
                 && objectClass.equals(obj.getClass())
                 // ensure method name matches the property name
@@ -77,11 +77,11 @@ public final class DuckGetExecutor extends AbstractExecutor.Get {
                 && ((property == null && key == null)
                 || (property != null && property.equals(key)))) {
             try {
-                Object[] args = {property};
+                final Object[] args = {property};
                 return method.invoke(obj, args);
             } catch (IllegalAccessException | IllegalArgumentException xill) {
                 return TRY_FAILED;// fail
-            } catch (InvocationTargetException xinvoke) {
+            } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw
             }  
         }

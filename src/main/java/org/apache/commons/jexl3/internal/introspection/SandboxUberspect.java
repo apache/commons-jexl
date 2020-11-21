@@ -54,7 +54,7 @@ public final class SandboxUberspect implements JexlUberspect {
     }
 
     @Override
-    public void setClassLoader(ClassLoader loader) {
+    public void setClassLoader(final ClassLoader loader) {
         uberspect.setClassLoader(loader);
     }
 
@@ -84,8 +84,8 @@ public final class SandboxUberspect implements JexlUberspect {
     @Override
     public JexlMethod getMethod(final Object obj, final String method, final Object... args) {
         if (obj != null && method != null) {
-            Class<?> clazz = (obj instanceof Class) ? (Class<?>) obj : obj.getClass();
-            String actual = sandbox.execute(clazz, method);
+            final Class<?> clazz = (obj instanceof Class) ? (Class<?>) obj : obj.getClass();
+            final String actual = sandbox.execute(clazz, method);
             if (actual != null) {
                 return uberspect.getMethod(obj, actual, args);
             }
@@ -94,7 +94,7 @@ public final class SandboxUberspect implements JexlUberspect {
     }
 
     @Override
-    public List<PropertyResolver> getResolvers(JexlOperator op, Object obj) {
+    public List<PropertyResolver> getResolvers(final JexlOperator op, final Object obj) {
         return uberspect.getResolvers(op, obj);
     }
 
@@ -108,11 +108,11 @@ public final class SandboxUberspect implements JexlUberspect {
                                           final Object obj,
                                           final Object identifier) {
         if (obj != null && identifier != null) {
-            String property = identifier.toString();
-            String actual = sandbox.read(obj.getClass(), property);
+            final String property = identifier.toString();
+            final String actual = sandbox.read(obj.getClass(), property);
             if (actual != null) {
                  // no transformation, strict equality: use identifier before string conversion
-                Object pty = actual == property? identifier : actual;
+                final Object pty = actual == property? identifier : actual;
                 return uberspect.getPropertyGet(resolvers, obj, pty);
             }
         }
@@ -130,11 +130,11 @@ public final class SandboxUberspect implements JexlUberspect {
                                           final Object identifier,
                                           final Object arg) {
         if (obj != null && identifier != null) {
-            String property = identifier.toString();
-            String actual = sandbox.write(obj.getClass(), property);
+            final String property = identifier.toString();
+            final String actual = sandbox.write(obj.getClass(), property);
             if (actual != null) {
                  // no transformation, strict equality: use identifier before string conversion
-                Object pty = actual == property? identifier : actual;
+                final Object pty = actual == property? identifier : actual;
                 return uberspect.getPropertySet(resolvers, obj, pty, arg);
             }
         }

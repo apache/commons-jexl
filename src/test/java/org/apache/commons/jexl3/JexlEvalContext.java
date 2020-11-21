@@ -51,7 +51,7 @@ public class JexlEvalContext implements
      * @param map the variables map
      */
     @NoJexl
-    public JexlEvalContext(Map<String, Object> map) {
+    public JexlEvalContext(final Map<String, Object> map) {
         this.vars = map == EMPTY_MAP ? new MapContext() : new MapContext(map);
         this.ns = null;
     }
@@ -61,7 +61,7 @@ public class JexlEvalContext implements
      * @param context the context (may be null, implies readonly)
      */
     @NoJexl
-    public JexlEvalContext(JexlContext context) {
+    public JexlEvalContext(final JexlContext context) {
         this(context, context instanceof JexlContext.NamespaceResolver? (JexlContext.NamespaceResolver) context : null);
     }
 
@@ -71,32 +71,32 @@ public class JexlEvalContext implements
      * @param namespace the namespace (may be null, implies empty namespace)
      */
     @NoJexl
-    public JexlEvalContext(JexlContext context, JexlContext.NamespaceResolver namespace) {
+    public JexlEvalContext(final JexlContext context, final JexlContext.NamespaceResolver namespace) {
         this.vars = context != null? context : JexlEngine.EMPTY_CONTEXT;
         this.ns = namespace != null? namespace : JexlEngine.EMPTY_NS;
     }
 
     @Override
     @NoJexl
-    public boolean has(String name) {
+    public boolean has(final String name) {
         return vars.has(name);
     }
 
     @Override
     @NoJexl
-    public Object get(String name) {
+    public Object get(final String name) {
         return vars.get(name);
     }
 
     @Override
     @NoJexl
-    public void set(String name, Object value) {
+    public void set(final String name, final Object value) {
         vars.set(name, value);
     }
 
     @Override
     @NoJexl
-    public Object resolveNamespace(String name) {
+    public Object resolveNamespace(final String name) {
         return ns != null? ns.resolveNamespace(name) : null;
     }
 

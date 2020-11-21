@@ -38,7 +38,7 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
      * @param identifier the key to use as an argument to the get method
      * @return the executor if found, null otherwise
      */
-    public static MapGetExecutor discover(Introspector is, Class<?> clazz, Object identifier) {
+    public static MapGetExecutor discover(final Introspector is, final Class<?> clazz, final Object identifier) {
         if (Map.class.isAssignableFrom(clazz)) {
             return new MapGetExecutor(clazz, MAP_GET, identifier);
         } else {
@@ -52,7 +52,7 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
      * @param method the method held by this executor
      * @param key the property to get
      */
-    private MapGetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object key) {
+    private MapGetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final Object key) {
         super(clazz, method);
         property = key;
     }
@@ -70,7 +70,7 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
     }
 
     @Override
-    public Object tryInvoke(final Object obj, Object key) {
+    public Object tryInvoke(final Object obj, final Object key) {
         if (obj != null
             && method != null
             && objectClass.equals(obj.getClass())

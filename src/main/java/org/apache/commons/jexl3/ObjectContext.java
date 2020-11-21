@@ -53,18 +53,18 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
      * @param engine  the jexl engine to use to solve properties
      * @param wrapped the object to wrap in this context
      */
-    public ObjectContext(JexlEngine engine, T wrapped) {
+    public ObjectContext(final JexlEngine engine, final T wrapped) {
         this.jexl = engine;
         this.object = wrapped;
     }
 
     @Override
-    public Object get(String name) {
-        JexlPropertyGet jget = jexl.getUberspect().getPropertyGet(object, name);
+    public Object get(final String name) {
+        final JexlPropertyGet jget = jexl.getUberspect().getPropertyGet(object, name);
         if (jget != null) {
             try {
                 return jget.invoke(object);
-            } catch (Exception xany) {
+            } catch (final Exception xany) {
                 if (jexl.isStrict()) {
                     throw new JexlException.Property(null, name, true, xany);
                 }
@@ -74,12 +74,12 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
     }
 
     @Override
-    public void set(String name, Object value) {
-        JexlPropertySet jset = jexl.getUberspect().getPropertySet(object, name, value);
+    public void set(final String name, final Object value) {
+        final JexlPropertySet jset = jexl.getUberspect().getPropertySet(object, name, value);
         if (jset != null) {
             try {
                 jset.invoke(object, value);
-            } catch (Exception xany) {
+            } catch (final Exception xany) {
                 // ignore
                 if (jexl.isStrict()) {
                     throw new JexlException.Property(null, name, true, xany);
@@ -89,17 +89,17 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
     }
 
     @Override
-    public boolean has(String name) {
-        JexlPropertyGet jget = jexl.getUberspect().getPropertyGet(object, name);
+    public boolean has(final String name) {
+        final JexlPropertyGet jget = jexl.getUberspect().getPropertyGet(object, name);
         try {
             return jget != null && jget.invoke(object) != null;
-        } catch (Exception xany) {
+        } catch (final Exception xany) {
             return false;
         }
     }
 
     @Override
-    public Object resolveNamespace(String name) {
+    public Object resolveNamespace(final String name) {
         if (name == null || name.isEmpty()) {
             return object;
         } else {

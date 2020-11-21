@@ -19,12 +19,12 @@ package org.apache.commons.jexl3.parser;
 public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constant<Number> {
     private final NumberParser nlp;
 
-    ASTNumberLiteral(int id) {
+    ASTNumberLiteral(final int id) {
         super(id);
         nlp = new NumberParser();
     }
 
-    ASTNumberLiteral(Parser p, int id) {
+    ASTNumberLiteral(final Parser p, final int id) {
         super(p, id);
         nlp = new NumberParser();
     }
@@ -40,7 +40,7 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
     }
 
     @Override
-    protected boolean isConstant(boolean literal) {
+    protected boolean isConstant(final boolean literal) {
         return true;
     }
 
@@ -57,7 +57,7 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
      * Originally from OGNL.
      * @param s the natural as string
      */
-    void setNatural(String s) {
+    void setNatural(final String s) {
         nlp.setNatural(s);
     }
 
@@ -66,12 +66,12 @@ public final class ASTNumberLiteral extends JexlNode implements JexlNode.Constan
      * Originally from OGNL.
      * @param s the real as string
      */
-    void setReal(String s) {
+    void setReal(final String s) {
         nlp.setReal(s);
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 }

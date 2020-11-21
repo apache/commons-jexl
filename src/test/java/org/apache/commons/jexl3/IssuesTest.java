@@ -45,11 +45,11 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-49: blocks not parsed (fixed)
     @Test
     public void test49() throws Exception {
-        JexlEngine jexl = new Engine();
-        Map<String, Object> vars = new HashMap<String, Object>();
-        JexlContext ctxt = new MapContext(vars);
-        String stmt = "a = 'b'; c = 'd';";
-        JexlScript expr = jexl.createScript(stmt);
+        final JexlEngine jexl = new Engine();
+        final Map<String, Object> vars = new HashMap<String, Object>();
+        final JexlContext ctxt = new MapContext(vars);
+        final String stmt = "a = 'b'; c = 'd';";
+        final JexlScript expr = jexl.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertTrue("JEXL-49 is not fixed", vars.get("a").equals("b") && vars.get("c").equals("d"));
     }
@@ -82,21 +82,21 @@ public class IssuesTest extends JexlTestCase {
 
     @Test
     public void test48() throws Exception {
-        JexlEngine jexl = new Engine();
-        JexlEvalContext jc = new JexlEvalContext();
-        JexlOptions options = jc.getEngineOptions();
+        final JexlEngine jexl = new Engine();
+        final JexlEvalContext jc = new JexlEvalContext();
+        final JexlOptions options = jc.getEngineOptions();
         // ensure errors will throw
         options.setStrict(true);
         options.setSilent(false);
         try {
-            String jexlExp = "(foo.getInner().foo() eq true) and (foo.getInner().goo() = (foo.getInner().goo()+1-1))";
-            JexlExpression e = jexl.createExpression(jexlExp);
+            final String jexlExp = "(foo.getInner().foo() eq true) and (foo.getInner().goo() = (foo.getInner().goo()+1-1))";
+            final JexlExpression e = jexl.createExpression(jexlExp);
             jc.set("foo", new Foo());
             /* Object o = */ e.evaluate(jc);
             Assert.fail("Should have failed due to invalid assignment");
-        } catch (JexlException.Assignment xparse) {
-            String dbg = xparse.toString();
-        } catch (JexlException xjexl) {
+        } catch (final JexlException.Assignment xparse) {
+            final String dbg = xparse.toString();
+        } catch (final JexlException xjexl) {
             Assert.fail("Should have thrown a parse exception");
         }
     }
@@ -105,9 +105,9 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-44: comments dont allow double quotes (fixed in Parser.jjt)
     @Test
     public void test47() throws Exception {
-        JexlEngine jexl = new Engine();
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEngine jexl = new Engine();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
         options.setSilent(false);
 
@@ -128,19 +128,19 @@ public class IssuesTest extends JexlTestCase {
     // fixed in JexlArithmetic by allowing add operator to deal with string, null
     @Test
     public void test42() throws Exception {
-        JexlEngine jexl = new JexlBuilder().create();
-        JxltEngine uel = jexl.createJxltEngine();
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JxltEngine uel = jexl.createJxltEngine();
         // ensure errors will throw
         //jexl.setSilent(false);
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.set(jexl);
         options.setStrict(false);
         options.setStrictArithmetic(false);
         ctxt.set("ax", "ok");
 
-        JxltEngine.Expression expr = uel.createExpression("${ax+(bx)}");
-        Object value = expr.evaluate(ctxt);
+        final JxltEngine.Expression expr = uel.createExpression("${ax+(bx)}");
+        final Object value = expr.evaluate(ctxt);
         Assert.assertEquals("should be ok", "ok", value);
     }
 
@@ -159,30 +159,30 @@ public class IssuesTest extends JexlTestCase {
 
     @Test
     public void test40() throws Exception {
-        JexlEngine jexl = new Engine();
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEngine jexl = new Engine();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.set(jexl);
         // ensure errors will throw
         options.setSilent(false);
 
         ctxt.set("derived", new Derived());
 
-        JexlExpression expr = jexl.createExpression("derived.foo()");
-        Object value = expr.evaluate(ctxt);
+        final JexlExpression expr = jexl.createExpression("derived.foo()");
+        final Object value = expr.evaluate(ctxt);
         Assert.assertTrue("should be true", (Boolean) value);
     }
 
     // JEXL-52: can be implemented by deriving Interpreter.{g,s}etAttribute; later
     @Test
     public void test52base() throws Exception {
-        Engine jexl = (Engine) createEngine(false);
-        Uberspect uber = (Uberspect) jexl.getUberspect();
+        final Engine jexl = (Engine) createEngine(false);
+        final Uberspect uber = (Uberspect) jexl.getUberspect();
         // most likely, call will be in an Interpreter, getUberspect
         String[] names = uber.getMethodNames(Another.class);
         Assert.assertTrue("should find methods", names.length > 0);
         int found = 0;
-        for (String name : names) {
+        for (final String name : names) {
             if ("foo".equals(name) || "goo".equals(name)) {
                 found += 1;
             }
@@ -192,7 +192,7 @@ public class IssuesTest extends JexlTestCase {
         names = uber.getFieldNames(Another.class);
         Assert.assertTrue("should find fields", names.length > 0);
         found = 0;
-        for (String name : names) {
+        for (final String name : names) {
             if ("name".equals(name)) {
                 found += 1;
             }
@@ -203,29 +203,29 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-10/JEXL-11: variable checking, null operand is error
     @Test
     public void test11() throws Exception {
-        JexlEngine jexl = createEngine(false);
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEngine jexl = createEngine(false);
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
         options.setSilent(false);
         options.setStrict(true);
 
         ctxt.set("a", null);
 
-        String[] exprs = {
+        final String[] exprs = {
             //"10 + null",
             //"a - 10",
             //"b * 10",
             "a % b"//,
         //"1000 / a"
         };
-        for (String s : exprs) {
+        for (final String s : exprs) {
             try {
-                JexlExpression expr = jexl.createExpression(s);
+                final JexlExpression expr = jexl.createExpression(s);
                 /* Object value = */
                 expr.evaluate(ctxt);
                 Assert.fail(s + " : should have failed due to null argument");
-            } catch (JexlException xjexl) {
+            } catch (final JexlException xjexl) {
                 // expected
             }
         }
@@ -234,10 +234,10 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-62
     @Test
     public void test62() throws Exception {
-        JexlEngine jexl = createEngine(false);
-        MapContext vars = new MapContext();
-        JexlEvalContext ctxt = new JexlEvalContext(vars);
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEngine jexl = createEngine(false);
+        final MapContext vars = new MapContext();
+        final JexlEvalContext ctxt = new JexlEvalContext(vars);
+        final JexlOptions options = ctxt.getEngineOptions();
         options.setStrict(true);
         options.setSilent(true);// to avoid throwing JexlException on null method call
 
@@ -267,13 +267,13 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-87
     @Test
     public void test87() throws Exception {
-        JexlEngine jexl = createEngine(false);
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEngine jexl = createEngine(false);
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
         options.setSilent(false);
-        JexlExpression divide = jexl.createExpression("l / r");
-        JexlExpression modulo = jexl.createExpression("l % r");
+        final JexlExpression divide = jexl.createExpression("l / r");
+        final JexlExpression modulo = jexl.createExpression("l % r");
 
         ctxt.set("l", java.math.BigInteger.valueOf(7));
         ctxt.set("r", java.math.BigInteger.valueOf(2));
@@ -289,29 +289,29 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-90
     @Test
     public void test90() throws Exception {
-        JexlEngine jexl = createEngine(false);
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEngine jexl = createEngine(false);
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
         options.setSilent(false);
         // ';' is necessary between expressions
-        String[] fexprs = {
+        final String[] fexprs = {
             "a=3 b=4",
             "while(a) while(a)",
             "1 2",
             "if (true) 2; 3 {}",
             "while (x) 1 if (y) 2 3"
         };
-        for (String fexpr : fexprs) {
+        for (final String fexpr : fexprs) {
             try {
                 jexl.createScript(fexpr);
                 Assert.fail(fexpr + ": Should have failed in parse");
-            } catch (JexlException xany) {
+            } catch (final JexlException xany) {
                 // expected to fail in createExpression
             }
         }
         // ';' is necessary between expressions and only expressions
-        String[] exprs = {
+        final String[] exprs = {
             "if (x) {1} if (y) {2}",
             "if (x) 1 if (y) 2",
             "while (x) 1 if (y) 2 else 3",
@@ -320,8 +320,8 @@ public class IssuesTest extends JexlTestCase {
         };
         ctxt.set("x", Boolean.FALSE);
         ctxt.set("y", Boolean.TRUE);
-        for (String expr : exprs) {
-            JexlScript s = jexl.createScript(expr);
+        for (final String expr : exprs) {
+            final JexlScript s = jexl.createScript(expr);
             Assert.assertEquals(Integer.valueOf(2), s.execute(ctxt));
         }
         debuggerCheck(jexl);
@@ -330,9 +330,9 @@ public class IssuesTest extends JexlTestCase {
     // JEXL-44
     @Test
     public void test44() throws Exception {
-        JexlEngine jexl = createEngine(false);
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEngine jexl = createEngine(false);
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
         options.setSilent(false);
         JexlScript script;
@@ -348,47 +348,47 @@ public class IssuesTest extends JexlTestCase {
 
     @Test
     public void test97() throws Exception {
-        JexlEngine jexl = createEngine(false);
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEngine jexl = createEngine(false);
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         // ensure errors will throw
         options.setSilent(false);
         for (char v = 'a'; v <= 'z'; ++v) {
             ctxt.set(Character.toString(v), 10);
         }
-        String input
+        final String input
                 = "(((((((((((((((((((((((((z+y)/x)*w)-v)*u)/t)-s)*r)/q)+p)-o)*n)-m)+l)*k)+j)/i)+h)*g)+f)/e)+d)-c)/b)+a)";
 
         JexlExpression script;
         // Make sure everything is loaded...
-        long start = System.nanoTime();
+        final long start = System.nanoTime();
         script = jexl.createExpression(input);
-        Object value = script.evaluate(ctxt);
+        final Object value = script.evaluate(ctxt);
         Assert.assertEquals(Integer.valueOf(11), value);
-        long end = System.nanoTime();
-        double millisec = (end - start) / 1e6;
-        double limit = 200.0; // Allow plenty of slack
+        final long end = System.nanoTime();
+        final double millisec = (end - start) / 1e6;
+        final double limit = 200.0; // Allow plenty of slack
         Assert.assertTrue("Expected parse to take less than " + limit + "ms, actual " + millisec, millisec < limit);
     }
 
     public static class fn98 {
-        public String replace(String str, String target, String replacement) {
+        public String replace(final String str, final String target, final String replacement) {
             return str.replace(target, replacement);
         }
     }
 
     @Test
     public void test98() throws Exception {
-        String[] exprs = {
+        final String[] exprs = {
             "fn:replace('DOMAIN\\somename', '\\\\', '\\\\\\\\')",
             "fn:replace(\"DOMAIN\\somename\", \"\\\\\", \"\\\\\\\\\")",
             "fn:replace('DOMAIN\\somename', '\\u005c', '\\u005c\\u005c')"
         };
-        Map<String, Object> funcs = new HashMap<String, Object>();
+        final Map<String, Object> funcs = new HashMap<String, Object>();
         funcs.put("fn", new fn98());
-        JexlEngine jexl = new JexlBuilder().namespaces(funcs).create();
-        for (String expr : exprs) {
-            Object value = jexl.createExpression(expr).evaluate(null);
+        final JexlEngine jexl = new JexlBuilder().namespaces(funcs).create();
+        for (final String expr : exprs) {
+            final Object value = jexl.createExpression(expr).evaluate(null);
             Assert.assertEquals(expr, "DOMAIN\\\\somename", value);
         }
     }

@@ -70,7 +70,7 @@ public class JexlInfo {
      * @param l line number
      * @param c column number
      */
-    public JexlInfo(String source, int l, int c) {
+    public JexlInfo(final String source, final int l, final int c) {
         name = source;
         line = l;
         column = c;
@@ -82,13 +82,13 @@ public class JexlInfo {
      * outside of o.a.c.jexl3.</p>
      */
     public JexlInfo() {
-        StackTraceElement[] stack = new Throwable().getStackTrace();
+        final StackTraceElement[] stack = new Throwable().getStackTrace();
         String cname = getClass().getName();
-        String pkgname = getClass().getPackage().getName();
+        final String pkgname = getClass().getPackage().getName();
         StackTraceElement se = null;
         for (int s = 1; s < stack.length; ++s) {
             se = stack[s];
-            String className = se.getClassName();
+            final String className = se.getClassName();
             if (!className.equals(cname)) {
                 // go deeper if called from jexl implementation classes
                 if (className.startsWith(pkgname + ".internal.")
@@ -114,7 +114,7 @@ public class JexlInfo {
      * @param c the column
      * @return a new info instance
      */
-    public JexlInfo at(int l, int c) {
+    public JexlInfo at(final int l, final int c) {
         return new JexlInfo(name, l, c);
     }
 
@@ -123,7 +123,7 @@ public class JexlInfo {
      * 
      * @param copy the instance to copy
      */
-    protected JexlInfo(JexlInfo copy) {
+    protected JexlInfo(final JexlInfo copy) {
         name = copy.getName();
         line = copy.getLine();
         column = copy.getColumn();
@@ -136,7 +136,7 @@ public class JexlInfo {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(name != null? name : "");
+        final StringBuilder sb = new StringBuilder(name != null? name : "");
         if (line > 0) {
             sb.append("@");
             sb.append(line);
@@ -145,7 +145,7 @@ public class JexlInfo {
                 sb.append(column);
             }
         }
-        JexlInfo.Detail dbg = getDetail();
+        final JexlInfo.Detail dbg = getDetail();
         if (dbg!= null) {
             sb.append("![");
             sb.append(dbg.start());
@@ -197,7 +197,7 @@ public class JexlInfo {
      * @param script the script
      * @return the info
      */
-    public static JexlInfo from(JexlScript script) {
+    public static JexlInfo from(final JexlScript script) {
         return script instanceof Script? ((Script) script).getInfo() :  null;
     }
 }

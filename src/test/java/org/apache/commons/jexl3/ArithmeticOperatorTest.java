@@ -166,14 +166,14 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     public static class MatchingContainer {
         private final Set<Integer> values;
 
-        public MatchingContainer(int[] is) {
+        public MatchingContainer(final int[] is) {
             values = new HashSet<Integer>();
-            for (int value : is) {
+            for (final int value : is) {
                 values.add(value);
             }
         }
 
-        public boolean contains(int value) {
+        public boolean contains(final int value) {
             return values.contains(value);
         }
     }
@@ -181,9 +181,9 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     public static class IterableContainer implements Iterable<Integer> {
         private final SortedSet<Integer> values;
 
-        public IterableContainer(int[] is) {
+        public IterableContainer(final int[] is) {
             values = new TreeSet<Integer>();
-            for (int value : is) {
+            for (final int value : is) {
                 values.add(value);
             }
         }
@@ -193,36 +193,36 @@ public class ArithmeticOperatorTest extends JexlTestCase {
             return values.iterator();
         }
 
-        public boolean contains(int i) {
+        public boolean contains(final int i) {
             return values.contains(i);
         }
 
-        public boolean contains(int[] i) {
+        public boolean contains(final int[] i) {
             return values.containsAll(Collections.singletonList(i));
         }
 
-        public boolean startsWith(int i) {
+        public boolean startsWith(final int i) {
             return values.first().equals(i);
         }
 
-        public boolean endsWith(int i) {
+        public boolean endsWith(final int i) {
             return values.last().equals(i);
         }
 
-        public boolean startsWith(int[] i) {
-            SortedSet<Integer> sw =  values.headSet(i.length);
+        public boolean startsWith(final int[] i) {
+            final SortedSet<Integer> sw =  values.headSet(i.length);
             int n = 0;
-            for(Integer value : sw) {
+            for(final Integer value : sw) {
                 if(!value.equals(i[n++])) {
                     return false;
                 }
             }
             return true;
         }
-        public boolean endsWith(int[] i) {
-            SortedSet<Integer> sw =  values.tailSet(values.size() - i.length);
+        public boolean endsWith(final int[] i) {
+            final SortedSet<Integer> sw =  values.tailSet(values.size() - i.length);
             int n = 0;
-            for(Integer value : sw) {
+            for(final Integer value : sw) {
                 if(!value.equals(i[n++])) {
                     return false;
                 }
@@ -234,24 +234,24 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     @Test
     public void testMatch() throws Exception {
         // check in/not-in on array, list, map, set and duck-type collection
-        int[] ai = {2, 4, 42, 54};
-        List<Integer> al = new ArrayList<Integer>();
-        for (int i : ai) {
+        final int[] ai = {2, 4, 42, 54};
+        final List<Integer> al = new ArrayList<Integer>();
+        for (final int i : ai) {
             al.add(i);
         }
-        Map<Integer, String> am = new HashMap<Integer, String>();
+        final Map<Integer, String> am = new HashMap<Integer, String>();
         am.put(2, "two");
         am.put(4, "four");
         am.put(42, "forty-two");
         am.put(54, "fifty-four");
-        MatchingContainer ad = new MatchingContainer(ai);
-        IterableContainer ic = new IterableContainer(ai);
-        Set<Integer> as = ad.values;
-        Object[] vars = {ai, al, am, ad, as, ic};
+        final MatchingContainer ad = new MatchingContainer(ai);
+        final IterableContainer ic = new IterableContainer(ai);
+        final Set<Integer> as = ad.values;
+        final Object[] vars = {ai, al, am, ad, as, ic};
 
-        for (Object var : vars) {
+        for (final Object var : vars) {
             asserter.setVariable("container", var);
-            for (int x : ai) {
+            for (final int x : ai) {
                 asserter.setVariable("x", x);
                 asserter.assertExpression("x =~ container", Boolean.TRUE);
             }
@@ -269,8 +269,8 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.assertExpression("x =^ 'foo'", Boolean.FALSE);
         asserter.assertExpression("x =$ 'foo'", Boolean.TRUE);
 
-        int[] ai = {2, 4, 42, 54};
-        IterableContainer ic = new IterableContainer(ai);
+        final int[] ai = {2, 4, 42, 54};
+        final IterableContainer ic = new IterableContainer(ai);
         asserter.setVariable("x", ic);
         asserter.assertExpression("x =^ 2", Boolean.TRUE);
         asserter.assertExpression("x =$ 54", Boolean.TRUE);
@@ -289,8 +289,8 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         asserter.assertExpression("x !^ 'foo'", Boolean.TRUE);
         asserter.assertExpression("x !$ 'foo'", Boolean.FALSE);
 
-        int[] ai = {2, 4, 42, 54};
-        IterableContainer ic = new IterableContainer(ai);
+        final int[] ai = {2, 4, 42, 54};
+        final IterableContainer ic = new IterableContainer(ai);
         asserter.setVariable("x", ic);
         asserter.assertExpression("x !^ 2", Boolean.FALSE);
         asserter.assertExpression("x !$ 54", Boolean.FALSE);
@@ -302,9 +302,9 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
     public static class Aggregate {
         private Aggregate() {}
-        public static int sum(Iterable<Integer> ii) {
+        public static int sum(final Iterable<Integer> ii) {
             int sum = 0;
-            for(Integer i : ii) {
+            for(final Integer i : ii) {
                 sum += i;
             }
             return sum;
@@ -314,9 +314,9 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     @Test
     @SuppressWarnings("unchecked")
     public void testInterval() throws Exception {
-        Map<String, Object> ns = new HashMap<String, Object>();
+        final Map<String, Object> ns = new HashMap<String, Object>();
         ns.put("calc", Aggregate.class);
-        JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
+        final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
         JexlScript script;
         Object result;
 
@@ -351,13 +351,13 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     }
 
     public static class DateArithmetic extends JexlArithmetic {
-        DateArithmetic(boolean flag) {
+        DateArithmetic(final boolean flag) {
             super(flag);
         }
 
-        protected Object getDateValue(Date date, String key) {
+        protected Object getDateValue(final Date date, final String key) {
             try {
-                Calendar cal = Calendar.getInstance(UTC);
+                final Calendar cal = Calendar.getInstance(UTC);
                 cal.setTime(date);
                 if ("yyyy".equals(key)) {
                     return cal.get(Calendar.YEAR);
@@ -367,16 +367,16 @@ public class ArithmeticOperatorTest extends JexlTestCase {
                     return cal.get(Calendar.DAY_OF_MONTH);
                 }
                 // Otherwise treat as format mask
-                SimpleDateFormat df = new SimpleDateFormat(key);//, dfs);
+                final SimpleDateFormat df = new SimpleDateFormat(key);//, dfs);
                 return df.format(date);
 
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 return null;
             }
         }
 
-        protected Object setDateValue(Date date, String key, Object value) throws Exception {
-            Calendar cal = Calendar.getInstance(UTC);
+        protected Object setDateValue(final Date date, final String key, final Object value) throws Exception {
+            final Calendar cal = Calendar.getInstance(UTC);
             cal.setTime(date);
             if ("yyyy".equals(key)) {
                 cal.set(Calendar.YEAR, toInteger(value));
@@ -389,19 +389,19 @@ public class ArithmeticOperatorTest extends JexlTestCase {
             return date;
         }
 
-        public Object propertyGet(Date date, String identifier) {
+        public Object propertyGet(final Date date, final String identifier) {
             return getDateValue(date, identifier);
         }
 
-        public Object propertySet(Date date, String identifier, Object value) throws Exception {
+        public Object propertySet(final Date date, final String identifier, final Object value) throws Exception {
             return setDateValue(date, identifier, value);
         }
 
-        public Object arrayGet(Date date, String identifier) {
+        public Object arrayGet(final Date date, final String identifier) {
             return getDateValue(date, identifier);
         }
 
-        public Object arraySet(Date date, String identifier, Object value) throws Exception {
+        public Object arraySet(final Date date, final String identifier, final Object value) throws Exception {
             return setDateValue(date, identifier, value);
         }
 
@@ -409,7 +409,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
             return new Date(System.currentTimeMillis());
         }
 
-        public Date multiply(Date d0, Date d1) {
+        public Date multiply(final Date d0, final Date d1) {
             throw new ArithmeticException("unsupported");
         }
     }
@@ -417,17 +417,17 @@ public class ArithmeticOperatorTest extends JexlTestCase {
     public static class DateContext extends MapContext {
         private Locale locale = Locale.US;
 
-        void setLocale(Locale l10n) {
+        void setLocale(final Locale l10n) {
             this.locale = l10n;
         }
 
-        public String format(Date date, String fmt) {
-            SimpleDateFormat sdf = new SimpleDateFormat(fmt, locale);
+        public String format(final Date date, final String fmt) {
+            final SimpleDateFormat sdf = new SimpleDateFormat(fmt, locale);
             sdf.setTimeZone(UTC);
             return sdf.format(date);
         }
 
-        public String format(Number number, String fmt) {
+        public String format(final Number number, final String fmt) {
             return new DecimalFormat(fmt).format(number);
         }
     }
@@ -438,21 +438,21 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         testOperatorError(false);
     }
 
-    private void testOperatorError(boolean silent) throws Exception {
-        CaptureLog log = new CaptureLog();
-        DateContext jc = new DateContext();
-        Date d = new Date();
-        JexlEngine jexl = new JexlBuilder().logger(log).strict(true).silent(silent).cache(32)
+    private void testOperatorError(final boolean silent) throws Exception {
+        final CaptureLog log = new CaptureLog();
+        final DateContext jc = new DateContext();
+        final Date d = new Date();
+        final JexlEngine jexl = new JexlBuilder().logger(log).strict(true).silent(silent).cache(32)
                                            .arithmetic(new DateArithmetic(true)).create();
-        JexlScript expr0 = jexl.createScript("date * date", "date");
+        final JexlScript expr0 = jexl.createScript("date * date", "date");
         try {
-            Object value0 = expr0.execute(jc, d);
+            final Object value0 = expr0.execute(jc, d);
             if (!silent) {
                 Assert.fail("should have failed");
             } else {
                 Assert.assertEquals(1, log.count("warn"));
             }
-        } catch(JexlException.Operator xop) {
+        } catch(final JexlException.Operator xop) {
             Assert.assertEquals("*", xop.getSymbol());
         }
         if (!silent) {
@@ -462,10 +462,10 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
     @Test
     public void testDateArithmetic() throws Exception {
-        Date d = new Date();
-        JexlContext jc = new MapContext();
-        JexlEngine jexl = new JexlBuilder().cache(32).arithmetic(new DateArithmetic(true)).create();
-        JexlScript expr0 = jexl.createScript("date.yyyy = 1969; date.MM=7; date.dd=20; ", "date");
+        final Date d = new Date();
+        final JexlContext jc = new MapContext();
+        final JexlEngine jexl = new JexlBuilder().cache(32).arithmetic(new DateArithmetic(true)).create();
+        final JexlScript expr0 = jexl.createScript("date.yyyy = 1969; date.MM=7; date.dd=20; ", "date");
         Object value0 = expr0.execute(jc, d);
         Assert.assertNotNull(value0);
         value0 = d;
@@ -477,20 +477,20 @@ public class ArithmeticOperatorTest extends JexlTestCase {
 
     @Test
     public void testFormatArithmetic() throws Exception {
-        Calendar cal = Calendar.getInstance(UTC);
+        final Calendar cal = Calendar.getInstance(UTC);
         cal.set(1969, Calendar.AUGUST, 20);
-        Date x0 = cal.getTime();
-        String y0 =  "MM/yy/dd";
-        Number x1 = 42.12345;
-        String y1 = "##0.##";
-        DateContext jc = new DateContext();
-        JexlEngine jexl = new JexlBuilder().cache(32).arithmetic(new DateArithmetic(true)).create();
-        JexlScript expr0 = jexl.createScript("x.format(y)", "x", "y");
+        final Date x0 = cal.getTime();
+        final String y0 =  "MM/yy/dd";
+        final Number x1 = 42.12345;
+        final String y1 = "##0.##";
+        final DateContext jc = new DateContext();
+        final JexlEngine jexl = new JexlBuilder().cache(32).arithmetic(new DateArithmetic(true)).create();
+        final JexlScript expr0 = jexl.createScript("x.format(y)", "x", "y");
         Object value10 = expr0.execute(jc, x0, y0);
-        Object value20 = expr0.execute(jc, x0, y0);
+        final Object value20 = expr0.execute(jc, x0, y0);
         Assert.assertEquals(value10, value20);
         Object value11 = expr0.execute(jc, x1, y1);
-        Object value21 = expr0.execute(jc, x1, y1);
+        final Object value21 = expr0.execute(jc, x1, y1);
         Assert.assertEquals(value11, value21);
         value10 = expr0.execute(jc, x0, y0);
         Assert.assertEquals(value10, value20);
@@ -511,25 +511,25 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         Assert.assertEquals("mer. 20 ao\u00fbt 1969", s0);
 
         expr1 = jexl.createScript("format(now(), y)", "y");
-        Object n0 = expr1.execute(jc, y0);
+        final Object n0 = expr1.execute(jc, y0);
         Assert.assertNotNull(n0);
         expr1 = jexl.createScript("now().format(y)", "y");
-        Object n1 = expr1.execute(jc, y0);
+        final Object n1 = expr1.execute(jc, y0);
         Assert.assertNotNull(n0);
         Assert.assertEquals(n0, n1);
     }
 
     @Test
     public void testFormatArithmeticJxlt() throws Exception {
-        Map<String, Object> ns = new HashMap<String, Object>();
+        final Map<String, Object> ns = new HashMap<String, Object>();
         ns.put("calc", Aggregate.class);
-        Calendar cal = Calendar.getInstance(UTC);
+        final Calendar cal = Calendar.getInstance(UTC);
         cal.set(1969, Calendar.AUGUST, 20);
-        Date x0 = cal.getTime();
-        String y0 =  "yyyy-MM-dd";
-        DateContext jc = new DateContext();
-        JexlEngine jexl = new JexlBuilder().cache(32).namespaces(ns).arithmetic(new DateArithmetic(true)).create();
-        JxltEngine jxlt = jexl.createJxltEngine();
+        final Date x0 = cal.getTime();
+        final String y0 =  "yyyy-MM-dd";
+        final DateContext jc = new DateContext();
+        final JexlEngine jexl = new JexlBuilder().cache(32).namespaces(ns).arithmetic(new DateArithmetic(true)).create();
+        final JxltEngine jxlt = jexl.createJxltEngine();
 
         JxltEngine.Template expr0 = jxlt.createTemplate("${x.format(y)}", "x", "y");
         StringWriter strw = new StringWriter();
@@ -543,7 +543,7 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         strws = strw.toString();
         Assert.assertEquals("6", strws);
 
-        JxltEngine.Template expr1 = jxlt.createTemplate("${jexl:include(s, x, y)}", "s", "x", "y");
+        final JxltEngine.Template expr1 = jxlt.createTemplate("${jexl:include(s, x, y)}", "s", "x", "y");
         strw = new StringWriter();
         expr1.evaluate(jc, strw, expr0, 1, 3);
         strws = strw.toString();

@@ -32,31 +32,31 @@ public class WhileTest extends JexlTestCase {
 
     @Test
     public void testSimpleWhileFalse() throws Exception {
-        JexlScript e = JEXL.createScript("while (false) ;");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("while (false) ;");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertNull("Result is not null", o);
     }
 
     @Test
     public void testWhileExecutesExpressionWhenLooping() throws Exception {
-        JexlScript e = JEXL.createScript("while (x < 10) x = x + 1;");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("while (x < 10) x = x + 1;");
+        final JexlContext jc = new MapContext();
         jc.set("x", new Integer(1));
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertEquals("Result is wrong", new Integer(10), o);
     }
 
     @Test
     public void testWhileWithBlock() throws Exception {
-        JexlScript e = JEXL.createScript("while (x < 10) { x = x + 1; y = y * 2; }");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("while (x < 10) { x = x + 1; y = y * 2; }");
+        final JexlContext jc = new MapContext();
         jc.set("x", new Integer(1));
         jc.set("y", new Integer(1));
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertEquals("Result is wrong", new Integer(512), o);
         Assert.assertEquals("x is wrong", new Integer(10), jc.get("x"));
         Assert.assertEquals("y is wrong", new Integer(512), jc.get("y"));

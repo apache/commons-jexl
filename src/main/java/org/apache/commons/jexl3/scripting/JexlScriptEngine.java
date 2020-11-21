@@ -223,10 +223,10 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
         // This is mandated by JSR-223 (end of section SCR.4.3.4.1.2 - JexlScript Execution)
         context.setAttribute(CONTEXT_KEY, context, ScriptContext.ENGINE_SCOPE);
         try {
-            JexlScript jexlScript = jexlEngine.createScript(script);
-            JexlContext ctxt = new JexlContextWrapper(context);
+            final JexlScript jexlScript = jexlEngine.createScript(script);
+            final JexlContext ctxt = new JexlContextWrapper(context);
             return jexlScript.execute(ctxt);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new ScriptException(e.toString());
         }
     }
@@ -243,9 +243,9 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
             throw new NullPointerException("script must be non-null");
         }
         try {
-            JexlScript jexlScript = jexlEngine.createScript(script);
+            final JexlScript jexlScript = jexlEngine.createScript(script);
             return new JexlCompiledScript(jexlScript);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new ScriptException(e.toString());
         }
     }
@@ -267,8 +267,8 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * @return the contents of the reader as a String.
      * @throws ScriptException on any error reading the reader.
      */
-    private static String readerToString(Reader scriptReader) throws ScriptException {
-        StringBuilder buffer = new StringBuilder();
+    private static String readerToString(final Reader scriptReader) throws ScriptException {
+        final StringBuilder buffer = new StringBuilder();
         BufferedReader reader;
         if (scriptReader instanceof BufferedReader) {
             reader = (BufferedReader) scriptReader;
@@ -281,7 +281,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
                 buffer.append(line).append('\n');
             }
             return buffer.toString();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new ScriptException(e);
         }
     }
@@ -350,7 +350,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
         @Override
         public boolean has(final String name) {
-            Bindings bnd = scriptContext.getBindings(ScriptContext.ENGINE_SCOPE);
+            final Bindings bnd = scriptContext.getBindings(ScriptContext.ENGINE_SCOPE);
             return bnd.containsKey(name);
         }
 
@@ -382,9 +382,9 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
             // This is mandated by JSR-223 (end of section SCR.4.3.4.1.2 - JexlScript Execution)
             context.setAttribute(CONTEXT_KEY, context, ScriptContext.ENGINE_SCOPE);
             try {
-                JexlContext ctxt = new JexlContextWrapper(context);
+                final JexlContext ctxt = new JexlContextWrapper(context);
                 return script.execute(ctxt);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new ScriptException(e.toString());
             }
         }

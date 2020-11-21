@@ -62,7 +62,7 @@ public class TemplateInterpreter extends Interpreter {
          * Sole ctor.
          * @param e the JEXL engine
          */
-        Arguments(Engine e) {
+        Arguments(final Engine e) {
             this.jexl = e;
         }
         /**
@@ -70,7 +70,7 @@ public class TemplateInterpreter extends Interpreter {
          * @param o the options
          * @return this instance
          */
-        Arguments options(JexlOptions o) {
+        Arguments options(final JexlOptions o) {
             this.options = o;
             return this;
         }
@@ -79,7 +79,7 @@ public class TemplateInterpreter extends Interpreter {
          * @param j the context
          * @return this instance
          */
-        Arguments context(JexlContext j) {
+        Arguments context(final JexlContext j) {
             this.jcontext = j;
             return this;
         }
@@ -88,7 +88,7 @@ public class TemplateInterpreter extends Interpreter {
          * @param f the frame
          * @return this instance
          */
-        Arguments frame(Frame f) {
+        Arguments frame(final Frame f) {
             this.jframe = f;
             return this;
         }
@@ -97,7 +97,7 @@ public class TemplateInterpreter extends Interpreter {
          * @param e the expressions
          * @return this instance
          */
-        Arguments expressions(TemplateExpression[] e) {
+        Arguments expressions(final TemplateExpression[] e) {
             this.expressions = e;
             return this;
         }
@@ -106,7 +106,7 @@ public class TemplateInterpreter extends Interpreter {
          * @param o the writer
          * @return this instance
          */
-        Arguments writer(Writer o) {
+        Arguments writer(final Writer o) {
             this.out = o;
             return this;
         }
@@ -116,7 +116,7 @@ public class TemplateInterpreter extends Interpreter {
      * Creates a template interpreter instance.
      * @param args the template interpreter arguments
      */
-    TemplateInterpreter(Arguments args) {
+    TemplateInterpreter(final Arguments args) {
         super(args.jexl, args.options, args.jcontext, args.jframe);
         exprs = args.expressions;
         writer = args.out;
@@ -130,7 +130,7 @@ public class TemplateInterpreter extends Interpreter {
      * @param script the TemplateScript to evaluate
      * @param args   the arguments
      */
-    public void include(TemplateScript script, Object... args) {
+    public void include(final TemplateScript script, final Object... args) {
         script.evaluate(context, writer, args);
     }
 
@@ -138,7 +138,7 @@ public class TemplateInterpreter extends Interpreter {
      * Prints a unified expression evaluation result.
      * @param e the expression number
      */
-    public void print(int e) {
+    public void print(final int e) {
         if (e < 0 || e >= exprs.length) {
             return;
         }
@@ -157,10 +157,10 @@ public class TemplateInterpreter extends Interpreter {
      * Prints a composite expression.
      * @param composite the composite expression
      */
-    private void printComposite(TemplateEngine.CompositeExpression composite) {
-        TemplateEngine.TemplateExpression[] cexprs = composite.exprs;
+    private void printComposite(final TemplateEngine.CompositeExpression composite) {
+        final TemplateEngine.TemplateExpression[] cexprs = composite.exprs;
         Object value;
-        for (TemplateExpression cexpr : cexprs) {
+        for (final TemplateExpression cexpr : cexprs) {
             value = cexpr.evaluate(this);
             doPrint(cexpr.getInfo(), value);
         }
@@ -175,15 +175,15 @@ public class TemplateInterpreter extends Interpreter {
      * @param info the source info
      * @param arg  the argument to print out
      */
-    private void doPrint(JexlInfo info, Object arg) {
+    private void doPrint(final JexlInfo info, final Object arg) {
         try {
             if (writer != null) {
                 if (arg instanceof CharSequence) {
                     writer.write(arg.toString());
                 } else if (arg != null) {
-                    Object[] value = {arg};
-                    JexlUberspect uber = jexl.getUberspect();
-                    JexlMethod method = uber.getMethod(writer, "print", value);
+                    final Object[] value = {arg};
+                    final JexlUberspect uber = jexl.getUberspect();
+                    final JexlMethod method = uber.getMethod(writer, "print", value);
                     if (method != null) {
                         method.invoke(writer, value);
                     } else {
@@ -191,21 +191,21 @@ public class TemplateInterpreter extends Interpreter {
                     }
                 }
             }
-        } catch (java.io.IOException xio) {
+        } catch (final java.io.IOException xio) {
             throw TemplateEngine.createException(info, "call print", null, xio);
-        } catch (java.lang.Exception xany) {
+        } catch (final java.lang.Exception xany) {
             throw TemplateEngine.createException(info, "invoke print", null, xany);
         }
     }
 
     @Override
-    protected Object resolveNamespace(String prefix, JexlNode node) {
+    protected Object resolveNamespace(final String prefix, final JexlNode node) {
         return "jexl".equals(prefix)? this : super.resolveNamespace(prefix, node);
     }
 
     @Override
-    protected Object visit(ASTIdentifier node, Object data) {
-        String name = node.getName();
+    protected Object visit(final ASTIdentifier node, final Object data) {
+        final String name = node.getName();
         if ("$jexl".equals(name)) {
             return writer;
         }
@@ -213,13 +213,13 @@ public class TemplateInterpreter extends Interpreter {
     }
 
     @Override
-    protected Object visit(ASTJexlScript script, Object data) {
+    protected Object visit(final ASTJexlScript script, final Object data) {
         if (script instanceof ASTJexlLambda && !((ASTJexlLambda) script).isTopLevel()) {
             return new Closure(this, (ASTJexlLambda) script) {
                 @Override
-                protected Interpreter createInterpreter(JexlContext context, Frame local) {
-                    JexlOptions opts = jexl.options(script, context);
-                    TemplateInterpreter.Arguments targs = new TemplateInterpreter.Arguments(jexl)
+                protected Interpreter createInterpreter(final JexlContext context, final Frame local) {
+                    final JexlOptions opts = jexl.options(script, context);
+                    final TemplateInterpreter.Arguments targs = new TemplateInterpreter.Arguments(jexl)
                             .context(context)
                             .options(opts)
                             .frame(local)
@@ -233,7 +233,7 @@ public class TemplateInterpreter extends Interpreter {
         final int numChildren = script.jjtGetNumChildren();
             Object result = null;
             for (int i = 0; i < numChildren; i++) {
-            JexlNode child = script.jjtGetChild(i);
+            final JexlNode child = script.jjtGetChild(i);
                 result = child.jjtAccept(this, data);
                 cancelCheck(child);
             }

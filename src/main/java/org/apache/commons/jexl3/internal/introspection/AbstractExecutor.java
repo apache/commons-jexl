@@ -39,10 +39,10 @@ abstract class AbstractExecutor {
      * @param parms the parameters
      * @return the method
      */
-    static java.lang.reflect.Method initMarker(Class<?> clazz, String name, Class<?>... parms) {
+    static java.lang.reflect.Method initMarker(final Class<?> clazz, final String name, final Class<?>... parms) {
         try {
             return clazz.getMethod(name, parms);
-        } catch (Exception xnever) {
+        } catch (final Exception xnever) {
             throw new Error(xnever);
         }
     }
@@ -52,7 +52,7 @@ abstract class AbstractExecutor {
      * @param arg the Object to coerce
      * @return an Integer if it can be converted, null otherwise
      */
-    static Integer castInteger(Object arg) {
+    static Integer castInteger(final Object arg) {
         return arg instanceof Number? ((Number) arg).intValue() : null;
     }
 
@@ -61,7 +61,7 @@ abstract class AbstractExecutor {
      * @param arg the Object to coerce
      * @return a String if it can be converted, null otherwise
      */
-    static String castString(Object arg) {
+    static String castString(final Object arg) {
         return arg instanceof CharSequence || arg instanceof Integer ? arg.toString() : null;
     }
 
@@ -70,7 +70,7 @@ abstract class AbstractExecutor {
      * @param args the list of arguments
      * @return the arguments array
      */
-    static Object[] makeArgs(Object... args) {
+    static Object[] makeArgs(final Object... args) {
         return args;
     }
     
@@ -79,7 +79,7 @@ abstract class AbstractExecutor {
      * @param instance the instance
      * @return the class
      */
-    static Class<?> classOf(Object instance) {
+    static Class<?> classOf(final Object instance) {
         return instance == null? Object.class : instance.getClass();
     }
 
@@ -93,13 +93,13 @@ abstract class AbstractExecutor {
      * @param theClass the class this executor applies to
      * @param theMethod the method held by this executor
      */
-    protected AbstractExecutor(Class<?> theClass, java.lang.reflect.Method theMethod) {
+    protected AbstractExecutor(final Class<?> theClass, final java.lang.reflect.Method theMethod) {
         objectClass = theClass;
         method = theMethod;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         return this == obj || (obj instanceof AbstractExecutor && equals((AbstractExecutor) obj));
     }
 
@@ -113,7 +113,7 @@ abstract class AbstractExecutor {
      * @param arg the other executor to check
      * @return true if both executors are equivalent, false otherwise
      */
-    public boolean equals(AbstractExecutor arg) {
+    public boolean equals(final AbstractExecutor arg) {
         // common equality check
         if (!this.getClass().equals(arg.getClass())) {
             return false;
@@ -125,8 +125,8 @@ abstract class AbstractExecutor {
             return false;
         }
         // specific equality check
-        Object lhsp = this.getTargetProperty();
-        Object rhsp = arg.getTargetProperty();
+        final Object lhsp = this.getTargetProperty();
+        final Object rhsp = arg.getTargetProperty();
         if (lhsp == null && rhsp == null) {
             return true;
         }
@@ -193,7 +193,7 @@ abstract class AbstractExecutor {
      * @param exec the value returned by tryExecute
      * @return true if tryExecute failed, false otherwise
      */
-    public final boolean tryFailed(Object exec) {
+    public final boolean tryFailed(final Object exec) {
         return exec == JexlEngine.TRY_FAILED;
     }
 
@@ -206,7 +206,7 @@ abstract class AbstractExecutor {
          * @param theClass the class this executor applies to
          * @param theMethod the method held by this executor
          */
-        protected Get(Class<?> theClass, java.lang.reflect.Method theMethod) {
+        protected Get(final Class<?> theClass, final java.lang.reflect.Method theMethod) {
             super(theClass, theMethod);
         }
     }
@@ -220,7 +220,7 @@ abstract class AbstractExecutor {
          * @param theClass the class this executor applies to
          * @param theMethod the method held by this executor
          */
-        protected Set(Class<?> theClass, java.lang.reflect.Method theMethod) {
+        protected Set(final Class<?> theClass, final java.lang.reflect.Method theMethod) {
             super(theClass, theMethod);
         }
     }
@@ -238,7 +238,7 @@ abstract class AbstractExecutor {
          * @param m the method
          * @param k the MethodKey
          */
-        protected Method(Class<?> c, java.lang.reflect.Method m, MethodKey k) {
+        protected Method(final Class<?> c, final java.lang.reflect.Method m, final MethodKey k) {
             super(c, m);
             key = k;
         }

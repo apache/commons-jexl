@@ -53,9 +53,9 @@ public final class IndexedType implements JexlPropertyGet {
      * @param name the container name
      * @return a JexlPropertyGet is successful, null otherwise
      */
-    public static JexlPropertyGet discover(Introspector is, Object object, String name) {
+    public static JexlPropertyGet discover(final Introspector is, final Object object, final String name) {
         if (object != null && name != null && !name.isEmpty()) {
-            String base = name.substring(0, 1).toUpperCase() + name.substring(1);
+            final String base = name.substring(0, 1).toUpperCase() + name.substring(1);
             final String container = name;
             final Class<?> clazz = object.getClass();
             final Method[] getters = is.getMethods(object.getClass(), "get" + base);
@@ -83,7 +83,7 @@ public final class IndexedType implements JexlPropertyGet {
          * @param theType the container type
          * @param theContainer the container instance
          */
-        private IndexedContainer(IndexedType theType, Object theContainer) {
+        private IndexedContainer(final IndexedType theType, final Object theContainer) {
             this.type = theType;
             this.container = theContainer;
         }
@@ -110,7 +110,7 @@ public final class IndexedType implements JexlPropertyGet {
          * @return the property value
          * @throws Exception if inner invocation fails
          */
-        public Object get(Object key) throws Exception {
+        public Object get(final Object key) throws Exception {
             return type.invokeGet(container, key);
         }
 
@@ -121,7 +121,7 @@ public final class IndexedType implements JexlPropertyGet {
          * @return the invocation result (frequently null)
          * @throws Exception if inner invocation fails
          */
-        public Object set(Object key, Object value) throws Exception {
+        public Object set(final Object key, final Object value) throws Exception {
             return type.invokeSet(container, key, value);
         }
     }
@@ -133,7 +133,7 @@ public final class IndexedType implements JexlPropertyGet {
      * @param gets the array of getter methods
      * @param sets the array of setter methods
      */
-    private IndexedType(String name, Class<?> c, Method[] gets, Method[] sets) {
+    private IndexedType(final String name, final Class<?> c, final Method[] gets, final Method[] sets) {
         this.container = name;
         this.clazz = c;
         this.getters = gets;
@@ -141,7 +141,7 @@ public final class IndexedType implements JexlPropertyGet {
     }
 
     @Override
-    public Object invoke(Object obj) throws Exception {
+    public Object invoke(final Object obj) throws Exception {
         if (obj != null && clazz.equals(obj.getClass())) {
             return new IndexedContainer(this, obj);
         } else {
@@ -150,7 +150,7 @@ public final class IndexedType implements JexlPropertyGet {
     }
 
     @Override
-    public Object tryInvoke(Object obj, Object key) {
+    public Object tryInvoke(final Object obj, final Object key) {
         if (obj != null && key != null
             && clazz.equals(obj.getClass())
             && container.equals(key.toString())) {
@@ -161,7 +161,7 @@ public final class IndexedType implements JexlPropertyGet {
     }
 
     @Override
-    public boolean tryFailed(Object rval) {
+    public boolean tryFailed(final Object rval) {
         return rval == Uberspect.TRY_FAILED;
     }
 
@@ -178,7 +178,7 @@ public final class IndexedType implements JexlPropertyGet {
      * @throws Exception if invocation failed;
      *         IntrospectionException if a property getter could not be found
      */
-    private Object invokeGet(Object object, Object key) throws Exception {
+    private Object invokeGet(final Object object, final Object key) throws Exception {
         if (getters != null && getters.length > 0) {
             Method jm = get;
             if (jm != null) {
@@ -192,7 +192,7 @@ public final class IndexedType implements JexlPropertyGet {
             final MethodKey km = new MethodKey(mname, args);
             jm = km.getMostSpecificMethod(getters);
             if (jm != null) {
-                Object invoked = jm.invoke(object, args);
+                final Object invoked = jm.invoke(object, args);
                 get = jm;
                 return invoked;
             }
@@ -211,7 +211,7 @@ public final class IndexedType implements JexlPropertyGet {
      * @throws Exception if invocation failed;
      *         IntrospectionException if a property setter could not be found
      */
-    private Object invokeSet(Object object, Object key, Object value) throws Exception {
+    private Object invokeSet(final Object object, final Object key, final Object value) throws Exception {
         if (setters != null && setters.length > 0) {
             Method jm = set;
             if (jm != null) {
@@ -227,7 +227,7 @@ public final class IndexedType implements JexlPropertyGet {
             final MethodKey km = new MethodKey(mname, args);
             jm = km.getMostSpecificMethod(setters);
             if (jm != null) {
-                Object invoked = jm.invoke(object, args);
+                final Object invoked = jm.invoke(object, args);
                 set = jm;
                 return invoked;
             }

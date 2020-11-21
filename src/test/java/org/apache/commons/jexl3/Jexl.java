@@ -27,20 +27,20 @@ import java.util.Map;
 public class Jexl {
     private Jexl() {}
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         final JexlEngine JEXL = new Engine();
-        Map<Object,Object> m = System.getProperties();
+        final Map<Object,Object> m = System.getProperties();
         // dummy context to get variables
-        JexlContext context = new MapContext();
-        for(Map.Entry<Object,Object> e : m.entrySet()) {
+        final JexlContext context = new MapContext();
+        for(final Map.Entry<Object,Object> e : m.entrySet()) {
             context.set(e.getKey().toString(), e.getValue());
         }
         try {
-            for (String arg : args) {
-                JexlExpression e = JEXL.createExpression(arg);
+            for (final String arg : args) {
+                final JexlExpression e = JEXL.createExpression(arg);
                 System.out.println("evaluate(" + arg + ") = '" + e.evaluate(context) + "'");
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }

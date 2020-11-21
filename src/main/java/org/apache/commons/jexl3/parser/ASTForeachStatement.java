@@ -21,16 +21,16 @@ package org.apache.commons.jexl3.parser;
  */
 public class ASTForeachStatement extends JexlLexicalNode {
     
-    public ASTForeachStatement(int id) {
+    public ASTForeachStatement(final int id) {
         super(id);
     }
 
-    public ASTForeachStatement(Parser p, int id) {
+    public ASTForeachStatement(final Parser p, final int id) {
         super(p, id);
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 

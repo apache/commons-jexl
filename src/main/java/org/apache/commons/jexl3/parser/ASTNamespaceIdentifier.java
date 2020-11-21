@@ -22,7 +22,7 @@ package org.apache.commons.jexl3.parser;
 public class ASTNamespaceIdentifier extends ASTIdentifier {
     private String namespace;
     
-    public ASTNamespaceIdentifier(int id) {
+    public ASTNamespaceIdentifier(final int id) {
         super(id);
     }
     
@@ -37,7 +37,7 @@ public class ASTNamespaceIdentifier extends ASTIdentifier {
      * @param ns the namespace
      * @param id the names
      */
-    public void setNamespace(String ns, String id) {
+    public void setNamespace(final String ns, final String id) {
         this.namespace = ns;
         this.name = id;
     }

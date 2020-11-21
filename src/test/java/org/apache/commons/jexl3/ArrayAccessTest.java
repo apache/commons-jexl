@@ -66,7 +66,7 @@ public class ArrayAccessTest extends JexlTestCase {
          * test List access
          */
 
-        List<Integer> l = new ArrayList<Integer>();
+        final List<Integer> l = new ArrayList<Integer>();
         l.add(new Integer(1));
         l.add(new Integer(2));
         l.add(new Integer(3));
@@ -82,7 +82,7 @@ public class ArrayAccessTest extends JexlTestCase {
          * test array access
          */
 
-        String[] args = { "hello", "there" };
+        final String[] args = { "hello", "there" };
         asserter.setVariable("array", args);
         asserter.assertExpression("array[0]", "hello");
 
@@ -94,7 +94,7 @@ public class ArrayAccessTest extends JexlTestCase {
         /*
          * test map access
          */
-        Map<String, String> m = new HashMap<String, String>();
+        final Map<String, String> m = new HashMap<String, String>();
         m.put("foo", "bar");
 
         asserter.setVariable("map", m);
@@ -116,7 +116,7 @@ public class ArrayAccessTest extends JexlTestCase {
      */
     @Test
     public void testDoubleArrays() throws Exception {
-        Object[][] foo = new Object[2][2];
+        final Object[][] foo = new Object[2][2];
 
         foo[0][0] = "one";
         foo[0][1] = "two";
@@ -153,8 +153,8 @@ public class ArrayAccessTest extends JexlTestCase {
 
     @Test
     public void testDoubleMaps() throws Exception {
-        Map<Object, Map<Object, Object>> foo = new HashMap<Object, Map<Object, Object>>();
-        Map<Object, Object> foo0 = new HashMap<Object, Object>();
+        final Map<Object, Map<Object, Object>> foo = new HashMap<Object, Map<Object, Object>>();
+        final Map<Object, Object> foo0 = new HashMap<Object, Object>();
         foo.put(0, foo0);
         foo0.put(0, "one");
         foo0.put(1, "two");
@@ -193,7 +193,7 @@ public class ArrayAccessTest extends JexlTestCase {
 
     @Test
     public void testArrayProperty() throws Exception {
-        Foo foo = new Foo();
+        final Foo foo = new Foo();
 
         asserter.setVariable("foo", foo);
 
@@ -206,7 +206,7 @@ public class ArrayAccessTest extends JexlTestCase {
     // This is JEXL-26
     @Test
     public void testArrayAndDottedConflict() throws Exception {
-        Object[] objects = new Object[] {"an", "array", new Long(0)};
+        final Object[] objects = new Object[] {"an", "array", new Long(0)};
         asserter.setStrict(false);
         asserter.setSilent(true);
         asserter.setVariable("objects", objects);
@@ -221,7 +221,7 @@ public class ArrayAccessTest extends JexlTestCase {
 
     @Test
     public void testArrayIdentifierParsing() throws Exception {
-        Map<Object, Number> map = new HashMap<Object, Number>();
+        final Map<Object, Number> map = new HashMap<Object, Number>();
         map.put("00200", -42.42d);
         map.put(200, 42.42d);
         asserter.setVariable("objects", map);
@@ -234,7 +234,7 @@ public class ArrayAccessTest extends JexlTestCase {
 
     @Test
     public void testArrayMethods() throws Exception {
-        Object[] objects = new Object[] {"an", "array", new Long(0)};
+        final Object[] objects = new Object[] {"an", "array", new Long(0)};
 
         asserter.setVariable("objects", objects);
         asserter.assertExpression("objects.get(1)", "array");
@@ -246,11 +246,11 @@ public class ArrayAccessTest extends JexlTestCase {
 
     @Test
     public void testArrayArray() throws Exception {
-        Integer i42 = Integer.valueOf(42);
-        Integer i43 = Integer.valueOf(43);
-        String s42 = "fourty-two";
-        String s43 = "fourty-three";
-        Object[] foo = new Object[3];
+        final Integer i42 = Integer.valueOf(42);
+        final Integer i43 = Integer.valueOf(43);
+        final String s42 = "fourty-two";
+        final String s43 = "fourty-three";
+        final Object[] foo = new Object[3];
         foo[0] = foo;
         foo[1] = i42;
         foo[2] = s42;
@@ -313,7 +313,7 @@ public class ArrayAccessTest extends JexlTestCase {
 
     public static class Sample {
         private int[] array;
-        public void setFoo(int[] a) {
+        public void setFoo(final int[] a) {
             array = a;
         }
         public int[] getFoo() {
@@ -322,7 +322,7 @@ public class ArrayAccessTest extends JexlTestCase {
     }
     @Test
     public void testArrayGetSet() throws Exception {
-        Sample bar  = new Sample();
+        final Sample bar  = new Sample();
         bar.setFoo(new int[]{24});
         asserter.setVariable("bar", bar);
         asserter.assertExpression("bar.foo[0]", 24);

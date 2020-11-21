@@ -24,11 +24,11 @@ public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant
 
     private Pattern literal = null;
 
-    ASTRegexLiteral(int id) {
+    ASTRegexLiteral(final int id) {
         super(id);
     }
 
-    ASTRegexLiteral(Parser p, int id) {
+    ASTRegexLiteral(final Parser p, final int id) {
         super(p, id);
     }
 
@@ -47,16 +47,16 @@ public final class ASTRegexLiteral extends JexlNode implements JexlNode.Constant
     }
 
     @Override
-    protected boolean isConstant(boolean literal) {
+    protected boolean isConstant(final boolean literal) {
         return true;
     }
 
-    void setLiteral(String literal) {
+    void setLiteral(final String literal) {
         this.literal = Pattern.compile(literal);
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 }

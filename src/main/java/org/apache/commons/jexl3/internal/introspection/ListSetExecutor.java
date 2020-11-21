@@ -42,8 +42,8 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
      * @param value the value to use as argument in list.put(key,value)
      * @return the executor if found, null otherwise
      */
-    public static ListSetExecutor discover(Introspector is, Class<?> clazz, Object identifier, Object value) {
-        Integer index = castInteger(identifier);
+    public static ListSetExecutor discover(final Introspector is, final Class<?> clazz, final Object identifier, final Object value) {
+        final Integer index = castInteger(identifier);
         if (index != null) {
             if (clazz.isArray()) {
                 // we could verify if the call can be performed but it does not change
@@ -68,7 +68,7 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
      * @param method the method called through this executor
      * @param key the key to use as 1st argument to the set method
      */
-    private ListSetExecutor(Class<?> clazz, java.lang.reflect.Method method, Integer key) {
+    private ListSetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final Integer key) {
         super(clazz, method);
         property = key;
     }
@@ -79,7 +79,7 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
     }
 
     @Override
-    public Object invoke(final Object obj, Object value) {
+    public Object invoke(final Object obj, final Object value) {
         if (method == ARRAY_SET) {
             Array.set(obj, property, value);
         } else {
@@ -91,8 +91,8 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
     }
 
     @Override
-    public Object tryInvoke(final Object obj, Object key, Object value) {
-        Integer index = castInteger(key);
+    public Object tryInvoke(final Object obj, final Object key, final Object value) {
+        final Integer index = castInteger(key);
         if (obj != null && method != null
                 && objectClass.equals(obj.getClass())
                 && index != null) {

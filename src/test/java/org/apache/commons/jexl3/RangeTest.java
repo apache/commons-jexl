@@ -34,14 +34,14 @@ public class RangeTest extends JexlTestCase {
 
     @Test
     public void testIntegerRangeOne() throws Exception {
-        JexlExpression e = JEXL.createExpression("(1..1)");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("(1..1)");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.evaluate(jc);
+        final Object o = e.evaluate(jc);
         Assert.assertTrue(o instanceof Collection<?>);
-        Collection<?> c = (Collection<?>) o;
+        final Collection<?> c = (Collection<?>) o;
         Assert.assertEquals(1, c.size());
-        Object[] a = c.toArray();
+        final Object[] a = c.toArray();
         Assert.assertEquals(1, a.length);
         Assert.assertEquals(1, ((Number) a[0]).intValue());
         Assert.assertFalse((Boolean) JEXL.createScript("empty x", "x").execute(null, e));
@@ -49,13 +49,13 @@ public class RangeTest extends JexlTestCase {
 
     @Test
     public void testIntegerRange() throws Exception {
-        JexlExpression e = JEXL.createExpression("(1..32)");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("(1..32)");
+        final JexlContext jc = new MapContext();
 
-        Object o0 = e.evaluate(jc);
-        Object o = e.evaluate(jc);
+        final Object o0 = e.evaluate(jc);
+        final Object o = e.evaluate(jc);
         Assert.assertTrue(o instanceof Collection<?>);
-        Collection<?> c = (Collection<?>) o;
+        final Collection<?> c = (Collection<?>) o;
         Assert.assertEquals(32, c.size());
 
         Assert.assertNotSame(o0, o);
@@ -63,7 +63,7 @@ public class RangeTest extends JexlTestCase {
         Assert.assertEquals(o0, o);
 
         int i = 0;
-        for (Object v : c) {
+        for (final Object v : c) {
             i += 1;
             Assert.assertEquals(i, ((Number) v).intValue());
         }
@@ -87,7 +87,7 @@ public class RangeTest extends JexlTestCase {
             Assert.assertEquals((int) aa[l], l + 1);
         }
 
-        Object[] oaa = c.toArray();
+        final Object[] oaa = c.toArray();
         Assert.assertEquals(32, oaa.length);
         for (int l = 0; l < 32; ++l) {
             Assert.assertEquals(oaa[l], l + 1);
@@ -96,13 +96,13 @@ public class RangeTest extends JexlTestCase {
 
     @Test
     public void testLongRange() throws Exception {
-        JexlExpression e = JEXL.createExpression("(6789000001L..6789000032L)");
-        JexlContext jc = new MapContext();
+        final JexlExpression e = JEXL.createExpression("(6789000001L..6789000032L)");
+        final JexlContext jc = new MapContext();
 
-        Object o0 = e.evaluate(jc);
-        Object o = e.evaluate(jc);
+        final Object o0 = e.evaluate(jc);
+        final Object o = e.evaluate(jc);
         Assert.assertTrue(o instanceof Collection<?>);
-        Collection<?> c = (Collection<?>) o;
+        final Collection<?> c = (Collection<?>) o;
         Assert.assertEquals(32, c.size());
         Assert.assertFalse((Boolean) JEXL.createScript("empty x", "x").execute(null, e));
 
@@ -111,7 +111,7 @@ public class RangeTest extends JexlTestCase {
         Assert.assertEquals(o0, o);
 
         long i = 6789000000L;
-        for (Object v : c) {
+        for (final Object v : c) {
             i += 1;
             Assert.assertEquals(i, ((Number) v).longValue());
         }
@@ -135,7 +135,7 @@ public class RangeTest extends JexlTestCase {
             Assert.assertEquals((long) aa[l], 6789000001L + l);
         }
 
-        Object[] oaa = c.toArray();
+        final Object[] oaa = c.toArray();
         Assert.assertEquals(32, oaa.length);
         for (int l = 0; l < 32; ++l) {
             Assert.assertEquals(oaa[l], 6789000001L + l);
@@ -144,17 +144,17 @@ public class RangeTest extends JexlTestCase {
 
     @Test
     public void testIntegerSum() throws Exception {
-        JexlScript e = JEXL.createScript("var s = 0; for(var i : (1..5)) { s = s + i; }; s");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("var s = 0; for(var i : (1..5)) { s = s + i; }; s");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertEquals(15, ((Number) o).intValue());
     }
 
     @Test
     public void testIntegerContains() throws Exception {
-        JexlScript e = JEXL.createScript("(x)->{ x =~ (1..10) }");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("(x)->{ x =~ (1..10) }");
+        final JexlContext jc = new MapContext();
 
         Object o = e.execute(jc, 5);
         Assert.assertEquals(Boolean.TRUE, o);
@@ -166,17 +166,17 @@ public class RangeTest extends JexlTestCase {
 
     @Test
     public void testLongSum() throws Exception {
-        JexlScript e = JEXL.createScript("var s = 0; for(var i : (6789000001L..6789000001L)) { s = s + i; }; s");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("var s = 0; for(var i : (6789000001L..6789000001L)) { s = s + i; }; s");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertEquals(6789000001L, ((Number) o).longValue());
     }
 
     @Test
     public void testLongContains() throws Exception {
-        JexlScript e = JEXL.createScript("(x)->{ x =~ (90000000001L..90000000010L) }");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("(x)->{ x =~ (90000000001L..90000000010L) }");
+        final JexlContext jc = new MapContext();
 
         Object o = e.execute(jc, 90000000005L);
         Assert.assertEquals(Boolean.TRUE, o);

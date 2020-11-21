@@ -181,7 +181,7 @@ public class Engine extends JexlEngine {
      * Creates a JEXL engine using the provided {@link JexlBuilder}.
      * @param conf the builder
      */
-    public Engine(JexlBuilder conf) {
+    public Engine(final JexlBuilder conf) {
         // options:
         this.options = conf.options().copy();
         this.strict = options.isStrict();
@@ -193,12 +193,12 @@ public class Engine extends JexlEngine {
         this.collectMode = conf.collectMode();
         this.stackOverflow = conf.stackOverflow() > 0? conf.stackOverflow() : Integer.MAX_VALUE;
         // core properties:
-        JexlUberspect uber = conf.uberspect() == null ? getUberspect(conf.logger(), conf.strategy()) : conf.uberspect();
-        ClassLoader loader = conf.loader();
+        final JexlUberspect uber = conf.uberspect() == null ? getUberspect(conf.logger(), conf.strategy()) : conf.uberspect();
+        final ClassLoader loader = conf.loader();
         if (loader != null) {
             uber.setClassLoader(loader);
         }
-        JexlSandbox sandbox = conf.sandbox();
+        final JexlSandbox sandbox = conf.sandbox();
         if (sandbox == null) {
             this.uberspect = uber;
         } else {
@@ -211,7 +211,7 @@ public class Engine extends JexlEngine {
         options.setStrictArithmetic(arithmetic.isStrict());
         this.functions = conf.namespaces() == null ? Collections.<String, Object>emptyMap() : conf.namespaces();
         // parsing & features:
-        JexlFeatures features = conf.features() == null? DEFAULT_FEATURES : conf.features();
+        final JexlFeatures features = conf.features() == null? DEFAULT_FEATURES : conf.features();
         this.expressionFeatures = new JexlFeatures(features).script(false);
         this.scriptFeatures = new JexlFeatures(features).script(true);
         this.charset = conf.charset();
@@ -234,7 +234,7 @@ public class Engine extends JexlEngine {
      * @param strategy the property resolver strategy
      * @return Uberspect the default uberspector instance.
      */
-    public static Uberspect getUberspect(Log logger, JexlUberspect.ResolverStrategy strategy) {
+    public static Uberspect getUberspect(final Log logger, final JexlUberspect.ResolverStrategy strategy) {
         if ((logger == null || logger.equals(LogFactory.getLog(JexlEngine.class)))
             && (strategy == null || strategy == JexlUberspect.JEXL_STRATEGY)) {
             return UberspectHolder.UBERSPECT;
@@ -273,21 +273,21 @@ public class Engine extends JexlEngine {
     }
 
     @Override
-    public void setClassLoader(ClassLoader loader) {
+    public void setClassLoader(final ClassLoader loader) {
         jxlt = null;
         uberspect.setClassLoader(loader);
         if (functions != null) {
-            List<String> names = new ArrayList<String>(functions.keySet());
-            for(String name : names) {
-                Object functor = functions.get(name);
+            final List<String> names = new ArrayList<String>(functions.keySet());
+            for(final String name : names) {
+                final Object functor = functions.get(name);
                 if (functor instanceof Class<?>) {
-                    Class<?> fclass = ((Class<?>) functor);
+                    final Class<?> fclass = ((Class<?>) functor);
                     try {
-                        Class<?> nclass = loader.loadClass(fclass.getName());
+                        final Class<?> nclass = loader.loadClass(fclass.getName());
                         if (nclass != fclass) {
                             functions.put(name, nclass);
                         }
-                    } catch (ClassNotFoundException xany) {
+                    } catch (final ClassNotFoundException xany) {
                          functions.put(name, fclass.getName());
                     }
                 }
@@ -310,7 +310,7 @@ public class Engine extends JexlEngine {
      * @param <T> the option type
      * @return conf or def
      */
-    private static <T> T option(T conf, T def) {
+    private static <T> T option(final T conf, final T def) {
         return conf == null? def : conf;
     }
     
@@ -322,22 +322,22 @@ public class Engine extends JexlEngine {
      * @param context the context
      * @return the options if any
      */
-    protected JexlOptions options(JexlContext context) {
+    protected JexlOptions options(final JexlContext context) {
         // Make a copy of the handled options if any
         if (context instanceof JexlContext.OptionsHandle) {
-            JexlOptions jexlo = ((JexlContext.OptionsHandle) context).getEngineOptions();
+            final JexlOptions jexlo = ((JexlContext.OptionsHandle) context).getEngineOptions();
             if (jexlo != null) {
                 return jexlo.isSharedInstance()? jexlo : jexlo.copy();
             }
         } else if (context instanceof JexlEngine.Options) {
             // This condition and block for compatibility between 3.1 and 3.2
-            JexlOptions jexlo = options.copy();
-            JexlEngine jexl = this;
-            JexlEngine.Options opts = (JexlEngine.Options) context;
+            final JexlOptions jexlo = options.copy();
+            final JexlEngine jexl = this;
+            final JexlEngine.Options opts = (JexlEngine.Options) context;
             jexlo.setCancellable(option(opts.isCancellable(), jexl.isCancellable()));
             jexlo.setSilent(option(opts.isSilent(), jexl.isSilent()));
             jexlo.setStrict(option(opts.isStrict(), jexl.isStrict()));
-            JexlArithmetic jexla = jexl.getArithmetic();
+            final JexlArithmetic jexla = jexl.getArithmetic();
             jexlo.setStrictArithmetic(option(opts.isStrictArithmetic(), jexla.isStrict()));
             jexlo.setMathContext(opts.getArithmeticMathContext());
             jexlo.setMathScale(opts.getArithmeticMathScale());
@@ -353,7 +353,7 @@ public class Engine extends JexlEngine {
      * @param context the context
      * @return the options
      */
-    protected JexlOptions options(ASTJexlScript script, JexlContext context) {
+    protected JexlOptions options(final ASTJexlScript script, final JexlContext context) {
         final JexlOptions opts = options(context); 
         if (opts != options) {
             // when feature lexical, try hard to run lexical
@@ -378,33 +378,33 @@ public class Engine extends JexlEngine {
      * @param context the context
      * @param opts the options
      */
-    protected void processPragmas(ASTJexlScript script, JexlContext context, JexlOptions opts) {
-        Map<String, Object> pragmas = script.getPragmas();
+    protected void processPragmas(final ASTJexlScript script, final JexlContext context, final JexlOptions opts) {
+        final Map<String, Object> pragmas = script.getPragmas();
         if (pragmas != null && !pragmas.isEmpty()) {
-            JexlContext.PragmaProcessor processor =
+            final JexlContext.PragmaProcessor processor =
                     context instanceof JexlContext.PragmaProcessor
                     ? (JexlContext.PragmaProcessor) context
                     : null;
             Map<String, Object> ns = null;
-            for(Map.Entry<String, Object> pragma : pragmas.entrySet()) {
-                String key = pragma.getKey();
-                Object value = pragma.getValue();
+            for(final Map.Entry<String, Object> pragma : pragmas.entrySet()) {
+                final String key = pragma.getKey();
+                final Object value = pragma.getValue();
                 if (value instanceof String) {
                     if (PRAGMA_OPTIONS.equals(key)) {
                         // jexl.options
-                        String[] vs = value.toString().split(" ");
+                        final String[] vs = value.toString().split(" ");
                         opts.setFlags(vs);
                     } else if (key.startsWith(PRAGMA_JEXLNS)) {
                         // jexl.namespace.***
-                        String nsname = key.substring(PRAGMA_JEXLNS.length());
+                        final String nsname = key.substring(PRAGMA_JEXLNS.length());
                         if (nsname != null && !nsname.isEmpty()) {
                             if (ns == null) {
                                 ns = new HashMap<>(functions);
                             }
-                            String nsclass = value.toString();
+                            final String nsclass = value.toString();
                             try {
                                 ns.put(nsname, uberspect.getClassLoader().loadClass(nsclass));
-                            } catch (ClassNotFoundException e) {
+                            } catch (final ClassNotFoundException e) {
                                 ns.put(nsname, nsclass);
                             }
                         }
@@ -425,7 +425,7 @@ public class Engine extends JexlEngine {
      * @param opts the options to set
      * @return the options
      */
-    public JexlOptions optionsSet(JexlOptions opts) {
+    public JexlOptions optionsSet(final JexlOptions opts) {
         if (opts != null) {
             opts.set(options);
         }
@@ -433,7 +433,7 @@ public class Engine extends JexlEngine {
     }
     
     @Override
-    public TemplateEngine createJxltEngine(boolean noScript, int cacheSize, char immediate, char deferred) {
+    public TemplateEngine createJxltEngine(final boolean noScript, final int cacheSize, final char immediate, final char deferred) {
         return new TemplateEngine(this, noScript, cacheSize, immediate, deferred);
     }
 
@@ -451,25 +451,25 @@ public class Engine extends JexlEngine {
      * @param opts    the evaluation options
      * @return an Interpreter
      */
-    protected Interpreter createInterpreter(JexlContext context, Frame frame, JexlOptions opts) {
+    protected Interpreter createInterpreter(final JexlContext context, final Frame frame, final JexlOptions opts) {
         return new Interpreter(this, opts, context, frame);
     }
 
     
     @Override
-    public Script createExpression(JexlInfo info, String expression) {
+    public Script createExpression(final JexlInfo info, final String expression) {
         return createScript(expressionFeatures, info, expression, null);
     }
 
     @Override
-    public Script createScript(JexlFeatures features, JexlInfo info, String scriptText, String[] names) {
+    public Script createScript(final JexlFeatures features, final JexlInfo info, final String scriptText, final String[] names) {
         if (scriptText == null) {
             throw new NullPointerException("source is null");
         }
-        String source = trimSource(scriptText);
-        Scope scope = names == null || names.length == 0? null : new Scope(null, names);
-        JexlFeatures ftrs = features == null? scriptFeatures : features;
-        ASTJexlScript tree = parse(info, ftrs, source, scope);
+        final String source = trimSource(scriptText);
+        final Scope scope = names == null || names.length == 0? null : new Scope(null, names);
+        final JexlFeatures ftrs = features == null? scriptFeatures : features;
+        final ASTJexlScript tree = parse(info, ftrs, source, scope);
         return new Script(this, source, tree);
     }
 
@@ -486,12 +486,12 @@ public class Engine extends JexlEngine {
             .register(true);
 
     @Override
-    public Object getProperty(Object bean, String expr) {
+    public Object getProperty(final Object bean, final String expr) {
         return getProperty(null, bean, expr);
     }
 
     @Override
-    public Object getProperty(JexlContext context, Object bean, String expr) {
+    public Object getProperty(JexlContext context, final Object bean, final String expr) {
         if (context == null) {
             context = EMPTY_CONTEXT;
         }
@@ -505,7 +505,7 @@ public class Engine extends JexlEngine {
             final Frame frame = script.createFrame(bean);
             final Interpreter interpreter = createInterpreter(context, frame, options);
             return interpreter.visitLexicalNode(node, null);
-        } catch (JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             if (silent) {
                 logger.warn(xjexl.getMessage(), xjexl.getCause());
                 return null;
@@ -515,12 +515,12 @@ public class Engine extends JexlEngine {
     }
 
     @Override
-    public void setProperty(Object bean, String expr, Object value) {
+    public void setProperty(final Object bean, final String expr, final Object value) {
         setProperty(null, bean, expr, value);
     }
 
     @Override
-    public void setProperty(JexlContext context, Object bean, String expr, Object value) {
+    public void setProperty(JexlContext context, final Object bean, final String expr, final Object value) {
         if (context == null) {
             context = EMPTY_CONTEXT;
         }
@@ -534,7 +534,7 @@ public class Engine extends JexlEngine {
             final Frame frame = script.createFrame(bean, value);
             final Interpreter interpreter = createInterpreter(context, frame, options);
             interpreter.visitLexicalNode(node, null);
-        } catch (JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             if (silent) {
                 logger.warn(xjexl.getMessage(), xjexl.getCause());
                 return;
@@ -544,7 +544,7 @@ public class Engine extends JexlEngine {
     }
 
     @Override
-    public Object invokeMethod(Object obj, String meth, Object... args) {
+    public Object invokeMethod(final Object obj, final String meth, final Object... args) {
         JexlException xjexl = null;
         Object result = null;
         final JexlInfo info = debug ? createInfo() : null;
@@ -558,9 +558,9 @@ public class Engine extends JexlEngine {
             } else {
                 xjexl = new JexlException.Method(info, meth, args);
             }
-        } catch (JexlException xany) {
+        } catch (final JexlException xany) {
             xjexl = xany;
-        } catch (Exception xany) {
+        } catch (final Exception xany) {
             xjexl = new JexlException.Method(info, meth, args, xany);
         }
         if (xjexl != null) {
@@ -575,12 +575,12 @@ public class Engine extends JexlEngine {
     }
 
     @Override
-    public <T> T newInstance(Class<? extends T> clazz, Object... args) {
+    public <T> T newInstance(final Class<? extends T> clazz, final Object... args) {
         return clazz.cast(doCreateInstance(clazz, args));
     }
 
     @Override
-    public Object newInstance(String clazz, Object... args) {
+    public Object newInstance(final String clazz, final Object... args) {
         return doCreateInstance(clazz, args);
     }
 
@@ -591,7 +591,7 @@ public class Engine extends JexlEngine {
      * @param args  the constructor arguments
      * @return the created object instance or null on failure when silent
      */
-    protected Object doCreateInstance(Object clazz, Object... args) {
+    protected Object doCreateInstance(final Object clazz, final Object... args) {
         JexlException xjexl = null;
         Object result = null;
         final JexlInfo info = debug ? createInfo() : null;
@@ -605,9 +605,9 @@ public class Engine extends JexlEngine {
             } else {
                 xjexl = new JexlException.Method(info, clazz.toString(), args);
             }
-        } catch (JexlException xany) {
+        } catch (final JexlException xany) {
             xjexl = xany;
-        } catch (Exception xany) {
+        } catch (final Exception xany) {
             xjexl = new JexlException.Method(info, clazz.toString(), args, xany);
         }
         if (xjexl != null) {
@@ -625,8 +625,8 @@ public class Engine extends JexlEngine {
      * @param tls the context or null
      * @return the previous thread local context
      */
-    protected JexlContext.ThreadLocal putThreadLocal(JexlContext.ThreadLocal tls) {
-        JexlContext.ThreadLocal local = CONTEXT.get();
+    protected JexlContext.ThreadLocal putThreadLocal(final JexlContext.ThreadLocal tls) {
+        final JexlContext.ThreadLocal local = CONTEXT.get();
         CONTEXT.set(tls);
         return local;
     }
@@ -636,8 +636,8 @@ public class Engine extends JexlEngine {
      * @param jexl the engine or null
      * @return the previous thread local engine
      */
-    protected JexlEngine putThreadEngine(JexlEngine jexl) {
-        JexlEngine pjexl = ENGINE.get();
+    protected JexlEngine putThreadEngine(final JexlEngine jexl) {
+        final JexlEngine pjexl = ENGINE.get();
         ENGINE.set(jexl);
         return pjexl;
     }
@@ -650,8 +650,8 @@ public class Engine extends JexlEngine {
      * @return the set of variables, each as a list of strings (ant-ish variables use more than 1 string)
      *         or the empty set if no variables are used
      */
-    protected Set<List<String>> getVariables(ASTJexlScript script) {
-        VarCollector collector = varCollector();
+    protected Set<List<String>> getVariables(final ASTJexlScript script) {
+        final VarCollector collector = varCollector();
         getVariables(script, script, collector);
         return collector.collected();
     }
@@ -691,7 +691,7 @@ public class Engine extends JexlEngine {
          * Constructor.
          * @param constaa whether constant array-access is considered equivalent to dot-access
          */
-        protected VarCollector(int constaa) {
+        protected VarCollector(final int constaa) {
             mode = constaa;
         }
 
@@ -699,7 +699,7 @@ public class Engine extends JexlEngine {
          * Starts/stops a variable collect.
          * @param node starts if not null, stop if null
          */
-        public void collect(JexlNode node) {
+        public void collect(final JexlNode node) {
             if (!ref.isEmpty()) {
                 refs.add(ref);
                 ref = new ArrayList<String>();
@@ -718,7 +718,7 @@ public class Engine extends JexlEngine {
          * Adds a 'segment' to the variable being collected.
          * @param name the name
          */
-        public void add(String name) {
+        public void add(final String name) {
             ref.add(name);
         }
 
@@ -736,16 +736,16 @@ public class Engine extends JexlEngine {
      * @param node the node
      * @param collector the variable collector
      */
-    protected void getVariables(final ASTJexlScript script, JexlNode node, VarCollector collector) {
+    protected void getVariables(final ASTJexlScript script, final JexlNode node, final VarCollector collector) {
         if (node instanceof ASTIdentifier) {
-            JexlNode parent = node.jjtGetParent();
+            final JexlNode parent = node.jjtGetParent();
             if (parent instanceof ASTMethodNode || parent instanceof ASTFunctionNode) {
                 // skip identifiers for methods and functions
                 collector.collect(null);
                 return;
             }
-            ASTIdentifier identifier = (ASTIdentifier) node;
-            int symbol = identifier.getSymbol();
+            final ASTIdentifier identifier = (ASTIdentifier) node;
+            final int symbol = identifier.getSymbol();
             // symbols that are captured are considered "global" variables
             if (symbol >= 0 && script != null && !script.isCapturedSymbol(symbol)) {
                 collector.collect(null);
@@ -755,7 +755,7 @@ public class Engine extends JexlEngine {
                 collector.add(identifier.getName());
             }
         } else if (node instanceof ASTIdentifierAccess) {
-            JexlNode parent = node.jjtGetParent();
+            final JexlNode parent = node.jjtGetParent();
             if (parent instanceof ASTMethodNode || parent instanceof ASTFunctionNode) {
                 // skip identifiers for methods and functions
                 collector.collect(null);
@@ -766,17 +766,17 @@ public class Engine extends JexlEngine {
                 collector.add(((ASTIdentifierAccess) node).getName());
             }
         } else if (node instanceof ASTArrayAccess && collector.mode > 0) {
-            int num = node.jjtGetNumChildren();
+            final int num = node.jjtGetNumChildren();
             // collect only if array access is const and follows an identifier
             boolean collecting = collector.isCollecting();
             for (int i = 0; i < num; ++i) {
-                JexlNode child = node.jjtGetChild(i);
+                final JexlNode child = node.jjtGetChild(i);
                 if (collecting && child.isConstant()) {
                     // collect all constants or only string and number literals
-                    boolean collect = collector.mode > 1
+                    final boolean collect = collector.mode > 1
                             || (child instanceof ASTStringLiteral || child instanceof ASTNumberLiteral);
                     if (collect) {
-                        String image = child.toString();
+                        final String image = child.toString();
                         collector.add(image);
                     }
                 } else {
@@ -787,7 +787,7 @@ public class Engine extends JexlEngine {
                 }
             }
         } else {
-            int num = node.jjtGetNumChildren();
+            final int num = node.jjtGetNumChildren();
             for (int i = 0; i < num; ++i) {
                 getVariables(script, node.jjtGetChild(i), collector);
             }
@@ -801,7 +801,7 @@ public class Engine extends JexlEngine {
      * @return the parameters which may be empty (but not null) if no parameters were defined
      * @since 3.0
      */
-    protected String[] getParameters(JexlScript script) {
+    protected String[] getParameters(final JexlScript script) {
         return script.getParameters();
     }
 
@@ -811,7 +811,7 @@ public class Engine extends JexlEngine {
      * @return the local variables array which may be empty (but not null) if no local variables were defined
      * @since 3.0
      */
-    protected String[] getLocalVariables(JexlScript script) {
+    protected String[] getLocalVariables(final JexlScript script) {
         return script.getLocalVariables();
     }
 
@@ -825,7 +825,7 @@ public class Engine extends JexlEngine {
      * @return the parsed tree
      * @throws JexlException if any error occurred during parsing
      */
-    protected ASTJexlScript parse(JexlInfo info, boolean expr, String src, Scope scope) {
+    protected ASTJexlScript parse(final JexlInfo info, final boolean expr, final String src, final Scope scope) {
         return parse(info, expr? this.expressionFeatures : this.scriptFeatures, src, scope);
     }
 
@@ -839,7 +839,7 @@ public class Engine extends JexlEngine {
      * @return the parsed tree
      * @throws JexlException if any error occurred during parsing
      */
-    protected ASTJexlScript parse(JexlInfo info, JexlFeatures parsingf, String src, Scope scope) {
+    protected ASTJexlScript parse(final JexlInfo info, final JexlFeatures parsingf, final String src, final Scope scope) {
         final boolean cached = src.length() < cacheThreshold && cache != null;
         final JexlFeatures features = parsingf != null? parsingf : DEFAULT_FEATURES;
         final Source source = cached? new Source(features, src) : null;
@@ -847,7 +847,7 @@ public class Engine extends JexlEngine {
         if (source != null) {
             script = cache.get(source);
             if (script != null) {
-                Scope f = script.getScope();
+                final Scope f = script.getScope();
                 if ((f == null && scope == null) || (f != null && f.equals(scope))) {
                     return script;
                 }
@@ -865,7 +865,7 @@ public class Engine extends JexlEngine {
             }
         } else {
             // ...otherwise parser was in use, create a new temporary one
-            Parser lparser = new Parser(new StringReader(";"));
+            final Parser lparser = new Parser(new StringReader(";"));
             script = lparser.parse(ninfo, features, src, scope);
         }
         if (source != null) {
@@ -879,7 +879,7 @@ public class Engine extends JexlEngine {
      * @param str expression to clean
      * @return trimmed expression ending in a semi-colon
      */
-    protected String trimSource(CharSequence str) {
+    protected String trimSource(final CharSequence str) {
         if (str != null) {
             int start = 0;
             int end = str.length();

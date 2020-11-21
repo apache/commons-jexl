@@ -38,7 +38,7 @@ public class AntishCallTest extends JexlTestCase {
      */
     public static class ClassReference {
         final Class<?> clazz;
-        ClassReference(Class<?> c) {
+        ClassReference(final Class<?> c) {
             this.clazz = c;
         }
     }
@@ -50,10 +50,10 @@ public class AntishCallTest extends JexlTestCase {
      * @param args the constructor arguments
      * @return an instance if that was possible
      */
-    public static Object callConstructor(JexlEngine engine, ClassReference ref, Object... args) {
+    public static Object callConstructor(final JexlEngine engine, final ClassReference ref, final Object... args) {
         return callConstructor(engine, ref.clazz, args);
     }
-    public static Object callConstructor(JexlEngine engine, Class<?> clazz, Object... args) {
+    public static Object callConstructor(final JexlEngine engine, final Class<?> clazz, final Object... args) {
         if (clazz == null || clazz.isPrimitive() || clazz.isInterface()
             || clazz.isMemberClass() || clazz.isAnnotation() || clazz.isArray()) {
             throw new ArithmeticException("not a constructible object");
@@ -72,15 +72,15 @@ public class AntishCallTest extends JexlTestCase {
      * An arithmetic that considers class objects as callable.
      */
     public class CallSupportArithmetic extends JexlArithmetic {
-        public CallSupportArithmetic(boolean strict) {
+        public CallSupportArithmetic(final boolean strict) {
             super(strict);
         }
 
-        public Object call(ClassReference clazz, Object... args) {
+        public Object call(final ClassReference clazz, final Object... args) {
             return callConstructor(null, clazz, args);
         }
 
-        public Object call(Class<?> clazz, Object... args) {
+        public Object call(final Class<?> clazz, final Object... args) {
             return callConstructor(null, clazz, args);
         }
     }
@@ -89,51 +89,51 @@ public class AntishCallTest extends JexlTestCase {
      * A context that considers class references as callable.
      */
     public static class CallSupportContext extends MapContext {
-        CallSupportContext(Map<String, Object> map) {
+        CallSupportContext(final Map<String, Object> map) {
             super(map);
         }
         private JexlEngine engine;
 
-        @Override public Object get(String str) {
+        @Override public Object get(final String str) {
             if (!super.has(str)) {
                 try {
                     return CallSupportContext.class.getClassLoader().loadClass(str);
-                } catch(Exception xany) {
+                } catch(final Exception xany) {
                     return null;
                 }
             }
             return super.get(str);
         }
 
-        @Override public boolean has(String str) {
+        @Override public boolean has(final String str) {
             if (!super.has(str)){
                 try {
                     return CallSupportContext.class.getClassLoader().loadClass(str) != null;
-                } catch(Exception xany) {
+                } catch(final Exception xany) {
                     return false;
                 }
             }
             return true;
         }
 
-        CallSupportContext engine(JexlEngine j) {
+        CallSupportContext engine(final JexlEngine j) {
             engine = j;
             return this;
         }
 
-        public Object call(ClassReference clazz, Object... args) {
+        public Object call(final ClassReference clazz, final Object... args) {
             return callConstructor(engine, clazz, args);
         }
 
-        public Object call(Class<?> clazz, Object... args) {
+        public Object call(final Class<?> clazz, final Object... args) {
             return callConstructor(engine, clazz, args);
         }
     }
 
     @Test
     public void testAntishContextVar() throws Exception {
-        Map<String,Object> lmap = new TreeMap<String,Object>();
-        JexlContext jc = new CallSupportContext(lmap).engine(JEXL);
+        final Map<String,Object> lmap = new TreeMap<String,Object>();
+        final JexlContext jc = new CallSupportContext(lmap).engine(JEXL);
         runTestCall(JEXL, jc);
         lmap.put("java.math.BigInteger", new ClassReference(BigInteger.class));
         runTestCall(JEXL, jc);
@@ -143,10 +143,10 @@ public class AntishCallTest extends JexlTestCase {
 
     @Test
     public void testAntishArithmetic() throws Exception {
-        CallSupportArithmetic ja = new CallSupportArithmetic(true);
-        JexlEngine jexl = new JexlBuilder().cache(512).arithmetic(ja).create();
-        Map<String,Object> lmap = new TreeMap<String,Object>();
-        JexlContext jc = new MapContext(lmap);
+        final CallSupportArithmetic ja = new CallSupportArithmetic(true);
+        final JexlEngine jexl = new JexlBuilder().cache(512).arithmetic(ja).create();
+        final Map<String,Object> lmap = new TreeMap<String,Object>();
+        final JexlContext jc = new MapContext(lmap);
         lmap.put("java.math.BigInteger", java.math.BigInteger.class);
         runTestCall(jexl, jc);
         lmap.put("java.math.BigInteger", new ClassReference(BigInteger.class));
@@ -155,27 +155,27 @@ public class AntishCallTest extends JexlTestCase {
         try {
             runTestCall(jexl, jc);
         Assert.fail("should have failed");
-        } catch(JexlException xjexl) {
+        } catch(final JexlException xjexl) {
             //
         }
     }
 
-    void runTestCall(JexlEngine jexl, JexlContext jc) throws Exception {
-        JexlScript check1 = jexl.createScript("var x = java.math.BigInteger; x('1234')");
-        JexlScript check2 = jexl.createScript("java.math.BigInteger('4321')");
+    void runTestCall(final JexlEngine jexl, final JexlContext jc) throws Exception {
+        final JexlScript check1 = jexl.createScript("var x = java.math.BigInteger; x('1234')");
+        final JexlScript check2 = jexl.createScript("java.math.BigInteger('4321')");
 
-        Object o1 = check1.execute(jc);
+        final Object o1 = check1.execute(jc);
         Assert.assertEquals("Result is not 1234", new java.math.BigInteger("1234"), o1);
 
-        Object o2 = check2.execute(jc);
+        final Object o2 = check2.execute(jc);
         Assert.assertEquals("Result is not 4321", new java.math.BigInteger("4321"), o2);
     }
     
     // JEXL-300
     @Test
     public void testSafeAnt() throws Exception {
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         ctxt.set("x.y.z", 42);
         JexlScript script;
         Object result;
@@ -189,9 +189,9 @@ public class AntishCallTest extends JexlTestCase {
         try {
             result = script.execute(ctxt);
             Assert.fail("antish var shall not be resolved");
-        } catch(JexlException.Variable xvar) {
+        } catch(final JexlException.Variable xvar) {
             Assert.assertEquals("x", xvar.getVariable());
-        } catch(JexlException xother) {
+        } catch(final JexlException xother) {
             Assert.assertNotNull(xother);
         } finally {
             options.setAntish(true);
@@ -207,7 +207,7 @@ public class AntishCallTest extends JexlTestCase {
         try {
              result = script.execute(ctxt);
              Assert.fail("not antish assign");
-        } catch(JexlException xjexl) {
+        } catch(final JexlException xjexl) {
             Assert.assertNull(result);
         }
         
@@ -216,7 +216,7 @@ public class AntishCallTest extends JexlTestCase {
         try {
              result = script.execute(ctxt);
              Assert.fail("x not defined");
-        } catch(JexlException xjexl) {
+        } catch(final JexlException xjexl) {
             Assert.assertNull(result);
         }
         
@@ -225,7 +225,7 @@ public class AntishCallTest extends JexlTestCase {
         try {
              result = script.execute(ctxt);
              Assert.fail("not antish assign");
-        } catch(JexlException xjexl) {
+        } catch(final JexlException xjexl) {
             Assert.assertNull(result);
         } 
         
@@ -234,7 +234,7 @@ public class AntishCallTest extends JexlTestCase {
         try {
              result = script.execute(ctxt);
              Assert.fail("not antish assign");
-        } catch(JexlException xjexl) {
+        } catch(final JexlException xjexl) {
             Assert.assertNull(result);
         }
     }

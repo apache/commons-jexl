@@ -39,7 +39,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
      * @param value the value to use as argument in map.put(key,value)
      * @return the executor if found, null otherwise
      */
-    public static MapSetExecutor discover(Introspector is, Class<?> clazz, Object identifier, Object value) {
+    public static MapSetExecutor discover(final Introspector is, final Class<?> clazz, final Object identifier, final Object value) {
         if (Map.class.isAssignableFrom(clazz)) {
             return new MapSetExecutor(clazz, MAP_SET, identifier, value);
         } else {
@@ -54,7 +54,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
      * @param key the key to use as 1st argument to the set method
      * @param value the value to use as 2nd argument to the set method
      */
-    private MapSetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object key, Object value) {
+    private MapSetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final Object key, final Object value) {
         super(clazz, method);
         property = key;
         valueClass = classOf(value);
@@ -66,7 +66,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     }
 
     @Override
-    public Object invoke(final Object obj, Object value) {
+    public Object invoke(final Object obj, final Object value) {
         @SuppressWarnings("unchecked") // ctor only allows Map instances - see discover() method
         final Map<Object,Object> map = ((Map<Object, Object>) obj);
         map.put(property, value);
@@ -74,7 +74,7 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
     }
 
     @Override
-    public Object tryInvoke(final Object obj, Object key, Object value) {
+    public Object tryInvoke(final Object obj, final Object key, final Object value) {
         if (obj != null
             && method != null
             && objectClass.equals(obj.getClass())

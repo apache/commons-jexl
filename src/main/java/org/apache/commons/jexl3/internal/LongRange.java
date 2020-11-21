@@ -38,7 +38,7 @@ public abstract class LongRange implements Collection<Long> {
      * @param to   the higher inclusive boundary
      * @return a range
      */
-    public static LongRange create(long from, long to) {
+    public static LongRange create(final long from, final long to) {
         if (from <= to) {
             return new LongRange.Ascending(from, to);
         } else {
@@ -51,7 +51,7 @@ public abstract class LongRange implements Collection<Long> {
      * @param from the lower inclusive boundary
      * @param to   the higher inclusive boundary
      */
-    protected LongRange(long from, long to) {
+    protected LongRange(final long from, final long to) {
         min = from;
         max = to;
     }
@@ -83,7 +83,7 @@ public abstract class LongRange implements Collection<Long> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -114,9 +114,9 @@ public abstract class LongRange implements Collection<Long> {
     }
 
     @Override
-    public boolean contains(Object o) {
+    public boolean contains(final Object o) {
         if (o instanceof Number) {
-            long v = ((Number) o).longValue();
+            final long v = ((Number) o).longValue();
             return min <= v && v <= max;
         } else {
             return false;
@@ -126,7 +126,7 @@ public abstract class LongRange implements Collection<Long> {
     @Override
     public Object[] toArray() {
         final int size = size();
-        Object[] array = new Object[size];
+        final Object[] array = new Object[size];
         for (int a = 0; a < size; ++a) {
             array[a] = min + a;
         }
@@ -135,7 +135,7 @@ public abstract class LongRange implements Collection<Long> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> T[] toArray(T[] array) {
+    public <T> T[] toArray(final T[] array) {
         final Class<?> ct = array.getClass().getComponentType();
         final int length = size();
         T[] copy = array;
@@ -155,8 +155,8 @@ public abstract class LongRange implements Collection<Long> {
     }
 
     @Override
-    public boolean containsAll(Collection<?> c) {
-        for (Object cc : c) {
+    public boolean containsAll(final Collection<?> c) {
+        for (final Object cc : c) {
             if (!contains(cc)) {
                 return false;
             }
@@ -165,27 +165,27 @@ public abstract class LongRange implements Collection<Long> {
     }
 
     @Override
-    public boolean add(Long e) {
+    public boolean add(final Long e) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean remove(Object o) {
+    public boolean remove(final Object o) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean addAll(Collection<? extends Long> c) {
+    public boolean addAll(final Collection<? extends Long> c) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean removeAll(Collection<?> c) {
+    public boolean removeAll(final Collection<?> c) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(final Collection<?> c) {
         throw new UnsupportedOperationException();
     }
 
@@ -203,7 +203,7 @@ public abstract class LongRange implements Collection<Long> {
          * @param from lower boundary
          * @param to upper boundary
          */
-        protected Ascending(long from, long to) {
+        protected Ascending(final long from, final long to) {
             super(from, to);
         }
 
@@ -222,7 +222,7 @@ public abstract class LongRange implements Collection<Long> {
          * @param from upper boundary
          * @param to lower boundary
          */
-        protected Descending(long from, long to) {
+        protected Descending(final long from, final long to) {
             super(from, to);
         }
 
@@ -249,7 +249,7 @@ class AscLongIterator implements Iterator<Long> {
      * @param l low boundary
      * @param h high boundary
      */
-    AscLongIterator(long l, long h) {
+    AscLongIterator(final long l, final long h) {
         min = l;
         max = h;
         cursor = min;
@@ -290,7 +290,7 @@ class DescLongIterator implements Iterator<Long> {
      * @param l low boundary
      * @param h high boundary
      */
-    DescLongIterator(long l, long h) {
+    DescLongIterator(final long l, final long h) {
         min = l;
         max = h;
         cursor = max;

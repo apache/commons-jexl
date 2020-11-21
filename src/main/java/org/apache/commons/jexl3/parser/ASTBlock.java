@@ -21,16 +21,16 @@ package org.apache.commons.jexl3.parser;
  */
 public class ASTBlock extends JexlLexicalNode {
 
-    public ASTBlock(int id) {
+    public ASTBlock(final int id) {
         super(id);
     }
 
-    public ASTBlock(Parser p, int id) {
+    public ASTBlock(final Parser p, final int id) {
         super(p, id);
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 }

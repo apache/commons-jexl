@@ -31,11 +31,11 @@ public class ASTIdentifier extends JexlNode {
     /** The captured variable flag. */
     private static final int CAPTURED = 2;
 
-    ASTIdentifier(int id) {
+    ASTIdentifier(final int id) {
         super(id);
     }
 
-    ASTIdentifier(Parser p, int id) {
+    ASTIdentifier(final Parser p, final int id) {
         super(p, id);
     }
 
@@ -44,14 +44,14 @@ public class ASTIdentifier extends JexlNode {
         return name;
     }
 
-    void setSymbol(String identifier) {
+    void setSymbol(final String identifier) {
         if (identifier.charAt(0) == '#') {
             symbol = Integer.parseInt(identifier.substring(1));
         }
         name = identifier;
     }
 
-    void setSymbol(int r, String identifier) {
+    void setSymbol(final int r, final String identifier) {
         symbol = r;
         name = identifier;
     }
@@ -67,7 +67,7 @@ public class ASTIdentifier extends JexlNode {
      * @param value true or false
      * @return the new flags mask value
      */
-    private static int set(int ordinal, int mask, boolean value) {
+    private static int set(final int ordinal, final int mask, final boolean value) {
         return value? mask | (1 << ordinal) : mask & ~(1 << ordinal);
     }
 
@@ -77,11 +77,11 @@ public class ASTIdentifier extends JexlNode {
      * @param mask the flags mask
      * @return the mask value with this flag or-ed in
      */
-    private static boolean isSet(int ordinal, int mask) {
+    private static boolean isSet(final int ordinal, final int mask) {
         return (mask & 1 << ordinal) != 0;
     }
       
-    public void setRedefined(boolean f) {
+    public void setRedefined(final boolean f) {
         flags = set(REDEFINED, flags, f);
     }
      
@@ -89,7 +89,7 @@ public class ASTIdentifier extends JexlNode {
         return isSet(REDEFINED, flags);
     }
     
-    public void setShaded(boolean f) {
+    public void setShaded(final boolean f) {
         flags = set(SHADED, flags, f);
     }
     
@@ -97,7 +97,7 @@ public class ASTIdentifier extends JexlNode {
         return isSet(SHADED, flags);
     }
     
-    public void setCaptured(boolean f) {
+    public void setCaptured(final boolean f) {
         flags = set(CAPTURED, flags, f);
     }
     
@@ -114,7 +114,7 @@ public class ASTIdentifier extends JexlNode {
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 }

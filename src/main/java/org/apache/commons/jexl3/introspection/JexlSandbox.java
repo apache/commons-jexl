@@ -96,7 +96,7 @@ public final class JexlSandbox {
      * if no permission is explicitly defined for a class.
      * @since 3.1
      */
-    public JexlSandbox(boolean ab) {
+    public JexlSandbox(final boolean ab) {
         this(ab, false, null);
     }
 
@@ -106,7 +106,7 @@ public final class JexlSandbox {
      * @param inh whether permissions on interfaces and classes are inherited (true) or not (false)
      * @since 3.2
      */
-    public JexlSandbox(boolean ab, boolean inh) {
+    public JexlSandbox(final boolean ab, final boolean inh) {
         this(ab, inh, null);
     }
 
@@ -115,7 +115,7 @@ public final class JexlSandbox {
      * @param map the permissions map
      */
     @Deprecated
-    protected JexlSandbox(Map<String, Permissions> map) {
+    protected JexlSandbox(final Map<String, Permissions> map) {
         this(true, false, map);
     }
 
@@ -126,7 +126,7 @@ public final class JexlSandbox {
      * @since 3.1
      */
     @Deprecated
-    protected JexlSandbox(boolean ab, Map<String, Permissions> map) {
+    protected JexlSandbox(final boolean ab, final Map<String, Permissions> map) {
         this(ab, false, map);
     }
 
@@ -137,7 +137,7 @@ public final class JexlSandbox {
      * @param map the permissions map
      * @since 3.2
      */
-    protected JexlSandbox(boolean ab, boolean inh, Map<String, Permissions> map) {
+    protected JexlSandbox(final boolean ab, final boolean inh, final Map<String, Permissions> map) {
         allow = ab;
         inherit = inh;
         sandbox = map != null? map : new HashMap<>();
@@ -148,8 +148,8 @@ public final class JexlSandbox {
      */
     public JexlSandbox copy() {
         // modified concurently at runtime so...
-        Map<String, Permissions> map = new ConcurrentHashMap<>();
-        for (Map.Entry<String, Permissions> entry : sandbox.entrySet()) {
+        final Map<String, Permissions> map = new ConcurrentHashMap<>();
+        for (final Map.Entry<String, Permissions> entry : sandbox.entrySet()) {
             map.put(entry.getKey(), entry.getValue().copy());
         }
         return new JexlSandbox(allow, inherit, map);
@@ -160,10 +160,10 @@ public final class JexlSandbox {
      * @param cname the class name
      * @return the class
      */
-    static Class<?> forName(String cname) {
+    static Class<?> forName(final String cname) {
         try {
             return Class.forName(cname);
-        } catch(Exception xany) {
+        } catch(final Exception xany) {
             return null;
         }
     }
@@ -175,7 +175,7 @@ public final class JexlSandbox {
      * @param name the property name
      * @return null if not allowed, the name of the property to use otherwise
      */
-    public String read(Class<?> clazz, String name) {
+    public String read(final Class<?> clazz, final String name) {
         return get(clazz).read().get(name);
     }
 
@@ -187,7 +187,7 @@ public final class JexlSandbox {
      * @return null if not allowed, the name of the property to use otherwise
      */
     @Deprecated
-    public String read(String clazz, String name) {
+    public String read(final String clazz, final String name) {
         return get(clazz).read().get(name);
     }
 
@@ -198,7 +198,7 @@ public final class JexlSandbox {
      * @param name the property name
      * @return null if not allowed, the name of the property to use otherwise
      */
-    public String write(Class<?> clazz, String name) {
+    public String write(final Class<?> clazz, final String name) {
         return get(clazz).write().get(name);
     }
 
@@ -210,7 +210,7 @@ public final class JexlSandbox {
      * @return null if not allowed, the name of the property to use otherwise
      */
     @Deprecated
-    public String write(String clazz, String name) {
+    public String write(final String clazz, final String name) {
         return get(clazz).write().get(name);
     }
 
@@ -221,8 +221,8 @@ public final class JexlSandbox {
      * @param name the method name
      * @return null if not allowed, the name of the method to use otherwise
      */
-    public String execute(Class<?> clazz, String name) {
-        String m = get(clazz).execute().get(name);
+    public String execute(final Class<?> clazz, final String name) {
+        final String m = get(clazz).execute().get(name);
         return "".equals(name) && m != null? clazz.getName() : m;
     }
 
@@ -234,8 +234,8 @@ public final class JexlSandbox {
      * @return null if not allowed, the name of the method to use otherwise
      */
     @Deprecated
-    public String execute(String clazz, String name) {
-        String m = get(clazz).execute().get(name);
+    public String execute(final String clazz, final String name) {
+        final String m = get(clazz).execute().get(name);
         return "".equals(name) && m != null? clazz : m;
     }
 
@@ -260,7 +260,7 @@ public final class JexlSandbox {
          * @param alias the alias
          * @return  true if the alias was added, false if it was already present
          */
-        public boolean alias(String name, String alias) {
+        public boolean alias(final String name, final String alias) {
             return false;
         }
 
@@ -270,7 +270,7 @@ public final class JexlSandbox {
          * @param name the method/property name to check
          * @return null if not allowed, the actual name to use otherwise
          */
-        public String get(String name) {
+        public String get(final String name) {
             return name;
         }
 
@@ -287,7 +287,7 @@ public final class JexlSandbox {
      */
     private static final Names ALLOW_NAMES = new Names() {
         @Override
-        public boolean add(String name) {
+        public boolean add(final String name) {
             return false;
         }
 
@@ -302,7 +302,7 @@ public final class JexlSandbox {
      */
     private static final Names BLOCK_NAMES = new Names() {
         @Override
-        public boolean add(String name) {
+        public boolean add(final String name) {
             return false;
         }
 
@@ -312,7 +312,7 @@ public final class JexlSandbox {
         }
 
         @Override
-        public String get(String name) {
+        public String get(final String name) {
             return null;
         }
     };
@@ -326,13 +326,13 @@ public final class JexlSandbox {
 
         @Override
         protected Names copy() {
-            AllowSet copy = new AllowSet();
+            final AllowSet copy = new AllowSet();
             copy.names = names == null ? null : new HashMap<>(names);
             return copy;
         }
 
         @Override
-        public boolean add(String name) {
+        public boolean add(final String name) {
             if (names == null) {
                 names = new HashMap<>();
             }
@@ -340,7 +340,7 @@ public final class JexlSandbox {
         }
 
         @Override
-        public boolean alias(String name, String alias) {
+        public boolean alias(final String name, final String alias) {
             if (names == null) {
                 names = new HashMap<>();
             }
@@ -348,7 +348,7 @@ public final class JexlSandbox {
         }
 
         @Override
-        public String get(String name) {
+        public String get(final String name) {
             return names == null ? name : names.get(name);
         }
     }
@@ -362,13 +362,13 @@ public final class JexlSandbox {
 
         @Override
         protected Names copy() {
-            BlockSet copy = new BlockSet();
+            final BlockSet copy = new BlockSet();
             copy.names = names == null ? null : new HashSet<>(names);
             return copy;
         }
 
         @Override
-        public boolean add(String name) {
+        public boolean add(final String name) {
             if (names == null) {
                 names = new HashSet<>();
             }
@@ -376,7 +376,7 @@ public final class JexlSandbox {
         }
 
         @Override
-        public String get(String name) {
+        public String get(final String name) {
             return names != null && !names.contains(name) ? name : null;
         }
     }
@@ -414,7 +414,7 @@ public final class JexlSandbox {
          * @param writeFlag whether the write property list is allow or block
          * @param executeFlag whether the method list is allow of block
          */
-        Permissions(boolean inherit, boolean readFlag, boolean writeFlag, boolean executeFlag) {
+        Permissions(final boolean inherit, final boolean readFlag, final boolean writeFlag, final boolean executeFlag) {
             this(inherit,
                     readFlag ? new AllowSet() : new BlockSet(),
                     writeFlag ? new AllowSet() : new BlockSet(),
@@ -429,7 +429,7 @@ public final class JexlSandbox {
          * @param nwrite the write set
          * @param nexecute the method set
          */
-        Permissions(boolean inherit, Names nread, Names nwrite, Names nexecute) {
+        Permissions(final boolean inherit, final Names nread, final Names nwrite, final Names nexecute) {
             this.read = nread != null ? nread : ALLOW_NAMES;
             this.write = nwrite != null ? nwrite : ALLOW_NAMES;
             this.execute = nexecute != null ? nexecute : ALLOW_NAMES;
@@ -456,8 +456,8 @@ public final class JexlSandbox {
          * @param pnames the property names
          * @return this instance of permissions
          */
-        public Permissions read(String... pnames) {
-            for (String pname : pnames) {
+        public Permissions read(final String... pnames) {
+            for (final String pname : pnames) {
                 read.add(pname);
             }
             return this;
@@ -469,8 +469,8 @@ public final class JexlSandbox {
          * @param pnames the property names
          * @return this instance of permissions
          */
-        public Permissions write(String... pnames) {
-            for (String pname : pnames) {
+        public Permissions write(final String... pnames) {
+            for (final String pname : pnames) {
                 write.add(pname);
             }
             return this;
@@ -483,8 +483,8 @@ public final class JexlSandbox {
          * @param mnames the method names
          * @return this instance of permissions
          */
-        public Permissions execute(String... mnames) {
-            for (String mname : mnames) {
+        public Permissions execute(final String... mnames) {
+            for (final String mname : mnames) {
                 execute.add(mname);
             }
             return this;
@@ -537,7 +537,7 @@ public final class JexlSandbox {
      * @param executeFlag whether the executable method list is allow allow - true - or block - false -
      * @return the set of permissions
      */
-    public Permissions permissions(String clazz, boolean readFlag, boolean writeFlag, boolean executeFlag) {
+    public Permissions permissions(final String clazz, final boolean readFlag, final boolean writeFlag, final boolean executeFlag) {
         return permissions(clazz, inherit, readFlag, writeFlag, executeFlag);
     }
         
@@ -551,8 +551,8 @@ public final class JexlSandbox {
      * @param execf whether the executable method list is allow allow - true - or block - false -
      * @return the set of permissions
      */
-    public Permissions permissions(String clazz, boolean inhf,  boolean readf, boolean writef, boolean execf) {
-        Permissions box = new Permissions(inhf, readf, writef, execf);
+    public Permissions permissions(final String clazz, final boolean inhf,  final boolean readf, final boolean writef, final boolean execf) {
+        final Permissions box = new Permissions(inhf, readf, writef, execf);
         sandbox.put(clazz, box);
         return box;
     }
@@ -564,7 +564,7 @@ public final class JexlSandbox {
      * @param clazz the allowed class name
      * @return the permissions instance
      */
-    public Permissions allow(String clazz) {
+    public Permissions allow(final String clazz) {
         return permissions(clazz, true, true, true);
     }
     /** 
@@ -573,7 +573,7 @@ public final class JexlSandbox {
      * @return the permissions instance
      */
     @Deprecated
-    public Permissions white(String clazz) {
+    public Permissions white(final String clazz) {
         return allow(clazz);
     }
 
@@ -584,7 +584,7 @@ public final class JexlSandbox {
      * @param clazz the blocked class name
      * @return the permissions instance
      */
-    public Permissions block(String clazz) {
+    public Permissions block(final String clazz) {
         return permissions(clazz, false, false, false);
     }
         
@@ -594,7 +594,7 @@ public final class JexlSandbox {
      * @return the permissions instance
      */
     @Deprecated
-    public Permissions black(String clazz) {
+    public Permissions black(final String clazz) {
         return block(clazz);
     }
 
@@ -604,11 +604,11 @@ public final class JexlSandbox {
      * @param clazz the class name
      * @return the defined permissions or an all-allow permission instance if none were defined
      */
-    public Permissions get(String clazz) {
+    public Permissions get(final String clazz) {
         if (inherit) {
             return get(forName(clazz));
         }
-        Permissions permissions = sandbox.get(clazz);
+        final Permissions permissions = sandbox.get(clazz);
         if (permissions == null) {
             return allow ? ALLOW_ALL : BLOCK_ALL;
         } else {
@@ -622,12 +622,12 @@ public final class JexlSandbox {
      * @return the permissions
      */
     @SuppressWarnings("null") // clazz can not be null since permissions would be not null and block;
-    public Permissions get(Class<?> clazz) {
+    public Permissions get(final Class<?> clazz) {
         Permissions permissions = clazz == null ? BLOCK_ALL : sandbox.get(clazz.getName());
         if (permissions == null) {
             if (inherit) {
                 // find first inherited interface that defines permissions
-                for (Class<?> inter : clazz.getInterfaces()) {
+                for (final Class<?> inter : clazz.getInterfaces()) {
                     permissions = sandbox.get(inter.getName());
                     if (permissions != null && permissions.isInheritable()) {
                         break;

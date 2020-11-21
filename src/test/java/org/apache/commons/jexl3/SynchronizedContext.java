@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
 public class SynchronizedContext extends MapContext implements JexlContext.AnnotationProcessor {
     private final JexlContext context;
 
-    public SynchronizedContext(JexlContext ctxt) {
+    public SynchronizedContext(final JexlContext ctxt) {
         this.context = ctxt;
     }
 
@@ -34,9 +34,9 @@ public class SynchronizedContext extends MapContext implements JexlContext.Annot
      * @param script the script
      * @return the script value
      */
-    public Object call(Object var, JexlScript script) {
-        String[] parms = script.getParameters();
-        boolean varisarg = parms != null && parms.length == 1;
+    public Object call(final Object var, final JexlScript script) {
+        final String[] parms = script.getParameters();
+        final boolean varisarg = parms != null && parms.length == 1;
         if (var == null) {
             return varisarg ? script.execute(context, var) : script.execute(context);
         } else {
@@ -47,21 +47,21 @@ public class SynchronizedContext extends MapContext implements JexlContext.Annot
     }
 
     @Override
-    public Object get(String name) {
+    public Object get(final String name) {
         synchronized (this) {
             return super.get(name);
         }
     }
 
     @Override
-    public void set(String name, Object value) {
+    public void set(final String name, final Object value) {
         synchronized (this) {
             super.set(name, value);
         }
     }
 
     @Override
-    public Object processAnnotation(String name, Object[] args, Callable<Object> statement) throws Exception {
+    public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {
         if ("synchronized".equals(name)) {
             final Object arg = args[0];
             synchronized(arg) {

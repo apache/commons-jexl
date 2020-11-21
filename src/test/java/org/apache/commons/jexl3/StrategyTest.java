@@ -38,23 +38,23 @@ public class StrategyTest extends JexlTestCase {
 
     // JEXL-174
     public static class MapArithmetic extends JexlArithmetic {
-        public MapArithmetic(boolean flag) {
+        public MapArithmetic(final boolean flag) {
             super(flag);
         }
 
-        public Object propertyGet(Map<?,?> map, Object identifier) {
+        public Object propertyGet(final Map<?,?> map, final Object identifier) {
             return arrayGet(map, identifier);
         }
 
-        public Object propertySet(Map<Object, Object> map, Object identifier, Object value) {
+        public Object propertySet(final Map<Object, Object> map, final Object identifier, final Object value) {
              return arraySet(map, identifier, value);
         }
 
-        public Object arrayGet(Map<?,?> map, Object identifier) {
+        public Object arrayGet(final Map<?,?> map, final Object identifier) {
             return map.get(identifier);
         }
 
-        public Object arraySet(Map<Object, Object> map, Object identifier, Object value) {
+        public Object arraySet(final Map<Object, Object> map, final Object identifier, final Object value) {
              map.put(identifier, value);
              return value;
         }
@@ -62,18 +62,18 @@ public class StrategyTest extends JexlTestCase {
 
     @Test
     public void testRawResolvers() throws Exception {
-        Object map  = new HashMap<String, Object>();
+        final Object map  = new HashMap<String, Object>();
         final JexlEngine jexl = new JexlBuilder().create();
-        JexlUberspect uberspect = jexl.getUberspect();
-        JexlUberspect.PropertyResolver rfieldp = JexlUberspect.JexlResolver.FIELD;
-        JexlPropertyGet fget = rfieldp.getPropertyGet(uberspect, map, "key");
+        final JexlUberspect uberspect = jexl.getUberspect();
+        final JexlUberspect.PropertyResolver rfieldp = JexlUberspect.JexlResolver.FIELD;
+        final JexlPropertyGet fget = rfieldp.getPropertyGet(uberspect, map, "key");
         Assert.assertNull(fget);
-        JexlPropertySet fset = rfieldp.getPropertySet(uberspect, map, "key", "value");
+        final JexlPropertySet fset = rfieldp.getPropertySet(uberspect, map, "key", "value");
         Assert.assertNull(fset);
-        JexlUberspect.PropertyResolver rmap = JexlUberspect.JexlResolver.MAP;
-        JexlPropertyGet mget = rmap.getPropertyGet(uberspect, map, "key");
+        final JexlUberspect.PropertyResolver rmap = JexlUberspect.JexlResolver.MAP;
+        final JexlPropertyGet mget = rmap.getPropertyGet(uberspect, map, "key");
         Assert.assertNotNull(mget);
-        JexlPropertySet mset = rmap.getPropertySet(uberspect, map, "key", "value");
+        final JexlPropertySet mset = rmap.getPropertySet(uberspect, map, "key", "value");
         Assert.assertNotNull(mset);
     }
 
@@ -95,9 +95,9 @@ public class StrategyTest extends JexlTestCase {
         run171(jexl, false);
     }
 
-    public void run171(JexlEngine jexl, boolean std) throws Exception {
+    public void run171(final JexlEngine jexl, final boolean std) throws Exception {
         Object result;
-        Map<String, Object> i = new HashMap<String, Object>();
+        final Map<String, Object> i = new HashMap<String, Object>();
 
         i.put("class", 42);
         result = jexl.createScript("i['class'] ", "i").execute((JexlContext)null, i);

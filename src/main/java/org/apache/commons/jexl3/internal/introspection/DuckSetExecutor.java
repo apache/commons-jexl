@@ -51,7 +51,7 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
      * @param value the value to use as 2nd argument to the set method
      * @return the executor if found, null otherwise
      */
-    public static DuckSetExecutor discover(Introspector is, Class<?> clazz, Object key, Object value) {
+    public static DuckSetExecutor discover(final Introspector is, final Class<?> clazz, final Object key, final Object value) {
         java.lang.reflect.Method method = is.getMethod(clazz, "set", makeArgs(key, value));
         if (method == null) {
             method = is.getMethod(clazz, "put", makeArgs(key, value));
@@ -66,7 +66,7 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
      * @param key the key to use as 1st argument to the set method
      * @param value the value to use as 2nd argument to the set method
      */
-    private DuckSetExecutor(Class<?> clazz, java.lang.reflect.Method method, Object key, Object value) {
+    private DuckSetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final Object key, final Object value) {
         super(clazz, method);
         property = key;
         valueClass = classOf(value);
@@ -78,8 +78,8 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
     }
 
     @Override
-    public Object invoke(Object obj, Object value) throws IllegalAccessException, InvocationTargetException {
-        Object[] pargs = {property, value};
+    public Object invoke(final Object obj, final Object value) throws IllegalAccessException, InvocationTargetException {
+        final Object[] pargs = {property, value};
         if (method != null) {
                 method.invoke(obj, pargs);
             }
@@ -87,7 +87,7 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
     }
 
     @Override
-    public Object tryInvoke(Object obj, Object key, Object value) {
+    public Object tryInvoke(final Object obj, final Object key, final Object value) {
         if (obj != null
             && objectClass.equals(obj.getClass())
             && method !=  null
@@ -95,12 +95,12 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
                 || (property == null && key == null))
             && valueClass.equals(classOf(value))) {
             try {
-                Object[] args = {property, value};
+                final Object[] args = {property, value};
                 method.invoke(obj, args);
                 return value;
             } catch (IllegalAccessException | IllegalArgumentException xill) {
                 return TRY_FAILED;// fail
-            } catch (InvocationTargetException xinvoke) {
+            } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw
             } 
         }

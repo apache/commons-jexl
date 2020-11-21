@@ -55,7 +55,7 @@ public abstract class JxltEngine {
          * @param msg the exception message
          * @param cause the exception cause
          */
-        public Exception(JexlInfo info, String msg, Throwable cause) {
+        public Exception(final JexlInfo info, final String msg, final Throwable cause) {
             super(info, msg, cause);
         }
     }
@@ -213,7 +213,7 @@ public abstract class JxltEngine {
      * @return the {@link Expression}, null if silent and an error occurred
      * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
      */
-    public Expression createExpression(String expression) {
+    public Expression createExpression(final String expression) {
         return createExpression(null, expression);
     }
 
@@ -355,7 +355,7 @@ public abstract class JxltEngine {
      * @param source the source
      * @return the template
      */
-    public Template createTemplate(JexlInfo info, String source, String... parms) {
+    public Template createTemplate(final JexlInfo info, final String source, final String... parms) {
         return createTemplate(info, "$$", new StringReader(source), parms);
     }
 
@@ -366,7 +366,7 @@ public abstract class JxltEngine {
      * @param source the source
      * @return the template
      */
-    public Template createTemplate(JexlInfo info, String source) {
+    public Template createTemplate(final JexlInfo info, final String source) {
         return createTemplate(info, "$$", new StringReader(source), (String[]) null);
     }
 
@@ -378,7 +378,7 @@ public abstract class JxltEngine {
      * @param parms the parameter names
      * @return the template
      */
-    public Template createTemplate(String prefix, Reader source, String... parms) {
+    public Template createTemplate(final String prefix, final Reader source, final String... parms) {
         return createTemplate(null, prefix, source, parms);
     }
 
@@ -389,7 +389,7 @@ public abstract class JxltEngine {
      * @param parms the parameter names
      * @return the template
      */
-    public Template createTemplate(String source, String... parms) {
+    public Template createTemplate(final String source, final String... parms) {
         return createTemplate(null, source, parms);
     }
 
@@ -399,7 +399,7 @@ public abstract class JxltEngine {
      * @param source the source
      * @return the template
      */
-    public Template createTemplate(String source) {
+    public Template createTemplate(final String source) {
         return createTemplate(null, source);
     }
 

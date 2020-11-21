@@ -38,17 +38,17 @@ public class MethodPropertyTest {
          * First step is to retrieve an instance of a JexlEngine;
          * it might be already existing and shared or created anew.
          */
-        JexlEngine jexl = new JexlBuilder().create();
+        final JexlEngine jexl = new JexlBuilder().create();
         /*
          *  Second make a jexlContext and put stuff in it
          */
-        JexlContext jc = new MapContext();
+        final JexlContext jc = new MapContext();
 
         /*
          * The Java equivalents of foo and number for comparison and checking
          */
-        Foo foo = new Foo();
-        Integer number = 10;
+        final Foo foo = new Foo();
+        final Integer number = 10;
 
         jc.set("foo", foo);
         jc.set("number", number);
@@ -101,7 +101,7 @@ public class MethodPropertyTest {
          * @param arg property name.
          * @return arg prefixed with 'This is the property '.
          */
-        public String get(String arg) {
+        public String get(final String arg) {
             return "This is the property " + arg;
         }
 
@@ -110,7 +110,7 @@ public class MethodPropertyTest {
          * @param i a long.
          * @return The argument prefixed with 'The value is : '
          */
-        public String convert(long i) {
+        public String convert(final long i) {
             return "The value is : " + i;
         }
     }
@@ -130,7 +130,7 @@ public class MethodPropertyTest {
      * @param args command line arguments
      * @throws Exception cos jexl does.
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         example(Output.SYSTEM);
     }
 }

@@ -45,7 +45,7 @@ public class SimpleNode implements Node {
      * Creates a SimpleNode instance.
      * @param i the node type identifier
      */
-    public SimpleNode(int i) {
+    public SimpleNode(final int i) {
         id = i;
     }
 
@@ -54,7 +54,7 @@ public class SimpleNode implements Node {
      * @param p the parser instance
      * @param i the node type identifier
      */
-    public SimpleNode(Parser p, int i) {
+    public SimpleNode(final Parser p, final int i) {
         this(i);
     }
 
@@ -71,7 +71,7 @@ public class SimpleNode implements Node {
      * @param n the parent
      */
     @Override
-    public void jjtSetParent(Node n) {
+    public void jjtSetParent(final Node n) {
         parent = (JexlNode) n;
     }
 
@@ -89,11 +89,11 @@ public class SimpleNode implements Node {
      * @param i the child offset
      */
     @Override
-    public void jjtAddChild(Node n, int i) {
+    public void jjtAddChild(final Node n, final int i) {
         if (children == null) {
             children = new JexlNode[i + 1];
         } else if (i >= children.length) {
-            JexlNode[] c = new JexlNode[i + 1];
+            final JexlNode[] c = new JexlNode[i + 1];
             System.arraycopy(children, 0, c, 0, children.length);
             children = c;
         }
@@ -101,7 +101,7 @@ public class SimpleNode implements Node {
     }
 
     // For use by ASTJexlScript only
-    void jjtSetChildren(JexlNode[] jexlNodes) {
+    void jjtSetChildren(final JexlNode[] jexlNodes) {
         children = jexlNodes;
     }
 
@@ -111,7 +111,7 @@ public class SimpleNode implements Node {
      * @return the child node
      */
     @Override
-    public JexlNode jjtGetChild(int i) {
+    public JexlNode jjtGetChild(final int i) {
         return children[i];
     }
 
@@ -127,7 +127,7 @@ public class SimpleNode implements Node {
     /** Sets this node value.
      * @param value
      */
-    public void jjtSetValue(Object value) {
+    public void jjtSetValue(final Object value) {
         this.value = value;
     }
 
@@ -145,7 +145,7 @@ public class SimpleNode implements Node {
      * @return result of visit
      **/
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 
@@ -155,9 +155,9 @@ public class SimpleNode implements Node {
      * @param data contextual data
      * @return result of visit
      **/
-    public Object childrenAccept(ParserVisitor visitor, Object data) {
+    public Object childrenAccept(final ParserVisitor visitor, final Object data) {
         if (children != null) {
-            for (JexlNode child : children) {
+            for (final JexlNode child : children) {
                 child.jjtAccept(visitor, data);
             }
         }
@@ -174,16 +174,16 @@ public class SimpleNode implements Node {
         return ParserTreeConstants.jjtNodeName[id];
     }
 
-    public String toString(String prefix) {
+    public String toString(final String prefix) {
         return prefix + toString();
     }
 
     /* Override this method if you want to customize how the JexlNode dumps
     out its children. */
-    public void dump(String prefix) {
+    public void dump(final String prefix) {
         System.out.println(toString(prefix));
         if (children != null) {
-            for (SimpleNode n : children) {
+            for (final SimpleNode n : children) {
                 if (n != null) {
                     n.dump(prefix + " ");
                 }

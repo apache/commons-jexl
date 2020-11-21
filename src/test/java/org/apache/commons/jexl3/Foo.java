@@ -55,11 +55,11 @@ public class Foo {
         return "String : quux";
     }
 
-    public String repeat(String str) {
+    public String repeat(final String str) {
         return "Repeat : " + str;
     }
 
-    public String convertBoolean(boolean b)
+    public String convertBoolean(final boolean b)
     {
         return "Boolean : " + b;
     }
@@ -70,7 +70,7 @@ public class Foo {
 
     public List<String> getCheeseList()
     {
-        ArrayList<String> answer = new ArrayList<String>();
+        final ArrayList<String> answer = new ArrayList<String>();
         answer.add("cheddar");
         answer.add("edam");
         answer.add("brie");
@@ -97,7 +97,7 @@ public class Foo {
         return true;
     }
 
-    public int square(int value)
+    public int square(final int value)
     {
         return value * value;
     }
@@ -123,7 +123,7 @@ public class Foo {
         return property1;
     }
 
-    public void setProperty1(String newValue) {
+    public void setProperty1(final String newValue) {
         property1 = newValue;
     }
 }

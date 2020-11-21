@@ -37,10 +37,10 @@ public class IfTest extends JexlTestCase {
      */
     @Test
     public void testSimpleIfTrue() throws Exception {
-        JexlScript e = JEXL.createScript("if (true) 1");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("if (true) 1");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertEquals("Result is not 1", new Integer(1), o);
     }
 
@@ -51,10 +51,10 @@ public class IfTest extends JexlTestCase {
      */
     @Test
     public void testSimpleIfFalse() throws Exception {
-        JexlScript e = JEXL.createScript("if (false) 1");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("if (false) 1");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertNull("Return value is not empty", o);
     }
 
@@ -65,10 +65,10 @@ public class IfTest extends JexlTestCase {
      */
     @Test
     public void testSimpleElse() throws Exception {
-        JexlScript e = JEXL.createScript("if (false) 1 else 2;");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("if (false) 1 else 2;");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertEquals("Result is not 2", new Integer(2), o);
     }
 
@@ -79,10 +79,10 @@ public class IfTest extends JexlTestCase {
      */
     @Test
     public void testBlockIfTrue() throws Exception {
-        JexlScript e = JEXL.createScript("if (true) { 'hello'; }");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("if (true) { 'hello'; }");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertEquals("Result is wrong", "hello", o);
     }
 
@@ -93,10 +93,10 @@ public class IfTest extends JexlTestCase {
      */
     @Test
     public void testBlockElse() throws Exception {
-        JexlScript e = JEXL.createScript("if (false) {1} else {2 ; 3}");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("if (false) {1} else {2 ; 3}");
+        final JexlContext jc = new MapContext();
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertEquals("Result is wrong", new Integer(3), o);
     }
 
@@ -107,17 +107,17 @@ public class IfTest extends JexlTestCase {
      */
     @Test
     public void testIfWithSimpleExpression() throws Exception {
-        JexlScript e = JEXL.createScript("if (x == 1) true;");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("if (x == 1) true;");
+        final JexlContext jc = new MapContext();
         jc.set("x", new Integer(1));
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
     @Test
     public void testIfElseIfExpression() throws Exception {
-        JexlScript e = JEXL.createScript("if (x == 1) { 10; } else if (x == 2) 20  else 30", "x");
+        final JexlScript e = JEXL.createScript("if (x == 1) { 10; } else if (x == 2) 20  else 30", "x");
         Object o = e.execute(null, 1);
         Assert.assertEquals(10, o);
         o = e.execute(null, 2);
@@ -128,7 +128,7 @@ public class IfTest extends JexlTestCase {
 
     @Test
     public void testIfElseIfReturnExpression0() throws Exception {
-        JexlScript e = JEXL.createScript(
+        final JexlScript e = JEXL.createScript(
                 "if (x == 1) return 10; if (x == 2)  return 20; else if (x == 3) return 30  else { return 40 }",
                 "x");
         Object o = e.execute(null, 1);
@@ -143,7 +143,7 @@ public class IfTest extends JexlTestCase {
 
     @Test
     public void testIfElseIfReturnExpression() throws Exception {
-        JexlScript e = JEXL.createScript(
+        final JexlScript e = JEXL.createScript(
                 "if (x == 1) return 10;  if (x == 2) return 20  else if (x == 3) return 30; else return 40;",
                 "x");
         Object o = e.execute(null, 1);
@@ -163,11 +163,11 @@ public class IfTest extends JexlTestCase {
      */
     @Test
     public void testIfWithArithmeticExpression() throws Exception {
-        JexlScript e = JEXL.createScript("if ((x * 2) + 1 == 5) true;");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("if ((x * 2) + 1 == 5) true;");
+        final JexlContext jc = new MapContext();
         jc.set("x", new Integer(2));
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
@@ -178,11 +178,11 @@ public class IfTest extends JexlTestCase {
      */
     @Test
     public void testIfWithDecimalArithmeticExpression() throws Exception {
-        JexlScript e = JEXL.createScript("if ((x * 2) == 5) true");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("if ((x * 2) == 5) true");
+        final JexlContext jc = new MapContext();
         jc.set("x", new Float(2.5f));
 
-        Object o = e.execute(jc);
+        final Object o = e.execute(jc);
         Assert.assertEquals("Result is not true", Boolean.TRUE, o);
     }
 
@@ -193,12 +193,12 @@ public class IfTest extends JexlTestCase {
      */
     @Test
     public void testIfWithAssignment() throws Exception {
-        JexlScript e = JEXL.createScript("if ((x * 2) == 5) {y = 1} else {y = 2;}");
-        JexlContext jc = new MapContext();
+        final JexlScript e = JEXL.createScript("if ((x * 2) == 5) {y = 1} else {y = 2;}");
+        final JexlContext jc = new MapContext();
         jc.set("x", new Float(2.5f));
 
         e.execute(jc);
-        Object result = jc.get("y");
+        final Object result = jc.get("y");
         Assert.assertEquals("y has the wrong value", new Integer(1), result);
     }
 
@@ -209,11 +209,11 @@ public class IfTest extends JexlTestCase {
      */
     @Test
     public void testTernary() throws Exception {
-        JexlEngine jexl = JEXL;
+        final JexlEngine jexl = JEXL;
 
-        JexlEvalContext jc = new JexlEvalContext();
-        JexlOptions options = jc.getEngineOptions();
-        JexlExpression e = jexl.createExpression("x.y.z = foo ?'bar':'quux'");
+        final JexlEvalContext jc = new JexlEvalContext();
+        final JexlOptions options = jc.getEngineOptions();
+        final JexlExpression e = jexl.createExpression("x.y.z = foo ?'bar':'quux'");
         Object o;
 
         // undefined foo
@@ -269,10 +269,10 @@ public class IfTest extends JexlTestCase {
      */
     @Test
     public void testTernaryShorthand() throws Exception {
-        JexlEvalContext jc = new JexlEvalContext();
-        JexlOptions options = jc.getEngineOptions();
-        JexlExpression e = JEXL.createExpression("x.y.z = foo?:'quux'");
-        JexlExpression f = JEXL.createExpression("foo??'quux'");
+        final JexlEvalContext jc = new JexlEvalContext();
+        final JexlOptions options = jc.getEngineOptions();
+        final JexlExpression e = JEXL.createExpression("x.y.z = foo?:'quux'");
+        final JexlExpression f = JEXL.createExpression("foo??'quux'");
         Object o;
 
         // undefined foo
@@ -395,14 +395,14 @@ public class IfTest extends JexlTestCase {
     @Test
     public void testNullCoaelescing() throws Exception {
         Object o;
-        JexlEvalContext jc = new JexlEvalContext();
-        JexlExpression xtrue = JEXL.createExpression("x??true");
+        final JexlEvalContext jc = new JexlEvalContext();
+        final JexlExpression xtrue = JEXL.createExpression("x??true");
         o = xtrue.evaluate(jc);
         Assert.assertEquals("Should be true", true, o);
         jc.set("x", false);
         o = xtrue.evaluate(jc);
         Assert.assertEquals("Should be false", false, o);
-        JexlExpression yone = JEXL.createExpression("y??1");
+        final JexlExpression yone = JEXL.createExpression("y??1");
         o = yone.evaluate(jc);
         Assert.assertEquals("Should be 1", 1, o);
         jc.set("y", 0);
@@ -414,14 +414,14 @@ public class IfTest extends JexlTestCase {
     @Test
     public void testNullCoaelescingScript() throws Exception {
         Object o;
-        JexlEvalContext jc = new JexlEvalContext();
-        JexlScript xtrue = JEXL.createScript("x??true");
+        final JexlEvalContext jc = new JexlEvalContext();
+        final JexlScript xtrue = JEXL.createScript("x??true");
         o = xtrue.execute(jc);
         Assert.assertEquals("Should be true", true, o);
         jc.set("x", false);
         o = xtrue.execute(jc);
         Assert.assertEquals("Should be false", false, o);
-        JexlScript yone = JEXL.createScript("y??1");
+        final JexlScript yone = JEXL.createScript("y??1");
         o = yone.execute(jc);
         Assert.assertEquals("Should be 1", 1, o);
         jc.set("y", 0);
@@ -433,16 +433,16 @@ public class IfTest extends JexlTestCase {
 
     @Test
     public void testTernaryFail() throws Exception {
-        JexlEvalContext jc = new JexlEvalContext();
-        JexlOptions options = jc.getEngineOptions();
-        JexlExpression e = JEXL.createExpression("false ? bar : quux");
+        final JexlEvalContext jc = new JexlEvalContext();
+        final JexlOptions options = jc.getEngineOptions();
+        final JexlExpression e = JEXL.createExpression("false ? bar : quux");
         Object o;
         options.setStrict(true);
         options.setSilent(false);
         try {
            o = e.evaluate(jc);
            Assert.fail("Should have failed");
-        } catch (JexlException xjexl) {
+        } catch (final JexlException xjexl) {
            // OK
            Assert.assertTrue(xjexl.toString().contains("quux"));
         }

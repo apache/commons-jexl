@@ -84,13 +84,13 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param opts     the evaluation options
      * @param aContext the evaluation context
      */
-    protected InterpreterBase(Engine engine, JexlOptions opts, JexlContext aContext) {
+    protected InterpreterBase(final Engine engine, final JexlOptions opts, final JexlContext aContext) {
         this.jexl = engine;
         this.logger = jexl.logger;
         this.uberspect = jexl.uberspect;
         this.context = aContext != null ? aContext : Engine.EMPTY_CONTEXT;
         this.cache = engine.cache != null;
-        JexlArithmetic jexla = jexl.arithmetic;
+        final JexlArithmetic jexla = jexl.arithmetic;
         this.options = opts == null? engine.options(aContext) : opts;
         this.arithmetic = jexla.options(options);
         if (arithmetic != jexla && !arithmetic.getClass().equals(jexla.getClass())) {
@@ -108,7 +108,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             acancel = ((JexlContext.CancellationHandle) context).getCancellation();
         }
         this.cancelled = acancel != null? acancel : new AtomicBoolean(false);
-        Map<String,Object> ons = options.getNamespaces();
+        final Map<String,Object> ons = options.getNamespaces();
         this.functions = ons.isEmpty()? jexl.functions : ons;
         this.functors = null;
         this.operators = new Operators(this);
@@ -119,7 +119,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param ii the base to copy
      * @param jexla the arithmetic instance to use (or null)
      */
-    protected InterpreterBase(InterpreterBase ii, JexlArithmetic jexla) {
+    protected InterpreterBase(final InterpreterBase ii, final JexlArithmetic jexla) {
         jexl = ii.jexl;
         logger = ii.logger;
         uberspect = ii.uberspect;
@@ -139,13 +139,13 @@ public abstract class InterpreterBase extends ParserVisitor {
      * <p>This is used when dealing with auto-closeable (duck-like) objects
      * @param closeable the object we'd like to close
      */
-    protected void closeIfSupported(Object closeable) {
+    protected void closeIfSupported(final Object closeable) {
         if (closeable != null) {
-            JexlMethod mclose = uberspect.getMethod(closeable, "close", EMPTY_PARAMS);
+            final JexlMethod mclose = uberspect.getMethod(closeable, "close", EMPTY_PARAMS);
             if (mclose != null) {
                 try {
                     mclose.invoke(closeable, EMPTY_PARAMS);
-                } catch (Exception xignore) {
+                } catch (final Exception xignore) {
                     logger.warn(xignore);
                 }
             }
@@ -160,7 +160,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param node   the AST node
      * @return the namespace instance
      */
-    protected Object resolveNamespace(String prefix, JexlNode node) {
+    protected Object resolveNamespace(final String prefix, final JexlNode node) {
         Object namespace;
         // check whether this namespace is a functor
         synchronized (this) {
@@ -181,7 +181,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         // shortcut if ns is known to be not-a-functor
         final boolean cacheable = cache;
-        Object cached = cacheable ? node.jjtGetValue() : null;
+        final Object cached = cacheable ? node.jjtGetValue() : null;
         if (cached != JexlContext.NamespaceFunctor.class) {
             // allow namespace to instantiate a functor with context if possible, not an error otherwise
             Object functor = null;
@@ -191,11 +191,11 @@ public abstract class InterpreterBase extends ParserVisitor {
                 // attempt to reuse last ctor cached in volatile JexlNode.value
                 if (cached instanceof JexlMethod) {
                     try {
-                        Object eval = ((JexlMethod) cached).tryInvoke(null, context);
+                        final Object eval = ((JexlMethod) cached).tryInvoke(null, context);
                         if (JexlEngine.TRY_FAILED != eval) {
                             functor = eval;
                         }
-                    } catch (JexlException.TryFailed xtry) {
+                    } catch (final JexlException.TryFailed xtry) {
                         throw new JexlException(node, "unable to instantiate namespace " + prefix, xtry.getCause());
                     }
                 }
@@ -208,7 +208,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                             if (cacheable && ctor.isCacheable()) {
                                 node.jjtSetValue(ctor);
                             }
-                        } catch (Exception xinst) {
+                        } catch (final Exception xinst) {
                             throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
                         }
                     }
@@ -218,7 +218,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                         if (ctor != null) {
                             try {
                                 functor = ctor.invoke(namespace);
-                            } catch (Exception xinst) {
+                            } catch (final Exception xinst) {
                                 throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
                             }
                         }
@@ -228,7 +228,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                             if (namespace instanceof String) {
                                 try {
                                     namespace = uberspect.getClassLoader().loadClass((String) namespace);
-                                } catch (ClassNotFoundException xignore) {
+                                } catch (final ClassNotFoundException xignore) {
                                     // not a class
                                     namespace = null;
                                 }
@@ -260,8 +260,8 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param frame the frame in which it will be defined
      * @return true if definition succeeded, false otherwise
      */
-    protected boolean defineVariable(ASTVar var, LexicalFrame frame) {
-        int symbol = var.getSymbol();
+    protected boolean defineVariable(final ASTVar var, final LexicalFrame frame) {
+        final int symbol = var.getSymbol();
         if (symbol < 0) {
             return false;
         }
@@ -280,12 +280,12 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param name the variable name
      * @return true if variable is defined, false otherwise
      */
-    protected boolean isVariableDefined(Frame frame, LexicalScope block, String name) {
+    protected boolean isVariableDefined(final Frame frame, final LexicalScope block, final String name) {
         if (frame != null && block != null) {
-            Integer ref = frame.getScope().getSymbol(name);
-            int symbol = ref != null? ref : -1;
+            final Integer ref = frame.getScope().getSymbol(name);
+            final int symbol = ref != null? ref : -1;
             if (symbol >= 0  && block.hasSymbol(symbol)) {
-                Object value = frame.get(symbol);
+                final Object value = frame.get(symbol);
                 return value != Scope.UNDEFINED && value != Scope.UNDECLARED;
             }
         }
@@ -299,24 +299,24 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param identifier the variable node
      * @return the value
      */
-    protected Object getVariable(Frame frame, LexicalScope block, ASTIdentifier identifier) {
-        int symbol = identifier.getSymbol();
+    protected Object getVariable(final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
+        final int symbol = identifier.getSymbol();
         // if we have a symbol, we have a scope thus a frame
         if (options.isLexicalShade() && identifier.isShaded()) {
             return undefinedVariable(identifier, identifier.getName());
         }
         if (symbol >= 0) {
             if (frame.has(symbol)) {
-                Object value = frame.get(symbol);
+                final Object value = frame.get(symbol);
                 if (value != Scope.UNDEFINED) {
                     return value;
                 }
             }
         }
-        String name = identifier.getName();
-        Object value = context.get(name);
+        final String name = identifier.getName();
+        final Object value = context.get(name);
         if (value == null && !context.has(name)) {
-            boolean ignore = (isSafe()
+            final boolean ignore = (isSafe()
                     && (symbol >= 0
                     || identifier.jjtGetParent() instanceof ASTAssignment))
                     || (identifier.jjtGetParent() instanceof ASTReference);
@@ -335,13 +335,13 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param name the variable name
      * @param value the variable value
      */
-    protected void setContextVariable(JexlNode node, String name, Object value) {
+    protected void setContextVariable(final JexlNode node, final String name, final Object value) {
         if (options.isLexicalShade() && !context.has(name)) {
             throw new JexlException.Variable(node, name, true);
         }
         try {
             context.set(name, value);
-        } catch (UnsupportedOperationException xsupport) {
+        } catch (final UnsupportedOperationException xsupport) {
             throw new JexlException(node, "context is readonly", xsupport);
         }
     }
@@ -385,7 +385,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param right the right argument
      * @return the left, right or parent node
      */
-    protected JexlNode findNullOperand(RuntimeException xrt, JexlNode node, Object left, Object right) {
+    protected JexlNode findNullOperand(final RuntimeException xrt, final JexlNode node, final Object left, final Object right) {
         if (xrt instanceof JexlArithmetic.NullOperand) {
             if (left == null) {
                 return node.jjtGetChild(0);
@@ -404,7 +404,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param undef whether the variable is undefined or null
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object unsolvableVariable(JexlNode node, String var, boolean undef) {
+    protected Object unsolvableVariable(final JexlNode node, final String var, final boolean undef) {
         return variableError(node, var, undef? VariableIssue.UNDEFINED : VariableIssue.NULLVALUE);
     }
     
@@ -414,7 +414,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param var   the variable name
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object undefinedVariable(JexlNode node, String var) {
+    protected Object undefinedVariable(final JexlNode node, final String var) {
         return variableError(node, var, VariableIssue.UNDEFINED);
     }
            
@@ -424,7 +424,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param var   the variable name
      * @return throws JexlException if strict and not silent, null otherwise
      */ 
-    protected Object redefinedVariable(JexlNode node, String var) {
+    protected Object redefinedVariable(final JexlNode node, final String var) {
         return variableError(node, var, VariableIssue.REDEFINED);
     }
           
@@ -435,7 +435,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param issue the issue type
      * @return throws JexlException if strict and not silent, null otherwise
      */ 
-    protected Object variableError(JexlNode node, String var, VariableIssue issue) {
+    protected Object variableError(final JexlNode node, final String var, final VariableIssue issue) {
         if (isStrictEngine() && !node.isTernaryProtected()) {
             throw new JexlException.Variable(node, var, issue);
         } else if (logger.isDebugEnabled()) {
@@ -449,7 +449,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param method the method name
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object unsolvableMethod(JexlNode node, String method) {
+    protected Object unsolvableMethod(final JexlNode node, final String method) {
         return unsolvableMethod(node, method, null);
     }
    
@@ -460,7 +460,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param args the method arguments
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object unsolvableMethod(JexlNode node, String method, Object[] args) {
+    protected Object unsolvableMethod(final JexlNode node, final String method, final Object[] args) {
         if (isStrictEngine()) {
             throw new JexlException.Method(node, method, args);
         } else if (logger.isDebugEnabled()) {
@@ -477,7 +477,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param undef whether the property is undefined or null
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object unsolvableProperty(JexlNode node, String property, boolean undef, Throwable cause) {
+    protected Object unsolvableProperty(final JexlNode node, final String property, final boolean undef, final Throwable cause) {
         if (isStrictEngine() && !node.isTernaryProtected()) {
             throw new JexlException.Property(node, property, undef, cause);
         } else if (logger.isDebugEnabled()) {
@@ -492,7 +492,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param which the child we are checking
      * @return true if child is local variable, false otherwise
      */
-    protected boolean isLocalVariable(ASTReference node, int which) {
+    protected boolean isLocalVariable(final ASTReference node, final int which) {
         return (node.jjtGetNumChildren() > which
                 && node.jjtGetChild(which) instanceof ASTIdentifier
                 && ((ASTIdentifier) node.jjtGetChild(which)).getSymbol() >= 0);
@@ -503,7 +503,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param node  the reference node
      * @return true if child is function call, false otherwise
      */
-    protected boolean isFunctionCall(ASTReference node) {
+    protected boolean isFunctionCall(final ASTReference node) {
         return (node.jjtGetNumChildren() > 0
                 && node.jjtGetChild(0) instanceof ASTFunctionNode);
     }
@@ -514,7 +514,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param node the property node
      * @return the (pretty) string
      */
-    protected String stringifyProperty(JexlNode node) {
+    protected String stringifyProperty(final JexlNode node) {
         if (node instanceof ASTArrayAccess) {
             return "["
                     + stringifyPropertyValue(node.jjtGetChild(0))
@@ -541,7 +541,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param node the property node
      * @return the (pretty) string value
      */
-    protected static String stringifyPropertyValue(JexlNode node) {
+    protected static String stringifyPropertyValue(final JexlNode node) {
         return node != null? new Debugger().depth(1).data(node) : "???";
     }
 
@@ -552,7 +552,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param cause    the cause of error (if any)
      * @return throws JexlException if strict and not silent, null otherwise
      */
-    protected Object operatorError(JexlNode node, JexlOperator operator, Throwable cause) {
+    protected Object operatorError(final JexlNode node, final JexlOperator operator, final Throwable cause) {
         if (isStrictEngine()) {
             throw new JexlException.Operator(node, operator.getOperatorSymbol(), cause);
         } else if (logger.isDebugEnabled()) {
@@ -568,7 +568,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param cause    the cause of error (if any)
      * @return throws a JexlException if strict and not silent, null otherwise
      */
-    protected Object annotationError(JexlNode node, String annotation, Throwable cause) {
+    protected Object annotationError(final JexlNode node, final String annotation, final Throwable cause) {
         if (isStrictEngine()) {
             throw new JexlException.Annotation(node, annotation, cause);
         } else if (logger.isDebugEnabled()) {
@@ -584,8 +584,8 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param xany       the cause
      * @return a JexlException that will be thrown
      */
-    protected JexlException invocationException(JexlNode node, String methodName, Throwable xany) {
-        Throwable cause = xany.getCause();
+    protected JexlException invocationException(final JexlNode node, final String methodName, final Throwable xany) {
+        final Throwable cause = xany.getCause();
         if (cause instanceof JexlException) {
             return (JexlException) cause;
         }
@@ -615,7 +615,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Throws a JexlException.Cancel if script execution was cancelled.
      * @param node the node being evaluated
      */
-    protected void cancelCheck(JexlNode node) {
+    protected void cancelCheck(final JexlNode node) {
         if (isCancelled()) {
             throw new JexlException.Cancel(node);
         }
@@ -629,7 +629,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param args   the other (non null) arguments
      * @return the arguments array
      */
-    protected Object[] functionArguments(Object target, boolean narrow, Object[] args) {
+    protected Object[] functionArguments(final Object target, final boolean narrow, final Object[] args) {
         // when target == context, we are dealing with the null namespace
         if (target == null || target == context) {
             if (narrow) {
@@ -638,7 +638,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             return args;
         }
         // makes target 1st args, copy others - optionally narrow numbers
-        Object[] nargv = new Object[args.length + 1];
+        final Object[] nargv = new Object[args.length + 1];
         if (narrow) {
             nargv[0] = functionArgument(true, target);
             for (int a = 1; a <= args.length; ++a) {
@@ -658,9 +658,9 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param args   the other (non null) arguments
      * @return the arguments array
      */
-    protected Object[] callArguments(Object target, boolean narrow, Object[] args) {
+    protected Object[] callArguments(final Object target, final boolean narrow, final Object[] args) {
         // makes target 1st args, copy others - optionally narrow numbers
-        Object[] nargv = new Object[args.length + 1];
+        final Object[] nargv = new Object[args.length + 1];
         if (narrow) {
             nargv[0] = functionArgument(true, target);
             for (int a = 1; a <= args.length; ++a) {
@@ -679,7 +679,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param arg    the argument
      * @return the narrowed argument
      */
-    protected Object functionArgument(boolean narrow, Object arg) {
+    protected Object functionArgument(final boolean narrow, final Object arg) {
         return narrow && arg instanceof Number ? arithmetic.narrow((Number) arg) : arg;
     }
 
@@ -696,7 +696,7 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @param jme  the method
          * @param flag the narrow flag
          */
-        protected Funcall(JexlMethod jme, boolean flag) {
+        protected Funcall(final JexlMethod jme, final boolean flag) {
             this.me = jme;
             this.narrow = flag;
         }
@@ -709,7 +709,7 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @param args   the method arguments
          * @return the method invocation result (or JexlEngine.TRY_FAILED)
          */
-        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) {
+        protected Object tryInvoke(final InterpreterBase ii, final String name, final Object target, final Object[] args) {
             return me.tryInvoke(name, target, ii.functionArguments(null, narrow, args));
         }
     }
@@ -723,12 +723,12 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @param jme  the method
          * @param flag the narrow flag
          */
-        protected ArithmeticFuncall(JexlMethod jme, boolean flag) {
+        protected ArithmeticFuncall(final JexlMethod jme, final boolean flag) {
             super(jme, flag);
         }
 
         @Override
-        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) {
+        protected Object tryInvoke(final InterpreterBase ii, final String name, final Object target, final Object[] args) {
             return me.tryInvoke(name, ii.arithmetic, ii.functionArguments(target, narrow, args));
         }
     }
@@ -742,12 +742,12 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @param jme  the method
          * @param flag the narrow flag
          */
-        protected ContextFuncall(JexlMethod jme, boolean flag) {
+        protected ContextFuncall(final JexlMethod jme, final boolean flag) {
             super(jme, flag);
         }
 
         @Override
-        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) {
+        protected Object tryInvoke(final InterpreterBase ii, final String name, final Object target, final Object[] args) {
             return me.tryInvoke(name, ii.context, ii.functionArguments(target, narrow, args));
         }
     }
@@ -761,12 +761,12 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @param jme the method
          * @param flag the narrow flag
          */
-        protected ContextualCtor(JexlMethod jme, boolean flag) {
+        protected ContextualCtor(final JexlMethod jme, final boolean flag) {
             super(jme, flag);
         }
 
         @Override
-        protected Object tryInvoke(InterpreterBase ii, String name, Object target, Object[] args) {
+        protected Object tryInvoke(final InterpreterBase ii, final String name, final Object target, final Object[] args) {
             return me.tryInvoke(name, target, ii.callArguments(ii.context, narrow, args));
         }
     }
@@ -810,7 +810,7 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @param anode the syntactic node.
          * @param acacheable whether resolution can be cached
          */
-        CallDispatcher(JexlNode anode, boolean acacheable) {
+        CallDispatcher(final JexlNode anode, final boolean acacheable) {
             this.node = anode;
             this.cacheable = acacheable;
         }
@@ -823,7 +823,7 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @param arguments the method arguments
          * @return true if arithmetic, false otherwise
          */
-        protected boolean isTargetMethod(Object ntarget, String mname, final Object[] arguments) {
+        protected boolean isTargetMethod(final Object ntarget, final String mname, final Object[] arguments) {
             // try a method
             vm = uberspect.getMethod(ntarget, mname, arguments);
             if (vm != null) {
@@ -844,7 +844,7 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @param arguments the method arguments
          * @return true if arithmetic, false otherwise
          */
-        protected boolean isContextMethod(String mname, final Object[] arguments) {
+        protected boolean isContextMethod(final String mname, final Object[] arguments) {
             vm = uberspect.getMethod(context, mname, arguments);
             if (vm != null) {
                 argv = arguments;
@@ -864,7 +864,7 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @param arguments the method arguments
          * @return true if arithmetic, false otherwise
          */
-        protected boolean isArithmeticMethod(String mname, final Object[] arguments) {
+        protected boolean isArithmeticMethod(final String mname, final Object[] arguments) {
             vm = uberspect.getMethod(arithmetic, mname, arguments);
             if (vm != null) {
                 argv = arguments;
@@ -891,7 +891,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             // do we have  a method/function name ?
             // attempt to reuse last funcall cached in volatile JexlNode.value (if it was not a variable)
             if (mname != null && cacheable && ntarget != null) {
-                Object cached = node.jjtGetValue();
+                final Object cached = node.jjtGetValue();
                 if (cached instanceof Funcall) {
                     return ((Funcall) cached).tryInvoke(InterpreterBase.this, mname, ntarget, arguments);
                 }
@@ -906,11 +906,11 @@ public abstract class InterpreterBase extends ParserVisitor {
          * @return the method invocation result
          * @throws Exception when invocation fails
          */
-        protected Object eval(String mname) throws Exception {
+        protected Object eval(final String mname) throws Exception {
             // we have either evaluated and returned or might have found a method
             if (vm != null) {
                 // vm cannot be null if xjexl is null
-                Object eval = vm.invoke(target, argv);
+                final Object eval = vm.invoke(target, argv);
                 // cache executor in volatile JexlNode.value
                 if (funcall != null) {
                     node.jjtSetValue(funcall);
@@ -929,14 +929,14 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param node      the node that evaluated as the object
      * @return the attribute value
      */
-    protected Object getAttribute(Object object, Object attribute, JexlNode node) {
+    protected Object getAttribute(final Object object, final Object attribute, final JexlNode node) {
         if (object == null) {
             throw new JexlException(node, "object is null");
         }
         cancelCheck(node);
         final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
                 ? JexlOperator.ARRAY_GET : JexlOperator.PROPERTY_GET;
-        Object result = operators.tryOverload(node, operator, object, attribute);
+        final Object result = operators.tryOverload(node, operator, object, attribute);
         if (result != JexlEngine.TRY_FAILED) {
             return result;
         }
@@ -944,41 +944,41 @@ public abstract class InterpreterBase extends ParserVisitor {
         try {
             // attempt to reuse last executor cached in volatile JexlNode.value
             if (node != null && cache) {
-                Object cached = node.jjtGetValue();
+                final Object cached = node.jjtGetValue();
                 if (cached instanceof JexlPropertyGet) {
-                    JexlPropertyGet vg = (JexlPropertyGet) cached;
-                    Object value = vg.tryInvoke(object, attribute);
+                    final JexlPropertyGet vg = (JexlPropertyGet) cached;
+                    final Object value = vg.tryInvoke(object, attribute);
                     if (!vg.tryFailed(value)) {
                         return value;
                     }
                 }
             }
             // resolve that property
-            List<JexlUberspect.PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
-            JexlPropertyGet vg = uberspect.getPropertyGet(resolvers, object, attribute);
+            final List<JexlUberspect.PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
+            final JexlPropertyGet vg = uberspect.getPropertyGet(resolvers, object, attribute);
             if (vg != null) {
-                Object value = vg.invoke(object);
+                final Object value = vg.invoke(object);
                 // cache executor in volatile JexlNode.value
                 if (node != null && cache && vg.isCacheable()) {
                     node.jjtSetValue(vg);
                 }
                 return value;
             }
-        } catch (Exception xany) {
+        } catch (final Exception xany) {
             xcause = xany;
         }
         // lets fail
         if (node != null) {
-            boolean safe = (node instanceof ASTIdentifierAccess) && ((ASTIdentifierAccess) node).isSafe();
+            final boolean safe = (node instanceof ASTIdentifierAccess) && ((ASTIdentifierAccess) node).isSafe();
             if (safe) {
                 return null;
             } else {
-                String attrStr = attribute != null ? attribute.toString() : null;
+                final String attrStr = attribute != null ? attribute.toString() : null;
                 return unsolvableProperty(node, attrStr, true, xcause);
             }
         } else {
             // direct call
-            String error = "unable to get object property"
+            final String error = "unable to get object property"
                     + ", class: " + object.getClass().getName()
                     + ", property: " + attribute;
             throw new UnsupportedOperationException(error, xcause);
@@ -993,11 +993,11 @@ public abstract class InterpreterBase extends ParserVisitor {
      * @param value     the value to assign to the object's attribute
      * @param node      the node that evaluated as the object
      */
-    protected void setAttribute(Object object, Object attribute, Object value, JexlNode node) {
+    protected void setAttribute(final Object object, final Object attribute, final Object value, final JexlNode node) {
         cancelCheck(node);
         final JexlOperator operator = node != null && node.jjtGetParent() instanceof ASTArrayAccess
                                       ? JexlOperator.ARRAY_SET : JexlOperator.PROPERTY_SET;
-        Object result = operators.tryOverload(node, operator, object, attribute, value);
+        final Object result = operators.tryOverload(node, operator, object, attribute, value);
         if (result != JexlEngine.TRY_FAILED) {
             return;
         }
@@ -1005,21 +1005,21 @@ public abstract class InterpreterBase extends ParserVisitor {
         try {
             // attempt to reuse last executor cached in volatile JexlNode.value
             if (node != null && cache) {
-                Object cached = node.jjtGetValue();
+                final Object cached = node.jjtGetValue();
                 if (cached instanceof JexlPropertySet) {
-                    JexlPropertySet setter = (JexlPropertySet) cached;
-                    Object eval = setter.tryInvoke(object, attribute, value);
+                    final JexlPropertySet setter = (JexlPropertySet) cached;
+                    final Object eval = setter.tryInvoke(object, attribute, value);
                     if (!setter.tryFailed(eval)) {
                         return;
                     }
                 }
             }
-            List<JexlUberspect.PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
+            final List<JexlUberspect.PropertyResolver> resolvers = uberspect.getResolvers(operator, object);
             JexlPropertySet vs = uberspect.getPropertySet(resolvers, object, attribute, value);
             // if we can't find an exact match, narrow the value argument and try again
             if (vs == null) {
                 // replace all numbers with the smallest type that will fit
-                Object[] narrow = {value};
+                final Object[] narrow = {value};
                 if (arithmetic.narrowArguments(narrow)) {
                     vs = uberspect.getPropertySet(resolvers, object, attribute, narrow[0]);
                 }
@@ -1032,16 +1032,16 @@ public abstract class InterpreterBase extends ParserVisitor {
                 }
                 return;
             }
-        } catch (Exception xany) {
+        } catch (final Exception xany) {
             xcause = xany;
         }
         // lets fail
         if (node != null) {
-            String attrStr = attribute != null ? attribute.toString() : null;
+            final String attrStr = attribute != null ? attribute.toString() : null;
             unsolvableProperty(node, attrStr, true, xcause);
         } else {
             // direct call
-            String error = "unable to set object property"
+            final String error = "unable to set object property"
                     + ", class: " + object.getClass().getName()
                     + ", property: " + attribute
                     + ", argument: " + value.getClass().getSimpleName();

@@ -64,7 +64,7 @@ public final class MethodKey {
      * @param aMethod the method to generate the key from
      * @param args    the intended method arguments
      */
-    public MethodKey(String aMethod, Object[] args) {
+    public MethodKey(final String aMethod, final Object[] args) {
         // !! keep this in sync with the other ctor (hash code) !!
         this.method = aMethod;
         int hash = this.method.hashCode();
@@ -73,9 +73,9 @@ public final class MethodKey {
         if (args != null && (size = args.length) > 0) {
             this.params = new Class<?>[size];
             for (int p = 0; p < size; ++p) {
-                Object arg = args[p];
+                final Object arg = args[p];
                 // null arguments use void as Void.class as marker
-                Class<?> parm = arg == null ? Void.class : arg.getClass();
+                final Class<?> parm = arg == null ? Void.class : arg.getClass();
                 hash = (HASH * hash) + parm.hashCode();
                 this.params[p] = parm;
             }
@@ -89,7 +89,7 @@ public final class MethodKey {
      * Creates a key from a method.
      * @param aMethod the method to generate the key from.
      */
-    MethodKey(Method aMethod) {
+    MethodKey(final Method aMethod) {
         this(aMethod.getName(), aMethod.getParameterTypes());
     }
 
@@ -97,7 +97,7 @@ public final class MethodKey {
      * Creates a key from a constructor.
      * @param aCtor the constructor to generate the key from.
      */
-    MethodKey(Constructor<?> aCtor) {
+    MethodKey(final Constructor<?> aCtor) {
         this(aCtor.getDeclaringClass().getName(), aCtor.getParameterTypes());
     }
 
@@ -106,7 +106,7 @@ public final class MethodKey {
      * @param aMethod the method to generate the key from
      * @param args    the intended method parameters
      */
-    MethodKey(String aMethod, Class<?>[] args) {
+    MethodKey(final String aMethod, final Class<?>[] args) {
         // !! keep this in sync with the other ctor (hash code) !!
         this.method = aMethod.intern();
         int hash = this.method.hashCode();
@@ -115,7 +115,7 @@ public final class MethodKey {
         if (args != null && (size = args.length) > 0) {
             this.params = new Class<?>[size];
             for (int p = 0; p < size; ++p) {
-                Class<?> parm = primitiveClass(args[p]);
+                final Class<?> parm = primitiveClass(args[p]);
                 hash = (HASH * hash) + parm.hashCode();
                 this.params[p] = parm;
             }
@@ -147,9 +147,9 @@ public final class MethodKey {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj instanceof MethodKey) {
-            MethodKey key = (MethodKey) obj;
+            final MethodKey key = (MethodKey) obj;
             return method.equals(key.method) && Arrays.equals(params, key.params);
         }
         return false;
@@ -157,8 +157,8 @@ public final class MethodKey {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder(method);
-        for (Class<?> c : params) {
+        final StringBuilder builder = new StringBuilder(method);
+        for (final Class<?> c : params) {
             builder.append(c == Void.class ? "null" : c.getName());
         }
         return builder.toString();
@@ -169,7 +169,7 @@ public final class MethodKey {
      * @return method(p0, p1, ...)
      */
     public String debugString() {
-        StringBuilder builder = new StringBuilder(method);
+        final StringBuilder builder = new StringBuilder(method);
         builder.append('(');
         for (int i = 0; i < params.length; i++) {
             if (i > 0) {
@@ -207,11 +207,11 @@ public final class MethodKey {
         Class<?> clazz = method.getDeclaringClass();
         do {
             try {
-                Method m = clazz.getMethod(mname, ptypes);
+                final Method m = clazz.getMethod(mname, ptypes);
                 if (m.isVarArgs()) {
                     return true;
                 }
-            } catch (NoSuchMethodException xignore) {
+            } catch (final NoSuchMethodException xignore) {
                 // this should not happen...
             }
             clazz = clazz.getSuperclass();
@@ -225,7 +225,7 @@ public final class MethodKey {
      * @return the most specific method.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
-    public Method getMostSpecificMethod(Method[] methods) {
+    public Method getMostSpecificMethod(final Method[] methods) {
         return METHODS.getMostSpecific(this, methods);
     }
 
@@ -235,7 +235,7 @@ public final class MethodKey {
      * @return the most specific constructor.
      * @throws MethodKey.AmbiguousException if there is more than one.
      */
-    public Constructor<?> getMostSpecificConstructor(Constructor<?>[] methods) {
+    public Constructor<?> getMostSpecificConstructor(final Constructor<?>[] methods) {
         return CONSTRUCTORS.getMostSpecific(this, methods);
     }
 
@@ -259,7 +259,7 @@ public final class MethodKey {
      *         type or an object type of a primitive type that can be converted to
      *         the formal type.
      */
-    public static boolean isInvocationConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
+    public static boolean isInvocationConvertible(final Class<?> formal, final Class<?> actual, final boolean possibleVarArg) {
         return isInvocationConvertible(formal, actual, false, possibleVarArg);
     }
 
@@ -279,7 +279,7 @@ public final class MethodKey {
      *         or formal and actual are both primitive types and actual can be
      *         subject to widening conversion to formal.
      */
-    public static boolean isStrictInvocationConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
+    public static boolean isStrictInvocationConvertible(final Class<?> formal, final Class<?> actual, final boolean possibleVarArg) {
         return isInvocationConvertible(formal, actual, true, possibleVarArg);
     }
 
@@ -293,10 +293,10 @@ public final class MethodKey {
      * @param parm a may-be primitive type class
      * @return the equivalent object class
      */
-    static Class<?> primitiveClass(Class<?> parm) {
+    static Class<?> primitiveClass(final Class<?> parm) {
         // it was marginally faster to get from the map than call isPrimitive...
         //if (!parm.isPrimitive()) return parm;
-        Class<?>[] prim = CONVERTIBLES.get(parm);
+        final Class<?>[] prim = CONVERTIBLES.get(parm);
         return prim == null ? parm : prim[0];
     }
 
@@ -305,7 +305,7 @@ public final class MethodKey {
      * @param args the classes
      * @return the array
      */
-    private static Class<?>[] asArray(Class<?>... args) {
+    private static Class<?>[] asArray(final Class<?>... args) {
         return args;
     }
 
@@ -365,7 +365,7 @@ public final class MethodKey {
      * @return true if compatible, false otherwise
      */
     private static boolean isInvocationConvertible(
-            Class<?> formal, Class<?> actual, boolean strict, boolean possibleVarArg) {
+            final Class<?> formal, Class<?> actual, final boolean strict, final boolean possibleVarArg) {
         /* if it's a null, it means the arg was null */
         if (actual == null && !formal.isPrimitive()) {
             return true;
@@ -380,9 +380,9 @@ public final class MethodKey {
         }
         /* Primitive conversion check. */
         if (formal.isPrimitive()) {
-            Class<?>[] clist = strict ? STRICT_CONVERTIBLES.get(formal) : CONVERTIBLES.get(formal);
+            final Class<?>[] clist = strict ? STRICT_CONVERTIBLES.get(formal) : CONVERTIBLES.get(formal);
             if (clist != null) {
-                for (Class<?> aClass : clist) {
+                for (final Class<?> aClass : clist) {
                     if (actual == aClass) {
                         return true;
                     }
@@ -428,7 +428,7 @@ public final class MethodKey {
          * A severe or not ambiguous exception.
          * @param flag logging flag
          */
-        AmbiguousException(boolean flag) {
+        AmbiguousException(final boolean flag) {
             this.severe = flag;
         }
 
@@ -482,9 +482,9 @@ public final class MethodKey {
          * @return the most specific method.
          * @throws MethodKey.AmbiguousException if there is more than one.
          */
-        private T getMostSpecific(MethodKey key, T[] methods) {
+        private T getMostSpecific(final MethodKey key, final T[] methods) {
             final Class<?>[] args = key.params;
-            LinkedList<T> applicables = getApplicables(methods, args);
+            final LinkedList<T> applicables = getApplicables(methods, args);
             if (applicables.isEmpty()) {
                 return null;
             }
@@ -498,13 +498,13 @@ public final class MethodKey {
              * the end of the below loop, the list will contain exactly one method,
              * (the most specific method) otherwise we have ambiguity.
              */
-            LinkedList<T> maximals = new LinkedList<T>();
-            for (T app : applicables) {
+            final LinkedList<T> maximals = new LinkedList<T>();
+            for (final T app : applicables) {
                 final Class<?>[] parms = getParameterTypes(app);
                 boolean lessSpecific = false;
-                Iterator<T> maximal = maximals.iterator();
+                final Iterator<T> maximal = maximals.iterator();
                 while(!lessSpecific && maximal.hasNext()) {
-                    T max = maximal.next();
+                    final T max = maximal.next();
                     switch (moreSpecific(args, parms, getParameterTypes(max))) {
                         case MORE_SPECIFIC:
                             /*
@@ -560,17 +560,17 @@ public final class MethodKey {
          * @param applicables the list of applicable methods or constructors
          * @return an ambiguous exception
          */
-        private AmbiguousException ambiguousException (Class<?>[] classes, List<T> applicables) {
+        private AmbiguousException ambiguousException (final Class<?>[] classes, final List<T> applicables) {
             boolean severe = false;
             int instanceArgCount = 0; // count the number of valid instances, aka not null
             for(int c = 0; c < classes.length; ++c) {
-                Class<?> argClazz = classes[c];
+                final Class<?> argClazz = classes[c];
                 if (Void.class.equals(argClazz)) {
                     // count the number of methods for which the current arg maps to an Object parameter
                     int objectParmCount = 0;
-                    for (T app : applicables) {
-                        Class<?>[] parmClasses = getParameterTypes(app);
-                        Class<?> parmClass =  parmClasses[c];
+                    for (final T app : applicables) {
+                        final Class<?>[] parmClasses = getParameterTypes(app);
+                        final Class<?> parmClass =  parmClasses[c];
                         if (Object.class.equals(parmClass)) {
                             if (objectParmCount++ == 2) {
                                 severe = true;
@@ -618,7 +618,7 @@ public final class MethodKey {
              // ok, move on and compare those of equal lengths
              for (int i = 0; i < length; ++i) {
                  if (c1[i] != c2[i]) {
-                     boolean last = (i == ultimate);
+                     final boolean last = (i == ultimate);
                      // argument is null, prefer an Object param
                      if (a[i] == Void.class) {
                          if (c1[i] == Object.class && c2[i] != Object.class) {
@@ -653,12 +653,12 @@ public final class MethodKey {
          * @param possibleVarArg true if this is the last parameter which can be a primitive array (vararg call)
          * @return true if primitive, false otherwise
          */
-        private boolean isPrimitive(Class<?> c, boolean possibleVarArg) {
+        private boolean isPrimitive(final Class<?> c, final boolean possibleVarArg) {
             if (c != null) {
                 if (c.isPrimitive()) {
                     return true;
                 } else if (possibleVarArg) {
-                    Class<?> t = c.getComponentType();
+                    final Class<?> t = c.getComponentType();
                     return t != null && t.isPrimitive();
                 }
             }
@@ -674,9 +674,9 @@ public final class MethodKey {
          *         formal and actual arguments matches, and argument types are assignable
          *         to formal types through a method invocation conversion).
          */
-        private LinkedList<T> getApplicables(T[] methods, Class<?>[] classes) {
-            LinkedList<T> list = new LinkedList<T>();
-            for (T method : methods) {
+        private LinkedList<T> getApplicables(final T[] methods, final Class<?>[] classes) {
+            final LinkedList<T> list = new LinkedList<T>();
+            for (final T method : methods) {
                 if (isApplicable(method, classes)) {
                     list.add(method);
                 }
@@ -692,8 +692,8 @@ public final class MethodKey {
          * @param actuals arguments signature for method
          * @return true if method is applicable to arguments
          */
-        private boolean isApplicable(T method, Class<?>[] actuals) {
-            Class<?>[] formals = getParameterTypes(method);
+        private boolean isApplicable(final T method, final Class<?>[] actuals) {
+            final Class<?>[] formals = getParameterTypes(method);
             // if same number or args or
             // there's just one more methodArg than class arg
             // and the last methodArg is an array, then treat it as a vararg
@@ -745,7 +745,7 @@ public final class MethodKey {
                 }
                 // check that all remaining arguments are convertible to the vararg type
                 // (last parm is an array since method is vararg)
-                Class<?> vararg = formals[formals.length - 1].getComponentType();
+                final Class<?> vararg = formals[formals.length - 1].getComponentType();
                 for (int i = formals.length - 1; i < actuals.length; ++i) {
                     if (!isConvertible(vararg, actuals[i], false)) {
                         return false;
@@ -766,7 +766,7 @@ public final class MethodKey {
          *                       in the method declaration
          * @return see isMethodInvocationConvertible.
          */
-        private boolean isConvertible(Class<?> formal, Class<?> actual, boolean possibleVarArg) {
+        private boolean isConvertible(final Class<?> formal, final Class<?> actual, final boolean possibleVarArg) {
             // if we see Void.class, the argument was null
             return isInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
         }
@@ -780,8 +780,8 @@ public final class MethodKey {
          *                       in the method declaration
          * @return see isStrictMethodInvocationConvertible.
          */
-        private boolean isStrictConvertible(Class<?> formal, Class<?> actual,
-                boolean possibleVarArg) {
+        private boolean isStrictConvertible(final Class<?> formal, final Class<?> actual,
+                final boolean possibleVarArg) {
             // if we see Void.class, the argument was null
             return isStrictInvocationConvertible(formal, actual.equals(Void.class) ? null : actual, possibleVarArg);
         }
@@ -792,12 +792,12 @@ public final class MethodKey {
      */
     private static final Parameters<Method> METHODS = new Parameters<Method>() {
         @Override
-        protected Class<?>[] getParameterTypes(Method app) {
+        protected Class<?>[] getParameterTypes(final Method app) {
             return app.getParameterTypes();
         }
 
         @Override
-        public boolean isVarArgs(Method app) {
+        public boolean isVarArgs(final Method app) {
             return MethodKey.isVarArgs(app);
         }
 
@@ -808,12 +808,12 @@ public final class MethodKey {
      */
     private static final Parameters<Constructor<?>> CONSTRUCTORS = new Parameters<Constructor<?>>() {
         @Override
-        protected Class<?>[] getParameterTypes(Constructor<?> app) {
+        protected Class<?>[] getParameterTypes(final Constructor<?> app) {
             return app.getParameterTypes();
         }
 
         @Override
-        public boolean isVarArgs(Constructor<?> app) {
+        public boolean isVarArgs(final Constructor<?> app) {
             return app.isVarArgs();
         }
 

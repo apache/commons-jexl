@@ -139,7 +139,7 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("1 + 9223372036854775807", new BigInteger("9223372036854775808"));
         asserter.assertExpression("-1 + (-9223372036854775808)", new BigInteger("-9223372036854775809"));
         asserter.assertExpression("-9223372036854775808 - 1", new BigInteger("-9223372036854775809"));
-        BigInteger maxl = BigInteger.valueOf(Long.MAX_VALUE);
+        final BigInteger maxl = BigInteger.valueOf(Long.MAX_VALUE);
         asserter.assertExpression(maxl.toString() + " * " + maxl.toString() , maxl.multiply(maxl));
     }
 
@@ -282,11 +282,11 @@ public class ArithmeticTest extends JexlTestCase {
     // JEXL-24: long integers (and doubles)
     @Test
     public void testLongLiterals() throws Exception {
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
-        String stmt = "{a = 10L; b = 10l; c = 42.0D; d = 42.0d; e=56.3F; f=56.3f; g=63.5; h=0x10; i=010; j=0x10L; k=010l}";
-        JexlScript expr = JEXL.createScript(stmt);
+        final String stmt = "{a = 10L; b = 10l; c = 42.0D; d = 42.0d; e=56.3F; f=56.3f; g=63.5; h=0x10; i=010; j=0x10L; k=010l}";
+        final JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertEquals(10L, ctxt.get("a"));
         Assert.assertEquals(10L, ctxt.get("b"));
@@ -303,35 +303,35 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testBigLiteralValue() throws Exception {
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
-        JexlExpression e = JEXL.createExpression("9223372036854775806.5B");
-        String res = String.valueOf(e.evaluate(ctxt));
+        final JexlExpression e = JEXL.createExpression("9223372036854775806.5B");
+        final String res = String.valueOf(e.evaluate(ctxt));
         Assert.assertEquals("9223372036854775806.5", res);
     }
 
     @Test
     public void testBigdOp() throws Exception {
-        BigDecimal sevendot475 = new BigDecimal("7.475");
-        BigDecimal SO = new BigDecimal("325");
-        JexlContext jc = new MapContext();
+        final BigDecimal sevendot475 = new BigDecimal("7.475");
+        final BigDecimal SO = new BigDecimal("325");
+        final JexlContext jc = new MapContext();
         jc.set("SO", SO);
 
-        String expr = "2.3*SO/100";
+        final String expr = "2.3*SO/100";
 
-        Object evaluate = JEXL.createExpression(expr).evaluate(jc);
+        final Object evaluate = JEXL.createExpression(expr).evaluate(jc);
         Assert.assertEquals(sevendot475, evaluate);
     }
 
     // JEXL-24: big integers and big decimals
     @Test
     public void testBigLiterals() throws Exception {
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
-        String stmt = "{a = 10H; b = 10h; c = 42.0B; d = 42.0b;}";
-        JexlScript expr = JEXL.createScript(stmt);
+        final String stmt = "{a = 10H; b = 10h; c = 42.0B; d = 42.0b;}";
+        final JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertEquals(new BigInteger("10"), ctxt.get("a"));
         Assert.assertEquals(new BigInteger("10"), ctxt.get("b"));
@@ -342,11 +342,11 @@ public class ArithmeticTest extends JexlTestCase {
     // JEXL-24: big decimals with exponent
     @Test
     public void testBigExponentLiterals() throws Exception {
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
-        String stmt = "{a = 42.0e1B; b = 42.0E+2B; c = 42.0e-1B; d = 42.0E-2b; e=4242.4242e1b}";
-        JexlScript expr = JEXL.createScript(stmt);
+        final String stmt = "{a = 42.0e1B; b = 42.0E+2B; c = 42.0e-1B; d = 42.0E-2b; e=4242.4242e1b}";
+        final JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertEquals(new BigDecimal("42.0e+1"), ctxt.get("a"));
         Assert.assertEquals(new BigDecimal("42.0e+2"), ctxt.get("b"));
@@ -358,11 +358,11 @@ public class ArithmeticTest extends JexlTestCase {
     // JEXL-24: doubles with exponent
     @Test
     public void test2DoubleLiterals() throws Exception {
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
-        String stmt = "{a = 42.0e1D; b = 42.0E+2D; c = 42.0e-1d; d = 42.0E-2d; e=10e10; f= +1.e1; g=1e1; }";
-        JexlScript expr = JEXL.createScript(stmt);
+        final String stmt = "{a = 42.0e1D; b = 42.0E+2D; c = 42.0e-1d; d = 42.0E-2d; e=10e10; f= +1.e1; g=1e1; }";
+        final JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertEquals(Double.valueOf("42.0e+1"), ctxt.get("a"));
         Assert.assertEquals(Double.valueOf("42.0e+2"), ctxt.get("b"));
@@ -381,9 +381,9 @@ public class ArithmeticTest extends JexlTestCase {
      */
     @Test
     public void testDivideByZero() throws Exception {
-        Map<String, Object> vars = new HashMap<String, Object>();
-        JexlEvalContext context = new JexlEvalContext(vars);
-        JexlOptions options = context.getEngineOptions();
+        final Map<String, Object> vars = new HashMap<String, Object>();
+        final JexlEvalContext context = new JexlEvalContext(vars);
+        final JexlOptions options = context.getEngineOptions();
         options.setStrictArithmetic(true);
         vars.put("aByte", new Byte((byte) 1));
         vars.put("aShort", new Short((short) 2));
@@ -403,7 +403,7 @@ public class ArithmeticTest extends JexlTestCase {
         vars.put("zBigInteger", new BigInteger("0"));
         vars.put("zBigDecimal", new BigDecimal("0"));
 
-        String[] tnames = {
+        final String[] tnames = {
             "Byte", "Short", "Integer", "Long",
             "Float", "Double",
             "BigInteger", "BigDecimal"
@@ -411,31 +411,31 @@ public class ArithmeticTest extends JexlTestCase {
         // number of permutations this will generate
         final int PERMS = tnames.length * tnames.length;
 
-        JexlEngine jexl = JEXL;
+        final JexlEngine jexl = JEXL;
         // for non-silent, silent...
         for (int s = 0; s < 2; ++s) {
-            boolean strict = Boolean.valueOf(s != 0);
+            final boolean strict = Boolean.valueOf(s != 0);
             options.setStrict(true);
             options.setStrictArithmetic(strict);
             int zthrow = 0;
             int zeval = 0;
             // for vars of all types...
-            for (String vname : tnames) {
+            for (final String vname : tnames) {
                 // for zeros of all types...
-                for (String zname : tnames) {
+                for (final String zname : tnames) {
                     // divide var by zero
-                    String expr = "a" + vname + " / " + "z" + zname;
+                    final String expr = "a" + vname + " / " + "z" + zname;
                     try {
-                        JexlExpression zexpr = jexl.createExpression(expr);
-                        Object nan = zexpr.evaluate(context);
+                        final JexlExpression zexpr = jexl.createExpression(expr);
+                        final Object nan = zexpr.evaluate(context);
                         // check we have a zero & incremement zero count
                         if (nan instanceof Number) {
-                            double zero = ((Number) nan).doubleValue();
+                            final double zero = ((Number) nan).doubleValue();
                             if (zero == 0.0) {
                                 zeval += 1;
                             }
                         }
-                    } catch (Exception any) {
+                    } catch (final Exception any) {
                         // increment the exception count
                         zthrow += 1;
                     }
@@ -452,9 +452,9 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testNaN() throws Exception {
-        Map<String, Object> ns = new HashMap<String, Object>();
+        final Map<String, Object> ns = new HashMap<String, Object>();
         ns.put("double", Double.class);
-        JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
+        final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
         JexlScript script;
         Object result;
         script = jexl.createScript("#NaN");
@@ -476,55 +476,55 @@ public class ArithmeticTest extends JexlTestCase {
      */
     @Test
     public void testMultClass() throws Exception {
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlContext jc = new MapContext();
-        Object ra = jexl.createExpression("463.0d * 0.1").evaluate(jc);
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext jc = new MapContext();
+        final Object ra = jexl.createExpression("463.0d * 0.1").evaluate(jc);
         Assert.assertEquals(Double.class, ra.getClass());
-        Object r0 = jexl.createExpression("463.0B * 0.1").evaluate(jc);
+        final Object r0 = jexl.createExpression("463.0B * 0.1").evaluate(jc);
         Assert.assertEquals(java.math.BigDecimal.class, r0.getClass());
-        Object r1 = jexl.createExpression("463.0B * 0.1B").evaluate(jc);
+        final Object r1 = jexl.createExpression("463.0B * 0.1B").evaluate(jc);
         Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
     }
 
     @Test
     public void testDivClass() throws Exception {
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlContext jc = new MapContext();
-        Object ra = jexl.createExpression("463.0d / 0.1").evaluate(jc);
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext jc = new MapContext();
+        final Object ra = jexl.createExpression("463.0d / 0.1").evaluate(jc);
         Assert.assertEquals(Double.class, ra.getClass());
-        Object r0 = jexl.createExpression("463.0B / 0.1").evaluate(jc);
+        final Object r0 = jexl.createExpression("463.0B / 0.1").evaluate(jc);
         Assert.assertEquals(java.math.BigDecimal.class, r0.getClass());
-        Object r1 = jexl.createExpression("463.0B / 0.1B").evaluate(jc);
+        final Object r1 = jexl.createExpression("463.0B / 0.1B").evaluate(jc);
         Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
     }
 
     @Test
     public void testPlusClass() throws Exception {
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlContext jc = new MapContext();
-        Object ra = jexl.createExpression("463.0d + 0.1").evaluate(jc);
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext jc = new MapContext();
+        final Object ra = jexl.createExpression("463.0d + 0.1").evaluate(jc);
         Assert.assertEquals(Double.class, ra.getClass());
-        Object r0 = jexl.createExpression("463.0B + 0.1").evaluate(jc);
+        final Object r0 = jexl.createExpression("463.0B + 0.1").evaluate(jc);
         Assert.assertEquals(java.math.BigDecimal.class, r0.getClass());
-        Object r1 = jexl.createExpression("463.0B + 0.1B").evaluate(jc);
+        final Object r1 = jexl.createExpression("463.0B + 0.1B").evaluate(jc);
         Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
     }
 
     @Test
     public void testMinusClass() throws Exception {
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlContext jc = new MapContext();
-        Object ra = jexl.createExpression("463.0d - 0.1").evaluate(jc);
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext jc = new MapContext();
+        final Object ra = jexl.createExpression("463.0d - 0.1").evaluate(jc);
         Assert.assertEquals(Double.class, ra.getClass());
-        Object r0 = jexl.createExpression("463.0B - 0.1").evaluate(jc);
+        final Object r0 = jexl.createExpression("463.0B - 0.1").evaluate(jc);
         Assert.assertEquals(java.math.BigDecimal.class, r0.getClass());
-        Object r1 = jexl.createExpression("463.0B - 0.1B").evaluate(jc);
+        final Object r1 = jexl.createExpression("463.0B - 0.1B").evaluate(jc);
         Assert.assertEquals(java.math.BigDecimal.class, r1.getClass());
     }
 
     @Test
     public void testAddWithStringsLenient() throws Exception {
-        JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(false)).create();
+        final JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(false)).create();
         JexlScript script;
         Object result;
         script = jexl.createScript("'a' + 0");
@@ -562,7 +562,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testAddWithStringsStrict() throws Exception {
-        JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(true)).create();
+        final JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(true)).create();
         JexlScript script;
         Object result;
         script = jexl.createScript("'a' + 0");
@@ -600,11 +600,11 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testOption() throws Exception {
-        Map<String, Object> vars = new HashMap<String, Object>();
-        JexlEvalContext context = new JexlEvalContext(vars);
-        JexlOptions options = context.getEngineOptions();
+        final Map<String, Object> vars = new HashMap<String, Object>();
+        final JexlEvalContext context = new JexlEvalContext(vars);
+        final JexlOptions options = context.getEngineOptions();
         options.setStrictArithmetic(true);
-        JexlScript script = JEXL.createScript("0 + '1.2' ");
+        final JexlScript script = JEXL.createScript("0 + '1.2' ");
         Object result;
 
         options.setStrictArithmetic(true);
@@ -618,7 +618,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testIsFloatingPointPattern() throws Exception {
-        JexlArithmetic ja = new JexlArithmetic(true);
+        final JexlArithmetic ja = new JexlArithmetic(true);
 
         Assert.assertFalse(ja.isFloatingPointNumber("floating point"));
         Assert.assertFalse(ja.isFloatingPointNumber("a1."));
@@ -658,25 +658,25 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     public static class EmptyTestContext extends MapContext implements JexlContext.NamespaceResolver {
-        public static int log(Object fmt, Object... arr) {
+        public static int log(final Object fmt, final Object... arr) {
             //System.out.println(String.format(fmt.toString(), arr));
             return arr == null ? 0 : arr.length;
         }
 
-        public static int log(Object fmt, int... arr) {
+        public static int log(final Object fmt, final int... arr) {
             //System.out.println(String.format(fmt.toString(), arr));
             return arr == null ? 0 : arr.length;
         }
 
         @Override
-        public Object resolveNamespace(String name) {
+        public Object resolveNamespace(final String name) {
             return this;
         }
     }
 
     @Test
     public void testEmpty() throws Exception {
-        Object[] SCRIPTS = {
+        final Object[] SCRIPTS = {
             "var x = null; log('x = %s', x);", 0,
             "var x = 'abc'; log('x = %s', x);", 1,
             "var x = 333; log('x = %s', x);", 1,
@@ -698,15 +698,15 @@ public class ArithmeticTest extends JexlTestCase {
             "var x = {}; return empty(x);", true,
             "var x = {'A','B'}; return empty(x);", false
         };
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlContext jc = new EmptyTestContext();
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext jc = new EmptyTestContext();
         JexlScript script;
 
         for (int e = 0; e < SCRIPTS.length; e += 2) {
-            String stext = (String) SCRIPTS[e];
-            Object expected = SCRIPTS[e + 1];
+            final String stext = (String) SCRIPTS[e];
+            final Object expected = SCRIPTS[e + 1];
             script = jexl.createScript(stext);
-            Object result = script.execute(jc);
+            final Object result = script.execute(jc);
             Assert.assertEquals("failed on " + stext, expected, result);
         }
     }
@@ -714,7 +714,7 @@ public class ArithmeticTest extends JexlTestCase {
     public static class Var {
         int value;
 
-        Var(int v) {
+        Var(final int v) {
             value = v;
         }
 
@@ -726,122 +726,122 @@ public class ArithmeticTest extends JexlTestCase {
 
     // an arithmetic that know how to subtract strings
     public static class ArithmeticPlus extends JexlArithmetic {
-        public ArithmeticPlus(boolean strict) {
+        public ArithmeticPlus(final boolean strict) {
             super(strict);
         }
 
-        public boolean equals(Var lhs, Var rhs) {
+        public boolean equals(final Var lhs, final Var rhs) {
             return lhs.value == rhs.value;
         }
 
-        public boolean lessThan(Var lhs, Var rhs) {
+        public boolean lessThan(final Var lhs, final Var rhs) {
             return lhs.value < rhs.value;
         }
 
-        public boolean lessThanOrEqual(Var lhs, Var rhs) {
+        public boolean lessThanOrEqual(final Var lhs, final Var rhs) {
             return lhs.value <= rhs.value;
         }
 
-        public boolean greaterThan(Var lhs, Var rhs) {
+        public boolean greaterThan(final Var lhs, final Var rhs) {
             return lhs.value > rhs.value;
         }
 
-        public boolean greaterThanOrEqual(Var lhs, Var rhs) {
+        public boolean greaterThanOrEqual(final Var lhs, final Var rhs) {
             return lhs.value >= rhs.value;
         }
 
-        public Var add(Var lhs, Var rhs) {
+        public Var add(final Var lhs, final Var rhs) {
             return new Var(lhs.value + rhs.value);
         }
 
-        public Var subtract(Var lhs, Var rhs) {
+        public Var subtract(final Var lhs, final Var rhs) {
             return new Var(lhs.value - rhs.value);
         }
 
-        public Var divide(Var lhs, Var rhs) {
+        public Var divide(final Var lhs, final Var rhs) {
             return new Var(lhs.value / rhs.value);
         }
 
-        public Var multiply(Var lhs, Var rhs) {
+        public Var multiply(final Var lhs, final Var rhs) {
             return new Var(lhs.value * rhs.value);
         }
 
-        public Var mod(Var lhs, Var rhs) {
+        public Var mod(final Var lhs, final Var rhs) {
             return new Var(lhs.value / rhs.value);
         }
 
-        public Var negate(Var arg) {
+        public Var negate(final Var arg) {
             return new Var(-arg.value);
         }
 
-        public Var and(Var lhs, Var rhs) {
+        public Var and(final Var lhs, final Var rhs) {
             return new Var(lhs.value & rhs.value);
         }
 
-        public Var or(Var lhs, Var rhs) {
+        public Var or(final Var lhs, final Var rhs) {
             return new Var(lhs.value | rhs.value);
         }
 
-        public Var xor(Var lhs, Var rhs) {
+        public Var xor(final Var lhs, final Var rhs) {
             return new Var(lhs.value ^ rhs.value);
         }
 
-        public Boolean contains(Var lhs, Var rhs) {
+        public Boolean contains(final Var lhs, final Var rhs) {
             return lhs.toString().contains(rhs.toString());
         }
 
-        public Boolean startsWith(Var lhs, Var rhs) {
+        public Boolean startsWith(final Var lhs, final Var rhs) {
             return lhs.toString().startsWith(rhs.toString());
         }
 
-        public Boolean endsWith(Var lhs, Var rhs) {
+        public Boolean endsWith(final Var lhs, final Var rhs) {
             return lhs.toString().endsWith(rhs.toString());
         }
 
-        public Var complement(Var arg) {
+        public Var complement(final Var arg) {
             return new Var(~arg.value);
         }
 
-        public Object subtract(String x, String y) {
-            int ix = x.indexOf(y);
+        public Object subtract(final String x, final String y) {
+            final int ix = x.indexOf(y);
             if (ix < 0) {
                 return x;
             }
-            StringBuilder strb = new StringBuilder(x.substring(0, ix));
+            final StringBuilder strb = new StringBuilder(x.substring(0, ix));
             strb.append(x.substring(ix + y.length()));
             return strb.toString();
         }
 
         public Object negate(final String str) {
             final int length = str.length();
-            StringBuilder strb = new StringBuilder(str.length());
+            final StringBuilder strb = new StringBuilder(str.length());
             for (int c = length - 1; c >= 0; --c) {
                 strb.append(str.charAt(c));
             }
             return strb.toString();
         }
 
-        public Object not(Var x) {
+        public Object not(final Var x) {
             throw new NullPointerException("make it fail");
         }
     }
 
     @Test
     public void testArithmeticPlus() throws Exception {
-        JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new ArithmeticPlus(false)).create();
-        JexlContext jc = new EmptyTestContext();
+        final JexlEngine jexl = new JexlBuilder().cache(64).arithmetic(new ArithmeticPlus(false)).create();
+        final JexlContext jc = new EmptyTestContext();
         runOverload(jexl, jc);
         runOverload(jexl, jc);
     }
 
     @Test
     public void testArithmeticPlusNoCache() throws Exception {
-        JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new ArithmeticPlus(false)).create();
-        JexlContext jc = new EmptyTestContext();
+        final JexlEngine jexl = new JexlBuilder().cache(0).arithmetic(new ArithmeticPlus(false)).create();
+        final JexlContext jc = new EmptyTestContext();
         runOverload(jexl, jc);
     }
 
-    protected void runOverload(JexlEngine jexl, JexlContext jc) {
+    protected void runOverload(final JexlEngine jexl, final JexlContext jc) {
         JexlScript script;
         Object result;
 
@@ -1019,25 +1019,25 @@ public class ArithmeticTest extends JexlTestCase {
         try {
             result = script.execute(jc, new Var(-42));
             Assert.fail("should fail");
-        } catch (JexlException xany) {
+        } catch (final JexlException xany) {
             Assert.assertTrue(xany instanceof JexlException.Operator);
         }
     }
 
     public static class Callable173 {
-        public Object call(String... arg) {
+        public Object call(final String... arg) {
             return 42;
         }
-        public Object call(Integer... arg) {
+        public Object call(final Integer... arg) {
             return arg[0] * arg[1];
         }
     }
 
     @Test
     public void testJexl173() throws Exception {
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlContext jc = new MapContext();
-        Callable173 c173 = new Callable173();
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext jc = new MapContext();
+        final Callable173 c173 = new Callable173();
         JexlScript e = jexl.createScript( "c173(9, 6)", "c173" );
         Object result = e.execute(jc, c173);
         Assert.assertEquals(54, result);
@@ -1052,8 +1052,8 @@ public class ArithmeticTest extends JexlTestCase {
             super(false);
         }
 
-        protected double divideZero(BigDecimal x) {
-            int ls = x.signum();
+        protected double divideZero(final BigDecimal x) {
+            final int ls = x.signum();
             if (ls < 0) {
                 return Double.NEGATIVE_INFINITY;
             } else if (ls > 0) {
@@ -1063,8 +1063,8 @@ public class ArithmeticTest extends JexlTestCase {
             }
         }
 
-        protected double divideZero(BigInteger x) {
-            int ls = x.signum();
+        protected double divideZero(final BigInteger x) {
+            final int ls = x.signum();
             if (ls < 0) {
                 return Double.NEGATIVE_INFINITY;
             } else if (ls > 0) {
@@ -1075,61 +1075,61 @@ public class ArithmeticTest extends JexlTestCase {
         }
 
         @Override
-        public Object divide(Object left, Object right) {
+        public Object divide(final Object left, final Object right) {
             if (left == null && right == null) {
                 return controlNullNullOperands();
             }
             // if either are bigdecimal use that type
             if (left instanceof BigDecimal || right instanceof BigDecimal) {
-                BigDecimal l = toBigDecimal(left);
-                BigDecimal r = toBigDecimal(right);
+                final BigDecimal l = toBigDecimal(left);
+                final BigDecimal r = toBigDecimal(right);
                 if (BigDecimal.ZERO.equals(r)) {
                     return divideZero(l);
                 }
-                BigDecimal result = l.divide(r, getMathContext());
+                final BigDecimal result = l.divide(r, getMathContext());
                 return narrowBigDecimal(left, right, result);
             }
             // if either are floating point (double or float) use double
             if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-                double l = toDouble(left);
-                double r = toDouble(right);
+                final double l = toDouble(left);
+                final double r = toDouble(right);
                 return new Double(l / r);
             }
             // otherwise treat as integers
-            BigInteger l = toBigInteger(left);
-            BigInteger r = toBigInteger(right);
+            final BigInteger l = toBigInteger(left);
+            final BigInteger r = toBigInteger(right);
             if (BigInteger.ZERO.equals(r)) {
                 return divideZero(l);
             }
-            BigInteger result = l.divide(r);
+            final BigInteger result = l.divide(r);
             return narrowBigInteger(left, right, result);
         }
 
         @Override
-        public Object mod(Object left, Object right) {
+        public Object mod(final Object left, final Object right) {
             if (left == null && right == null) {
                 return controlNullNullOperands();
             }
             // if either are bigdecimal use that type
             if (left instanceof BigDecimal || right instanceof BigDecimal) {
-                BigDecimal l = toBigDecimal(left);
-                BigDecimal r = toBigDecimal(right);
+                final BigDecimal l = toBigDecimal(left);
+                final BigDecimal r = toBigDecimal(right);
                 if (BigDecimal.ZERO.equals(r)) {
                     return divideZero(l);
                 }
-                BigDecimal remainder = l.remainder(r, getMathContext());
+                final BigDecimal remainder = l.remainder(r, getMathContext());
                 return narrowBigDecimal(left, right, remainder);
             }
             // if either are floating point (double or float) use double
             if (isFloatingPointNumber(left) || isFloatingPointNumber(right)) {
-                double l = toDouble(left);
-                double r = toDouble(right);
+                final double l = toDouble(left);
+                final double r = toDouble(right);
                 return new Double(l % r);
             }
             // otherwise treat as integers
-            BigInteger l = toBigInteger(left);
-            BigInteger r = toBigInteger(right);
-            BigInteger result = l.mod(r);
+            final BigInteger l = toBigInteger(left);
+            final BigInteger r = toBigInteger(right);
+            final BigInteger result = l.mod(r);
             if (BigInteger.ZERO.equals(r)) {
                 return divideZero(l);
             }
@@ -1139,9 +1139,9 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testInfiniteArithmetic() throws Exception {
-        Map<String, Object> ns = new HashMap<String, Object>();
+        final Map<String, Object> ns = new HashMap<String, Object>();
         ns.put("math", Math.class);
-        JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic132()).namespaces(ns).create();
+        final JexlEngine jexl = new JexlBuilder().arithmetic(new Arithmetic132()).namespaces(ns).create();
 
         Object evaluate = jexl.createExpression("1/0").evaluate(null);
         Assert.assertTrue(Double.isInfinite((Double) evaluate));
@@ -1159,26 +1159,26 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(42, evaluate);
     }
 
-    private static Document getDocument(String xml) throws Exception {
-        DocumentBuilder xmlBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        InputStream stringInputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+    private static Document getDocument(final String xml) throws Exception {
+        final DocumentBuilder xmlBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        final InputStream stringInputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
         return xmlBuilder.parse(stringInputStream);
     }
 
     public static class XmlArithmetic extends JexlArithmetic {
-        public XmlArithmetic(boolean astrict) {
+        public XmlArithmetic(final boolean astrict) {
             super(astrict);
         }
         
-        public XmlArithmetic(boolean astrict, MathContext bigdContext, int bigdScale) {
+        public XmlArithmetic(final boolean astrict, final MathContext bigdContext, final int bigdScale) {
             super(astrict, bigdContext, bigdScale);
         }
 
-        public boolean empty(org.w3c.dom.Element elt) {
+        public boolean empty(final org.w3c.dom.Element elt) {
             return !elt.hasAttributes() && !elt.hasChildNodes();
         }
 
-        public int size(org.w3c.dom.Element elt) {
+        public int size(final org.w3c.dom.Element elt) {
             return elt.getChildNodes().getLength();
         }
     }
@@ -1192,12 +1192,12 @@ public class ArithmeticTest extends JexlTestCase {
         Node x;
         Boolean empty;
         int size;
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlEngine jexl = new JexlBuilder().strict(true).safe(false).arithmetic(new XmlArithmetic(false)).create();
-        JexlScript e0 = jexl.createScript("x.empty()", "x");
-        JexlScript e1 = jexl.createScript("empty(x)", "x");
-        JexlScript s0 = jexl.createScript("x.size()", "x");
-        JexlScript s1 = jexl.createScript("size(x)", "x");
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).arithmetic(new XmlArithmetic(false)).create();
+        final JexlScript e0 = jexl.createScript("x.empty()", "x");
+        final JexlScript e1 = jexl.createScript("empty(x)", "x");
+        final JexlScript s0 = jexl.createScript("x.size()", "x");
+        final JexlScript s1 = jexl.createScript("size(x)", "x");
         
         empty = (Boolean) e1.execute(null, (Object) null);
         Assert.assertTrue(empty);
@@ -1205,22 +1205,22 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(0, size);
             
         try {
-            Object xx = e0.execute(null, (Object) null);
+            final Object xx = e0.execute(null, (Object) null);
             Assert.assertNull(xx);
-        } catch (JexlException.Variable xvar) {
+        } catch (final JexlException.Variable xvar) {
             Assert.assertNotNull(xvar);
         }
         try {
-            Object xx = s0.execute(null, (Object) null);
+            final Object xx = s0.execute(null, (Object) null);
             Assert.assertNull(xx);
-        } catch (JexlException.Variable xvar) {
+        } catch (final JexlException.Variable xvar) {
             Assert.assertNotNull(xvar);
         }
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.setSafe(true);
-        Object x0 = e0.execute(ctxt, (Object) null);
+        final Object x0 = e0.execute(ctxt, (Object) null);
         Assert.assertNull(x0);
-        Object x1 = s0.execute(ctxt, (Object) null);
+        final Object x1 = s0.execute(ctxt, (Object) null);
         Assert.assertNull(x1);
         
         xml = getDocument("<node info='123'/>");
@@ -1259,12 +1259,12 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals("123", info.getValue());
 
         // JEXL-161
-        JexlContext jc = new MapContext();
+        final JexlContext jc = new MapContext();
         jc.set("x", xml.getLastChild());
         final String y = "456";
         jc.set("y", y);
-        JexlScript s = jexl.createScript("x.attribute.info = y");
-        Object r = s.execute(jc);
+        final JexlScript s = jexl.createScript("x.attribute.info = y");
+        final Object r = s.execute(jc);
         nnm = xml.getLastChild().getAttributes();
         info = (Attr) nnm.getNamedItem("info");
         Assert.assertEquals(y, r);
@@ -1321,26 +1321,26 @@ public class ArithmeticTest extends JexlTestCase {
 
     }
 
-    void checkEmpty(Object x, boolean expect) {
-        JexlScript s0 = JEXL.createScript("empty(x)", "x");
+    void checkEmpty(final Object x, final boolean expect) {
+        final JexlScript s0 = JEXL.createScript("empty(x)", "x");
         boolean empty = (Boolean) s0.execute(null, x);
         Assert.assertEquals(expect, empty);
-        JexlScript s1 = JEXL.createScript("empty x", "x");
+        final JexlScript s1 = JEXL.createScript("empty x", "x");
         empty = (Boolean) s1.execute(null, x);
         Assert.assertEquals(expect, empty);
-        JexlScript s2 = JEXL.createScript("x.empty()", "x");
+        final JexlScript s2 = JEXL.createScript("x.empty()", "x");
         empty = (Boolean) s2.execute(null, x);
         Assert.assertEquals(expect, empty);
     }
 
     @Test
     public void testCoerceInteger() throws Exception {
-        JexlArithmetic ja = JEXL.getArithmetic();
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlArithmetic ja = JEXL.getArithmetic();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
-        String stmt = "a = 34L; b = 45.0D; c=56.0F; d=67B; e=78H;";
-        JexlScript expr = JEXL.createScript(stmt);
+        final String stmt = "a = 34L; b = 45.0D; c=56.0F; d=67B; e=78H;";
+        final JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertEquals(34, ja.toInteger(ctxt.get("a")));
         Assert.assertEquals(45, ja.toInteger(ctxt.get("b")));
@@ -1354,12 +1354,12 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testCoerceLong() throws Exception {
-        JexlArithmetic ja = JEXL.getArithmetic();
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlArithmetic ja = JEXL.getArithmetic();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
-        String stmt = "a = 34L; b = 45.0D; c=56.0F; d=67B; e=78H;";
-        JexlScript expr = JEXL.createScript(stmt);
+        final String stmt = "a = 34L; b = 45.0D; c=56.0F; d=67B; e=78H;";
+        final JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertEquals(34L, ja.toLong(ctxt.get("a")));
         Assert.assertEquals(45L, ja.toLong(ctxt.get("b")));
@@ -1373,12 +1373,12 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testCoerceDouble() throws Exception {
-        JexlArithmetic ja = JEXL.getArithmetic();
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlArithmetic ja = JEXL.getArithmetic();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
-        String stmt = "{a = 34L; b = 45.0D; c=56.0F; d=67B; e=78H; }";
-        JexlScript expr = JEXL.createScript(stmt);
+        final String stmt = "{a = 34L; b = 45.0D; c=56.0F; d=67B; e=78H; }";
+        final JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertEquals(34, ja.toDouble(ctxt.get("a")), EPSILON);
         Assert.assertEquals(45, ja.toDouble(ctxt.get("b")), EPSILON);
@@ -1392,12 +1392,12 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testCoerceBigInteger() throws Exception {
-        JexlArithmetic ja = JEXL.getArithmetic();
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlArithmetic ja = JEXL.getArithmetic();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
-        String stmt = "{a = 34L; b = 45.0D; c=56.0F; d=67B; e=78H; }";
-        JexlScript expr = JEXL.createScript(stmt);
+        final String stmt = "{a = 34L; b = 45.0D; c=56.0F; d=67B; e=78H; }";
+        final JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertEquals(BigInteger.valueOf(34), ja.toBigInteger(ctxt.get("a")));
         Assert.assertEquals(BigInteger.valueOf(45), ja.toBigInteger(ctxt.get("b")));
@@ -1411,12 +1411,12 @@ public class ArithmeticTest extends JexlTestCase {
 
     @Test
     public void testCoerceBigDecimal() throws Exception {
-        JexlArithmetic ja = JEXL.getArithmetic();
-        JexlEvalContext ctxt = new JexlEvalContext();
-        JexlOptions options = ctxt.getEngineOptions();
+        final JexlArithmetic ja = JEXL.getArithmetic();
+        final JexlEvalContext ctxt = new JexlEvalContext();
+        final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
-        String stmt = "{a = 34L; b = 45.0D; c=56.0F; d=67B; e=78H; }";
-        JexlScript expr = JEXL.createScript(stmt);
+        final String stmt = "{a = 34L; b = 45.0D; c=56.0F; d=67B; e=78H; }";
+        final JexlScript expr = JEXL.createScript(stmt);
         /* Object value = */ expr.execute(ctxt);
         Assert.assertEquals(BigDecimal.valueOf(34), ja.toBigDecimal(ctxt.get("a")));
         Assert.assertEquals(BigDecimal.valueOf(45.), ja.toBigDecimal(ctxt.get("b")));
@@ -1432,8 +1432,8 @@ public class ArithmeticTest extends JexlTestCase {
     public void testAtomicBoolean() throws Exception {
         // in a condition
         JexlScript e = JEXL.createScript("if (x) 1 else 2;", "x");
-        JexlContext jc = new MapContext();
-        AtomicBoolean ab = new AtomicBoolean(false);
+        final JexlContext jc = new MapContext();
+        final AtomicBoolean ab = new AtomicBoolean(false);
         Object o;
         o = e.execute(jc, ab);
         Assert.assertEquals("Result is not 2", new Integer(2), o);
@@ -1466,14 +1466,14 @@ public class ArithmeticTest extends JexlTestCase {
         o = e.execute(jc, 10.d, ab);
         Assert.assertEquals(11.d, (Double) o, EPSILON);
 
-        BigInteger bi10 = BigInteger.TEN;
+        final BigInteger bi10 = BigInteger.TEN;
         ab.set(false);
         o = e.execute(jc, ab, bi10);
         Assert.assertEquals(bi10, o);
         o = e.execute(jc, bi10, ab);
         Assert.assertEquals(bi10, o);
 
-        BigDecimal bd10 = BigDecimal.TEN;
+        final BigDecimal bd10 = BigDecimal.TEN;
         ab.set(false);
         o = e.execute(jc, ab, bd10);
         Assert.assertEquals(bd10, o);

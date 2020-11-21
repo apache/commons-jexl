@@ -44,16 +44,16 @@ public class ScriptCallableTest extends JexlTestCase {
 
     @Test
     public void testFuture() throws Exception {
-        JexlScript e = JEXL.createScript("while(true);");
-        FutureTask<Object> future = new FutureTask<Object>(e.callable(null));
+        final JexlScript e = JEXL.createScript("while(true);");
+        final FutureTask<Object> future = new FutureTask<Object>(e.callable(null));
 
-        ExecutorService executor = Executors.newFixedThreadPool(1);
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
         executor.submit(future);
         Object t = 42;
         try {
             t = future.get(100, TimeUnit.MILLISECONDS);
             Assert.fail("should have timed out");
-        } catch (TimeoutException xtimeout) {
+        } catch (final TimeoutException xtimeout) {
             // ok, ignore
             future.cancel(true);
         } finally {
@@ -67,25 +67,25 @@ public class ScriptCallableTest extends JexlTestCase {
     @Test
     public void testCallableCancel() throws Exception {
         final Semaphore latch = new Semaphore(0);
-        JexlContext ctxt = new MapContext();
+        final JexlContext ctxt = new MapContext();
         ctxt.set("latch", latch);
 
-        JexlScript e = JEXL.createScript("latch.release(); while(true);");
+        final JexlScript e = JEXL.createScript("latch.release(); while(true);");
         final Script.Callable c = (Script.Callable) e.callable(ctxt);
         Object t = 42;
-        Callable<Object> kc = () -> {
+        final Callable<Object> kc = () -> {
             latch.acquire();
             return c.cancel();
         };
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        Future<?> future = executor.submit(c);
-        Future<?> kfc = executor.submit(kc);
+        final ExecutorService executor = Executors.newFixedThreadPool(2);
+        final Future<?> future = executor.submit(c);
+        final Future<?> kfc = executor.submit(kc);
         List<Runnable> lr;
         try {
             Assert.assertTrue((Boolean) kfc.get());
             t = future.get();
             Assert.fail("should have been cancelled");
-        } catch (ExecutionException xexec) {
+        } catch (final ExecutionException xexec) {
             // ok, ignore
             Assert.assertTrue(xexec.getCause() instanceof JexlException.Cancel);
         } finally {
@@ -98,7 +98,7 @@ public class ScriptCallableTest extends JexlTestCase {
     public static class CancellationContext extends MapContext implements JexlContext.CancellationHandle {
         private final AtomicBoolean cancellation;
         
-        CancellationContext(AtomicBoolean c) {
+        CancellationContext(final AtomicBoolean c) {
             cancellation = c;
         }
         @Override
@@ -112,25 +112,25 @@ public class ScriptCallableTest extends JexlTestCase {
     public void testCallableCancellation() throws Exception {
         final Semaphore latch = new Semaphore(0);
         final AtomicBoolean cancel = new AtomicBoolean(false);
-        JexlContext ctxt = new CancellationContext(cancel);
+        final JexlContext ctxt = new CancellationContext(cancel);
         ctxt.set("latch", latch);
 
-        JexlScript e = JEXL.createScript("latch.release(); while(true);");
+        final JexlScript e = JEXL.createScript("latch.release(); while(true);");
         final Script.Callable c = (Script.Callable) e.callable(ctxt);
         Object t = 42;
-        Callable<Object> kc = () -> {
+        final Callable<Object> kc = () -> {
             latch.acquire();
             return cancel.compareAndSet(false, true);
         };
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        Future<?> future = executor.submit(c);
-        Future<?> kfc = executor.submit(kc);
+        final ExecutorService executor = Executors.newFixedThreadPool(2);
+        final Future<?> future = executor.submit(c);
+        final Future<?> kfc = executor.submit(kc);
         List<Runnable> lr;
         try {
             Assert.assertTrue((Boolean) kfc.get());
             t = future.get();
             Assert.fail("should have been cancelled");
-        } catch (ExecutionException xexec) {
+        } catch (final ExecutionException xexec) {
             // ok, ignore
             Assert.assertTrue(xexec.getCause() instanceof JexlException.Cancel);
         } finally {
@@ -144,20 +144,20 @@ public class ScriptCallableTest extends JexlTestCase {
     public void testCallableTimeout() throws Exception {
         List<Runnable> lr = null;
         final Semaphore latch = new Semaphore(0);
-        JexlContext ctxt = new MapContext();
+        final JexlContext ctxt = new MapContext();
         ctxt.set("latch", latch);
 
-        JexlScript e = JEXL.createScript("latch.release(); while(true);");
-        Callable<Object> c = e.callable(ctxt);
+        final JexlScript e = JEXL.createScript("latch.release(); while(true);");
+        final Callable<Object> c = e.callable(ctxt);
         Object t = 42;
 
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        Future<?> future = executor.submit(c);
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
+        final Future<?> future = executor.submit(c);
         try {
             latch.acquire();
             t = future.get(100, TimeUnit.MILLISECONDS);
             Assert.fail("should have timed out");
-        } catch (TimeoutException xtimeout) {
+        } catch (final TimeoutException xtimeout) {
             // ok, ignore
             future.cancel(true);
         } finally {
@@ -171,16 +171,16 @@ public class ScriptCallableTest extends JexlTestCase {
     @Test
     public void testCallableClosure() throws Exception {
         List<Runnable> lr = null;
-        JexlScript e = JEXL.createScript("function(t) {while(t);}");
-        Callable<Object> c = e.callable(null, Boolean.TRUE);
+        final JexlScript e = JEXL.createScript("function(t) {while(t);}");
+        final Callable<Object> c = e.callable(null, Boolean.TRUE);
         Object t = 42;
 
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        Future<?> future = executor.submit(c);
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
+        final Future<?> future = executor.submit(c);
         try {
             t = future.get(100, TimeUnit.MILLISECONDS);
             Assert.fail("should have timed out");
-        } catch (TimeoutException xtimeout) {
+        } catch (final TimeoutException xtimeout) {
             // ok, ignore
             future.cancel(true);
         } finally {
@@ -193,20 +193,20 @@ public class ScriptCallableTest extends JexlTestCase {
 
     public static class TestContext extends MapContext implements JexlContext.NamespaceResolver {
         @Override
-        public Object resolveNamespace(String name) {
+        public Object resolveNamespace(final String name) {
             return name == null ? this : null;
         }
 
-        public int wait(int s) throws InterruptedException {
+        public int wait(final int s) throws InterruptedException {
             Thread.sleep(1000 * s);
             return s;
         }
 
-        public int waitInterrupt(int s) {
+        public int waitInterrupt(final int s) {
             try {
                 Thread.sleep(1000 * s);
                 return s;
-            } catch (InterruptedException xint) {
+            } catch (final InterruptedException xint) {
                 Thread.currentThread().interrupt();
             }
             return -1;
@@ -226,11 +226,11 @@ public class ScriptCallableTest extends JexlTestCase {
             return 42;
         }
 
-        public void sleep(long millis) throws InterruptedException {
+        public void sleep(final long millis) throws InterruptedException {
             Thread.sleep(millis);
         }
 
-        public int hangs(Object t) {
+        public int hangs(final Object t) {
             return 1;
         }
     }
@@ -238,13 +238,13 @@ public class ScriptCallableTest extends JexlTestCase {
     @Test
     public void testNoWait() throws Exception {
         List<Runnable> lr = null;
-        JexlScript e = JEXL.createScript("wait(0)");
-        Callable<Object> c = e.callable(new TestContext());
+        final JexlScript e = JEXL.createScript("wait(0)");
+        final Callable<Object> c = e.callable(new TestContext());
 
-        ExecutorService executor = Executors.newFixedThreadPool(1);
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
         try {
-            Future<?> future = executor.submit(c);
-            Object t = future.get(2, TimeUnit.SECONDS);
+            final Future<?> future = executor.submit(c);
+            final Object t = future.get(2, TimeUnit.SECONDS);
             Assert.assertTrue(future.isDone());
             Assert.assertEquals(0, t);
         } finally {
@@ -256,13 +256,13 @@ public class ScriptCallableTest extends JexlTestCase {
     @Test
     public void testWait() throws Exception {
         List<Runnable> lr = null;
-        JexlScript e = JEXL.createScript("wait(1)");
-        Callable<Object> c = e.callable(new TestContext());
+        final JexlScript e = JEXL.createScript("wait(1)");
+        final Callable<Object> c = e.callable(new TestContext());
 
-        ExecutorService executor = Executors.newFixedThreadPool(1);
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
         try {
-            Future<?> future = executor.submit(c);
-            Object t = future.get(2, TimeUnit.SECONDS);
+            final Future<?> future = executor.submit(c);
+            final Object t = future.get(2, TimeUnit.SECONDS);
             Assert.assertEquals(1, t);
         } finally {
             lr = executor.shutdownNow();
@@ -273,17 +273,17 @@ public class ScriptCallableTest extends JexlTestCase {
     @Test
     public void testCancelWait() throws Exception {
         List<Runnable> lr = null;
-        JexlScript e = JEXL.createScript("wait(10)");
-        Callable<Object> c = e.callable(new TestContext());
+        final JexlScript e = JEXL.createScript("wait(10)");
+        final Callable<Object> c = e.callable(new TestContext());
 
-        ExecutorService executor = Executors.newFixedThreadPool(1);
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
         try {
-            Future<?> future = executor.submit(c);
+            final Future<?> future = executor.submit(c);
             Object t = 42;
             try {
                 t = future.get(100, TimeUnit.MILLISECONDS);
                 Assert.fail("should have timed out");
-            } catch (TimeoutException xtimeout) {
+            } catch (final TimeoutException xtimeout) {
                 // ok, ignore
                 future.cancel(true);
             }
@@ -298,17 +298,17 @@ public class ScriptCallableTest extends JexlTestCase {
     @Test
     public void testCancelWaitInterrupt() throws Exception {
         List<Runnable> lr = null;
-        JexlScript e = JEXL.createScript("waitInterrupt(42)");
-        Callable<Object> c = e.callable(new TestContext());
+        final JexlScript e = JEXL.createScript("waitInterrupt(42)");
+        final Callable<Object> c = e.callable(new TestContext());
 
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        Future<?> future = executor.submit(c);
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
+        final Future<?> future = executor.submit(c);
         Object t = 42;
 
         try {
             t = future.get(100, TimeUnit.MILLISECONDS);
             Assert.fail("should have timed out");
-        } catch (TimeoutException xtimeout) {
+        } catch (final TimeoutException xtimeout) {
             // ok, ignore
             future.cancel(true);
         } finally {
@@ -323,21 +323,21 @@ public class ScriptCallableTest extends JexlTestCase {
     public void testCancelForever() throws Exception {
         List<Runnable> lr = null;
         final Semaphore latch = new Semaphore(0);
-        JexlContext ctxt = new TestContext();
+        final JexlContext ctxt = new TestContext();
         ctxt.set("latch", latch);
 
-        JexlScript e = JEXL.createScript("latch.release(); runForever()");
-        Callable<Object> c = e.callable(ctxt);
+        final JexlScript e = JEXL.createScript("latch.release(); runForever()");
+        final Callable<Object> c = e.callable(ctxt);
 
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        Future<?> future = executor.submit(c);
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
+        final Future<?> future = executor.submit(c);
         Object t = 42;
 
         try {
             latch.acquire();
             t = future.get(100, TimeUnit.MILLISECONDS);
             Assert.fail("should have timed out");
-        } catch (TimeoutException xtimeout) {
+        } catch (final TimeoutException xtimeout) {
             // ok, ignore
             future.cancel(true);
         } finally {
@@ -351,17 +351,17 @@ public class ScriptCallableTest extends JexlTestCase {
     @Test
     public void testCancelLoopWait() throws Exception {
         List<Runnable> lr = null;
-        JexlScript e = JEXL.createScript("while (true) { wait(10) }");
-        Callable<Object> c = e.callable(new TestContext());
+        final JexlScript e = JEXL.createScript("while (true) { wait(10) }");
+        final Callable<Object> c = e.callable(new TestContext());
 
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        Future<?> future = executor.submit(c);
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
+        final Future<?> future = executor.submit(c);
         Object t = 42;
 
         try {
             t = future.get(100, TimeUnit.MILLISECONDS);
             Assert.fail("should have timed out");
-        } catch (TimeoutException xtimeout) {
+        } catch (final TimeoutException xtimeout) {
             future.cancel(true);
         } finally {
             lr = executor.shutdownNow();
@@ -400,14 +400,14 @@ public class ScriptCallableTest extends JexlTestCase {
      * Redundant test with previous ones but impervious to JEXL engine configuation.
      * @throws Exception if there is a regression
      */
-    private void runInterrupt(JexlEngine jexl) throws Exception {
+    private void runInterrupt(final JexlEngine jexl) throws Exception {
         List<Runnable> lr = null;
-        ExecutorService exec = Executors.newFixedThreadPool(2);
+        final ExecutorService exec = Executors.newFixedThreadPool(2);
         try {
-            JexlContext ctxt = new TestContext();
+            final JexlContext ctxt = new TestContext();
 
             // run an interrupt
-            JexlScript sint = jexl.createScript("interrupt(); return 42");
+            final JexlScript sint = jexl.createScript("interrupt(); return 42");
             Object t = null;
             Script.Callable c = (Script.Callable) sint.callable(ctxt);
             try {
@@ -415,7 +415,7 @@ public class ScriptCallableTest extends JexlTestCase {
                 if (c.isCancellable()) {
                     Assert.fail("should have thrown a Cancel");
                 }
-            } catch (JexlException.Cancel xjexl) {
+            } catch (final JexlException.Cancel xjexl) {
                 if (!c.isCancellable()) {
                     Assert.fail("should not have thrown " + xjexl);
                 }
@@ -432,7 +432,7 @@ public class ScriptCallableTest extends JexlTestCase {
                 if (c.isCancellable()) {
                     Assert.fail("should have thrown a Cancel");
                 }
-            } catch (ExecutionException xexec) {
+            } catch (final ExecutionException xexec) {
                 if (!c.isCancellable()) {
                     Assert.fail("should not have thrown " + xexec);
                 }
@@ -441,12 +441,12 @@ public class ScriptCallableTest extends JexlTestCase {
             Assert.assertNotEquals(42, t);
 
             // timeout a sleep
-            JexlScript ssleep = jexl.createScript("sleep(30000); return 42");
+            final JexlScript ssleep = jexl.createScript("sleep(30000); return 42");
             try {
                 f = exec.submit(ssleep.callable(ctxt));
                 t = f.get(100L, TimeUnit.MILLISECONDS);
                 Assert.fail("should timeout");
-            } catch (TimeoutException xtimeout) {
+            } catch (final TimeoutException xtimeout) {
                 if (f != null) {
                     f.cancel(true);
                 }
@@ -456,10 +456,10 @@ public class ScriptCallableTest extends JexlTestCase {
             // cancel a sleep
             try {
                 final Future<Object> fc = exec.submit(ssleep.callable(ctxt));
-                Runnable cancels = () -> {
+                final Runnable cancels = () -> {
                     try {
                         Thread.sleep(200L);
-                    } catch (Exception xignore) {
+                    } catch (final Exception xignore) {
 
                     }
                     fc.cancel(true);
@@ -467,17 +467,17 @@ public class ScriptCallableTest extends JexlTestCase {
                 exec.submit(cancels);
                 t = f.get(100L, TimeUnit.MILLISECONDS);
                 Assert.fail("should be cancelled");
-            } catch (CancellationException xexec) {
+            } catch (final CancellationException xexec) {
                 // this is the expected result
             }
 
             // timeout a while(true)
-            JexlScript swhile = jexl.createScript("while(true); return 42");
+            final JexlScript swhile = jexl.createScript("while(true); return 42");
             try {
                 f = exec.submit(swhile.callable(ctxt));
                 t = f.get(100L, TimeUnit.MILLISECONDS);
                 Assert.fail("should timeout");
-            } catch (TimeoutException xtimeout) {
+            } catch (final TimeoutException xtimeout) {
                 if (f != null) {
                     f.cancel(true);
                 }
@@ -487,10 +487,10 @@ public class ScriptCallableTest extends JexlTestCase {
             // cancel a while(true)
             try {
                 final Future<Object> fc = exec.submit(swhile.callable(ctxt));
-                Runnable cancels = () -> {
+                final Runnable cancels = () -> {
                     try {
                         Thread.sleep(200L);
-                    } catch (Exception xignore) {
+                    } catch (final Exception xignore) {
 
                     }
                     fc.cancel(true);
@@ -498,7 +498,7 @@ public class ScriptCallableTest extends JexlTestCase {
                 exec.submit(cancels);
                 t = fc.get();
                 Assert.fail("should be cancelled");
-            } catch (CancellationException xexec) {
+            } catch (final CancellationException xexec) {
                 // this is the expected result
             }
             Assert.assertNotEquals(42, t);
@@ -510,15 +510,15 @@ public class ScriptCallableTest extends JexlTestCase {
 
     @Test
     public void testHangs() throws Exception {
-        JexlScript e = JEXL.createScript("hangs()");
-        Callable<Object> c = e.callable(new TestContext());
+        final JexlScript e = JEXL.createScript("hangs()");
+        final Callable<Object> c = e.callable(new TestContext());
 
-        ExecutorService executor = Executors.newFixedThreadPool(1);
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
         try {
-            Future<?> future = executor.submit(c);
-            Object t = future.get(1, TimeUnit.SECONDS);
+            final Future<?> future = executor.submit(c);
+            final Object t = future.get(1, TimeUnit.SECONDS);
             Assert.fail("hangs should not be solved");
-        } catch(ExecutionException xexec) {
+        } catch(final ExecutionException xexec) {
             Assert.assertTrue(xexec.getCause() instanceof JexlException.Method);
         } finally {
             executor.shutdown();
@@ -527,19 +527,19 @@ public class ScriptCallableTest extends JexlTestCase {
 
     public static class AnnotationContext extends MapContext implements JexlContext.AnnotationProcessor {
         @Override
-        public Object processAnnotation(String name, Object[] args, Callable<Object> statement) throws Exception {
+        public Object processAnnotation(final String name, final Object[] args, final Callable<Object> statement) throws Exception {
             if ("timeout".equals(name) && args != null && args.length > 0) {
-                long ms = args[0] instanceof Number
+                final long ms = args[0] instanceof Number
                           ? ((Number) args[0]).longValue()
                           : Long.parseLong(args[0].toString());
-                Object def = args.length > 1? args[1] : null;
+                final Object def = args.length > 1? args[1] : null;
                 if (ms > 0) {
-                    ExecutorService executor = Executors.newFixedThreadPool(1);
+                    final ExecutorService executor = Executors.newFixedThreadPool(1);
                     Future<?> future = null;
                     try {
                         future = executor.submit(statement);
                         return future.get(ms, TimeUnit.MILLISECONDS);
-                    } catch (TimeoutException xtimeout) {
+                    } catch (final TimeoutException xtimeout) {
                         if (future != null) {
                             future.cancel(true);
                         }
@@ -553,7 +553,7 @@ public class ScriptCallableTest extends JexlTestCase {
             return statement.call();
         }
 
-        public void sleep(long ms) throws InterruptedException {
+        public void sleep(final long ms) throws InterruptedException {
            Thread.sleep(ms);
         }
 
@@ -562,11 +562,11 @@ public class ScriptCallableTest extends JexlTestCase {
     @Test
     public void testTimeout() throws Exception {
         JexlScript script = JEXL.createScript("(flag)->{ @timeout(100) { while(flag); return 42 }; 'cancelled' }");
-        JexlContext ctxt = new AnnotationContext();
+        final JexlContext ctxt = new AnnotationContext();
         Object result = null;
         try {
             result = script.execute(ctxt, true);
-        } catch (Exception xany) {
+        } catch (final Exception xany) {
             Assert.fail(xany.toString());
         }
         Assert.assertEquals("cancelled", result);
@@ -576,7 +576,7 @@ public class ScriptCallableTest extends JexlTestCase {
         script = JEXL.createScript("(flag)->{ @timeout(100, 'cancelled') { while(flag); 42; } }");
         try {
             result = script.execute(ctxt, true);
-        } catch (Exception xany) {
+        } catch (final Exception xany) {
             Assert.fail(xany.toString());
         }
         Assert.assertEquals("cancelled", result);
@@ -586,7 +586,7 @@ public class ScriptCallableTest extends JexlTestCase {
         script = JEXL.createScript("@timeout(10) {sleep(1000); 42; } -42;");
         try {
             result = script.execute(ctxt);
-        } catch (Exception xany) {
+        } catch (final Exception xany) {
             Assert.fail(xany.toString());
         }
         Assert.assertEquals(-42, result);
@@ -594,14 +594,14 @@ public class ScriptCallableTest extends JexlTestCase {
         script = JEXL.createScript("@timeout(10) {sleep(1000); return 42; } return -42;");
         try {
             result = script.execute(ctxt);
-        } catch (Exception xany) {
+        } catch (final Exception xany) {
             Assert.fail(xany.toString());
         }
         Assert.assertEquals(-42, result);
         script = JEXL.createScript("@timeout(1000) {sleep(10); return 42; } return -42;");
         try {
             result = script.execute(ctxt);
-        } catch (Exception xany) {
+        } catch (final Exception xany) {
             Assert.fail(xany.toString());
         }
         Assert.assertEquals(42, result);

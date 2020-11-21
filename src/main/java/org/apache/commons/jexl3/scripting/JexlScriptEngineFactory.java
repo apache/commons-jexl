@@ -63,14 +63,14 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     }
 
     @Override
-    public String getMethodCallSyntax(String obj, String m, String... args) {
-        StringBuilder sb = new StringBuilder();
+    public String getMethodCallSyntax(final String obj, final String m, final String... args) {
+        final StringBuilder sb = new StringBuilder();
         sb.append(obj);
         sb.append('.');
         sb.append(m);
         sb.append('(');
         boolean needComma = false;
-        for(String arg : args){
+        for(final String arg : args){
             if (needComma) {
                 sb.append(',');
             }
@@ -101,7 +101,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     }
 
     @Override
-    public String getOutputStatement(String toDisplay) {
+    public String getOutputStatement(final String toDisplay) {
         if (toDisplay == null) {
             return "JEXL.out.print(null)";
         } else {
@@ -110,7 +110,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     }
 
     @Override
-    public Object getParameter(String key) {
+    public Object getParameter(final String key) {
         switch (key) {
             case ScriptEngine.ENGINE:
                 return getEngineName();
@@ -135,9 +135,9 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     }
 
     @Override
-    public String getProgram(String... statements) {
-        StringBuilder sb = new StringBuilder();
-        for(String statement : statements){
+    public String getProgram(final String... statements) {
+        final StringBuilder sb = new StringBuilder();
+        for(final String statement : statements){
             sb.append(statement.trim());
             if (!statement.endsWith(";")){
                 sb.append(';');

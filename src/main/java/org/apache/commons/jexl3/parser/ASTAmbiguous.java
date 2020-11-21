@@ -18,16 +18,16 @@ package org.apache.commons.jexl3.parser;
 
 public final class ASTAmbiguous extends JexlNode {
 
-    ASTAmbiguous(int id) {
+    ASTAmbiguous(final int id) {
         super(id);
     }
 
-    ASTAmbiguous(Parser p, int id) {
+    ASTAmbiguous(final Parser p, final int id) {
         super(p, id);
     }
 
     @Override
-    public Object jjtAccept(ParserVisitor visitor, Object data) {
+    public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
 }

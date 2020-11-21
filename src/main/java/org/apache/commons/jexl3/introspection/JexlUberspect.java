@@ -97,12 +97,12 @@ public interface JexlUberspect {
         CONTAINER;
 
         @Override
-        public final JexlPropertyGet getPropertyGet(JexlUberspect uber, Object obj, Object identifier) {
+        public final JexlPropertyGet getPropertyGet(final JexlUberspect uber, final Object obj, final Object identifier) {
             return uber.getPropertyGet(Collections.singletonList(this), obj, identifier);
         }
 
         @Override
-        public final JexlPropertySet getPropertySet(JexlUberspect uber, Object obj, Object identifier, Object arg) {
+        public final JexlPropertySet getPropertySet(final JexlUberspect uber, final Object obj, final Object identifier, final Object arg) {
             return uber.getPropertySet(Collections.singletonList(this), obj, identifier, arg);
         }
     }

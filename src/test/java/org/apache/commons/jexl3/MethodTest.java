@@ -45,14 +45,14 @@ public class MethodTest extends JexlTestCase {
 
     public static class VarArgs {
         public String callInts() {
-            int result = -5000;
+            final int result = -5000;
             return "Varargs:" + result;
         }
 
-        public String callInts(Integer... args) {
+        public String callInts(final Integer... args) {
             int result = 0;
             if (args != null) {
-                for (Integer arg : args) {
+                for (final Integer arg : args) {
                     result += arg != null ? arg : -100;
                 }
             } else {
@@ -61,10 +61,10 @@ public class MethodTest extends JexlTestCase {
             return "Varargs:" + result;
         }
 
-        public String callMixed(Integer fixed, Integer... args) {
+        public String callMixed(final Integer fixed, final Integer... args) {
             int result = fixed;
             if (args != null) {
-                for (Integer arg : args) {
+                for (final Integer arg : args) {
                     result += arg != null ? arg : -100;
                 }
             } else {
@@ -73,10 +73,10 @@ public class MethodTest extends JexlTestCase {
             return "Mixed:" + result;
         }
 
-        public String callMixed(String mixed, Integer... args) {
+        public String callMixed(final String mixed, final Integer... args) {
             int result = 0;
             if (args != null) {
-                for (Integer arg : args) {
+                for (final Integer arg : args) {
                     result += arg != null ? arg : -100;
                 }
             } else {
@@ -85,9 +85,9 @@ public class MethodTest extends JexlTestCase {
             return mixed + ":" + result;
         }
 
-        public String concat(String... strs) {
+        public String concat(final String... strs) {
             if (strs.length > 0) {
-                StringBuilder strb = new StringBuilder(strs[0]);
+                final StringBuilder strb = new StringBuilder(strs[0]);
                 for (int s = 1; s < strs.length; ++s) {
                     strb.append(", ");
                     strb.append(strs[s]);
@@ -103,12 +103,12 @@ public class MethodTest extends JexlTestCase {
         int factor = 6;
         final Map<String, Object> funcs;
 
-        EnhancedContext(Map<String, Object> funcs) {
+        EnhancedContext(final Map<String, Object> funcs) {
             this.funcs = funcs;
         }
 
         @Override
-        public Object resolveNamespace(String name) {
+        public Object resolveNamespace(final String name) {
             return funcs.get(name);
         }
     }
@@ -116,11 +116,11 @@ public class MethodTest extends JexlTestCase {
     public static class ContextualFunctor {
         private final EnhancedContext context;
 
-        public ContextualFunctor(EnhancedContext theContext) {
+        public ContextualFunctor(final EnhancedContext theContext) {
             context = theContext;
         }
 
-        public int ratio(int n) {
+        public int ratio(final int n) {
             context.factor -= 1;
             return n / context.factor;
         }
@@ -134,7 +134,7 @@ public class MethodTest extends JexlTestCase {
 
     @Test
     public void testCallVarArgMethod() throws Exception {
-        VarArgs test = new VarArgs();
+        final VarArgs test = new VarArgs();
         asserter.setVariable("test", test);
         asserter.assertExpression("test.callInts()", test.callInts());
         asserter.assertExpression("test.callInts(1)", test.callInts(1));
@@ -146,7 +146,7 @@ public class MethodTest extends JexlTestCase {
 
     @Test
     public void testCallMixedVarArgMethod() throws Exception {
-        VarArgs test = new VarArgs();
+        final VarArgs test = new VarArgs();
         asserter.setVariable("test", test);
         Assert.assertEquals("Mixed:1", test.callMixed(Integer.valueOf(1)));
         asserter.assertExpression("test.callMixed(1)", test.callMixed(1));
@@ -161,7 +161,7 @@ public class MethodTest extends JexlTestCase {
 
     @Test
     public void testCallJexlVarArgMethod() throws Exception {
-        VarArgs test = new VarArgs();
+        final VarArgs test = new VarArgs();
         asserter.setVariable("test", test);
         Assert.assertEquals("jexl:0", test.callMixed("jexl"));
         asserter.assertExpression("test.callMixed('jexl')", "jexl:0");
@@ -178,7 +178,7 @@ public class MethodTest extends JexlTestCase {
         private boolean overKill = false;
         private String under = null;
         
-        void setKill(boolean ok) {
+        void setKill(final boolean ok) {
             overKill = ok;
         }
         
@@ -186,7 +186,7 @@ public class MethodTest extends JexlTestCase {
             return 10;
         }
 
-        public int plus10(int num) {
+        public int plus10(final int num) {
             return num + 10;
         }
 
@@ -194,30 +194,30 @@ public class MethodTest extends JexlTestCase {
             return 20;
         }
 
-        public static int PLUS20(int num) {
+        public static int PLUS20(final int num) {
             return num + 20;
         }
 
-        public static Class<?> NPEIfNull(Object x) {
+        public static Class<?> NPEIfNull(final Object x) {
             return x.getClass();
         }
 
-        public Object over(String f, int i) {
+        public Object over(final String f, final int i) {
             if (overKill) {
                 throw new UnsupportedOperationException("kill " + f + " + " + i);
             }
             return f + " + " + i;
         }
 
-        public Object over(String f, Date g) {
+        public Object over(final String f, final Date g) {
             return f + " + " + g;
         }
 
-        public Object over(String f, String g) {
+        public Object over(final String f, final String g) {
             return f + " + " + g;
         }
 
-        public void setUnder(String str) {
+        public void setUnder(final String str) {
             if (overKill) {
                 throw new UnsupportedOperationException("kill " + str);
             }
@@ -234,7 +234,7 @@ public class MethodTest extends JexlTestCase {
 
     public static class FunctorOver extends Functor {
 
-        public Object over(Object f, Object g) {
+        public Object over(final Object f, final Object g) {
             return f + " + " + g;
         }
     }
@@ -247,13 +247,13 @@ public class MethodTest extends JexlTestCase {
         try {
             JEXL.invokeMethod(func, "nonExistentMethod");
             Assert.fail("method does not exist!");
-        } catch (Exception xj0) {
+        } catch (final Exception xj0) {
             // ignore
         }
         try {
             JEXL.invokeMethod(func, "NPEIfNull", (Object[]) null);
             Assert.fail("method should have thrown!");
-        } catch (Exception xj0) {
+        } catch (final Exception xj0) {
             // ignore
         }
 
@@ -261,7 +261,7 @@ public class MethodTest extends JexlTestCase {
         try {
             result = JEXL.invokeMethod(func, "over", "foo", 42);
             Assert.assertEquals("foo + 42", result);
-        } catch (Exception xj0) {
+        } catch (final Exception xj0) {
             // ignore
             result = xj0;
         }
@@ -269,7 +269,7 @@ public class MethodTest extends JexlTestCase {
         try {
             result = JEXL.invokeMethod(func, "over", null, null);
             Assert.fail("method should have thrown!");
-        } catch (Exception xj0) {
+        } catch (final Exception xj0) {
             // ignore
             result = xj0;
         }
@@ -278,7 +278,7 @@ public class MethodTest extends JexlTestCase {
         try {
             result = JEXL.invokeMethod(func, "over", null, null);
             Assert.assertEquals("null + null", result);
-        } catch (Exception xj0) {
+        } catch (final Exception xj0) {
             Assert.fail("method should not have thrown!");
         }
     }
@@ -286,8 +286,8 @@ public class MethodTest extends JexlTestCase {
     @Test
     public void testAmbiguousInvoke() throws Exception {
         // JEXL-299
-        Functor func = new Functor();
-        JexlContext ctxt = new MapContext();
+        final Functor func = new Functor();
+        final JexlContext ctxt = new MapContext();
         ctxt.set("func", func);
         Object result;
         // basic call works
@@ -297,16 +297,16 @@ public class MethodTest extends JexlTestCase {
         try {
             JEXL.invokeMethod(func, "over", "not null", null);
             Assert.fail("should be ambiguous");
-        } catch (JexlException.Method xinvoke) {
+        } catch (final JexlException.Method xinvoke) {
             Assert.assertEquals("over(String, Object)", xinvoke.getMethodSignature());
         }
 
         // another ambiguous call fails
         try {
-            String[] arg2 = new String[]{"more", "than", "one"};
+            final String[] arg2 = new String[]{"more", "than", "one"};
             JEXL.invokeMethod(func, "over", "not null", arg2);
             Assert.fail("should be ambiguous");
-        } catch (JexlException.Method xinvoke) {
+        } catch (final JexlException.Method xinvoke) {
             Assert.assertEquals("over(String, String[])", xinvoke.getMethodSignature());
         }
     }
@@ -314,13 +314,13 @@ public class MethodTest extends JexlTestCase {
     @Test
     public void testTryFailed() throws Exception {
         // JEXL-257
-        Functor func = new Functor();
-        JexlContext ctxt = new MapContext();
+        final Functor func = new Functor();
+        final JexlContext ctxt = new MapContext();
         ctxt.set("func", func);
         Object result;
-        JexlUberspect uber = JEXL.getUberspect();
+        final JexlUberspect uber = JEXL.getUberspect();
         // tryInvoke 
-        JexlMethod method = uber.getMethod(func, "over", "foo", 42);
+        final JexlMethod method = uber.getMethod(func, "over", "foo", 42);
         Assert.assertNotNull(method);
         // tryInvoke succeeds 
         result = method.tryInvoke("over", func, "foo", 42);
@@ -330,17 +330,17 @@ public class MethodTest extends JexlTestCase {
         try {
             /*result = */method.tryInvoke("over", func, "foo", 42);
             Assert.fail("should throw TryFailed");
-        } catch (JexlException.TryFailed xfail) {
+        } catch (final JexlException.TryFailed xfail) {
             Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
         }
 
         func.setKill(false);
-        JexlPropertySet setter = uber.getPropertySet(func, "under", "42");
+        final JexlPropertySet setter = uber.getPropertySet(func, "under", "42");
         result = setter.tryInvoke(func, "under", "42");
         Assert.assertFalse(setter.tryFailed(result));
         Assert.assertEquals("42", result);
 
-        JexlPropertyGet getter = uber.getPropertyGet(func, "under");
+        final JexlPropertyGet getter = uber.getPropertyGet(func, "under");
         result = getter.tryInvoke(func, "under");
         Assert.assertFalse(getter.tryFailed(result));
         Assert.assertEquals("42", result);
@@ -349,7 +349,7 @@ public class MethodTest extends JexlTestCase {
         try {
             /*result = */setter.tryInvoke(func, "under", "42");
             Assert.fail("should throw TryFailed");
-        } catch (JexlException.TryFailed xfail) {
+        } catch (final JexlException.TryFailed xfail) {
             Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
         }
         func.setKill(false);
@@ -360,7 +360,7 @@ public class MethodTest extends JexlTestCase {
         try {
             /*result = */getter.tryInvoke(func, "under");
             Assert.fail("should throw TryFailed");
-        } catch (JexlException.TryFailed xfail) {
+        } catch (final JexlException.TryFailed xfail) {
             Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
         }
 
@@ -373,12 +373,12 @@ public class MethodTest extends JexlTestCase {
     @Test
     public void testTryFailedScript() throws Exception {
         // JEXL-257
-        Functor func = new Functor();
-        JexlContext ctxt = new MapContext();
+        final Functor func = new Functor();
+        final JexlContext ctxt = new MapContext();
         ctxt.set("func", func);
         Object result;
-        JexlUberspect uber = JEXL.getUberspect();
-        JexlScript method = JEXL.createScript("(x, y)->{ func.over(x, y) }");
+        final JexlUberspect uber = JEXL.getUberspect();
+        final JexlScript method = JEXL.createScript("(x, y)->{ func.over(x, y) }");
         // tryInvoke 
         //JexlMethod method = uber.getMethod(func, "over", "foo", 42);
         Assert.assertNotNull(method);
@@ -390,24 +390,24 @@ public class MethodTest extends JexlTestCase {
         try {
             /*result = */method.execute(ctxt, "foo", 42);
             Assert.fail("should throw TryFailed");
-        } catch (JexlException xfail) {
+        } catch (final JexlException xfail) {
             Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
         }
 
         func.setKill(false);
-        JexlScript setter = JEXL.createScript("(x)->{ func.under = x }");
+        final JexlScript setter = JEXL.createScript("(x)->{ func.under = x }");
         //JexlPropertySet setter = uber.getPropertySet(func, "under", "42");
         result = setter.execute(ctxt, "42");
         Assert.assertEquals("42", result);
 
-        JexlScript getter = JEXL.createScript("func.under");
+        final JexlScript getter = JEXL.createScript("func.under");
         Assert.assertEquals("42", result);
 
         func.setKill(true);
         try {
             /*result = */setter.execute(ctxt, "42");
             Assert.fail("should throw TryFailed");
-        } catch (JexlException xfail) {
+        } catch (final JexlException xfail) {
             Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
         }
         func.setKill(false);
@@ -418,7 +418,7 @@ public class MethodTest extends JexlTestCase {
         try {
             /*result = */getter.execute(ctxt);
             Assert.fail("should throw TryFailed");
-        } catch (JexlException xfail) {
+        } catch (final JexlException xfail) {
             Assert.assertEquals(UnsupportedOperationException.class, xfail.getCause().getClass());
         }
 
@@ -472,19 +472,19 @@ public class MethodTest extends JexlTestCase {
     }
 
     public static class MyMath {
-        public double cos(double x) {
+        public double cos(final double x) {
             return Math.cos(x);
         }
     }
 
     @Test
     public void testTopLevelCall() throws Exception {
-        java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
+        final java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
         funcs.put(null, new Functor());
         funcs.put("math", new MyMath());
         funcs.put("cx", ContextualFunctor.class);
 
-        EnhancedContext jc = new EnhancedContext(funcs);
+        final EnhancedContext jc = new EnhancedContext(funcs);
 
         JexlExpression e = JEXL.createExpression("ten()");
         Object o = e.evaluate(jc);
@@ -510,12 +510,12 @@ public class MethodTest extends JexlTestCase {
 
     @Test
     public void testNamespaceCall() throws Exception {
-        java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
+        final java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
         funcs.put("func", new Functor());
         funcs.put("FUNC", Functor.class);
 
         JexlExpression e = JEXL.createExpression("func:ten()");
-        JexlEvalContext jc = new EnhancedContext(funcs);
+        final JexlEvalContext jc = new EnhancedContext(funcs);
 
         Object o = e.evaluate(jc);
         Assert.assertEquals("Result is not 10", new Integer(10), o);
@@ -541,52 +541,52 @@ public class MethodTest extends JexlTestCase {
         private Edge() {
         }
 
-        public int exec(int arg) {
+        public int exec(final int arg) {
             return 1;
         }
 
-        public int exec(int[] arg) {
+        public int exec(final int[] arg) {
             return 20;
         }
 
-        public int exec(String arg) {
+        public int exec(final String arg) {
             return 2;
         }
 
-        public int exec(String... arg) {
+        public int exec(final String... arg) {
             return 200;
         }
 
-        public int exec(Object args) {
+        public int exec(final Object args) {
             return 3;
         }
 
-        public int exec(Object... args) {
+        public int exec(final Object... args) {
             return 4;
         }
 
-        public int exec(Boolean x, int arg) {
+        public int exec(final Boolean x, final int arg) {
             return 1;
         }
 
-        public int exec(Boolean x, int[] arg) {
+        public int exec(final Boolean x, final int[] arg) {
             return 20;
         }
 
-        public int exec(Boolean x, String arg) {
+        public int exec(final Boolean x, final String arg) {
             return 2;
         }
 
-        public int exec(Boolean x, Object args) {
+        public int exec(final Boolean x, final Object args) {
             return 3;
         }
 
-        public int exec(Boolean x, Object... args) {
+        public int exec(final Boolean x, final Object... args) {
             return 4;
         }
 
-        public Class<?>[] execute(Object... args) {
-            Class<?>[] clazz = new Class<?>[args.length];
+        public Class<?>[] execute(final Object... args) {
+            final Class<?>[] clazz = new Class<?>[args.length];
             for (int a = 0; a < args.length; ++a) {
                 clazz[a] = args[a] != null ? args[a].getClass() : Void.class;
             }
@@ -594,10 +594,10 @@ public class MethodTest extends JexlTestCase {
         }
     }
 
-    private boolean eqExecute(Object lhs, Object rhs) {
+    private boolean eqExecute(final Object lhs, final Object rhs) {
         if (lhs instanceof Class<?>[] && rhs instanceof Class<?>[]) {
-            Class<?>[] lhsa = (Class<?>[]) lhs;
-            Class<?>[] rhsa = (Class<?>[]) rhs;
+            final Class<?>[] lhsa = (Class<?>[]) lhs;
+            final Class<?>[] rhsa = (Class<?>[]) rhs;
             return Arrays.deepEquals(lhsa, rhsa);
         }
         return false;
@@ -605,14 +605,14 @@ public class MethodTest extends JexlTestCase {
 
     @Test
     public void testNamespaceCallEdge() throws Exception {
-        java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
-        Edge func = new Edge();
+        final java.util.Map<String, Object> funcs = new java.util.HashMap<String, Object>();
+        final Edge func = new Edge();
         funcs.put("func", func);
 
         Object o;
         Object c;
         JexlExpression e;
-        JexlEvalContext jc = new EnhancedContext(funcs);
+        final JexlEvalContext jc = new EnhancedContext(funcs);
         try {
             for (int i = 0; i < 2; ++i) {
                 e = JEXL.createExpression("func:exec([1, 2])");
@@ -666,7 +666,7 @@ public class MethodTest extends JexlTestCase {
                 c = func.execute(new boolean[]{true});
                 Assert.assertTrue("execute(Object... args): " + i, eqExecute(o, c));
             }
-        } catch (JexlException xjexl) {
+        } catch (final JexlException xjexl) {
             Assert.fail(xjexl.toString());
         }
     }
@@ -674,12 +674,12 @@ public class MethodTest extends JexlTestCase {
     public static class ScriptContext extends MapContext implements JexlContext.NamespaceResolver {
         Map<String, Object> nsScript;
 
-        ScriptContext(Map<String, Object> ns) {
+        ScriptContext(final Map<String, Object> ns) {
             nsScript = ns;
         }
 
         @Override
-        public Object resolveNamespace(String name) {
+        public Object resolveNamespace(final String name) {
             if (name == null) {
                 return this;
             }
@@ -688,7 +688,7 @@ public class MethodTest extends JexlTestCase {
             }
             if ("functor".equals(name)) {
                 return (NamespaceFunctor) context -> {
-                    Map<String, Object> values = new HashMap<String, Object>();
+                    final Map<String, Object> values = new HashMap<String, Object>();
                     if ("gin".equals(context.get("base"))) {
                         values.put("drink", "gin fizz");
                     } else {
@@ -704,13 +704,13 @@ public class MethodTest extends JexlTestCase {
     @Test
     public void testScriptCall() throws Exception {
         JexlContext context = new MapContext();
-        JexlScript plus = JEXL.createScript("a + b", new String[]{"a", "b"});
+        final JexlScript plus = JEXL.createScript("a + b", new String[]{"a", "b"});
         context.set("plus", plus);
         JexlScript forty2 = JEXL.createScript("plus(4, 2) * plus(4, 3)");
         Object o = forty2.execute(context);
         Assert.assertEquals("Result is not 42", new Integer(42), o);
 
-        Map<String, Object> foo = new HashMap<String, Object>();
+        final Map<String, Object> foo = new HashMap<String, Object>();
         foo.put("plus", plus);
         context.set("foo", foo);
         forty2 = JEXL.createScript("foo.plus(4, 2) * foo.plus(4, 3)");
@@ -723,9 +723,9 @@ public class MethodTest extends JexlTestCase {
         Assert.assertEquals("Result is not 42", new Integer(42), o);
 
         final JexlArithmetic ja = JEXL.getArithmetic();
-        JexlMethod mplus = new JexlMethod() {
+        final JexlMethod mplus = new JexlMethod() {
             @Override
-            public Object invoke(Object obj, Object ... params) throws Exception {
+            public Object invoke(final Object obj, final Object ... params) throws Exception {
                 if (obj instanceof Map<?, ?>) {
                     return ja.add(params[0], params[1]);
                 } else {
@@ -734,19 +734,19 @@ public class MethodTest extends JexlTestCase {
             }
 
             @Override
-            public Object tryInvoke(String name, Object obj, Object ... params) {
+            public Object tryInvoke(final String name, final Object obj, final Object ... params) {
                 try {
                     if ("plus".equals(name)) {
                         return invoke(obj, params);
                     }
-                } catch (Exception xany) {
+                } catch (final Exception xany) {
                     // ignore and fail by returning this
                 }
                 return this;
             }
 
             @Override
-            public boolean tryFailed(Object rval) {
+            public boolean tryFailed(final Object rval) {
                 // this is the marker for failure
                 return rval == this;
             }
@@ -775,7 +775,7 @@ public class MethodTest extends JexlTestCase {
 
     @Test
     public void testFizzCall() throws Exception {
-        ScriptContext context = new ScriptContext(new HashMap<String, Object>());
+        final ScriptContext context = new ScriptContext(new HashMap<String, Object>());
 
         JexlScript bar = JEXL.createScript("functor:get('drink')");
         Object o;
@@ -793,31 +793,31 @@ public class MethodTest extends JexlTestCase {
     }
 
     public static class ZArithmetic extends JexlArithmetic {
-        public ZArithmetic(boolean astrict) {
+        public ZArithmetic(final boolean astrict) {
             super(astrict);
         }
 
-        public int zzzz(int z) {
+        public int zzzz(final int z) {
             return 38 + z;
         }
     }
 
     public static class ZSpace {
-        public int zzz(int z) {
+        public int zzz(final int z) {
             return 39 + z;
         }
     }
 
     public static class ZContext extends MapContext {
-        public ZContext(Map<String,Object> map) {
+        public ZContext(final Map<String,Object> map) {
             super(map);
         }
 
-        public int zz(int z) {
+        public int zz(final int z) {
             return 40 + z;
         }
 
-        public int z(int z) {
+        public int z(final int z) {
             return 181 + z;
         }
     }
@@ -825,21 +825,21 @@ public class MethodTest extends JexlTestCase {
     @Test
     public void testVariousFunctionLocation() throws Exception {
         // see JEXL-190
-        Map<String, Object> vars = new HashMap<String, Object>();
-        Map<String,Object> funcs = new HashMap<String,Object>();
+        final Map<String, Object> vars = new HashMap<String, Object>();
+        final Map<String,Object> funcs = new HashMap<String,Object>();
         funcs.put(null, new ZSpace());
-        JexlEngine jexl = new JexlBuilder().namespaces(funcs).arithmetic(new ZArithmetic(true)).create();
+        final JexlEngine jexl = new JexlBuilder().namespaces(funcs).arithmetic(new ZArithmetic(true)).create();
 
-        JexlContext zjc = new ZContext(vars); // that implements a z(int x) function
-        String z41 = "z(41)";
-        JexlScript callz41 = jexl.createScript(z41);
+        final JexlContext zjc = new ZContext(vars); // that implements a z(int x) function
+        final String z41 = "z(41)";
+        final JexlScript callz41 = jexl.createScript(z41);
         Object onovar = callz41.execute(zjc);
         Assert.assertEquals(222, onovar);
 
         // override z() with global var
-        JexlScript z241 = jexl.createScript("(x)->{ return x + 241}");
+        final JexlScript z241 = jexl.createScript("(x)->{ return x + 241}");
         vars.put("z", z241);
-        Object oglobal = callz41.execute(zjc);
+        final Object oglobal = callz41.execute(zjc);
         Assert.assertEquals(282, oglobal);
         // clear global and execute again
         vars.remove("z");
@@ -847,9 +847,9 @@ public class MethodTest extends JexlTestCase {
         Assert.assertEquals(222, onovar);
 
         // override z() with local var
-        String slocal = "var z = (x)->{ return x + 141}; z(1)";
-        JexlScript jlocal = jexl.createScript(slocal);
-        Object olocal = jlocal.execute(zjc);
+        final String slocal = "var z = (x)->{ return x + 141}; z(1)";
+        final JexlScript jlocal = jexl.createScript(slocal);
+        final Object olocal = jlocal.execute(zjc);
         Assert.assertEquals(142, olocal);
 
         // and now try the context, the null namespace and the arithmetic

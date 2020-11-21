@@ -35,9 +35,9 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
      * @param property the the property name
      * @return the executor if found, null otherwise
      */
-    public static BooleanGetExecutor discover(Introspector is, final Class<?> clazz, String property) {
+    public static BooleanGetExecutor discover(final Introspector is, final Class<?> clazz, final String property) {
         if (property != null && !property.isEmpty()) {
-            java.lang.reflect.Method m = PropertyGetExecutor.discoverGet(is, "is", clazz, property);
+            final java.lang.reflect.Method m = PropertyGetExecutor.discoverGet(is, "is", clazz, property);
             if (m != null && (m.getReturnType() == Boolean.TYPE || m.getReturnType() == Boolean.class)) {
                 return new BooleanGetExecutor(clazz, m, property);
             }
@@ -51,7 +51,7 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
      * @param method the method held by this executor
      * @param key the property to get
      */
-    private BooleanGetExecutor(Class<?> clazz, java.lang.reflect.Method method, String key) {
+    private BooleanGetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final String key) {
         super(clazz, method);
         property = key;
     }
@@ -62,21 +62,21 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
     }
 
     @Override
-    public Object invoke(Object obj) throws IllegalAccessException, InvocationTargetException {
+    public Object invoke(final Object obj) throws IllegalAccessException, InvocationTargetException {
         return method == null ? null : method.invoke(obj, (Object[]) null);
     }
 
     @Override
-    public Object tryInvoke(Object obj, Object key) {
+    public Object tryInvoke(final Object obj, final Object key) {
         if (obj != null && method !=  null
             // ensure method name matches the property name
             && property.equals(key)
             && objectClass.equals(obj.getClass())) {
             try {
                 return method.invoke(obj, (Object[]) null);
-            } catch (IllegalAccessException xill) {
+            } catch (final IllegalAccessException xill) {
                 return TRY_FAILED;// fail
-            } catch (InvocationTargetException xinvoke) {
+            } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw
             }
         }

@@ -26,7 +26,7 @@ public abstract class ParserVisitor {
      * @param data the data
      * @return does not return
      */
-    protected final Object visit(SimpleNode node, Object data) {
+    protected final Object visit(final SimpleNode node, final Object data) {
         throw new UnsupportedOperationException(node.getClass().getSimpleName() + " : not supported yet.");
     }
 
@@ -36,7 +36,7 @@ public abstract class ParserVisitor {
      * @param data the data
      * @return does not return
      */
-    protected final Object visit(ASTAmbiguous node, Object data) {
+    protected final Object visit(final ASTAmbiguous node, final Object data) {
         throw new UnsupportedOperationException("unexpected type of node");
     }
 

@@ -36,20 +36,20 @@ public class ArrayTest {
     /**
      * An example for array access.
      */
-    static void example(Output out) throws Exception {
+    static void example(final Output out) throws Exception {
         /*
          * First step is to retrieve an instance of a JexlEngine;
          * it might be already existing and shared or created anew.
          */
-        JexlEngine jexl = new JexlBuilder().create();
+        final JexlEngine jexl = new JexlBuilder().create();
         /*
          *  Second make a jexlContext and put stuff in it
          */
-        JexlContext jc = new MapContext();
+        final JexlContext jc = new MapContext();
 
-        List<Object> l = new ArrayList<Object>();
+        final List<Object> l = new ArrayList<Object>();
         l.add("Hello from location 0");
-        Integer two = 2;
+        final Integer two = 2;
         l.add(two);
         jc.set("array", l);
 
@@ -77,7 +77,7 @@ public class ArrayTest {
      * @param args command line arguments
      * @throws Exception cos jexl does.
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         example(Output.SYSTEM);
     }
 }

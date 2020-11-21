@@ -43,7 +43,7 @@ public class LexicalFrame extends LexicalScope {
      * @param scriptf the script frame
      * @param outerf  the previous lexical frame
      */
-    public LexicalFrame(Frame scriptf, LexicalFrame outerf) {
+    public LexicalFrame(final Frame scriptf, final LexicalFrame outerf) {
         this.previous = outerf;
         this.frame = scriptf;
     }
@@ -53,7 +53,7 @@ public class LexicalFrame extends LexicalScope {
      *
      * @param src the frame to copy
      */
-    public LexicalFrame(LexicalFrame src) {
+    public LexicalFrame(final LexicalFrame src) {
         super(src.symbols, src.moreSymbols);
         frame = src.frame;
         previous = src.previous;
@@ -67,7 +67,7 @@ public class LexicalFrame extends LexicalScope {
      */
     public LexicalFrame defineArgs() {
         if (frame != null) {
-            int argc = frame.getScope().getArgCount();
+            final int argc = frame.getScope().getArgCount();
             for (int a = 0; a < argc; ++a) {
                 super.addSymbol(a);
             }
@@ -82,8 +82,8 @@ public class LexicalFrame extends LexicalScope {
      * @param capture whether this redefines a captured symbol
      * @return true if symbol is defined, false otherwise
      */
-    public boolean defineSymbol(int symbol, boolean capture) {
-        boolean declared = addSymbol(symbol);
+    public boolean defineSymbol(final int symbol, final boolean capture) {
+        final boolean declared = addSymbol(symbol);
         if (declared && capture) {
             if (stack == null) {
                 stack = new ArrayDeque<>();
@@ -115,7 +115,7 @@ public class LexicalFrame extends LexicalScope {
                 } else if (value == this) {
                     value = null;
                 }
-                int symbol = (Integer) stack.pop();
+                final int symbol = (Integer) stack.pop();
                 frame.set(symbol, value);
             }
         }

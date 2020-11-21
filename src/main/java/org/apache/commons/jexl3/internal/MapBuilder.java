@@ -31,12 +31,12 @@ public class MapBuilder implements JexlArithmetic.MapBuilder {
      * Creates a new builder.
      * @param size the expected map size
      */
-    public MapBuilder(int size) {
+    public MapBuilder(final int size) {
         map = new HashMap<Object, Object>(size);
     }
 
     @Override
-    public void put(Object key, Object value) {
+    public void put(final Object key, final Object value) {
         map.put(key, value);
     }
 

@@ -33,14 +33,14 @@ public final class ReadonlyContext implements JexlContext, JexlContext.OptionsHa
      * @param context the wrapped context
      * @param eopts the engine evaluation options
      */
-    public ReadonlyContext(JexlContext context, JexlOptions eopts) {
+    public ReadonlyContext(final JexlContext context, final JexlOptions eopts) {
         wrapped = context;
         options = eopts;
     }
 
     @Override
     @NoJexl
-    public Object get(String name) {
+    public Object get(final String name) {
         return wrapped.get(name);
     }
 
@@ -51,13 +51,13 @@ public final class ReadonlyContext implements JexlContext, JexlContext.OptionsHa
      */
     @Override
     @NoJexl
-    public void set(String name, Object value) {
+    public void set(final String name, final Object value) {
         throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
     @NoJexl
-    public boolean has(String name) {
+    public boolean has(final String name) {
         return wrapped.has(name);
     }
 

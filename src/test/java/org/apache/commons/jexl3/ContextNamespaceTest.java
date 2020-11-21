@@ -35,15 +35,15 @@ public class ContextNamespaceTest extends JexlTestCase {
     public static class Taxes {
         private final double vat;
         
-        public Taxes(TaxesContext ctxt) {
+        public Taxes(final TaxesContext ctxt) {
             vat = ctxt.getVAT();
         } 
         
-        public Taxes(double d) {
+        public Taxes(final double d) {
             vat = d;
         }
         
-        public double vat(double n) {
+        public double vat(final double n) {
             return (n * vat) / 100.;
         }
     }
@@ -55,12 +55,12 @@ public class ContextNamespaceTest extends JexlTestCase {
         private Taxes taxes = null;
         private final double vat;
 
-        TaxesContext(double vat) {
+        TaxesContext(final double vat) {
             this.vat = vat;
         }
 
         @Override
-        public Object resolveNamespace(String name) {
+        public Object resolveNamespace(final String name) {
             if ("taxes".equals(name)) {
                 if (taxes == null) {
                     taxes = new Taxes(vat);
@@ -77,45 +77,45 @@ public class ContextNamespaceTest extends JexlTestCase {
 
     @Test
     public void testThreadedContext() throws Exception {
-        JexlEngine jexl = new JexlBuilder().create();
-        TaxesContext context = new TaxesContext(18.6);
-        String strs = "taxes:vat(1000)";
-        JexlScript staxes = jexl.createScript(strs);
-        Object result = staxes.execute(context);
+        final JexlEngine jexl = new JexlBuilder().create();
+        final TaxesContext context = new TaxesContext(18.6);
+        final String strs = "taxes:vat(1000)";
+        final JexlScript staxes = jexl.createScript(strs);
+        final Object result = staxes.execute(context);
         Assert.assertEquals(186., result);
     }
     
     @Test
     public void testNamespacePragma() throws Exception {
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlContext context = new TaxesContext(18.6);
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext context = new TaxesContext(18.6);
         // local namespace tax declared
-        String strs =
+        final String strs =
                   "#pragma jexl.namespace.tax org.apache.commons.jexl3.ContextNamespaceTest$Taxes\n"
                 + "tax:vat(2000)";
-        JexlScript staxes = jexl.createScript(strs);
-        Object result = staxes.execute(context);
+        final JexlScript staxes = jexl.createScript(strs);
+        final Object result = staxes.execute(context);
         Assert.assertEquals(372., result);
     }
 
         
     @Test
     public void testNamespacePragmaString() throws Exception {
-        JexlEngine jexl = new JexlBuilder().create();
-        JexlContext context = new MapContext();
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext context = new MapContext();
         // local namespace str declared
-        String strs =
+        final String strs =
                   "#pragma jexl.namespace.str java.lang.String\n"
                 + "str:format('%04d', 42)";
-        JexlScript staxes = jexl.createScript(strs);
-        Object result = staxes.execute(context);
+        final JexlScript staxes = jexl.createScript(strs);
+        final Object result = staxes.execute(context);
         Assert.assertEquals("0042", result);
     }
 
     public static class Vat {
         private double vat;
 
-        Vat(double vat) {
+        Vat(final double vat) {
             this.vat = vat;
         }
 
@@ -123,7 +123,7 @@ public class ContextNamespaceTest extends JexlTestCase {
             return vat;
         }
 
-        public void setVAT(double vat) {
+        public void setVAT(final double vat) {
             this.vat = vat;
         }
 
@@ -131,16 +131,16 @@ public class ContextNamespaceTest extends JexlTestCase {
             throw new UnsupportedOperationException("no way");
         }
 
-        public void setvat(double vat) {
+        public void setvat(final double vat) {
             throw new UnsupportedOperationException("no way");
         }
     }
 
     @Test
     public void testObjectContext() throws Exception {
-        JexlEngine jexl = new JexlBuilder().strict(true).silent(false).create();
-        Vat vat = new Vat(18.6);
-        ObjectContext<Vat> ctxt = new ObjectContext<Vat>(jexl, vat);
+        final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).create();
+        final Vat vat = new Vat(18.6);
+        final ObjectContext<Vat> ctxt = new ObjectContext<Vat>(jexl, vat);
         Assert.assertEquals(18.6d, (Double) ctxt.get("VAT"), 0.0001d);
         ctxt.set("VAT", 20.0d);
         Assert.assertEquals(20.0d, (Double) ctxt.get("VAT"), 0.0001d);
@@ -148,14 +148,14 @@ public class ContextNamespaceTest extends JexlTestCase {
         try {
             ctxt.get("vat");
             Assert.fail("should have failed");
-        } catch(JexlException.Property xprop) {
+        } catch(final JexlException.Property xprop) {
             //
         }
 
         try {
             ctxt.set("vat", 33.0d);
             Assert.fail("should have failed");
-        } catch(JexlException.Property xprop) {
+        } catch(final JexlException.Property xprop) {
             //
         }
     }

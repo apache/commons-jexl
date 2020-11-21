@@ -20,11 +20,11 @@ package org.apache.commons.jexl3.parser;
  * Lambda (function).
  */
 public final class ASTJexlLambda extends ASTJexlScript {
-    ASTJexlLambda(int id) {
+    ASTJexlLambda(final int id) {
         super(id);
     }
 
-    ASTJexlLambda(Parser p, int id) {
+    ASTJexlLambda(final Parser p, final int id) {
         super(p, id);
     }
 

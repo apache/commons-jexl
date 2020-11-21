@@ -64,7 +64,7 @@ public class PublicFieldsTest extends JexlTestCase {
 
     @Test
     public void testGetInt() throws Exception {
-        JexlExpression get = JEXL.createExpression("pub.anInt");
+        final JexlExpression get = JEXL.createExpression("pub.anInt");
         Assert.assertEquals(42, get.evaluate(ctxt));
         JEXL.setProperty(pub, "anInt", -42);
         Assert.assertEquals(-42, get.evaluate(ctxt));
@@ -72,7 +72,7 @@ public class PublicFieldsTest extends JexlTestCase {
 
     @Test
     public void testSetInt() throws Exception {
-        JexlExpression set = JEXL.createExpression("pub.anInt = value");
+        final JexlExpression set = JEXL.createExpression("pub.anInt = value");
         ctxt.set("value", -42);
         Assert.assertEquals(-42, set.evaluate(ctxt));
         Assert.assertEquals(-42, JEXL.getProperty(pub, "anInt"));
@@ -83,12 +83,12 @@ public class PublicFieldsTest extends JexlTestCase {
             ctxt.set("value", UPPER42);
             Assert.assertNull(set.evaluate(ctxt));
             Assert.fail("should have thrown");
-        } catch(JexlException xjexl) {}
+        } catch(final JexlException xjexl) {}
     }
 
     @Test
     public void testGetString() throws Exception {
-        JexlExpression get = JEXL.createExpression("pub.aString");
+        final JexlExpression get = JEXL.createExpression("pub.aString");
         Assert.assertEquals(LOWER42, get.evaluate(ctxt));
         JEXL.setProperty(pub, "aString", UPPER42);
         Assert.assertEquals(UPPER42, get.evaluate(ctxt));
@@ -96,7 +96,7 @@ public class PublicFieldsTest extends JexlTestCase {
 
     @Test
     public void testSetString() throws Exception {
-        JexlExpression set = JEXL.createExpression("pub.aString = value");
+        final JexlExpression set = JEXL.createExpression("pub.aString = value");
         ctxt.set("value", UPPER42);
         Assert.assertEquals(UPPER42, set.evaluate(ctxt));
         Assert.assertEquals(UPPER42, JEXL.getProperty(pub, "aString"));
@@ -107,7 +107,7 @@ public class PublicFieldsTest extends JexlTestCase {
 
     @Test
     public void testGetInnerDouble() throws Exception {
-        JexlExpression get = JEXL.createExpression("pub.inner.aDouble");
+        final JexlExpression get = JEXL.createExpression("pub.inner.aDouble");
         Assert.assertEquals(42.0, get.evaluate(ctxt));
         JEXL.setProperty(pub, "inner.aDouble", -42);
         Assert.assertEquals(-42.0, get.evaluate(ctxt));
@@ -115,7 +115,7 @@ public class PublicFieldsTest extends JexlTestCase {
 
     @Test
     public void testSetInnerDouble() throws Exception {
-        JexlExpression set = JEXL.createExpression("pub.inner.aDouble = value");
+        final JexlExpression set = JEXL.createExpression("pub.inner.aDouble = value");
         ctxt.set("value", -42.0);
         Assert.assertEquals(-42.0, set.evaluate(ctxt));
         Assert.assertEquals(-42.0, JEXL.getProperty(pub, "inner.aDouble"));
@@ -126,7 +126,7 @@ public class PublicFieldsTest extends JexlTestCase {
             ctxt.set("value", UPPER42);
             Assert.assertNull(set.evaluate(ctxt));
             Assert.fail("should have thrown");
-        } catch(JexlException xjexl) {}
+        } catch(final JexlException xjexl) {}
     }
 
     public enum Gender { MALE, FEMALE };
@@ -134,9 +134,9 @@ public class PublicFieldsTest extends JexlTestCase {
     @Test
     public void testGetEnum() throws Exception {
         ctxt.set("com.jexl.gender", Gender.class);
-        String src = "x = com.jexl.gender.FEMALE";
-        JexlScript script = JEXL.createScript(src);
-        Object result = script.execute(ctxt);
+        final String src = "x = com.jexl.gender.FEMALE";
+        final JexlScript script = JEXL.createScript(src);
+        final Object result = script.execute(ctxt);
         Assert.assertEquals(Gender.FEMALE, result);
         Assert.assertEquals(Gender.FEMALE, ctxt.get("x"));
     }
@@ -144,9 +144,9 @@ public class PublicFieldsTest extends JexlTestCase {
     @Test
     public void testGetStaticField() throws Exception {
         ctxt.set("com.jexl", Inner.class);
-        String src = "x = com.jexl.NOT42";
-        JexlScript script = JEXL.createScript(src);
-        Object result = script.execute(ctxt);
+        final String src = "x = com.jexl.NOT42";
+        final JexlScript script = JEXL.createScript(src);
+        final Object result = script.execute(ctxt);
         Assert.assertEquals(Inner.NOT42, result);
         Assert.assertEquals(Inner.NOT42, ctxt.get("x"));
     }
