@@ -62,7 +62,7 @@
         The common way of using a JEXL engine is to create it as a singleton and use this opportunity to tailor its
         behavior and cache through the jexlBuilder options.
         <source>
-            private static final JexlEngine jexl = new JexlBuilder.cache(512).strict(true).silent(false).create();
+            private static final JexlEngine jexl = new JexlBuilder().cache(512).strict(true).silent(false).create();
         </source>
       </p>
       <p>
