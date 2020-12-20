@@ -877,7 +877,7 @@ public class Engine extends JexlEngine {
     /**
      * Trims the source from front and ending spaces.
      * @param str expression to clean
-     * @return trimmed expression ending in a semi-colon
+     * @return trimmed expression ending in a semicolon
      */
     protected String trimSource(final CharSequence str) {
         if (str != null) {
