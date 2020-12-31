@@ -132,7 +132,7 @@ public final class TemplateScript implements JxltEngine.Template {
         for (final Block block : blocks) {
             if (block.getType() == BlockType.VERBATIM) {
                 final JexlNode.Info ji = minfo.get(jpe);
-                TemplateExpression te;
+                final TemplateExpression te;
                 // no node info means this verbatim is surrounded by comments markers;
                 // expr at this index is never called
                 if (ji != null) {

@@ -60,7 +60,7 @@ public abstract class JexlEngine {
         public String toString() {
             return "tryExecute failed";
         }
-    };
+    }
 
     /**
      * The thread local context.
@@ -193,7 +193,7 @@ public abstract class JexlEngine {
         public void set(final String name, final Object value) {
             throw new UnsupportedOperationException("Not supported in void context.");
         }
-    };
+    }
 
     /**
      * An empty/static/non-mutable JexlNamespace singleton used instead of null namespace.
@@ -213,7 +213,7 @@ public abstract class JexlEngine {
         public Object resolveNamespace(final String name) {
             return null;
         }
-    };
+    }
 
     /** The default Jxlt cache size. */
     private static final int JXLT_CACHE_SIZE = 256;

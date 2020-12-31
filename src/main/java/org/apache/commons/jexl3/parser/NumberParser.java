@@ -85,7 +85,7 @@ public final class NumberParser {
      */
     void setNatural(String s) {
         Number result;
-        Class<? extends Number> rclass;
+        final Class<? extends Number> rclass;
         // determine the base
         final int base;
         if (s.charAt(0) == '0') {
@@ -136,7 +136,7 @@ public final class NumberParser {
      */
     void setReal(final String s) {
         Number result;
-        Class<? extends Number> rclass;
+        final Class<? extends Number> rclass;
         if ("#NaN".equals(s) || "NaN".equals(s)) {
             result = Double.NaN;
             rclass = Double.class;

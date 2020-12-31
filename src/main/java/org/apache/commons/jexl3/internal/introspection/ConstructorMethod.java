@@ -37,7 +37,7 @@ public final class ConstructorMethod implements JexlMethod {
      * @return a {@link JexlMethod}
      */
     public static ConstructorMethod discover(final Introspector is, final Object ctorHandle, final Object... args) {
-        String className;
+        final String className;
         Class<?> clazz = null;
         if (ctorHandle instanceof Class<?>) {
             clazz = (Class<?>) ctorHandle;
@@ -95,7 +95,7 @@ public final class ConstructorMethod implements JexlMethod {
             if (invoke) {
                 return ctor.newInstance(params);
             }
-        } catch (InstantiationException | IllegalArgumentException | IllegalAccessException xinstance) {
+        } catch (final InstantiationException | IllegalArgumentException | IllegalAccessException xinstance) {
             return Uberspect.TRY_FAILED;
         } catch (final InvocationTargetException xinvoke) {
             throw JexlException.tryFailed(xinvoke); // throw

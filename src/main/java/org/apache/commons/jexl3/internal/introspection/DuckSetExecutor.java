@@ -98,7 +98,7 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
                 final Object[] args = {property, value};
                 method.invoke(obj, args);
                 return value;
-            } catch (IllegalAccessException | IllegalArgumentException xill) {
+            } catch (final IllegalAccessException | IllegalArgumentException xill) {
                 return TRY_FAILED;// fail
             } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw

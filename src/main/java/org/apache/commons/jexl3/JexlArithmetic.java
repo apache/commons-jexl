@@ -211,7 +211,7 @@ public class JexlArithmetic {
         if (ctor != null) {
             try {
                 return ctor.newInstance(astrict, bigdContext, bigdScale);
-            } catch (IllegalAccessException | IllegalArgumentException
+            } catch (final IllegalAccessException | IllegalArgumentException
                     | InstantiationException | InvocationTargetException xany) {
                 // it was worth the try
             }

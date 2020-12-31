@@ -46,7 +46,7 @@ public class TemplateInterpreter extends Interpreter {
      */
     static class Arguments {
         /** The engine. */
-        Engine jexl;
+        final Engine jexl;
         /** The options. */
         JexlOptions options;
         /** The context. */

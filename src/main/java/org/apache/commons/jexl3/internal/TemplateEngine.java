@@ -894,7 +894,7 @@ public final class TemplateEngine extends JxltEngine {
                         } else  {
                             // materialize the nested/deferred expr
                             final String src = strb.toString();
-                            TemplateExpression dexpr;
+                            final TemplateExpression dexpr;
                             if (nested) {
                                 dexpr = new NestedExpression(
                                         expr.substring(inested, column + 1),

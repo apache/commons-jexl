@@ -1846,7 +1846,7 @@ public class Interpreter extends InterpreterBase {
             processed = true;
             try {
                 return processAnnotation(stmt, index, data);
-            } catch (JexlException.Return | JexlException.Break | JexlException.Continue xreturn) {
+            } catch (final JexlException.Return | JexlException.Break | JexlException.Continue xreturn) {
                 return xreturn;
             }
         }
@@ -1905,7 +1905,7 @@ public class Interpreter extends InterpreterBase {
         final Object[] argv = anode.jjtGetNumChildren() > 0
                         ? visit((ASTArguments) anode.jjtGetChild(0), null) : null;
         // wrap the future, will recurse through annotation processor
-        Object result;
+        final Object result;
         try {
             result = processAnnotation(aname, argv, jstmt);
             // not processing an annotation is an error
