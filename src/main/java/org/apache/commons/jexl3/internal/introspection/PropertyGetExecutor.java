@@ -75,7 +75,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
                 return TRY_FAILED;// fail
             } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw
-            } 
+            }
         }
         return TRY_FAILED;
     }
@@ -88,7 +88,10 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
      * @param property The property being addressed.
      * @return The {get,is}{p,P}roperty method if one exists, null otherwise.
      */
-    static java.lang.reflect.Method discoverGet(final Introspector is, final String which, final Class<?> clazz, final String property) {
+    static java.lang.reflect.Method discoverGet(final Introspector is,
+                                                final String which,
+                                                final Class<?> clazz,
+                                                final String property) {
         if (property == null || property.isEmpty()) {
             return null;
         }

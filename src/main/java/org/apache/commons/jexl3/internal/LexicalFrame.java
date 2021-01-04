@@ -31,7 +31,7 @@ public class LexicalFrame extends LexicalScope {
     /**
      * Previous frame.
      */
-    protected LexicalFrame previous;
+    protected final LexicalFrame previous;
     /**
      * The stack of values in the lexical frame.
      */

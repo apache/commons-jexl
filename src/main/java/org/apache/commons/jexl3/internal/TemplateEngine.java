@@ -60,7 +60,11 @@ public final class TemplateEngine extends JxltEngine {
      * @param immediate the immediate template expression character, default is '$'
      * @param deferred  the deferred template expression character, default is '#'
      */
-    public TemplateEngine(final Engine aJexl, final boolean noScript, final int cacheSize, final char immediate, final char deferred) {
+    public TemplateEngine(final Engine aJexl,
+                          final boolean noScript,
+                          final int cacheSize,
+                          final char immediate,
+                          final char deferred) {
         this.jexl = aJexl;
         this.cache = new SoftCache<>(cacheSize);
         immediateChar = immediate;
@@ -327,7 +331,7 @@ public final class TemplateEngine extends JxltEngine {
         protected JexlOptions options(final JexlContext context) {
             return jexl.options(null, context);
         }
-        
+
         /**
          * Evaluates this expression.
          * @param frame the frame storing parameters and local variables
@@ -436,7 +440,7 @@ public final class TemplateEngine extends JxltEngine {
             strb.append("}");
             return strb;
         }
-        
+
         @Override
         protected JexlOptions options(final JexlContext context) {
             return jexl.options(node instanceof ASTJexlScript? (ASTJexlScript) node : null, context);
@@ -705,7 +709,10 @@ public final class TemplateEngine extends JxltEngine {
      * @param xany   the exception
      * @return an exception containing an explicit error message
      */
-    static Exception createException(final JexlInfo info, final String action, final TemplateExpression expr, final java.lang.Exception xany) {
+    static Exception createException(final JexlInfo info,
+                                     final String action,
+                                     final TemplateExpression expr,
+                                     final java.lang.Exception xany) {
         final StringBuilder strb = new StringBuilder("failed to ");
         strb.append(action);
         if (expr != null) {
@@ -746,13 +753,13 @@ public final class TemplateEngine extends JxltEngine {
      * @param expr the source
      * @param position the offset into the source
      * @param c the separator character
-     * @return the new position to read the source from 
+     * @return the new position to read the source from
      */
     private static int append(final StringBuilder strb, final CharSequence expr, final int position, final char c) {
         strb.append(c);
         if (c != '"' && c != '\'') {
             return position;
-        } 
+        }
         // read thru strings
         final int end = expr.length();
         boolean escape= false;
@@ -770,7 +777,7 @@ public final class TemplateEngine extends JxltEngine {
         }
         return index;
     }
-    
+
     /**
      * Parses a unified expression.
      * @param info  the source info
@@ -989,7 +996,7 @@ public final class TemplateEngine extends JxltEngine {
             line = theLine;
             body = theBlock;
         }
-        
+
         /**
          * @return type
          */

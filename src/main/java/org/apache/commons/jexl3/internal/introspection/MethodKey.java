@@ -259,7 +259,9 @@ public final class MethodKey {
      *         type or an object type of a primitive type that can be converted to
      *         the formal type.
      */
-    public static boolean isInvocationConvertible(final Class<?> formal, final Class<?> actual, final boolean possibleVarArg) {
+    public static boolean isInvocationConvertible(final Class<?> formal,
+                                                  final Class<?> actual,
+                                                  final boolean possibleVarArg) {
         return isInvocationConvertible(formal, actual, false, possibleVarArg);
     }
 
@@ -279,7 +281,9 @@ public final class MethodKey {
      *         or formal and actual are both primitive types and actual can be
      *         subject to widening conversion to formal.
      */
-    public static boolean isStrictInvocationConvertible(final Class<?> formal, final Class<?> actual, final boolean possibleVarArg) {
+    public static boolean isStrictInvocationConvertible(final Class<?> formal,
+                                                        final Class<?> actual,
+                                                        final boolean possibleVarArg) {
         return isInvocationConvertible(formal, actual, true, possibleVarArg);
     }
 

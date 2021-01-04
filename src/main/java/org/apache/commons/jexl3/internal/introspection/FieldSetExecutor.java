@@ -39,7 +39,10 @@ public final class FieldSetExecutor implements JexlPropertySet {
      * @param value the value to set the field to
      * @return the executor if found, null otherwise
      */
-    public static JexlPropertySet discover(final Introspector is, final Class<?> clazz, final String identifier, final Object value) {
+    public static JexlPropertySet discover(final Introspector is,
+                                           final Class<?> clazz,
+                                           final String identifier,
+                                           final Object value) {
         if (identifier != null) {
             final Field field = is.getField(clazz, identifier);
             if (field != null

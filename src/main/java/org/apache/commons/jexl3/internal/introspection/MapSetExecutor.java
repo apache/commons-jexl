@@ -39,7 +39,10 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
      * @param value the value to use as argument in map.put(key,value)
      * @return the executor if found, null otherwise
      */
-    public static MapSetExecutor discover(final Introspector is, final Class<?> clazz, final Object identifier, final Object value) {
+    public static MapSetExecutor discover(final Introspector is,
+                                          final Class<?> clazz,
+                                          final Object identifier,
+                                          final Object value) {
         if (Map.class.isAssignableFrom(clazz)) {
             return new MapSetExecutor(clazz, MAP_SET, identifier, value);
         } else {

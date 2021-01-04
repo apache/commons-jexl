@@ -42,7 +42,10 @@ public final class ListSetExecutor extends AbstractExecutor.Set {
      * @param value the value to use as argument in list.put(key,value)
      * @return the executor if found, null otherwise
      */
-    public static ListSetExecutor discover(final Introspector is, final Class<?> clazz, final Object identifier, final Object value) {
+    public static ListSetExecutor discover(final Introspector is,
+                                           final Class<?> clazz,
+                                           final Object identifier,
+                                           final Object value) {
         final Integer index = castInteger(identifier);
         if (index != null) {
             if (clazz.isArray()) {

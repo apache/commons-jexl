@@ -65,7 +65,11 @@ public final class TemplateScript implements JxltEngine.Template {
      * @throws NullPointerException     if either the directive prefix or input is null
      * @throws IllegalArgumentException if the directive prefix is invalid
      */
-    public TemplateScript(final TemplateEngine engine, JexlInfo info, final String directive, final Reader reader, final String... parms) {
+    public TemplateScript(final TemplateEngine engine,
+                          JexlInfo info,
+                          final String directive,
+                          final Reader reader,
+                          final String... parms) {
         if (directive == null) {
             throw new NullPointerException("null prefix");
         }
@@ -186,7 +190,7 @@ public final class TemplateScript implements JxltEngine.Template {
 
     /**
      * Collects the scope surrounding a call to jexl:print(i).
-     * <p>This allows to later parse the blocks with the known symbols 
+     * <p>This allows to later parse the blocks with the known symbols
      * in the frame visible to the parser.
      * @param node the visited node
      * @param minfo the map of printed expression number to node info

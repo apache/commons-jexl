@@ -19,6 +19,7 @@ package org.apache.commons.jexl3.internal;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlOptions;
+import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.internal.TemplateEngine.TemplateExpression;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
@@ -130,7 +131,7 @@ public class TemplateInterpreter extends Interpreter {
      * @param script the TemplateScript to evaluate
      * @param args   the arguments
      */
-    public void include(final TemplateScript script, final Object... args) {
+    public void include(final JxltEngine.Template script, final Object... args) {
         script.evaluate(context, writer, args);
     }
 

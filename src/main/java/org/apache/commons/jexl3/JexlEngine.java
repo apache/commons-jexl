@@ -60,13 +60,13 @@ public abstract class JexlEngine {
         public String toString() {
             return "tryExecute failed";
         }
-    };
+    }
 
     /**
      * The thread local context.
      */
     protected static final java.lang.ThreadLocal<JexlContext.ThreadLocal> CONTEXT =
-                       new java.lang.ThreadLocal<JexlContext.ThreadLocal>();
+                       new java.lang.ThreadLocal<>();
 
     /**
      * Accesses the current thread local context.
@@ -81,7 +81,7 @@ public abstract class JexlEngine {
      * The thread local engine.
      */
     protected static final java.lang.ThreadLocal<JexlEngine> ENGINE =
-                       new java.lang.ThreadLocal<JexlEngine>();
+                       new java.lang.ThreadLocal<>();
 
     /**
      * Accesses the current thread local engine.
@@ -132,7 +132,7 @@ public abstract class JexlEngine {
          * @return true if strict, false otherwise
          */
         Boolean isStrict();
-        
+
         /**
          * Checks whether the arithmetic triggers errors during evaluation when null is used as an operand.
          *
@@ -161,7 +161,7 @@ public abstract class JexlEngine {
          */
         int getArithmeticMathScale();
     }
-   
+
     /** Default features. */
     public static final JexlFeatures DEFAULT_FEATURES = new JexlFeatures();
 
@@ -193,7 +193,7 @@ public abstract class JexlEngine {
         public void set(final String name, final Object value) {
             throw new UnsupportedOperationException("Not supported in void context.");
         }
-    };
+    }
 
     /**
      * An empty/static/non-mutable JexlNamespace singleton used instead of null namespace.
@@ -213,7 +213,7 @@ public abstract class JexlEngine {
         public Object resolveNamespace(final String name) {
             return null;
         }
-    };
+    }
 
     /** The default Jxlt cache size. */
     private static final int JXLT_CACHE_SIZE = 256;

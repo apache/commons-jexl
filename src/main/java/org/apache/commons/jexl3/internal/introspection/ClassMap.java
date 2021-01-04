@@ -263,7 +263,10 @@ final class ClassMap {
      * @param iface       the interface to populate the cache from
      * @param log         the Log
      */
-    private static void populateWithInterface(final ClassMap cache, final Permissions permissions, final Class<?> iface, final Log log) {
+    private static void populateWithInterface(final ClassMap cache,
+                                              final Permissions permissions,
+                                              final Class<?> iface,
+                                              final Log log) {
         if (Modifier.isPublic(iface.getModifiers())) {
             populateWithClass(cache, permissions, iface, log);
             final Class<?>[] supers = iface.getInterfaces();
@@ -281,7 +284,10 @@ final class ClassMap {
      * @param clazz       the class to populate the cache from
      * @param log         the Log
      */
-    private static void populateWithClass(final ClassMap cache, final Permissions permissions, final Class<?> clazz, final Log log) {
+    private static void populateWithClass(final ClassMap cache,
+                                          final Permissions permissions,
+                                          final Class<?> clazz,
+                                          final Log log) {
         try {
             final Method[] methods = clazz.getDeclaredMethods();
             for (final Method mi : methods) {

@@ -42,7 +42,10 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @param value      the value to assign to the property
      * @return the executor if found, null otherwise
      */
-    public static PropertySetExecutor discover(final Introspector is, final Class<?> clazz, final String property, final Object value) {
+    public static PropertySetExecutor discover(final Introspector is,
+                                               final Class<?> clazz,
+                                               final String property,
+                                               final Object value) {
         if (property == null || property.isEmpty()) {
             return null;
         }
@@ -57,7 +60,10 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @param key    the key to use as 1st argument to the set method
      * @param value    the value
      */
-    protected PropertySetExecutor(final Class<?> clazz, final java.lang.reflect.Method method, final String key, final Object value) {
+    protected PropertySetExecutor(final Class<?> clazz,
+                                  final java.lang.reflect.Method method,
+                                  final String key,
+                                  final Object value) {
         super(clazz, method);
         property = key;
         valueClass = classOf(value);
@@ -81,7 +87,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
                 }
             }
                 method.invoke(o, arg);
-            } 
+            }
         return arg;
     }
 
@@ -100,7 +106,7 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
                 return TRY_FAILED;// fail
             } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw
-            } 
+            }
         }
         return TRY_FAILED;
     }
@@ -125,7 +131,10 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
      * @param arg      the value to assign to the property
      * @return the method if found, null otherwise
      */
-    private static java.lang.reflect.Method discoverSet(final Introspector is, final Class<?> clazz, final String property, final Object arg) {
+    private static java.lang.reflect.Method discoverSet(final Introspector is,
+                                                        final Class<?> clazz,
+                                                        final String property,
+                                                        final Object arg) {
         // first, we introspect for the set<identifier> setter method
         final Object[] params = {arg};
         final StringBuilder sb = new StringBuilder("set");

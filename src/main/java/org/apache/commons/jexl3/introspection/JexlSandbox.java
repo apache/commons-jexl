@@ -380,19 +380,19 @@ public final class JexlSandbox {
             return names != null && !names.contains(name) ? name : null;
         }
     }
-    
+
     /**
      * Unused.
      */
     @Deprecated
     public static final class WhiteSet extends AllowSet {}
-    
+
     /**
      * Unused.
      */
     @Deprecated
     public static final class BlackSet extends BlockSet {}
-    
+
     /**
      * Contains the allow or block lists for properties and methods for a given class.
      */
@@ -537,10 +537,13 @@ public final class JexlSandbox {
      * @param executeFlag whether the executable method list is allow allow - true - or block - false -
      * @return the set of permissions
      */
-    public Permissions permissions(final String clazz, final boolean readFlag, final boolean writeFlag, final boolean executeFlag) {
+    public Permissions permissions(final String clazz,
+                                   final boolean readFlag,
+                                   final boolean writeFlag,
+                                   final boolean executeFlag) {
         return permissions(clazz, inherit, readFlag, writeFlag, executeFlag);
     }
-        
+
     /**
      * Creates the set of permissions for a given class.
      *
@@ -551,7 +554,11 @@ public final class JexlSandbox {
      * @param execf whether the executable method list is allow allow - true - or block - false -
      * @return the set of permissions
      */
-    public Permissions permissions(final String clazz, final boolean inhf,  final boolean readf, final boolean writef, final boolean execf) {
+    public Permissions permissions(final String clazz,
+                                   final boolean inhf,
+                                   final boolean readf,
+                                   final boolean writef,
+                                   final boolean execf) {
         final Permissions box = new Permissions(inhf, readf, writef, execf);
         sandbox.put(clazz, box);
         return box;
@@ -560,14 +567,14 @@ public final class JexlSandbox {
     /**
      * Creates a new set of permissions based on allow lists for methods and properties for a given class.
      * <p>The sandbox inheritance property will apply to the permissions created by this method
-     * 
+     *
      * @param clazz the allowed class name
      * @return the permissions instance
      */
     public Permissions allow(final String clazz) {
         return permissions(clazz, true, true, true);
     }
-    /** 
+    /**
      * Use allow() instead.
      * @param clazz the allowed class name
      * @return the permissions instance
@@ -587,8 +594,8 @@ public final class JexlSandbox {
     public Permissions block(final String clazz) {
         return permissions(clazz, false, false, false);
     }
-        
-    /** 
+
+    /**
      * Use block() instead.
      * @param clazz the allowed class name
      * @return the permissions instance

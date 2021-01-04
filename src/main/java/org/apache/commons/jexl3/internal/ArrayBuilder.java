@@ -132,7 +132,7 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
                 }
                 return typed;
             } else {
-                return untyped;
+                return untyped.clone();
             }
         } else {
             return new Object[0];
