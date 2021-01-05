@@ -28,10 +28,12 @@ import java.lang.reflect.UndeclaredThrowableException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+
 /**
  * Wraps any error that might occur during interpretation of a script or expression.
  *
@@ -47,6 +49,7 @@ public class JexlException extends RuntimeException {
 
     /** Maximum number of characters around exception location. */
     private static final int MAX_EXCHARLOC = 42;
+
 
     /**
      * Creates a new JexlException.
@@ -97,7 +100,7 @@ public class JexlException extends RuntimeException {
     public JexlInfo getInfo() {
         return detailedInfo(mark, info);
     }
-    
+
     /**
      * Creates a string builder pre-filled with common error information (if possible).
      *
@@ -128,7 +131,7 @@ public class JexlException extends RuntimeException {
     public static JexlInfo getInfo(final JexlNode node, final JexlInfo info) {
         return detailedInfo(node, info);
     }
-    
+
     /**
      * Gets the most specific information attached to a node.
      *
@@ -169,7 +172,7 @@ public class JexlException extends RuntimeException {
      */
     private static <X extends Throwable> X clean(final X xthrow) {
         if (xthrow != null) {
-            final List<StackTraceElement> stackJexl = new ArrayList<StackTraceElement>();
+            final List<StackTraceElement> stackJexl = new ArrayList<>();
             for (final StackTraceElement se : xthrow.getStackTrace()) {
                 final String className = se.getClassName();
                 if (!className.startsWith("org.apache.commons.jexl3.internal")
@@ -205,14 +208,13 @@ public class JexlException extends RuntimeException {
      * @return the info to use
      */
     private static JexlInfo merge(final JexlInfo info, final JavaccError cause) {
-        final JexlInfo dbgn = info;
         if (cause == null || cause.getLine() < 0) {
-            return dbgn;
-        } else if (dbgn == null) {
-            return new JexlInfo("", cause.getLine(), cause.getColumn());
-        } else {
-            return new JexlInfo(dbgn.getName(), cause.getLine(), cause.getColumn());
+            return info;
         }
+        if (info == null) {
+            return new JexlInfo("", cause.getLine(), cause.getColumn());
+        }
+        return new JexlInfo(info.getName(), cause.getLine(), cause.getColumn());
     }
 
     /**
@@ -221,6 +223,16 @@ public class JexlException extends RuntimeException {
      * @return the message
      */
     protected String detailedMessage() {
+        Class<? extends JexlException> clazz = getClass();
+        String name = clazz == JexlException.class? "JEXL" : clazz.getSimpleName().toLowerCase();
+        return name + " error : " + getDetail();
+    }
+
+    /**
+     * @return this exception specific detail
+     * @since 3.2
+     */
+    public final String getDetail() {
         return super.getMessage();
     }
 
@@ -251,7 +263,7 @@ public class JexlException extends RuntimeException {
                     + expr.substring(begin, end) + " ...'";
         }
     }
-    
+
     /**
      * Pleasing checkstyle.
      * @return the info
@@ -272,14 +284,7 @@ public class JexlException extends RuntimeException {
          * @param cause the javacc cause
          */
         public Tokenization(final JexlInfo info, final TokenMgrError cause) {
-            super(merge(info, cause), cause.getAfter(), null);
-        }
-
-        /**
-         * @return the specific detailed message
-         */
-        public String getDetail() {
-            return super.detailedMessage();
+            super(merge(info, cause), Objects.requireNonNull(cause).getAfter(), null);
         }
 
         @Override
@@ -301,7 +306,7 @@ public class JexlException extends RuntimeException {
          * @param cause the javacc cause
          */
         public Parsing(final JexlInfo info, final ParseException cause) {
-            super(merge(info, cause), cause.getAfter(), null);
+            super(merge(info, cause), Objects.requireNonNull(cause).getAfter(), null);
         }
 
         /**
@@ -312,13 +317,6 @@ public class JexlException extends RuntimeException {
          */
         public Parsing(final JexlInfo info, final String msg) {
             super(info, msg, null);
-        }
-
-        /**
-         * @return the specific detailed message
-         */
-        public String getDetail() {
-            return super.detailedMessage();
         }
 
         @Override
@@ -334,7 +332,7 @@ public class JexlException extends RuntimeException {
      */
     public static class Ambiguous extends Parsing {
         /** The mark at which ambiguity might stop and recover. */
-        private JexlInfo recover = null;
+        private final transient JexlInfo recover;
         /**
          * Creates a new Ambiguous statement exception instance.
          * @param info  the location information
@@ -343,7 +341,7 @@ public class JexlException extends RuntimeException {
         public Ambiguous(final JexlInfo info, final String expr) {
            this(info, null, expr);
         }
-                
+
         /**
          * Creates a new Ambiguous statement exception instance.
          * @param begin  the start location information
@@ -354,7 +352,7 @@ public class JexlException extends RuntimeException {
             super(begin, expr);
             recover = end;
         }
-        
+
         @Override
         protected String detailedMessage() {
             return parserError("ambiguous statement", getDetail());
@@ -363,7 +361,7 @@ public class JexlException extends RuntimeException {
         /**
          * Tries to remove this ambiguity in the source.
          * @param src the source that triggered this exception
-         * @return the source with the ambiguous statement removed 
+         * @return the source with the ambiguous statement removed
          *         or null if no recovery was possible
          */
         public String tryCleanSource(final String src) {
@@ -394,7 +392,7 @@ public class JexlException extends RuntimeException {
                     buffer.append(line).append('\n');
                 } else {
                     if (cl == froml) {
-                        buffer.append(line.substring(0, fromc - 1));
+                        buffer.append(line, 0, fromc - 1);
                     }
                     if (cl == tol) {
                         buffer.append(line.substring(toc + 1));
@@ -425,19 +423,12 @@ public class JexlException extends RuntimeException {
             super(info, name, cause);
         }
 
-        /**
-         * @return the specific detailed message
-         */
-        public String getDetail() {
-            return super.detailedMessage();
-        }
-
         @Override
         protected String detailedMessage() {
             return "stack overflow " + getDetail();
         }
     }
-    
+
     /**
      * Thrown when parsing fails due to an invalid assigment.
      *
@@ -484,7 +475,10 @@ public class JexlException extends RuntimeException {
             return parserError(JexlFeatures.stringify(code), getDetail());
         }
     }
-    
+
+    /** Used 3 times. */
+    private static final String VARQUOTE = "variable '";
+
     /**
      * The various type of variable issues.
      */
@@ -495,7 +489,7 @@ public class JexlException extends RuntimeException {
         REDEFINED,
         /** The variable has a null value. */
         NULLVALUE;
-        
+
         /**
          * Stringifies the variable issue.
          * @param var the variable name
@@ -503,10 +497,10 @@ public class JexlException extends RuntimeException {
          */
         public String message(final String var) {
             switch(this) {
-                case NULLVALUE : return "variable '" + var + "' is null";
-                case REDEFINED : return "variable '" + var + "' is already defined";
+                case NULLVALUE : return VARQUOTE + var + "' is null";
+                case REDEFINED : return VARQUOTE + var + "' is already defined";
                 case UNDEFINED :
-                default: return "variable '" + var + "' is undefined";
+                default: return VARQUOTE + var + "' is undefined";
             }
         }
     }
@@ -520,8 +514,8 @@ public class JexlException extends RuntimeException {
         /**
          * Undefined variable flag.
          */
-        private final VariableIssue issue; 
-        
+        private final VariableIssue issue;
+
         /**
          * Creates a new Variable exception instance.
          *
@@ -533,7 +527,7 @@ public class JexlException extends RuntimeException {
             super(node, var, null);
             issue = vi;
         }
-        
+
         /**
          * Creates a new Variable exception instance.
          *
@@ -558,7 +552,7 @@ public class JexlException extends RuntimeException {
          * @return the variable name
          */
         public String getVariable() {
-            return super.detailedMessage();
+            return getDetail();
         }
 
         @Override
@@ -574,12 +568,13 @@ public class JexlException extends RuntimeException {
      * @param variable the variable
      * @param undef whether the variable is null or undefined
      * @return the error message
+     * @deprecated 3.2
      */
     @Deprecated
     public static String variableError(final JexlNode node, final String variable, final boolean undef) {
         return variableError(node, variable, undef? VariableIssue.UNDEFINED : VariableIssue.NULLVALUE);
     }
-       
+
     /**
      * Generates a message for a variable error.
      *
@@ -604,7 +599,7 @@ public class JexlException extends RuntimeException {
          * Undefined variable flag.
          */
         private final boolean undefined;
-                          
+
         /**
          * Creates a new Property exception instance.
          *
@@ -615,7 +610,7 @@ public class JexlException extends RuntimeException {
         @Deprecated
         public Property(final JexlNode node, final String pty) {
             this(node, pty, true, null);
-        }    
+        }
         /**
          * Creates a new Property exception instance.
          *
@@ -628,7 +623,7 @@ public class JexlException extends RuntimeException {
         public Property(final JexlNode node, final String pty, final Throwable cause) {
             this(node, pty, true, cause);
         }
-        
+
         /**
          * Creates a new Property exception instance.
          *
@@ -655,7 +650,7 @@ public class JexlException extends RuntimeException {
          * @return the property name
          */
         public String getProperty() {
-            return super.detailedMessage();
+            return getDetail();
         }
 
         @Override
@@ -684,7 +679,7 @@ public class JexlException extends RuntimeException {
         msg.append('\'');
         return msg.toString();
     }
-    
+
     /**
      * Generates a message for an unsolvable property error.
      *
@@ -715,7 +710,7 @@ public class JexlException extends RuntimeException {
         public Method(final JexlNode node, final String name) {
             this(node, name, null);
         }
-         
+
         /**
          * Creates a new Method exception instance.
          *
@@ -728,7 +723,7 @@ public class JexlException extends RuntimeException {
         public Method(final JexlInfo info, final String name, final Throwable cause) {
             this(info, name, null, cause);
         }
-        
+
         /**
          * Creates a new Method exception instance.
          *
@@ -740,7 +735,7 @@ public class JexlException extends RuntimeException {
         public Method(final JexlNode node, final String name, final Object[] args) {
             super(node, methodSignature(name, args));
         }
-        
+
         /**
          * Creates a new Method exception instance.
          *
@@ -753,7 +748,7 @@ public class JexlException extends RuntimeException {
             this(info, name, args, null);
         }
 
-                
+
         /**
          * Creates a new Method exception instance.
          *
@@ -766,7 +761,7 @@ public class JexlException extends RuntimeException {
         public Method(final JexlInfo info, final String name, final Object[] args, final Throwable cause) {
             super(info, methodSignature(name, args), cause);
         }
-        
+
         /**
          * @return the method name
          */
@@ -774,14 +769,14 @@ public class JexlException extends RuntimeException {
             final String signature = getMethodSignature();
             final int lparen = signature.indexOf('(');
             return lparen > 0? signature.substring(0, lparen) : signature;
-        }  
-        
+        }
+
         /**
          * @return the method signature
          * @since 3.2
          */
         public String getMethodSignature() {
-            return super.detailedMessage();
+            return getDetail();
         }
 
         @Override
@@ -819,11 +814,13 @@ public class JexlException extends RuntimeException {
      * @param node the node where the error occurred
      * @param method the method name
      * @return the error message
+     * @deprecated 3.2
      */
+    @Deprecated
     public static String methodError(final JexlNode node, final String method) {
         return methodError(node, method, null);
     }
-    
+
     /**
      * Generates a message for a unsolvable method error.
      *
@@ -861,7 +858,7 @@ public class JexlException extends RuntimeException {
          * @return the method name
          */
         public String getSymbol() {
-            return super.detailedMessage();
+            return getDetail();
         }
 
         @Override
@@ -906,7 +903,7 @@ public class JexlException extends RuntimeException {
          * @return the annotation name
          */
         public String getAnnotation() {
-            return super.detailedMessage();
+            return getDetail();
         }
 
         @Override
@@ -939,7 +936,7 @@ public class JexlException extends RuntimeException {
     public static class Return extends JexlException {
 
         /** The returned value. */
-        private final Object result;
+        private final transient Object result;
 
         /**
          * Creates a new instance of Return.
@@ -1024,7 +1021,7 @@ public class JexlException extends RuntimeException {
             super((JexlInfo) null, "tryFailed", xany.getCause());
         }
     }
-    
+
     /**
      * Wrap an invocation exception.
      * <p>Return the cause if it is already a JexlException.
@@ -1034,11 +1031,11 @@ public class JexlException extends RuntimeException {
     public static JexlException tryFailed(final InvocationTargetException xinvoke) {
         final Throwable cause = xinvoke.getCause();
         return cause instanceof JexlException
-                ? (JexlException) cause 
+                ? (JexlException) cause
                 : new JexlException.TryFailed(xinvoke); // fail
     }
 
-    
+
     /**
      * Detailed info message about this error.
      * Format is "debug![begin,end]: string \n msg" where:
