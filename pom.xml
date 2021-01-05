@@ -289,7 +289,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <excludePackageNames>*.internal;*.parser</excludePackageNames>
+                    <excludePackageNames>*.internal:*.parser</excludePackageNames>
                     <show>public</show>
                 </configuration>
             </plugin>
