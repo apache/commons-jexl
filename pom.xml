@@ -291,6 +291,7 @@
                 <configuration>
                     <excludePackageNames>*.internal:*.parser</excludePackageNames>
                     <show>public</show>
+                    <doclint>none</doclint>
                 </configuration>
             </plugin>
 
