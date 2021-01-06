@@ -34,6 +34,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <commons.componentid>jexl</commons.componentid>
         <commons.module.name>org.apache.commons.jexl3</commons.module.name>
         <commons.release.version>3.2</commons.release.version>
@@ -71,7 +72,6 @@
         <project.reporting.outputEncoding>${commons.encoding}</project.reporting.outputEncoding>
 
         <commons.bc.version>1.5</commons.bc.version>
-        <commons.release-plugin.version>1.4</commons.release-plugin.version>
         <commons.release.isDistModule>true</commons.release.isDistModule>
         <commons.distSvnStagingUrl>scm:svn:https://dist.apache.org/repos/dist/dev/commons/${commons.componentid}</commons.distSvnStagingUrl>
         <commons.releaseManagerName>Henri Biestro</commons.releaseManagerName>
@@ -280,6 +280,20 @@
                     </excludes>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <source>8</source>
+                    <detectLinks>true</detectLinks> <!-- don't think it's needed but doesn't hurt -->
+                    <detectJavaApiLink>false</detectJavaApiLink>
+                    <excludePackageNames>*.internal:*.parser</excludePackageNames>
+                    <show>public</show>
+                    <doclint>none</doclint>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -288,7 +302,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.1</version>
                 <configuration>
+                    <source>8</source>
+                    <detectLinks>true</detectLinks> <!-- don't think it's needed but doesn't hurt -->
+                    <detectJavaApiLink>false</detectJavaApiLink>
                     <excludePackageNames>*.internal:*.parser</excludePackageNames>
                     <show>public</show>
                     <doclint>none</doclint>
