@@ -34,7 +34,6 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <commons.componentid>jexl</commons.componentid>
         <commons.module.name>org.apache.commons.jexl3</commons.module.name>
         <commons.release.version>3.2</commons.release.version>
@@ -55,8 +54,15 @@
         <commons.jira.pid>12310479</commons.jira.pid>
         <checkstyle.plugin.version>3.1.1</checkstyle.plugin.version>
         <checksyle.version>8.39</checksyle.version>
-        <!-- override of version defined in CP52 -->
-        <commons.jacoco.version>0.8.6</commons.jacoco.version>
+
+        <!-- override of Jacoco properties defined in CP52 -->
+        <commons.jacoco.classRatio>0.95</commons.jacoco.classRatio>
+        <commons.jacoco.instructionRatio>0.85</commons.jacoco.instructionRatio>
+        <commons.jacoco.methodRatio>0.85</commons.jacoco.methodRatio>
+        <commons.jacoco.branchRatio>0.75</commons.jacoco.branchRatio>
+        <commons.jacoco.complexityRatio>0.70</commons.jacoco.complexityRatio>
+        <commons.jacoco.lineRatio>0.85</commons.jacoco.lineRatio>
+        <commons.jacoco.haltOnFailure>false</commons.jacoco.haltOnFailure>
 
         <!--
           Encoding of Java source files: ensures that the compiler and
@@ -183,27 +189,6 @@
                             <exclude>**/org/apache/commons/jexl3/parser/*.class</exclude>
                             <exclude>**/org/apache/commons/jexl3/**/*Test.class</exclude>
                     </excludes>
-                    <rules>
-                        <rule>
-                            <limits>
-                                <limit>
-                                    <counter>INSTRUCTION</counter>
-                                    <value>COVEREDRATIO</value>
-                                    <minimum>85.0%</minimum>
-                                </limit>
-                                <limit>
-                                    <counter>LINE</counter>
-                                    <value>COVEREDRATIO</value>
-                                    <minimum>0.75</minimum>
-                                </limit>
-                                <limit>
-                                    <counter>BRANCH</counter>
-                                    <value>COVEREDRATIO</value>
-                                    <minimum>0.75</minimum>
-                                </limit>
-                            </limits>
-                        </rule>
-                    </rules>
                 </configuration>
             </plugin>
 
@@ -284,14 +269,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
                 <configuration>
-                    <source>8</source>
-                    <detectLinks>true</detectLinks> <!-- don't think it's needed but doesn't hurt -->
-                    <detectJavaApiLink>false</detectJavaApiLink>
                     <excludePackageNames>*.internal:*.parser</excludePackageNames>
                     <show>public</show>
-                    <doclint>none</doclint>
                 </configuration>
             </plugin>
         </plugins>
@@ -302,14 +282,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
                 <configuration>
-                    <source>8</source>
-                    <detectLinks>true</detectLinks> <!-- don't think it's needed but doesn't hurt -->
-                    <detectJavaApiLink>false</detectJavaApiLink>
                     <excludePackageNames>*.internal:*.parser</excludePackageNames>
                     <show>public</show>
-                    <doclint>none</doclint>
                 </configuration>
             </plugin>
 
@@ -391,6 +366,19 @@
                 <configuration>
                     <excludes>
                         <exclude>.travis.yml</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${commons.jacoco.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/generated-sources/**/*</exclude>
+                        <exclude>**/org/apache/commons/jexl3/parser/*.class</exclude>
+                        <exclude>**/org/apache/commons/jexl3/**/*Test.class</exclude>
                     </excludes>
                 </configuration>
             </plugin>
