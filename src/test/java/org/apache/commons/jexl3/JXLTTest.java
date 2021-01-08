@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import java.io.File;
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.TemplateDebugger;
 import org.apache.commons.logging.Log;

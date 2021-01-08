@@ -17,7 +17,6 @@
 package org.apache.commons.jexl3;
 
 import java.util.Collection;
-import java.util.Iterator;
 import org.junit.Assert;
 import org.junit.Test;
 
