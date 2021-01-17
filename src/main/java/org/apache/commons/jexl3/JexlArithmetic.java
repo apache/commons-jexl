@@ -1453,7 +1453,7 @@ public class JexlArithmetic {
             return ((AtomicBoolean) val).get();
         } else if (val instanceof String) {
             final String strval = val.toString();
-            return strval.length() > 0 && !"false".equals(strval);
+            return !strval.isEmpty() && !"false".equals(strval);
         } else {
             // non null value is true
             return true;
