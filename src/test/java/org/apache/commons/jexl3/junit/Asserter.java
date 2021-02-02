@@ -29,7 +29,6 @@ import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
 import org.junit.Assert;
-import static org.junit.Assert.fail;
 
 /**
  * A utility class for performing JUnit based assertions using Jexl

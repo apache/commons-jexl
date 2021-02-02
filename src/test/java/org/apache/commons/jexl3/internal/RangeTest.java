@@ -17,7 +17,6 @@
 package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlTestCase;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
