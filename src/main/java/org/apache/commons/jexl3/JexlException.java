@@ -69,7 +69,19 @@ public class JexlException extends RuntimeException {
      * @param cause the exception causing the error
      */
     public JexlException(final JexlNode node, final String msg, final Throwable cause) {
-        super(msg != null ? msg : "", unwrap(cause));
+        this(node, msg != null ? msg : "", unwrap(cause), true);
+    }
+
+    /**
+     * Creates a new JexlException.
+     *
+     * @param node  the node causing the error
+     * @param msg   the error message
+     * @param cause the exception causing the error
+     * @param trace whether this exception has a stacktrace and can <em>not</em> be suppressed
+     */
+    protected JexlException(final JexlNode node, final String msg, final Throwable cause, boolean trace) {
+        super(msg != null ? msg : "", unwrap(cause), !trace, trace);
         if (node != null) {
             mark = node;
             info = node.jexlInfo();
@@ -946,7 +958,7 @@ public class JexlException extends RuntimeException {
          * @param value the returned value
          */
         public Return(final JexlNode node, final String msg, final Object value) {
-            super(node, msg, null);
+            super(node, msg, null, false);
             this.result = value;
         }
 
@@ -986,7 +998,7 @@ public class JexlException extends RuntimeException {
          * @param node the break
          */
         public Break(final JexlNode node) {
-            super(node, "break loop", null);
+            super(node, "break loop", null, false);
         }
     }
 
@@ -1002,7 +1014,7 @@ public class JexlException extends RuntimeException {
          * @param node the continue
          */
         public Continue(final JexlNode node) {
-            super(node, "continue loop", null);
+            super(node, "continue loop", null, false);
         }
     }
 
