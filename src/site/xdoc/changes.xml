@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2">
+            <action dev="henrib" type="fix" issue="JEXL-344"  due-to="David Costanzo">
+                Don't fill stack trace for JexlExpression#Return (to improve performance)
+            </action>dev>
             <action dev="Hussachai Puripunpinyo" type="fix" issue="JEXL-336">
                 Escape some control characters
             </action>

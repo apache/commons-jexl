@@ -48,6 +48,7 @@ What's new in 3.2:
 
 New Features in 3.2:
 ====================
+* JEXL-344:      Don't fill stack trace for JexlExpression#Return (to improve performance)
 * JEXL-334:      Remove offensive terminology from code and API
 * JEXL-333:      Allow declaration of namespace within script
 * JEXL-317:      Support script cancellation through less invasive API
