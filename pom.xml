@@ -52,7 +52,7 @@
         <commons.release.3.binary.suffix />
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
-        <checkstyle.plugin.version>3.1.1</checkstyle.plugin.version>
+        <checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
         <checksyle.version>8.40</checksyle.version>
 
         <!-- override of Jacoco properties defined in CP52 -->
