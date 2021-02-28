@@ -414,7 +414,7 @@ public class ArithmeticTest extends JexlTestCase {
         final JexlEngine jexl = JEXL;
         // for non-silent, silent...
         for (int s = 0; s < 2; ++s) {
-            final boolean strict = Boolean.valueOf(s != 0);
+            final boolean strict = s != 0;
             options.setStrict(true);
             options.setStrictArithmetic(strict);
             int zthrow = 0;
