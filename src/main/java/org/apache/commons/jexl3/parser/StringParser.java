@@ -225,7 +225,7 @@ public class StringParser {
         strb.append(delim);
         return strb.toString();
     }
-    
+
     /**
      * Remove escape char ('\') from an identifier.
      * @param str the identifier escaped string, ie with a backslash before space, quote, double-quote and backslash
@@ -242,7 +242,7 @@ public class StringParser {
                     if (strb == null) {
                         strb = new StringBuilder(last);
                         strb.append(str.substring(0, n));
-                    } 
+                    }
                 } else if (strb != null) {
                     strb.append(c);
                 }

@@ -246,7 +246,7 @@ public abstract class JexlNode extends SimpleNode {
         }
         return false;
     }
-        
+
     /**
      * Check if a null evaluated expression is protected by a ternary expression.
      * <p>
@@ -272,7 +272,7 @@ public abstract class JexlNode extends SimpleNode {
             node = walk;
         }
         return false;
-    } 
+    }
 
     /**
      * An info bound to its node.
@@ -288,16 +288,16 @@ public abstract class JexlNode extends SimpleNode {
         public Info(final JexlNode jnode) {
             this(jnode, jnode.jexlInfo());
         }
-        
+
         /**
          * Copy ctor.
          * @param jnode the node
-         * @param info the 
+         * @param info the
          */
         public Info(final JexlNode jnode, final JexlInfo info) {
             this(jnode, info.getName(), info.getLine(), info.getColumn());
         }
-        
+
         /**
          * Full detail ctor.
          * @param jnode the node

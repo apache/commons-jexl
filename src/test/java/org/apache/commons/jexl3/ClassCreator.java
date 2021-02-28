@@ -98,7 +98,7 @@ public class ClassCreator {
     public String getClassName() {
         return GEN_CLASS + className;
     }
-    
+
     public Class<?> getClassInstance() throws Exception {
         return getClassLoader().loadClass(getClassName());
     }
@@ -130,12 +130,12 @@ public class ClassCreator {
             return clazz;
         }
         throw new Exception("failed to validate foo" + seed);
-    }  
-    
+    }
+
     Object newInstance(final Class<?> clazz, final JexlContext ctxt) throws Exception {
         return clazz.getConstructor(JexlContext.class).newInstance(ctxt);
     }
-    
+
     void generate(final boolean ftor) throws Exception {
         final FileWriter aWriter = new FileWriter(new File(packageDir, sourceName), false);
         aWriter.write("package ");

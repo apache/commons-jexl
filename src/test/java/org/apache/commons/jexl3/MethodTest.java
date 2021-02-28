@@ -177,11 +177,11 @@ public class MethodTest extends JexlTestCase {
     public static class Functor {
         private boolean overKill = false;
         private String under = null;
-        
+
         void setKill(final boolean ok) {
             overKill = ok;
         }
-        
+
         public int ten() {
             return 10;
         }
@@ -282,7 +282,7 @@ public class MethodTest extends JexlTestCase {
             Assert.fail("method should not have thrown!");
         }
     }
-    
+
     @Test
     public void testAmbiguousInvoke() throws Exception {
         // JEXL-299
@@ -319,13 +319,13 @@ public class MethodTest extends JexlTestCase {
         ctxt.set("func", func);
         Object result;
         final JexlUberspect uber = JEXL.getUberspect();
-        // tryInvoke 
+        // tryInvoke
         final JexlMethod method = uber.getMethod(func, "over", "foo", 42);
         Assert.assertNotNull(method);
-        // tryInvoke succeeds 
+        // tryInvoke succeeds
         result = method.tryInvoke("over", func, "foo", 42);
         Assert.assertEquals("foo + 42", result);
-        // tryInvoke fails 
+        // tryInvoke fails
         func.setKill(true);
         try {
             /*result = */method.tryInvoke("over", func, "foo", 42);
@@ -369,7 +369,7 @@ public class MethodTest extends JexlTestCase {
         Assert.assertFalse(getter.tryFailed(result));
         Assert.assertEquals("-42", result);
     }
-    
+
     @Test
     public void testTryFailedScript() throws Exception {
         // JEXL-257
@@ -379,13 +379,13 @@ public class MethodTest extends JexlTestCase {
         Object result;
         final JexlUberspect uber = JEXL.getUberspect();
         final JexlScript method = JEXL.createScript("(x, y)->{ func.over(x, y) }");
-        // tryInvoke 
+        // tryInvoke
         //JexlMethod method = uber.getMethod(func, "over", "foo", 42);
         Assert.assertNotNull(method);
-        // tryInvoke succeeds 
+        // tryInvoke succeeds
         result = method.execute(ctxt, "foo", 42);
         Assert.assertEquals("foo + 42", result);
-        // tryInvoke fails 
+        // tryInvoke fails
         func.setKill(true);
         try {
             /*result = */method.execute(ctxt, "foo", 42);

@@ -93,12 +93,12 @@ public final class JexlOptions {
     private static boolean isSet(final int ordinal, final int mask) {
         return (mask & 1 << ordinal) != 0;
     }
-        
+
     /**
      * Default ctor.
      */
     public JexlOptions() {}
-            
+
     /**
      * Sets the default (static, shared) option flags.
      * <p>
@@ -107,21 +107,21 @@ public final class JexlOptions {
      * <p>A '+flag' or 'flag' will set the option named 'flag' as true, '-flag' set as false.
      * The possible flag names are:
      * cancellable, strict, silent, safe, lexical, antish, lexicalShade
-     * <p>Calling JexlBuilder.setDefaultOptions("+safe") once before JEXL engine creation 
+     * <p>Calling JexlBuilder.setDefaultOptions("+safe") once before JEXL engine creation
      * may ease validating JEXL3.2 in your environment.
-     * @param flags the flags to set 
+     * @param flags the flags to set
      */
     public static void setDefaultFlags(final String...flags) {
         DEFAULT = parseFlags(DEFAULT, flags);
     }
-        
+
     /**
      * Parses flags by name.
      * <p>A '+flag' or 'flag' will set flag as true, '-flag' set as false.
      * The possible flag names are:
      * cancellable, strict, silent, safe, lexical, antish, lexicalShade
      * @param mask the initial mask state
-     * @param flags the flags to set 
+     * @param flags the flags to set
      * @return the flag mask updated
      */
     public static int parseFlags(int mask, final String...flags) {
@@ -146,7 +146,7 @@ public final class JexlOptions {
         }
         return mask;
     }
-    
+
     /**
      * Sets this option flags using the +/- syntax.
      * @param opts the option flags
@@ -154,7 +154,7 @@ public final class JexlOptions {
     public void setFlags(final String[] opts) {
         flags = parseFlags(flags, opts);
     }
-    
+
     /**
      * The MathContext instance used for +,-,/,*,% operations on big decimals.
      * @return the math context
@@ -178,7 +178,7 @@ public final class JexlOptions {
     public boolean isAntish() {
         return isSet(ANTISH, flags);
     }
-    
+
     /**
      * Checks whether evaluation will throw JexlException.Cancel (true) or
      * return null (false) if interrupted.
@@ -197,12 +197,12 @@ public final class JexlOptions {
     public boolean isLexical() {
         return isSet(LEXICAL, flags);
     }
-    
+
     /**
      * Checks whether local variables shade global ones.
      * <p>After a symbol is defined as local, dereferencing it outside its
      * scope will trigger an error instead of seeking a global variable of the
-     * same name. To further reduce potential naming ambiguity errors, 
+     * same name. To further reduce potential naming ambiguity errors,
      * global variables (ie non local) must be declared to be assigned (@link JexlContext#has(String) )
      * when this flag is on; attempting to set an undeclared global variables will
      * raise an error.
@@ -211,7 +211,7 @@ public final class JexlOptions {
     public boolean isLexicalShade() {
         return isSet(SHADE, flags);
     }
-    
+
     /**
      * Checks whether the engine considers null in navigation expression as
      * errors during evaluation..
@@ -247,9 +247,9 @@ public final class JexlOptions {
     public boolean isStrictArithmetic() {
         return strictArithmetic;
     }
-    
+
     /**
-     * Sets whether the engine will attempt solving antish variable names from 
+     * Sets whether the engine will attempt solving antish variable names from
      * context.
      * @param flag true if antish variables are solved, false otherwise
      */
@@ -265,7 +265,7 @@ public final class JexlOptions {
     public void setCancellable(final boolean flag) {
         flags = set(CANCELLABLE, flags, flag);
     }
-    
+
     /**
      * Sets whether the engine uses a strict block lexical scope during
      * evaluation.
@@ -273,8 +273,8 @@ public final class JexlOptions {
      */
     public void setLexical(final boolean flag) {
         flags = set(LEXICAL, flags, flag);
-    }   
-    
+    }
+
     /**
      * Sets whether the engine strictly shades global variables.
      * Local symbols shade globals after definition and creating global
@@ -312,7 +312,7 @@ public final class JexlOptions {
      */
     public void setSafe(final boolean flag) {
         flags = set(SAFE, flags, flag);
-    } 
+    }
 
     /**
      * Sets whether the engine will throw a {@link JexlException} when an error
@@ -349,20 +349,20 @@ public final class JexlOptions {
     public void setSharedInstance(final boolean flag) {
         flags = set(SHARED, flags, flag);
     }
-    
+
     /**
      * @return false if a copy of these options is used during execution,
-     * true if those can potentially be modified 
+     * true if those can potentially be modified
      */
     public boolean isSharedInstance() {
         return isSet(SHARED, flags);
     }
-    
+
     /**
      * Set options from engine.
      * @param jexl the engine
      * @return this instance
-     */        
+     */
     public JexlOptions set(final JexlEngine jexl) {
         if (jexl instanceof Engine) {
             ((Engine) jexl).optionsSet(this);
@@ -383,7 +383,7 @@ public final class JexlOptions {
         namespaces = src.namespaces;
         return this;
     }
-    
+
     /**
      * Gets the optional map of namespaces.
      * @return the map of namespaces, may be empty, not null
@@ -399,7 +399,7 @@ public final class JexlOptions {
     public void setNamespaces(final Map<String, Object> ns) {
         this.namespaces = ns == null? Collections.emptyMap() : ns;
     }
-    
+
     /**
      * Creates a copy of this instance.
      * @return a copy
@@ -407,5 +407,5 @@ public final class JexlOptions {
     public JexlOptions copy() {
         return new JexlOptions().set(this);
     }
-    
+
 }

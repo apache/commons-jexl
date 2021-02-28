@@ -99,7 +99,7 @@ public class Script implements JexlScript, JexlExpression {
     protected Frame createFrame(final Object[] args) {
         return script.createFrame(args);
     }
-    
+
     /**
      * Creates this script interpreter.
      * @param context the context
@@ -219,14 +219,14 @@ public class Script implements JexlScript, JexlExpression {
     public String[] getLocalVariables() {
         return script.getLocalVariables();
     }
-    
+
     /**
      * @return the info
      */
     public JexlInfo getInfo() {
         return script.jexlInfo();
     }
-     
+
     /**
      * @return the script features
      */

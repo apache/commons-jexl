@@ -72,7 +72,7 @@ public class Operators {
         }
         return false;
     }
-        
+
     /**
      * Checks whether a method is a JexlArithmetic method.
      * @param vm the JexlMethod (may be null)
@@ -85,7 +85,7 @@ public class Operators {
         }
         return false;
     }
-    
+
     /**
      * Attempts to call an operator.
      * <p>

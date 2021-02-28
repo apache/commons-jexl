@@ -118,7 +118,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
 //            super.monitorExit(o);
 //        }
 //    }
-    
+
     /**
      * Crude monitor replacement...
      */
@@ -161,7 +161,7 @@ public class SynchronizedArithmetic extends JexlArithmetic {
             }
         }
     }
-    
+
     /**
      * An iterator that implements Closeable (at least implements a close method)
      * and uses monitors to protect iteration.

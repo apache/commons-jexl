@@ -24,7 +24,7 @@ import org.apache.commons.jexl3.internal.LexicalScope;
  */
 public class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit {
     private LexicalScope locals = null;
-    
+
     public JexlLexicalNode(final int id) {
         super(id);
     }
@@ -32,7 +32,7 @@ public class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit 
     public JexlLexicalNode(final Parser p, final int id) {
         super(p, id);
     }
-    
+
     @Override
     public boolean declareSymbol(final int symbol) {
         if (locals == null) {
@@ -40,7 +40,7 @@ public class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit 
         }
         return locals.addSymbol(symbol);
     }
-    
+
     @Override
     public int getSymbolCount() {
         return locals == null? 0 : locals.getSymbolCount();
@@ -49,7 +49,7 @@ public class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit 
     @Override
     public boolean hasSymbol(final int symbol) {
         return locals != null && locals.hasSymbol(symbol);
-    }    
+    }
 
     @Override
     public LexicalScope getLexicalScope() {

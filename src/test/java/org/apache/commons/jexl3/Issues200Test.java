@@ -595,7 +595,7 @@ public class Issues200Test extends JexlTestCase {
             Assert.assertTrue(sxs.contains("jvm"));
         }
     }
-    
+
     @Test
     public void test275a() throws Exception {
         final JexlContext ctxt = new MapContext();
@@ -657,7 +657,7 @@ public class Issues200Test extends JexlTestCase {
             Assert.fail("should not have thrown" + xvar);
         }
     }
-    
+
     @Test
     public void test278() throws Exception {
         final String[] srcs = new String[]{

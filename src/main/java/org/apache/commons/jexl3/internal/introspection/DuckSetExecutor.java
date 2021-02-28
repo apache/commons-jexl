@@ -102,7 +102,7 @@ public final class DuckSetExecutor extends AbstractExecutor.Set {
                 return TRY_FAILED;// fail
             } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw
-            } 
+            }
         }
         return TRY_FAILED;
     }

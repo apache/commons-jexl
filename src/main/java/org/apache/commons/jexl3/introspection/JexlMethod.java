@@ -43,7 +43,7 @@ public interface JexlMethod {
      * Attempts to reuse this JexlMethod, checking that it is compatible with
      * the actual set of arguments.
      * Related to isCacheable since this method is often used with cached JexlMethod instances.
-     * 
+     *
      * @param name the method name
      * @param obj the object to invoke the method upon
      * @param params the method arguments
@@ -57,7 +57,7 @@ public interface JexlMethod {
     /**
      * Checks whether a tryInvoke return value indicates a failure or not.
      * <p>Usage is : <code>Object r = tryInvoke(...); if (tryFailed(r) {...} else {...}</code>
-     * 
+     *
      * @param rval the value returned by tryInvoke
      * @return true if tryInvoke failed, false otherwise
      */
@@ -73,7 +73,7 @@ public interface JexlMethod {
 
     /**
      * returns the return type of the method invoked.
-     * 
+     *
      * @return return type
      */
     Class<?> getReturnType();

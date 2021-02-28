@@ -117,5 +117,5 @@ public final class ConstructorMethod implements JexlMethod {
     public Class<?> getReturnType() {
         return ctor.getDeclaringClass();
     }
-    
+
 }

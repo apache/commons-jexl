@@ -28,14 +28,14 @@ import javax.script.ScriptException;
 
 /**
  * Test application for JexlScriptEngine (JSR-223 implementation).
- * 
+ *
  * @since 2.0
  */
 public class Main {
 
     /**
      * Reads an input.
-     * 
+     *
      * @param charset the charset or null for default charset
      * @param fileName the file name or null for stdin
      * @return the reader

@@ -34,15 +34,15 @@ public class ContextNamespaceTest extends JexlTestCase {
      */
     public static class Taxes {
         private final double vat;
-        
+
         public Taxes(final TaxesContext ctxt) {
             vat = ctxt.getVAT();
-        } 
-        
+        }
+
         public Taxes(final double d) {
             vat = d;
         }
-        
+
         public double vat(final double n) {
             return (n * vat) / 100.;
         }
@@ -84,7 +84,7 @@ public class ContextNamespaceTest extends JexlTestCase {
         final Object result = staxes.execute(context);
         Assert.assertEquals(186., result);
     }
-    
+
     @Test
     public void testNamespacePragma() throws Exception {
         final JexlEngine jexl = new JexlBuilder().create();
@@ -98,7 +98,7 @@ public class ContextNamespaceTest extends JexlTestCase {
         Assert.assertEquals(372., result);
     }
 
-        
+
     @Test
     public void testNamespacePragmaString() throws Exception {
         final JexlEngine jexl = new JexlBuilder().create();

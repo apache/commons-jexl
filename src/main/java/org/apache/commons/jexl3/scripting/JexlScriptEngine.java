@@ -58,7 +58,7 @@ import org.apache.commons.logging.LogFactory;
  * See
  * <a href="http://java.sun.com/javase/6/docs/api/javax/script/package-summary.html">Java Scripting API</a>
  * Javadoc.
- * 
+ *
  * @since 2.0
  */
 public class JexlScriptEngine extends AbstractScriptEngine implements Compilable {
@@ -99,7 +99,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      * Those properties are always bound to the default engine scope context.
      *
      * <p>The following properties are defined:</p>
-     * 
+     *
      * <ul>
      *   <li>in - refers to the engine scope reader that defaults to reading System.err</li>
      *   <li>out - refers the engine scope writer that defaults to writing in System.out</li>
@@ -117,7 +117,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
          * <p>Although this allows to manipulate various engine flags (lenient, debug, cache...)
          * for <strong>all</strong> JexlScriptEngine instances, you probably should only do so
          * if you are in strict control and sole user of the JEXL scripting feature.</p>
-         * 
+         *
          * @return the shared underlying JEXL engine
          */
         public JexlEngine getEngine() {
@@ -126,7 +126,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
         /**
          * Gives access to the engine scope output writer (defaults to System.out).
-         * 
+         *
          * @return the engine output writer
          */
         public PrintWriter getOut() {
@@ -142,7 +142,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
         /**
          * Gives access to the engine scope error writer (defaults to System.err).
-         * 
+         *
          * @return the engine error writer
          */
         public PrintWriter getErr() {
@@ -158,7 +158,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
         /**
          * Gives access to the engine scope input reader (defaults to System.in).
-         * 
+         *
          * @return the engine input reader
          */
         public Reader getIn() {
@@ -167,7 +167,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
         /**
          * Gives access to System class.
-         * 
+         *
          * @return System.class
          */
         public Class<System> getSystem() {
@@ -176,7 +176,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
         /**
          * Gives access to the engine logger.
-         * 
+         *
          * @return the JexlScriptEngine logger
          */
         public Log getLogger() {
@@ -262,7 +262,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     /**
      * Read from a reader into a local buffer and return a String with
      * the contents of the reader.
-     * 
+     *
      * @param scriptReader to be read.
      * @return the contents of the reader as a String.
      * @throws ScriptException on any error reading the reader.
@@ -320,7 +320,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
         /**
          * Creates a context wrapper.
-         * 
+         *
          * @param theContext the engine context.
          */
         private JexlContextWrapper (final ScriptContext theContext){
@@ -365,7 +365,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
 
         /**
          * Creates an instance.
-         * 
+         *
          * @param theScript to wrap
          */
         private JexlCompiledScript(final JexlScript theScript) {

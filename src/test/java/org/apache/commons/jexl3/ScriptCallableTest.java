@@ -94,10 +94,10 @@ public class ScriptCallableTest extends JexlTestCase {
         Assert.assertTrue(c.isCancelled());
         Assert.assertTrue(lr == null || lr.isEmpty());
     }
-    
+
     public static class CancellationContext extends MapContext implements JexlContext.CancellationHandle {
         private final AtomicBoolean cancellation;
-        
+
         CancellationContext(final AtomicBoolean c) {
             cancellation = c;
         }
@@ -106,7 +106,7 @@ public class ScriptCallableTest extends JexlTestCase {
             return cancellation;
         }
     }
-    
+
     // JEXL-317
     @Test
     public void testCallableCancellation() throws Exception {
@@ -139,7 +139,7 @@ public class ScriptCallableTest extends JexlTestCase {
         Assert.assertTrue(c.isCancelled());
         Assert.assertTrue(lr == null || lr.isEmpty());
     }
-    
+
     @Test
     public void testCallableTimeout() throws Exception {
         List<Runnable> lr = null;

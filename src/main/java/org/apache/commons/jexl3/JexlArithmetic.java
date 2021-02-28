@@ -83,10 +83,10 @@ public class JexlArithmetic {
 
     /** The big decimal scale. */
     private final int mathScale;
-    
+
     /** The dynamic constructor. */
     private final Constructor<? extends JexlArithmetic> ctor;
-    
+
     /**
      * Creates a JexlArithmetic.
      * <p>If you derive your own arithmetic, implement the
@@ -118,7 +118,7 @@ public class JexlArithmetic {
         }
         this.ctor = actor;
     }
-    
+
     /**
      * Apply options to this arithmetic which eventually may create another instance.
      * @see #createWithOptions(boolean, java.math.MathContext, int)
@@ -145,7 +145,7 @@ public class JexlArithmetic {
         }
         return this;
     }
-    
+
     /**
      * Apply options to this arithmetic which eventually may create another instance.
      * @see #createWithOptions(boolean, java.math.MathContext, int)
@@ -177,7 +177,7 @@ public class JexlArithmetic {
         }
         return this;
     }
-        
+
     /**
      * Apply options to this arithmetic which eventually may create another instance.
      * @see #createWithOptions(boolean, java.math.MathContext, int)
@@ -636,7 +636,7 @@ public class JexlArithmetic {
         }
         return bigd;
     }
-    
+
     /**
      * Replace all numbers in an arguments array with the smallest type that will fit.
      *
@@ -661,7 +661,7 @@ public class JexlArithmetic {
         }
         return narrowed;
     }
-    
+
     /**
      * Given a long, attempt to narrow it to an int.
      * <p>Narrowing will only occur if no operand is a Long.
@@ -677,7 +677,7 @@ public class JexlArithmetic {
             return r;
         }
     }
-    
+
     /**
      * Checks if value class is a number that can be represented exactly in a long.
      *
@@ -875,7 +875,7 @@ public class JexlArithmetic {
                   && (((y != 0) && (r / y != x))
                       || (x == Long.MIN_VALUE && y == -1)));
     }
-    
+
     /**
      * Multiply the left value by the right.
      *
@@ -1022,7 +1022,7 @@ public class JexlArithmetic {
         if (val == null) {
             controlNullOperand();
             return null;
-        } 
+        }
         if (val instanceof Short) {
             return ((Short) val).intValue();
         }
@@ -1162,7 +1162,7 @@ public class JexlArithmetic {
     public Boolean isEmpty(final Object object) {
         return isEmpty(object, object == null);
     }
-    
+
     /**
      * Check for emptiness of various types: Number, Collection, Array, Map, String.
      *
@@ -1200,7 +1200,7 @@ public class JexlArithmetic {
     public Integer size(final Object object) {
         return size(object, object == null? 0 : 1);
     }
-    
+
     /**
      * Calculate the <code>size</code> of various types: Collection, Array, Map, String.
      *

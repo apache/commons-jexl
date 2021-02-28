@@ -76,7 +76,7 @@ public class ParserTest {
             Assert.fail(xother.toString());
         }
     }
-        
+
     @Test
     public void testIdentifierEscape() {
         final String[] ids = new String[]{"a\\ b", "a\\ b\\ c", "a\\'b\\\"c", "a\\ \\ c"};

@@ -69,7 +69,7 @@ public class SandboxTest extends JexlTestCase {
         public void callMeNot() {
             throw new RuntimeException("should not be callable!");
         }
-        
+
         public String allowInherit() {
             return "this is allowed";
         }
@@ -100,7 +100,7 @@ public class SandboxTest extends JexlTestCase {
         public String Quux() {
             return name + "-quux";
         }
-        
+
         public int doIt() {
             return 42;
         }
@@ -211,7 +211,7 @@ public class SandboxTest extends JexlTestCase {
             LOGGER.info(xvar.toString());
         }
     }
-        
+
     @Test
     public void testCantSeeMe() throws Exception {
         final JexlContext jc = new MapContext();
@@ -385,7 +385,7 @@ public class SandboxTest extends JexlTestCase {
         final List<String> foo = new ArrayList<String>();
         final JexlSandbox sandbox = new JexlSandbox(false, true);
         sandbox.allow(java.util.List.class.getName());
-        
+
         final JexlEngine sjexl = new JexlBuilder().sandbox(sandbox).safe(false).strict(true).create();
         final JexlScript method = sjexl.createScript("foo.add(y)", "foo", "y");
         final JexlScript set = sjexl.createScript("foo[x] = y", "foo", "x", "y");
@@ -404,13 +404,13 @@ public class SandboxTest extends JexlTestCase {
         result = get.execute(null, foo, 0);
         Assert.assertEquals("42", result);
     }
-    
+
     public abstract static class Operation {
         protected final int base;
         public Operation(final int sz) {
          base = sz;
         }
-        
+
         public abstract int someOp(int x);
         public abstract int nonCallable(int y);
     }
@@ -453,7 +453,7 @@ public class SandboxTest extends JexlTestCase {
             LOGGER.info(xjm.toString());
         }
     }
-    
+
     public static class Foo42 {
         public int getFoo() {
             return 42;
@@ -474,11 +474,11 @@ public class SandboxTest extends JexlTestCase {
             return 44;
         }
     }
-    
+
     @Test
     public void testNoJexl312() throws Exception {
         final JexlContext ctxt = new MapContext();
-        
+
         final JexlEngine sjexl = new JexlBuilder().safe(false).strict(true).create();
         final JexlScript foo = sjexl.createScript("x.getFoo()", "x");
         try {

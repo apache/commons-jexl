@@ -102,12 +102,12 @@ public abstract class JexlParser extends StringParser {
          * @return true if declared, false otherwise
          */
         boolean hasSymbol(int symbol);
-        
+
         /**
          * @return the number of local variables declared in this unit
          */
         int getSymbolCount();
-        
+
         LexicalScope getLexicalScope();
     }
 
@@ -257,7 +257,7 @@ public abstract class JexlParser extends StringParser {
             }
         }
     }
-    
+
     /**
      * Checks if a symbol is defined in lexical scopes.
      * <p>This works with with parsed scripts in template resolution only.
@@ -282,7 +282,7 @@ public abstract class JexlParser extends StringParser {
         }
         return false;
     }
-    
+
     /**
      * Checks whether an identifier is a local variable or argument, ie a symbol, stored in a register.
      * @param identifier the identifier
@@ -585,7 +585,7 @@ public abstract class JexlParser extends StringParser {
         // unlikely but safe
         throw xparse != null ? xparse : new JexlException.Parsing(xinfo, msg);
     }
-    
+
     /**
      * Pick the most significant token for error reporting.
      * @param tokens the tokens to choose from

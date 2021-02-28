@@ -302,7 +302,7 @@ public class Engine extends JexlEngine {
     public Charset getCharset() {
         return charset;
     }
- 
+
     /**
      * Solves an optional option.
      * @param conf the option as configured, may be null
@@ -313,7 +313,7 @@ public class Engine extends JexlEngine {
     private static <T> T option(final T conf, final T def) {
         return conf == null? def : conf;
     }
-    
+
     /**
      * Extracts the engine evaluation options from context if available, the engine
      * options otherwise.
@@ -354,7 +354,7 @@ public class Engine extends JexlEngine {
      * @return the options
      */
     protected JexlOptions options(final ASTJexlScript script, final JexlContext context) {
-        final JexlOptions opts = options(context); 
+        final JexlOptions opts = options(context);
         if (opts != options) {
             // when feature lexical, try hard to run lexical
             if (scriptFeatures.isLexical()) {
@@ -370,7 +370,7 @@ public class Engine extends JexlEngine {
         }
         return opts;
     }
-    
+
     /**
      * Processes a script pragmas.
      * <p>Only called from options(...)
@@ -419,7 +419,7 @@ public class Engine extends JexlEngine {
             }
         }
     }
-    
+
     /**
      * Sets options from this engine options.
      * @param opts the options to set
@@ -431,7 +431,7 @@ public class Engine extends JexlEngine {
         }
         return opts;
     }
-    
+
     @Override
     public TemplateEngine createJxltEngine(final boolean noScript, final int cacheSize, final char immediate, final char deferred) {
         return new TemplateEngine(this, noScript, cacheSize, immediate, deferred);
@@ -443,7 +443,7 @@ public class Engine extends JexlEngine {
             cache.clear();
         }
     }
-       
+
     /**
      * Creates an interpreter.
      * @param context a JexlContext; if null, the empty context is used instead.
@@ -455,7 +455,7 @@ public class Engine extends JexlEngine {
         return new Interpreter(this, opts, context, frame);
     }
 
-    
+
     @Override
     public Script createExpression(final JexlInfo info, final String expression) {
         return createScript(expressionFeatures, info, expression, null);
@@ -682,7 +682,7 @@ public class Engine extends JexlEngine {
         private JexlNode root = null;
         /**
          * Whether constant array-access is considered equivalent to dot-access;
-         * if so, > 1 means collect any constant (set,map,...) instead of just 
+         * if so, > 1 means collect any constant (set,map,...) instead of just
          * strings and numbers.
          */
         private int mode = 1;

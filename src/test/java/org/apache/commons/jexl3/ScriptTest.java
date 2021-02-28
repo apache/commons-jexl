@@ -60,7 +60,7 @@ public class ScriptTest extends JexlTestCase {
         final JexlScript s = JEXL.createScript(code);
         Assert.assertNotNull(s);
     }
-    
+
     /**
      * Test creating a script from a string.
      */
@@ -86,7 +86,7 @@ public class ScriptTest extends JexlTestCase {
         Assert.assertNotNull("No result", result);
         Assert.assertEquals("Wrong result", new Integer(7), result);
     }
-  
+
     @Test
     public void testArgScriptFromFile() throws Exception {
         final File testScript = new File(TEST_ADD);

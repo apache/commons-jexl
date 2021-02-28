@@ -32,7 +32,7 @@ public class JexlEvalContext implements
     /** The variables.*/
     private final JexlContext vars;
     /** The namespace. */
-    private final JexlContext.NamespaceResolver ns; 
+    private final JexlContext.NamespaceResolver ns;
     /** The options. */
     private final JexlOptions options = new JexlOptions();
 
@@ -43,7 +43,7 @@ public class JexlEvalContext implements
     public JexlEvalContext() {
         this(EMPTY_MAP);
     }
-    
+
     /**
      * Creates an evaluation environment wrapping an existing user provided vars.
      * <p>The supplied vars should be null only in derived classes that override the get/set/has methods.

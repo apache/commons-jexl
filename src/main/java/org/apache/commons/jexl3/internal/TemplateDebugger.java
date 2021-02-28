@@ -54,7 +54,7 @@ public class TemplateDebugger extends Debugger {
         exprs = null;
         script = null;
     }
-    
+
     /**
      * Position the debugger on the root of a template expression.
      * @param je the expression
@@ -203,7 +203,7 @@ public class TemplateDebugger extends Debugger {
             }
         }
     }
-    
+
     /**
      * Insert \n when needed.
      */
@@ -222,7 +222,7 @@ public class TemplateDebugger extends Debugger {
             }
         }
     }
-    
+
     /**
      * Visit a template expression.
      * @param expr the constant expression

@@ -59,7 +59,7 @@ public class PragmaTest extends JexlTestCase {
         Assert.assertEquals(1, pragmas.get("one"));
         Assert.assertEquals("truth", pragmas.get("the.very.hard"));
     }
-    
+
     public static class SafeContext extends JexlEvalContext {
         // @Override
         public void processPragmas(final Map<String, Object> pragmas) {
@@ -108,11 +108,11 @@ public class PragmaTest extends JexlTestCase {
         }
     }
 
-        
+
     public static class StaticSleeper {
         // precludes instantiation
         private StaticSleeper() {}
-        
+
         public static void sleep(final long ms) {
             try {
                 Thread.sleep(ms);
@@ -121,7 +121,7 @@ public class PragmaTest extends JexlTestCase {
             }
         }
     }
-    
+
     public static class Sleeper {
         public void sleep(final long ms) {
             try {

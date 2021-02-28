@@ -378,19 +378,19 @@ public class Issues300Test {
             Assert.assertEquals(ctls[i], output);
         }
     }
-    
+
     public static class User322 {
         public String getName() {
             return "user322";
         }
     }
-    
+
     public static class Session322 {
         public User322 getUser() {
             return new User322();
         }
     }
-    
+
     @Test
     public void test322b() throws Exception {
         final MapContext ctxt = new MapContext();
@@ -401,26 +401,26 @@ public class Issues300Test {
         JxltEngine.Template template;
         String output;
         template = jxlt.createTemplate("$$", new StringReader(src));
-        
+
         ctxt.set("session", new Session322());
         strw = new StringWriter();
         template.evaluate(ctxt, strw);
         output = strw.toString();
         Assert.assertEquals("L'utilisateur user322 s'est connecte", output);
-        
+
         ctxt.set("session.user", new User322());
         strw = new StringWriter();
         template.evaluate(ctxt, strw);
         output = strw.toString();
         Assert.assertEquals("L'utilisateur user322 s'est connecte", output);
-        
+
         ctxt.set("session.user.name", "user322");
         strw = new StringWriter();
         template.evaluate(ctxt, strw);
         output = strw.toString();
         Assert.assertEquals("L'utilisateur user322 s'est connecte", output);
     }
-    
+
     @Test
     public void test323() throws Exception {
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
@@ -428,37 +428,37 @@ public class Issues300Test {
         final JexlContext jc = new MapContext(vars);
         JexlScript script;
         Object result;
-        
+
         // nothing in context, ex
         try {
          script = jexl.createScript("a.n.t.variable");
-         result = script.execute(jc); 
+         result = script.execute(jc);
          Assert.fail("a.n.t.variable is undefined!");
         } catch(final JexlException.Variable xvar) {
             Assert.assertTrue(xvar.toString().contains("a.n.t"));
         }
-        
+
         // defined and null
         jc.set("a.n.t.variable", null);
         script = jexl.createScript("a.n.t.variable");
         result = script.execute(jc);
         Assert.assertNull(result);
-        
+
         // defined and null, dereference
         jc.set("a.n.t", null);
         try {
          script = jexl.createScript("a.n.t[0].variable");
-         result = script.execute(jc); 
+         result = script.execute(jc);
          Assert.fail("a.n.t is null!");
         } catch(final JexlException.Variable xvar) {
             Assert.assertTrue(xvar.toString().contains("a.n.t"));
         }
-        
+
         // undefined, dereference
         vars.remove("a.n.t");
         try {
          script = jexl.createScript("a.n.t[0].variable");
-         result = script.execute(jc); 
+         result = script.execute(jc);
          Assert.fail("a.n.t is undefined!");
         } catch(final JexlException.Variable xvar) {
             Assert.assertTrue(xvar.toString().contains("a.n.t"));
@@ -468,7 +468,7 @@ public class Issues300Test {
         vars.put("a.n.t", inner);
         try {
             script = jexl.createScript("a.n.t[0].variable");
-            result = script.execute(jc); 
+            result = script.execute(jc);
             Assert.fail("a.n.t is null!");
         } catch(final JexlException.Property xprop) {
             Assert.assertTrue(xprop.toString().contains("0"));
@@ -477,14 +477,14 @@ public class Issues300Test {
         inner.add(42);
         try {
             script = jexl.createScript("a.n.t[0].variable");
-            result = script.execute(jc); 
+            result = script.execute(jc);
             Assert.fail("a.n.t is null!");
         } catch(final JexlException.Property xprop) {
             Assert.assertTrue(xprop.toString().contains("variable"));
         }
-        
+
     }
-    
+
     @Test
     public void test324() throws Exception {
         final JexlEngine jexl = new JexlBuilder().create();
@@ -529,7 +529,7 @@ public class Issues300Test {
         result = script.execute(jc, map, "42");
         Assert.assertEquals(42, result);
     }
-    
+
     @Test
     public void test330() throws Exception {
         final JexlEngine jexl = new JexlBuilder().create();

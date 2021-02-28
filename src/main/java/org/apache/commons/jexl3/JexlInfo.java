@@ -24,7 +24,7 @@ import org.apache.commons.jexl3.internal.Script;
  * debugging information reporting.
  */
 public class JexlInfo {
-    
+
     /** line number. */
     private final int line;
 
@@ -65,7 +65,7 @@ public class JexlInfo {
 
     /**
      * Create info.
-     * 
+     *
      * @param source source name
      * @param l line number
      * @param c column number
@@ -75,7 +75,7 @@ public class JexlInfo {
         line = l;
         column = c;
     }
-                
+
     /**
      * Create an information structure for dynamic set/get/invoke/new.
      * <p>This gathers the class, method and line number of the first calling method
@@ -109,7 +109,7 @@ public class JexlInfo {
 
     /**
      * Creates info reusing the name.
-     * 
+     *
      * @param l the line
      * @param c the column
      * @return a new info instance
@@ -120,7 +120,7 @@ public class JexlInfo {
 
     /**
      * The copy constructor.
-     * 
+     *
      * @param copy the instance to copy
      */
     protected JexlInfo(final JexlInfo copy) {
@@ -131,7 +131,7 @@ public class JexlInfo {
 
     /**
      * Formats this info in the form 'name&#064;line:column'.
-     * 
+     *
      * @return the formatted info
      */
     @Override
@@ -160,7 +160,7 @@ public class JexlInfo {
 
     /**
      * Gets the file/script/url name.
-     * 
+     *
      * @return template name
      */
     public final String getName() {
@@ -169,7 +169,7 @@ public class JexlInfo {
 
     /**
      * Gets the line number.
-     * 
+     *
      * @return line number.
      */
     public final int getLine() {
@@ -178,20 +178,20 @@ public class JexlInfo {
 
     /**
      * Gets the column number.
-     * 
+     *
      * @return the column.
      */
     public final int getColumn() {
         return column;
     }
-    
+
     /**
      * @return this instance or a copy without any decorations
      */
     public JexlInfo detach() {
         return this;
     }
-    
+
     /**
      * Gets the info from a script.
      * @param script the script

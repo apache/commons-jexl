@@ -20,7 +20,7 @@ package org.apache.commons.jexl3.parser;
  * Declares a for each loop.
  */
 public class ASTForeachStatement extends JexlLexicalNode {
-    
+
     public ASTForeachStatement(final int id) {
         super(id);
     }

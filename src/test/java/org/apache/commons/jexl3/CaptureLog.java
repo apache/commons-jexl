@@ -29,11 +29,11 @@ public class CaptureLog implements Log {
         final StackTraceElement[] stack = new Exception().fillInStackTrace().getStackTrace();
         return stack[2];
     }
-   
+
     public CaptureLog() {
         this("org.apache.commons.jexl3");
     }
-    
+
     public CaptureLog(final String name) {
         //super(name);
     }
@@ -51,7 +51,7 @@ public class CaptureLog implements Log {
         }
         return count;
     }
-        
+
     //@Override
     public boolean isEnabledFor(final int /*Priority*/ p) {
         return true;

@@ -23,7 +23,7 @@ public class ASTIdentifier extends JexlNode {
     protected String name = null;
     protected int symbol = -1;
     protected int flags = 0;
-    
+
     /** The redefined variable flag. */
     private static final int REDEFINED = 0;
     /** The shaded variable flag. */
@@ -55,11 +55,11 @@ public class ASTIdentifier extends JexlNode {
         symbol = r;
         name = identifier;
     }
-    
+
     public int getSymbol() {
         return symbol;
     }
-        
+
     /**
      * Sets the value of a flag in a mask.
      * @param ordinal the flag ordinal
@@ -80,35 +80,35 @@ public class ASTIdentifier extends JexlNode {
     private static boolean isSet(final int ordinal, final int mask) {
         return (mask & 1 << ordinal) != 0;
     }
-      
+
     public void setRedefined(final boolean f) {
         flags = set(REDEFINED, flags, f);
     }
-     
+
     public boolean isRedefined() {
         return isSet(REDEFINED, flags);
     }
-    
+
     public void setShaded(final boolean f) {
         flags = set(SHADED, flags, f);
     }
-    
+
     public boolean isShaded() {
         return isSet(SHADED, flags);
     }
-    
+
     public void setCaptured(final boolean f) {
         flags = set(CAPTURED, flags, f);
     }
-    
+
     public boolean isCaptured() {
         return isSet(CAPTURED, flags);
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public String getNamespace() {
         return null;
     }

@@ -49,14 +49,14 @@ public class JXLTTest extends JexlTestCase {
     private final JexlBuilder BUILDER;
     private final JexlEngine ENGINE;
     private final JxltEngine JXLT;
-    
+
     public JXLTTest(final JexlBuilder builder) {
         super("JXLTTest");
         BUILDER = builder;
         ENGINE = BUILDER.create();
         JXLT = ENGINE.createJxltEngine();
     }
-   
+
 
    @Parameterized.Parameters
    public static List<JexlBuilder> engines() {
@@ -72,7 +72,7 @@ public class JXLTTest extends JexlTestCase {
             .cache(128).strict(true),
       });
    }
-    
+
     @Before
     @Override
     public void setUp() throws Exception {
@@ -87,7 +87,7 @@ public class JXLTTest extends JexlTestCase {
         debuggerCheck(ENGINE);
         super.tearDown();
     }
-    
+
     private boolean isLexicalShade() {
         JexlOptions options = context.getEngineOptions();
         if (options.isLexicalShade()) {
@@ -584,17 +584,17 @@ public class JXLTTest extends JexlTestCase {
         Assert.assertNotNull(refactored);
         Assert.assertEquals(test42, refactored);
     }
-    
+
     @Test
     public void testInheritedDebugger() throws Exception {
         final String src = "if ($A) { $B + 1; } else { $C - 2 }";
         final JexlEngine jexl = JXLT.getEngine();
         final JexlScript script = jexl.createScript(src);
-                
+
         final Debugger sd = new Debugger();
         final String rscript = sd.debug(script)? sd.toString() : null;
         Assert.assertNotNull(rscript);
-        
+
         final TemplateDebugger td = new TemplateDebugger();
         final String refactored = td.debug(script)? td.toString() : null;
         Assert.assertNotNull(refactored);
@@ -768,7 +768,7 @@ public class JXLTTest extends JexlTestCase {
         final Object value = ENGINE.createScript(expr).execute(context);
         Assert.assertEquals(expr, "H\"ello \nHenrib", value);
     }
-        
+
     @Test
     public void testInterpolationLvsG2() throws Exception {
         if (isLexicalShade()) {
@@ -806,11 +806,11 @@ public class JXLTTest extends JexlTestCase {
         t.evaluate(context, strw);
         final String output = strw.toString();
         Assert.assertTrue(output.contains("table1") && output.contains("table2"));
-    }  
+    }
 
     public static class Executor311 {
         private final String name;
-        
+
         public Executor311(final String name) {
             this.name = name;
         }
@@ -827,15 +827,15 @@ public class JXLTTest extends JexlTestCase {
             return script.execute(JexlEngine.getThreadContext(), actuals);
         }
     }
-    
-    public static class Context311 extends MapContext 
+
+    public static class Context311 extends MapContext
       implements JexlContext.OptionsHandle, JexlContext.ThreadLocal {
         private JexlOptions options = null;
-        
+
         public void setOptions(final JexlOptions o) {
             options = o;
         }
-        
+
         public Executor311 exec(final String name) {
             return new Executor311(name);
         }
@@ -844,13 +844,13 @@ public class JXLTTest extends JexlTestCase {
         public JexlOptions getEngineOptions() {
             return options;
         }
-        
+
         JexlOptions newOptions() {
             options = new JexlOptions();
             return options;
         }
     }
-    
+
     @Test
     public void test311a() throws Exception {
         final JexlContext ctx = null;
@@ -878,7 +878,7 @@ public class JXLTTest extends JexlTestCase {
         final String output = strw.toString();
         Assert.assertEquals("<p>Universe 42</p>\n", output);
     }
-    
+
     @Test
     public void test311c() throws Exception {
         final Context311 ctx311 = new Context311();
@@ -893,7 +893,7 @@ public class JXLTTest extends JexlTestCase {
         final String output = strw.toString();
         Assert.assertEquals("<p>Universe 42</p>\n", output);
     }
-       
+
     @Test
     public void test311d() throws Exception {
         final Context311 ctx311 = new Context311();
@@ -908,7 +908,7 @@ public class JXLTTest extends JexlTestCase {
         final String output = strw.toString();
         Assert.assertEquals("<p>Universe 42</p>\n", output);
     }
-    
+
     @Test
     public void test311e() throws Exception {
         final Context311 ctx311 = new Context311();
@@ -920,8 +920,8 @@ public class JXLTTest extends JexlTestCase {
         final JexlScript script = JEXL.createScript(rpt);
         final String output = script.execute(ctx311, 42).toString();
         Assert.assertEquals("<p>Universe 42</p>", output);
-    } 
-    
+    }
+
     @Test
     public void test311f() throws Exception {
         final Context311 ctx311 = new Context311();
@@ -934,7 +934,7 @@ public class JXLTTest extends JexlTestCase {
         final String output = script.execute(ctx311, 42).toString();
         Assert.assertEquals("<p>Universe 42</p>", output);
     }
-           
+
     @Test
     public void test311g() throws Exception {
         final Context311 ctx311 = new Context311();
@@ -946,8 +946,8 @@ public class JXLTTest extends JexlTestCase {
         final JexlScript script = JEXL.createScript(rpt);
         final String output = script.execute(ctx311, "4", "2").toString();
         Assert.assertEquals("<p>Universe 42</p>", output);
-    }  
-               
+    }
+
     @Test
     public void test311h() throws Exception {
         final Context311 ctx311 = new Context311();
@@ -956,8 +956,8 @@ public class JXLTTest extends JexlTestCase {
         final JexlScript script = JEXL.createScript(rpt, "a", "b");
         final String output = script.execute(ctx311, "4", "2").toString();
         Assert.assertEquals("<p>Universe 42</p>", output);
-    }   
-    
+    }
+
     @Test
     public void test311i() throws Exception {
         final JexlContext ctx311 = new Context311();
@@ -971,28 +971,28 @@ public class JXLTTest extends JexlTestCase {
         final String output = strw.toString();
         Assert.assertEquals("<p>Universe 42</p>\n", output);
     }
-    
+
     @Test
     public void test315() throws Exception {
         String s315;
         StringWriter strw;
         JxltEngine.Template t315;
         String output;
-        
+
         s315 = "<report/>$";
         t315 = JXLT.createTemplate("$$", new StringReader(s315));
         strw = new StringWriter();
         t315.evaluate(context, strw);
         output = strw.toString();
         Assert.assertEquals(s315, output);
-        
+
         s315 = "<foo/>#";
         t315 = JXLT.createTemplate("$$", new StringReader(s315));
          strw = new StringWriter();
         t315.evaluate(context, strw);
         output = strw.toString();
         Assert.assertEquals(s315, output);
-        
+
         s315 = "<bar/>\\";
         t315 = JXLT.createTemplate("$$", new StringReader(s315));
         strw = new StringWriter();
@@ -1000,7 +1000,7 @@ public class JXLTTest extends JexlTestCase {
         output = strw.toString();
         Assert.assertEquals(s315, output);
     }
-    
+
         // define mode pro50
     static final JexlOptions MODE_PRO50 = new JexlOptions();
     static {
@@ -1034,7 +1034,7 @@ public class JXLTTest extends JexlTestCase {
             return options;
         }
     }
-    
+
     @Test
     public void testLexicalTemplate() throws Exception {
         final JexlOptions opts = new JexlOptions();
@@ -1049,15 +1049,15 @@ public class JXLTTest extends JexlTestCase {
                 + " ${$options.lexical?'+':'-'}lexical"
                 + " ${$options.lexicalShade?'+':'-'}lexicalShade"
                 + " ${$options.safe?'+':'-'}safe";
-        
+
         final JxltEngine.Template tmplt0 = JXLT.createTemplate("$$", new StringReader(src0));
         final Writer strw0 = new StringWriter();
         tmplt0.evaluate(ctxt, strw0);
         final String output0 = strw0.toString();
         Assert.assertEquals( "-strict -cancellable -lexical -lexicalShade +safe", output0);
-                
+
         final String src = "$$ #pragma script.mode pro50\n" + src0;
-            
+
         final JxltEngine.Template tmplt = JXLT.createTemplate("$$", new StringReader(src));
         final Writer strw = new StringWriter();
         tmplt.evaluate(ctxt, strw);
@@ -1088,7 +1088,7 @@ public class JXLTTest extends JexlTestCase {
             Assert.assertFalse(xvar.isUndefined());
         }
     }
-    
+
     @Test
     public void testTemplateOutOfScope() throws Exception {
         final JexlOptions opts = new JexlOptions();
@@ -1130,7 +1130,7 @@ public class JXLTTest extends JexlTestCase {
             Assert.assertTrue(xany.getMessage().contains("tab"));
         }
     }
-    
+
     @Test
     public void testCommentedTemplate0() throws Exception {
         final JexlContext ctxt = new MapContext();

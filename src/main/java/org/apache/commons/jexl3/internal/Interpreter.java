@@ -123,7 +123,7 @@ public class Interpreter extends InterpreterBase {
     protected final Frame frame;
     /** Block micro-frames. */
     protected LexicalFrame block = null;
-    
+
     /**
      * The thread local interpreter.
      */
@@ -707,7 +707,7 @@ public class Interpreter extends InterpreterBase {
                         if (lexical && cnt++ > 0) {
                             // clean up but remain current
                             block.pop();
-                            // unlikely to fail 
+                            // unlikely to fail
                             if (loopSymbol && !defineVariable((ASTVar) loopVariable, locals)) {
                                 return redefinedVariable(node, loopVariable.getName());
                             }
@@ -988,7 +988,7 @@ public class Interpreter extends InterpreterBase {
             return true;
         }
     }
-    
+
     /**
      * Runs a node.
      * @param node the node
@@ -1003,7 +1003,7 @@ public class Interpreter extends InterpreterBase {
             block = block.pop();
         }
     }
-    
+
     /**
      * Runs a closure.
      * @param closure the closure
@@ -1314,7 +1314,7 @@ public class Interpreter extends InterpreterBase {
                     if (!defineVariable((ASTVar) var, block)) {
                         return redefinedVariable(var, var.getName());
                     }
-                } else if (options.isLexicalShade() && var.isShaded()) { 
+                } else if (options.isLexicalShade() && var.isShaded()) {
                     return undefinedVariable(var, var.getName());
                 }
             }
@@ -1850,14 +1850,14 @@ public class Interpreter extends InterpreterBase {
                 return xreturn;
             }
         }
-        
+
         /**
          * @return whether the statement has been processed
          */
         public boolean isProcessed() {
             return processed;
         }
-        
+
         /**
          * @return the actual statement.
          */
@@ -1865,7 +1865,7 @@ public class Interpreter extends InterpreterBase {
             return stmt;
         }
     }
-    
+
     /**
      * Processes an annotated statement.
      * @param stmt the statement

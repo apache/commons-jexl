@@ -134,7 +134,7 @@ public interface JexlContext {
          * <p>All annotations are processed through this method; the statement 'call' is to be performed within
          * the processAnnotation method. The implementation <em>must</em> perform the call explicitly.
          * <p>The arguments and the statement <em>must not</em> be referenced or cached for longer than the duration
-         * of the processAnnotation call. 
+         * of the processAnnotation call.
          *
          * @param name the annotation name
          * @param args the arguments of the annotation, evaluated as arguments of this call
@@ -144,7 +144,7 @@ public interface JexlContext {
          */
         Object processAnnotation(String name, Object[] args, Callable<Object> statement) throws Exception;
     }
-    
+
     /**
      * A marker interface of the JexlContext that exposes runtime evaluation options.
      * @since 3.2
@@ -161,7 +161,7 @@ public interface JexlContext {
          */
         JexlOptions getEngineOptions();
     }
-     
+
     /**
      * A marker interface of the JexlContext that processes pragmas.
      * It is called by the engine before interpreter creation; as a marker of
@@ -177,7 +177,7 @@ public interface JexlContext {
          */
         void processPragma(String key, Object value);
     }
-    
+
     /**
      * A marker interface of the JexlContext sharing a cancelling flag.
      * <p>A script running in a thread can thus be notified through this reference
@@ -188,7 +188,7 @@ public interface JexlContext {
      */
     interface CancellationHandle {
         /**
-         * @return a cancelable boolean used by the interpreter 
+         * @return a cancelable boolean used by the interpreter
          */
         AtomicBoolean getCancellation();
     }

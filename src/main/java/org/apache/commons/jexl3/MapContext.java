@@ -40,7 +40,7 @@ public class MapContext implements JexlContext {
 
     /**
      * Creates a MapContext wrapping an existing user provided map.
-     * 
+     *
      * @param vars the variable map
      */
     public MapContext(final Map<String, Object> vars) {

@@ -21,11 +21,11 @@ package org.apache.commons.jexl3.parser;
  */
 public class ASTNamespaceIdentifier extends ASTIdentifier {
     private String namespace;
-    
+
     public ASTNamespaceIdentifier(final int id) {
         super(id);
     }
-    
+
     @Override
     public String getNamespace() {
         return namespace;

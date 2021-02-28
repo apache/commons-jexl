@@ -39,7 +39,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     public ASTJexlScript(final Parser p, final int id) {
         super(p, id);
     }
-  
+
     /**
      * Consider script with no parameters that return lambda as parametric-scripts.
      * @return the script
@@ -58,7 +58,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     public Object jjtAccept(final ParserVisitor visitor, final Object data) {
         return visitor.visit(this, data);
     }
-    
+
     /**
      * Sets this script pragmas.
      * @param thePragmas the pragmas
@@ -118,7 +118,7 @@ public class ASTJexlScript extends JexlLexicalNode  {
     public Frame createFrame(final Frame caller, final Object... values) {
         return scope != null? scope.createFrame(caller, values) : null;
     }
-    
+
     /**
      * Creates an array of arguments by copying values up to the number of parameters.
      * @param values the argument values

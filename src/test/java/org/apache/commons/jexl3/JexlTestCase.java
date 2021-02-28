@@ -61,11 +61,11 @@ public class JexlTestCase {
     public void tearDown() throws Exception {
         debuggerCheck(JEXL);
     }
-   
+
     static JexlEngine createEngine() {
         return new JexlBuilder().create();
     }
-    
+
     public static JexlEngine createEngine(final boolean lenient) {
         return new JexlBuilder().arithmetic(new JexlArithmetic(!lenient)).cache(128).create();
     }

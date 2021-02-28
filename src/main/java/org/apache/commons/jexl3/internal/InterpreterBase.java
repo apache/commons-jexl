@@ -77,7 +77,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected final Map<String, Object> functions;
     /** The map of dynamically creates namespaces, NamespaceFunctor or duck-types of those. */
     protected Map<String, Object> functors;
-    
+
     /**
      * Creates an interpreter base.
      * @param engine   the engine creating this interpreter
@@ -113,7 +113,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         this.functors = null;
         this.operators = new Operators(this);
     }
-    
+
     /**
      * Copy constructor.
      * @param ii the base to copy
@@ -133,7 +133,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         functions = ii.functions;
         functors = ii.functors;
     }
-    
+
     /**
      * Attempt to call close() if supported.
      * <p>This is used when dealing with auto-closeable (duck-like) objects
@@ -151,7 +151,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             }
         }
     }
-              
+
     /**
      * Resolves a namespace, eventually allocating an instance using context as constructor argument.
      * <p>
@@ -270,7 +270,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         return frame.defineSymbol(symbol, var.isCaptured());
     }
-    
+
     /**
      * Checks whether a variable is defined.
      * <p>The var may be either a local variable declared in the frame and
@@ -291,7 +291,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         return context.has(name);
     }
-    
+
     /**
      * Gets a value of a defined local variable or from the context.
      * @param frame the local frame
@@ -331,7 +331,7 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Sets a variable in the global context.
      * <p>If interpretation applies lexical shade, the variable must exist (ie
      * the context has(...) method returns true) otherwise an error occurs.
-     * @param node the node 
+     * @param node the node
      * @param name the variable name
      * @param value the variable value
      */
@@ -345,7 +345,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             throw new JexlException(node, "context is readonly", xsupport);
         }
     }
-    
+
     /**
      * Whether this interpreter is currently evaluating with a strict engine flag.
      * @return true if strict engine, false otherwise
@@ -353,7 +353,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected boolean isStrictEngine() {
         return options.isStrict();
     }
-    
+
     /**
      * Whether this interpreter ignores null in navigation expression as errors.
      * @return true if safe, false otherwise
@@ -369,7 +369,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected boolean isSilent() {
         return options.isSilent();
     }
-    
+
     /**
      * @return true if interrupt throws a JexlException.Cancel.
      */
@@ -407,7 +407,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object unsolvableVariable(final JexlNode node, final String var, final boolean undef) {
         return variableError(node, var, undef? VariableIssue.UNDEFINED : VariableIssue.NULLVALUE);
     }
-    
+
     /**
      * Triggered when a variable is lexically known as undefined.
      * @param node  the node where the error originated from
@@ -417,24 +417,24 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object undefinedVariable(final JexlNode node, final String var) {
         return variableError(node, var, VariableIssue.UNDEFINED);
     }
-           
+
     /**
      * Triggered when a variable is lexically known as being redefined.
      * @param node  the node where the error originated from
      * @param var   the variable name
      * @return throws JexlException if strict and not silent, null otherwise
-     */ 
+     */
     protected Object redefinedVariable(final JexlNode node, final String var) {
         return variableError(node, var, VariableIssue.REDEFINED);
     }
-          
+
     /**
      * Triggered when a variable generates an issue.
      * @param node  the node where the error originated from
      * @param var   the variable name
      * @param issue the issue type
      * @return throws JexlException if strict and not silent, null otherwise
-     */ 
+     */
     protected Object variableError(final JexlNode node, final String var, final VariableIssue issue) {
         if (isStrictEngine() && !node.isTernaryProtected()) {
             throw new JexlException.Variable(node, var, issue);
@@ -452,7 +452,7 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object unsolvableMethod(final JexlNode node, final String method) {
         return unsolvableMethod(node, method, null);
     }
-   
+
     /**
      * Triggered when a method can not be resolved.
      * @param node   the node where the error originated from
@@ -485,7 +485,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         return null;
     }
-    
+
     /**
      * Checks whether a reference child node holds a local variable reference.
      * @param node  the reference node
@@ -497,7 +497,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                 && node.jjtGetChild(which) instanceof ASTIdentifier
                 && ((ASTIdentifier) node.jjtGetChild(which)).getSymbol() >= 0);
     }
-    
+
     /**
      * Checks whether a reference child node holds a function call.
      * @param node  the reference node
@@ -507,7 +507,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         return (node.jjtGetNumChildren() > 0
                 && node.jjtGetChild(0) instanceof ASTFunctionNode);
     }
-    
+
     /**
      * Pretty-prints a failing property (de)reference.
      * <p>Used by calls to unsolvableProperty(...).</p>
@@ -534,7 +534,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         return stringifyPropertyValue(node);
     }
-        
+
     /**
      * Pretty-prints a failing property value (de)reference.
      * <p>Used by calls to unsolvableProperty(...).</p>
@@ -620,7 +620,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             throw new JexlException.Cancel(node);
         }
     }
-    
+
     /**
      * Concatenate arguments in call(...).
      * <p>When target == context, we are dealing with a global namespace function call
@@ -672,7 +672,7 @@ public abstract class InterpreterBase extends ParserVisitor {
         }
         return nargv;
     }
-    
+
     /**
      * Optionally narrows an argument for a function call.
      * @param narrow whether narrowing should occur
@@ -751,7 +751,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             return me.tryInvoke(name, ii.context, ii.functionArguments(target, narrow, args));
         }
     }
-    
+
     /**
      * A ctor that needs a context as 1st argument.
      */
@@ -770,7 +770,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             return me.tryInvoke(name, target, ii.callArguments(ii.context, narrow, args));
         }
     }
-    
+
     /**
      * Helping dispatch function calls.
      */

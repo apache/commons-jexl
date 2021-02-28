@@ -30,7 +30,7 @@ import java.util.Objects;
  * <li>Registers: register syntax (#number), used internally for {g,s}etProperty
  * <li>Reserved Names: a set of reserved variable names that can not be used as local variable (or parameter) names
  * <li>Global Side Effect : assigning/modifying values on global variables (=, += , -=, ...)
- * <li>Lexical: lexical scope, prevents redefining local variables 
+ * <li>Lexical: lexical scope, prevents redefining local variables
  * <li>Lexical Shade: local variables shade globals, prevents confusing a global variable with a local one
  * <li>Side Effect : assigning/modifying values on any variables or left-value
  * <li>Constant Array Reference: ensures array references only use constants;they should be statically solvable.
@@ -480,20 +480,20 @@ public final class JexlFeatures {
     /**
      * Sets whether syntactic lexical mode is enabled.
      *
-     * @param flag true means syntactic lexical function scope is in effect, false implies non-lexical scoping 
+     * @param flag true means syntactic lexical function scope is in effect, false implies non-lexical scoping
      * @return this features instance
      */
     public JexlFeatures lexical(final boolean flag) {
         setFeature(LEXICAL, flag);
         return this;
     }
-    
-    
+
+
     /** @return whether lexical scope feature is enabled */
     public boolean isLexical() {
         return getFeature(LEXICAL);
     }
-        
+
     /**
      * Sets whether syntactic lexical shade is enabled.
      *
@@ -507,8 +507,8 @@ public final class JexlFeatures {
         }
         return this;
     }
-    
-    
+
+
     /** @return whether lexical shade feature is enabled */
     public boolean isLexicalShade() {
         return getFeature(LEXICAL_SHADE);

@@ -36,7 +36,7 @@ public class AnnotationTest extends JexlTestCase {
 
     public final static int NUM_THREADS = 10;
     public final static int NUM_ITERATIONS = 1000;
-    
+
     public AnnotationTest() {
         super("AnnotationTest");
     }
@@ -222,7 +222,7 @@ public class AnnotationTest extends JexlTestCase {
         Assert.assertEquals(1, jc.getCount());
         Assert.assertTrue(jc.getNames().contains("synchronized"));
     }
-    
+
     @Test
     public void testHoistingStatement() throws Exception {
         final AnnotationContext jc = new AnnotationContext();
@@ -232,7 +232,7 @@ public class AnnotationTest extends JexlTestCase {
         Assert.assertEquals(1, jc.getCount());
         Assert.assertTrue(jc.getNames().contains("synchronized"));
     }
-    
+
     @Test
     public void testOneArg() throws Exception {
         final AnnotationContext jc = new AnnotationContext();
@@ -313,7 +313,7 @@ public class AnnotationTest extends JexlTestCase {
             Assert.assertEquals(0, log.count("warn"));
         }
     }
-    
+
     /**
      * A counter whose inc method will misbehave if not mutex-ed.
      */
@@ -355,11 +355,11 @@ public class AnnotationTest extends JexlTestCase {
                 Assert.assertEquals(NUM_THREADS * NUM_ITERATIONS, syncCounter.getValue());
             }
         }
-    }    
+    }
 
     @Test
     /**
-     * A base test to ensure synchronized makes a difference. 
+     * A base test to ensure synchronized makes a difference.
      */
     public void testSynchronized() throws InterruptedException {
         final TestRunner tr = new TestRunner();

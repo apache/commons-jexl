@@ -75,10 +75,10 @@ public class JexlBuilder {
 
     /** Whether error messages will carry debugging information. */
     private Boolean debug = null;
-    
+
     /** Whether interrupt throws JexlException.Cancel. */
     private Boolean cancellable = null;
-    
+
     /** The options. */
     private final JexlOptions options = new JexlOptions();
 
@@ -266,7 +266,7 @@ public class JexlBuilder {
     public Charset charset() {
         return charset;
     }
-    
+
    /**
      * Sets whether the engine will resolve antish variable names.
      *
@@ -277,16 +277,16 @@ public class JexlBuilder {
         options.setAntish(flag);
         return this;
     }
-    
+
     /** @return whether antish resolution is enabled */
     public boolean antish() {
         return options.isAntish();
     }
-       
+
     /**
      * Sets whether the engine is in lexical mode.
      *
-     * @param flag true means lexical function scope is in effect, false implies non-lexical scoping 
+     * @param flag true means lexical function scope is in effect, false implies non-lexical scoping
      * @return this builder
      * @since 3.2
      */
@@ -294,16 +294,16 @@ public class JexlBuilder {
         options.setLexical(flag);
         return this;
     }
-    
+
     /** @return whether lexical scope is enabled */
     public boolean lexical() {
         return options.isLexical();
     }
-           
+
     /**
      * Sets whether the engine is in lexical shading mode.
      *
-     * @param flag true means lexical shading is in effect, false implies no lexical shading 
+     * @param flag true means lexical shading is in effect, false implies no lexical shading
      * @return this builder
      * @since 3.2
      */
@@ -311,12 +311,12 @@ public class JexlBuilder {
         options.setLexicalShade(flag);
         return this;
     }
-    
+
     /** @return whether lexical shading is enabled */
     public boolean lexicalShade() {
         return options.isLexicalShade();
     }
-    
+
     /**
      * Sets whether the engine will throw JexlException during evaluation when an error is triggered.
      *
@@ -417,10 +417,10 @@ public class JexlBuilder {
     public JexlBuilder collectAll(final boolean flag) {
         return collectMode(flag? 1 : 0);
     }
-    
+
     /**
      * Experimental collector mode setter.
-     * 
+     *
      * @param mode 0 or 1 as equivalents to false and true, other values are experimental
      * @return this builder
      * @since 3.2
@@ -428,18 +428,18 @@ public class JexlBuilder {
     public JexlBuilder collectMode(final int mode) {
         this.collectMode = mode;
         return this;
-    }  
-    
-    /** 
-     * @return true if variable collection follows strict syntactic rule 
+    }
+
+    /**
+     * @return true if variable collection follows strict syntactic rule
      * @since 3.2
      */
     public boolean collectAll() {
         return this.collectMode != 0;
     }
 
-    /** 
-     * @return 0 if variable collection follows strict syntactic rule 
+    /**
+     * @return 0 if variable collection follows strict syntactic rule
      * @since 3.2
      */
     public int collectMode() {

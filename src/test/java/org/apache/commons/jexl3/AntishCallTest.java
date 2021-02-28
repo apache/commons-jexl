@@ -170,7 +170,7 @@ public class AntishCallTest extends JexlTestCase {
         final Object o2 = check2.execute(jc);
         Assert.assertEquals("Result is not 4321", new java.math.BigInteger("4321"), o2);
     }
-    
+
     // JEXL-300
     @Test
     public void testSafeAnt() throws Exception {
@@ -179,12 +179,12 @@ public class AntishCallTest extends JexlTestCase {
         ctxt.set("x.y.z", 42);
         JexlScript script;
         Object result;
-        
+
         script = JEXL.createScript("x.y.z");
         result = script.execute(ctxt);
         Assert.assertEquals(42, result);
         Assert.assertEquals(42, ctxt.get("x.y.z"));
-        
+
         options.setAntish(false);
         try {
             result = script.execute(ctxt);
@@ -196,12 +196,12 @@ public class AntishCallTest extends JexlTestCase {
         } finally {
             options.setAntish(true);
         }
-                
+
         result = null;
         script = JEXL.createScript("x?.y?.z");
         result = script.execute(ctxt);
         Assert.assertNull(result); // safe navigation, null
-        
+
         result = null;
         script = JEXL.createScript("x?.y?.z = 3");
         try {
@@ -210,7 +210,7 @@ public class AntishCallTest extends JexlTestCase {
         } catch(final JexlException xjexl) {
             Assert.assertNull(result);
         }
-        
+
         result = null;
         script = JEXL.createScript("x.y?.z");
         try {
@@ -219,7 +219,7 @@ public class AntishCallTest extends JexlTestCase {
         } catch(final JexlException xjexl) {
             Assert.assertNull(result);
         }
-        
+
         result = null;
         script = JEXL.createScript("x.y?.z = 3");
         try {
@@ -227,8 +227,8 @@ public class AntishCallTest extends JexlTestCase {
              Assert.fail("not antish assign");
         } catch(final JexlException xjexl) {
             Assert.assertNull(result);
-        } 
-        
+        }
+
         result = null;
         script = JEXL.createScript("x.`'y'`.z = 3");
         try {

@@ -25,7 +25,7 @@ import org.apache.commons.jexl3.JexlException;
  * <code>
  * ${foo.bar}
  * </code>
- * 
+ *
  * @since 1.0
  */
 public interface JexlPropertyGet {
@@ -41,7 +41,7 @@ public interface JexlPropertyGet {
     /**
      * Attempts to reuse this JexlPropertyGet, checking that it is compatible with
      * the actual set of arguments.
-     * 
+     *
      * @param obj the object to invoke the property get upon
      * @param key the property key to get
      * @return the result of the method invocation that should be checked by tryFailed to determine if it succeeded
@@ -53,7 +53,7 @@ public interface JexlPropertyGet {
 
     /**
      * Checks whether a tryInvoke failed or not.
-     * 
+     *
      * @param rval the value returned by tryInvoke
      * @return true if tryInvoke failed, false otherwise
      */

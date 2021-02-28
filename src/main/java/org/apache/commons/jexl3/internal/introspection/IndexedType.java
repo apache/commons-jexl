@@ -87,7 +87,7 @@ public final class IndexedType implements JexlPropertyGet {
             this.type = theType;
             this.container = theContainer;
         }
-        
+
         /**
          * Gets the property container name.
          * @return the container name
@@ -103,7 +103,7 @@ public final class IndexedType implements JexlPropertyGet {
         public Class<?> getContainerClass() {
             return type.clazz;
         }
-        
+
         /**
          * Gets a property from this indexed container.
          * @param key the property key
