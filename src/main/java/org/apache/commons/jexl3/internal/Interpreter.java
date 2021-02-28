@@ -517,13 +517,11 @@ public class Interpreter extends InterpreterBase {
             }
             Object number = arithmetic.negate(val);
             // attempt to recoerce to literal class
-            if ((number instanceof Number)) {
-                // cache if number literal and negate is idempotent
-                if (valNode instanceof ASTNumberLiteral) {
-                    number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
-                    if (arithmetic.isNegateStable()) {
-                        node.jjtSetValue(number);
-                    }
+            // cache if number literal and negate is idempotent
+            if (number instanceof Number && valNode instanceof ASTNumberLiteral) {
+                number = arithmetic.narrowNumber((Number) number, ((ASTNumberLiteral) valNode).getLiteralClass());
+                if (arithmetic.isNegateStable()) {
+                    node.jjtSetValue(number);
                 }
             }
             return number;

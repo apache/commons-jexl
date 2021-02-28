@@ -223,17 +223,15 @@ public abstract class InterpreterBase extends ParserVisitor {
                             }
                         }
                         // try again; use a class, namespace of static methods
-                        if (functor == null) {
-                            // try to find a class with that name
-                            if (namespace instanceof String) {
-                                try {
-                                    namespace = uberspect.getClassLoader().loadClass((String) namespace);
-                                } catch (final ClassNotFoundException xignore) {
-                                    // not a class
-                                    namespace = null;
-                                }
-                            } // we know its a class
-                        }
+                        // try to find a class with that name
+                        if (functor == null && namespace instanceof String) {
+                            try {
+                                namespace = uberspect.getClassLoader().loadClass((String) namespace);
+                            } catch (final ClassNotFoundException xignore) {
+                                // not a class
+                                namespace = null;
+                            }
+                        } // we know its a class
                     }
                 }
             }
@@ -305,12 +303,10 @@ public abstract class InterpreterBase extends ParserVisitor {
         if (options.isLexicalShade() && identifier.isShaded()) {
             return undefinedVariable(identifier, identifier.getName());
         }
-        if (symbol >= 0) {
-            if (frame.has(symbol)) {
-                final Object value = frame.get(symbol);
-                if (value != Scope.UNDEFINED) {
-                    return value;
-                }
+        if ((symbol >= 0) && frame.has(symbol)) {
+            final Object value = frame.get(symbol);
+            if (value != Scope.UNDEFINED) {
+                return value;
             }
         }
         final String name = identifier.getName();

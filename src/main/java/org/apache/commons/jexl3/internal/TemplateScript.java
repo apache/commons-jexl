@@ -197,20 +197,18 @@ public final class TemplateScript implements JxltEngine.Template {
      */
     private static void collectPrintScope(final JexlNode node, final Map<Integer, JexlNode.Info> minfo) {
         final int nc = node.jjtGetNumChildren();
-        if (node instanceof ASTFunctionNode) {
-            if (nc == 2) {
-                // 0 must be the prefix jexl:
-                final ASTIdentifier nameNode = (ASTIdentifier) node.jjtGetChild(0);
-                if ("print".equals(nameNode.getName()) && "jexl".equals(nameNode.getNamespace())) {
-                    final ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
-                    if (argNode.jjtGetNumChildren() == 1) {
-                        // seek the epression number
-                        final JexlNode arg0 = argNode.jjtGetChild(0);
-                        if (arg0 instanceof ASTNumberLiteral) {
-                            final int exprNumber = ((ASTNumberLiteral) arg0).getLiteral().intValue();
-                            minfo.put(exprNumber, new JexlNode.Info(nameNode));
-                            return;
-                        }
+        if (node instanceof ASTFunctionNode && nc == 2) {
+            // 0 must be the prefix jexl:
+            final ASTIdentifier nameNode = (ASTIdentifier) node.jjtGetChild(0);
+            if ("print".equals(nameNode.getName()) && "jexl".equals(nameNode.getNamespace())) {
+                final ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
+                if (argNode.jjtGetNumChildren() == 1) {
+                    // seek the epression number
+                    final JexlNode arg0 = argNode.jjtGetChild(0);
+                    if (arg0 instanceof ASTNumberLiteral) {
+                        final int exprNumber = ((ASTNumberLiteral) arg0).getLiteral().intValue();
+                        minfo.put(exprNumber, new JexlNode.Info(nameNode));
+                        return;
                     }
                 }
             }

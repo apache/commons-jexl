@@ -575,11 +575,9 @@ public final class MethodKey {
                     for (final T app : applicables) {
                         final Class<?>[] parmClasses = getParameterTypes(app);
                         final Class<?> parmClass =  parmClasses[c];
-                        if (Object.class.equals(parmClass)) {
-                            if (objectParmCount++ == 2) {
-                                severe = true;
-                                break;
-                            }
+                        if (Object.class.equals(parmClass) && (objectParmCount++ == 2)) {
+                            severe = true;
+                            break;
                         }
                     }
                 } else {
