@@ -129,7 +129,7 @@ public class PublicFieldsTest extends JexlTestCase {
         } catch(final JexlException xjexl) {}
     }
 
-    public enum Gender { MALE, FEMALE };
+    public enum Gender { MALE, FEMALE }
 
     @Test
     public void testGetEnum() throws Exception {
