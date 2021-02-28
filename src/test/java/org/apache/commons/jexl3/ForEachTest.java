@@ -69,7 +69,7 @@ public class ForEachTest extends JexlTestCase {
     public void testForEachWithCollection() throws Exception {
         final JexlScript e = JEXL.createScript("for(var item : list) item");
         final JexlContext jc = new MapContext();
-        jc.set("list", Arrays.asList(new Object[]{"Hello", "World"}));
+        jc.set("list", Arrays.asList("Hello", "World"));
         final Object o = e.execute(jc);
         Assert.assertEquals("Result is not last evaluated expression", "World", o);
     }
@@ -87,7 +87,7 @@ public class ForEachTest extends JexlTestCase {
     public void testForEachWithIterator() throws Exception {
         final JexlScript e = JEXL.createScript("for(var item : list) item");
         final JexlContext jc = new MapContext();
-        jc.set("list", Arrays.asList(new Object[]{"Hello", "World"}).iterator());
+        jc.set("list", Arrays.asList("Hello", "World").iterator());
         final Object o = e.execute(jc);
         Assert.assertEquals("Result is not last evaluated expression", "World", o);
     }

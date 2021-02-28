@@ -62,15 +62,11 @@ public class JXLTTest extends JexlTestCase {
    public static List<JexlBuilder> engines() {
        final JexlFeatures f = new JexlFeatures();
        f.lexical(true).lexicalShade(true);
-      return Arrays.<JexlBuilder>asList(new JexlBuilder[] {
-         new JexlBuilder().silent(false)
-            .lexical(true).lexicalShade(true)
-            .cache(128).strict(true),
-         new JexlBuilder().features(f).silent(false)
-            .cache(128).strict(true),
-         new JexlBuilder().silent(false)
-            .cache(128).strict(true),
-      });
+      return Arrays.<JexlBuilder>asList(new JexlBuilder().silent(false)
+        .lexical(true).lexicalShade(true)
+        .cache(128).strict(true), new JexlBuilder().features(f).silent(false)
+        .cache(128).strict(true), new JexlBuilder().silent(false)
+        .cache(128).strict(true));
    }
 
     @Before

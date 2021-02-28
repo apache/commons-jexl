@@ -49,8 +49,8 @@ public class JexlScriptEngineTest {
         Assert.assertEquals(EXTENSIONS, factory.getExtensions());
         Assert.assertEquals(MIMES, factory.getMimeTypes());
 
-        Assert.assertEquals("42;", factory.getProgram(new String[]{"42"}));
-        Assert.assertEquals("str.substring(3,4)", factory.getMethodCallSyntax("str", "substring", new String[]{"3", "4"}));
+        Assert.assertEquals("42;", factory.getProgram("42"));
+        Assert.assertEquals("str.substring(3,4)", factory.getMethodCallSyntax("str", "substring", "3", "4"));
     }
 
     @Test
