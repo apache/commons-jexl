@@ -91,18 +91,14 @@ public class JexlInfo {
             final String className = se.getClassName();
             if (!className.equals(cname)) {
                 // go deeper if called from jexl implementation classes
-                if (className.startsWith(pkgname + ".internal.")
-                    || className.startsWith(pkgname + ".Jexl")
-                    || className.startsWith(pkgname + ".parser")) {
-                    cname = className;
-                } else {
+                if (!className.startsWith(pkgname + ".internal.") && !className.startsWith(pkgname + ".Jexl")
+                    && !className.startsWith(pkgname + ".parser")) {
                     break;
                 }
+                cname = className;
             }
         }
-        this.name = se != null
-             ? se.getClassName() + "." + se.getMethodName()  +":" + se.getLineNumber()
-                    : "?";
+        this.name = se != null ? se.getClassName() + "." + se.getMethodName() + ":" + se.getLineNumber() : "?";
         this.line = 0;
         this.column = 0;
     }
