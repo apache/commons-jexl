@@ -244,10 +244,9 @@ public abstract class InterpreterBase extends ParserVisitor {
                     functors.put(prefix, functor);
                 }
                 return functor;
-            } else {
-                // use the NamespaceFunctor class to tag this node as not-a-functor
-                node.jjtSetValue(JexlContext.NamespaceFunctor.class);
             }
+            // use the NamespaceFunctor class to tag this node as not-a-functor
+            node.jjtSetValue(JexlContext.NamespaceFunctor.class);
         }
         return namespace;
     }
@@ -434,7 +433,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object variableError(final JexlNode node, final String var, final VariableIssue issue) {
         if (isStrictEngine() && !node.isTernaryProtected()) {
             throw new JexlException.Variable(node, var, issue);
-        } else if (logger.isDebugEnabled()) {
+        }
+        if (logger.isDebugEnabled()) {
             logger.debug(JexlException.variableError(node, var, issue));
         }
         return null;
@@ -459,7 +459,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object unsolvableMethod(final JexlNode node, final String method, final Object[] args) {
         if (isStrictEngine()) {
             throw new JexlException.Method(node, method, args);
-        } else if (logger.isDebugEnabled()) {
+        }
+        if (logger.isDebugEnabled()) {
             logger.debug(JexlException.methodError(node, method, args));
         }
         return null;
@@ -476,7 +477,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object unsolvableProperty(final JexlNode node, final String property, final boolean undef, final Throwable cause) {
         if (isStrictEngine() && !node.isTernaryProtected()) {
             throw new JexlException.Property(node, property, undef, cause);
-        } else if (logger.isDebugEnabled()) {
+        }
+        if (logger.isDebugEnabled()) {
             logger.debug(JexlException.propertyError(node, property, undef));
         }
         return null;
@@ -551,7 +553,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object operatorError(final JexlNode node, final JexlOperator operator, final Throwable cause) {
         if (isStrictEngine()) {
             throw new JexlException.Operator(node, operator.getOperatorSymbol(), cause);
-        } else if (logger.isDebugEnabled()) {
+        }
+        if (logger.isDebugEnabled()) {
             logger.debug(JexlException.operatorError(node, operator.getOperatorSymbol()), cause);
         }
         return null;
@@ -567,7 +570,8 @@ public abstract class InterpreterBase extends ParserVisitor {
     protected Object annotationError(final JexlNode node, final String annotation, final Throwable cause) {
         if (isStrictEngine()) {
             throw new JexlException.Annotation(node, annotation, cause);
-        } else if (logger.isDebugEnabled()) {
+        }
+        if (logger.isDebugEnabled()) {
             logger.debug(JexlException.annotationError(node, annotation), cause);
         }
         return null;
@@ -964,21 +968,19 @@ public abstract class InterpreterBase extends ParserVisitor {
             xcause = xany;
         }
         // lets fail
-        if (node != null) {
-            final boolean safe = (node instanceof ASTIdentifierAccess) && ((ASTIdentifierAccess) node).isSafe();
-            if (safe) {
-                return null;
-            } else {
-                final String attrStr = attribute != null ? attribute.toString() : null;
-                return unsolvableProperty(node, attrStr, true, xcause);
-            }
-        } else {
+        if (node == null) {
             // direct call
             final String error = "unable to get object property"
                     + ", class: " + object.getClass().getName()
                     + ", property: " + attribute;
             throw new UnsupportedOperationException(error, xcause);
         }
+        final boolean safe = (node instanceof ASTIdentifierAccess) && ((ASTIdentifierAccess) node).isSafe();
+        if (safe) {
+            return null;
+        }
+        final String attrStr = attribute != null ? attribute.toString() : null;
+        return unsolvableProperty(node, attrStr, true, xcause);
     }
 
     /**
@@ -1032,10 +1034,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             xcause = xany;
         }
         // lets fail
-        if (node != null) {
-            final String attrStr = attribute != null ? attribute.toString() : null;
-            unsolvableProperty(node, attrStr, true, xcause);
-        } else {
+        if (node == null) {
             // direct call
             final String error = "unable to set object property"
                     + ", class: " + object.getClass().getName()
@@ -1043,5 +1042,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                     + ", argument: " + value.getClass().getSimpleName();
             throw new UnsupportedOperationException(error, xcause);
         }
+        final String attrStr = attribute != null ? attribute.toString() : null;
+        unsolvableProperty(node, attrStr, true, xcause);
     }
 }

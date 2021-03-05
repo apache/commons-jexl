@@ -225,7 +225,8 @@ public class Operators {
                 JexlMethod vm = uberspect.getMethod(left, "startsWith", argv);
                 if (returnsBoolean(vm)) {
                     return (Boolean) vm.invoke(left, argv);
-                } else if (arithmetic.narrowArguments(argv)) {
+                }
+                if (arithmetic.narrowArguments(argv)) {
                     vm = uberspect.getMethod(left, "startsWith", argv);
                     if (returnsBoolean(vm)) {
                         return (Boolean) vm.invoke(left, argv);
@@ -269,7 +270,8 @@ public class Operators {
                 JexlMethod vm = uberspect.getMethod(left, "endsWith", argv);
                 if (returnsBoolean(vm)) {
                     return (Boolean) vm.invoke(left, argv);
-                } else if (arithmetic.narrowArguments(argv)) {
+                }
+                if (arithmetic.narrowArguments(argv)) {
                     vm = uberspect.getMethod(left, "endsWith", argv);
                     if (returnsBoolean(vm)) {
                         return (Boolean) vm.invoke(left, argv);
@@ -317,7 +319,8 @@ public class Operators {
                 JexlMethod vm = uberspect.getMethod(left, "contains", argv);
                 if (returnsBoolean(vm)) {
                     return (Boolean) vm.invoke(left, argv);
-                } else if (arithmetic.narrowArguments(argv)) {
+                }
+                if (arithmetic.narrowArguments(argv)) {
                     vm = uberspect.getMethod(left, "contains", argv);
                     if (returnsBoolean(vm)) {
                         return (Boolean) vm.invoke(left, argv);

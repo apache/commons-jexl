@@ -940,16 +940,14 @@ public class Interpreter extends InterpreterBase {
         if (node.jjtGetNumChildren() == 3) {
             if (condition != null && arithmetic.toBoolean(condition)) {
                 return node.jjtGetChild(1).jjtAccept(this, data);
-            } else {
-                return node.jjtGetChild(2).jjtAccept(this, data);
             }
+            return node.jjtGetChild(2).jjtAccept(this, data);
         }
         // elvis as in "x ?: z"
         if (condition != null && arithmetic.toBoolean(condition)) {
             return condition;
-        } else {
-            return node.jjtGetChild(1).jjtAccept(this, data);
         }
+        return node.jjtGetChild(1).jjtAccept(this, data);
     }
 
     @Override
@@ -1023,20 +1021,19 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTJexlScript script, final Object data) {
         if (script instanceof ASTJexlLambda && !((ASTJexlLambda) script).isTopLevel()) {
             return new Closure(this, (ASTJexlLambda) script);
-        } else {
-            block = new LexicalFrame(frame, block).defineArgs();
-            try {
-                final int numChildren = script.jjtGetNumChildren();
-                Object result = null;
-                for (int i = 0; i < numChildren; i++) {
-                    final JexlNode child = script.jjtGetChild(i);
-                    result = child.jjtAccept(this, data);
-                    cancelCheck(child);
-                }
-                return result;
-            } finally {
-                block = block.pop();
+        }
+        block = new LexicalFrame(frame, block).defineArgs();
+        try {
+            final int numChildren = script.jjtGetNumChildren();
+            Object result = null;
+            for (int i = 0; i < numChildren; i++) {
+                final JexlNode child = script.jjtGetChild(i);
+                result = child.jjtAccept(this, data);
+                cancelCheck(child);
             }
+            return result;
+        } finally {
+            block = block.pop();
         }
     }
 
@@ -1078,31 +1075,30 @@ public class Interpreter extends InterpreterBase {
      * @return the evaluated identifier
      */
     private Object evalIdentifier(final ASTIdentifierAccess node) {
-        if (node instanceof ASTIdentifierAccessJxlt) {
-            final ASTIdentifierAccessJxlt accessJxlt = (ASTIdentifierAccessJxlt) node;
-            final String src = node.getName();
-            Throwable cause = null;
-            TemplateEngine.TemplateExpression expr = (TemplateEngine.TemplateExpression) accessJxlt.getExpression();
-            try {
-                if (expr == null) {
-                    final TemplateEngine jxlt = jexl.jxlt();
-                    expr = jxlt.parseExpression(node.jexlInfo(), src, frame != null ? frame.getScope() : null);
-                    accessJxlt.setExpression(expr);
-                }
-                if (expr != null) {
-                    final Object name = expr.evaluate(frame, context);
-                    if (name != null) {
-                        final Integer id = ASTIdentifierAccess.parseIdentifier(name.toString());
-                        return id != null ? id : name;
-                    }
-                }
-            } catch (final JxltEngine.Exception xjxlt) {
-                cause = xjxlt;
-            }
-            return node.isSafe() ? null : unsolvableProperty(node, src, true, cause);
-        } else {
+        if (!(node instanceof ASTIdentifierAccessJxlt)) {
             return node.getIdentifier();
         }
+        final ASTIdentifierAccessJxlt accessJxlt = (ASTIdentifierAccessJxlt) node;
+        final String src = node.getName();
+        Throwable cause = null;
+        TemplateEngine.TemplateExpression expr = (TemplateEngine.TemplateExpression) accessJxlt.getExpression();
+        try {
+            if (expr == null) {
+                final TemplateEngine jxlt = jexl.jxlt();
+                expr = jxlt.parseExpression(node.jexlInfo(), src, frame != null ? frame.getScope() : null);
+                accessJxlt.setExpression(expr);
+            }
+            if (expr != null) {
+                final Object name = expr.evaluate(frame, context);
+                if (name != null) {
+                    final Integer id = ASTIdentifierAccess.parseIdentifier(name.toString());
+                    return id != null ? id : name;
+                }
+            }
+        } catch (final JxltEngine.Exception xjxlt) {
+            cause = xjxlt;
+        }
+        return node.isSafe() ? null : unsolvableProperty(node, src, true, cause);
     }
 
     @Override
@@ -1143,11 +1139,10 @@ public class Interpreter extends InterpreterBase {
                             if (object != null) {
                                 object = visit((ASTMethodNode) objectNode, object, context);
                                 continue;
-                            } else {
-                                // remove method name from antish
-                                ant.delete(alen, ant.length());
-                                ptyNode = objectNode;
                             }
+                            // remove method name from antish
+                            ant.delete(alen, ant.length());
+                            ptyNode = objectNode;
                         }
                     }
                     break;
@@ -1170,15 +1165,14 @@ public class Interpreter extends InterpreterBase {
                 if (ant == null) {
                     // if we still have a null object, check for an antish variable
                     final JexlNode first = node.jjtGetChild(0);
-                    if (first instanceof ASTIdentifier) {
-                        final ASTIdentifier afirst = (ASTIdentifier) first;
-                        ant = new StringBuilder(afirst.getName());
-                        // skip the else...*
-                    } else {
+                    if (!(first instanceof ASTIdentifier)) {
                         // not an identifier, not antish
                         ptyNode = objectNode;
                         break main;
                     }
+                    final ASTIdentifier afirst = (ASTIdentifier) first;
+                    ant = new StringBuilder(afirst.getName());
+                    // skip the else...*
                     // *... and continue
                     if (!options.isAntish()) {
                         antish = false;
@@ -1192,18 +1186,17 @@ public class Interpreter extends InterpreterBase {
                 // catch up to current node
                 for (; v <= c; ++v) {
                     final JexlNode child = node.jjtGetChild(v);
-                    if (child instanceof ASTIdentifierAccess) {
-                        final ASTIdentifierAccess achild = (ASTIdentifierAccess) child;
-                        if (achild.isSafe() || achild.isExpression()) {
-                            break main;
-                        }
-                        ant.append('.');
-                        ant.append(achild.getName());
-                    } else {
+                    if (!(child instanceof ASTIdentifierAccess)) {
                         // not an identifier, not antish
                         ptyNode = objectNode;
                         break main;
                     }
+                    final ASTIdentifierAccess achild = (ASTIdentifierAccess) child;
+                    if (achild.isSafe() || achild.isExpression()) {
+                        break main;
+                    }
+                    ant.append('.');
+                    ant.append(achild.getName());
                 }
                 // solve antish
                 object = context.get(ant.toString());
@@ -1384,13 +1377,12 @@ public class Interpreter extends InterpreterBase {
                     final ASTIdentifier firstId = first instanceof ASTIdentifier
                             ? (ASTIdentifier) first
                             : null;
-                    if (firstId != null && firstId.getSymbol() < 0) {
-                        ant = new StringBuilder(firstId.getName());
-                    } else {
+                    if ((firstId == null) || (firstId.getSymbol() >= 0)) {
                         // ant remains null, object is null, stop solving
                         antish = false;
                         break main;
                     }
+                    ant = new StringBuilder(firstId.getName());
                 }
                 // catch up to current child
                 for (; v <= c; ++v) {
@@ -1399,13 +1391,12 @@ public class Interpreter extends InterpreterBase {
                             ? (ASTIdentifierAccess) child
                             : null;
                     // remain antish only if unsafe navigation
-                    if (aid != null && !aid.isSafe() && !aid.isExpression()) {
-                        ant.append('.');
-                        ant.append(aid.getName());
-                    } else {
+                    if ((aid == null) || aid.isSafe() || aid.isExpression()) {
                         antish = false;
                         break main;
                     }
+                    ant.append('.');
+                    ant.append(aid.getName());
                 }
                 // solve antish
                 object = context.get(ant.toString());
@@ -1689,12 +1680,11 @@ public class Interpreter extends InterpreterBase {
                 }
                 // if we did not find an exact method by name and we haven't tried yet,
                 // attempt to narrow the parameters and if this succeeds, try again in next loop
-                if (!narrow && arithmetic.narrowArguments(argv)) {
-                    narrow = true;
-                    // continue;
-                } else {
+                if (narrow || !arithmetic.narrowArguments(argv)) {
                     break;
                 }
+                narrow = true;
+                // continue;
             }
             // we have either evaluated and returned or no method was found
             return node.isSafeLhs(isSafe())
@@ -1878,21 +1868,20 @@ public class Interpreter extends InterpreterBase {
             final JexlNode cblock = stmt.jjtGetChild(last);
             // if the context has changed, might need a new interpreter
             final JexlArithmetic jexla = arithmetic.options(context);
-            if (jexla != arithmetic) {
-                if (!arithmetic.getClass().equals(jexla.getClass())) {
-                    logger.warn("expected arithmetic to be " + arithmetic.getClass().getSimpleName()
-                            + ", got " + jexla.getClass().getSimpleName()
-                    );
-                }
-                final Interpreter ii = new Interpreter(Interpreter.this, jexla);
-                final Object r = cblock.jjtAccept(ii, data);
-                if (ii.isCancelled()) {
-                    Interpreter.this.cancel();
-                }
-                return r;
-            } else {
+            if (jexla == arithmetic) {
                 return cblock.jjtAccept(Interpreter.this, data);
             }
+            if (!arithmetic.getClass().equals(jexla.getClass())) {
+                logger.warn("expected arithmetic to be " + arithmetic.getClass().getSimpleName()
+                        + ", got " + jexla.getClass().getSimpleName()
+                );
+            }
+            final Interpreter ii = new Interpreter(Interpreter.this, jexla);
+            final Object r = cblock.jjtAccept(ii, data);
+            if (ii.isCancelled()) {
+                Interpreter.this.cancel();
+            }
+            return r;
         }
         // tracking whether we processed the annotation
         final AnnotatedCall jstmt = new AnnotatedCall(stmt, index + 1, data);

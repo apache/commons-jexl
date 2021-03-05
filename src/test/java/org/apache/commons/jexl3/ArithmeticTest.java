@@ -1056,22 +1056,22 @@ public class ArithmeticTest extends JexlTestCase {
             final int ls = x.signum();
             if (ls < 0) {
                 return Double.NEGATIVE_INFINITY;
-            } else if (ls > 0) {
-                return Double.POSITIVE_INFINITY;
-            } else {
-                return Double.NaN;
             }
+            if (ls > 0) {
+                return Double.POSITIVE_INFINITY;
+            }
+            return Double.NaN;
         }
 
         protected double divideZero(final BigInteger x) {
             final int ls = x.signum();
             if (ls < 0) {
                 return Double.NEGATIVE_INFINITY;
-            } else if (ls > 0) {
-                return Double.POSITIVE_INFINITY;
-            } else {
-                return Double.NaN;
             }
+            if (ls > 0) {
+                return Double.POSITIVE_INFINITY;
+            }
+            return Double.NaN;
         }
 
         @Override

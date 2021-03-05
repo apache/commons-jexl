@@ -144,9 +144,8 @@ public final class IndexedType implements JexlPropertyGet {
     public Object invoke(final Object obj) throws Exception {
         if (obj != null && clazz.equals(obj.getClass())) {
             return new IndexedContainer(this, obj);
-        } else {
-            throw new IntrospectionException("property resolution error");
         }
+        throw new IntrospectionException("property resolution error");
     }
 
     @Override
@@ -155,9 +154,8 @@ public final class IndexedType implements JexlPropertyGet {
             && clazz.equals(obj.getClass())
             && container.equals(key.toString())) {
             return new IndexedContainer(this, obj);
-        } else {
-            return Uberspect.TRY_FAILED;
         }
+        return Uberspect.TRY_FAILED;
     }
 
     @Override

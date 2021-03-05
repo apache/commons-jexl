@@ -50,9 +50,8 @@ public final class ConstructorMethod implements JexlMethod {
         final Constructor<?> ctor = is.getConstructor(clazz, new MethodKey(className, args));
         if (ctor != null) {
             return new ConstructorMethod(ctor);
-        } else {
-            return null;
         }
+        return null;
     }
     /**
      * Creates a constructor method.

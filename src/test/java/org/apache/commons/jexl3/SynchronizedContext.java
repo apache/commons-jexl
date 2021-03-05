@@ -39,10 +39,9 @@ public class SynchronizedContext extends MapContext implements JexlContext.Annot
         final boolean varisarg = parms != null && parms.length == 1;
         if (var == null) {
             return varisarg ? script.execute(context, var) : script.execute(context);
-        } else {
-            synchronized (var) {
-                return varisarg ? script.execute(context, var) : script.execute(context);
-            }
+        }
+        synchronized (var) {
+            return varisarg ? script.execute(context, var) : script.execute(context);
         }
     }
 

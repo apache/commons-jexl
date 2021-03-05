@@ -151,9 +151,8 @@ final class ClassMap {
         final Method[] lm = byName.get(methodName);
         if (lm != null && lm.length > 0) {
             return lm.clone();
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -179,7 +178,8 @@ final class ClassMap {
         // We looked this up before and failed.
         if (cacheEntry == CACHE_MISS) {
             return null;
-        } else if (cacheEntry == null) {
+        }
+        if (cacheEntry == null) {
             try {
                 // That one is expensive...
                 final Method[] methodList = byName.get(methodKey.getMethod());
@@ -242,11 +242,10 @@ final class ClassMap {
                 int end = start + 1;
                 while (end < lm.size()) {
                     final String walk = lm.get(end).getName();
-                    if (walk.equals(name)) {
-                        end += 1;
-                    } else {
+                    if (!walk.equals(name)) {
                         break;
                     }
+                    end += 1;
                 }
                 final Method[] lmn = lm.subList(start, end).toArray(new Method[end - start]);
                 cache.byName.put(name, lmn);

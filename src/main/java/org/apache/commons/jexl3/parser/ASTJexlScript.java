@@ -49,9 +49,8 @@ public class ASTJexlScript extends JexlLexicalNode  {
             final ASTJexlLambda lambda = (ASTJexlLambda) jjtGetChild(0);
             lambda.jjtSetParent(null);
             return lambda;
-        } else {
-            return this;
         }
+        return this;
     }
 
     @Override

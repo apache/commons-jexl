@@ -184,9 +184,8 @@ public final class TemplateEngine extends JxltEngine {
             // if only one sub-expr, no need to create a composite
             if (expressions.size() == 1) {
                 return expressions.get(0);
-            } else {
-                return el.new CompositeExpression(counts, expressions, source);
             }
+            return el.new CompositeExpression(counts, expressions, source);
         }
     }
 
@@ -691,12 +690,11 @@ public final class TemplateEngine extends JxltEngine {
             xuel = new Exception(xjexl.getInfo(), "failed to parse '" + expression + "'", xjexl);
         }
         if (xuel != null) {
-            if (jexl.isSilent()) {
-                jexl.logger.warn(xuel.getMessage(), xuel.getCause());
-                stmt = null;
-            } else {
+            if (!jexl.isSilent()) {
                 throw xuel;
             }
+            jexl.logger.warn(xuel.getMessage(), xuel.getCause());
+            stmt = null;
         }
         return stmt;
     }
@@ -1022,16 +1020,15 @@ public final class TemplateEngine extends JxltEngine {
         public String toString() {
             if (BlockType.VERBATIM.equals(type)) {
                 return body;
-            } else {
-                // CHECKSTYLE:OFF
-                final StringBuilder strb = new StringBuilder(64); // CSOFF: MagicNumber
-                // CHECKSTYLE:ON
-                final Iterator<CharSequence> lines = readLines(new StringReader(body));
-                while (lines.hasNext()) {
-                    strb.append("$$").append(lines.next());
-                }
-                return strb.toString();
             }
+            // CHECKSTYLE:OFF
+            final StringBuilder strb = new StringBuilder(64); // CSOFF: MagicNumber
+            // CHECKSTYLE:ON
+            final Iterator<CharSequence> lines = readLines(new StringReader(body));
+            while (lines.hasNext()) {
+                strb.append("$$").append(lines.next());
+            }
+            return strb.toString();
         }
 
         /**
@@ -1152,7 +1149,8 @@ public final class TemplateEngine extends JxltEngine {
             final CharSequence line = lines.next();
             if (line == null) {
                 break;
-            } else if (type == null) {
+            }
+            if (type == null) {
                 // determine starting type if not known yet
                 prefixLen = startsWith(line, prefix);
                 if (prefixLen >= 0) {

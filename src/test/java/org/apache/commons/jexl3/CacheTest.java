@@ -180,7 +180,8 @@ public class CacheTest extends JexlTestCase {
         public Object get(final String prop) {
             if ("value".equals(prop)) {
                 return value;
-            } else if ("flag".equals(prop)) {
+            }
+            if ("flag".equals(prop)) {
                 return Boolean.valueOf(flag);
             }
             throw new RuntimeException("no such property");

@@ -756,9 +756,8 @@ public class Issues100Test extends JexlTestCase {
         public static Integer callme(final Integer n) {
             if (n == null) {
                 return null;
-            } else {
-                return n >= 0 ? 42 : -42;
             }
+            return n >= 0 ? 42 : -42;
         }
 
         public static Object kickme() {

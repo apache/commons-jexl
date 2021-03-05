@@ -88,9 +88,8 @@ public final class MethodExecutor extends AbstractExecutor.Method {
         }
         if (method.getDeclaringClass() == ArrayListWrapper.class && o.getClass().isArray()) {
             return method.invoke(new ArrayListWrapper(o), args);
-        } else {
-            return method.invoke(o, args);
         }
+        return method.invoke(o, args);
     }
 
     @Override

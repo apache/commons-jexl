@@ -361,9 +361,11 @@ public class ArithmeticOperatorTest extends JexlTestCase {
                 cal.setTime(date);
                 if ("yyyy".equals(key)) {
                     return cal.get(Calendar.YEAR);
-                } else if ("MM".equals(key)) {
+                }
+                if ("MM".equals(key)) {
                     return cal.get(Calendar.MONTH) + 1;
-                } else if ("dd".equals(key)) {
+                }
+                if ("dd".equals(key)) {
                     return cal.get(Calendar.DAY_OF_MONTH);
                 }
                 // Otherwise treat as format mask

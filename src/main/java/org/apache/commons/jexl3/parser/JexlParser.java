@@ -385,9 +385,8 @@ public abstract class JexlParser extends StringParser {
         if (!declareSymbol(symbol)) {
             if (getFeatures().isLexical()) {
                 throw new JexlException(var, name + ": variable is already declared");
-            } else {
-                var.setRedefined(true);
             }
+            var.setRedefined(true);
         }
     }
 

@@ -75,7 +75,8 @@ public class ASTIdentifierAccess extends JexlNode {
                 if (c == '0') {
                     if (length == 1) {
                         return 0;
-                    } else if (val == 0) {
+                    }
+                    if (val == 0) {
                         return null;
                     }
                 } // any non numeric, NaN

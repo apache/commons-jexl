@@ -112,30 +112,28 @@ public class ArrayBuilder implements JexlArithmetic.ArrayBuilder {
 
     @Override
     public Object create(final boolean extended) {
-        if (untyped != null) {
-            if (extended) {
-                final List<Object> list = new ArrayList<Object>(added);
-                list.addAll(Arrays.asList(untyped).subList(0, added));
-                return list;
-            }
-            // convert untyped array to the common class if not Object.class
-            if (commonClass != null && !Object.class.equals(commonClass)) {
-                final int size = added;
-                // if the commonClass is a number, it has an equivalent primitive type, get it
-                if (unboxing) {
-                    commonClass = unboxingClass(commonClass);
-                }
-                // allocate and fill up the typed array
-                final Object typed = Array.newInstance(commonClass, size);
-                for (int i = 0; i < size; ++i) {
-                    Array.set(typed, i, untyped[i]);
-                }
-                return typed;
-            } else {
-                return untyped.clone();
-            }
-        } else {
+        if (untyped == null) {
             return new Object[0];
         }
+        if (extended) {
+            final List<Object> list = new ArrayList<Object>(added);
+            list.addAll(Arrays.asList(untyped).subList(0, added));
+            return list;
+        }
+        // convert untyped array to the common class if not Object.class
+        if ((commonClass == null) || Object.class.equals(commonClass)) {
+            return untyped.clone();
+        }
+        final int size = added;
+        // if the commonClass is a number, it has an equivalent primitive type, get it
+        if (unboxing) {
+            commonClass = unboxingClass(commonClass);
+        }
+        // allocate and fill up the typed array
+        final Object typed = Array.newInstance(commonClass, size);
+        for (int i = 0; i < size; ++i) {
+            Array.set(typed, i, untyped[i]);
+        }
+        return typed;
     }
 }

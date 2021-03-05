@@ -564,12 +564,11 @@ public class Engine extends JexlEngine {
             xjexl = new JexlException.Method(info, meth, args, xany);
         }
         if (xjexl != null) {
-            if (silent) {
-                logger.warn(xjexl.getMessage(), xjexl.getCause());
-                result = null;
-            } else {
+            if (!silent) {
                 throw xjexl.clean();
             }
+            logger.warn(xjexl.getMessage(), xjexl.getCause());
+            result = null;
         }
         return result;
     }

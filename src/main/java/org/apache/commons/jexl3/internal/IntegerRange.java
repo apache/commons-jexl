@@ -39,9 +39,8 @@ public abstract class IntegerRange implements Collection<Integer> {
     public static IntegerRange create(final int from, final int to) {
         if (from <= to) {
             return new IntegerRange.Ascending(from, to);
-        } else {
-            return new IntegerRange.Descending(to, from);
         }
+        return new IntegerRange.Descending(to, from);
     }
     /**
      * Creates a new range.
@@ -116,9 +115,8 @@ public abstract class IntegerRange implements Collection<Integer> {
         if (o instanceof Number) {
             final long v = ((Number) o).intValue();
             return min <= v && v <= max;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

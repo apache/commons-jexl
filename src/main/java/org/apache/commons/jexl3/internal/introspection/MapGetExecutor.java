@@ -41,9 +41,8 @@ public final class MapGetExecutor extends AbstractExecutor.Get {
     public static MapGetExecutor discover(final Introspector is, final Class<?> clazz, final Object identifier) {
         if (Map.class.isAssignableFrom(clazz)) {
             return new MapGetExecutor(clazz, MAP_GET, identifier);
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**

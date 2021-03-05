@@ -383,9 +383,8 @@ public final class Introspector {
             while (cloader != null) {
                 if (cloader.equals(loader)) {
                     return true;
-                } else {
-                    cloader = cloader.getParent();
                 }
+                cloader = cloader.getParent();
             }
         }
         return false;

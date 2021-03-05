@@ -97,9 +97,8 @@ public class JXLTTest extends JexlTestCase {
         final boolean dbg = td.debug(ts);
         if (dbg) {
             return td.toString();
-        } else {
-            return "";
         }
+        return "";
     }
 
     /** Extract the source from a toString-ed expression. */
@@ -112,9 +111,8 @@ public class JXLTTest extends JexlTestCase {
         final int ec = tostring.lastIndexOf(" */");
         if (sc >= 0 && ec >= 0 && ec > sc && ec < len) {
             return tostring.substring(sc, ec);
-        } else {
-            return tostring;
         }
+        return tostring;
 
     }
 

@@ -64,9 +64,8 @@ public class TemplateDebugger extends Debugger {
         if (je instanceof TemplateExpression) {
             final TemplateEngine.TemplateExpression te = (TemplateEngine.TemplateExpression) je;
             return visit(te, this) != null;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -75,30 +74,29 @@ public class TemplateDebugger extends Debugger {
      * @return true if the template was a {@link TemplateScript} instance, false otherwise
      */
     public boolean debug(final JxltEngine.Template jt) {
-        if (jt instanceof TemplateScript) {
-            final TemplateScript ts = (TemplateScript) jt;
-            // ensure expr is not null for templates
-            this.exprs = ts.getExpressions() == null? new TemplateExpression[0] : ts.getExpressions();
-            this.script = ts.getScript();
-            start = 0;
-            end = 0;
-            indentLevel = 0;
-            builder.setLength(0);
-            cause = script;
-            final int num = script.jjtGetNumChildren();
-            for (int i = 0; i < num; ++i) {
-                final JexlNode child = script.jjtGetChild(i);
-                acceptStatement(child, null);
-            }
-            // the last line
-            if (builder.length() > 0 && builder.charAt(builder.length() - 1) != '\n') {
-                builder.append('\n');
-            }
-            end = builder.length();
-            return end > 0;
-        } else {
+        if (!(jt instanceof TemplateScript)) {
             return false;
         }
+        final TemplateScript ts = (TemplateScript) jt;
+        // ensure expr is not null for templates
+        this.exprs = ts.getExpressions() == null? new TemplateExpression[0] : ts.getExpressions();
+        this.script = ts.getScript();
+        start = 0;
+        end = 0;
+        indentLevel = 0;
+        builder.setLength(0);
+        cause = script;
+        final int num = script.jjtGetNumChildren();
+        for (int i = 0; i < num; ++i) {
+            final JexlNode child = script.jjtGetChild(i);
+            acceptStatement(child, null);
+        }
+        // the last line
+        if (builder.length() > 0 && builder.charAt(builder.length() - 1) != '\n') {
+            builder.append('\n');
+        }
+        end = builder.length();
+        return end > 0;
     }
 
 
@@ -147,11 +145,10 @@ public class TemplateDebugger extends Debugger {
             // if statement is a jexl:print(...), may need to prepend '\n'
             newJxltLine();
             return visit(te, data);
-        } else {
-            // if statement is not a jexl:print(...), need to prepend '$$'
-            newJexlLine();
-            return super.acceptStatement(child, data);
         }
+        // if statement is not a jexl:print(...), need to prepend '$$'
+        newJexlLine();
+        return super.acceptStatement(child, data);
     }
 
     /**

@@ -84,10 +84,9 @@ public abstract class JexlNode extends SimpleNode {
             final int l = lc >> 0xc;
             // at least an info with line/column number
             return info != null? info.at(l, c) : new JexlInfo(null, l, c);
-        } else {
-            // weird though; no jjSetFirstToken(...) ever called?
-            return info;
         }
+        // weird though; no jjSetFirstToken(...) ever called?
+        return info;
     }
 
     /**
@@ -160,11 +159,10 @@ public abstract class JexlNode extends SimpleNode {
                 return true;
             }
             final int nc = walk.jjtGetNumChildren() - 1;
-            if (nc >= 0) {
-                walk = walk.jjtGetChild(nc);
-            } else {
+            if (nc < 0) {
                 return walk.jjtGetParent() instanceof ASTReference;
             }
+            walk = walk.jjtGetChild(nc);
         } while (walk != null);
         return false;
     }

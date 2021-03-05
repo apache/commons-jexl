@@ -110,16 +110,7 @@ public class AnnotationTest extends JexlTestCase {
             }
             // transient side effect for silent
             if ("silent".equals(name)) {
-                if (args == null || args.length == 0) {
-                    final boolean b = options.isSilent();
-                    try {
-                        return statement.call();
-                    } catch(final JexlException xjexl) {
-                        return null;
-                    } finally {
-                        options.setSilent(b);
-                    }
-                } else {
+                if ((args != null) && (args.length != 0)) {
                     final boolean s = (Boolean) args[0];
                     final boolean b = options.isSilent();
                     options.setSilent(s);
@@ -127,6 +118,14 @@ public class AnnotationTest extends JexlTestCase {
                     final Object r = statement.call();
                     options.setSilent(b);
                     return r;
+                }
+                final boolean b = options.isSilent();
+                try {
+                    return statement.call();
+                } catch(final JexlException xjexl) {
+                    return null;
+                } finally {
+                    options.setSilent(b);
                 }
             }
             // durable side effect for scale

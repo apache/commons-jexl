@@ -219,21 +219,20 @@ public final class Scope {
      * @return the arguments array
      */
     public Frame createFrame(final Frame frame, final Object...args) {
-        if (namedVariables != null) {
-            final Object[] arguments = new Object[namedVariables.size()];
-            Arrays.fill(arguments, UNDECLARED);
-            if (frame != null && capturedVariables != null && parent != null) {
-                for (final Map.Entry<Integer, Integer> capture : capturedVariables.entrySet()) {
-                    final Integer target = capture.getKey();
-                    final Integer source = capture.getValue();
-                    final Object arg = frame.get(source);
-                    arguments[target] = arg;
-                }
-            }
-            return new Frame(this, arguments, 0).assign(args);
-        } else {
+        if (namedVariables == null) {
             return null;
         }
+        final Object[] arguments = new Object[namedVariables.size()];
+        Arrays.fill(arguments, UNDECLARED);
+        if (frame != null && capturedVariables != null && parent != null) {
+            for (final Map.Entry<Integer, Integer> capture : capturedVariables.entrySet()) {
+                final Integer target = capture.getKey();
+                final Integer source = capture.getValue();
+                final Object arg = frame.get(source);
+                arguments[target] = arg;
+            }
+        }
+        return new Frame(this, arguments, 0).assign(args);
     }
 
     /**
@@ -284,19 +283,18 @@ public final class Scope {
      */
     protected String[] getParameters(final int bound) {
         final int unbound = parms - bound;
-        if (namedVariables != null && unbound > 0) {
-            final String[] pa = new String[unbound];
-            int p = 0;
-            for (final Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
-                final int argn = entry.getValue();
-                if (argn >= bound && argn < parms) {
-                    pa[p++] = entry.getKey();
-                }
-            }
-            return pa;
-        } else {
+        if ((namedVariables == null) || (unbound <= 0)) {
             return EMPTY_STRS;
         }
+        final String[] pa = new String[unbound];
+        int p = 0;
+        for (final Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
+            final int argn = entry.getValue();
+            if (argn >= bound && argn < parms) {
+                pa[p++] = entry.getKey();
+            }
+        }
+        return pa;
     }
 
     /**
@@ -304,18 +302,17 @@ public final class Scope {
      * @return the local variable names
      */
     public String[] getLocalVariables() {
-        if (namedVariables != null && vars > 0) {
-            final List<String> locals = new ArrayList<String>(vars);
-            for (final Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
-                final int symnum = entry.getValue();
-                if (symnum >= parms && (capturedVariables == null || !capturedVariables.containsKey(symnum))) {
-                    locals.add(entry.getKey());
-                }
-            }
-            return locals.toArray(new String[locals.size()]);
-        } else {
+        if ((namedVariables == null) || (vars <= 0)) {
             return EMPTY_STRS;
         }
+        final List<String> locals = new ArrayList<String>(vars);
+        for (final Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
+            final int symnum = entry.getValue();
+            if (symnum >= parms && (capturedVariables == null || !capturedVariables.containsKey(symnum))) {
+                locals.add(entry.getKey());
+            }
+        }
+        return locals.toArray(new String[locals.size()]);
     }
 
 }

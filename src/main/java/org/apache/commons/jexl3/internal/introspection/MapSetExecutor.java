@@ -45,9 +45,8 @@ public final class MapSetExecutor extends AbstractExecutor.Set {
                                           final Object value) {
         if (Map.class.isAssignableFrom(clazz)) {
             return new MapSetExecutor(clazz, MAP_SET, identifier, value);
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**

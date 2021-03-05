@@ -214,15 +214,14 @@ public class ClassCreator {
         fileManager.close();
         if (success) {
             return getClassLoader().loadClass(GEN_CLASS + className);
-        } else {
-            final List<Diagnostic<? extends JavaFileObject>> diagnostics = diagnosticsCollector.getDiagnostics();
-            for (final Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
-                // read error dertails from the diagnostic object
-                System.out.println(diagnostic.getMessage(null));
-
-            }
-            return null;
         }
+        final List<Diagnostic<? extends JavaFileObject>> diagnostics = diagnosticsCollector.getDiagnostics();
+        for (final Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
+            // read error dertails from the diagnostic object
+            System.out.println(diagnostic.getMessage(null));
+
+        }
+        return null;
     }
 
     Object validate(final Class<?> clazz) throws Exception {

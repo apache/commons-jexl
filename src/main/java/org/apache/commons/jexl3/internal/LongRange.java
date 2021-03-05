@@ -41,9 +41,8 @@ public abstract class LongRange implements Collection<Long> {
     public static LongRange create(final long from, final long to) {
         if (from <= to) {
             return new LongRange.Ascending(from, to);
-        } else {
-            return new LongRange.Descending(to, from);
         }
+        return new LongRange.Descending(to, from);
     }
 
     /**
@@ -118,9 +117,8 @@ public abstract class LongRange implements Collection<Long> {
         if (o instanceof Number) {
             final long v = ((Number) o).longValue();
             return min <= v && v <= max;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

@@ -102,8 +102,7 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
     public Object resolveNamespace(final String name) {
         if (name == null || name.isEmpty()) {
             return object;
-        } else {
-            return null;
         }
+        return null;
     }
 }

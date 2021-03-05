@@ -105,11 +105,11 @@ public class PropertyAccessTest extends JexlTestCase {
         public Object getProperty(final String name) {
             if ("name".equals(name)) {
                 return value0;
-            } else if ("number".equals(name)) {
-                return value1;
-            } else {
-                return null;
             }
+            if ("number".equals(name)) {
+                return value1;
+            }
+            return null;
         }
 
         public void setProperty(final String name, final String value) {

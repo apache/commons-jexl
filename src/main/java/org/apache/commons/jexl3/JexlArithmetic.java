@@ -358,9 +358,8 @@ public class JexlArithmetic {
         if ((lfrom >= Integer.MIN_VALUE && lfrom <= Integer.MAX_VALUE)
                 && (lto >= Integer.MIN_VALUE && lto <= Integer.MAX_VALUE)) {
             return org.apache.commons.jexl3.internal.IntegerRange.create((int) lfrom, (int) lto);
-        } else {
-            return org.apache.commons.jexl3.internal.LongRange.create(lfrom, lto);
         }
+        return org.apache.commons.jexl3.internal.LongRange.create(lfrom, lto);
     }
 
     /**
@@ -401,9 +400,8 @@ public class JexlArithmetic {
         final int mscale = getMathScale();
         if (mscale >= 0) {
             return number.setScale(mscale, getMathContext().getRoundingMode());
-        } else {
-            return number;
         }
+        return number;
     }
 
     /**
@@ -526,20 +524,20 @@ public class JexlArithmetic {
             if (bigd.compareTo(BIGD_DOUBLE_MAX_VALUE) > 0
                 || bigd.compareTo(BIGD_DOUBLE_MIN_VALUE) < 0) {
                 return original;
-            } else {
-                try {
-                    final long l = bigd.longValueExact();
-                    // coerce to int when possible (int being so often used in method parms)
-                    if (narrowAccept(narrow, Integer.class)
-                            && l <= Integer.MAX_VALUE
-                            && l >= Integer.MIN_VALUE) {
-                        return (int) l;
-                    } else if (narrowAccept(narrow, Long.class)) {
-                        return l;
-                    }
-                } catch (final ArithmeticException xa) {
-                    // ignore, no exact value possible
+            }
+            try {
+                final long l = bigd.longValueExact();
+                // coerce to int when possible (int being so often used in method parms)
+                if (narrowAccept(narrow, Integer.class)
+                        && l <= Integer.MAX_VALUE
+                        && l >= Integer.MIN_VALUE) {
+                    return (int) l;
                 }
+                if (narrowAccept(narrow, Long.class)) {
+                    return l;
+                }
+            } catch (final ArithmeticException xa) {
+                // ignore, no exact value possible
             }
         }
         if (original instanceof Double || original instanceof Float) {
@@ -627,9 +625,8 @@ public class JexlArithmetic {
                 // coerce to int when possible (int being so often used in method parms)
                 if (l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE) {
                     return (int) l;
-                } else {
-                    return l;
                 }
+                return l;
             } catch (final ArithmeticException xa) {
                 // ignore, no exact value possible
             }
@@ -673,9 +670,8 @@ public class JexlArithmetic {
     protected Number narrowLong(final Object lhs, final Object rhs, final long r) {
         if (!(lhs instanceof Long || rhs instanceof Long) && (int) r == r) {
             return (int) r;
-        } else {
-            return r;
         }
+        return r;
     }
 
     /**
@@ -974,25 +970,35 @@ public class JexlArithmetic {
         if (val == null) {
             controlNullOperand();
             return null;
-        } else if (val instanceof Integer) {
+        }
+        if (val instanceof Integer) {
             return -((Integer) val);
-        } else if (val instanceof Double) {
+        }
+        if (val instanceof Double) {
             return - ((Double) val);
-        } else if (val instanceof Long) {
+        }
+        if (val instanceof Long) {
             return -((Long) val);
-        } else if (val instanceof BigDecimal) {
+        }
+        if (val instanceof BigDecimal) {
             return ((BigDecimal) val).negate();
-        } else if (val instanceof BigInteger) {
+        }
+        if (val instanceof BigInteger) {
             return ((BigInteger) val).negate();
-        } else if (val instanceof Float) {
+        }
+        if (val instanceof Float) {
             return -((Float) val);
-        } else if (val instanceof Short) {
+        }
+        if (val instanceof Short) {
             return (short) -((Short) val);
-        } else if (val instanceof Byte) {
+        }
+        if (val instanceof Byte) {
             return (byte) -((Byte) val);
-        } else if (val instanceof Boolean) {
+        }
+        if (val instanceof Boolean) {
             return ((Boolean) val) ? Boolean.FALSE : Boolean.TRUE;
-        } else if (val instanceof AtomicBoolean) {
+        }
+        if (val instanceof AtomicBoolean) {
             return ((AtomicBoolean) val).get() ? Boolean.FALSE : Boolean.TRUE;
         }
         throw new ArithmeticException("Object negate:(" + val + ")");
@@ -1299,48 +1305,56 @@ public class JexlArithmetic {
                 final BigDecimal l = toBigDecimal(left);
                 final BigDecimal r = toBigDecimal(right);
                 return l.compareTo(r);
-            } else if (left instanceof BigInteger || right instanceof BigInteger) {
+            }
+            if (left instanceof BigInteger || right instanceof BigInteger) {
                 final BigInteger l = toBigInteger(left);
                 final BigInteger r = toBigInteger(right);
                 return l.compareTo(r);
-            } else if (isFloatingPoint(left) || isFloatingPoint(right)) {
+            }
+            if (isFloatingPoint(left) || isFloatingPoint(right)) {
                 final double lhs = toDouble(left);
                 final double rhs = toDouble(right);
                 if (Double.isNaN(lhs)) {
                     if (Double.isNaN(rhs)) {
                         return 0;
-                    } else {
-                        return -1;
                     }
-                } else if (Double.isNaN(rhs)) {
+                    return -1;
+                }
+                if (Double.isNaN(rhs)) {
                     // lhs is not NaN
                     return +1;
-                } else if (lhs < rhs) {
-                    return -1;
-                } else if (lhs > rhs) {
-                    return +1;
-                } else {
-                    return 0;
                 }
-            } else if (isNumberable(left) || isNumberable(right)) {
+                if (lhs < rhs) {
+                    return -1;
+                }
+                if (lhs > rhs) {
+                    return +1;
+                }
+                return 0;
+            }
+            if (isNumberable(left) || isNumberable(right)) {
                 final long lhs = toLong(left);
                 final long rhs = toLong(right);
                 if (lhs < rhs) {
                     return -1;
-                } else if (lhs > rhs) {
-                    return +1;
-                } else {
-                    return 0;
                 }
-            } else if (left instanceof String || right instanceof String) {
+                if (lhs > rhs) {
+                    return +1;
+                }
+                return 0;
+            }
+            if (left instanceof String || right instanceof String) {
                 return toString(left).compareTo(toString(right));
-            } else if ("==".equals(operator)) {
+            }
+            if ("==".equals(operator)) {
                 return left.equals(right) ? 0 : -1;
-            } else if (left instanceof Comparable<?>) {
+            }
+            if (left instanceof Comparable<?>) {
                 @SuppressWarnings("unchecked") // OK because of instanceof check above
                 final Comparable<Object> comparable = (Comparable<Object>) left;
                 return comparable.compareTo(right);
-            } else if (right instanceof Comparable<?>) {
+            }
+            if (right instanceof Comparable<?>) {
                 @SuppressWarnings("unchecked") // OK because of instanceof check above
                 final Comparable<Object> comparable = (Comparable<Object>) right;
                 return comparable.compareTo(left);
@@ -1359,13 +1373,14 @@ public class JexlArithmetic {
     public boolean equals(final Object left, final Object right) {
         if (left == right) {
             return true;
-        } else if (left == null || right == null) {
-            return false;
-        } else if (left instanceof Boolean || right instanceof Boolean) {
-            return toBoolean(left) == toBoolean(right);
-        } else {
-            return compare(left, right, "==") == 0;
         }
+        if (left == null || right == null) {
+            return false;
+        }
+        if (left instanceof Boolean || right instanceof Boolean) {
+            return toBoolean(left) == toBoolean(right);
+        }
+        return compare(left, right, "==") == 0;
     }
 
     /**
@@ -1378,9 +1393,8 @@ public class JexlArithmetic {
     public boolean lessThan(final Object left, final Object right) {
         if ((left == right) || (left == null) || (right == null)) {
             return false;
-        } else {
-            return compare(left, right, "<") < 0;
         }
+        return compare(left, right, "<") < 0;
 
     }
 
@@ -1394,9 +1408,8 @@ public class JexlArithmetic {
     public boolean greaterThan(final Object left, final Object right) {
         if ((left == right) || left == null || right == null) {
             return false;
-        } else {
-            return compare(left, right, ">") > 0;
         }
+        return compare(left, right, ">") > 0;
     }
 
     /**
@@ -1409,11 +1422,11 @@ public class JexlArithmetic {
     public boolean lessThanOrEqual(final Object left, final Object right) {
         if (left == right) {
             return true;
-        } else if (left == null || right == null) {
-            return false;
-        } else {
-            return compare(left, right, "<=") <= 0;
         }
+        if (left == null || right == null) {
+            return false;
+        }
+        return compare(left, right, "<=") <= 0;
     }
 
     /**
@@ -1426,11 +1439,11 @@ public class JexlArithmetic {
     public boolean greaterThanOrEqual(final Object left, final Object right) {
         if (left == right) {
             return true;
-        } else if (left == null || right == null) {
-            return false;
-        } else {
-            return compare(left, right, ">=") >= 0;
         }
+        if (left == null || right == null) {
+            return false;
+        }
+        return compare(left, right, ">=") >= 0;
     }
 
     /**
@@ -1444,20 +1457,23 @@ public class JexlArithmetic {
         if (val == null) {
             controlNullOperand();
             return false;
-        } else if (val instanceof Boolean) {
+        }
+        if (val instanceof Boolean) {
             return ((Boolean) val);
-        } else if (val instanceof Number) {
+        }
+        if (val instanceof Number) {
             final double number = toDouble(val);
             return !Double.isNaN(number) && number != 0.d;
-        } else if (val instanceof AtomicBoolean) {
+        }
+        if (val instanceof AtomicBoolean) {
             return ((AtomicBoolean) val).get();
-        } else if (val instanceof String) {
+        }
+        if (val instanceof String) {
             final String strval = val.toString();
             return !strval.isEmpty() && !"false".equals(strval);
-        } else {
-            // non null value is true
-            return true;
         }
+        // non null value is true
+        return true;
     }
 
     /**
@@ -1473,25 +1489,30 @@ public class JexlArithmetic {
         if (val == null) {
             controlNullOperand();
             return 0;
-        } else if (val instanceof Double) {
+        }
+        if (val instanceof Double) {
             final Double dval = (Double) val;
             if (Double.isNaN(dval)) {
                 return 0;
-            } else {
-                return dval.intValue();
             }
-        } else if (val instanceof Number) {
+            return dval.intValue();
+        }
+        if (val instanceof Number) {
             return ((Number) val).intValue();
-        } else if (val instanceof String) {
+        }
+        if (val instanceof String) {
             if ("".equals(val)) {
                 return 0;
             }
             return Integer.parseInt((String) val);
-        } else if (val instanceof Boolean) {
+        }
+        if (val instanceof Boolean) {
             return ((Boolean) val) ? 1 : 0;
-        } else if (val instanceof AtomicBoolean) {
+        }
+        if (val instanceof AtomicBoolean) {
             return ((AtomicBoolean) val).get() ? 1 : 0;
-        } else if (val instanceof Character) {
+        }
+        if (val instanceof Character) {
             return ((Character) val);
         }
 
@@ -1512,26 +1533,30 @@ public class JexlArithmetic {
         if (val == null) {
             controlNullOperand();
             return 0L;
-        } else if (val instanceof Double) {
+        }
+        if (val instanceof Double) {
             final Double dval = (Double) val;
             if (Double.isNaN(dval)) {
                 return 0L;
-            } else {
-                return dval.longValue();
             }
-        } else if (val instanceof Number) {
+            return dval.longValue();
+        }
+        if (val instanceof Number) {
             return ((Number) val).longValue();
-        } else if (val instanceof String) {
+        }
+        if (val instanceof String) {
             if ("".equals(val)) {
                 return 0L;
-            } else {
-                return Long.parseLong((String) val);
             }
-        } else if (val instanceof Boolean) {
+            return Long.parseLong((String) val);
+        }
+        if (val instanceof Boolean) {
             return ((Boolean) val) ? 1L : 0L;
-        } else if (val instanceof AtomicBoolean) {
+        }
+        if (val instanceof AtomicBoolean) {
             return ((AtomicBoolean) val).get() ? 1L : 0L;
-        } else if (val instanceof Character) {
+        }
+        if (val instanceof Character) {
             return ((Character) val);
         }
 
@@ -1552,31 +1577,37 @@ public class JexlArithmetic {
         if (val == null) {
             controlNullOperand();
             return BigInteger.ZERO;
-        } else if (val instanceof BigInteger) {
+        }
+        if (val instanceof BigInteger) {
             return (BigInteger) val;
-        } else if (val instanceof Double) {
+        }
+        if (val instanceof Double) {
             final Double dval = (Double) val;
             if (Double.isNaN(dval)) {
                 return BigInteger.ZERO;
-            } else {
-                return BigInteger.valueOf(dval.longValue());
             }
-        } else if (val instanceof BigDecimal) {
+            return BigInteger.valueOf(dval.longValue());
+        }
+        if (val instanceof BigDecimal) {
             return ((BigDecimal) val).toBigInteger();
-        } else if (val instanceof Number) {
+        }
+        if (val instanceof Number) {
             return BigInteger.valueOf(((Number) val).longValue());
-        } else if (val instanceof Boolean) {
+        }
+        if (val instanceof Boolean) {
             return BigInteger.valueOf(((Boolean) val) ? 1L : 0L);
-        } else if (val instanceof AtomicBoolean) {
+        }
+        if (val instanceof AtomicBoolean) {
             return BigInteger.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
-        } else if (val instanceof String) {
+        }
+        if (val instanceof String) {
             final String string = (String) val;
             if ("".equals(string)) {
                 return BigInteger.ZERO;
-            } else {
-                return new BigInteger(string);
             }
-        } else if (val instanceof Character) {
+            return new BigInteger(string);
+        }
+        if (val instanceof Character) {
             final int i = ((Character) val);
             return BigInteger.valueOf(i);
         }
@@ -1597,28 +1628,34 @@ public class JexlArithmetic {
     public BigDecimal toBigDecimal(final Object val) {
         if (val instanceof BigDecimal) {
             return roundBigDecimal((BigDecimal) val);
-        } else if (val == null) {
+        }
+        if (val == null) {
             controlNullOperand();
             return BigDecimal.ZERO;
-        } else if (val instanceof Double) {
+        }
+        if (val instanceof Double) {
             if (Double.isNaN(((Double) val))) {
                 return BigDecimal.ZERO;
-            } else {
-                return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
             }
-        } else if (val instanceof Number) {
             return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
-        } else if (val instanceof Boolean) {
+        }
+        if (val instanceof Number) {
+            return roundBigDecimal(new BigDecimal(val.toString(), getMathContext()));
+        }
+        if (val instanceof Boolean) {
             return BigDecimal.valueOf(((Boolean) val) ? 1. : 0.);
-        } else if (val instanceof AtomicBoolean) {
+        }
+        if (val instanceof AtomicBoolean) {
             return BigDecimal.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
-        } else if (val instanceof String) {
+        }
+        if (val instanceof String) {
             final String string = (String) val;
             if ("".equals(string)) {
                 return BigDecimal.ZERO;
             }
             return roundBigDecimal(new BigDecimal(string, getMathContext()));
-        } else if (val instanceof Character) {
+        }
+        if (val instanceof Character) {
             final int i = ((Character) val);
             return new BigDecimal(i);
         }
@@ -1639,25 +1676,30 @@ public class JexlArithmetic {
         if (val == null) {
             controlNullOperand();
             return 0;
-        } else if (val instanceof Double) {
+        }
+        if (val instanceof Double) {
             return ((Double) val);
-        } else if (val instanceof Number) {
+        }
+        if (val instanceof Number) {
             //The below construct is used rather than ((Number)val).doubleValue() to ensure
             //equality between comparing new Double( 6.4 / 3 ) and the jexl expression of 6.4 / 3
             return Double.parseDouble(String.valueOf(val));
-        } else if (val instanceof Boolean) {
+        }
+        if (val instanceof Boolean) {
             return ((Boolean) val) ? 1. : 0.;
-        } else if (val instanceof AtomicBoolean) {
+        }
+        if (val instanceof AtomicBoolean) {
             return ((AtomicBoolean) val).get() ? 1. : 0.;
-        } else if (val instanceof String) {
+        }
+        if (val instanceof String) {
             final String string = (String) val;
             if ("".equals(string)) {
                 return Double.NaN;
-            } else {
-                // the spec seems to be iffy about this.  Going to give it a wack anyway
-                return Double.parseDouble(string);
             }
-        } else if (val instanceof Character) {
+            // the spec seems to be iffy about this.  Going to give it a wack anyway
+            return Double.parseDouble(string);
+        }
+        if (val instanceof Character) {
             final int i = ((Character) val);
             return i;
         }
@@ -1677,16 +1719,15 @@ public class JexlArithmetic {
         if (val == null) {
             controlNullOperand();
             return "";
-        } else if (val instanceof Double) {
-            final Double dval = (Double) val;
-            if (Double.isNaN(dval)) {
-                return "";
-            } else {
-                return dval.toString();
-            }
-        } else {
+        }
+        if (!(val instanceof Double)) {
             return val.toString();
         }
+        final Double dval = (Double) val;
+        if (Double.isNaN(dval)) {
+            return "";
+        }
+        return dval.toString();
     }
 
     /**

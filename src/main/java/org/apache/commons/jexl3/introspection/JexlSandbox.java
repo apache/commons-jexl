@@ -618,9 +618,8 @@ public final class JexlSandbox {
         final Permissions permissions = sandbox.get(clazz);
         if (permissions == null) {
             return allow ? ALLOW_ALL : BLOCK_ALL;
-        } else {
-            return permissions;
         }
+        return permissions;
     }
 
     /**

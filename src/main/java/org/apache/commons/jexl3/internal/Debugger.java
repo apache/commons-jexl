@@ -152,9 +152,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     public boolean debug(final JexlExpression jscript) {
         if (jscript instanceof Script) {
             return debug(((Script) jscript).script);
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -165,9 +164,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     public boolean debug(final JexlScript jscript) {
         if (jscript instanceof Script) {
             return debug(((Script) jscript).script);
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -640,10 +638,9 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         final String image = StringParser.escapeIdentifier(node.getName());
         if (ns == null) {
             return check(node, image, data);
-        } else {
-            final String nsid = StringParser.escapeIdentifier(ns) + ":" + image;
-            return check(node, nsid, data);
         }
+        final String nsid = StringParser.escapeIdentifier(ns) + ":" + image;
+        return check(node, nsid, data);
     }
 
     @Override

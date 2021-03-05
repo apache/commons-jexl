@@ -104,9 +104,8 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
     public String getOutputStatement(final String toDisplay) {
         if (toDisplay == null) {
             return "JEXL.out.print(null)";
-        } else {
-            return "JEXL.out.print("+StringParser.escapeString(toDisplay, '\'')+")";
         }
+        return "JEXL.out.print("+StringParser.escapeString(toDisplay, '\'')+")";
     }
 
     @Override

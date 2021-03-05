@@ -133,11 +133,11 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
             final Writer out = context.getWriter();
             if (out instanceof PrintWriter) {
                 return (PrintWriter) out;
-            } else if (out != null) {
-                return new PrintWriter(out, true);
-            } else {
-                return null;
             }
+            if (out != null) {
+                return new PrintWriter(out, true);
+            }
+            return null;
         }
 
         /**
@@ -149,11 +149,11 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
             final Writer error = context.getErrorWriter();
             if (error instanceof PrintWriter) {
                 return (PrintWriter) error;
-            } else if (error != null) {
-                return new PrintWriter(error, true);
-            } else {
-                return null;
             }
+            if (error != null) {
+                return new PrintWriter(error, true);
+            }
+            return null;
         }
 
         /**

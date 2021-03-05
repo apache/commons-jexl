@@ -86,16 +86,15 @@ public class MethodTest extends JexlTestCase {
         }
 
         public String concat(final String... strs) {
-            if (strs.length > 0) {
-                final StringBuilder strb = new StringBuilder(strs[0]);
-                for (int s = 1; s < strs.length; ++s) {
-                    strb.append(", ");
-                    strb.append(strs[s]);
-                }
-                return strb.toString();
-            } else {
+            if (strs.length <= 0) {
                 return "";
             }
+            final StringBuilder strb = new StringBuilder(strs[0]);
+            for (int s = 1; s < strs.length; ++s) {
+                strb.append(", ");
+                strb.append(strs[s]);
+            }
+            return strb.toString();
         }
     }
 
@@ -728,9 +727,8 @@ public class MethodTest extends JexlTestCase {
             public Object invoke(final Object obj, final Object ... params) throws Exception {
                 if (obj instanceof Map<?, ?>) {
                     return ja.add(params[0], params[1]);
-                } else {
-                    throw new Exception("not a script context");
                 }
+                throw new Exception("not a script context");
             }
 
             @Override

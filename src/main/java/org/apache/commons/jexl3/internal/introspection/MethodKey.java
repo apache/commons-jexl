@@ -659,7 +659,8 @@ public final class MethodKey {
             if (c != null) {
                 if (c.isPrimitive()) {
                     return true;
-                } else if (possibleVarArg) {
+                }
+                if (possibleVarArg) {
                     final Class<?> t = c.getComponentType();
                     return t != null && t.isPrimitive();
                 }

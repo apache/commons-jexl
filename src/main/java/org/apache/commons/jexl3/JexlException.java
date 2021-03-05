@@ -259,21 +259,20 @@ public class JexlException extends RuntimeException {
         final int length = expr.length();
         if (length < MAX_EXCHARLOC) {
             return prefix + " error in '" + expr + "'";
-        } else {
-            final int me = MAX_EXCHARLOC / 2;
-            int begin = info.getColumn() - me;
-            if (begin < 0 || length < me) {
-                begin = 0;
-            } else if (begin > length) {
-                begin = me;
-            }
-            int end = begin + MAX_EXCHARLOC;
-            if (end > length) {
-                end = length;
-            }
-            return prefix + " error near '... "
-                    + expr.substring(begin, end) + " ...'";
         }
+        final int me = MAX_EXCHARLOC / 2;
+        int begin = info.getColumn() - me;
+        if (begin < 0 || length < me) {
+            begin = 0;
+        } else if (begin > length) {
+            begin = me;
+        }
+        int end = begin + MAX_EXCHARLOC;
+        if (end > length) {
+            end = length;
+        }
+        return prefix + " error near '... "
+                + expr.substring(begin, end) + " ...'";
     }
 
     /**
