@@ -318,7 +318,7 @@
         <p>
             Those configuration options can be overridden during evaluation by implementing a
             {@link org.apache.commons.jexl3.JexlContext}
-            that also implements {@link org.apache.commons.jexl3.JexlEngine#Options} to carry evaluation options.
+            that also implements {@link org.apache.commons.jexl3.JexlEngine.Options} to carry evaluation options.
             An example of such a class exists in the test package.
         </p>
         <p>
@@ -334,7 +334,7 @@
             JexlException which are unchecked exception.
         </p>
         <p>
-            Implementing a {@link org.apache.commons.jexl3.JexlContext$NamespaceResolver} through a JexlContext - look at
+            Implementing a {@link org.apache.commons.jexl3.JexlContext.NamespaceResolver} through a JexlContext - look at
             <a href="https://gitbox.apache.org/repos/asf?p=commons-jexl.git;a=blob;f=src/test/java/org/apache/commons/jexl3/JexlEvalContext.java">JexlEvalContext</a>
             as an example - allows to override the namespace resolution and the default namespace map defined
             through {@link org.apache.commons.jexl3.JexlBuilder#namespaces}.
@@ -371,7 +371,7 @@
             Note however that you can <em>not</em> change the operator precedence.
             The list of operator / method matches is the following:
         </p>
-            <table>
+            <table summary="Operators">
                 <tr>
                     <th>Operator</th>
                     <th>Method Name</th>
@@ -476,7 +476,7 @@
             where V is the property value class, O the object class and  P the property identifier class (usually String or Integer).
         </p>
 
-            <table>
+            <table summary="Property accessors">
                 <tr>
                     <th>Expression</th>
                     <th>Method Template</th>
