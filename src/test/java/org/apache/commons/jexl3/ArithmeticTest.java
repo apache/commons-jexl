@@ -1289,11 +1289,10 @@ public class ArithmeticTest extends JexlTestCase {
         int sep = version.indexOf(".");
         if (sep < 0) {
             sep = version.indexOf("-");
-            if (sep < 0) {
-                sep = 1;
-            }
         }
-        version = version.substring(0, sep);
+        if (sep > 0) {
+            version = version.substring(0, sep);
+        }
         return Integer.parseInt(version);
     }
 
