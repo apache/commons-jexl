@@ -14,18 +14,23 @@
 # limitations under the License.
 
 language: java
-sudo: false
+
 cache:
   directories:
     - $HOME/.m2
+
+jdk:
+  - openjdk8
+  - openjdk11
+  - openjdk15
+  - openjdk-ea
+
 matrix:
-  include:
-    - jdk: openjdk8
-    - jdk: openjdk11
-    - jdk: openjdk15
-    - jdk: openjdk-ea
   allow_failures:
     - jdk: openjdk-ea
-after_success:
-  - mvn -V --no-transfer-progress clean test jacoco:report coveralls:report
 
+script:
+  - mvn -V --no-transfer-progress
+
+after_success:
+  - mvn -V --no-transfer-progress clean test jacoco:report coveralls:report -Ptravis-jacoco javadoc:javadoc -Ddoclint=all
