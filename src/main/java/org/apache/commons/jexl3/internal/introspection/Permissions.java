@@ -42,7 +42,7 @@ public class Permissions {
      * @return true if JEXL is allowed to introspect, false otherwise
      */
     public boolean allow(final Package pack) {
-        if (pack != null && pack.getAnnotation(NoJexl.class) != null) {
+        if (pack == null || pack.getAnnotation(NoJexl.class) != null) {
             return false;
         }
         return true;

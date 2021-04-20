@@ -209,7 +209,7 @@ public class Engine extends JexlEngine {
         options.setMathContext(arithmetic.getMathContext());
         options.setMathScale(arithmetic.getMathScale());
         options.setStrictArithmetic(arithmetic.isStrict());
-        this.functions = conf.namespaces() == null ? Collections.<String, Object>emptyMap() : conf.namespaces();
+        this.functions = conf.namespaces() == null ? Collections.emptyMap() : conf.namespaces();
         // parsing & features:
         final JexlFeatures features = conf.features() == null? DEFAULT_FEATURES : conf.features();
         this.expressionFeatures = new JexlFeatures(features).script(false);
