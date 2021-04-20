@@ -864,7 +864,7 @@ public class JexlArithmetic {
      * @return true if product fits a long, false if it overflows
      */
     @SuppressWarnings("MagicNumber")
-    private static boolean isMultiplyExact(final long x, final long y, final long r) {
+    protected static boolean isMultiplyExact(final long x, final long y, final long r) {
         final long ax = Math.abs(x);
         final long ay = Math.abs(y);
         return !(((ax | ay) >>> (Integer.SIZE - 1) != 0)
