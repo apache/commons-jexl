@@ -190,6 +190,9 @@
                             <exclude>**/generated-sources/**/*</exclude>
                             <exclude>**/org/apache/commons/jexl3/parser/*.class</exclude>
                             <exclude>**/org/apache/commons/jexl3/**/*Test.class</exclude>
+                            <exclude>**/java/**/*</exclude>
+                            <exclude>**/javax/**/*</exclude>
+                            <exclude>**/com/sun/**/*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
