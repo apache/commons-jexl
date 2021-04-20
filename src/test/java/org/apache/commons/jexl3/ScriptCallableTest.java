@@ -583,7 +583,7 @@ public class ScriptCallableTest extends JexlTestCase {
 
         result = script.execute(ctxt, false);
         Assert.assertEquals(42, result);
-        script = JEXL.createScript("@timeout(10) {sleep(1000); 42; } -42;");
+        script = JEXL.createScript("@timeout(100) {sleep(1000); 42; } -42;");
         try {
             result = script.execute(ctxt);
         } catch (final Exception xany) {
@@ -591,14 +591,14 @@ public class ScriptCallableTest extends JexlTestCase {
         }
         Assert.assertEquals(-42, result);
 
-        script = JEXL.createScript("@timeout(10) {sleep(1000); return 42; } return -42;");
+        script = JEXL.createScript("@timeout(100) {sleep(1000); return 42; } return -42;");
         try {
             result = script.execute(ctxt);
         } catch (final Exception xany) {
             Assert.fail(xany.toString());
         }
         Assert.assertEquals(-42, result);
-        script = JEXL.createScript("@timeout(1000) {sleep(10); return 42; } return -42;");
+        script = JEXL.createScript("@timeout(1000) {sleep(100); return 42; } return -42;");
         try {
             result = script.execute(ctxt);
         } catch (final Exception xany) {
