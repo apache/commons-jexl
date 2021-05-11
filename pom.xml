@@ -56,7 +56,7 @@
         <checksyle.version>8.42</checksyle.version>
 
         <!-- override of Jacoco properties defined in CP52 -->
-        <commons.jacoco.version>0.8.6</commons.jacoco.version>
+        <commons.jacoco.version>0.8.7</commons.jacoco.version>
         <commons.jacoco.classRatio>0.95</commons.jacoco.classRatio>
         <commons.jacoco.instructionRatio>0.85</commons.jacoco.instructionRatio>
         <commons.jacoco.methodRatio>0.85</commons.jacoco.methodRatio>
