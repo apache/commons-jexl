@@ -462,7 +462,7 @@ public class Engine extends JexlEngine {
     }
 
     @Override
-    public Script createScript(final JexlFeatures features, final JexlInfo info, final String scriptText, final String[] names) {
+    public Script createScript(final JexlFeatures features, final JexlInfo info, final String scriptText, final String... names) {
         if (scriptText == null) {
             throw new NullPointerException("source is null");
         }
