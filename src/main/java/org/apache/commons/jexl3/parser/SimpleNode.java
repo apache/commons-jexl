@@ -190,6 +190,11 @@ public class SimpleNode implements Node {
             }
         }
     }
+
+    @Override
+    public int getId() {
+        return id;
+    }
 }
 
 /* JavaCC - OriginalChecksum=7dff880883d088a37c1e3197e4b455a0 (do not edit this line) */

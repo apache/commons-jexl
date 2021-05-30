@@ -47,4 +47,12 @@
         <method>java.lang.ClassLoader getClassLoader()</method>
         <to>java.lang.ClassLoader getClassLoader()</to>
     </difference>
+
+    <!-- The parser now expects/generates TokenMgrException instead of TokenMgrError -->
+    <difference>
+        <className>org/apache/commons/jexl3/JexlException$Tokenization</className>
+        <differenceType>7005</differenceType> <!-- parser now constructs this exception using TokenMgrException -->
+        <method>JexlException$Tokenization(org.apache.commons.jexl3.JexlInfo, org.apache.commons.jexl3.parser.TokenMgrError)</method>
+        <to>JexlException$Tokenization(org.apache.commons.jexl3.JexlInfo, org.apache.commons.jexl3.parser.TokenMgrException)</to>
+    </difference>
 </differences>
