@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 /**
  * A JexlEngine implementation.
@@ -212,8 +213,13 @@ public class Engine extends JexlEngine {
         this.functions = conf.namespaces() == null ? Collections.emptyMap() : conf.namespaces();
         // parsing & features:
         final JexlFeatures features = conf.features() == null? DEFAULT_FEATURES : conf.features();
-        this.expressionFeatures = new JexlFeatures(features).script(false);
-        this.scriptFeatures = new JexlFeatures(features).script(true);
+        Predicate<String> nsTest = features.namespaceTest();
+        final Set<String> nsNames = functions.keySet();
+        if (!nsNames.isEmpty()) {
+            nsTest = nsTest == JexlFeatures.TEST_STR_FALSE ?nsNames::contains : nsTest.or(nsNames::contains);
+        }
+        this.expressionFeatures = new JexlFeatures(features).script(false).namespaceTest(nsTest);
+        this.scriptFeatures = new JexlFeatures(features).script(true).namespaceTest(nsTest);
         this.charset = conf.charset();
         // caching:
         this.cache = conf.cache() <= 0 ? null : new SoftCache<Source, ASTJexlScript>(conf.cache());
@@ -840,7 +846,10 @@ public class Engine extends JexlEngine {
      */
     protected ASTJexlScript parse(final JexlInfo info, final JexlFeatures parsingf, final String src, final Scope scope) {
         final boolean cached = src.length() < cacheThreshold && cache != null;
-        final JexlFeatures features = parsingf != null? parsingf : DEFAULT_FEATURES;
+        JexlFeatures features = parsingf != null? parsingf : DEFAULT_FEATURES;
+       // if (features.getNameSpaces().isEmpty() && !functions.isEmpty()) {
+       //     features = new JexlFeatures(features).nameSpaces(functions.keySet());
+       // }
         final Source source = cached? new Source(features, src) : null;
         ASTJexlScript script = null;
         if (source != null) {

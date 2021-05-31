@@ -19,6 +19,11 @@ package org.apache.commons.jexl3;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
  * Tests JexlContext (advanced) features.
  */
@@ -98,6 +103,36 @@ public class ContextNamespaceTest extends JexlTestCase {
         Assert.assertEquals(372., result);
     }
 
+    public static class Context346 extends MapContext {
+        public int func(int y) { return 42 * y;}
+    }
+
+    @Test
+    public void testNamespace346a() throws Exception {
+        JexlContext ctxt = new Context346();
+        final JexlEngine jexl = new JexlBuilder().safe(false).create();
+        String src = "x != null ? x : func(y)";
+        final JexlScript script = jexl.createScript(src,"x","y");
+        Object result = script.execute(ctxt, null, 1);
+        Assert.assertEquals(42, result);
+        result = script.execute(ctxt, 169, -169);
+        Assert.assertEquals(169, result);
+    }
+
+    @Test
+    public void testNamespace346b() throws Exception {
+        JexlContext ctxt = new MapContext();
+        Map<String, Object> ns = new HashMap<String, Object>();
+        ns.put("x", Math.class);
+        ns.put(null, Math.class);
+        final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
+        String src = "x != null ? x : abs(y)";
+        final JexlScript script = jexl.createScript(src,"x","y");
+        Object result = script.execute(ctxt, null, 42);
+        Assert.assertEquals(42, result);
+        result = script.execute(ctxt, 169, -169);
+        Assert.assertEquals(169, result);
+    }
 
     @Test
     public void testNamespacePragmaString() throws Exception {
