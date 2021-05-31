@@ -257,7 +257,7 @@ public class Issues300Test {
 
     @Test
     public void test314() throws Exception {
-        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
         final Map<String,Object> vars = new HashMap<String, Object>();
         final JexlContext ctxt = new VaContext(vars);
         JexlScript script;
@@ -548,5 +548,49 @@ public class Issues300Test {
         } catch (final JexlException.Parsing exception) {
             Assert.assertTrue(exception.getMessage().contains("VARIABLE"));
         }
+    }
+
+    @Test
+    public void test331() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext ctxt = new MapContext();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript("a + '\\n' + b", "a", "b");
+        result = script.execute(ctxt, "hello", "world");
+        Assert.assertTrue(result.toString().contains("\n"));
+    }
+
+    @Test
+    public void test347() throws Exception {
+        final String src = "A.B == 5";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null);
+        // safe navigation is lenient wrt null
+        Assert.assertFalse((Boolean)result);
+
+        jexl = new JexlBuilder().strict(true).safe(false).create();
+        JexlContext ctxt = new MapContext();
+        script = jexl.createScript(src);
+        // A and A.B undefined
+        try {
+            result = script.execute(ctxt);
+            Assert.fail("should only succeed with safe navigation");
+        } catch(JexlException xany) {
+            Assert.assertNotNull(xany);
+        }
+        // A is null, A.B is undefined
+        ctxt.set("A", null);
+        try {
+            result = script.execute(ctxt);
+            Assert.fail("should only succeed with safe navigation");
+        } catch(JexlException xany) {
+            Assert.assertNotNull(xany);
+        }
+        // A.B is null
+        ctxt.set("A.B", null);
+        result = script.execute(ctxt);
+        Assert.assertFalse((Boolean) result);
     }
 }

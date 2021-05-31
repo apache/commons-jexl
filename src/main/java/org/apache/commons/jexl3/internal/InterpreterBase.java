@@ -298,25 +298,38 @@ public abstract class InterpreterBase extends ParserVisitor {
      */
     protected Object getVariable(final Frame frame, final LexicalScope block, final ASTIdentifier identifier) {
         final int symbol = identifier.getSymbol();
+        final String name = identifier.getName();
         // if we have a symbol, we have a scope thus a frame
         if (options.isLexicalShade() && identifier.isShaded()) {
-            return undefinedVariable(identifier, identifier.getName());
+            return undefinedVariable(identifier, name);
         }
+        // a local var ?
         if ((symbol >= 0) && frame.has(symbol)) {
             final Object value = frame.get(symbol);
+            // not out of scope with no lexical shade ?
             if (value != Scope.UNDEFINED) {
+                // null argument of an arithmetic operator ?
+                if (value == null && arithmetic.isStrict() && identifier.jjtGetParent().isStrictOperator()) {
+                    return unsolvableVariable(identifier, name, false); // defined but null
+                }
                 return value;
             }
         }
-        final String name = identifier.getName();
+        // consider global
         final Object value = context.get(name);
-        if (value == null && !context.has(name)) {
-            final boolean ignore = (isSafe()
-                    && (symbol >= 0
-                    || identifier.jjtGetParent() instanceof ASTAssignment))
-                    || (identifier.jjtGetParent() instanceof ASTReference);
-            if (!ignore) {
-                return unsolvableVariable(identifier, name, true); // undefined
+        // is it null ?
+        if (value == null) {
+            // is it defined ?
+            if (!context.has(name)) {
+                // not defined, ignore in some cases...
+                final boolean ignore =
+                        (isSafe() && (symbol >= 0 || identifier.jjtGetParent() instanceof ASTAssignment))
+                         || (identifier.jjtGetParent() instanceof ASTReference);
+                if (!ignore) {
+                    return undefinedVariable(identifier, name); // undefined
+                }
+            } else if (arithmetic.isStrict() && identifier.jjtGetParent().isStrictOperator()) {
+                return unsolvableVariable(identifier, name, false); // defined but null
             }
         }
         return value;

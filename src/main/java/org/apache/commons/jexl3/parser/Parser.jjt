@@ -312,7 +312,7 @@ ASTJexlScript JexlScript(Scope frame) : {
 ASTJexlScript JexlExpression(Scope frame) #JexlScript : {
     jjtThis.setScope(frame);
 }
-{   
+{
    {
         pushUnit(jjtThis);
    }
@@ -350,7 +350,7 @@ void Statement() #void : {}
     | Continue()
     | Break()
     | Var()
-    | Pragma() 
+    | Pragma()
 }
 
 void Block() #Block : {}
@@ -507,8 +507,13 @@ void ConditionalExpression() #void : {}
 {
   ConditionalOrExpression()
   (
-    <QMARK> Expression() <COLON> Expression() #TernaryNode(3)
-  |
+    <QMARK> (LOOKAHEAD(<IDENTIFIER> <COLON>,
+                       { isVariable(getToken(1).image) || !isDeclaredNamespace(getToken(1).image) })
+                Identifier(true)
+             |
+                Expression()
+             ) <COLON> Expression() #TernaryNode(3)
+     |
     <ELVIS> Expression() #TernaryNode(2)
   |
     <NULLP> Expression() #NullpNode(2)

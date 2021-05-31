@@ -71,6 +71,29 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.failExpression("left & right", ".*null.*");
         asserter.failExpression("left | right", ".*null.*");
         asserter.failExpression("left ^ right", ".*null.*");
+        asserter.failExpression("left < right", ".*null.*");
+        asserter.failExpression("left <= right", ".*null.*");
+        asserter.failExpression("left > right", ".*null.*");
+        asserter.failExpression("left >= right", ".*null.*");
+    }
+
+    @Test
+    public void testLeftNullOperand2() throws Exception {
+        asserter.setVariable("x.left", null);
+        asserter.setVariable("right", Integer.valueOf(8));
+        asserter.setStrict(true);
+        asserter.failExpression("x.left + right", ".*null.*");
+        asserter.failExpression("x.left - right", ".*null.*");
+        asserter.failExpression("x.left * right", ".*null.*");
+        asserter.failExpression("x.left / right", ".*null.*");
+        asserter.failExpression("x.left % right", ".*null.*");
+        asserter.failExpression("x.left & right", ".*null.*");
+        asserter.failExpression("x.left | right", ".*null.*");
+        asserter.failExpression("x.left ^ right", ".*null.*");
+        asserter.failExpression("x.left < right", ".*null.*");
+        asserter.failExpression("x.left <= right", ".*null.*");
+        asserter.failExpression("x.left > right", ".*null.*");
+        asserter.failExpression("x.left >= right", ".*null.*");
     }
 
     @Test
@@ -85,8 +108,29 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.failExpression("left & right", ".*null.*");
         asserter.failExpression("left | right", ".*null.*");
         asserter.failExpression("left ^ right", ".*null.*");
+        asserter.failExpression("left < right", ".*null.*");
+        asserter.failExpression("left <= right", ".*null.*");
+        asserter.failExpression("left > right", ".*null.*");
+        asserter.failExpression("left >= right", ".*null.*");
     }
 
+    @Test
+    public void testRightNullOperand2() throws Exception {
+        asserter.setVariable("left", Integer.valueOf(9));
+        asserter.setVariable("y.right", null);
+        asserter.failExpression("left + y.right", ".*null.*");
+        asserter.failExpression("left - y.right", ".*null.*");
+        asserter.failExpression("left * y.right", ".*null.*");
+        asserter.failExpression("left / y.right", ".*null.*");
+        asserter.failExpression("left % y.right", ".*null.*");
+        asserter.failExpression("left & y.right", ".*null.*");
+        asserter.failExpression("left | y.right", ".*null.*");
+        asserter.failExpression("left ^ y.right", ".*null.*");
+        asserter.failExpression("left < y.right", ".*null.*");
+        asserter.failExpression("left <= y.right", ".*null.*");
+        asserter.failExpression("left > y.right", ".*null.*");
+        asserter.failExpression("left >= y.right", ".*null.*");
+    }
     @Test
     public void testNullOperands() throws Exception {
         asserter.setVariable("left", null);
