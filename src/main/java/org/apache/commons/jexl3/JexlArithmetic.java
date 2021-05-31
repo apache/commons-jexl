@@ -996,10 +996,10 @@ public class JexlArithmetic {
             return (byte) -((Byte) val);
         }
         if (val instanceof Boolean) {
-            return ((Boolean) val) ? Boolean.FALSE : Boolean.TRUE;
+            return !(Boolean) val;
         }
         if (val instanceof AtomicBoolean) {
-            return ((AtomicBoolean) val).get() ? Boolean.FALSE : Boolean.TRUE;
+            return !((AtomicBoolean) val).get();
         }
         throw new ArithmeticException("Object negate:(" + val + ")");
     }
@@ -1179,20 +1179,20 @@ public class JexlArithmetic {
     public Boolean isEmpty(final Object object, final Boolean def) {
         if (object instanceof Number) {
             final double d = ((Number) object).doubleValue();
-            return Double.isNaN(d) || d == 0.d ? Boolean.TRUE : Boolean.FALSE;
+            return Double.isNaN(d) || d == 0.d;
         }
         if (object instanceof CharSequence) {
-            return ((CharSequence) object).length() == 0 ? Boolean.TRUE : Boolean.FALSE;
+            return ((CharSequence) object).length() == 0;
         }
         if (object.getClass().isArray()) {
-            return Array.getLength(object) == 0 ? Boolean.TRUE : Boolean.FALSE;
+            return Array.getLength(object) == 0;
         }
         if (object instanceof Collection<?>) {
-            return ((Collection<?>) object).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
+            return ((Collection<?>) object).isEmpty();
         }
         // Map isn't a collection
         if (object instanceof Map<?, ?>) {
-            return ((Map<?, ?>) object).isEmpty() ? Boolean.TRUE : Boolean.FALSE;
+            return ((Map<?, ?>) object).isEmpty();
         }
         return def;
     }
@@ -1287,7 +1287,7 @@ public class JexlArithmetic {
      * @return !val
      */
     public Object not(final Object val) {
-        return toBoolean(val) ? Boolean.FALSE : Boolean.TRUE;
+        return !toBoolean(val);
     }
 
     /**

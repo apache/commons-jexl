@@ -368,9 +368,7 @@ public class Interpreter extends InterpreterBase {
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
         try {
             final Object result = operators.tryOverload(node, JexlOperator.EQ, left, right);
-            return result != JexlEngine.TRY_FAILED
-                   ? result
-                   : arithmetic.equals(left, right) ? Boolean.TRUE : Boolean.FALSE;
+            return result != JexlEngine.TRY_FAILED ? result : arithmetic.equals(left, right);
         } catch (final ArithmeticException xrt) {
             throw new JexlException(node, "== error", xrt);
         }
@@ -383,8 +381,8 @@ public class Interpreter extends InterpreterBase {
         try {
             final Object result = operators.tryOverload(node, JexlOperator.EQ, left, right);
             return result != JexlEngine.TRY_FAILED
-                   ? arithmetic.toBoolean(result) ? Boolean.FALSE : Boolean.TRUE
-                   : arithmetic.equals(left, right) ? Boolean.FALSE : Boolean.TRUE;
+                   ? !arithmetic.toBoolean(result)
+                   : !arithmetic.equals(left, right);
         } catch (final ArithmeticException xrt) {
             final JexlNode xnode = findNullOperand(xrt, node, left, right);
             throw new JexlException(xnode, "!= error", xrt);
@@ -399,7 +397,7 @@ public class Interpreter extends InterpreterBase {
             final Object result = operators.tryOverload(node, JexlOperator.GTE, left, right);
             return result != JexlEngine.TRY_FAILED
                    ? result
-                   : arithmetic.greaterThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
+                   : arithmetic.greaterThanOrEqual(left, right);
         } catch (final ArithmeticException xrt) {
             throw new JexlException(node, ">= error", xrt);
         }
@@ -413,7 +411,7 @@ public class Interpreter extends InterpreterBase {
             final Object result = operators.tryOverload(node, JexlOperator.GT, left, right);
             return result != JexlEngine.TRY_FAILED
                    ? result
-                   : arithmetic.greaterThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
+                   : arithmetic.greaterThan(left, right);
         } catch (final ArithmeticException xrt) {
             throw new JexlException(node, "> error", xrt);
         }
@@ -427,7 +425,7 @@ public class Interpreter extends InterpreterBase {
             final Object result = operators.tryOverload(node, JexlOperator.LTE, left, right);
             return result != JexlEngine.TRY_FAILED
                    ? result
-                   : arithmetic.lessThanOrEqual(left, right) ? Boolean.TRUE : Boolean.FALSE;
+                   : arithmetic.lessThanOrEqual(left, right);
         } catch (final ArithmeticException xrt) {
             throw new JexlException(node, "<= error", xrt);
         }
@@ -441,7 +439,7 @@ public class Interpreter extends InterpreterBase {
             final Object result = operators.tryOverload(node, JexlOperator.LT, left, right);
             return result != JexlEngine.TRY_FAILED
                    ? result
-                   : arithmetic.lessThan(left, right) ? Boolean.TRUE : Boolean.FALSE;
+                   : arithmetic.lessThan(left, right);
         } catch (final ArithmeticException xrt) {
             throw new JexlException(node, "< error", xrt);
         }
@@ -451,42 +449,42 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTSWNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return operators.startsWith(node, "^=", left, right) ? Boolean.TRUE : Boolean.FALSE;
+        return operators.startsWith(node, "^=", left, right);
     }
 
     @Override
     protected Object visit(final ASTNSWNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return operators.startsWith(node, "^!", left, right) ? Boolean.FALSE : Boolean.TRUE;
+        return !operators.startsWith(node, "^!", left, right);
     }
 
     @Override
     protected Object visit(final ASTEWNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return operators.endsWith(node, "$=", left, right) ? Boolean.TRUE : Boolean.FALSE;
+        return operators.endsWith(node, "$=", left, right);
     }
 
     @Override
     protected Object visit(final ASTNEWNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return operators.endsWith(node, "$!", left, right) ? Boolean.FALSE : Boolean.TRUE;
+        return !operators.endsWith(node, "$!", left, right);
     }
 
     @Override
     protected Object visit(final ASTERNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return operators.contains(node, "=~", right, left) ? Boolean.TRUE : Boolean.FALSE;
+        return operators.contains(node, "=~", right, left);
     }
 
     @Override
     protected Object visit(final ASTNRNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        return operators.contains(node, "!~", right, left) ? Boolean.FALSE : Boolean.TRUE;
+        return !operators.contains(node, "!~", right, left);
     }
 
     @Override
