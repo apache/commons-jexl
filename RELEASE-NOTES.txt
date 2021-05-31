@@ -78,6 +78,8 @@ New Features in 3.2:
 
 Bugs Fixed in 3.2:
 ==================
+* JEXL-347 :     Missing unsolvable property exception for reference when used with equals
+* JEXL-346:      namespace function syntax leads to strange error for "common case" of ternary operator
 * JEXL-336:      Escape some control characters
 * JEXL-331:      Please document \uXXXX escape sequence
 * JEXL-330:      JexlException.Parsing.getMessage() throws exception when parse error is in long expression
