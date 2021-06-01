@@ -291,6 +291,11 @@ public abstract class JexlParser extends StringParser {
         return false;
     }
 
+    /**
+     * Checks whether an identifier is a local variable or argument.
+     * @param name the variable name
+     * @return true if a variable with that name was declared
+     */
     protected boolean isVariable(String name) {
         return frame != null && frame.getSymbol(name) != null;
     }
