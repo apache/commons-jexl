@@ -145,10 +145,21 @@ public class ContextNamespaceTest extends JexlTestCase {
         ns.put("ns", Ns348.class);
         String src = "empty(x) ? ns:func(y) : z";
         final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
-        final JexlScript script = jexl.createScript(src, "x", "y", "z");
+        // local vars
+        JexlScript script = jexl.createScript(src, "x", "y", "z");
         Object result = script.execute(ctxt, null, 1, 169);
         Assert.assertEquals(42, result);
         result = script.execute(ctxt, "42", 1, 169);
+        Assert.assertEquals(169, result);
+        // global vars
+        script = jexl.createScript(src);
+        ctxt.set("x", null);
+        ctxt.set("y", 1);
+        ctxt.set("z", 169);
+        result = script.execute(ctxt);
+        Assert.assertEquals(42, result);
+        ctxt.set("x", "42");
+        result = script.execute(ctxt);
         Assert.assertEquals(169, result);
     }
 
