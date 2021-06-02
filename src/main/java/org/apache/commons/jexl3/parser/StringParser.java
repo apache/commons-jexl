@@ -45,11 +45,32 @@ public class StringParser {
      * @return the built string
      */
     public static String buildString(final CharSequence str, final boolean eatsep) {
+        return buildString(str, eatsep, true);
+    }
+
+    /**
+     * Builds a template, does not escape characters.
+     * @param str the string to build from
+     * @param eatsep whether the separator, the first character, should be considered
+     * @return the built string
+     */
+    public static String buildTemplate(final CharSequence str, final boolean eatsep) {
+        return buildString(str, eatsep, false);
+    }
+
+    /**
+     * Builds a string, handles escaping through '\' syntax.
+     * @param str the string to build from
+     * @param eatsep whether the separator, the first character, should be considered
+     * @param esc whether escape characters are interpreted or escaped
+     * @return the built string
+     */
+    private static String buildString(final CharSequence str, final boolean eatsep, final boolean esc) {
         final StringBuilder strb = new StringBuilder(str.length());
         final char sep = eatsep ? str.charAt(0) : 0;
         final int end = str.length() - (eatsep ? 1 : 0);
         final int begin = (eatsep ? 1 : 0);
-        read(strb, str, begin, end, sep);
+        read(strb, str, begin, end, sep, esc);
         return strb.toString();
     }
 
@@ -72,7 +93,7 @@ public class StringParser {
      * @return the offset in origin
      */
     public static int readString(final StringBuilder strb, final CharSequence str, final int index, final char sep) {
-        return read(strb, str, index, str.length(), sep);
+        return read(strb, str, index, str.length(), sep, true);
     }
     /** The length of an escaped unicode sequence. */
     private static final int UCHAR_LEN = 4;
@@ -85,9 +106,10 @@ public class StringParser {
      * @param begin the relative offset in str to begin reading
      * @param end the relative offset in str to end reading
      * @param sep the separator, single or double quote, marking end of string
+     * @param esc whether escape characters are interpreted or escaped
      * @return the last character offset handled in origin
      */
-    private static int read(final StringBuilder strb, final CharSequence str, final int begin, final int end, final char sep) {
+    private static int read(final StringBuilder strb, final CharSequence str, final int begin, final int end, final char sep, final boolean esc) {
         boolean escape = false;
         int index = begin;
         for (; index < end; ++index) {
@@ -99,15 +121,30 @@ public class StringParser {
                     // if c is not an escapable character, re-emmit the backslash before it
                     final boolean notSeparator = sep == 0 ? c != '\'' && c != '"' : c != sep;
                     if (notSeparator && c != '\\') {
-                        switch (c) {
-                            // http://es5.github.io/x7.html#x7.8.4
-                            case 'b': strb.append('\b'); break; // backspace \u0008
-                            case 't': strb.append('\t'); break; // horizontal tab \u0009
-                            case 'n': strb.append('\n'); break; // line feed \u000A
-                            // We don't support vertical tab. If needed, the unicode (\u000B) should be used instead
-                            case 'f': strb.append('\f'); break; // form feed \u000C
-                            case 'r': strb.append('\r'); break; // carriage return \u000D
-                            default: strb.append('\\').append(c);
+                        if (!esc) {
+                            strb.append('\\').append(c);
+                        } else {
+                            switch (c) {
+                                // http://es5.github.io/x7.html#x7.8.4
+                                case 'b':
+                                    strb.append('\b');
+                                    break; // backspace \u0008
+                                case 't':
+                                    strb.append('\t');
+                                    break; // horizontal tab \u0009
+                                case 'n':
+                                    strb.append('\n');
+                                    break; // line feed \u000A
+                                // We don't support vertical tab. If needed, the unicode (\u000B) should be used instead
+                                case 'f':
+                                    strb.append('\f');
+                                    break; // form feed \u000C
+                                case 'r':
+                                    strb.append('\r');
+                                    break; // carriage return \u000D
+                                default:
+                                    strb.append('\\').append(c);
+                            }
                         }
                     } else {
                         strb.append(c);

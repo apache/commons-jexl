@@ -388,7 +388,7 @@ public final class TemplateEngine extends JxltEngine {
                 throw new NullPointerException("constant can not be null");
             }
             if (val instanceof String) {
-                val = StringParser.buildString((String) val, false);
+                val = StringParser.buildTemplate((String) val, false);
             }
             this.value = val;
         }

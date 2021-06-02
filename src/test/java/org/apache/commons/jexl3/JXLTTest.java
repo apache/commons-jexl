@@ -1161,4 +1161,23 @@ public class JXLTTest extends JexlTestCase {
         Assert.assertEquals("42\n", strw.toString());
     }
 
+    @Test
+    public void testConstantTemplate() {
+        String src = "<script>\n" +
+                "      function test(src){\n" +
+                "        var res = src.replace(/\\n\\t\\s/g, '\\n');\n" +
+                "      }\n" +
+                "      test();\n" +
+                "    </script>";
+        final JexlContext ctxt = new MapContext();
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        JxltEngine.Template tmplt;
+        tmplt = jxlt.createTemplate(src);
+        Assert.assertNotNull(tmplt);
+        final Writer strw = new StringWriter();
+        tmplt.evaluate(ctxt, strw);
+        String result = strw.toString();
+        Assert.assertEquals(src, result);
+    }
 }
