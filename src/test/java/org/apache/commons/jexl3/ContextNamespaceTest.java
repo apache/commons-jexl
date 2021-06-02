@@ -134,6 +134,24 @@ public class ContextNamespaceTest extends JexlTestCase {
         Assert.assertEquals(169, result);
     }
 
+    public static class Ns348 {
+        public static int func(int y) { return 42 * y;}
+    }
+
+    @Test
+    public void testNamespace348() throws Exception {
+        JexlContext ctxt = new MapContext();
+        Map<String, Object> ns = new HashMap<String, Object>();
+        ns.put("ns", Ns348.class);
+        String src = "empty(x) ? ns:func(y) : z";
+        final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
+        final JexlScript script = jexl.createScript(src, "x", "y", "z");
+        Object result = script.execute(ctxt, null, 1, 169);
+        Assert.assertEquals(42, result);
+        result = script.execute(ctxt, "42", 1, 169);
+        Assert.assertEquals(169, result);
+    }
+
     @Test
     public void testNamespacePragmaString() throws Exception {
         final JexlEngine jexl = new JexlBuilder().create();
