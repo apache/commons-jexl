@@ -29,14 +29,12 @@ import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.function.Predicate;
 
 
@@ -65,7 +63,7 @@ public abstract class JexlParser extends StringParser {
     /**
      * When parsing inner functions/lambda, need to stack the scope (sic).
      */
-    protected final Deque<Scope> frames = new ArrayDeque<Scope>();
+    protected final Deque<Scope> frames = new ArrayDeque<>();
     /**
      * The list of pragma declarations.
      */
@@ -81,7 +79,7 @@ public abstract class JexlParser extends StringParser {
     /**
      * Stack of parsing loop counts.
      */
-    protected final Deque<Integer> loopCounts = new ArrayDeque<Integer>();
+    protected final Deque<Integer> loopCounts = new ArrayDeque<>();
     /**
      * The current lexical block.
      */
@@ -89,7 +87,7 @@ public abstract class JexlParser extends StringParser {
     /**
      * Stack of lexical blocks.
      */
-    protected final Deque<LexicalUnit> blocks = new ArrayDeque<LexicalUnit>();
+    protected final Deque<LexicalUnit> blocks = new ArrayDeque<>();
 
     /**
      * A lexical unit is the container defining local symbols and their
@@ -134,6 +132,7 @@ public abstract class JexlParser extends StringParser {
         blocks.clear();
         block = null;
     }
+
     /**
      * Utility function to create '.' separated string from a list of string.
      * @param lstr the list of strings
@@ -441,15 +440,28 @@ public abstract class JexlParser extends StringParser {
 
     /**
      * Checks whether a name identifies a declared namespace.
-     * @param name the name
+     * @param token the namespace token
      * @return true if the name qualifies a namespace
      */
-    protected boolean isDeclaredNamespace(String name) {
-        final Set<String> ns = namespaces;
-        if (ns != null && ns.contains(name)) {
+    protected boolean isDeclaredNamespace(final Token token, final Token colon) {
+        // syntactic hint, the namespace sticks to the colon
+        if (colon != null && ":".equals(colon.image) && colon.beginColumn - 1 == token.endColumn) {
             return true;
         }
-        return getFeatures().namespaceTest().test(name);
+        // if name is shared with a variable name, use syntactic hint
+        String name = token.image;
+        if (!isVariable(name)) {
+            final Set<String> ns = namespaces;
+            // declared through local pragma ?
+            if (ns != null && ns.contains(name)) {
+                return true;
+            }
+            // declared through engine features ?
+            if (getFeatures().namespaceTest().test(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -28,7 +28,7 @@ options
    TRACK_TOKENS=true;
    CACHE_TOKENS=true;
    ERROR_REPORTING=false;
-   //DEBUG_PARSER=true;
+  // DEBUG_PARSER=true;
    //DEBUG_TOKEN_MANAGER=true;
 }
 
@@ -64,8 +64,8 @@ public final class Parser extends JexlParser
             script.jjtSetValue(info.detach());
             script.setFeatures(jexlFeatures);
             script.setPragmas(pragmas != null
-                             ? Collections.<String,Object>unmodifiableMap(pragmas)
-                             : Collections.<String,Object>emptyMap());
+                             ? Collections.unmodifiableMap(pragmas)
+                             : Collections.emptyMap());
             return script;
         } catch (TokenMgrError xtme) {
             throw new JexlException.Tokenization(info, xtme).clean();
@@ -302,7 +302,7 @@ ASTJexlScript JexlScript(Scope frame) : {
    {
         pushUnit(jjtThis);
    }
-        ( ( Statement() )*) <EOF>
+        (Statement())* <EOF>
    {
         popUnit(jjtThis);
         return jjtThis.script();
@@ -331,7 +331,7 @@ void Annotation() #Annotation :
     t=<ANNOTATION> (LOOKAHEAD(<LPAREN>) Arguments() )? { jjtThis.setName(t.image); }
 }
 
-void AnnotatedStatement() #AnnotatedStatement() : {}
+void AnnotatedStatement() #AnnotatedStatement : {}
  {
     (LOOKAHEAD(<ANNOTATION>) Annotation())+ (LOOKAHEAD(1) Block() | Statement())
  }
@@ -507,12 +507,11 @@ void ConditionalExpression() #void : {}
 {
   ConditionalOrExpression()
   (
-    <QMARK> (LOOKAHEAD(<IDENTIFIER> <COLON>,
-                       { isVariable(getToken(1).image) || !isDeclaredNamespace(getToken(1).image) })
-                Identifier(true)
-             |
-                Expression()
-             ) <COLON> Expression() #TernaryNode(3)
+    <QMARK> (LOOKAHEAD(<IDENTIFIER> <COLON> ,  { !isDeclaredNamespace(getToken(1), getToken(2)) })
+            Identifier(true)
+         |
+            Expression()
+         ) <COLON> Expression() #TernaryNode(3)
      |
     <ELVIS> Expression() #TernaryNode(2)
   |
@@ -752,7 +751,7 @@ void RegexLiteral() :
 }
 
 
-void ExtendedLiteral() #ExtendedLiteral() : {}
+void ExtendedLiteral() #ExtendedLiteral : {}
 {
    <ELIPSIS>
 }
@@ -814,7 +813,7 @@ void FunctionCall() #void : {}
       LOOKAHEAD(2) Identifier(true) Arguments() #FunctionNode(2)
 }
 
-void Constructor() #ConstructorNode() : {}
+void Constructor() #ConstructorNode : {}
 {
   <NEW> <LPAREN> Expression() ( <COMMA> Expression() )* <RPAREN>
 }
@@ -833,7 +832,7 @@ void Parameters() #void : {}
 }
 
 
-void LambdaLookahead() #void() : {}
+void LambdaLookahead() #void : {}
 {
   <FUNCTION> Parameters()
   |
@@ -842,7 +841,7 @@ void LambdaLookahead() #void() : {}
   Parameter() <LAMBDA>
 }
 
-void Lambda() #JexlLambda() :
+void Lambda() #JexlLambda :
 {
    pushFrame();
 }
@@ -908,7 +907,7 @@ void MemberAccess() #void : {}
 
 void ReferenceExpression() #MethodNode(>1) : {}
 {
-    ( <LPAREN> Expression() <RPAREN> #ReferenceExpression(1) ) ( LOOKAHEAD(<LPAREN>) Arguments() )*
+    <LPAREN> Expression() <RPAREN> #ReferenceExpression(1) ( LOOKAHEAD(<LPAREN>) Arguments() )*
 }
 
 void PrimaryExpression() #void : {}

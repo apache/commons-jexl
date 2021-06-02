@@ -154,17 +154,20 @@ public class ContextNamespaceTest extends JexlTestCase {
         Map<String, Object> ns = new HashMap<String, Object>();
         ns.put("ns", Ns348.class);
         final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
-        run348ab(jexl, ctxt);
-        run348cd(jexl, ctxt);
+        run348a(jexl, ctxt);
+        run348b(jexl, ctxt);
+        run348c(jexl, ctxt);
+        run348d(jexl, ctxt);
     }
 
-    @Ignore
     @Test
     public void testNamespace348b() throws Exception {
         JexlContext ctxt = new ContextNs348();
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
-        run348ab(jexl, ctxt);
-        run348cd(jexl, ctxt);
+        run348a(jexl, ctxt, "ns:"); // no space for ns name
+        run348b(jexl, ctxt, "ns:"); // no space for ns name
+        run348c(jexl, ctxt);
+        run348d(jexl, ctxt);
     }
 
     @Test
@@ -175,8 +178,10 @@ public class ContextNamespaceTest extends JexlTestCase {
         JexlFeatures f = new JexlFeatures();
         f.namespaceTest((n)->true);
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).features(f).safe(false).create();
-        run348ab(jexl, ctxt);
-        run348cd(jexl, ctxt);
+        run348a(jexl, ctxt);
+        run348b(jexl, ctxt);
+        run348c(jexl, ctxt);
+        run348d(jexl, ctxt);
     }
 
     @Test
@@ -185,44 +190,66 @@ public class ContextNamespaceTest extends JexlTestCase {
         JexlFeatures f = new JexlFeatures();
         f.namespaceTest((n)->true);
         final JexlEngine jexl = new JexlBuilder().features(f).safe(false).create();
-        run348ab(jexl, ctxt);
-        run348cd(jexl, ctxt);
+        run348a(jexl, ctxt);
+        run348b(jexl, ctxt);
+        run348c(jexl, ctxt);
+        run348d(jexl, ctxt);
     }
 
-    private void run348ab(JexlEngine jexl, JexlContext ctxt) {
-        String src = "empty(x) ? ns:func(y) : z";
+    private void run348a(JexlEngine jexl, JexlContext ctxt) {
+        run348a(jexl, ctxt, "ns : ");
+    }
+    private void run348a(JexlEngine jexl, JexlContext ctxt, String ns) {
+        String src = "empty(x) ? "+ns+"func(y) : z";
         // local vars
         JexlScript script = jexl.createScript(src, "x", "y", "z");
         Object result = script.execute(ctxt, null, 1, 169);
         Assert.assertEquals(42, result);
         result = script.execute(ctxt, "42", 1, 169);
         Assert.assertEquals(169, result);
+    }
+
+    private void run348b(JexlEngine jexl, JexlContext ctxt) {
+        run348b(jexl, ctxt, "ns : ");
+    }
+    private void run348b(JexlEngine jexl, JexlContext ctxt, String ns) {
+        String src = "empty(x) ? "+ns+"func(y) : z";
         // global vars
-        script = jexl.createScript(src);
+        JexlScript script = jexl.createScript(src);
         ctxt.set("x", null);
         ctxt.set("y", 1);
         ctxt.set("z", 169);
-        result = script.execute(ctxt);
+        Object result = script.execute(ctxt);
         Assert.assertEquals(42, result);
         ctxt.set("x", "42");
         result = script.execute(ctxt);
         Assert.assertEquals(169, result);
     }
 
-    private void run348cd(JexlEngine jexl, JexlContext ctxt) {
-        String src = "empty(x) ? z : ns:func(y)";
+    private void run348c(JexlEngine jexl, JexlContext ctxt) {
+        run348c(jexl, ctxt, "ns : ");
+    }
+    private void run348c(JexlEngine jexl, JexlContext ctxt, String ns) {
+        String src = "empty(x) ? z : "+ns+"func(y)";
         // local vars
         JexlScript script = jexl.createScript(src, "x", "z", "y");
         Object result = script.execute(ctxt, null, 169, 1);
         Assert.assertEquals(169, result);
         result = script.execute(ctxt, "42", 169, 1);
         Assert.assertEquals(42, result);
+    }
+
+    private void run348d(JexlEngine jexl, JexlContext ctxt) {
+        run348d(jexl, ctxt, "ns : ");
+    }
+    private void run348d(JexlEngine jexl, JexlContext ctxt, String ns) {
+        String src = "empty(x) ? z : "+ns+"func(y)";
         // global vars
-        script = jexl.createScript(src);
+        JexlScript script = jexl.createScript(src);
         ctxt.set("x", null);
         ctxt.set("z", 169);
         ctxt.set("y", 1);
-        result = script.execute(ctxt);
+        Object result = script.execute(ctxt);
         Assert.assertEquals(169, result);
         ctxt.set("x", "42");
         result = script.execute(ctxt);
