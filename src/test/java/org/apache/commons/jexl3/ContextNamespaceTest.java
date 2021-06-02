@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -138,13 +139,58 @@ public class ContextNamespaceTest extends JexlTestCase {
         public static int func(int y) { return 42 * y;}
     }
 
+    public static class ContextNs348 extends MapContext implements JexlContext.NamespaceResolver {
+        ContextNs348() { super(); }
+
+        @Override
+        public Object resolveNamespace(String name) {
+            return "ns".equals(name)? new Ns348() : null;
+        }
+    }
+
     @Test
-    public void testNamespace348() throws Exception {
+    public void testNamespace348a() throws Exception {
         JexlContext ctxt = new MapContext();
         Map<String, Object> ns = new HashMap<String, Object>();
         ns.put("ns", Ns348.class);
-        String src = "empty(x) ? ns:func(y) : z";
         final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
+        run348ab(jexl, ctxt);
+        run348cd(jexl, ctxt);
+    }
+
+    @Ignore
+    @Test
+    public void testNamespace348b() throws Exception {
+        JexlContext ctxt = new ContextNs348();
+        final JexlEngine jexl = new JexlBuilder().safe(false).create();
+        run348ab(jexl, ctxt);
+        run348cd(jexl, ctxt);
+    }
+
+    @Test
+    public void testNamespace348c() throws Exception {
+        JexlContext ctxt = new ContextNs348();
+        Map<String, Object> ns = new HashMap<String, Object>();
+        ns.put("ns", Ns348.class);
+        JexlFeatures f = new JexlFeatures();
+        f.namespaceTest((n)->true);
+        final JexlEngine jexl = new JexlBuilder().namespaces(ns).features(f).safe(false).create();
+        run348ab(jexl, ctxt);
+        run348cd(jexl, ctxt);
+    }
+
+    @Test
+    public void testNamespace348d() throws Exception {
+        JexlContext ctxt = new ContextNs348();
+        JexlFeatures f = new JexlFeatures();
+        f.namespaceTest((n)->true);
+        final JexlEngine jexl = new JexlBuilder().features(f).safe(false).create();
+        run348ab(jexl, ctxt);
+        run348cd(jexl, ctxt);
+    }
+
+    private void run348ab(JexlEngine jexl, JexlContext ctxt) {
+        String src = "empty(x) ? ns:func(y) : z";
         // local vars
         JexlScript script = jexl.createScript(src, "x", "y", "z");
         Object result = script.execute(ctxt, null, 1, 169);
@@ -161,6 +207,26 @@ public class ContextNamespaceTest extends JexlTestCase {
         ctxt.set("x", "42");
         result = script.execute(ctxt);
         Assert.assertEquals(169, result);
+    }
+
+    private void run348cd(JexlEngine jexl, JexlContext ctxt) {
+        String src = "empty(x) ? z : ns:func(y)";
+        // local vars
+        JexlScript script = jexl.createScript(src, "x", "z", "y");
+        Object result = script.execute(ctxt, null, 169, 1);
+        Assert.assertEquals(169, result);
+        result = script.execute(ctxt, "42", 169, 1);
+        Assert.assertEquals(42, result);
+        // global vars
+        script = jexl.createScript(src);
+        ctxt.set("x", null);
+        ctxt.set("z", 169);
+        ctxt.set("y", 1);
+        result = script.execute(ctxt);
+        Assert.assertEquals(169, result);
+        ctxt.set("x", "42");
+        result = script.execute(ctxt);
+        Assert.assertEquals(42, result);
     }
 
     @Test
