@@ -26,16 +26,34 @@
     </properties>
     <body>
         <release version="3.2">
+            <action dev="henrib" type="fix" issue="JEXL-348" due-to="Cameron Samak">
+                Parsing error when mixing namespaces with conditional expressions
+            </action>
+            <action dev="csamak" type="update" due-to="Cameron Samak">
+                Update to ph-javacc-maven-plugin 4.1.4.
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-347" due-to="Cameron Samak">
+                Missing unsolvable property exception for reference when used with equals
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-346" due-to="David Costanzo">
+                namespace function syntax leads to strange error for "common case" of ternary operator
+            </action>
             <action dev="ggregory" type="update" due-to="Gary Gregory">
                 Bump actions/setup-java from v1.4.3 to v2 #160.
             </action>
-            <action dev="henrib" type="fix" issue="JEXL-344"  due-to="David Costanzo">
+            <action dev="henrib" type="add" issue="JEXL-344"  due-to="David Costanzo">
                 Don't fill stack trace for JexlExpression#Return (to improve performance)
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-341"  due-to="Garret Wilson">
+                Errors needs to provide more information on caught exceptions.
+            </action>
+            <action dev="henrib" type="add" issue="JEXL-340"  due-to="Garret Wilson">
+                JexlException message access is incomplete and reversed
             </action>
             <action dev="Hussachai Puripunpinyo" type="fix" issue="JEXL-336">
                 Escape some control characters
             </action>
-            <action dev="henrib" type="fix" issue="JEXL-335">
+            <action dev="henrib" type="update" issue="JEXL-335">
                 Update JUnit to 4.13.1
             </action>
             <action dev="henrib" type="add" issue="JEXL-334">
