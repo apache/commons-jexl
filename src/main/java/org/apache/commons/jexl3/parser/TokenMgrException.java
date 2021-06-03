@@ -19,7 +19,7 @@ package org.apache.commons.jexl3.parser;
 /**
  * Token Manager Error.
  */
-public class TokenMgrError extends Error implements JavaccError {
+public class TokenMgrException extends RuntimeException implements JavaccError {
     /**
      * The version identifier for this Serializable class.
      * Increment only if the <i>serialized</i> form of the
@@ -94,19 +94,19 @@ public class TokenMgrError extends Error implements JavaccError {
 
 
     /** Constructor with message and reason. */
-    public TokenMgrError(final String message, final int reason) {
+    public TokenMgrException(final String message, final int reason) {
         super(message);
         errorCode = reason;
     }
 
     /** Full Constructor. */
-    public TokenMgrError(final boolean EOFSeen, final int lexState, final int errorLine, final int errorColumn, final String errorAfter, final char curChar, final int reason) {
+    public TokenMgrException(final boolean EOFSeen, final int lexState, final int errorLine, final int errorColumn, final String errorAfter, final int curChar, final int reason) {
         eof = EOFSeen;
         state = lexState;
         line = errorLine;
         column = errorColumn;
         after = errorAfter;
-        current = curChar;
+        current = (char) curChar;
         errorCode = reason;
     }
 

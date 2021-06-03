@@ -21,7 +21,7 @@ import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.parser.JavaccError;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.ParseException;
-import org.apache.commons.jexl3.parser.TokenMgrError;
+import org.apache.commons.jexl3.parser.TokenMgrException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
@@ -294,7 +294,7 @@ public class JexlException extends RuntimeException {
          * @param info  the location info
          * @param cause the javacc cause
          */
-        public Tokenization(final JexlInfo info, final TokenMgrError cause) {
+        public Tokenization(final JexlInfo info, final TokenMgrException cause) {
             super(merge(info, cause), Objects.requireNonNull(cause).getAfter(), null);
         }
 
