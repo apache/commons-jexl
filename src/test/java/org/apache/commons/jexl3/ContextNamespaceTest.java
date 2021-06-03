@@ -164,10 +164,11 @@ public class ContextNamespaceTest extends JexlTestCase {
     public void testNamespace348b() throws Exception {
         JexlContext ctxt = new ContextNs348();
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
-        run348a(jexl, ctxt, "ns:"); // no space for ns name
-        run348b(jexl, ctxt, "ns:"); // no space for ns name
-        run348c(jexl, ctxt);
-        run348d(jexl, ctxt);
+        // no space for ns name as syntactic hint
+        run348a(jexl, ctxt, "ns:");
+        run348b(jexl, ctxt, "ns:");
+        run348c(jexl, ctxt, "ns:");
+        run348d(jexl, ctxt, "ns:");
     }
 
     @Test

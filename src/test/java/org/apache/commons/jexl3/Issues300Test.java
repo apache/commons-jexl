@@ -497,7 +497,7 @@ public class Issues300Test {
             final JexlExpression expr = jexl.createExpression("new()");
             Assert.fail("should not parse");
         } catch (final JexlException.Parsing xparse) {
-            Assert.assertTrue(xparse.toString().contains("new"));
+            Assert.assertTrue(xparse.toString().contains(")"));
         }
     }
 
@@ -592,5 +592,12 @@ public class Issues300Test {
         ctxt.set("A.B", null);
         result = script.execute(ctxt);
         Assert.assertFalse((Boolean) result);
+    }
+
+    @Test public void test349() throws Exception {
+        String text = "(A ? C.D : E)";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlExpression expr = jexl.createExpression(text);
+        JexlScript script = jexl.createScript(text);
     }
 }
