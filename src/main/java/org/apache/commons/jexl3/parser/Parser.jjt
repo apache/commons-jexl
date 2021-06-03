@@ -19,7 +19,7 @@
 options
 {
    MULTI=true;
-   STATIC=false;
+   //STATIC=false;
    VISITOR=true;
    NODE_SCOPE_HOOK=true;
    NODE_CLASS="JexlNode";
@@ -507,11 +507,7 @@ void ConditionalExpression() #void : {}
 {
   ConditionalOrExpression()
   (
-    <QMARK> (LOOKAHEAD(<IDENTIFIER> <COLON> ,  { !isDeclaredNamespace(getToken(1), getToken(2)) })
-            Identifier(true)
-         |
-            Expression()
-         ) <COLON> Expression() #TernaryNode(3)
+    <QMARK> Expression() <COLON> Expression() #TernaryNode(3)
      |
     <ELVIS> Expression() #TernaryNode(2)
   |
@@ -651,15 +647,7 @@ void NamespaceIdentifier()  #NamespaceIdentifier :
     Token id;
 }
 {
-    ns=<IDENTIFIER> <COLON> id=<IDENTIFIER> { jjtThis.setNamespace(ns.image, id.image); }
-}
-
-void StringIdentifier() #Identifier :
-{
-    Token t;
-}
-{
-    t=<STRING_LITERAL>  { jjtThis.setSymbol(Parser.buildString(t.image, true));  }
+   ns=<IDENTIFIER> <COLON> id=<IDENTIFIER> { jjtThis.setNamespace(ns.image, id.image); }
 }
 
 void Literal() #void :
@@ -799,7 +787,7 @@ void Arguments() #Arguments : {}
 
 void FunctionCallLookahead() #void : {}
 {
-    LOOKAHEAD(2) <IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>
+    LOOKAHEAD(<IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>,  { isDeclaredNamespace(getToken(1), getToken(2)) }) <IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>
     |
     LOOKAHEAD(2) <IDENTIFIER> <LPAREN>
     |
@@ -808,9 +796,9 @@ void FunctionCallLookahead() #void : {}
 
 void FunctionCall() #void : {}
 {
-      LOOKAHEAD(2) NamespaceIdentifier() Arguments() #FunctionNode(2)
+    LOOKAHEAD(<IDENTIFIER> <COLON> <IDENTIFIER> <LPAREN>,  { isDeclaredNamespace(getToken(1), getToken(2)) })  NamespaceIdentifier() Arguments() #FunctionNode(2)
     |
-      LOOKAHEAD(2) Identifier(true) Arguments() #FunctionNode(2)
+    LOOKAHEAD(<IDENTIFIER> <LPAREN>) Identifier(true) Arguments() #FunctionNode(2)
 }
 
 void Constructor() #ConstructorNode : {}
