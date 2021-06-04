@@ -499,7 +499,7 @@ public class JexlArithmetic {
      * Whether we consider the narrow class as a potential candidate for narrowing the source.
      *
      * @param narrow the target narrow class
-     * @param source the orginal source class
+     * @param source the original source class
      * @return true if attempt to narrow source to target is accepted
      */
     protected boolean narrowAccept(final Class<?> narrow, final Class<?> source) {

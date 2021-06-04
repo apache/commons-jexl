@@ -109,7 +109,7 @@ public class Permissions {
     /**
      * Checks whether a method explicitly disallows JEXL introspection.
      * <p>Since methods can be overridden, this also checks that no superclass or interface
-     * explictly disallows this methods.</p>
+     * explicitly disallows this methods.</p>
      * @param method the method to check
      * @return true if JEXL is allowed to introspect, false otherwise
      */
@@ -214,7 +214,7 @@ public class Permissions {
                 // unexpected, return no
                 return true;
             } catch (final SecurityException ex) {
-                // unexpected, cant do much
+                // unexpected, can't do much
                 return false;
             }
         }

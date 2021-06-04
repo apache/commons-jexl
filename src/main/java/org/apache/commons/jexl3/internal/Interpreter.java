@@ -699,7 +699,7 @@ public class Interpreter extends InterpreterBase {
                     int cnt = 0;
                     while (itemsIterator.hasNext()) {
                         cancelCheck(node);
-                        // reset loop varaible
+                        // reset loop variable
                         if (lexical && cnt++ > 0) {
                             // clean up but remain current
                             block.pop();
@@ -1566,7 +1566,7 @@ public class Interpreter extends InterpreterBase {
                     functor = context.get(methodName);
                     isavar = functor != null;
                 }
-                // name is a variable, cant be cached
+                // name is a variable, can't be cached
                 cacheable &= !isavar;
             }
         } else if (functor instanceof ASTIdentifierAccess) {
