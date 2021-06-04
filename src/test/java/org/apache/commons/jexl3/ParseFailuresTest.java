@@ -50,7 +50,7 @@ public class ParseFailuresTest extends JexlTestCase {
                     + "\" should result in a JexlException");
         } catch (final JexlException pe) {
             // expected
-            LOGGER.info(pe);
+            LOGGER.debug(pe);
         }
     }
 
@@ -64,7 +64,7 @@ public class ParseFailuresTest extends JexlTestCase {
                     + "\" should result in a JexlException");
         } catch (final JexlException pe) {
             // expected
-            LOGGER.info(pe);
+            LOGGER.debug(pe);
         }
     }
 
@@ -78,7 +78,7 @@ public class ParseFailuresTest extends JexlTestCase {
                     + "\" should result in a JexlException");
         } catch (final JexlException pe) {
             // expected
-            LOGGER.info(pe);
+            LOGGER.debug(pe);
         }
     }
 
@@ -92,7 +92,7 @@ public class ParseFailuresTest extends JexlTestCase {
                     + "\" should result in a JexlException");
         } catch (final JexlException pe) {
             // expected
-            LOGGER.info(pe);
+            LOGGER.debug(pe);
         }
     }
 
@@ -106,7 +106,7 @@ public class ParseFailuresTest extends JexlTestCase {
                     + "\" should result in a JexlException");
         } catch (final JexlException pe) {
             // expected
-            LOGGER.error(pe);
+            LOGGER.debug(pe);
         }
     }
 

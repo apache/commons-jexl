@@ -17,16 +17,23 @@
 package org.apache.commons.jexl3.introspection;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.JexlTestCase;
 import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.annotations.NoJexl;
 
+import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -139,7 +146,7 @@ public class SandboxTest extends JexlTestCase {
             Assert.fail("ctor should not be accessible");
         } catch (final JexlException.Method xmethod) {
             // ok, ctor should not have been accessible
-            LOGGER.info(xmethod.toString());
+            LOGGER.debug(xmethod.toString());
         }
     }
 
@@ -162,7 +169,7 @@ public class SandboxTest extends JexlTestCase {
             Assert.fail("Quux should not be accessible");
         } catch (final JexlException.Method xmethod) {
             // ok, Quux should not have been accessible
-            LOGGER.info(xmethod.toString());
+            LOGGER.debug(xmethod.toString());
         }
     }
 
@@ -185,7 +192,7 @@ public class SandboxTest extends JexlTestCase {
             Assert.fail("alias should not be accessible");
         } catch (final JexlException.Property xvar) {
             // ok, alias should not have been accessible
-            LOGGER.info(xvar.toString());
+            LOGGER.debug(xvar.toString());
         }
     }
 
@@ -208,7 +215,7 @@ public class SandboxTest extends JexlTestCase {
             Assert.fail("alias should not be accessible");
         } catch (final JexlException.Property xvar) {
             // ok, alias should not have been accessible
-            LOGGER.info(xvar.toString());
+            LOGGER.debug(xvar.toString());
         }
     }
 
@@ -289,7 +296,7 @@ public class SandboxTest extends JexlTestCase {
                 Assert.fail("should have not been possible");
             } catch (JexlException.Method | JexlException.Property xjm) {
                 // ok
-                LOGGER.info(xjm.toString());
+                LOGGER.debug(xjm.toString());
             }
         }
     }
@@ -353,7 +360,7 @@ public class SandboxTest extends JexlTestCase {
             result = script.execute(context);
             Assert.fail("should not allow calling exit!");
         } catch (final JexlException xjexl) {
-            LOGGER.info(xjexl.toString());
+            LOGGER.debug(xjexl.toString());
         }
 
         script = sjexl.createScript("System.exit(1)");
@@ -361,7 +368,7 @@ public class SandboxTest extends JexlTestCase {
             result = script.execute(context);
             Assert.fail("should not allow calling exit!");
         } catch (final JexlException xjexl) {
-            LOGGER.info(xjexl.toString());
+            LOGGER.debug(xjexl.toString());
         }
 
         script = sjexl.createScript("new('java.io.File', '/tmp/should-not-be-created')");
@@ -369,7 +376,7 @@ public class SandboxTest extends JexlTestCase {
             result = script.execute(context);
             Assert.fail("should not allow creating a file");
         } catch (final JexlException xjexl) {
-            LOGGER.info(xjexl.toString());
+            LOGGER.debug(xjexl.toString());
         }
 
         expr = "System.currentTimeMillis()";
@@ -450,7 +457,7 @@ public class SandboxTest extends JexlTestCase {
             Assert.fail("should not be possible");
         } catch (final JexlException xjm) {
             // ok
-            LOGGER.info(xjm.toString());
+            LOGGER.debug(xjm.toString());
         }
     }
 
@@ -486,6 +493,138 @@ public class SandboxTest extends JexlTestCase {
             Assert.fail("should have thrown");
         } catch (final JexlException xany) {
             Assert.assertNotNull(xany);
+        }
+    }
+
+    @Test
+    public void testGetNullKeyAllowed0() throws Exception {
+        JexlEngine jexl = new JexlBuilder().sandbox(new JexlSandbox(true)).create();
+        JexlExpression expression = jexl.createExpression("{null : 'foo'}[null]");
+        Object o = expression.evaluate(null);
+        Assert.assertEquals("foo", o);
+    }
+
+    @Test
+    public void testGetNullKeyAllowed1() throws Exception {
+        JexlSandbox sandbox = new JexlSandbox(true, true);
+        JexlSandbox.Permissions p = sandbox.permissions("java.util.Map", false, true, true);
+        p.read().add("quux");
+        JexlEngine jexl = new JexlBuilder().sandbox(sandbox).create();
+        // cant read quux
+        String q = "'quux'"; //quotes are important!
+        JexlExpression expression = jexl.createExpression("{"+q+" : 'foo'}["+q+"]");
+        try {
+            Object o = expression.evaluate(null);
+            Assert.fail("should have blocked " + q);
+        } catch (JexlException.Property xp) {
+            Assert.assertTrue(xp.getMessage().contains("undefined"));
+        }
+        // can read foo, null
+        for(String k : Arrays.asList("'foo'", "null")) {
+            expression = jexl.createExpression("{"+k+" : 'foo'}["+k+"]");
+            Object o = expression.evaluate(null);
+            Assert.assertEquals("foo", o);
+        }
+    }
+
+    @Test
+    public void testGetNullKeyBlocked() throws Exception {
+        JexlSandbox sandbox = new JexlSandbox(true, true);
+        JexlSandbox.Permissions p = sandbox.permissions("java.util.Map", false, true, true);
+        p.read().add(null);
+        p.read().add("quux");
+        // can read bar
+        JexlEngine jexl = new JexlBuilder().sandbox(sandbox).create();
+        JexlExpression e0 = jexl.createExpression("{'bar' : 'foo'}['bar']");
+        Object r0 = e0.evaluate(null);
+        Assert.assertEquals("foo", r0);
+        // can not read quux, null
+        for(String k : Arrays.asList("'quux'", "null")) {
+            JexlExpression expression = jexl.createExpression("{"+k+" : 'foo'}["+k+"]");
+            try {
+                Object o = expression.evaluate(null);
+                Assert.fail("should have blocked " + k);
+            } catch (JexlException.Property xp) {
+                Assert.assertTrue(xp.getMessage().contains("undefined"));
+            }
+        }
+    }
+
+    public static class Arithmetic350 extends JexlArithmetic {
+        // cheat and keep the map builder around
+        MapBuilder mb = new org.apache.commons.jexl3.internal.MapBuilder(3);
+        public Arithmetic350(boolean astrict) {
+            super(astrict);
+        }
+        public MapBuilder mapBuilder(final int size) {
+            return mb;
+        }
+        Map<?,?> getLastMap() {
+            return (Map<Object,Object>) mb.create();
+        }
+    }
+
+    @Test
+    public void testSetNullKeyAllowed0() throws Exception {
+        Arithmetic350 a350 = new Arithmetic350(true);
+        JexlEngine jexl = new JexlBuilder().arithmetic(a350).sandbox(new JexlSandbox(true)).create();
+        JexlContext jc = new MapContext();
+        JexlExpression expression = jexl.createExpression("{null : 'foo'}[null] = 'bar'");
+        expression.evaluate(jc);
+        Map<?,?> map = a350.getLastMap();
+        Assert.assertEquals("bar", map.get(null));
+    }
+
+    @Test
+    public void testSetNullKeyAllowed1() throws Exception {
+        Arithmetic350 a350 = new Arithmetic350(true);
+        JexlSandbox sandbox = new JexlSandbox(true, true);
+        JexlSandbox.Permissions p = sandbox.permissions("java.util.Map", true, false, true);
+        p.write().add("quux");
+        JexlEngine jexl = new JexlBuilder().arithmetic(a350).sandbox(sandbox).create();
+        // can not write quux
+        String q = "'quux'"; //quotes are important!
+        JexlExpression expression = jexl.createExpression("{"+q+" : 'foo'}["+q+"] = '42'");
+        try {
+            Object o = expression.evaluate(null);
+            Assert.fail("should have blocked " + q);
+        } catch (JexlException.Property xp) {
+            Assert.assertTrue(xp.getMessage().contains("undefined"));
+        }
+        // can write bar, null
+        expression = jexl.createExpression("{'bar' : 'foo'}['bar'] = '42'");
+        expression.evaluate(null);
+        Map<?, ?> map = a350.getLastMap();
+        Assert.assertEquals("42", map.get("bar"));
+        map.clear();
+        expression = jexl.createExpression("{null : 'foo'}[null] = '42'");
+        expression.evaluate(null);
+        map = a350.getLastMap();
+        Assert.assertEquals("42", map.get(null));
+    }
+
+    @Test
+    public void testSetNullKeyBlocked() throws Exception {
+        Arithmetic350 a350 = new Arithmetic350(true);
+        JexlSandbox sandbox = new JexlSandbox(true, true);
+        JexlSandbox.Permissions p = sandbox.permissions("java.util.Map", true, false, true);
+        p.write().add(null);
+        p.write().add("quux");
+        JexlEngine jexl = new JexlBuilder().arithmetic(a350).sandbox(sandbox).create();
+        // can write bar
+        JexlExpression expression = jexl.createExpression("{'bar' : 'foo'}['bar'] = '42'");
+        expression.evaluate(null);
+        Map<?,?> map = a350.getLastMap();
+        Assert.assertEquals("42", map.get("bar"));
+        // can not write quux, null
+        for(String k : Arrays.asList("'quux'", "null")) {
+            expression = jexl.createExpression("{"+k+" : 'foo'}["+k+"] = '42'");
+            try {
+                Object o = expression.evaluate(null);
+                Assert.fail("should have blocked " + k);
+            } catch (JexlException.Property xp) {
+                Assert.assertTrue(xp.getMessage().contains("undefined"));
+            }
         }
     }
 }

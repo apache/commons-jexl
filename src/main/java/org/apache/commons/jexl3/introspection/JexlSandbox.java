@@ -67,6 +67,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class JexlSandbox {
     /**
+     * The marker string for explicitly disallowed null properties.
+     */
+    public static final String NULL = "?";
+    /**
      * The map from class names to permissions.
      */
     private final Map<String, Permissions> sandbox;
@@ -173,7 +177,7 @@ public final class JexlSandbox {
      *
      * @param clazz the class
      * @param name the property name
-     * @return null if not allowed, the name of the property to use otherwise
+     * @return null (or NULL if name is null) if not allowed, the name of the property to use otherwise
      */
     public String read(final Class<?> clazz, final String name) {
         return get(clazz).read().get(name);
@@ -196,7 +200,7 @@ public final class JexlSandbox {
      *
      * @param clazz the class
      * @param name the property name
-     * @return null if not allowed, the name of the property to use otherwise
+     * @return null (or NULL if name is null) if not allowed, the name of the property to use otherwise
      */
     public String write(final Class<?> clazz, final String name) {
         return get(clazz).write().get(name);
@@ -268,7 +272,7 @@ public final class JexlSandbox {
          * Whether a given name is allowed or not.
          *
          * @param name the method/property name to check
-         * @return null if not allowed, the actual name to use otherwise
+         * @return null (or NULL if name is null) if not allowed, the actual name to use otherwise
          */
         public String get(final String name) {
             return name;
@@ -313,7 +317,7 @@ public final class JexlSandbox {
 
         @Override
         public String get(final String name) {
-            return null;
+            return name == null? NULL : null;
         }
     };
 
@@ -349,7 +353,15 @@ public final class JexlSandbox {
 
         @Override
         public String get(final String name) {
-            return names == null ? name : names.get(name);
+            if (names == null) {
+                return name;
+            }
+            String actual = names.get(name);
+            // if null is not explicitly allowed, explicit null aka NULL
+            if (name == null && actual == null && !names.containsKey(null)) {
+                return JexlSandbox.NULL;
+            }
+            return actual;
         }
     }
 
@@ -377,7 +389,8 @@ public final class JexlSandbox {
 
         @Override
         public String get(final String name) {
-            return names != null && !names.contains(name) ? name : null;
+            // if name is null and contained in set, explicit null aka NULL
+            return names != null && !names.contains(name) ? name : name != null? null : NULL;
         }
     }
 

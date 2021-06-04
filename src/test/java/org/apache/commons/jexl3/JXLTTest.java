@@ -366,7 +366,7 @@ public class JXLTTest extends JexlTestCase {
         } catch (final JxltEngine.Exception xjexl) {
             // expected
             final String xmsg = xjexl.getMessage();
-            LOGGER.warn(xmsg);
+            LOGGER.debug(xmsg);
         }
     }
 
@@ -380,7 +380,7 @@ public class JXLTTest extends JexlTestCase {
         } catch (final JxltEngine.Exception xjexl) {
             // expected
             final String xmsg = xjexl.getMessage();
-            LOGGER.warn(xmsg);
+            LOGGER.debug(xmsg);
         }
     }
 
@@ -395,7 +395,7 @@ public class JXLTTest extends JexlTestCase {
         } catch (final JxltEngine.Exception xjexl) {
             // expected
             final String xmsg = xjexl.getMessage();
-            LOGGER.warn(xmsg);
+            LOGGER.debug(xmsg);
         }
     }
 
@@ -409,7 +409,7 @@ public class JXLTTest extends JexlTestCase {
         } catch (final JxltEngine.Exception xjexl) {
             // expected
             final String xmsg = xjexl.getMessage();
-            LOGGER.warn(xmsg);
+            LOGGER.debug(xmsg);
         }
     }
 

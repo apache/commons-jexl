@@ -41,7 +41,7 @@ public class MapBuilder implements JexlArithmetic.MapBuilder {
     }
 
     @Override
-    public Object create() {
+    public Map<Object,Object> create() {
         return map;
     }
 }
