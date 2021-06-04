@@ -45,7 +45,6 @@ import org.apache.commons.jexl3.parser.Parser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -149,7 +148,7 @@ public class Engine extends JexlEngine {
      * The {@link Parser}; when parsing expressions, this engine uses the parser if it
      * is not already in use otherwise it will create a new temporary one.
      */
-    protected final Parser parser = new Parser(new StringReader(";")); //$NON-NLS-1$
+    protected final Parser parser = new Parser(";"); //$NON-NLS-1$
     /**
      * The expression max length to hit the cache.
      */
@@ -873,7 +872,7 @@ public class Engine extends JexlEngine {
             }
         } else {
             // ...otherwise parser was in use, create a new temporary one
-            final Parser lparser = new Parser(new StringReader(";"));
+            final Parser lparser = new Parser(";");
             script = lparser.parse(ninfo, features, src, scope);
         }
         if (source != null) {

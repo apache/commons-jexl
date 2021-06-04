@@ -20,6 +20,7 @@ options
 {
    MULTI=true;
    //STATIC=false;
+   JAVA_TEMPLATE_TYPE="modern";
    VISITOR=true;
    NODE_SCOPE_HOOK=true;
    NODE_CLASS="JexlNode";
@@ -59,7 +60,7 @@ public final class Parser extends JexlParser
             source = jexlSrc;
             pragmas = null;
             frame = scope;
-            ReInit(new java.io.StringReader(jexlSrc));
+            ReInit(jexlSrc);
             ASTJexlScript script = jexlFeatures.supportsScript()? JexlScript(scope) : JexlExpression(scope);
             script.jjtSetValue(info.detach());
             script.setFeatures(jexlFeatures);
