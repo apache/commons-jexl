@@ -78,7 +78,7 @@
         <!-- This is used by reporting plugins -->
         <project.reporting.outputEncoding>${commons.encoding}</project.reporting.outputEncoding>
 
-        <commons.bc.version>1.5</commons.bc.version>
+        <commons.bc.version>3.1</commons.bc.version>
         <commons.release.isDistModule>true</commons.release.isDistModule>
         <commons.distSvnStagingUrl>scm:svn:https://dist.apache.org/repos/dist/dev/commons/${commons.componentid}</commons.distSvnStagingUrl>
         <commons.releaseManagerName>Henri Biestro</commons.releaseManagerName>

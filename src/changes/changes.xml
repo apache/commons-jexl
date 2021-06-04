@@ -26,6 +26,12 @@
     </properties>
     <body>
         <release version="3.2">
+            <action dev="henrib" type="fix" issue="JEXL-350" due-to="David Costanzo">
+                map[null] throws "unsolvable property" when a Sandbox is used
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-349" due-to="Cameron Samak">
+                Script valid in 3.0 no longer valid
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-348" due-to="Cameron Samak">
                 Parsing error when mixing namespaces with conditional expressions
             </action>
