@@ -267,7 +267,7 @@ public abstract class JexlParser extends StringParser {
 
     /**
      * Checks if a symbol is defined in lexical scopes.
-     * <p>This works with with parsed scripts in template resolution only.
+     * <p>This works with parsed scripts in template resolution only.
      * @param info an info linked to a node
      * @param symbol the symbol number
      * @return true if symbol accessible in lexical scope
@@ -485,12 +485,12 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
-     * Default implementation does nothing but is overriden by generated code.
+     * Default implementation does nothing but is overridden by generated code.
      * @param top whether the identifier is beginning an l/r value
      * @throws ParseException subclasses may throw this
      */
     protected void Identifier(final boolean top) throws ParseException {
-        // Overriden by generated code
+        // Overridden by generated code
     }
 
     /**

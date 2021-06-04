@@ -585,7 +585,7 @@ public final class TemplateEngine extends JxltEngine {
          * Creates a composite expression.
          * @param counters counters of expressions per type
          * @param list     the sub-expressions
-         * @param src      the source for this expresion if any
+         * @param src      the source for this expression if any
          */
         CompositeExpression(final int[] counters, final ArrayList<TemplateExpression> list, final TemplateExpression src) {
             super(src);
@@ -798,7 +798,7 @@ public final class TemplateEngine extends JxltEngine {
         for (int column = 0; column < size; ++column) {
             final char c = expr.charAt(column);
             switch (state) {
-                default: // in case we ever add new unified expresssion type
+                default: // in case we ever add new unified expression type
                     throw new UnsupportedOperationException("unexpected unified expression type");
                 case CONST:
                     if (c == immediateChar) {

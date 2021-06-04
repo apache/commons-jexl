@@ -314,7 +314,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         depth -= 1;
         final Object value = accept(child, data);
         depth += 1;
-        // blocks, if, for & while dont need a ';' at end
+        // blocks, if, for & while don't need a ';' at end
         if (!(child instanceof ASTJexlScript
             || child instanceof ASTBlock
             || child instanceof ASTIfStatement
@@ -333,7 +333,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     /**
-     * Checks if a terminal node is the the cause to debug &amp; adds its representation to the rebuilt expression.
+     * Checks if a terminal node is the cause to debug &amp; adds its representation to the rebuilt expression.
      * @param node  the child node
      * @param image the child node token image (may be null)
      * @param data  visitor pattern argument

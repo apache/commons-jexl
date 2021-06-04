@@ -455,7 +455,7 @@ public class JexlBuilder {
      * If all methods are static, you may use the bean class instead of an instance as value.
      * </p>
      * <p>
-     * If the entry value is a class that has one contructor taking a JexlContext as argument, an instance
+     * If the entry value is a class that has one constructor taking a JexlContext as argument, an instance
      * of the namespace will be created at evaluation time. It might be a good idea to derive a JexlContext
      * to carry the information used by the namespace to avoid variable space pollution and strongly type
      * the constructor with this specialized JexlContext.

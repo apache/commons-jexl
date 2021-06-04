@@ -225,7 +225,7 @@ public abstract class JxltEngine {
      *
      * @param info the {@link JexlInfo} source information
      * @param expression the {@link Template} string expression
-     * @return the {@link Expression}, null if silent and an error occured
+     * @return the {@link Expression}, null if silent and an error occurred
      * @throws Exception if an error occurs and the {@link JexlEngine} is not silent
      */
     public abstract Expression createExpression(JexlInfo info, String expression);
@@ -244,9 +244,9 @@ public abstract class JxltEngine {
      * $$   if (x == 42) {
      * Life, the universe, and everything
      * $$   } else if (x &gt; 42) {
-     * The value $(x} is over fourty-two
+     * The value $(x} is over forty-two
      * $$   } else {
-     * The value ${x} is under fourty-two
+     * The value ${x} is under forty-two
      * $$   }
      * $$ }
      * </pre></blockquote>
@@ -254,11 +254,11 @@ public abstract class JxltEngine {
      * <p>Will evaluate as:</p>
      *
      * <blockquote><pre>
-     * The value 1 is under fourty-two
-     * The value 3 is under fourty-two
-     * The value 5 is under fourty-two
+     * The value 1 is under forty-two
+     * The value 3 is under forty-two
+     * The value 5 is under forty-two
      * Life, the universe, and everything
-     * The value 169 is over fourty-two
+     * The value 169 is over forty-two
      * </pre></blockquote>
      *
      * <p>During evaluation, the template context exposes its writer as '$jexl' which is safe to use in this case.

@@ -501,7 +501,7 @@ public class Engine extends JexlEngine {
         if (context == null) {
             context = EMPTY_CONTEXT;
         }
-        // synthetize expr using register
+        // synthesize expr using register
         String src = trimSource(expr);
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src;
         try {
@@ -530,7 +530,7 @@ public class Engine extends JexlEngine {
         if (context == null) {
             context = EMPTY_CONTEXT;
         }
-        // synthetize expr using register
+        // synthesize expr using register
         String src = trimSource(expr);
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src + "=" + "#1";
         try {

@@ -77,7 +77,7 @@ public class Script implements JexlScript, JexlExpression {
      * <p>
      * If the engine class loader has changed since we last evaluated this script, the script local cache
      * is invalidated to drop references to obsolete methods. It is not strictly necessary since the tryExecute
-     * will fail because the class wont match but it seems cleaner nevertheless.
+     * will fail because the class won't match but it seems cleaner nevertheless.
      * </p>
      */
     protected void checkCacheVersion() {

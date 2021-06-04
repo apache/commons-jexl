@@ -32,7 +32,7 @@ public final class BooleanGetExecutor extends AbstractExecutor.Get {
      *
      * @param is the introspector
      * @param clazz the class to find the get method from
-     * @param property the the property name
+     * @param property the property name
      * @return the executor if found, null otherwise
      */
     public static BooleanGetExecutor discover(final Introspector is, final Class<?> clazz, final String property) {

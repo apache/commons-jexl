@@ -147,7 +147,7 @@ public final class JexlSandbox {
      * @return a copy of this sandbox
      */
     public JexlSandbox copy() {
-        // modified concurently at runtime so...
+        // modified concurrently at runtime so...
         final Map<String, Permissions> map = new ConcurrentHashMap<>();
         for (final Map.Entry<String, Permissions> entry : sandbox.entrySet()) {
             map.put(entry.getKey(), entry.getValue().copy());

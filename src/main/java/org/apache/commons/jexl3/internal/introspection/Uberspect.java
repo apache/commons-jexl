@@ -165,7 +165,7 @@ public class Uberspect implements JexlUberspect {
      * @param c   Class in which the field search is taking place
      * @param key Name of the field being searched for
      * @return a {@link java.lang.reflect.Field} or null if it does not exist or is not accessible
-     * */
+     */
     public final Field getField(final Class<?> c, final String key) {
         return base().getField(c, key);
     }
@@ -459,7 +459,7 @@ public class Uberspect implements JexlUberspect {
                                 }
                                 // filter method that is an actual overload:
                                 // - not inherited (not declared by base class)
-                                // - nor overriden (not present in base class)
+                                // - nor overridden (not present in base class)
                                 if (!JexlArithmetic.class.equals(method.getDeclaringClass())) {
                                     try {
                                         JexlArithmetic.class.getMethod(method.getName(), method.getParameterTypes());

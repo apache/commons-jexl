@@ -54,7 +54,7 @@ final class ClassMap {
         try {
             return ClassMap.class.getMethod("cacheMiss");
         } catch (final Exception xio) {
-            // this really cant make an error...
+            // this really can't make an error...
             return null;
         }
     }

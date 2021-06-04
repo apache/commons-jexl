@@ -35,7 +35,7 @@ public interface JavaccError {
 
     /**
      * Gets the last correct input.
-     * @return the string after which the error occured
+     * @return the string after which the error occurred
      */
     String getAfter();
 }

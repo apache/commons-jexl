@@ -270,7 +270,7 @@ public abstract class JexlNode extends SimpleNode {
     /**
      * Check if a null evaluated expression is protected by a ternary expression.
      * <p>
-     * The rationale is that the ternary / elvis expressions are meant for the user to explictly take control
+     * The rationale is that the ternary / elvis expressions are meant for the user to explicitly take control
      * over the error generation; ie, ternaries can return null even if the engine in strict mode
      * would normally throw an exception.
      * </p>
