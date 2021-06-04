@@ -19,7 +19,7 @@
 options
 {
    MULTI=true;
-   //STATIC=false;
+   STATIC=false;
    JAVA_TEMPLATE_TYPE="modern";
    VISITOR=true;
    NODE_SCOPE_HOOK=true;
@@ -454,16 +454,22 @@ Object pragmaValue() #void :
 {
 Token v;
 LinkedList<String> lstr = new LinkedList<String>();
+Object result;
 }
 {
-      LOOKAHEAD(1) v=<INTEGER_LITERAL> { return NumberParser.parseInteger(v.image); }
-    | LOOKAHEAD(1) v=<FLOAT_LITERAL> { return NumberParser.parseDouble(v.image); }
-    | LOOKAHEAD(1) v=<STRING_LITERAL> { return Parser.buildString(v.image, true); }
-    | LOOKAHEAD(1)  pragmaKey(lstr) { return stringify(lstr); }
-    | LOOKAHEAD(1) <TRUE> { return true; }
-    | LOOKAHEAD(1) <FALSE> { return false; }
-    | LOOKAHEAD(1) <NULL> { return null; }
-    | LOOKAHEAD(1) <NAN_LITERAL> { return Double.NaN; }
+  (
+      LOOKAHEAD(1) v=<INTEGER_LITERAL> { result = NumberParser.parseInteger(v.image); }
+    | LOOKAHEAD(1) v=<FLOAT_LITERAL> { result = NumberParser.parseDouble(v.image); }
+    | LOOKAHEAD(1) v=<STRING_LITERAL> { result = Parser.buildString(v.image, true); }
+    | LOOKAHEAD(1)  pragmaKey(lstr) { result = stringify(lstr); }
+    | LOOKAHEAD(1) <TRUE> { result = true; }
+    | LOOKAHEAD(1) <FALSE> { result = false; }
+    | LOOKAHEAD(1) <NULL> { result = null; }
+    | LOOKAHEAD(1) <NAN_LITERAL> { result = Double.NaN; }
+  )
+  {
+    return result;
+  }
 }
 
 
