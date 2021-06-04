@@ -40,6 +40,7 @@ import org.apache.commons.jexl3.parser.ASTNumberLiteral;
 import org.apache.commons.jexl3.parser.ASTStringLiteral;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.Parser;
+import org.apache.commons.jexl3.parser.StringProvider;
 
 
 import org.apache.commons.logging.Log;
@@ -148,7 +149,7 @@ public class Engine extends JexlEngine {
      * The {@link Parser}; when parsing expressions, this engine uses the parser if it
      * is not already in use otherwise it will create a new temporary one.
      */
-    protected final Parser parser = new Parser(";"); //$NON-NLS-1$
+    protected final Parser parser = new Parser(new StringProvider(";")); //$NON-NLS-1$
     /**
      * The expression max length to hit the cache.
      */
@@ -872,7 +873,7 @@ public class Engine extends JexlEngine {
             }
         } else {
             // ...otherwise parser was in use, create a new temporary one
-            final Parser lparser = new Parser(";");
+            final Parser lparser = new Parser(new StringProvider(";"));
             script = lparser.parse(ninfo, features, src, scope);
         }
         if (source != null) {
