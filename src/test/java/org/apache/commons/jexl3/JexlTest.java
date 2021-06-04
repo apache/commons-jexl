@@ -16,7 +16,6 @@
  */
 package org.apache.commons.jexl3;
 
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -692,7 +691,7 @@ public class JexlTest extends JexlTestCase {
         jc.set("aString", "Hello");
         final Foo foo = new Foo();
         jc.set("foo", foo);
-        final Parser parser = new Parser(new StringReader(";"));
+        final Parser parser = new Parser(";");
         parser.parse(null, new JexlFeatures().register(false), "aString = 'World';", null);
 
         assertExpression(jc, "hello = 'world'", "world");

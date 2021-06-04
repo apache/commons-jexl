@@ -16,8 +16,6 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import java.io.StringReader;
-
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.junit.Assert;
@@ -36,7 +34,7 @@ public class ParserTest {
      */
     @Test
     public void testParse() throws Exception {
-        final Parser parser = new Parser(new StringReader(";"));
+        final Parser parser = new Parser(";");
         JexlNode sn;
         sn = parser.parse(null, FEATURES, "foo = 1;", null);
         Assert.assertNotNull("parsed node is null", sn);
@@ -52,7 +50,7 @@ public class ParserTest {
     public void testErrorAssign() throws Exception {
         final String[] ops = { "=", "+=", "-=", "/=", "*=", "^=", "&=", "|=" };
         for(final String op : ops) {
-            final Parser parser = new Parser(new StringReader(";"));
+            final Parser parser = new Parser(";");
             try {
                 final JexlNode sn = parser.parse(null, FEATURES, "foo() "+op+" 1;", null);
                 Assert.fail("should have failed on invalid assignment " + op);
@@ -66,7 +64,7 @@ public class ParserTest {
 
     @Test
     public void testErrorAmbiguous() throws Exception {
-        final Parser parser = new Parser(new StringReader(";"));
+        final Parser parser = new Parser(";");
         try {
             final JexlNode sn = parser.parse(null, FEATURES, "x = 1 y = 5", null);
             Assert.fail("should have failed on ambiguous statement");
