@@ -18,6 +18,11 @@ package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Debugger;
 import org.apache.commons.jexl3.internal.TemplateDebugger;
+import org.apache.commons.jexl3.internal.TemplateInterpreter;
+import org.apache.commons.jexl3.internal.TemplateScript;
+import org.apache.commons.jexl3.internal.introspection.Permissions;
+import org.apache.commons.jexl3.internal.introspection.Uberspect;
+import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,10 +30,12 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -1179,5 +1186,51 @@ public class JXLTTest extends JexlTestCase {
         tmplt.evaluate(ctxt, strw);
         String result = strw.toString();
         Assert.assertEquals(src, result);
+    }
+
+    private static final Permissions NOJEXL3 = new Permissions() {
+        @Override public boolean allow(Class<?> clazz) {
+            String cname = clazz.getName();
+            return !cname.contains("jexl3") || cname.contains("311");
+        }
+    };
+
+    @Test
+    public void testSanboxedTemplate() throws Exception {
+        final String src = "Hello ${user}";
+        final JexlContext ctxt = new MapContext();
+        ctxt.set("user", "Francesco");
+        /// this uberspect can not access jexl3 classes (besides test)
+        Uberspect uberspect = new Uberspect(LogFactory.getLog(JXLTTest.class), null, NOJEXL3);
+        Method method = uberspect.getMethod(TemplateInterpreter.class, "print", new Object[]{Integer.TYPE});
+        Assert.assertNull(method);
+        // ensures JXLT sandboxed still executes
+        final JexlEngine jexl= new JexlBuilder().uberspect(uberspect).create();
+        final JxltEngine jxlt = jexl.createJxltEngine();
+
+        JxltEngine.Template tmplt = jxlt.createTemplate(src);
+        Writer strw = new StringWriter();
+        tmplt.evaluate(ctxt, strw);
+        String result = strw.toString();
+        Assert.assertEquals("Hello Francesco", result);
+    }
+
+    @Test
+    public void testSanboxed311i() throws Exception {
+        /// this uberspect can not access jexl3 classes (besides test)
+        Uberspect uberspect = new Uberspect(LogFactory.getLog(JXLTTest.class), null, NOJEXL3);
+        Method method = uberspect.getMethod(TemplateInterpreter.class, "print", new Object[]{Integer.TYPE});
+        final JexlEngine jexl= new JexlBuilder().uberspect(uberspect).create();
+        final JxltEngine jxlt = jexl.createJxltEngine();
+        final JexlContext ctx311 = new Context311();
+        final String rpt
+                = "$$var u = 'Universe'; exec('4').execute((a, b)->{"
+                + "\n<p>${u} ${a}${b}</p>"
+                + "\n$$}, '2')";
+        final JxltEngine.Template t = jxlt.createTemplate("$$", new StringReader(rpt));
+        final StringWriter strw = new StringWriter();
+        t.evaluate(ctx311, strw, 42);
+        final String output = strw.toString();
+        Assert.assertEquals("<p>Universe 42</p>\n", output);
     }
 }

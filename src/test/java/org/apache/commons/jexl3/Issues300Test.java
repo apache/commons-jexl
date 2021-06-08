@@ -36,7 +36,7 @@ public class Issues300Test {
     public void testIssue301a() throws Exception {
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new JexlArithmetic(false)).create();
         final String[] srcs = new String[]{
-            "var x = null; x.0", "var x = null; x[0]", "var x = [null,1]; x[0][0]"
+                "var x = null; x.0", "var x = null; x[0]", "var x = [null,1]; x[0][0]"
         };
         for (int i = 0; i < srcs.length; ++i) {
             final String src = srcs[i];
@@ -57,7 +57,7 @@ public class Issues300Test {
         final JexlEngine jexl = new JexlBuilder().safe(false).arithmetic(new JexlArithmetic(false)).create();
         final Object[] xs = new Object[]{null, null, new Object[]{null, 1}};
         final String[] srcs = new String[]{
-            "x.0", "x[0]", "x[0][0]"
+                "x.0", "x[0]", "x[0][0]"
         };
         final JexlContext ctxt = new MapContext();
         for (int i = 0; i < xs.length; ++i) {
@@ -73,21 +73,21 @@ public class Issues300Test {
         }
     }
 
-     @Test
+    @Test
     public void testIssue302() throws Exception {
         final JexlContext jc = new MapContext();
         final String[] strs = new String[]{
-            "{if (0) 1 else 2; var x = 4;}",
-            "if (0) 1; else 2; ",
-            "{ if (0) 1; else 2; }",
-            "{ if (0) { if (false) 1 else -3 } else 2; }"
+                "{if (0) 1 else 2; var x = 4;}",
+                "if (0) 1; else 2; ",
+                "{ if (0) 1; else 2; }",
+                "{ if (0) { if (false) 1 else -3 } else 2; }"
         };
         final JexlEngine jexl = new JexlBuilder().create();
-        for(final String str : strs) {
-        final JexlScript e = jexl.createScript(str);
-        final Object o = e.execute(jc);
-        final int oo = ((Number) o).intValue() % 2;
-        Assert.assertEquals("Block result is wrong " + str, 0, oo);
+        for (final String str : strs) {
+            final JexlScript e = jexl.createScript(str);
+            final Object o = e.execute(jc);
+            final int oo = ((Number) o).intValue() % 2;
+            Assert.assertEquals("Block result is wrong " + str, 0, oo);
         }
     }
 
@@ -96,11 +96,11 @@ public class Issues300Test {
         final JexlEngine jexlEngine = new JexlBuilder().strict(false).create();
         JexlExpression e304 = jexlEngine.createExpression("overview.limit.var");
 
-        final HashMap<String,Object> map3 = new HashMap<String,Object>();
+        final HashMap<String, Object> map3 = new HashMap<String, Object>();
         map3.put("var", "4711");
-        final HashMap<String,Object> map2 = new HashMap<String,Object>();
+        final HashMap<String, Object> map2 = new HashMap<String, Object>();
         map2.put("limit", map3);
-        final HashMap<String,Object> map = new HashMap<String,Object>();
+        final HashMap<String, Object> map = new HashMap<String, Object>();
         map.put("overview", map2);
 
         final JexlContext context = new MapContext(map);
@@ -125,7 +125,7 @@ public class Issues300Test {
         JexlScript e;
         e = jexl.createScript("{while(false) {}; var x = 1;}");
         final String str0 = e.getParsedText();
-        e =  jexl.createScript(str0);
+        e = jexl.createScript(str0);
         Assert.assertNotNull(e);
         final String str1 = e.getParsedText();
         Assert.assertEquals(str0, str1);
@@ -246,11 +246,12 @@ public class Issues300Test {
         VaContext(final Map<String, Object> vars) {
             super(vars);
         }
+
         public int cell(final String... ms) {
             return ms.length;
         }
 
-        public int cell(final List<?> l, final String...ms) {
+        public int cell(final List<?> l, final String... ms) {
             return 42 + cell(ms);
         }
     }
@@ -258,7 +259,7 @@ public class Issues300Test {
     @Test
     public void test314() throws Exception {
         final JexlEngine jexl = new JexlBuilder().strict(true).safe(false).create();
-        final Map<String,Object> vars = new HashMap<String, Object>();
+        final Map<String, Object> vars = new HashMap<String, Object>();
         final JexlContext ctxt = new VaContext(vars);
         JexlScript script;
         Object result;
@@ -299,7 +300,7 @@ public class Issues300Test {
     @Test
     public void test315() throws Exception {
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        final Map<String,Object> vars = new HashMap<String, Object>();
+        final Map<String, Object> vars = new HashMap<String, Object>();
         final JexlContext ctxt = new VaContext(vars);
         JexlScript script;
         Object result;
@@ -336,7 +337,7 @@ public class Issues300Test {
         Object result;
         JexlInfo info = new JexlInfo("test317", 1, 1);
         script = jexl.createScript(info, "var f = "
-                + "()-> {x + x }; f",
+                        + "()-> {x + x }; f",
                 "x");
         result = script.execute(ctxt, 21);
         Assert.assertTrue(result instanceof JexlScript);
@@ -355,10 +356,10 @@ public class Issues300Test {
         final JexlContext context = new MapContext();
 
         final String[] ins = new String[]{
-            "${'{'}", "${\"{\"}", "${\"{}\"}", "${'{42}'}", "${\"{\\\"\\\"}\"}"
+                "${'{'}", "${\"{\"}", "${\"{}\"}", "${'{42}'}", "${\"{\\\"\\\"}\"}"
         };
         final String[] ctls = new String[]{
-            "{", "{", "{}", "{42}", "{\"\"}"
+                "{", "{", "{}", "{42}", "{\"\"}"
         };
         StringWriter strw;
         JxltEngine.Template template;
@@ -368,7 +369,7 @@ public class Issues300Test {
             final String src = ins[i];
             try {
                 template = jxlt.createTemplate("$$", new StringReader(src));
-            } catch(final JexlException xany) {
+            } catch (final JexlException xany) {
                 Assert.fail(src);
                 throw xany;
             }
@@ -424,17 +425,17 @@ public class Issues300Test {
     @Test
     public void test323() throws Exception {
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
-        final Map<String,Object> vars = new HashMap<String, Object>();
+        final Map<String, Object> vars = new HashMap<String, Object>();
         final JexlContext jc = new MapContext(vars);
         JexlScript script;
         Object result;
 
         // nothing in context, ex
         try {
-         script = jexl.createScript("a.n.t.variable");
-         result = script.execute(jc);
-         Assert.fail("a.n.t.variable is undefined!");
-        } catch(final JexlException.Variable xvar) {
+            script = jexl.createScript("a.n.t.variable");
+            result = script.execute(jc);
+            Assert.fail("a.n.t.variable is undefined!");
+        } catch (final JexlException.Variable xvar) {
             Assert.assertTrue(xvar.toString().contains("a.n.t"));
         }
 
@@ -447,20 +448,20 @@ public class Issues300Test {
         // defined and null, dereference
         jc.set("a.n.t", null);
         try {
-         script = jexl.createScript("a.n.t[0].variable");
-         result = script.execute(jc);
-         Assert.fail("a.n.t is null!");
-        } catch(final JexlException.Variable xvar) {
+            script = jexl.createScript("a.n.t[0].variable");
+            result = script.execute(jc);
+            Assert.fail("a.n.t is null!");
+        } catch (final JexlException.Variable xvar) {
             Assert.assertTrue(xvar.toString().contains("a.n.t"));
         }
 
         // undefined, dereference
         vars.remove("a.n.t");
         try {
-         script = jexl.createScript("a.n.t[0].variable");
-         result = script.execute(jc);
-         Assert.fail("a.n.t is undefined!");
-        } catch(final JexlException.Variable xvar) {
+            script = jexl.createScript("a.n.t[0].variable");
+            result = script.execute(jc);
+            Assert.fail("a.n.t is undefined!");
+        } catch (final JexlException.Variable xvar) {
             Assert.assertTrue(xvar.toString().contains("a.n.t"));
         }
         // defined, derefence undefined property
@@ -470,7 +471,7 @@ public class Issues300Test {
             script = jexl.createScript("a.n.t[0].variable");
             result = script.execute(jc);
             Assert.fail("a.n.t is null!");
-        } catch(final JexlException.Property xprop) {
+        } catch (final JexlException.Property xprop) {
             Assert.assertTrue(xprop.toString().contains("0"));
         }
         // defined, derefence undefined property
@@ -479,7 +480,7 @@ public class Issues300Test {
             script = jexl.createScript("a.n.t[0].variable");
             result = script.execute(jc);
             Assert.fail("a.n.t is null!");
-        } catch(final JexlException.Property xprop) {
+        } catch (final JexlException.Property xprop) {
             Assert.assertTrue(xprop.toString().contains("variable"));
         }
 
@@ -568,7 +569,7 @@ public class Issues300Test {
         JexlScript script = jexl.createScript(src);
         Object result = script.execute(null);
         // safe navigation is lenient wrt null
-        Assert.assertFalse((Boolean)result);
+        Assert.assertFalse((Boolean) result);
 
         jexl = new JexlBuilder().strict(true).safe(false).create();
         JexlContext ctxt = new MapContext();
@@ -577,7 +578,7 @@ public class Issues300Test {
         try {
             result = script.execute(ctxt);
             Assert.fail("should only succeed with safe navigation");
-        } catch(JexlException xany) {
+        } catch (JexlException xany) {
             Assert.assertNotNull(xany);
         }
         // A is null, A.B is undefined
@@ -585,7 +586,7 @@ public class Issues300Test {
         try {
             result = script.execute(ctxt);
             Assert.fail("should only succeed with safe navigation");
-        } catch(JexlException xany) {
+        } catch (JexlException xany) {
             Assert.assertNotNull(xany);
         }
         // A.B is null

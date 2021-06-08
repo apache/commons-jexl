@@ -25,10 +25,15 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
-        <release version="3.2">
+        <release version="3.2.1">
+            <action dev="henrib" type="fix" issue="JEXL-351" due-to="Francesco Chicchiricco">
+                JXLT Template fails when using sandboxing
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-350" due-to="David Costanzo">
                 map[null] throws "unsolvable property" when a Sandbox is used
             </action>
+        </release>
+        <release version="3.2" date="2021-06-07">
             <action dev="henrib" type="fix" issue="JEXL-349" due-to="Cameron Samak">
                 Script valid in 3.0 no longer valid
             </action>

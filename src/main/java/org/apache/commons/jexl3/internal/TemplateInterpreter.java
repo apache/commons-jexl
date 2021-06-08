@@ -23,12 +23,15 @@ import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.internal.TemplateEngine.TemplateExpression;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
+import org.apache.commons.jexl3.parser.ASTArguments;
+import org.apache.commons.jexl3.parser.ASTFunctionNode;
 import org.apache.commons.jexl3.parser.ASTIdentifier;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlNode;
 
 import java.io.Writer;
+import java.util.Arrays;
 
 /**
  * The type of interpreter to use during evaluation of templates.
@@ -209,6 +212,53 @@ public class TemplateInterpreter extends Interpreter {
         final String name = node.getName();
         if ("$jexl".equals(name)) {
             return writer;
+        }
+        return super.visit(node, data);
+    }
+
+    /**
+     * Interprets a function node.
+     * print() and include() must be decoded by this interpreter since delegating to the Uberspect
+     * may be sandboxing the interpreter itself making it unable to call the function.
+     * @param node the function node
+     * @param data the data
+     * @return the function evaluation result.
+     */
+    @Override
+    protected Object visit(final ASTFunctionNode node, Object data) {
+        final int argc = node.jjtGetNumChildren();
+        if (argc == 2) {
+            final ASTIdentifier functionNode = (ASTIdentifier) node.jjtGetChild(0);
+            if ("jexl".equals(functionNode.getNamespace())) {
+                final String functionName = functionNode.getName();
+                final ASTArguments argNode = (ASTArguments) node.jjtGetChild(1);
+                if ("print".equals(functionName)) {
+                    // evaluate the arguments
+                    Object[] argv = visit(argNode, null);
+                    if (argv != null && argv.length > 0 && argv[0] instanceof Number) {
+                        print(((Number) argv[0]).intValue());
+                        return null;
+                    }
+                }
+                if ("include".equals(functionName)) {
+                    // evaluate the arguments
+                    Object[] argv = visit(argNode, null);
+                    if (argv != null && argv.length > 0) {
+                        if (argv[0] instanceof TemplateScript) {
+                            TemplateScript script = (TemplateScript) argv[0];
+                            if (argv.length > 1) {
+                                argv = Arrays.copyOfRange(argv, 1, argv.length);
+                            } else {
+                                argv = null;
+                            }
+                            include(script, argv);
+                            return null;
+                        }
+                    }
+                }
+                // fail safe
+                throw new JxltEngine.Exception(node.jexlInfo(), "no callable template function " + functionName, null);
+            }
         }
         return super.visit(node, data);
     }
