@@ -40,6 +40,7 @@ import java.io.StringReader;
  * @since 2.0
  */
 public class JexlException extends RuntimeException {
+    private static final long serialVersionUID = 20210606123900L;
 
     /** The point of origin for this exception. */
     private final transient JexlNode mark;
@@ -289,6 +290,7 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Tokenization extends JexlException {
+        private static final long serialVersionUID = 20210606123901L;
         /**
          * Creates a new Tokenization exception instance.
          * @param info  the location info
@@ -310,6 +312,7 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Parsing extends JexlException {
+        private static final long serialVersionUID = 20210606123902L;
         /**
          * Creates a new Parsing exception instance.
          *
@@ -342,6 +345,7 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Ambiguous extends Parsing {
+        private static final long serialVersionUID = 20210606123903L;
         /** The mark at which ambiguity might stop and recover. */
         private final transient JexlInfo recover;
         /**
@@ -423,6 +427,7 @@ public class JexlException extends RuntimeException {
      * @since 3.2
      */
     public static class StackOverflow extends JexlException {
+        private static final long serialVersionUID = 20210606123904L;
         /**
          * Creates a new stack overflow exception instance.
          *
@@ -446,6 +451,7 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Assignment extends Parsing {
+        private static final long serialVersionUID = 20210606123905L;
         /**
          * Creates a new Assignment statement exception instance.
          *
@@ -468,6 +474,7 @@ public class JexlException extends RuntimeException {
      * @since 3.2
      */
     public static class Feature extends Parsing {
+        private static final long serialVersionUID = 20210606123906L;
         /** The feature code. */
         private final int code;
         /**
@@ -522,6 +529,7 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Variable extends JexlException {
+        private static final long serialVersionUID = 20210606123907L;
         /**
          * Undefined variable flag.
          */
@@ -606,6 +614,7 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Property extends JexlException {
+        private static final long serialVersionUID = 20210606123908L;
         /**
          * Undefined variable flag.
          */
@@ -710,6 +719,7 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Method extends JexlException {
+        private static final long serialVersionUID = 20210606123909L;
         /**
          * Creates a new Method exception instance.
          *
@@ -854,6 +864,7 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Operator extends JexlException {
+        private static final long serialVersionUID = 20210606124100L;
         /**
          * Creates a new Operator exception instance.
          *
@@ -899,6 +910,7 @@ public class JexlException extends RuntimeException {
      * @since 3.1
      */
     public static class Annotation extends JexlException {
+        private static final long serialVersionUID = 20210606124101L;
         /**
          * Creates a new Annotation exception instance.
          *
@@ -945,6 +957,7 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Return extends JexlException {
+        private static final long serialVersionUID = 20210606124102L;
 
         /** The returned value. */
         private final transient Object result;
@@ -991,6 +1004,7 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Break extends JexlException {
+        private static final long serialVersionUID = 20210606124103L;
         /**
          * Creates a new instance of Break.
          *
@@ -1007,6 +1021,7 @@ public class JexlException extends RuntimeException {
      * @since 3.0
      */
     public static class Continue extends JexlException {
+        private static final long serialVersionUID = 20210606124104L;
         /**
          * Creates a new instance of Continue.
          *
@@ -1024,6 +1039,7 @@ public class JexlException extends RuntimeException {
      * @since 3.2
      */
     public static class TryFailed extends JexlException {
+        private static final long serialVersionUID = 20210606124105L;
         /**
          * Creates a new instance.
          * @param xany the original invocation target exception
