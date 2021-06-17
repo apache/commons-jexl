@@ -30,6 +30,7 @@ Version 3.2.1 is source and binary compatible with 3.2.
 
 Bugs Fixed in 3.2.1:
 ==================
+* JEXL-352:      Possible memory leak regarding parser jjtree nodes in JEXL 3.2
 * JEXL-351:      JXLT Template fails when using sandboxing
 * JEXL-350:      map[null] throws "unsolvable property" when a Sandbox is used
 

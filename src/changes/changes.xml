@@ -26,6 +26,9 @@
     </properties>
     <body>
         <release version="3.2.1">
+            <action dev="henrib" type="fix" issue="JEXL-352" due-to="Øyvind Horneland">
+                Possible memory leak regarding parser jjtree nodes in JEXL 3.2
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-351" due-to="Francesco Chicchiricco">
                 JXLT Template fails when using sandboxing
             </action>
