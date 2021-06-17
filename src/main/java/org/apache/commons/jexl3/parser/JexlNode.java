@@ -85,7 +85,7 @@ public abstract class JexlNode extends SimpleNode {
             final int c = lc & 0xfff;
             final int l = lc >> 0xc;
             // at least an info with line/column number
-            return info != null? info.at(l, c) : new JexlInfo(null, l, c);
+            return info != null? info.at(info.getLine() + l - 1, c) : new JexlInfo(null, l, c);
         }
         // weird though; no jjSetFirstToken(...) ever called?
         return info;
