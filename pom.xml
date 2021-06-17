@@ -89,7 +89,8 @@
         <connection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</developerConnection>
         <url>https://gitbox.apache.org/repos/asf/commons-jexl.git</url>
-    </scm>
+      <tag>commons-jexl3-3.2</tag>
+  </scm>
     <issueManagement>
         <system>jira</system>
         <url>https://issues.apache.org/jira/browse/JEXL</url>
