@@ -117,8 +117,7 @@
     </dependencies>
 
     <build>
-        <!-- TODO spotbugs:check  -->
-        <defaultGoal>clean apache-rat:check package clirr:check checkstyle:check javadoc:javadoc</defaultGoal>
+        <defaultGoal>clean apache-rat:check spotbugs:check package clirr:check checkstyle:check javadoc:javadoc</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
