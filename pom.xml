@@ -36,7 +36,6 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <commons.componentid>jexl</commons.componentid>
         <commons.module.name>org.apache.commons.jexl3</commons.module.name>
-        <commons.release.version>3.2.1</commons.release.version>
         <commons.site.path>jexl</commons.site.path>
         <commons.scmPubUrl>https://svn.apache.org/repos/infra/websites/production/commons/content/proper/commons-jexl</commons.scmPubUrl>
         <commons.scmPubCheckoutDirectory>site-content</commons.scmPubCheckoutDirectory>
@@ -78,7 +77,9 @@
         <!-- This is used by reporting plugins -->
         <project.reporting.outputEncoding>${commons.encoding}</project.reporting.outputEncoding>
 
-        <commons.bc.version>3.1</commons.bc.version>
+        <!-- Commons release plugin -->
+        <commons.bc.version>3.2.1</commons.bc.version>
+        <commons.release.version>3.2.1</commons.release.version>
         <commons.release.isDistModule>true</commons.release.isDistModule>
         <commons.distSvnStagingUrl>scm:svn:https://dist.apache.org/repos/dist/dev/commons/${commons.componentid}</commons.distSvnStagingUrl>
         <commons.releaseManagerName>Henri Biestro</commons.releaseManagerName>

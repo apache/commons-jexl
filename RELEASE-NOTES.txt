@@ -1,6 +1,6 @@
 
                             Apache Commons JEXL
-                                Version 3.2
+                               Version 3.2.1
                                Release Notes
 
 
@@ -22,7 +22,7 @@ Its goal is to expose scripting features usable by technical operatives or consu
 Release 3.2.1
 ========================================================================================================================
 
-Version 3.2.1 is a micro release.
+Version 3.2.1 is a maintenance release.
 
 Compatibility with previous releases
 ====================================
