@@ -53,7 +53,7 @@
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
         <checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
-        <checksyle.version>8.43</checksyle.version>
+        <checksyle.version>8.44</checksyle.version>
 
         <!-- override of Jacoco properties defined in CP52 -->
         <commons.jacoco.version>0.8.7</commons.jacoco.version>
