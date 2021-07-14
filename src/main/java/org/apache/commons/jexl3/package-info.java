@@ -317,10 +317,7 @@
  * </p>
  * <p>
  * Implementing a {@link org.apache.commons.jexl3.JexlContext.NamespaceResolver} through a JexlContext - look at
- * <a
- * href=https://github.com/apache/commons-jexl/blob/master/src/test/java/org/apache/commons/jexl3/JexlEvalContext.java">
- * JexlEvalContext
- * </a>
+ * JexlEvalContext in the test directory
  * as an example - allows to override the namespace resolution and the default namespace map defined
  * through {@link org.apache.commons.jexl3.JexlBuilder#namespaces}.
  * </p>
