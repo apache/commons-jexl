@@ -235,12 +235,13 @@
  * </p>
  * <h3><a id="static_configuration">Static &amp; Shared Configuration</a></h3>
  * <p>
- * Both JexlEngine and JxltEngine are thread-safe, most of their inner fields are final; the same instance can be shared between different
- * threads and proper synchronization is enforced in critical areas (introspection caches).
+ * Both JexlEngine and JxltEngine are thread-safe, most of their inner fields are final; the same instance can
+ * be shared between different  threads and proper synchronization is enforced in critical areas (introspection caches).
  * </p>
  * <p>
- * Of particular importance is {@link org.apache.commons.jexl3.JexlBuilder#loader} which indicates to the JexlEngine
- * being built which class loader to use to solve a class name; this directly affects how JexlEngine.newInstance and the 'new' script method operates.
+ * Of particular importance is {@link org.apache.commons.jexl3.JexlBuilder#loader(java.lang.ClassLoader)} which indicates
+ * to the JexlEngine being built which class loader to use to solve a class name;
+ * this directly affects how JexlEngine.newInstance and the 'new' script method operates.
  * </p>
  * <p>
  * This can also be very useful in cases where you rely on JEXL to dynamically load and call plugins for your application.
@@ -253,7 +254,7 @@
  * annotation that completely shield classes and methods from JEXL introspection.
  * The other configurable way to restrict JEXL is by using a
  * {@link org.apache.commons.jexl3.introspection.JexlSandbox} which allows finer control over what is exposed; the sandbox
- * can be set through {@link org.apache.commons.jexl3.JexlBuilder#sandbox}.
+ * can be set through {@link org.apache.commons.jexl3.JexlBuilder#sandbox(org.apache.commons.jexl3.introspection.JexlSandbox)}.
  * </p>
  * <p>
  * {@link org.apache.commons.jexl3.JexlBuilder#namespaces} extends JEXL scripting by registering your own classes as
@@ -284,14 +285,14 @@
  * JexlEngine and JxltEngine expression caches can be configured as well. If you intend to use JEXL
  * repeatedly in your application, these are worth configuring since expression parsing is quite heavy.
  * Note that all caches created by JEXL are held through SoftReference; under high memory pressure, the GC will be able
- * to reclaim those caches and JEXL will rebuild them if needed. By default, a JexlEngine does create a cache for "small" expressions
- * and a JxltEngine does create one for Expression .
+ * to reclaim those caches and JEXL will rebuild them if needed. By default, a JexlEngine does create a cache for
+ * "small" expressions and a JxltEngine does create one for Expression .
  * </p>
- * <p>{@link org.apache.commons.jexl3.JexlBuilder#cache} will set how many expressions can be simultaneously cached by the
+ * <p>{@link org.apache.commons.jexl3.JexlBuilder#cache(int)} will set how many expressions can be simultaneously cached by the
  * JEXL engine. JxltEngine allows to define the cache size through its constructor.
  * </p>
  * <p>
- * {@link org.apache.commons.jexl3.JexlBuilder#debug}
+ * {@link org.apache.commons.jexl3.JexlBuilder#debug(boolean)}
  * makes stacktraces carried by JExlException more meaningful; in particular, these
  * traces will carry the exact caller location the Expression was created from.
  * </p>
@@ -316,7 +317,10 @@
  * </p>
  * <p>
  * Implementing a {@link org.apache.commons.jexl3.JexlContext.NamespaceResolver} through a JexlContext - look at
- * <a href="https://gitbox.apache.org/repos/asf?p=commons-jexl.git;a=blob;f=src/test/java/org/apache/commons/jexl3/JexlEvalContext.java">JexlEvalContext</a>
+ * <a
+ * href=https://github.com/apache/commons-jexl/blob/master/src/test/java/org/apache/commons/jexl3/JexlEvalContext.java">
+ * JexlEvalContext
+ * </a>
  * as an example - allows to override the namespace resolution and the default namespace map defined
  * through {@link org.apache.commons.jexl3.JexlBuilder#namespaces}.
  * </p>
