@@ -269,7 +269,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      */
     private static String readerToString(final Reader scriptReader) throws ScriptException {
         final StringBuilder buffer = new StringBuilder();
-        BufferedReader reader;
+        final BufferedReader reader;
         if (scriptReader instanceof BufferedReader) {
             reader = (BufferedReader) scriptReader;
         } else {

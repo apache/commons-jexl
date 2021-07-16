@@ -71,7 +71,7 @@ public final class PropertyGetExecutor extends AbstractExecutor.Get {
             && objectClass.equals(o.getClass())) {
             try {
                 return method.invoke(o, (Object[]) null);
-            } catch (IllegalAccessException | IllegalArgumentException xill) {
+            } catch (final IllegalAccessException | IllegalArgumentException xill) {
                 return TRY_FAILED;// fail
             } catch (final InvocationTargetException xinvoke) {
                 throw JexlException.tryFailed(xinvoke); // throw

@@ -227,7 +227,7 @@ public class TemplateDebugger extends Debugger {
      * @return the visitor argument
      */
     private Object visit(final TemplateExpression expr, final Object data) {
-        Object r;
+        final Object r;
         switch (expr.getType()) {
             case CONSTANT:
                 r = visit((ConstantExpression) expr, data);
