@@ -120,11 +120,12 @@ public final class JexlOptions {
      * <p>A '+flag' or 'flag' will set flag as true, '-flag' set as false.
      * The possible flag names are:
      * cancellable, strict, silent, safe, lexical, antish, lexicalShade
-     * @param mask the initial mask state
+     * @param initial the initial mask state
      * @param flags the flags to set
      * @return the flag mask updated
      */
-    public static int parseFlags(int mask, final String...flags) {
+    public static int parseFlags(int initial, final String...flags) {
+        int mask = initial;
         for(String name : flags) {
             boolean b = true;
             if (name.charAt(0) == '+') {

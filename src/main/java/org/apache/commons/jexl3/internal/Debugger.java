@@ -701,7 +701,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     @Override
-    protected Object visit(final ASTJexlScript node, Object data) {
+    protected Object visit(final ASTJexlScript node, Object arg) {
+        Object data = arg;
         // if lambda, produce parameters
         if (node instanceof ASTJexlLambda) {
             final JexlNode parent = node.jjtGetParent();

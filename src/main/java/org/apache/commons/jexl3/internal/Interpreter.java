@@ -1475,11 +1475,12 @@ public class Interpreter extends InterpreterBase {
     /**
      * Execute a method call, ie syntactically written as name.call(...).
      * @param node the actual method call node
-     * @param object non null when name.call is an antish variable
+     * @param antish non null when name.call is an antish variable
      * @param data the context
      * @return the method call result
      */
-    private Object visit(final ASTMethodNode node, Object object, final Object data) {
+    private Object visit(final ASTMethodNode node, final Object antish, final Object data) {
+        Object object = antish;
         // left contains the reference to the method
         final JexlNode methodNode = node.jjtGetChild(0);
         Object method;
@@ -1538,11 +1539,11 @@ public class Interpreter extends InterpreterBase {
      *
      * @param node    the method node
      * @param target  the target of the method, what it should be invoked upon
-     * @param functor the object carrying the method or function or the method identifier
+     * @param funcNode the object carrying the method or function or the method identifier
      * @param argNode the node carrying the arguments
      * @return the result of the method invocation
      */
-    protected Object call(final JexlNode node, final Object target, Object functor, final ASTArguments argNode) {
+    protected Object call(final JexlNode node, final Object target, final Object funcNode, final ASTArguments argNode) {
         cancelCheck(node);
         // evaluate the arguments
         final Object[] argv = visit(argNode, null);
@@ -1551,6 +1552,7 @@ public class Interpreter extends InterpreterBase {
         final String methodName;
         boolean cacheable = cache;
         boolean isavar = false;
+        Object functor = funcNode;
         if (functor instanceof ASTIdentifier) {
             // function call, target is context or namespace (if there was one)
             final ASTIdentifier methodIdentifier = (ASTIdentifier) functor;
