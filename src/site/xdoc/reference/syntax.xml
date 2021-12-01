@@ -729,7 +729,7 @@
                         as "not in" operator.
                         Note that arrays and user classes exposing a public 'contains' method will allow their instances
                         to behave as right-hand side operands of this operator.
-                        <code> "a" !~ ["a","b","c","d","e",f"]</code> returns <code>true</code>.
+                        <code> "a" !~ ["a","b","c","d","e",f"]</code> returns <code>false</code>.
                     </td>
                 </tr>
                  <tr>
