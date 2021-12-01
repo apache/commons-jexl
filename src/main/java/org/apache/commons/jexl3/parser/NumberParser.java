@@ -22,6 +22,9 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+/**
+ * Parses number literals.
+ */
 public final class NumberParser {
     /** The type literal value. */
     private Number literal = null;
@@ -66,24 +69,52 @@ public final class NumberParser {
         return literal;
     }
 
-    static Number parseInteger(final String s) {
-        final NumberParser np  = new NumberParser();
-        np.setNatural(s);
-        return np.getLiteralValue();
+    private static boolean isNegative(Token token) {
+        return token != null && "-".equals(token.image);
     }
 
-    static Number parseDouble(final String s) {
-        final NumberParser np  = new NumberParser();
-        np.setReal(s);
-        return np.getLiteralValue();
+    static Number parseInteger(Token negative, final Token s) {
+        return new NumberParser().assignNatural(isNegative(negative), s.image).getLiteralValue();
+    }
+
+    static Number parseDouble(final Token negative, final Token s) {
+        return new NumberParser().assignReal(isNegative(negative), s.image).getLiteralValue();
+    }
+
+    /**
+     * Sets this node as an (optionally) signed natural literal.
+     * Originally from OGNL.
+     * @param str the natural as string
+     * @return this parser instance
+     */
+    NumberParser assignNatural(String str) {
+        String s;
+        // determine negative sign if any, ignore +
+        final boolean negative;
+        switch (str.charAt(0)) {
+            case '-':
+                negative = true;
+                s = str.substring(1);
+                break;
+            case '+':
+                negative = false;
+                s = str.substring(1);
+                break;
+            default:
+                negative = false;
+                s = str;
+        }
+        return assignNatural(negative, s);
     }
 
     /**
      * Sets this node as a natural literal.
      * Originally from OGNL.
+     * @param negative whether the natural should be negative
      * @param s the natural as string
+     * @return this parser instance
      */
-    void setNatural(String s) {
+    NumberParser assignNatural(boolean negative, String s) {
         Number result;
         Class<? extends Number> rclass;
         // determine the base
@@ -98,43 +129,79 @@ public final class NumberParser {
         } else {
             base = 10;
         }
+        // switch on suffix if any
         final int last = s.length() - 1;
         switch (s.charAt(last)) {
             case 'l':
             case 'L': {
                 rclass = Long.class;
-                result = Long.valueOf(s.substring(0, last), base);
+                long l = Long.parseLong(s.substring(0, last), base);
+                result = negative? -l : l;
                 break;
             }
             case 'h':
             case 'H': {
                 rclass = BigInteger.class;
-                result = new BigInteger(s.substring(0, last), base);
+                BigInteger bi = new BigInteger(s.substring(0, last), base);
+                result = negative? bi.negate() : bi;
                 break;
             }
             default: {
+                // preferred literal class is integer
                 rclass = Integer.class;
                 try {
-                    result = Integer.valueOf(s, base);
+                    int i = Integer.parseInt(s, base);
+                    result = negative? -i : i;
                 } catch (final NumberFormatException take2) {
                     try {
-                        result = Long.valueOf(s, base);
+                        long l = Long.parseLong(s, base);
+                        result = negative? -l : l;
                     } catch (final NumberFormatException take3) {
-                        result = new BigInteger(s, base);
+                        BigInteger bi = new BigInteger(s, base);
+                        result = negative? bi.negate() : bi;
                     }
                 }
             }
         }
         literal = result;
         clazz = rclass;
+        return this;
+    }
+
+    /**
+     * Sets this node as an (optionally) signed real literal.
+     * Originally from OGNL.
+     * @param str the real as string
+     * @return this parser instance
+     */
+    NumberParser assignReal(final String str) {
+        String s;
+        // determine negative sign if any, ignore +
+        final boolean negative;
+        switch (str.charAt(0)) {
+            case '-':
+                negative = true;
+                s = str.substring(1);
+                break;
+            case '+':
+                negative = false;
+                s = str.substring(1);
+                break;
+            default:
+                negative = false;
+                s = str;
+        }
+        return assignReal(negative, s);
     }
 
     /**
      * Sets this node as a real literal.
      * Originally from OGNL.
+     * @param negative whether the real should be negative
      * @param s the real as string
+     * @return this parser instance
      */
-    void setReal(final String s) {
+    NumberParser assignReal(boolean negative, String s) {
         Number result;
         Class<? extends Number> rclass;
         if ("#NaN".equals(s) || "NaN".equals(s)) {
@@ -146,26 +213,32 @@ public final class NumberParser {
                 case 'b':
                 case 'B': {
                     rclass = BigDecimal.class;
-                    result = new BigDecimal(s.substring(0, last));
+                    BigDecimal bd = new BigDecimal(s.substring(0, last));
+                    result = negative? bd.negate() : bd;
                     break;
                 }
                 case 'f':
                 case 'F': {
                     rclass = Float.class;
-                    result = Float.valueOf(s.substring(0, last));
+                    float f4 = Float.parseFloat(s.substring(0, last));
+                    result = negative? -f4 : f4;
                     break;
                 }
                 case 'd':
                 case 'D':
                     rclass = Double.class;
-                    result = Double.valueOf(s.substring(0, last));
+                    double f8 = Double.parseDouble(s.substring(0, last));
+                    result = negative? -f8 : f8;
                     break;
                 default: {
+                    // preferred literal class is double
                     rclass = Double.class;
                     try {
-                        result = Double.valueOf(s);
+                        double d = Double.parseDouble(s);
+                        result = negative? -d : d;
                     } catch (final NumberFormatException take3) {
-                        result = new BigDecimal(s);
+                        BigDecimal bd = new BigDecimal(s);
+                        result = negative? bd.negate() : bd;
                     }
                     break;
                 }
@@ -173,6 +246,7 @@ public final class NumberParser {
         }
         literal = result;
         clazz = rclass;
+        return this;
     }
 
 }

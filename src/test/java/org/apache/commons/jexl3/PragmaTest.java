@@ -16,8 +16,12 @@
  */
 package org.apache.commons.jexl3;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Map;
+import java.util.TreeMap;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -182,4 +186,43 @@ public class PragmaTest extends JexlTestCase {
         Assert.assertEquals(42, result);
     }
 
+    @Test public void test354() throws Exception {
+        Map<String, Number> values = new TreeMap<>();
+        values.put("1", 1);
+        values.put("+1", 1);
+        values.put("-1", -1);
+        values.put("1l", 1l);
+        values.put("+1l", 1l);
+        values.put("-1l", -1l);
+        values.put("10h", BigInteger.valueOf(10));
+        values.put("-11h", BigInteger.valueOf(-11));
+        values.put("+12h", BigInteger.valueOf(12));
+        values.put("0xa", 0xa);
+        values.put("+0xa", 0xa);
+        values.put("-0xa", -0xa);
+        values.put("0xacl", 0xacl);
+        values.put("+0xadl", 0xadl);
+        values.put("-0xafl", -0xafl);
+        values.put("1d", 1d);
+        values.put("-1d", -1d);
+        values.put("+1d", 1d);
+        values.put("1f", 1f);
+        values.put("-1f", -1f);
+        values.put("+1f", 1f);
+        values.put("1B", new BigDecimal(1));
+        values.put("-1B", new BigDecimal(-1));
+        values.put("+1B", new BigDecimal(1));
+        values.put("-42424242424242424242424242424242", new BigInteger("-42424242424242424242424242424242"));
+        values.put("+42424242424242424242424242424242", new BigInteger("+42424242424242424242424242424242"));
+        values.put("42424242424242424242424242424242", new BigInteger("42424242424242424242424242424242"));
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        for(Map.Entry<String, Number> e : values.entrySet()) {
+            String text = "#pragma number " + e.getKey();
+            JexlScript script = jexl.createScript(text);
+            Assert.assertNotNull(script);
+            Map<String, Object> pragmas = script.getPragmas();
+            Assert.assertNotNull(pragmas);
+            Assert.assertEquals(e.getKey(), e.getValue(), pragmas.get("number"));
+        }
+    }
 }

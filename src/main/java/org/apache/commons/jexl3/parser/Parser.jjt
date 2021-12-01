@@ -100,6 +100,7 @@ TOKEN_MGR_DECLS : {
             dotLexState = defaultLexState;
         }
     }
+
 }
 /***************************************
  *     Skip & Number literal tokens
@@ -453,14 +454,15 @@ void pragmaKey(LinkedList<String> lstr) #void :
 
 Object pragmaValue() #void :
 {
+Token s = null;
 Token v;
 LinkedList<String> lstr = new LinkedList<String>();
 Object result;
 }
 {
   (
-      LOOKAHEAD(1) v=<INTEGER_LITERAL> { result = NumberParser.parseInteger(v.image); }
-    | LOOKAHEAD(1) v=<FLOAT_LITERAL> { result = NumberParser.parseDouble(v.image); }
+      LOOKAHEAD(2) (s=<plus>|s=<minus>)? v=<INTEGER_LITERAL> { result = NumberParser.parseInteger(s, v); }
+    | LOOKAHEAD(2) (s=<plus>|s=<minus>)? v=<FLOAT_LITERAL> { result = NumberParser.parseDouble(s, v); }
     | LOOKAHEAD(1) v=<STRING_LITERAL> { result = Parser.buildString(v.image, true); }
     | LOOKAHEAD(1)  pragmaKey(lstr) { result = stringify(lstr); }
     | LOOKAHEAD(1) <TRUE> { result = true; }
