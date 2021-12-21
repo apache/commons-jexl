@@ -23,8 +23,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.script.CompiledScript;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -105,17 +109,31 @@ public class JexlScriptEngineTest {
         Assert.assertNotNull("Manager should not be null", manager);
         final ScriptEngine engine = manager.getEngineByName("jexl3");
         Assert.assertNotNull("Engine should not be null (name)", engine);
+        Assert.assertNotNull(engine.getFactory());
         try {
-            engine.eval((String)null);
+            engine.eval((String) null);
             Assert.fail("Should have caused NPE");
         } catch (final NullPointerException e) {
             // NOOP
         }
         try {
-            engine.eval((Reader)null);
+            engine.eval((Reader) null);
             Assert.fail("Should have caused NPE");
         } catch (final NullPointerException e) {
             // NOOP
+        }
+        ScriptContext ctxt = null;
+        try {
+            engine.eval((String) null, ctxt);
+            Assert.fail("Should have caused NPE");
+        } catch (final NullPointerException e) {
+            //NOOP
+        }
+        try {
+            engine.eval((Reader) null, ctxt);
+            Assert.fail("Should have caused NPE");
+        } catch (final NullPointerException e) {
+            //NOOP
         }
     }
 
@@ -141,6 +159,90 @@ public class JexlScriptEngineTest {
         Assert.assertNull(manager.get("newvar"));
     }
 
+    public static class Errors {
+        public int npe() {
+            throw new NullPointerException("jexl");
+        }
+        public int illegal() {
+            throw new IllegalArgumentException("jexl");
+        }
+    }
+
+    @Test
+    public void testErrors() throws Exception {
+        final ScriptEngineManager manager = new ScriptEngineManager();
+        final JexlScriptEngine engine = (JexlScriptEngine) manager.getEngineByName("JEXL");
+        ScriptContext ctxt = engine.getContext();
+        engine.put("errors", new Errors());
+        try {
+            engine.eval("errors.npe()");
+        } catch(ScriptException xscript) {
+            Assert.assertTrue(xscript.getCause() instanceof NullPointerException);
+        }
+        try {
+            engine.eval("errors.illegal()", ctxt);
+        } catch(ScriptException xscript) {
+            Assert.assertTrue(xscript.getCause() instanceof IllegalArgumentException);
+        }
+        CompiledScript script0 = engine.compile("errors.npe()");
+        try {
+            script0.eval();
+        } catch(ScriptException xscript) {
+            Assert.assertTrue(xscript.getCause() instanceof NullPointerException);
+        }
+        CompiledScript script1 = engine.compile("errors.illegal()");
+        try {
+            script1.eval(ctxt);
+        } catch(ScriptException xscript) {
+            Assert.assertTrue(xscript.getCause() instanceof IllegalArgumentException);
+        }
+    }
+
+
+    @Test
+    public void testCompile() throws Exception {
+        final ScriptEngineManager manager = new ScriptEngineManager();
+        final JexlScriptEngine engine = (JexlScriptEngine) manager.getEngineByName("JEXL");
+        ScriptContext ctxt = engine.getContext();
+        String str = null;
+        String reader = null;
+        try {
+            CompiledScript script0 = engine.compile(str);
+            Assert.fail("should have thrown npe");
+        } catch(NullPointerException npe) {
+            Assert.assertNotNull(npe);
+        }
+        try {
+            CompiledScript script0 = engine.compile(reader);
+            Assert.fail("should have thrown npe");
+        } catch(NullPointerException npe) {
+            Assert.assertNotNull(npe);
+        }
+        try {
+            CompiledScript script0 = engine.compile("3 + 4");
+            Assert.assertEquals(engine, script0.getEngine());
+            Object result = script0.eval();
+            Assert.assertEquals(7, result);
+            result = script0.eval();
+            Assert.assertEquals(7, result);
+        } catch(ScriptException xscript) {
+            Assert.assertTrue(xscript.getCause() instanceof NullPointerException);
+        }
+        try {
+            ctxt.setAttribute("x", 20, ScriptContext.ENGINE_SCOPE);
+            ctxt.setAttribute("y", 22, ScriptContext.ENGINE_SCOPE);
+            CompiledScript script0 = engine.compile("x + y");
+            Object result = script0.eval();
+            Assert.assertEquals(42, result);
+            ctxt.setAttribute("x", -20, ScriptContext.ENGINE_SCOPE);
+            ctxt.setAttribute("y", -22, ScriptContext.ENGINE_SCOPE);
+            result = script0.eval();
+            Assert.assertEquals(-42, result);
+        } catch(ScriptException xscript) {
+            Assert.assertTrue(xscript.getCause() instanceof NullPointerException);
+        }
+
+    }
     @Test
     public void testDottedNames() throws Exception {
         final ScriptEngineManager manager = new ScriptEngineManager();

@@ -54,7 +54,7 @@ public final class JexlFeatures {
     /** The namespace names. */
     private Predicate<String> nameSpaces;
     /** The false predicate. */
-    public static final Predicate<String> TEST_STR_FALSE = (s)->false;
+    public static final Predicate<String> TEST_STR_FALSE = s->false;
     /** Te feature names (for toString()). */
     private static final String[] F_NAMES = {
         "register", "reserved variable", "local variable", "assign/modify",
@@ -67,7 +67,7 @@ public final class JexlFeatures {
     public static final int RESERVED = 1;
     /** Locals feature ordinal. */
     public static final int LOCAL_VAR = 2;
-    /** Side-effects feature ordinal. */
+    /** Side effects feature ordinal. */
     public static final int SIDE_EFFECT = 3;
     /** Global side-effects feature ordinal. */
     public static final int SIDE_EFFECT_GLOBAL = 4;
@@ -171,7 +171,7 @@ public final class JexlFeatures {
         if (names == null || names.isEmpty()) {
             reservedNames = Collections.emptySet();
         } else {
-            reservedNames = Collections.unmodifiableSet(new TreeSet<String>(names));
+            reservedNames = Collections.unmodifiableSet(new TreeSet<>(names));
         }
         setFeature(RESERVED, !reservedNames.isEmpty());
         return this;
@@ -217,7 +217,7 @@ public final class JexlFeatures {
      */
     private void setFeature(final int feature, final boolean flag) {
         if (flag) {
-            flags |= (1 << feature);
+            flags |= (1L << feature);
         } else {
             flags &= ~(1L << feature);
         }
@@ -274,7 +274,7 @@ public final class JexlFeatures {
     }
 
     /**
-     * Sets whether side effect expressions on global variables (aka non local) are enabled.
+     * Sets whether side effect expressions on global variables (aka non-local) are enabled.
      * <p>
      * When disabled, parsing a script/expression using syntactical constructs modifying variables
      * <em>including all potentially ant-ish variables</em> will throw a parsing exception.

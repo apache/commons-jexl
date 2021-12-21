@@ -20,10 +20,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -165,7 +165,7 @@ public final class MethodKey {
     }
 
     /**
-     * Outputs a human readable debug representation of this key.
+     * Outputs a human-readable debug representation of this key.
      * @return method(p0, p1, ...)
      */
     public String debugString() {
@@ -183,7 +183,7 @@ public final class MethodKey {
 
     /**
      * Checks whether a method accepts a variable number of arguments.
-     * <p>May be due to a subtle bug in some JVMs, if a varargs method is an override, depending on (may be) the
+     * <p>May be due to a subtle bug in some JVMs, if a varargs method is an override, depending on (perhaps) the
      * class introspection order, the isVarargs flag on the method itself will be false.
      * To circumvent the potential problem, fetch the method with the same signature from the super-classes,
      * - which will be different if override  -and get the varargs flag from it.
@@ -252,11 +252,11 @@ public final class MethodKey {
      * @param formal         the formal parameter type to which the actual
      *                       parameter type should be convertible
      * @param actual         the actual parameter type.
-     * @param possibleVarArg whether or not we're dealing with the last parameter
+     * @param possibleVarArg whether we're dealing with the last parameter
      *                       in the method declaration
      * @return true if either formal type is assignable from actual type,
      *         or formal is a primitive type and actual is its corresponding object
-     *         type or an object type of a primitive type that can be converted to
+     *         type or an object-type of a primitive type that can be converted to
      *         the formal type.
      */
     public static boolean isInvocationConvertible(final Class<?> formal,
@@ -275,7 +275,7 @@ public final class MethodKey {
      * @param formal         the formal parameter type to which the actual
      *                       parameter type should be convertible
      * @param actual         the actual parameter type.
-     * @param possibleVarArg whether or not we're dealing with the last parameter
+     * @param possibleVarArg whether not we're dealing with the last parameter
      *                       in the method declaration
      * @return true if either formal type is assignable from actual type,
      *         or formal and actual are both primitive types and actual can be
@@ -320,7 +320,7 @@ public final class MethodKey {
      */
     private static final Map<Class<?>, Class<?>[]> CONVERTIBLES;
     static {
-        CONVERTIBLES = new HashMap<Class<?>, Class<?>[]>(PRIMITIVE_SIZE);
+        CONVERTIBLES = new HashMap<>(PRIMITIVE_SIZE);
         CONVERTIBLES.put(Boolean.TYPE,
                 asArray(Boolean.class));
         CONVERTIBLES.put(Character.TYPE,
@@ -346,7 +346,7 @@ public final class MethodKey {
      */
     private static final Map<Class<?>, Class<?>[]> STRICT_CONVERTIBLES;
     static {
-        STRICT_CONVERTIBLES = new HashMap<Class<?>, Class<?>[]>(PRIMITIVE_SIZE);
+        STRICT_CONVERTIBLES = new HashMap<>(PRIMITIVE_SIZE);
         STRICT_CONVERTIBLES.put(Short.TYPE,
                 asArray(Byte.TYPE));
         STRICT_CONVERTIBLES.put(Integer.TYPE,
@@ -363,18 +363,19 @@ public final class MethodKey {
      * Determines parameter-argument invocation compatibility.
      *
      * @param formal         the formal parameter type
-     * @param actual         the argument type
+     * @param type           the argument type
      * @param strict         whether the check is strict or not
-     * @param possibleVarArg whether or not we're dealing with the last parameter in the method declaration
+     * @param possibleVarArg whether we're dealing with the last parameter in the method declaration
      * @return true if compatible, false otherwise
      */
     private static boolean isInvocationConvertible(
-            final Class<?> formal, Class<?> actual, final boolean strict, final boolean possibleVarArg) {
-        /* if it's a null, it means the arg was null */
+            final Class<?> formal, Class<?> type, final boolean strict, final boolean possibleVarArg) {
+        Class<?> actual = type;
+        /* if it is a null, it means the arg was null */
         if (actual == null && !formal.isPrimitive()) {
             return true;
         }
-        /* system asssignable, both sides must be array or not */
+        /* system asssignable, both sides must be arrays or not */
         if (actual != null && formal.isAssignableFrom(actual) && actual.isArray() == formal.isArray()) {
             return true;
         }
@@ -466,7 +467,6 @@ public final class MethodKey {
          */
         protected abstract boolean isVarArgs(T app);
 
-        // CSOFF: RedundantThrows
         /**
          * Gets the most specific method that is applicable to actual argument types.<p>
          * Attempts to find the most specific applicable method using the
@@ -486,9 +486,9 @@ public final class MethodKey {
          * @return the most specific method.
          * @throws MethodKey.AmbiguousException if there is more than one.
          */
-        private T getMostSpecific(final MethodKey key, final T[] methods) {
-            final Class<?>[] args = key.params;
-            final LinkedList<T> applicables = getApplicables(methods, args);
+        T getMostSpecific(final MethodKey key, final T[] methods) {
+            final Class<?>[] args = key.getParameters();
+            final Deque<T> applicables = getApplicables(methods, args);
             if (applicables.isEmpty()) {
                 return null;
             }
@@ -502,7 +502,7 @@ public final class MethodKey {
              * the end of the below loop, the list will contain exactly one method,
              * (the most specific method) otherwise we have ambiguity.
              */
-            final LinkedList<T> maximals = new LinkedList<T>();
+            final Deque<T> maximals = new LinkedList<>();
             for (final T app : applicables) {
                 final Class<?>[] parms = getParameterTypes(app);
                 boolean lessSpecific = false;
@@ -529,7 +529,7 @@ public final class MethodKey {
                             lessSpecific = true;
                             break;
                         default:
-                            // nothing do do
+                            // nothing to do
                     }
                 }
 
@@ -564,7 +564,7 @@ public final class MethodKey {
          * @param applicables the list of applicable methods or constructors
          * @return an ambiguous exception
          */
-        private AmbiguousException ambiguousException (final Class<?>[] classes, final List<T> applicables) {
+        private AmbiguousException ambiguousException (final Class<?>[] classes, final Deque<T> applicables) {
             boolean severe = false;
             int instanceArgCount = 0; // count the number of valid instances, aka not null
             for(int c = 0; c < classes.length; ++c) {
@@ -677,8 +677,8 @@ public final class MethodKey {
          *         formal and actual arguments matches, and argument types are assignable
          *         to formal types through a method invocation conversion).
          */
-        private LinkedList<T> getApplicables(final T[] methods, final Class<?>[] classes) {
-            final LinkedList<T> list = new LinkedList<T>();
+        private Deque<T> getApplicables(final T[] methods, final Class<?>[] classes) {
+            final Deque<T> list = new LinkedList<>();
             for (final T method : methods) {
                 if (isApplicable(method, classes)) {
                     list.add(method);

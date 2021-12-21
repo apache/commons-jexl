@@ -222,7 +222,7 @@ public class Engine extends JexlEngine {
         this.scriptFeatures = new JexlFeatures(features).script(true).namespaceTest(nsTest);
         this.charset = conf.charset();
         // caching:
-        this.cache = conf.cache() <= 0 ? null : new SoftCache<Source, ASTJexlScript>(conf.cache());
+        this.cache = conf.cache() <= 0 ? null : new SoftCache<>(conf.cache());
         this.cacheThreshold = conf.cacheThreshold();
         if (uberspect == null) {
             throw new IllegalArgumentException("uberspect can not be null");
@@ -283,7 +283,7 @@ public class Engine extends JexlEngine {
         jxlt = null;
         uberspect.setClassLoader(loader);
         if (functions != null) {
-            final List<String> names = new ArrayList<String>(functions.keySet());
+            final Iterable<String> names = new ArrayList<>(functions.keySet());
             for(final String name : names) {
                 final Object functor = functions.get(name);
                 if (functor instanceof Class<?>) {
@@ -328,7 +328,7 @@ public class Engine extends JexlEngine {
      * @param context the context
      * @return the options if any
      */
-    protected JexlOptions options(final JexlContext context) {
+    protected JexlOptions evalOptions(final JexlContext context) {
         // Make a copy of the handled options if any
         if (context instanceof JexlContext.OptionsHandle) {
             final JexlOptions jexlo = ((JexlContext.OptionsHandle) context).getEngineOptions();
@@ -336,20 +336,28 @@ public class Engine extends JexlEngine {
                 return jexlo.isSharedInstance()? jexlo : jexlo.copy();
             }
         } else if (context instanceof JexlEngine.Options) {
-            // This condition and block for compatibility between 3.1 and 3.2
-            final JexlOptions jexlo = options.copy();
-            final JexlEngine jexl = this;
-            final JexlEngine.Options opts = (JexlEngine.Options) context;
-            jexlo.setCancellable(option(opts.isCancellable(), jexl.isCancellable()));
-            jexlo.setSilent(option(opts.isSilent(), jexl.isSilent()));
-            jexlo.setStrict(option(opts.isStrict(), jexl.isStrict()));
-            final JexlArithmetic jexla = jexl.getArithmetic();
-            jexlo.setStrictArithmetic(option(opts.isStrictArithmetic(), jexla.isStrict()));
-            jexlo.setMathContext(opts.getArithmeticMathContext());
-            jexlo.setMathScale(opts.getArithmeticMathScale());
-            return jexlo;
+            return evalOptions((JexlEngine.Options) context);
         }
         return options;
+    }
+
+    /**
+     * Obsolete version of options evaluation.
+     * @param opts the obsolete instance of options
+     * @return the newer class of options
+     */
+    private JexlOptions evalOptions(final JexlEngine.Options opts) {
+        // This condition and block for compatibility between 3.1 and 3.2
+        final JexlOptions jexlo = options.copy();
+        final JexlEngine jexl = this;
+        jexlo.setCancellable(option(opts.isCancellable(), jexl.isCancellable()));
+        jexlo.setSilent(option(opts.isSilent(), jexl.isSilent()));
+        jexlo.setStrict(option(opts.isStrict(), jexl.isStrict()));
+        final JexlArithmetic jexla = jexl.getArithmetic();
+        jexlo.setStrictArithmetic(option(opts.isStrictArithmetic(), jexla.isStrict()));
+        jexlo.setMathContext(opts.getArithmeticMathContext());
+        jexlo.setMathScale(opts.getArithmeticMathScale());
+        return jexlo;
     }
 
     /**
@@ -359,8 +367,8 @@ public class Engine extends JexlEngine {
      * @param context the context
      * @return the options
      */
-    protected JexlOptions options(final ASTJexlScript script, final JexlContext context) {
-        final JexlOptions opts = options(context);
+    protected JexlOptions evalOptions(final ASTJexlScript script, final JexlContext context) {
+        final JexlOptions opts = evalOptions(context);
         if (opts != options) {
             // when feature lexical, try hard to run lexical
             if (scriptFeatures.isLexical()) {
@@ -498,9 +506,6 @@ public class Engine extends JexlEngine {
 
     @Override
     public Object getProperty(JexlContext context, final Object bean, final String expr) {
-        if (context == null) {
-            context = EMPTY_CONTEXT;
-        }
         // synthesize expr using register
         String src = trimSource(expr);
         src = "#0" + (src.charAt(0) == '[' ? "" : ".") + src;
@@ -509,11 +514,13 @@ public class Engine extends JexlEngine {
             final ASTJexlScript script = parse(null, PROPERTY_FEATURES, src, scope);
             final JexlNode node = script.jjtGetChild(0);
             final Frame frame = script.createFrame(bean);
-            final Interpreter interpreter = createInterpreter(context, frame, options);
+            final Interpreter interpreter = createInterpreter(context == null? EMPTY_CONTEXT : context, frame, options);
             return interpreter.visitLexicalNode(node, null);
         } catch (final JexlException xjexl) {
             if (silent) {
-                logger.warn(xjexl.getMessage(), xjexl.getCause());
+                if (logger.isWarnEnabled()) {
+                    logger.warn(xjexl.getMessage(), xjexl.getCause());
+                }
                 return null;
             }
             throw xjexl.clean();
@@ -539,7 +546,9 @@ public class Engine extends JexlEngine {
             interpreter.visitLexicalNode(node, null);
         } catch (final JexlException xjexl) {
             if (silent) {
-                logger.warn(xjexl.getMessage(), xjexl.getCause());
+                if (logger.isWarnEnabled()) {
+                    logger.warn(xjexl.getMessage(), xjexl.getCause());
+                }
                 return;
             }
             throw xjexl.clean();
@@ -570,8 +579,9 @@ public class Engine extends JexlEngine {
             if (!silent) {
                 throw xjexl.clean();
             }
-            logger.warn(xjexl.getMessage(), xjexl.getCause());
-            result = null;
+            if (logger.isWarnEnabled()) {
+                logger.warn(xjexl.getMessage(), xjexl.getCause());
+            }
         }
         return result;
     }
@@ -614,7 +624,9 @@ public class Engine extends JexlEngine {
         }
         if (xjexl != null) {
             if (silent) {
-                logger.warn(xjexl.getMessage(), xjexl.getCause());
+                if (logger.isWarnEnabled()) {
+                    logger.warn(xjexl.getMessage(), xjexl.getCause());
+                }
                 return null;
             }
             throw xjexl.clean();
@@ -673,11 +685,11 @@ public class Engine extends JexlEngine {
         /**
          * The collected variables represented as a set of list of strings.
          */
-        private final Set<List<String>> refs = new LinkedHashSet<List<String>>();
+        private final Set<List<String>> refs = new LinkedHashSet<>();
         /**
          * The current variable being collected.
          */
-        private List<String> ref = new ArrayList<String>();
+        private List<String> ref = new ArrayList<>();
         /**
          * The node that started the collect.
          */
@@ -687,7 +699,7 @@ public class Engine extends JexlEngine {
          * if so, > 1 means collect any constant (set,map,...) instead of just
          * strings and numbers.
          */
-        private int mode = 1;
+        final int mode;
 
         /**
          * Constructor.
@@ -704,7 +716,7 @@ public class Engine extends JexlEngine {
         public void collect(final JexlNode node) {
             if (!ref.isEmpty()) {
                 refs.add(ref);
-                ref = new ArrayList<String>();
+                ref = new ArrayList<>();
             }
             root = node;
         }
@@ -848,7 +860,7 @@ public class Engine extends JexlEngine {
        //     features = new JexlFeatures(features).nameSpaces(functions.keySet());
        // }
         final Source source = cached? new Source(features, src) : null;
-        ASTJexlScript script = null;
+        ASTJexlScript script;
         if (source != null) {
             script = cache.get(source);
             if (script != null) {

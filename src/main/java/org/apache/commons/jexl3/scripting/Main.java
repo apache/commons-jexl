@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -69,10 +70,11 @@ public class Main {
     public static void main(final String[] args) throws Exception {
         final JexlScriptEngineFactory fac = new JexlScriptEngineFactory();
         final ScriptEngine engine = fac.getScriptEngine();
+        final PrintStream out = System.out;
         engine.put("args", args);
         if (args.length == 1){
             final Object value = engine.eval(read(null, args[0]));
-            System.out.println("Return value: "+value);
+            out.println("Return value: "+value);
         } else {
             final BufferedReader console = read(null, null);
             String line;
@@ -80,11 +82,11 @@ public class Main {
             while(null != (line=console.readLine())){
                 try {
                     final Object value = engine.eval(line);
-                    System.out.println("Return value: "+value);
+                    out.println("Return value: "+value);
                 } catch (final ScriptException e) {
-                    System.out.println(e.getLocalizedMessage());
+                    out.println(e.getLocalizedMessage());
                 }
-                System.out.print("> ");
+                out.print("> ");
             }
         }
     }

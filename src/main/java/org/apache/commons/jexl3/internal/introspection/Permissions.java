@@ -156,7 +156,7 @@ public class Permissions {
      * @param interf whether interfaces should be checked as well
      * @return true if JEXL is allowed to introspect, false otherwise
      */
-    protected boolean allow(Class<?> clazz, final boolean interf) {
+    protected boolean allow(final Class<?> clazz, final boolean interf) {
         if (clazz == null) {
             return false;
         }
@@ -174,15 +174,15 @@ public class Permissions {
             }
         }
         // lets walk all super classes
-        clazz = clazz.getSuperclass();
+        Class<?> walk = clazz.getSuperclass();
         // walk all superclasses
-        while (clazz != null) {
+        while (walk != null) {
             // is clazz annotated with nojexl ?
-            final NoJexl nojexl = clazz.getAnnotation(NoJexl.class);
+            final NoJexl nojexl = walk.getAnnotation(NoJexl.class);
             if (nojexl != null) {
                 return false;
             }
-            clazz = clazz.getSuperclass();
+            walk = walk.getSuperclass();
         }
         return true;
     }

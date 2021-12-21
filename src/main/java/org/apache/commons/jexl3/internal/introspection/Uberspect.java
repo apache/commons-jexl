@@ -420,7 +420,7 @@ public class Uberspect implements JexlUberspect {
          * @param theArithmetic the arithmetic instance
          * @param theOverloads  the overloaded operators
          */
-        private ArithmeticUberspect(final JexlArithmetic theArithmetic, final Set<JexlOperator> theOverloads) {
+        ArithmeticUberspect(final JexlArithmetic theArithmetic, final Set<JexlOperator> theOverloads) {
             this.arithmetic = theArithmetic;
             this.overloads = theOverloads;
         }

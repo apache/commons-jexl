@@ -120,7 +120,7 @@ public class JexlException extends RuntimeException {
      * @param node the node
      * @return a string builder
      */
-    private static StringBuilder errorAt(final JexlNode node) {
+     static StringBuilder errorAt(final JexlNode node) {
         final JexlInfo info = node != null? detailedInfo(node, node.jexlInfo()) : null;
         final StringBuilder msg = new StringBuilder();
         if (info != null) {
@@ -152,7 +152,7 @@ public class JexlException extends RuntimeException {
      * @param info the information
      * @return the information or null
      */
-    private static JexlInfo detailedInfo(final JexlNode node, final JexlInfo info) {
+     static JexlInfo detailedInfo(final JexlNode node, final JexlInfo info) {
         if (info != null && node != null) {
             final Debugger dbg = new Debugger();
             if (dbg.debug(node)) {
@@ -183,7 +183,7 @@ public class JexlException extends RuntimeException {
      * @param xthrow the thowable
      * @return the throwable
      */
-    private static <X extends Throwable> X clean(final X xthrow) {
+     static <X extends Throwable> X clean(final X xthrow) {
         if (xthrow != null) {
             final List<StackTraceElement> stackJexl = new ArrayList<>();
             for (final StackTraceElement se : xthrow.getStackTrace()) {
@@ -204,7 +204,7 @@ public class JexlException extends RuntimeException {
      * @param xthrow the throwable
      * @return the cause
      */
-    private static Throwable unwrap(final Throwable xthrow) {
+    static Throwable unwrap(final Throwable xthrow) {
         if (xthrow instanceof TryFailed
             || xthrow instanceof InvocationTargetException
             || xthrow instanceof UndeclaredThrowableException) {
@@ -220,7 +220,7 @@ public class JexlException extends RuntimeException {
      * @param cause the cause
      * @return the info to use
      */
-    private static JexlInfo merge(final JexlInfo info, final JavaccError cause) {
+    static JexlInfo merge(final JexlInfo info, final JavaccError cause) {
         if (cause == null || cause.getLine() < 0) {
             return info;
         }
@@ -812,7 +812,7 @@ public class JexlException extends RuntimeException {
      * @param args the method arguments
      * @return a suitable signed name
      */
-    private static String methodSignature(final String name, final Object[] args) {
+     static String methodSignature(final String name, final Object[] args) {
         if (args != null && args.length > 0) {
             final StringBuilder strb = new StringBuilder(name);
             strb.append('(');

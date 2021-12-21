@@ -33,6 +33,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -42,15 +43,153 @@ public class ArithmeticTest extends JexlTestCase {
     /** A small delta to compare doubles. */
     private static final double EPSILON = 1.e-6;
     private final Asserter asserter;
+    private final JexlArithmetic jexla;
+    private final JexlArithmetic jexlb;
+    private final Date date = new Date();
 
     public ArithmeticTest() {
         super("ArithmeticTest");
         asserter = new Asserter(JEXL);
+        jexla = JEXL.getArithmetic();
+        JexlOptions options = new JexlOptions();
+        options.setStrictArithmetic(false);
+        jexlb = jexla.options(options);
     }
 
     @Before
     @Override
     public void setUp() {
+    }
+
+    static private void assertNullOperand(java.util.function.Supplier<Object> fun) {
+        try {
+            Assert.assertNull(fun.get());
+        } catch(JexlArithmetic.NullOperand xany) {
+            Assert.assertNotNull(xany);
+        }
+    }
+
+    static private void assertArithmeticException(java.util.function.Supplier<Object> fun) {
+        try {
+            Assert.assertNull(fun.get());
+        } catch(ArithmeticException xany) {
+            Assert.assertNotNull(xany);
+        }
+    }
+
+    @Test
+    public void testModEdge() {
+        assertNullOperand(() -> jexla.mod(null, null));
+        Assert.assertEquals(0, jexlb.mod(null, null));
+        assertArithmeticException(() -> jexla.mod(1, 0));
+        assertArithmeticException(() -> jexla.mod(1L, 0L));
+        assertArithmeticException(() -> jexla.mod(1f, 0f));
+        assertArithmeticException(() -> jexla.mod(1d, 0d));
+        assertArithmeticException(() -> jexla.mod(BigInteger.ONE, BigInteger.ZERO));
+        assertArithmeticException(() -> jexla.mod(BigInteger.ONE, BigDecimal.ZERO));
+        assertNullOperand(()-> jexla.divide(null, null));
+    }
+
+    @Test
+    public void testUnaryopsEdges() {
+        assertArithmeticException(()-> jexla.positivize(date) );
+        assertNullOperand(()-> jexla.positivize(null));
+        Assert.assertNull(jexlb.positivize(null));
+        Assert.assertEquals(42, jexla.positivize((char) 42));
+        Assert.assertEquals(Boolean.TRUE, jexla.positivize(Boolean.TRUE));
+        Assert.assertEquals(Boolean.FALSE, jexla.positivize(Boolean.FALSE));
+        Assert.assertEquals(Boolean.TRUE, jexla.positivize(new AtomicBoolean(true)));
+        Assert.assertEquals(Boolean.FALSE, jexla.positivize(new AtomicBoolean(false)));
+
+        assertNullOperand(()-> jexla.negate(null));
+        Assert.assertNull(jexlb.negate(null));
+        assertArithmeticException(()-> jexla.negate(date));
+        Assert.assertEquals(Boolean.FALSE, jexla.negate(Boolean.TRUE));
+        Assert.assertEquals(Boolean.TRUE, jexla.negate(Boolean.FALSE));
+    }
+
+    @Test
+    public void testDivideEdges() {
+        assertNullOperand(()-> jexla.divide(null, null));
+        Assert.assertEquals(0, jexlb.divide(null, null));
+        assertNullOperand(() -> jexla.divide(null, null));
+        Assert.assertEquals(0, jexlb.mod(null, null));
+        assertArithmeticException(() -> jexla.divide(1, 0));
+        assertArithmeticException(() -> jexla.divide(1L, 0L));
+        assertArithmeticException(() -> jexla.divide(1f, 0f));
+        assertArithmeticException(() -> jexla.divide(1d, 0d));
+        assertArithmeticException(() -> jexla.divide(BigInteger.ONE, BigInteger.ZERO));
+        assertArithmeticException(() -> jexla.divide(BigInteger.ONE, BigDecimal.ZERO));
+    }
+
+
+    @Test
+    public void testOperatorsEdges() {
+        assertNullOperand(()-> jexla.multiply(null, null));
+        Assert.assertEquals(0, jexlb.multiply(null, null));
+        assertNullOperand(()-> jexla.add(null, null));
+        Assert.assertEquals(0, jexlb.add(null, null));
+        assertNullOperand(()-> jexla.subtract(null, null));
+        Assert.assertEquals(0, jexlb.subtract(null, null));
+
+        Assert.assertTrue(jexla.contains(null, null));
+        Assert.assertFalse(jexla.contains(true, null));
+        Assert.assertFalse(jexla.contains(null, true));
+        Assert.assertTrue(jexla.endsWith(null, null));
+        Assert.assertFalse(jexla.endsWith(true, null));
+        Assert.assertFalse(jexla.endsWith(null, true));
+        Assert.assertTrue(jexla.startsWith(null, null));
+        Assert.assertFalse(jexla.startsWith(true, null));
+        Assert.assertFalse(jexla.startsWith(null, true));
+        Assert.assertTrue(jexla.isEmpty(null));
+    }
+
+    @Test
+    public void testIntegerCoercionEdges() {
+        assertNullOperand(()-> jexla.toBoolean(null));
+        Assert.assertTrue(jexla.toBoolean(date));
+        // int coercions
+        assertNullOperand(()-> jexla.toInteger(null));
+        Assert.assertEquals(0, jexlb.toInteger(null));
+        assertArithmeticException(()-> jexla.toInteger(date));
+        Assert.assertEquals(0, jexla.toInteger(Double.NaN));
+        Assert.assertEquals(0, jexla.toInteger(""));
+        Assert.assertEquals((int) 'b', jexla.toInteger('b'));
+        Assert.assertEquals(1, jexla.toInteger(new AtomicBoolean(true)));
+        Assert.assertEquals(0, jexla.toInteger(new AtomicBoolean(false)));
+
+        // long coercions
+        assertNullOperand(()-> jexla.toLong(null));
+        Assert.assertEquals(0L, jexlb.toLong(null));
+        assertArithmeticException(()-> jexla.toLong(date));
+        Assert.assertEquals(0L, jexla.toLong(Double.NaN));
+        Assert.assertEquals(0L, jexla.toLong(""));
+        Assert.assertEquals('b', jexla.toLong('b'));
+        Assert.assertEquals(1L, jexla.toLong(new AtomicBoolean(true)));
+        Assert.assertEquals(0L, jexla.toLong(new AtomicBoolean(false)));
+    }
+
+    @Test
+    public void testRealCoercionEdges() {
+        assertNullOperand(()-> jexla.toDouble(null));
+        Assert.assertEquals(0.0d, jexlb.toDouble(null), EPSILON);
+        Assert.assertEquals(32.0d, jexlb.toDouble((char) 32), EPSILON);
+        assertArithmeticException(()-> jexla.toDouble(date));
+        Assert.assertTrue(Double.isNaN(jexla.toDouble("")));
+        Assert.assertEquals("", jexla.toString(Double.NaN));
+
+        assertNullOperand(()-> jexla.toBigInteger(null));
+        assertArithmeticException(()-> jexla.toBigInteger(date));
+        Assert.assertEquals(BigInteger.ZERO, jexla.toBigInteger(Double.NaN));
+        Assert.assertEquals(BigInteger.ZERO, jexla.toBigInteger(""));
+        Assert.assertEquals(BigInteger.ZERO, jexla.toBigInteger((char) 0));
+
+        assertNullOperand(()-> jexla.toBigDecimal(null));
+        assertArithmeticException(()-> jexla.toBigDecimal(date));
+
+        Assert.assertEquals(BigDecimal.ZERO, jexla.toBigDecimal(Double.NaN));
+        Assert.assertEquals(BigDecimal.ZERO, jexla.toBigDecimal(""));
+        Assert.assertEquals(BigDecimal.ZERO, jexla.toBigDecimal((char) 0));
     }
 
     @Test
@@ -183,7 +322,7 @@ public class ArithmeticTest extends JexlTestCase {
         asserter.assertExpression("-1 + (-9223372036854775808)", new BigInteger("-9223372036854775809"));
         asserter.assertExpression("-9223372036854775808 - 1", new BigInteger("-9223372036854775809"));
         final BigInteger maxl = BigInteger.valueOf(Long.MAX_VALUE);
-        asserter.assertExpression(maxl.toString() + " * " + maxl.toString() , maxl.multiply(maxl));
+        asserter.assertExpression(maxl + " * " + maxl , maxl.multiply(maxl));
     }
 
     /**
@@ -324,7 +463,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     // JEXL-24: long integers (and doubles)
     @Test
-    public void testLongLiterals() throws Exception {
+    public void testLongLiterals() {
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
@@ -339,13 +478,13 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(56.3f, ctxt.get("f"));
         Assert.assertEquals(63.5d, ctxt.get("g"));
         Assert.assertEquals(0x10, ctxt.get("h"));
-        Assert.assertEquals(010, ctxt.get("i"));
-        Assert.assertEquals(0x10L, ctxt.get("j"));
+        Assert.assertEquals(010, ctxt.get("i")); // octal 010
+        Assert.assertEquals(0x10L, ctxt.get("j")); // octal 010L
         Assert.assertEquals(010L, ctxt.get("k"));
     }
 
     @Test
-    public void testBigLiteralValue() throws Exception {
+    public void testBigLiteralValue() {
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
@@ -355,7 +494,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testBigdOp() throws Exception {
+    public void testBigdOp() {
         final BigDecimal sevendot475 = new BigDecimal("7.475");
         final BigDecimal SO = new BigDecimal("325");
         final JexlContext jc = new MapContext();
@@ -369,7 +508,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     // JEXL-24: big integers and big decimals
     @Test
-    public void testBigLiterals() throws Exception {
+    public void testBigLiterals() {
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
@@ -384,7 +523,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     // JEXL-24: big decimals with exponent
     @Test
-    public void testBigExponentLiterals() throws Exception {
+    public void testBigExponentLiterals() {
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
@@ -400,7 +539,7 @@ public class ArithmeticTest extends JexlTestCase {
 
     // JEXL-24: doubles with exponent
     @Test
-    public void test2DoubleLiterals() throws Exception {
+    public void test2DoubleLiterals() {
         final JexlEvalContext ctxt = new JexlEvalContext();
         final JexlOptions options = ctxt.getEngineOptions();
         options.setStrictArithmetic(true);
@@ -420,11 +559,10 @@ public class ArithmeticTest extends JexlTestCase {
      *
      * if silent, all arith exception return 0.0
      * if not silent, all arith exception throw
-     * @throws Exception
      */
     @Test
     public void testDivideByZero() throws Exception {
-        final Map<String, Object> vars = new HashMap<String, Object>();
+        final Map<String, Object> vars = new HashMap<>();
         final JexlEvalContext context = new JexlEvalContext(vars);
         final JexlOptions options = context.getEngineOptions();
         options.setStrictArithmetic(true);
@@ -494,8 +632,8 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testNaN() throws Exception {
-        final Map<String, Object> ns = new HashMap<String, Object>();
+    public void testNaN() {
+        final Map<String, Object> ns = new HashMap<>();
         ns.put("double", Double.class);
         final JexlEngine jexl = new JexlBuilder().namespaces(ns).create();
         JexlScript script;
@@ -518,7 +656,7 @@ public class ArithmeticTest extends JexlTestCase {
      * JEXL-156.
      */
     @Test
-    public void testMultClass() throws Exception {
+    public void testMultClass(){
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext jc = new MapContext();
         final Object ra = jexl.createExpression("463.0d * 0.1").evaluate(jc);
@@ -530,7 +668,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testDivClass() throws Exception {
+    public void testDivClass() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext jc = new MapContext();
         final Object ra = jexl.createExpression("463.0d / 0.1").evaluate(jc);
@@ -542,7 +680,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testPlusClass() throws Exception {
+    public void testPlusClass() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext jc = new MapContext();
         final Object ra = jexl.createExpression("463.0d + 0.1").evaluate(jc);
@@ -554,7 +692,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testMinusClass() throws Exception {
+    public void testMinusClass() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext jc = new MapContext();
         final Object ra = jexl.createExpression("463.0d - 0.1").evaluate(jc);
@@ -566,7 +704,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testAddWithStringsLenient() throws Exception {
+    public void testAddWithStringsLenient() {
         final JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(false)).create();
         JexlScript script;
         Object result;
@@ -604,7 +742,7 @@ public class ArithmeticTest extends JexlTestCase {
     }
 
     @Test
-    public void testAddWithStringsStrict() throws Exception {
+    public void testAddWithStringsStrict() {
         final JexlEngine jexl = new JexlBuilder().arithmetic(new JexlArithmetic(true)).create();
         JexlScript script;
         Object result;

@@ -57,7 +57,7 @@ public final class TemplateScript implements JxltEngine.Template {
     /**
      * Creates a new template from an character input.
      * @param engine the template engine
-     * @param info the source info
+     * @param jexlInfo the source info
      * @param directive the prefix for lines of code; can not be "$", "${", "#" or "#{"
                   since this would preclude being able to differentiate directives and jxlt expressions
      * @param reader    the input reader
@@ -66,7 +66,7 @@ public final class TemplateScript implements JxltEngine.Template {
      * @throws IllegalArgumentException if the directive prefix is invalid
      */
     public TemplateScript(final TemplateEngine engine,
-                          JexlInfo info,
+                          JexlInfo jexlInfo,
                           final String directive,
                           final Reader reader,
                           final String... parms) {
@@ -120,9 +120,7 @@ public final class TemplateScript implements JxltEngine.Template {
             }
         }
         // create the script
-        if (info == null) {
-            info = jxlt.getEngine().createInfo();
-        }
+        final JexlInfo info = jexlInfo == null? jxlt.getEngine().createInfo() : jexlInfo;
         // allow lambda defining params
         final Scope scope = parms == null ? null : new Scope(null, parms);
         script = jxlt.getEngine().parse(info.at(1, 1), false, strb.toString(), scope).script();
@@ -259,7 +257,7 @@ public final class TemplateScript implements JxltEngine.Template {
     @Override
     public TemplateScript prepare(final JexlContext context) {
         final Engine jexl = jxlt.getEngine();
-        final JexlOptions options = jexl.options(script, context);
+        final JexlOptions options = jexl.evalOptions(script, context);
         final Frame frame = script.createFrame((Object[]) null);
         final TemplateInterpreter.Arguments targs = new TemplateInterpreter
                 .Arguments(jxlt.getEngine())
@@ -274,7 +272,9 @@ public final class TemplateScript implements JxltEngine.Template {
             } catch (final JexlException xjexl) {
                 final JexlException xuel = TemplateEngine.createException(xjexl.getInfo(), "prepare", exprs[e], xjexl);
                 if (jexl.isSilent()) {
-                    jexl.logger.warn(xuel.getMessage(), xuel.getCause());
+                    if (jexl.logger.isWarnEnabled()) {
+                        jexl.logger.warn(xuel.getMessage(), xuel.getCause());
+                    }
                     return null;
                 }
                 throw xuel;
@@ -291,7 +291,7 @@ public final class TemplateScript implements JxltEngine.Template {
     @Override
     public void evaluate(final JexlContext context, final Writer writer, final Object... args) {
         final Engine jexl = jxlt.getEngine();
-        final JexlOptions options = jexl.options(script, context);
+        final JexlOptions options = jexl.evalOptions(script, context);
         final Frame frame = script.createFrame(args);
         final TemplateInterpreter.Arguments targs = new TemplateInterpreter
                 .Arguments(jexl)

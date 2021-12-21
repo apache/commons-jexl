@@ -29,10 +29,10 @@ import java.beans.IntrospectionException;
  * It implements JexlPropertyGet since such a container can only be accessed from its owning instance (not set).
  */
 public final class IndexedType implements JexlPropertyGet {
-     /** The container name. */
-    private final String container;
+    /** The container name. */
+    final String container;
     /** The container class. */
-    private final Class<?> clazz;
+    final Class<?> clazz;
     /** The array of getter methods. */
     private final Method[] getters;
     /** Last get method used. */
@@ -74,16 +74,16 @@ public final class IndexedType implements JexlPropertyGet {
      */
     public static final class IndexedContainer {
         /** The container instance. */
-        private final Object container;
+        final Object container;
         /** The container type instance. */
-        private final IndexedType type;
+        final IndexedType type;
 
         /**
          * Creates a new duck container.
          * @param theType the container type
          * @param theContainer the container instance
          */
-        private IndexedContainer(final IndexedType theType, final Object theContainer) {
+        IndexedContainer(final IndexedType theType, final Object theContainer) {
             this.type = theType;
             this.container = theContainer;
         }
@@ -176,7 +176,7 @@ public final class IndexedType implements JexlPropertyGet {
      * @throws Exception if invocation failed;
      *         IntrospectionException if a property getter could not be found
      */
-    private Object invokeGet(final Object object, final Object key) throws Exception {
+    Object invokeGet(final Object object, final Object key) throws Exception {
         if (getters != null && getters.length > 0) {
             Method jm = get;
             if (jm != null) {
@@ -209,7 +209,7 @@ public final class IndexedType implements JexlPropertyGet {
      * @throws Exception if invocation failed;
      *         IntrospectionException if a property setter could not be found
      */
-    private Object invokeSet(final Object object, final Object key, final Object value) throws Exception {
+    Object invokeSet(final Object object, final Object key, final Object value) throws Exception {
         if (setters != null && setters.length > 0) {
             Method jm = set;
             if (jm != null) {

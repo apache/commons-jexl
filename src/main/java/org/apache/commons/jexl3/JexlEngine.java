@@ -54,7 +54,7 @@ public abstract class JexlEngine {
         /**
          * Default ctor.
          */
-        private FailObject() {}
+        FailObject() {}
 
         @Override
         public String toString() {
@@ -177,7 +177,7 @@ public abstract class JexlEngine {
         /**
          * Default ctor.
          */
-        private EmptyContext() {}
+        EmptyContext() {}
 
         @Override
         public Object get(final String name) {
@@ -207,7 +207,7 @@ public abstract class JexlEngine {
         /**
          * Default ctor.
          */
-        private EmptyNamespaceResolver() {}
+        EmptyNamespaceResolver() {}
 
         @Override
         public Object resolveNamespace(final String name) {

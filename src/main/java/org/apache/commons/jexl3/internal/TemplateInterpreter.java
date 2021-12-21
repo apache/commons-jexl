@@ -40,9 +40,9 @@ import java.util.Arrays;
  */
 public class TemplateInterpreter extends Interpreter {
     /** The array of template expressions. */
-    private final TemplateExpression[] exprs;
+    final TemplateExpression[] exprs;
     /** The writer used to output. */
-    private final Writer writer;
+    final Writer writer;
 
     /**
      * Helper ctor.
@@ -269,7 +269,7 @@ public class TemplateInterpreter extends Interpreter {
             return new Closure(this, (ASTJexlLambda) script) {
                 @Override
                 protected Interpreter createInterpreter(final JexlContext context, final Frame local) {
-                    final JexlOptions opts = jexl.options(script, context);
+                    final JexlOptions opts = jexl.evalOptions(script, context);
                     final TemplateInterpreter.Arguments targs = new TemplateInterpreter.Arguments(jexl)
                             .context(context)
                             .options(opts)

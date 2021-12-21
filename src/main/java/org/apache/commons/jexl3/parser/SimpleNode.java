@@ -39,7 +39,7 @@ public class SimpleNode implements Node {
     /** The node type id. */
     protected final int id;
     /** volatile value so it can be used as a last evaluation cache. */
-    private volatile Object value;
+    private transient volatile Object value;
 
     /**
      * Creates a SimpleNode instance.
@@ -181,7 +181,7 @@ public class SimpleNode implements Node {
     /* Override this method if you want to customize how the JexlNode dumps
     out its children. */
     public void dump(final String prefix) {
-        System.out.println(toString(prefix));
+        dumpOut(toString(prefix));
         if (children != null) {
             for (final SimpleNode n : children) {
                 if (n != null) {
@@ -189,6 +189,14 @@ public class SimpleNode implements Node {
                 }
             }
         }
+    }
+
+    /**
+     * Override to dump output somewhere.
+     * @param str the string to output
+     */
+    protected void dumpOut(String str) {
+        // override to obtain an output
     }
 
     @Override

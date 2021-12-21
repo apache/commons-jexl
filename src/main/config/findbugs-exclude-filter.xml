@@ -22,6 +22,15 @@
 -->
 <FindBugsFilter>
     <Match>
+        <Class name="org.apache.commons.jexl3.parser.AbstractCharStream"/>
+    </Match>
+    <Match>
+        <Class name="org.apache.commons.jexl3.parser.JexlLexicalNode"/>
+    </Match>
+    <Match>
+        <Class name="org.apache.commons.jexl3.parser.JexlParser"/>
+    </Match>
+    <Match>
         <Class name="org.apache.commons.jexl3.parser.ParseException"/>
     </Match>
     <Match>
@@ -38,5 +47,8 @@
     </Match>
     <Match>
         <Class name="org.apache.commons.jexl3.parser.TokenMgrError"/>
+    </Match>
+    <Match>
+        <Class name="org.apache.commons.jexl3.parser.SimpleNode"/>
     </Match>
 </FindBugsFilter>

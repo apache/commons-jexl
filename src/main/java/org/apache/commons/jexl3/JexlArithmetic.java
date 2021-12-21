@@ -1177,22 +1177,24 @@ public class JexlArithmetic {
      * @return the boolean or null if there is no arithmetic solution
      */
     public Boolean isEmpty(final Object object, final Boolean def) {
-        if (object instanceof Number) {
-            final double d = ((Number) object).doubleValue();
-            return Double.isNaN(d) || d == 0.d;
-        }
-        if (object instanceof CharSequence) {
-            return ((CharSequence) object).length() == 0;
-        }
-        if (object.getClass().isArray()) {
-            return Array.getLength(object) == 0;
-        }
-        if (object instanceof Collection<?>) {
-            return ((Collection<?>) object).isEmpty();
-        }
-        // Map isn't a collection
-        if (object instanceof Map<?, ?>) {
-            return ((Map<?, ?>) object).isEmpty();
+        if (object != null) {
+            if (object instanceof Number) {
+                final double d = ((Number) object).doubleValue();
+                return Double.isNaN(d) || d == 0.d;
+            }
+            if (object instanceof CharSequence) {
+                return ((CharSequence) object).length() == 0;
+            }
+            if (object.getClass().isArray()) {
+                return Array.getLength(object) == 0;
+            }
+            if (object instanceof Collection<?>) {
+                return ((Collection<?>) object).isEmpty();
+            }
+            // Map isn't a collection
+            if (object instanceof Map<?, ?>) {
+                return ((Map<?, ?>) object).isEmpty();
+            }
         }
         return def;
     }
@@ -1353,11 +1355,6 @@ public class JexlArithmetic {
                 @SuppressWarnings("unchecked") // OK because of instanceof check above
                 final Comparable<Object> comparable = (Comparable<Object>) left;
                 return comparable.compareTo(right);
-            }
-            if (right instanceof Comparable<?>) {
-                @SuppressWarnings("unchecked") // OK because of instanceof check above
-                final Comparable<Object> comparable = (Comparable<Object>) right;
-                return comparable.compareTo(left);
             }
         }
         throw new ArithmeticException("Object comparison:(" + left + " " + operator + " " + right + ")");
@@ -1736,7 +1733,7 @@ public class JexlArithmetic {
      * @param rhs right hand side
      * @return lhs &amp; rhs
      * @see JexlArithmetic#and
-     * @deprecated
+     * @deprecated 3.0
      */
     @Deprecated
     public final Object bitwiseAnd(final Object lhs, final Object rhs) {
@@ -1750,7 +1747,7 @@ public class JexlArithmetic {
      * @param rhs right hand side
      * @return lhs | rhs
      * @see JexlArithmetic#or
-     * @deprecated
+     * @deprecated 3.0
      */
     @Deprecated
     public final Object bitwiseOr(final Object lhs, final Object rhs) {
@@ -1764,7 +1761,7 @@ public class JexlArithmetic {
      * @param rhs right hand side
      * @return lhs ^ rhs
      * @see JexlArithmetic#xor
-     * @deprecated
+     * @deprecated 3.0
      */
     @Deprecated
     public final Object bitwiseXor(final Object lhs, final Object rhs) {
@@ -1777,7 +1774,7 @@ public class JexlArithmetic {
      * @param arg argument
      * @return !arg
      * @see JexlArithmetic#not
-     * @deprecated
+     * @deprecated 3.0
      */
     @Deprecated
     public final Object logicalNot(final Object arg) {
@@ -1791,7 +1788,7 @@ public class JexlArithmetic {
      * @param rhs right hand side
      * @return contains(rhs, lhs)
      * @see JexlArithmetic#contains
-     * @deprecated
+     * @deprecated 3.0
      */
     @Deprecated
     public final Object matches(final Object lhs, final Object rhs) {

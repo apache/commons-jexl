@@ -783,10 +783,29 @@ public class JXLTTest extends JexlTestCase {
     @Test
     public void testInterpolationParameter() throws Exception {
         final String expr =  "(user)->{`Hello \n${user}`}";
-        Object value = ENGINE.createScript(expr).execute(context, "Henrib");
+        JexlScript script = ENGINE.createScript(expr);
+        Object value = script.execute(context, "Henrib");
         Assert.assertEquals(expr, "Hello \nHenrib", value);
         value = ENGINE.createScript(expr).execute(context, "Dimitri");
         Assert.assertEquals(expr, "Hello \nDimitri", value);
+    }
+
+    @Test
+    public void testDbgEscapes() throws Exception {
+        String[] srcs = new String[]{
+                "jexl:print('hello\\'\\nworld')",
+                "'hello\\tworld'",
+                "'hello\\nworld'",
+                "'hello\\fworld'",
+                "'hello\\rworld'"
+        };
+        for(String src : srcs) {
+            JexlScript script = ENGINE.createScript(src);
+            Debugger dbg = new Debugger();
+            dbg.debug(script);
+            String msrc = dbg.toString();
+            Assert.assertEquals(src, msrc);
+        }
     }
 
     @Test

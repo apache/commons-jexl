@@ -24,6 +24,7 @@ import org.apache.commons.jexl3.JxltEngine;
 import org.apache.commons.jexl3.parser.ASTJexlScript;
 import org.apache.commons.jexl3.parser.JexlNode;
 import org.apache.commons.jexl3.parser.StringParser;
+import org.apache.commons.logging.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,15 +43,17 @@ import java.util.Set;
  */
 public final class TemplateEngine extends JxltEngine {
     /** The TemplateExpression cache. */
-    private final SoftCache<String, TemplateExpression> cache;
+    final SoftCache<String, TemplateExpression> cache;
     /** The JEXL engine instance. */
-    private final Engine jexl;
+    final Engine jexl;
+    /** The logger. */
+    final Log logger;
     /** The first character for immediate expressions. */
-    private final char immediateChar;
+    final char immediateChar;
     /** The first character for deferred expressions. */
-    private final char deferredChar;
+    final char deferredChar;
     /** Whether expressions can use JEXL script or only expressions (ie, no for, var, etc). */
-    private boolean noscript = true;
+    final boolean noscript;
 
     /**
      * Creates a new instance of {@link JxltEngine} creating a local cache.
@@ -66,6 +69,7 @@ public final class TemplateEngine extends JxltEngine {
                           final char immediate,
                           final char deferred) {
         this.jexl = aJexl;
+        this.logger = aJexl.logger;
         this.cache = new SoftCache<>(cacheSize);
         immediateChar = immediate;
         deferredChar = deferred;
@@ -113,7 +117,16 @@ public final class TemplateEngine extends JxltEngine {
         ExpressionType(final int idx) {
             this.index = idx;
         }
+
+        /**
+         * @return the index member
+         */
+        int getIndex() {
+            return index;
+        }
     }
+
+
 
     /**
      * A helper class to build expressions.
@@ -123,13 +136,13 @@ public final class TemplateEngine extends JxltEngine {
         /** Per TemplateExpression type counters. */
         private final int[] counts;
         /** The list of expressions. */
-        private final ArrayList<TemplateExpression> expressions;
+        private final List<TemplateExpression> expressions;
 
         /**
          * Creates a builder.
          * @param size the initial TemplateExpression array size
          */
-        private ExpressionBuilder(final int size) {
+        ExpressionBuilder(final int size) {
             counts = new int[]{0, 0, 0};
             expressions = new ArrayList<>(size <= 0 ? 3 : size);
         }
@@ -138,8 +151,8 @@ public final class TemplateEngine extends JxltEngine {
          * Adds an TemplateExpression to the list of expressions, maintain per-type counts.
          * @param expr the TemplateExpression to add
          */
-        private void add(final TemplateExpression expr) {
-            counts[expr.getType().index] += 1;
+        void add(final TemplateExpression expr) {
+            counts[expr.getType().getIndex()] += 1;
             expressions.add(expr);
         }
 
@@ -153,15 +166,15 @@ public final class TemplateEngine extends JxltEngine {
          * @param error the builder to fill
          * @return the builder
          */
-        private StringBuilder toString(final StringBuilder error) {
+        StringBuilder toString(final StringBuilder error) {
             error.append("exprs{");
             error.append(expressions.size());
             error.append(", constant:");
-            error.append(counts[ExpressionType.CONSTANT.index]);
+            error.append(counts[ExpressionType.CONSTANT.getIndex()]);
             error.append(", immediate:");
-            error.append(counts[ExpressionType.IMMEDIATE.index]);
+            error.append(counts[ExpressionType.IMMEDIATE.getIndex()]);
             error.append(", deferred:");
-            error.append(counts[ExpressionType.DEFERRED.index]);
+            error.append(counts[ExpressionType.DEFERRED.getIndex()]);
             error.append("}");
             return error;
         }
@@ -172,7 +185,7 @@ public final class TemplateEngine extends JxltEngine {
          * @param source the source TemplateExpression
          * @return an TemplateExpression
          */
-        private TemplateExpression build(final TemplateEngine el, final TemplateExpression source) {
+        TemplateExpression build(final TemplateEngine el, final TemplateExpression source) {
             int sum = 0;
             for (final int count : counts) {
                 sum += count;
@@ -295,12 +308,14 @@ public final class TemplateEngine extends JxltEngine {
          */
         protected final TemplateExpression prepare(final Frame frame, final JexlContext context) {
             try {
-                final Interpreter interpreter = jexl.createInterpreter(context, frame, jexl.options(context));
+                final Interpreter interpreter = jexl.createInterpreter(context, frame, jexl.evalOptions(context));
                 return prepare(interpreter);
             } catch (final JexlException xjexl) {
                 final JexlException xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
                 if (jexl.isSilent()) {
-                    jexl.logger.warn(xuel.getMessage(), xuel.getCause());
+                    if (logger.isWarnEnabled()) {
+                        logger.warn(xuel.getMessage(), xuel.getCause());
+                    }
                     return null;
                 }
                 throw xuel;
@@ -328,7 +343,7 @@ public final class TemplateEngine extends JxltEngine {
          * @return the options
          */
         protected JexlOptions options(final JexlContext context) {
-            return jexl.options(null, context);
+            return jexl.evalOptions(null, context);
         }
 
         /**
@@ -351,7 +366,9 @@ public final class TemplateEngine extends JxltEngine {
             } catch (final JexlException xjexl) {
                 final JexlException xuel = createException(xjexl.getInfo(), "evaluate", this, xjexl);
                 if (jexl.isSilent()) {
-                    jexl.logger.warn(xuel.getMessage(), xuel.getCause());
+                    if (logger.isWarnEnabled()) {
+                        logger.warn(xuel.getMessage(), xuel.getCause());
+                    }
                     return null;
                 }
                 throw xuel;
@@ -387,10 +404,9 @@ public final class TemplateEngine extends JxltEngine {
             if (val == null) {
                 throw new NullPointerException("constant can not be null");
             }
-            if (val instanceof String) {
-                val = StringParser.buildTemplate((String) val, false);
-            }
-            this.value = val;
+            this.value = val instanceof String
+                    ? StringParser.buildTemplate((String) val, false)
+                    : val;
         }
 
         @Override
@@ -442,7 +458,7 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         protected JexlOptions options(final JexlContext context) {
-            return jexl.options(node instanceof ASTJexlScript? (ASTJexlScript) node : null, context);
+            return jexl.evalOptions(node instanceof ASTJexlScript? (ASTJexlScript) node : null, context);
         }
 
         @Override
@@ -587,11 +603,11 @@ public final class TemplateEngine extends JxltEngine {
          * @param list     the sub-expressions
          * @param src      the source for this expression if any
          */
-        CompositeExpression(final int[] counters, final ArrayList<TemplateExpression> list, final TemplateExpression src) {
+        CompositeExpression(final int[] counters, final List<TemplateExpression> list, final TemplateExpression src) {
             super(src);
             this.exprs = list.toArray(new TemplateExpression[list.size()]);
-            this.meta = (counters[ExpressionType.DEFERRED.index] > 0 ? 2 : 0)
-                    | (counters[ExpressionType.IMMEDIATE.index] > 0 ? 1 : 0);
+            this.meta = (counters[ExpressionType.DEFERRED.getIndex()] > 0 ? 2 : 0)
+                    | (counters[ExpressionType.IMMEDIATE.getIndex()] > 0 ? 1 : 0);
         }
 
         @Override
@@ -674,10 +690,8 @@ public final class TemplateEngine extends JxltEngine {
 
 
     @Override
-    public JxltEngine.Expression createExpression(JexlInfo info, final String expression) {
-        if (info == null) {
-            info = jexl.createInfo();
-        }
+    public JxltEngine.Expression createExpression(JexlInfo jexlInfo, final String expression) {
+        JexlInfo info = jexlInfo == null?  jexl.createInfo() : jexlInfo;
         Exception xuel = null;
         TemplateExpression stmt = null;
         try {
@@ -693,7 +707,9 @@ public final class TemplateEngine extends JxltEngine {
             if (!jexl.isSilent()) {
                 throw xuel;
             }
-            jexl.logger.warn(xuel.getMessage(), xuel.getCause());
+            if (logger.isWarnEnabled()) {
+                logger.warn(xuel.getMessage(), xuel.getCause());
+            }
             stmt = null;
         }
         return stmt;
@@ -798,8 +814,6 @@ public final class TemplateEngine extends JxltEngine {
         for (int column = 0; column < size; ++column) {
             final char c = expr.charAt(column);
             switch (state) {
-                default: // in case we ever add new unified expression type
-                    throw new UnsupportedOperationException("unexpected unified expression type");
                 case CONST:
                     if (c == immediateChar) {
                         state = ParseState.IMMEDIATE0;
@@ -931,6 +945,9 @@ public final class TemplateEngine extends JxltEngine {
                         strb.append(c);
                     }
                     state = ParseState.CONST;
+                    break;
+                default: // in case we ever add new unified expression type
+                    throw new UnsupportedOperationException("unexpected unified expression type");
             }
             if (c == '\n') {
                 lineno += 1;
@@ -1062,8 +1079,8 @@ public final class TemplateEngine extends JxltEngine {
             s += 1;
         }
         if (s < length && pattern.length() <= (length - s)) {
-            sequence = sequence.subSequence(s, length);
-            if (sequence.subSequence(0, pattern.length()).equals(pattern)) {
+            CharSequence subSequence = sequence.subSequence(s, length);
+            if (subSequence.subSequence(0, pattern.length()).equals(pattern)) {
                 return s + pattern.length();
             }
         }

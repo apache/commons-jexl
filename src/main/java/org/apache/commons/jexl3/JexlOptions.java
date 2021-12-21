@@ -56,7 +56,7 @@ public final class JexlOptions {
     private static final int STRICT = 1;
     /** The cancellable bit. */
     private static final int CANCELLABLE = 0;
-    /** The flags names ordered. */
+    /** The flag names ordered. */
     private static final String[] NAMES = {
         "cancellable", "strict", "silent", "safe", "lexical", "antish", "lexicalShade", "sharedInstance"
     };
@@ -97,7 +97,9 @@ public final class JexlOptions {
     /**
      * Default ctor.
      */
-    public JexlOptions() {}
+    public JexlOptions() {
+        // all inits in members declarations
+    }
 
     /**
      * Sets the default (static, shared) option flags.
@@ -126,20 +128,23 @@ public final class JexlOptions {
      */
     public static int parseFlags(int initial, final String...flags) {
         int mask = initial;
-        for(String name : flags) {
+        for(String flag : flags) {
             boolean b = true;
-            if (name.charAt(0) == '+') {
-                name = name.substring(1);
-            } else if (name.charAt(0) == '-') {
-                name = name.substring(1);
+            final String name;
+            if (flag.charAt(0) == '+') {
+                name = flag.substring(1);
+            } else if (flag.charAt(0) == '-') {
+                name = flag.substring(1);
                 b = false;
+            } else {
+                name = flag;
             }
-            for(int flag = 0; flag < NAMES.length; ++flag) {
-                if (NAMES[flag].equals(name)) {
+            for(int f = 0; f < NAMES.length; ++f) {
+                if (NAMES[f].equals(name)) {
                     if (b) {
-                        mask |= (1 << flag);
+                        mask |= (1 << f);
                     } else {
-                        mask &= ~(1 << flag);
+                        mask &= ~(1 << f);
                     }
                     break;
                 }

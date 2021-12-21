@@ -36,6 +36,7 @@ import javax.script.SimpleBindings;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
 
 import org.apache.commons.logging.Log;
@@ -64,10 +65,10 @@ import org.apache.commons.logging.LogFactory;
 public class JexlScriptEngine extends AbstractScriptEngine implements Compilable {
 
     /** The logger. */
-    private static final Log LOG = LogFactory.getLog(JexlScriptEngine.class);
+    static final Log LOG = LogFactory.getLog(JexlScriptEngine.class);
 
     /** The shared expression cache size. */
-    private static final int CACHE_SIZE = 512;
+    static final int CACHE_SIZE = 512;
 
     /** Reserved key for context (mandated by JSR-223). */
     public static final String CONTEXT_KEY = "context";
@@ -76,13 +77,13 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
     public static final String JEXL_OBJECT_KEY = "JEXL";
 
     /** The JexlScriptObject instance. */
-    private final JexlScriptObject jexlObject;
+    final JexlScriptObject jexlObject;
 
     /** The factory which created this instance. */
-    private final ScriptEngineFactory parentFactory;
+    final ScriptEngineFactory parentFactory;
 
     /** The JEXL EL engine. */
-    private final JexlEngine jexlEngine;
+    final JexlEngine jexlEngine;
 
     /**
      * Default constructor.
@@ -227,7 +228,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
             final JexlContext ctxt = new JexlContextWrapper(context);
             return jexlScript.execute(ctxt);
         } catch (final Exception e) {
-            throw new ScriptException(e.toString());
+            throw scriptException(e);
         }
     }
 
@@ -246,8 +247,20 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
             final JexlScript jexlScript = jexlEngine.createScript(script);
             return new JexlCompiledScript(jexlScript);
         } catch (final Exception e) {
-            throw new ScriptException(e.toString());
+            throw scriptException(e);
         }
+    }
+
+    static ScriptException scriptException(Exception e) {
+        Exception xany = e;
+        // unwrap a jexl exception
+        if (xany instanceof JexlException) {
+            Throwable cause = xany.getCause();
+            if (cause instanceof Exception) {
+                xany = (Exception) cause;
+            }
+        }
+        return new ScriptException(xany);
     }
 
     @Override
@@ -316,14 +329,14 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
      */
     private final class JexlContextWrapper implements JexlContext {
         /** The wrapped script context. */
-        private final ScriptContext scriptContext;
+        final ScriptContext scriptContext;
 
         /**
          * Creates a context wrapper.
          *
          * @param theContext the engine context.
          */
-        private JexlContextWrapper (final ScriptContext theContext){
+        JexlContextWrapper (final ScriptContext theContext){
             scriptContext = theContext;
         }
 
@@ -368,7 +381,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
          *
          * @param theScript to wrap
          */
-        private JexlCompiledScript(final JexlScript theScript) {
+        JexlCompiledScript(final JexlScript theScript) {
             script = theScript;
         }
 
@@ -385,7 +398,7 @@ public class JexlScriptEngine extends AbstractScriptEngine implements Compilable
                 final JexlContext ctxt = new JexlContextWrapper(context);
                 return script.execute(ctxt);
             } catch (final Exception e) {
-                throw new ScriptException(e.toString());
+                throw scriptException(e);
             }
         }
 

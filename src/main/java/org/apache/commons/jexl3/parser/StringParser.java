@@ -35,7 +35,8 @@ package org.apache.commons.jexl3.parser;
  */
 public class StringParser {
     /** Default constructor.  */
-    public StringParser() {
+    protected StringParser() {
+        // nothing to initialize
     }
 
     /**
@@ -179,7 +180,7 @@ public class StringParser {
     private static int readUnicodeChar(final StringBuilder strb, final CharSequence str, final int begin) {
         char xc = 0;
         int bits = SHIFT;
-        int value = 0;
+        int value;
         for (int offset = 0; offset < UCHAR_LEN; ++offset) {
             final char c = str.charAt(begin + offset);
             if (c >= '0' && c <= '9') {
@@ -221,31 +222,34 @@ public class StringParser {
                 case 0:
                     continue;
                 case '\b':
-                    strb.append("\\b");
+                    strb.append('\\');
+                    strb.append('b');
                     break;
                 case '\t':
-                    strb.append("\\t");
+                    strb.append('\\');
+                    strb.append('t');
                     break;
                 case '\n':
-                    strb.append("\\n");
+                    strb.append('\\');
+                    strb.append('n');
                     break;
                 case '\f':
-                    strb.append("\\f");
+                    strb.append('\\');
+                    strb.append('f');
                     break;
                 case '\r':
-                    strb.append("\\r");
-                    break;
-                case '\"':
-                    strb.append("\\\"");
-                    break;
-                case '\'':
-                    strb.append("\\\'");
+                    strb.append('\\');
+                    strb.append('r');
                     break;
                 case '\\':
-                    strb.append("\\\\");
+                    strb.append('\\');
+                    strb.append('\\');
                     break;
                 default:
-                    if (c >= FIRST_ASCII && c <= LAST_ASCII) {
+                    if (c == delim) {
+                        strb.append('\\');
+                        strb.append(delim);
+                    } else if (c >= FIRST_ASCII && c <= LAST_ASCII) {
                         strb.append(c);
                     } else {
                         // convert to Unicode escape sequence
@@ -278,7 +282,7 @@ public class StringParser {
                 if (c == '\\') {
                     if (strb == null) {
                         strb = new StringBuilder(last);
-                        strb.append(str.substring(0, n));
+                        strb.append(str, 0, n);
                     }
                 } else if (strb != null) {
                     strb.append(c);
@@ -308,7 +312,7 @@ public class StringParser {
                     case '\\': {
                         if (strb == null) {
                             strb = new StringBuilder(last);
-                            strb.append(str.substring(0, n));
+                            strb.append(str, 0, n);
                         }
                         strb.append('\\');
                         strb.append(c);

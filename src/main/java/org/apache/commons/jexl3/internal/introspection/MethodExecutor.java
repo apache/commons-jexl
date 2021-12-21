@@ -112,15 +112,16 @@ public final class MethodExecutor extends AbstractExecutor.Method {
 
     /**
      * Reassembles arguments if the method is a vararg method.
-     * @param actual The actual arguments being passed to this method
+     * @param args The actual arguments being passed to this method
      * @return The actual parameters adjusted for the varargs in order
      * to fit the method declaration.
      */
     @SuppressWarnings("SuspiciousSystemArraycopy")
-    private Object[] handleVarArg(Object[] actual) {
+    private Object[] handleVarArg(Object[] args) {
         final Class<?> vaclass = vaClass;
         final int vastart = vaStart;
         // variable arguments count
+        Object[] actual = args;
         final int varargc = actual.length - vastart;
         // if no values are being passed into the vararg, size == 0
         if (varargc == 1) {

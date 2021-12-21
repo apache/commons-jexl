@@ -326,14 +326,12 @@ public final class Introspector {
     /**
      * Sets the class loader used to solve constructors.
      * <p>Also cleans the constructors and methods caches.</p>
-     * @param cloader the class loader; if null, use this instance class loader
+     * @param classLoader the class loader; if null, use this instance class loader
      */
-    public void setLoader(ClassLoader cloader) {
+    public void setLoader(ClassLoader classLoader) {
         final ClassLoader previous = loader;
-        if (cloader == null) {
-            cloader = getClass().getClassLoader();
-        }
-        if (!cloader.equals(loader)) {
+        final ClassLoader current = classLoader == null? getClass().getClassLoader() : classLoader;
+        if (!current.equals(loader)) {
             lock.writeLock().lock();
             try {
                 // clean up constructor and class maps
@@ -356,7 +354,7 @@ public final class Introspector {
                         centries.remove();
                     }
                 }
-                loader = cloader;
+                loader = current;
             } finally {
                 lock.writeLock().unlock();
             }

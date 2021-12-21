@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.parser;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
@@ -25,7 +26,7 @@ import java.util.Locale;
 /**
  * Parses number literals.
  */
-public final class NumberParser {
+public final class NumberParser implements Serializable {
     /** The type literal value. */
     private Number literal = null;
     /** The expected class. */
@@ -111,10 +112,11 @@ public final class NumberParser {
      * Sets this node as a natural literal.
      * Originally from OGNL.
      * @param negative whether the natural should be negative
-     * @param s the natural as string
+     * @param natural the natural as string
      * @return this parser instance
      */
-    NumberParser assignNatural(boolean negative, String s) {
+    NumberParser assignNatural(boolean negative, String natural) {
+        String s = natural;
         Number result;
         Class<? extends Number> rclass;
         // determine the base

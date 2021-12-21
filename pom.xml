@@ -53,6 +53,9 @@
         <commons.jira.pid>12310479</commons.jira.pid>
         <checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
         <checksyle.version>9.2</checksyle.version>
+        <japicmp.skip>false</japicmp.skip>
+        <commons.japicmp.version>0.15.3</commons.japicmp.version>
+        <commons.pmd.version>3.15.0</commons.pmd.version>
 
         <!-- override of Jacoco properties defined in CP52 -->
         <commons.jacoco.version>0.8.7</commons.jacoco.version>
@@ -119,7 +122,7 @@
     </dependencies>
 
     <build>
-        <defaultGoal>clean apache-rat:check spotbugs:check package clirr:check checkstyle:check javadoc:javadoc</defaultGoal>
+        <defaultGoal>clean package apache-rat:check spotbugs:check japicmp:check checkstyle:check javadoc:javadoc</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -244,17 +247,57 @@
                 </configuration>
             </plugin>
 
-            <!-- Allow Clirr to be run from command-line. Must agree with config in report section. -->
+            <!-- japicmp -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>clirr-maven-plugin</artifactId>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <version>${commons.japicmp.version}</version>
                 <configuration>
-                    <ignoredDifferencesFile>${basedir}/src/main/config/clirr-ignored.xml</ignoredDifferencesFile>
+                    <parameter>
+                        <includes>
+                            <include>org.apache.commons.jexl3</include>
+                            <include>org.apache.commons.jexl3.introspection</include>
+                            <include>org.apache.commons.jexl3.scripting</include>
+                        </includes>
+                        <excludes>
+                            <exclude>org.apache.commons.jexl3.internal</exclude>
+                            <exclude>org.apache.commons.jexl3.introspection.internal</exclude>
+                            <exclude>org.apache.commons.jexl3.parser</exclude>
+                        </excludes>
+                        <onlyModified>true</onlyModified>
+                        <accessModifier>protected</accessModifier>
+                        <ignoreMissingClasses>true</ignoreMissingClasses>
+                        <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+                        <breakBuildIfCausedByExclusion>false</breakBuildIfCausedByExclusion>
+                    </parameter>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>${commons.pmd.version}</version>
+                <configuration>
+                    <targetJdk>${maven.compiler.target}</targetJdk>
+                    <rulesets>
+                        <ruleset>${project.basedir}/src/main/config/pmd_jexl.xml</ruleset>
+                    </rulesets>
                     <excludes>
-                        <exclude>org/apache/commons/jexl3/parser/**</exclude>
-                        <exclude>org/apache/commons/jexl3/internal/**</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/Parser.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/AST*.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/ParserTokenManager.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/*Constants.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/AbstractCharStream.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/*Provider.java</exclude>
                     </excludes>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.ow2.asm</groupId>
+                        <artifactId>asm</artifactId>
+                        <version>9.2</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <!-- Allow RAT to be run from command-line. Must agree with config in report section. -->
@@ -327,40 +370,30 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.15.0</version>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <version>${commons.japicmp.version}</version>
                 <configuration>
-                    <targetJdk>${maven.compiler.target}</targetJdk>
-                    <excludes>
-                        <excludes>**/generated-sources/**/*</excludes>
-                    </excludes>
-                    <rulesets>
-                        <ruleset>/category/java/bestpractices.xml</ruleset>
-                    </rulesets>
+                    <parameter>
+                        <includes>
+                            <include>org.apache.commons.jexl3</include>
+                            <include>org.apache.commons.jexl3.introspection</include>
+                            <include>org.apache.commons.jexl3.scripting</include>
+                        </includes>
+                        <excludes>
+                            <exclude>org.apache.commons.jexl3.internal</exclude>
+                            <exclude>org.apache.commons.jexl3.introspection.internal</exclude>
+                            <exclude>org.apache.commons.jexl3.parser</exclude>
+                        </excludes>
+                        <onlyModified>true</onlyModified>
+                        <accessModifier>protected</accessModifier>
+                        <ignoreMissingClasses>true</ignoreMissingClasses>
+                        <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+                        <breakBuildIfCausedByExclusion>false</breakBuildIfCausedByExclusion>
+                    </parameter>
                 </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>pmd</report>
-                            <report>cpd</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
             </plugin>
 
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>clirr-maven-plugin</artifactId>
-                <version>2.8</version>
-                <configuration>
-                    <ignoredDifferencesFile>${basedir}/src/main/config/clirr-ignored.xml</ignoredDifferencesFile>
-                    <excludes>
-                        <exclude>org/apache/commons/jexl3/parser/**</exclude>
-                        <exclude>org/apache/commons/jexl3/internal/**</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.rat</groupId>
                 <artifactId>apache-rat-plugin</artifactId>
@@ -382,6 +415,34 @@
                         <exclude>**/org/apache/commons/jexl3/**/*Test.class</exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>${commons.pmd.version}</version>
+                <configuration>
+                    <targetJdk>${maven.compiler.target}</targetJdk>
+                    <rulesets>
+                        <ruleset>${project.basedir}/src/main/config/pmd.xml</ruleset>
+                    </rulesets>
+                    <excludes>
+                        <exclude>org/apache/commons/jexl3/parser/Parser.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/AST*.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/ParserTokenManager.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/*Constants.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/AbstractCharStream.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/*Provider.java</exclude>
+                    </excludes>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>pmd</report>
+                            <report>cpd</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
 
         </plugins>

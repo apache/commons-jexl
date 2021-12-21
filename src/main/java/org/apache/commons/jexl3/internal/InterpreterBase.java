@@ -91,9 +91,9 @@ public abstract class InterpreterBase extends ParserVisitor {
         this.context = aContext != null ? aContext : Engine.EMPTY_CONTEXT;
         this.cache = engine.cache != null;
         final JexlArithmetic jexla = jexl.arithmetic;
-        this.options = opts == null? engine.options(aContext) : opts;
+        this.options = opts == null? engine.evalOptions(aContext) : opts;
         this.arithmetic = jexla.options(options);
-        if (arithmetic != jexla && !arithmetic.getClass().equals(jexla.getClass())) {
+        if (arithmetic != jexla && !arithmetic.getClass().equals(jexla.getClass()) && logger.isWarnEnabled()) {
             logger.warn("expected arithmetic to be " + jexla.getClass().getSimpleName()
                     + ", got " + arithmetic.getClass().getSimpleName()
             );
@@ -788,33 +788,19 @@ public abstract class InterpreterBase extends ParserVisitor {
      * Helping dispatch function calls.
      */
     protected class CallDispatcher {
-        /**
-         * The syntactic node.
-         */
+        /** The syntactic node. */
         final JexlNode node;
-        /**
-         * Whether solution is cacheable.
-         */
-        boolean cacheable = true;
-        /**
-         * Whether arguments have been narrowed.
-         */
+        /** Whether solution is cacheable. */
+        final boolean cacheable;
+        /** Whether arguments have been narrowed.  */
         boolean narrow = false;
-        /**
-         * The method to call.
-         */
+        /** The method to call. */
         JexlMethod vm = null;
-        /**
-         * The method invocation target.
-         */
+        /** The method invocation target. */
         Object target = null;
-        /**
-         * The actual arguments.
-         */
+        /** The actual arguments. */
         Object[] argv = null;
-        /**
-         * The cacheable funcall if any.
-         */
+        /** The cacheable funcall if any. */
         Funcall funcall = null;
 
         /**

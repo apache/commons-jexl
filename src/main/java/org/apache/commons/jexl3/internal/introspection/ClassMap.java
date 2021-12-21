@@ -208,10 +208,10 @@ final class ClassMap {
      *
      * @param cache          the ClassMap instance we create
      * @param permissions    the permissions to apply during introspection
-     * @param classToReflect the class to cache
+     * @param clazz          the class to cache
      * @param log            the Log
      */
-    private static void create(final ClassMap cache, final Permissions permissions, Class<?> classToReflect, final Log log) {
+    private static void create(final ClassMap cache, final Permissions permissions, Class<?> clazz, final Log log) {
         //
         // Build a list of all elements in the class hierarchy. This one is bottom-first (i.e. we start
         // with the actual declaring class and its interfaces and then move up (superclass etc.) until we
@@ -220,7 +220,7 @@ final class ClassMap {
         //
         // We also ignore all SecurityExceptions that might happen due to SecurityManager restrictions.
         //
-        for (; classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
+        for (Class<?> classToReflect = clazz; classToReflect != null; classToReflect = classToReflect.getSuperclass()) {
             if (Modifier.isPublic(classToReflect.getModifiers())) {
                 populateWithClass(cache, permissions, classToReflect, log);
             }

@@ -75,7 +75,8 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
     }
 
     @Override
-    public Object invoke(final Object o, Object arg) throws IllegalAccessException, InvocationTargetException {
+    public Object invoke(final Object o, final Object argument) throws IllegalAccessException, InvocationTargetException {
+        Object arg = argument;
         if (method != null) {
             // handle the empty array case
             if (isEmptyArray(arg)) {
@@ -86,8 +87,8 @@ public class PropertySetExecutor extends AbstractExecutor.Set {
                     arg = Array.newInstance(componentType, 0);
                 }
             }
-                method.invoke(o, arg);
-            }
+            method.invoke(o, arg);
+        }
         return arg;
     }
 

@@ -109,7 +109,6 @@ import org.apache.commons.jexl3.parser.ASTUnaryPlusNode;
 import org.apache.commons.jexl3.parser.ASTVar;
 import org.apache.commons.jexl3.parser.ASTWhileStatement;
 import org.apache.commons.jexl3.parser.JexlNode;
-import org.apache.commons.jexl3.parser.Node;
 
 /**
  * An interpreter of JEXL syntax.
@@ -128,7 +127,7 @@ public class Interpreter extends InterpreterBase {
      * The thread local interpreter.
      */
     protected static final java.lang.ThreadLocal<Interpreter> INTER =
-                       new java.lang.ThreadLocal<Interpreter>();
+                       new java.lang.ThreadLocal<>();
 
     /**
      * Creates an interpreter.
@@ -743,7 +742,7 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTWhileStatement node, final Object data) {
         Object result = null;
         /* first objectNode is the condition */
-        final Node condition = node.jjtGetChild(0);
+        final JexlNode condition = node.jjtGetChild(0);
         while (arithmetic.toBoolean(condition.jjtAccept(this, data))) {
             cancelCheck(node);
             if (node.jjtGetNumChildren() > 1) {
@@ -765,7 +764,7 @@ public class Interpreter extends InterpreterBase {
         Object result = null;
         final int nc = node.jjtGetNumChildren();
         /* last objectNode is the condition */
-        final Node condition = node.jjtGetChild(nc - 1);
+        final JexlNode condition = node.jjtGetChild(nc - 1);
         do {
             cancelCheck(node);
             if (nc > 1) {
@@ -1402,11 +1401,11 @@ public class Interpreter extends InterpreterBase {
             }
         }
         // 2: last objectNode will perform assignement in all cases
-        Object property = null;
         JexlNode propertyNode = left.jjtGetChild(last);
         final ASTIdentifierAccess propertyId = propertyNode instanceof ASTIdentifierAccess
                 ? (ASTIdentifierAccess) propertyNode
                 : null;
+        final Object property;
         if (propertyId != null) {
             // deal with creating/assignining antish variable
             if (antish && ant != null && object == null && !propertyId.isSafe() && !propertyId.isExpression()) {
@@ -1547,16 +1546,15 @@ public class Interpreter extends InterpreterBase {
         cancelCheck(node);
         // evaluate the arguments
         final Object[] argv = visit(argNode, null);
-        // get the method name if identifier
-        final int symbol;
         final String methodName;
         boolean cacheable = cache;
         boolean isavar = false;
         Object functor = funcNode;
+        // get the method name if identifier
         if (functor instanceof ASTIdentifier) {
             // function call, target is context or namespace (if there was one)
             final ASTIdentifier methodIdentifier = (ASTIdentifier) functor;
-            symbol = methodIdentifier.getSymbol();
+            final int symbol = methodIdentifier.getSymbol();
             methodName = methodIdentifier.getName();
             functor = null;
             // is it a global or local variable ?
@@ -1574,12 +1572,10 @@ public class Interpreter extends InterpreterBase {
         } else if (functor instanceof ASTIdentifierAccess) {
             // a method call on target
             methodName = ((ASTIdentifierAccess) functor).getName();
-            symbol = -1;
             functor = null;
             cacheable = true;
         } else if (functor != null) {
             // ...(x)(y)
-            symbol = -1 - 1; // -2;
             methodName = null;
             cacheable = false;
         } else if (!node.isSafeLhs(isSafe())) {
@@ -1872,7 +1868,7 @@ public class Interpreter extends InterpreterBase {
             if (jexla == arithmetic) {
                 return cblock.jjtAccept(Interpreter.this, data);
             }
-            if (!arithmetic.getClass().equals(jexla.getClass())) {
+            if (!arithmetic.getClass().equals(jexla.getClass()) && logger.isWarnEnabled()) {
                 logger.warn("expected arithmetic to be " + arithmetic.getClass().getSimpleName()
                         + ", got " + jexla.getClass().getSimpleName()
                 );

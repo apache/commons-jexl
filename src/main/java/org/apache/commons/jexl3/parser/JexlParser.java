@@ -589,11 +589,12 @@ public abstract class JexlParser extends StringParser {
     /**
      * Throws a feature exception.
      * @param feature the feature code
-     * @param token the token that triggered it
+     * @param trigger the token that triggered it
      * @throws JexlException.Parsing if actual error token can not be found
      * @throws JexlException.Feature in all other cases
      */
-    protected void throwFeatureException(final int feature, Token token) {
+    protected void throwFeatureException(final int feature, Token trigger) {
+        Token token = trigger;
         if (token == null) {
             token = this.getToken(0);
             if (token == null) {
@@ -607,20 +608,21 @@ public abstract class JexlParser extends StringParser {
     /**
      * Creates a parsing exception.
      * @param xclazz the class of exception
-     * @param tok the token to report
+     * @param parsed the token to report
      * @param <T> the parsing exception subclass
      * @throws JexlException.Parsing in all cases
      */
-    protected <T extends JexlException.Parsing> void throwParsingException(final Class<T> xclazz, Token tok) {
+    protected <T extends JexlException.Parsing> void throwParsingException(final Class<T> xclazz, final Token parsed) {
         JexlInfo xinfo  = null;
         String msg = "unrecoverable state";
         JexlException.Parsing xparse = null;
-        if (tok == null) {
-            tok = this.getToken(0);
+        Token token = parsed;
+        if (token == null) {
+            token = this.getToken(0);
         }
-        if (tok != null) {
-            xinfo = info.at(tok.beginLine, tok.beginColumn);
-            msg = tok.image;
+        if (token != null) {
+            xinfo = info.at(token.beginLine, token.beginColumn);
+            msg = token.image;
             if (xclazz != null) {
                 try {
                     final Constructor<T> ctor = xclazz.getConstructor(JexlInfo.class, String.class);

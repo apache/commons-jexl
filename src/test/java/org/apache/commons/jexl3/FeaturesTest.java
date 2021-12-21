@@ -24,7 +24,7 @@ import org.junit.Test;
  * Tests for blocks
  * @since 1.1
  */
-@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
+@SuppressWarnings({"AssertEqualsBetweenInconvertibleTypes"})
 public class FeaturesTest extends JexlTestCase {
     private final JexlEngine jexl = new JexlBuilder().create();
     /**
@@ -68,6 +68,7 @@ public class FeaturesTest extends JexlTestCase {
     @Test
     public void testNoScript() throws Exception {
         final JexlFeatures f = new JexlFeatures().script(false);
+        Assert.assertTrue(f.supportsExpression());
         final String[] scripts = new String[]{
             "if (false) { block(); }",
             "{ noway(); }",
