@@ -103,6 +103,17 @@ public final class SandboxUberspect implements JexlUberspect {
         return getPropertyGet(null, obj, identifier);
     }
 
+    /**
+     * Identity equality.
+     * <p>Spotbugs just <em>hates</em> string identity...</p>
+     * @param lhs left hand side
+     * @param rhs right hand side
+     * @return true if left is identical to right
+     */
+    private static boolean eq(Object lhs, Object rhs) {
+        return lhs == rhs;
+    }
+
     @Override
     public JexlPropertyGet getPropertyGet(final List<PropertyResolver> resolvers,
                                           final Object obj,
@@ -113,7 +124,7 @@ public final class SandboxUberspect implements JexlUberspect {
                 final String actual = sandbox.read(obj.getClass(), property);
                 if (actual != null) {
                     // no transformation, strict equality: use identifier before string conversion
-                    final Object pty = actual == property ? identifier : actual;
+                    final Object pty = eq(actual, property) ? identifier : actual;
                     return uberspect.getPropertyGet(resolvers, obj, pty);
                 }
             } else {
@@ -142,7 +153,7 @@ public final class SandboxUberspect implements JexlUberspect {
                 final String actual = sandbox.write(obj.getClass(), property);
                 if (actual != null) {
                     // no transformation, strict equality: use identifier before string conversion
-                    final Object pty = actual == property ? identifier : actual;
+                    final Object pty = eq(actual, property) ? identifier : actual;
                     return uberspect.getPropertySet(resolvers, obj, pty, arg);
                 }
             } else {

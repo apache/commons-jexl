@@ -19,16 +19,16 @@ Its goal is to expose scripting features usable by technical operatives or consu
   https://commons.apache.org/jexl/
 
 ========================================================================================================================
-Release 3.2.2
+Release 3.3
 ========================================================================================================================
 
-Version 3.2.2 is a maintenance release.
+Version 3.3 is a minor release.
 
 Compatibility with previous releases
 ====================================
-Version 3.2.2 is source and binary compatible with 3.2.
+Version 3.3 is source and binary compatible with 3.2.
 
-Bugs Fixed in 3.2.1:
+Bugs Fixed in 3.3:
 ==================
 * JEXL-354:     #pragma does not handle negative integer or real literals
 * JEXL-353:     Documentation error for not-in/not-match operator

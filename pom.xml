@@ -122,7 +122,7 @@
     </dependencies>
 
     <build>
-        <defaultGoal>clean package apache-rat:check spotbugs:check japicmp:check checkstyle:check javadoc:javadoc</defaultGoal>
+        <defaultGoal>clean package apache-rat:check spotbugs:check japicmp:cmp checkstyle:check javadoc:javadoc </defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -243,6 +243,9 @@
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>${commons.spotbugs.version}</version>
                 <configuration>
+                    <effort>Max</effort>
+                    <threshold>High</threshold>
+                    <xmlOutput>true</xmlOutput>
                     <excludeFilterFile>${basedir}/src/main/config/findbugs-exclude-filter.xml</excludeFilterFile>
                 </configuration>
             </plugin>
