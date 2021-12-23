@@ -56,6 +56,7 @@
         <japicmp.skip>false</japicmp.skip>
         <commons.japicmp.version>0.15.3</commons.japicmp.version>
         <commons.pmd.version>3.15.0</commons.pmd.version>
+        <commons.spotbugs.version>4.4.1</commons.spotbugs.version>
 
         <!-- override of Jacoco properties defined in CP52 -->
         <commons.jacoco.version>0.8.7</commons.jacoco.version>
@@ -122,7 +123,7 @@
     </dependencies>
 
     <build>
-        <defaultGoal>clean package apache-rat:check spotbugs:check japicmp:cmp checkstyle:check javadoc:javadoc </defaultGoal>
+        <defaultGoal>clean package apache-rat:check spotbugs:check clirr:check checkstyle:check javadoc:javadoc </defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -248,6 +249,72 @@
                     <xmlOutput>true</xmlOutput>
                     <excludeFilterFile>${basedir}/src/main/config/findbugs-exclude-filter.xml</excludeFilterFile>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.ow2.asm</groupId>
+                        <artifactId>asm</artifactId>
+                        <version>9.2</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <!-- Allow Clirr to be run from command-line. Must agree with config in report section. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>clirr-maven-plugin</artifactId>
+                <configuration>
+                    <ignoredDifferencesFile>${basedir}/src/main/config/clirr-ignored.xml</ignoredDifferencesFile>
+                    <excludes>
+                        <exclude>org/apache/commons/jexl3/parser/**</exclude>
+                        <exclude>org/apache/commons/jexl3/internal/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- Allow RAT to be run from command-line. Must agree with config in report section. -->
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>.travis.yml</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <excludePackageNames>*.internal:*.parser</excludePackageNames>
+                    <show>public</show>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>${commons.pmd.version}</version>
+                <configuration>
+                    <rulesets>
+                        <ruleset>${project.basedir}/src/main/config/pmd_jexl.xml</ruleset>
+                    </rulesets>
+                    <excludes>
+                        <exclude>org/apache/commons/jexl3/parser/Parser.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/AST*.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/ParserTokenManager.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/*Constants.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/AbstractCharStream.java</exclude>
+                        <exclude>org/apache/commons/jexl3/parser/*Provider.java</exclude>
+                    </excludes>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.ow2.asm</groupId>
+                        <artifactId>asm</artifactId>
+                        <version>9.2</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <!-- japicmp -->
@@ -276,52 +343,6 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>${commons.pmd.version}</version>
-                <configuration>
-                    <targetJdk>${maven.compiler.target}</targetJdk>
-                    <rulesets>
-                        <ruleset>${project.basedir}/src/main/config/pmd_jexl.xml</ruleset>
-                    </rulesets>
-                    <excludes>
-                        <exclude>org/apache/commons/jexl3/parser/Parser.java</exclude>
-                        <exclude>org/apache/commons/jexl3/parser/AST*.java</exclude>
-                        <exclude>org/apache/commons/jexl3/parser/ParserTokenManager.java</exclude>
-                        <exclude>org/apache/commons/jexl3/parser/*Constants.java</exclude>
-                        <exclude>org/apache/commons/jexl3/parser/AbstractCharStream.java</exclude>
-                        <exclude>org/apache/commons/jexl3/parser/*Provider.java</exclude>
-                    </excludes>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.ow2.asm</groupId>
-                        <artifactId>asm</artifactId>
-                        <version>9.2</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <!-- Allow RAT to be run from command-line. Must agree with config in report section. -->
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>.travis.yml</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <excludePackageNames>*.internal:*.parser</excludePackageNames>
-                    <show>public</show>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
@@ -373,54 +394,6 @@
             </plugin>
 
             <plugin>
-                <groupId>com.github.siom79.japicmp</groupId>
-                <artifactId>japicmp-maven-plugin</artifactId>
-                <version>${commons.japicmp.version}</version>
-                <configuration>
-                    <parameter>
-                        <includes>
-                            <include>org.apache.commons.jexl3</include>
-                            <include>org.apache.commons.jexl3.introspection</include>
-                            <include>org.apache.commons.jexl3.scripting</include>
-                        </includes>
-                        <excludes>
-                            <exclude>org.apache.commons.jexl3.internal</exclude>
-                            <exclude>org.apache.commons.jexl3.introspection.internal</exclude>
-                            <exclude>org.apache.commons.jexl3.parser</exclude>
-                        </excludes>
-                        <onlyModified>true</onlyModified>
-                        <accessModifier>protected</accessModifier>
-                        <ignoreMissingClasses>true</ignoreMissingClasses>
-                        <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
-                        <breakBuildIfCausedByExclusion>false</breakBuildIfCausedByExclusion>
-                    </parameter>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.rat</groupId>
-                <artifactId>apache-rat-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>.travis.yml</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${commons.jacoco.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/generated-sources/**/*</exclude>
-                        <exclude>**/org/apache/commons/jexl3/parser/*.class</exclude>
-                        <exclude>**/org/apache/commons/jexl3/**/*Test.class</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>${commons.pmd.version}</version>
@@ -446,6 +419,67 @@
                         </reports>
                     </reportSet>
                 </reportSets>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <version>${commons.japicmp.version}</version>
+                <configuration>
+                    <parameter>
+                        <includes>
+                            <include>org.apache.commons.jexl3</include>
+                            <include>org.apache.commons.jexl3.introspection</include>
+                            <include>org.apache.commons.jexl3.scripting</include>
+                        </includes>
+                        <excludes>
+                            <exclude>org.apache.commons.jexl3.internal</exclude>
+                            <exclude>org.apache.commons.jexl3.introspection.internal</exclude>
+                            <exclude>org.apache.commons.jexl3.parser</exclude>
+                        </excludes>
+                        <onlyModified>true</onlyModified>
+                        <accessModifier>protected</accessModifier>
+                        <ignoreMissingClasses>true</ignoreMissingClasses>
+                        <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
+                        <breakBuildIfCausedByExclusion>false</breakBuildIfCausedByExclusion>
+                    </parameter>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>clirr-maven-plugin</artifactId>
+                <version>2.8</version>
+                <configuration>
+                    <ignoredDifferencesFile>${basedir}/src/main/config/clirr-ignored.xml</ignoredDifferencesFile>
+                    <excludes>
+                        <exclude>org/apache/commons/jexl3/parser/**</exclude>
+                        <exclude>org/apache/commons/jexl3/internal/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.rat</groupId>
+                <artifactId>apache-rat-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>.travis.yml</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${commons.jacoco.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/generated-sources/**/*</exclude>
+                        <exclude>**/org/apache/commons/jexl3/parser/*.class</exclude>
+                        <exclude>**/org/apache/commons/jexl3/**/*Test.class</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
         </plugins>

@@ -25,7 +25,9 @@ limitations under the License.
     </description>
 
     <rule ref="category/java/bestpractices.xml">
+        <!-- Often arguments and parameters array, not semantically varargs -->
         <exclude name="UseVarargs"/>
+        <!-- Internal structures (nodes, etc) -->
         <exclude name="ArrayIsStoredDirectly"/>
     </rule>
 </ruleset>
