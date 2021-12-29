@@ -25,6 +25,11 @@
         <author email="dev@commons.apache.org">Commons Developers</author>
     </properties>
     <body>
+        <release version="3.3" date="YYYY-MM-DD">
+            <action dev="ggregory" type="update" due-to="Dependabot">
+                Bump checkstyle from 9.2 to 9.2.1 #72.
+            </action>
+        </release>
         <release version="3.2.1" date="2021-06-25">
             <action dev="henrib" type="fix" issue="JEXL-352" due-to="Øyvind Horneland">
                 Possible memory leak regarding parser jjtree nodes in JEXL 3.2
