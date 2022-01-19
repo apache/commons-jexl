@@ -26,6 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 /**
@@ -197,5 +198,26 @@ public class MiscIntrospectionTest {
         Constructor<?> cA3 = A3.class.getDeclaredConstructor();
         Assert.assertNotNull(cA3);
         Assert.assertFalse(p.allow(cA3));
+    }
+
+
+    @Test
+    public void testParsePermissions0() throws Exception {
+        String src = "java.lang { Runtime { exit(); } }";
+        PermissionParser pp = new PermissionParser();
+        Map<String, Permissions.NoJexlPackage> nojexlmap = pp.parse(src);
+        Assert.assertNotNull(nojexlmap);
+    }
+
+
+    @Test
+    public void testParsePermissions1() throws Exception {
+        String src = "java.lang { Runtime { exit(); } }" +
+                "java.rmi {}" +
+                "java.io { File {} }" +
+                "java.nio { Path {} }";
+        PermissionParser pp = new PermissionParser();
+        Map<String, Permissions.NoJexlPackage> nojexlmap = pp.parse(src);
+        Assert.assertNotNull(nojexlmap);
     }
 }

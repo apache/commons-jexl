@@ -21,10 +21,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-//import java.util.Collections;
-//import java.util.Map;
-//import java.util.Set;
-//import java.util.concurrent.ConcurrentHashMap;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.jexl3.annotations.NoJexl;
 
@@ -35,35 +37,192 @@ import org.apache.commons.jexl3.annotations.NoJexl;
 public class Permissions {
     /** Allow inheritance. */
     protected Permissions() {
+        packages = Collections.emptyMap();
     }
     /**
      * The default singleton.
      */
     public static final Permissions DEFAULT = new Permissions();
-//
-//    // my.package {
-//    // class0 {...
-//    //    class1 {...}
-//    //    class1(); // constructors
-//    //    method(); // method
-//    //   field;
-//    // } // end class0
-//    // } // end package my.package
-//
-//    public static class NoJexlPackage {
-//        protected Map<String, NoJexlClass> nojexl = new ConcurrentHashMap<>();
-//    }
-//    public static class NoJexlClass {
-//        protected Set<String> methodNames;
-//        protected Set<String> fieldNames;
-//    }
-//    static final NoJexlClass NOJEXL_CLASS = new NoJexlClass();
-//    static final Set<String> NOJEXL_METHODS = Collections.singleton("");
-//    static final Set<String> NOJEXL_FIELDS = Collections.singleton("");
-//
-//    public static final class Shielded extends Permissions {
-//        Map<String, NoJexlPackage> packageShields;
-//    }
+
+    /**
+     * Equivalent of @NoJexl on a class in a package.
+     */
+    static class NoJexlPackage {
+        // the NoJexl class names
+        protected Map<String, NoJexlClass> nojexl;
+
+        /**
+         * Ctor.
+         * @param map the map of NoJexl classes
+         */
+        NoJexlPackage(Map<String, NoJexlClass> map) {
+            this.nojexl = map;
+        }
+
+        /**
+         * Default ctor.
+         */
+        NoJexlPackage() {
+            this(new ConcurrentHashMap<>());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o == this;
+        }
+
+        NoJexlClass getNoJexl(Class<?> clazz) {
+            return nojexl.get(clazz.getName());
+        }
+    }
+
+    /**
+     * Equivalent of @NoJexl on a ctor, a method or a field in a class.
+     */
+    static class NoJexlClass {
+        // the NoJexl method names (including ctor, name of class)
+        protected Set<String> methodNames;
+        // the NoJexl field names
+        protected Set<String> fieldNames;
+
+        NoJexlClass(Set<String> methods, Set<String> fields) {
+            methodNames = methods;
+            fieldNames = fields;
+        }
+
+        NoJexlClass() {
+            this(new HashSet<>(), new HashSet<>());
+        }
+
+        boolean deny(Field field) {
+            return fieldNames.contains(field.getName());
+        }
+
+        boolean deny(Method method) {
+            return methodNames.contains(method.getName());
+        }
+
+        boolean deny(Constructor method) {
+            return methodNames.contains(method.getName());
+        }
+    }
+
+    /** Marker for whole NoJexl class. */
+    static final NoJexlClass NOJEXL_CLASS = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
+        @Override
+        boolean deny(Field field) {
+            return true;
+        }
+        @Override
+        boolean deny(Method method) {
+            return true;
+        }
+        @Override
+        boolean deny(Constructor method) {
+            return true;
+        }
+    };
+
+    /** Marker for allowed class. */
+    static final NoJexlClass JEXL_CLASS = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
+        @Override
+        boolean deny(Field field) {
+            return false;
+        }
+        @Override
+        boolean deny(Method method) {
+            return false;
+        }
+        @Override
+        boolean deny(Constructor method) {
+            return false;
+        }
+    };
+
+    /** Marker for @NoJexl package. */
+    static final NoJexlPackage NOJEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
+        NoJexlClass getNoJexl(Class<?> clazz) {
+            return NOJEXL_CLASS;
+        }
+    };
+
+    /** Marker for fully allowed package. */
+    static final NoJexlPackage JEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
+        NoJexlClass getNoJexl(Class<?> clazz) {
+            return JEXL_CLASS;
+        }
+    };
+
+    /**
+     * The @NoJexl execution-time map.
+     */
+    private final Map<String, NoJexlPackage> packages;
+
+    /**
+     * Gets the package constraints.
+     * @param pack the package
+     * @return the package constraints instance, not-null.
+     */
+    private NoJexlPackage getNoJexl(Package pack) {
+        NoJexlPackage njp = packages.get(pack.getName());
+        return njp == null? JEXL_PACKAGE : njp;
+    }
+
+    /**
+     * Gets the class constraints.
+     * @param clazz the class
+     * @return the class constraints instance, not-null.
+     */
+    private NoJexlClass getNoJexl(Class<?> clazz) {
+        NoJexlPackage njp = getNoJexl(clazz.getPackage());
+        return njp == null? JEXL_CLASS : njp.getNoJexl(clazz);
+    }
+
+    /**
+     * Whether a whole package is denied Jexl visibility.
+     * @param pack the package
+     * @return true if denied, false otherwise
+     */
+    private boolean deny(Package pack) {
+        return Objects.equals(NOJEXL_PACKAGE, packages.get(pack.getName()));
+    }
+
+    /**
+     * Whether a whole class is denied Jexl visibility.
+     * @param clazz the class
+     * @return true if denied, false otherwise
+     */
+    private boolean deny(Class<?> clazz) {
+        NoJexlPackage njp = packages.get(clazz.getPackage().getName());
+        return njp != null && NOJEXL_CLASS.equals(njp.getNoJexl(clazz));
+    }
+
+    /**
+     * Whether a constructor is denied Jexl visibility.
+     * @param ctor the constructor
+     * @return true if denied, false otherwise
+     */
+    private boolean deny(Constructor<?> ctor) {
+        return getNoJexl(ctor.getDeclaringClass()).deny(ctor);
+    }
+
+    /**
+     * Whether a field is denied Jexl visibility.
+     * @param field the field
+     * @return true if denied, false otherwise
+     */
+    private boolean deny(Field field) {
+        return getNoJexl(field.getDeclaringClass()).deny(field);
+    }
+
+    /**
+     * Whether a method is denied Jexl visibility.
+     * @param method the method
+     * @return true if denied, false otherwise
+     */
+    private boolean deny(Method method) {
+        return getNoJexl(method.getDeclaringClass()).deny(method);
+    }
 
     /**
      * Checks whether a package explicitly disallows JEXL introspection.
@@ -71,7 +230,7 @@ public class Permissions {
      * @return true if JEXL is allowed to introspect, false otherwise
      */
     public boolean allow(final Package pack) {
-        if (pack == null || pack.getAnnotation(NoJexl.class) != null) {
+        if (pack == null || pack.getAnnotation(NoJexl.class) != null || deny(pack)) {
             return false;
         }
         return true;
@@ -108,6 +267,10 @@ public class Permissions {
         if (nojexl != null) {
             return false;
         }
+        // check added restrictions
+        if (deny(ctor)) {
+            return false;
+        }
         return true;
     }
 
@@ -130,6 +293,10 @@ public class Permissions {
         // is field annotated with nojexl ?
         final NoJexl nojexl = field.getAnnotation(NoJexl.class);
         if (nojexl != null) {
+            return false;
+        }
+        // check added restrictions
+        if (deny(field)) {
             return false;
         }
         return true;
@@ -158,6 +325,10 @@ public class Permissions {
         Class<?> clazz = method.getDeclaringClass();
         nojexl = clazz.getAnnotation(NoJexl.class);
         if (nojexl != null) {
+            return false;
+        }
+        // check added restrictions
+        if (deny(method)) {
             return false;
         }
         // lets walk all interfaces
@@ -200,6 +371,10 @@ public class Permissions {
                 if (nojexl != null) {
                     return false;
                 }
+                // check added restrictions
+                if (deny(inter)) {
+                    return false;
+                }
             }
         }
         // lets walk all super classes
@@ -209,6 +384,10 @@ public class Permissions {
             // is clazz annotated with nojexl ?
             final NoJexl nojexl = walk.getAnnotation(NoJexl.class);
             if (nojexl != null) {
+                return false;
+            }
+            // check added restrictions
+            if (deny(walk)) {
                 return false;
             }
             walk = walk.getSuperclass();
@@ -233,9 +412,13 @@ public class Permissions {
                     if (nojexl != null) {
                         return false;
                     }
-                    // check if parent declaring class said nojexl (transitivity)
+                    // check if parent declaring class said nojexl on that method (transitivity)
                     nojexl = wmethod.getAnnotation(NoJexl.class);
                     if (nojexl != null) {
+                        return false;
+                    }
+                    // check added restrictions
+                    if (deny(wmethod)) {
                         return false;
                     }
                 }
