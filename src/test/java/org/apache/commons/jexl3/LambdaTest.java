@@ -298,6 +298,30 @@ public class LambdaTest extends JexlTestCase {
     }
 
     @Test
+    public void testCurry4() throws Exception {
+        final JexlEngine jexl = createEngine();
+        JexlScript script;
+        Object result;
+
+        final JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");
+        script = base.curry(5);
+        result = script.execute(null, 15, 22);
+        Assert.assertEquals(42, result);
+    }
+
+    @Test
+    public void testCurry5() throws Exception {
+        final JexlEngine jexl = createEngine();
+        JexlScript script;
+        Object result;
+
+        final JexlScript base = jexl.createScript("var t = x + y + z; return t", "x", "y", "z");
+        script = base.curry(5);
+        result = script.execute(null, 15, 22);
+        Assert.assertEquals(42, result);
+    }
+
+    @Test
     public void test270() throws Exception {
         final JexlEngine jexl = createEngine();
         final JexlScript base = jexl.createScript("(x, y, z)->{ x + y + z }");

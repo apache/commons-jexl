@@ -1005,9 +1005,16 @@ public class Interpreter extends InterpreterBase {
      */
     protected Object runClosure(final Closure closure, final Object data) {
         final ASTJexlScript script = closure.getScript();
+        // if empty script, nothing to evaluate
+        final int numChildren = script.jjtGetNumChildren();
+        if (numChildren == 0) {
+            return null;
+        }
         block = new LexicalFrame(frame, block).defineArgs();
         try {
-            final JexlNode body = script.jjtGetChild(script.jjtGetNumChildren() - 1);
+            final JexlNode body = script instanceof ASTJexlLambda
+                    ? script.jjtGetChild(numChildren - 1)
+                    : script;
             return interpret(body);
         } finally {
             block = block.pop();
