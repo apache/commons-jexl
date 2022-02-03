@@ -83,6 +83,10 @@ public class OptionalTest {
         result = script.execute(null, thing);
         Assert.assertNull(result);
         thing.name = "froboz";
+        script = jexl.createScript(info,"thing.names", "thing");
+        result = script.execute(null, thing);
+        Assert.assertNotNull(result);
+        script = jexl.createScript(info,"thing.names.size()", "thing");
         result = script.execute(null, thing);
         Assert.assertEquals(1, result);
     }

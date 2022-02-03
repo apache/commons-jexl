@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.logging.Log;
 
 import java.lang.reflect.Constructor;
@@ -69,7 +70,7 @@ public final class Introspector {
     /**
      * The permissions.
      */
-    private final Permissions permissions;
+    private final JexlPermissions permissions;
     /**
      * The read/write lock.
      */
@@ -93,7 +94,7 @@ public final class Introspector {
      * @param cloader the class loader
      */
     public Introspector(final Log log, final ClassLoader cloader) {
-        this(log, cloader, null);
+        this(log, cloader, Permissions.DEFAULT);
     }
 
     /**
@@ -102,10 +103,10 @@ public final class Introspector {
      * @param cloader the class loader
      * @param perms the permissions
      */
-    public Introspector(final Log log, final ClassLoader cloader, final Permissions perms) {
+    public Introspector(final Log log, final ClassLoader cloader, final JexlPermissions perms) {
         this.logger = log;
         this.loader = cloader;
-        this.permissions = perms != null? perms : Permissions.DEFAULT;
+        this.permissions = perms != null? perms : Permissions.SECURE;
     }
 
     /**
@@ -312,7 +313,9 @@ public final class Introspector {
                 // try again
                 classMap = classMethodMaps.get(c);
                 if (classMap == null) {
-                    classMap = new ClassMap(c, permissions, logger);
+                    classMap = permissions.allow(c)
+                            ? new ClassMap(c, permissions, logger)
+                            : ClassMap.empty();
                     classMethodMaps.put(c, classMap);
                 }
             } finally {

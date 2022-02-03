@@ -25,6 +25,7 @@ import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -88,9 +89,9 @@ public class Uberspect implements JexlUberspect {
      * @param perms the introspector permissions
      */
     public Uberspect(final Log runtimeLogger, final JexlUberspect.ResolverStrategy sty, final Permissions perms) {
-        logger = runtimeLogger;
+        logger = runtimeLogger == null? LogFactory.getLog(JexlEngine.class) : runtimeLogger;
         strategy = sty == null? JexlUberspect.JEXL_STRATEGY : sty;
-        permissions  = perms;
+        permissions = perms == null? Permissions.DEFAULT : perms;
         ref = new SoftReference<Introspector>(null);
         loader = new SoftReference<ClassLoader>(getClass().getClassLoader());
         operatorMap = new ConcurrentHashMap<Class<? extends JexlArithmetic>, Set<JexlOperator>>();

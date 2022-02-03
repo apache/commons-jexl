@@ -17,13 +17,20 @@
 
 package org.apache.commons.jexl3.internal.introspection;
 
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Parses permissions akin to NoJexl annotations.
- * The syntax only recognizes packages, classes (and inner classes), methods and fields.
- *
+ * A crude parser to configure permissions akin to NoJexl annotations.
+ * The syntax recognizes 2 types of permissions:
+ * - restricting access to packages, classes (and inner classes), methods and fields
+ * - allowing access to a wildcard restricted set of packages
+ *  Example:
+ *  my.allowed.packages.*
+ *  another.allowed.package.*
+ *  # nojexl like restrictions
  *  my.package {
  *   class0 {...
  *     class1 {...}
@@ -32,44 +39,52 @@ import java.util.concurrent.ConcurrentHashMap;
  *         class3 {}
  *     }
  *     # and eol comment
- *     class0(); // constructors
- *     method(); // method
- *     field; // field
- *   } // end class0
- * } // end package my.package
+ *     class0(); # constructors
+ *     method(); # method
+ *     field; # field
+ *   } # end class0
+ * } # end package my.package
  *
  */
-public class PermissionParser {
+public class PermissionsParser {
     /** The source. */
     private String src;
     /** The source size. */
     private int size;
     /** The @NoJexl execution-time map. */
     private Map<String, Permissions.NoJexlPackage> packages;
+    /** The set of wildcard imports. */
+    private Set<String> wildcards;
 
     /**
      * Basic ctor.
      */
-    PermissionParser() {
+    public PermissionsParser() {
     }
 
-    void clear() {
-        src = null; size = 0; packages = null;
+    /**
+     * Clears this parser internals.
+     */
+    public void clear() {
+        src = null; size = 0; packages = null; wildcards = null;
     }
 
     /**
      * Parses permissions from a source.
-     * @param src the source
+     * @param srcs the sources
      * @return the permissions map
      */
-    Map<String, Permissions.NoJexlPackage> parse(String src) {
+    public Permissions parse(String... srcs) {
         packages = new ConcurrentHashMap<>();
-        this.src = src;
-        this.size = src.length();
-        readPackages();
-        Map<String, Permissions.NoJexlPackage> map = packages;
+        wildcards = new LinkedHashSet<>();
+        for(String src : srcs) {
+            this.src = src;
+            this.size = src.length();
+            readPackages();
+        }
+        Permissions permissions = new Permissions(wildcards, packages);
         clear();
-        return map;
+        return permissions;
     }
 
     /**
@@ -96,12 +111,11 @@ public class PermissionParser {
             }
             i += 1;
         }
-        return offset;
+        return i;
     }
 
     /**
      * Reads spaces.
-     * @param offset
      * @param offset initial position
      * @return position after spaces
      */
@@ -109,7 +123,7 @@ public class PermissionParser {
         int i = offset;
         while (i < size) {
             char c = src.charAt(i);
-            if (!Character.isSpaceChar(c)) {
+            if (!Character.isWhitespace(c)) {
                 break;
             }
             i += 1;
@@ -121,10 +135,21 @@ public class PermissionParser {
      * Reads an identifier (optionally dot-separated).
      * @param id the builder to fill the identifier character with
      * @param offset the initial reading position
-     * @param dot whether dots (.) are allowed
      * @return the position after the identifier
      */
-    private int readIdentifier(StringBuilder id, int offset, boolean dot) {
+    private int readIdentifier(StringBuilder id, int offset) {
+        return readIdentifier(id, offset, false, false);
+    }
+
+    /**
+     * Reads an identifier (optionally dot-separated).
+     * @param id the builder to fill the identifier character with
+     * @param offset the initial reading position
+     * @param dot whether dots (.) are allowed
+     * @param star whether stars (*) are allowed
+     * @return the position after the identifier
+     */
+    private int readIdentifier(StringBuilder id, int offset, boolean dot, boolean star) {
         int begin = -1;
         int i = offset;
         char c = 0;
@@ -140,8 +165,10 @@ public class PermissionParser {
                 if (src.charAt(i - 1) == '.') {
                     throw new IllegalStateException(unexpected(c, i));
                 }
-                id.append(c);
+                id.append('.');
                 begin = -1;
+            } else if (star && c == '*') {
+                id.append('*');
             } else {
                 break;
             }
@@ -163,7 +190,7 @@ public class PermissionParser {
         int i = 0;
         int j = -1;
         String pname = null;
-        for (; i < size; ) {
+        while (i < size) {
             char c = src.charAt(i);
             // if no parsing progress can be made, we are in error
             if (j < i) {
@@ -172,7 +199,7 @@ public class PermissionParser {
                 throw new IllegalStateException(unexpected(c, i));
             }
             // get rid of space
-            if (Character.isSpaceChar(c)) {
+            if (Character.isWhitespace(c)) {
                 i = readSpaces(i + 1);
                 continue;
             }
@@ -183,11 +210,16 @@ public class PermissionParser {
             }
             // read the package qualified name
             if (pname == null) {
-                int next = readIdentifier(temp, i, true);
+                int next = readIdentifier(temp, i, true, true);
                 if (i != next) {
                     pname = temp.toString();
                     temp.setLength(0);
                     i = next;
+                    // consume it if it is a wildcard decl
+                    if (pname.endsWith(".*")) {
+                        wildcards.add(pname);
+                        pname = null;
+                    }
                     continue;
                 }
             }
@@ -235,7 +267,7 @@ public class PermissionParser {
                 throw new IllegalStateException(unexpected(c, i));
             }
             // get rid of space
-            if (Character.isSpaceChar(c)) {
+            if (Character.isWhitespace(c)) {
                 i = readSpaces(i + 1);
                 continue;
             }
@@ -246,7 +278,7 @@ public class PermissionParser {
             }
             // read an identifier, the class name
             if (identifier == null) {
-                int next = readIdentifier(temp, i, false);
+                int next = readIdentifier(temp, i);
                 if (i != next) {
                     identifier = temp.toString();
                     temp.setLength(0);
@@ -254,6 +286,10 @@ public class PermissionParser {
                     continue;
                 } else if (c == '}') {
                     i += 1;
+                    // restrict the whole class
+                    if (njname != null && njclass.isEmpty()) {
+                        njpackage.addNoJexl(njname, Permissions.NOJEXL_CLASS);
+                    }
                     break;
                 }
             }
@@ -264,7 +300,7 @@ public class PermissionParser {
                     // if we have a class, it has a name
                     njclass = new Permissions.NoJexlClass();
                     njname = outer != null ? outer + "$" + identifier : identifier;
-                    njpackage.nojexl.put(njname, njclass);
+                    njpackage.addNoJexl(njname, njclass);
                     identifier = null;
                     i += 1;
                 } else {
@@ -275,6 +311,7 @@ public class PermissionParser {
                 if (c == '{') {
                     // inner class
                     i = readClass(njpackage, njname, identifier, i - 1);
+                    identifier = null;
                 } else if (c == ';') {
                     // field or method?
                     if (isMethod) {
@@ -283,7 +320,6 @@ public class PermissionParser {
                     } else {
                         njclass.fieldNames.add(identifier);
                     }
-                    isMethod = false;
                     identifier = null;
                     i += 1;
                 } else if (c == '(' && !isMethod) {
@@ -293,6 +329,10 @@ public class PermissionParser {
                 } else if (c == ')' && src.charAt(i - 1) == '(') {
                     i += 1;
                 } else if (c == '}') {
+                    // restrict the whole class
+                    if (njname != null && njclass.isEmpty()) {
+                        njpackage.addNoJexl(njname, Permissions.NOJEXL_CLASS);
+                    }
                     i += 1;
                     break;
                 } else {

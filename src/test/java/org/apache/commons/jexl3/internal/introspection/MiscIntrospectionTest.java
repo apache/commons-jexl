@@ -26,8 +26,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * Checks the CacheMap.MethodKey implementation
@@ -95,129 +97,4 @@ public class MiscIntrospectionTest {
         Assert.assertEquals(-1, alw.indexOf(null));
     }
 
-    public static class A {
-        public int i;
-        public A() {}
-        public int method() { return 0; }
-    }
-
-    @NoJexl
-    public interface InterNoJexl0 {
-        int method();
-    }
-
-    public interface InterNoJexl1 {
-        @NoJexl
-        int method();
-    }
-
-
-    public static class A0 extends A implements InterNoJexl0 {
-        @NoJexl public int i0;
-        @NoJexl public A0() {}
-        @Override public int method() { return 1; }
-    }
-
-    public static class A1 extends A implements InterNoJexl1 {
-        private int i1;
-        @NoJexl public A1() {}
-        @Override public int method() { return 2; }
-    }
-
-    @NoJexl
-    public static class A2 extends A  {
-        public A2() {}
-        @Override public int method() { return 3; }
-    }
-
-    protected static class A3 {
-        protected int i3;
-        protected A3() {}
-        int method() { return 4; }
-    }
-
-    public static class A5 implements InterNoJexl5 {
-        public A5() {}
-        @Override public int method() { return 0; }
-    }
-
-    @NoJexl
-    public interface InterNoJexl5 {
-        int method();
-    }
-
-    @Test
-    public void testPermissions() throws Exception {
-        Permissions p = Permissions.DEFAULT;
-        Assert.assertFalse(p.allow((Field) null));
-        Assert.assertFalse(p.allow((Package) null));
-        Assert.assertFalse(p.allow((Method) null));
-        Assert.assertFalse(p.allow((Constructor<?>) null));
-        Assert.assertFalse(p.allow((Class<?>) null));
-
-        Assert.assertTrue(p.allow(A2.class));
-        Assert.assertFalse(p.allow(A3.class));
-        Assert.assertFalse(p.allow(A5.class));
-
-        Method mA = A.class.getMethod("method");
-        Assert.assertNotNull(mA);
-        Method mA0 = A0.class.getMethod("method");
-        Assert.assertNotNull(mA0);
-        Method mA1 = A1.class.getMethod("method");
-        Assert.assertNotNull(mA1);
-        Method mA2 = A2.class.getMethod("method");
-        Assert.assertNotNull(mA1);
-        Method mA3 = A2.class.getDeclaredMethod("method");
-        Assert.assertNotNull(mA1);
-
-        Assert.assertTrue(p.allow(mA));
-        Assert.assertFalse(p.allow(mA0));
-        Assert.assertFalse(p.allow(mA1));
-        Assert.assertFalse(p.allow(mA2));
-        Assert.assertFalse(p.allow(mA3));
-
-        Field fA = A.class.getField("i");
-        Assert.assertNotNull(fA);
-        Assert.assertTrue(p.allow(fA));
-
-        Field fA0 = A0.class.getField("i0");
-        Assert.assertNotNull(fA0);
-        Assert.assertFalse(p.allow(fA0));
-        Field fA1 = A1.class.getDeclaredField("i1");
-        Assert.assertNotNull(fA1);
-        Assert.assertFalse(p.allow(fA0));
-
-        Constructor<?> cA = A.class.getConstructor();
-        Assert.assertNotNull(cA);
-        Assert.assertTrue(p.allow(cA));
-
-        Constructor<?> cA0 = A0.class.getConstructor();
-        Assert.assertNotNull(cA0);
-        Assert.assertFalse(p.allow(cA0));
-
-        Constructor<?> cA3 = A3.class.getDeclaredConstructor();
-        Assert.assertNotNull(cA3);
-        Assert.assertFalse(p.allow(cA3));
-    }
-
-
-    @Test
-    public void testParsePermissions0() throws Exception {
-        String src = "java.lang { Runtime { exit(); } }";
-        PermissionParser pp = new PermissionParser();
-        Map<String, Permissions.NoJexlPackage> nojexlmap = pp.parse(src);
-        Assert.assertNotNull(nojexlmap);
-    }
-
-
-    @Test
-    public void testParsePermissions1() throws Exception {
-        String src = "java.lang { Runtime { exit(); } }" +
-                "java.rmi {}" +
-                "java.io { File {} }" +
-                "java.nio { Path {} }";
-        PermissionParser pp = new PermissionParser();
-        Map<String, Permissions.NoJexlPackage> nojexlmap = pp.parse(src);
-        Assert.assertNotNull(nojexlmap);
-    }
 }

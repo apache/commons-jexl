@@ -22,6 +22,8 @@ import java.lang.reflect.Method;
 
 
 import org.apache.commons.jexl3.internal.Util;
+import org.apache.commons.jexl3.internal.introspection.Permissions;
+import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.junit.After;
 import org.junit.Assert;
 
@@ -67,7 +69,9 @@ public class JexlTestCase {
     }
 
     public static JexlEngine createEngine(final boolean lenient) {
-        return new JexlBuilder().arithmetic(new JexlArithmetic(!lenient)).cache(128).create();
+        return new JexlBuilder()
+                .uberspect(new Uberspect(null, null, Permissions.SECURE))
+                .arithmetic(new JexlArithmetic(!lenient)).cache(128).create();
     }
 
     /**

@@ -16,21 +16,21 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.logging.Log;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * A cache of introspection information for a specific class instance.
@@ -77,15 +77,48 @@ final class ClassMap {
      * </p>
      * Uses ConcurrentMap since 3.0, marginally faster than 2.1 under contention.
      */
-    private final ConcurrentMap<MethodKey, Method> byKey = new ConcurrentHashMap<>();
+    private final Map<MethodKey, Method> byKey ;
     /**
      * Keep track of all methods with the same name; this is not modified after creation.
      */
-    private final Map<String, Method[]> byName = new HashMap<>();
+    private final Map<String, Method[]> byName;
     /**
      * Cache of fields.
      */
     private final Map<String, Field> fieldCache;
+
+    /**
+     * Singleton for permissions non-allowed classes.
+     */
+    private static final ClassMap EMPTY = new ClassMap();
+
+    /**
+     * @return the empty classmap instance
+     */
+    static ClassMap empty() {
+        return EMPTY;
+    }
+
+    /**
+     * Empty map.
+     */
+    private ClassMap() {
+        this.byKey = Collections.unmodifiableMap(new AbstractMap<MethodKey, Method>() {
+            @Override
+            public String toString() {
+                return "emptyClassMap{}";
+            }
+            @Override
+            public Set<Entry<MethodKey, Method>> entrySet() {
+                return null;
+            }
+            @Override public Method get(Object name) {
+                return CACHE_MISS;
+            }
+        });
+        this.byName = Collections.emptyMap();
+        this.fieldCache = Collections.emptyMap();
+    }
 
     /**
      * Standard constructor.
@@ -95,7 +128,9 @@ final class ClassMap {
      * @param log         the logger.
      */
     @SuppressWarnings("LeakingThisInConstructor")
-    ClassMap(final Class<?> aClass, final Permissions permissions, final Log log) {
+    ClassMap(final Class<?> aClass, final JexlPermissions permissions, final Log log) {
+        this.byKey = new ConcurrentHashMap<>();
+        this.byName = new HashMap<>();
         // eagerly cache methods
         create(this, permissions, aClass, log);
         // eagerly cache public fields
@@ -211,7 +246,7 @@ final class ClassMap {
      * @param clazz          the class to cache
      * @param log            the Log
      */
-    private static void create(final ClassMap cache, final Permissions permissions, Class<?> clazz, final Log log) {
+    private static void create(final ClassMap cache, final JexlPermissions permissions, Class<?> clazz, final Log log) {
         //
         // Build a list of all elements in the class hierarchy. This one is bottom-first (i.e. we start
         // with the actual declaring class and its interfaces and then move up (superclass etc.) until we
@@ -263,7 +298,7 @@ final class ClassMap {
      * @param log         the Log
      */
     private static void populateWithInterface(final ClassMap cache,
-                                              final Permissions permissions,
+                                              final JexlPermissions permissions,
                                               final Class<?> iface,
                                               final Log log) {
         if (Modifier.isPublic(iface.getModifiers())) {
@@ -284,7 +319,7 @@ final class ClassMap {
      * @param log         the Log
      */
     private static void populateWithClass(final ClassMap cache,
-                                          final Permissions permissions,
+                                          final JexlPermissions permissions,
                                           final Class<?> clazz,
                                           final Log log) {
         try {

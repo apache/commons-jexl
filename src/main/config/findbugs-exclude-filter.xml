@@ -51,4 +51,20 @@
     <Match>
         <Class name="org.apache.commons.jexl3.parser.SimpleNode"/>
     </Match>
+    <Match>
+        <Class name="org.apache.commons.jexl3.JexlBuilder"/>
+        <Bug code="EI2,EI"></Bug>
+    </Match>
+    <Match>
+        <Package name="org.apache.commons.jexl3.internal"/>
+        <Bug code="EI2,EI"></Bug>
+    </Match>
+    <Match>
+        <Package name="org.apache.commons.jexl3.introspection.internal"/>
+        <Bug code="EI2,EI"></Bug>
+    </Match>
+    <Match>
+        <Package name="org.apache.commons.jexl3.parser"/>
+        <Bug code="EI2,EI"></Bug>
+    </Match>
 </FindBugsFilter>
