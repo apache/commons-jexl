@@ -16,6 +16,8 @@
  */
 package org.apache.commons.jexl3.introspection;
 
+import org.apache.commons.jexl3.internal.introspection.PermissionsParser;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -62,4 +64,13 @@ public interface JexlPermissions {
      * @return true if JEXL is allowed to introspect, false otherwise
      */
     boolean allow(final Field field);
+
+    /**
+     * Parses a set of permissions.
+     * @param src the permissions source
+     * @return the permissions instance
+     */
+    static JexlPermissions parse(String... src) {
+        return new PermissionsParser().parse(src);
+    }
 }

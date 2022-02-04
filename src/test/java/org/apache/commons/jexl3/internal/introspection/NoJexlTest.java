@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal.introspection;
 
 import org.apache.commons.jexl3.annotations.NoJexl;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -86,7 +87,7 @@ public class NoJexlTest {
     }
 
     @Test
-    public void testPermissions() throws Exception {
+    public void testNoJexlPermissions() throws Exception {
         Permissions p = Permissions.DEFAULT;
         Assert.assertFalse(p.allow((Field) null));
         Assert.assertFalse(p.allow((Package) null));
@@ -137,38 +138,6 @@ public class NoJexlTest {
         Constructor<?> cA3 = A3.class.getDeclaredConstructor();
         Assert.assertNotNull(cA3);
         Assert.assertFalse(p.allow(cA3));
-    }
-
-
-    @Test
-    public void testParsePermissions0() throws Exception {
-        String src = "java.lang { Runtime { exit(); } }";
-        Permissions p = new PermissionsParser().parse(src);
-        Map<String, Permissions.NoJexlPackage> nojexlmap = p.getPackages();
-        Assert.assertNotNull(nojexlmap);
-    }
-
-
-    @Test
-    public void testParsePermissions1() throws Exception {
-        String src = "java.lang { Runtime { exit(); } }" +
-                "java.rmi {}" +
-                "java.io { File {} }" +
-                "java.nio { Path {} }";
-        Permissions p = new PermissionsParser().parse(src);
-        Map<String, Permissions.NoJexlPackage> nojexlmap = p.getPackages();
-        Assert.assertNotNull(nojexlmap);
-    }
-
-    @Test
-    public void testWildCardPackages() {
-        Set<String> wildcards;
-        boolean found;
-        wildcards = new HashSet<>(Arrays.asList("com.apache.*"));
-        found = Permissions.wildcardAllow(wildcards, "com.apache.commons.jexl3");
-        Assert.assertTrue(found);
-        found = Permissions.wildcardAllow(wildcards, "com.google.spexl");
-        Assert.assertFalse(found);
     }
 
 }

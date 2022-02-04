@@ -472,7 +472,7 @@ public class Engine extends JexlEngine {
 
     @Override
     public Script createExpression(final JexlInfo info, final String expression) {
-        return createScript(expressionFeatures, info, expression, null);
+        return createScript(expressionFeatures, info, expression);
     }
 
     @Override

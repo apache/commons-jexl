@@ -16,16 +16,23 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import org.apache.commons.jexl3.internal.introspection.nojexlpackage.Invisible;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+
+import static org.apache.commons.jexl3.internal.introspection.Permissions.SECURE;
 
 /**
  * Checks the CacheMap.MethodKey implementation
@@ -85,7 +92,6 @@ public class PermissionsTest {
 
     @Test
     public void testPermissions() throws Exception {
-
         String src = " org.apache.commons.jexl3.internal.introspection { PermissionsTest { "+
                 "InterNoJexl0 { } "+
                 "InterNoJexl1 { method(); } "+
@@ -95,7 +101,7 @@ public class PermissionsTest {
                 "InterNoJexl5 { } "+
                 "} }";
 
-        Permissions p = new PermissionsParser().parse(src);
+        JexlPermissions p = (Permissions) JexlPermissions.parse(src);
         Assert.assertFalse(p.allow((Field) null));
         Assert.assertFalse(p.allow((Package) null));
         Assert.assertFalse(p.allow((Method) null));
@@ -147,26 +153,71 @@ public class PermissionsTest {
         Assert.assertFalse(p.allow(cA3));
     }
 
-
-    @Test
-    public void testParsePermissions0() {
-        String src = "java.lang { Runtime { exit(); } }";
-        PermissionsParser pp = new PermissionsParser();
-        Permissions p = pp.parse(src);
-        Map<String, Permissions.NoJexlPackage> nojexlmap = p.getPackages();
-        Assert.assertNotNull(nojexlmap);
+    static Method getMethod(Class<?> clazz, String method) {
+        return Arrays.stream(clazz.getMethods()).filter(mth->mth.getName().equals(method)).findFirst().get();
     }
 
+    @Test
+    public void testParsePermissions0() throws Exception {
+        String src = "java.lang { Runtime { exit(); exec(); } }";
+        Permissions p = (Permissions) JexlPermissions.parse(src);
+        Map<String, Permissions.NoJexlPackage> nojexlmap = p.getPackages();
+        Assert.assertNotNull(nojexlmap);
+        Permissions.NoJexlPackage njp = nojexlmap.get("java.lang");
+        Assert.assertNotNull(njp);
+        Method exit = getMethod(java.lang.Runtime.class,"exit");
+        Assert.assertNotNull(exit);
+        Assert.assertFalse(p.allow(exit));
+        Method exec = getMethod(java.lang.Runtime.class,"exec");
+        Assert.assertNotNull(exec);
+        Assert.assertFalse(p.allow(exec));
+    }
+
+    public static class Outer {
+        public static class Inner {
+            public void callMeNot() {}
+        }
+    }
 
     @Test
     public void testParsePermissions1() {
-        String src = "java.lang { Runtime { exit(); } }" +
-                "java.rmi {}" +
-                "java.io { File {} }" +
-                "java.nio { Path {} }";
-        Permissions p = new PermissionsParser().parse(src);
+        String[] src = new String[]{
+                "java.lang.*",
+                "java.math.*",
+                "java.text.*",
+                "java.util.*",
+                "java.lang { Runtime {} }",
+                "java.rmi {}",
+                "java.io { File {} }",
+                "java.nio { Path {} }" ,
+                "org.apache.commons.jexl3.internal.introspection { " +
+                    "PermissionsTest { #level 0\n" +
+                        " Outer { #level 1\n" +
+                            " Inner { #level 2\n" +
+                                " callMeNot();" +
+                            " }" +
+                        " }" +
+                    " }" +
+                " }"};
+        Permissions p = (Permissions) JexlPermissions.parse(src);
         Map<String, Permissions.NoJexlPackage> nojexlmap = p.getPackages();
         Assert.assertNotNull(nojexlmap);
+        Set<String> wildcards = p.getWildcards();
+        Assert.assertEquals(4, wildcards.size());
+
+        Method exit = getMethod(java.lang.Runtime.class,"exit");
+        Assert.assertNotNull(exit);
+        Assert.assertFalse(p.allow(exit));
+        Method exec = getMethod(java.lang.Runtime.class,"getRuntime");
+        Assert.assertNotNull(exec);
+        Assert.assertFalse(p.allow(exec));
+        Method callMeNot = getMethod(Outer.Inner.class, "callMeNot");
+        Assert.assertNotNull(callMeNot);
+        Assert.assertFalse(p.allow(callMeNot));
+        Method uncallable = getMethod(Invisible.class, "uncallable");
+        Assert.assertFalse(p.allow(uncallable));
+        Package ip = Invisible.class.getPackage();
+        Assert.assertFalse(p.allow(ip));
     }
 
     @Test
@@ -182,20 +233,29 @@ public class PermissionsTest {
 
     @Test
     public void testSecurePermissions() {
-        Permissions SECURE = new PermissionsParser().parse(
-                        "java.lang.*\n"+
-                        "java.math.*\n"+
-                        "java.text.*\n"+
-                        "java.util.*\n"+
-                        "java.lang { Runtime {} System {} ProcessBuilder {} Class {} }\n" +
-                                "java.lang.annotation {}\n" +
-                                "java.lang.instrument {}\n" +
-                                "java.lang.invoke {}\n" +
-                                "java.lang.management {}\n" +
-                                "java.lang.ref {}\n" +
-                                "java.lang.reflect {}\n");
         Assert.assertNotNull(SECURE);
-        Set<String> wilcards = SECURE.getWildcards();
-        Assert.assertEquals(4, wilcards.size());
+        List<Class<?>> acs = Arrays.asList(
+            java.lang.Runtime.class,
+            java.math.BigDecimal.class,
+            java.text.SimpleDateFormat.class,
+            java.util.Map.class);
+        for(Class<?> ac: acs) {
+            Package p = ac.getPackage();
+            Assert.assertNotNull(ac.getName(), p);
+            Assert.assertTrue(ac.getName(), SECURE.allow(p));
+        }
+        List<Class<?>> nacs = Arrays.asList(
+                java.lang.annotation.ElementType.class,
+                java.lang.instrument.ClassDefinition.class,
+                java.lang.invoke.CallSite.class,
+                java.lang.management.BufferPoolMXBean.class,
+                java.lang.ref.SoftReference.class,
+                java.lang.reflect.Method.class);
+        for(Class<?> nac : nacs) {
+            Package p = nac.getPackage();
+            Assert.assertNotNull(nac.getName(), p);
+            Assert.assertFalse(nac.getName(), SECURE.allow(p));
+        }
     }
+
 }

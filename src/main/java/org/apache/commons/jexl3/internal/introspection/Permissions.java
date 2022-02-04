@@ -71,6 +71,8 @@ public class Permissions implements JexlPermissions {
             this(new ConcurrentHashMap<>());
         }
 
+        boolean isEmpty() { return nojexl.isEmpty(); }
+
         @Override
         public boolean equals(Object o) {
             return o == this;

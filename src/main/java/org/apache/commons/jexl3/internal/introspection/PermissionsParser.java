@@ -232,6 +232,10 @@ public class PermissionsParser {
                 }
             } else {
                 if (c == '}') {
+                    // empty means whole package
+                    if (njpackage.isEmpty()) {
+                        packages.put(pname, Permissions.NOJEXL_PACKAGE);
+                    }
                     njpackage = null; // can restart anew
                     pname = null;
                     i += 1;
@@ -276,6 +280,15 @@ public class PermissionsParser {
                 i = readEol(i + 1);
                 continue;
             }
+            // end of class ?
+            if (njclass != null && c == '}') {
+                // restrict the whole class
+                if (njclass.isEmpty()) {
+                    njpackage.addNoJexl(njname, Permissions.NOJEXL_CLASS);
+                }
+                i += 1;
+                break;
+            }
             // read an identifier, the class name
             if (identifier == null) {
                 int next = readIdentifier(temp, i);
@@ -284,25 +297,17 @@ public class PermissionsParser {
                     temp.setLength(0);
                     i = next;
                     continue;
-                } else if (c == '}') {
-                    i += 1;
-                    // restrict the whole class
-                    if (njname != null && njclass.isEmpty()) {
-                        njpackage.addNoJexl(njname, Permissions.NOJEXL_CLASS);
-                    }
-                    break;
                 }
             }
             // parse a class:
             if (njclass == null) {
                 // we must have read the class ('identifier {'...)
-                if (c == '{') {
+                if (identifier != null && c == '{') {
                     // if we have a class, it has a name
                     njclass = new Permissions.NoJexlClass();
                     njname = outer != null ? outer + "$" + identifier : identifier;
                     njpackage.addNoJexl(njname, njclass);
                     identifier = null;
-                    i += 1;
                 } else {
                     throw new IllegalStateException(unexpected(c, i));
                 }
@@ -312,7 +317,9 @@ public class PermissionsParser {
                     // inner class
                     i = readClass(njpackage, njname, identifier, i - 1);
                     identifier = null;
-                } else if (c == ';') {
+                    continue;
+                }
+                if (c == ';') {
                     // field or method?
                     if (isMethod) {
                         njclass.methodNames.add(identifier);
@@ -321,26 +328,15 @@ public class PermissionsParser {
                         njclass.fieldNames.add(identifier);
                     }
                     identifier = null;
-                    i += 1;
                 } else if (c == '(' && !isMethod) {
                     // method; only one opening parenthesis allowed
                     isMethod = true;
-                    i += 1;
-                } else if (c == ')' && src.charAt(i - 1) == '(') {
-                    i += 1;
-                } else if (c == '}') {
-                    // restrict the whole class
-                    if (njname != null && njclass.isEmpty()) {
-                        njpackage.addNoJexl(njname, Permissions.NOJEXL_CLASS);
-                    }
-                    i += 1;
-                    break;
-                } else {
+                } else if (c != ')' || src.charAt(i - 1) != '(') {
+                    // closing parenthesis following opening one was expected
                     throw new IllegalStateException(unexpected(c, i));
                 }
-            } else {
-                i += 1;
             }
+            i += 1;
         }
         return i;
     }
