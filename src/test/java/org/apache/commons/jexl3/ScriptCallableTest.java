@@ -397,7 +397,7 @@ public class ScriptCallableTest extends JexlTestCase {
     }
 
     /**
-     * Redundant test with previous ones but impervious to JEXL engine configuation.
+     * Redundant test with previous ones but impervious to JEXL engine configuration.
      * @throws Exception if there is a regression
      */
     private void runInterrupt(final JexlEngine jexl) throws Exception {
@@ -567,7 +567,11 @@ public class ScriptCallableTest extends JexlTestCase {
         try {
             result = script.execute(ctxt, true);
         } catch (final Exception xany) {
-            Assert.fail(xany.toString());
+            if (xany.getCause() != null) {
+                Assert.fail(xany.getCause().toString());
+            } else {
+                Assert.fail(xany.toString());
+            }
         }
         Assert.assertEquals("cancelled", result);
 
