@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import org.apache.commons.jexl3.internal.Util;
 import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.After;
 import org.junit.Assert;
 
@@ -68,9 +69,36 @@ public class JexlTestCase {
         return new JexlBuilder().create();
     }
 
+    /**
+     * A very secure singleton.
+     */
+    public static final JexlPermissions SECURE = JexlPermissions.parse(
+            "# Secure Uberspect Permissions",
+            "java.nio.*",
+            "java.io.*",
+            "java.lang.*",
+            "java.math.*",
+            "java.text.*",
+            "java.util.*",
+            "org.w3c.dom.*",
+            "org.apache.commons.jexl3.*",
+            "org.apache.commons.jexl3 { JexlBuilder {} }",
+            "org.apache.commons.jexl3.internal { Engine {} }",
+            "java.lang { Runtime {} System {} ProcessBuilder {} Class {} }",
+            "java.lang.annotation {}",
+            "java.lang.instrument {}",
+            "java.lang.invoke {}",
+            "java.lang.management {}",
+            "java.lang.ref {}",
+            "java.lang.reflect {}",
+            "java.net {}",
+            "java.io { File { } }",
+            "java.nio { Path { } Paths { } Files { } }"
+    );
+
     public static JexlEngine createEngine(final boolean lenient) {
         return new JexlBuilder()
-                .uberspect(new Uberspect(null, null, Permissions.SECURE))
+                .uberspect(new Uberspect(null, null, SECURE))
                 .arithmetic(new JexlArithmetic(!lenient)).cache(128).create();
     }
 

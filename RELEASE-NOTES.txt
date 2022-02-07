@@ -28,6 +28,18 @@ Compatibility with previous releases
 ====================================
 Version 3.3 is source and binary compatible with 3.2.
 
+What's new in 3.3:
+==================
+JEXL 3.3 brings the ability to configure permissions on libraries in the manner pioneered
+with the @NoJexl annotation on source code. This is achieved through a crude but light mechanism akin to
+a security manager that controls what JEXL can introspect and thus expose to scripts.
+Used in conjunction with options (JexlOptions) and features (JexlFeatures), the permissions (JexlPermissions)
+allow fine-tuning the scripting integration into any project.
+
+New Features in 3.3:
+====================
+* JEXL-357:     Configure accessible packages/classes/methods/fields
+
 Bugs Fixed in 3.3:
 ==================
 * JEXL-354:     #pragma does not handle negative integer or real literals

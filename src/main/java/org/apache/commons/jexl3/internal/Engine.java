@@ -25,9 +25,11 @@ import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.jexl3.internal.introspection.SandboxUberspect;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.apache.commons.jexl3.introspection.JexlMethod;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.jexl3.parser.ASTArrayAccess;
@@ -73,7 +75,9 @@ public class Engine extends JexlEngine {
     private static final class UberspectHolder {
         /** The default uberspector that handles all introspection patterns. */
         private static final Uberspect UBERSPECT =
-                new Uberspect(LogFactory.getLog(JexlEngine.class), JexlUberspect.JEXL_STRATEGY);
+                new Uberspect(LogFactory.getLog(JexlEngine.class),
+                        JexlUberspect.JEXL_STRATEGY,
+                        JexlPermissions.parse());
 
         /** Non-instantiable. */
         private UberspectHolder() {}
@@ -194,7 +198,9 @@ public class Engine extends JexlEngine {
         this.collectMode = conf.collectMode();
         this.stackOverflow = conf.stackOverflow() > 0? conf.stackOverflow() : Integer.MAX_VALUE;
         // core properties:
-        final JexlUberspect uber = conf.uberspect() == null ? getUberspect(conf.logger(), conf.strategy()) : conf.uberspect();
+        final JexlUberspect uber = conf.uberspect() == null
+                ? getUberspect(conf.logger(), conf.strategy(), conf.permissions())
+                : conf.uberspect();
         final ClassLoader loader = conf.loader();
         if (loader != null) {
             uber.setClassLoader(loader);
@@ -238,14 +244,32 @@ public class Engine extends JexlEngine {
      * instead of the default one.</p>
      * @param logger the logger to use for the underlying Uberspect
      * @param strategy the property resolver strategy
+     * @param permissions the introspection permissions
      * @return Uberspect the default uberspector instance.
+     * @since 3.3
      */
-    public static Uberspect getUberspect(final Log logger, final JexlUberspect.ResolverStrategy strategy) {
+    public static Uberspect getUberspect(
+            final Log logger,
+            final JexlUberspect.ResolverStrategy strategy,
+            final JexlPermissions permissions) {
         if ((logger == null || logger.equals(LogFactory.getLog(JexlEngine.class)))
-            && (strategy == null || strategy == JexlUberspect.JEXL_STRATEGY)) {
+            && (strategy == null || strategy == JexlUberspect.JEXL_STRATEGY)
+            && permissions == null || permissions == Permissions.DEFAULT) {
             return UberspectHolder.UBERSPECT;
         }
-        return new Uberspect(logger, strategy);
+        return new Uberspect(logger, strategy, permissions);
+    }
+
+    /**
+     * Use {@link Engine#getUberspect(Log, JexlUberspect.ResolverStrategy, JexlPermissions)}.
+     * @deprecated 3.3
+     * @param logger the logger
+     * @param strategy the strategy
+     * @return an Uberspect instance
+     */
+    @Deprecated
+    public static Uberspect getUberspect(final Log logger, final JexlUberspect.ResolverStrategy strategy) {
+        return getUberspect(logger, strategy, null);
     }
 
     @Override

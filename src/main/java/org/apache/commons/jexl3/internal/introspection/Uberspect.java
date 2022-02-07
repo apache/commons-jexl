@@ -20,6 +20,7 @@ import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.introspection.JexlMethod;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.apache.commons.jexl3.introspection.JexlPropertySet;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
@@ -58,7 +59,7 @@ public class Uberspect implements JexlUberspect {
     /** The resolver strategy. */
     private final JexlUberspect.ResolverStrategy strategy;
     /** The permissions. */
-    private final Permissions permissions;
+    private final JexlPermissions permissions;
     /** The introspector version. */
     private final AtomicInteger version;
     /** The soft reference to the introspector currently in use. */
@@ -88,7 +89,7 @@ public class Uberspect implements JexlUberspect {
      * @param sty the resolver strategy
      * @param perms the introspector permissions
      */
-    public Uberspect(final Log runtimeLogger, final JexlUberspect.ResolverStrategy sty, final Permissions perms) {
+    public Uberspect(final Log runtimeLogger, final JexlUberspect.ResolverStrategy sty, final JexlPermissions perms) {
         logger = runtimeLogger == null? LogFactory.getLog(JexlEngine.class) : runtimeLogger;
         strategy = sty == null? JexlUberspect.JEXL_STRATEGY : sty;
         permissions = perms == null? Permissions.DEFAULT : perms;

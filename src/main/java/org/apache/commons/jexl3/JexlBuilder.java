@@ -18,6 +18,7 @@
 package org.apache.commons.jexl3;
 
 import org.apache.commons.jexl3.internal.Engine;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.apache.commons.jexl3.introspection.JexlSandbox;
 import org.apache.commons.jexl3.introspection.JexlUberspect;
 import org.apache.commons.logging.Log;
@@ -26,13 +27,27 @@ import java.util.Map;
 import java.nio.charset.Charset;
 
 /**
- * Configure and builds a JexlEngine.
+ * Configures and builds a JexlEngine.
  *
- * <p>The <code>setSilent</code> and <code>setStrict</code> methods allow to fine-tune an engine instance behavior
- * according to various error control needs. The strict flag tells the engine when and if null as operand is
- * considered an error, the silent flag tells the engine what to do with the error
- * (log as warning or throw exception).</p>
+ * <p>The builder allow fine-tuning an engine instance behavior according to various control needs.</p>
  *
+ * <p>Broad configurations elements are controlled through the features ({@link JexlFeatures}) that can restrict JEXL
+ *  syntax - for instance, only expressions with no-side effects - and permissions ({@link JexlPermissions}) that control
+ *  the visible set of objects - for instance, avoiding access to any object in java.rmi.* -. </p>
+ *
+ * <p>Fine error control and runtime-overridable behaviors are implemented through options ({@link JexlOptions}). Most
+ * common flags accessible from the builder are reflected in its options ({@link #options()}).
+ * <p>The <code>silent</code> flag tells the engine what to do with the error; when true, errors are logged as
+ * warning, when false, they throw {@link JexlException} exceptions.</p>
+ * <p>The <code>strict</code> flag tells the engine when and if null as operand is considered an error. The <code>safe</code>
+ * flog determines if safe-navigation is used. Safe-navigation allows an  evaluation shortcut and return null in expressions
+ * that attempts dereferencing null, typically a method call or accessing a property.</p>
+ * <p>The <code>lexical</code> and <code>lexicalShade</code> flags can be used to enforce a lexical scope for
+ * variables and parameters. The <code>lexicalShade</code> can be used to further ensure no global variable can be
+ * used with the same name as a local one even after it goes out of scope. The corresponding feature flags should be
+ * preferred since they will detect violations at parsing time. (see {@link JexlFeatures})</p>
+ *
+ * <p>The following rules apply on silent and strict flags:</p>
  * <ul>
  * <li>When "silent" &amp; "not-strict":
  * <p> 0 &amp; null should be indicators of "default" values so that even in an case of error,
@@ -55,6 +70,7 @@ import java.nio.charset.Charset;
  * </p>
  * </li>
  * </ul>
+ *
  */
 public class JexlBuilder {
 
@@ -66,6 +82,9 @@ public class JexlBuilder {
 
     /** The strategy strategy. */
     private JexlUberspect.ResolverStrategy strategy = null;
+
+    /** The set of permissions. */
+    private JexlPermissions permissions = null;
 
     /** The sandbox. */
     private JexlSandbox sandbox = null;
@@ -120,6 +139,22 @@ public class JexlBuilder {
     /** @return the uberspect */
     public JexlUberspect uberspect() {
         return this.uberspect;
+    }
+
+    /**
+     * Sets the JexlPermissions instance the engine will use.
+     *
+     * @param p the permissions
+     * @return this builder
+     */
+    public JexlBuilder permissions(final JexlPermissions p) {
+        this.permissions = p;
+        return this;
+    }
+
+    /** @return the permissions */
+    public JexlPermissions permissions() {
+        return this.permissions;
     }
 
     /**
@@ -319,7 +354,9 @@ public class JexlBuilder {
 
     /**
      * Sets whether the engine will throw JexlException during evaluation when an error is triggered.
-     *
+     * <p>When <em>not</em> silent, the engine throws an exception when the evaluation triggers an exception or an
+     * error.</p>
+     * <p>It is recommended to use <em>silent(true)</em> as an explicit default.</p>
      * @param flag true means no JexlException will occur, false allows them
      * @return this builder
      */
@@ -336,6 +373,9 @@ public class JexlBuilder {
     /**
      * Sets whether the engine considers unknown variables, methods, functions and constructors as errors or
      * evaluates them as null.
+     * <p>When <em>not</em> strict, operators or functions using null operands return null on evaluation. When
+     * strict, those raise exceptions.</p>
+     * <p>It is recommended to use <em>strict(true)</em> as an explicit default.</p>
      *
      * @param flag true means strict error reporting, false allows them to be evaluated as null
      * @return this builder
@@ -352,9 +392,10 @@ public class JexlBuilder {
 
     /**
      * Sets whether the engine considers dereferencing null in navigation expressions
-     * as errors or evaluates them as null.
+     * as null or triggers an error.
      * <p><code>x.y()</code> if x is null throws an exception when not safe,
-     * return null and warns if it is.<p>
+     * return null and warns if it is.</p>
+     * <p>It is recommended to use <em>safe(false)</em> as an explicit default.</p>
      *
      * @param flag true means safe navigation, false throws exception when dereferencing null
      * @return this builder

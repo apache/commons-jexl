@@ -27,7 +27,7 @@ import org.apache.commons.jexl3.internal.Engine;
  * The flags, briefly explained, are the following:
  * <ul>
  * <li>silent: whether errors throw exception</li>
- * <li>safe: whether navigation through null is an error</li>
+ * <li>safe: whether navigation through null is <em>not</em>an error</li>
  * <li>cancellable: whether thread interruption is an error</li>
  * <li>lexical: whether redefining local variables is an error</li>
  * <li>lexicalShade: whether local variables shade global ones even outside their scope</li>
@@ -312,8 +312,11 @@ public final class JexlOptions {
     }
 
     /**
-     * Sets whether the engine considers null in navigation expression as errors
+     * Sets whether the engine considers null in navigation expression as null or as errors
      * during evaluation.
+     * <p>If safe, encountering null during a navigation expression - dereferencing a method or a field through a null
+     * object or property - will <em>not</em> be considered an error but evaluated as <em>null</em>. It is recommended
+     * to use <em>setSafe(false)</em> as an explicit default.</p>
      * @param flag true if safe, false otherwise
      */
     public void setSafe(final boolean flag) {

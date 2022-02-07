@@ -27,6 +27,15 @@
     <body>
         <release version="3.3" date="YYYY-MM-DD">
             <!-- UPDATE -->
+            <action dev="henrib" type="add" issue="JEXL-357" >
+                Configure accessible packages/classes/methods/fields
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-354"  due-to="William Price">
+                #pragma does not handle negative integer or real literals
+            </action>
+            <action dev="henrib" type="fix" issue="JEXL-353" due-to="Mr.Z">
+                Documentation error for not-in/not-match operator
+            </action>
             <action dev="ggregory" type="update" due-to="Dependabot">
                 Bump checkstyle from 9.2 to 9.2.1 #72.
             </action>

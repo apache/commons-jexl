@@ -16,6 +16,11 @@
  */
 package org.apache.commons.jexl3.internal.introspection;
 
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.JexlTestCase;
 import org.apache.commons.jexl3.internal.introspection.nojexlpackage.Invisible;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.Assert;
@@ -24,21 +29,19 @@ import org.junit.Test;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
-import static org.apache.commons.jexl3.internal.introspection.Permissions.SECURE;
 
 /**
  * Checks the CacheMap.MethodKey implementation
  */
 
 public class PermissionsTest {
+
 
     public static class A {
         public int i;
@@ -205,6 +208,8 @@ public class PermissionsTest {
         Set<String> wildcards = p.getWildcards();
         Assert.assertEquals(4, wildcards.size());
 
+        JexlEngine jexl = new JexlBuilder().permissions(p).safe(false).lexical(true).create();
+
         Method exit = getMethod(java.lang.Runtime.class,"exit");
         Assert.assertNotNull(exit);
         Assert.assertFalse(p.allow(exit));
@@ -214,10 +219,24 @@ public class PermissionsTest {
         Method callMeNot = getMethod(Outer.Inner.class, "callMeNot");
         Assert.assertNotNull(callMeNot);
         Assert.assertFalse(p.allow(callMeNot));
+        JexlScript script = jexl.createScript("o.callMeNot()", "o");
+        try {
+            Object result = script.execute(null, new Outer.Inner());
+            Assert.fail("callMeNot should be uncallable");
+        } catch(JexlException.Method xany) {
+            Assert.assertEquals("callMeNot", xany.getMethod());
+        }
         Method uncallable = getMethod(Invisible.class, "uncallable");
         Assert.assertFalse(p.allow(uncallable));
         Package ip = Invisible.class.getPackage();
         Assert.assertFalse(p.allow(ip));
+        script = jexl.createScript("o.uncallable()", "o");
+        try {
+            Object result = script.execute(null, new Invisible());
+            Assert.fail("uncallable should be uncallable");
+        } catch(JexlException.Method xany) {
+            Assert.assertEquals("uncallable", xany.getMethod());
+        }
     }
 
     @Test
@@ -233,7 +252,7 @@ public class PermissionsTest {
 
     @Test
     public void testSecurePermissions() {
-        Assert.assertNotNull(SECURE);
+        Assert.assertNotNull(JexlTestCase.SECURE);
         List<Class<?>> acs = Arrays.asList(
             java.lang.Runtime.class,
             java.math.BigDecimal.class,
@@ -242,7 +261,7 @@ public class PermissionsTest {
         for(Class<?> ac: acs) {
             Package p = ac.getPackage();
             Assert.assertNotNull(ac.getName(), p);
-            Assert.assertTrue(ac.getName(), SECURE.allow(p));
+            Assert.assertTrue(ac.getName(), JexlTestCase.SECURE.allow(p));
         }
         List<Class<?>> nacs = Arrays.asList(
                 java.lang.annotation.ElementType.class,
@@ -254,8 +273,29 @@ public class PermissionsTest {
         for(Class<?> nac : nacs) {
             Package p = nac.getPackage();
             Assert.assertNotNull(nac.getName(), p);
-            Assert.assertFalse(nac.getName(), SECURE.allow(p));
+            Assert.assertFalse(nac.getName(), JexlTestCase.SECURE.allow(p));
         }
     }
 
+
+    @Test
+    public void testParsePermissionsFailures() {
+        String[] srcs = new String[]{
+                "java.lang.*.*",
+                "java.math.*.",
+                "java.text.*;",
+                "java.lang {{ Runtime {} }",
+                "java.rmi {}}",
+                "java.io { Text File {} }",
+                "java.io { File { m.x } }"
+        };
+        for(String src : srcs) {
+            try {
+                Permissions p = (Permissions) JexlPermissions.parse(src);
+                Assert.fail(src);
+            } catch(IllegalStateException xill) {
+                Assert.assertNotNull(xill);
+            }
+        }
+    }
 }

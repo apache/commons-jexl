@@ -33,19 +33,21 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
 
 /**
  * Checks whether an element (ctor, field or method) is visible by JEXL introspection.
- * Default implementation does this by checking if element has been annotated with NoJexl.
+ * <p>Default implementation does this by checking if element has been annotated with NoJexl.</p>
  *
- * The NoJexl annotation allows a fine grain permissions on executable objects (methods, fields, constructors).
- * NoJexl of a package implies all classes (including derived classes) and all interfaces
- * of that package are invisible to Jexl;
- * NoJexl on a class implies this class and all its derived classes are invisible to Jexl;
- * NoJexl on a (public) field makes it not visible as a property to Jexl;
- * NoJexl on a constructor prevents that constructor to be used to instantiate through 'new';
- * NoJexl on a method prevents that method and any of its overrides to be visible to Jexl;
- * NoJexl on an interface prevents all methods of that interface and their overrides to be visible to Jexl.
- *
- * It is possible to further refine permissions on classes used through libraries where source code form can
- * not be altered. The @link(PermissionsParser).
+ * <p>The NoJexl annotation allows a fine grain permissions on executable objects (methods, fields, constructors).
+ * </p>
+ * <ul>
+ * <li>NoJexl of a package implies all classes (including derived classes) and all interfaces
+ * of that package are invisible to JEXL.</li>
+ * <li>NoJexl on a class implies this class and all its derived classes are invisible to JEXL.</li>
+ * <li>NoJexl on a (public) field makes it not visible as a property to JEXL.</li>
+ * <li>NoJexl on a constructor prevents that constructor to be used to instantiate through 'new'.</li>
+ * <li>NoJexl on a method prevents that method and any of its overrides to be visible to JEXL.</li>
+ * <li>NoJexl on an interface prevents all methods of that interface and their overrides to be visible to JEXL.</li>
+ * </ul>
+ * <p> It is possible to further refine permissions on classes used through libraries where source code form can
+ * not be altered using an instance of permissions using {@link JexlPermissions#parse(String...)}.</p>
  */
 public class Permissions implements JexlPermissions {
 
@@ -233,31 +235,6 @@ public class Permissions implements JexlPermissions {
      * The default singleton.
      */
     public static final Permissions DEFAULT = new Permissions();
-
-    /**
-     * A very secure singleton.
-     */
-    public static final Permissions SECURE = new PermissionsParser().parse(
-            "# Secure Uberspect Permissions",
-            "java.nio.*",
-            "java.io.*",
-            "java.lang.*",
-            "java.math.*",
-            "java.text.*",
-            "java.util.*",
-            "org.w3c.dom.*",
-            "org.apache.commons.jexl3.*",
-            "java.lang { Runtime {} System {} ProcessBuilder {} Class {} }",
-            "java.lang.annotation {}",
-            "java.lang.instrument {}",
-            "java.lang.invoke {}",
-            "java.lang.management {}",
-            "java.lang.ref {}",
-            "java.lang.reflect {}",
-            "java.net {}",
-            "java.io { File { } }",
-            "java.nio { Path { } Paths { } Files { } }"
-    );
 
     /**
      * @return the packages

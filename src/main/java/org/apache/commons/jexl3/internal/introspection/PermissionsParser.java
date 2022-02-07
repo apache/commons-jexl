@@ -151,6 +151,7 @@ public class PermissionsParser {
      */
     private int readIdentifier(StringBuilder id, int offset, boolean dot, boolean star) {
         int begin = -1;
+        boolean starf = star;
         int i = offset;
         char c = 0;
         while (i < size) {
@@ -167,8 +168,9 @@ public class PermissionsParser {
                 }
                 id.append('.');
                 begin = -1;
-            } else if (star && c == '*') {
+            } else if (starf && c == '*') {
                 id.append('*');
+                starf = false; // only one star
             } else {
                 break;
             }
