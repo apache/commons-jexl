@@ -17,9 +17,14 @@
 
 package org.apache.commons.jexl3.scripting;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
@@ -49,7 +54,7 @@ public class JexlScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public String getEngineVersion() {
-        return "3.2"; // ensure this is updated if function changes are made to this class
+        return "3.3"; // ensure this is updated if function changes are made to this class
     }
 
     @Override
