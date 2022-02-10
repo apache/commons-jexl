@@ -17,18 +17,13 @@
 
 package org.apache.commons.jexl3.scripting;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
+import org.apache.commons.jexl3.parser.StringParser;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
-import org.apache.commons.jexl3.parser.StringParser;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Implements the JEXL ScriptEngineFactory for JSF-223.
