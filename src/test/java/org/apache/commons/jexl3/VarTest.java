@@ -206,7 +206,7 @@ public class VarTest extends JexlTestCase {
         }
             ls.add(strb.toString());
         }
-        Collections.sort(ls);
+        ls.sort(null);
         return ls;
     }
 
