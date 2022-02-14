@@ -111,7 +111,7 @@ public class Permissions implements JexlPermissions {
      * @param clazz the clazz
      * @return the clazz key
      */
-    private static String classKey(final Class<?> clazz) {
+    static String classKey(final Class<?> clazz) {
         return classKey(clazz, null);
     }
 
@@ -122,7 +122,7 @@ public class Permissions implements JexlPermissions {
      * @param strb the buffer to compose the key
      * @return the clazz key
      */
-    private static String classKey(final Class<?> clazz, final StringBuilder strb) {
+    static String classKey(final Class<?> clazz, final StringBuilder strb) {
         StringBuilder keyb = strb;
         Class<?> outer = clazz.getEnclosingClass();
         if (outer != null) {
@@ -175,50 +175,44 @@ public class Permissions implements JexlPermissions {
 
     /** Marker for whole NoJexl class. */
     static final NoJexlClass NOJEXL_CLASS = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
-        @Override
-        boolean deny(Field field) {
+        @Override boolean deny(Field field) {
             return true;
         }
 
-        @Override
-        boolean deny(Method method) {
+        @Override boolean deny(Method method) {
             return true;
         }
 
-        @Override
-        boolean deny(Constructor<?> method) {
+        @Override boolean deny(Constructor<?> method) {
             return true;
         }
     };
 
     /** Marker for allowed class. */
     static final NoJexlClass JEXL_CLASS = new NoJexlClass(Collections.emptySet(), Collections.emptySet()) {
-        @Override
-        boolean deny(Field field) {
+        @Override boolean deny(Field field) {
             return false;
         }
 
-        @Override
-        boolean deny(Method method) {
+        @Override  boolean deny(Method method) {
             return false;
         }
 
-        @Override
-        boolean deny(Constructor<?> method) {
+        @Override boolean deny(Constructor<?> method) {
             return false;
         }
     };
 
     /** Marker for @NoJexl package. */
     static final NoJexlPackage NOJEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
-        NoJexlClass getNoJexl(Class<?> clazz) {
+        @Override NoJexlClass getNoJexl(Class<?> clazz) {
             return NOJEXL_CLASS;
         }
     };
 
     /** Marker for fully allowed package. */
     static final NoJexlPackage JEXL_PACKAGE = new NoJexlPackage(Collections.emptyMap()) {
-        NoJexlClass getNoJexl(Class<?> clazz) {
+        @Override NoJexlClass getNoJexl(Class<?> clazz) {
             return JEXL_CLASS;
         }
     };

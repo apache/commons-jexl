@@ -38,6 +38,7 @@ allow fine-tuning the scripting integration into any project.
 
 New Features in 3.3:
 ====================
+* JEXL-359:     Allow per-operator arithmetic handling of null arguments
 * JEXL-357:     Configure accessible packages/classes/methods/fields
 
 Bugs Fixed in 3.3:

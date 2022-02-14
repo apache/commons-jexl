@@ -62,7 +62,7 @@ final class ClassMap {
     /**
      * The cache miss marker method.
      */
-    private static final Method CACHE_MISS = cacheMiss();
+    static final Method CACHE_MISS = cacheMiss();
     /**
      * This is the cache to store and look up the method information.
      * <p>

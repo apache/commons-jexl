@@ -309,7 +309,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             // not out of scope with no lexical shade ?
             if (value != Scope.UNDEFINED) {
                 // null argument of an arithmetic operator ?
-                if (value == null && arithmetic.isStrict() && identifier.jjtGetParent().isStrictOperator()) {
+                if (value == null && identifier.jjtGetParent().isStrictOperator(arithmetic)) {
                     return unsolvableVariable(identifier, name, false); // defined but null
                 }
                 return value;
@@ -328,7 +328,7 @@ public abstract class InterpreterBase extends ParserVisitor {
                 if (!ignore) {
                     return undefinedVariable(identifier, name); // undefined
                 }
-            } else if (arithmetic.isStrict() && identifier.jjtGetParent().isStrictOperator()) {
+            } else if (identifier.jjtGetParent().isStrictOperator(arithmetic)) {
                 return unsolvableVariable(identifier, name, false); // defined but null
             }
         }
@@ -385,22 +385,24 @@ public abstract class InterpreterBase extends ParserVisitor {
         return options.isCancellable();
     }
 
+    @Deprecated
+    protected JexlNode findNullOperand(final RuntimeException xrt, final JexlNode node, final Object left, final Object right) {
+        return findNullOperand(node, left, right);
+    }
+
     /**
      * Finds the node causing a NPE for diadic operators.
-     * @param xrt   the RuntimeException
      * @param node  the parent node
      * @param left  the left argument
      * @param right the right argument
      * @return the left, right or parent node
      */
-    protected JexlNode findNullOperand(final RuntimeException xrt, final JexlNode node, final Object left, final Object right) {
-        if (xrt instanceof JexlArithmetic.NullOperand) {
-            if (left == null) {
-                return node.jjtGetChild(0);
-            }
-            if (right == null) {
-                return node.jjtGetChild(1);
-            }
+    protected JexlNode findNullOperand(final JexlNode node, final Object left, final Object right) {
+        if (left == null) {
+            return node.jjtGetChild(0);
+        }
+        if (right == null) {
+            return node.jjtGetChild(1);
         }
         return node;
     }

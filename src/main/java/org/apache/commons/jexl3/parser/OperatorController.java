@@ -16,7 +16,8 @@
  */
 package org.apache.commons.jexl3.parser;
 
-import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlArithmetic;
+import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.internal.ScriptVisitor;
 
 /**
@@ -24,168 +25,175 @@ import org.apache.commons.jexl3.internal.ScriptVisitor;
  **/
 class OperatorController extends ScriptVisitor {
     static final OperatorController INSTANCE  = new OperatorController();
-    /**
-     * Controls the operator.
-     * @param node the node
-     * @param safe whether we are checking for any or only null-unsafe operators
-     * @return true if node is (null-unsafe) operator
-     */
-    boolean control(final JexlNode node, Boolean safe) {
-        return Boolean.TRUE.equals(node.jjtAccept(this, safe));
-    }
 
-    @Override
-    protected Object visitNode(final JexlNode node, final Object data) {
+    /**
+     * Checks whether an operator is strict for a given arithmetic.
+     * @param node the node which should delegate to an operator
+     * @return true if node points to a (null-unsafe) operator
+     */
+    boolean isStrict(JexlArithmetic arithmetic, final JexlNode node) {
+        if (arithmetic.isStrict()) {
+            Object ctl = node.jjtAccept(this, arithmetic);
+            if (ctl instanceof JexlOperator) {
+                JexlOperator operator = (JexlOperator) ctl;
+                return arithmetic.isStrict(operator);
+            }
+        }
         return false;
     }
 
     @Override
-    protected Object visit(final ASTNotNode node, final Object data) {
-        return true;
+    protected JexlOperator visitNode(final JexlNode node, final Object data) {
+        return null;
     }
 
     @Override
-    protected Object visit(final ASTAddNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTNotNode node, final Object data) {
+        return JexlOperator.NOT;
     }
 
     @Override
-    protected Object visit(final ASTSetAddNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTAddNode node, final Object data) {
+        return JexlOperator.ADD;
     }
 
     @Override
-    protected Object visit(final ASTMulNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTSetAddNode node, final Object data) {
+        return JexlOperator.SELF_ADD;
     }
 
     @Override
-    protected Object visit(final ASTSetMultNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTMulNode node, final Object data) {
+        return JexlOperator.MULTIPLY;
     }
 
     @Override
-    protected Object visit(final ASTModNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTSetMultNode node, final Object data) {
+        return JexlOperator.SELF_MULTIPLY;
     }
 
     @Override
-    protected Object visit(final ASTSetModNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTModNode node, final Object data) {
+        return JexlOperator.MOD;
     }
 
     @Override
-    protected Object visit(final ASTDivNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTSetModNode node, final Object data) {
+        return JexlOperator.SELF_MOD;
     }
 
     @Override
-    protected Object visit(final ASTSetDivNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTDivNode node, final Object data) {
+        return JexlOperator.DIVIDE;
     }
 
     @Override
-    protected Object visit(final ASTBitwiseAndNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTSetDivNode node, final Object data) {
+        return JexlOperator.SELF_DIVIDE;
     }
 
     @Override
-    protected Object visit(final ASTSetAndNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTBitwiseAndNode node, final Object data) {
+        return JexlOperator.AND;
     }
 
     @Override
-    protected Object visit(final ASTBitwiseOrNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTSetAndNode node, final Object data) {
+        return JexlOperator.SELF_AND;
     }
 
     @Override
-    protected Object visit(final ASTSetOrNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTBitwiseOrNode node, final Object data) {
+        return JexlOperator.OR;
     }
 
     @Override
-    protected Object visit(final ASTBitwiseXorNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTSetOrNode node, final Object data) {
+        return JexlOperator.SELF_OR;
     }
 
     @Override
-    protected Object visit(final ASTSetXorNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTBitwiseXorNode node, final Object data) {
+        return JexlOperator.XOR;
     }
 
     @Override
-    protected Object visit(final ASTBitwiseComplNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTSetXorNode node, final Object data) {
+        return JexlOperator.SELF_OR;
     }
 
     @Override
-    protected Object visit(final ASTSubNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTBitwiseComplNode node, final Object data) {
+        return JexlOperator.COMPLEMENT;
     }
 
     @Override
-    protected Object visit(final ASTSetSubNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTSubNode node, final Object data) {
+        return JexlOperator.SUBTRACT;
     }
 
     @Override
-    protected Object visit(final ASTEQNode node, final Object data) {
-        return data;
+    protected JexlOperator visit(final ASTSetSubNode node, final Object data) {
+        return JexlOperator.SELF_SUBTRACT;
     }
 
     @Override
-    protected Object visit(final ASTNENode node, final Object data) {
-        return data;
+    protected JexlOperator visit(final ASTEQNode node, final Object data) {
+        return JexlOperator.EQ;
     }
 
     @Override
-    protected Object visit(final ASTGTNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTNENode node, final Object data) {
+        return JexlOperator.EQ;
     }
 
     @Override
-    protected Object visit(final ASTGENode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTGTNode node, final Object data) {
+        return JexlOperator.GT;
     }
 
     @Override
-    protected Object visit(final ASTLTNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTGENode node, final Object data) {
+        return JexlOperator.GTE;
     }
 
     @Override
-    protected Object visit(final ASTLENode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTLTNode node, final Object data) {
+        return JexlOperator.LT;
     }
 
     @Override
-    protected Object visit(final ASTSWNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTLENode node, final Object data) {
+        return JexlOperator.LTE;
     }
 
     @Override
-    protected Object visit(final ASTNSWNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTSWNode node, final Object data) {
+        return JexlOperator.STARTSWITH;
     }
 
     @Override
-    protected Object visit(final ASTEWNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTNSWNode node, final Object data) {
+        return JexlOperator.STARTSWITH;
     }
 
     @Override
-    protected Object visit(final ASTNEWNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTEWNode node, final Object data) {
+        return JexlOperator.ENDSWITH;
     }
 
     @Override
-    protected Object visit(final ASTERNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTNEWNode node, final Object data) {
+        return JexlOperator.ENDSWITH;
     }
 
     @Override
-    protected Object visit(final ASTNRNode node, final Object data) {
-        return true;
+    protected JexlOperator visit(final ASTERNode node, final Object data) {
+        return JexlOperator.CONTAINS;
+    }
+
+    @Override
+    protected JexlOperator visit(final ASTNRNode node, final Object data) {
+        return JexlOperator.CONTAINS;
     }
 }

@@ -373,6 +373,22 @@ public class JexlArithmetic {
     }
 
     /**
+     * Checks whether this arithmetic considers a given operator as strict or null-safe.
+     * <p>When an operator is strict, it does <em>not</em> accept null arguments when the arithmetic is strict.
+     * If null-safe (ie not-strict), the operator does accept null arguments even if the arithmetic itself is strict.</p>
+     * <p>The default implementation considers equal/not-equal operators as null-safe so one can check for null as in
+     * <code>if (myvar == null) {...}</code>. Note that this operator is used for equal and not-equal syntax.</p>
+     * <p>An arithmetic refining its strict behavior handling for more operators must declare which by overriding
+     * this method.</p>
+     * @param operator the operator to check for null-argument(s) handling
+     * @return true if operator considers null arguments as errors, false if operator has appropriate semantics
+     * for null argument(s)
+     */
+    public boolean isStrict(JexlOperator operator) {
+        return operator == JexlOperator.EQ? false : isStrict();
+    }
+
+    /**
      * The MathContext instance used for +,-,/,*,% operations on big decimals.
      *
      * @return the math context
@@ -746,7 +762,7 @@ public class JexlArithmetic {
                 }
             }
         }
-        return toString(left).concat(toString(right));
+        return (left == null? "" : toString(left)).concat(right == null ? "" : toString(right));
     }
 
     /**

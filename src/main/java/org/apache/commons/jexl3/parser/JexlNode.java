@@ -16,6 +16,7 @@
  */
 package org.apache.commons.jexl3.parser;
 
+import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.internal.ScriptVisitor;
@@ -116,23 +117,14 @@ public abstract class JexlNode extends SimpleNode {
     }
 
     /**
-     * Checks whether this node is an operator.
-     *
-     * @return true if node is an operator node, false otherwise
-     */
-    public boolean isOperator() {
-        return OperatorController.INSTANCE.control(this, Boolean.TRUE);
-    }
-
-    /**
      * Checks whether this node is an operator that accepts a null argument
      * even when arithmetic is in strict mode.
-     * The sole cases are equals and not equals.
+     * The default cases are equals and not equals.
      *
      * @return true if node accepts null arguments, false otherwise
      */
-    public boolean isStrictOperator() {
-        return OperatorController.INSTANCE.control(this, Boolean.FALSE);
+    public boolean isStrictOperator(JexlArithmetic arithmetic) {
+        return OperatorController.INSTANCE.isStrict(arithmetic, this);
     }
 
     /**

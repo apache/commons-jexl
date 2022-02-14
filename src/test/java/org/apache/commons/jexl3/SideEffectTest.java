@@ -592,7 +592,6 @@ public class SideEffectTest extends JexlTestCase {
         Assert.assertSame(zz, z);
         Assert.assertEquals(1, z.size());
         z.clear();
-        ctx.clear();
 
         boolean t246 = false;
         // call with null

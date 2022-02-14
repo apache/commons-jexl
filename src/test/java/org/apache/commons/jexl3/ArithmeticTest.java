@@ -777,6 +777,19 @@ public class ArithmeticTest extends JexlTestCase {
         script = jexl.createScript("'1.2' + '1.2' ");
         result = script.execute(null);
         Assert.assertEquals("1.21.2", result);
+
+    }
+
+    @Test
+    public void testNullArgs() throws Exception {
+        JexlEngine jexl =  new JexlBuilder().arithmetic(new JexlArithmetic(true) {
+            @Override public boolean isStrict(JexlOperator op) {
+                return JexlOperator.ADD == op? false: super.isStrict(op);
+            }
+        }).create();
+        JexlScript script = jexl.createScript("'1.2' + x ", "x");
+        Object result = script.execute(null, null);
+        Assert.assertEquals("1.2", result);
     }
 
     @Test
