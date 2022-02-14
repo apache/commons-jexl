@@ -183,6 +183,25 @@ public class PermissionsTest {
     }
 
     @Test
+    public void testGetPackageName() {
+        final String PKG = "org.apache.commons.jexl3.internal.introspection";
+        String pkg = Permissions.getPackageName(Outer.class);
+        Assert.assertEquals(PKG, pkg);
+        pkg = Permissions.getPackageName(Outer.Inner.class);
+        Assert.assertEquals(PKG, pkg);
+        Outer[] oo = new Outer[0];
+        pkg = Permissions.getPackageName(oo.getClass());
+        Assert.assertEquals(PKG, pkg);
+        Outer.Inner[] ii = new Outer.Inner[0];
+        pkg = Permissions.getPackageName(ii.getClass());
+        Assert.assertEquals(PKG, pkg);
+        pkg = Permissions.getPackageName(Process.class);
+        Assert.assertEquals("java.lang", pkg);
+        pkg = Permissions.getPackageName(Integer.TYPE);
+        Assert.assertEquals("java.lang", pkg);
+    }
+
+    @Test
     public void testParsePermissions1() {
         String[] src = new String[]{
                 "java.lang.*",

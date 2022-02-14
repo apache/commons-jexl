@@ -17,6 +17,8 @@
 
 package org.apache.commons.jexl3.internal.introspection;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -50,6 +52,20 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
  * not be altered using an instance of permissions using {@link JexlPermissions#parse(String...)}.</p>
  */
 public class Permissions implements JexlPermissions {
+    /**
+     * Java9 introduced Class.getPackageName(), use it if it exists.
+     */
+    private static final MethodHandle GETPKGNAME = getPackageNameHandle();
+    static MethodHandle getPackageNameHandle() {
+        MethodHandle mh;
+        try {
+            Method m = Class.class.getMethod("getPackageName");
+            mh = MethodHandles.lookup().unreflect(m);
+        } catch(Exception xm) {
+            mh = null;
+        }
+        return mh;
+    }
 
     /**
      * Equivalent of @NoJexl on a class in a package.
@@ -250,17 +266,61 @@ public class Permissions implements JexlPermissions {
         return allowed == null? Collections.emptySet() : Collections.unmodifiableSet(allowed);
     }
 
+
+    /**
+     * Gets the package name of a class (class.getPackage() may return null).
+     * @param clz the class
+     * @return the class package name
+     */
+    static String getPackageName(Class<?> clz) {
+        String pkgName = "";
+        if (clz != null) {
+            // use native if we can
+            if (GETPKGNAME != null) {
+                try {
+                    return (String) GETPKGNAME.invokeWithArguments(clz);
+                } catch(Throwable xany) {
+                    return "";
+                }
+            }
+            // remove array
+            Class<?> clazz = clz;
+            while(clazz.isArray()) {
+                clazz = clazz.getComponentType();
+            }
+            // mimic getPackageName()
+            if (clazz.isPrimitive()) {
+                return "java.lang";
+            }
+            // remove enclosing
+            Class<?> walk = clazz.getEnclosingClass();
+            while(walk != null) {
+                clazz = walk;
+                walk = walk.getEnclosingClass();
+            }
+            Package pkg = clazz.getPackage();
+            // pkg may be null for unobvious reasons
+            if (pkg == null) {
+                String name = clazz.getName();
+                int dot = name.lastIndexOf('.');
+                if (dot > 0) {
+                    pkgName = name.substring(0, dot);
+                }
+            } else {
+                pkgName = pkg.getName();
+            }
+        }
+        return pkgName;
+    }
+
     /**
      * Gets the package constraints.
-     * @param pack the package
+     * @param packageName the package name
      * @return the package constraints instance, not-null.
      */
-    private NoJexlPackage getNoJexl(Package pack) {
-        NoJexlPackage njp = packages.get(pack.getName());
-        if (njp != null) {
-            return njp;
-        }
-        return JEXL_PACKAGE;
+    private NoJexlPackage getNoJexlPackage(String packageName) {
+        NoJexlPackage njp = packages.get(packageName);
+        return njp != null? njp : JEXL_PACKAGE;
     }
 
     /**
@@ -270,7 +330,8 @@ public class Permissions implements JexlPermissions {
      * @return the class constraints instance, not-null.
      */
     private NoJexlClass getNoJexl(Class<?> clazz) {
-        NoJexlPackage njp = getNoJexl(clazz.getPackage());
+        String pkgName = getPackageName(clazz);
+        NoJexlPackage njp = getNoJexlPackage(pkgName);
         if (njp != null) {
             NoJexlClass njc = njp.getNoJexl(clazz);
             if (njc != null) {
@@ -286,7 +347,7 @@ public class Permissions implements JexlPermissions {
      * @return true if allowed, false otherwise
      */
     private boolean wildcardAllow(Class<?> clazz) {
-        return wildcardAllow(allowed, clazz.getPackage().getName());
+        return wildcardAllow(allowed, getPackageName(clazz));
     }
 
     /**
@@ -338,8 +399,7 @@ public class Permissions implements JexlPermissions {
         if (nojexl != null) {
             return true;
         }
-        Package pkg = clazz.getPackage();
-        NoJexlPackage njp = packages.get(pkg.getName());
+        NoJexlPackage njp = packages.get(getPackageName(clazz));
         return njp != null && Objects.equals(NOJEXL_CLASS, njp.getNoJexl(clazz));
     }
 
