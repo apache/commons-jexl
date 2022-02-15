@@ -106,6 +106,30 @@ public enum JexlOperator {
 
     /**
      * Bit-pattern right-shift operator.
+     * <br><strong>Syntax:</strong> <code>x >> y</code>
+     * <br><strong>Method:</strong> <code>T rightShift(L x, R y);</code>.
+     * @see JexlArithmetic#shiftRight(Object, Object)
+     */
+    SHIFTRIGHT(">>", "shiftRight", 2),
+
+    /**
+     * Bit-pattern right-shift unsigned operator.
+     * <br><strong>Syntax:</strong> <code>x >>> y</code>
+     * <br><strong>Method:</strong> <code>T rightShiftUnsigned(L x, R y);</code>.
+     * @see JexlArithmetic#shiftRightUnsigned(Object, Object)
+     */
+    SHIFTRIGHTU(">>>", "shiftRightUnsigned", 2),
+
+    /**
+     * Bit-pattern left-shift operator.
+     * <br><strong>Syntax:</strong> <code>x << y</code>
+     * <br><strong>Method:</strong> <code>T leftShift(L x, R y);</code>.
+     * @see JexlArithmetic#shiftLeft(Object, Object)
+     */
+    SHIFTLEFT("<<", "shiftLeft", 2),
+
+    /**
+     * Bit-pattern right-shift operator.
      * <br><strong>Syntax:</strong> <code>x &gt;&gt; y</code>
      * <br><strong>Method:</strong> <code>T rightShift(L x, R y);</code>.
      * @see JexlArithmetic#shiftRight(Object, Object)
@@ -295,6 +319,27 @@ public enum JexlOperator {
      * <br><strong>Method:</strong> <code>T selfXor(L x, R y);</code>.
      */
     SELF_XOR("^=", "selfXor", XOR),
+
+    /**
+     * Self-right-shift operator.
+     * <br><strong>Syntax:</strong> <code>x >>= y</code>
+     * <br><strong>Method:</strong> <code>T selfShiftRight(L x, R y);</code>.
+     */
+    SELF_SHIFTRIGHT(">>", "selfShiftRight", SHIFTRIGHT),
+
+    /**
+     * Self-right-shift unsigned operator.
+     * <br><strong>Syntax:</strong> <code>x >>> y</code>
+     * <br><strong>Method:</strong> <code>T selfShiftRightUnsigned(L x, R y);</code>.
+     */
+    SELF_SHIFTRIGHTU(">>>=", "selfShiftRightUnsigned", SHIFTRIGHTU),
+
+    /**
+     * Self-left-shift operator.
+     * <br><strong>Syntax:</strong> <code>x << y</code>
+     * <br><strong>Method:</strong> <code>T selfShiftLeft(L x, R y);</code>.
+     */
+    SELF_SHIFTLEFT("<<=", "selfShiftLeft", SHIFTLEFT),
 
     /**
      * Self-right-shift operator.
