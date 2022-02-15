@@ -1309,6 +1309,45 @@ public class JexlArithmetic {
     }
 
     /**
+     * Shifts a bit pattern to the right.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left &lt;&lt; right.
+     */
+    public Object shiftLeft(Object left, Object right) {
+        final long l = toLong(left);
+        final int r = toInteger(right);
+        return l << r;
+    }
+
+    /**
+     * Shifts a bit pattern to the right.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left &gt;&gt; right.
+     */
+    public Object shiftRight(Object left, Object right) {
+        final long l = toLong(left);
+        final long r = toInteger(right);
+        return l >> r;
+    }
+
+    /**
+     * Shifts a bit pattern to the right unsigned.
+     *
+     * @param left  left argument
+     * @param right  right argument
+     * @return left &gt;&gt;&gt; right.
+     */
+    public Object shiftRightUnsigned(Object left, Object right) {
+        final long l = toLong(left);
+        final long r = toInteger(right);
+        return l >>> r;
+    }
+
+    /**
      * Performs a comparison.
      *
      * @param left     the left operand

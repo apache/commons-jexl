@@ -980,6 +980,18 @@ public class ArithmeticTest extends JexlTestCase {
             return new Var(lhs.value ^ rhs.value);
         }
 
+        public Var shiftRight(final Var lhs, final Var rhs) {
+            return new Var(lhs.value >> rhs.value);
+        }
+
+        public Var shiftRightUnsigned(final Var lhs, final Var rhs) {
+            return new Var(lhs.value >>> rhs.value);
+        }
+
+        public Var shiftLeft(final Var lhs, final Var rhs) {
+            return new Var(lhs.value << rhs.value);
+        }
+
         public Boolean contains(final Var lhs, final Var rhs) {
             return lhs.toString().contains(rhs.toString());
         }
@@ -1162,6 +1174,24 @@ public class ArithmeticTest extends JexlTestCase {
         Assert.assertEquals(36L, result);
         result = script.execute(jc, new Var(35), new Var(7));
         Assert.assertEquals(36L, ((Var) result).value);
+
+        script = jexl.createScript("(x, y)->{ x << y }");
+        result = script.execute(jc, 35, 1);
+        Assert.assertEquals(70L, result);
+        result = script.execute(jc, new Var(35), new Var(1));
+        Assert.assertEquals(70L, ((Var) result).value);
+
+        script = jexl.createScript("(x, y)->{ x >> y }");
+        result = script.execute(jc, 42, 1);
+        Assert.assertEquals(21L, result);
+        result = script.execute(jc, new Var(42), new Var(1));
+        Assert.assertEquals(21, ((Var) result).value);
+
+        script = jexl.createScript("(x, y)->{ x >>> y }");
+        result = script.execute(jc, 84, 2);
+        Assert.assertEquals(21L, result);
+        result = script.execute(jc, new Var(84), new Var(2));
+        Assert.assertEquals(21, ((Var) result).value);
 
         script = jexl.createScript("(x, y)->{ x & y }");
         result = script.execute(jc, 35, 7);
