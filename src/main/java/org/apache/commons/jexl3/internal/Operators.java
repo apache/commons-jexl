@@ -187,6 +187,12 @@ public class Operators {
                     return arithmetic.or(args[0], args[1]);
                 case SELF_XOR:
                     return arithmetic.xor(args[0], args[1]);
+                case SELF_SHIFTLEFT:
+                    return arithmetic.shiftLeft(args[0], args[1]);
+                case SELF_SHIFTRIGHT:
+                    return arithmetic.shiftRight(args[0], args[1]);
+                case SELF_SHIFTRIGHTU:
+                    return arithmetic.shiftRightUnsigned(args[0], args[1]);
                 default:
                     // unexpected, new operator added?
                     throw new UnsupportedOperationException(operator.getOperatorSymbol());
