@@ -582,7 +582,7 @@ void EqualityExpression() #void : {}
 void RelationalExpression() #void : {}
 {
   AdditiveExpression()
-  ( LOOKAHEAD(2) (
+  (
     (<lt> |<LT>)  AdditiveExpression() #LTNode(2)
    |
     (<gt> | <GT>) ShiftExpression() #GTNode(2)
@@ -602,7 +602,7 @@ void RelationalExpression() #void : {}
     <eeq> ShiftExpression() #EWNode(2) // ends with
    |
     <ene> AdditiveExpression() #NEWNode(2) // not ends with
-  ) )?
+  )?
 }
 
 /***************************************
