@@ -1177,19 +1177,19 @@ public class ArithmeticTest extends JexlTestCase {
 
         script = jexl.createScript("(x, y)->{ x << y }");
         result = script.execute(jc, 35, 1);
-        Assert.assertEquals(70L, result);
+        Assert.assertEquals(70, result);
         result = script.execute(jc, new Var(35), new Var(1));
         Assert.assertEquals(70L, ((Var) result).value);
 
         script = jexl.createScript("(x, y)->{ x >> y }");
         result = script.execute(jc, 42, 1);
-        Assert.assertEquals(21L, result);
+        Assert.assertEquals(21, result);
         result = script.execute(jc, new Var(42), new Var(1));
         Assert.assertEquals(21, ((Var) result).value);
 
         script = jexl.createScript("(x, y)->{ x >>> y }");
         result = script.execute(jc, 84, 2);
-        Assert.assertEquals(21L, result);
+        Assert.assertEquals(21, result);
         result = script.execute(jc, new Var(84), new Var(2));
         Assert.assertEquals(21, ((Var) result).value);
 

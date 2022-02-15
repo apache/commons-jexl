@@ -676,6 +676,32 @@ public class JexlArithmetic {
     }
 
     /**
+     * Checks if object is eligible for fast integer arithmetic.
+     *
+     * @param object  argument
+     */
+    protected boolean isIntegerPrecisionNumber(Object value) {
+        if (value == null) {
+            return false;
+        }
+        Class c = value.getClass();
+        return c == Integer.class || c == Short.class || c == Byte.class;
+    }
+
+    /**
+     * Checks if object is eligible for fast long arithmetic.
+     *
+     * @param object  argument
+     */
+    protected boolean isLongPrecisionNumber(Object value) {
+        if (value == null) {
+            return false;
+        }
+        Class c = value.getClass();
+        return c == Long.class || c == Integer.class || c == Short.class || c == Byte.class;
+    }
+
+    /**
      * Given a long, attempt to narrow it to an int.
      * <p>Narrowing will only occur if no operand is a Long.
      * @param lhs  the left hand side operand that lead to the long result
@@ -1316,9 +1342,28 @@ public class JexlArithmetic {
      * @return left &lt;&lt; right.
      */
     public Object shiftLeft(Object left, Object right) {
-        final long l = toLong(left);
-        final int r = toInteger(right);
-        return l << r;
+        if (left == null && right == null) {
+            return controlNullNullOperands();
+        }
+        // if either are no longer than integers use that type
+        if (isIntegerPrecisionNumber(left)) {
+            int l = ((Number) left).intValue();
+            int r = toInteger(right);
+            int result = l << r;
+            return result;
+        }
+        // if either are no longer than long integers use that type
+        if (isLongPrecisionNumber(left)) {
+            long l = ((Number) left).longValue();
+            int r = toInteger(right);
+            long result = l << r;
+            return result;
+        }
+        // otherwise treat as big integers
+        BigInteger l = toBigInteger(left);
+        int r = toInteger(right);
+        BigInteger result = l.shiftLeft(r);
+        return result;
     }
 
     /**
@@ -1329,9 +1374,28 @@ public class JexlArithmetic {
      * @return left &gt;&gt; right.
      */
     public Object shiftRight(Object left, Object right) {
-        final long l = toLong(left);
-        final long r = toInteger(right);
-        return l >> r;
+        if (left == null && right == null) {
+            return controlNullNullOperands();
+        }
+        // if either are no longer than integers use that type
+        if (isIntegerPrecisionNumber(left)) {
+            int l = ((Number) left).intValue();
+            int r = toInteger(right);
+            int result = l >> r;
+            return result;
+        }
+        // if either are no longer than long integers use that type
+        if (isLongPrecisionNumber(left)) {
+            long l = ((Number) left).longValue();
+            int r = toInteger(right);
+            long result = l >> r;
+            return result;
+        }
+        // otherwise treat as big integers
+        BigInteger l = toBigInteger(left);
+        int r = toInteger(right);
+        BigInteger result = l.shiftRight(r);
+        return result;
     }
 
     /**
@@ -1342,9 +1406,21 @@ public class JexlArithmetic {
      * @return left &gt;&gt;&gt; right.
      */
     public Object shiftRightUnsigned(Object left, Object right) {
-        final long l = toLong(left);
-        final long r = toInteger(right);
-        return l >>> r;
+        if (left == null && right == null) {
+            return controlNullNullOperands();
+        }
+        // if either are no longer than integers use that type
+        if (isIntegerPrecisionNumber(left)) {
+            int l = ((Number) left).intValue();
+            int r = toInteger(right);
+            int result = l >>> r;
+            return result;
+        }
+        // otherwise treat as long integers
+        long l = toLong(left);
+        int r = toInteger(right);
+        long result = l >>> r;
+        return result;
     }
 
     /**
