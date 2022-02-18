@@ -332,9 +332,8 @@ public abstract class InterpreterBase extends ParserVisitor {
             // is it defined ?
             if (!context.has(name)) {
                 // not defined, ignore in some cases...
-                final boolean ignore =
-                        (isSafe() && (symbol >= 0 || identifier.jjtGetParent() instanceof ASTAssignment))
-                         || (identifier.jjtGetParent() instanceof ASTReference);
+                final boolean ignore = identifier.jjtGetParent() instanceof ASTReference
+                        || (isSafe() && (symbol >= 0 || identifier.jjtGetParent() instanceof ASTAssignment));
                 if (!ignore) {
                     return undefinedVariable(identifier, name); // undefined
                 }
