@@ -317,4 +317,41 @@ public class PermissionsTest {
             }
         }
     }
+
+    protected static class Foo2 {
+        protected String protectedMethod() {
+            return "foo2";
+        }
+        public String publicMethod() {
+            return "foo2";
+        }
+    }
+
+    public static class Foo3 extends Foo2 {
+        @Override public String protectedMethod() {
+            return "foo3";
+        }
+        @Override public String publicMethod() {
+            return "foo3";
+        }
+    }
+
+    @Test public void testProtectedOverrideFail() throws Exception {
+        JexlScript script;
+        Object r;
+        Foo2 foo3 = new Foo3();
+        JexlEngine jexl = new JexlBuilder().safe(false).create();
+        // call public override, ok
+        script = jexl.createScript("x.publicMethod()", "x");
+        r = script.execute(null, foo3);
+        Assert.assertEquals("foo3",r);
+        // call public override of protected, nok
+        script = jexl.createScript("x.protectedMethod()", "x");
+        try {
+            r = script.execute(null, foo3);
+            Assert.fail("protectedMethod() is not public through superclass Foo2");
+        } catch(JexlException xjexl) {
+            Assert.assertNotNull(xjexl);
+        }
+    }
 }

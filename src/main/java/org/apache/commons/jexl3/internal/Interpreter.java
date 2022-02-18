@@ -1229,7 +1229,7 @@ public class Interpreter extends InterpreterBase {
                 final String aname = ant != null ? ant.toString() : "?";
                 final boolean defined = isVariableDefined(frame, block, aname);
                 // defined but null; arg of a strict operator?
-                if (defined && !node.jjtGetParent().isStrictOperator(arithmetic)) {
+                if (defined && !isStrictOperand(node)) {
                     return null;
                 }
                 return unsolvableVariable(node, aname, !defined);

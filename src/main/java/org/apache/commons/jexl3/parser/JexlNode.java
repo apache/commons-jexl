@@ -203,14 +203,6 @@ public abstract class JexlNode extends SimpleNode {
     }
 
     /**
-     * Whether this node is a local variable.
-     * @return true if local, false otherwise
-     */
-    public boolean isLocalVar() {
-        return this instanceof ASTIdentifier && ((ASTIdentifier) this).getSymbol() >= 0;
-    }
-
-    /**
      * Whether this node is the left-hand side of a safe access identifier as in.
      * For instance, in 'x?.y' , 'x' is safe.
      * @param safe whether the engine is in safe-navigation mode
@@ -255,31 +247,6 @@ public abstract class JexlNode extends SimpleNode {
             if (rsibling instanceof ASTArrayAccess) {
                 return safe;
             }
-        }
-        return false;
-    }
-
-    /**
-     * Check if a null evaluated expression is protected by a ternary expression.
-     * <p>
-     * The rationale is that the ternary / elvis expressions are meant for the user to explicitly take control
-     * over the error generation; ie, ternaries can return null even if the engine in strict mode
-     * would normally throw an exception.
-     * </p>
-     * @return true if nullable variable, false otherwise
-     */
-    public boolean isTernaryProtected() {
-        JexlNode node = this;
-        for (JexlNode walk = node.jjtGetParent(); walk != null; walk = walk.jjtGetParent()) {
-            // protect only the condition part of the ternary
-            if (walk instanceof ASTTernaryNode
-                || walk instanceof ASTNullpNode) {
-                return node == walk.jjtGetChild(0);
-            }
-            if (!(walk instanceof ASTReference || walk instanceof ASTArrayAccess)) {
-                break;
-            }
-            node = walk;
         }
         return false;
     }
