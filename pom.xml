@@ -123,7 +123,7 @@
     </dependencies>
 
     <build>
-        <defaultGoal>clean package apache-rat:check spotbugs:check clirr:check checkstyle:check javadoc:javadoc </defaultGoal>
+        <defaultGoal>clean verify apache-rat:check spotbugs:check clirr:check checkstyle:check javadoc:javadoc </defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
