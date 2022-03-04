@@ -39,8 +39,11 @@
             <action dev="ggregory" type="update" due-to="Dependabot">
                 Bump checkstyle from 9.2 to 9.2.1 #72.
             </action>
-           <action dev="ggregory" type="update" due-to="Dependabot">
+            <action dev="ggregory" type="update" due-to="Dependabot">
                 Bump spotbugs-maven-plugin from 4.4.1 to 4.5.3.0 #73.
+            </action>
+            <action dev="ggregory" type="update" due-to="Dependabot">
+                Bump actions/checkout from 2 to 3 #79.
             </action>
         </release>
         <release version="3.2.1" date="2021-06-25">
