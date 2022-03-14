@@ -38,11 +38,15 @@ allow fine-tuning the scripting integration into any project.
 
 New Features in 3.3:
 ====================
+* JEXL-363:     Allow retrieving captured variables in script
 * JEXL-359:     Allow per-operator arithmetic handling of null arguments
 * JEXL-357:     Configure accessible packages/classes/methods/fields
 
 Bugs Fixed in 3.3:
 ==================
+* JEXL-364:     Evaluator options not propagated in closures
+* JEXL-362:     JexlInfo position reporting is off
+* JEXL-361:     Null may be used as operand silently even in arithmetic strict(true) mode
 * JEXL-354:     #pragma does not handle negative integer or real literals
 * JEXL-353:     Documentation error for not-in/not-match operator
 
