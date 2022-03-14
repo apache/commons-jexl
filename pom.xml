@@ -55,7 +55,7 @@
         <checksyle.version>9.3</checksyle.version>
         <japicmp.skip>false</japicmp.skip>
         <commons.japicmp.version>0.15.6</commons.japicmp.version>
-        <commons.pmd.version>3.16.0</commons.pmd.version>
+        <commons.pmd.version>3.15.0</commons.pmd.version>
         <commons.spotbugs.version>4.5.3.0</commons.spotbugs.version>
 
         <!-- override of Jacoco properties defined in CP52 -->
@@ -123,7 +123,7 @@
     </dependencies>
 
     <build>
-        <defaultGoal>clean verify apache-rat:check spotbugs:check clirr:check checkstyle:check javadoc:javadoc </defaultGoal>
+        <defaultGoal>clean verify apache-rat:check spotbugs:check japicmp:check checkstyle:check javadoc:javadoc </defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -256,19 +256,6 @@
                         <version>9.2</version>
                     </dependency>
                 </dependencies>
-            </plugin>
-
-            <!-- Allow Clirr to be run from command-line. Must agree with config in report section. -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>clirr-maven-plugin</artifactId>
-                <configuration>
-                    <ignoredDifferencesFile>${basedir}/src/main/config/clirr-ignored.xml</ignoredDifferencesFile>
-                    <excludes>
-                        <exclude>org/apache/commons/jexl3/parser/**</exclude>
-                        <exclude>org/apache/commons/jexl3/internal/**</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
 
             <!-- Allow RAT to be run from command-line. Must agree with config in report section. -->
@@ -443,19 +430,6 @@
                         <breakBuildOnBinaryIncompatibleModifications>false</breakBuildOnBinaryIncompatibleModifications>
                         <breakBuildIfCausedByExclusion>false</breakBuildIfCausedByExclusion>
                     </parameter>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>clirr-maven-plugin</artifactId>
-                <version>2.8</version>
-                <configuration>
-                    <ignoredDifferencesFile>${basedir}/src/main/config/clirr-ignored.xml</ignoredDifferencesFile>
-                    <excludes>
-                        <exclude>org/apache/commons/jexl3/parser/**</exclude>
-                        <exclude>org/apache/commons/jexl3/internal/**</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
 
