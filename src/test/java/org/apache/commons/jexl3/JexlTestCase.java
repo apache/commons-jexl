@@ -21,6 +21,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 
+import org.apache.commons.jexl3.internal.Interpreter;
+import org.apache.commons.jexl3.internal.OptionsContext;
 import org.apache.commons.jexl3.internal.Util;
 import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
@@ -68,6 +70,43 @@ public class JexlTestCase {
     static JexlEngine createEngine() {
         return new JexlBuilder().create();
     }
+
+    // define mode pro50
+    static final JexlOptions MODE_PRO50 = new JexlOptions();
+    static {
+        MODE_PRO50.setFlags( "+strict +cancellable +lexical +lexicalShade -safe".split(" "));
+    }
+
+    public static class PragmaticContext extends OptionsContext implements JexlContext.PragmaProcessor, JexlContext.OptionsHandle {
+        private final JexlOptions options;
+
+        public PragmaticContext() {
+            this(new JexlOptions());
+        }
+
+        public PragmaticContext(final JexlOptions o) {
+            super();
+            this.options = o;
+        }
+
+        @Override
+        public void processPragma(String key, Object value) {
+            processPragma(null, key, value);
+        }
+
+        @Override
+        public void processPragma(JexlOptions opts, final String key, final Object value) {
+            if ("script.mode".equals(key) && "pro50".equals(value)) {
+                opts.set(MODE_PRO50);
+            }
+        }
+
+        @Override
+        public JexlOptions getEngineOptions() {
+            return options;
+        }
+    }
+
 
     /**
      * A very secure singleton.

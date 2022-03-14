@@ -157,7 +157,7 @@ public final class JexlOptions {
      * Sets this option flags using the +/- syntax.
      * @param opts the option flags
      */
-    public void setFlags(final String[] opts) {
+    public void setFlags(final String... opts) {
         flags = parseFlags(flags, opts);
     }
 
@@ -415,6 +415,18 @@ public final class JexlOptions {
      */
     public JexlOptions copy() {
         return new JexlOptions().set(this);
+    }
+
+    @Override public String toString() {
+        StringBuilder strb = new StringBuilder();
+        for(int i = 0; i < NAMES.length; ++i) {
+            if (i > 0) {
+                strb.append(' ');
+            }
+            strb.append((flags & (1 << i)) != 0? '+':'-');
+            strb.append(NAMES[i]);
+        }
+        return strb.toString();
     }
 
 }

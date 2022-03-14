@@ -264,7 +264,7 @@ public final class TemplateScript implements JxltEngine.Template {
                 .context(context)
                 .options(options)
                 .frame(frame);
-        final Interpreter interpreter = new TemplateInterpreter(targs);
+        final Interpreter interpreter = jexl.createTemplateInterpreter(targs);
         final TemplateExpression[] immediates = new TemplateExpression[exprs.length];
         for (int e = 0; e < exprs.length; ++e) {
             try {
@@ -300,7 +300,7 @@ public final class TemplateScript implements JxltEngine.Template {
                 .frame(frame)
                 .expressions(exprs)
                 .writer(writer);
-        final Interpreter interpreter = new TemplateInterpreter(targs);
+        final Interpreter interpreter = jexl.createTemplateInterpreter(targs);
         interpreter.interpret(script);
     }
 

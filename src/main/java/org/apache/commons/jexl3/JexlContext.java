@@ -172,10 +172,30 @@ public interface JexlContext {
     interface PragmaProcessor {
         /**
          * Process one pragma.
+         * <p>Never called in 3.3, must be implemented for 3.2 binary compatibility reasons.</p>
+         * <p>Typical implementation in 3.3:</p>
+         * <code>
+         *         &#64;Override
+         *         public void processPragma(String key, Object value) {
+         *             processPragma(null, key, value);
+         *         }
+         * </code>
          * @param key the key
          * @param value the value
+         * @deprecated 3.3
          */
         void processPragma(String key, Object value);
+
+        /**
+         * Process one pragma.
+         * @param opts the current evaluator options
+         * @param key the key
+         * @param value the value
+         * @since 3.3
+         */
+        default void processPragma(JexlOptions opts, String key, Object value) {
+            processPragma(key, value);
+        }
     }
 
     /**

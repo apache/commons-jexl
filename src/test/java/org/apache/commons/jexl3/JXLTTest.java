@@ -69,11 +69,10 @@ public class JXLTTest extends JexlTestCase {
    public static List<JexlBuilder> engines() {
        final JexlFeatures f = new JexlFeatures();
        f.lexical(true).lexicalShade(true);
-      return Arrays.<JexlBuilder>asList(new JexlBuilder().silent(false)
-        .lexical(true).lexicalShade(true)
-        .cache(128).strict(true), new JexlBuilder().features(f).silent(false)
-        .cache(128).strict(true), new JexlBuilder().silent(false)
-        .cache(128).strict(true));
+      return Arrays.<JexlBuilder>asList(
+              new JexlBuilder().silent(false).lexical(true).lexicalShade(true).cache(128).strict(true),
+              new JexlBuilder().features(f).silent(false).cache(128).strict(true),
+              new JexlBuilder().silent(false).cache(128).strict(true));
    }
 
     @Before
@@ -1021,40 +1020,6 @@ public class JXLTTest extends JexlTestCase {
         Assert.assertEquals(s315, output);
     }
 
-        // define mode pro50
-    static final JexlOptions MODE_PRO50 = new JexlOptions();
-    static {
-        MODE_PRO50.setFlags( "+strict +cancellable +lexical +lexicalShade -safe".split(" "));
-    }
-
-    public static class PragmaticContext extends MapContext implements JexlContext.PragmaProcessor, JexlContext.OptionsHandle {
-        private final JexlOptions options;
-
-        public PragmaticContext(final JexlOptions o) {
-            this.options = o;
-        }
-
-        @Override
-        public void processPragma(final String key, final Object value) {
-            if ("script.mode".equals(key) && "pro50".equals(value)) {
-                options.set(MODE_PRO50);
-            }
-        }
-
-        @Override
-        public Object get(final String name) {
-            if ("$options".equals(name)) {
-                return options;
-            }
-            return super.get(name);
-        }
-
-        @Override
-        public JexlOptions getEngineOptions() {
-            return options;
-        }
-    }
-
     @Test
     public void testLexicalTemplate() throws Exception {
         final JexlOptions opts = new JexlOptions();
@@ -1074,7 +1039,12 @@ public class JXLTTest extends JexlTestCase {
         final Writer strw0 = new StringWriter();
         tmplt0.evaluate(ctxt, strw0);
         final String output0 = strw0.toString();
-        Assert.assertEquals( "-strict -cancellable -lexical -lexicalShade +safe", output0);
+        JexlFeatures features = BUILDER.features();
+        if (features != null && features.isLexical() && features.isLexicalShade()) {
+            Assert.assertEquals("-strict -cancellable +lexical +lexicalShade +safe", output0);
+        } else {
+            Assert.assertEquals("-strict -cancellable -lexical -lexicalShade +safe", output0);
+        }
 
         final String src = "$$ #pragma script.mode pro50\n" + src0;
 

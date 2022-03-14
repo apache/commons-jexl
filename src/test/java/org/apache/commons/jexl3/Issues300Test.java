@@ -20,10 +20,14 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.jexl3.internal.Engine32;
+import org.apache.commons.jexl3.internal.OptionsContext;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -600,5 +604,142 @@ public class Issues300Test {
         JexlEngine jexl = new JexlBuilder().safe(true).create();
         JexlExpression expr = jexl.createExpression(text);
         JexlScript script = jexl.createScript(text);
+    }
+
+    static JexlContext pragmaticContext() {
+        final JexlOptions opts = new JexlOptions();
+        opts.setFlags( "-strict", "-cancellable", "-lexical", "-lexicalShade", "+safe", "+sharedInstance");
+        return new JexlTestCase.PragmaticContext(opts);
+    }
+
+    @Test public void testPropagateOptions() throws Exception {
+        final String src0 = "`${$options.strict?'+':'-'}strict"
+                + " ${$options.cancellable?'+':'-'}cancellable"
+                + " ${$options.lexical?'+':'-'}lexical"
+                + " ${$options.lexicalShade?'+':'-'}lexicalShade"
+                + " ${$options.sharedInstance?'+':'-'}sharedInstance"
+                + " ${$options.safe?'+':'-'}safe`";
+        String text = "#pragma script.mode pro50\n" +
+                "()->{ ()->{ "+src0+"; } }";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlScript script = jexl.createScript(text);
+        JexlContext context = pragmaticContext();
+        JexlScript closure = (JexlScript) script.execute(context);
+        JexlContext opts = new OptionsContext();
+        Object result = closure.execute(opts);
+        Assert.assertEquals("+strict +cancellable +lexical +lexicalShade -sharedInstance -safe", result);
+
+        String text0 = "#pragma script.mode pro50\n" +
+                "()->{ "+src0+"; }";
+        JexlScript script0 = jexl.createScript(text0);
+        context = pragmaticContext();
+        Object result0 = script0.execute(context);
+        Assert.assertEquals("+strict +cancellable +lexical +lexicalShade -sharedInstance -safe", result0);
+
+        String text1 = "#pragma script.mode pro50\n"+src0;
+        JexlScript script1 = jexl.createScript(text1);
+        context = pragmaticContext();
+        Object result1 = script1.execute(context);
+        Assert.assertEquals("+strict +cancellable +lexical +lexicalShade -sharedInstance -safe", result1);
+
+        String text2 = src0;
+        JexlScript script2 = jexl.createScript(text2);
+        context = pragmaticContext();
+        Object result2 = script2.execute(context);
+        Assert.assertEquals("-strict -cancellable -lexical -lexicalShade +sharedInstance +safe", result2);
+    }
+
+    @Test
+    public void tes361a_32() throws Exception {
+        JexlEngine jexl = new Engine32(new JexlBuilder().safe(false));
+        Object result  = run361a(jexl);
+        Assert.assertNotNull(result);
+    }
+
+    @Test
+    public void test361a_33() throws Exception {
+        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+        try {
+            Object result = run361a(jexl);
+            Assert.fail("null arg should fail");
+        } catch(JexlException xany) {
+            Assert.assertNotNull(xany);
+        }
+    }
+
+    private Object run361a(JexlEngine jexl) throws Exception {
+        String src = "()-> { ()-> { if (versionFile != null) { return 'foo'; } else { return 'bar'; }} }";
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null);
+        JexlScript rs = (JexlScript) result;
+        return rs.execute(null);
+    }
+
+    @Test
+    public void test361b_33() throws Exception {
+        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+        try {
+            Object result = run361b(jexl);
+            Assert.fail("null arg should fail");
+        } catch(JexlException xany) {
+            Assert.assertNotNull(xany);
+        }
+    }
+
+    @Test
+    public void test361b_32() {
+        JexlEngine jexl = new Engine32(new JexlBuilder().safe(false));
+        Object result = run361b(jexl);
+        Assert.assertNotNull(result);
+    }
+
+    private Object run361b(JexlEngine jexl) {
+        String src = "()-> { ()-> {" +
+                "var voa = vaf.value;\n" +
+                "if (voa != NaN && voa <= 0)" +
+                "{ return 'foo'; } else { return 'bar'; }" +
+                "} }";
+        MapContext context = new MapContext();
+        Map<String,Object> vaf = Collections.singletonMap("value", null);
+        context.set("vaf", vaf);
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null);
+        JexlScript rs = (JexlScript) result;
+        return rs.execute(context);
+    }
+
+    @Test
+    public void test361_33() {
+        JexlEngine jexl = new JexlBuilder().safe(false).strict(true).create();
+        try {
+            run361c(jexl);
+            Assert.fail("null arg should fail");
+        } catch(JexlException xany) {
+            Assert.assertNotNull(xany);
+        }
+    }
+
+    @Test
+    public void test361c_32() {
+        JexlEngine jexl = new Engine32(new JexlBuilder().safe(false));
+        String result = run361c(jexl);
+        Assert.assertNotNull(result);
+    }
+
+    private String run361c(JexlEngine jexl) {
+        String src = "$$var t = null;\n" +
+                "$$if (t < 0) {\n" +
+                "'foo'\n" +
+                "$$} else {\n" +
+                "'bar'\n" +
+                "$$}";
+        JxltEngine jxlt = jexl.createJxltEngine();
+        MapContext context = new MapContext();
+        Map<String,Object> vaf = Collections.singletonMap("value", null);
+        context.set("vaf", vaf);
+        JxltEngine.Template template = jxlt.createTemplate(src);
+        StringWriter strw = new StringWriter();
+        template.evaluate(context, strw);
+        return strw.toString();
     }
 }

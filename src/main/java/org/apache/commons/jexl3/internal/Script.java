@@ -107,8 +107,18 @@ public class Script implements JexlScript, JexlExpression {
      * @return  the interpreter
      */
     protected Interpreter createInterpreter(final JexlContext context, final Frame frame) {
-        final JexlOptions opts = jexl.evalOptions(script, context);
-        return jexl.createInterpreter(context, frame, opts);
+        return createInterpreter(context, frame, null);
+    }
+
+    /**
+     * Creates this script interpreter.
+     * @param context the context
+     * @param frame the calling frame
+     * @param options the interpreter options
+     * @return  the interpreter
+     */
+    protected Interpreter createInterpreter(final JexlContext context, final Frame frame, final JexlOptions options) {
+        return jexl.createInterpreter(context, frame, options != null? options : jexl.evalOptions(script, context));
     }
 
     /**
@@ -218,6 +228,14 @@ public class Script implements JexlScript, JexlExpression {
     @Override
     public String[] getLocalVariables() {
         return script.getLocalVariables();
+    }
+
+    /**
+     * Gets this script captured variable, i.e. symbols captured from outer scopes.
+     * @return the captured variable names
+     */
+    public String[] getCapturedVariables() {
+        return script.getCapturedVariables();
     }
 
     /**

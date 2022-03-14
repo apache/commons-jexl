@@ -449,7 +449,7 @@ public class Engine extends JexlEngine {
                     }
                 }
                 if (processor != null) {
-                    processor.processPragma(key, value);
+                    processor.processPragma(opts, key, value);
                 }
             }
             if (ns != null) {
@@ -493,6 +493,13 @@ public class Engine extends JexlEngine {
         return new Interpreter(this, opts, context, frame);
     }
 
+    /**
+     * Creates a template interpreter.
+     * @param args the template interpreter arguments
+     */
+    protected Interpreter createTemplateInterpreter(TemplateInterpreter.Arguments args) {
+        return new TemplateInterpreter(args);
+    }
 
     @Override
     public Script createExpression(final JexlInfo info, final String expression) {

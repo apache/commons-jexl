@@ -17,6 +17,7 @@
 package org.apache.commons.jexl3.internal;
 
 import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlOptions;
 import org.apache.commons.jexl3.parser.ASTJexlLambda;
 
 import java.util.Objects;
@@ -27,6 +28,8 @@ import java.util.Objects;
 public class Closure extends Script {
     /** The frame. */
     protected final Frame frame;
+    /** The options. */
+    protected final JexlOptions options;
 
     /**
      * Creates a closure.
@@ -36,6 +39,8 @@ public class Closure extends Script {
     protected Closure(final Interpreter theCaller, final ASTJexlLambda lambda) {
         super(theCaller.jexl, null, lambda);
         frame = lambda.createFrame(theCaller.frame);
+        JexlOptions callerOptions = theCaller.options;
+        options = callerOptions != null ? callerOptions.copy() :  null;
     }
 
     /**
@@ -49,6 +54,11 @@ public class Closure extends Script {
         frame = sf == null
                 ? script.createFrame(args)
                 : sf.assign(args);
+        JexlOptions closureOptions = null;
+        if (base instanceof Closure) {
+            closureOptions = ((Closure) base).options;
+        }
+        options = closureOptions != null ? closureOptions.copy() :  null;
     }
 
     @Override
@@ -123,14 +133,14 @@ public class Closure extends Script {
     @Override
     public Object execute(final JexlContext context, final Object... args) {
         final Frame local = frame != null? frame.assign(args) : null;
-        final Interpreter interpreter = createInterpreter(context, local);
+        final Interpreter interpreter = createInterpreter(context, local, options);
         return interpreter.runClosure(this, null);
     }
 
     @Override
     public Callable callable(final JexlContext context, final Object... args) {
         final Frame local = frame != null? frame.assign(args) : null;
-        return new Callable(createInterpreter(context, local)) {
+        return new Callable(createInterpreter(context, local, options)) {
             @Override
             public Object interpret() {
                 return interpreter.runClosure(Closure.this, null);

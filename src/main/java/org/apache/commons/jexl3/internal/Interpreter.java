@@ -338,9 +338,6 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTBitwiseOrNode node, final Object data) {
         final Object left = node.jjtGetChild(0).jjtAccept(this, data);
         final Object right = node.jjtGetChild(1).jjtAccept(this, data);
-        if (arithmetic.isStrict(JexlOperator.OR) && left == null || right == null) {
-            // boum
-        }
         try {
             final Object result = operators.tryOverload(node, JexlOperator.OR, left, right);
             return result != JexlEngine.TRY_FAILED ? result : arithmetic.or(left, right);
@@ -1091,7 +1088,7 @@ public class Interpreter extends InterpreterBase {
                 accessJxlt.setExpression(expr);
             }
             if (expr != null) {
-                final Object name = expr.evaluate(frame, context);
+                final Object name = expr.evaluate(context, frame, options);
                 if (name != null) {
                     final Integer id = ASTIdentifierAccess.parseIdentifier(name.toString());
                     return id != null ? id : name;
@@ -1178,12 +1175,9 @@ public class Interpreter extends InterpreterBase {
                     // *... and continue
                     if (!options.isAntish()) {
                         antish = false;
-                        continue;
                     }
+                    continue;
                     // skip the first node case since it was trialed in jjtAccept above and returned null
-                    if (c == 0) {
-                        continue;
-                    }
                 }
                 // catch up to current node
                 for (; v <= c; ++v) {
@@ -1790,7 +1784,7 @@ public class Interpreter extends InterpreterBase {
             node.jjtSetValue(tp);
         }
         if (tp != null) {
-            return tp.evaluate(frame, context);
+            return tp.evaluate(context, frame, options);
         }
         return null;
     }

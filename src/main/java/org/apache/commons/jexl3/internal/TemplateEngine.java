@@ -296,7 +296,7 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public final TemplateExpression prepare(final JexlContext context) {
-                return prepare(null, context);
+                return prepare(context, null, null);
         }
 
         /**
@@ -306,9 +306,10 @@ public final class TemplateEngine extends JxltEngine {
          * @return the expression value
          * @throws JexlException
          */
-        protected final TemplateExpression prepare(final Frame frame, final JexlContext context) {
+        protected final TemplateExpression prepare(final JexlContext context, final Frame frame, final JexlOptions opts) {
             try {
-                final Interpreter interpreter = jexl.createInterpreter(context, frame, jexl.evalOptions(context));
+                final JexlOptions interOptions = opts != null? opts : jexl.evalOptions(context);
+                final Interpreter interpreter = jexl.createInterpreter(context, frame, interOptions);
                 return prepare(interpreter);
             } catch (final JexlException xjexl) {
                 final JexlException xuel = createException(xjexl.getInfo(), "prepare", this, xjexl);
@@ -334,7 +335,7 @@ public final class TemplateEngine extends JxltEngine {
 
         @Override
         public final Object evaluate(final JexlContext context) {
-            return evaluate(null, context);
+            return evaluate(context, null, null);
         }
 
         /**
@@ -353,15 +354,14 @@ public final class TemplateEngine extends JxltEngine {
          * @return the expression value
          * @throws JexlException
          */
-        protected final Object evaluate(final Frame frame, final JexlContext context) {
+        protected final Object evaluate( final JexlContext context, final Frame frame, final JexlOptions options) {
             try {
-                final JexlOptions options = options(context);
                 final TemplateInterpreter.Arguments args = new TemplateInterpreter
                         .Arguments(jexl)
                         .context(context)
-                        .options(options)
+                        .options(options != null? options : options(context))
                         .frame(frame);
-                final Interpreter interpreter = new TemplateInterpreter(args);
+                final Interpreter interpreter = jexl.createTemplateInterpreter(args);
                 return evaluate(interpreter);
             } catch (final JexlException xjexl) {
                 final JexlException xuel = createException(xjexl.getInfo(), "evaluate", this, xjexl);
