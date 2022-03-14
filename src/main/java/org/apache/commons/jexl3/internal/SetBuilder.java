@@ -41,7 +41,7 @@ public class SetBuilder implements JexlArithmetic.SetBuilder {
     }
 
     @Override
-    public Object create() {
+    public Set<?> create() {
         return set;
     }
 }

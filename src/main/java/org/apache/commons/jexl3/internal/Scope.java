@@ -253,6 +253,27 @@ public final class Scope {
     }
 
     /**
+     * Gets this script captured symbols names, i.e. local variables defined in outer scopes and used
+     * by this scope.
+     * @return the captured names
+     */
+    public String[] getCapturedVariables() {
+        if (capturedVariables != null) {
+            final List<String> captured = new ArrayList<String>(vars);
+            for (final Map.Entry<String, Integer> entry : namedVariables.entrySet()) {
+                final int symnum = entry.getValue();
+                if (symnum >= parms && capturedVariables.containsKey(symnum)) {
+                    captured.add(entry.getKey());
+                }
+            }
+            if (!captured.isEmpty()) {
+                return captured.toArray(new String[captured.size()]);
+            }
+        }
+        return EMPTY_STRS;
+    }
+
+    /**
      * Gets the (maximum) number of arguments this script expects.
      * @return the number of parameters
      */

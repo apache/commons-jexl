@@ -19,6 +19,8 @@ package org.apache.commons.jexl3.parser;
 import org.apache.commons.jexl3.JexlArithmetic;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.internal.LexicalScope;
+import org.apache.commons.jexl3.internal.Scope;
 import org.apache.commons.jexl3.internal.ScriptVisitor;
 import org.apache.commons.jexl3.introspection.JexlMethod;
 import org.apache.commons.jexl3.introspection.JexlPropertyGet;
@@ -128,8 +130,9 @@ public abstract class JexlNode extends SimpleNode {
     }
 
     /**
-     * Whether this node is a constant node Its value can not change after the first evaluation and can be cached
-     * indefinitely.
+     * Whether this node is a constant node.
+     * <p>Its value can not change after the first evaluation and can be cached
+     * indefinitely.</p>
      *
      * @return true if constant, false otherwise
      */

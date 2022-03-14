@@ -34,4 +34,10 @@ public final class ASTJexlLambda extends ASTJexlScript {
     public boolean isTopLevel() {
         return jjtGetParent() == null;
     }
+
+    @Override
+    protected boolean isConstant(final boolean literal) {
+        // a closure is constant if it does not capture any variables
+        return getCapturedVariables().length == 0;
+    }
 }
