@@ -72,8 +72,8 @@ public class JexlInfo {
      */
     public JexlInfo(final String source, final int l, final int c) {
         name = source;
-        line = l;
-        column = c;
+        line = l <= 0? 1: l;
+        column = c <= 0? 1 : c;
     }
 
     /**
@@ -99,8 +99,8 @@ public class JexlInfo {
             }
         }
         this.name = se != null ? se.getClassName() + "." + se.getMethodName() + ":" + se.getLineNumber() : "?";
-        this.line = 0;
-        this.column = 0;
+        this.line = 1;
+        this.column = 1;
     }
 
     /**
@@ -120,9 +120,7 @@ public class JexlInfo {
      * @param copy the instance to copy
      */
     protected JexlInfo(final JexlInfo copy) {
-        name = copy.getName();
-        line = copy.getLine();
-        column = copy.getColumn();
+        this(copy.getName(), copy.getLine(), copy.getColumn());
     }
 
     /**
@@ -133,14 +131,10 @@ public class JexlInfo {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder(name != null? name : "");
-        if (line > 0) {
-            sb.append("@");
-            sb.append(line);
-            if (column > 0) {
-                sb.append(":");
-                sb.append(column);
-            }
-        }
+        sb.append("@");
+        sb.append(line);
+        sb.append(":");
+        sb.append(column);
         final JexlInfo.Detail dbg = getDetail();
         if (dbg!= null) {
             sb.append("![");
