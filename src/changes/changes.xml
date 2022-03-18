@@ -36,6 +36,7 @@
             <action dev="henrib" type="fix" issue="JEXL-353" due-to="Mr.Z">
                 Documentation error for not-in/not-match operator
             </action>
+            <!-- UPDATE -->
             <action dev="ggregory" type="update" due-to="Dependabot">
                 Bump checkstyle from 9.2 to 9.2.1 #72.
             </action>
@@ -44,6 +45,9 @@
             </action>
             <action dev="ggregory" type="update" due-to="Dependabot">
                 Bump actions/checkout from 2 to 3 #79.
+            </action>
+            <action dev="ggregory" type="update" due-to="Dependabot">
+                Bump maven-pmd-plugin from 3.15.0 to 3.16.0 #82.
             </action>
         </release>
         <release version="3.2.1" date="2021-06-25">
