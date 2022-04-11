@@ -43,7 +43,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
 
     @Test
     public void testLeftShiftIntValue() throws Exception {
-        final String expr = "(x, y)->{ x << y }";
+        final String expr = "(x, y)-> x << y";
         asserter.assertExpression(expr, 1L << 2, 1L, 2);
         asserter.assertExpression(expr, 1L << -2, 1L, -2);
         asserter.assertExpression(expr, -1L << 2, -1L, 2);
@@ -62,7 +62,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
 
     @Test
     public void testRightShiftIntValue() throws Exception {
-        final String expr = "(x, y)->{ x >> y }";
+        final String expr = "(x, y)-> x >> y";
         asserter.assertExpression(expr, 42L >> 2, 42L, 2);
         asserter.assertExpression(expr, 42L >> -2, 42L, -2);
         asserter.assertExpression(expr, -42L >> 2, -42L, 2);
@@ -81,7 +81,7 @@ public class ShiftOperatorsTest extends JexlTestCase {
 
     @Test
     public void testRightShiftUnsignedIntValue() throws Exception {
-        final String expr = "(x, y)->{ x >>> y }";
+        final String expr = "(x, y)-> x >>> y";
         asserter.assertExpression(expr, 42L >>> 2, 42L, 2);
         asserter.assertExpression(expr, 42L >>> -2, 42L, -2);
         asserter.assertExpression(expr, -42L >>> 2, -42L, 2);
