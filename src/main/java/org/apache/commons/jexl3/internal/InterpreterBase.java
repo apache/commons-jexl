@@ -314,7 +314,7 @@ public abstract class InterpreterBase extends ParserVisitor {
             return undefinedVariable(identifier, name);
         }
         // a local var ?
-        if ((symbol >= 0) && frame.has(symbol)) {
+        if (symbol >= 0 && frame.has(symbol)) {
             final Object value = frame.get(symbol);
             // not out of scope with no lexical shade ?
             if (value != Scope.UNDEFINED) {

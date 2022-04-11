@@ -198,6 +198,18 @@ public class LambdaTest extends JexlTestCase {
     }
 
     @Test
+    public void testRecurse1() {
+        final JexlEngine jexl = createEngine();
+        final JexlContext jc = new MapContext();
+        String src = "var fact = (x)-> x <= 1? 1 : x * fact(x - 1);\nfact(5);\n";
+        final JexlScript script = jexl.createScript(src);
+        final int result = (Integer) script.execute(jc);
+        Assert.assertEquals(120, result);
+        String parsed = script.getParsedText();
+        Assert.assertEquals(src, parsed);
+    }
+
+    @Test
     public void testRecurse2() {
         final JexlEngine jexl = createEngine();
         final JexlContext jc = new MapContext();
@@ -372,19 +384,65 @@ public class LambdaTest extends JexlTestCase {
     @Test
     public void test271d() {
         final JexlEngine jexl = createEngine();
-        final JexlScript base = jexl.createScript("var base = 2; return (x, y, z)->{ base + x + y + z };");
+        final JexlScript base = jexl.createScript("var base = 2; (x, y, z)->base + x + y + z;");
         final JexlScript y = ((JexlScript) base.execute(null)).curry(1);
         final Object result = y.execute(null, 2, 3);
         Assert.assertEquals(8, result);
     }
 
-    // redefining an captured var is not resolved correctly in left hand side;
-    // declare the var in local frame, resolved in local frame instead of parent
+    // Redefining a captured var is not resolved correctly in left-hand side;
+    // declare the var in local frame, resolved in local frame instead of parent.
     @Test
     public void test271e() {
         JexlEngine jexl = createEngine();
         JexlScript base = jexl.createScript("var base = 1000; var f = (x, y)->{ var base = x + y + (base?:-1000); base; }; f(100, 20)");
         Object result = base.execute(null);
         Assert.assertEquals(1120, result);
+    }
+
+    @Test public void testLambdaExpr0() {
+        String src = "(x, y) -> x + y";
+        JexlEngine jexl = createEngine();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null, 11, 31);
+        Assert.assertEquals(42, result);
+    }
+
+    @Test public void testLambdaExpr1() {
+        String src = "x -> x + x";
+        JexlEngine jexl = createEngine();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null, 21);
+        Assert.assertEquals(42, result);
+    }
+
+    @Test public void testLambdaExpr10() {
+        String src = "(a)->{ var x = x -> x + x; x(a) }";
+        JexlEngine jexl = createEngine();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null, 21);
+        Assert.assertEquals(42, result);
+    }
+
+    @Test public void testLambdaExpr2() {
+        String src = "x -> { { x + x } }";
+        JexlEngine jexl = createEngine();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null, 21);
+        Assert.assertTrue(result instanceof Set);
+        Set<?> set = (Set<?>) result;
+        Assert.assertEquals(1, set.size());
+        Assert.assertTrue(set.contains(42));
+    }
+
+    @Test public void testLambdaExpr3() {
+        String src = "x -> ( { x + x } )";
+        JexlEngine jexl = createEngine();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null, 21);
+        Assert.assertTrue(result instanceof Set);
+        Set<?> set = (Set<?>) result;
+        Assert.assertEquals(1, set.size());
+        Assert.assertTrue(set.contains(42));
     }
 }
