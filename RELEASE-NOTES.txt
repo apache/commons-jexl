@@ -40,6 +40,7 @@ New Features in 3.3:
 ====================
 * JEXL-365:     Lambda expressions
 * JEXL-363:     Allow retrieving captured variables in script
+* JEXL-360:     Add missing bitshift operators ( >>, >>>, <<)
 * JEXL-359:     Allow per-operator arithmetic handling of null arguments
 * JEXL-357:     Configure accessible packages/classes/methods/fields
 
