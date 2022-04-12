@@ -37,6 +37,9 @@
                 Documentation error for not-in/not-match operator
             </action>
             <!-- UPDATE -->
+            <action dev="ggregory" type="update" due-to="Gary Gregory">
+                Bump actions/cache from 3 to 3.0.2.
+            </action>
             <action dev="ggregory" type="update" due-to="Dependabot">
                 Bump actions/checkout from 2 to 3 #79.
             </action>
