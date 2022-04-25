@@ -195,6 +195,9 @@ TOKEN_MGR_DECLS : {
     | < and_assign : "&=" >
     | < or_assign : "|=" >
     | < xor_assign : "^=" >
+    | < lshift_assign : "<<=" >
+    | < rshiftu_assign : ">>>=" >
+    | < rshift_assign : ">>=" >
 
     | < assign : "=" >
     | < plus : "+" >
@@ -209,6 +212,9 @@ TOKEN_MGR_DECLS : {
     | < and : "&" >
     | < or : "|" >
     | < xor : "^" >
+    | < lshift : "<<" >
+    | < rshiftu : ">>>" >
+    | < rshift : ">>" >
 
     | < tilda : "~" >
     | < range : ".." >
@@ -505,6 +511,12 @@ void AssignmentExpression() #void : {}
   |
     <minus_assign>  Expression() #SetSubNode(2)
   |
+    <lshift_assign>  Expression() #SetShiftLeftNode(2)
+  |
+    <rshift_assign>  Expression() #SetShiftRightNode(2)
+  |
+    <rshiftu_assign>  Expression() #SetShiftRightUnsignedNode(2)
+  |
     <assign> Expression() #Assignment(2)
   ) )*
 }
@@ -569,33 +581,44 @@ void EqualityExpression() #void : {}
 
 void RelationalExpression() #void : {}
 {
-  AdditiveExpression()
+  ShiftExpression()
   ( LOOKAHEAD(2) (
-    (<lt> |<LT>)  AdditiveExpression() #LTNode(2)
+    (<lt> |<LT>)  ShiftExpression() #LTNode(2)
    |
-    (<gt> | <GT>) AdditiveExpression() #GTNode(2)
+    (<gt> | <GT>) ShiftExpression() #GTNode(2)
    |
-    (<le> | <LE>) AdditiveExpression() #LENode(2)
+    (<le> | <LE>) ShiftExpression() #LENode(2)
    |
-    (<ge> | <GE>) AdditiveExpression() #GENode(2)
+    (<ge> | <GE>) ShiftExpression() #GENode(2)
    |
-    <req> AdditiveExpression() #ERNode(2) // equals regexp
+    <req> ShiftExpression() #ERNode(2) // equals regexp
    |
-    <rne> AdditiveExpression() #NRNode(2) // not equals regexp
+    <rne> ShiftExpression() #NRNode(2) // not equals regexp
    |
-    <seq> AdditiveExpression() #SWNode(2) // starts with
+    <seq> ShiftExpression() #SWNode(2) // starts with
    |
-    <sne> AdditiveExpression() #NSWNode(2) // not starts with
+    <sne> ShiftExpression() #NSWNode(2) // not starts with
    |
-    <eeq> AdditiveExpression() #EWNode(2) // ends with
+    <eeq> ShiftExpression() #EWNode(2) // ends with
    |
-    <ene> AdditiveExpression() #NEWNode(2) // not ends with
+    <ene> ShiftExpression() #NEWNode(2) // not ends with
   ) )?
 }
 
 /***************************************
  *      Arithmetic
  ***************************************/
+void ShiftExpression() #void : {}
+{
+    AdditiveExpression()
+    ( LOOKAHEAD(2) (
+      <lshift> AdditiveExpression() #ShiftLeftNode(2) // left shift
+    |
+      <rshift> AdditiveExpression() #ShiftRightNode(2) // right shift
+    |
+      <rshiftu> AdditiveExpression() #ShiftRightUnsignedNode(2) // right shift unsigned
+    ) )*
+}
 
 void AdditiveExpression() #void : {}
 {

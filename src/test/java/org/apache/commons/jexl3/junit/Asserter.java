@@ -92,9 +92,9 @@ public class Asserter extends Assert {
      * @throws Exception if the expression could not be evaluationed or an assertion
      * fails
      */
-    public void assertExpression(final String expression, final Object expected) throws Exception {
+    public void assertExpression(final String expression, final Object expected, Object... args) throws Exception {
         final JexlScript exp = engine.createScript(expression);
-        final Object value = exp.execute(context);
+        final Object value = exp.execute(context, args);
         if (expected instanceof BigDecimal) {
             final JexlArithmetic jexla = engine.getArithmetic();
             Assert.assertEquals("expression: " + expression, 0,
