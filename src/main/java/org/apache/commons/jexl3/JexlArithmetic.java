@@ -1390,13 +1390,19 @@ public class JexlArithmetic {
                 return 0;
             }
             if (isNumberable(left) || isNumberable(right)) {
-                final long lhs = toLong(left);
-                final long rhs = toLong(right);
-                if (lhs < rhs) {
-                    return -1;
-                }
-                if (lhs > rhs) {
-                    return +1;
+                if (left instanceof String || right instanceof String) {
+                    final BigDecimal l = toBigDecimal(left);
+                    final BigDecimal r = toBigDecimal(right);
+                    return l.compareTo(r);
+                } else {
+                    final long lhs = toLong(left);
+                    final long rhs = toLong(right);
+                    if (lhs < rhs) {
+                        return -1;
+                    }
+                    if (lhs > rhs) {
+                        return +1;
+                    }
                 }
                 return 0;
             }

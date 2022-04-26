@@ -1748,4 +1748,61 @@ public class ArithmeticTest extends JexlTestCase {
         o = e.execute(jc, ab);
         Assert.assertTrue((Boolean) o);
     }
+
+    @Test
+    public void testCompare() {
+        // JEXL doesn't support more than one operator in the same expression, for example: 1 == 1 == 1
+        final Object[] EXPRESSIONS = {
+                // Basic compare
+                "1 == 1", true,
+                "1 != 1", false,
+                "1 != 2", true,
+                "1 > 2", false,
+                "1 >= 2", false,
+                "1 < 2", true,
+                "1 <= 2", true,
+                // Int <-> Float Coercion
+                "1.0 == 1", true,
+                "1 == 1.0", true,
+                "1.1 != 1", true,
+                "1.1 < 2", true,
+                // Big Decimal <-> Big Integer Coercion
+                "1.0b == 1h", true,
+                "1h == 1.0b", true,
+                "1.1b != 1h", true,
+                "1.1b < 2h", true,
+                // Mix all type of numbers
+                "1l == 1.0", true, // long and int
+                "1.0d == 1.0f", true, // double and float
+                "1l == 1.0b", true,
+                "1l == 1h", true,
+                "1.0d == 1.0b", true,
+                "1.0f == 1.0b", true,
+                "1.0d == 1h", true,
+                "1.0f == 1h", true,
+                // numbers and strings
+                "'1' == 1", true,
+                "'1' == 1l", true,
+                "'1' == 1h", true,
+                "'' == 0", true, // empty string is coerced to zero (ECMA compliance)
+                "'1.0' == 1", true,
+                "'1.0' == 1.0f", true,
+                "'1.0' == 1.0d", true,
+                "'1.0' == 1.0b", true,
+                "'1.01' == 1.01", true,
+                "1.0 >= '1'", true,
+                "1.0 > '1'", false,
+        };
+        final JexlEngine jexl = new JexlBuilder().create();
+        final JexlContext jc = new EmptyTestContext();
+        JexlExpression expression;
+
+        for (int e = 0; e < EXPRESSIONS.length; e += 2) {
+            final String stext = (String) EXPRESSIONS[e];
+            final Object expected = EXPRESSIONS[e + 1];
+            expression = jexl.createExpression(stext);
+            final Object result = expression.evaluate(jc);
+            Assert.assertEquals("failed on " + stext, expected, result);
+        }
+    }
 }
