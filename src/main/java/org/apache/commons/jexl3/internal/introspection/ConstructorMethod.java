@@ -79,25 +79,28 @@ public final class ConstructorMethod implements JexlMethod {
     }
 
     @Override
-    public Object tryInvoke(final String name, final Object obj, final Object... params) {
-        try {
-            final Class<?> ctorClass = ctor.getDeclaringClass();
-            boolean invoke = true;
-            if (obj != null) {
-                if (obj instanceof Class<?>) {
-                    invoke = ctorClass.equals(obj);
-                } else {
-                    invoke = ctorClass.getName().equals(obj.toString());
+    public Object tryInvoke(final String name, final Object obj, final Object... args) {
+        // dont try to invoke if no parameter but call has arguments
+        if (ctor.getParameterCount() > 0 || args.length == 0) {
+            try {
+                final Class<?> ctorClass = ctor.getDeclaringClass();
+                boolean invoke = true;
+                if (obj != null) {
+                    if (obj instanceof Class<?>) {
+                        invoke = ctorClass.equals(obj);
+                    } else {
+                        invoke = ctorClass.getName().equals(obj.toString());
+                    }
                 }
+                invoke &= name == null || ctorClass.getName().equals(name);
+                if (invoke) {
+                    return ctor.newInstance(args);
+                }
+            } catch (InstantiationException | IllegalArgumentException | IllegalAccessException xinstance) {
+                return Uberspect.TRY_FAILED;
+            } catch (final InvocationTargetException xinvoke) {
+                throw JexlException.tryFailed(xinvoke); // throw
             }
-            invoke &= name == null || ctorClass.getName().equals(name);
-            if (invoke) {
-                return ctor.newInstance(params);
-            }
-        } catch (InstantiationException | IllegalArgumentException | IllegalAccessException xinstance) {
-            return Uberspect.TRY_FAILED;
-        } catch (final InvocationTargetException xinvoke) {
-            throw JexlException.tryFailed(xinvoke); // throw
         }
         return Uberspect.TRY_FAILED;
     }

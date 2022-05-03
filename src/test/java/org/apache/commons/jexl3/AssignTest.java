@@ -19,6 +19,8 @@ package org.apache.commons.jexl3;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 /**
  * Test cases for assignment.
  *
@@ -72,10 +74,9 @@ public class AssignTest extends JexlTestCase {
     /**
      * Make sure bean assignment works
      *
-     * @throws Exception on any error
      */
     @Test
-    public void testAntish() throws Exception {
+    public void testAntish() {
         final JexlExpression assign = JEXL.createExpression("froboz.value = 10");
         final JexlExpression check = JEXL.createExpression("froboz.value");
         final JexlContext jc = new MapContext();
@@ -86,7 +87,7 @@ public class AssignTest extends JexlTestCase {
     }
 
     @Test
-    public void testAntishInteger() throws Exception {
+    public void testAntishInteger() {
         final JexlExpression assign = JEXL.createExpression("froboz.0 = 10");
         final JexlExpression check = JEXL.createExpression("froboz.0");
         final JexlContext jc = new MapContext();
@@ -97,7 +98,7 @@ public class AssignTest extends JexlTestCase {
     }
 
     @Test
-    public void testBeanish() throws Exception {
+    public void testBeanish() {
         final JexlExpression assign = JEXL.createExpression("froboz.value = 10");
         final JexlExpression check = JEXL.createExpression("froboz.value");
         final JexlContext jc = new MapContext();
@@ -110,7 +111,7 @@ public class AssignTest extends JexlTestCase {
     }
 
     @Test
-    public void testAmbiguous() throws Exception {
+    public void testAmbiguous() {
         final JexlExpression assign = JEXL.createExpression("froboz.nosuchbean = 10");
         final JexlContext jc = new MapContext();
         final Froboz froboz = new Froboz(-169);
@@ -129,7 +130,7 @@ public class AssignTest extends JexlTestCase {
     }
 
     @Test
-    public void testArray() throws Exception {
+    public void testArray() {
         final JexlExpression assign = JEXL.createExpression("froboz[\"value\"] = 10");
         final JexlExpression check = JEXL.createExpression("froboz[\"value\"]");
         final JexlContext jc = new MapContext();
@@ -142,7 +143,7 @@ public class AssignTest extends JexlTestCase {
     }
 
     @Test
-    public void testMini() throws Exception {
+    public void testMini() {
         final JexlContext jc = new MapContext();
         final JexlExpression assign = JEXL.createExpression("quux = 10");
         final Object o = assign.evaluate(jc);
@@ -151,7 +152,7 @@ public class AssignTest extends JexlTestCase {
     }
 
     @Test
-    public void testMore() throws Exception {
+    public void testMore() {
         final JexlContext jc = new MapContext();
         jc.set("quuxClass", Quux.class);
         final JexlExpression create = JEXL.createExpression("quux = new(quuxClass, 'xuuq', 100)");
@@ -167,7 +168,7 @@ public class AssignTest extends JexlTestCase {
     }
 
     @Test
-    public void testUtil() throws Exception {
+    public void testUtil() {
         final Quux quux = JEXL.newInstance(Quux.class, "xuuq", Integer.valueOf(100));
         Assert.assertNotNull(quux);
         JEXL.setProperty(quux, "froboz.value", Integer.valueOf(100));
@@ -179,7 +180,7 @@ public class AssignTest extends JexlTestCase {
     }
 
     @Test
-    public void testRejectLocal() throws Exception {
+    public void testRejectLocal() {
         final JexlContext jc = new MapContext();
         JexlScript assign = JEXL.createScript("var quux = null; quux.froboz.value = 10");
         try {
@@ -193,5 +194,54 @@ public class AssignTest extends JexlTestCase {
         assign = JEXL.createScript("quux.froboz.value = 10");
         final Object o = assign.execute(jc);
         Assert.assertEquals(10, o);
+    }
+
+    @Test
+    public void testPropertyInError0() {
+        JexlScript script;
+        for(String op : Arrays.asList(
+                " = ", "+= ", " -= "," *= "," /= "," %= ",
+                " &= ", " |= ", " ^= ",
+                " <<= ", " >>= ", " >>>= ")) {
+            script = JEXL.createScript("x -> x.y " +op+ "42");
+            try {
+                script.execute(null, "the_x_value");
+            } catch (final JexlException.Property xprop) {
+                Assert.assertEquals("y", xprop.getProperty());
+            }
+        }
+        script = JEXL.createScript("x -> x.y ");
+        try {
+            script.execute(null, "the_x_value");
+        } catch (final JexlException.Property xprop) {
+            Assert.assertEquals("y", xprop.getProperty());
+        }
+    }
+
+    @Test
+    public void testSetInError1() {
+        try {
+            JEXL.setProperty("the_x_value", "y", 42);
+        } catch (final JexlException.Property xprop) {
+            Assert.assertEquals("y", xprop.getProperty());
+        }
+        try {
+            JEXL.setProperty(null, "y", 42);
+        } catch (final JexlException xprop) {
+            //
+        }
+    }
+    @Test
+    public void testGetInError1() {
+        try {
+            JEXL.getProperty("the_x_value", "y");
+        } catch (final JexlException.Property xprop) {
+            Assert.assertEquals("y", xprop.getProperty());
+        }
+        try {
+            JEXL.getProperty(null, "y");
+        } catch (final JexlException xprop) {
+            //
+        }
     }
 }

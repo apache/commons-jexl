@@ -189,74 +189,92 @@ public abstract class InterpreterBase extends ParserVisitor {
                 throw new JexlException(node, "no such function namespace " + prefix, null);
             }
         }
-        // shortcut if ns is known to be not-a-functor
-        final boolean cacheable = cache;
-        final Object cached = cacheable ? node.jjtGetValue() : null;
-        if (cached != JexlContext.NamespaceFunctor.class) {
-            // allow namespace to instantiate a functor with context if possible, not an error otherwise
-            Object functor = null;
-            if (namespace instanceof JexlContext.NamespaceFunctor) {
-                functor = ((JexlContext.NamespaceFunctor) namespace).createFunctor(context);
-            } else if (namespace instanceof Class<?> || namespace instanceof String) {
-                // attempt to reuse last ctor cached in volatile JexlNode.value
-                if (cached instanceof JexlMethod) {
-                    try {
-                        final Object eval = ((JexlMethod) cached).tryInvoke(null, context);
-                        if (JexlEngine.TRY_FAILED != eval) {
-                            functor = eval;
-                        }
-                    } catch (final JexlException.TryFailed xtry) {
-                        throw new JexlException(node, "unable to instantiate namespace " + prefix, xtry.getCause());
-                    }
+        Object functor = null;
+        // class or string (*1)
+        if (namespace instanceof Class<?> || namespace instanceof String) {
+            // the namespace(d) identifier
+            final ASTIdentifier nsNode = (ASTIdentifier) node.jjtGetChild(0);
+            final boolean cacheable = cache && prefix != null;
+            final Object cached = cacheable ? nsNode.jjtGetValue() : null;
+            // we know the class is used as namespace of static methods, no functor
+            if (cached instanceof Class<?>) {
+                return (Class<?>) cached;
+            }
+            // attempt to reuse last cached constructor
+            if (cached instanceof JexlContext.NamespaceFunctor) {
+                Object eval = ((JexlContext.NamespaceFunctor) cached).createFunctor(context);
+                if (JexlEngine.TRY_FAILED != eval) {
+                    functor = eval;
+                    namespace = cached;
                 }
-                // find a ctor with that context class
-                if (functor == null) {
-                    JexlMethod ctor = uberspect.getConstructor(namespace, context);
+            }
+            if (functor == null) {
+                // find a constructor with that context as argument or without
+                for (int tried = 0; tried < 2; ++tried) {
+                    final boolean withContext = tried == 0;
+                    final JexlMethod ctor = withContext
+                            ? uberspect.getConstructor(namespace, context)
+                            : uberspect.getConstructor(namespace);
                     if (ctor != null) {
                         try {
-                            functor = ctor.invoke(namespace, context);
-                            if (cacheable && ctor.isCacheable()) {
-                                node.jjtSetValue(ctor);
+                            functor = withContext
+                                    ? ctor.invoke(namespace, context)
+                                    : ctor.invoke(namespace);
+                            // defensive
+                            if (functor != null) {
+                                // wrap the namespace in a NamespaceFunctor to shield us from the actual
+                                // number of arguments to call it with.
+                                final Object ns = namespace;
+                                // make it a class (not a lambda!) so instanceof (see *2) will catch it
+                                namespace = new JexlContext.NamespaceFunctor() {
+                                    @Override
+                                    public Object createFunctor(JexlContext context) {
+                                        return withContext
+                                                ? ctor.tryInvoke(null, ns, context)
+                                                : ctor.tryInvoke(null, ns);
+                                    }
+                                };
+                                if (cacheable && ctor.isCacheable()) {
+                                    nsNode.jjtSetValue(namespace);
+                                }
+                                break; // we found a constructor that did create a functor
                             }
                         } catch (final Exception xinst) {
                             throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
                         }
                     }
-                    // try again; find a ctor with no arg
-                    if (functor == null) {
-                        ctor = uberspect.getConstructor(namespace);
-                        if (ctor != null) {
-                            try {
-                                functor = ctor.invoke(namespace);
-                            } catch (final Exception xinst) {
-                                throw new JexlException(node, "unable to instantiate namespace " + prefix, xinst);
-                            }
-                        }
-                        // try again; use a class, namespace of static methods
+                }
+                // did not, will not create a functor instance; use a class, namespace of static methods
+                if (functor == null) {
+                    try {
                         // try to find a class with that name
-                        if (functor == null && namespace instanceof String) {
-                            try {
-                                namespace = uberspect.getClassLoader().loadClass((String) namespace);
-                            } catch (final ClassNotFoundException xignore) {
-                                // not a class
-                                namespace = null;
-                            }
-                        } // we know it's a class
+                        if (namespace instanceof String) {
+                            namespace = uberspect.getClassLoader().loadClass((String) namespace);
+                        }
+                        // we know it's a class in all cases (see *1)
+                        if (cacheable) {
+                            nsNode.jjtSetValue(namespace);
+                        }
+                    } catch (final ClassNotFoundException xignore) {
+                        // not a class
+                        throw new JexlException(node, "no such class namespace " + prefix, null);
                     }
                 }
             }
-            // got a functor, store it and return it
-            if (functor != null) {
-                synchronized (this) {
-                    if (functors == null) {
-                        functors = new HashMap<>();
-                    }
-                    functors.put(prefix, functor);
+        }
+        // if a namespace functor, instantiate the functor (if not done already) and store it (*2)
+        if (functor == null && namespace instanceof JexlContext.NamespaceFunctor) {
+            functor = ((JexlContext.NamespaceFunctor) namespace).createFunctor(context);
+        }
+        // got a functor, store it and return it
+        if (functor != null) {
+            synchronized (this) {
+                if (functors == null) {
+                    functors = new HashMap<>();
                 }
-                return functor;
+                functors.put(prefix, functor);
             }
-            // use the NamespaceFunctor class to tag this node as not-a-functor
-            node.jjtSetValue(JexlContext.NamespaceFunctor.class);
+            return functor;
         }
         return namespace;
     }
