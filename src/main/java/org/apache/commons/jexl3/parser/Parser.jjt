@@ -127,6 +127,7 @@ TOKEN_MGR_DECLS : {
     | < DO : "do" > { popDot(); }
     | < NEW : "new" >  { popDot(); }
     | < VAR : "var" >  { popDot(); }
+    | < LET : "let" >  { popDot(); }
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < SIZE : "size" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < NULL : "null" >  { popDot(); }
@@ -134,7 +135,7 @@ TOKEN_MGR_DECLS : {
     | < FALSE : "false" >  { popDot(); }
     | < RETURN : "return" > { popDot(); }
     | < FUNCTION : "function" >  { popDot(); }
-    | < LAMBDA : "->" >
+    | < LAMBDA : "->" | "=>" > { popDot(); }
     | < BREAK : "break" > { popDot(); }
     | < CONTINUE : "continue" > { popDot(); }
     | < PRAGMA : "#pragma" > { popDot(); }
@@ -421,22 +422,26 @@ void ForeachStatement() : {}
 
 void ForEachVar() #Reference : {}
 {
-    <VAR> DeclareVar()
+    <VAR> DeclareVar(false)
+|
+    <LET> DeclareVar(true)
 |
     Identifier(true)
 }
 
 void Var() #void : {}
 {
-    <VAR> DeclareVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    <VAR> DeclareVar(false) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    |
+    <LET> DeclareVar(true) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
 }
 
-void DeclareVar() #Var :
+void DeclareVar(boolean lexical) #Var :
 {
     Token t;
 }
 {
-    t=<IDENTIFIER> { declareVariable(jjtThis, t); }
+    t=<IDENTIFIER> { declareVariable(jjtThis, t, lexical); }
 }
 
 void Pragma() #void :
