@@ -21,9 +21,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Tests JexlContext (advanced) features.
@@ -225,6 +227,9 @@ public class ContextNamespaceTest extends JexlTestCase {
         ctxt.set("x", "42");
         result = script.execute(ctxt);
         Assert.assertEquals(169, result);
+        //ctxt.set("x", "42");
+        result = script.execute(ctxt);
+        Assert.assertEquals(169, result);
     }
 
     private void run348c(JexlEngine jexl, JexlContext ctxt) {
@@ -318,4 +323,73 @@ public class ContextNamespaceTest extends JexlTestCase {
         }
     }
 
+    static AtomicInteger nsnsCtor = new AtomicInteger(0);
+
+    public static class NsNs {
+        private final int constVar;
+        public NsNs(JexlContext ctxt) {
+            nsnsCtor.incrementAndGet();
+            Object n = ctxt.get("NUMBER");
+            constVar = (n instanceof Number) ? ((Number) n).intValue() : -1;
+        }
+
+        public int callIt(int n) {
+            return n + constVar;
+        }
+    }
+
+    @Test
+    public void testNsNsContext0() throws Exception {
+        nsnsCtor.set(0);
+        String clsName = NsNs.class.getName();
+        runNsNsContext(Collections.singletonMap("nsns", clsName));
+    }
+
+    @Test
+    public void testNsNsContext1() throws Exception {
+        nsnsCtor.set(0);
+        runNsNsContext(Collections.singletonMap("nsns", NsNs.class));
+    }
+
+    private void runNsNsContext(Map<String,Object> nsMap) {
+        JexlContext ctxt = new MapContext();
+        ctxt.set("NUMBER", 19);
+        final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).cache(32)
+                .namespaces(nsMap).create();
+        final JexlScript script = jexl.createScript("x ->{ nsns:callIt(x); nsns:callIt(x); }");
+        Number result = (Number) script.execute(ctxt, 23);
+        Assert.assertEquals(42, result);
+        Assert.assertEquals(1, nsnsCtor.get());
+        result = (Number) script.execute(ctxt, 623);
+        Assert.assertEquals(642, result);
+        Assert.assertEquals(2, nsnsCtor.get());
+    }
+
+    public static class StaticNs {
+        private StaticNs() { }
+        public static int callIt(int n) {
+            return n + 19;
+        }
+    }
+
+    @Test
+    public void testStaticNs0() {
+        runStaticNsContext(Collections.singletonMap("sns", StaticNs.class));
+    }
+
+    @Test
+    public void testStaticNs1() {
+        runStaticNsContext(Collections.singletonMap("sns", StaticNs.class.getName()));
+    }
+
+    private void runStaticNsContext(Map<String,Object> nsMap) {
+        JexlContext ctxt = new MapContext();
+        final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).cache(32)
+                .namespaces(nsMap).create();
+        final JexlScript script = jexl.createScript("x ->{ sns:callIt(x); sns:callIt(x); }");
+        Number result = (Number) script.execute(ctxt, 23);
+        Assert.assertEquals(42, result);
+        result = (Number) script.execute(ctxt, 623);
+        Assert.assertEquals(642, result);
+    }
 }
