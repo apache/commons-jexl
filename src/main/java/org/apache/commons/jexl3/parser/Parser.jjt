@@ -135,7 +135,8 @@ TOKEN_MGR_DECLS : {
     | < FALSE : "false" >  { popDot(); }
     | < RETURN : "return" > { popDot(); }
     | < FUNCTION : "function" >  { popDot(); }
-    | < LAMBDA : "->" | "=>" > { popDot(); }
+    | < LAMBDA : "->" > { popDot(); }
+    | < FATARROW : "=>" > { popDot(); }
     | < BREAK : "break" > { popDot(); }
     | < CONTINUE : "continue" > { popDot(); }
     | < PRAGMA : "#pragma" > { popDot(); }
@@ -442,6 +443,13 @@ void DeclareVar(boolean lexical) #Var :
 }
 {
     t=<IDENTIFIER> { declareVariable(jjtThis, t, lexical); }
+}
+void DeclareFunction(Scope scope) #Var :
+{
+    Token t;
+}
+{
+    t=<IDENTIFIER> { declareFunction(jjtThis, t, scope); }
 }
 
 void Pragma() #void :
@@ -860,23 +868,26 @@ void Parameters() #void : {}
 
 void LambdaLookahead() #void : {}
 {
-  <FUNCTION> Parameters()
+  <FUNCTION> (<IDENTIFIER>)? Parameters()
   |
-  Parameters() <LAMBDA>
+  Parameters() (<LAMBDA> | <FATARROW>)
   |
-  Parameter() <LAMBDA>
+  Parameter() (<LAMBDA> | <FATARROW>)
 }
 
 void Lambda() #JexlLambda :
 {
+   Token arrow;
+   Token name;
+   Scope scope = getFrame();
    pushFrame();
 }
 {
-  { pushUnit(jjtThis); } <FUNCTION> Parameters() ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); }
+  { pushUnit(jjtThis); } <FUNCTION> (LOOKAHEAD(<IDENTIFIER>) DeclareFunction(scope))? Parameters() ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); }
   |
-  { pushUnit(jjtThis); } Parameters() <LAMBDA>  ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); }
+  { pushUnit(jjtThis); } Parameters() (arrow=<LAMBDA> | arrow=<FATARROW>) ( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); popUnit(jjtThis); }
   |
-  { pushUnit(jjtThis); } Parameter() <LAMBDA> ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); }
+  { pushUnit(jjtThis); } Parameter() (arrow=<LAMBDA> | arrow=<FATARROW>)( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); popUnit(jjtThis); }
 }
 
 

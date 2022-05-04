@@ -20,8 +20,8 @@ import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
-import org.apache.commons.jexl3.internal.Scope;
 import org.apache.commons.jexl3.internal.LexicalScope;
+import org.apache.commons.jexl3.internal.Scope;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -377,6 +377,27 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
+     * Declares a local function.
+     * @param variable the identifier used to declare
+     * @param token      the variable name toekn
+     */
+    protected void declareFunction(final ASTVar variable, final Token token, Scope scope) {
+        final String name = token.image;
+        final int symbol = scope.declareVariable(name);
+        variable.setSymbol(symbol, name);
+        if (scope.isCapturedSymbol(symbol)) {
+            variable.setCaptured(true);
+        }
+        // lexical feature error
+        if (!declareSymbol(symbol)) {
+            if (getFeatures().isLexical()) {
+                throw new JexlException(variable, name + ": variable is already declared");
+            }
+            variable.setRedefined(true);
+        }
+    }
+
+    /**
      * Declares a local variable.
      * <p> This method creates an new entry in the symbol map. </p>
      * @param variable the identifier used to declare
@@ -559,6 +580,23 @@ public abstract class JexlParser extends StringParser {
         }
         // heavy check
         featureController.controlNode(node);
+    }
+
+    /**
+     * Check fat vs thin arrow syntax feature.
+     * @param token the arrow token
+     */
+    protected void checkLambda(Token token) {
+        final String arrow = token.image;
+        if ("->".equals(arrow)) {
+            if (!getFeatures().supportsThinArrow()) {
+                throwFeatureException(JexlFeatures.THIN_ARROW, token);
+            }
+            return;
+        }
+        if ("=>".equals(arrow) && !getFeatures().supportsFatArrow()) {
+            throwFeatureException(JexlFeatures.FAT_ARROW, token);
+        }
     }
 
     /**

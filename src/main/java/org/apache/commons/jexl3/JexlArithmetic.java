@@ -497,7 +497,7 @@ public class JexlArithmetic {
     }
 
     /**
-     * Given a Number, return back the value using the smallest type the result
+     * Given a Number, return the value using the smallest type the result
      * will fit into.
      * <p>This works hand in hand with parameter 'widening' in java
      * method calls, e.g. a call to substring(int,int) with an int and a long
@@ -1390,8 +1390,8 @@ public class JexlArithmetic {
                 return 0;
             }
             if (isNumberable(left) || isNumberable(right)) {
-                final long lhs = toLong(left);
-                final long rhs = toLong(right);
+                final long lhs = toLong(left instanceof String? Double.parseDouble((String) left) : left);
+                final long rhs = toLong(right instanceof String? Double.parseDouble((String) right) : right);
                 if (lhs < rhs) {
                     return -1;
                 }

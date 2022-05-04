@@ -768,4 +768,16 @@ public class Issues300Test {
         Object result = script.execute(null);
         return result;
     }
+
+
+    @Test public void test367() {
+        String text = "var toto; function foo(x) { x }; var tata = 3; foo(3)";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlScript script = jexl.createScript(text);
+        Object result = script.execute(null);
+        Assert.assertEquals(3, result);
+        String s0 = script.getParsedText();
+        String s1 = script.getSourceText();
+        Assert.assertNotEquals(s0, s1);
+    }
 }
