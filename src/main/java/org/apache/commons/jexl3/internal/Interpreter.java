@@ -983,7 +983,15 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(final ASTJexlScript script, final Object data) {
         if (script instanceof ASTJexlLambda && !((ASTJexlLambda) script).isTopLevel()) {
-            return new Closure(this, (ASTJexlLambda) script);
+            Closure closure = new Closure(this, (ASTJexlLambda) script);
+            // if the function is named, assign in the local frame
+            JexlNode child0 = script.jjtGetChild(0);
+            if (child0 instanceof ASTVar) {
+                ASTVar var = (ASTVar) child0;
+                this.visit(var, data);
+                frame.set(var.getSymbol(), closure);
+            }
+            return closure;
         }
         block = new LexicalFrame(frame, block).defineArgs();
         try {
