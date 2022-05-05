@@ -497,7 +497,16 @@ public class JexlArithmetic {
     }
 
     /**
-     * Given a Number, return back the value using the smallest type the result
+     * The last method called before returning a result from a script execution.
+     * @param returned the returned value
+     * @return the controlled returned value
+     */
+    public Object controlReturn(Object returned) {
+        return returned;
+    }
+
+    /**
+     * Given a Number, return the value using the smallest type the result
      * will fit into.
      * <p>This works hand in hand with parameter 'widening' in java
      * method calls, e.g. a call to substring(int,int) with an int and a long
@@ -1348,6 +1357,21 @@ public class JexlArithmetic {
     }
 
     /**
+     * Converts an arg to a long for comparison purpose.
+     * @param arg the arg
+     * @return a long
+     * @throws NumberFormatException if the
+     */
+    private long comparableLong(Object arg) throws NumberFormatException {
+        if (arg instanceof String) {
+            String s = (String) arg;
+            return s.isEmpty()? 0 :(long) Double.parseDouble((String) arg);
+        } else {
+            return toLong(arg);
+        }
+    }
+
+    /**
      * Performs a comparison.
      *
      * @param left     the left operand
@@ -1390,15 +1414,19 @@ public class JexlArithmetic {
                 return 0;
             }
             if (isNumberable(left) || isNumberable(right)) {
-                final long lhs = toLong(left);
-                final long rhs = toLong(right);
-                if (lhs < rhs) {
-                    return -1;
+                try {
+                    final long lhs = comparableLong(left);
+                    final long rhs = comparableLong(right);
+                    if (lhs < rhs) {
+                        return -1;
+                    }
+                    if (lhs > rhs) {
+                        return +1;
+                    }
+                    return 0;
+                } catch(NumberFormatException xformat) {
+                    // ignore it, continue in sequence
                 }
-                if (lhs > rhs) {
-                    return +1;
-                }
-                return 0;
             }
             if (left instanceof String || right instanceof String) {
                 return toString(left).compareTo(toString(right));
