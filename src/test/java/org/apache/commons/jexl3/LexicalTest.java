@@ -506,13 +506,35 @@ public class LexicalTest {
     }
 
     @Test
-    public void testInnerAccess1() throws Exception {
+    public void testInnerAccess1a() throws Exception {
         final JexlEngine jexl = new JexlBuilder().strict(true).lexical(true).create();
         final JexlScript script = jexl.createScript("var x = 32; (()->{ for(var x : null) { var c = 0; {return x; }} })();");
+        Assert.assertNotNull(script);
     }
 
     @Test
-    public void testForVariable0() throws Exception {
+    public void testInnerAccess1b() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        final JexlScript script = jexl.createScript("let x = 32; (()->{ for(let x : null) { let c = 0; { return x; } } } )(); ");
+        Assert.assertNotNull(script);
+        String dbg = script.getParsedText();
+        String src = script.getSourceText();
+        Assert.assertTrue(JexlTestCase.equalsIgnoreWhiteSpace(src, dbg));
+    }
+
+    @Test
+    public void testForVariable0a() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        try {
+            final JexlScript script = jexl.createScript("for(let x : 1..3) { let c = 0}; return x");
+            Assert.fail("Should not have been parsed");
+        } catch (final JexlException ex) {
+           // OK
+        }
+    }
+
+    @Test
+    public void testForVariable0b() throws Exception {
         final JexlFeatures f = new JexlFeatures();
         f.lexical(true);
         f.lexicalShade(true);
@@ -521,12 +543,12 @@ public class LexicalTest {
             final JexlScript script = jexl.createScript("for(var x : 1..3) { var c = 0}; return x");
             Assert.fail("Should not have been parsed");
         } catch (final JexlException ex) {
-           // OK
+            // OK
         }
     }
 
     @Test
-    public void testForVariable1() throws Exception {
+    public void testForVariable1a() throws Exception {
         final JexlFeatures f = new JexlFeatures();
         f.lexical(true);
         f.lexicalShade(true);
@@ -537,6 +559,18 @@ public class LexicalTest {
         } catch (final JexlException ex) {
            // OK
            Assert.assertTrue(ex instanceof JexlException);
+        }
+    }
+
+    @Test
+    public void testForVariable1b() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        try {
+            final JexlScript script = jexl.createScript("for(let x : 1..3) { let c = 0} for(let x : 1..3) { var c = 0}; return x");
+            Assert.fail("Should not have been parsed");
+        } catch (final JexlException ex) {
+            // OK
+            Assert.assertTrue(ex instanceof JexlException);
         }
     }
 
@@ -762,10 +796,23 @@ public class LexicalTest {
         f.lexical(true);
         final JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
         final JexlScript script = jexl.createScript(
-                "{var x = 10; } (b->{ x + b })(32)");
+                "{ var x = 10; } (b->{ x + b })(32)");
         final JexlContext jc = new MapContext();
         jc.set("x", 11);
         final Object result = script.execute(jc);
         Assert.assertEquals(43, result);
+    }
+
+    @Test
+    public void testLet0() {
+        final JexlFeatures f = new JexlFeatures();
+        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        final JexlScript script = jexl.createScript(
+                "{ let x = 10; } (b->{ x + b })(32)");
+        final JexlContext jc = new MapContext();
+        jc.set("x", 11);
+        final Object result = script.execute(jc);
+        Assert.assertEquals(43, result);
+
     }
 }

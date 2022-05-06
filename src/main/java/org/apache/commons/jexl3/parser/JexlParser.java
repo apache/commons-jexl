@@ -309,6 +309,8 @@ public abstract class JexlParser extends StringParser {
         if (frame != null) {
             final Integer symbol = frame.getSymbol(name);
             if (symbol != null) {
+                identifier.setLexical(frame.isLexical(symbol));
+                identifier.setConstant(frame.isConstant(symbol));
                 boolean declared = true;
                 if (frame.isCapturedSymbol(symbol)) {
                     // captured are declared in all cases
@@ -331,7 +333,7 @@ public abstract class JexlParser extends StringParser {
                 identifier.setSymbol(symbol, name);
                 if (!declared) {
                     identifier.setShaded(true);
-                    if (getFeatures().isLexicalShade()) {
+                    if (identifier.isLexical() || getFeatures().isLexicalShade()) {
                         // can not reuse a local as a global
                         throw new JexlException(identifier, name + ": variable is not defined");
                     }
@@ -382,7 +384,7 @@ public abstract class JexlParser extends StringParser {
      * @param variable the identifier used to declare
      * @param token      the variable name toekn
      */
-    protected void declareVariable(final ASTVar variable, final Token token, boolean lexical) {
+    protected void declareVariable(final ASTVar variable, final Token token, boolean lexical, boolean constant) {
         final String name = token.image;
         if (!allowVariable(name)) {
             throwFeatureException(JexlFeatures.LOCAL_VAR, token);
@@ -390,7 +392,7 @@ public abstract class JexlParser extends StringParser {
         if (frame == null) {
             frame = new Scope(null, (String[]) null);
         }
-        final int symbol = frame.declareVariable(name);
+        final int symbol = frame.declareVariable(name, lexical, constant);
         variable.setSymbol(symbol, name);
         if (frame.isCapturedSymbol(symbol)) {
             variable.setCaptured(true);
@@ -402,6 +404,8 @@ public abstract class JexlParser extends StringParser {
             }
             variable.setRedefined(true);
         }
+        variable.setLexical(lexical);
+        variable.setConstant(constant);
     }
 
     /**
@@ -513,12 +517,16 @@ public abstract class JexlParser extends StringParser {
         Arrays.asList(
             ASTAssignment.class,
             ASTSetAddNode.class,
+            ASTSetSubNode.class,
             ASTSetMultNode.class,
             ASTSetDivNode.class,
+            ASTSetModNode.class,
             ASTSetAndNode.class,
             ASTSetOrNode.class,
             ASTSetXorNode.class,
-            ASTSetSubNode.class
+            ASTSetShiftLeftNode.class,
+            ASTSetShiftRightNode.class,
+            ASTSetShiftRightUnsignedNode.class
         )
     );
 
@@ -556,6 +564,13 @@ public abstract class JexlParser extends StringParser {
             if (!lv.isLeftValue()) {
                 throwParsingException(JexlException.Assignment.class, null);
             }
+            if (lv instanceof ASTIdentifier) {
+                ASTIdentifier var = (ASTIdentifier) lv;
+                int symbol = var.getSymbol();
+                if (symbol >= 0 && frame.isConstant(symbol)) {
+                    throwParsingException(JexlException.Assignment.class, null);
+                }
+            }
         }
         // heavy check
         featureController.controlNode(node);
@@ -572,7 +587,7 @@ public abstract class JexlParser extends StringParser {
         final Token t = getToken(0);
         final JexlInfo end = info.at(t.beginLine, t.endColumn);
         final String msg = readSourceLine(source, end.getLine());
-        throw new JexlException.Ambiguous(begin, end, msg);
+        throw new JexlException.Ambiguous(begin, end, msg).clean();
     }
 
     /**
@@ -583,7 +598,7 @@ public abstract class JexlParser extends StringParser {
      */
     protected void throwFeatureException(final int feature, final JexlInfo info) {
         final String msg = info != null? readSourceLine(source, info.getLine()) : null;
-        throw new JexlException.Feature(info, feature, msg);
+        throw new JexlException.Feature(info, feature, msg).clean();
     }
 
     /**
@@ -626,14 +641,14 @@ public abstract class JexlParser extends StringParser {
             if (xclazz != null) {
                 try {
                     final Constructor<T> ctor = xclazz.getConstructor(JexlInfo.class, String.class);
-                    xparse = ctor.newInstance(xinfo, msg);
+                    xparse = (JexlException.Parsing) ctor.newInstance(xinfo, msg).clean();
                 } catch (final Exception xany) {
                     // ignore, very unlikely but then again..
                 }
             }
         }
         // unlikely but safe
-        throw xparse != null ? xparse : new JexlException.Parsing(xinfo, msg);
+        throw xparse != null ? xparse : new JexlException.Parsing(xinfo, msg).clean();
     }
 
     /**

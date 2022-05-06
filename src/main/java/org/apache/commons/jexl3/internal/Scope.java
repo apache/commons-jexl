@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,32 @@ public final class Scope {
      * The map of local captured variables to parent scope variables, ie closure.
      */
     private Map<Integer, Integer> capturedVariables = null;
+
+    private LexicalScope constVariables = null;
+    private LexicalScope lexicalVariables = null;
+
+    void addLexical(int s) {
+        if (lexicalVariables == null) {
+            lexicalVariables = new LexicalScope();
+        }
+        lexicalVariables.addSymbol(s);
+    }
+
+    public boolean isLexical(int s) {
+        return lexicalVariables != null && s >= 0 && lexicalVariables.hasSymbol(s);
+    }
+
+    void addConstant(int s) {
+        if (constVariables == null) {
+            constVariables = new LexicalScope();
+        }
+        constVariables.addSymbol(s);
+    }
+
+    public boolean isConstant(int s) {
+        return constVariables != null && s >= 0 && constVariables.hasSymbol(s);
+    }
+
     /**
      * The empty string array.
      */
@@ -143,6 +170,12 @@ public final class Scope {
                 register = namedVariables.size();
                 namedVariables.put(name, register);
                 capturedVariables.put(register, pr);
+                if (parent.isLexical(pr)) {
+                    this.addLexical(register);
+                    if (parent.isConstant(pr)) {
+                        this.addConstant(register);
+                    }
+                }
             }
         }
         return register;
@@ -188,7 +221,7 @@ public final class Scope {
      * @param name the variable name
      * @return the register index storing this variable
      */
-    public int declareVariable(final String name) {
+    public int declareVariable(final String name, boolean lexical, boolean constant) {
         if (namedVariables == null) {
             namedVariables = new LinkedHashMap<String, Integer>();
         }
@@ -205,6 +238,22 @@ public final class Scope {
                         capturedVariables = new LinkedHashMap<Integer, Integer>();
                     }
                     capturedVariables.put(register, pr);
+                }
+            }
+            if (lexical) {
+                addLexical(register);
+                if (constant) {
+                    addConstant(register);
+                }
+            }
+        } else {
+            // belt and suspenders
+            if (lexical) {
+                if (!isLexical(register)) {
+                    throw new IllegalStateException("cant redefine lexical variable");
+                }
+                if (constant && !isConstant(register)) {
+                    throw new IllegalStateException("cant redefine const variable");
                 }
             }
         }

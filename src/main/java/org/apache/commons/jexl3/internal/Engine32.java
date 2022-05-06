@@ -76,7 +76,7 @@ public class Engine32 extends Engine {
     static Object getVariable(Interpreter ii, Frame frame, LexicalScope block, ASTIdentifier identifier) {
         int symbol = identifier.getSymbol();
         // if we have a symbol, we have a scope thus a frame
-        if (ii.options.isLexicalShade() && identifier.isShaded()) {
+        if ((ii.options.isLexicalShade() || identifier.isLexical()) && identifier.isShaded()) {
             return ii.undefinedVariable(identifier, identifier.getName());
         }
         if (symbol >= 0) {

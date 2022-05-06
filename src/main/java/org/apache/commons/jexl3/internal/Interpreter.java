@@ -564,7 +564,7 @@ public class Interpreter extends InterpreterBase {
     protected Object visit(final ASTVar node, final Object data) {
         final int symbol = node.getSymbol();
         // if we have a var, we have a scope thus a frame
-        if (!options.isLexical()) {
+        if (!options.isLexical() && !node.isLexical()) {
             if (frame.has(symbol)) {
                 return frame.get(symbol);
             }
@@ -578,7 +578,7 @@ public class Interpreter extends InterpreterBase {
     @Override
     protected Object visit(final ASTBlock node, final Object data) {
         final int cnt = node.getSymbolCount();
-        if (!options.isLexical() || cnt <= 0) {
+        if (cnt <= 0) {
             return visitBlock(node, data);
         }
         try {
@@ -629,7 +629,7 @@ public class Interpreter extends InterpreterBase {
         final ASTReference loopReference = (ASTReference) node.jjtGetChild(0);
         final ASTIdentifier loopVariable = (ASTIdentifier) loopReference.jjtGetChild(0);
         final int symbol = loopVariable.getSymbol();
-        final boolean lexical = options.isLexical();// && node.getSymbolCount() > 0;
+        final boolean lexical = loopVariable.isLexical() || options.isLexical() ;// && node.getSymbolCount() > 0;
         final LexicalFrame locals = lexical? new LexicalFrame(frame, block) : null;
         final boolean loopSymbol = symbol >= 0 && loopVariable instanceof ASTVar;
         if (lexical) {
@@ -1274,12 +1274,12 @@ public class Interpreter extends InterpreterBase {
         if (left instanceof ASTIdentifier) {
             var = (ASTIdentifier) left;
             symbol = var.getSymbol();
-            if (symbol >= 0 && options.isLexical()) {
+            if (symbol >= 0 && (var.isLexical() || options.isLexical())) {
                 if (var instanceof ASTVar) {
                     if (!defineVariable((ASTVar) var, block)) {
                         return redefinedVariable(var, var.getName());
                     }
-                } else if (options.isLexicalShade() && var.isShaded()) {
+                } else if (var.isShaded() && (var.isLexical() || options.isLexicalShade())) {
                     return undefinedVariable(var, var.getName());
                 }
             }
