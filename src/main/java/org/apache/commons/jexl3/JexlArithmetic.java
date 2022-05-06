@@ -31,6 +31,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.StrictMath.floor;
+
 /**
  * Perform arithmetic, implements JexlOperator methods.
  *
@@ -765,7 +767,7 @@ public class JexlArithmetic {
                 final BigInteger r = toBigInteger(right);
                 final BigInteger result = l.add(r);
                 return narrowBigInteger(left, right, result);
-            } catch (final java.lang.NumberFormatException nfe) {
+            } catch (final ArithmeticException nfe) {
                 if (left == null || right == null) {
                     controlNullOperand();
                 }
@@ -1044,7 +1046,7 @@ public class JexlArithmetic {
     /**
      * Positivize value (unary plus for numbers).
      * <p>C/C++/C#/Java perform integral promotion of the operand, ie
-     * cast to int if type can represented as int without loss of precision.
+     * cast to int if type can be represented as int without loss of precision.
      * @see #isPositivizeStable()
      * @param val the value to positivize
      * @return the positive value
@@ -1357,21 +1359,6 @@ public class JexlArithmetic {
     }
 
     /**
-     * Converts an arg to a long for comparison purpose.
-     * @param arg the arg
-     * @return a long
-     * @throws NumberFormatException if the
-     */
-    private long comparableLong(Object arg) throws NumberFormatException {
-        if (arg instanceof String) {
-            String s = (String) arg;
-            return s.isEmpty()? 0 :(long) Double.parseDouble((String) arg);
-        } else {
-            return toLong(arg);
-        }
-    }
-
-    /**
      * Performs a comparison.
      *
      * @param left     the left operand
@@ -1388,9 +1375,13 @@ public class JexlArithmetic {
                 return l.compareTo(r);
             }
             if (left instanceof BigInteger || right instanceof BigInteger) {
-                final BigInteger l = toBigInteger(left);
-                final BigInteger r = toBigInteger(right);
-                return l.compareTo(r);
+                try {
+                    final BigInteger l = toBigInteger(left);
+                    final BigInteger r = toBigInteger(right);
+                    return l.compareTo(r);
+                } catch(ArithmeticException xconvert) {
+                    // ignore it, continue in sequence
+                }
             }
             if (isFloatingPoint(left) || isFloatingPoint(right)) {
                 final double lhs = toDouble(left);
@@ -1405,26 +1396,14 @@ public class JexlArithmetic {
                     // lhs is not NaN
                     return +1;
                 }
-                if (lhs < rhs) {
-                    return -1;
-                }
-                if (lhs > rhs) {
-                    return +1;
-                }
-                return 0;
+                return Double.compare(lhs, rhs);
             }
             if (isNumberable(left) || isNumberable(right)) {
                 try {
-                    final long lhs = comparableLong(left);
-                    final long rhs = comparableLong(right);
-                    if (lhs < rhs) {
-                        return -1;
-                    }
-                    if (lhs > rhs) {
-                        return +1;
-                    }
-                    return 0;
-                } catch(NumberFormatException xformat) {
+                    final long lhs = toLong(left);
+                    final long rhs = toLong(right);
+                    return Long.compare(lhs, rhs);
+                } catch(ArithmeticException xconvert) {
                     // ignore it, continue in sequence
                 }
             }
@@ -1571,20 +1550,14 @@ public class JexlArithmetic {
             return 0;
         }
         if (val instanceof Double) {
-            final Double dval = (Double) val;
-            if (Double.isNaN(dval)) {
-                return 0;
-            }
-            return dval.intValue();
+            final double dval = (Double) val;
+            return Double.isNaN(dval)? 0 : (int) dval;
         }
         if (val instanceof Number) {
             return ((Number) val).intValue();
         }
         if (val instanceof String) {
-            if ("".equals(val)) {
-                return 0;
-            }
-            return Integer.parseInt((String) val);
+            return parseInteger((String) val);
         }
         if (val instanceof Boolean) {
             return ((Boolean) val) ? 1 : 0;
@@ -1615,20 +1588,14 @@ public class JexlArithmetic {
             return 0L;
         }
         if (val instanceof Double) {
-            final Double dval = (Double) val;
-            if (Double.isNaN(dval)) {
-                return 0L;
-            }
-            return dval.longValue();
+            final double dval = (Double) val;
+            return Double.isNaN(dval)? 0L : (long) dval;
         }
         if (val instanceof Number) {
             return ((Number) val).longValue();
         }
         if (val instanceof String) {
-            if ("".equals(val)) {
-                return 0L;
-            }
-            return Long.parseLong((String) val);
+            return parseLong((String) val);
         }
         if (val instanceof Boolean) {
             return ((Boolean) val) ? 1L : 0L;
@@ -1639,9 +1606,78 @@ public class JexlArithmetic {
         if (val instanceof Character) {
             return ((Character) val);
         }
-
         throw new ArithmeticException("Long coercion: "
                 + val.getClass().getName() + ":(" + val + ")");
+    }
+
+
+    /**
+     * Convert a string to a double.
+     * <>Empty string is considered as NaN.</>
+     * @param arg the arg
+     * @return a double
+     * @throws ArithmeticException if the string can not be coerced into a double
+     */
+    private double parseDouble(String arg) throws ArithmeticException {
+        try {
+            return arg.isEmpty()? Double.NaN : Double.parseDouble((String) arg);
+        } catch(NumberFormatException xformat) {
+            throw new ArithmeticException("Double coercion: ("+ arg +")");
+        }
+    }
+
+    /**
+     * Converts a string to a long.
+     * <p>This ensure the represented number is a natural (not a real).</p>
+     * @param arg the arg
+     * @return a long
+     * @throws ArithmeticException if the string can not be coerced into a long
+     */
+    private long parseLong(String arg) throws ArithmeticException {
+        final double d = parseDouble(arg);
+        if (Double.isNaN(d)) {
+            return 0L;
+        }
+        final double f = floor(d);
+        if (d == f) {
+            return (long) d;
+        }
+        throw new ArithmeticException("Long coercion: ("+ arg +")");
+    }
+
+    /**
+     * Converts a string to an int.
+     * <p>This ensure the represented number is a natural (not a real).</p>
+     * @param arg the arg
+     * @return an int
+     * @throws ArithmeticException if the string can not be coerced into a long
+     */
+    private int parseInteger(String arg) throws ArithmeticException {
+        final long l = parseLong(arg);
+        final int i = (int) l;
+        if ((long) i == l) {
+            return i;
+        }
+        throw new ArithmeticException("Int coercion: ("+ arg +")");
+    }
+
+    /**
+     * Converts a string to a big integer.
+     * <>Empty string is considered as 0.</>
+     * @param arg the arg
+     * @return a big integer
+     * @throws ArithmeticException if the string can not be coerced into a big integer
+     */
+    private BigInteger parseBigInteger(String arg) throws ArithmeticException {
+        if (arg.isEmpty()) {
+            return BigInteger.ZERO;
+        }
+        try {
+            return new BigInteger(arg);
+        } catch(NumberFormatException xformat) {
+            // ignore, try harder
+        }
+        return BigInteger.valueOf(parseLong(arg));
     }
 
     /**
@@ -1681,17 +1717,12 @@ public class JexlArithmetic {
             return BigInteger.valueOf(((AtomicBoolean) val).get() ? 1L : 0L);
         }
         if (val instanceof String) {
-            final String string = (String) val;
-            if ("".equals(string)) {
-                return BigInteger.ZERO;
-            }
-            return new BigInteger(string);
+            return parseBigInteger((String) val);
         }
         if (val instanceof Character) {
             final int i = ((Character) val);
             return BigInteger.valueOf(i);
         }
-
         throw new ArithmeticException("BigInteger coercion: "
                 + val.getClass().getName() + ":(" + val + ")");
     }
@@ -1772,12 +1803,7 @@ public class JexlArithmetic {
             return ((AtomicBoolean) val).get() ? 1. : 0.;
         }
         if (val instanceof String) {
-            final String string = (String) val;
-            if ("".equals(string)) {
-                return Double.NaN;
-            }
-            // the spec seems to be iffy about this.  Going to give it a wack anyway
-            return Double.parseDouble(string);
+            return parseDouble((String) val);
         }
         if (val instanceof Character) {
             final int i = ((Character) val);
