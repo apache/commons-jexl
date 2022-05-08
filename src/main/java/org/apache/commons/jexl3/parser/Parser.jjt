@@ -349,6 +349,13 @@ void AnnotatedStatement() #AnnotatedStatement : {}
 
 void Statement() #void : {}
 {
+    LOOKAHEAD(<LET>|<CONST>|<VAR>) Var()
+    |
+    StatementNoVar()
+}
+
+void StatementNoVar() #void : {}
+{
     <SEMICOL>
     | LOOKAHEAD(<ANNOTATION>) AnnotatedStatement()
     | LOOKAHEAD(Expression()) ExpressionStatement()
@@ -360,7 +367,7 @@ void Statement() #void : {}
     | ReturnStatement()
     | Continue()
     | Break()
-    | Var()
+    | LOOKAHEAD(<VAR>, {!getFeatures().isLexical()} ) Var()
     | Pragma()
 }
 
@@ -378,19 +385,19 @@ void ExpressionStatement() #void : {}
 
 void IfStatement() : {}
 {
-    <IF> <LPAREN> Expression() <RPAREN>  (LOOKAHEAD(1) Block() | Statement())
-    ( LOOKAHEAD(2) <ELSE> <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | Statement()) )*
-    ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | Statement()) )?
+    <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | StatementNoVar())
+    ( LOOKAHEAD(2) <ELSE> <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | StatementNoVar()) )*
+    ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | StatementNoVar()) )?
 }
 
 void WhileStatement() : {}
 {
-    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount += 1; }  (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
+    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount += 1; }  (LOOKAHEAD(1) Block() | StatementNoVar()) { loopCount -= 1; }
 }
 
 void DoWhileStatement() : {}
 {
-    <DO> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount -= 1; }
+    <DO> { loopCount += 1; } (LOOKAHEAD(1) Block() | StatementNoVar()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount -= 1; }
 }
 
 void ReturnStatement() : {}
@@ -417,7 +424,7 @@ void ForeachStatement() : {}
     { pushUnit(jjtThis); }
     <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN>
         { loopCount += 1; }
-        (LOOKAHEAD(1) Block() | Statement())
+        (LOOKAHEAD(1) Block() | StatementNoVar())
     { loopCount -= 1; popUnit(jjtThis); }
 }
 

@@ -820,13 +820,13 @@ public class LexicalTest {
     @Test
     public void testLetSucceed() {
         List<String> srcs = Arrays.asList(
-                "var x = 1; var x = 0;",
+            "var x = 1; var x = 0;",
             "{ let x = 0; } var x = 1;",
-                "var x = 0; var f = () -> { let x = 1; } f()",
-                //"let x = 0; function f() { let x = 1; }; f()" ,
-                "var x = 0; var f = (let x) -> { x = 1; } f()",
-                "var x = 0; let f = (let x) -> { x = 1; } f()",
-                "var x = 0; const f = (let x) -> { x = 1; } f()",
+            "var x = 0; var f = () -> { let x = 1; } f()",
+            //"let x = 0; function f() { let x = 1; }; f()" ,
+            "var x = 0; var f = (let x) -> { x = 1; } f()",
+            "var x = 0; let f = (let x) -> { x = 1; } f()",
+            "var x = 0; const f = (let x) -> { x = 1; } f()",
             ""
         );
         checkParse(srcs, true);
@@ -847,6 +847,23 @@ public class LexicalTest {
     }
 
     @Test
+    public void testVarFail() {
+        List<String> srcs = Arrays.asList(
+                "var x = 0; var x = 1;",
+                "var x = 0; let x = 1;",
+                "let x = 0; var x = 1;",
+                "var x = 0; const f = (var x) -> { let x = 1; } f()",
+                "var x = 0; const f = (let x) -> { var x = 1; } f()",
+                "var x = 0; const f = (var x) -> { var x = 1; } f()",
+                ""
+        );
+        JexlFeatures f=  new JexlFeatures();
+        f.lexical(true).lexicalShade(true);
+        checkParse(f, srcs, false);
+    }
+
+
+    @Test
     public void testConstFail() {
         List<String> srcs = Arrays.asList(
                 "const x = 0;  x = 1;",
@@ -859,8 +876,50 @@ public class LexicalTest {
         checkParse(srcs, false);
     }
 
+    @Test
+    public void testSingleStatementDeclFail() {
+        List<String> srcs = Arrays.asList(
+                "if (true) let x ;",
+                "if (true) let x = 1;",
+                "if (true) var x = 1;",
+                "if (true) { 1 } else let x ;",
+                "if (true) { 1 } else let x = 1;",
+                "if (true) { 1 } else var x = 1;",
+                "while (true) let x ;",
+                "while (true) let x = 1;",
+                "while (true) var x = 1;",
+                "do let x ; while (true)",
+                "do let x = 1; while (true)",
+                "do var x = 1; while (true)",
+                "for (let i:ii) let x ;",
+                "for (let i:ii) let x = 1;",
+                "for (let i:ii) var x = 1;",
+                ""
+        );
+        JexlFeatures f=  new JexlFeatures();
+        f.lexical(true).lexicalShade(true);
+        checkParse(f, srcs, false);
+    }
+
+    @Test
+    public void testSingleStatementVarSucceed() {
+        List<String> srcs = Arrays.asList(
+                "if (true) var x = 1;",
+                "if (true) { 1 } else var x = 1;",
+                "while (true) var x = 1;",
+                "do var x = 1 while (true)",
+                "for (let i:ii) var x = 1;",
+                ""
+        );
+        checkParse(srcs, true);
+    }
+
     private void checkParse(List<String> srcs, boolean expected) {
-        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        checkParse(null, srcs, expected);
+    }
+
+    private void checkParse(JexlFeatures f, List<String> srcs, boolean expected) {
+        final JexlEngine jexl = new JexlBuilder().features(f).strict(true).create();
         for(String src : srcs) {
             if (!src.isEmpty()) try {
                 final JexlScript script = jexl.createScript(src);
@@ -871,7 +930,7 @@ public class LexicalTest {
                 if (expected) {
                     Assert.fail(src);
                 }
-                Assert.assertTrue(xlexical.detailedMessage().contains("x"));
+                //Assert.assertTrue(xlexical.detailedMessage().contains("x"));
             }
         }
 
