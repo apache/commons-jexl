@@ -58,13 +58,6 @@ public final class Frame {
         return scope;
     }
 
-    boolean isLexical(int symbol) {
-        return scope != null && scope.isLexical(symbol);
-    }
-    boolean isConstant(int symbol) {
-        return scope != null && scope.isConstant(symbol);
-    }
-
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(this.stack);

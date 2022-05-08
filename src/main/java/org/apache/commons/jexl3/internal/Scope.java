@@ -18,14 +18,13 @@ package org.apache.commons.jexl3.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * A script scope, stores the declaration of parameters and local variables as symbols.
- * <p>This also acts as the functional scope and variable definition store.
+ * <p>This also acts as the functional scope and variable definition store.</p>
  * @since 3.0
  */
 public final class Scope {
@@ -67,31 +66,14 @@ public final class Scope {
      * The map of local captured variables to parent scope variables, ie closure.
      */
     private Map<Integer, Integer> capturedVariables = null;
-
+    /**
+     * Const symbols.
+     */
     private LexicalScope constVariables = null;
+    /**
+     * Let symbols.
+     */
     private LexicalScope lexicalVariables = null;
-
-    void addLexical(int s) {
-        if (lexicalVariables == null) {
-            lexicalVariables = new LexicalScope();
-        }
-        lexicalVariables.addSymbol(s);
-    }
-
-    public boolean isLexical(int s) {
-        return lexicalVariables != null && s >= 0 && lexicalVariables.hasSymbol(s);
-    }
-
-    void addConstant(int s) {
-        if (constVariables == null) {
-            constVariables = new LexicalScope();
-        }
-        constVariables.addSymbol(s);
-    }
-
-    public boolean isConstant(int s) {
-        return constVariables != null && s >= 0 && constVariables.hasSymbol(s);
-    }
 
     /**
      * The empty string array.
@@ -170,15 +152,51 @@ public final class Scope {
                 register = namedVariables.size();
                 namedVariables.put(name, register);
                 capturedVariables.put(register, pr);
-                if (parent.isLexical(pr)) {
-                    this.addLexical(register);
-                    if (parent.isConstant(pr)) {
-                        this.addConstant(register);
-                    }
-                }
             }
         }
         return register;
+    }
+
+    /**
+     * Marks a symbol as a lexical, declared through let or const.
+     * @param s the symbol
+     * @return true if the symbol was not already present in the lexical set
+     */
+    public boolean addLexical(int s) {
+        if (lexicalVariables == null) {
+            lexicalVariables = new LexicalScope();
+        }
+        return lexicalVariables.addSymbol(s);
+    }
+
+    /**
+     * Checks whether a symbol is declared through a let or const.
+     * @param s the symbol
+     * @return true if symbol was declared through let or const
+     */
+    public boolean isLexical(int s) {
+        return lexicalVariables != null && s >= 0 && lexicalVariables.hasSymbol(s);
+    }
+
+    /**
+     * Marks a symbol as a const.
+     * @param s the symbol
+     * @return true if the symbol was not already present in the constant set
+     */
+    public boolean addConstant(int s) {
+        if (constVariables == null) {
+            constVariables = new LexicalScope();
+        }
+        return constVariables.addSymbol(s);
+    }
+
+    /**
+     * Checks whether a symbol is declared through a const.
+     * @param s the symbol
+     * @return true if symbol was declared through const
+     */
+    public boolean isConstant(int s) {
+        return constVariables != null && s >= 0 && constVariables.hasSymbol(s);
     }
 
     /**
@@ -238,22 +256,6 @@ public final class Scope {
                         capturedVariables = new LinkedHashMap<Integer, Integer>();
                     }
                     capturedVariables.put(register, pr);
-                }
-            }
-            if (lexical) {
-                addLexical(register);
-                if (constant) {
-                    addConstant(register);
-                }
-            }
-        } else {
-            // belt and suspenders
-            if (lexical) {
-                if (!isLexical(register)) {
-                    throw new IllegalStateException("cant redefine lexical variable");
-                }
-                if (constant && !isConstant(register)) {
-                    throw new IllegalStateException("cant redefine const variable");
                 }
             }
         }
