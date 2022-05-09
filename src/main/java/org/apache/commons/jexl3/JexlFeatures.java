@@ -442,7 +442,7 @@ public final class JexlFeatures {
     /**
      * Sets whether thin-arrow lambda syntax is enabled.
      * <p>
-     * When disabled, parsing a script/expression using syntactic thin-arrow (->)
+     * When disabled, parsing a script/expression using syntactic thin-arrow (-&lt;)
      * will throw a parsing exception.
      * @param flag true to enable, false to disable
      * @return this features instance
@@ -462,7 +462,7 @@ public final class JexlFeatures {
     /**
      * Sets whether fat-arrow lambda syntax is enabled.
      * <p>
-     * When disabled, parsing a script/expression using syntactic fat-arrow (=>)
+     * When disabled, parsing a script/expression using syntactic fat-arrow (=&lt;)
      * will throw a parsing exception.
      * @param flag true to enable, false to disable
      * @return this features instance

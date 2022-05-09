@@ -205,7 +205,7 @@ public abstract class JexlParser extends StringParser {
      * regain access after parsing to known which / how-many registers are needed. </p>
      * @return the named register map
      */
-    protected Scope getFrame() {
+    protected Scope getScope() {
         return scope;
     }
 
@@ -388,7 +388,11 @@ public abstract class JexlParser extends StringParser {
      */
     protected void declareFunction(final ASTVar variable, final Token token, Scope scope) {
         final String name = token.image;
-        final int symbol = scope.declareVariable(name);
+        // function foo() ... <=> const foo = ()->...
+        if (scope == null) {
+            scope = new Scope(null);
+        }
+        final int symbol = scope.declareVariable(name, true, true);
         variable.setSymbol(symbol, name);
         if (scope.isCapturedSymbol(symbol)) {
             variable.setCaptured(true);
@@ -416,7 +420,7 @@ public abstract class JexlParser extends StringParser {
             throwFeatureException(JexlFeatures.LOCAL_VAR, token);
         }
         if (scope == null) {
-            scope = new Scope(null, (String[]) null);
+            scope = new Scope(null);
         }
         final int symbol = scope.declareVariable(name, lexical, constant);
         variable.setSymbol(symbol, name);
@@ -601,7 +605,6 @@ public abstract class JexlParser extends StringParser {
             if (script.getScope() != scope) {
                 script.setScope(scope);
             }
-            popScope();
         } else if (ASSIGN_NODES.contains(node.getClass())) {
             final JexlNode lv = node.jjtGetChild(0);
             if (!lv.isLeftValue()) {

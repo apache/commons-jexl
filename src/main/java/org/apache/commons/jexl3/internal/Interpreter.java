@@ -989,7 +989,10 @@ public class Interpreter extends InterpreterBase {
             if (child0 instanceof ASTVar) {
                 ASTVar var = (ASTVar) child0;
                 this.visit(var, data);
-                frame.set(var.getSymbol(), closure);
+                int symbol = var.getSymbol();
+                frame.set(symbol, closure);
+                // make the closure accessible to itself, ie capture the currently set variable after frame creation
+                closure.setCaptured(symbol, closure);
             }
             return closure;
         }

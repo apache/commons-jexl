@@ -20,11 +20,8 @@ package org.apache.commons.jexl3;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-
-import org.apache.commons.jexl3.internal.Interpreter;
 import org.apache.commons.jexl3.internal.OptionsContext;
 import org.apache.commons.jexl3.internal.Util;
-import org.apache.commons.jexl3.internal.introspection.Permissions;
 import org.apache.commons.jexl3.internal.introspection.Uberspect;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.After;
@@ -69,6 +66,9 @@ public class JexlTestCase {
 
     static JexlEngine createEngine() {
         return new JexlBuilder().create();
+    }
+    static JexlEngine createEngine(JexlFeatures features) {
+        return new JexlBuilder().features(features).create();
     }
 
     // define mode pro50
@@ -119,6 +119,10 @@ public class JexlTestCase {
         String lhsw = lhs.trim().replaceAll("\\s+", "");
         String rhsw = rhs.trim().replaceAll("\\s+", "");
         return lhsw.equals(rhsw);
+    }
+
+    public String simpleWhitespace(String arg) {
+        return arg.trim().replaceAll("\\s+", " ");
     }
 
     /**

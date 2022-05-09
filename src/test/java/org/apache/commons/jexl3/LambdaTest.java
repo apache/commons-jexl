@@ -400,6 +400,53 @@ public class LambdaTest extends JexlTestCase {
         Assert.assertEquals(1120, result);
     }
 
+    @Test public void testFatFact0() {
+        JexlFeatures features = new JexlFeatures();
+        features.fatArrow(true);
+        String src = "function (a) { const fact = (x)=>{ x <= 1? 1 : x * fact(x - 1) }; fact(a) }";
+        JexlEngine jexl = createEngine(features);
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null, 6);
+        Assert.assertEquals(720, result);
+    }
+
+    @Test public void testFatFact1() {
+        String src = "function (a) { const fact = (x)=> x <= 1? 1 : x * fact(x - 1) ; fact(a) }";
+        JexlFeatures features = new JexlFeatures();
+        features.fatArrow(true);
+        JexlEngine jexl = createEngine(features);
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null, 6);
+        Assert.assertEquals(720, result);
+        features.fatArrow(false);
+        jexl = createEngine(features);
+        try {
+            script = jexl.createScript(src);
+        } catch(JexlException.Feature xfeature) {
+            Assert.assertTrue(xfeature.getMessage().contains("fat-arrow"));
+        }
+    }
+
+    @Test public void testNamedFunc() {
+        String src = "(a)->{ function fact(x) { x <= 1? 1 : x * fact(x - 1); } fact(a); }";
+        JexlEngine jexl = createEngine();
+        JexlScript script = jexl.createScript(src);
+        Object result = script.execute(null, 6);
+        Assert.assertEquals(720, result);
+        String parsed = simpleWhitespace(script.getParsedText());
+        Assert.assertEquals(simpleWhitespace(src), parsed);
+    }
+
+    @Test public void testNamedFuncIsConst() {
+        String src = "function foo(x) { x + x }; var foo ='nonononon'";
+        JexlEngine jexl = createEngine();
+        try {
+            JexlScript script = jexl.createScript(src);
+        } catch(JexlException.Parsing xparse) {
+            Assert.assertTrue(xparse.getMessage().contains("foo"));
+        }
+    }
+
     @Test public void testLambdaExpr0() {
         String src = "(x, y) -> x + y";
         JexlEngine jexl = createEngine();
