@@ -117,7 +117,8 @@
                             Scripts can be created with named parameters which allow a later evaluation to be performed with arguments.
                         </p>
                         <p>
-                            By default scripts return the value of the last evaluated statement.
+                            By default, in the absence of an explicit <code>return</code> statement, scripts return the value of the
+                            last evaluated statement.
                         </p>
                         <p>
                             Using the <code>return</code> keyword, a script will return the expression that follows (or null).
@@ -165,13 +166,26 @@
                 </tr>
                 <tr>
                     <td>Local variables</td>
-                    <td>Can be defined using the <code>var</code> keyword; their identifying rules are the same as contextual variables.
+                    <td>Can be defined using the <code>let</code>, <code>const</code> and <code>var</code> keywords;
+                        their identifying rules are the same as contextual variables.
                         <ul>
-                            <li>Basic declaration: <code>var x;</code></li>
-                            <li>Declaration with assignment: <code>var theAnswer = 42;</code></li>
+                            <li><code>let</code> declares a local variable (or a parameter) with a lexical block scope. The
+                            variable can only be accessed within its definition block and any nested sub-block. This also
+                            forbids variable redeclaration within that scope. Note: This emulates Java behavior which differs
+                            from ECMAScript.</li>
+                            <li><code>const</code> behaves as <code>let</code> but will prevent the variable from being
+                            reassigned by any side effect operator.</li>
+                            <li>
+                            <code>var</code> declares a variable whose scope is the whole script and allows redefinition.
+                            This behavior is altered by the <code>JexlFeature#setLexical(true)</code> that will enforce a
+                            lexical scope for all variables akin to <code>let</code>  declaration.
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>Basic declaration: <code>let x;</code></li>
+                            <li>Declaration with assignment: <code>const theAnswer = 42;</code></li>
                             <li>Invalid declaration: <code>var x.y;</code></li>
                         </ul>
-                        Their scope is either the entire script scope or the function definition block;
                         Local variables they take precedence in resolution over contextual variables.
                         When scripts are created with named parameters, those behave as local variables.
                         Local variables can not use <code>ant-style</code> naming, only one identifier.
@@ -197,10 +211,16 @@
                     <td>
                         Defines a function within the script, usually associated with a local variable assignment.
                         <code>var fun = function(x, y) { x + y }</code>
-                        The following syntax is also supported
-                        <code>var fun = (x, y) -> { x + y }</code>
+                        The following syntaxes are also supported:
+                        <ul>
+                            <li><code>var fun = (x, y) -> { x + y }</code></li>
+                            <li><code>var fun = (let x, let y) -> { x + y }</code></li>
+                            <li><code>const fun = (const x, const y) -> { x + y }</code></li>
+                        </ul>
                         If the function has only one argument the parentheses may be omitted
-                        <code>var fun = x -> { x * x }</code>
+                        <code>var fun = x -> { x * x }</code>.
+                        Functions with an expression as body can forego the curly brackets as in:
+                        <code>var fun = x -> x * x </code>.
                         <p>Note that functions can use local variables and parameters from their declaring script.
                             Those variables values are bound to the function environment at definition time.</p>
                         <code>var t = 20; var s = function(x, y) {x + y + t}; t = 54; s(15, 7)</code>
@@ -603,6 +623,27 @@
                     <td>
                         The usual <code>~</code> operator is used, e.g.
                         <code>~33</code>, ~0010 0001 = 1101 1110 = -34.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Left-shift <code>&lt;&lt;</code></td>
+                    <td>
+                    The left shift operator (&lt;&lt;) shifts the first operand the specified number of bits to the left.
+                        <code>1 &lt;&lt; 2</code> = 4
+                    </td>
+                </tr>
+                <tr>
+                    <td>Right-shift <code>&gt;&gt;</code></td>
+                    <td>
+                        The right shift operator (>>) shifts the first operand the specified number of bits to the right.
+                        <code>4 &gt;&gt; 2</code> = 1
+                    </td>
+                </tr>
+                <tr>
+                    <td>Unsigned Right-shift <code>&gt;&gt;&gt;</code></td>
+                    <td>
+                    (zero-fill right shift) shifts the first operand the specified number of bits to the right.
+                    The sign bit becomes 0, so the result is always non-negative.
                     </td>
                 </tr>
                 <tr>
