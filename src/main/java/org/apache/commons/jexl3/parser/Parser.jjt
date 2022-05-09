@@ -47,7 +47,7 @@ import org.apache.commons.jexl3.internal.Scope;
 
 public final class Parser extends JexlParser
 {
-    public ASTJexlScript parse(JexlInfo jexlInfo, JexlFeatures jexlFeatures, String jexlSrc, Scope scope) {
+    public ASTJexlScript parse(JexlInfo jexlInfo, JexlFeatures jexlFeatures, String jexlSrc, Scope jexlScope) {
         JexlFeatures previous = getFeatures();
         try {
             setFeatures(jexlFeatures);
@@ -59,9 +59,9 @@ public final class Parser extends JexlParser
             info = jexlInfo != null? jexlInfo : new JexlInfo();
             source = jexlSrc;
             pragmas = null;
-            frame = scope;
+            this.scope = jexlScope;
             ReInit(jexlSrc);
-            ASTJexlScript script = jexlFeatures.supportsScript()? JexlScript(scope) : JexlExpression(scope);
+            ASTJexlScript script = jexlFeatures.supportsScript()? JexlScript(jexlScope) : JexlExpression(jexlScope);
             script.jjtSetValue(info.detach());
             script.setFeatures(jexlFeatures);
             script.setPragmas(pragmas != null
@@ -127,6 +127,8 @@ TOKEN_MGR_DECLS : {
     | < DO : "do" > { popDot(); }
     | < NEW : "new" >  { popDot(); }
     | < VAR : "var" >  { popDot(); }
+    | < LET : "let" >  { popDot(); }
+    | < CONST : "const" >  { popDot(); }
     | < EMPTY : "empty" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < SIZE : "size" > { popDot(); } /* Revert state to default if was DOT_ID. */
     | < NULL : "null" >  { popDot(); }
@@ -134,7 +136,7 @@ TOKEN_MGR_DECLS : {
     | < FALSE : "false" >  { popDot(); }
     | < RETURN : "return" > { popDot(); }
     | < FUNCTION : "function" >  { popDot(); }
-    | < LAMBDA : "->" >
+    | < LAMBDA : "->" | "=>" > { popDot(); }
     | < BREAK : "break" > { popDot(); }
     | < CONTINUE : "continue" > { popDot(); }
     | < PRAGMA : "#pragma" > { popDot(); }
@@ -347,6 +349,13 @@ void AnnotatedStatement() #AnnotatedStatement : {}
 
 void Statement() #void : {}
 {
+    LOOKAHEAD(<LET>|<CONST>|<VAR>) Var()
+    |
+    StatementNoVar()
+}
+
+void StatementNoVar() #void : {}
+{
     <SEMICOL>
     | LOOKAHEAD(<ANNOTATION>) AnnotatedStatement()
     | LOOKAHEAD(Expression()) ExpressionStatement()
@@ -358,7 +367,7 @@ void Statement() #void : {}
     | ReturnStatement()
     | Continue()
     | Break()
-    | Var()
+    | LOOKAHEAD(<VAR>, {!getFeatures().isLexical()} ) Var()
     | Pragma()
 }
 
@@ -376,19 +385,19 @@ void ExpressionStatement() #void : {}
 
 void IfStatement() : {}
 {
-    <IF> <LPAREN> Expression() <RPAREN>  (LOOKAHEAD(1) Block() | Statement())
-    ( LOOKAHEAD(2) <ELSE> <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | Statement()) )*
-    ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | Statement()) )?
+    <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | StatementNoVar())
+    ( LOOKAHEAD(2) <ELSE> <IF> <LPAREN> Expression() <RPAREN> (LOOKAHEAD(1) Block() | StatementNoVar()) )*
+    ( LOOKAHEAD(1) <ELSE>  (LOOKAHEAD(1) Block() | StatementNoVar()) )?
 }
 
 void WhileStatement() : {}
 {
-    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount += 1; }  (LOOKAHEAD(1) Block() | Statement()) { loopCount -= 1; }
+    <WHILE> <LPAREN> Expression() <RPAREN>  { loopCount += 1; }  (LOOKAHEAD(1) Block() | StatementNoVar()) { loopCount -= 1; }
 }
 
 void DoWhileStatement() : {}
 {
-    <DO> { loopCount += 1; } (LOOKAHEAD(1) Block() | Statement()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount -= 1; }
+    <DO> { loopCount += 1; } (LOOKAHEAD(1) Block() | StatementNoVar()) <WHILE> <LPAREN> Expression() <RPAREN> { loopCount -= 1; }
 }
 
 void ReturnStatement() : {}
@@ -400,14 +409,14 @@ void Continue() #Continue : {
     Token t;
 }
 {
-    t=<CONTINUE> { if (loopCount == 0) { throwParsingException(null, t); } }
+    t=<CONTINUE> { if (loopCount == 0) { throwParsingException(t); } }
 }
 
 void Break() #Break : {
     Token t;
 }
 {
-    t=<BREAK> { if (loopCount == 0) { throwParsingException(null, t); } }
+    t=<BREAK> { if (loopCount == 0) { throwParsingException(t); } }
 }
 
 void ForeachStatement() : {}
@@ -415,28 +424,34 @@ void ForeachStatement() : {}
     { pushUnit(jjtThis); }
     <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN>
         { loopCount += 1; }
-        (LOOKAHEAD(1) Block() | Statement())
+        (LOOKAHEAD(1) Block() | StatementNoVar())
     { loopCount -= 1; popUnit(jjtThis); }
 }
 
 void ForEachVar() #Reference : {}
 {
-    <VAR> DeclareVar()
+    <VAR> DeclareVar(false, false)
+|
+    <LET> DeclareVar(true, false)
 |
     Identifier(true)
 }
 
 void Var() #void : {}
 {
-    <VAR> DeclareVar() (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    <VAR> DeclareVar(false, false) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    |
+    <LET> DeclareVar(true, false) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    |
+    <CONST> DeclareVar(true, true) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
 }
 
-void DeclareVar() #Var :
+void DeclareVar(boolean lexical, boolean constant) #Var :
 {
     Token t;
 }
 {
-    t=<IDENTIFIER> { declareVariable(jjtThis, t); }
+    t=<IDENTIFIER> { declareVariable(jjtThis, t, lexical, constant); }
 }
 
 void Pragma() #void :
@@ -844,27 +859,35 @@ void Parameter() #void :
     Token t;
 }
 {
-    t=<IDENTIFIER> { declareParameter(t); }
+    (<VAR>)? t=<IDENTIFIER> { declareParameter(t, false, false); }
+    |
+    <LET> t=<IDENTIFIER> { declareParameter(t, true, false); }
+    |
+    <CONST> t=<IDENTIFIER> { declareParameter(t, true, true); }
 }
 
 void Parameters() #void : {}
 {
-     <LPAREN> [(<VAR>)? Parameter() (<COMMA> (<VAR>)? Parameter())* ] <RPAREN>
+     <LPAREN> [Parameter() (<COMMA> Parameter())* ] <RPAREN>
 }
 
+void ParametersLookahead() #void : {}
+{
+     <LPAREN> [(<VAR>|<LET>|<CONST>)? <IDENTIFIER> (<COMMA> ((<VAR>|<LET>|<CONST>)? <IDENTIFIER>))*] <RPAREN>
+}
 
 void LambdaLookahead() #void : {}
 {
-  <FUNCTION> Parameters()
+  <FUNCTION> ParametersLookahead()
   |
-  Parameters() <LAMBDA>
+  ParametersLookahead() <LAMBDA>
   |
-  Parameter() <LAMBDA>
+  <IDENTIFIER> <LAMBDA>
 }
 
 void Lambda() #JexlLambda :
 {
-   pushFrame();
+   pushScope();
 }
 {
   { pushUnit(jjtThis); } <FUNCTION> Parameters() ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); }

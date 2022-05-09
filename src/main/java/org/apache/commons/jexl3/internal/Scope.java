@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * A script scope, stores the declaration of parameters and local variables as symbols.
- * <p>This also acts as the functional scope and variable definition store.
+ * <p>This also acts as the functional scope and variable definition store.</p>
  * @since 3.0
  */
 public final class Scope {
@@ -66,6 +66,15 @@ public final class Scope {
      * The map of local captured variables to parent scope variables, ie closure.
      */
     private Map<Integer, Integer> capturedVariables = null;
+    /**
+     * Const symbols.
+     */
+    private LexicalScope constVariables = null;
+    /**
+     * Let symbols.
+     */
+    private LexicalScope lexicalVariables = null;
+
     /**
      * The empty string array.
      */
@@ -149,6 +158,48 @@ public final class Scope {
     }
 
     /**
+     * Marks a symbol as a lexical, declared through let or const.
+     * @param s the symbol
+     * @return true if the symbol was not already present in the lexical set
+     */
+    public boolean addLexical(int s) {
+        if (lexicalVariables == null) {
+            lexicalVariables = new LexicalScope();
+        }
+        return lexicalVariables.addSymbol(s);
+    }
+
+    /**
+     * Checks whether a symbol is declared through a let or const.
+     * @param s the symbol
+     * @return true if symbol was declared through let or const
+     */
+    public boolean isLexical(int s) {
+        return lexicalVariables != null && s >= 0 && lexicalVariables.hasSymbol(s);
+    }
+
+    /**
+     * Marks a symbol as a const.
+     * @param s the symbol
+     * @return true if the symbol was not already present in the constant set
+     */
+    public boolean addConstant(int s) {
+        if (constVariables == null) {
+            constVariables = new LexicalScope();
+        }
+        return constVariables.addSymbol(s);
+    }
+
+    /**
+     * Checks whether a symbol is declared through a const.
+     * @param s the symbol
+     * @return true if symbol was declared through const
+     */
+    public boolean isConstant(int s) {
+        return constVariables != null && s >= 0 && constVariables.hasSymbol(s);
+    }
+
+    /**
      * Checks whether a given symbol is captured.
      * @param symbol the symbol number
      * @return true if captured, false otherwise
@@ -188,7 +239,7 @@ public final class Scope {
      * @param name the variable name
      * @return the register index storing this variable
      */
-    public int declareVariable(final String name) {
+    public int declareVariable(final String name, boolean lexical, boolean constant) {
         if (namedVariables == null) {
             namedVariables = new LinkedHashMap<String, Integer>();
         }

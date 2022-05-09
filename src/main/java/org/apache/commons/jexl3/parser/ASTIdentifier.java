@@ -30,6 +30,10 @@ public class ASTIdentifier extends JexlNode {
     private static final int SHADED = 1;
     /** The captured variable flag. */
     private static final int CAPTURED = 2;
+    /** The lexical variable flag. */
+    private static final int LEXICAL = 3;
+    /** The const variable flag. */
+    private static final int CONST = 4;
 
     ASTIdentifier(final int id) {
         super(id);
@@ -103,6 +107,22 @@ public class ASTIdentifier extends JexlNode {
 
     public boolean isCaptured() {
         return isSet(CAPTURED, flags);
+    }
+
+    public boolean isLexical() {
+        return isSet(LEXICAL, flags);
+    }
+
+    public void setLexical(final boolean f) {
+        flags = set(LEXICAL, flags, f);
+    }
+
+    public boolean isConstant() {
+        return isSet(CONST, flags);
+    }
+
+    public void setConstant(final boolean f) {
+        flags = set(CONST, flags, f);
     }
 
     public String getName() {

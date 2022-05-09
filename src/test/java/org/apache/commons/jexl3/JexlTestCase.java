@@ -107,6 +107,19 @@ public class JexlTestCase {
         }
     }
 
+    /**
+     * Compare strings ignoring white space differences.
+     * <p>This replaces any sequence of whitespaces (ie \\s) by one space (ie ASCII 32) in both
+     * arguments then compares them.</p>
+     * @param lhs left hand side
+     * @param rhs right hand side
+     * @return true if strings are equal besides whitespace
+     */
+    public static boolean equalsIgnoreWhiteSpace(String lhs, String rhs) {
+        String lhsw = lhs.trim().replaceAll("\\s+", "");
+        String rhsw = rhs.trim().replaceAll("\\s+", "");
+        return lhsw.equals(rhsw);
+    }
 
     /**
      * A very secure singleton.

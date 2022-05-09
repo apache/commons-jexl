@@ -38,6 +38,7 @@ allow fine-tuning the scripting integration into any project.
 
 New Features in 3.3:
 ====================
+* JEXL-369:     Add 'let' and 'const' variable declarations
 * JEXL-365:     Lambda expressions
 * JEXL-363:     Allow retrieving captured variables in script
 * JEXL-360:     Add missing bitshift operators ( >>, >>>, <<)

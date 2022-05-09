@@ -962,7 +962,13 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
 
     @Override
     protected Object visit(final ASTVar node, final Object data) {
-        builder.append("var ");
+        if (node.isConstant()) {
+            builder.append("const ");
+        } else  if (node.isLexical()) {
+            builder.append("let ");
+        } else {
+            builder.append("var ");
+        }
         check(node, node.getName(), data);
         return data;
     }
