@@ -89,6 +89,18 @@ public class SideEffectTest extends JexlTestCase {
         context.put("foo", foo);
         asserter.assertExpression("foo ^= 2", (long)(i41 ^ 2));
         Assert.assertEquals(context.get("foo"), (long)(i41 ^ 2));
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo <<= 2", (long)(i41 << 2));
+        Assert.assertEquals(context.get("foo"), (long)(i41 << 2));
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo >>= 2", (long)(i41 >> 2));
+        Assert.assertEquals(context.get("foo"), (long)(i41 >> 2));
+
+        context.put("foo", foo);
+        asserter.assertExpression("foo >>>= 2", (long)(i41 >>> 2));
+        Assert.assertEquals(context.get("foo"), (long)(i41 >>> 2));
     }
 
     @Test

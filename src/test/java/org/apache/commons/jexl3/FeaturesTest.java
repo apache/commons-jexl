@@ -125,9 +125,13 @@ public class FeaturesTest extends JexlTestCase {
             "x -= 1",
             "x *= 1",
             "x /= 1",
+            "x %= 1",
             "x ^= 1",
             "x &= 1",
             "x |= 1",
+            "x >>= 1",
+            "x <<= 1",
+            "x >>>= 1",
         };
         checkFeature(f, scripts);
     }

@@ -151,10 +151,14 @@ public class ShiftOperatorsTest extends JexlTestCase {
     @Test
     public void testOverloadedShift() throws Exception {
         JexlEngine jexl = new JexlBuilder().arithmetic(new ShiftArithmetic(true)).create();
-        JexlScript e = jexl.createScript("x << 'Left'", "x");
-        StringBuilder x = new StringBuilder("1");
-        Object o = e.execute(null, x);
-        Assert.assertEquals(e.getSourceText(), "1Left", x.toString());
+        StringBuilder x;
+        JexlScript e;
+        Object o;
+
+        x = new StringBuilder("1");
+        e = jexl.createScript("x << 'Left'", "x");
+        o = e.execute(null, x);
+        Assert.assertEquals(e.getSourceText(), "1Left", o.toString());
 
         e = jexl.createScript("'Right' >> x", "x");
         x = new StringBuilder("1");

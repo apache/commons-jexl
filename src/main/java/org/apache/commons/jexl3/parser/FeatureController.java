@@ -215,6 +215,11 @@ public class FeatureController extends ScriptVisitor {
     }
 
     @Override
+    protected Object visit(final ASTSetModNode node, final Object data) {
+        return controlSideEffect(node, data);
+    }
+
+    @Override
     protected Object visit(final ASTSetAndNode node, final Object data) {
         return controlSideEffect(node, data);
     }
