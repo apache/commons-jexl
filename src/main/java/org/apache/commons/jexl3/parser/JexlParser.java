@@ -20,8 +20,8 @@ import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
-import org.apache.commons.jexl3.internal.Scope;
 import org.apache.commons.jexl3.internal.LexicalScope;
+import org.apache.commons.jexl3.internal.Scope;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -205,7 +205,7 @@ public abstract class JexlParser extends StringParser {
      * regain access after parsing to known which / how-many registers are needed. </p>
      * @return the named register map
      */
-    protected Scope getFrame() {
+    protected Scope getScope() {
         return scope;
     }
 
@@ -382,6 +382,31 @@ public abstract class JexlParser extends StringParser {
     }
 
     /**
+     * Declares a local function.
+     * @param variable the identifier used to declare
+     * @param token      the variable name toekn
+     */
+    protected void declareFunction(final ASTVar variable, final Token token, Scope scope) {
+        final String name = token.image;
+        // function foo() ... <=> const foo = ()->...
+        if (scope == null) {
+            scope = new Scope(null);
+        }
+        final int symbol = scope.declareVariable(name, true, true);
+        variable.setSymbol(symbol, name);
+        if (scope.isCapturedSymbol(symbol)) {
+            variable.setCaptured(true);
+        }
+        // lexical feature error
+        if (!declareSymbol(symbol)) {
+            if (getFeatures().isLexical()) {
+                throw new JexlException(variable, name + ": variable is already declared");
+            }
+            variable.setRedefined(true);
+        }
+    }
+
+    /**
      * Declares a local variable.
      * <p> This method creates an new entry in the symbol map. </p>
      * @param variable the identifier used to declare
@@ -395,7 +420,7 @@ public abstract class JexlParser extends StringParser {
             throwFeatureException(JexlFeatures.LOCAL_VAR, token);
         }
         if (scope == null) {
-            scope = new Scope(null, (String[]) null);
+            scope = new Scope(null);
         }
         final int symbol = scope.declareVariable(name, lexical, constant);
         variable.setSymbol(symbol, name);
@@ -580,7 +605,6 @@ public abstract class JexlParser extends StringParser {
             if (script.getScope() != scope) {
                 script.setScope(scope);
             }
-            popScope();
         } else if (ASSIGN_NODES.contains(node.getClass())) {
             final JexlNode lv = node.jjtGetChild(0);
             if (!lv.isLeftValue()) {
@@ -598,6 +622,23 @@ public abstract class JexlParser extends StringParser {
         }
         // heavy check
         featureController.controlNode(node);
+    }
+
+    /**
+     * Check fat vs thin arrow syntax feature.
+     * @param token the arrow token
+     */
+    protected void checkLambda(Token token) {
+        final String arrow = token.image;
+        if ("->".equals(arrow)) {
+            if (!getFeatures().supportsThinArrow()) {
+                throwFeatureException(JexlFeatures.THIN_ARROW, token);
+            }
+            return;
+        }
+        if ("=>".equals(arrow) && !getFeatures().supportsFatArrow()) {
+            throwFeatureException(JexlFeatures.FAT_ARROW, token);
+        }
     }
 
     /**

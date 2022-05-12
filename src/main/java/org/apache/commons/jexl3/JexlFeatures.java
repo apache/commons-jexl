@@ -59,7 +59,8 @@ public final class JexlFeatures {
     private static final String[] F_NAMES = {
         "register", "reserved variable", "local variable", "assign/modify",
         "global assign/modify", "array reference", "create instance", "loop", "function",
-        "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade"
+        "method call", "set/map/array literal", "pragma", "annotation", "script", "lexical", "lexicalShade",
+        "thin-arrow", "fat-arrow"
     };
     /** Registers feature ordinal. */
     private static final int REGISTER = 0;
@@ -93,6 +94,10 @@ public final class JexlFeatures {
     public static final int LEXICAL = 14;
     /** Lexical shade feature ordinal. */
     public static final int LEXICAL_SHADE = 15;
+    /** Fat-arrow lambda syntax. */
+    public static final int THIN_ARROW = 16;
+    /** Fat-arrow lambda syntax. */
+    public static final int FAT_ARROW = 17;
 
     /**
      * Creates an all-features-enabled instance.
@@ -109,7 +114,8 @@ public final class JexlFeatures {
                 | (1L << STRUCTURED_LITERAL)
                 | (1L << PRAGMA)
                 | (1L << ANNOTATION)
-                | (1L << SCRIPT);
+                | (1L << SCRIPT)
+                | (1L << THIN_ARROW);
         reservedNames = Collections.emptySet();
         nameSpaces = TEST_STR_FALSE;
     }
@@ -431,6 +437,46 @@ public final class JexlFeatures {
      */
     public boolean supportsLambda() {
         return getFeature(LAMBDA);
+    }
+
+    /**
+     * Sets whether thin-arrow lambda syntax is enabled.
+     * <p>
+     * When disabled, parsing a script/expression using syntactic thin-arrow (-&lt;)
+     * will throw a parsing exception.
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     */
+    public JexlFeatures thinArrow(final boolean flag) {
+        setFeature(THIN_ARROW, flag);
+        return this;
+    }
+
+    /**
+     * @return true if thin-arrow lambda syntax is enabled, false otherwise
+     */
+    public boolean supportsThinArrow() {
+        return getFeature(THIN_ARROW);
+    }
+
+    /**
+     * Sets whether fat-arrow lambda syntax is enabled.
+     * <p>
+     * When disabled, parsing a script/expression using syntactic fat-arrow (=&lt;)
+     * will throw a parsing exception.
+     * @param flag true to enable, false to disable
+     * @return this features instance
+     */
+    public JexlFeatures fatArrow(final boolean flag) {
+        setFeature(FAT_ARROW, flag);
+        return this;
+    }
+
+    /**
+     * @return true if fat-arrow lambda syntax is enabled, false otherwise
+     */
+    public boolean supportsFatArrow() {
+        return getFeature(FAT_ARROW);
     }
 
     /**

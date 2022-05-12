@@ -18,6 +18,7 @@ package org.apache.commons.jexl3.internal;
 
 
 import org.apache.commons.jexl3.JexlExpression;
+import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.*;
@@ -47,6 +48,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     protected int indent = 2;
     /** accept() relative depth. */
     protected int depth = Integer.MAX_VALUE;
+    /** Arrow symbol. */
+    protected String arrow = "->";
 
     /**
      * Creates a Debugger.
@@ -69,13 +72,44 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     }
 
     /**
+     * Tries (hard) to find the features used to parse a node.
+     * @param node the node
+     * @return the features or null
+     */
+    protected JexlFeatures getFeatures(JexlNode node) {
+        JexlNode walk = node;
+        while(walk != null) {
+            if (walk instanceof ASTJexlScript) {
+                ASTJexlScript script = (ASTJexlScript) walk;
+                return script.getFeatures();
+            }
+            walk = walk.jjtGetParent();
+        }
+        return null;
+    }
+
+    /**
+     * Sets the arrow style (fat or thin) depending on features.
+     * @param node the node to start seeking features from.
+     */
+    protected void setArrowSymbol(JexlNode node) {
+        JexlFeatures features = getFeatures(node);
+        if (features != null && features.supportsFatArrow() && !features.supportsThinArrow()) {
+            arrow = "=>";
+        } else {
+            arrow = "->";
+        }
+    }
+
+    /**
      * Position the debugger on the root of an expression.
      * @param jscript the expression
      * @return true if the expression was a {@link Script} instance, false otherwise
      */
     public boolean debug(final JexlExpression jscript) {
         if (jscript instanceof Script) {
-            return debug(((Script) jscript).script);
+            Script script = (Script) jscript;
+            return debug(script.script);
         }
         return false;
     }
@@ -87,7 +121,8 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
      */
     public boolean debug(final JexlScript jscript) {
         if (jscript instanceof Script) {
-            return debug(((Script) jscript).script);
+            Script script = (Script) jscript;
+            return debug(script.script);
         }
         return false;
     }
@@ -111,6 +146,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         start = 0;
         end = 0;
         indentLevel = 0;
+        setArrowSymbol(node);
         if (node != null) {
             builder.setLength(0);
             cause = node;
@@ -144,6 +180,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         start = 0;
         end = 0;
         indentLevel = 0;
+        setArrowSymbol(node);
         if (node != null) {
             builder.setLength(0);
             cause = node;
@@ -675,15 +712,22 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(final ASTJexlScript node, Object arg) {
         Object data = arg;
+        boolean named = false;
         // if lambda, produce parameters
         if (node instanceof ASTJexlLambda) {
             final ASTJexlLambda lambda = (ASTJexlLambda) node;
             final JexlNode parent = node.jjtGetParent();
             // use lambda syntax if not assigned
             boolean expr = isLambdaExpr(lambda);
-            final boolean named = parent instanceof ASTAssignment;
-            if (named && !expr) {
+            named = node.jjtGetChild(0) instanceof ASTVar;
+            final boolean assigned = parent instanceof ASTAssignment || named;
+            if (assigned && !expr) {
                 builder.append("function");
+                if (named) {
+                    ASTVar avar = (ASTVar) node.jjtGetChild(0);
+                    builder.append(' ');
+                    builder.append(avar.getName());
+                }
             }
             builder.append('(');
             final String[] params = lambda.getParameters();
@@ -695,11 +739,11 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
                 }
             }
             builder.append(')');
-            if (named && !expr) {
+            if (assigned && !expr) {
                 // block follows
                 builder.append(' ');
             } else {
-                builder.append("->");
+                builder.append(arrow);
                 // add a space if lambda expr otherwise block follows
                 if (expr) {
                     builder.append(' ');
@@ -711,7 +755,7 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         if (num == 1 && !(node instanceof ASTJexlLambda)) {
             data = accept(node.jjtGetChild(0), data);
         } else {
-            for (int i = 0; i < num; ++i) {
+            for (int i = named? 1 : 0; i < num; ++i) {
                 final JexlNode child = node.jjtGetChild(i);
                 acceptStatement(child, data);
             }
