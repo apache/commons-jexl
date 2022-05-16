@@ -26,7 +26,6 @@ import org.apache.commons.jexl3.internal.Scope;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.Constructor;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
@@ -99,6 +98,8 @@ public abstract class JexlParser extends StringParser {
          * @return true if declaration was successful, false if symbol was already declared
          */
         boolean declareSymbol(int symbol);
+        void setConstant(int symbol);
+        void setDefined(int symbol);
 
         /**
          * Checks whether a symbol is declared in this lexical unit.
@@ -106,6 +107,8 @@ public abstract class JexlParser extends StringParser {
          * @return true if declared, false otherwise
          */
         boolean hasSymbol(int symbol);
+        boolean isConstant(int symbol);
+        boolean isDefined(int symbol);
 
         /**
          * @return the number of local variables declared in this unit
@@ -313,32 +316,41 @@ public abstract class JexlParser extends StringParser {
             final Integer symbol = scope.getSymbol(name);
             if (symbol != null) {
                 identifier.setLexical(scope.isLexical(symbol));
-                identifier.setConstant(scope.isConstant(symbol));
                 boolean declared = true;
                 if (scope.isCapturedSymbol(symbol)) {
                     // captured are declared in all cases
                     identifier.setCaptured(true);
                 } else {
-                    declared = block.hasSymbol(symbol);
+                    LexicalUnit unit = block;
+                    declared = unit.hasSymbol(symbol);
                     // one of the lexical blocks above should declare it
                     if (!declared) {
                         for (final LexicalUnit u : blocks) {
                             if (u.hasSymbol(symbol)) {
+                                unit = u;
                                 declared = true;
                                 break;
                             }
                         }
                     }
-                    if (!declared && info instanceof JexlNode.Info) {
+                    if (declared) {
+                        if (unit.isConstant(symbol)) {
+                            identifier.setConstant(true);
+                            if (!unit.isDefined(symbol)) {
+                                throw new JexlException.Parsing(info, name + ": variable is not defined").clean();
+                            }
+                            identifier.setDefined(true);
+                        }
+                    } else if (info instanceof JexlNode.Info) {
                         declared = isSymbolDeclared((JexlNode.Info) info, symbol);
                     }
                 }
                 identifier.setSymbol(symbol, name);
                 if (!declared) {
                     identifier.setShaded(true);
-                    if (identifier.isLexical() || getFeatures().isLexicalShade()) {
+                    if (/*identifier.isLexical() ||*/ getFeatures().isLexicalShade()) {
                         // can not reuse a local as a global
-                        throw new JexlException.Parsing(info, name + ": variable is not defined").clean();
+                        throw new JexlException.Parsing(info, name + ": variable is not declared").clean();
                     }
                 }
             }
@@ -386,7 +398,7 @@ public abstract class JexlParser extends StringParser {
      * @param variable the identifier used to declare
      * @param token      the variable name toekn
      */
-    protected void declareFunction(final ASTVar variable, final Token token, Scope scope) {
+    protected void declareFunction(final ASTVar variable, final Token token) {
         final String name = token.image;
         // function foo() ... <=> const foo = ()->...
         if (scope == null) {
@@ -394,11 +406,16 @@ public abstract class JexlParser extends StringParser {
         }
         final int symbol = scope.declareVariable(name, true, true);
         variable.setSymbol(symbol, name);
+        variable.setLexical(true);
         if (scope.isCapturedSymbol(symbol)) {
             variable.setCaptured(true);
         }
-        // lexical feature error
-        if (!declareSymbol(symbol)) {
+        // function is const fun...
+        if (declareSymbol(symbol)) {
+            scope.addLexical(symbol);
+            block.setConstant(symbol);
+            block.setDefined(symbol);
+        } else {
             if (getFeatures().isLexical()) {
                 throw new JexlException(variable, name + ": variable is already declared");
             }
@@ -440,7 +457,7 @@ public abstract class JexlParser extends StringParser {
             if (lexical) {
                 scope.addLexical(symbol);
                 if (constant) {
-                    scope.addConstant(symbol);
+                    block.setConstant(symbol);
                 }
             }
         }
@@ -472,7 +489,8 @@ public abstract class JexlParser extends StringParser {
         } else if (lexical) {
             scope.addLexical(symbol);
             if (constant) {
-                scope.addConstant(symbol);
+                block.setConstant(symbol);
+                block.setDefined(symbol); // worst case is no argument, parameter will bind to null
             }
         }
     }
@@ -612,10 +630,17 @@ public abstract class JexlParser extends StringParser {
             }
             if (lv instanceof ASTIdentifier) {
                 ASTIdentifier var = (ASTIdentifier) lv;
-                if (!(var instanceof ASTVar)) { // if not a declaration...
-                    int symbol = var.getSymbol();
-                    if (symbol >= 0 && scope.isConstant(symbol)) {
-                        throw new JexlException.Assignment(var.jexlInfo(), var.getName()).clean();
+                int symbol = var.getSymbol();
+                boolean isconst = symbol >= 0 && block != null && block.isConstant(symbol);
+                if (isconst) {
+                    if (!(var instanceof ASTVar)) { // if not a declaration...
+                        if (block.isDefined(symbol)) {
+                            throw new JexlException.Assignment(var.jexlInfo(), var.getName()).clean();
+                        } else {
+                            block.setDefined(symbol);
+                        }
+                    } else {
+                        block.setDefined(symbol);
                     }
                 }
             }

@@ -34,6 +34,8 @@ public class ASTIdentifier extends JexlNode {
     private static final int LEXICAL = 3;
     /** The const variable flag. */
     private static final int CONST = 4;
+    /** The defined variable flag. */
+    private static final int DEFINED = 5;
 
     ASTIdentifier(final int id) {
         super(id);
@@ -123,6 +125,14 @@ public class ASTIdentifier extends JexlNode {
 
     public void setConstant(final boolean f) {
         flags = set(CONST, flags, f);
+    }
+
+    public boolean isDefined() {
+        return isSet(DEFINED, flags);
+    }
+
+    public void setDefined(final boolean f) {
+        flags = set(DEFINED, flags, f);
     }
 
     public String getName() {

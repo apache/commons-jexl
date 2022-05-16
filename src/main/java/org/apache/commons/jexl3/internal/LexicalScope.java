@@ -20,7 +20,10 @@ import java.util.BitSet;
 
 /**
  * The set of symbols declared in a lexical scope.
- * <p>The symbol identifiers are determined by the functional scope.
+ * <p>The symbol identifiers are determined by the functional scope.</p>
+ * <p>We use 3 bits per symbol; bit 0 sets the actual symbol as lexical (let),
+ * bit 1 as a const, bit 2 as a defined (valued) const.
+ * There are actually only 4 used states: 0, 1, 3, 7</p>
  */
 public class LexicalScope {
     /**
@@ -28,13 +31,23 @@ public class LexicalScope {
      */
     protected static final int LONGBITS = 64;
     /**
-     * The mask of symbols in the frame.
+     * Bits per symbol.
+     * Declared, const, defined.
+     */
+    protected static final int BITS_PER_SYMBOL = 3;
+    /**
+     * Number of symbols.
+     */
+    protected int count = 0;
+    /**
+     * The mask of symbols in the scope.
      */
     protected long symbols = 0L;
     /**
      * Symbols after 64.
      */
     protected BitSet moreSymbols = null;
+
 
     /**
      * Create a scope.
@@ -44,25 +57,58 @@ public class LexicalScope {
 
     /**
      * Frame copy ctor base.
-     *
-     * @param s  the symbols mask
-     * @param ms the more symbols bitset
      */
-    protected LexicalScope(final long s, final BitSet ms) {
-        symbols = s;
+    protected LexicalScope(LexicalScope other) {
+        BitSet ms;
+        symbols = other.symbols;
+        ms = other.moreSymbols;
         moreSymbols = ms != null ? (BitSet) ms.clone() : null;
     }
 
     /**
-     * Ensure more symbpls can be stored.
+     * Ensures more symbols can be stored.
      *
      * @return the set of more symbols
      */
-    protected final BitSet moreSymbols() {
+    private BitSet moreSymbols() {
         if (moreSymbols == null) {
             moreSymbols = new BitSet();
         }
         return moreSymbols;
+    }
+
+    /**
+     * Whether a given bit (not symbol) is set.
+     * @param bit the bit
+     * @return true if set
+     */
+    private boolean isSet(final int bit) {
+        if (bit < LONGBITS) {
+            return (symbols & (1L << bit)) != 0L;
+        }
+        return moreSymbols != null && moreSymbols.get(bit - LONGBITS);
+    }
+
+    /**
+     * Sets a given bit (not symbol).
+     * @param bit the bit
+     * @return true if it was actually set, false if it was set before
+     */
+    private boolean set(final int bit) {
+        if (bit < LONGBITS) {
+            if ((symbols & (1L << bit)) != 0L) {
+                return false;
+            }
+            symbols |= (1L << bit);
+        } else {
+            final int s = bit - LONGBITS;
+            final BitSet ms = moreSymbols();
+            if (ms.get(s)) {
+                return false;
+            }
+            ms.set(s, true);
+        }
+        return true;
     }
 
     /**
@@ -72,10 +118,31 @@ public class LexicalScope {
      * @return true if declared, false otherwise
      */
     public boolean hasSymbol(final int symbol) {
-        if (symbol < LONGBITS) {
-            return (symbols & (1L << symbol)) != 0L;
-        }
-        return moreSymbols != null && moreSymbols.get(symbol - LONGBITS);
+        final int bit = symbol << BITS_PER_SYMBOL;
+        return isSet(bit);
+    }
+
+    /**
+     * Checks whether a symbol is declared as a constant.
+     *
+     * @param symbol the symbol
+     * @return true if declared as constant, false otherwise
+     */
+    public boolean isConstant(final int symbol) {
+        final int bit = (symbol << BITS_PER_SYMBOL) | 1;
+        return isSet(bit);
+    }
+
+    /**
+     * Checks whether a const symbol has been defined, ie has a value.
+     *
+     * @param symbol the symbol
+     * @return true if defined, false otherwise
+     */
+    public boolean isDefined(final int symbol) {
+        final int bit = (symbol << BITS_PER_SYMBOL) | 2;
+        return isSet(bit);
+
     }
 
     /**
@@ -85,20 +152,34 @@ public class LexicalScope {
      * @return true if registered, false if symbol was already registered
      */
     public boolean addSymbol(final int symbol) {
-        if (symbol < LONGBITS) {
-            if ((symbols & (1L << symbol)) != 0L) {
-                return false;
-            }
-            symbols |= (1L << symbol);
-        } else {
-            final int s = symbol - LONGBITS;
-            final BitSet ms = moreSymbols();
-            if (ms.get(s)) {
-                return false;
-            }
-            ms.set(s, true);
+        final int bit = (symbol << BITS_PER_SYMBOL) ;
+        if (set(bit)) {
+            count += 1;
+            return true;
         }
-        return true;
+        return false;
+    }
+
+    /**
+     * Adds a constant in this scope.
+     *
+     * @param symbol the symbol
+     * @return true if registered, false if symbol was already registered
+     */
+    public boolean addConstant(final int symbol) {
+        final int bit = (symbol << BITS_PER_SYMBOL) | 1;
+        return set(bit);
+    }
+
+    /**
+     * Defines a constant in this scope.
+     *
+     * @param symbol the symbol
+     * @return true if registered, false if symbol was already registered
+     */
+    public boolean defineSymbol(final int symbol) {
+        final int bit = (symbol << BITS_PER_SYMBOL) | 2;
+        return set(bit);
     }
 
     /**
@@ -112,14 +193,16 @@ public class LexicalScope {
             long clean = symbols;
             while (clean != 0L) {
                 final int s = Long.numberOfTrailingZeros(clean);
-                clean &= ~(1L << s);
-                cleanSymbol.accept(s);
+                // call clean for symbol definition (7 as a mask for 3 bits,1+2+4)
+                clean &= ~(7L << s);
+                cleanSymbol.accept(s >> BITS_PER_SYMBOL);
             }
         }
         symbols = 0L;
         if (moreSymbols != null) {
             if (cleanSymbol != null) {
-                for (int s = moreSymbols.nextSetBit(0); s != -1; s = moreSymbols.nextSetBit(s + 1)) {
+                // step over const and definition (3 bits per symbol)
+                for (int s = moreSymbols.nextSetBit(0); s != -1; s = moreSymbols.nextSetBit(s + BITS_PER_SYMBOL)) {
                     cleanSymbol.accept(s + LONGBITS);
                 }
             }
@@ -131,6 +214,6 @@ public class LexicalScope {
      * @return the number of symbols defined in this scope.
      */
     public int getSymbolCount() {
-        return Long.bitCount(symbols) + (moreSymbols == null ? 0 : moreSymbols.cardinality());
+        return count;
     }
 }

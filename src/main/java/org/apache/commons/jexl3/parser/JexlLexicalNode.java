@@ -23,7 +23,7 @@ import org.apache.commons.jexl3.internal.LexicalScope;
  * @since 3.2
  */
 public class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit {
-    private LexicalScope locals = null;
+    private LexicalScope lexicalScope = null;
 
     public JexlLexicalNode(final int id) {
         super(id);
@@ -35,24 +35,50 @@ public class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit 
 
     @Override
     public boolean declareSymbol(final int symbol) {
-        if (locals == null) {
-            locals  = new LexicalScope();
+        if (lexicalScope == null) {
+            lexicalScope = new LexicalScope();
         }
-        return locals.addSymbol(symbol);
+        return lexicalScope.addSymbol(symbol);
+    }
+
+    @Override
+    public boolean isConstant(final int symbol) {
+        return lexicalScope != null && lexicalScope.isConstant(symbol);
+    }
+
+    @Override
+    public boolean isDefined(final int symbol) {
+        return  lexicalScope != null && lexicalScope.isDefined(symbol);
+    }
+
+    @Override
+    public void setConstant(int symbol) {
+        lexicalScope.addConstant(symbol);
+    }
+
+    @Override
+    public void setDefined(int symbol) {
+        lexicalScope.defineSymbol(symbol);
     }
 
     @Override
     public int getSymbolCount() {
-        return locals == null? 0 : locals.getSymbolCount();
+        return lexicalScope == null? 0 : lexicalScope.getSymbolCount();
     }
 
     @Override
     public boolean hasSymbol(final int symbol) {
-        return locals != null && locals.hasSymbol(symbol);
+        return lexicalScope != null && lexicalScope.hasSymbol(symbol);
     }
 
     @Override
     public LexicalScope getLexicalScope() {
-        return locals;
+        return lexicalScope;
+    }
+
+
+    @Override
+    public void jjtClose() {
+
     }
 }

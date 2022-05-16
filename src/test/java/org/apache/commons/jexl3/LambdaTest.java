@@ -437,11 +437,36 @@ public class LambdaTest extends JexlTestCase {
         Assert.assertEquals(simpleWhitespace(src), parsed);
     }
 
+    @Test
+    public void testConst0() {
+        final JexlFeatures f = new JexlFeatures();
+        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        final JexlScript script = jexl.createScript(
+                "{ const x = 10; x + 1 }; { let x = 20; x = 22}");
+        final JexlContext jc = new MapContext();
+        final Object result = script.execute(jc);
+        Assert.assertEquals(22, result);
+    }
+
+    @Test
+    public void testConst1() {
+        final JexlFeatures f = new JexlFeatures();
+        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        try {
+            final JexlScript script = jexl.createScript(
+                    "const x;  x + 1");
+            Assert.fail("should fail, x is not defined");
+        } catch(JexlException.Parsing xparse) {
+            Assert.assertTrue(xparse.getMessage().contains("x"));
+        }
+    }
+
     @Test public void testNamedFuncIsConst() {
         String src = "function foo(x) { x + x }; var foo ='nonononon'";
         JexlEngine jexl = createEngine();
         try {
             JexlScript script = jexl.createScript(src);
+            Assert.fail("should fail, foo is already defined");
         } catch(JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getMessage().contains("foo"));
         }

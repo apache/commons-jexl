@@ -67,10 +67,6 @@ public final class Scope {
      */
     private Map<Integer, Integer> capturedVariables = null;
     /**
-     * Const symbols.
-     */
-    private LexicalScope constVariables = null;
-    /**
      * Let symbols.
      */
     private LexicalScope lexicalVariables = null;
@@ -176,27 +172,6 @@ public final class Scope {
      */
     public boolean isLexical(int s) {
         return lexicalVariables != null && s >= 0 && lexicalVariables.hasSymbol(s);
-    }
-
-    /**
-     * Marks a symbol as a const.
-     * @param s the symbol
-     * @return true if the symbol was not already present in the constant set
-     */
-    public boolean addConstant(int s) {
-        if (constVariables == null) {
-            constVariables = new LexicalScope();
-        }
-        return constVariables.addSymbol(s);
-    }
-
-    /**
-     * Checks whether a symbol is declared through a const.
-     * @param s the symbol
-     * @return true if symbol was declared through const
-     */
-    public boolean isConstant(int s) {
-        return constVariables != null && s >= 0 && constVariables.hasSymbol(s);
     }
 
     /**

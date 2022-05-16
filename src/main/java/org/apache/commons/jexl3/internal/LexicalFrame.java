@@ -54,7 +54,7 @@ public class LexicalFrame extends LexicalScope {
      * @param src the frame to copy
      */
     public LexicalFrame(final LexicalFrame src) {
-        super(src.symbols, src.moreSymbols);
+        super(src);
         frame = src.frame;
         previous = src.previous;
         stack = src.stack != null ? new ArrayDeque<>(src.stack) : null;

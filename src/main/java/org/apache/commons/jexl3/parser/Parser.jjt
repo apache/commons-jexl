@@ -455,12 +455,12 @@ void DeclareVar(boolean lexical, boolean constant) #Var :
 {
     t=<IDENTIFIER> { declareVariable(jjtThis, t, lexical, constant); }
 }
-void DeclareFunction(Scope scope) #Var :
+void DeclareFunction() #Var :
 {
     Token t;
 }
 {
-    t=<IDENTIFIER> { declareFunction(jjtThis, t, scope); }
+    t=<IDENTIFIER> { declareFunction(jjtThis, t); }
 }
 
 void Pragma() #void :
@@ -898,15 +898,14 @@ void Lambda() #JexlLambda :
 {
    Token arrow;
    Token name;
-   Scope scope = getScope();
-   pushScope();
 }
 {
-  { pushUnit(jjtThis); } <FUNCTION> (LOOKAHEAD(<IDENTIFIER>) DeclareFunction(scope))? Parameters() ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); popScope(); }
+  <FUNCTION> (LOOKAHEAD(<IDENTIFIER>) DeclareFunction())? {
+   pushScope(); pushUnit(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); popScope(); }
   |
-  { pushUnit(jjtThis); } Parameters() (arrow=<LAMBDA> | arrow=<FATARROW>) ( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); popUnit(jjtThis); popScope(); }
+  { pushScope(); pushUnit(jjtThis); } Parameters() (arrow=<LAMBDA> | arrow=<FATARROW>) ( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); popUnit(jjtThis); popScope(); }
   |
-  { pushUnit(jjtThis); } Parameter() (arrow=<LAMBDA> | arrow=<FATARROW>)( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); popUnit(jjtThis); popScope(); }
+  { pushScope(); pushUnit(jjtThis); } Parameter() (arrow=<LAMBDA> | arrow=<FATARROW>)( LOOKAHEAD(3) Block() | Expression()) { checkLambda(arrow); popUnit(jjtThis); popScope(); }
 }
 
 

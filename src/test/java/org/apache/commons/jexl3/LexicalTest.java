@@ -29,6 +29,8 @@ import org.apache.commons.jexl3.internal.Script;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.commons.jexl3.JexlTestCase.createEngine;
+
 /**
  * Test cases for lexical option and feature.
  */
@@ -525,7 +527,10 @@ public class LexicalTest {
 
     @Test
     public void testForVariable0a() {
-        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        final JexlFeatures f = new JexlFeatures();
+        f.lexical(true);
+        f.lexicalShade(true);
+        final JexlEngine jexl = createEngine(f);
         try {
             final JexlScript script = jexl.createScript("for(let x : 1..3) { let c = 0}; return x");
             Assert.fail("Should not have been parsed");
@@ -539,7 +544,7 @@ public class LexicalTest {
         final JexlFeatures f = new JexlFeatures();
         f.lexical(true);
         f.lexicalShade(true);
-        final JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
+        final JexlEngine jexl = createEngine(f);
         try {
             final JexlScript script = jexl.createScript("for(var x : 1..3) { var c = 0}; return x");
             Assert.fail("Should not have been parsed");
@@ -553,7 +558,7 @@ public class LexicalTest {
         final JexlFeatures f = new JexlFeatures();
         f.lexical(true);
         f.lexicalShade(true);
-        final JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
+        final JexlEngine jexl = createEngine(f);
         try {
             final JexlScript script = jexl.createScript("for(var x : 1..3) { var c = 0} for(var x : 1..3) { var c = 0}; return x");
             Assert.fail("Should not have been parsed");
@@ -565,7 +570,10 @@ public class LexicalTest {
 
     @Test
     public void testForVariable1b() {
-        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        final JexlFeatures f = new JexlFeatures();
+        f.lexical(true);
+        f.lexicalShade(true);
+        final JexlEngine jexl = createEngine(f);
         try {
             final JexlScript script = jexl.createScript("for(let x : 1..3) { let c = 0} for(let x : 1..3) { var c = 0}; return x");
             Assert.fail("Should not have been parsed");
@@ -580,7 +588,7 @@ public class LexicalTest {
         final JexlFeatures f = new JexlFeatures();
         f.lexical(true);
         f.lexicalShade(true);
-        final JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
+        final JexlEngine jexl = createEngine(f);
         try {
             final JexlScript script = jexl.createScript("{var x = 0}; return x");
             Assert.fail("Should not have been parsed");
@@ -595,7 +603,7 @@ public class LexicalTest {
         final String str = "i = 0; { var i = 32; }; i";
         final JexlFeatures f = new JexlFeatures();
         f.lexical(true);
-        final JexlEngine jexl = new JexlBuilder().strict(true).features(f).create();
+        final JexlEngine jexl = createEngine(f);
         final JexlScript e = jexl.createScript(str);
         final JexlContext ctxt = new MapContext();
         final Object o = e.execute(ctxt);
