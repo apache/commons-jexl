@@ -267,7 +267,7 @@ public class JXLTTest extends JexlTestCase {
     }
 
     @Test
-    public void testConstant() throws Exception {
+    public void testConstant0() throws Exception {
         final JexlContext none = null;
         final String source = "Hello World!";
         final JxltEngine.Expression expr = JXLT.createExpression(source);

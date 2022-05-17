@@ -334,12 +334,10 @@ public abstract class JexlParser extends StringParser {
                         }
                     }
                     if (declared) {
+                        // track if const is defined or not
                         if (unit.isConstant(symbol)) {
                             identifier.setConstant(true);
-                            if (!unit.isDefined(symbol)) {
-                                throw new JexlException.Parsing(info, name + ": variable is not defined").clean();
-                            }
-                            identifier.setDefined(true);
+                            identifier.setDefined(unit.isDefined(symbol));
                         }
                     } else if (info instanceof JexlNode.Info) {
                         declared = isSymbolDeclared((JexlNode.Info) info, symbol);
@@ -570,12 +568,6 @@ public abstract class JexlParser extends StringParser {
     protected abstract Token getToken(int index);
 
     /**
-     * Overridden in actual parser to access tokens stack.
-     * @return the next token on the stack
-     */
-    protected abstract Token getNextToken();
-
-    /**
      * The set of assignment operators as classes.
      */
     private static final Set<Class<? extends JexlNode>> ASSIGN_NODES = new HashSet<>(
@@ -641,6 +633,18 @@ public abstract class JexlParser extends StringParser {
                         }
                     } else {
                         block.setDefined(symbol);
+                    }
+                }
+            }
+        } else {
+            // control that a const is defined before usage
+            int nchildren = node.jjtGetNumChildren();
+            for(int c = 0; c < nchildren; ++c) {
+                JexlNode child = node.jjtGetChild(c);
+                if (child instanceof ASTIdentifier) {
+                    ASTIdentifier var = (ASTIdentifier) child;
+                    if (var.isConstant() && !var.isDefined()) {
+                        throw new JexlException.Parsing(info, var.getName() + ": constant is not defined").clean();
                     }
                 }
             }
