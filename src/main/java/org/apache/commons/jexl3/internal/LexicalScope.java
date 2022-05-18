@@ -34,7 +34,7 @@ public class LexicalScope {
      * Bits per symbol.
      * Declared, const, defined.
      */
-    protected static final int BITS_PER_SYMBOL = 3;
+    protected static final int BITS_PER_SYMBOL = 2;
     /**
      * Number of symbols.
      */
@@ -134,18 +134,6 @@ public class LexicalScope {
     }
 
     /**
-     * Checks whether a const symbol has been defined, ie has a value.
-     *
-     * @param symbol the symbol
-     * @return true if defined, false otherwise
-     */
-    public boolean isDefined(final int symbol) {
-        final int bit = (symbol << BITS_PER_SYMBOL) | 2;
-        return isSet(bit);
-
-    }
-
-    /**
      * Adds a symbol in this scope.
      *
      * @param symbol the symbol
@@ -168,17 +156,6 @@ public class LexicalScope {
      */
     public boolean addConstant(final int symbol) {
         final int bit = (symbol << BITS_PER_SYMBOL) | 1;
-        return set(bit);
-    }
-
-    /**
-     * Defines a constant in this scope.
-     *
-     * @param symbol the symbol
-     * @return true if registered, false if symbol was already registered
-     */
-    public boolean defineSymbol(final int symbol) {
-        final int bit = (symbol << BITS_PER_SYMBOL) | 2;
         return set(bit);
     }
 

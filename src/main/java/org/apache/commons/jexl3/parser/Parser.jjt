@@ -445,7 +445,7 @@ void Var() #void : {}
     |
     <LET> DeclareVar(true, false) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
     |
-    <CONST> DeclareVar(true, true) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    <CONST> DeclareVar(true, true) <assign> Expression() #Assignment(2)
 }
 
 void DeclareVar(boolean lexical, boolean constant) #Var :

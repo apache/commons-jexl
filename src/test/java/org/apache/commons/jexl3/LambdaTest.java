@@ -438,7 +438,7 @@ public class LambdaTest extends JexlTestCase {
     }
 
     @Test
-    public void testConst0() {
+    public void testConst0a() {
         final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
         final JexlScript script = jexl.createScript(
@@ -449,36 +449,54 @@ public class LambdaTest extends JexlTestCase {
     }
 
     @Test
+    public void testConstb0() {
+        final JexlFeatures f = new JexlFeatures();
+        final JexlEngine jexl = new JexlBuilder().strict(true).create();
+        final JexlScript script = jexl.createScript(
+                "{ const x = 10; }{ const x = 20; }");
+        final JexlContext jc = new MapContext();
+        final Object result = script.execute(jc);
+        Assert.assertEquals(20, result);
+    }
+
+    @Test
     public void testConst1() {
         final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
         try {
             final JexlScript script = jexl.createScript(
-                    "const x;  x + 1");
-            Assert.fail("should fail, x is not defined");
+                    "const foo;  foo");
+            Assert.fail("should fail, const foo must be followed by assign.");
         } catch(JexlException.Parsing xparse) {
-            Assert.assertTrue(xparse.getMessage().contains("x"));
+            Assert.assertTrue(xparse.getMessage().contains("const"));
         }
     }
 
     @Test
-    public void testConst2() {
+    public void testConst2a() {
         final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
-            final JexlScript script = jexl.createScript( "const x;  x = 1");
-            Object result = script.execute(null);
-            Assert.assertEquals(1, result);
+        for(String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
+            try {
+                final JexlScript script = jexl.createScript("const foo = 42;  foo "+op+" 1;");
+                Assert.fail("should fail, const precludes assignment");
+            } catch (JexlException.Parsing xparse) {
+                Assert.assertTrue(xparse.getMessage().contains("foo"));
+            }
+        }
     }
 
     @Test
-    public void testConst3() {
+    public void testConst2b() {
         final JexlFeatures f = new JexlFeatures();
         final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        try {
-            final JexlScript script = jexl.createScript( "const x;  x = 1; x = 2;");
-            Assert.fail("should fail, x is not defined");
-        } catch(JexlException.Parsing xparse) {
-            Assert.assertTrue(xparse.getMessage().contains("x"));
+        for(String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
+            try {
+                final JexlScript script = jexl.createScript("{ const foo = 42; } { let foo  = 0; foo " + op + " 1; }");
+                Assert.assertNotNull(script);
+            } catch(JexlException.Parsing xparse) {
+                Assert.fail(xparse.toString());
+            }
         }
     }
 

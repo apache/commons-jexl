@@ -47,18 +47,8 @@ public class JexlLexicalNode extends JexlNode implements JexlParser.LexicalUnit 
     }
 
     @Override
-    public boolean isDefined(final int symbol) {
-        return  lexicalScope != null && lexicalScope.isDefined(symbol);
-    }
-
-    @Override
     public void setConstant(int symbol) {
         lexicalScope.addConstant(symbol);
-    }
-
-    @Override
-    public void setDefined(int symbol) {
-        lexicalScope.defineSymbol(symbol);
     }
 
     @Override

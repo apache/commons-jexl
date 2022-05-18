@@ -99,7 +99,6 @@ public abstract class JexlParser extends StringParser {
          */
         boolean declareSymbol(int symbol);
         void setConstant(int symbol);
-        void setDefined(int symbol);
 
         /**
          * Checks whether a symbol is declared in this lexical unit.
@@ -108,7 +107,6 @@ public abstract class JexlParser extends StringParser {
          */
         boolean hasSymbol(int symbol);
         boolean isConstant(int symbol);
-        boolean isDefined(int symbol);
 
         /**
          * @return the number of local variables declared in this unit
@@ -337,7 +335,6 @@ public abstract class JexlParser extends StringParser {
                         // track if const is defined or not
                         if (unit.isConstant(symbol)) {
                             identifier.setConstant(true);
-                            identifier.setDefined(unit.isDefined(symbol));
                         }
                     } else if (info instanceof JexlNode.Info) {
                         declared = isSymbolDeclared((JexlNode.Info) info, symbol);
@@ -412,7 +409,6 @@ public abstract class JexlParser extends StringParser {
         if (declareSymbol(symbol)) {
             scope.addLexical(symbol);
             block.setConstant(symbol);
-            block.setDefined(symbol);
         } else {
             if (getFeatures().isLexical()) {
                 throw new JexlException(variable, name + ": variable is already declared");
@@ -488,7 +484,6 @@ public abstract class JexlParser extends StringParser {
             scope.addLexical(symbol);
             if (constant) {
                 block.setConstant(symbol);
-                block.setDefined(symbol); // worst case is no argument, parameter will bind to null
             }
         }
     }
@@ -620,32 +615,12 @@ public abstract class JexlParser extends StringParser {
             if (!lv.isLeftValue()) {
                 throw new JexlException.Assignment(lv.jexlInfo(), null).clean();
             }
-            if (lv instanceof ASTIdentifier) {
+            if (lv instanceof ASTIdentifier && !(lv instanceof ASTVar)) {
                 ASTIdentifier var = (ASTIdentifier) lv;
                 int symbol = var.getSymbol();
                 boolean isconst = symbol >= 0 && block != null && block.isConstant(symbol);
-                if (isconst) {
-                    if (!(var instanceof ASTVar)) { // if not a declaration...
-                        if (block.isDefined(symbol)) {
-                            throw new JexlException.Assignment(var.jexlInfo(), var.getName()).clean();
-                        } else {
-                            block.setDefined(symbol);
-                        }
-                    } else {
-                        block.setDefined(symbol);
-                    }
-                }
-            }
-        } else {
-            // control that a const is defined before usage
-            int nchildren = node.jjtGetNumChildren();
-            for(int c = 0; c < nchildren; ++c) {
-                JexlNode child = node.jjtGetChild(c);
-                if (child instanceof ASTIdentifier) {
-                    ASTIdentifier var = (ASTIdentifier) child;
-                    if (var.isConstant() && !var.isDefined()) {
-                        throw new JexlException.Parsing(info, var.getName() + ": constant is not defined").clean();
-                    }
+                if (isconst) { // if not a declaration...
+                    throw new JexlException.Parsing(var.jexlInfo(), var.getName() +": const assignment.").clean();
                 }
             }
         }
