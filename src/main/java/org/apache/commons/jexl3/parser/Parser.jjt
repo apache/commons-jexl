@@ -352,6 +352,8 @@ void Statement() #void : {}
 {
     LOOKAHEAD(<LET>|<CONST>|<VAR>) Var()
     |
+    LOOKAHEAD(<FUNCTION> <IDENTIFIER>) FunctionStatement()
+    |
     StatementNoVar()
 }
 
@@ -367,7 +369,6 @@ void StatementNoVar() #void : {}
     | LOOKAHEAD(<RETURN>) ReturnStatement()
     | LOOKAHEAD(<CONTINUE>) Continue()
     | LOOKAHEAD(<BREAK>) Break()
-    | LOOKAHEAD(<FUNCTION> <IDENTIFIER> <LPAREN>) Lambda()
     | LOOKAHEAD(Expression()) ExpressionStatement()
     | Block()
     | LOOKAHEAD(<VAR>, {!getFeatures().isLexical()} ) Var()
@@ -378,6 +379,10 @@ void Block() #Block : {}
     <LCURLY> { pushUnit(jjtThis); } ( Statement() )* { popUnit(jjtThis); } <RCURLY>
 }
 
+void FunctionStatement() #JexlLambda : {}
+{
+<FUNCTION> DeclareFunction() { pushScope(); pushUnit(jjtThis); } Parameters() ( LOOKAHEAD(3) Block() | Expression()) { popUnit(jjtThis); popScope(); }
+}
 
 void ExpressionStatement() #void : {}
 {
@@ -887,7 +892,7 @@ void ParametersLookahead() #void : {}
 
 void LambdaLookahead() #void : {}
 {
-  <FUNCTION> (<IDENTIFIER>)? ParametersLookahead()
+  <FUNCTION> ParametersLookahead()
   |
   ParametersLookahead() (<LAMBDA> | <FATARROW>)
   |

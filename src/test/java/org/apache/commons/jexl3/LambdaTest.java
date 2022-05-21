@@ -428,76 +428,13 @@ public class LambdaTest extends JexlTestCase {
     }
 
     @Test public void testNamedFunc() {
-        String src = "(a)->{ function fact(x) { x <= 1? 1 : x * fact(x - 1); } fact(a); }";
+        String src = "(let a)->{ function fact(const x) { x <= 1? 1 : x * fact(x - 1); } fact(a); }";
         JexlEngine jexl = createEngine();
         JexlScript script = jexl.createScript(src);
         Object result = script.execute(null, 6);
         Assert.assertEquals(720, result);
         String parsed = simpleWhitespace(script.getParsedText());
         Assert.assertEquals(simpleWhitespace(src), parsed);
-    }
-
-    @Test
-    public void testConst0a() {
-        final JexlFeatures f = new JexlFeatures();
-        final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        final JexlScript script = jexl.createScript(
-                "{ const x = 10; x + 1 }; { let x = 20; x = 22}");
-        final JexlContext jc = new MapContext();
-        final Object result = script.execute(jc);
-        Assert.assertEquals(22, result);
-    }
-
-    @Test
-    public void testConstb0() {
-        final JexlFeatures f = new JexlFeatures();
-        final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        final JexlScript script = jexl.createScript(
-                "{ const x = 10; }{ const x = 20; }");
-        final JexlContext jc = new MapContext();
-        final Object result = script.execute(jc);
-        Assert.assertEquals(20, result);
-    }
-
-    @Test
-    public void testConst1() {
-        final JexlFeatures f = new JexlFeatures();
-        final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        try {
-            final JexlScript script = jexl.createScript(
-                    "const foo;  foo");
-            Assert.fail("should fail, const foo must be followed by assign.");
-        } catch(JexlException.Parsing xparse) {
-            Assert.assertTrue(xparse.getMessage().contains("const"));
-        }
-    }
-
-    @Test
-    public void testConst2a() {
-        final JexlFeatures f = new JexlFeatures();
-        final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        for(String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
-            try {
-                final JexlScript script = jexl.createScript("const foo = 42;  foo "+op+" 1;");
-                Assert.fail("should fail, const precludes assignment");
-            } catch (JexlException.Parsing xparse) {
-                Assert.assertTrue(xparse.getMessage().contains("foo"));
-            }
-        }
-    }
-
-    @Test
-    public void testConst2b() {
-        final JexlFeatures f = new JexlFeatures();
-        final JexlEngine jexl = new JexlBuilder().strict(true).create();
-        for(String op : Arrays.asList("=", "+=", "-=", "/=", "*=", "%=", "<<=", ">>=", ">>>=", "^=", "&=", "|=")) {
-            try {
-                final JexlScript script = jexl.createScript("{ const foo = 42; } { let foo  = 0; foo " + op + " 1; }");
-                Assert.assertNotNull(script);
-            } catch(JexlException.Parsing xparse) {
-                Assert.fail(xparse.toString());
-            }
-        }
     }
 
     @Test public void testNamedFuncIsConst() {
@@ -508,6 +445,27 @@ public class LambdaTest extends JexlTestCase {
             Assert.fail("should fail, foo is already defined");
         } catch(JexlException.Parsing xparse) {
             Assert.assertTrue(xparse.getMessage().contains("foo"));
+        }
+    }
+    @Test
+    public void testFailParseFunc0() {
+        String src = "if (false) function foo(x) { x + x }; var foo = 1";
+        JexlEngine jexl = createEngine();
+        try {
+            JexlScript script = jexl.createScript(src);
+        } catch(JexlException.Parsing xparse) {
+            Assert.assertTrue(xparse.getMessage().contains("function"));
+        }
+    }
+
+    @Test
+    public void testFailParseFunc1() {
+        String src = "if (false) let foo = (x) { x + x }; var foo = 1";
+        JexlEngine jexl = createEngine();
+        try {
+            JexlScript script = jexl.createScript(src);
+        } catch(JexlException.Parsing xparse) {
+            Assert.assertTrue(xparse.getMessage().contains("let"));
         }
     }
 
