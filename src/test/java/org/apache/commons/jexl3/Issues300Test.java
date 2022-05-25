@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.apache.commons.jexl3.internal.Engine32;
 import org.apache.commons.jexl3.internal.OptionsContext;
+import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -779,5 +780,39 @@ public class Issues300Test {
         String s0 = script.getParsedText();
         String s1 = script.getSourceText();
         Assert.assertNotEquals(s0, s1);
+    }
+
+    public static class Var370 {
+        private String name = null;
+        public void setName(String s) {
+            name = s;
+        }
+        public String getName() {
+            return name;
+        }
+    }
+
+    @Test public void test370() {
+        Var370 var370 = new Var370();
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        ObjectContext<Var370> ctxt = new ObjectContext<Var370>(jexl, var370);
+        JexlExpression get = jexl.createExpression("name");
+        // not null
+        var370.setName("John");
+        Assert.assertEquals("John",get.evaluate(ctxt));
+        Assert.assertTrue(ctxt.has("name"));
+        // null
+        var370.setName(null);
+        Assert.assertNull(get.evaluate(ctxt));
+        Assert.assertTrue(ctxt.has("name"));
+        // undefined
+        get = jexl.createExpression("phone");
+        Assert.assertFalse(ctxt.has("phone"));
+        try {
+            get.evaluate(ctxt);
+            Assert.fail("phone should be undefined!");
+        } catch(JexlException.Variable xvar) {
+            Assert.assertEquals("phone", xvar.getVariable());
+        }
     }
 }

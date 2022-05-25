@@ -47,6 +47,7 @@ New Features in 3.3:
 
 Bugs Fixed in 3.3:
 ==================
+* JEXL-370:     Cannot check if variable is defined using ObjectContext if the value is null
 * JEXL-364:     Evaluator options not propagated in closures
 * JEXL-362:     JexlInfo position reporting is off
 * JEXL-361:     Null may be used as operand silently even in arithmetic strict(true) mode

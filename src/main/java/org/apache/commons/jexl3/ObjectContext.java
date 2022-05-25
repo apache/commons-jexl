@@ -90,12 +90,7 @@ public class ObjectContext<T> implements JexlContext, JexlContext.NamespaceResol
 
     @Override
     public boolean has(final String name) {
-        final JexlPropertyGet jget = jexl.getUberspect().getPropertyGet(object, name);
-        try {
-            return jget != null && jget.invoke(object) != null;
-        } catch (final Exception xany) {
-            return false;
-        }
+        return jexl.getUberspect().getPropertyGet(object, name) != null;
     }
 
     @Override
