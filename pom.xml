@@ -52,7 +52,7 @@
         <commons.jira.id>JEXL</commons.jira.id>
         <commons.jira.pid>12310479</commons.jira.pid>
         <checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
-        <checksyle.version>9.3</checksyle.version>
+        <checkstyle.version>10.3</checkstyle.version>
         <japicmp.skip>false</japicmp.skip>
         <commons.japicmp.version>0.15.7</commons.japicmp.version>
         <commons.pmd.version>3.16.0</commons.pmd.version>
@@ -89,6 +89,19 @@
         <commons.releaseManagerName>Henri Biestro</commons.releaseManagerName>
         <commons.releaseManagerKey>4E066E0459CD109B</commons.releaseManagerKey>
     </properties>
+
+    <!-- Checkstyle 10 is incompatible with jdk 8, keep 9.3 -->
+    <profiles>
+        <profile>
+            <id>jdk8-plugin-fix-version</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <properties>
+                <checkstyle.version>9.3</checkstyle.version>
+            </properties>
+        </profile>
+    </profiles>
 
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/commons-jexl.git</connection>
@@ -227,7 +240,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>${checksyle.version}</version>
+                        <version>${checkstyle.version}</version>
                         <exclusions><!-- MCHECKSTYLE-156 -->
                             <exclusion>
                                 <groupId>com.sun</groupId>
