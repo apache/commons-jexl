@@ -26,10 +26,11 @@
     </properties>
     <body>
         <release version="3.3" date="YYYY-MM-DD">
-            <!-- UPDATE -->
+            <!-- ADD -->
             <action dev="henrib" type="add" issue="JEXL-357" >
                 Configure accessible packages/classes/methods/fields
             </action>
+            <!--  FIX -->
             <action dev="henrib" type="fix" issue="JEXL-354"  due-to="William Price">
                 #pragma does not handle negative integer or real literals
             </action>
