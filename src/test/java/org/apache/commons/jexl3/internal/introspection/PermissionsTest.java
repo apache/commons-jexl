@@ -17,10 +17,12 @@
 package org.apache.commons.jexl3.internal.introspection;
 
 import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.JexlTestCase;
+import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.internal.introspection.nojexlpackage.Invisible;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.junit.Assert;
@@ -31,6 +33,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -336,22 +339,37 @@ public class PermissionsTest {
         }
     }
 
-    @Test public void testProtectedOverrideFail() throws Exception {
+    @Test public void testProtectedOverride0() {
         JexlScript script;
         Object r;
         Foo2 foo3 = new Foo3();
         JexlEngine jexl = new JexlBuilder().safe(false).create();
-        // call public override, ok
-        script = jexl.createScript("x.publicMethod()", "x");
-        r = script.execute(null, foo3);
-        Assert.assertEquals("foo3",r);
         // call public override of protected, nok
+        Foo2 foo2 = new Foo2();
         script = jexl.createScript("x.protectedMethod()", "x");
         try {
-            r = script.execute(null, foo3);
+            r = script.execute(null, foo2);
             Assert.fail("protectedMethod() is not public through superclass Foo2");
         } catch(JexlException xjexl) {
             Assert.assertNotNull(xjexl);
         }
+        // call public override, ok
+        foo2 = new Foo3();
+        r = script.execute(null, foo3);
+        Assert.assertEquals("foo3",r);
+    }
+
+    @Test public void testProtectedOverride1() {
+        List<String> a = new LinkedList<>();
+        a.add("aaa");
+        a.add("bbb");
+
+        String src = "a.clone()";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlScript script = jexl.createScript(src);
+        JexlContext context = new MapContext();
+        context.set("a", a);
+        Object result = script.execute(context, a);
+        Assert.assertNotNull(result);
     }
 }

@@ -403,10 +403,6 @@ public class Permissions implements JexlPermissions {
      * @return true if denied, false otherwise
      */
     private boolean deny(Constructor<?> ctor) {
-        // only public
-        if (!Modifier.isPublic(ctor.getModifiers())) {
-            return true;
-        }
         // is ctor annotated with nojexl ?
         final NoJexl nojexl = ctor.getAnnotation(NoJexl.class);
         if (nojexl != null) {
@@ -421,10 +417,6 @@ public class Permissions implements JexlPermissions {
      * @return true if denied, false otherwise
      */
     private boolean deny(Field field) {
-        // only public
-        if (!Modifier.isPublic(field.getModifiers())) {
-            return true;
-        }
         // is field annotated with nojexl ?
         final NoJexl nojexl = field.getAnnotation(NoJexl.class);
         if (nojexl != null) {
@@ -439,8 +431,9 @@ public class Permissions implements JexlPermissions {
      * @return true if denied, false otherwise
      */
     private boolean deny(Method method) {
-        // only public
-        if (!Modifier.isPublic(method.getModifiers())) {
+        // private are denied
+        int modifiers = method.getModifiers();
+        if (Modifier.isPrivate(modifiers)) {
             return true;
         }
         // is method annotated with nojexl ?
@@ -497,6 +490,10 @@ public class Permissions implements JexlPermissions {
         if (ctor == null) {
             return false;
         }
+        // field must be public
+        if (!Modifier.isPublic(ctor.getModifiers())) {
+            return false;
+        }
         // check declared restrictions
         if (deny(ctor)) {
             return false;
@@ -518,6 +515,10 @@ public class Permissions implements JexlPermissions {
     @Override
     public boolean allow(final Field field) {
         if (field == null) {
+            return false;
+        }
+        // field must be public
+        if (!Modifier.isPublic(field.getModifiers())) {
             return false;
         }
         // check declared restrictions
@@ -543,6 +544,10 @@ public class Permissions implements JexlPermissions {
     @Override
     public boolean allow(final Method method) {
         if (method == null) {
+            return false;
+        }
+        // method must be public
+        if (!Modifier.isPublic(method.getModifiers())) {
             return false;
         }
         // method must be allowed
@@ -581,11 +586,8 @@ public class Permissions implements JexlPermissions {
             return false;
         }
         Class<?> clazz = method.getDeclaringClass();
-        // class must be allowed
-        if (deny(clazz)) {
-            return false;
-        }
-        return true;
+        // class must not be denied
+        return !deny(clazz);
     }
 
     /**
