@@ -717,6 +717,62 @@ public class JexlArithmetic {
     }
 
     /**
+     * Increments argument by 1.
+     * @param val the argument
+     * @return val + 1
+     */
+    public Object increment(Object val) {
+        return increment(val, 1);
+    }
+
+    /**
+     * Decrements argument by 1.
+     * @param val the argument
+     * @return val - 1
+     */
+    public Object decrement(Object val) {
+        return increment(val, -1);
+    }
+
+    /**
+     * Add value to number argument.
+     * @param val the number
+     * @param incr the value to add
+     * @return val + incr
+     */
+    protected Object increment(Object val, int incr) {
+        if (val == null) {
+            controlNullOperand();
+            return null;
+        }
+        if (val instanceof Integer) {
+            return ((Integer) val) + incr;
+        }
+        if (val instanceof Double) {
+            return ((Double) val) + incr;
+        }
+        if (val instanceof Long) {
+            return ((Long) val) + incr;
+        }
+        if (val instanceof BigDecimal) {
+            return ((BigDecimal) val).add(BigDecimal.valueOf(incr));
+        }
+        if (val instanceof BigInteger) {
+            return ((BigInteger) val).add(BigInteger.valueOf(incr));
+        }
+        if (val instanceof Float) {
+            return ((Float) val) + incr;
+        }
+        if (val instanceof Short) {
+            return (short) ((Short) val) + incr;
+        }
+        if (val instanceof Byte) {
+            return (byte) ((Byte) val) + incr;
+        }
+        throw new ArithmeticException("Object "+(incr < 0? "decrement":"increment")+":(" + val + ")");
+    }
+
+    /**
      * Add two values together.
      * <p>
      * If any numeric add fails on coercion to the appropriate type,

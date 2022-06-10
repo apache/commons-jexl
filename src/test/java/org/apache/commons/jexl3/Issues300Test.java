@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.apache.commons.jexl3.internal.Engine32;
 import org.apache.commons.jexl3.internal.OptionsContext;
-import org.apache.commons.jexl3.introspection.JexlPropertyGet;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;

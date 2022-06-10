@@ -20,6 +20,15 @@ package org.apache.commons.jexl3.parser;
  * Declares a for each loop.
  */
 public class ASTForeachStatement extends JexlLexicalNode {
+    private int loopForm;
+
+    void setLoopForm(int form) {
+        loopForm = form;
+    }
+
+    public int getLoopForm() {
+        return loopForm;
+    }
 
     public ASTForeachStatement(final int id) {
         super(id);

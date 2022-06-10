@@ -20,6 +20,7 @@ package org.apache.commons.jexl3.internal;
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
+import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.*;
 
@@ -388,6 +389,26 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
         if (paren) {
             builder.append(')');
         }
+        return data;
+    }
+
+    /**
+     * Postfix operators.
+     * @param node a postfix operator
+     * @param prefix the postfix
+     * @param data visitor pattern argument
+     * @return visitor pattern value
+     */
+    protected Object postfixChild(final JexlNode node, final String prefix, final Object data) {
+        final boolean paren = node.jjtGetChild(0).jjtGetNumChildren() > 1;
+        if (paren) {
+            builder.append('(');
+        }
+        accept(node.jjtGetChild(0), data);
+        if (paren) {
+            builder.append(')');
+        }
+        builder.append(prefix);
         return data;
     }
 
@@ -1108,6 +1129,26 @@ public class Debugger extends ParserVisitor implements JexlInfo.Detail {
     @Override
     protected Object visit(final ASTSetShiftLeftNode node, final Object data) {
         return infixChildren(node, " <<= ", false, data);
+    }
+
+    @Override
+    protected Object visit(final ASTGetDecrementNode node, final Object data) {
+        return postfixChild(node, "++", data);
+    }
+
+    @Override
+    protected Object visit(final ASTGetIncrementNode node, final Object data) {
+        return postfixChild(node, "++", data);
+    }
+
+    @Override
+    protected Object visit(final ASTDecrementGetNode node, final Object data) {
+        return prefixChild(node, "--", data);
+    }
+
+    @Override
+    protected Object visit(final ASTIncrementGetNode node, final Object data) {
+        return prefixChild(node, "--", data);
     }
 
     @Override

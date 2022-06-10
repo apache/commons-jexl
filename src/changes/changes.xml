@@ -31,6 +31,9 @@
                 Configure accessible packages/classes/methods/fields
             </action>
             <!--  FIX -->
+            <action dev="henrib" type="fix" issue="JEXL-371">
+                Override of a protected method with public visibility is not callable
+            </action>
             <action dev="henrib" type="fix" issue="JEXL-354"  due-to="William Price">
                 #pragma does not handle negative integer or real literals
             </action>
