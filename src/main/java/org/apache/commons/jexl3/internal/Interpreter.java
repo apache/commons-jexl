@@ -1373,7 +1373,7 @@ public class Interpreter extends InterpreterBase {
      * @param operator the operator
      * @return true if operator is a postfix operator (x++, y--)
      */
-    static private boolean isPostfix(JexlOperator operator) {
+    private static boolean isPostfix(JexlOperator operator) {
         return operator == JexlOperator.GET_AND_INCREMENT || operator == JexlOperator.GET_AND_DECREMENT;
     }
 

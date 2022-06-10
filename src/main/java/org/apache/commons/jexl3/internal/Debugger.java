@@ -20,7 +20,6 @@ package org.apache.commons.jexl3.internal;
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.JexlFeatures;
 import org.apache.commons.jexl3.JexlInfo;
-import org.apache.commons.jexl3.JexlOperator;
 import org.apache.commons.jexl3.JexlScript;
 import org.apache.commons.jexl3.parser.*;
 
