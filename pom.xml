@@ -55,7 +55,7 @@
         <checkstyle.version>10.3</checkstyle.version>
         <japicmp.skip>false</japicmp.skip>
         <commons.japicmp.version>0.15.7</commons.japicmp.version>
-        <commons.pmd.version>3.16.0</commons.pmd.version>
+        <commons.pmd.version>3.17.0</commons.pmd.version>
         <commons.spotbugs.version>4.7.0.0</commons.spotbugs.version>
 
         <!-- override of Jacoco properties defined in CP52 -->
