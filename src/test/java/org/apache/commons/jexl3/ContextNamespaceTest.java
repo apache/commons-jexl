@@ -17,20 +17,17 @@
 package org.apache.commons.jexl3;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Tests JexlContext (advanced) features.
  */
-@SuppressWarnings({"UnnecessaryBoxing", "AssertEqualsBetweenInconvertibleTypes"})
+@SuppressWarnings({"AssertEqualsBetweenInconvertibleTypes"})
 public class ContextNamespaceTest extends JexlTestCase {
 
     public ContextNamespaceTest() {
@@ -84,9 +81,9 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testThreadedContext() throws Exception {
+    public void testThreadedContext() {
         final JexlEngine jexl = new JexlBuilder().create();
-        final TaxesContext context = new TaxesContext(18.6);
+        final JexlContext context = new TaxesContext(18.6);
         final String strs = "taxes:vat(1000)";
         final JexlScript staxes = jexl.createScript(strs);
         final Object result = staxes.execute(context);
@@ -94,7 +91,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespacePragma() throws Exception {
+    public void testNamespacePragma() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext context = new TaxesContext(18.6);
         // local namespace tax declared
@@ -111,7 +108,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespace346a() throws Exception {
+    public void testNamespace346a() {
         JexlContext ctxt = new Context346();
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         String src = "x != null ? x : func(y)";
@@ -123,9 +120,9 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespace346b() throws Exception {
+    public void testNamespace346b() {
         JexlContext ctxt = new MapContext();
-        Map<String, Object> ns = new HashMap<String, Object>();
+        Map<String, Object> ns = new HashMap<>();
         ns.put("x", Math.class);
         ns.put(null, Math.class);
         final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
@@ -151,9 +148,9 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespace348a() throws Exception {
+    public void testNamespace348a() {
         JexlContext ctxt = new MapContext();
-        Map<String, Object> ns = new HashMap<String, Object>();
+        Map<String, Object> ns = new HashMap<>();
         ns.put("ns", Ns348.class);
         final JexlEngine jexl = new JexlBuilder().safe(false).namespaces(ns).create();
         run348a(jexl, ctxt);
@@ -163,7 +160,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespace348b() throws Exception {
+    public void testNamespace348b() {
         JexlContext ctxt = new ContextNs348();
         final JexlEngine jexl = new JexlBuilder().safe(false).create();
         // no space for ns name as syntactic hint
@@ -174,9 +171,9 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespace348c() throws Exception {
+    public void testNamespace348c() {
         JexlContext ctxt = new ContextNs348();
-        Map<String, Object> ns = new HashMap<String, Object>();
+        Map<String, Object> ns = new HashMap<>();
         ns.put("ns", Ns348.class);
         JexlFeatures f = new JexlFeatures();
         f.namespaceTest((n)->true);
@@ -188,7 +185,7 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNamespace348d() throws Exception {
+    public void testNamespace348d() {
         JexlContext ctxt = new ContextNs348();
         JexlFeatures f = new JexlFeatures();
         f.namespaceTest((n)->true);
@@ -240,9 +237,9 @@ public class ContextNamespaceTest extends JexlTestCase {
         // local vars
         JexlScript script = jexl.createScript(src, "x", "z", "y");
         Object result = script.execute(ctxt, null, 169, 1);
-        Assert.assertEquals(169, result);
+        Assert.assertEquals(src, 169, result);
         result = script.execute(ctxt, "42", 169, 1);
-        Assert.assertEquals(42, result);
+        Assert.assertEquals(src, 42, result);
     }
 
     private void run348d(JexlEngine jexl, JexlContext ctxt) {
@@ -251,19 +248,24 @@ public class ContextNamespaceTest extends JexlTestCase {
     private void run348d(JexlEngine jexl, JexlContext ctxt, String ns) {
         String src = "empty(x) ? z : "+ns+"func(y)";
         // global vars
-        JexlScript script = jexl.createScript(src);
+        JexlScript script = null;
+        try {
+           script = jexl.createScript(src);
+        } catch(JexlException.Parsing xparse) {
+            Assert.fail(src);
+        }
         ctxt.set("x", null);
         ctxt.set("z", 169);
         ctxt.set("y", 1);
         Object result = script.execute(ctxt);
-        Assert.assertEquals(169, result);
+        Assert.assertEquals(src, 169, result);
         ctxt.set("x", "42");
         result = script.execute(ctxt);
-        Assert.assertEquals(42, result);
+        Assert.assertEquals(src,42, result);
     }
 
     @Test
-    public void testNamespacePragmaString() throws Exception {
+    public void testNamespacePragmaString() {
         final JexlEngine jexl = new JexlBuilder().create();
         final JexlContext context = new MapContext();
         // local namespace str declared
@@ -300,10 +302,10 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testObjectContext() throws Exception {
+    public void testObjectContext() {
         final JexlEngine jexl = new JexlBuilder().strict(true).silent(false).create();
         final Vat vat = new Vat(18.6);
-        final ObjectContext<Vat> ctxt = new ObjectContext<Vat>(jexl, vat);
+        final ObjectContext<Vat> ctxt = new ObjectContext<>(jexl, vat);
         Assert.assertEquals(18.6d, (Double) ctxt.get("VAT"), 0.0001d);
         ctxt.set("VAT", 20.0d);
         Assert.assertEquals(20.0d, (Double) ctxt.get("VAT"), 0.0001d);
@@ -339,14 +341,14 @@ public class ContextNamespaceTest extends JexlTestCase {
     }
 
     @Test
-    public void testNsNsContext0() throws Exception {
+    public void testNsNsContext0() {
         nsnsCtor.set(0);
         String clsName = NsNs.class.getName();
         runNsNsContext(Collections.singletonMap("nsns", clsName));
     }
 
     @Test
-    public void testNsNsContext1() throws Exception {
+    public void testNsNsContext1() {
         nsnsCtor.set(0);
         runNsNsContext(Collections.singletonMap("nsns", NsNs.class));
     }

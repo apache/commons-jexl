@@ -204,7 +204,9 @@ TOKEN_MGR_DECLS : {
 
     | < assign : "=" >
     | < plus : "+" >
+    | < plusplus : "++" >
     | < minus : "-" >
+    | < minusminus : "--" >
     | < mult : "*" >
     | < div : "/" >
     | < DIV : "div" > { popDot(); }
@@ -426,13 +428,31 @@ void Break() #Break : {
     t=<BREAK> { if (loopCount == 0) { throwParsingException(t); } }
 }
 
-void ForeachStatement() : {}
+void ForeachStatement() : {
+ int loopForm = 0;
+}
 {
-    { pushUnit(jjtThis); }
-    <FOR> <LPAREN> ForEachVar() <COLON>  Expression() <RPAREN>
-        { loopCount += 1; }
-        (LOOKAHEAD(1) Block() | StatementNoVar())
-    { loopCount -= 1; popUnit(jjtThis); }
+    {
+        pushUnit(jjtThis);
+    }
+    <FOR> <LPAREN>
+    (
+        LOOKAHEAD(3) ForEachVar() <COLON> Expression() { loopForm = 0; }
+    |
+        ((LOOKAHEAD(1) Var() | Expression()) { loopForm = 1; })? <SEMICOL>
+        (Expression() { loopForm |= 2; })? <SEMICOL>
+        (Expression() { loopForm |= 4; })? { loopForm |= 8; }
+    )
+    <RPAREN>
+    {
+        loopCount += 1;
+    }
+        (LOOKAHEAD(1) Block() | StatementNoVar() )
+    {
+        loopCount -= 1;
+        jjtThis.setLoopForm(loopForm);
+        popUnit(jjtThis);
+    }
 }
 
 void ForEachVar() #Reference : {}
@@ -563,7 +583,7 @@ void ConditionalExpression() #void : {}
     <ELVIS> Expression() #TernaryNode(2)
   |
     <NULLP> Expression() #NullpNode(2)
-  ) )?
+  ) )*
 }
 
 void ConditionalOrExpression() #void : {}
@@ -685,7 +705,23 @@ void UnaryExpression() #void : {}
   |
     <SIZE> UnaryExpression() #SizeFunction(1)
   |
-    ValueExpression()
+   <minusminus> UnaryExpression() #DecrementGetNode(1)
+  |
+   <plusplus> UnaryExpression() #IncrementGetNode(1)
+  |
+    PostfixExpression()
+}
+
+void PostfixOperator() #void : {}
+{
+    <plusplus> #GetIncrementNode(1)
+  |
+    <minusminus> #GetDecrementNode(1)
+}
+
+void PostfixExpression() #void : {}
+{
+   ValueExpression() [ LOOKAHEAD(1) PostfixOperator() ]
 }
 
 /***************************************
@@ -999,7 +1035,6 @@ void MethodCall() #void : {}
 {
     (MemberAccess() (LOOKAHEAD(<LPAREN>) Arguments())+) #MethodNode(>1)
 }
-
 
 void MemberExpression() #void : {}
 {

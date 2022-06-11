@@ -141,7 +141,7 @@ public class Operators {
      */
     protected Object tryAssignOverload(final JexlNode node, final JexlOperator operator, final Object...args) {
         final JexlArithmetic arithmetic = interpreter.arithmetic;
-        if (args.length != operator.getArity()) {
+        if (args.length < operator.getArity()) {
             return JexlEngine.TRY_FAILED;
         }
         // try to call overload with side effect
@@ -193,6 +193,12 @@ public class Operators {
                     return arithmetic.shiftRight(args[0], args[1]);
                 case SELF_SHIFTRIGHTU:
                     return arithmetic.shiftRightUnsigned(args[0], args[1]);
+                case INCREMENT_AND_GET:
+                case GET_AND_INCREMENT:
+                    return arithmetic.increment(args[0]);
+                case DECREMENT_AND_GET:
+                case GET_AND_DECREMENT:
+                    return arithmetic.decrement(args[0]);
                 default:
                     // unexpected, new operator added?
                     throw new UnsupportedOperationException(operator.getOperatorSymbol());

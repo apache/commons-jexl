@@ -557,4 +557,32 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         strws = strw.toString();
         Assert.assertNotNull(strws);
     }
+
+    @Test public void test373a() {
+        testSelfAssignOperators("y.add(x++)", 42, 42, 43);
+    }
+    @Test public void test373b() {
+        testSelfAssignOperators("y.add(++x)", 42, 43, 43);
+    }
+    @Test public void test373c() {
+        testSelfAssignOperators("y.add(x--)", 42, 42, 41);
+    }
+    @Test public void test373d() {
+        testSelfAssignOperators("y.add(--x)", 42, 41, 41);
+    }
+
+    void testSelfAssignOperators(String text, int x, int y0, int x0) {
+        //String text = "y.add(x++)";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlScript script = jexl.createScript(text);
+        JexlContext context = new MapContext();
+        context.set("x", x);
+        List<Number> y = new ArrayList<>();
+        context.set("y", y);
+        Object result = script.execute(context);
+        Assert.assertEquals("x0", x0, context.get("x"));
+        Assert.assertEquals("y0", y0, y.get(0));
+    }
+
+
 }

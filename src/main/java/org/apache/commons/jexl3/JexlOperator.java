@@ -318,6 +318,48 @@ public enum JexlOperator {
     SELF_SHIFTLEFT("<<=", "selfShiftLeft", SHIFTLEFT),
 
     /**
+     * Increment pseudo-operator.
+     * <br>No syntax, used as helper for <code>++</code>.
+     * @see JexlArithmetic#increment
+     */
+    INCREMENT("+1", "increment", 1),
+
+    /**
+     * Decrement pseudo-operator.
+     * <br>No syntax, used as helper for <code>--</code>.
+     * @see JexlArithmetic#decrement
+     */
+    DECREMENT("-1", "decrement", 1),
+
+    /**
+     * Prefix ++ operator, increments and returns the value after incrementing.
+     * <br><strong>Syntax:</strong> <code>++x</code>
+     * <br><strong>Method:</strong> <code>T incrementAndGet(L x);</code>.
+     */
+    INCREMENT_AND_GET("++.", "incrementAndGet", INCREMENT),
+
+    /**
+     * Postfix ++, increments and returns the value before incrementing.
+     * <br><strong>Syntax:</strong> <code>x++</code>
+     * <br><strong>Method:</strong> <code>T getAndIncrement(L x);</code>.
+     */
+    GET_AND_INCREMENT(".++", "getAndIncrement", INCREMENT),
+
+    /**
+     * Prefix --, decrements and returns the value after decrementing.
+     * <br><strong>Syntax:</strong> <code>--x</code>
+     * <br><strong>Method:</strong> <code>T decrementAndGet(L x);</code>.
+     */
+    DECREMENT_AND_GET("--.", "decrementAndGet", DECREMENT),
+
+    /**
+     * Postfix --, decrements and returns the value before decrementing.
+     * <br><strong>Syntax:</strong> <code>x--</code>
+     * <br><strong>Method:</strong> <code>T getAndDecrement(L x);</code>.
+     */
+    GET_AND_DECREMENT(".--", "getAndDecrement", DECREMENT),
+
+    /**
      * Marker for side effect.
      * <br>Returns this from 'self*' overload method to let the engine know the side effect has been performed and
      * there is no need to assign the result.
