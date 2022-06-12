@@ -466,11 +466,26 @@ void ForEachVar() #Reference : {}
 
 void Var() #void : {}
 {
-    <VAR> DeclareVar(false, false) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    <VAR> DefineVar() (<COMMA> DefineVar())*
     |
-    <LET> DeclareVar(true, false) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+    <LET> DefineLet() (<COMMA> DefineLet())*
     |
-    <CONST> DeclareVar(true, true) <assign> Expression() #Assignment(2)
+    <CONST> DefineConst() (<COMMA> DefineConst())*
+}
+
+ void DefineVar() #void : {}
+ {
+    DeclareVar(false, false) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+ }
+
+void DefineLet() #void : {}
+{
+    DeclareVar(true, false) (LOOKAHEAD(1) <assign> Expression() #Assignment(2))?
+}
+
+void DefineConst() #void : {}
+{
+    DeclareVar(true, true) <assign> Expression() #Assignment(2)
 }
 
 void DeclareVar(boolean lexical, boolean constant) #Var :

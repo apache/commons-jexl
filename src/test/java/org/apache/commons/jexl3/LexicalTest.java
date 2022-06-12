@@ -919,6 +919,28 @@ public class LexicalTest {
         }
     }
 
+    @Test public void testManyLet() {
+        String text = "let x = 1, y = 41, z; x + y";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlScript script = jexl.createScript(text);
+        Object result = script.execute(null);
+        Assert.assertEquals(42, result);
+        String s0 = script.getParsedText();
+        String s1 = script.getSourceText();
+        Assert.assertNotEquals(s0, s1);
+    }
+
+    @Test public void testManyConst() {
+        String text = "const x = 1, y = 41; x + y";
+        JexlEngine jexl = new JexlBuilder().safe(true).create();
+        JexlScript script = jexl.createScript(text);
+        Object result = script.execute(null);
+        Assert.assertEquals(42, result);
+        String s0 = script.getParsedText();
+        String s1 = script.getSourceText();
+        Assert.assertNotEquals(s0, s1);
+    }
+
     @Test
     public void testConst2a() {
         final JexlFeatures f = new JexlFeatures();
