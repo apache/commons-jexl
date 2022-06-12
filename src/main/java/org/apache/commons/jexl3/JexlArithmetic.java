@@ -743,7 +743,7 @@ public class JexlArithmetic {
     protected Object increment(Object val, int incr) {
         if (val == null) {
             controlNullOperand();
-            return null;
+            return incr;
         }
         if (val instanceof Integer) {
             return ((Integer) val) + incr;

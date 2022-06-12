@@ -584,5 +584,17 @@ public class ArithmeticOperatorTest extends JexlTestCase {
         Assert.assertEquals("y0", y0, y.get(0));
     }
 
+    @Test
+    public void testIncrementOperatorOnNull() throws Exception {
+        final JexlEngine jexl = new JexlBuilder().strict(false).create();
+        JexlScript script;
+        Object result;
+        script = jexl.createScript("var i = null; ++i");
+        result = script.execute(null);
+        Assert.assertEquals(1, result);
+        script = jexl.createScript("var i = null; --i");
+        result = script.execute(null);
+        Assert.assertEquals(-1, result);
+    }
 
 }
