@@ -54,8 +54,10 @@
         <checkstyle.plugin.version>3.1.2</checkstyle.plugin.version>
         <checkstyle.version>10.3</checkstyle.version>
         <japicmp.skip>false</japicmp.skip>
+        <commons.rat.version>0.14</commons.rat.version>
         <commons.japicmp.version>0.15.7</commons.japicmp.version>
         <commons.pmd.version>3.17.0</commons.pmd.version>
+        <commons.pmd-impl.version>6.46.0</commons.pmd-impl.version>
         <commons.spotbugs.version>4.7.0.0</commons.spotbugs.version>
 
         <!-- override of Jacoco properties defined in CP52 -->
@@ -308,13 +310,6 @@
                         <exclude>org/apache/commons/jexl3/parser/*Provider.java</exclude>
                     </excludes>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.ow2.asm</groupId>
-                        <artifactId>asm</artifactId>
-                        <version>9.3</version>
-                    </dependency>
-                </dependencies>
             </plugin>
 
             <!-- japicmp -->
