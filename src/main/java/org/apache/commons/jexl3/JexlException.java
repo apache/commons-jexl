@@ -193,7 +193,7 @@ public class JexlException extends RuntimeException {
                     stackJexl.add(se);
                 }
             }
-            xthrow.setStackTrace(stackJexl.toArray(new StackTraceElement[stackJexl.size()]));
+            xthrow.setStackTrace(stackJexl.toArray(new StackTraceElement[0]));
         }
         return xthrow;
     }
@@ -631,6 +631,7 @@ public class JexlException extends RuntimeException {
         public Property(final JexlNode node, final String pty) {
             this(node, pty, true, null);
         }
+
         /**
          * Creates a new Property exception instance.
          *

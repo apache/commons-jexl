@@ -146,8 +146,8 @@ public final class TemplateScript implements JxltEngine.Template {
                 jpe += 1;
             }
         }
-        source = blocks.toArray(new Block[blocks.size()]);
-        exprs = uexprs.toArray(new TemplateExpression[uexprs.size()]);
+        source = blocks.toArray(new Block[0]);
+        exprs = uexprs.toArray(new TemplateExpression[0]);
     }
 
     /**

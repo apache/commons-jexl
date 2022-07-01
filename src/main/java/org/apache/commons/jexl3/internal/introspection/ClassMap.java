@@ -164,7 +164,7 @@ final class ClassMap {
      * @return the array of field names
      */
     String[] getFieldNames() {
-        return fieldCache.keySet().toArray(new String[fieldCache.size()]);
+        return fieldCache.keySet().toArray(new String[0]);
     }
 
     /**
@@ -173,7 +173,7 @@ final class ClassMap {
      * @return the array of method names
      */
     String[] getMethodNames() {
-        return byName.keySet().toArray(new String[byName.size()]);
+        return byName.keySet().toArray(new String[0]);
     }
 
     /**
@@ -282,7 +282,7 @@ final class ClassMap {
                     }
                     end += 1;
                 }
-                final Method[] lmn = lm.subList(start, end).toArray(new Method[end - start]);
+                final Method[] lmn = lm.subList(start, end).toArray(new Method[0]);
                 cache.byName.put(name, lmn);
                 start = end;
             }

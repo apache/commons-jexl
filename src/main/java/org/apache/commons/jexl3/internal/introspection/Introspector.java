@@ -267,7 +267,7 @@ public final class Introspector {
                     }
                 }
                 // try to find one
-                ctor = key.getMostSpecificConstructor(l.toArray(new Constructor<?>[l.size()]));
+                ctor = key.getMostSpecificConstructor(l.toArray(new Constructor<?>[0]));
                 if (ctor != null) {
                     constructorsMap.put(key, ctor);
                 } else {

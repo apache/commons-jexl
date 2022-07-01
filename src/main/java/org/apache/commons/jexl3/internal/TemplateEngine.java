@@ -605,7 +605,7 @@ public final class TemplateEngine extends JxltEngine {
          */
         CompositeExpression(final int[] counters, final List<TemplateExpression> list, final TemplateExpression src) {
             super(src);
-            this.exprs = list.toArray(new TemplateExpression[list.size()]);
+            this.exprs = list.toArray(new TemplateExpression[0]);
             this.meta = (counters[ExpressionType.DEFERRED.getIndex()] > 0 ? 2 : 0)
                     | (counters[ExpressionType.IMMEDIATE.getIndex()] > 0 ? 1 : 0);
         }

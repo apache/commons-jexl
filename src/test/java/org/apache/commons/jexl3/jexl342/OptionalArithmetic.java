@@ -228,4 +228,34 @@ public class OptionalArithmetic extends JexlArithmetic {
         }
         return narrowed;
     }
+
+    @Override
+    public ArrayBuilder arrayBuilder(final int size) {
+        return new org.apache.commons.jexl3.internal.ArrayBuilder(size) {
+            @Override
+            public void add(Object value) {
+                super.add(star(value));
+            }
+        };
+    }
+
+    @Override
+    public SetBuilder setBuilder(final int size) {
+        return new org.apache.commons.jexl3.internal.SetBuilder(size) {
+            @Override
+            public void add(Object value) {
+                super.add(star(value));
+            }
+        };
+    }
+
+    @Override
+    public MapBuilder mapBuilder(final int size) {
+        return new org.apache.commons.jexl3.internal.MapBuilder(size) {
+            @Override
+            public void put(Object key, Object value) {
+                super.put(key, star(value));
+            }
+        };
+    }
 }
